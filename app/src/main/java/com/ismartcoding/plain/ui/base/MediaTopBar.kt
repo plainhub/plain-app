@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -99,7 +100,7 @@ fun <T : IData> MediaTopBar(
                 }
 
                 PIconButton(
-                    icon = R.drawable.sort,
+                    icon = Res.drawable.sort,
                     contentDescription = stringResource(R.string.sort),
                     tint = MaterialTheme.colorScheme.onSurface,
                     click = { mediaVM.showSortAndBrowseDialog.value = true },

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -61,7 +62,7 @@ fun ChatEditTextPage(
                 title = stringResource(id = R.string.edit_text),
                 actions = {
                     PIconButton(
-                        icon = R.drawable.save,
+                        icon = Res.drawable.save,
                         contentDescription = stringResource(R.string.save),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {

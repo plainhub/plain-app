@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -21,11 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 
@@ -38,7 +39,7 @@ fun PListItem(
     title: String,
     subtitle: String = "",
     value: String? = null,
-    icon: Int? = null,
+    icon: DrawableResource? = null,
     start: (@Composable () -> Unit)? = null,
     titleTrailing: (@Composable () -> Unit)? = null,
     separatedActions: Boolean = false,
@@ -134,7 +135,7 @@ fun PListItem(
 
             if (showMore) {
                 Icon(
-                    painter = painterResource(id = R.drawable.chevron_right),
+                    painter = painterResource(Res.drawable.chevron_right),
                     modifier =
                         Modifier
                             .size(24.dp),

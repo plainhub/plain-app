@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatDuration
@@ -86,7 +87,7 @@ fun ChatAudioInlineControls(
                         .background(MaterialTheme.colorScheme.primaryContainer),
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.pause),
+                        painter = painterResource(Res.drawable.pause),
                         contentDescription = stringResource(R.string.pause),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(24.dp),
@@ -102,7 +103,7 @@ fun ChatAudioInlineControls(
                         .background(MaterialTheme.colorScheme.primary),
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.play_arrow),
+                        painter = painterResource(Res.drawable.play_arrow),
                         contentDescription = stringResource(R.string.play),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp),
@@ -119,7 +120,7 @@ fun ChatAudioInlineControls(
                     .clip(CircleShape),
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.music2),
+                    painter = painterResource(Res.drawable.music2),
                     contentDescription = "Full player",
                     tint = MaterialTheme.colorScheme.primary,
                 )

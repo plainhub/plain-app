@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.i18n.*
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -21,7 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -62,7 +63,7 @@ fun OtherFilePage(
                 title = displayTitle,
                 actions = {
                     PIconButton(
-                        icon = R.drawable.share_2,
+                        icon = Res.drawable.share_2,
                         contentDescription = stringResource(R.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
@@ -85,7 +86,7 @@ fun OtherFilePage(
                                 Modifier
                                     .padding(bottom = 32.dp)
                                     .size(56.dp),
-                            painter = painterResource(id = R.drawable.file_question),
+                            painter = painterResource(Res.drawable.file_question),
                             contentDescription = "",
                         )
                         SelectionContainer {

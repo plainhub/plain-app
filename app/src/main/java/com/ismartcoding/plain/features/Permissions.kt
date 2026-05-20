@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -234,10 +236,10 @@ enum class Permission {
     }
 }
 
-data class PermissionItem(val icon: Int?, val permission: Permission, val permissions: Set<Permission>, var granted: Boolean = false) {
+data class PermissionItem(val icon: DrawableResource?, val permission: Permission, val permissions: Set<Permission>, var granted: Boolean = false) {
 
     companion object {
-        fun create(context: Context, icon: Int?, permission: Permission, permissions: Set<Permission> = setOf(permission)): PermissionItem {
+        fun create(context: Context, icon: DrawableResource?, permission: Permission, permissions: Set<Permission> = setOf(permission)): PermissionItem {
             return PermissionItem(icon, permission, permissions).apply {
                 granted = permissions.all { it.can(context) }
             }
@@ -274,18 +276,18 @@ object Permissions {
         val list = mutableListOf<PermissionItem>()
         list.add(
             PermissionItem.create(
-                context, R.drawable.folder, Permission.WRITE_EXTERNAL_STORAGE
+                context, Res.drawable.folder, Permission.WRITE_EXTERNAL_STORAGE
             )
         )
         list.add(
-            PermissionItem.create(context, R.drawable.contact_round, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
+            PermissionItem.create(context, Res.drawable.contact_round, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
         )
 
         if (AppFeatureType.SMS.has()) {
             list.add(
                 PermissionItem.create(
                     context,
-                    R.drawable.message_square_text,
+                    Res.drawable.message_square_text,
                     Permission.READ_SMS,
                     setOf(Permission.READ_SMS),
                 )
@@ -293,24 +295,24 @@ object Permissions {
             list.add(
                 PermissionItem.create(
                     context,
-                    R.drawable.message_square_text,
+                    Res.drawable.message_square_text,
                     Permission.SEND_SMS,
                     setOf( Permission.SEND_SMS),
                 )
             )
         }
         if (AppFeatureType.CALLS.has()) {
-            list.add(PermissionItem.create(context, R.drawable.call_log, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
+            list.add(PermissionItem.create(context, Res.drawable.call_log, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
         }
         list.add(
-            PermissionItem.create(context, R.drawable.phone_call, Permission.CALL_PHONE)
+            PermissionItem.create(context, Res.drawable.phone_call, Permission.CALL_PHONE)
         )
         list.add(
-            PermissionItem.create(context, R.drawable.file_digit, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS))
+            PermissionItem.create(context, Res.drawable.file_digit, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS))
         )
         if (AppFeatureType.APPS.has()) {
             list.add(
-                PermissionItem.create(context, R.drawable.package2, Permission.QUERY_ALL_PACKAGES)
+                PermissionItem.create(context, Res.drawable.package2, Permission.QUERY_ALL_PACKAGES)
             )
         }
         return list

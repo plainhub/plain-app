@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.dlna
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -30,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -99,7 +100,7 @@ fun DlnaReceiverImageViewer(onExit: () -> Unit) {
             ) {
                 IconButton(onClick = onExit) {
                     Icon(
-                        painter = painterResource(R.drawable.arrow_left),
+                        painter = painterResource(Res.drawable.arrow_left),
                         contentDescription = stringResource(R.string.dlna_receiver_exit_player),
                         tint = Color.White,
                         modifier = Modifier.size(24.dp),

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -17,7 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -77,11 +78,11 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
                     ActionButtonMoreWithMenu { dismiss ->
                         PDropdownMenuItem(
                             text = { Text(stringResource(R.string.import_opml_file)) },
-                            leadingIcon = { Icon(painter = painterResource(R.drawable.upload), contentDescription = stringResource(R.string.import_opml_file)) },
+                            leadingIcon = { Icon(painter = painterResource(Res.drawable.upload), contentDescription = stringResource(R.string.import_opml_file)) },
                             onClick = { dismiss(); sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false)) })
                         PDropdownMenuItem(
                             text = { Text(stringResource(R.string.export_opml_file)) },
-                            leadingIcon = { Icon(painter = painterResource(R.drawable.download), contentDescription = stringResource(R.string.export_opml_file)) },
+                            leadingIcon = { Icon(painter = painterResource(Res.drawable.download), contentDescription = stringResource(R.string.export_opml_file)) },
                             onClick = { dismiss(); sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + Date().formatName() + ".opml")) })
                     }
                 }
@@ -94,7 +95,7 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
             {
                 PDraggableElement {
                     FloatingActionButton(onClick = { feedsVM.showAddDialog() }) {
-                        Icon(painter = painterResource(R.drawable.plus), stringResource(R.string.add))
+                        Icon(painter = painterResource(Res.drawable.plus), stringResource(R.string.add))
                     }
                 }
             }

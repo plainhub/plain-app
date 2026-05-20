@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.images
 
+import com.ismartcoding.plain.i18n.*
 import android.content.ClipData
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -106,7 +107,7 @@ internal fun ViewImageActionButtons(
         }
     }
     if (showAddToHomeDialog) {
-        AddToHomeDialog(path = m.path, iconRes = R.drawable.image, onDismiss = {
+        AddToHomeDialog(path = m.path, iconRes = R.mipmap.ic_launcher, onDismiss = {
             showAddToHomeDialog = false
             onDismiss()
         })

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,7 +26,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 fun NoDataView(
     modifier: Modifier = Modifier,
     message: String = stringResource(R.string.no_data),
-    iconResId: Int = R.drawable.files,
+    icon: DrawableResource = Res.drawable.files,
     showRefreshButton: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {
@@ -36,7 +38,7 @@ fun NoDataView(
             .padding(32.dp)
     ) {
         Image(
-            painter = painterResource(id = iconResId),
+            painter = painterResource(icon),
             contentDescription = null,
             modifier = Modifier
                 .size(112.dp),

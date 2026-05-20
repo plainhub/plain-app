@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.imePadding
@@ -118,7 +119,7 @@ fun ChatPage(
                         PTopRightButton(label = stringResource(if (chatVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { chatVM.toggleSelectAll() })
                         HorizontalSpace(dp = 8.dp)
                     } else {
-                        PIconButton(icon = R.drawable.ellipsis_vertical, contentDescription = stringResource(R.string.more), click = { navController.navigate(Routing.ChatInfo(id.ifEmpty { "local" })) })
+                        PIconButton(icon = Res.drawable.ellipsis_vertical, contentDescription = stringResource(R.string.more), click = { navController.navigate(Routing.ChatInfo(id.ifEmpty { "local" })) })
                     }
                 },
             )

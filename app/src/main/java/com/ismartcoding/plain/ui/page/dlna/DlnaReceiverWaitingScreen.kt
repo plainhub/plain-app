@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.dlna
 
+import com.ismartcoding.plain.i18n.*
 import android.os.Build
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -22,7 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -106,7 +107,7 @@ private fun DlnaRippleAnimation() {
             ring(s1, a1); ring(s2, a2); ring(s3, a3)
             drawCircle(color, radius = 28.dp.toPx())
         }
-        Icon(painter = painterResource(R.drawable.cast), contentDescription = null, modifier = Modifier.size(28.dp), tint = MaterialTheme.colorScheme.onPrimary)
+        Icon(painter = painterResource(Res.drawable.cast), contentDescription = null, modifier = Modifier.size(28.dp), tint = MaterialTheme.colorScheme.onPrimary)
     }
 }
 

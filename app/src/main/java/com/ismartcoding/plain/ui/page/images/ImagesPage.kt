@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.images
 
+import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -123,7 +124,7 @@ fun ImagesPage(
         },
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
-            if (!imagesVM.hasPermission.value) { NeedPermissionColumn(R.drawable.image, AppFeatureType.FILES.getPermission()!!); return@PScaffold }
+            if (!imagesVM.hasPermission.value) { NeedPermissionColumn(Res.drawable.image, AppFeatureType.FILES.getPermission()!!); return@PScaffold }
             if (!dragSelectState.selectMode) {
                 PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
                     tabs.forEachIndexed { index, s ->

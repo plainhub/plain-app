@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.home.chat
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +54,7 @@ fun HomeChatWidget(
         sortAt = localChat?.createdAt ?: Instant.DISTANT_PAST,
         title = stringResource(R.string.local_chat),
         desc = stringResource(R.string.local_chat_desc),
-        icon = R.drawable.bot,
+        icon = Res.drawable.bot,
         online = null,
         latestChat = localChat,
         route = Routing.Chat("local"),
@@ -79,7 +80,7 @@ fun HomeChatWidget(
                 sortAt = latestChat?.createdAt ?: channel.updatedAt,
                 title = channel.name,
                 desc = channelsText,
-                icon = R.drawable.hash,
+                icon = Res.drawable.hash,
                 online = null,
                 latestChat = latestChat,
                 route = Routing.Chat("channel:${channel.id}"),

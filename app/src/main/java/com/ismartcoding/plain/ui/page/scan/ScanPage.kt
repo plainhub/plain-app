@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.scan
 
+import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -43,7 +44,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -128,7 +129,7 @@ fun ScanPage(navController: NavHostController) {
 
     PScaffold(topBar = {
         PTopAppBar(navController = navController, title = stringResource(id = R.string.scan_qrcode), actions = {
-            PIconButton(icon = R.drawable.history, contentDescription = stringResource(R.string.scan_history), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.ScanHistory) }
+            PIconButton(icon = Res.drawable.history, contentDescription = stringResource(R.string.scan_history), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.ScanHistory) }
         })
     }, content = { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
@@ -136,7 +137,7 @@ fun ScanPage(navController: NavHostController) {
             if (hasCamPermission) ScanOverlay()
             Row(modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 64.dp).align(Alignment.BottomCenter), horizontalArrangement = Arrangement.End) {
                 Box(modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.darkMask(0.2f)).clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) }, contentAlignment = Alignment.Center) {
-                    Icon(painter = painterResource(R.drawable.image), contentDescription = stringResource(R.string.images), tint = Color.White)
+                    Icon(painter = painterResource(Res.drawable.image), contentDescription = stringResource(R.string.images), tint = Color.White)
                 }
             }
         }

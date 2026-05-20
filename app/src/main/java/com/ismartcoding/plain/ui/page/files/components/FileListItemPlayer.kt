@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.files.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatDuration
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
@@ -56,7 +56,7 @@ internal fun FileListItemPlayer(
                     IconButton(onClick = { if (isPlaying) AudioPlayer.pause() else AudioPlayer.play() },
                         modifier = Modifier.size(40.dp).shadow(2.dp, CircleShape).clip(CircleShape)
                             .background(if (isPlaying) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary)) {
-                        Icon(painter = painterResource(id = if (isPlaying) R.drawable.pause else R.drawable.play_arrow),
+                        Icon(painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
                             contentDescription = if (isPlaying) "Pause" else "Play",
                             tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp))
@@ -64,7 +64,7 @@ internal fun FileListItemPlayer(
                     HorizontalSpace(8.dp)
                     IconButton(onClick = onShowFullPlayer,
                         modifier = Modifier.size(36.dp).shadow(2.dp, CircleShape).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant)) {
-                        Icon(painter = painterResource(id = R.drawable.music2), contentDescription = "Full player",
+                        Icon(painter = painterResource(Res.drawable.music2), contentDescription = "Full player",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
                     }
                 }

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.videos
 
+import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -123,7 +124,7 @@ fun VideosPage(
         },
     ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
-            if (!videosVM.hasPermission.value) { NeedPermissionColumn(R.drawable.video, AppFeatureType.FILES.getPermission()!!); return@PScaffold }
+            if (!videosVM.hasPermission.value) { NeedPermissionColumn(Res.drawable.video, AppFeatureType.FILES.getPermission()!!); return@PScaffold }
             if (!dragSelectState.selectMode) {
                 PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
                     tabs.forEachIndexed { index, s ->

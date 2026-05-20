@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
+import com.ismartcoding.plain.i18n.*
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,7 +28,7 @@ fun AudioListItemActions(
     castMode: Boolean,
     castItems: List<IMedia>,
     isInPlaylist: Boolean,
-    iconResource: Int,
+    iconResource: DrawableResource,
     iconColor: androidx.compose.ui.graphics.Color,
     rotation: Float,
     onAnimStart: () -> Unit,
@@ -40,7 +42,7 @@ fun AudioListItemActions(
             castItems.any { it.path == item.path }
         }
         PIconButton(
-            icon = if (isInCastQueue) R.drawable.playlist_remove else R.drawable.playlist_add,
+            icon = if (isInCastQueue) Res.drawable.playlist_remove else Res.drawable.playlist_add,
             tint = if (isInCastQueue) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.primary,
             contentDescription = if (isInCastQueue) stringResource(R.string.remove_from_cast_queue) else stringResource(R.string.add_to_cast_queue),
             modifier = Modifier.rotate(rotation),

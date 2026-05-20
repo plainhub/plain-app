@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.i18n.*
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,7 +37,7 @@ fun PdfPage(
                 title = title,
                 actions = {
                     PIconButton(
-                        icon = R.drawable.share_2,
+                        icon = Res.drawable.share_2,
                         contentDescription = stringResource(R.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {

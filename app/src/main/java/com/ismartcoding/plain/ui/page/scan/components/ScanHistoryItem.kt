@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.scan.components
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import android.content.ClipData
 import android.content.Context
 import androidx.compose.foundation.clickable
@@ -21,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
@@ -36,7 +38,7 @@ import com.ismartcoding.plain.ui.theme.red
 
 @Composable
 private fun ActionButton(
-    icon: Int,
+    icon: DrawableResource,
     text: String,
     tint: Color,
     onClick: () -> Unit,
@@ -51,7 +53,7 @@ private fun ActionButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            painter = painterResource(id = icon),
+            painter = painterResource(icon),
             contentDescription = text,
             tint = tint,
             modifier = Modifier.size(20.dp)
@@ -101,7 +103,7 @@ fun ScanHistoryItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 ActionButton(
-                    icon = R.drawable.copy,
+                    icon = Res.drawable.copy,
                     text = stringResource(R.string.copy),
                     tint = MaterialTheme.colorScheme.onSurface,
                     onClick = {
@@ -112,7 +114,7 @@ fun ScanHistoryItem(
                     modifier = Modifier.weight(1f)
                 )
                 ActionButton(
-                    icon = R.drawable.delete_forever,
+                    icon = Res.drawable.delete_forever,
                     text = stringResource(R.string.delete),
                     tint = MaterialTheme.colorScheme.red,
                     onClick = onDelete,

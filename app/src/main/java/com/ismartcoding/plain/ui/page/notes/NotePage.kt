@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.notes
 
+import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -82,16 +83,16 @@ fun NotePage(
     PScaffold(topBar = {
         PTopAppBar(navController = navController, title = "", scrollBehavior = scrollBehavior, actions = {
             if (noteVM.editMode) {
-                PIconButton(icon = R.drawable.undo, contentDescription = stringResource(R.string.undo), enabled = mdEditorVM.textFieldState.undoState.canUndo,
+                PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(R.string.undo), enabled = mdEditorVM.textFieldState.undoState.canUndo,
                     tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.textFieldState.undoState.undo() }
-                PIconButton(icon = R.drawable.redo, contentDescription = stringResource(R.string.redo), enabled = mdEditorVM.textFieldState.undoState.canRedo,
+                PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(R.string.redo), enabled = mdEditorVM.textFieldState.undoState.canRedo,
                     tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.textFieldState.undoState.redo() }
-                PIconButton(icon = R.drawable.wrap_text, contentDescription = stringResource(R.string.wrap_content),
+                PIconButton(icon = Res.drawable.wrap_text, contentDescription = stringResource(R.string.wrap_content),
                     tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.toggleWrapContent(navController.context) }
             } else if (id.value.isNotEmpty()) {
                 ActionButtonTags { noteVM.showSelectTagsDialog.value = true }
             }
-            PIconButton(icon = if (noteVM.editMode) R.drawable.markdown else R.drawable.square_pen,
+            PIconButton(icon = if (noteVM.editMode) Res.drawable.markdown else Res.drawable.square_pen,
                 contentDescription = stringResource(if (noteVM.editMode) R.string.view else R.string.edit),
                 tint = MaterialTheme.colorScheme.onSurface) { noteVM.editMode = !noteVM.editMode }
         })

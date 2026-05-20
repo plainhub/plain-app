@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -19,7 +20,7 @@ fun HomeSectionCollapseButton(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     PIconButton(
-        icon = if (collapsed) R.drawable.chevron_down else R.drawable.chevron_up,
+        icon = if (collapsed) Res.drawable.chevron_down else Res.drawable.chevron_up,
         contentDescription = if (collapsed) stringResource(R.string.expand_section) else stringResource(R.string.collapse_section),
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
         click = {

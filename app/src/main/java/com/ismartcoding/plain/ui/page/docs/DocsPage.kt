@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.docs
 
+import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.preferences.DocSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
@@ -194,7 +194,7 @@ fun DocsPage(
     ) { paddingValues ->
         Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             if (!docsVM.hasPermission.value) {
-                NeedPermissionColumn(R.drawable.file_text, AppFeatureType.FILES.getPermission()!!)
+                NeedPermissionColumn(Res.drawable.file_text, AppFeatureType.FILES.getPermission()!!)
                 return@Column
             }
             if (!dragSelectState.selectMode) {

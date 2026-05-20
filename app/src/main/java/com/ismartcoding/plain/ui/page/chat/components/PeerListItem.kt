@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -24,7 +25,7 @@ fun PeerListItem(
     modifier: Modifier = Modifier,
     title: String,
     desc: String,
-    icon: Int,
+    icon: DrawableResource,
     online: Boolean? = null,
     latestChat: DChat? = null,
     peerId: String? = null,

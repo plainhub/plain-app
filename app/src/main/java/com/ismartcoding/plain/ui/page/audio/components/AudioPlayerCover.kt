@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
+import com.ismartcoding.plain.i18n.*
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import androidx.compose.foundation.Image
@@ -19,11 +20,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 
 @Composable
 fun AudioPlayerCover(
@@ -31,7 +31,7 @@ fun AudioPlayerCover(
 ) {
     if (path.isBlank()) {
         Icon(
-            painter = painterResource(R.drawable.music2),
+            painter = painterResource(Res.drawable.music2),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
             modifier = Modifier.size(120.dp)
@@ -96,7 +96,7 @@ fun AudioPlayerCover(
         }
     } else {
         Icon(
-            painter = painterResource(R.drawable.music2),
+            painter = painterResource(Res.drawable.music2),
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
             modifier = Modifier.size(120.dp)

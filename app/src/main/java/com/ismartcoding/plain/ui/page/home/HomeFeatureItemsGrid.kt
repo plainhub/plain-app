@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.home
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -26,7 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -107,7 +109,7 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
         }
         item {
             HomeFeatureGridCell(
-                iconRes = R.drawable.plus,
+                iconRes = Res.drawable.plus,
                 titleRes = R.string.more,
                 onClick = { navController.navigate(Routing.CustomFeatures) },
             )
@@ -117,7 +119,7 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
 
 @Composable
 private fun HomeFeatureGridCell(
-    iconRes: Int,
+    iconRes: DrawableResource,
     titleRes: Int,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,

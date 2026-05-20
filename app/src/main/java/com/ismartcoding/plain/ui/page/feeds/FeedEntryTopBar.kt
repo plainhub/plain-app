@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
 import android.content.ClipData
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -11,7 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
@@ -42,18 +43,18 @@ internal fun FeedEntryTopBar(
         modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { onScrollToTop() }),
         navController = navController, title = "", scrollBehavior = scrollBehavior,
         actions = {
-            PIconButton(icon = R.drawable.label, contentDescription = stringResource(R.string.select_tags), tint = MaterialTheme.colorScheme.onSurface) {
+            PIconButton(icon = Res.drawable.label, contentDescription = stringResource(R.string.select_tags), tint = MaterialTheme.colorScheme.onSurface) {
                 feedEntryVM.showSelectTagsDialog.value = true
             }
-            PIconButton(icon = R.drawable.chrome, contentDescription = stringResource(R.string.open_in_web), tint = MaterialTheme.colorScheme.onSurface) {
+            PIconButton(icon = Res.drawable.chrome, contentDescription = stringResource(R.string.open_in_web), tint = MaterialTheme.colorScheme.onSurface) {
                 val m = feedEntryVM.item.value ?: return@PIconButton; WebHelper.open(context, m.url)
             }
-            PIconButton(icon = R.drawable.share_2, contentDescription = stringResource(R.string.share), tint = MaterialTheme.colorScheme.onSurface) {
+            PIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(R.string.share), tint = MaterialTheme.colorScheme.onSurface) {
                 val m = feedEntryVM.item.value ?: return@PIconButton; ShareHelper.shareText(context, m.title.let { it + "\n" } + m.url)
             }
             ActionButtonMoreWithMenu { dismiss ->
                 PDropdownMenuItem(text = { Text(stringResource(R.string.save_to_notes)) },
-                    leadingIcon = { Icon(painter = painterResource(R.drawable.save), contentDescription = stringResource(id = R.string.save_to_notes)) },
+                    leadingIcon = { Icon(painter = painterResource(Res.drawable.save), contentDescription = stringResource(id = R.string.save_to_notes)) },
                     onClick = {
                         dismiss(); val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
                         scope.launch(Dispatchers.IO) {
@@ -63,7 +64,7 @@ internal fun FeedEntryTopBar(
                         }
                     })
                 PDropdownMenuItem(text = { Text(stringResource(R.string.copy_link)) },
-                    leadingIcon = { Icon(painter = painterResource(R.drawable.link), contentDescription = stringResource(id = R.string.copy_link)) },
+                    leadingIcon = { Icon(painter = painterResource(Res.drawable.link), contentDescription = stringResource(id = R.string.copy_link)) },
                     onClick = {
                         dismiss(); val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
                         val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)

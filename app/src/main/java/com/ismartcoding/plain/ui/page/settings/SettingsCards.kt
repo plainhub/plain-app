@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
@@ -36,7 +37,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
             modifier = Modifier.clickable {
                 navController.navigate(Routing.DarkTheme)
             },
-            icon = R.drawable.sun_moon,
+            icon = Res.drawable.sun_moon,
             title = stringResource(R.string.dark_theme),
             subtitle = DarkTheme.entries.find { it.value == darkTheme }?.getText(context) ?: "",
             separatedActions = true,
@@ -60,7 +61,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
             },
             title = stringResource(R.string.language),
             subtitle = stringResource(R.string.language_desc),
-            icon = R.drawable.languages,
+            icon = Res.drawable.languages,
             showMore = true,
         )
     }
@@ -72,7 +73,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
             },
             title = stringResource(R.string.backup_restore),
             subtitle = stringResource(R.string.backup_desc),
-            icon = R.drawable.database_backup,
+            icon = Res.drawable.database_backup,
             showMore = true,
         )
     }
@@ -85,20 +86,20 @@ internal fun DeveloperSettingsCard(navController: NavHostController) {
         PListItem(
             modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
             title = stringResource(R.string.developer_options),
-            icon = R.drawable.code,
+            icon = Res.drawable.code,
             showMore = true,
         )
         PListItem(
             modifier = Modifier.clickable { navController.navigate(Routing.ComponentShowcase) },
             title = stringResource(R.string.ui_components),
-            icon = R.drawable.layout_grid,
+            icon = Res.drawable.layout_grid,
             showMore = true,
         )
         PListItem(
             modifier = Modifier.clickable { throw RuntimeException("Test crash triggered from Developer Options") },
             title = stringResource(R.string.simulate_crash),
             subtitle = stringResource(R.string.simulate_crash_desc),
-            icon = R.drawable.circle_alert,
+            icon = Res.drawable.circle_alert,
         )
     }
 }

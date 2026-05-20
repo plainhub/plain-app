@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.dlna
 
+import com.ismartcoding.plain.i18n.*
 import androidx.annotation.OptIn
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -36,7 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -148,7 +149,7 @@ private fun DlnaVideoControls(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onExit) {
-                Icon(painter = painterResource(R.drawable.arrow_left), contentDescription = stringResource(R.string.dlna_receiver_exit_player), tint = Color.White, modifier = Modifier.size(24.dp))
+                Icon(painter = painterResource(Res.drawable.arrow_left), contentDescription = stringResource(R.string.dlna_receiver_exit_player), tint = Color.White, modifier = Modifier.size(24.dp))
             }
             Text(text = mediaTitle, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Medium, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(end = 8.dp))
         }
@@ -165,7 +166,7 @@ private fun DlnaVideoControls(
                 Text(text = positionMs.formatMinSec(), style = MaterialTheme.typography.labelSmall, color = Color.White, modifier = Modifier.width(52.dp))
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     IconButton(modifier = Modifier.size(48.dp), onClick = onPlayPause) {
-                        Icon(painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play_arrow), contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+                        Icon(painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow), contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
                     }
                 }
                 Text(text = durationMs.formatMinSec(), style = MaterialTheme.typography.labelSmall, color = Color.White, modifier = Modifier.width(52.dp))

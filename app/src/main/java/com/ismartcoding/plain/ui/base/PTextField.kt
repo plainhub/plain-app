@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,7 +24,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -105,12 +106,12 @@ fun PTextField(
                             painterResource(
                                 if (isPassword) {
                                     if (showPassword) {
-                                        R.drawable.eye
+                                        Res.drawable.eye
                                     } else {
-                                        R.drawable.eye_off
+                                        Res.drawable.eye_off
                                     }
                                 } else {
-                                    R.drawable.x
+                                    Res.drawable.x
                                 }
                             ),
                         contentDescription = if (isPassword) stringResource(R.string.password) else stringResource(R.string.clear),
@@ -122,7 +123,7 @@ fun PTextField(
                     onValueChange(clipboardManager.getText()?.text ?: "")
                 }) {
                     Icon(
-                        painter = painterResource(R.drawable.content_paste),
+                        painter = painterResource(Res.drawable.content_paste),
                         contentDescription = stringResource(R.string.paste),
                         tint = MaterialTheme.colorScheme.primary,
                     )

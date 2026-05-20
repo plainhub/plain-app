@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -104,7 +105,7 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
                     modifier = Modifier.size(32.dp),
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.pen),
+                        painter = painterResource(Res.drawable.pen),
                         contentDescription = stringResource(R.string.device_name),
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -114,7 +115,7 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
         },
         actions = {
             PIconButton(
-                icon = if (isDiscoverable) R.drawable.eye else R.drawable.eye_off,
+                icon = if (isDiscoverable) Res.drawable.eye else Res.drawable.eye_off,
                 contentDescription = stringResource(R.string.make_discoverable),
                 tint = MaterialTheme.colorScheme.onSurface,
                 click = { showDiscoverableDialog = true },

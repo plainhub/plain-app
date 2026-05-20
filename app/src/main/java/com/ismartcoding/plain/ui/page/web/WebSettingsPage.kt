@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.i18n.*
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -71,19 +72,19 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.Connections) },
-                            icon = R.drawable.devices, title = stringResource(R.string.connections), showMore = true
+                            icon = Res.drawable.devices, title = stringResource(R.string.connections), showMore = true
                         )
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.WebSecurity) },
-                            icon = R.drawable.lock, title = stringResource(R.string.security), showMore = true
+                            icon = Res.drawable.lock, title = stringResource(R.string.security), showMore = true
                         )
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.HowToUse) },
-                            icon = R.drawable.info, title = stringResource(R.string.how_to_use), showMore = true
+                            icon = Res.drawable.info, title = stringResource(R.string.how_to_use), showMore = true
                         )
                         PListItem(
                             modifier = Modifier.clickable { WebHelper.open(context, "https://plainapp.app/troubleshooting") },
-                            icon = R.drawable.troubleshoot, title = stringResource(R.string.troubleshoot), showMore = true
+                            icon = Res.drawable.troubleshoot, title = stringResource(R.string.troubleshoot), showMore = true
                         )
                     }
                     VerticalSpace(dp = 16.dp)
@@ -105,7 +106,7 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     item {
                         VerticalSpace(dp = 16.dp)
                         PCard {
-                            val m = PermissionItem.create(context, R.drawable.bell, Permission.NOTIFICATION_LISTENER)
+                            val m = PermissionItem.create(context, Res.drawable.bell, Permission.NOTIFICATION_LISTENER)
                             val permission = m.permission
                             val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
                             PListItem(
@@ -118,7 +119,7 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                             if (enabled) {
                                 PListItem(
                                     modifier = Modifier.clickable { navController.navigate(Routing.NotificationSettings) },
-                                    icon = R.drawable.settings, title = stringResource(R.string.notification_filter_settings),
+                                    icon = Res.drawable.settings, title = stringResource(R.string.notification_filter_settings),
                                     subtitle = stringResource(R.string.notification_filter_settings_desc), showMore = true
                                 )
                             }
@@ -160,7 +161,7 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
-                            icon = R.drawable.code, title = stringResource(R.string.developer_options), showMore = true
+                            icon = Res.drawable.code, title = stringResource(R.string.developer_options), showMore = true
                         )
                     }
                 }

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.apps
 
+import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -59,7 +60,7 @@ fun AppPage(navController: NavHostController, id: String) {
         topBar = {
             PTopAppBar(navController = navController, title = item?.name ?: "", actions = {
                 if (isShareable) {
-                    PIconButton(icon = R.drawable.share_2, contentDescription = stringResource(R.string.share),
+                    PIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(R.string.share),
                         tint = MaterialTheme.colorScheme.onSurface) {
                         item?.let { pkg ->
                             ShareHelper.shareFile(context, File(pkg.path), displayName = "${pkg.name.replace(" ", "")}-${pkg.id}.apk")

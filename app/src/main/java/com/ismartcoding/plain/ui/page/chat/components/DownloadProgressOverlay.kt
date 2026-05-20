@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,7 +48,7 @@ private fun DownloadActionButton(
 ) {
     when (status) {
         DownloadStatus.DOWNLOADING -> PIconButton(
-            icon = R.drawable.pause,
+            icon = Res.drawable.pause,
             click = onPause,
             tint = Color.White,
             contentDescription = stringResource(R.string.pause),
@@ -55,7 +56,7 @@ private fun DownloadActionButton(
         )
 
         DownloadStatus.PAUSED -> PIconButton(
-            icon = R.drawable.download,
+            icon = Res.drawable.download,
             click = onResume,
             tint = Color.White,
             contentDescription = stringResource(R.string.resume),
@@ -63,7 +64,7 @@ private fun DownloadActionButton(
         )
 
         DownloadStatus.PENDING -> PIconButton(
-            icon = R.drawable.x,
+            icon = Res.drawable.x,
             click = onCancel,
             tint = Color.White,
             contentDescription = stringResource(R.string.cancel),
@@ -71,7 +72,7 @@ private fun DownloadActionButton(
         )
 
         DownloadStatus.FAILED -> PIconButton(
-            icon = R.drawable.circle_alert,
+            icon = Res.drawable.circle_alert,
             click = onResume,
             tint = Color.White,
             contentDescription = stringResource(R.string.try_again),

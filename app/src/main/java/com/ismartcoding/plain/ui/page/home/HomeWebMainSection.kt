@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -70,7 +71,7 @@ fun HomeWebMainSection(
                     trailingContent = {
                         if (webState != WebState.ON) {
                             PIconButton(
-                                icon = R.drawable.tune,
+                                icon = Res.drawable.tune,
                                 contentDescription = stringResource(R.string.web_settings),
                                 tint = MaterialTheme.colorScheme.blue,
                                 click = { navController.navigate(Routing.WebSettings) })

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.cast
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,9 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 
@@ -37,7 +37,7 @@ fun CastDeviceCard(
                 modifier = Modifier.size(48.dp),
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.tv),
+                    painter = painterResource(Res.drawable.tv),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(12.dp),
@@ -54,7 +54,7 @@ fun CastDeviceCard(
             }
             HorizontalSpace(12.dp)
             Icon(
-                painter = painterResource(R.drawable.chevron_right),
+                painter = painterResource(Res.drawable.chevron_right),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.cast
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -22,7 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -88,7 +89,7 @@ internal fun AudioCastPlayerBarContent(
                         .background(if (isPlaying) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary),
                 ) {
                     Icon(
-                        painter = painterResource(id = if (isPlaying) R.drawable.pause else R.drawable.play_arrow),
+                        painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
                         contentDescription = if (isPlaying) stringResource(R.string.pause) else stringResource(R.string.play),
                         tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp),
@@ -101,7 +102,7 @@ internal fun AudioCastPlayerBarContent(
                 modifier = Modifier.size(42.dp).clip(CircleShape),
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.list_music),
+                    painter = painterResource(Res.drawable.list_music),
                     contentDescription = stringResource(R.string.playlist),
                     tint = MaterialTheme.colorScheme.primary,
                 )

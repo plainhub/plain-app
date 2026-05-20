@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -43,7 +44,7 @@ internal fun RowScope.TextFilePageActions(
     if (textFileVM.readOnly.value) {
         if (type != TextFileType.APP_LOG.name && !textFileVM.isExternalFile.value) {
             PIconButton(
-                icon = R.drawable.square_pen,
+                icon = Res.drawable.square_pen,
                 contentDescription = stringResource(R.string.edit),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
@@ -52,7 +53,7 @@ internal fun RowScope.TextFilePageActions(
         }
     } else {
         PIconButton(
-            icon = R.drawable.save,
+            icon = Res.drawable.save,
             contentDescription = stringResource(R.string.save),
             tint = if (isSaving) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.rotate(rotation),
@@ -77,14 +78,14 @@ internal fun RowScope.TextFilePageActions(
     }
     if (setOf(TextFileType.APP_LOG.name, TextFileType.CHAT.name).contains(type)) {
         PIconButton(
-            icon = R.drawable.wrap_text,
+            icon = Res.drawable.wrap_text,
             contentDescription = stringResource(R.string.wrap_content),
             tint = MaterialTheme.colorScheme.onSurface,
         ) {
             textFileVM.toggleWrapContent(context)
         }
         PIconButton(
-            icon = R.drawable.share_2,
+            icon = Res.drawable.share_2,
             contentDescription = stringResource(R.string.share),
             tint = MaterialTheme.colorScheme.onSurface,
         ) {

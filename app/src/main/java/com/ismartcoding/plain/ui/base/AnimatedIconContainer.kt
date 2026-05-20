@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -20,12 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun AnimatedIconContainer(
-    iconRes: Int
+    iconRes: DrawableResource
 ) {
     Box(
         modifier = Modifier
@@ -64,7 +65,7 @@ internal fun AnimatedIconContainer(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = iconRes),
+                    painter = painterResource(iconRes),
                     contentDescription = null,
                     modifier = Modifier.size(45.dp),
                     tint = MaterialTheme.colorScheme.primary

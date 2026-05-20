@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.apps
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -83,16 +84,16 @@ fun AppPageHeader(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
             ) {
-                PIconTextActionButton(icon = R.drawable.square_arrow_out_up_right, text = stringResource(R.string.launch), click = {
+                PIconTextActionButton(icon = Res.drawable.square_arrow_out_up_right, text = stringResource(R.string.launch), click = {
                     try { PackageHelper.launch(context, item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = R.drawable.delete_forever, text = stringResource(R.string.uninstall), click = {
+                PIconTextActionButton(icon = Res.drawable.delete_forever, text = stringResource(R.string.uninstall), click = {
                     try { PackageHelper.uninstall(context, item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = R.drawable.settings, text = stringResource(R.string.settings), click = {
+                PIconTextActionButton(icon = Res.drawable.settings, text = stringResource(R.string.settings), click = {
                     try { PackageHelper.viewInSettings(context, item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = R.drawable.code, text = "Manifest", click = {
+                PIconTextActionButton(icon = Res.drawable.code, text = "Manifest", click = {
                     coMain {
                         try {
                             DialogHelper.showLoading()

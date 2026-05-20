@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.dlna
 
+import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -125,7 +126,7 @@ fun DlnaReceiverPage(
                 title = stringResource(R.string.dlna_receiver),
                 actions = {
                     PIconButton(
-                        icon = R.drawable.history,
+                        icon = Res.drawable.history,
                         contentDescription = stringResource(R.string.dlna_cast_history),
                         tint = MaterialTheme.colorScheme.onSurface
                     ) { navController.navigate(Routing.DlnaCastHistory) }

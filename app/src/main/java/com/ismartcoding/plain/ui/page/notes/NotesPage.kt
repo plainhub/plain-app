@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.notes
 
+import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -25,7 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -102,7 +103,7 @@ fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM:
                 })
         },
         bottomBar = { AnimatedVisibility(visible = notesVM.showBottomActions(), enter = slideInVertically { it }, exit = slideOutVertically { it }) { NotesSelectModeBottomActions(notesVM, tagsVM, tagsState) } },
-        floatingActionButton = if (notesVM.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { navController.navigate(Routing.NotesCreate(notesVM.tag.value?.id ?: "")) }) { Icon(painter = painterResource(R.drawable.plus), stringResource(R.string.add)) } } } },
+        floatingActionButton = if (notesVM.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { navController.navigate(Routing.NotesCreate(notesVM.tag.value?.id ?: "")) }) { Icon(painter = painterResource(Res.drawable.plus), stringResource(R.string.add)) } } } },
     ) { paddingValues ->
         Column(Modifier.padding(top = paddingValues.calculateTopPadding())) {
             if (!notesVM.selectMode.value) {

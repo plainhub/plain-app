@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -106,7 +107,7 @@ fun FeedEntriesPage(
                 if (feedEntriesVM.selectMode.value) { PTopRightButton(label = stringResource(if (feedEntriesVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { feedEntriesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
                 else {
                     ActionButtonSearch { feedEntriesVM.enterSearchMode() }
-                    if (feedEntriesVM.feedId.value.isEmpty()) { PIconButton(icon = R.drawable.rss, contentDescription = stringResource(R.string.subscriptions), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.Feeds) } }
+                    if (feedEntriesVM.feedId.value.isEmpty()) { PIconButton(icon = Res.drawable.rss, contentDescription = stringResource(R.string.subscriptions), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.Feeds) } }
                     ActionButtonMoreWithMenu { dismiss -> PDropdownMenuItemTags(onClick = { dismiss(); feedEntriesVM.showTagsDialog.value = true })
                         if (feedEntriesVM.feedId.value.isEmpty()) PDropdownMenuItemSettings(onClick = { dismiss(); navController.navigate(Routing.FeedSettings) }) }
                 }

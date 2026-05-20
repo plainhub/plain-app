@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,13 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun PIconTextSmallButton(
-    icon: Int,
+    icon: DrawableResource,
     text: String,
     click: () -> Unit,
 ) {

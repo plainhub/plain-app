@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.appfiles.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +44,7 @@ fun AppFileListContent(
 
     if (files.isEmpty()) {
         NoDataView(
-            iconResId = R.drawable.package_open,
+            icon = Res.drawable.package_open,
             message = stringResource(R.string.no_app_files),
             showRefreshButton = true,
             onRefresh = onRefresh,

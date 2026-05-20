@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.cast
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,7 +68,7 @@ internal fun ReorderableCollectionItemScope.AudioCastPlaylistItemContent(
             VerticalSpace(4.dp)
             Text(text = artist, style = MaterialTheme.typography.listItemSubtitle())
         }
-        PIconButton(icon = R.drawable.playlist_remove, tint = MaterialTheme.colorScheme.red,
+        PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.red,
             contentDescription = stringResource(R.string.remove_from_cast_queue), click = onRemove)
     }
 }

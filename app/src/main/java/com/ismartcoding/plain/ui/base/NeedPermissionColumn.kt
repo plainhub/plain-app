@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -32,7 +33,7 @@ import com.ismartcoding.plain.events.RequestPermissionsEvent
 
 @Composable
 fun NeedPermissionColumn(
-    icon: Int,
+    icon: DrawableResource,
     permission: DFeaturePermission
 ) {
     Column(

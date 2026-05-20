@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -25,12 +26,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.yellow
 
@@ -90,13 +90,13 @@ fun PToast(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val iconRes = when (type) {
-                        ToastType.INFO -> R.drawable.info
-                        ToastType.SUCCESS -> R.drawable.circle_check
-                        ToastType.WARNING -> R.drawable.circle_alert
-                        ToastType.ERROR -> R.drawable.circle_x
+                        ToastType.INFO -> Res.drawable.info
+                        ToastType.SUCCESS -> Res.drawable.circle_check
+                        ToastType.WARNING -> Res.drawable.circle_alert
+                        ToastType.ERROR -> Res.drawable.circle_x
                     }
                     Icon(
-                        painter = painterResource(id = iconRes),
+                        painter = painterResource(iconRes),
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.tools
 
+import com.ismartcoding.plain.i18n.*
 import android.media.AudioRecord
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -65,7 +66,7 @@ fun SoundMeterPage(navController: NavHostController) {
     PScaffold(topBar = {
         PTopAppBar(navController = navController,
             title = stringResource(R.string.sound_meter), actions = {
-                PIconButton(icon = R.drawable.info, contentDescription = stringResource(R.string.decibel_values),
+                PIconButton(icon = Res.drawable.info, contentDescription = stringResource(R.string.decibel_values),
                     tint = MaterialTheme.colorScheme.onSurface) { decibelValuesDialogVisible.value = true }
             })
     }, content = { paddingValues ->

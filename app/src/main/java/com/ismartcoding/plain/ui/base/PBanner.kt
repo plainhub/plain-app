@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,7 @@ fun PBanner(
     desc: String? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
-    icon: Int? = null,
+    icon: DrawableResource? = null,
     action: (@Composable () -> Unit)? = null,
     onClick: () -> Unit = {},
 ) {

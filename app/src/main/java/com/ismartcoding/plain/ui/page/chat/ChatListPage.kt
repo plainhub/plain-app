@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -87,7 +88,7 @@ fun ChatListPage(
                     PeerListItem(
                         title = stringResource(R.string.local_chat),
                         desc = stringResource(R.string.local_chat_desc),
-                        icon = R.drawable.bot,
+                        icon = Res.drawable.bot,
                         latestChat = peerVM.getLatestChat("local"),
                         modifier = PlainTheme.getCardModifier(),
                         onClick = { navController.navigate(Routing.Chat("local")) })
@@ -101,7 +102,7 @@ fun ChatListPage(
                         PeerListItem(
                             title = channel.name,
                             desc = stringResource(R.string.channels),
-                            icon = R.drawable.hash,
+                            icon = Res.drawable.hash,
                             latestChat = peerVM.getLatestChat(channel.id),
                             onClick = {
                                 navController.navigate(Routing.Chat("channel:${channel.id}"))

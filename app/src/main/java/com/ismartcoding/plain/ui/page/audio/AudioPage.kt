@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.audio
 
+import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -176,7 +177,7 @@ fun AudioPage(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 if (!audioVM.hasPermission.value) {
-                    NeedPermissionColumn(R.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column
+                    NeedPermissionColumn(Res.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column
                 }
                 if (!dragSelectState.selectMode) {
                     PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {

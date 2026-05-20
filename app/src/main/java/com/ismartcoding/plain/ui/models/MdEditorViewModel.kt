@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
+import org.jetbrains.compose.resources.DrawableResource
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.input.TextFieldState
@@ -19,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 data class MdAccessoryItem(val text: String, val before: String, val after: String = "")
-data class MdAccessoryItem2(val icon: Int, val click: (MdEditorViewModel) -> Unit = {})
+data class MdAccessoryItem2(val icon: DrawableResource, val click: (MdEditorViewModel) -> Unit = {})
 
 @OptIn(ExperimentalFoundationApi::class, SavedStateHandleSaveableApi::class)
 class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.connections
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.foundation.clickable
@@ -28,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -110,7 +111,7 @@ internal fun SessionListItem(
             SessionMainListItem(
                 title = m.name.ifEmpty { osDisplay },
                 subtitle = if (m.name.isEmpty()) "" else osDisplay,
-                icon = if (m.isCustom) R.drawable.lock else R.drawable.laptop,
+                icon = if (m.isCustom) Res.drawable.lock else Res.drawable.laptop,
                 onEditTitle = {
                     inputName = m.name
                     showRenameDialog = true

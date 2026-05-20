@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.tags
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -86,7 +87,7 @@ fun TagsBottomSheet(
                             title = tag.name,
                             action = {
                                 PIconButton(
-                                    icon = R.drawable.delete_forever,
+                                    icon = Res.drawable.delete_forever,
                                     tint = MaterialTheme.colorScheme.red,
                                     contentDescription = stringResource(R.string.delete),
                                     click = {

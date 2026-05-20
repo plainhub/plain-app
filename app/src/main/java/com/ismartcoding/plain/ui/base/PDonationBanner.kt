@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,7 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -120,7 +121,7 @@ private fun DonationLabel() {
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Icon(
-                painter = painterResource(R.drawable.rocket),
+                painter = painterResource(Res.drawable.rocket),
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
                 tint = MaterialTheme.colorScheme.primary,
@@ -163,7 +164,7 @@ private fun DonationButton(onClick: () -> Unit) {
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
     ) {
         Icon(
-            painter = painterResource(R.drawable.rocket),
+            painter = painterResource(Res.drawable.rocket),
             contentDescription = null,
             modifier = Modifier.size(18.dp),
         )

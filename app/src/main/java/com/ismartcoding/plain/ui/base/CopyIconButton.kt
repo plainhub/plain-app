@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import android.content.ClipData
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,7 +15,7 @@ fun CopyIconButton(
     text: String,
     clipLabel: String,
     modifier: Modifier = Modifier,
-    icon: Int = R.drawable.copy,
+    icon: DrawableResource = Res.drawable.copy,
     contentDescription: String = stringResource(R.string.copy_text),
     copiedMessage: String = text,
     onCopied: (() -> Unit)? = null,

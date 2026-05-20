@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,7 +19,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
@@ -44,7 +45,7 @@ fun PasswordTextField(
                     if (isChanged()) { Button(onClick = { onConfirm(value) }) { Text(stringResource(R.string.save)) } }
                 } else {
                     IconButton(onClick = { onValueChange(clipboardManager.getText()?.text ?: "") }) {
-                        Icon(painter = painterResource(R.drawable.content_paste), contentDescription = stringResource(R.string.paste), tint = MaterialTheme.colorScheme.primary)
+                        Icon(painter = painterResource(Res.drawable.content_paste), contentDescription = stringResource(R.string.paste), tint = MaterialTheme.colorScheme.primary)
                     }
                 }
             },

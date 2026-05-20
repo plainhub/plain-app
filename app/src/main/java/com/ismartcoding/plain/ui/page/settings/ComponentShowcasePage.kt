@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -85,7 +86,7 @@ private fun ShowcaseAlerts() {
 @Composable
 private fun ShowcaseBanners() {
     SectionTitle("PBanner")
-    PBanner(title = "Banner Title", desc = "Banner description.", icon = R.drawable.lightbulb, onClick = {})
+    PBanner(title = "Banner Title", desc = "Banner description.", icon = Res.drawable.lightbulb, onClick = {})
     VerticalSpace(16.dp)
 }
 
@@ -93,7 +94,7 @@ private fun ShowcaseBanners() {
 private fun ShowcaseCards() {
     SectionTitle("PCard + PListItem")
     PCard {
-        PListItem(title = "List item with icon", subtitle = "Subtitle", icon = R.drawable.settings, showMore = true)
+        PListItem(title = "List item with icon", subtitle = "Subtitle", icon = Res.drawable.settings, showMore = true)
         PListItem(title = "List item with value", value = "Value")
         PListItem(title = "List item with switch", separatedActions = true) {
             val checked = remember { mutableStateOf(true) }

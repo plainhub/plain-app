@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -21,7 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,7 +35,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 @Composable
 internal fun MemberGridItem(
     name: String,
-    iconRes: Int,
+    iconRes: DrawableResource,
     onClick: () -> Unit = {},
 ) {
     Column(
@@ -82,7 +84,7 @@ internal fun AddMemberGridItem(onClick: () -> Unit) {
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                painter = painterResource(R.drawable.plus),
+                painter = painterResource(Res.drawable.plus),
                 contentDescription = stringResource(R.string.manage_members),
                 modifier = Modifier.size(26.dp), tint = MaterialTheme.colorScheme.primary,
             )

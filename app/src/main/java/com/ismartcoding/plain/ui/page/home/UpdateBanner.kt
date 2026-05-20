@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -116,7 +117,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
             PBanner(
                 title = stringResource(R.string.get_new_updates, newVersion.toString()),
                 desc = stringResource(R.string.get_new_updates_desc),
-                icon = R.drawable.lightbulb,
+                icon = Res.drawable.lightbulb,
             ) { updateVM.showDialog() }
             VerticalSpace(dp = 12.dp)
         }
@@ -175,7 +176,7 @@ private fun DownloadCompleteBanner(
 ) {
     PBanner(
         title = stringResource(R.string.update_downloaded),
-        icon = R.drawable.lightbulb,
+        icon = Res.drawable.lightbulb,
         action = {
             PFilledButton(
                 text = stringResource(R.string.install_update),
@@ -197,7 +198,7 @@ private fun DownloadFailedBanner(
         title = stringResource(R.string.download_update_failed),
         backgroundColor = MaterialTheme.colorScheme.errorContainer,
         contentColor = MaterialTheme.colorScheme.onErrorContainer,
-        icon = R.drawable.lightbulb,
+        icon = Res.drawable.lightbulb,
         action = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 PFilledButton(

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
 import android.content.ClipData
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -50,7 +51,7 @@ fun WebAddressBarRow(
         }
         Spacer(modifier = Modifier.weight(1f))
         PIconButton(
-            icon = R.drawable.pen,
+            icon = Res.drawable.pen,
             modifier = Modifier.size(32.dp),
             iconSize = 16.dp,
             contentDescription = if (isHostnameRow) "Edit hostname" else "Edit port",
@@ -58,7 +59,7 @@ fun WebAddressBarRow(
             click = onEditClick,
         )
         PIconButton(
-            icon = R.drawable.qr_code,
+            icon = Res.drawable.qr_code,
             modifier = Modifier.size(32.dp),
             iconSize = 16.dp,
             contentDescription = "Show QR code",

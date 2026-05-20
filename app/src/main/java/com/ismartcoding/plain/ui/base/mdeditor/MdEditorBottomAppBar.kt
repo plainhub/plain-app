@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base.mdeditor
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -119,7 +120,7 @@ fun MdEditorBottomAppBar(
             contentAlignment = Alignment.CenterEnd
         ) {
             PIconButton(
-                icon = if (mdEditorVM.level == 0) R.drawable.looks_one else R.drawable.looks_two,
+                icon = if (mdEditorVM.level == 0) Res.drawable.looks_one else Res.drawable.looks_two,
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.onPrimary,
                 click = {

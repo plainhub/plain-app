@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -87,7 +88,7 @@ fun NearbyPage(
                 title = stringResource(R.string.nearby_devices),
                 actions = {
                     PIconButton(
-                        icon = R.drawable.qr_code,
+                        icon = Res.drawable.qr_code,
                         contentDescription = stringResource(R.string.show_qr_code),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {

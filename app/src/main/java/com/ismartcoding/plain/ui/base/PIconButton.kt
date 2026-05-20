@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import org.jetbrains.compose.resources.DrawableResource
 import android.view.HapticFeedbackConstants
 import android.view.SoundEffectConstants
 import androidx.compose.foundation.background
@@ -18,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.badgeBorderColor
@@ -27,7 +28,7 @@ import com.ismartcoding.plain.ui.theme.red
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PIconButton(
-    icon: Int,
+    icon: DrawableResource,
     modifier: Modifier = Modifier,
     iconSize: Dp = 24.dp,
     tint: Color = LocalContentColor.current,

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -66,7 +67,7 @@ fun <T : IData> ListSearchBar(
             placeholder = { Text(stringResource(id = R.string.search)) },
             leadingIcon = {
                 PIconButton(
-                    icon = R.drawable.arrow_left,
+                    icon = Res.drawable.arrow_left,
                     contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {

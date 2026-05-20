@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,7 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -61,7 +62,7 @@ fun NotificationSettingsPage(
                         ActionButtonMoreWithMenu { dismiss ->
                             PDropdownMenuItem(
                                 leadingIcon = {
-                                    Icon(painter = painterResource(R.drawable.delete_forever),
+                                    Icon(painter = painterResource(Res.drawable.delete_forever),
                                         tint = MaterialTheme.colorScheme.red,
                                         contentDescription = stringResource(R.string.clear_all))
                                 },
@@ -102,7 +103,7 @@ fun NotificationSettingsPage(
                         onClick = { vm.showAppSelectorDialog() },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                     ) {
-                        Icon(painter = painterResource(R.drawable.plus), contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(painter = painterResource(Res.drawable.plus), contentDescription = null, modifier = Modifier.size(18.dp))
                         HorizontalSpace(dp = 8.dp)
                         Text(stringResource(R.string.add_app))
                     }

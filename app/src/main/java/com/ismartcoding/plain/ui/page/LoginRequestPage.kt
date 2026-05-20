@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,7 @@ fun LoginRequestPage(
     val isWeb = request.browserName != "PlainApp"
     val titleRes = if (isWeb) R.string.allow_web_access else R.string.allow_desktop_access
     val descRes = if (isWeb) R.string.allow_web_access_desc else R.string.allow_desktop_access_desc
-    val iconRes = if (isWeb) R.drawable.chrome else R.drawable.laptop
+    val iconRes = if (isWeb) Res.drawable.chrome else Res.drawable.laptop
 
     LazyColumn(
         modifier = Modifier

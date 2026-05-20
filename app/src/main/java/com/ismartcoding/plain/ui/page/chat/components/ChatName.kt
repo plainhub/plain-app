@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -14,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -91,7 +92,7 @@ fun ChatName(
                         ) {
                             if (isAllFailed) {
                                 Icon(
-                                    painter = painterResource(R.drawable.rotate_ccw),
+                                    painter = painterResource(Res.drawable.rotate_ccw),
                                     contentDescription = null,
                                     tint = badgeColor,
                                     modifier = Modifier.size(10.dp),
@@ -114,7 +115,7 @@ fun ChatName(
                     if (onRetry != null) {
                         HorizontalSpace(4.dp)
                         PIconButton(
-                            icon = R.drawable.rotate_ccw,
+                            icon = Res.drawable.rotate_ccw,
                             contentDescription = stringResource(R.string.try_again),
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(16.dp)

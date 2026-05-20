@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.pomodoro
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -57,7 +58,7 @@ fun PomodoroPage(navController: NavHostController, pomodoroVM: PomodoroViewModel
 
     PScaffold(topBar = {
         PTopAppBar(navController = navController, title = "", actions = {
-            PIconButton(icon = R.drawable.settings, contentDescription = stringResource(R.string.settings), tint = MaterialTheme.colorScheme.onSurface) { pomodoroVM.showSettings.value = true }
+            PIconButton(icon = Res.drawable.settings, contentDescription = stringResource(R.string.settings), tint = MaterialTheme.colorScheme.onSurface) { pomodoroVM.showSettings.value = true }
         })
     }) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).fillMaxSize().padding(horizontal = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {

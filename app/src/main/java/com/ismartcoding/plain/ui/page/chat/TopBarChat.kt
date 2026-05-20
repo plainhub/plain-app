@@ -1,12 +1,13 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
@@ -43,7 +44,7 @@ fun TopBarChat(
                     text = { Text(stringResource(R.string.new_channel)) },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.hash),
+                            painter = painterResource(Res.drawable.hash),
                             contentDescription = null,
                         )
                     },
@@ -56,7 +57,7 @@ fun TopBarChat(
                     text = { Text(stringResource(R.string.add_device)) },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(R.drawable.plus),
+                            painter = painterResource(Res.drawable.plus),
                             contentDescription = null,
                         )
                     },

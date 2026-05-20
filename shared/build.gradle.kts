@@ -12,6 +12,15 @@ kotlin {
         namespace = "com.ismartcoding.plain.shared"
         compileSdk = 36
         minSdk = 28
+
+        // Required so that Compose Multiplatform resources (drawable/strings/etc.)
+        // are packaged into the consuming Android app's assets. Without this the
+        // new `com.android.kotlin.multiplatform.library` plugin disables Android
+        // resource processing and `copyAndroidMainComposeResourcesToAndroidAssets`
+        // is never wired up.
+        androidResources {
+            enable = true
+        }
     }
 
     listOf(
@@ -39,4 +48,5 @@ kotlin {
 compose.resources {
     packageOfResClass = "com.ismartcoding.plain.i18n"
     generateResClass = always
+    publicResClass = true
 }

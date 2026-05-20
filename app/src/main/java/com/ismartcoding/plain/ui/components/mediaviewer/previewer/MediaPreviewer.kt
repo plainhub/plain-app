@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
+import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.components.mediaviewer.toggleScale
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -27,7 +28,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.ui.components.mediaviewer.GestureScope
@@ -117,7 +117,7 @@ private fun SpeedBoostIndicator(state: MediaPreviewerState) {
             Row(modifier = Modifier.background(color = Color.Black.copy(alpha = 0.6f),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically) {
-                Icon(painter = painterResource(R.drawable.double_arrow_right), contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                Icon(painter = painterResource(Res.drawable.double_arrow_right), contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
                 Text(text = " 2x", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             }
         }

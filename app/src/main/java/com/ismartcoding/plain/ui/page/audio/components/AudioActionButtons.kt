@@ -1,16 +1,17 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.ismartcoding.lib.extensions.isUrl
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.IconTextAddToHomeButton
 import com.ismartcoding.plain.ui.components.AddToHomeDialog
@@ -89,7 +90,7 @@ internal fun AudioActionButtons(
         }
     }
     if (showAddToHomeDialog) {
-        AddToHomeDialog(path = m.path, iconRes = R.drawable.music, onDismiss = {
+        AddToHomeDialog(path = m.path, iconRes = R.mipmap.ic_launcher, onDismiss = {
             showAddToHomeDialog = false
             onDismiss()
         })

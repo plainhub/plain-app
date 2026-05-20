@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
+import com.ismartcoding.plain.i18n.*
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,12 +22,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.coil.ForceVideoDecoder
 import kotlinx.coroutines.launch
 
@@ -46,7 +46,7 @@ fun TransformImageView(
             )
             val imageModifier = Modifier.fillMaxSize()
             if (painter.state.value is AsyncImagePainter.State.Error) {
-                Image(modifier = imageModifier, painter = painterResource(if (fileName.isImageFast()) R.drawable.image else R.drawable.file_video), contentDescription = path, contentScale = ContentScale.Crop)
+                Image(modifier = imageModifier, painter = painterResource(if (fileName.isImageFast()) Res.drawable.image else Res.drawable.file_video), contentDescription = path, contentScale = ContentScale.Crop)
             } else {
                 Image(modifier = if (fileName.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier, painter = painter, contentDescription = path, contentScale = ContentScale.Crop)
             }

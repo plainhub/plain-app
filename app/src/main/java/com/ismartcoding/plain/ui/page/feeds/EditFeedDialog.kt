@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -13,7 +14,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,7 +34,7 @@ fun EditFeedDialog(feedsVM: FeedsViewModel) {
             },
             icon = {
                 Icon(
-                    painter = painterResource(R.drawable.square_pen),
+                    painter = painterResource(Res.drawable.square_pen),
                     contentDescription = stringResource(id = R.string.edit),
                 )
             },

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,7 +71,7 @@ fun FolderKanbanDialog(filesVM: FilesViewModel, onDismiss: () -> Unit = {}) {
                             HorizontalSpace(8.dp)
                             Text(text = item.title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
                             if (item.isFavoriteFolder) {
-                                PIconButton(icon = R.drawable.delete_forever, tint = MaterialTheme.colorScheme.red, contentDescription = stringResource(R.string.delete), click = {
+                                PIconButton(icon = Res.drawable.delete_forever, tint = MaterialTheme.colorScheme.red, contentDescription = stringResource(R.string.delete), click = {
                                     DialogHelper.confirmToDelete {
                                         scope.launch(Dispatchers.IO) { FavoriteFoldersPreference.removeAsync(context, item.fullPath); options.remove(item) }
                                     }

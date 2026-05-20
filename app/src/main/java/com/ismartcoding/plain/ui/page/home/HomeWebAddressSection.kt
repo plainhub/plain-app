@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +27,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -126,12 +127,12 @@ fun HomeWebAddressSection(
                     )
                 } else {
                     PIconTextButton(
-                        icon = R.drawable.wifi_tethering,
+                        icon = Res.drawable.wifi_tethering,
                         text = stringResource(R.string.stay_online_mode),
                         click = { showStayOnlineOverlay = true },
                     )
                 }
-                PIconTextButton(R.drawable.settings, stringResource(R.string.web_settings)) {
+                PIconTextButton(Res.drawable.settings, stringResource(R.string.web_settings)) {
                     navController.navigate(Routing.WebSettings)
                 }
             }

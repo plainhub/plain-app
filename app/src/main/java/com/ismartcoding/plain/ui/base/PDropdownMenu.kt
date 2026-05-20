@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,7 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
@@ -60,7 +61,7 @@ fun PDropdownMenuItem(
 fun PDropdownMenuItemCreateFolder(onClick: () -> Unit) {
     PDropdownMenuItem(text = { Text(stringResource(R.string.create_folder)) }, leadingIcon = {
         Icon(
-            painter = painterResource(R.drawable.folder_plus),
+            painter = painterResource(Res.drawable.folder_plus),
             contentDescription = stringResource(id = R.string.create_folder)
         )
     }, onClick = onClick)
@@ -70,7 +71,7 @@ fun PDropdownMenuItemCreateFolder(onClick: () -> Unit) {
 fun PDropdownMenuItemCreateFile(onClick: () -> Unit) {
     PDropdownMenuItem(text = { Text(stringResource(R.string.create_file)) }, leadingIcon = {
         Icon(
-            painter = painterResource(R.drawable.file_plus),
+            painter = painterResource(Res.drawable.file_plus),
             contentDescription = stringResource(id = R.string.create_file)
         )
     }, onClick = onClick)
@@ -80,7 +81,7 @@ fun PDropdownMenuItemCreateFile(onClick: () -> Unit) {
 fun PDropdownMenuItemCast(onClick: () -> Unit) {
     PDropdownMenuItem(text = { Text(stringResource(R.string.cast_mode)) }, leadingIcon = {
         Icon(
-            painter = painterResource(R.drawable.cast),
+            painter = painterResource(Res.drawable.cast),
             contentDescription = stringResource(id = R.string.cast_mode)
         )
     }, onClick = onClick)
@@ -90,7 +91,7 @@ fun PDropdownMenuItemCast(onClick: () -> Unit) {
 fun PDropdownMenuItemSort(onClick: () -> Unit) {
     PDropdownMenuItem(text = { Text(stringResource(R.string.sort)) }, leadingIcon = {
         Icon(
-            painter = painterResource(R.drawable.sort),
+            painter = painterResource(Res.drawable.sort),
             contentDescription = stringResource(id = R.string.sort)
         )
     }, onClick = onClick)
@@ -100,7 +101,7 @@ fun PDropdownMenuItemSort(onClick: () -> Unit) {
 fun PDropdownMenuItemTags(onClick: () -> Unit) {
     PDropdownMenuItem(text = { Text(stringResource(R.string.tags)) }, leadingIcon = {
         Icon(
-            painter = painterResource(R.drawable.tags),
+            painter = painterResource(Res.drawable.tags),
             contentDescription = stringResource(id = R.string.tags)
         )
     }, onClick = onClick)
@@ -110,7 +111,7 @@ fun PDropdownMenuItemTags(onClick: () -> Unit) {
 fun PDropdownMenuItemSettings(onClick: () -> Unit) {
     PDropdownMenuItem(text = { Text(stringResource(R.string.settings)) }, leadingIcon = {
         Icon(
-            painter = painterResource(R.drawable.settings),
+            painter = painterResource(Res.drawable.settings),
             contentDescription = stringResource(id = R.string.settings)
         )
     }, onClick = onClick)

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.videos
 
+import com.ismartcoding.plain.i18n.*
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.runtime.Composable
@@ -102,7 +103,7 @@ internal fun VideoActionButtons(
         }
     }
     if (showAddToHomeDialog) {
-        AddToHomeDialog(path = m.path, iconRes = R.drawable.video, onDismiss = {
+        AddToHomeDialog(path = m.path, iconRes = R.mipmap.ic_launcher, onDismiss = {
             showAddToHomeDialog = false
             onDismiss()
         })

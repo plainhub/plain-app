@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.dlna
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,10 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatMinSec
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.PlayerSlider
 
 @Composable
@@ -56,7 +56,7 @@ fun AudioPlayerControls(
         ) {
             IconButton(modifier = Modifier.size(72.dp), onClick = onPlayPause) {
                 Icon(
-                    painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play_arrow),
+                    painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(40.dp),

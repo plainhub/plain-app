@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.files.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,7 +46,7 @@ fun FileListContent(
         }
     } else if (files.isEmpty()) {
         NoDataView(
-            iconResId = R.drawable.package_open,
+            icon = Res.drawable.package_open,
             message = stringResource(R.string.no_data),
             showRefreshButton = true,
             onRefresh = { loadFiles(emptyList(), true) }

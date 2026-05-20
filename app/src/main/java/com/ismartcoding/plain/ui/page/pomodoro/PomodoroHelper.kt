@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.pomodoro
 
+import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context

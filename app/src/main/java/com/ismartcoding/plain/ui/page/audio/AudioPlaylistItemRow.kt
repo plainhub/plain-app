@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.audio
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -62,7 +63,7 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
                 VerticalSpace(4.dp)
                 Text(text = audio.artist, style = MaterialTheme.typography.listItemSubtitle())
             }
-            PIconButton(icon = R.drawable.playlist_remove, tint = MaterialTheme.colorScheme.red,
+            PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.red,
                 contentDescription = stringResource(R.string.remove_from_playlist),
                 click = { scope.launch(Dispatchers.IO) { audioPlaylistVM.removeAsync(context, audio.path) } })
         }

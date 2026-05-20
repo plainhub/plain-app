@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.connections
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -28,7 +30,7 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 internal fun SessionMainListItem(
     title: String,
     subtitle: String,
-    icon: Int,
+    icon: DrawableResource,
     onEditTitle: () -> Unit,
     action: @Composable () -> Unit,
 ) {
@@ -61,7 +63,7 @@ internal fun SessionMainListItem(
                     modifier = Modifier.size(24.dp),
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.pen),
+                        painter = painterResource(Res.drawable.pen),
                         contentDescription = stringResource(R.string.rename),
                         modifier = Modifier.size(12.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,

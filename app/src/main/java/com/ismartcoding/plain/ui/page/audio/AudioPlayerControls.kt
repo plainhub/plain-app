@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.audio
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -17,10 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.audio.AudioPlayer
@@ -61,9 +61,9 @@ fun AudioPlayerControls(
         ) {
             Icon(
                 painter = painterResource(when (playMode) {
-                    MediaPlayMode.REPEAT -> R.drawable.repeat
-                    MediaPlayMode.REPEAT_ONE -> R.drawable.repeat1
-                    MediaPlayMode.SHUFFLE -> R.drawable.shuffle
+                    MediaPlayMode.REPEAT -> Res.drawable.repeat
+                    MediaPlayMode.REPEAT_ONE -> Res.drawable.repeat1
+                    MediaPlayMode.SHUFFLE -> Res.drawable.shuffle
                 }),
                 contentDescription = "Play mode",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp),
@@ -76,7 +76,7 @@ fun AudioPlayerControls(
             ),
         ) {
             Icon(
-                painter = painterResource(R.drawable.timer), contentDescription = "Sleep timer",
+                painter = painterResource(Res.drawable.timer), contentDescription = "Sleep timer",
                 tint = if (isTimerActive) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(24.dp),
             )
@@ -85,7 +85,7 @@ fun AudioPlayerControls(
             onClick = onPlaylist,
             modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         ) {
-            Icon(painter = painterResource(R.drawable.list_music), contentDescription = "Playlist", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
+            Icon(painter = painterResource(Res.drawable.list_music), contentDescription = "Playlist", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
         }
     }
 
@@ -99,14 +99,14 @@ fun AudioPlayerControls(
             onClick = { AudioPlayer.skipToPrevious() },
             modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         ) {
-            Icon(painter = painterResource(R.drawable.skip_previous), contentDescription = "Previous", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(36.dp))
+            Icon(painter = painterResource(Res.drawable.skip_previous), contentDescription = "Previous", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(36.dp))
         }
         IconButton(
             onClick = { if (isPlaying) AudioPlayer.pause() else AudioPlayer.play() },
             modifier = Modifier.size(80.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
         ) {
             Icon(
-                painter = painterResource(if (isPlaying) R.drawable.pause else R.drawable.play_arrow),
+                painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
                 contentDescription = if (isPlaying) "Pause" else "Play",
                 tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(48.dp),
             )
@@ -115,7 +115,7 @@ fun AudioPlayerControls(
             onClick = { AudioPlayer.skipToNext() },
             modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         ) {
-            Icon(painter = painterResource(R.drawable.skip_next), contentDescription = "Next", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(36.dp))
+            Icon(painter = painterResource(Res.drawable.skip_next), contentDescription = "Next", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(36.dp))
         }
     }
 }

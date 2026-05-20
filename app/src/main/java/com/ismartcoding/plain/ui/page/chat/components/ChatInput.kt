@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -74,14 +75,14 @@ fun ChatInput(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 PIconButton(
-                    icon = R.drawable.image,
+                    icon = Res.drawable.image,
                     contentDescription = stringResource(R.string.images),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
                 }
                 PIconButton(
-                    icon = R.drawable.folder,
+                    icon = Res.drawable.folder,
                     contentDescription = stringResource(R.string.files),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
@@ -89,7 +90,7 @@ fun ChatInput(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 PIconButton(
-                    icon = R.drawable.send,
+                    icon = Res.drawable.send,
                     contentDescription = stringResource(R.string.send_message),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {

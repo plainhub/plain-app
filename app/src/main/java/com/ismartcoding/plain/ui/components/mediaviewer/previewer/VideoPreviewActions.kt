@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
+import com.ismartcoding.plain.i18n.*
 import android.content.Context
 import android.os.Environment
 import androidx.compose.foundation.background
@@ -28,7 +29,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -86,16 +87,16 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
                 return
             }
             Row(modifier = Modifier.clip(RoundedCornerShape(50)).align(Alignment.CenterHorizontally).background(MaterialTheme.colorScheme.darkMask()).padding(horizontal = 20.dp, vertical = 8.dp)) {
-                ActionIconButton(icon = R.drawable.share_2, contentDescription = stringResource(R.string.share)) {
+                ActionIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(R.string.share)) {
                     if (m.mediaId.isNotEmpty()) { ShareHelper.shareUris(context, listOf(VideoMediaStoreHelper.getItemUri(m.mediaId))) }
                     else if (m.path.isUrl()) { scope.launch { val tempFile = File.createTempFile("videoPreviewShare", "." + m.path.getFilenameExtension(), File(context.cacheDir, "/video_cache")); DialogHelper.showLoading(); val r = withIO { DownloadHelper.downloadToTempAsync(m.path, tempFile) }; DialogHelper.hideLoading(); if (r.success) ShareHelper.shareFile(context, File(r.path), m.getMimeType().ifEmpty { "video/*" }) else DialogHelper.showMessage(r.message) } }
                     else ShareHelper.shareFile(context, File(m.path), m.getMimeType().ifEmpty { "video/*" })
                 }
                 HorizontalSpace(dp = 20.dp)
-                ActionIconButton(icon = R.drawable.cast, contentDescription = stringResource(R.string.cast)) { castViewModel.showCastDialog.value = true }
+                ActionIconButton(icon = Res.drawable.cast, contentDescription = stringResource(R.string.cast)) { castViewModel.showCastDialog.value = true }
                 if (m.data !is DVideo && m.data !is DFile) {
                     HorizontalSpace(dp = 20.dp)
-                    ActionIconButton(icon = R.drawable.save, contentDescription = stringResource(R.string.save)) {
+                    ActionIconButton(icon = Res.drawable.save, contentDescription = stringResource(R.string.save)) {
                         scope.launch {
                             if (m.path.isUrl()) { DialogHelper.showLoading(); val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_MOVIES); val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }; DialogHelper.hideLoading(); if (r.success) DialogHelper.showMessage(LocaleHelper.getStringF(R.string.video_save_to, "path", r.path)) else DialogHelper.showMessage(r.message) }
                             else { val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""; val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_MOVIES, newName = newName) }; if (r.isNotEmpty()) DialogHelper.showMessage(LocaleHelper.getStringF(R.string.video_save_to, "path", r)) else DialogHelper.showMessage(LocaleHelper.getString(R.string.video_save_to_failed)) }
@@ -103,7 +104,7 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
                     }
                 }
                 HorizontalSpace(dp = 20.dp)
-                ActionIconButton(icon = R.drawable.ellipsis, contentDescription = stringResource(R.string.more_info)) { state.showMediaInfo = true }
+                ActionIconButton(icon = Res.drawable.ellipsis, contentDescription = stringResource(R.string.more_info)) { state.showMediaInfo = true }
             }
         }
     }
@@ -114,7 +115,7 @@ fun VideoButtons2(videoState: VideoState, scope: CoroutineScope) {
     val sliderProgress = if (videoState.totalTime <= 0L) 0f else (videoState.currentTime.toFloat() / videoState.totalTime.toFloat()).coerceIn(0f, 1f)
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
         IconButton(modifier = Modifier.size(40.dp), onClick = { videoState.togglePlay() }) {
-            Image(modifier = Modifier.size(32.dp), painter = painterResource(if (videoState.isPlaying) R.drawable.pause else R.drawable.play_arrow), colorFilter = ColorFilter.tint(Color.White), contentDescription = stringResource(if (videoState.isPlaying) R.string.pause else R.string.play))
+            Image(modifier = Modifier.size(32.dp), painter = painterResource(if (videoState.isPlaying) Res.drawable.pause else Res.drawable.play_arrow), colorFilter = ColorFilter.tint(Color.White), contentDescription = stringResource(if (videoState.isPlaying) R.string.pause else R.string.play))
         }
         Text(modifier = Modifier.width(52.dp), text = videoState.currentTime.formatMinSec(), fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyMedium, color = Color.White, textAlign = TextAlign.Center)
         Box(modifier = Modifier.weight(1f).padding(horizontal = 4.dp)) {
@@ -122,7 +123,7 @@ fun VideoButtons2(videoState: VideoState, scope: CoroutineScope) {
         }
         Text(modifier = Modifier.width(52.dp), text = videoState.totalTime.formatMinSec(), fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyMedium, color = Color.White, textAlign = TextAlign.Center)
         IconButton(modifier = Modifier.size(40.dp), onClick = { videoState.isFullscreenMode = !videoState.isFullscreenMode }) {
-            Icon(painter = painterResource(R.drawable.maximize), tint = Color.White, contentDescription = stringResource(R.string.fullscreen))
+            Icon(painter = painterResource(Res.drawable.maximize), tint = Color.White, contentDescription = stringResource(R.string.fullscreen))
         }
     }
 }

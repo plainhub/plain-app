@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.enums
 
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
@@ -20,13 +22,13 @@ enum class DeviceType(val value: String) {
         }
     }
 
-    fun getIcon(): Int {
+    fun getIcon(): DrawableResource {
         return when (this) {
-            COMPUTER -> R.drawable.laptop
-            PHONE -> R.drawable.smartphone
-            TABLET -> R.drawable.tablet
-            TV -> R.drawable.tv
-            OTHER -> R.drawable.devices
+            COMPUTER -> Res.drawable.laptop
+            PHONE -> Res.drawable.smartphone
+            TABLET -> Res.drawable.tablet
+            TV -> Res.drawable.tv
+            OTHER -> Res.drawable.devices
         }
     }
 

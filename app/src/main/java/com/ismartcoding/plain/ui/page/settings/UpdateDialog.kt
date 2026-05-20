@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
@@ -17,7 +18,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
@@ -54,7 +55,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
             onDismissRequest = { updateVM.updateDialogVisible.value = false },
             icon = {
                 Icon(
-                    painter = painterResource(R.drawable.rocket),
+                    painter = painterResource(Res.drawable.rocket),
                     contentDescription = stringResource(R.string.change_log),
                 )
             },

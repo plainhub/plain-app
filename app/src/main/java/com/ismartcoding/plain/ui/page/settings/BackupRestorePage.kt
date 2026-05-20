@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -90,7 +91,7 @@ fun BackupRestorePage(
 
                     PCircularButton(
                         text = stringResource(R.string.backup),
-                        icon = R.drawable.database_backup,
+                        icon = Res.drawable.database_backup,
                         description = stringResource(R.string.backup),
                         onClick = {
                             val fileName = "backup_" + Date().formatName() + ".zip"
@@ -110,7 +111,7 @@ fun BackupRestorePage(
 
                     PCircularButton(
                         text = stringResource(R.string.restore),
-                        icon = R.drawable.archive_restore,
+                        icon = Res.drawable.archive_restore,
                         description = stringResource(R.string.restore),
                         onClick = {
                             sendEvent(PickFileEvent(PickFileTag.RESTORE, PickFileType.FILE, false))
