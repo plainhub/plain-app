@@ -1,9 +1,13 @@
 package com.ismartcoding.plain.web.models
 
-data class ContentItemInput(var value: String, var type: Int, var label: String)
+import kotlinx.serialization.Serializable
 
+@Serializable
+data class ContentItemInput(var value: String, var type: Int, var label: String)
+@Serializable
 data class OrganizationInput(var company: String, var title: String)
 
+@Serializable
 data class ContactInput(
     var prefix: String,
     var firstName: String,

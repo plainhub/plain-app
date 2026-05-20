@@ -15,7 +15,7 @@ enum class DataType(val value: Int) {
     FILE(22),
     APP_FILE(23),
     DOC(24),
-    ; // starts from 21, not used for tag
+    ;
 
     companion object {
         fun fromInt(value: Int) = entries.first { it.value == value }
