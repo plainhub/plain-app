@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relative_time_now">अभी</string>
+    <string name="relative_time_minutes_short">%1$s मि</string>
+    <string name="relative_time_hours_short">%1$s घं</string>
+    <string name="relative_time_days_short">%1$s दि</string>
+    <string name="relative_time_weeks_short">%1$s सप्ता</string>
+    <string name="relative_time_months_short">%1$s माह</string>
+    <string name="relative_time_years_short">%1$s वर्ष</string>
+    <string name="relative_time_minutes_long">%1$s मिनट पहले</string>
+    <string name="relative_time_hours_long">%1$s घंटे पहले</string>
+    <string name="relative_time_days_long">%1$s दिन पहले</string>
+    <string name="relative_time_weeks_long">%1$s सप्ताह पहले</string>
+    <string name="relative_time_months_long">%1$s महीने पहले</string>
+    <string name="relative_time_years_long">%1$s वर्ष पहले</string>
+</resources>

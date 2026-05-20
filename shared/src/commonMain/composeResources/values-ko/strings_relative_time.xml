@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relative_time_now">방금</string>
+    <string name="relative_time_minutes_short">%1$s분</string>
+    <string name="relative_time_hours_short">%1$s시간</string>
+    <string name="relative_time_days_short">%1$s일</string>
+    <string name="relative_time_weeks_short">%1$s주</string>
+    <string name="relative_time_months_short">%1$s개월</string>
+    <string name="relative_time_years_short">%1$s년</string>
+    <string name="relative_time_minutes_long">%1$s분 전</string>
+    <string name="relative_time_hours_long">%1$s시간 전</string>
+    <string name="relative_time_days_long">%1$s일 전</string>
+    <string name="relative_time_weeks_long">%1$s주 전</string>
+    <string name="relative_time_months_long">%1$s개월 전</string>
+    <string name="relative_time_years_long">%1$s년 전</string>
+</resources>

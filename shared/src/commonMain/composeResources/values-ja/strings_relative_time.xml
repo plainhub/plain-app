@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relative_time_now">たった今</string>
+    <string name="relative_time_minutes_short">%1$s分前</string>
+    <string name="relative_time_hours_short">%1$s時間前</string>
+    <string name="relative_time_days_short">%1$s日前</string>
+    <string name="relative_time_weeks_short">%1$s週前</string>
+    <string name="relative_time_months_short">%1$sヶ月前</string>
+    <string name="relative_time_years_short">%1$s年前</string>
+    <string name="relative_time_minutes_long">%1$s分前</string>
+    <string name="relative_time_hours_long">%1$s時間前</string>
+    <string name="relative_time_days_long">%1$s日前</string>
+    <string name="relative_time_weeks_long">%1$s週前</string>
+    <string name="relative_time_months_long">%1$sヶ月前</string>
+    <string name="relative_time_years_long">%1$s年前</string>
+</resources>

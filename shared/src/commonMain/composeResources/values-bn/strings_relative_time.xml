@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relative_time_now">এইমাত্র</string>
+    <string name="relative_time_minutes_short">%1$s মি</string>
+    <string name="relative_time_hours_short">%1$s ঘ</string>
+    <string name="relative_time_days_short">%1$s দি</string>
+    <string name="relative_time_weeks_short">%1$s সপ্তাহ</string>
+    <string name="relative_time_months_short">%1$s মাস</string>
+    <string name="relative_time_years_short">%1$s বছর</string>
+    <string name="relative_time_minutes_long">%1$s মিনিট আগে</string>
+    <string name="relative_time_hours_long">%1$s ঘণ্টা আগে</string>
+    <string name="relative_time_days_long">%1$s দিন আগে</string>
+    <string name="relative_time_weeks_long">%1$s সপ্তাহ আগে</string>
+    <string name="relative_time_months_long">%1$s মাস আগে</string>
+    <string name="relative_time_years_long">%1$s বছর আগে</string>
+</resources>

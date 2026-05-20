@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relative_time_now">now</string>
+    <string name="relative_time_minutes_short">%1$sm</string>
+    <string name="relative_time_hours_short">%1$sh</string>
+    <string name="relative_time_days_short">%1$sd</string>
+    <string name="relative_time_weeks_short">%1$sw</string>
+    <string name="relative_time_months_short">%1$smo</string>
+    <string name="relative_time_years_short">%1$sy</string>
+    <string name="relative_time_minutes_long">%1$s minutes ago</string>
+    <string name="relative_time_hours_long">%1$s hours ago</string>
+    <string name="relative_time_days_long">%1$s days ago</string>
+    <string name="relative_time_weeks_long">%1$s weeks ago</string>
+    <string name="relative_time_months_long">%1$s months ago</string>
+    <string name="relative_time_years_long">%1$s years ago</string>
+</resources>

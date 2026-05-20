@@ -150,6 +150,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.ext.junit)
     implementation(project(":lib"))
+    implementation(project(":shared"))
 
     implementation(platform(libs.compose.bom))
 
@@ -161,6 +162,7 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.compose.foundation.layout)
     implementation(libs.compose.material3)
+    implementation(libs.compose.components.resources)
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation(libs.compose.navigation)
 

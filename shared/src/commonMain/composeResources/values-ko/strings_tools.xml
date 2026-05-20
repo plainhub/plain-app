@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="custom_sound">커스텀 사운드</string>
+    <string name="select_sound">사운드 선택</string>
+    <string name="sound_meter">음향 미터</string>
+    <string name="pomodoro_timer">포모도로 타이머</string>
+    <string name="dlna_receiver">무선 캐스트</string>
+    <string name="dlna_receiver_description">활성화하면 같은 Wi-Fi 네트워크의 PlainApp이 이 기기로 동영상과 음악을 전송할 수 있습니다</string>
+    <string name="dlna_receiver_active">활성, 전송 대기 중…</string>
+    <string name="dlna_receiver_waiting_title">전송 대기 중</string>
+    <string name="dlna_receiver_waiting_desc">네트워크에서 보이는 기기: %1$s</string>
+    <string name="dlna_receiver_step1_title">같은 Wi-Fi에 연결</string>
+    <string name="dlna_receiver_step1_desc">두 기기가 같은 Wi-Fi 네트워크에 연결되어 있는지 확인하세요</string>
+    <string name="dlna_receiver_step2_title">PlainApp 열기</string>
+    <string name="dlna_receiver_step2_desc">다른 기기에서 PlainApp을 열고 재생할 동영상이나 음악을 찾으세요</string>
+    <string name="dlna_receiver_step3_title">전송</string>
+    <string name="dlna_receiver_step3_desc">전송 아이콘을 탭하고 목록에서 "%1$s"를 선택하면 재생이 시작됩니다</string>
+    <string name="dlna_receiver_protocol_note">DLNA / UPnP 프로토콜 지원, VLC, Kodi 등 주요 전송 앱과 호환됩니다</string>
+    <string name="dlna_receiver_enable">수신기 활성화</string>
+    <string name="dlna_receiver_disable">수신기 비활성화</string>
+    <string name="dlna_receiver_exit_player">플레이어 종료</string>
+    <string name="short_break">짧은 휴식</string>
+    <string name="long_break">긴 휴식</string>
+    <string name="tomatoes_today">오늘의 토마토</string>
+    <string name="current_round">라운드</string>
+    <string name="work_duration">작업 시간 (분)</string>
+    <string name="short_break_duration">짧은 휴식 시간 (분)</string>
+    <string name="long_break_duration">긴 휴식 시간 (분)</string>
+    <string name="pomodoros_before_long_break">긴 휴식 전 포모도로 수</string>
+    <string name="total_pomodoros">총 포모도로 수</string>
+    <string name="session_complete">세션 완료!</string>
+    <string name="time_for_break">휴식 시간입니다!</string>
+    <string name="back_to_work">작업으로 돌아가세요!</string>
+    <string name="pomodoro_stats">포모도로 통계</string>
+    <string name="work_time">작업 시간</string>
+    <string name="round_counter">%2$d 라운드 중 %1$d 라운드</string>
+    <string name="drag_to_adjust_progress">진행 상황을 조정하려면 드래그하세요</string>
+    <string name="today_completed">오늘 완료된 항목</string>
+    <string name="pomodoro_notification_prompt">세션이 완료될 때 알림과 타이머 경고를 표시하려면 앱에서 알림 권한을 허용하세요.</string>
+    <string name="work_session_complete">작업 세션 완료!</string>
+    <string name="great_job_short_break">잘했어요! 짧은 휴식을 취하세요 😊</string>
+    <string name="great_job_long_break">잘했어요! 긴 휴식을 취하세요 😊</string>
+    <string name="break_complete">휴식 완료!</string>
+    <string name="time_to_work">작업으로 돌아갈 시간입니다 💪</string>
+    <string name="long_break_complete">긴 휴식 완료!</string>
+    <string name="ready_for_work">다음 작업을 시작할 준비가 되셨나요? 🚀</string>
+    <string name="grant_permission_button">권한 부여</string>
+    <string name="sleep_timer_permission_message">수면 타이머가 백그라운드에서 정상적으로 작동하려면 정확한 알람 예약 권한이 필요합니다.</string>
+    <string name="play_sound_on_complete">완료 시 소리 재생</string>
+    <string name="checked">선택됨</string>
+    <string name="min">최소</string>
+    <string name="avg">평균</string>
+    <string name="max">최대</string>
+    <string name="decibel_values">데시벨 값 참조</string>
+    <string-array name="decibel_values">
+        <item>10 dB: 숨소리, 거의 조용함</item>
+        <item>20 dB: 모기, 나뭇잎 속삭임</item>
+        <item>30 dB: 조용한 도서관, 부드러운 배경 음악</item>
+        <item>40 dB: 조용한 대화, 냉장고 소리</item>
+        <item>50 dB: 보통 비, 가벼운 교통 소음</item>
+        <item>60 dB: 보통 대화, 사무실 환경</item>
+        <item>70 dB: 청소기, 번화한 거리 소음</item>
+        <item>80 dB: 차 경적 소리, 생활폐기물 처리기</item>
+        <item>90 dB: 오토바이, 지하철 소리</item>
+        <item>100 dB: 전기톱, 콘서트 음악</item>
+        <item>110 dB: 록 콘서트, 천둥 소리</item>
+        <item>120 dB: 이륙 중인 제트 엔진, 응급 사이렌</item>
+        <item>130 dB: 샷건 발사, 공구용 망치</item>
+        <item>140 dB: 군용 제트 비행기, 불꽃놀이</item>
+    </string-array>
+    <string name="dlna_cast_request_title">캐스트 요청</string>
+    <string name="dlna_cast_request_desc">기기 %1$s이(가) 이 기기로 캐스트하려고 합니다</string>
+    <string name="dlna_cast_accept">허용</string>
+    <string name="dlna_cast_reject">거부</string>
+    <string name="dlna_cast_remember_choice">선택 기억, 다시 묻지 않기</string>
+    <string name="dlna_cast_history">캐스트 규칙</string>
+    <string name="dlna_cast_accepted">허용됨</string>
+    <string name="dlna_cast_rejected">거부됨</string>
+    <string name="dlna_receiver_start_error">수신기를 시작하지 못했습니다.</string>
+    <string name="retry">다시 시도</string>
+</resources>

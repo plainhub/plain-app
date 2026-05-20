@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relative_time_now">Az önce</string>
+    <string name="relative_time_minutes_short">%1$s dk</string>
+    <string name="relative_time_hours_short">%1$s sa</string>
+    <string name="relative_time_days_short">%1$s g</string>
+    <string name="relative_time_weeks_short">%1$s hf</string>
+    <string name="relative_time_months_short">%1$s ay</string>
+    <string name="relative_time_years_short">%1$s yıl</string>
+    <string name="relative_time_minutes_long">%1$s dakika önce</string>
+    <string name="relative_time_hours_long">%1$s saat önce</string>
+    <string name="relative_time_days_long">%1$s gün önce</string>
+    <string name="relative_time_weeks_long">%1$s hafta önce</string>
+    <string name="relative_time_months_long">%1$s ay önce</string>
+    <string name="relative_time_years_long">%1$s yıl önce</string>
+</resources>
