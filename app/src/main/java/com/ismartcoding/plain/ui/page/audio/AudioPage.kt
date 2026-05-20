@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -80,8 +79,8 @@ fun AudioPage(
     val isAudioPlaying by AudioPlayer.isPlayingFlow.collectAsState()
 
     val tabs = remember(tagsState, audioVM.total.intValue, audioVM.totalTrash.intValue) {
-        val baseTabs = mutableListOf(VTabData(LocaleHelper.getString(R.string.all), "all", audioVM.total.intValue))
-        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(R.string.trash), "trash", audioVM.totalTrash.intValue))
+        val baseTabs = mutableListOf(VTabData(LocaleHelper.getStringSync(Res.string.all), "all", audioVM.total.intValue))
+        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getStringSync(Res.string.trash), "trash", audioVM.totalTrash.intValue))
         baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) })
         baseTabs
     }

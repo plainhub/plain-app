@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +16,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
@@ -38,7 +39,7 @@ fun ChannelMembersDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.channel_members),
+                text = stringResource(Res.string.channel_members),
                 style = MaterialTheme.typography.titleLarge,
             )
         },
@@ -49,7 +50,7 @@ fun ChannelMembersDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = stringResource(R.string.no_paired_peers_available),
+                        text = stringResource(Res.string.no_paired_peers_available),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -84,7 +85,7 @@ fun ChannelMembersDialog(
         },
         confirmButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.done))
+                Text(text = stringResource(Res.string.done))
             }
         },
         dismissButton = {},

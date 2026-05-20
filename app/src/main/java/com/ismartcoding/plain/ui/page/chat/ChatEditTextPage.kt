@@ -18,13 +18,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageContent
@@ -59,11 +58,11 @@ fun ChatEditTextPage(
         topBar = {
             PTopAppBar(
                 navController = navController,
-                title = stringResource(id = R.string.edit_text),
+                title = stringResource(Res.string.edit_text),
                 actions = {
                     PIconButton(
                         icon = Res.drawable.save,
-                        contentDescription = stringResource(R.string.save),
+                        contentDescription = stringResource(Res.string.save),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
                         if (inputValue.isNotEmpty()) {

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.audio
 
+import com.ismartcoding.plain.i18n.*
+
 import android.os.SystemClock
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,12 +26,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.events.SleepTimerEvent
@@ -77,7 +78,7 @@ fun SleepTimerPage(onDismissRequest: () -> Unit) {
         Box(modifier = Modifier.fillMaxWidth().height(500.dp).padding(bottom = 32.dp)) {
             Column(modifier = Modifier.fillMaxWidth().fillMaxHeight().padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top) {
-                Text(text = stringResource(R.string.sleep_timer),
+                Text(text = stringResource(Res.string.sleep_timer),
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(vertical = 16.dp))
                 Spacer(modifier = Modifier.height(8.dp))
@@ -87,7 +88,7 @@ fun SleepTimerPage(onDismissRequest: () -> Unit) {
                         modifier = Modifier.fillMaxWidth().weight(1f)) {
                         SleepTimerActiveContent(remainingTimeMs, selectedTimeMinutes)
                         Spacer(modifier = Modifier.weight(1f))
-                        PFilledButton(text = stringResource(R.string.cancel_timer), onClick = {
+                        PFilledButton(text = stringResource(Res.string.cancel_timer), onClick = {
                             scope.launch {
                                 withIO { TempData.audioSleepTimerFutureTime = 0 }
                                 timerJob?.cancel(); timerActive = false; remainingTimeMs = 0
@@ -101,7 +102,7 @@ fun SleepTimerPage(onDismissRequest: () -> Unit) {
                         modifier = Modifier.fillMaxWidth().weight(1f)) {
                         SleepTimerSelectionContent(selectedTimeMinutes) { selectedTimeMinutes = it }
                         Spacer(modifier = Modifier.weight(1f))
-                        PFilledButton(text = stringResource(R.string.start_timer), onClick = {
+                        PFilledButton(text = stringResource(Res.string.start_timer), onClick = {
                             scope.launch {
                                 withIO {
                                     val durationMs = selectedTimeMinutes * 60 * 1000L

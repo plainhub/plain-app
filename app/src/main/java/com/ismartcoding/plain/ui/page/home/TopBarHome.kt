@@ -24,13 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
@@ -72,9 +71,9 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = { showDiscoverableDialog = false },
-            title = { Text(stringResource(R.string.make_discoverable), style = MaterialTheme.typography.titleLarge) },
+            title = { Text(stringResource(Res.string.make_discoverable), style = MaterialTheme.typography.titleLarge) },
             text = {
-                PDialogListItem(title = stringResource(R.string.make_discoverable_desc)) {
+                PDialogListItem(title = stringResource(Res.string.make_discoverable_desc)) {
                     PSwitch(activated = isDiscoverable) {
                         peerVM.updateDiscoverable(context, it)
                     }
@@ -82,7 +81,7 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
             },
             confirmButton = {
                 Button(onClick = { showDiscoverableDialog = false }) {
-                    Text(text = stringResource(R.string.close))
+                    Text(text = stringResource(Res.string.close))
                 }
             },
         )
@@ -106,7 +105,7 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.pen),
-                        contentDescription = stringResource(R.string.device_name),
+                        contentDescription = stringResource(Res.string.device_name),
                         modifier = Modifier.size(16.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -116,7 +115,7 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
         actions = {
             PIconButton(
                 icon = if (isDiscoverable) Res.drawable.eye else Res.drawable.eye_off,
-                contentDescription = stringResource(R.string.make_discoverable),
+                contentDescription = stringResource(Res.string.make_discoverable),
                 tint = MaterialTheme.colorScheme.onSurface,
                 click = { showDiscoverableDialog = true },
             )

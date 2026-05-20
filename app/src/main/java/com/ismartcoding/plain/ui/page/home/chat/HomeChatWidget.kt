@@ -10,10 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -48,12 +47,12 @@ fun HomeChatWidget(
     val channels = channelVM.channels.collectAsStateValue()
 
     val localChat = peerVM.getLatestChat("local")
-    val onlineText = stringResource(R.string.online)
-    val channelsText = stringResource(R.string.channels)
+    val onlineText = stringResource(Res.string.online)
+    val channelsText = stringResource(Res.string.channels)
     val localRow = ChatRow(
         sortAt = localChat?.createdAt ?: Instant.DISTANT_PAST,
-        title = stringResource(R.string.local_chat),
-        desc = stringResource(R.string.local_chat_desc),
+        title = stringResource(Res.string.local_chat),
+        desc = stringResource(Res.string.local_chat_desc),
         icon = Res.drawable.bot,
         online = null,
         latestChat = localChat,
@@ -97,7 +96,7 @@ fun HomeChatWidget(
     ) {
         Column {
             HomeSectionClickableHeader(
-                title = stringResource(R.string.chat),
+                title = stringResource(Res.string.chat),
                 onClick = { navController.navigate(Routing.ChatList) },
                 trailingContent = { HomeSectionCollapseButton(collapsed = collapsed, featureType = AppFeatureType.CHAT) },
             )

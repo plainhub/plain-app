@@ -28,10 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.preferences.HttpsPreference
@@ -76,7 +75,7 @@ fun HomeWebAddressSection(
 
     Column {
         Text(
-            text = stringResource(R.string.web_address_hint),
+            text = stringResource(Res.string.web_address_hint),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 32.dp),
@@ -116,7 +115,7 @@ fun HomeWebAddressSection(
             ) {
                 if (isError) {
                     PFilledButton(
-                        stringResource(R.string.troubleshoot),
+                        stringResource(Res.string.troubleshoot),
                         buttonSize = ButtonSize.SMALL,
                         onClick = {
                             WebHelper.open(
@@ -128,16 +127,16 @@ fun HomeWebAddressSection(
                 } else {
                     PIconTextButton(
                         icon = Res.drawable.wifi_tethering,
-                        text = stringResource(R.string.stay_online_mode),
+                        text = stringResource(Res.string.stay_online_mode),
                         click = { showStayOnlineOverlay = true },
                     )
                 }
-                PIconTextButton(Res.drawable.settings, stringResource(R.string.web_settings)) {
+                PIconTextButton(Res.drawable.settings, stringResource(Res.string.web_settings)) {
                     navController.navigate(Routing.WebSettings)
                 }
             }
         }
         VerticalSpace(8.dp)
-        Tips(text = stringResource(R.string.same_network_hint))
+        Tips(text = stringResource(Res.string.same_network_hint))
     }
 }

@@ -28,13 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ActionButtonTags
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -83,17 +82,17 @@ fun NotePage(
     PScaffold(topBar = {
         PTopAppBar(navController = navController, title = "", scrollBehavior = scrollBehavior, actions = {
             if (noteVM.editMode) {
-                PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(R.string.undo), enabled = mdEditorVM.textFieldState.undoState.canUndo,
+                PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.textFieldState.undoState.canUndo,
                     tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.textFieldState.undoState.undo() }
-                PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(R.string.redo), enabled = mdEditorVM.textFieldState.undoState.canRedo,
+                PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(Res.string.redo), enabled = mdEditorVM.textFieldState.undoState.canRedo,
                     tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.textFieldState.undoState.redo() }
-                PIconButton(icon = Res.drawable.wrap_text, contentDescription = stringResource(R.string.wrap_content),
+                PIconButton(icon = Res.drawable.wrap_text, contentDescription = stringResource(Res.string.wrap_content),
                     tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.toggleWrapContent(navController.context) }
             } else if (id.value.isNotEmpty()) {
                 ActionButtonTags { noteVM.showSelectTagsDialog.value = true }
             }
             PIconButton(icon = if (noteVM.editMode) Res.drawable.markdown else Res.drawable.square_pen,
-                contentDescription = stringResource(if (noteVM.editMode) R.string.view else R.string.edit),
+                contentDescription = stringResource(if (noteVM.editMode) Res.string.view else Res.string.edit),
                 tint = MaterialTheme.colorScheme.onSurface) { noteVM.editMode = !noteVM.editMode }
         })
     }, modifier = Modifier.imePadding(), bottomBar = {

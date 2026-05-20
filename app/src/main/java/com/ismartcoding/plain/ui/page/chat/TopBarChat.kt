@@ -8,9 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.ActionButtonFolders
@@ -34,14 +33,14 @@ fun TopBarChat(
         navigationIcon = {
             NavigationBackIcon(onClick = onNavigateBack)
         },
-        title = stringResource(R.string.chat),
+        title = stringResource(Res.string.chat),
         actions = {
             ActionButtonFolders {
                 navController.navigateAppFiles()
             }
             ActionButtonAddWithMenu { dismiss ->
                 PDropdownMenuItem(
-                    text = { Text(stringResource(R.string.new_channel)) },
+                    text = { Text(stringResource(Res.string.new_channel)) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(Res.drawable.hash),
@@ -54,7 +53,7 @@ fun TopBarChat(
                     },
                 )
                 PDropdownMenuItem(
-                    text = { Text(stringResource(R.string.add_device)) },
+                    text = { Text(stringResource(Res.string.add_device)) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(Res.drawable.plus),

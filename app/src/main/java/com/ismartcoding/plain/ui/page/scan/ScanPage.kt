@@ -45,7 +45,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
@@ -54,7 +54,6 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -100,7 +99,7 @@ fun ScanPage(navController: NavHostController) {
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
             when (event) {
-                is PermissionsResultEvent -> { hasCamPermission = Permission.CAMERA.can(context); if (!hasCamPermission) DialogHelper.showMessage(LocaleHelper.getString(R.string.scan_needs_camera_warning)) }
+                is PermissionsResultEvent -> { hasCamPermission = Permission.CAMERA.can(context); if (!hasCamPermission) DialogHelper.showMessage(LocaleHelper.getString(Res.string.scan_needs_camera_warning)) }
                 is PickFileResultEvent -> {
                     if (event.tag != PickFileTag.SCAN) return@collect
                     coIO {
@@ -121,15 +120,15 @@ fun ScanPage(navController: NavHostController) {
     if (showScanResultSheet) { QrScanResultBottomSheet(context, scanResult) { showScanResultSheet = false; cameraDetecting.value = true } }
     pendingPairData?.let { pairData ->
         AlertDialog(onDismissRequest = { pendingPairData = null; cameraDetecting.value = true },
-            title = { Text(stringResource(R.string.pair_via_qr_title)) },
-            text = { Text(stringResource(R.string.confirm_pair_with_device, pairData.name)) },
-            confirmButton = { Button(onClick = { navController.navigate(Routing.Nearby(JsonHelper.jsonEncode(pairData))) { popUpTo(Routing.Scan) { inclusive = true } }; pendingPairData = null }) { Text(stringResource(R.string.pair)) } },
-            dismissButton = { TextButton(onClick = { pendingPairData = null; cameraDetecting.value = true }) { Text(stringResource(R.string.cancel)) } })
+            title = { Text(stringResource(Res.string.pair_via_qr_title)) },
+            text = { Text(stringResource(Res.string.confirm_pair_with_device, pairData.name)) },
+            confirmButton = { Button(onClick = { navController.navigate(Routing.Nearby(JsonHelper.jsonEncode(pairData))) { popUpTo(Routing.Scan) { inclusive = true } }; pendingPairData = null }) { Text(stringResource(Res.string.pair)) } },
+            dismissButton = { TextButton(onClick = { pendingPairData = null; cameraDetecting.value = true }) { Text(stringResource(Res.string.cancel)) } })
     }
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController, title = stringResource(id = R.string.scan_qrcode), actions = {
-            PIconButton(icon = Res.drawable.history, contentDescription = stringResource(R.string.scan_history), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.ScanHistory) }
+        PTopAppBar(navController = navController, title = stringResource(Res.string.scan_qrcode), actions = {
+            PIconButton(icon = Res.drawable.history, contentDescription = stringResource(Res.string.scan_history), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.ScanHistory) }
         })
     }, content = { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
@@ -137,7 +136,7 @@ fun ScanPage(navController: NavHostController) {
             if (hasCamPermission) ScanOverlay()
             Row(modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 64.dp).align(Alignment.BottomCenter), horizontalArrangement = Arrangement.End) {
                 Box(modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.darkMask(0.2f)).clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) }, contentAlignment = Alignment.Center) {
-                    Icon(painter = painterResource(Res.drawable.image), contentDescription = stringResource(R.string.images), tint = Color.White)
+                    Icon(painter = painterResource(Res.drawable.image), contentDescription = stringResource(Res.string.images), tint = Color.White)
                 }
             }
         }

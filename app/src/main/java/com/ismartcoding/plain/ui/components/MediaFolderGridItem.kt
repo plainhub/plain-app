@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -23,14 +25,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
+import org.jetbrains.compose.resources.pluralStringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.helpers.BitmapHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -127,7 +128,7 @@ fun MediaFolderGridItem(
             )
 
             VerticalSpace(4.dp)
-            var subtitle = pluralStringResource(R.plurals.items, m.itemCount, m.itemCount)
+            var subtitle = pluralStringResource(Res.plurals.items, m.itemCount, m.itemCount)
             if (m.size > 0) {
                 subtitle += " • " + m.size.formatBytes()
             }

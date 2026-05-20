@@ -24,10 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -68,7 +67,7 @@ internal fun AudioCastPlayerBarContent(
                     .padding(horizontal = 12.dp, vertical = 8.dp),
             ) {
                 Text(
-                    text = if (title.isNotEmpty()) title else stringResource(R.string.casting),
+                    text = if (title.isNotEmpty()) title else stringResource(Res.string.casting),
                     style = MaterialTheme.typography.listItemTitle(),
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
@@ -90,7 +89,7 @@ internal fun AudioCastPlayerBarContent(
                 ) {
                     Icon(
                         painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
-                        contentDescription = if (isPlaying) stringResource(R.string.pause) else stringResource(R.string.play),
+                        contentDescription = if (isPlaying) stringResource(Res.string.pause) else stringResource(Res.string.play),
                         tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp),
                     )
@@ -103,7 +102,7 @@ internal fun AudioCastPlayerBarContent(
             ) {
                 Icon(
                     painter = painterResource(Res.drawable.list_music),
-                    contentDescription = stringResource(R.string.playlist),
+                    contentDescription = stringResource(Res.string.playlist),
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }

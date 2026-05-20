@@ -1,18 +1,19 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.events.PeerUpdatedEvent
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -75,7 +76,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                 _chatState.value = _chatState.value.copy(toId = toId, toName = channel?.name ?: "", chatType = ChatType.CHANNEL)
             }
             else -> {
-                _chatState.value = _chatState.value.copy(toId = "local", toName = getString(R.string.local_chat), chatType = ChatType.LOCAL)
+                _chatState.value = _chatState.value.copy(toId = "local", toName = LocaleHelper.getString(Res.string.local_chat), chatType = ChatType.LOCAL)
             }
         }
     }

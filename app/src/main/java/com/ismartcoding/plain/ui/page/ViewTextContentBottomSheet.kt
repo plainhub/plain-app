@@ -1,13 +1,14 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -60,7 +61,7 @@ fun ViewTextContentBottomSheet(
             item {
                 VerticalSpace(dp = 24.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.wrap_content), action = {
+                    PListItem(title = stringResource(Res.string.wrap_content), action = {
                         PSwitch(
                             activated = textFileVM.wrapContent.value,
                         ) {

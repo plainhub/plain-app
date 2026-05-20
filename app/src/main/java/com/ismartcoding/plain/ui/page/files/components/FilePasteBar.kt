@@ -15,10 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -45,9 +44,9 @@ fun FilePasteBar(
 
             Text(
                 text = if (filesVM.cutFiles.isNotEmpty())
-                    LocaleHelper.getQuantityString(R.plurals.moving_items, filesVM.cutFiles.size)
+                    pluralStringResource(Res.plurals.moving_items, filesVM.cutFiles.size, filesVM.cutFiles.size)
                 else
-                    LocaleHelper.getQuantityString(R.plurals.copying_items, filesVM.copyFiles.size),
+                    pluralStringResource(Res.plurals.copying_items, filesVM.copyFiles.size, filesVM.copyFiles.size),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
@@ -61,7 +60,7 @@ fun FilePasteBar(
                     }
                 }
             }) {
-                Text(stringResource(R.string.paste))
+                Text(stringResource(Res.string.paste))
             }
         }
     }

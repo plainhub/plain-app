@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,10 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.extensions.getElegantDisplayName
 import com.ismartcoding.plain.preferences.LanguagePreference
@@ -41,7 +42,7 @@ fun LanguagePage(navController: NavHostController) {
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(R.string.language))
+            PTopAppBar(navController = navController, title = stringResource(Res.string.language))
         },
         content = { paddingValues ->
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
@@ -57,7 +58,7 @@ fun LanguagePage(navController: NavHostController) {
                                     LanguagePreference.putAsync(context, item)
                                 }
                             },
-                        title = item?.getElegantDisplayName() ?: stringResource(id = R.string.use_device_language),
+                        title = item?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
                     ) {
                         RadioButton(selected = (item == null && language == null) || (item?.language == language?.language && item?.country == language?.country), onClick = {
                             scope.launch(Dispatchers.IO) {

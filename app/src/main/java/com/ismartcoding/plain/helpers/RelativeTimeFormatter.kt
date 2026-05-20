@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
+import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.i18n.*
+import org.jetbrains.compose.resources.StringResource
 
 /**
  * Modern, cross-platform relative time formatter.
@@ -9,10 +10,6 @@ import com.ismartcoding.plain.R
  * RelativeTimeFormatter.format(timestamp, now, style)
  *
  * All display strings live in strings_relative_time.xml — no hardcoded text.
- * Android's resource system automatically selects the correct locale.
- *
- * Supported locales with dedicated translations: en (default), zh-CN, zh-TW, ja.
- * All other locales fall back to the English short format (5m / 2h / 1d / …).
  */
 object RelativeTimeFormatter {
 
@@ -32,18 +29,18 @@ object RelativeTimeFormatter {
     ): String {
         val diff = now - timestamp
         return when {
-            diff < MIN      -> str(R.string.relative_time_now)
-            diff < HOUR     -> fmt((diff / MIN).coerceAtLeast(1), style, R.string.relative_time_minutes_short, R.string.relative_time_minutes_long)
-            diff < DAY      -> fmt((diff / HOUR).coerceAtLeast(1), style, R.string.relative_time_hours_short, R.string.relative_time_hours_long)
-            diff < WEEK     -> fmt((diff / DAY).coerceAtLeast(1), style, R.string.relative_time_days_short, R.string.relative_time_days_long)
-            diff < 4 * WEEK -> fmt((diff / WEEK).coerceAtLeast(1), style, R.string.relative_time_weeks_short, R.string.relative_time_weeks_long)
-            diff < YEAR     -> fmt((diff / MONTH).coerceAtLeast(1), style, R.string.relative_time_months_short, R.string.relative_time_months_long)
-            else            -> fmt((diff / YEAR).coerceAtLeast(1), style, R.string.relative_time_years_short, R.string.relative_time_years_long)
+            diff < MIN      -> str(Res.string.relative_time_now)
+            diff < HOUR     -> fmt((diff / MIN).coerceAtLeast(1), style, Res.string.relative_time_minutes_short, Res.string.relative_time_minutes_long)
+            diff < DAY      -> fmt((diff / HOUR).coerceAtLeast(1), style, Res.string.relative_time_hours_short, Res.string.relative_time_hours_long)
+            diff < WEEK     -> fmt((diff / DAY).coerceAtLeast(1), style, Res.string.relative_time_days_short, Res.string.relative_time_days_long)
+            diff < 4 * WEEK -> fmt((diff / WEEK).coerceAtLeast(1), style, Res.string.relative_time_weeks_short, Res.string.relative_time_weeks_long)
+            diff < YEAR     -> fmt((diff / MONTH).coerceAtLeast(1), style, Res.string.relative_time_months_short, Res.string.relative_time_months_long)
+            else            -> fmt((diff / YEAR).coerceAtLeast(1), style, Res.string.relative_time_years_short, Res.string.relative_time_years_long)
         }
     }
 
-    private fun str(resId: Int) = MainApp.instance.getString(resId)
+    private fun str(resource: StringResource) = LocaleHelper.getStringSync(resource)
 
-    private fun fmt(n: Long, style: Style, shortRes: Int, longRes: Int): String =
-        MainApp.instance.getString(if (style == Style.SHORT) shortRes else longRes, n)
+    private fun fmt(n: Long, style: Style, shortRes: StringResource, longRes: StringResource): String =
+        LocaleHelper.getStringSync(if (style == Style.SHORT) shortRes else longRes).format(n)
 }

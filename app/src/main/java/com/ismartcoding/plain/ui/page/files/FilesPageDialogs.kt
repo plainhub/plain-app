@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.preferences.FileSortByPreference
 import com.ismartcoding.plain.ui.base.TextFieldDialog
@@ -31,8 +32,8 @@ internal fun FilesPageDialogs(
     if (filesVM.showCreateFolderDialog.value) {
         val folderNameValue = remember { mutableStateOf("") }
         TextFieldDialog(
-            title = stringResource(id = R.string.create_folder), value = folderNameValue.value,
-            placeholder = stringResource(id = R.string.name),
+            title = stringResource(Res.string.create_folder), value = folderNameValue.value,
+            placeholder = stringResource(Res.string.name),
             onValueChange = { folderNameValue.value = it },
             onDismissRequest = { filesVM.showCreateFolderDialog.value = false },
             onConfirm = { name ->
@@ -51,8 +52,8 @@ internal fun FilesPageDialogs(
     if (filesVM.showCreateFileDialog.value) {
         val fileNameValue = remember { mutableStateOf("") }
         TextFieldDialog(
-            title = stringResource(id = R.string.create_file), value = fileNameValue.value,
-            placeholder = stringResource(id = R.string.name),
+            title = stringResource(Res.string.create_file), value = fileNameValue.value,
+            placeholder = stringResource(Res.string.name),
             onValueChange = { fileNameValue.value = it },
             onDismissRequest = { filesVM.showCreateFileDialog.value = false },
             onConfirm = { name ->

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
+
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -33,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,7 +44,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
@@ -101,7 +102,7 @@ fun FeedEntryPage(navController: NavHostController, id: String, tagsVM: TagsView
         content = { paddingValues ->
             val m = feedEntryVM.item.value ?: return@PScaffold
             PullToRefresh(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = topRefreshLayoutState,
-                refreshContent = remember { { PullToRefreshContent(createText = { when (it) { RefreshContentState.Failed -> stringResource(id = R.string.fetch_failed); RefreshContentState.Finished -> stringResource(id = R.string.fetched); RefreshContentState.Refreshing -> stringResource(id = R.string.fetching_content); RefreshContentState.Dragging -> if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) stringResource(id = R.string.pull_down_to_fetch_content) else stringResource(id = R.string.release_to_fetch) } }) } }) {
+                refreshContent = remember { { PullToRefreshContent(createText = { when (it) { RefreshContentState.Failed -> stringResource(Res.string.fetch_failed); RefreshContentState.Finished -> stringResource(Res.string.fetched); RefreshContentState.Refreshing -> stringResource(Res.string.fetching_content); RefreshContentState.Dragging -> if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) stringResource(Res.string.pull_down_to_fetch_content) else stringResource(Res.string.release_to_fetch) } }) } }) {
                 LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection), state = scrollState) {
                     item {
                         androidx.compose.foundation.layout.Box(modifier = Modifier.padding(horizontal = 8.dp).clip(RoundedCornerShape(PlainTheme.CARD_RADIUS)).combinedClickable(onDoubleClick = { navController.navigateText("JSON", jsonEncode(m, pretty = true), "json") }, onClick = { WebHelper.open(context, m.url) })) {
@@ -122,7 +123,7 @@ fun FeedEntryPage(navController: NavHostController, id: String, tagsVM: TagsView
                         item {
                             VerticalSpace(dp = 32.dp)
                             if (feedEntryVM.fetchingContent.value) { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) { CircularProgressIndicator(modifier = Modifier.size(32.dp), color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp) } }
-                            else { POutlinedButton(text = stringResource(id = R.string.load_full_content), block = true, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), enabled = !feedEntryVM.fetchingContent.value, onClick = { scope.launch { feedEntryVM.item.value?.let { mm -> feedEntryVM.fetchingContent.value = true; val r = withIO { mm.fetchContentAsync() }; feedEntryVM.fetchingContent.value = false; if (r.isOk()) feedEntryVM.content.value = mm.content else DialogHelper.showErrorDialog(r.errorMessage()) } } }) }
+                            else { POutlinedButton(text = stringResource(Res.string.load_full_content), block = true, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), enabled = !feedEntryVM.fetchingContent.value, onClick = { scope.launch { feedEntryVM.item.value?.let { mm -> feedEntryVM.fetchingContent.value = true; val r = withIO { mm.fetchContentAsync() }; feedEntryVM.fetchingContent.value = false; if (r.isOk()) feedEntryVM.content.value = mm.content else DialogHelper.showErrorDialog(r.errorMessage()) } } }) }
                         }
                     }
                     item { BottomSpace(paddingValues) }

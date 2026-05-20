@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.images
 
+import com.ismartcoding.plain.i18n.*
+
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,11 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getMimeType
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.extensions.formatDateTime
@@ -95,7 +96,7 @@ fun ViewImageBottomSheet(
             if (!imagesVM.trash.value) {
                 item {
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(text = stringResource(id = R.string.tags))
+                    Subtitle(text = stringResource(Res.string.tags))
                     TagSelector(data = m, tagsVM = tagsVM, tagsMap = tagsMap, tagsState = tagsState,
                         onChangedAsync = { imagesVM.loadAsync(context, tagsVM) })
                 }
@@ -107,11 +108,11 @@ fun ViewImageBottomSheet(
             item {
                 VerticalSpace(dp = 16.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.file_size), value = m.size.formatBytes())
-                    PListItem(title = stringResource(id = R.string.type), value = m.path.getMimeType())
-                    PListItem(title = stringResource(id = R.string.dimensions), value = "${viewSize.width}\u00d7${viewSize.height}")
-                    PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
-                    PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
+                    PListItem(title = stringResource(Res.string.type), value = m.path.getMimeType())
+                    PListItem(title = stringResource(Res.string.dimensions), value = "${viewSize.width}\u00d7${viewSize.height}")
+                    PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
                     ImageMetaRows(path = m.path)
                 }
             }

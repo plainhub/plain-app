@@ -20,10 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatDuration
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
@@ -88,7 +87,7 @@ fun ChatAudioInlineControls(
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.pause),
-                        contentDescription = stringResource(R.string.pause),
+                        contentDescription = stringResource(Res.string.pause),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(24.dp),
                     )
@@ -104,7 +103,7 @@ fun ChatAudioInlineControls(
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.play_arrow),
-                        contentDescription = stringResource(R.string.play),
+                        contentDescription = stringResource(Res.string.play),
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp),
                     )

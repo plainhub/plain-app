@@ -16,31 +16,6 @@ object LocaleHelper {
         return MainApp.instance.resources.configuration.locales.get(0)
     }
 
-    fun getString(resourceKey: Int): String {
-        return try {
-            MainApp.instance.resources.getString(resourceKey)
-        } catch (e: Exception) {
-            resourceKey.toString()
-        }
-    }
-
-    fun getStringIdentifier(identifierName: String): Int {
-        return MainApp.instance.resources.getIdentifier(identifierName, "string", MainApp.instance.packageName)
-    }
-
-    fun getString(identifierName: String): String {
-        val identifier = MainApp.instance.resources.getIdentifier(identifierName, "string", MainApp.instance.packageName)
-        return try {
-            if (identifier == 0) {
-                ""
-            } else {
-                MainApp.instance.getString(identifier)
-            }
-        } catch (e: Exception) {
-            identifierName
-        }
-    }
-
     fun getQuantityString(
         @PluralsRes id: Int,
         quantity: Int,
@@ -98,14 +73,16 @@ object LocaleHelper {
         return text.mustache(*toMustachePairs(formatArguments))
     }
 
+    fun getStringSync(resource: StringResource): String = kotlinx.coroutines.runBlocking { getComposeString(resource) }
+
     /**
-     * Load a [PluralStringResource] for [quantity] from the shared KMP module.
-     *
-     * Usage (suspend / coroutine context):
-     *   val text = LocaleHelper.getQuantityString(Res.plurals.items, count)
+     * Synchronous Mustache-substituted string load for non-Composable, non-coroutine contexts.
      */
-    suspend fun getQuantityString(resource: PluralStringResource, quantity: Int): String =
-        getComposePluralString(resource, quantity, quantity)
+    fun getStringSyncF(resource: StringResource, vararg formatArguments: Any): String {
+        if (formatArguments.size % 2 != 0) return getStringSync(resource)
+        val text = getStringSync(resource)
+        return text.mustache(*toMustachePairs(formatArguments))
+    }
 
     private fun toMustachePairs(args: Array<out Any>): Array<Pair<String, Any>> {
         val result = ArrayList<Pair<String, Any>>(args.size / 2)

@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.features.file
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import android.os.Environment
 import android.os.StatFs
@@ -13,9 +17,7 @@ import com.ismartcoding.plain.extensions.normalizeComparison
 import com.ismartcoding.plain.extensions.parseSizeToBytes
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.sorted
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.helpers.RootHelper
 import com.ismartcoding.plain.storageManager
@@ -85,7 +87,7 @@ object FileSystemHelper {
     }
 
     fun getInternalStorageName(): String {
-        return getString(R.string.internal_storage)
+        return LocaleHelper.getStringSync(Res.string.internal_storage)
     }
 
     fun getSDCardPath(context: Context): String {

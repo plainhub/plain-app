@@ -24,9 +24,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -61,9 +60,9 @@ fun ImagePreviewActions(
                     .background(MaterialTheme.colorScheme.darkMask())
                     .padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
-                POutlinedButton(text = stringResource(id = R.string.cast), small = true, onClick = { castViewModel.cast(m.path) })
+                POutlinedButton(text = stringResource(Res.string.cast), small = true, onClick = { castViewModel.cast(m.path) })
                 HorizontalSpace(dp = 20.dp)
-                POutlinedButton(text = stringResource(id = R.string.exit_cast_mode), small = true, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
+                POutlinedButton(text = stringResource(Res.string.exit_cast_mode), small = true, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
             }
             return
         }
@@ -73,15 +72,15 @@ fun ImagePreviewActions(
                 .background(MaterialTheme.colorScheme.darkMask())
                 .padding(horizontal = 20.dp, vertical = 8.dp),
         ) {
-            ActionIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(R.string.share)) {
+            ActionIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(Res.string.share)) {
                 scope.launch { sharePreviewImage(context, m) }
             }
             HorizontalSpace(dp = 20.dp)
-            ActionIconButton(icon = Res.drawable.cast, contentDescription = stringResource(R.string.cast)) {
+            ActionIconButton(icon = Res.drawable.cast, contentDescription = stringResource(Res.string.cast)) {
                 castViewModel.showCastDialog.value = true
             }
             HorizontalSpace(dp = 20.dp)
-            ActionIconButton(icon = Res.drawable.rotate_cw_square, contentDescription = stringResource(R.string.rotate)) {
+            ActionIconButton(icon = Res.drawable.rotate_cw_square, contentDescription = stringResource(Res.string.rotate)) {
                 scope.launch {
                     state.viewerContainerState?.viewerState?.let {
                         it.rotation.animateTo(it.rotation.value + 90, SpringSpec())
@@ -90,12 +89,12 @@ fun ImagePreviewActions(
             }
             if (m.data !is DImage && m.data !is DFile) {
                 HorizontalSpace(dp = 20.dp)
-                ActionIconButton(icon = Res.drawable.save, contentDescription = stringResource(R.string.save)) {
+                ActionIconButton(icon = Res.drawable.save, contentDescription = stringResource(Res.string.save)) {
                     scope.launch { savePreviewImage(context, m) }
                 }
             }
             HorizontalSpace(dp = 20.dp)
-            ActionIconButton(icon = Res.drawable.ellipsis, contentDescription = stringResource(R.string.more_info)) {
+            ActionIconButton(icon = Res.drawable.ellipsis, contentDescription = stringResource(Res.string.more_info)) {
                 state.showMediaInfo = true
             }
         }

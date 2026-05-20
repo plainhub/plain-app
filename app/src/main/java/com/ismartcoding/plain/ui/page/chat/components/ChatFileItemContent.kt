@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -13,7 +15,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
@@ -24,7 +26,6 @@ import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageFile
@@ -82,7 +83,7 @@ internal fun ChatFileItemContent(
                             )
                         }
                     } else if (fileName.isAudioFast()) {
-                        Permissions.checkNotification(context, R.string.audio_notification_prompt) {
+                        Permissions.checkNotification(context, Res.string.audio_notification_prompt) {
                             AudioPlayer.play(context, DPlaylistAudio.fromPath(context, path))
                         }
                     } else if (fileName.isTextFile()) {
@@ -103,13 +104,13 @@ internal fun ChatFileItemContent(
             onDismissRequest = { showContextMenu.value = false },
         ) {
             PDropdownMenuItem(
-                text = { Text(stringResource(R.string.save)) },
+                text = { Text(stringResource(Res.string.save)) },
                 onClick = {
                     showContextMenu.value = false
                     coMain {
                         val result = withIO { FileHelper.copyFileToDownloads(path, fileName) }
                         if (result.isNotEmpty()) {
-                            DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.file_save_to, "path", result))
+                            DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.file_save_to, "path", result))
                         } else {
                             DialogHelper.showErrorMessage(result)
                         }

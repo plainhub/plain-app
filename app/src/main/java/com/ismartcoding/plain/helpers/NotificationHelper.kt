@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
+import com.ismartcoding.plain.i18n.*
+
 import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
@@ -17,7 +21,6 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.receivers.PeerChatReplyReceiver
 import com.ismartcoding.plain.receivers.ServiceStopBroadcastReceiver
 import com.ismartcoding.plain.ui.MainActivity
@@ -46,7 +49,7 @@ object NotificationHelper {
             notificationManager.createNotificationChannel(
                 NotificationChannel(
                     Constants.NOTIFICATION_CHANNEL_ID,
-                    getString(R.string.app_name),
+                    LocaleHelper.getStringSync(Res.string.app_name),
                     NotificationManager.IMPORTANCE_DEFAULT,
                 ).apply {
                     setShowBadge(false)
@@ -61,7 +64,7 @@ object NotificationHelper {
             notificationManager.createNotificationChannel(
                 NotificationChannel(
                     Constants.CHAT_NOTIFICATION_CHANNEL_ID,
-                    getString(R.string.peer_chat),
+                    LocaleHelper.getStringSync(Res.string.peer_chat),
                     NotificationManager.IMPORTANCE_HIGH,
                 ),
             )
@@ -88,12 +91,12 @@ object NotificationHelper {
         )
 
         val remoteInput = RemoteInput.Builder(PeerChatReplyReceiver.KEY_TEXT_REPLY)
-            .setLabel(getString(R.string.peer_chat_type_reply))
+            .setLabel(LocaleHelper.getStringSync(Res.string.peer_chat_type_reply))
             .build()
 
         val replyAction = NotificationCompat.Action.Builder(
             R.drawable.notification,
-            getString(R.string.peer_chat_reply),
+            LocaleHelper.getStringSync(Res.string.peer_chat_reply),
             replyPendingIntent,
         )
             .addRemoteInput(remoteInput)
@@ -120,7 +123,7 @@ object NotificationHelper {
         val description = listOf(clientIp, browserDisplay, "$osName $osVersion").filter { it.isNotBlank() }.joinToString(" · ")
         val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.notification)
-            .setContentTitle(getString(R.string.web_client_connected))
+            .setContentTitle(LocaleHelper.getStringSync(Res.string.web_client_connected))
             .setContentText(description)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
@@ -174,7 +177,7 @@ object NotificationHelper {
                 foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
             }
             setContentIntent(createContentIntent(context))
-            addAction(-1, getString(R.string.stop_service), stopPendingIntent)
+            addAction(-1, LocaleHelper.getStringSync(Res.string.stop_service), stopPendingIntent)
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
         }.build()
     }

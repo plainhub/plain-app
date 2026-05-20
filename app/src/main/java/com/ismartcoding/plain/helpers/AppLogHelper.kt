@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
@@ -9,7 +11,6 @@ import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import java.io.File
@@ -36,7 +37,7 @@ object AppLogHelper {
             val crashReportFile = File(context.filesDir, "crash_report.txt")
 
             if (!logFolderFile.exists() && !crashReportFile.exists()) {
-                DialogHelper.showMessage(R.string.no_logs_error)
+                DialogHelper.showMessage(Res.string.no_logs_error)
                 return@coMain
             }
 
@@ -51,7 +52,7 @@ object AppLogHelper {
             }
             DialogHelper.hideLoading()
             if (!success) {
-                DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.error))
+                DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.error))
                 return@coMain
             }
             share(context, zipFile)
@@ -65,11 +66,11 @@ object AppLogHelper {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "*/*"
         val appVersion = MainApp.getAppVersion()
-        intent.putExtra(Intent.EXTRA_SUBJECT, LocaleHelper.getString(R.string.share_logs) + " - PlainApp $appVersion")
+        intent.putExtra(Intent.EXTRA_SUBJECT, LocaleHelper.getStringSync(Res.string.share_logs) + " - PlainApp $appVersion")
         intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.SUPPORT_EMAIL))
         intent.putExtra(Intent.EXTRA_TEXT, buildDeviceInfoText())
         intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, file))
-        val chooserIntent = Intent.createChooser(intent, LocaleHelper.getString(R.string.share_logs))
+        val chooserIntent = Intent.createChooser(intent, LocaleHelper.getStringSync(Res.string.share_logs))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, ShareHelper.getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
     }

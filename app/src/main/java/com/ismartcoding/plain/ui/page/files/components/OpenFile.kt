@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.files.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
@@ -11,7 +13,6 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.Permissions
@@ -44,7 +45,7 @@ fun openFile(
             val tempFile = withIO { ZipBrowserHelper.extractEntryToCache(context, file.path) }
             DialogHelper.hideLoading()
             if (tempFile == null) {
-                DialogHelper.showMessage(R.string.error)
+                DialogHelper.showMessage(Res.string.error)
                 return@coMain
             }
             val tempPath = tempFile.absolutePath
@@ -95,7 +96,7 @@ fun openFile(
 
         path.isAudioFast() -> {
             try {
-                Permissions.checkNotification(context, R.string.audio_notification_prompt) {
+                Permissions.checkNotification(context, Res.string.audio_notification_prompt) {
                     val audio = DPlaylistAudio.fromPath(context, path)
                     if (audioPlaylistVM != null) {
                         coMain {
@@ -108,7 +109,7 @@ fun openFile(
                     }
                 }
             } catch (ex: Exception) {
-                DialogHelper.showMessage(R.string.audio_play_error)
+                DialogHelper.showMessage(Res.string.audio_play_error)
             }
         }
 
@@ -116,7 +117,7 @@ fun openFile(
             if (file.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
                 navController.navigateTextFile(path)
             } else {
-                DialogHelper.showMessage(R.string.text_file_size_limit)
+                DialogHelper.showMessage(Res.string.text_file_size_limit)
             }
         }
 
@@ -124,7 +125,7 @@ fun openFile(
             try {
                 navController.navigatePdf(File(path).toUri())
             } catch (ex: Exception) {
-                DialogHelper.showMessage(R.string.pdf_open_error)
+                DialogHelper.showMessage(Res.string.pdf_open_error)
             }
         }
 

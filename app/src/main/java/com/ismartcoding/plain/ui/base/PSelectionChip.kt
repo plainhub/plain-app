@@ -11,9 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
@@ -37,7 +36,7 @@ fun PSelectionChip(
                         .padding(start = 8.dp)
                         .size(20.dp),
                     painter = painterResource(Res.drawable.check),
-                    contentDescription = stringResource(R.string.select),
+                    contentDescription = stringResource(Res.string.select),
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }

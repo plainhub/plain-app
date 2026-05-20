@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,10 +21,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preferences.HomeFeaturesPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
@@ -82,7 +83,7 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(R.string.customize_home_features))
+            PTopAppBar(navController = navController, title = stringResource(Res.string.customize_home_features))
         },
         content = { paddingValues ->
             LazyColumn(
@@ -92,7 +93,7 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
             ) {
                 item(key = "hint") {
                     Text(
-                        text = stringResource(R.string.drag_number_to_reorder_list),
+                        text = stringResource(Res.string.drag_number_to_reorder_list),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondaryTextColor,
                         modifier = Modifier.fillMaxWidth()

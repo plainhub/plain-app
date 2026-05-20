@@ -16,14 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.extensions.formatTime
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.models.VChat
@@ -44,9 +42,9 @@ fun ChatName(
     ) {
         Text(
             text = when {
-                m.fromId == "local" -> getString(R.string.local_chat)
-                m.fromId == "me" -> getString(R.string.me)
-                else -> ChatCacheManager.peerMap[m.fromId]?.name ?: getString(R.string.unknown)
+                m.fromId == "local" -> stringResource(Res.string.local_chat)
+                m.fromId == "me" -> stringResource(Res.string.me)
+                else -> ChatCacheManager.peerMap[m.fromId]?.name ?: stringResource(Res.string.unknown)
             },
 
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
@@ -100,7 +98,7 @@ fun ChatName(
                                 HorizontalSpace(3.dp)
                             }
                             Text(
-                                text = if (isPeerFailureBadge) stringResource(R.string.error) else statusData.deliveryLabel(),
+                                text = if (isPeerFailureBadge) stringResource(Res.string.error) else statusData.deliveryLabel(),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     color = badgeColor,
                                     fontWeight = FontWeight.SemiBold,
@@ -116,7 +114,7 @@ fun ChatName(
                         HorizontalSpace(4.dp)
                         PIconButton(
                             icon = Res.drawable.rotate_ccw,
-                            contentDescription = stringResource(R.string.try_again),
+                            contentDescription = stringResource(Res.string.try_again),
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(16.dp)
                         ) {

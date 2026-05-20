@@ -39,7 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,7 +48,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.ui.components.mediaviewer.video.findActivity
@@ -109,7 +108,7 @@ fun DlnaReceiverAudioPlayer(vm: DlnaReceiverViewModel, onExit: () -> Unit) {
                 IconButton(onClick = onExit) {
                     Icon(
                         painter = painterResource(Res.drawable.arrow_left),
-                        contentDescription = stringResource(R.string.dlna_receiver_exit_player),
+                        contentDescription = stringResource(Res.string.dlna_receiver_exit_player),
                         tint = Color.White,
                         modifier = Modifier.size(24.dp),
                     )
@@ -142,7 +141,7 @@ fun DlnaReceiverAudioPlayer(vm: DlnaReceiverViewModel, onExit: () -> Unit) {
             }
             Spacer(modifier = Modifier.height(36.dp))
             Text(
-                text = mediaTitle.ifEmpty { stringResource(R.string.unknown) },
+                text = mediaTitle.ifEmpty { stringResource(Res.string.unknown) },
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.apps
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -16,12 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preferences.PackageSortByPreference
 import com.ismartcoding.plain.ui.base.*
@@ -61,8 +62,8 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
         }
     }
     if (appsVM.showSortDialog.value) {
-        RadioDialog(title = stringResource(R.string.sort), options = FileSortBy.entries.map {
-            RadioDialogOption(text = stringResource(id = it.getTextId()), selected = it == appsVM.sortBy.value) {
+        RadioDialog(title = stringResource(Res.string.sort), options = FileSortBy.entries.map {
+            RadioDialogOption(text = stringResource(it.getTextId()), selected = it == appsVM.sortBy.value) {
                 scope.launch(Dispatchers.IO) { PackageSortByPreference.putAsync(context, it); appsVM.sortBy.value = it; appsVM.loadAsync() }
             }
         }) { appsVM.showSortDialog.value = false }
@@ -75,7 +76,7 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
         if (appsVM.showSearchBar.value) { ListSearchBar(viewModel = appsVM, onSearch = onSearch); return@PScaffold }
         PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } }),
             navController = navController,
-            title = stringResource(id = R.string.apps), scrollBehavior = scrollBehavior, actions = {
+            title = stringResource(Res.string.apps), scrollBehavior = scrollBehavior, actions = {
                 ActionButtonSearch { appsVM.enterSearchMode() }; ActionButtonSort { appsVM.showSortDialog.value = true }
             })
     }) { paddingValues ->

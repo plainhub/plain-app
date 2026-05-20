@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">PlainApp Afstandsbediening</string>
+    <string name="accessibility_service_description">PlainApp gebruikt deze toegankelijkheidsservice om afstandsbediening tijdens schermspiegeling mogelijk te maken. Het injecteert aanraakgebeurtenissen (tikken, vegen, scrollen) en navigatieacties (Terug, Start, Recent) die vanuit de webinterface worden verzonden.</string>
+</resources>

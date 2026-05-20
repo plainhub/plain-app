@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components.mediaviewer
 
+import com.ismartcoding.plain.i18n.*
+
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,11 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DTag
@@ -90,7 +91,7 @@ fun ViewMediaBottomSheet(
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(text = stringResource(id = R.string.tags))
+                    Subtitle(text = stringResource(Res.string.tags))
                     TagSelector(data = m.data, tagsVM = tagsVM!!, tagsMap = tagsMap!!,
                         tagsState = tagsState, onChangedAsync = { onTagsChangedAsync() })
                     VerticalSpace(dp = 16.dp)
@@ -100,20 +101,20 @@ fun ViewMediaBottomSheet(
             item {
                 VerticalSpace(dp = 16.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.file_size), value = m.size.formatBytes())
+                    PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
                     val mimeType = m.getMimeType()
-                    PListItem(title = stringResource(id = R.string.type), value = mimeType)
+                    PListItem(title = stringResource(Res.string.type), value = mimeType)
                     val intrinsicSize = m.intrinsicSize
                     if (intrinsicSize.width > 0 && intrinsicSize.height > 0) {
-                        PListItem(title = stringResource(id = R.string.dimensions), value = "${intrinsicSize.width}\u00d7${intrinsicSize.height}")
+                        PListItem(title = stringResource(Res.string.dimensions), value = "${intrinsicSize.width}\u00d7${intrinsicSize.height}")
                     }
                     if (m.data is DImage) {
-                        PListItem(title = stringResource(id = R.string.created_at), value = m.data.createdAt.formatDateTime())
-                        PListItem(title = stringResource(id = R.string.updated_at), value = m.data.updatedAt.formatDateTime())
+                        PListItem(title = stringResource(Res.string.created_at), value = m.data.createdAt.formatDateTime())
+                        PListItem(title = stringResource(Res.string.updated_at), value = m.data.updatedAt.formatDateTime())
                         ImageMetaRows(path = m.path)
                     } else if (m.data is DVideo) {
-                        PListItem(title = stringResource(id = R.string.created_at), value = m.data.createdAt.formatDateTime())
-                        PListItem(title = stringResource(id = R.string.updated_at), value = m.data.updatedAt.formatDateTime())
+                        PListItem(title = stringResource(Res.string.created_at), value = m.data.createdAt.formatDateTime())
+                        PListItem(title = stringResource(Res.string.updated_at), value = m.data.updatedAt.formatDateTime())
                         VideoMetaRows(path = m.path)
                     } else if (m.path.isUrl()) {
                     } else if (mimeType.startsWith("image/")) {

@@ -1,10 +1,11 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.helpers.MediaShortcutHelper
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import java.io.File
@@ -18,9 +19,9 @@ fun AddToHomeDialog(
     val context = LocalContext.current
     val defaultLabel = remember(path) { File(path).nameWithoutExtension }
     TextFieldDialog(
-        title = stringResource(R.string.add_to_home),
+        title = stringResource(Res.string.add_to_home),
         value = defaultLabel,
-        description = stringResource(R.string.shortcut_label_hint),
+        description = stringResource(Res.string.shortcut_label_hint),
         onDismissRequest = onDismiss,
         onConfirm = { label ->
             MediaShortcutHelper.addToDesktop(context, path, label, iconRes)

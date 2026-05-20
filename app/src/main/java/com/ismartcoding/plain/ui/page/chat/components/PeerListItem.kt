@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -11,9 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.PListItem
@@ -33,10 +34,10 @@ fun PeerListItem(
     onClick: () -> Unit = {},
 ) {
     val showContextMenu = remember { mutableStateOf(false) }
-    val deleteDeviceText = stringResource(id = R.string.delete_device)
-    val deleteText = stringResource(id = R.string.delete)
-    val deleteWarningText = stringResource(id = R.string.delete_peer_warning)
-    val cancelText = stringResource(id = R.string.cancel)
+    val deleteDeviceText = stringResource(Res.string.delete_device)
+    val deleteText = stringResource(Res.string.delete)
+    val deleteWarningText = stringResource(Res.string.delete_peer_warning)
+    val cancelText = stringResource(Res.string.cancel)
 
     Box {
         PListItem(

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,10 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
@@ -36,12 +37,12 @@ fun PeerChatInfoPage(
     val chatState = chatVM.chatState.collectAsState()
     val peer = peerVM.pairedPeers.find { it.id == chatState.value.toId }
 
-    val clearMessagesText = stringResource(R.string.clear_messages)
-    val clearMessagesConfirmText = stringResource(R.string.clear_messages_confirm)
-    val cancelText = stringResource(R.string.cancel)
-    val deleteDeviceText = stringResource(R.string.delete_device)
-    val deleteText = stringResource(R.string.delete)
-    val deleteDeviceWarningText = stringResource(R.string.delete_peer_warning)
+    val clearMessagesText = stringResource(Res.string.clear_messages)
+    val clearMessagesConfirmText = stringResource(Res.string.clear_messages_confirm)
+    val cancelText = stringResource(Res.string.cancel)
+    val deleteDeviceText = stringResource(Res.string.delete_device)
+    val deleteText = stringResource(Res.string.delete)
+    val deleteDeviceWarningText = stringResource(Res.string.delete_peer_warning)
 
     PScaffold(
         topBar = {
@@ -50,7 +51,7 @@ fun PeerChatInfoPage(
                 navigationIcon = {
                     NavigationBackIcon { navController.navigateUp() }
                 },
-                title = stringResource(R.string.chat_info),
+                title = stringResource(Res.string.chat_info),
             )
         },
     ) { paddingValues ->
@@ -62,13 +63,13 @@ fun PeerChatInfoPage(
             if (peer != null) {
                 item {
                     PCard {
-                        PListItem(title = stringResource(R.string.peer_id), value = peer.id)
-                        PListItem(title = stringResource(R.string.ip_address), value = peer.getBestIp())
-                        PListItem(title = stringResource(R.string.port), value = peer.port.toString())
-                        PListItem(title = stringResource(R.string.device_type), value = DeviceType.fromValue(peer.deviceType).getText())
+                        PListItem(title = stringResource(Res.string.peer_id), value = peer.id)
+                        PListItem(title = stringResource(Res.string.ip_address), value = peer.getBestIp())
+                        PListItem(title = stringResource(Res.string.port), value = peer.port.toString())
+                        PListItem(title = stringResource(Res.string.device_type), value = DeviceType.fromValue(peer.deviceType).getText())
                         val status = peer.getStatusText()
                         if (status.isNotEmpty()) {
-                            PListItem(title = stringResource(R.string.status), value = status)
+                            PListItem(title = stringResource(Res.string.status), value = status)
                         }
                     }
                 }
@@ -83,7 +84,7 @@ fun PeerChatInfoPage(
                 onClear = {
                     chatVM.clearAllMessages(context)
                     navController.navigateUp()
-                    DialogHelper.showSuccess(R.string.messages_cleared)
+                    DialogHelper.showSuccess(Res.string.messages_cleared)
                 },
             )
 

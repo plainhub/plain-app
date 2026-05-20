@@ -19,10 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
@@ -64,7 +63,7 @@ fun ChannelInvitePage(
         }
         item {
             Text(
-                text = stringResource(R.string.channel_invite),
+                text = stringResource(Res.string.channel_invite),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                 ),
@@ -73,7 +72,7 @@ fun ChannelInvitePage(
             )
             VerticalSpace(dp = 8.dp)
             Text(
-                text = stringResource(R.string.channel_invite_message, event.ownerPeerName, event.channelName),
+                text = stringResource(Res.string.channel_invite_message, event.ownerPeerName, event.channelName),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
@@ -84,8 +83,8 @@ fun ChannelInvitePage(
         }
         item {
             PCard {
-                PListItem(title = stringResource(R.string.channel_name), value = event.channelName)
-                PListItem(title = stringResource(R.string.inviter), value = event.ownerPeerName)
+                PListItem(title = stringResource(Res.string.channel_name), value = event.channelName)
+                PListItem(title = stringResource(Res.string.inviter), value = event.ownerPeerName)
             }
         }
         item {
@@ -96,13 +95,13 @@ fun ChannelInvitePage(
                     .padding(horizontal = 16.dp),
             ) {
                 PFilledButton(
-                    text = stringResource(R.string.accept),
+                    text = stringResource(Res.string.accept),
                     buttonSize = ButtonSize.LARGE,
                     onClick = onAccept,
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
-                    text = stringResource(R.string.decline),
+                    text = stringResource(Res.string.decline),
                     buttonSize = ButtonSize.LARGE,
                     onClick = onDecline,
                     type = ButtonType.DANGER,

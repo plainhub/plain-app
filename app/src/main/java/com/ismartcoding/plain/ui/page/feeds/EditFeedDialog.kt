@@ -15,10 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.edit
@@ -35,12 +34,12 @@ fun EditFeedDialog(feedsVM: FeedsViewModel) {
             icon = {
                 Icon(
                     painter = painterResource(Res.drawable.square_pen),
-                    contentDescription = stringResource(id = R.string.edit),
+                    contentDescription = stringResource(Res.string.edit),
                 )
             },
             title = {
                 Text(
-                    text = stringResource(id = R.string.edit), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    text = stringResource(Res.string.edit), maxLines = 1, overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge
                 )
             },
@@ -53,7 +52,7 @@ fun EditFeedDialog(feedsVM: FeedsViewModel) {
                         },
                         singleLine = true,
                         label = {
-                            Text(text = stringResource(id = R.string.name))
+                            Text(text = stringResource(Res.string.name))
                         }
                     )
                     VerticalSpace(dp = 8.dp)
@@ -67,7 +66,7 @@ fun EditFeedDialog(feedsVM: FeedsViewModel) {
                         },
                         singleLine = true,
                         label = {
-                            Text(text = stringResource(id = R.string.url))
+                            Text(text = stringResource(Res.string.url))
                         }
                     )
                     if (feedsVM.editUrlError.value.isNotEmpty()) {
@@ -89,14 +88,14 @@ fun EditFeedDialog(feedsVM: FeedsViewModel) {
                         feedsVM.edit()
                     },
                 ) {
-                    Text(stringResource(id = R.string.save))
+                    Text(stringResource(Res.string.save))
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     feedsVM.showEditDialog.value = false
                 }) {
-                    Text(text = stringResource(id = R.string.cancel))
+                    Text(text = stringResource(Res.string.cancel))
                 }
             },
         )

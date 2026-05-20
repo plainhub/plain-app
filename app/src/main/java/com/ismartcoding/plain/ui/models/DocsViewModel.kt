@@ -1,17 +1,18 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
 import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.docs.DDoc
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.docs.DocMediaStoreHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
@@ -42,13 +43,13 @@ class DocsViewModel : BaseMediaViewModel<DDoc>() {
         noMore.value = _itemsFlow.value.size < limit.intValue
         if (!trash.value) {
             val extGroups = DocMediaStoreHelper.getDocExtGroupsAsync(context, super.getQuery())
-            val trashTabs = if (AppFeatureType.MEDIA_TRASH.has()) listOf(VTabData(getString(R.string.trash), "trash", totalTrash.intValue)) else emptyList()
+            val trashTabs = if (AppFeatureType.MEDIA_TRASH.has()) listOf(VTabData(LocaleHelper.getString(Res.string.trash), "trash", totalTrash.intValue)) else emptyList()
             if (tabsShowTags.value) {
                 val tagsState = tagsVM.itemsFlow.value
-                tabs.value = listOf(VTabData(getString(R.string.all), "all", total.intValue)) + trashTabs + tagsState.map { VTabData(it.name, it.id, it.count) }
+                tabs.value = listOf(VTabData(LocaleHelper.getString(Res.string.all), "all", total.intValue)) + trashTabs + tagsState.map { VTabData(it.name, it.id, it.count) }
             } else {
                 val extensions = extGroups.map { VTabData(it.first, it.first.lowercase(), it.second) }
-                tabs.value = listOf(VTabData(getString(R.string.all), "", total.intValue)) + trashTabs + extensions
+                tabs.value = listOf(VTabData(LocaleHelper.getString(Res.string.all), "", total.intValue)) + trashTabs + extensions
             }
         }
         showLoading.value = false

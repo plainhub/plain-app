@@ -14,12 +14,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
@@ -85,11 +84,11 @@ fun NearbyPage(
                 navigationIcon = {
                     NavigationBackIcon { navController.navigateUp() }
                 },
-                title = stringResource(R.string.nearby_devices),
+                title = stringResource(Res.string.nearby_devices),
                 actions = {
                     PIconButton(
                         icon = Res.drawable.qr_code,
-                        contentDescription = stringResource(R.string.show_qr_code),
+                        contentDescription = stringResource(Res.string.show_qr_code),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
                         qrData = null

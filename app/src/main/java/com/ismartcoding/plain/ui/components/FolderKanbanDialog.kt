@@ -22,10 +22,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.events.FolderKanbanSelectEvent
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.base.*
@@ -43,11 +42,11 @@ fun FolderKanbanDialog(filesVM: FilesViewModel, onDismiss: () -> Unit = {}) {
     val options = remember { mutableStateListOf<FolderOption>() }
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val recentsText = stringResource(R.string.recents)
-    val internalStorageText = stringResource(R.string.internal_storage)
-    val sdcardText = stringResource(R.string.sdcard)
-    val usbStorageText = stringResource(R.string.usb_storage)
-    val fileTransferAssistantText = stringResource(R.string.app_data)
+    val recentsText = stringResource(Res.string.recents)
+    val internalStorageText = stringResource(Res.string.internal_storage)
+    val sdcardText = stringResource(Res.string.sdcard)
+    val usbStorageText = stringResource(Res.string.usb_storage)
+    val fileTransferAssistantText = stringResource(Res.string.app_data)
 
     LaunchedEffect(Unit) {
         val items = buildFolderOptions(context, filesVM, recentsText, internalStorageText, sdcardText, usbStorageText, fileTransferAssistantText)
@@ -57,7 +56,7 @@ fun FolderKanbanDialog(filesVM: FilesViewModel, onDismiss: () -> Unit = {}) {
 
     PModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column {
-            PBottomSheetTopAppBar(title = stringResource(R.string.folders))
+            PBottomSheetTopAppBar(title = stringResource(Res.string.folders))
             if (options.isNotEmpty()) {
                 LazyColumn(Modifier.fillMaxSize()) {
                     item { TopSpace() }
@@ -71,7 +70,7 @@ fun FolderKanbanDialog(filesVM: FilesViewModel, onDismiss: () -> Unit = {}) {
                             HorizontalSpace(8.dp)
                             Text(text = item.title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
                             if (item.isFavoriteFolder) {
-                                PIconButton(icon = Res.drawable.delete_forever, tint = MaterialTheme.colorScheme.red, contentDescription = stringResource(R.string.delete), click = {
+                                PIconButton(icon = Res.drawable.delete_forever, tint = MaterialTheme.colorScheme.red, contentDescription = stringResource(Res.string.delete), click = {
                                     DialogHelper.confirmToDelete {
                                         scope.launch(Dispatchers.IO) { FavoriteFoldersPreference.removeAsync(context, item.fullPath); options.remove(item) }
                                     }

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,14 +17,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.PasswordType
@@ -74,7 +75,7 @@ fun WebSecurityPage(navController: NavHostController) {
         }
 
         PScaffold(
-            topBar = { PTopAppBar(navController = navController, title = stringResource(R.string.security)) },
+            topBar = { PTopAppBar(navController = navController, title = stringResource(Res.string.security)) },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item { TopSpace() }
@@ -87,7 +88,7 @@ fun WebSecurityPage(navController: NavHostController) {
                                         if (passwordType == PasswordType.NONE.value) PasswordType.FIXED.value else PasswordType.NONE.value
                                     )
                                 }
-                            }, title = stringResource(R.string.require_password)) {
+                            }, title = stringResource(Res.string.require_password)) {
                                 PSwitch(activated = passwordType != PasswordType.NONE.value) {
                                     scope.launch(Dispatchers.IO) {
                                         PasswordTypePreference.putAsync(
@@ -104,7 +105,7 @@ fun WebSecurityPage(navController: NavHostController) {
                                 OutlinedButton(
                                     modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
                                     onClick = { scope.launch(Dispatchers.IO) { editPassword.value = HttpServerManager.resetPasswordAsync() } }) {
-                                    Text(stringResource(R.string.generate_password))
+                                    Text(stringResource(Res.string.generate_password))
                                 }
                             }
                         }
@@ -114,42 +115,42 @@ fun WebSecurityPage(navController: NavHostController) {
                         PCard {
                             PListItem(
                                 modifier = Modifier.clickable { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(context, !authTwoFactor) } },
-                                title = stringResource(R.string.require_confirmation)
+                                title = stringResource(Res.string.require_confirmation)
                             ) {
                                 PSwitch(activated = authTwoFactor) { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(context, it) } }
                             }
                         }
-                        Tips(text = stringResource(R.string.two_factor_auth_tips)); VerticalSpace(dp = 24.dp)
+                        Tips(text = stringResource(Res.string.two_factor_auth_tips)); VerticalSpace(dp = 24.dp)
                     }
                     item {
-                        Subtitle(text = stringResource(R.string.https_certificate_signature))
-                        ClipboardCard(label = stringResource(R.string.https_certificate_signature), text = sslSignature)
+                        Subtitle(text = stringResource(Res.string.https_certificate_signature))
+                        ClipboardCard(label = stringResource(Res.string.https_certificate_signature), text = sslSignature)
                         VerticalSpace(dp = 16.dp)
-                        PFilledButton(text = stringResource(R.string.reset_ssl_certificate), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        PFilledButton(text = stringResource(Res.string.reset_ssl_certificate), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             scope.launch(Dispatchers.IO) {
                                 DialogHelper.showLoading(); KeyStorePasswordPreference.resetAsync(context)
                                 keyStorePassword = KeyStorePasswordPreference.getAsync(context)
                                 HttpServerManager.generateSSLKeyStore(File(context.filesDir, Constants.KEY_STORE_FILE_NAME), keyStorePassword)
                                 DialogHelper.hideLoading()
-                                DialogHelper.showConfirmDialog("", LocaleHelper.getString(R.string.ssl_certificate_reset)) { sendEvent(RestartAppEvent()) }
+                                DialogHelper.showConfirmDialog("", LocaleHelper.getString(Res.string.ssl_certificate_reset)) { sendEvent(RestartAppEvent()) }
                             }
                         })
-                        VerticalSpace(dp = 24.dp); Subtitle(text = stringResource(R.string.url_token))
-                        ClipboardCard(label = stringResource(R.string.url_token), text = urlToken)
-                        Tips(text = stringResource(R.string.url_token_tips)); VerticalSpace(dp = 16.dp)
+                        VerticalSpace(dp = 24.dp); Subtitle(text = stringResource(Res.string.url_token))
+                        ClipboardCard(label = stringResource(Res.string.url_token), text = urlToken)
+                        Tips(text = stringResource(Res.string.url_token_tips)); VerticalSpace(dp = 16.dp)
                         PCard {
                             PListItem(modifier = Modifier.clickable {
                                 scope.launch(Dispatchers.IO) { RotateUrlTokenOnRestartPreference.putAsync(context, !rotateUrlTokenOnRestart) }
-                            }, title = stringResource(R.string.rotate_url_token_on_restart)) {
+                            }, title = stringResource(Res.string.rotate_url_token_on_restart)) {
                                 PSwitch(activated = rotateUrlTokenOnRestart) {
                                     scope.launch(Dispatchers.IO) { RotateUrlTokenOnRestartPreference.putAsync(context, it) }
                                 }
                             }
                         }
-                        Tips(text = stringResource(R.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
-                        PFilledButton(text = stringResource(R.string.reset_token), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
+                        PFilledButton(text = stringResource(Res.string.reset_token), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             scope.launch(Dispatchers.IO) {
-                                UrlTokenPreference.resetAsync(context); urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP); DialogHelper.showMessage(R.string.the_token_is_reset)
+                                UrlTokenPreference.resetAsync(context); urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP); DialogHelper.showMessage(Res.string.the_token_is_reset)
                             }
                         })
                         BottomSpace(paddingValues)

@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.services
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
@@ -30,11 +34,11 @@ class QSTileService : TileService() {
     private fun setState(state: Int) {
         if (state == Tile.STATE_INACTIVE) {
             qsTile?.state = Tile.STATE_INACTIVE
-            qsTile?.label = getString(R.string.app_name)
+            qsTile?.label = LocaleHelper.getStringSync(Res.string.app_name)
             qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.app_icon)
         } else if (state == Tile.STATE_ACTIVE) {
             qsTile?.state = Tile.STATE_ACTIVE
-            qsTile?.label = getString(R.string.app_name)
+            qsTile?.label = LocaleHelper.getStringSync(Res.string.app_name)
             qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.app_icon)
         }
 

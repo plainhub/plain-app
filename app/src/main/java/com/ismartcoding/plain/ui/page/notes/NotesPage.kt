@@ -27,11 +27,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonTags
@@ -74,16 +73,16 @@ fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM:
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !notesVM.selectMode.value })
     val isFirstTime = remember { mutableStateOf(true) }
     val tabs = remember(tagsState, notesVM.total.intValue, notesVM.totalTrash.intValue) {
-        listOf(VTabData(LocaleHelper.getString(R.string.all), "all", notesVM.total.intValue), VTabData(LocaleHelper.getString(R.string.trash), "trash", notesVM.totalTrash.intValue), *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray())
+        listOf(VTabData(LocaleHelper.getStringSync(Res.string.all), "all", notesVM.total.intValue), VTabData(LocaleHelper.getStringSync(Res.string.trash), "trash", notesVM.totalTrash.intValue), *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray())
     }
     val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { withIO { notesVM.loadAsync(tagsVM) } }; setRefreshState(RefreshContentState.Finished) }
 
     NotesPageEffects(notesVM, tagsVM, scrollBehavior, scrollStateMap, pagerState, scope, isFirstTime)
 
-    val pageTitle = if (notesVM.selectMode.value) LocaleHelper.getStringF(R.string.x_selected, "count", notesVM.selectedIds.size)
-        else if (notesVM.tag.value != null) stringResource(id = R.string.notes) + " - " + notesVM.tag.value!!.name
-        else if (notesVM.trash.value) stringResource(id = R.string.notes) + " - " + stringResource(id = R.string.trash)
-        else stringResource(id = R.string.notes)
+    val pageTitle = if (notesVM.selectMode.value) LocaleHelper.getStringSyncF(Res.string.x_selected, "count", notesVM.selectedIds.size)
+        else if (notesVM.tag.value != null) stringResource(Res.string.notes) + " - " + notesVM.tag.value!!.name
+        else if (notesVM.trash.value) stringResource(Res.string.notes) + " - " + stringResource(Res.string.trash)
+        else stringResource(Res.string.notes)
     ViewNoteBottomSheet(notesVM, tagsVM, tagsMapState, tagsState)
     if (notesVM.showTagsDialog.value) { TagsBottomSheet(tagsVM) { notesVM.showTagsDialog.value = false } }
     val onSearch: (String) -> Unit = { notesVM.searchActive.value = false; notesVM.showLoading.value = true; scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) }; scope.launch(Dispatchers.IO) { notesVM.loadAsync(tagsVM) } }
@@ -98,12 +97,12 @@ fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM:
             PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } }),
                 navController = navController, navigationIcon = { if (notesVM.selectMode.value) NavigationCloseIcon { notesVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() } },
                 title = pageTitle, scrollBehavior = scrollBehavior, actions = {
-                    if (notesVM.selectMode.value) { PTopRightButton(label = stringResource(if (notesVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { notesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
+                    if (notesVM.selectMode.value) { PTopRightButton(label = stringResource(if (notesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { notesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
                     else { ActionButtonSearch { notesVM.enterSearchMode() }; ActionButtonTags { notesVM.showTagsDialog.value = true } }
                 })
         },
         bottomBar = { AnimatedVisibility(visible = notesVM.showBottomActions(), enter = slideInVertically { it }, exit = slideOutVertically { it }) { NotesSelectModeBottomActions(notesVM, tagsVM, tagsState) } },
-        floatingActionButton = if (notesVM.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { navController.navigate(Routing.NotesCreate(notesVM.tag.value?.id ?: "")) }) { Icon(painter = painterResource(Res.drawable.plus), stringResource(R.string.add)) } } } },
+        floatingActionButton = if (notesVM.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { navController.navigate(Routing.NotesCreate(notesVM.tag.value?.id ?: "")) }) { Icon(painter = painterResource(Res.drawable.plus), stringResource(Res.string.add)) } } } },
     ) { paddingValues ->
         Column(Modifier.padding(top = paddingValues.calculateTopPadding())) {
             if (!notesVM.selectMode.value) {

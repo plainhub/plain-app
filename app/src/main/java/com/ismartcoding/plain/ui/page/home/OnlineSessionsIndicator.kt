@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -21,10 +23,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.greenDot
 import com.ismartcoding.plain.ui.theme.greenPill
 import com.ismartcoding.plain.ui.theme.greenText
@@ -76,7 +77,7 @@ fun OnlineSessionsIndicator(count: Int, onClick: () -> Unit) {
                 }
             }
             Text(
-                text = stringResource(R.string.clients_online, count),
+                text = stringResource(Res.string.clients_online, count),
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
                 color = MaterialTheme.colorScheme.greenText,
                 modifier = Modifier.padding(start = 6.dp),

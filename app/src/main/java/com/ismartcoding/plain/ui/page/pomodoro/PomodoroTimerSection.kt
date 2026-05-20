@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.pomodoro
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,12 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.ui.base.CircularTimer
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -56,7 +57,7 @@ internal fun PomodoroTimerSection(pomodoroVM: PomodoroViewModel, scope: Coroutin
                     pomodoroVM.adjustJob.value?.cancel()
                     pomodoroVM.adjustJob.value = coIO {
                         delay(500)
-                        Permissions.checkNotification(context, R.string.pomodoro_notification_prompt) {
+                        Permissions.checkNotification(context, Res.string.pomodoro_notification_prompt) {
                             scope.launch(Dispatchers.IO) { pomodoroVM.startSession(); sendPomodoroAction("start", pomodoroVM) }
                         }
                     }
@@ -73,7 +74,7 @@ internal fun PomodoroTimerSection(pomodoroVM: PomodoroViewModel, scope: Coroutin
                 style = MaterialTheme.typography.displayLarge.copy(fontSize = 56.sp, fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.onSurface)
             VerticalSpace(dp = 16.dp)
-            Text(text = stringResource(R.string.drag_to_adjust_progress),
+            Text(text = stringResource(Res.string.drag_to_adjust_progress),
                 style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
         }
     }
@@ -86,16 +87,16 @@ internal fun PomodoroTimerSection(pomodoroVM: PomodoroViewModel, scope: Coroutin
                 modifier = Modifier.weight(1f).height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(28.dp)
-            ) { Text(text = stringResource(id = R.string.pause), fontWeight = FontWeight.Medium) }
+            ) { Text(text = stringResource(Res.string.pause), fontWeight = FontWeight.Medium) }
             Button(onClick = { pomodoroVM.resetTimer(); sendPomodoroAction("stop", pomodoroVM) },
                 modifier = Modifier.weight(1f).height(48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 shape = RoundedCornerShape(28.dp)
-            ) { Text(text = stringResource(R.string.stop), fontWeight = FontWeight.Medium) }
+            ) { Text(text = stringResource(Res.string.stop), fontWeight = FontWeight.Medium) }
         }
     } else {
         Button(onClick = {
-            Permissions.checkNotification(context, R.string.pomodoro_notification_prompt) {
+            Permissions.checkNotification(context, Res.string.pomodoro_notification_prompt) {
                 scope.launch(Dispatchers.IO) { pomodoroVM.startSession(); sendPomodoroAction("start", pomodoroVM) }
             }
         }, modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -103,8 +104,8 @@ internal fun PomodoroTimerSection(pomodoroVM: PomodoroViewModel, scope: Coroutin
             shape = RoundedCornerShape(28.dp)
         ) {
             Text(text = when {
-                pomodoroVM.isPaused.value -> stringResource(id = R.string.resume)
-                else -> stringResource(id = R.string.start)
+                pomodoroVM.isPaused.value -> stringResource(Res.string.resume)
+                else -> stringResource(Res.string.start)
             }, fontSize = 18.sp, fontWeight = FontWeight.Medium)
         }
     }

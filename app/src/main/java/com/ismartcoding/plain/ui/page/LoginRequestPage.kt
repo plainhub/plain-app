@@ -19,11 +19,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.capitalize
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.base.PCard
@@ -40,8 +39,8 @@ fun LoginRequestPage(
     onAllow: () -> Unit,
 ) {
     val isWeb = request.browserName != "PlainApp"
-    val titleRes = if (isWeb) R.string.allow_web_access else R.string.allow_desktop_access
-    val descRes = if (isWeb) R.string.allow_web_access_desc else R.string.allow_desktop_access_desc
+    val titleRes = if (isWeb) Res.string.allow_web_access else Res.string.allow_desktop_access
+    val descRes = if (isWeb) Res.string.allow_web_access_desc else Res.string.allow_desktop_access_desc
     val iconRes = if (isWeb) Res.drawable.chrome else Res.drawable.laptop
 
     LazyColumn(
@@ -92,15 +91,15 @@ fun LoginRequestPage(
         item {
             PCard {
                 PListItem(
-                    title = stringResource(R.string.os),
+                    title = stringResource(Res.string.os),
                     value = "${request.osName.capitalize()} ${request.osVersion}".trim(),
                 )
                 PListItem(
-                    title = stringResource(R.string.browser),
+                    title = stringResource(Res.string.browser),
                     value = "${request.browserName.capitalize()} ${request.browserVersion}".trim(),
                 )
                 PListItem(
-                    title = stringResource(R.string.ip_address),
+                    title = stringResource(Res.string.ip_address),
                     value = clientIp,
                 )
             }
@@ -113,13 +112,13 @@ fun LoginRequestPage(
                     .padding(horizontal = 16.dp),
             ) {
                 PFilledButton(
-                    text = stringResource(R.string.allow),
+                    text = stringResource(Res.string.allow),
                     buttonSize = ButtonSize.LARGE,
                     onClick = onAllow,
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
-                    text = stringResource(R.string.deny),
+                    text = stringResource(Res.string.deny),
                     buttonSize = ButtonSize.LARGE,
                     onClick = onDeny,
                     type = ButtonType.DANGER,

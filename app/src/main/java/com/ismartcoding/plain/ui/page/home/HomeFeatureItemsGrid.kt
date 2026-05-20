@@ -29,12 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.preferences.HomeFeaturesPreference
 import com.ismartcoding.plain.preferences.dataFlow
@@ -110,7 +110,7 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
         item {
             HomeFeatureGridCell(
                 iconRes = Res.drawable.plus,
-                titleRes = R.string.more,
+                titleRes = Res.string.more,
                 onClick = { navController.navigate(Routing.CustomFeatures) },
             )
         }
@@ -120,7 +120,7 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
 @Composable
 private fun HomeFeatureGridCell(
     iconRes: DrawableResource,
-    titleRes: Int,
+    titleRes: StringResource,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {

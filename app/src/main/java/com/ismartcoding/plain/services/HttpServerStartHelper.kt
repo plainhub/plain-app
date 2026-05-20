@@ -1,10 +1,11 @@
 package com.ismartcoding.plain.services
 
+import com.ismartcoding.plain.i18n.*
+
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
@@ -99,15 +100,15 @@ object HttpServerStartHelper {
             if (PortHelper.isPortInUse(TempData.httpsPort)) HttpServerManager.portsInUse.add(TempData.httpsPort)
         }
         HttpServerManager.httpServerError = when {
-            HttpServerManager.portsInUse.isNotEmpty() -> LocaleHelper.getStringF(
-                if (HttpServerManager.portsInUse.size > 1) R.string.http_port_conflict_errors
-                else R.string.http_port_conflict_error,
+            HttpServerManager.portsInUse.isNotEmpty() -> LocaleHelper.getStringSyncF(
+                if (HttpServerManager.portsInUse.size > 1) Res.string.http_port_conflict_errors
+                else Res.string.http_port_conflict_error,
                 "port", HttpServerManager.portsInUse.joinToString(", "),
             )
-            serverWasRunning -> LocaleHelper.getString(R.string.http_server_health_check_failed)
+            serverWasRunning -> LocaleHelper.getStringSync(Res.string.http_server_health_check_failed)
             HttpServerManager.httpServerError.isNotEmpty() ->
-                LocaleHelper.getString(R.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
-            else -> LocaleHelper.getString(R.string.http_server_failed)
+                LocaleHelper.getStringSync(Res.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
+            else -> LocaleHelper.getStringSync(Res.string.http_server_failed)
         }
         onStateChanged(HttpServerState.ERROR)
         sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))

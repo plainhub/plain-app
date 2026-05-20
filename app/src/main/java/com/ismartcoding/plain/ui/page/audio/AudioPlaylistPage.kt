@@ -11,9 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -44,15 +43,15 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = { showClearConfirmDialog = false },
-            title = { Text(stringResource(R.string.clear_all)) },
-            text = { Text(stringResource(R.string.clear_all_confirm)) },
+            title = { Text(stringResource(Res.string.clear_all)) },
+            text = { Text(stringResource(Res.string.clear_all_confirm)) },
             confirmButton = {
                 TextButton(
                     onClick = { scope.launch(Dispatchers.IO) { audioPlaylistVM.clearAsync(context); showClearConfirmDialog = false } },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) { Text(stringResource(R.string.confirm)) }
+                ) { Text(stringResource(Res.string.confirm)) }
             },
-            dismissButton = { TextButton(onClick = { showClearConfirmDialog = false }) { Text(stringResource(R.string.cancel)) } },
+            dismissButton = { TextButton(onClick = { showClearConfirmDialog = false }) { Text(stringResource(Res.string.cancel)) } },
         )
     }
 
@@ -60,9 +59,9 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
         Column {
             PBottomSheetTopAppBar(
                 title = if (audioPlaylistVM.playlistItems.value.isNotEmpty())
-                    LocaleHelper.getStringF(R.string.playlist_title, "total", audioPlaylistVM.playlistItems.value.size)
-                else stringResource(R.string.playlist),
-                subtitle = if (audioPlaylistVM.playlistItems.value.isEmpty()) "" else stringResource(R.string.drag_number_to_reorder_list),
+                    LocaleHelper.getStringSyncF(Res.string.playlist_title, "total", audioPlaylistVM.playlistItems.value.size)
+                else stringResource(Res.string.playlist),
+                subtitle = if (audioPlaylistVM.playlistItems.value.isEmpty()) "" else stringResource(Res.string.drag_number_to_reorder_list),
                 actions = {
                     if (audioPlaylistVM.playlistItems.value.isNotEmpty()) {
                         IconButton(onClick = { showClearConfirmDialog = true }) {
@@ -78,7 +77,7 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                         .fillMaxWidth()
                         .weight(1f), contentAlignment = Alignment.Center
                 ) {
-                    Text(text = stringResource(R.string.empty_playlist), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.secondaryTextColor)
+                    Text(text = stringResource(Res.string.empty_playlist), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.secondaryTextColor)
                 }
             } else {
                 LazyColumn(

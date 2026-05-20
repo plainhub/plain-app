@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base.pullrefresh
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,10 +10,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
@@ -25,7 +26,7 @@ fun LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
     ) {
         if (!isLoadFinish) {
             Text(
-                text = stringResource(id = R.string.loading),
+                text = stringResource(Res.string.loading),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.secondaryTextColor,
             )

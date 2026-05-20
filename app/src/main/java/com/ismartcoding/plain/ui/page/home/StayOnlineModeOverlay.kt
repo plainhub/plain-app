@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
+
 import android.app.Activity
 import android.view.WindowManager
 import androidx.compose.animation.core.animateFloatAsState
@@ -30,7 +32,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit.Companion
 import androidx.compose.ui.unit.dp
@@ -41,7 +43,6 @@ import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.ismartcoding.plain.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -130,7 +131,7 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = stringResource(R.string.stay_online_mode),
+                        text = stringResource(Res.string.stay_online_mode),
                         color = Color.White.copy(alpha = 0.8f),
                         lineHeight = 56.sp,
                         fontSize = 36.sp,
@@ -138,13 +139,13 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = stringResource(R.string.stay_online_mode_oled_saving),
+                        text = stringResource(Res.string.stay_online_mode_oled_saving),
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 20.sp,
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = stringResource(R.string.stay_online_mode_tap_to_exit),
+                        text = stringResource(Res.string.stay_online_mode_tap_to_exit),
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 20.sp,
                     )

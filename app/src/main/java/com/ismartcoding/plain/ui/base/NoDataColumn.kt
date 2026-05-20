@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -10,8 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun NoDataColumn(loading: Boolean = false, search: Boolean = false) {
@@ -23,13 +24,13 @@ fun NoDataColumn(loading: Boolean = false, search: Boolean = false) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val text = if (search) {
-            if (loading) R.string.searching else R.string.no_results_found
+            if (loading) Res.string.searching else Res.string.no_results_found
         } else {
-            if (loading) R.string.loading else R.string.no_data
+            if (loading) Res.string.loading else Res.string.no_data
         }
         item {
             Text(
-                text = stringResource(id = text),
+                text = stringResource(text),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

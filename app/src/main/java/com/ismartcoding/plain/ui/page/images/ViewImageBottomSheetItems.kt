@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.images
 
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.R
 import android.content.ClipData
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -9,7 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -34,7 +34,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.lib.extensions.isUrl
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.base.CopyIconButton
 
 @Composable
@@ -120,7 +120,7 @@ internal fun ViewImagePathCard(
 ) {
     PCard {
         PListItem(title = m.path, action = {
-            CopyIconButton(text = m.path, clipLabel = stringResource(R.string.file_path))
+            CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
         })
     }
 }

@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.features.bluetooth
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
+import com.ismartcoding.plain.i18n.*
+
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
@@ -14,8 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -46,7 +48,7 @@ object BluetoothPermission {
                     }
                 } else {
                     sendEvent(BluetoothPermissionResultEvent())
-                    DialogHelper.showMessage(R.string.location_permission_should_be_enabled)
+                    DialogHelper.showMessage(Res.string.location_permission_should_be_enabled)
                 }
             }
 
@@ -81,13 +83,13 @@ object BluetoothPermission {
                     }
                     is RequestBluetoothLocationGPSPermissionEvent -> {
                         AlertDialog.Builder(activity)
-                            .setTitle(getString(R.string.bluetooth_scan_gps_enable_title))
-                            .setMessage(getString(R.string.bluetooth_scan_gps_enable_description))
-                            .setPositiveButton(getString(R.string.bluetooth_scan_gps_enable_confirm)) { _, _ ->
+                            .setTitle(LocaleHelper.getStringSync(Res.string.bluetooth_scan_gps_enable_title))
+                            .setMessage(LocaleHelper.getStringSync(Res.string.bluetooth_scan_gps_enable_description))
+                            .setPositiveButton(LocaleHelper.getStringSync(Res.string.bluetooth_scan_gps_enable_confirm)) { _, _ ->
                                 activity.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                             }
                             .setCancelable(false)
-                            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                            .setNegativeButton(LocaleHelper.getStringSync(Res.string.cancel)) { _, _ ->
                                 if (BluetoothUtil.isBluetoothReadyToUse()) {
                                     sendEvent(BluetoothPermissionResultEvent())
                                 } else {

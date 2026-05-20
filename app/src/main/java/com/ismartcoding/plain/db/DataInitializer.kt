@@ -1,17 +1,20 @@
 package com.ismartcoding.plain.db
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ContentValues
+import com.ismartcoding.plain.features.locale.LocaleHelper
+import org.jetbrains.compose.resources.StringResource
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.helpers.TimeHelper
 
 class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
-    private data class TagItem(val nameKey: Int, val type: DataType)
+    private data class TagItem(val nameKey: StringResource, val type: DataType)
 
     private data class MessageItem(val content: String, val fromId: String, val toId: String)
 
@@ -19,15 +22,15 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
 
     private val tags =
         arrayOf(
-            TagItem(R.string.light_music, DataType.AUDIO),
-            TagItem(R.string.movie, DataType.VIDEO),
-            TagItem(R.string.family, DataType.IMAGE),
-            TagItem(R.string.important, DataType.SMS),
-            TagItem(R.string.todo, DataType.SMS),
-            TagItem(R.string.family, DataType.CONTACT),
-            TagItem(R.string.important, DataType.CONTACT),
-            TagItem(R.string.personal, DataType.NOTE),
-            TagItem(R.string.work, DataType.NOTE),
+            TagItem(Res.string.light_music, DataType.AUDIO),
+            TagItem(Res.string.movie, DataType.VIDEO),
+            TagItem(Res.string.family, DataType.IMAGE),
+            TagItem(Res.string.important, DataType.SMS),
+            TagItem(Res.string.todo, DataType.SMS),
+            TagItem(Res.string.family, DataType.CONTACT),
+            TagItem(Res.string.important, DataType.CONTACT),
+            TagItem(Res.string.personal, DataType.NOTE),
+            TagItem(Res.string.work, DataType.NOTE),
         )
 
     fun insertTags() {
@@ -37,7 +40,7 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
                 SQLiteDatabase.CONFLICT_NONE,
                 ContentValues().apply {
                     put("id", StringHelper.shortUUID())
-                    put("name", context.resources.getString(tag.nameKey))
+                    put("name", LocaleHelper.getStringSync(tag.nameKey))
                     put("type", tag.type.value)
                     put("count", 0)
                     put("created_at", now)
@@ -48,8 +51,8 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
     }
 
     fun insertNotes() {
-        setOf(R.string.note_sample1).forEach {
-            val sample = context.resources.getString(it)
+        setOf(Res.string.note_sample1).forEach {
+            val sample = LocaleHelper.getStringSync(it)
             db.insert(
                 "notes",
                 SQLiteDatabase.CONFLICT_NONE,
@@ -66,7 +69,7 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
 
     fun insertWelcome() {
         setOf<MessageItem>(
-            MessageItem("""{"type":"text","value":{"text":"${context.resources.getString(R.string.welcome_text)}"}}""", "local", "me"),
+            MessageItem("""{"type":"text","value":{"text":"${LocaleHelper.getStringSync(Res.string.welcome_text)}"}}""", "local", "me"),
         ).forEach {
             db.insert(
                 "chats",

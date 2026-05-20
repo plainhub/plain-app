@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.border
@@ -11,12 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 
 @Composable
 fun ChatLinkPreviewLoading(url: String, modifier: Modifier = Modifier) {
@@ -30,7 +31,7 @@ fun ChatLinkPreviewLoading(url: String, modifier: Modifier = Modifier) {
             CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = stringResource(R.string.loading_link_preview), style = MaterialTheme.typography.bodyMedium,
+                Text(text = stringResource(Res.string.loading_link_preview), style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -60,7 +61,7 @@ fun ChatLinkPreviewError(url: String, modifier: Modifier = Modifier) {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = stringResource(R.string.link_preview_error), style = MaterialTheme.typography.bodyMedium,
+            Text(text = stringResource(Res.string.link_preview_error), style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,

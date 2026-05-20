@@ -3,14 +3,13 @@ package com.ismartcoding.plain.ui.base
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ActionButtonTags(onClick: () -> Unit) {
     PIconButton(
         icon = Res.drawable.tag,
-        contentDescription = stringResource(R.string.tags),
+        contentDescription = stringResource(Res.string.tags),
         tint = MaterialTheme.colorScheme.onSurface,
         click = onClick,
     )
@@ -20,7 +19,7 @@ fun ActionButtonTags(onClick: () -> Unit) {
 fun ActionButtonSort(onClick: () -> Unit) {
     PIconButton(
         icon = Res.drawable.sort,
-        contentDescription = stringResource(R.string.sort),
+        contentDescription = stringResource(Res.string.sort),
         tint = MaterialTheme.colorScheme.onSurface,
         click = onClick,
     )
@@ -30,7 +29,7 @@ fun ActionButtonSort(onClick: () -> Unit) {
 fun ActionButtonSearch(onClick: () -> Unit) {
     PIconButton(
         icon = Res.drawable.search,
-        contentDescription = stringResource(R.string.search),
+        contentDescription = stringResource(Res.string.search),
         tint = MaterialTheme.colorScheme.onSurface,
         click = onClick,
     )
@@ -40,7 +39,7 @@ fun ActionButtonSearch(onClick: () -> Unit) {
 fun ActionButtonFolderKanban(onClick: () -> Unit) {
     PIconButton(
         icon = Res.drawable.folder_kanban,
-        contentDescription = stringResource(R.string.folders),
+        contentDescription = stringResource(Res.string.folders),
         tint = MaterialTheme.colorScheme.onSurface,
         click = onClick,
     )
@@ -50,7 +49,7 @@ fun ActionButtonFolderKanban(onClick: () -> Unit) {
 fun ActionButtonFolders(onClick: () -> Unit) {
     PIconButton(
         icon = Res.drawable.folder,
-        contentDescription = stringResource(R.string.folders),
+        contentDescription = stringResource(Res.string.folders),
         tint = MaterialTheme.colorScheme.onSurface,
         click = onClick,
     )
@@ -60,7 +59,7 @@ fun ActionButtonFolders(onClick: () -> Unit) {
 fun ActionButtonCast(onClick: () -> Unit) {
     PIconButton(
         icon = Res.drawable.cast,
-        contentDescription = stringResource(R.string.cast),
+        contentDescription = stringResource(Res.string.cast),
         tint = MaterialTheme.colorScheme.onSurface,
         click = onClick,
     )
@@ -85,7 +84,7 @@ fun IconTextFavoriteButton(
     val icon = if (isFavorite) Res.drawable.check else Res.drawable.plus
     PIconTextActionButton(
         icon = icon,
-        text = stringResource(R.string.favorites),
+        text = stringResource(Res.string.favorites),
         click = onClick
     )
 }

@@ -1,15 +1,16 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.base.TextFieldDialog
@@ -28,12 +29,12 @@ internal fun FileRenameDialog(
     val name = remember { mutableStateOf(file.name) }
 
     TextFieldDialog(
-        title = stringResource(id = R.string.rename),
+        title = stringResource(Res.string.rename),
         value = name.value,
         placeholder = file.name,
         onValueChange = { name.value = it },
         onDismissRequest = { showDialog.value = false },
-        confirmText = stringResource(id = R.string.save),
+        confirmText = stringResource(Res.string.save),
         onConfirm = { newName ->
             scope.launch {
                 DialogHelper.showLoading()

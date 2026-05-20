@@ -21,11 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.components.ColorPickerDialog
@@ -54,7 +53,7 @@ fun MdEditorBottomAppBar(
     }
     if (mdEditorVM.showColorPicker) {
         ColorPickerDialog(
-            stringResource(id = R.string.pick_color),
+            stringResource(Res.string.pick_color),
             initValue = "FFFFFFFF",
             onDismiss = {
                 mdEditorVM.showColorPicker = false
@@ -63,7 +62,7 @@ fun MdEditorBottomAppBar(
                 if (hex != null) {
                     mdEditorVM.insertColor("#$hex")
                 } else {
-                    DialogHelper.showMessage(LocaleHelper.getString(R.string.invalid_value))
+                    DialogHelper.showMessage(LocaleHelper.getStringSync(Res.string.invalid_value))
                 }
             })
     }

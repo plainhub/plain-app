@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
@@ -23,13 +25,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.CrashHandler
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.AppLogHelper
 import java.io.File
 
@@ -40,11 +41,11 @@ fun CrashReportDialog(crashReport: String, onDismiss: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.crash_report_title)) },
+        title = { Text(stringResource(Res.string.crash_report_title)) },
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text(
-                    text = stringResource(R.string.crash_report_message),
+                    text = stringResource(Res.string.crash_report_message),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -57,7 +58,7 @@ fun CrashReportDialog(crashReport: String, onDismiss: () -> Unit) {
                         onCheckedChange = { includeAppLogs = it },
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(stringResource(R.string.crash_include_app_logs))
+                    Text(stringResource(Res.string.crash_include_app_logs))
                 }
             }
         },
@@ -111,12 +112,12 @@ fun CrashReportDialog(crashReport: String, onDismiss: () -> Unit) {
                 }
                 context.startActivity(Intent.createChooser(intent, null))
             }) {
-                Text(stringResource(R.string.crash_share))
+                Text(stringResource(Res.string.crash_share))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(Res.string.cancel))
             }
         },
     )

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.media
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,7 +20,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.Permissions
@@ -41,7 +42,7 @@ fun PlayMediaPage(
 
     if (path.isAudioFast()) {
         LaunchedEffect(path) {
-            Permissions.checkNotification(context, R.string.audio_notification_prompt) {
+            Permissions.checkNotification(context, Res.string.audio_notification_prompt) {
                 coMain {
                     val audio = withIO { DPlaylistAudio.fromPath(context, path) }
                     withIO {

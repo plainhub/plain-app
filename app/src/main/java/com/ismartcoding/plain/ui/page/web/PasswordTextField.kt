@@ -20,11 +20,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 
 @Composable
 fun PasswordTextField(
@@ -38,14 +37,14 @@ fun PasswordTextField(
             colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent),
             maxLines = 1, value = value, onValueChange = { onValueChange(it) },
             visualTransformation = VisualTransformation.None,
-            placeholder = { Text(text = stringResource(R.string.password), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyMedium) },
+            placeholder = { Text(text = stringResource(Res.string.password), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyMedium) },
             singleLine = true,
             trailingIcon = {
                 if (value.isNotEmpty()) {
-                    if (isChanged()) { Button(onClick = { onConfirm(value) }) { Text(stringResource(R.string.save)) } }
+                    if (isChanged()) { Button(onClick = { onConfirm(value) }) { Text(stringResource(Res.string.save)) } }
                 } else {
                     IconButton(onClick = { onValueChange(clipboardManager.getText()?.text ?: "") }) {
-                        Icon(painter = painterResource(Res.drawable.content_paste), contentDescription = stringResource(R.string.paste), tint = MaterialTheme.colorScheme.primary)
+                        Icon(painter = painterResource(Res.drawable.content_paste), contentDescription = stringResource(Res.string.paste), tint = MaterialTheme.colorScheme.primary)
                     }
                 }
             },

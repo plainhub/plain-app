@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.scan
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,11 +14,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -51,7 +52,7 @@ fun ScanHistoryPage(
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(R.string.scan_history))
+            PTopAppBar(navController = navController, title = stringResource(Res.string.scan_history))
         },
         content = { paddingValues ->
             PullToRefresh(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = refreshState) {

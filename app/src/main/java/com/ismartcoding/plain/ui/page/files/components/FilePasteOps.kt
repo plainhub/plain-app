@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.files.components
 
-import com.ismartcoding.plain.R
+import com.ismartcoding.plain.i18n.*
+
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -25,7 +26,7 @@ internal suspend fun executeCutFiles(
                 (dstCanonical.path == srcCanonical.path ||
                         dstCanonical.path.startsWith(srcCanonical.path + "/"))
             ) {
-                DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.cannot_move_folder_into_itself))
+                DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.cannot_move_folder_into_itself))
                 return@forEach
             }
 
@@ -47,7 +48,7 @@ internal suspend fun executeCutFiles(
                         srcCanonical.delete()
                     }
                 } catch (ex: Exception) {
-                    DialogHelper.showErrorMessage(ex.message ?: LocaleHelper.getString(R.string.unknown_error))
+                    DialogHelper.showErrorMessage(ex.message ?: LocaleHelper.getString(Res.string.unknown_error))
                 }
             }
         }
@@ -74,7 +75,7 @@ internal suspend fun executeCopyFiles(
                 (dstCanonical.path == srcCanonical.path ||
                         dstCanonical.path.startsWith(srcCanonical.path + "/"))
             ) {
-                DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.cannot_copy_folder_into_itself))
+                DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.cannot_copy_folder_into_itself))
                 return@forEach
             }
 
@@ -86,7 +87,7 @@ internal suspend fun executeCopyFiles(
                     srcCanonical.copyRecursively(File(dstFile.newPath()), true)
                 }
             } catch (e: Exception) {
-                DialogHelper.showErrorMessage(e.message ?: LocaleHelper.getString(R.string.unknown_error))
+                DialogHelper.showErrorMessage(e.message ?: LocaleHelper.getString(Res.string.unknown_error))
             }
         }
         filesVM.copyFiles.clear()

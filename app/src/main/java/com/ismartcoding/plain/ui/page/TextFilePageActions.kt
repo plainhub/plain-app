@@ -8,8 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.helpers.AppLogHelper
 import com.ismartcoding.plain.helpers.ShareHelper
@@ -45,7 +44,7 @@ internal fun RowScope.TextFilePageActions(
         if (type != TextFileType.APP_LOG.name && !textFileVM.isExternalFile.value) {
             PIconButton(
                 icon = Res.drawable.square_pen,
-                contentDescription = stringResource(R.string.edit),
+                contentDescription = stringResource(Res.string.edit),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
                 textFileVM.enterEditMode()
@@ -54,13 +53,13 @@ internal fun RowScope.TextFilePageActions(
     } else {
         PIconButton(
             icon = Res.drawable.save,
-            contentDescription = stringResource(R.string.save),
+            contentDescription = stringResource(Res.string.save),
             tint = if (isSaving) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.rotate(rotation),
         ) {
             scope.launch {
                 if (textFileVM.isExternalFile.value) {
-                    DialogHelper.showMessage(R.string.not_supported_error)
+                    DialogHelper.showMessage(Res.string.not_supported_error)
                     return@launch
                 }
                 keyboardController?.hide()
@@ -79,14 +78,14 @@ internal fun RowScope.TextFilePageActions(
     if (setOf(TextFileType.APP_LOG.name, TextFileType.CHAT.name).contains(type)) {
         PIconButton(
             icon = Res.drawable.wrap_text,
-            contentDescription = stringResource(R.string.wrap_content),
+            contentDescription = stringResource(Res.string.wrap_content),
             tint = MaterialTheme.colorScheme.onSurface,
         ) {
             textFileVM.toggleWrapContent(context)
         }
         PIconButton(
             icon = Res.drawable.share_2,
-            contentDescription = stringResource(R.string.share),
+            contentDescription = stringResource(Res.string.share),
             tint = MaterialTheme.colorScheme.onSurface,
         ) {
             if (type == TextFileType.APP_LOG.name) {

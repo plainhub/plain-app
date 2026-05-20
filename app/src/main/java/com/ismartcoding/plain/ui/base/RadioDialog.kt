@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,8 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +45,7 @@ fun RadioDialog(
         },
         confirmButton = {
             Button(onClick = onDismissRequest) {
-                Text(text = stringResource(id = R.string.close))
+                Text(text = stringResource(Res.string.close))
             }
         },
         dismissButton = {},

@@ -1,16 +1,17 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ClipData
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getMimeType
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
@@ -80,7 +81,7 @@ fun ViewAudioBottomSheet(
             if (!audioVM.trash.value) {
                 item {
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(text = stringResource(id = R.string.tags))
+                    Subtitle(text = stringResource(Res.string.tags))
                     TagSelector(
                         data = m,
                         tagsVM = tagsVM,
@@ -96,18 +97,18 @@ fun ViewAudioBottomSheet(
                 VerticalSpace(dp = 16.dp)
                 PCard {
                     PListItem(title = m.path, action = {
-                        CopyIconButton(text = m.path, clipLabel = stringResource(R.string.file_path))
+                        CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
                     })
                 }
             }
             item {
                 VerticalSpace(dp = 16.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.file_size), value = m.size.formatBytes())
-                    PListItem(title = stringResource(id = R.string.type), value = m.path.getMimeType())
-                    PListItem(title = stringResource(id = R.string.duration), value = m.duration.formatDuration())
-                    PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
-                    PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
+                    PListItem(title = stringResource(Res.string.type), value = m.path.getMimeType())
+                    PListItem(title = stringResource(Res.string.duration), value = m.duration.formatDuration())
+                    PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
                 }
             }
             item {

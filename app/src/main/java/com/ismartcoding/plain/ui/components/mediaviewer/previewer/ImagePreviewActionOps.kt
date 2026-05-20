@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import android.os.Environment
 import coil3.imageLoader
@@ -7,7 +9,6 @@ import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
@@ -51,9 +52,9 @@ internal suspend fun savePreviewImage(context: Context, m: PreviewItem) {
             val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = m.path.getFilenameFromPath()) }
             DialogHelper.hideLoading()
             if (r.isNotEmpty()) {
-                DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
+                DialogHelper.showMessage(LocaleHelper.getStringF(Res.string.image_save_to, "path", r))
             } else {
-                DialogHelper.showMessage(LocaleHelper.getString(R.string.image_save_to_failed))
+                DialogHelper.showMessage(LocaleHelper.getString(Res.string.image_save_to_failed))
             }
             return
         }
@@ -61,7 +62,7 @@ internal suspend fun savePreviewImage(context: Context, m: PreviewItem) {
         val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
         DialogHelper.hideLoading()
         if (r.success) {
-            DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.image_save_to, "path", r.path))
+            DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.image_save_to, "path", r.path))
         } else {
             DialogHelper.showMessage(r.message)
         }
@@ -69,9 +70,9 @@ internal suspend fun savePreviewImage(context: Context, m: PreviewItem) {
         val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""
         val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES, newName = newName) }
         if (r.isNotEmpty()) {
-            DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
+            DialogHelper.showMessage(LocaleHelper.getStringF(Res.string.image_save_to, "path", r))
         } else {
-            DialogHelper.showMessage(LocaleHelper.getString(R.string.image_save_to_failed))
+            DialogHelper.showMessage(LocaleHelper.getString(Res.string.image_save_to_failed))
         }
     }
 }

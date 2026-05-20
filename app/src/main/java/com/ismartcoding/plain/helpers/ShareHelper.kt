@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -10,8 +14,6 @@ import com.ismartcoding.lib.extensions.getMimeTypeFromUri
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import java.io.File
@@ -51,7 +53,7 @@ object ShareHelper {
         uri: Uri,
     ) {
         val shareIntent = createFileIntent(context, uri)
-        val chooserIntent = Intent.createChooser(shareIntent, getString(R.string.share))
+        val chooserIntent = Intent.createChooser(shareIntent, LocaleHelper.getStringSync(Res.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
     }
@@ -78,7 +80,7 @@ object ShareHelper {
             )
             type = "text/plain"
         }
-        val chooserIntent = Intent.createChooser(shareIntent, getString(R.string.share))
+        val chooserIntent = Intent.createChooser(shareIntent, LocaleHelper.getStringSync(Res.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
     }
@@ -99,7 +101,7 @@ object ShareHelper {
         uris: List<Uri>,
     ) {
         val shareIntent = createFilesIntent(uris)
-        val chooserIntent = Intent.createChooser(shareIntent, getString(R.string.share))
+        val chooserIntent = Intent.createChooser(shareIntent, LocaleHelper.getStringSync(Res.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
     }
@@ -175,9 +177,9 @@ object ShareHelper {
         // Check if the file can be accessed by FileProvider
         if (!isFileAccessibleByProvider(fileToShare)) {
             val errorMessage = if (fileToShare.absolutePath.startsWith("/apex/")) {
-                getString(R.string.cannot_share_system_component)
+                LocaleHelper.getStringSync(Res.string.cannot_share_system_component)
             } else {
-                getString(R.string.cannot_share_system_file)
+                LocaleHelper.getStringSync(Res.string.cannot_share_system_file)
             }
             DialogHelper.showErrorMessage(errorMessage)
             return
@@ -187,13 +189,13 @@ object ShareHelper {
             intent.type = resolveShareMimeType(context, fileToShare, mimeType)
             intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, fileToShare))
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            val chooserIntent = Intent.createChooser(intent, getString(R.string.share))
+            val chooserIntent = Intent.createChooser(intent, LocaleHelper.getStringSync(Res.string.share))
             chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
             context.startActivity(chooserIntent)
         } catch (e: IllegalArgumentException) {
-            DialogHelper.showErrorMessage(getString(R.string.cannot_share_file_not_accessible))
+            DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.cannot_share_file_not_accessible))
         } catch (e: Exception) {
-            DialogHelper.showErrorMessage(e.message ?: getString(R.string.unknown_error))
+            DialogHelper.showErrorMessage(e.message ?: LocaleHelper.getStringSync(Res.string.unknown_error))
         }
     }
 
@@ -217,12 +219,12 @@ object ShareHelper {
         }
 
         if (fileUris.isEmpty()) {
-            DialogHelper.showErrorMessage(getString(R.string.cannot_share_any_files))
+            DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.cannot_share_any_files))
             return
         }
 
         if (inaccessibleFiles.isNotEmpty()) {
-            val message = getString(R.string.some_files_cannot_be_shared) + ": ${inaccessibleFiles.joinToString(", ")}"
+            val message = LocaleHelper.getStringSync(Res.string.some_files_cannot_be_shared) + ": ${inaccessibleFiles.joinToString(", ")}"
             DialogHelper.showErrorMessage(message)
         }
 
@@ -230,7 +232,7 @@ object ShareHelper {
         intent.type = "*/*"
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fileUris)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        val chooserIntent = Intent.createChooser(intent, getString(R.string.share))
+        val chooserIntent = Intent.createChooser(intent, LocaleHelper.getStringSync(Res.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
     }
@@ -242,9 +244,9 @@ object ShareHelper {
         val file = File(path)
         if (!isFileAccessibleByProvider(file)) {
             val errorMessage = if (file.absolutePath.startsWith("/apex/")) {
-                getString(R.string.cannot_open_system_component)
+                LocaleHelper.getStringSync(Res.string.cannot_open_system_component)
             } else {
-                getString(R.string.cannot_open_system_file)
+                LocaleHelper.getStringSync(Res.string.cannot_open_system_file)
             }
             DialogHelper.showErrorMessage(errorMessage)
             return
@@ -259,13 +261,13 @@ object ShareHelper {
             intent.setDataAndType(uri, mimeType)
             intent.putExtra("mimeType", mimeType)
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            val chooserIntent = Intent.createChooser(intent, getString(R.string.open_with))
+            val chooserIntent = Intent.createChooser(intent, LocaleHelper.getStringSync(Res.string.open_with))
             chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
             context.startActivity(chooserIntent)
         } catch (e: IllegalArgumentException) {
-            DialogHelper.showErrorMessage(getString(R.string.cannot_open_file_not_accessible))
+            DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.cannot_open_file_not_accessible))
         } catch (e: Exception) {
-            DialogHelper.showErrorMessage(e.message ?: getString(R.string.unknown_error))
+            DialogHelper.showErrorMessage(e.message ?: LocaleHelper.getStringSync(Res.string.unknown_error))
         }
     }
 }

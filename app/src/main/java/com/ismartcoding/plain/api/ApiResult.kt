@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.api
 
+import com.ismartcoding.plain.i18n.*
+
 import com.ismartcoding.lib.extensions.isOk
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import io.ktor.client.statement.*
 
@@ -11,6 +12,6 @@ data class ApiResult(val response: HttpResponse?, val exception: Throwable? = nu
     }
 
     fun errorMessage(): String {
-        return exception?.toString() ?: response?.toString() ?: LocaleHelper.getString(R.string.unknown)
+        return exception?.toString() ?: response?.toString() ?: LocaleHelper.getStringSync(Res.string.unknown)
     }
 }

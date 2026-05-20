@@ -32,13 +32,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.ui.components.mediaviewer.video.findActivity
 import com.ismartcoding.plain.ui.components.mediaviewer.video.setFullScreen
@@ -101,7 +100,7 @@ fun DlnaReceiverImageViewer(onExit: () -> Unit) {
                 IconButton(onClick = onExit) {
                     Icon(
                         painter = painterResource(Res.drawable.arrow_left),
-                        contentDescription = stringResource(R.string.dlna_receiver_exit_player),
+                        contentDescription = stringResource(Res.string.dlna_receiver_exit_player),
                         tint = Color.White,
                         modifier = Modifier.size(24.dp),
                     )

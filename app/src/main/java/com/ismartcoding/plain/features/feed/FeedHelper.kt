@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.features.feed
 
+import com.ismartcoding.plain.i18n.*
+
 import com.ismartcoding.lib.opml.OpmlParser
 import com.ismartcoding.lib.opml.OpmlWriter
 import com.ismartcoding.lib.opml.entity.Body
@@ -8,7 +10,6 @@ import com.ismartcoding.lib.opml.entity.Opml
 import com.ismartcoding.lib.opml.entity.Outline
 import com.ismartcoding.lib.rss.RssParser
 import com.ismartcoding.lib.rss.model.RssChannel
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeed
@@ -109,7 +110,7 @@ object FeedHelper {
                 Opml(
                     "2.0",
                     Head(
-                        LocaleHelper.getString(R.string.app_name),
+                        LocaleHelper.getStringSync(Res.string.app_name),
                         Date().toString(),
                     ),
                     Body(

@@ -1,13 +1,14 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.db.DMessageStatusData
 
 @Composable
@@ -23,7 +24,7 @@ fun PeerDeliveryStatusDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.delivery_status),
+                text = stringResource(Res.string.delivery_status),
                 style = MaterialTheme.typography.titleLarge,
             )
         },
@@ -42,12 +43,12 @@ fun PeerDeliveryStatusDialog(
                     onDismiss()
                 },
             ) {
-                Text(text = stringResource(R.string.try_again))
+                Text(text = stringResource(Res.string.try_again))
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(R.string.close))
+                Text(text = stringResource(Res.string.close))
             }
         },
     )

@@ -23,14 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
@@ -64,7 +63,7 @@ fun OtherFilePage(
                 actions = {
                     PIconButton(
                         icon = Res.drawable.share_2,
-                        contentDescription = stringResource(R.string.share),
+                        contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
                         ShareHelper.shareFile(context, File(path))
@@ -103,7 +102,7 @@ fun OtherFilePage(
                         VerticalSpace(dp = 16.dp)
                         SelectionContainer {
                             Text(
-                                text = stringResource(R.string.file_size) + ": " + file.length().formatBytes(),
+                                text = stringResource(Res.string.file_size) + ": " + file.length().formatBytes(),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .padding(horizontal = 32.dp),
@@ -113,7 +112,7 @@ fun OtherFilePage(
                         }
                         VerticalSpace(dp = 16.dp)
                         Text(
-                            text = stringResource(R.string.unknown_file_description),
+                            text = stringResource(Res.string.unknown_file_description),
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .padding(horizontal = 32.dp),
@@ -121,7 +120,7 @@ fun OtherFilePage(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         VerticalSpace(dp = 64.dp)
-                        PFilledButton(text = stringResource(id = R.string.open_with_other_app), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        PFilledButton(text = stringResource(Res.string.open_with_other_app), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             ShareHelper.openPathWith(context, path)
                         })
                     }

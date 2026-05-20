@@ -1,12 +1,13 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -106,7 +107,7 @@ class MediaFoldersViewModel : ViewModel() {
             }
         }
 
-        totalBucket.value = DMediaBucket("all", LocaleHelper.getString(R.string.all), totalValue, sizeValue, subItems.toMutableList())
+        totalBucket.value = DMediaBucket("all", LocaleHelper.getStringSync(Res.string.all), totalValue, sizeValue, subItems.toMutableList())
 
         LoadingHelper.ensureMinimumLoadingTime(
             viewModel = this,

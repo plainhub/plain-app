@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -11,7 +13,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
@@ -51,9 +52,9 @@ internal fun MainActivity.handleIntent(intent: Intent) {
         if (mimeType != null) {
             if (mimeType.startsWith("text/")) navControllerState.value?.navigateTextFile(uri.toString())
             else if (mimeType == "application/pdf") navControllerState.value?.navigatePdf(uri)
-            else DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.not_supported_error))
+            else DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.not_supported_error))
         } else {
-            DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.not_supported_error))
+            DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.not_supported_error))
         }
     } else if (intent.action == Intent.ACTION_SEND) {
         if (intent.type?.startsWith("text/") == true) {

@@ -30,11 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
 @Composable
@@ -127,7 +126,7 @@ private fun DonationLabel() {
                 tint = MaterialTheme.colorScheme.primary,
             )
             Text(
-                text = stringResource(R.string.donation),
+                text = stringResource(Res.string.donation),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
@@ -139,14 +138,14 @@ private fun DonationLabel() {
 @Composable
 private fun DonationTexts() {
     Text(
-        text = stringResource(R.string.donation_title),
+        text = stringResource(Res.string.donation_title),
         style = MaterialTheme.typography.headlineSmall,
         color = MaterialTheme.colorScheme.onPrimaryContainer,
         fontWeight = FontWeight.Bold,
     )
     Spacer(Modifier.height(8.dp))
     Text(
-        text = stringResource(R.string.donation_desc),
+        text = stringResource(Res.string.donation_desc),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
     )
@@ -170,7 +169,7 @@ private fun DonationButton(onClick: () -> Unit) {
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            text = stringResource(R.string.buy_me_a_coffee),
+            text = stringResource(Res.string.buy_me_a_coffee),
             fontWeight = FontWeight.Bold,
         )
     }

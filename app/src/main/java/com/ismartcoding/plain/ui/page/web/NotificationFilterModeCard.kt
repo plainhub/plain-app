@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,9 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.VerticalSpace
 
@@ -24,7 +25,7 @@ fun NotificationFilterModeCard(
     PCard {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = stringResource(R.string.notification_filter_mode_desc),
+                text = stringResource(Res.string.notification_filter_mode_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -39,13 +40,13 @@ fun NotificationFilterModeCard(
                 FilterChip(
                     selected = mode == "allowlist",
                     onClick = { if (mode != "allowlist") onToggleMode() },
-                    label = { Text(stringResource(R.string.allowlist_mode)) },
+                    label = { Text(stringResource(Res.string.allowlist_mode)) },
                     colors = chipColors
                 )
                 FilterChip(
                     selected = mode == "blacklist",
                     onClick = { if (mode != "blacklist") onToggleMode() },
-                    label = { Text(stringResource(R.string.blacklist_mode)) },
+                    label = { Text(stringResource(Res.string.blacklist_mode)) },
                     colors = chipColors
                 )
             }

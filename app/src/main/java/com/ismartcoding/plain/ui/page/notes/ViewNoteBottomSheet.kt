@@ -1,13 +1,14 @@
 package com.ismartcoding.plain.ui.page.notes
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.extensions.formatDateTime
@@ -82,7 +83,7 @@ fun ViewNoteBottomSheet(
             if (!notesVM.trash.value) {
                 item {
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(text = stringResource(id = R.string.tags))
+                    Subtitle(text = stringResource(Res.string.tags))
                     TagSelector(
                         data = m,
                         tagsVM = tagsVM,
@@ -97,8 +98,8 @@ fun ViewNoteBottomSheet(
             item {
                 VerticalSpace(dp = 16.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
-                    PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
                 }
             }
             item {

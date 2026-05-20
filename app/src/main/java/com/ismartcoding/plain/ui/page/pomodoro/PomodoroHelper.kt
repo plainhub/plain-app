@@ -49,19 +49,19 @@ object PomodoroHelper {
             PomodoroState.WORK -> {
                 val newCount = completedPomodoros + 1
                 val shouldBeLongBreak = newCount % settings.pomodorosBeforeLongBreak == 0 && newCount > 0
-                val messageRes = if (shouldBeLongBreak) R.string.great_job_long_break else R.string.great_job_short_break
+                val messageRes = if (shouldBeLongBreak) Res.string.great_job_long_break else Res.string.great_job_short_break
                 Pair(
-                    LocaleHelper.getString(R.string.work_session_complete),
+                    LocaleHelper.getString(Res.string.work_session_complete),
                     LocaleHelper.getString(messageRes)
                 )
             }
 
             PomodoroState.SHORT_BREAK -> {
-                Pair(LocaleHelper.getString(R.string.break_complete), LocaleHelper.getString(R.string.time_to_work))
+                Pair(LocaleHelper.getString(Res.string.break_complete), LocaleHelper.getString(Res.string.time_to_work))
             }
 
             PomodoroState.LONG_BREAK -> {
-                Pair(LocaleHelper.getString(R.string.long_break_complete), LocaleHelper.getString(R.string.ready_for_work))
+                Pair(LocaleHelper.getString(Res.string.long_break_complete), LocaleHelper.getString(Res.string.ready_for_work))
             }
         }
 

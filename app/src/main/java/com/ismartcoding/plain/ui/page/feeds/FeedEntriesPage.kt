@@ -23,11 +23,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
@@ -75,8 +74,8 @@ fun FeedEntriesPage(
     })
     val isFirstTime = remember { mutableStateOf(true) }
     val tabs = remember(tagsState, feedEntriesVM.total.intValue) {
-        listOf(VTabData(LocaleHelper.getString(R.string.all), "all", feedEntriesVM.total.intValue),
-            VTabData(LocaleHelper.getString(R.string.today), "today", feedEntriesVM.totalToday.value),
+        listOf(VTabData(LocaleHelper.getStringSync(Res.string.all), "all", feedEntriesVM.total.intValue),
+            VTabData(LocaleHelper.getStringSync(Res.string.today), "today", feedEntriesVM.totalToday.value),
             *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray())
     }
     val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { feedEntriesVM.sync() } }
@@ -90,10 +89,10 @@ fun FeedEntriesPage(
     FeedEntriesPageEffects(feedEntriesVM, feedsVM, tagsVM, feedId, scope, tabs, pagerState, scrollBehavior, scrollStateMap, topRefreshLayoutState, isFirstTime, onSearch)
 
     val feed = if (feedEntriesVM.feedId.value.isEmpty()) null else feedsMap.value[feedEntriesVM.feedId.value]
-    val feedName = feed?.name ?: stringResource(id = R.string.feeds)
-    val pageTitle = if (feedEntriesVM.selectMode.value) LocaleHelper.getStringF(R.string.x_selected, "count", feedEntriesVM.selectedIds.size)
+    val feedName = feed?.name ?: stringResource(Res.string.feeds)
+    val pageTitle = if (feedEntriesVM.selectMode.value) LocaleHelper.getStringSyncF(Res.string.x_selected, "count", feedEntriesVM.selectedIds.size)
         else if (feedEntriesVM.tag.value != null) listOf(feedName, feedEntriesVM.tag.value!!.name).joinToString(" - ")
-        else if (feedEntriesVM.filterType == FeedEntryFilterType.TODAY) feedName + " - " + stringResource(id = R.string.today) else feedName
+        else if (feedEntriesVM.filterType == FeedEntryFilterType.TODAY) feedName + " - " + stringResource(Res.string.today) else feedName
 
     ViewFeedEntryBottomSheet(feedEntriesVM, tagsVM, tagsMapState, tagsState)
     if (feedEntriesVM.showTagsDialog.value) { TagsBottomSheet(tagsVM) { feedEntriesVM.showTagsDialog.value = false } }
@@ -104,10 +103,10 @@ fun FeedEntriesPage(
             navController = navController, navigationIcon = {
                 if (feedEntriesVM.selectMode.value) NavigationCloseIcon { feedEntriesVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() }
             }, title = pageTitle, scrollBehavior = scrollBehavior, actions = {
-                if (feedEntriesVM.selectMode.value) { PTopRightButton(label = stringResource(if (feedEntriesVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { feedEntriesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
+                if (feedEntriesVM.selectMode.value) { PTopRightButton(label = stringResource(if (feedEntriesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { feedEntriesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
                 else {
                     ActionButtonSearch { feedEntriesVM.enterSearchMode() }
-                    if (feedEntriesVM.feedId.value.isEmpty()) { PIconButton(icon = Res.drawable.rss, contentDescription = stringResource(R.string.subscriptions), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.Feeds) } }
+                    if (feedEntriesVM.feedId.value.isEmpty()) { PIconButton(icon = Res.drawable.rss, contentDescription = stringResource(Res.string.subscriptions), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.Feeds) } }
                     ActionButtonMoreWithMenu { dismiss -> PDropdownMenuItemTags(onClick = { dismiss(); feedEntriesVM.showTagsDialog.value = true })
                         if (feedEntriesVM.feedId.value.isEmpty()) PDropdownMenuItemSettings(onClick = { dismiss(); navController.navigate(Routing.FeedSettings) }) }
                 }

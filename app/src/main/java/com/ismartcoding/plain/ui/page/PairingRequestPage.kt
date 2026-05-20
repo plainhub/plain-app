@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,10 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
@@ -65,7 +66,7 @@ fun PairingRequestPage(
         }
         item {
             Text(
-                text = stringResource(R.string.pairing_request),
+                text = stringResource(Res.string.pairing_request),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                 ),
@@ -74,7 +75,7 @@ fun PairingRequestPage(
             )
             VerticalSpace(dp = 8.dp)
             Text(
-                text = stringResource(R.string.pairing_request_message, request.fromName),
+                text = stringResource(Res.string.pairing_request_message, request.fromName),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 ),
@@ -85,8 +86,8 @@ fun PairingRequestPage(
         }
         item {
             PCard {
-                PListItem(title = stringResource(R.string.device_name), value = request.fromName)
-                PListItem(title = stringResource(R.string.ip_address), value = event.fromIp)
+                PListItem(title = stringResource(Res.string.device_name), value = request.fromName)
+                PListItem(title = stringResource(Res.string.ip_address), value = event.fromIp)
             }
         }
         item {
@@ -97,13 +98,13 @@ fun PairingRequestPage(
                     .padding(horizontal = 16.dp),
             ) {
                 PFilledButton(
-                    text = stringResource(R.string.allow),
+                    text = stringResource(Res.string.allow),
                     buttonSize = ButtonSize.LARGE,
                     onClick = onAllow,
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
-                    text = stringResource(R.string.deny),
+                    text = stringResource(Res.string.deny),
                     buttonSize = ButtonSize.LARGE,
                     onClick = onDeny,
                     type = ButtonType.DANGER,

@@ -24,9 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 
 data class PlaybackSpeed(val speed: Float, val label: String)
@@ -48,15 +47,15 @@ fun VideoButtons1(context: Context, videoState: VideoState) {
             }
         }
         IconButton(onClick = { showSpeedMenu = !showSpeedMenu }) {
-            Icon(painter = painterResource(Res.drawable.gauge), tint = Color.White, contentDescription = stringResource(R.string.change_playback_speed))
+            Icon(painter = painterResource(Res.drawable.gauge), tint = Color.White, contentDescription = stringResource(Res.string.change_playback_speed))
         }
     }
     IconButton(onClick = { videoState.toggleMute() }) {
-        Icon(painter = painterResource(if (videoState.isMuted) Res.drawable.volume_x else Res.drawable.volume_2), tint = Color.White, contentDescription = stringResource(R.string.toggle_audio))
+        Icon(painter = painterResource(if (videoState.isMuted) Res.drawable.volume_x else Res.drawable.volume_2), tint = Color.White, contentDescription = stringResource(Res.string.toggle_audio))
     }
     if (videoState.hasPipMode(context)) {
         IconButton(onClick = { videoState.enterPipMode(context) }) {
-            Icon(painter = painterResource(Res.drawable.pip), tint = Color.White, contentDescription = stringResource(R.string.picture_in_picture))
+            Icon(painter = painterResource(Res.drawable.pip), tint = Color.White, contentDescription = stringResource(Res.string.picture_in_picture))
         }
     }
 }

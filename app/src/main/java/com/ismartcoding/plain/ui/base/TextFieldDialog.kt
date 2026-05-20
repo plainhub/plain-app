@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,11 +20,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 
 @Composable
 fun TextFieldDialog(
@@ -36,8 +37,8 @@ fun TextFieldDialog(
     description: String = "",
     isPassword: Boolean = false,
     errorText: String = "",
-    dismissText: String = stringResource(R.string.cancel),
-    confirmText: String = stringResource(R.string.confirm),
+    dismissText: String = stringResource(Res.string.cancel),
+    confirmText: String = stringResource(Res.string.confirm),
     validator: (String) -> Boolean = { true },
     validationErrorText: String = "",
     onValueChange: (String) -> Unit = {},

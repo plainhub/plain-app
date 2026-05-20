@@ -12,10 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -47,7 +46,7 @@ fun FileListContent(
     } else if (files.isEmpty()) {
         NoDataView(
             icon = Res.drawable.package_open,
-            message = stringResource(R.string.no_data),
+            message = stringResource(Res.string.no_data),
             showRefreshButton = true,
             onRefresh = { loadFiles(emptyList(), true) }
         )

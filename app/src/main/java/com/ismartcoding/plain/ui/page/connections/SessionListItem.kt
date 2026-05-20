@@ -30,13 +30,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.capitalize
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.extensions.formatDateTime
@@ -70,18 +69,18 @@ internal fun SessionListItem(
     var showRenameDialog by remember { mutableStateOf(false) }
     var inputName by remember(m.clientId, m.name) { mutableStateOf(m.name) }
     val lastActiveText = if (showFullTime) m.lastActiveAt?.formatDateTime() else m.lastActiveAt?.timeAgo()
-    val displayName = m.name.ifEmpty { stringResource(R.string.unknown) }
+    val displayName = m.name.ifEmpty { stringResource(Res.string.unknown) }
     val title = if (m.isCustom) displayName else osDisplay
 
     if (showRenameDialog) {
         AlertDialog(
             onDismissRequest = { showRenameDialog = false },
-            title = { Text(stringResource(R.string.rename)) },
+            title = { Text(stringResource(Res.string.rename)) },
             text = {
                 OutlinedTextField(
                     value = inputName,
                     onValueChange = { inputName = it },
-                    label = { Text(stringResource(R.string.name)) },
+                    label = { Text(stringResource(Res.string.name)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -91,12 +90,12 @@ internal fun SessionListItem(
                     onRename(m.clientId, inputName.trim())
                     showRenameDialog = false
                 }) {
-                    Text(stringResource(R.string.save))
+                    Text(stringResource(Res.string.save))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRenameDialog = false }) {
-                    Text(stringResource(R.string.cancel))
+                    Text(stringResource(Res.string.cancel))
                 }
             },
         )
@@ -119,26 +118,26 @@ internal fun SessionListItem(
                 action = { SessionBadge(m = m, isOnline = isOnline) },
             )
             PListItem(
-                title = stringResource(R.string.client_id) + " - " + stringResource(R.string.token),
+                title = stringResource(Res.string.client_id) + " - " + stringResource(Res.string.token),
                 subtitle = m.clientId + "-" + m.token, action = {
                     Column(horizontalAlignment = Alignment.End) {
                         if (m.isCustom) {
-                            PFilledButton(stringResource(R.string.how_to_use), buttonSize = ButtonSize.SMALL, onClick = {
+                            PFilledButton(stringResource(Res.string.how_to_use), buttonSize = ButtonSize.SMALL, onClick = {
                                 showTokenTipsDialog = true
                             })
                         }
-                        CopyIconButton(text = m.clientId + "-" + m.token, clipLabel = stringResource(R.string.token))
+                        CopyIconButton(text = m.clientId + "-" + m.token, clipLabel = stringResource(Res.string.token))
                     }
                 })
             if (m.clientIP.isNotEmpty()) {
-                PListItem(title = stringResource(R.string.ip_address), value = m.clientIP)
+                PListItem(title = stringResource(Res.string.ip_address), value = m.clientIP)
             }
             if (browserDisplay.isNotEmpty()) {
-                PListItem(title = stringResource(R.string.browser), value = browserDisplay)
+                PListItem(title = stringResource(Res.string.browser), value = browserDisplay)
             }
-            PListItem(title = stringResource(R.string.created_at), value = m.createdAt.formatDateTime())
+            PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
             Text(
-                text = stringResource(if (m.isCustom) R.string.revoke_api_token else R.string.revoke_session),
+                text = stringResource(if (m.isCustom) Res.string.revoke_api_token else Res.string.revoke_session),
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.red,
                 textAlign = TextAlign.Center,
@@ -158,7 +157,7 @@ internal fun SessionListItem(
             horizontalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = stringResource(R.string.last_active, lastActiveText),
+                text = stringResource(Res.string.last_active, lastActiveText),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -184,12 +183,12 @@ private fun ApiTokenTipsDialog(m: VSession, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = stringResource(R.string.api_tokens) + " · " + stringResource(R.string.how_to_use))
+            Text(text = stringResource(Res.string.api_tokens) + " · " + stringResource(Res.string.how_to_use))
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
-                    text = stringResource(R.string.auth_dev_token_tips),
+                    text = stringResource(Res.string.auth_dev_token_tips),
                     style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
                 )
                 ClipboardCard(
@@ -197,11 +196,11 @@ private fun ApiTokenTipsDialog(m: VSession, onDismiss: () -> Unit) {
                     label = "CURL",
                     text = curlReal,
                 )
-                PFilledButton(text = stringResource(id = R.string.docs), onClick = { WebHelper.open(context, "https://plainapp.app/api-docs") })
+                PFilledButton(text = stringResource(Res.string.docs), onClick = { WebHelper.open(context, "https://plainapp.app/api-docs") })
             }
         },
         confirmButton = {
-            Button(onClick = onDismiss) { Text(stringResource(R.string.close)) }
+            Button(onClick = onDismiss) { Text(stringResource(Res.string.close)) }
         },
     )
 }

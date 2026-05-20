@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.scan.components
 
 import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.i18n.*
 import android.content.ClipData
 import android.content.Context
@@ -24,11 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.linkify
@@ -104,10 +103,10 @@ fun ScanHistoryItem(
             ) {
                 ActionButton(
                     icon = Res.drawable.copy,
-                    text = stringResource(R.string.copy),
+                    text = stringResource(Res.string.copy),
                     tint = MaterialTheme.colorScheme.onSurface,
                     onClick = {
-                        val clip = ClipData.newPlainText(getString(R.string.scan_result), text)
+                        val clip = ClipData.newPlainText(LocaleHelper.getStringSync(Res.string.scan_result), text)
                         clipboardManager.setPrimaryClip(clip)
                         DialogHelper.showTextCopiedMessage(text)
                     },
@@ -115,7 +114,7 @@ fun ScanHistoryItem(
                 )
                 ActionButton(
                     icon = Res.drawable.delete_forever,
-                    text = stringResource(R.string.delete),
+                    text = stringResource(Res.string.delete),
                     tint = MaterialTheme.colorScheme.red,
                     onClick = onDelete,
                     modifier = Modifier.weight(1f)

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,13 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.PermissionsResultEvent
@@ -91,17 +92,17 @@ fun HomePage(
                 if (webEnabled) {
                     if (mainVM.isVPNConnected) {
                         PAlert(
-                            description = stringResource(id = R.string.vpn_web_conflict_warning),
+                            description = stringResource(Res.string.vpn_web_conflict_warning),
                             AlertType.WARNING,
                         )
                     }
                     if (!systemAlertWindow) {
                         PAlert(
-                            description = stringResource(id = R.string.system_alert_window_warning),
+                            description = stringResource(Res.string.system_alert_window_warning),
                             AlertType.WARNING,
                         ) {
                             PFilledButton(
-                                text = stringResource(R.string.grant_permission),
+                                text = stringResource(Res.string.grant_permission),
                                 buttonSize = ButtonSize.SMALL,
                                 onClick = {
                                     sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))

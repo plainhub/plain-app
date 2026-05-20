@@ -27,10 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -81,7 +80,7 @@ fun AudioPlayerBarCard(
                 ) {
                     Icon(
                         painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
-                        contentDescription = if (isPlaying) stringResource(R.string.pause) else stringResource(R.string.play),
+                        contentDescription = if (isPlaying) stringResource(Res.string.pause) else stringResource(Res.string.play),
                         tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp)
                     )

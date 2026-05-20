@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -24,16 +26,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.base.ActionButtonFolderKanban
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
@@ -88,23 +89,19 @@ fun FilesPage(
     FilesPageDialogs(filesVM, context, scope)
 
     val title = when {
-        filesVM.selectMode.value -> LocaleHelper.getStringF(
-            R.string.x_selected,
-            "count",
-            filesVM.selectedIds.size
-        )
+        filesVM.selectMode.value -> stringRes(Res.string.x_selected, "count" to filesVM.selectedIds.size)
 
-        filesVM.type == FilesType.RECENTS -> stringResource(R.string.recents)
+        filesVM.type == FilesType.RECENTS -> stringResource(Res.string.recents)
         ZipBrowserHelper.isZipPath(filesVM.selectedPath) -> ZipBrowserHelper.getDisplayName(filesVM.selectedPath)
         filesVM.selectedPath != filesVM.rootPath -> filesVM.selectedPath.getFilenameFromPath()
-        else -> stringResource(R.string.files)
+        else -> stringResource(Res.string.files)
     }
     val subtitle = if (!filesVM.selectMode.value) {
         val fc = itemsState.count { it.isDir };
         val flc = itemsState.count { !it.isDir }
         val sl = mutableListOf<String>()
-        if (fc > 0) sl.add(LocaleHelper.getQuantityString(R.plurals.x_folders, fc))
-        if (flc > 0) sl.add(LocaleHelper.getQuantityString(R.plurals.x_files, flc))
+        if (fc > 0) sl.add(pluralStringResource(Res.plurals.x_folders, fc, fc))
+        if (flc > 0) sl.add(pluralStringResource(Res.plurals.x_files, flc, flc))
         sl.joinToString(", ")
     } else ""
 
@@ -129,7 +126,7 @@ fun FilesPage(
                             }
                         }
                         PDropdownMenuItem(
-                            text = { Text(stringResource(R.string.show_hidden_files)) },
+                            text = { Text(stringResource(Res.string.show_hidden_files)) },
                             leadingIcon = {
                                 Checkbox(
                                     checked = showHiddenFiles,
@@ -160,7 +157,7 @@ fun FilesPage(
                     }
                 } else {
                     PTopRightButton(
-                        label = stringResource(if (filesVM.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                        label = stringResource(if (filesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all),
                         click = { filesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp)
                 }
             },

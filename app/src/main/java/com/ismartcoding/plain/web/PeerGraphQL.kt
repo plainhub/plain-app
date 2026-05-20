@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.web
 
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
 import android.util.Base64
 import com.ismartcoding.lib.kgraphql.Context
 import com.ismartcoding.lib.kgraphql.GraphqlRequest
@@ -27,10 +30,8 @@ import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
@@ -146,7 +147,7 @@ class PeerGraphQL(val schema: Schema) {
                                 NotificationHelper.sendPeerMessageNotification(
                                     context = MainApp.instance,
                                     peerId = fromId,
-                                    peerName = notificationPeer.name.ifEmpty { getString(R.string.peer_chat) },
+                                    peerName = notificationPeer.name.ifEmpty { LocaleHelper.getStringSync(Res.string.peer_chat) },
                                     messageText = item.getMessagePreview(),
                                 )
                             }
@@ -163,7 +164,7 @@ class PeerGraphQL(val schema: Schema) {
                                 NotificationHelper.sendPeerMessageNotification(
                                     context = MainApp.instance,
                                     peerId = channelId,
-                                    peerName = notificationChannel.name.ifEmpty { getString(R.string.peer_chat) },
+                                    peerName = notificationChannel.name.ifEmpty { LocaleHelper.getStringSync(Res.string.peer_chat) },
                                     messageText = messageText,
                                 )
                             }

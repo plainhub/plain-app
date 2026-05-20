@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -24,11 +26,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
@@ -94,13 +95,13 @@ internal fun FeedEntriesPageContent(
             refreshContent = remember { {
                 PullToRefreshContent(createText = {
                     when (it) {
-                        RefreshContentState.Failed -> stringResource(id = R.string.sync_failed)
-                        RefreshContentState.Finished -> stringResource(id = R.string.synced)
-                        RefreshContentState.Refreshing -> stringResource(id = R.string.syncing)
+                        RefreshContentState.Failed -> stringResource(Res.string.sync_failed)
+                        RefreshContentState.Finished -> stringResource(Res.string.synced)
+                        RefreshContentState.Refreshing -> stringResource(Res.string.syncing)
                         RefreshContentState.Dragging -> {
                             if (abs(getRefreshContentOffset()) < getRefreshContentThreshold())
-                                stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) R.string.pull_down_to_sync_current_feed else R.string.pull_down_to_sync_all_feeds)
-                            else stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) R.string.release_to_sync_current_feed else R.string.release_to_sync_all_feeds)
+                                stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) Res.string.pull_down_to_sync_current_feed else Res.string.pull_down_to_sync_all_feeds)
+                            else stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) Res.string.release_to_sync_current_feed else Res.string.release_to_sync_all_feeds)
                         }
                     }
                 })

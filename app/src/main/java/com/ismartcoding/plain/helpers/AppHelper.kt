@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.i18n.*
+
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
@@ -13,11 +15,9 @@ import android.os.Process
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.data.Version
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.request.get
@@ -49,7 +49,7 @@ object AppHelper {
             UpdateInfoPreference.updateAsync(context) { it.copy(checkUpdateTime = System.currentTimeMillis()) }
             if (r.status == HttpStatusCode.Forbidden) {
                 if (showToast) {
-                    DialogHelper.showMessage(getString(R.string.rate_limit))
+                    DialogHelper.showMessage(Res.string.rate_limit)
                 }
                 return false
             }
@@ -57,7 +57,7 @@ object AppHelper {
             val latestJSON = r.bodyAsText()
             if (latestJSON.isEmpty()) {
                 if (showToast) {
-                    DialogHelper.showMessage(getString(R.string.check_failure))
+                    DialogHelper.showMessage(Res.string.check_failure)
                 }
                 return null
             }
@@ -94,7 +94,7 @@ object AppHelper {
         } catch (e: Exception) {
             e.printStackTrace()
             if (showToast) {
-                DialogHelper.showMessage(getString(R.string.check_failure))
+                DialogHelper.showMessage(Res.string.check_failure)
             }
             null
         }

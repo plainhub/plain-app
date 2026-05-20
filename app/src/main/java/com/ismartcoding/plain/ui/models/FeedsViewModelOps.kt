@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.rss.model.RssChannel
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.features.feed.FeedHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -28,12 +29,12 @@ internal fun FeedsViewModel.add() {
 internal fun FeedsViewModel.fetchChannel() {
     editUrlError.value = ""
     if (!editUrl.value.isUrl()) {
-        editUrlError.value = getString(R.string.invalid_url)
+        editUrlError.value = LocaleHelper.getStringSync(Res.string.invalid_url)
         return
     }
     viewModelScope.launch(Dispatchers.IO) {
         if (FeedHelper.getByUrl(editUrl.value) != null) {
-            editUrlError.value = getString(R.string.already_added)
+            editUrlError.value = LocaleHelper.getString(Res.string.already_added)
             return@launch
         }
         try {
@@ -42,7 +43,7 @@ internal fun FeedsViewModel.fetchChannel() {
                 editName.value = it.title ?: ""
             }
         } catch (e: Exception) {
-            editUrlError.value = e.message ?: getString(R.string.error)
+            editUrlError.value = e.message ?: LocaleHelper.getString(Res.string.error)
         }
     }
 }
@@ -50,13 +51,13 @@ internal fun FeedsViewModel.fetchChannel() {
 internal fun FeedsViewModel.edit() {
     editUrlError.value = ""
     if (!editUrl.value.isUrl()) {
-        editUrlError.value = getString(R.string.invalid_url)
+        editUrlError.value = LocaleHelper.getStringSync(Res.string.invalid_url)
         return
     }
     viewModelScope.launch(Dispatchers.IO) {
         val a = FeedHelper.getByUrl(editUrl.value)
         if (a != null && a.id != editId.value) {
-            editUrlError.value = getString(R.string.already_added)
+            editUrlError.value = LocaleHelper.getString(Res.string.already_added)
             return@launch
         }
         FeedHelper.updateAsync(editId.value) {

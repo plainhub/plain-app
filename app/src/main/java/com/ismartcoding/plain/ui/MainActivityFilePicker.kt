@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.ui
 
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.activity.result.PickVisualMediaRequest
@@ -7,7 +10,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.ExportFileEvent
@@ -58,7 +60,7 @@ internal fun MainActivity.handleExportFileEvent(event: ExportFileEvent) {
         )
     } catch (e: ActivityNotFoundException) {
         LogCat.e("No document creation app available")
-        DialogHelper.showMessage(getString(R.string.file_picker_not_available))
+        DialogHelper.showMessage(Res.string.file_picker_not_available)
     } catch (e: IllegalStateException) {
         LogCat.e("Error launching export file: ${e.message}")
     }
@@ -74,7 +76,7 @@ internal fun MainActivity.doPickFile(event: PickFileEvent) {
         pickFileActivityLauncher.launch(intent)
     } catch (e: ActivityNotFoundException) {
         LogCat.e("No file picker available on this device")
-        DialogHelper.showErrorMessage(getString(R.string.file_picker_not_available))
+        DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.file_picker_not_available))
     } catch (e: IllegalStateException) {
         LogCat.e("Error launching pick file activity: ${e.message}")
     }

@@ -8,9 +8,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.material3.MaterialTheme
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer
@@ -44,7 +43,7 @@ fun AudioListItemActions(
         PIconButton(
             icon = if (isInCastQueue) Res.drawable.playlist_remove else Res.drawable.playlist_add,
             tint = if (isInCastQueue) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.primary,
-            contentDescription = if (isInCastQueue) stringResource(R.string.remove_from_cast_queue) else stringResource(R.string.add_to_cast_queue),
+            contentDescription = if (isInCastQueue) stringResource(Res.string.remove_from_cast_queue) else stringResource(Res.string.add_to_cast_queue),
             modifier = Modifier.rotate(rotation),
             click = {
                 scope.launch(Dispatchers.IO) {
@@ -59,7 +58,7 @@ fun AudioListItemActions(
         PIconButton(
             icon = iconResource,
             tint = iconColor,
-            contentDescription = if (isInPlaylist) stringResource(R.string.remove_from_playlist) else stringResource(R.string.add_to_playlist),
+            contentDescription = if (isInPlaylist) stringResource(Res.string.remove_from_playlist) else stringResource(Res.string.add_to_playlist),
             modifier = Modifier.rotate(rotation),
             click = {
                 scope.launch(Dispatchers.IO) {

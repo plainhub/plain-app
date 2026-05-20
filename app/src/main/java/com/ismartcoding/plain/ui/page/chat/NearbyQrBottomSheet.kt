@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,10 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.helpers.QrCodeGenerateHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -33,7 +34,7 @@ fun NearbyQrBottomSheet(
     onDismiss: () -> Unit,
 ) {
     PModalBottomSheet(onDismissRequest = onDismiss) {
-        PBottomSheetTopAppBar(title = stringResource(R.string.pair_via_qr_title))
+        PBottomSheetTopAppBar(title = stringResource(Res.string.pair_via_qr_title))
         TopSpace()
 
         Column(
@@ -49,12 +50,12 @@ fun NearbyQrBottomSheet(
                 }
                 Image(
                     bitmap = bitmap.asImageBitmap(),
-                    contentDescription = stringResource(R.string.qrcode),
+                    contentDescription = stringResource(Res.string.qrcode),
                     modifier = Modifier.size(280.dp),
                 )
                 VerticalSpace(dp = 20.dp)
                 Text(
-                    text = stringResource(R.string.pair_via_qr_desc),
+                    text = stringResource(Res.string.pair_via_qr_desc),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,

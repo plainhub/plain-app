@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Contrôle à distance PlainApp</string>
+    <string name="accessibility_service_description">PlainApp utilise ce service d\'accessibilité pour permettre le contrôle à distance pendant la mise en miroir de l\'écran. Il injecte des événements tactiles (tap, balayage, défilement) et des actions de navigation (Retour, Accueil, Récents) envoyés depuis l\'interface Web.</string>
+</resources>

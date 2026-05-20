@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.features
 
+import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.i18n.*
 import android.content.ComponentName
 import android.content.Context
@@ -22,11 +25,10 @@ import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
@@ -60,12 +62,21 @@ enum class Permission {
     NONE
     ;
 
+    @Composable
     fun getText(): String {
-        if (this == NONE) {
-            return getString(R.string.open_permission_settings)
+        return when (this) {
+            NONE -> stringResource(Res.string.open_permission_settings)
+            WRITE_EXTERNAL_STORAGE -> stringResource(Res.string.feature_WRITE_EXTERNAL_STORAGE)
+            READ_SMS -> stringResource(Res.string.feature_READ_SMS)
+            SEND_SMS -> stringResource(Res.string.feature_SEND_SMS)
+            WRITE_CALL_LOG -> stringResource(Res.string.feature_WRITE_CALL_LOG)
+            CALL_PHONE -> stringResource(Res.string.feature_CALL_PHONE)
+            WRITE_CONTACTS -> stringResource(Res.string.feature_WRITE_CONTACTS)
+            NOTIFICATION_LISTENER -> stringResource(Res.string.feature_NOTIFICATION_LISTENER)
+            READ_PHONE_NUMBERS -> stringResource(Res.string.feature_READ_PHONE_NUMBERS)
+            QUERY_ALL_PACKAGES -> stringResource(Res.string.feature_QUERY_ALL_PACKAGES)
+            else -> ""
         }
-
-        return getString("feature_$name")
     }
 
     suspend fun isEnabledAsync(context: Context): Boolean {
@@ -137,24 +148,13 @@ enum class Permission {
         }
     }
 
+    @Composable
     fun getGrantAccessText(): String {
         return when {
-            this == READ_SMS -> {
-                getString(R.string.need_sms_permission)
-            }
-
-            this == READ_CALL_LOG -> {
-                getString(R.string.need_call_permission)
-            }
-
-            this == READ_CONTACTS -> {
-                getString(R.string.need_contact_permission)
-            }
-
-            this == WRITE_EXTERNAL_STORAGE -> {
-                getString(R.string.need_storage_permission)
-            }
-
+            this == READ_SMS -> stringResource(Res.string.need_sms_permission)
+            this == READ_CALL_LOG -> stringResource(Res.string.need_call_permission)
+            this == READ_CONTACTS -> stringResource(Res.string.need_contact_permission)
+            this == WRITE_EXTERNAL_STORAGE -> stringResource(Res.string.need_storage_permission)
             else -> ""
         }
     }
@@ -420,19 +420,24 @@ object Permissions {
 
     fun checkNotification(
         context: Context,
-        stringKey: Int,
+        stringResource: StringResource,
         callback: () -> Unit,
     ) {
         val permission = Permission.POST_NOTIFICATIONS
         if (permission.can(context)) {
             callback()
         } else {
-            DialogHelper.showConfirmDialog(getString(R.string.confirm), getString(stringKey), confirmButton = Pair(getString(R.string.ok)) {
-                coIO {
-                    ensureNotificationAsync(context)
-                    callback()
-                }
-            })
+            coIO {
+                val message = LocaleHelper.getString(stringResource)
+                val okText = LocaleHelper.getString(Res.string.ok)
+                val confirmText = LocaleHelper.getString(Res.string.confirm)
+                DialogHelper.showConfirmDialog(confirmText, message, confirmButton = Pair(okText) {
+                    coIO {
+                        ensureNotificationAsync(context)
+                        callback()
+                    }
+                })
+            }
         }
     }
 

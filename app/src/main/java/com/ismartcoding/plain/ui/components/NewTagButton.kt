@@ -14,9 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
@@ -33,7 +32,7 @@ fun NewTagButton(click: () -> Unit) {
         Icon(
             modifier = Modifier.size(20.dp),
             painter = painterResource(Res.drawable.plus),
-            contentDescription = stringResource(R.string.add_tag),
+            contentDescription = stringResource(Res.string.add_tag),
             tint = MaterialTheme.colorScheme.onSurface,
         )
     }

@@ -12,10 +12,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.components.NoDataView
@@ -45,7 +44,7 @@ fun AppFileListContent(
     if (files.isEmpty()) {
         NoDataView(
             icon = Res.drawable.package_open,
-            message = stringResource(R.string.no_app_files),
+            message = stringResource(Res.string.no_app_files),
             showRefreshButton = true,
             onRefresh = onRefresh,
         )

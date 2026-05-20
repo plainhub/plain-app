@@ -38,7 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,7 +48,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.ismartcoding.lib.extensions.formatMinSec
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.ui.base.PlayerSlider
@@ -149,7 +148,7 @@ private fun DlnaVideoControls(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onExit) {
-                Icon(painter = painterResource(Res.drawable.arrow_left), contentDescription = stringResource(R.string.dlna_receiver_exit_player), tint = Color.White, modifier = Modifier.size(24.dp))
+                Icon(painter = painterResource(Res.drawable.arrow_left), contentDescription = stringResource(Res.string.dlna_receiver_exit_player), tint = Color.White, modifier = Modifier.size(24.dp))
             }
             Text(text = mediaTitle, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Medium, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(end = 8.dp))
         }

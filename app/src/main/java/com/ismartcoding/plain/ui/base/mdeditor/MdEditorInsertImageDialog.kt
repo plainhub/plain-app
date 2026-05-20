@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base.mdeditor
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -20,10 +22,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
@@ -65,19 +66,19 @@ fun MdEditorInsertImageDialog(
                     mdEditorVM.showInsertImage = false
                 }
             ) {
-                Text(stringResource(id = R.string.confirm))
+                Text(stringResource(Res.string.confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = {
                 mdEditorVM.showInsertImage = false
             }) {
-                Text(stringResource(id = R.string.cancel))
+                Text(stringResource(Res.string.cancel))
             }
         },
         title = {
             Text(
-                text = stringResource(id = R.string.insert_image),
+                text = stringResource(Res.string.insert_image),
                 style = MaterialTheme.typography.titleLarge
             )
         },
@@ -91,7 +92,7 @@ fun MdEditorInsertImageDialog(
                             imageUrl = it
                         },
                         label = {
-                            Text(text = stringResource(id = R.string.image_url))
+                            Text(text = stringResource(Res.string.image_url))
                         }
                     )
                     Button(
@@ -101,7 +102,7 @@ fun MdEditorInsertImageDialog(
                             .padding(start = 8.dp)
                     ) {
                         Text(
-                            stringResource(id = R.string.browse),
+                            stringResource(Res.string.browse),
                             style = MaterialTheme.typography.labelLarge
                         )
                     }
@@ -109,11 +110,11 @@ fun MdEditorInsertImageDialog(
                 VerticalSpace(dp = 8.dp)
                 OutlinedTextField(value = description, onValueChange = { description = it },
                     label = {
-                        Text(text = stringResource(id = R.string.image_description))
+                        Text(text = stringResource(Res.string.image_description))
                     })
                 VerticalSpace(dp = 8.dp)
                 OutlinedTextField(value = width, onValueChange = { width = it }, label = {
-                    Text(text = stringResource(id = R.string.width))
+                    Text(text = stringResource(Res.string.width))
                 })
             }
         })

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -17,17 +19,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.DownloadUpdateEvent
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppLogHelper
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -83,7 +83,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     UpdateDialog(updateViewModel)
 
     PScaffold(
-        topBar = { PTopAppBar(navController = navController, title = stringResource(R.string.settings)) },
+        topBar = { PTopAppBar(navController = navController, title = stringResource(Res.string.settings)) },
         content = { paddingValues ->
             LazyColumn(
                 state = listState,
@@ -110,30 +110,30 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 developerMode = true
                                 scope.launch(Dispatchers.IO) { DeveloperModePreference.putAsync(context, true) }
                             }),
-                            title = stringResource(R.string.android_version),
+                            title = stringResource(Res.string.android_version),
                             value = MainApp.getAndroidVersion(),
                         )
                         if (AppFeatureType.CHECK_UPDATES.has()) {
-                            PListItem(title = stringResource(R.string.app_version), subtitle = MainApp.getAppVersion(), action = {
-                                PFilledButton(text = stringResource(R.string.check_update), buttonSize = ButtonSize.SMALL, onClick = {
+                            PListItem(title = stringResource(Res.string.app_version), subtitle = MainApp.getAppVersion(), action = {
+                                PFilledButton(text = stringResource(Res.string.check_update), buttonSize = ButtonSize.SMALL, onClick = {
                                     scope.launch {
-                                        DialogHelper.showMessage(getString(R.string.checking_updates))
+                                        DialogHelper.showMessage(Res.string.checking_updates)
                                         val r = withIO {
                                             UpdateInfoPreference.updateAsync(context) { it.copy(skipVersion = "") }
                                             AppHelper.checkUpdateAsync(context, true)
                                         }
                                         if (r != null) {
                                             if (r) updateViewModel.showDialog()
-                                            else DialogHelper.showMessage(getString(R.string.is_latest_version))
+                                            else DialogHelper.showMessage(Res.string.is_latest_version)
                                         }
                                     }
                                 })
                             })
-                            PListItem(title = stringResource(R.string.auto_check_update), subtitle = stringResource(R.string.auto_check_update_desc)) {
+                            PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
                                 PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.IO) { UpdateInfoPreference.updateAsync(context) { it.copy(autoCheckUpdate = newValue) } } }
                             }
                         } else {
-                            PListItem(title = stringResource(R.string.app_version), value = MainApp.getAppVersion())
+                            PListItem(title = stringResource(Res.string.app_version), value = MainApp.getAppVersion())
                         }
                     }
                 }
@@ -151,11 +151,11 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable { WebHelper.open(context, UrlHelper.getTermsUrl()) },
-                            title = stringResource(R.string.terms_of_use), showMore = true
+                            title = stringResource(Res.string.terms_of_use), showMore = true
                         )
                         PListItem(
                             modifier = Modifier.clickable { WebHelper.open(context, UrlHelper.getPolicyUrl()) },
-                            title = stringResource(R.string.privacy_policy), showMore = true
+                            title = stringResource(Res.string.privacy_policy), showMore = true
                         )
                     }
                 }

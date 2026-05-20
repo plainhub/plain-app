@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
+
 import org.jetbrains.compose.resources.DrawableResource
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -21,13 +23,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DFeaturePermission
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 
@@ -84,7 +85,7 @@ fun NeedPermissionColumn(
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.grant_access),
+                        text = stringResource(Res.string.grant_access),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
                     )

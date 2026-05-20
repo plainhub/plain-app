@@ -12,10 +12,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.preferences.LocalWeb
@@ -80,14 +79,14 @@ fun ChatListPage(
                 item { TopSpace() }
                 item {
                     if (!webEnabled) PAlert(
-                        description = stringResource(id = R.string.web_service_required_for_chat),
+                        description = stringResource(Res.string.web_service_required_for_chat),
                         AlertType.WARNING
-                    ) { PFilledButton(text = stringResource(R.string.enable_web_service), buttonSize = ButtonSize.SMALL, onClick = { mainVM.enableHttpServer(context, true) }) }
+                    ) { PFilledButton(text = stringResource(Res.string.enable_web_service), buttonSize = ButtonSize.SMALL, onClick = { mainVM.enableHttpServer(context, true) }) }
                 }
                 item {
                     PeerListItem(
-                        title = stringResource(R.string.local_chat),
-                        desc = stringResource(R.string.local_chat_desc),
+                        title = stringResource(Res.string.local_chat),
+                        desc = stringResource(Res.string.local_chat_desc),
                         icon = Res.drawable.bot,
                         latestChat = peerVM.getLatestChat("local"),
                         modifier = PlainTheme.getCardModifier(),
@@ -96,12 +95,12 @@ fun ChatListPage(
                 if (channels.isNotEmpty()) {
                     item {
                         VerticalSpace(dp = 16.dp)
-                        Subtitle(stringResource(R.string.channels))
+                        Subtitle(stringResource(Res.string.channels))
                     }
                     itemsIndexed(items = channels.toList(), key = { _, i -> i.id }) { index, channel ->
                         PeerListItem(
                             title = channel.name,
-                            desc = stringResource(R.string.channels),
+                            desc = stringResource(Res.string.channels),
                             icon = Res.drawable.hash,
                             latestChat = peerVM.getLatestChat(channel.id),
                             onClick = {
@@ -115,7 +114,7 @@ fun ChatListPage(
                 if (allPeers.isNotEmpty()) {
                     item {
                         VerticalSpace(dp = 16.dp)
-                        Subtitle(stringResource(R.string.nearby_devices))
+                        Subtitle(stringResource(Res.string.nearby_devices))
                     }
                     itemsIndexed(items = allPeers, key = { _, i -> i.id }) { index, peer ->
                         PeerListItem(

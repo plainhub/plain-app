@@ -14,10 +14,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
@@ -63,16 +62,16 @@ fun HomeWebMainSection(
             Column {
                 HomeSectionClickableHeader(
                     title = when (webState) {
-                        WebState.OFF -> stringResource(R.string.web_portal_off)
-                        WebState.ERROR -> stringResource(R.string.home_web_easy_failed_title)
-                        else -> stringResource(R.string.web_portal_running)
+                        WebState.OFF -> stringResource(Res.string.web_portal_off)
+                        WebState.ERROR -> stringResource(Res.string.home_web_easy_failed_title)
+                        else -> stringResource(Res.string.web_portal_running)
                     },
                     onClick = { navController.navigate(Routing.WebSettings) },
                     trailingContent = {
                         if (webState != WebState.ON) {
                             PIconButton(
                                 icon = Res.drawable.tune,
-                                contentDescription = stringResource(R.string.web_settings),
+                                contentDescription = stringResource(Res.string.web_settings),
                                 tint = MaterialTheme.colorScheme.blue,
                                 click = { navController.navigate(Routing.WebSettings) })
                         } else {
@@ -87,9 +86,9 @@ fun HomeWebMainSection(
                     Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp)) {
                         Text(
                             text = when (webState) {
-                                WebState.OFF -> stringResource(R.string.web_portal_desc_off)
+                                WebState.OFF -> stringResource(Res.string.web_portal_desc_off)
                                 WebState.ERROR -> errorMessage
-                                else -> stringResource(R.string.web_portal_desc_running)
+                                else -> stringResource(Res.string.web_portal_desc_running)
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -97,21 +96,21 @@ fun HomeWebMainSection(
                         VerticalSpace(24.dp)
                         when (webState) {
                             WebState.OFF -> PFilledButton(
-                                text = stringResource(R.string.start_service),
+                                text = stringResource(Res.string.start_service),
                                 onClick = onRun ?: {},
                                 buttonSize = ButtonSize.LARGE,
                                 isLoading = isLoading,
                             )
 
                             WebState.ERROR -> PFilledButton(
-                                text = stringResource(R.string.relaunch_app),
+                                text = stringResource(Res.string.relaunch_app),
                                 onClick = onRestartFix,
                                 type = ButtonType.TERTIARY,
                                 buttonSize = ButtonSize.LARGE,
                             )
 
                             else -> PFilledButton(
-                                text = stringResource(R.string.stop_service),
+                                text = stringResource(Res.string.stop_service),
                                 onClick = {
                                     mainVM.enableHttpServer(
                                         context,

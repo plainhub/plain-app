@@ -17,8 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.models.ISearchableViewModel
@@ -64,11 +63,11 @@ fun <T : IData> ListSearchBar(
                     }
                 }
             },
-            placeholder = { Text(stringResource(id = R.string.search)) },
+            placeholder = { Text(stringResource(Res.string.search)) },
             leadingIcon = {
                 PIconButton(
                     icon = Res.drawable.arrow_left,
-                    contentDescription = stringResource(R.string.back),
+                    contentDescription = stringResource(Res.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {
                     if (!viewModel.searchActive.value || viewModel.queryText.value.isEmpty()) {

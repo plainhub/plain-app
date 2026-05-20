@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,9 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.PDialogRadioRow
 import com.ismartcoding.plain.ui.base.PTextField
 import com.ismartcoding.plain.ui.base.RadioDialog
@@ -43,11 +44,11 @@ fun MdnsAndPortEditDialog(
         modifier = Modifier.fillMaxWidth(),
         containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(id = R.string.edit)) },
+        title = { Text(text = stringResource(Res.string.edit)) },
         text = {
             Column {
                 Text(
-                    text = stringResource(id = R.string.mdns_hostname),
+                    text = stringResource(Res.string.mdns_hostname),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -61,11 +62,11 @@ fun MdnsAndPortEditDialog(
                         hostnameError = false
                     },
                     placeholder = currentHostname,
-                    errorMessage = if (hostnameError) stringResource(id = R.string.mdns_hostname_invalid) else "",
+                    errorMessage = if (hostnameError) stringResource(Res.string.mdns_hostname_invalid) else "",
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 Text(
-                    text = stringResource(id = R.string.change_port),
+                    text = stringResource(Res.string.change_port),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                 )
@@ -91,11 +92,11 @@ fun MdnsAndPortEditDialog(
                     }
                     onSave(editHostname, selectedPort)
                 },
-            ) { Text(stringResource(R.string.save)) }
+            ) { Text(stringResource(Res.string.save)) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.cancel))
+                Text(text = stringResource(Res.string.cancel))
             }
         },
     )
@@ -110,7 +111,7 @@ fun PortSelectionDialog(
 ) {
     val ports = if (isHttps) HttpServerManager.httpsPorts else HttpServerManager.httpPorts
     RadioDialog(
-        title = stringResource(R.string.change_port),
+        title = stringResource(Res.string.change_port),
         options =
             ports.map {
                 RadioDialogOption(

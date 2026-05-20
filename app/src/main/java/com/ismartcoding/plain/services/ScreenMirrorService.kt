@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.services
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.i18n.*
+
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -12,7 +15,6 @@ import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
@@ -74,7 +76,7 @@ class ScreenMirrorService : LifecycleService() {
             NotificationHelper.createServiceNotification(
                 this,
                 Constants.ACTION_STOP_SCREEN_MIRROR,
-                getString(R.string.screen_mirror_service_is_running),
+                LocaleHelper.getStringSync(Res.string.screen_mirror_service_is_running),
             )
 
         // On AOSP/Pixel: the consent dialog already sets the project_media AppOp, so

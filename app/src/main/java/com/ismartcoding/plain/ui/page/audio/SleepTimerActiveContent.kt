@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.audio
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,11 +13,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.CircularTimer
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import java.util.concurrent.TimeUnit
@@ -44,7 +45,7 @@ internal fun SleepTimerActiveContent(
             )
             VerticalSpace(dp = 8.dp)
             Text(
-                text = stringResource(R.string.remaining),
+                text = stringResource(Res.string.remaining),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
                 fontWeight = FontWeight.Medium,

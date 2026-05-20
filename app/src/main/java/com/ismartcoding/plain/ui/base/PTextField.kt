@@ -25,10 +25,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import com.ismartcoding.plain.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -114,7 +113,7 @@ fun PTextField(
                                     Res.drawable.x
                                 }
                             ),
-                        contentDescription = if (isPassword) stringResource(R.string.password) else stringResource(R.string.clear),
+                        contentDescription = if (isPassword) stringResource(Res.string.password) else stringResource(Res.string.clear),
                         tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     )
                 }
@@ -124,7 +123,7 @@ fun PTextField(
                 }) {
                     Icon(
                         painter = painterResource(Res.drawable.content_paste),
-                        contentDescription = stringResource(R.string.paste),
+                        contentDescription = stringResource(Res.string.paste),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }

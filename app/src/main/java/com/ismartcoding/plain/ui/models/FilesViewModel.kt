@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -10,7 +12,6 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.FilePathData
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.file.DFile
@@ -90,10 +91,10 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     fun getRootDisplayName(): String = when (type) {
         FilesType.INTERNAL_STORAGE -> FileSystemHelper.getInternalStorageName()
-        FilesType.APP -> LocaleHelper.getString(R.string.app_data)
-        FilesType.SDCARD -> LocaleHelper.getString(R.string.sdcard)
-        FilesType.USB_STORAGE -> LocaleHelper.getString(R.string.usb_storage)
-        FilesType.RECENTS -> LocaleHelper.getString(R.string.recents)
+        FilesType.APP -> LocaleHelper.getStringSync(Res.string.app_data)
+        FilesType.SDCARD -> LocaleHelper.getStringSync(Res.string.sdcard)
+        FilesType.USB_STORAGE -> LocaleHelper.getStringSync(Res.string.usb_storage)
+        FilesType.RECENTS -> LocaleHelper.getStringSync(Res.string.recents)
     }
 
     fun updateRootBreadcrumb() { if (breadcrumbs.isNotEmpty()) breadcrumbs[0] = BreadcrumbItem(getRootDisplayName(), rootPath) }

@@ -14,10 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.base.AlertType
@@ -41,7 +40,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 fun ComponentShowcasePage(navController: NavHostController) {
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(R.string.ui_components))
+            PTopAppBar(navController = navController, title = stringResource(Res.string.ui_components))
         },
     ) { paddingValues ->
         LazyColumn(

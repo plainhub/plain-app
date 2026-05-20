@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModel
@@ -7,7 +11,6 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.KeepAwakeChangedEvent
 import com.ismartcoding.plain.helpers.AppHelper
@@ -22,18 +25,18 @@ class WebConsoleViewModel : ViewModel() {
     fun dig(context: Context) {
         viewModelScope.launch {
             DialogHelper.showLoading()
-            val errorMessage = context.getString(R.string.http_server_error)
+            val errorMessage = LocaleHelper.getString(Res.string.http_server_error)
             val serverUp = withIO { HttpServerManager.checkServerAsync() }
             DialogHelper.hideLoading()
             if (!serverUp) {
                 AlertDialog.Builder(context)
-                    .setTitle(context.getString(R.string.error))
+                    .setTitle(LocaleHelper.getString(Res.string.error))
                     .setMessage(errorMessage)
-                    .setPositiveButton(R.string.ok) { _, _ -> }
-                    .setNegativeButton(R.string.relaunch_app) { _, _ -> AppHelper.relaunch(context) }
+                    .setPositiveButton(LocaleHelper.getString(Res.string.ok)) { _, _ -> }
+                    .setNegativeButton(LocaleHelper.getString(Res.string.relaunch_app)) { _, _ -> AppHelper.relaunch(context) }
                     .create().show()
             } else {
-                DialogHelper.showConfirmDialog(context.getString(R.string.confirm), context.getString(R.string.http_server_ok))
+                DialogHelper.showConfirmDialog(LocaleHelper.getString(Res.string.confirm), LocaleHelper.getString(Res.string.http_server_ok))
             }
         }
     }

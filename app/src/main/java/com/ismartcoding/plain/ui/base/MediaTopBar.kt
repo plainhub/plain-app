@@ -7,11 +7,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.enums.DataType
@@ -74,7 +73,7 @@ fun <T : IData> MediaTopBar(
             }
             if (dragSelectState.selectMode) {
                 PTopRightButton(
-                    label = stringResource(if (dragSelectState.isAllSelected(itemsState)) R.string.unselect_all else R.string.select_all),
+                    label = stringResource(if (dragSelectState.isAllSelected(itemsState)) Res.string.unselect_all else Res.string.select_all),
                     click = {
                         dragSelectState.toggleSelectAll(itemsState)
                     },
@@ -101,7 +100,7 @@ fun <T : IData> MediaTopBar(
 
                 PIconButton(
                     icon = Res.drawable.sort,
-                    contentDescription = stringResource(R.string.sort),
+                    contentDescription = stringResource(Res.string.sort),
                     tint = MaterialTheme.colorScheme.onSurface,
                     click = { mediaVM.showSortAndBrowseDialog.value = true },
                 )

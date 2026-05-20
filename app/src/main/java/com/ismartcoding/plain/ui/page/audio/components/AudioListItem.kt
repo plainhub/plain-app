@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.Permissions
@@ -73,7 +72,7 @@ fun AudioListItem(
                     if (dragSelectState.selectMode) { dragSelectState.select(item.id) }
                     else if (castVM.castMode.value) { castVM.cast(item) }
                     else {
-                        Permissions.checkNotification(context, R.string.audio_notification_prompt) {
+                        Permissions.checkNotification(context, Res.string.audio_notification_prompt) {
                             scope.launch(Dispatchers.IO) { audioPlaylistVM.playAsync(context, item) }
                         }
                     }

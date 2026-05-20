@@ -22,10 +22,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
@@ -76,14 +75,14 @@ fun ChatInput(
             ) {
                 PIconButton(
                     icon = Res.drawable.image,
-                    contentDescription = stringResource(R.string.images),
+                    contentDescription = stringResource(Res.string.images),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
                 }
                 PIconButton(
                     icon = Res.drawable.folder,
-                    contentDescription = stringResource(R.string.files),
+                    contentDescription = stringResource(Res.string.files),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, multiple = true))
@@ -91,7 +90,7 @@ fun ChatInput(
                 Spacer(modifier = Modifier.weight(1f))
                 PIconButton(
                     icon = Res.drawable.send,
-                    contentDescription = stringResource(R.string.send_message),
+                    contentDescription = stringResource(Res.string.send_message),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     onSend()

@@ -16,13 +16,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
 import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
 import com.ismartcoding.plain.preferences.decodeSenderEntry
@@ -79,7 +78,7 @@ fun DlnaCastHistoryPage(
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(R.string.dlna_cast_history))
+            PTopAppBar(navController = navController, title = stringResource(Res.string.dlna_cast_history))
         },
     ) { paddingValues ->
         if (allowed.isEmpty() && denied.isEmpty()) {
@@ -90,7 +89,7 @@ fun DlnaCastHistoryPage(
             ) {
                 item { TopSpace() }
                 if (allowed.isNotEmpty()) {
-                    item { Subtitle(text = stringResource(R.string.dlna_cast_accepted)) }
+                    item { Subtitle(text = stringResource(Res.string.dlna_cast_accepted)) }
                     items(allowed, key = { it.first }) { (ip, name) ->
                         PCard {
                             PListItem(
@@ -99,7 +98,7 @@ fun DlnaCastHistoryPage(
                                     IconButton(onClick = { vm.removeAllowed(context, ip) }) {
                                         Icon(
                                             painter = painterResource(Res.drawable.trash_2),
-                                            contentDescription = stringResource(R.string.delete),
+                                            contentDescription = stringResource(Res.string.delete),
                                             tint = MaterialTheme.colorScheme.error,
                                         )
                                     }
@@ -111,7 +110,7 @@ fun DlnaCastHistoryPage(
                 }
                 if (denied.isNotEmpty()) {
                     item { VerticalSpace(8.dp) }
-                    item { Subtitle(text = stringResource(R.string.dlna_cast_rejected)) }
+                    item { Subtitle(text = stringResource(Res.string.dlna_cast_rejected)) }
                     items(denied, key = { it.first }) { (ip, name) ->
                         PCard {
                             PListItem(
@@ -120,7 +119,7 @@ fun DlnaCastHistoryPage(
                                     IconButton(onClick = { vm.removeDenied(context, ip) }) {
                                         Icon(
                                             painter = painterResource(Res.drawable.trash_2),
-                                            contentDescription = stringResource(R.string.delete),
+                                            contentDescription = stringResource(Res.string.delete),
                                             tint = MaterialTheme.colorScheme.error,
                                         )
                                     }

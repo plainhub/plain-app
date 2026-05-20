@@ -16,7 +16,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -43,7 +42,7 @@ fun WebAddressBarRow(
                         fontSize = 18.sp,
                     ),
                 onClick = {
-                    val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), url)
+                    val clip = ClipData.newPlainText(LocaleHelper.getStringSync(Res.string.link), url)
                     clipboardManager.setPrimaryClip(clip)
                     DialogHelper.showTextCopiedMessage(url)
                 },

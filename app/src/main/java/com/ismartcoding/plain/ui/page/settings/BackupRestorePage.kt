@@ -18,7 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,7 +26,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.isP
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -68,7 +67,7 @@ fun BackupRestorePage(
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(R.string.backup_restore))
+            PTopAppBar(navController = navController, title = stringResource(Res.string.backup_restore))
         },
         content = { paddingValues ->
             Box(
@@ -83,16 +82,16 @@ fun BackupRestorePage(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = stringResource(id = R.string.backup_desc),
+                        text = stringResource(Res.string.backup_desc),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 48.dp, bottom = 48.dp)
                     )
 
                     PCircularButton(
-                        text = stringResource(R.string.backup),
+                        text = stringResource(Res.string.backup),
                         icon = Res.drawable.database_backup,
-                        description = stringResource(R.string.backup),
+                        description = stringResource(Res.string.backup),
                         onClick = {
                             val fileName = "backup_" + Date().formatName() + ".zip"
                             // ACTION_CREATE_DOCUMENT is broken on many Samsung Android 9 devices:
@@ -110,9 +109,9 @@ fun BackupRestorePage(
                     Spacer(modifier = Modifier.height(40.dp))
 
                     PCircularButton(
-                        text = stringResource(R.string.restore),
+                        text = stringResource(Res.string.restore),
                         icon = Res.drawable.archive_restore,
-                        description = stringResource(R.string.restore),
+                        description = stringResource(Res.string.restore),
                         onClick = {
                             sendEvent(PickFileEvent(PickFileTag.RESTORE, PickFileType.FILE, false))
                         }

@@ -1,9 +1,10 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,16 +16,16 @@ fun TagNameDialog(tagsVM: TagsViewModel, onChangedAsync: suspend () -> Unit = {}
     val scope = rememberCoroutineScope()
     if (tagsVM.tagNameDialogVisible.value) {
         TextFieldDialog(
-            title = stringResource(id = if (tag != null) R.string.edit_tag else R.string.add_tag),
+            title = stringResource(if (tag != null) Res.string.edit_tag else Res.string.add_tag),
             value = tagsVM.editTagName.value,
-            placeholder = tag?.name ?: stringResource(id = R.string.name),
+            placeholder = tag?.name ?: stringResource(Res.string.name),
             onValueChange = {
                 tagsVM.editTagName.value = it
             },
             onDismissRequest = {
                 tagsVM.tagNameDialogVisible.value = false
             },
-            confirmText = stringResource(id = R.string.save),
+            confirmText = stringResource(Res.string.save),
             onConfirm = {
                 scope.launch(Dispatchers.IO) {
                     if (tag != null) {

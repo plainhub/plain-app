@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,9 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -37,7 +38,7 @@ fun ForwardTargetDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(id = R.string.forward),
+                text = stringResource(Res.string.forward),
                 style = MaterialTheme.typography.titleLarge
             )
         },
@@ -49,8 +50,8 @@ fun ForwardTargetDialog(
                             onTargetSelected(ForwardTarget.Local)
                             onDismiss()
                         },
-                        title = stringResource(id = R.string.local_chat),
-                        subtitle = stringResource(id = R.string.local_chat_desc),
+                        title = stringResource(Res.string.local_chat),
+                        subtitle = stringResource(Res.string.local_chat_desc),
                         showMore = true
                     )
                 }
@@ -72,7 +73,7 @@ fun ForwardTargetDialog(
         },
         confirmButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.close))
+                Text(text = stringResource(Res.string.close))
             }
         }
     )

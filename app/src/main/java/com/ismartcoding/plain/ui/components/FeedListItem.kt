@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
@@ -15,10 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.extensions.getText
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -81,7 +82,7 @@ fun FeedListItem(
                     )
                     VerticalSpace(dp = 8.dp)
                     Text(
-                        text = stringResource(id = R.string.auto_fetch_full_content) + ": " + m.fetchContent.getText(),
+                        text = stringResource(Res.string.auto_fetch_full_content) + ": " + m.fetchContent.getText(),
                         style = MaterialTheme.typography.listItemSubtitle(),
                     )
                 }

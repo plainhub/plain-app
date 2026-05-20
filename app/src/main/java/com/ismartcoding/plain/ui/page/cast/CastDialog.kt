@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.cast
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -25,11 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.preferences.WebPreference
@@ -81,8 +82,8 @@ fun CastDialog(castVM: CastViewModel) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             PBottomSheetTopAppBar(
-                title = stringResource(if (hasDevices) R.string.cast_select_screen else R.string.cast_searching_for_screen),
-                subtitle = stringResource(if (hasDevices)  R.string.cast_dialog_hint else R.string.cast_looking_for_devices),
+                title = stringResource(if (hasDevices) Res.string.cast_select_screen else Res.string.cast_searching_for_screen),
+                subtitle = stringResource(if (hasDevices)  Res.string.cast_dialog_hint else Res.string.cast_looking_for_devices),
             )
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -116,7 +117,7 @@ fun CastDialog(castVM: CastViewModel) {
                     }
                 }
             }
-            Tips(stringResource(R.string.cast_dialog_wireless_cast_tip))
+            Tips(stringResource(Res.string.cast_dialog_wireless_cast_tip))
             BottomSpace()
         }
     }

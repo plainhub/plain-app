@@ -19,12 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.extensions.formatDateTime
@@ -56,7 +55,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
             icon = {
                 Icon(
                     painter = painterResource(Res.drawable.rocket),
-                    contentDescription = stringResource(R.string.change_log),
+                    contentDescription = stringResource(Res.string.change_log),
                 )
             },
             title = {
@@ -89,7 +88,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
                         sendEvent(DownloadUpdateEvent())
                     }
                 ) {
-                    Text(text = stringResource(R.string.update))
+                    Text(text = stringResource(Res.string.update))
                 }
             },
             dismissButton = {
@@ -101,7 +100,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
                         }
                     }
                 ) {
-                    Text(text = stringResource(R.string.skip_this_version))
+                    Text(text = stringResource(Res.string.skip_this_version))
                 }
             },
         )

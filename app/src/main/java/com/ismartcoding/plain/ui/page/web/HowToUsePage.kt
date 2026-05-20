@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -8,11 +10,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -34,16 +35,16 @@ fun HowToUsePage(navController: NavHostController, webVM: WebConsoleViewModel = 
         val context = LocalContext.current
         PScaffold(
             topBar = {
-                PTopAppBar(navController = navController, title = stringResource(R.string.how_to_use))
+                PTopAppBar(navController = navController, title = stringResource(Res.string.how_to_use))
             },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item {
                         TopSpace()
-                        Subtitle(text = stringResource(id = R.string.instruction_for_use))
+                        Subtitle(text = stringResource(Res.string.instruction_for_use))
                         PCard {
                             Text(
-                                stringResource(id = R.string.web_how_to),
+                                stringResource(Res.string.web_how_to),
                                 modifier = Modifier.padding(16.dp),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
@@ -51,10 +52,10 @@ fun HowToUsePage(navController: NavHostController, webVM: WebConsoleViewModel = 
                         VerticalSpace(dp = 16.dp)
                     }
                     item {
-                        Subtitle(text = stringResource(id = R.string.recommendation))
+                        Subtitle(text = stringResource(Res.string.recommendation))
                         PCard {
                             Text(
-                                stringResource(id = R.string.usb_connect_recommendation),
+                                stringResource(Res.string.usb_connect_recommendation),
                                 modifier = Modifier.padding(16.dp),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
@@ -64,7 +65,7 @@ fun HowToUsePage(navController: NavHostController, webVM: WebConsoleViewModel = 
                     item {
                         if (webEnabled) {
                             VerticalSpace(dp = 16.dp)
-                            PFilledButton(text = stringResource(id = R.string.http_server_diagnostics), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                            PFilledButton(text = stringResource(Res.string.http_server_diagnostics), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                                 webVM.dig(context)
                             })
                         }

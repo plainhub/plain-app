@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,11 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.AmoledDarkThemePreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
@@ -43,7 +44,7 @@ fun DarkThemePage(navController: NavHostController) {
         topBar = {
             PTopAppBar(
                 navController = navController,
-                title = stringResource(R.string.dark_theme),
+                title = stringResource(Res.string.dark_theme),
             )
         },
         content = { paddingValues ->
@@ -62,7 +63,7 @@ fun DarkThemePage(navController: NavHostController) {
                                         }
                                     }
                                 },
-                                title = it.getText(context),
+                                title = it.getText(),
                             ) {
                                 RadioButton(selected = it.value == darkTheme, onClick = {
                                     scope.launch {
@@ -78,7 +79,7 @@ fun DarkThemePage(navController: NavHostController) {
                 item {
                     VerticalSpace(dp = 16.dp)
                     Subtitle(
-                        text = stringResource(R.string.other),
+                        text = stringResource(Res.string.other),
                     )
                     PCard {
                         PListItem(
@@ -87,7 +88,7 @@ fun DarkThemePage(navController: NavHostController) {
                                     AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
                                 }
                             },
-                            title = stringResource(R.string.amoled_dark_theme),
+                            title = stringResource(Res.string.amoled_dark_theme),
                         ) {
                             PSwitch(activated = amoledDarkTheme) {
                                 scope.launch(Dispatchers.IO) {

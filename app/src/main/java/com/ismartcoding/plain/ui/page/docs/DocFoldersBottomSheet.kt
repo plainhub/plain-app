@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.docs
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -14,9 +16,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ActionButtonRefresh
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -65,7 +66,7 @@ fun DocFoldersBottomSheet(
     ) {
         Column {
             PBottomSheetTopAppBar(
-                title = stringResource(R.string.folders),
+                title = stringResource(Res.string.folders),
                 actions = {
                     ActionButtonRefresh(
                         loading = mediaFoldersVM.showLoading.value,

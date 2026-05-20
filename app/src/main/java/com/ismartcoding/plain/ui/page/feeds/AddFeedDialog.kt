@@ -12,10 +12,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalFocusManager
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PDialogTips
@@ -37,11 +36,11 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
             icon = {
                 Icon(
                     painter = painterResource(Res.drawable.rss),
-                    contentDescription = stringResource(id = R.string.subscriptions),
+                    contentDescription = stringResource(Res.string.subscriptions),
                 )
             },
             title = {
-                Text(text = stringResource(id = R.string.add_subscription), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                Text(text = stringResource(Res.string.add_subscription), maxLines = 1, overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge
                 )
             },
@@ -55,7 +54,7 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                                 feedsVM.editUrlError.value = ""
                             }
                         },
-                        placeholder = stringResource(id = R.string.rss_url),
+                        placeholder = stringResource(Res.string.rss_url),
                         errorText = if (feedsVM.editUrl.value.isNotEmpty()) feedsVM.editUrlError.value else "",
                         focusManager = focusManager,
                         requestFocus = true,
@@ -72,12 +71,12 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                             },
                             singleLine = true,
                             label = {
-                                Text(text = stringResource(id = R.string.name))
+                                Text(text = stringResource(Res.string.name))
                             }
                         )
                         VerticalSpace(dp = 8.dp)
                         PDialogListItem(
-                            title = stringResource(id = R.string.auto_fetch_full_content),
+                            title = stringResource(Res.string.auto_fetch_full_content),
                         ) {
                             PSwitch(
                                 activated = feedsVM.editFetchContent.value,
@@ -85,12 +84,12 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                                 feedsVM.editFetchContent.value = it
                             }
                         }
-                        PDialogTips(text = stringResource(id = R.string.auto_fetch_full_content_tips))
+                        PDialogTips(text = stringResource(Res.string.auto_fetch_full_content_tips))
                     }
                 }
             },
             confirmButton = {
-                val buttonText = if (feedsVM.rssChannel.value == null) R.string.search else R.string.add
+                val buttonText = if (feedsVM.rssChannel.value == null) Res.string.search else Res.string.add
                 Button(
                     enabled = feedsVM.editUrl.value.isNotBlank(),
                     onClick = {
@@ -102,14 +101,14 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                         }
                     },
                 ) {
-                    Text(stringResource(id = buttonText))
+                    Text(stringResource(buttonText))
                 }
             },
             dismissButton = {
                 TextButton(onClick = {
                     feedsVM.showAddDialog.value = false
                 }) {
-                    Text(text = stringResource(id = R.string.cancel))
+                    Text(text = stringResource(Res.string.cancel))
                 }
             },
         )

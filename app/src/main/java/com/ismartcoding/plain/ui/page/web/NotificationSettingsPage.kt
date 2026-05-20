@@ -19,11 +19,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -56,7 +55,7 @@ fun NotificationSettingsPage(
         topBar = {
             PTopAppBar(
                 navController = navController,
-                title = stringResource(R.string.notification_filter_settings),
+                title = stringResource(Res.string.notification_filter_settings),
                 actions = {
                     if (selectedAppsState.isNotEmpty()) {
                         ActionButtonMoreWithMenu { dismiss ->
@@ -64,10 +63,10 @@ fun NotificationSettingsPage(
                                 leadingIcon = {
                                     Icon(painter = painterResource(Res.drawable.delete_forever),
                                         tint = MaterialTheme.colorScheme.red,
-                                        contentDescription = stringResource(R.string.clear_all))
+                                        contentDescription = stringResource(Res.string.clear_all))
                                 },
                                 onClick = { dismiss(); scope.launch(Dispatchers.IO) { vm.clearAllAsync(context) } },
-                                text = { Text(text = stringResource(R.string.clear_all)) }
+                                text = { Text(text = stringResource(Res.string.clear_all)) }
                             )
                         }
                     }
@@ -78,7 +77,7 @@ fun NotificationSettingsPage(
         LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             item {
                 TopSpace()
-                Subtitle(text = stringResource(R.string.filter_mode))
+                Subtitle(text = stringResource(Res.string.filter_mode))
                 NotificationFilterModeCard(
                     mode = vm.filterData.value.mode,
                     onToggleMode = { scope.launch(Dispatchers.IO) { vm.toggleModeAsync(context) } }
@@ -88,7 +87,7 @@ fun NotificationSettingsPage(
 
             item {
                 Subtitle(text = stringResource(
-                    if (vm.filterData.value.mode == "allowlist") R.string.allowed_apps else R.string.blocked_apps
+                    if (vm.filterData.value.mode == "allowlist") Res.string.allowed_apps else Res.string.blocked_apps
                 ))
             }
 
@@ -105,7 +104,7 @@ fun NotificationSettingsPage(
                     ) {
                         Icon(painter = painterResource(Res.drawable.plus), contentDescription = null, modifier = Modifier.size(18.dp))
                         HorizontalSpace(dp = 8.dp)
-                        Text(stringResource(R.string.add_app))
+                        Text(stringResource(Res.string.add_app))
                     }
                     VerticalSpace(dp = 16.dp)
                 }

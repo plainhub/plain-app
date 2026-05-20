@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.files.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -37,12 +39,11 @@ import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper
+import org.jetbrains.compose.resources.pluralStringResource
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
@@ -110,7 +111,7 @@ fun FileListItem(
                     Text(text = file.name, style = MaterialTheme.typography.bodyLarge,
                         color = if (isCurrentlyPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
                     VerticalSpace(4.dp)
-                    Text(text = if (file.isDir) LocaleHelper.getQuantityString(R.plurals.items, file.children) + ", " + file.updatedAt.formatDateTime()
+                    Text(text = if (file.isDir) pluralStringResource(Res.plurals.items, file.children, file.children) + ", " + file.updatedAt.formatDateTime()
                         else file.size.formatBytes() + ", " + file.updatedAt.formatDateTime(),
                         style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

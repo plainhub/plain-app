@@ -1,13 +1,14 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ fun DeviceRenameDialog(name: String, onDismiss: () -> Unit, onDone: (String) -> 
         mutableStateOf(name)
     }
     TextFieldDialog(
-        title = stringResource(id = R.string.device_name),
+        title = stringResource(Res.string.device_name),
         value = newName.value,
         placeholder = name,
         onValueChange = {
@@ -29,7 +30,7 @@ fun DeviceRenameDialog(name: String, onDismiss: () -> Unit, onDone: (String) -> 
         onDismissRequest = {
             onDismiss()
         },
-        confirmText = stringResource(id = R.string.save),
+        confirmText = stringResource(Res.string.save),
         onConfirm = {
             scope.launch {
                 withIO {

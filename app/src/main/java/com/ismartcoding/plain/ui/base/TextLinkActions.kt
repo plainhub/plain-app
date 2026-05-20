@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -9,7 +11,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
@@ -32,7 +33,7 @@ fun AnnotatedString.urlAt(
                 if (emailIntent.resolveActivity(packageManager) != null) {
                     context.startActivity(emailIntent)
                 } else {
-                    DialogHelper.showMessage(R.string.not_supported_error)
+                    DialogHelper.showMessage(Res.string.not_supported_error)
                 }
                 return true
             }
@@ -42,7 +43,7 @@ fun AnnotatedString.urlAt(
                 if (phoneIntent.resolveActivity(packageManager) != null) {
                     context.startActivity(phoneIntent)
                 } else {
-                    DialogHelper.showMessage(R.string.not_supported_error)
+                    DialogHelper.showMessage(Res.string.not_supported_error)
                 }
                 return true
             }

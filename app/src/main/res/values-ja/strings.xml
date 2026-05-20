@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">PlainApp リモート操作</string>
+    <string name="accessibility_service_description">PlainApp は画面ミラーリング中のリモート操作を有効にするために、このユーザー補助サービスを使用します。Web インターフェースから送信されたタッチ操作（タップ、スワイプ、スクロール）およびナビゲーション操作（戻る、ホーム、最近のアプリ）を注入します。</string>
+</resources>

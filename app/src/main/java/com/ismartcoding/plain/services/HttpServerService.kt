@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.services
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
+import com.ismartcoding.plain.i18n.*
+
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -11,7 +15,6 @@ import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -93,7 +96,7 @@ class HttpServerService : LifecycleService() {
             val notification = NotificationHelper.createServiceNotification(
                 this,
                 Constants.ACTION_STOP_HTTP_SERVER,
-                getString(R.string.api_service_is_running),
+                LocaleHelper.getStringSync(Res.string.api_service_is_running),
                 HttpServerManager.getNotificationContent()
             )
             

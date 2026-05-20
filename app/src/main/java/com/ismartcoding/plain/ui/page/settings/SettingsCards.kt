@@ -5,13 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.extensions.getText
@@ -38,8 +37,8 @@ internal fun SettingsCardItems(navController: NavHostController) {
                 navController.navigate(Routing.DarkTheme)
             },
             icon = Res.drawable.sun_moon,
-            title = stringResource(R.string.dark_theme),
-            subtitle = DarkTheme.entries.find { it.value == darkTheme }?.getText(context) ?: "",
+            title = stringResource(Res.string.dark_theme),
+            subtitle = DarkTheme.entries.find { it.value == darkTheme }?.getText() ?: "",
             separatedActions = true,
         ) {
             PSwitch(
@@ -59,8 +58,8 @@ internal fun SettingsCardItems(navController: NavHostController) {
             modifier = Modifier.clickable {
                 navController.navigate(Routing.Language)
             },
-            title = stringResource(R.string.language),
-            subtitle = stringResource(R.string.language_desc),
+            title = stringResource(Res.string.language),
+            subtitle = stringResource(Res.string.language_desc),
             icon = Res.drawable.languages,
             showMore = true,
         )
@@ -71,8 +70,8 @@ internal fun SettingsCardItems(navController: NavHostController) {
             modifier = Modifier.clickable {
                 navController.navigate(Routing.BackupRestore)
             },
-            title = stringResource(R.string.backup_restore),
-            subtitle = stringResource(R.string.backup_desc),
+            title = stringResource(Res.string.backup_restore),
+            subtitle = stringResource(Res.string.backup_desc),
             icon = Res.drawable.database_backup,
             showMore = true,
         )
@@ -82,23 +81,23 @@ internal fun SettingsCardItems(navController: NavHostController) {
 @Composable
 internal fun DeveloperSettingsCard(navController: NavHostController) {
     PCard {
-        PListItem(title = stringResource(R.string.client_id), value = TempData.clientId)
+        PListItem(title = stringResource(Res.string.client_id), value = TempData.clientId)
         PListItem(
             modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
-            title = stringResource(R.string.developer_options),
+            title = stringResource(Res.string.developer_options),
             icon = Res.drawable.code,
             showMore = true,
         )
         PListItem(
             modifier = Modifier.clickable { navController.navigate(Routing.ComponentShowcase) },
-            title = stringResource(R.string.ui_components),
+            title = stringResource(Res.string.ui_components),
             icon = Res.drawable.layout_grid,
             showMore = true,
         )
         PListItem(
             modifier = Modifier.clickable { throw RuntimeException("Test crash triggered from Developer Options") },
-            title = stringResource(R.string.simulate_crash),
-            subtitle = stringResource(R.string.simulate_crash_desc),
+            title = stringResource(Res.string.simulate_crash),
+            subtitle = stringResource(Res.string.simulate_crash_desc),
             icon = Res.drawable.circle_alert,
         )
     }

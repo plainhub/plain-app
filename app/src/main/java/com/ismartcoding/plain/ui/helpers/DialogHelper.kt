@@ -4,19 +4,20 @@ import android.widget.Toast
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isTPlus
-import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.ToastManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString as getComposeString
 
 object DialogHelper {
     private var showLoadingJob: Job? = null
     private var hideLoadingJob: Job? = null
+
     fun showMessage(
         message: String,
         duration: Int = Toast.LENGTH_SHORT,
@@ -33,12 +34,12 @@ object DialogHelper {
         ToastManager.showErrorToast(message, durationMs)
     }
 
-    fun showSuccess(resId: Int) {
-        ToastManager.showSuccessToast(getString(resId), 2000L)
+    fun showSuccess(resource: StringResource) {
+        coIO { ToastManager.showSuccessToast(getComposeString(resource), 2000L) }
     }
 
-    fun showMessage(resId: Int) {
-        showMessage(getString(resId))
+    fun showMessage(resource: StringResource) {
+        coIO { showMessage(getComposeString(resource)) }
     }
 
     fun showMessage(r: ApiResult) {
@@ -70,64 +71,78 @@ object DialogHelper {
     fun showConfirmDialog(
         title: String,
         message: String,
-        confirmButton: Pair<String, () -> Unit> = Pair(getString(R.string.ok)) {},
+        confirmButton: Pair<String, () -> Unit>? = null,
         dismissButton: Pair<String, () -> Unit>? = null,
     ) {
-        sendEvent(ConfirmDialogEvent(title, message, confirmButton, dismissButton))
+        if (confirmButton != null) {
+            sendEvent(ConfirmDialogEvent(title, message, confirmButton, dismissButton))
+        } else {
+            coIO {
+                sendEvent(ConfirmDialogEvent(title, message, Pair(getComposeString(Res.string.ok)) {}, dismissButton))
+            }
+        }
     }
 
     fun showConfirmDialog(
         title: String,
         message: String,
-        callback: () -> Unit = {},
+        callback: () -> Unit,
     ) {
-        showConfirmDialog(title, message, confirmButton = Pair(getString(R.string.ok), callback))
+        coIO {
+            sendEvent(ConfirmDialogEvent(title, message, Pair(getComposeString(Res.string.ok), callback), null))
+        }
     }
 
     fun showErrorDialog(
         message: String,
         callback: () -> Unit = {},
     ) {
-        showConfirmDialog(getString(R.string.error), message, confirmButton = Pair(getString(R.string.ok), callback))
+        coIO {
+            sendEvent(ConfirmDialogEvent(getComposeString(Res.string.error), message, Pair(getComposeString(Res.string.ok), callback), null))
+        }
     }
 
     fun confirmToAction(
-        messageId: Int,
+        resource: StringResource,
         callback: () -> Unit,
     ) {
-        confirmToAction(getString(messageId), callback)
+        coIO { confirmToAction(getComposeString(resource), callback) }
     }
 
     fun confirmToAction(
         message: String,
         callback: () -> Unit,
     ) {
-        sendEvent(ConfirmDialogEvent("", message, confirmButton = Pair(getString(R.string.ok)) {
-            callback()
-        }, dismissButton = Pair(getString(R.string.cancel)) {
-        }))
+        coIO {
+            sendEvent(ConfirmDialogEvent("", message,
+                confirmButton = Pair(getComposeString(Res.string.ok)) { callback() },
+                dismissButton = Pair(getComposeString(Res.string.cancel)) {}))
+        }
     }
 
     fun confirmToLeave(
         callback: () -> Unit,
     ) {
-        sendEvent(ConfirmDialogEvent(getString(R.string.leave_page_title),
-            getString(R.string.leave_page_message), confirmButton = Pair(getString(R.string.leave)) {
-                callback()
-            }, dismissButton = Pair(getString(R.string.cancel)) {
-            })
-        )
+        coIO {
+            sendEvent(ConfirmDialogEvent(
+                getComposeString(Res.string.leave_page_title),
+                getComposeString(Res.string.leave_page_message),
+                confirmButton = Pair(getComposeString(Res.string.leave)) { callback() },
+                dismissButton = Pair(getComposeString(Res.string.cancel)) {}))
+        }
     }
 
     fun confirmToDelete(
         callback: () -> Unit,
     ) {
-        confirmToAction(R.string.confirm_to_delete, callback)
+        coIO { confirmToAction(getComposeString(Res.string.confirm_to_delete), callback) }
     }
 
     fun showTextCopiedMessage(text: String) {
         if (!isTPlus()) {
-            showConfirmDialog("", MainApp.instance.getString(R.string.copied_to_clipboard_format, text))
+            coIO {
+                showConfirmDialog("", getComposeString(Res.string.copied_to_clipboard_format, text))
+            }
         }
     }
 }

@@ -33,9 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -67,22 +66,22 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = { showClearConfirmDialog = false },
-            title = { Text(stringResource(R.string.clear_all)) },
-            text = { Text(stringResource(R.string.clear_all_confirm)) },
+            title = { Text(stringResource(Res.string.clear_all)) },
+            text = { Text(stringResource(Res.string.clear_all_confirm)) },
             confirmButton = {
                 TextButton(
                     onClick = { scope.launch(Dispatchers.IO) { CastPlayer.clearItems(); showClearConfirmDialog = false } },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) { Text(stringResource(R.string.confirm)) }
+                ) { Text(stringResource(Res.string.confirm)) }
             },
-            dismissButton = { TextButton(onClick = { showClearConfirmDialog = false }) { Text(stringResource(R.string.cancel)) } })
+            dismissButton = { TextButton(onClick = { showClearConfirmDialog = false }) { Text(stringResource(Res.string.cancel)) } })
     }
 
     PModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
         Column {
             PBottomSheetTopAppBar(
-                title = if (castItems.isNotEmpty()) LocaleHelper.getStringF(R.string.playlist_title, "total", castItems.size) else stringResource(R.string.cast_playlist),
-                subtitle = if (castItems.isEmpty()) "" else stringResource(R.string.drag_number_to_reorder_list),
+                title = if (castItems.isNotEmpty()) LocaleHelper.getStringSyncF(Res.string.playlist_title, "total", castItems.size) else stringResource(Res.string.cast_playlist),
+                subtitle = if (castItems.isEmpty()) "" else stringResource(Res.string.drag_number_to_reorder_list),
                 actions = {
                     if (castItems.isNotEmpty()) {
                         IconButton(onClick = { showClearConfirmDialog = true }) {
@@ -95,7 +94,7 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f), contentAlignment = Alignment.Center) {
-                    Text(text = stringResource(R.string.cast_playlist_empty), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.secondaryTextColor)
+                    Text(text = stringResource(Res.string.cast_playlist_empty), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.secondaryTextColor)
                 }
             } else {
                 LazyColumn(state = lazyListState, modifier = Modifier

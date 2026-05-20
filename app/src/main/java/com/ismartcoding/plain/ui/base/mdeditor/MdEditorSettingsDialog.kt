@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base.mdeditor
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.AlertDialog
@@ -10,8 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.base.PDialogListItem
@@ -38,18 +39,18 @@ fun MdEditorSettingsDialog(
                     mdEditorVM.showSettings = false
                 }
             ) {
-                Text(stringResource(id = R.string.close))
+                Text(stringResource(Res.string.close))
             }
         },
         title = {
-            Text(text = stringResource(id = R.string.editor_settings),
+            Text(text = stringResource(Res.string.editor_settings),
                 style = MaterialTheme.typography.titleLarge
             )
         },
         text = {
             Column {
                 PDialogListItem(
-                    title = stringResource(id = R.string.show_line_numbers),
+                    title = stringResource(Res.string.show_line_numbers),
                 ) {
                     PSwitch(
                         activated = mdEditorVM.showLineNumbers,
@@ -61,7 +62,7 @@ fun MdEditorSettingsDialog(
                     }
                 }
                 PDialogListItem(
-                    title = stringResource(id = R.string.wrap_content),
+                    title = stringResource(Res.string.wrap_content),
                 ) {
                     PSwitch(
                         activated = mdEditorVM.wrapContent,
@@ -73,7 +74,7 @@ fun MdEditorSettingsDialog(
                     }
                 }
 //                PDialogListItem(
-//                    title = stringResource(id = R.string.syntax_highlight),
+//                    title = stringResource(Res.string.syntax_highlight),
 //                ) {
 //                    PSwitch(
 //                        activated = viewModel.syntaxHighLight,

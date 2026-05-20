@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.i18n.*
+
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -7,14 +9,13 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 object MediaShortcutHelper {
     fun addToDesktop(context: Context, path: String, label: String, iconRes: Int) {
         if (!ShortcutManagerCompat.isRequestPinShortcutSupported(context)) {
-            DialogHelper.showMessage(R.string.shortcut_not_supported)
+            DialogHelper.showMessage(Res.string.shortcut_not_supported)
             return
         }
         val launchIntent = Intent(context, MainActivity::class.java).apply {
@@ -48,6 +49,6 @@ object MediaShortcutHelper {
         ShortcutManagerCompat.requestPinShortcut(context, shortcut, successCallback.intentSender)
         // Show a toast so the user knows something happened, especially on launchers
         // that don't display a visible confirmation dialog (e.g. some MIUI versions).
-        DialogHelper.showMessage(R.string.shortcut_added_to_home)
+        DialogHelper.showMessage(Res.string.shortcut_added_to_home)
     }
 }

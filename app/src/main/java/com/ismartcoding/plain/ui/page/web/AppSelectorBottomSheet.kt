@@ -22,9 +22,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -74,10 +73,10 @@ fun AppSelectorBottomSheet(
     ) {
         Column {
             PBottomSheetTopAppBar(
-                title = stringResource(R.string.add_app),
+                title = stringResource(Res.string.add_app),
                 actions = {
                     PTopRightButton(
-                        stringResource(R.string.add) +
+                        stringResource(Res.string.add) +
                                 if (vm.selectedAppIds.isNotEmpty()) " (${vm.selectedAppIds.size})" else "", click = {
                             if (vm.selectedAppIds.isNotEmpty()) {
                                 onAppsSelected(vm.selectedAppIds.toList())
@@ -92,7 +91,7 @@ fun AppSelectorBottomSheet(
             OutlinedTextField(
                 value = vm.searchQuery.value,
                 onValueChange = { vm.searchQuery.value = it },
-                label = { Text(stringResource(R.string.search)) },
+                label = { Text(stringResource(Res.string.search)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)

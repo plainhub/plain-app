@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.apps
 
 import com.ismartcoding.plain.i18n.*
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.PackageInfoCompat
@@ -25,10 +24,8 @@ import coil3.compose.AsyncImage
 import com.ismartcoding.lib.apk.ApkParsers
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPackageDetail
 import com.ismartcoding.plain.features.PackageHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
@@ -63,8 +60,8 @@ fun AppPageHeader(
         VerticalSpace(dp = 8.dp)
         SelectionContainer {
             Text(
-                text = LocaleHelper.getStringF(
-                    R.string.version_name_with_code, "version_name", item.version, "version_code",
+                text = stringRes(
+                    Res.string.version_name_with_code, "version_name" to item.version, "version_code" to
                     PackageInfoCompat.getLongVersionCode(item.packageInfo)
                 ),
                 textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 32.dp),
@@ -72,10 +69,10 @@ fun AppPageHeader(
             )
         }
         Row(Modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            SuggestionChip(onClick = {}, label = { Text(text = stringResource(id = if (item.type == "user") R.string.user_app else R.string.system_app)) })
+            SuggestionChip(onClick = {}, label = { Text(text = stringResource(if (item.type == "user") Res.string.user_app else Res.string.system_app)) })
             if (item.hasLargeHeap) {
                 HorizontalSpace(dp = 8.dp)
-                SuggestionChip(onClick = {}, label = { Text(text = stringResource(id = R.string.large_heap)) })
+                SuggestionChip(onClick = {}, label = { Text(text = stringResource(Res.string.large_heap)) })
             }
         }
         VerticalSpace(dp = 16.dp)
@@ -84,13 +81,13 @@ fun AppPageHeader(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 horizontalArrangement = Arrangement.spacedBy(32.dp),
             ) {
-                PIconTextActionButton(icon = Res.drawable.square_arrow_out_up_right, text = stringResource(R.string.launch), click = {
+                PIconTextActionButton(icon = Res.drawable.square_arrow_out_up_right, text = stringResource(Res.string.launch), click = {
                     try { PackageHelper.launch(context, item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = Res.drawable.delete_forever, text = stringResource(R.string.uninstall), click = {
+                PIconTextActionButton(icon = Res.drawable.delete_forever, text = stringResource(Res.string.uninstall), click = {
                     try { PackageHelper.uninstall(context, item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
-                PIconTextActionButton(icon = Res.drawable.settings, text = stringResource(R.string.settings), click = {
+                PIconTextActionButton(icon = Res.drawable.settings, text = stringResource(Res.string.settings), click = {
                     try { PackageHelper.viewInSettings(context, item.id) } catch (ex: Exception) { DialogHelper.showMessage(ex) }
                 })
                 PIconTextActionButton(icon = Res.drawable.code, text = "Manifest", click = {

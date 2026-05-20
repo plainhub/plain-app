@@ -1,18 +1,19 @@
 package com.ismartcoding.plain.ui.page.pomodoro
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.queryOpenableFile
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -61,27 +62,27 @@ fun PomodoroSettingsDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.settings), style = MaterialTheme.typography.titleLarge) },
+        title = { Text(text = stringResource(Res.string.settings), style = MaterialTheme.typography.titleLarge) },
         text = {
             LazyColumn {
                 item {
                     OutlinedTextField(value = workDuration, onValueChange = { workDuration = it },
-                        label = { Text(stringResource(R.string.work_duration)) }, modifier = Modifier.fillMaxWidth())
+                        label = { Text(stringResource(Res.string.work_duration)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 8.dp)
                     OutlinedTextField(value = shortBreakDuration, onValueChange = { shortBreakDuration = it },
-                        label = { Text(stringResource(R.string.short_break_duration)) }, modifier = Modifier.fillMaxWidth())
+                        label = { Text(stringResource(Res.string.short_break_duration)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 8.dp)
                     OutlinedTextField(value = longBreakDuration, onValueChange = { longBreakDuration = it },
-                        label = { Text(stringResource(R.string.long_break_duration)) }, modifier = Modifier.fillMaxWidth())
+                        label = { Text(stringResource(Res.string.long_break_duration)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 8.dp)
                 }
                 item {
                     OutlinedTextField(value = pomodorosBeforeLongBreak, onValueChange = { pomodorosBeforeLongBreak = it },
-                        label = { Text(stringResource(R.string.pomodoros_before_long_break)) }, modifier = Modifier.fillMaxWidth())
+                        label = { Text(stringResource(Res.string.pomodoros_before_long_break)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 16.dp)
-                    PDialogListItem(title = stringResource(R.string.show_notification)) { PSwitch(activated = showNotification) { showNotification = it } }
+                    PDialogListItem(title = stringResource(Res.string.show_notification)) { PSwitch(activated = showNotification) { showNotification = it } }
                     VerticalSpace(dp = 8.dp)
-                    PDialogListItem(title = stringResource(R.string.play_sound_on_complete)) { PSwitch(activated = playSoundOnComplete) { playSoundOnComplete = it } }
+                    PDialogListItem(title = stringResource(Res.string.play_sound_on_complete)) { PSwitch(activated = playSoundOnComplete) { playSoundOnComplete = it } }
                     VerticalSpace(dp = 16.dp)
                 }
                 item {
@@ -99,8 +100,8 @@ fun PomodoroSettingsDialog(
                     soundPath = soundPath, originalSoundName = originalFileName,
                 ))
                 onDismiss()
-            }) { Text(stringResource(R.string.save)) }
+            }) { Text(stringResource(Res.string.save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
     )
 }

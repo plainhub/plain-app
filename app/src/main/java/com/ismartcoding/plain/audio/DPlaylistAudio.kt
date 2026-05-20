@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.audio
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.os.Parcelable
@@ -10,7 +12,6 @@ import androidx.media3.common.util.UnstableApi
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.lib.extensions.pathToUri
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -53,7 +54,7 @@ data class DPlaylistAudio(
             val retriever = MediaMetadataRetriever()
             var title = path.getFilenameWithoutExtensionFromPath()
             var duration = 0L
-            var artist = LocaleHelper.getString(R.string.unknown)
+            var artist = LocaleHelper.getStringSync(Res.string.unknown)
 
             try {
                 retriever.setDataSource(context, path.pathToUri())

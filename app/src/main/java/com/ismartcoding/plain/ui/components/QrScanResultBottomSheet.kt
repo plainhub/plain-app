@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -29,8 +30,8 @@ fun QrScanResultBottomSheet(
             onDismiss()
         },
     ) {
-        PBottomSheetTopAppBar(title = stringResource(id = R.string.scan_result)) {
-            CopyIconButton(text = value, clipLabel = stringResource(R.string.scan_result))
+        PBottomSheetTopAppBar(title = stringResource(Res.string.scan_result)) {
+            CopyIconButton(text = value, clipLabel = stringResource(Res.string.scan_result))
         }
         TopSpace()
         ScanResult(context, text = value)

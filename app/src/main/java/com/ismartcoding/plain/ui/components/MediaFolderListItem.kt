@@ -18,10 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.pluralStringResource
+import org.jetbrains.compose.resources.pluralStringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -74,7 +73,7 @@ fun MediaFolderListItem(
                 VerticalSpace(8.dp)
 
                 var subtitle = pluralStringResource(
-                    R.plurals.items,
+                    Res.plurals.items,
                     folder.itemCount,
                     folder.itemCount
                 )

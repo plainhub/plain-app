@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.enums
 
+import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
 enum class DeviceType(val value: String) {
     COMPUTER("computer"),
@@ -12,13 +12,14 @@ enum class DeviceType(val value: String) {
     TV("tv"),
     OTHER("other");
 
+    @Composable
     fun getText(): String {
         return when (this) {
-            COMPUTER -> getString(R.string.computer)
-            PHONE -> getString(R.string.phone)
-            TABLET -> getString(R.string.tablet)
-            TV -> getString(R.string.tv)
-            OTHER -> getString(R.string.other)
+            COMPUTER -> stringResource(Res.string.computer)
+            PHONE -> stringResource(Res.string.phone)
+            TABLET -> stringResource(Res.string.tablet)
+            TV -> stringResource(Res.string.tv)
+            OTHER -> stringResource(Res.string.other)
         }
     }
 

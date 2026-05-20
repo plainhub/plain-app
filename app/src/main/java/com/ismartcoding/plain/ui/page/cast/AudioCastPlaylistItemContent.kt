@@ -22,10 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -69,6 +68,6 @@ internal fun ReorderableCollectionItemScope.AudioCastPlaylistItemContent(
             Text(text = artist, style = MaterialTheme.typography.listItemSubtitle())
         }
         PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.red,
-            contentDescription = stringResource(R.string.remove_from_cast_queue), click = onRemove)
+            contentDescription = stringResource(Res.string.remove_from_cast_queue), click = onRemove)
     }
 }

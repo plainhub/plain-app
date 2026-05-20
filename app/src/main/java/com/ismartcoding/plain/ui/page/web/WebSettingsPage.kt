@@ -16,13 +16,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.isTV
 import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionItem
@@ -64,7 +63,7 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
         WebSettingsEffects(permissionList, shouldIgnoreOptimize, systemAlertWindow, notificationListenerGranted)
 
         PScaffold(topBar = {
-            PTopAppBar(navController = navController, title = stringResource(R.string.web_settings))
+            PTopAppBar(navController = navController, title = stringResource(Res.string.web_settings))
         }, content = { paddingValues ->
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
@@ -72,24 +71,24 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.Connections) },
-                            icon = Res.drawable.devices, title = stringResource(R.string.connections), showMore = true
+                            icon = Res.drawable.devices, title = stringResource(Res.string.connections), showMore = true
                         )
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.WebSecurity) },
-                            icon = Res.drawable.lock, title = stringResource(R.string.security), showMore = true
+                            icon = Res.drawable.lock, title = stringResource(Res.string.security), showMore = true
                         )
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.HowToUse) },
-                            icon = Res.drawable.info, title = stringResource(R.string.how_to_use), showMore = true
+                            icon = Res.drawable.info, title = stringResource(Res.string.how_to_use), showMore = true
                         )
                         PListItem(
                             modifier = Modifier.clickable { WebHelper.open(context, "https://plainapp.app/troubleshooting") },
-                            icon = Res.drawable.troubleshoot, title = stringResource(R.string.troubleshoot), showMore = true
+                            icon = Res.drawable.troubleshoot, title = stringResource(Res.string.troubleshoot), showMore = true
                         )
                     }
                     VerticalSpace(dp = 16.dp)
                 }
-                item { Subtitle(text = stringResource(R.string.permissions)) }
+                item { Subtitle(text = stringResource(Res.string.permissions)) }
                 itemsIndexed(permissionList.value) { index, m ->
                     val permission = m.permission
                     PListItem(
@@ -97,7 +96,7 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                             .getCardModifier(index = index, size = permissionList.value.size)
                             .clickable { togglePermission(scope, context, m, !enabledPermissions.contains(permission.name)) },
                         icon = m.icon, title = permission.getText(),
-                        subtitle = stringResource(if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted)
+                        subtitle = stringResource(if (m.granted) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
                     ) {
                         PSwitch(activated = enabledPermissions.contains(permission.name)) { enable -> togglePermission(scope, context, m, enable) }
                     }
@@ -112,15 +111,15 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                             PListItem(
                                 modifier = Modifier.clickable { togglePermission(scope, context, m, !enabled) },
                                 icon = m.icon, title = permission.getText(),
-                                subtitle = stringResource(if (notificationListenerGranted.value) R.string.system_permission_granted else R.string.system_permission_not_granted)
+                                subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
                             ) {
                                 PSwitch(activated = enabled) { enable -> togglePermission(scope, context, m, enable) }
                             }
                             if (enabled) {
                                 PListItem(
                                     modifier = Modifier.clickable { navController.navigate(Routing.NotificationSettings) },
-                                    icon = Res.drawable.settings, title = stringResource(R.string.notification_filter_settings),
-                                    subtitle = stringResource(R.string.notification_filter_settings_desc), showMore = true
+                                    icon = Res.drawable.settings, title = stringResource(Res.string.notification_filter_settings),
+                                    subtitle = stringResource(Res.string.notification_filter_settings_desc), showMore = true
                                 )
                             }
                         }
@@ -133,18 +132,18 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                         PListItem(modifier = Modifier.clickable {
                             val intent = Intent(if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                             intent.addCategory(Intent.CATEGORY_DEFAULT); intent.data = Uri.fromParts("package", context.packageName, null)
-                            if (intent.resolveActivity(packageManager) != null) context.startActivity(intent) else DialogHelper.showMessage(R.string.not_supported_error)
+                            if (intent.resolveActivity(packageManager) != null) context.startActivity(intent) else DialogHelper.showMessage(Res.string.not_supported_error)
                         }, icon = m.icon, title = m.permission.getText(), showMore = true)
                     }
                 }
                 item {
-                    VerticalSpace(dp = 16.dp); Subtitle(text = stringResource(R.string.performance))
+                    VerticalSpace(dp = 16.dp); Subtitle(text = stringResource(Res.string.performance))
                     PCard {
-                        PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(context, !keepAwake) }, title = stringResource(R.string.keep_awake)) {
+                        PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(context, !keepAwake) }, title = stringResource(Res.string.keep_awake)) {
                             PSwitch(activated = keepAwake) { enable -> webVM.enableKeepAwake(context, enable) }
                         }
                     }
-                    Tips(stringResource(R.string.keep_awake_tips))
+                    Tips(stringResource(Res.string.keep_awake_tips))
                     VerticalSpace(dp = 16.dp)
                     PCard {
                         PListItem(modifier = Modifier.clickable {
@@ -152,16 +151,16 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                             else {
                                 val intent = Intent(); intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS; context.startActivity(intent)
                             }
-                        }, title = stringResource(if (shouldIgnoreOptimize.value) R.string.disable_battery_optimization else R.string.battery_optimization_disabled), showMore = true)
+                        }, title = stringResource(if (shouldIgnoreOptimize.value) Res.string.disable_battery_optimization else Res.string.battery_optimization_disabled), showMore = true)
                     }
-                    Tips(stringResource(R.string.battery_optimization_tips))
+                    Tips(stringResource(Res.string.battery_optimization_tips))
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
-                            icon = Res.drawable.code, title = stringResource(R.string.developer_options), showMore = true
+                            icon = Res.drawable.code, title = stringResource(Res.string.developer_options), showMore = true
                         )
                     }
                 }

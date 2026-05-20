@@ -11,9 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.PulsatingWave
@@ -54,7 +53,7 @@ fun AudioListItemLeadingIcon(
                     Icon(
                         modifier = Modifier.size(24.dp),
                         painter = painterResource(Res.drawable.cast),
-                        contentDescription = stringResource(R.string.cast),
+                        contentDescription = stringResource(Res.string.cast),
                         tint = MaterialTheme.colorScheme.blue
                     )
                 }

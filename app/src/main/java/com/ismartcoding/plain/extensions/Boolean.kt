@@ -1,10 +1,12 @@
 package com.ismartcoding.plain.extensions
 
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import androidx.compose.runtime.Composable
+import com.ismartcoding.plain.i18n.*
+import org.jetbrains.compose.resources.stringResource
 
+@Composable
 fun Boolean.getText(): String {
-    return if (this) getString(R.string.on) else getString(R.string.off)
+    return if (this) stringResource(Res.string.on) else stringResource(Res.string.off)
 }
 
 fun Boolean.toJsValue(): String {

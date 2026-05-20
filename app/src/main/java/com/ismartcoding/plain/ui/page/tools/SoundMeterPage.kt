@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.tools
 
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.R
 import android.media.AudioRecord
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,19 +29,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.*
+import org.jetbrains.compose.resources.stringArrayResource
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +57,7 @@ fun SoundMeterPage(navController: NavHostController) {
     val max = remember { mutableFloatStateOf(0f) }
     val isRunning = remember { mutableStateOf(false) }
     val decibel = remember { mutableFloatStateOf(0f) }
-    val decibelValueStrings = stringArrayResource(R.array.decibel_values)
+    val decibelValueStrings = stringArrayResource(Res.array.decibel_values)
     val decibelValueString by remember(decibel.floatValue) {
         derivedStateOf { if (decibel.floatValue > 0) decibelValueStrings.getOrNull((decibel.floatValue / 10).toInt() - 1) ?: "" else "" }
     }
@@ -65,8 +66,8 @@ fun SoundMeterPage(navController: NavHostController) {
 
     PScaffold(topBar = {
         PTopAppBar(navController = navController,
-            title = stringResource(R.string.sound_meter), actions = {
-                PIconButton(icon = Res.drawable.info, contentDescription = stringResource(R.string.decibel_values),
+            title = stringResource(Res.string.sound_meter), actions = {
+                PIconButton(icon = Res.drawable.info, contentDescription = stringResource(Res.string.decibel_values),
                     tint = MaterialTheme.colorScheme.onSurface) { decibelValuesDialogVisible.value = true }
             })
     }, content = { paddingValues ->
@@ -86,28 +87,28 @@ fun SoundMeterPage(navController: NavHostController) {
             item {
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = stringResource(R.string.min)); Text(text = FormatHelper.formatFloat(min.floatValue, digits = 1))
+                        Text(text = stringResource(Res.string.min)); Text(text = FormatHelper.formatFloat(min.floatValue, digits = 1))
                     }
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = stringResource(R.string.avg)); Text(text = FormatHelper.formatFloat(avg.floatValue, digits = 1))
+                        Text(text = stringResource(Res.string.avg)); Text(text = FormatHelper.formatFloat(avg.floatValue, digits = 1))
                     }
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = stringResource(R.string.max)); Text(text = FormatHelper.formatFloat(max.floatValue, digits = 1))
+                        Text(text = stringResource(Res.string.max)); Text(text = FormatHelper.formatFloat(max.floatValue, digits = 1))
                     }
                 }
                 Text(text = decibelValueString, color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.fillMaxWidth().height(96.dp).padding(16.dp), textAlign = TextAlign.Center)
                 if (isRunning.value) {
-                    PFilledButton(text = stringResource(R.string.stop), modifier = Modifier.padding(horizontal = 16.dp), onClick = { isRunning.value = false })
+                    PFilledButton(text = stringResource(Res.string.stop), modifier = Modifier.padding(horizontal = 16.dp), onClick = { isRunning.value = false })
                 } else {
-                    PFilledButton(text = stringResource(R.string.start), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                    PFilledButton(text = stringResource(Res.string.start), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         if (Permission.RECORD_AUDIO.can(context)) isRunning.value = true
                         else sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))
                     })
                 }
                 if (count.intValue > 0) {
                     VerticalSpace(dp = 40.dp)
-                    PFilledButton(text = stringResource(R.string.reset), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                    PFilledButton(text = stringResource(Res.string.reset), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         total.floatValue = 0f; count.intValue = 0; decibel.floatValue = 0f
                         min.floatValue = 0f; max.floatValue = 0f; avg.floatValue = 0f
                     })
@@ -120,8 +121,8 @@ fun SoundMeterPage(navController: NavHostController) {
     if (decibelValuesDialogVisible.value) {
         AlertDialog(containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = { decibelValuesDialogVisible.value = false },
-            confirmButton = { Button(onClick = { decibelValuesDialogVisible.value = false }) { Text(stringResource(R.string.close)) } },
-            title = { Text(text = stringResource(R.string.decibel_values), style = MaterialTheme.typography.titleLarge) },
+            confirmButton = { Button(onClick = { decibelValuesDialogVisible.value = false }) { Text(stringResource(Res.string.close)) } },
+            title = { Text(text = stringResource(Res.string.decibel_values), style = MaterialTheme.typography.titleLarge) },
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     decibelValueStrings.forEach {

@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.db.DFeedEntry

@@ -5,8 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.preferences.HomeSectionCollapsedPreference
 import com.ismartcoding.plain.ui.base.PIconButton
@@ -21,7 +20,7 @@ fun HomeSectionCollapseButton(
     val scope = rememberCoroutineScope()
     PIconButton(
         icon = if (collapsed) Res.drawable.chevron_down else Res.drawable.chevron_up,
-        contentDescription = if (collapsed) stringResource(R.string.expand_section) else stringResource(R.string.collapse_section),
+        contentDescription = if (collapsed) stringResource(Res.string.expand_section) else stringResource(Res.string.collapse_section),
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
         click = {
             scope.launch {

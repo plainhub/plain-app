@@ -1,10 +1,11 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.base.PListItem
@@ -33,7 +34,7 @@ fun NearbyDeviceItem(
                 when {
                     isPairing -> {
                         POutlinedButton(
-                            text = stringResource(R.string.cancel),
+                            text = stringResource(Res.string.cancel),
                             onClick = onCancelClick,
                             type = ButtonType.DANGER,
                             isLoading = true
@@ -42,7 +43,7 @@ fun NearbyDeviceItem(
 
                     isPaired -> {
                         POutlinedButton(
-                            text = stringResource(R.string.unpair),
+                            text = stringResource(Res.string.unpair),
                             onClick = onUnpairClick,
                             type = ButtonType.DANGER,
                         )
@@ -50,7 +51,7 @@ fun NearbyDeviceItem(
 
                     else -> {
                         POutlinedButton(
-                            text = stringResource(R.string.pair),
+                            text = stringResource(Res.string.pair),
                             onClick = onPairClick,
                         )
                     }

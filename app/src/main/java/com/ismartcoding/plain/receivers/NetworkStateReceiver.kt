@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.receivers
 
+import com.ismartcoding.plain.i18n.*
+
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -9,7 +11,6 @@ import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -30,7 +31,7 @@ class NetworkStateReceiver : BroadcastReceiver() {
                             notificationId, NotificationHelper.createServiceNotification(
                                 context,
                                 Constants.ACTION_STOP_HTTP_SERVER,
-                                LocaleHelper.getString(R.string.api_service_is_running),
+                                LocaleHelper.getStringSync(Res.string.api_service_is_running),
                                 HttpServerManager.getNotificationContent()
                             )
                         )

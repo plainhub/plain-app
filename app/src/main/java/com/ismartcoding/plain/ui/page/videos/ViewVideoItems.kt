@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.videos
 
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.R
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.runtime.Composable
@@ -9,9 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DTag
@@ -114,7 +114,7 @@ internal fun VideoActionButtons(
 internal fun VideoPathCard(m: DVideo) {
     PCard {
         PListItem(title = m.path, action = {
-            CopyIconButton(text = m.path, clipLabel = stringResource(R.string.file_path))
+            CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
         })
     }
 }

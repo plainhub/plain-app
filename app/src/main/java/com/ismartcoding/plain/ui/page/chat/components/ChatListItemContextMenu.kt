@@ -1,12 +1,13 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ClipData
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -37,7 +38,7 @@ fun ChatListItemContextMenu(
         },
     ) {
         PDropdownMenuItem(
-            text = { Text(stringResource(id = R.string.select)) },
+            text = { Text(stringResource(Res.string.select)) },
             onClick = {
                 chatVM.enterSelectMode()
                 chatVM.select(m.id)
@@ -46,7 +47,7 @@ fun ChatListItemContextMenu(
             },
         )
         PDropdownMenuItem(
-            text = { Text(stringResource(id = R.string.forward)) },
+            text = { Text(stringResource(Res.string.forward)) },
             onClick = {
                 chatVM.selectedItem.value = null
                 showContextMenu.value = false
@@ -55,19 +56,19 @@ fun ChatListItemContextMenu(
         )
         if (m.value is DMessageText) {
             PDropdownMenuItem(
-                text = { Text(stringResource(id = R.string.copy_text)) },
+                text = { Text(stringResource(Res.string.copy_text)) },
                 onClick = {
                     chatVM.selectedItem.value = null
                     showContextMenu.value = false
                     val text = (m.value as DMessageText).text
-                    val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.message), text)
+                    val clip = ClipData.newPlainText(LocaleHelper.getStringSync(Res.string.message), text)
                     clipboardManager.setPrimaryClip(clip)
                     DialogHelper.showTextCopiedMessage(text)
                 },
             )
             if (m.fromId == "me") {
                 PDropdownMenuItem(
-                    text = { Text(stringResource(id = R.string.edit_text)) },
+                    text = { Text(stringResource(Res.string.edit_text)) },
                     onClick = {
                         chatVM.selectedItem.value = null
                         showContextMenu.value = false
@@ -78,7 +79,7 @@ fun ChatListItemContextMenu(
             }
         }
         PDropdownMenuItem(
-            text = { Text(stringResource(id = R.string.delete)) },
+            text = { Text(stringResource(Res.string.delete)) },
             onClick = {
                 chatVM.selectedItem.value = null
                 showContextMenu.value = false

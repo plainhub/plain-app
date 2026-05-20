@@ -17,10 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ActionButtonAdd
 import com.ismartcoding.plain.ui.base.ActionButtonRefresh
 import com.ismartcoding.plain.ui.base.NoDataColumn
@@ -55,7 +54,7 @@ fun TagsBottomSheet(
     ) {
         Column {
             PBottomSheetTopAppBar(
-                title = stringResource(R.string.tags),
+                title = stringResource(Res.string.tags),
                 actions = {
                     ActionButtonRefresh(
                         loading = tagsVM.showLoading.value,
@@ -89,7 +88,7 @@ fun TagsBottomSheet(
                                 PIconButton(
                                     icon = Res.drawable.delete_forever,
                                     tint = MaterialTheme.colorScheme.red,
-                                    contentDescription = stringResource(R.string.delete),
+                                    contentDescription = stringResource(Res.string.delete),
                                     click = {
                                         DialogHelper.confirmToDelete {
                                             tagsVM.deleteTag(tag.id)

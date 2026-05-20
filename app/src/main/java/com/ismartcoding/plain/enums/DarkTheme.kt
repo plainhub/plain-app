@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.enums
 
-import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import com.ismartcoding.plain.R
+import com.ismartcoding.plain.i18n.*
+import org.jetbrains.compose.resources.stringResource
 
 enum class DarkTheme(val value: Int) {
     UseDeviceTheme(0),
@@ -12,11 +12,12 @@ enum class DarkTheme(val value: Int) {
     OFF(2),
     ;
 
-    fun getText(context: Context): String =
+    @Composable
+    fun getText(): String =
         when (this) {
-            UseDeviceTheme -> context.getString(R.string.use_device_theme)
-            ON -> context.getString(R.string.on)
-            OFF -> context.getString(R.string.off)
+            UseDeviceTheme -> stringResource(Res.string.use_device_theme)
+            ON -> stringResource(Res.string.on)
+            OFF -> stringResource(Res.string.off)
         }
 
     companion object {

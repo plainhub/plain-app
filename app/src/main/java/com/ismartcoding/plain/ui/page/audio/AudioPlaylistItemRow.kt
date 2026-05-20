@@ -12,9 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.Permissions
@@ -41,7 +40,7 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .clickable { Permissions.checkNotification(context, R.string.audio_notification_prompt) { AudioPlayer.justPlay(context, audio) } },
+            .clickable { Permissions.checkNotification(context, Res.string.audio_notification_prompt) { AudioPlayer.justPlay(context, audio) } },
         colors = CardDefaults.cardColors(containerColor = if (isPlaying) MaterialTheme.colorScheme.cardBackgroundActive else MaterialTheme.colorScheme.cardBackgroundNormal),
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -64,7 +63,7 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
                 Text(text = audio.artist, style = MaterialTheme.typography.listItemSubtitle())
             }
             PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.red,
-                contentDescription = stringResource(R.string.remove_from_playlist),
+                contentDescription = stringResource(Res.string.remove_from_playlist),
                 click = { scope.launch(Dispatchers.IO) { audioPlaylistVM.removeAsync(context, audio.path) } })
         }
     }

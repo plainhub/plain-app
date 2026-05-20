@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.VideoSortByPreference
@@ -73,8 +72,8 @@ fun VideosPage(
     val density = LocalDensity.current
     val imageWidthPx = remember(cellsPerRow.value) { density.run { ((configuration.screenWidthDp.dp - ((cellsPerRow.value - 1) * 2).dp) / cellsPerRow.value).toPx().toInt() } }
     val tabs = remember(tagsState, videosVM.total.intValue, videosVM.totalTrash.intValue) {
-        val baseTabs = mutableListOf(VTabData(LocaleHelper.getString(R.string.all), "all", videosVM.total.intValue))
-        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(R.string.trash), "trash", videosVM.totalTrash.intValue))
+        val baseTabs = mutableListOf(VTabData(LocaleHelper.getStringSync(Res.string.all), "all", videosVM.total.intValue))
+        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getStringSync(Res.string.trash), "trash", videosVM.totalTrash.intValue))
         baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) }); baseTabs
     }
     val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { withIO { videosVM.loadAsync(context, tagsVM); mediaFoldersVM.loadAsync(context) }; setRefreshState(RefreshContentState.Finished) } }

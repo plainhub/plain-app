@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.pomodoro
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,11 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
@@ -29,7 +30,7 @@ fun PomodoroSoundSection(
 ) {
     Column {
         Text(
-            text = stringResource(R.string.custom_sound),
+            text = stringResource(Res.string.custom_sound),
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -46,17 +47,17 @@ fun PomodoroSoundSection(
                     )
                     Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.End) {
                         TextButton(onClick = { sendEvent(PickFileEvent(PickFileTag.POMODORO, PickFileType.FILE, multiple = false)) }) {
-                            Text(stringResource(R.string.change))
+                            Text(stringResource(Res.string.change))
                         }
                         TextButton(onClick = onClear) {
-                            Text(text = stringResource(R.string.clear), color = MaterialTheme.colorScheme.error)
+                            Text(text = stringResource(Res.string.clear), color = MaterialTheme.colorScheme.error)
                         }
                     }
                 }
             } else {
                 Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.Center) {
                     TextButton(onClick = { sendEvent(PickFileEvent(PickFileTag.POMODORO, PickFileType.FILE, multiple = false)) }) {
-                        Text(stringResource(R.string.select_sound))
+                        Text(stringResource(Res.string.select_sound))
                     }
                 }
             }

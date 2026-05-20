@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.appfiles
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -12,11 +14,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -62,7 +63,7 @@ fun AppFilesPage(
                 navigationIcon = {
                     NavigationBackIcon { navController.navigateUp() }
                 },
-                title = stringResource(R.string.app_files),
+                title = stringResource(Res.string.app_files),
             )
         },
         content = { paddingValues ->

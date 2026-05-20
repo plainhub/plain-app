@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -26,9 +28,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.colorpicker.ColorEnvelope
 import com.ismartcoding.plain.ui.base.colorpicker.HsvColorPicker
@@ -54,12 +55,12 @@ fun ColorPickerDialog(
                     onConfirm(customColorValue)
                 }
             ) {
-                Text(stringResource(id = R.string.confirm))
+                Text(stringResource(Res.string.confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = { onDismiss() }) {
-                Text(stringResource(id = R.string.cancel))
+                Text(stringResource(Res.string.cancel))
             }
         },
         title = {
@@ -92,7 +93,7 @@ fun ColorPickerDialog(
                     ClipboardTextField(
                         value = customColorValue,
                         modifier = Modifier.weight(0.6f),
-                        placeholder = stringResource(R.string.primary_color_hint),
+                        placeholder = stringResource(Res.string.primary_color_hint),
                         onValueChange = {
                             customColorValue = it
                         },

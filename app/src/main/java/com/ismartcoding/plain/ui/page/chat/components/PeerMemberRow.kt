@@ -17,10 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
 
@@ -68,7 +67,7 @@ internal fun PeerMemberRow(
                 )
                 if (isPending) {
                     Text(
-                        text = stringResource(R.string.pending_invite),
+                        text = stringResource(Res.string.pending_invite),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -83,14 +82,14 @@ internal fun PeerMemberRow(
                 ),
             ) {
                 Text(
-                    text = stringResource(R.string.remove_member),
+                    text = stringResource(Res.string.remove_member),
                     style = MaterialTheme.typography.labelSmall,
                 )
             }
         } else {
             Button(onClick = onAdd) {
                 Text(
-                    text = stringResource(R.string.add_member),
+                    text = stringResource(Res.string.add_member),
                     style = MaterialTheme.typography.labelSmall,
                 )
             }

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
@@ -15,11 +17,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FormatHelper
@@ -83,12 +84,12 @@ fun PackageListItem(
                 )
                 VerticalSpace(dp = 8.dp)
                 Text(
-                    text = stringResource(id = LocaleHelper.getStringIdentifier("app_type_" + item.type)) + " " + item.size.formatBytes(),
+                    text = stringResource(if (item.type == "system") Res.string.app_type_system else Res.string.app_type_user) + " " + item.size.formatBytes(),
                     style = MaterialTheme.typography.listItemDescription(),
                 )
                 VerticalSpace(dp = 8.dp)
                 Text(
-                    text = stringResource(id = R.string.updated_at) + "  " + item.updatedAt.formatDateTime(),
+                    text = stringResource(Res.string.updated_at) + "  " + item.updatedAt.formatDateTime(),
                     style = MaterialTheme.typography.listItemSubtitle()
                 )
             }

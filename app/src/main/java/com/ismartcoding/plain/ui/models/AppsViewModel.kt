@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -7,10 +10,8 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -48,9 +49,9 @@ class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ISearchabl
         totalSystem.intValue = PackageHelper.count("${queryText.value} type:system")
         noMore.value = _itemsFlow.value.size < limit.intValue
         tabs.value = listOf(
-            VTabData(getString(R.string.all), "", total.intValue),
-            VTabData(getString(R.string.app_type_system), "system", totalSystem.intValue),
-            VTabData(getString(R.string.app_type_user), "user", total.intValue - totalSystem.intValue)
+            VTabData(LocaleHelper.getString(Res.string.all), "", total.intValue),
+            VTabData(LocaleHelper.getString(Res.string.app_type_system), "system", totalSystem.intValue),
+            VTabData(LocaleHelper.getString(Res.string.app_type_user), "user", total.intValue - totalSystem.intValue)
         )
         showLoading.value = false
     }

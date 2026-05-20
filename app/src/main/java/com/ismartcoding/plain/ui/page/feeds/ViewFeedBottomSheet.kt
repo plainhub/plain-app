@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ClipData
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -8,9 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -78,7 +79,7 @@ fun ViewFeedBottomSheet(
             PListItem(modifier = Modifier.clickable {
                 WebHelper.open(context, m.url)
             }, title = m.url, separatedActions = true, action = {
-                CopyIconButton(text = m.url, clipLabel = stringResource(R.string.link))
+                CopyIconButton(text = m.url, clipLabel = stringResource(Res.string.link))
             })
         }
         VerticalSpace(dp = 16.dp)
@@ -87,7 +88,7 @@ fun ViewFeedBottomSheet(
                 feedsVM.editFetchContent.value = !feedsVM.editFetchContent.value
                 m.fetchContent = feedsVM.editFetchContent.value
                 feedsVM.updateFetchContent(m.id, feedsVM.editFetchContent.value)
-            }, title = stringResource(id = R.string.auto_fetch_full_content), action = {
+            }, title = stringResource(Res.string.auto_fetch_full_content), action = {
                 PSwitch(
                     activated = feedsVM.editFetchContent.value,
                 ) {
@@ -97,11 +98,11 @@ fun ViewFeedBottomSheet(
                 }
             })
         }
-        Tips(text = stringResource(id = R.string.auto_fetch_full_content_tips))
+        Tips(text = stringResource(Res.string.auto_fetch_full_content_tips))
         VerticalSpace(dp = 16.dp)
         PCard {
-            PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
-            PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+            PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
+            PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
         }
         BottomSpace()
     }

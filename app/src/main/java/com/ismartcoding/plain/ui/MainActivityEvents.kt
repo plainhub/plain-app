@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui
 
+import com.ismartcoding.plain.i18n.*
+
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
@@ -11,7 +13,6 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
@@ -52,7 +53,7 @@ internal fun MainActivity.initEvents() {
                     mainVM.httpServerError = HttpServerManager.httpServerError
                     mainVM.httpServerState = event.state
                     if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@initEvents)) {
-                        DialogHelper.showConfirmDialog(LocaleHelper.getString(R.string.confirm), LocaleHelper.getString(R.string.storage_permission_confirm)) {
+                        DialogHelper.showConfirmDialog(LocaleHelper.getString(Res.string.confirm), LocaleHelper.getString(Res.string.storage_permission_confirm)) {
                             coIO { ApiPermissionsPreference.putAsync(this@initEvents, Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }
                         }
                     }

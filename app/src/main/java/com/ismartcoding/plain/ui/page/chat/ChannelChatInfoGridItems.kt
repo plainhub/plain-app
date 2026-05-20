@@ -24,12 +24,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.VerticalSpace
 
 @Composable
@@ -85,13 +84,13 @@ internal fun AddMemberGridItem(onClick: () -> Unit) {
         ) {
             Icon(
                 painter = painterResource(Res.drawable.plus),
-                contentDescription = stringResource(R.string.manage_members),
+                contentDescription = stringResource(Res.string.manage_members),
                 modifier = Modifier.size(26.dp), tint = MaterialTheme.colorScheme.primary,
             )
         }
         VerticalSpace(dp = 4.dp)
         Text(
-            text = stringResource(R.string.add_member),
+            text = stringResource(Res.string.add_member),
             style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
             maxLines = 1, color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

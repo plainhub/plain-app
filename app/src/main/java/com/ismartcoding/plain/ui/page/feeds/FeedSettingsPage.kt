@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,11 +12,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.pluralStringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.feed.FeedAutoRefreshInterval
 import com.ismartcoding.plain.helpers.FormatHelper
@@ -48,10 +50,10 @@ fun FeedSettingsPage(
         }
 
         RadioDialog(
-            title = stringResource(R.string.auto_refresh_interval),
+            title = stringResource(Res.string.auto_refresh_interval),
             options = options.map {
                 RadioDialogOption(
-                    text = it.getText(),
+                    text = FormatHelper.formatSeconds(it.value) { res, qty, _ -> pluralStringResource(res, qty, qty) },
                     selected = it.value == feedSettingsVM.autoRefreshInterval.intValue,
                 ) {
                     feedSettingsVM.setAutoRefreshInterval(context, it.value)
@@ -68,7 +70,7 @@ fun FeedSettingsPage(
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(id = R.string.settings))
+            PTopAppBar(navController = navController, title = stringResource(Res.string.settings))
         },
     ) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
@@ -81,7 +83,7 @@ fun FeedSettingsPage(
                         modifier = Modifier.clickable {
                             feedSettingsVM.setAutoRefresh(context, !feedSettingsVM.autoRefresh.value)
                         },
-                        title = stringResource(id = R.string.auto_refresh_feeds),
+                        title = stringResource(Res.string.auto_refresh_feeds),
                     ) {
                         PSwitch(
                             activated = feedSettingsVM.autoRefresh.value,
@@ -95,15 +97,15 @@ fun FeedSettingsPage(
                             modifier = Modifier.clickable {
                                 feedSettingsVM.showIntervalDialog.value = true
                             },
-                            title = stringResource(id = R.string.auto_refresh_interval),
-                            value = FormatHelper.formatSeconds(feedSettingsVM.autoRefreshInterval.intValue),
+                            title = stringResource(Res.string.auto_refresh_interval),
+                            value = FormatHelper.formatSeconds(feedSettingsVM.autoRefreshInterval.intValue) { res, qty, _ -> pluralStringResource(res, qty, qty) },
                             showMore = true,
                         )
                         PListItem(
                             modifier = Modifier.clickable {
                                 feedSettingsVM.setAutoRefreshOnlyWifi(context, !feedSettingsVM.autoRefreshOnlyWifi.value)
                             },
-                            title = stringResource(id = R.string.auto_refresh_only_over_wifi),
+                            title = stringResource(Res.string.auto_refresh_only_over_wifi),
                         ) {
                             PSwitch(
                                 activated = feedSettingsVM.autoRefreshOnlyWifi.value,
@@ -116,7 +118,7 @@ fun FeedSettingsPage(
             }
             item {
                 VerticalSpace(dp = 48.dp)
-                PFilledButton(text = stringResource(id = R.string.clear_feed_items), type = ButtonType.DANGER, onClick = {
+                PFilledButton(text = stringResource(Res.string.clear_feed_items), type = ButtonType.DANGER, onClick = {
                     feedSettingsVM.showClearFeedsDialog.value = true
                 })
             }

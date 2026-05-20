@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.db
 
+import androidx.compose.runtime.Composable
+import com.ismartcoding.plain.i18n.*
+import org.jetbrains.compose.resources.stringResource
+
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
@@ -9,8 +13,6 @@ import androidx.room.Query
 import androidx.room.Update
 import com.ismartcoding.lib.extensions.urlEncode
 import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
 @Entity(tableName = "peers")
 data class DPeer(
@@ -47,10 +49,11 @@ data class DPeer(
         return "${getBaseUrl()}/fs?id=${fileId.urlEncode()}"
     }
 
+    @Composable
     fun getStatusText(): String {
         return when (status) {
-            "paired" -> getString(R.string.paired)
-            "unpaired" -> getString(R.string.unpaired)
+            "paired" -> stringResource(Res.string.paired)
+            "unpaired" -> stringResource(Res.string.unpaired)
             else -> ""
         }
     }

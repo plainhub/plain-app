@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -10,7 +12,6 @@ import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.helpers.FilePathValidator
@@ -97,7 +98,7 @@ fun FilesSelectModeBottomActions(
                                 filesVM.loadAsync(context)
                             }
                         } else {
-                            DialogHelper.showMessage(R.string.error)
+                            DialogHelper.showMessage(Res.string.error)
                         }
                         DialogHelper.hideLoading()
                         filesVM.exitSelectMode()

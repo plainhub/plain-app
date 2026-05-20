@@ -16,16 +16,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.VerticalSpace
 
 @Composable
 fun NoDataView(
     modifier: Modifier = Modifier,
-    message: String = stringResource(R.string.no_data),
+    message: String = stringResource(Res.string.no_data),
     icon: DrawableResource = Res.drawable.files,
     showRefreshButton: Boolean = false,
     onRefresh: () -> Unit = {}
@@ -60,7 +59,7 @@ fun NoDataView(
             FilledTonalButton(
                 onClick = onRefresh
             ) {
-                Text(text = stringResource(R.string.refresh))
+                Text(text = stringResource(Res.string.refresh))
             }
         }
     }

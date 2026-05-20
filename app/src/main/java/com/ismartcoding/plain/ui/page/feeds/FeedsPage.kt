@@ -19,13 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -63,8 +62,8 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
     FeedsPageEffects(feedsVM)
     BackHandler(enabled = feedsVM.selectMode.value) { feedsVM.exitSelectMode() }
     AddFeedDialog(feedsVM); EditFeedDialog(feedsVM); ViewFeedBottomSheet(feedsVM)
-    val pageTitle = if (feedsVM.selectMode.value) LocaleHelper.getStringF(R.string.x_selected, "count", feedsVM.selectedIds.size)
-    else LocaleHelper.getStringF(R.string.subscriptions_title, "count", itemsState.size)
+    val pageTitle = if (feedsVM.selectMode.value) LocaleHelper.getStringSyncF(Res.string.x_selected, "count", feedsVM.selectedIds.size)
+    else LocaleHelper.getStringSyncF(Res.string.subscriptions_title, "count", itemsState.size)
 
     PScaffold(
         topBar = {
@@ -72,17 +71,17 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
                 if (feedsVM.selectMode.value) NavigationCloseIcon { feedsVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() }
             }, title = pageTitle, actions = {
                 if (feedsVM.selectMode.value) {
-                    PTopRightButton(label = stringResource(if (feedsVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { feedsVM.toggleSelectAll() })
+                    PTopRightButton(label = stringResource(if (feedsVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { feedsVM.toggleSelectAll() })
                     HorizontalSpace(dp = 8.dp)
                 } else {
                     ActionButtonMoreWithMenu { dismiss ->
                         PDropdownMenuItem(
-                            text = { Text(stringResource(R.string.import_opml_file)) },
-                            leadingIcon = { Icon(painter = painterResource(Res.drawable.upload), contentDescription = stringResource(R.string.import_opml_file)) },
+                            text = { Text(stringResource(Res.string.import_opml_file)) },
+                            leadingIcon = { Icon(painter = painterResource(Res.drawable.upload), contentDescription = stringResource(Res.string.import_opml_file)) },
                             onClick = { dismiss(); sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false)) })
                         PDropdownMenuItem(
-                            text = { Text(stringResource(R.string.export_opml_file)) },
-                            leadingIcon = { Icon(painter = painterResource(Res.drawable.download), contentDescription = stringResource(R.string.export_opml_file)) },
+                            text = { Text(stringResource(Res.string.export_opml_file)) },
+                            leadingIcon = { Icon(painter = painterResource(Res.drawable.download), contentDescription = stringResource(Res.string.export_opml_file)) },
                             onClick = { dismiss(); sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + Date().formatName() + ".opml")) })
                     }
                 }
@@ -95,7 +94,7 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
             {
                 PDraggableElement {
                     FloatingActionButton(onClick = { feedsVM.showAddDialog() }) {
-                        Icon(painter = painterResource(Res.drawable.plus), stringResource(R.string.add))
+                        Icon(painter = painterResource(Res.drawable.plus), stringResource(Res.string.add))
                     }
                 }
             }

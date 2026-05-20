@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,9 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.QrCodeGenerateHelper
 
 @Composable
@@ -27,7 +28,7 @@ fun WebAddressBarQrDialog(
         onDismissRequest = onClose,
         confirmButton = {
             Button(onClick = onClose) {
-                Text(stringResource(id = R.string.close))
+                Text(stringResource(Res.string.close))
             }
         },
         title = {},
@@ -37,13 +38,13 @@ fun WebAddressBarQrDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = stringResource(id = R.string.scan_qrcode_to_access_web),
+                    text = stringResource(Res.string.scan_qrcode_to_access_web),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Image(
                     bitmap = QrCodeGenerateHelper.generate(url, 300, 300).asImageBitmap(),
-                    contentDescription = stringResource(id = R.string.qrcode),
+                    contentDescription = stringResource(Res.string.qrcode),
                     modifier = Modifier.size(300.dp),
                 )
             }

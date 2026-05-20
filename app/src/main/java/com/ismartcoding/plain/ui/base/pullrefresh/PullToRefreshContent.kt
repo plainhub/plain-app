@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.base.pullrefresh
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -8,10 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import kotlin.math.abs
 
@@ -19,14 +20,14 @@ import kotlin.math.abs
 fun RefreshLayoutState.PullToRefreshContent(
     createText: @Composable (RefreshContentState) -> String = {
         when (it) {
-            RefreshContentState.Failed -> stringResource(id = R.string.srl_header_failed)
-            RefreshContentState.Finished -> stringResource(id = R.string.srl_header_finish)
-            RefreshContentState.Refreshing -> stringResource(id = R.string.srl_header_refreshing)
+            RefreshContentState.Failed -> stringResource(Res.string.srl_header_failed)
+            RefreshContentState.Finished -> stringResource(Res.string.srl_header_finish)
+            RefreshContentState.Refreshing -> stringResource(Res.string.srl_header_refreshing)
             RefreshContentState.Dragging -> {
                 if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) {
-                    stringResource(id = R.string.srl_header_pulling)
+                    stringResource(Res.string.srl_header_pulling)
                 } else {
-                    stringResource(id = R.string.srl_header_release)
+                    stringResource(Res.string.srl_header_release)
                 }
             }
         }

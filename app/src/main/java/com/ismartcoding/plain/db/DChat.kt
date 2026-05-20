@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.db
 
+import com.ismartcoding.plain.features.locale.LocaleHelper
+
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Dao
@@ -12,9 +16,7 @@ import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
 import kotlin.time.Instant
 import com.ismartcoding.plain.helpers.TimeHelper
@@ -225,7 +227,7 @@ data class DChat(
         return when (content.type) {
             DMessageType.TEXT.value -> {
                 val textMessage = content.value as? DMessageText
-                textMessage?.text?.take(50) ?: getString(R.string.message)
+                textMessage?.text?.take(50) ?: LocaleHelper.getStringSync(Res.string.message)
             }
 
             DMessageType.IMAGES.value -> {
@@ -235,17 +237,17 @@ data class DChat(
                 val imageCount = items.size - videoCount
                 when {
                     imageCount > 0 && videoCount > 0 -> {
-                        val imgPart = if (imageCount > 1) "$imageCount ${getString(R.string.images)}" else getString(R.string.image)
-                        val vidPart = if (videoCount > 1) "$videoCount ${getString(R.string.videos)}" else getString(R.string.video)
+                        val imgPart = if (imageCount > 1) "$imageCount ${LocaleHelper.getStringSync(Res.string.images)}" else LocaleHelper.getStringSync(Res.string.image)
+                        val vidPart = if (videoCount > 1) "$videoCount ${LocaleHelper.getStringSync(Res.string.videos)}" else LocaleHelper.getStringSync(Res.string.video)
                         "$imgPart, $vidPart"
                     }
 
                     videoCount > 0 -> {
-                        if (videoCount > 1) "$videoCount ${getString(R.string.videos)}" else getString(R.string.video)
+                        if (videoCount > 1) "$videoCount ${LocaleHelper.getStringSync(Res.string.videos)}" else LocaleHelper.getStringSync(Res.string.video)
                     }
 
                     else -> {
-                        if (imageCount > 1) "$imageCount ${getString(R.string.images)}" else getString(R.string.image)
+                        if (imageCount > 1) "$imageCount ${LocaleHelper.getStringSync(Res.string.images)}" else LocaleHelper.getStringSync(Res.string.image)
                     }
                 }
             }
@@ -254,13 +256,13 @@ data class DChat(
                 val filesMessage = content.value as? DMessageFiles
                 val count = filesMessage?.items?.size ?: 0
                 if (count > 1) {
-                    "$count ${getString(R.string.files)}"
+                    "$count ${LocaleHelper.getStringSync(Res.string.files)}"
                 } else {
-                    getString(R.string.file)
+                    LocaleHelper.getStringSync(Res.string.file)
                 }
             }
 
-            else -> getString(R.string.message)
+            else -> LocaleHelper.getStringSync(Res.string.message)
         }
     }
 

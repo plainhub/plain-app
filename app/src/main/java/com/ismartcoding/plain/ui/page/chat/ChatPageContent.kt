@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,13 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -95,12 +96,12 @@ fun ChatPageContent(
         if (channelInactive) {
             Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
                 Text(
-                    text = stringResource(if (channelStatus == DChatChannel.STATUS_KICKED) R.string.channel_kicked_notice else R.string.channel_left_notice),
+                    text = stringResource(if (channelStatus == DChatChannel.STATUS_KICKED) Res.string.channel_kicked_notice else Res.string.channel_left_notice),
                     color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, textAlign = TextAlign.Center,
                 )
             }
         } else if (!chatVM.showBottomActions() && (peer == null || peer.status == "paired")) {
-            ChatInput(value = inputValue, hint = stringResource(R.string.chat_input_hint), onValueChange = onInputChange, onSend = onSend)
+            ChatInput(value = inputValue, hint = stringResource(Res.string.chat_input_hint), onValueChange = onInputChange, onSend = onSend)
         }
     }
 
@@ -109,8 +110,8 @@ fun ChatPageContent(
             onTargetSelected = { target ->
                 messageToForward?.let { message ->
                     when (target) {
-                        is ForwardTarget.Local -> chatVM.forwardMessageToLocal(message.id) { DialogHelper.showSuccess(R.string.sent) }
-                        is ForwardTarget.Peer -> chatVM.forwardMessage(message.id, target.peer) { DialogHelper.showSuccess(R.string.sent) }
+                        is ForwardTarget.Local -> chatVM.forwardMessageToLocal(message.id) { DialogHelper.showSuccess(Res.string.sent) }
+                        is ForwardTarget.Peer -> chatVM.forwardMessage(message.id, target.peer) { DialogHelper.showSuccess(Res.string.sent) }
                     }
                 }
             })

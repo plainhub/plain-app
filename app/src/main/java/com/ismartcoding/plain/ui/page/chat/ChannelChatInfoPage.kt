@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.clickable
 import com.ismartcoding.plain.ui.models.leaveChannel
 import androidx.compose.foundation.layout.Arrangement
@@ -18,10 +20,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.ButtonType
@@ -65,20 +66,20 @@ fun ChannelChatInfoPage(
     val joinedMemberPeers = memberPeers.value.filter { peer -> liveChannel?.findMember(peer.id)?.isJoined() != false }
     val pendingMemberPeers = memberPeers.value.filter { peer -> liveChannel?.findMember(peer.id)?.isPending() == true }
 
-    val clearMessagesText = stringResource(R.string.clear_messages)
-    val clearMessagesConfirmText = stringResource(R.string.clear_messages_confirm)
-    val cancelText = stringResource(R.string.cancel)
-    val deleteChannelText = stringResource(R.string.delete_channel)
-    val deleteChannelWarningText = stringResource(R.string.delete_channel_warning)
-    val leaveChannelText = stringResource(R.string.leave_channel)
-    val leaveChannelWarningText = stringResource(R.string.leave_channel_warning)
+    val clearMessagesText = stringResource(Res.string.clear_messages)
+    val clearMessagesConfirmText = stringResource(Res.string.clear_messages_confirm)
+    val cancelText = stringResource(Res.string.cancel)
+    val deleteChannelText = stringResource(Res.string.delete_channel)
+    val deleteChannelWarningText = stringResource(Res.string.delete_channel_warning)
+    val leaveChannelText = stringResource(Res.string.leave_channel)
+    val leaveChannelWarningText = stringResource(Res.string.leave_channel_warning)
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController, navigationIcon = { NavigationBackIcon { navController.navigateUp() } }, title = stringResource(R.string.chat_info))
+        PTopAppBar(navController = navController, navigationIcon = { NavigationBackIcon { navController.navigateUp() } }, title = stringResource(Res.string.chat_info))
     }) { paddingValues ->
         LazyColumn(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
             if (liveChannel != null) {
-                item { Subtitle(text = "${stringResource(R.string.members)} (${joinedMemberPeers.size})") }
+                item { Subtitle(text = "${stringResource(Res.string.members)} (${joinedMemberPeers.size})") }
                 item {
                     FlowRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         joinedMemberPeers.forEach { MemberGridItem(name = it.name.ifBlank { it.getBestIp() }, iconRes = DeviceType.fromValue(it.deviceType).getIcon(), onClick = { selectedMemberPeer.value = it }) }
@@ -87,7 +88,7 @@ fun ChannelChatInfoPage(
                 }
                 if (isOwner && pendingMemberPeers.isNotEmpty()) {
                     item { VerticalSpace(dp = 16.dp) }
-                    item { Subtitle(text = "${stringResource(R.string.pending_members)} (${pendingMemberPeers.size})") }
+                    item { Subtitle(text = "${stringResource(Res.string.pending_members)} (${pendingMemberPeers.size})") }
                     item {
                         FlowRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             pendingMemberPeers.forEach { MemberGridItem(name = it.name.ifBlank { it.getBestIp() }, iconRes = DeviceType.fromValue(it.deviceType).getIcon(), onClick = { selectedPendingMemberPeer.value = it }) }
@@ -95,12 +96,12 @@ fun ChannelChatInfoPage(
                     }
                 }
                 item { VerticalSpace(dp = 16.dp) }
-                item { PCard { PListItem(modifier = if (isOwner) Modifier.clickable { showRenameDialog.value = true } else Modifier, title = stringResource(R.string.channel_name), value = liveChannel.name, showMore = isOwner) } }
+                item { PCard { PListItem(modifier = if (isOwner) Modifier.clickable { showRenameDialog.value = true } else Modifier, title = stringResource(Res.string.channel_name), value = liveChannel.name, showMore = isOwner) } }
             }
             item { VerticalSpace(dp = 24.dp) }
             item {
                 POutlinedButton(text = clearMessagesText, type = ButtonType.DANGER, modifier = Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 16.dp), onClick = {
-                    DialogHelper.showConfirmDialog(title = clearMessagesText, message = clearMessagesConfirmText, confirmButton = Pair(clearMessagesText) { chatVM.clearAllMessages(context); navController.navigateUp(); DialogHelper.showSuccess(R.string.messages_cleared) }, dismissButton = Pair(cancelText) {})
+                    DialogHelper.showConfirmDialog(title = clearMessagesText, message = clearMessagesConfirmText, confirmButton = Pair(clearMessagesText) { chatVM.clearAllMessages(context); navController.navigateUp(); DialogHelper.showSuccess(Res.string.messages_cleared) }, dismissButton = Pair(cancelText) {})
                 })
             }
             if (liveChannel != null && isOwner) {

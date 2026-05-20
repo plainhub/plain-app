@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -10,7 +12,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.audio.AudioMediaStoreHelper
@@ -75,7 +76,7 @@ fun AudioFilesSelectModeBottomActions(
                             audioPlaylistVM.addAsync(context, selectedItems)
                         }
                         dragSelectState.exitSelectMode()
-                        DialogHelper.showMessage(R.string.added_to_playlist)
+                        DialogHelper.showMessage(Res.string.added_to_playlist)
                     }
                 }
                 IconTextSmallButtonShare {

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.home
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
@@ -12,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -99,12 +100,12 @@ fun HomeWeb(
 
 private fun buildHomeWebErrorMessage(mainVM: MainViewModel): String {
     return if (HttpServerManager.portsInUse.isNotEmpty()) {
-        LocaleHelper.getStringF(
-            if (HttpServerManager.portsInUse.size > 1) R.string.http_port_conflict_errors else R.string.http_port_conflict_error,
+        LocaleHelper.getStringSyncF(
+            if (HttpServerManager.portsInUse.size > 1) Res.string.http_port_conflict_errors else Res.string.http_port_conflict_error,
             "port",
             HttpServerManager.portsInUse.joinToString(", "),
         )
     } else {
-        mainVM.httpServerError.ifEmpty { LocaleHelper.getString(R.string.http_server_failed) }
+        mainVM.httpServerError.ifEmpty { LocaleHelper.getStringSync(Res.string.http_server_failed) }
     }
 }

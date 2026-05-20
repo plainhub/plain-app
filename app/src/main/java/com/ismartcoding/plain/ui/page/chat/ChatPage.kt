@@ -19,11 +19,10 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
@@ -92,7 +91,7 @@ fun ChatPage(
     }
 
     val pageTitle = if (chatVM.selectMode.value) {
-        LocaleHelper.getStringF(R.string.x_selected, "count", chatVM.selectedIds.size)
+        LocaleHelper.getStringSyncF(Res.string.x_selected, "count", chatVM.selectedIds.size)
     } else {
         val state = chatState.value
         if (state.chatType == ChatType.CHANNEL) {
@@ -116,10 +115,10 @@ fun ChatPage(
                 title = pageTitle,
                 actions = {
                     if (chatVM.selectMode.value) {
-                        PTopRightButton(label = stringResource(if (chatVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { chatVM.toggleSelectAll() })
+                        PTopRightButton(label = stringResource(if (chatVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { chatVM.toggleSelectAll() })
                         HorizontalSpace(dp = 8.dp)
                     } else {
-                        PIconButton(icon = Res.drawable.ellipsis_vertical, contentDescription = stringResource(R.string.more), click = { navController.navigate(Routing.ChatInfo(id.ifEmpty { "local" })) })
+                        PIconButton(icon = Res.drawable.ellipsis_vertical, contentDescription = stringResource(Res.string.more), click = { navController.navigate(Routing.ChatInfo(id.ifEmpty { "local" })) })
                     }
                 },
             )

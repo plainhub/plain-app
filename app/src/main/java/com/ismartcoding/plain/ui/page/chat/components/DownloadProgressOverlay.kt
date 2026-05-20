@@ -8,10 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.download.DownloadStatus
 import com.ismartcoding.plain.ui.base.PIconButton
 
@@ -51,7 +50,7 @@ private fun DownloadActionButton(
             icon = Res.drawable.pause,
             click = onPause,
             tint = Color.White,
-            contentDescription = stringResource(R.string.pause),
+            contentDescription = stringResource(Res.string.pause),
             modifier = Modifier.size(24.dp)
         )
 
@@ -59,7 +58,7 @@ private fun DownloadActionButton(
             icon = Res.drawable.download,
             click = onResume,
             tint = Color.White,
-            contentDescription = stringResource(R.string.resume),
+            contentDescription = stringResource(Res.string.resume),
             modifier = Modifier.size(24.dp)
         )
 
@@ -67,7 +66,7 @@ private fun DownloadActionButton(
             icon = Res.drawable.x,
             click = onCancel,
             tint = Color.White,
-            contentDescription = stringResource(R.string.cancel),
+            contentDescription = stringResource(Res.string.cancel),
             modifier = Modifier.size(24.dp)
         )
 
@@ -75,7 +74,7 @@ private fun DownloadActionButton(
             icon = Res.drawable.circle_alert,
             click = onResume,
             tint = Color.White,
-            contentDescription = stringResource(R.string.try_again),
+            contentDescription = stringResource(Res.string.try_again),
             modifier = Modifier.size(24.dp)
         )
 

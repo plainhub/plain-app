@@ -5,8 +5,7 @@ import com.ismartcoding.plain.i18n.*
 import android.content.ClipData
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
@@ -16,7 +15,7 @@ fun CopyIconButton(
     clipLabel: String,
     modifier: Modifier = Modifier,
     icon: DrawableResource = Res.drawable.copy,
-    contentDescription: String = stringResource(R.string.copy_text),
+    contentDescription: String = stringResource(Res.string.copy_text),
     copiedMessage: String = text,
     onCopied: (() -> Unit)? = null,
 ) {

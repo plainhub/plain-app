@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageStatusData
 
 @Composable
@@ -38,12 +39,12 @@ fun ChannelDeliveryStatusDialog(
         title = {
             Column {
                 Text(
-                    text = stringResource(R.string.delivery_status),
+                    text = stringResource(Res.string.delivery_status),
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
                     text = stringResource(
-                        R.string.delivery_status_summary,
+                        Res.string.delivery_status_summary,
                         statusData.deliveredCount,
                         statusData.total,
                     ),
@@ -83,12 +84,12 @@ fun ChannelDeliveryStatusDialog(
                     onDismiss()
                 },
             ) {
-                Text(text = stringResource(R.string.resend_selected))
+                Text(text = stringResource(Res.string.resend_selected))
             }
         },
         dismissButton = {
             OutlinedButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.close))
+                Text(text = stringResource(Res.string.close))
             }
         },
     )

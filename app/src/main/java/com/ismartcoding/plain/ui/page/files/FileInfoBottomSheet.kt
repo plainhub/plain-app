@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.files
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ClipData
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,12 +13,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getMimeType
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -85,21 +86,21 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                 VerticalSpace(dp = 24.dp)
                 PCard {
                     PListItem(title = file.path, action = {
-                        CopyIconButton(text = file.path, clipLabel = stringResource(R.string.file_path))
+                        CopyIconButton(text = file.path, clipLabel = stringResource(Res.string.file_path))
                     })
                 }
                 VerticalSpace(dp = 16.dp)
                 PCard {
                     if (!file.isDir) {
-                        PListItem(title = stringResource(id = R.string.file_size), value = file.size.formatBytes())
+                        PListItem(title = stringResource(Res.string.file_size), value = file.size.formatBytes())
                     }
-                    PListItem(title = stringResource(id = R.string.type), value = if (file.isDir) stringResource(id = R.string.folder) else file.path.getMimeType())
+                    PListItem(title = stringResource(Res.string.type), value = if (file.isDir) stringResource(Res.string.folder) else file.path.getMimeType())
                     file.createdAt?.let {
-                        PListItem(title = stringResource(id = R.string.created_at), value = it.formatDateTime())
+                        PListItem(title = stringResource(Res.string.created_at), value = it.formatDateTime())
                     }
-                    PListItem(title = stringResource(id = R.string.updated_at), value = file.updatedAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.updated_at), value = file.updatedAt.formatDateTime())
                     if (file.isDir && file.children > 0) {
-                        PListItem(title = stringResource(id = R.string.items), value = file.children.toString())
+                        PListItem(title = stringResource(Res.string.items), value = file.children.toString())
                     }
                 }
             }

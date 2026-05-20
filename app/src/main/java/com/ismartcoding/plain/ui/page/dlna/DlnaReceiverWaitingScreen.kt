@@ -24,10 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
@@ -49,12 +48,12 @@ fun DlnaReceiverWaitingScreen() {
             ) {
                 DlnaRippleAnimation()
                 Text(
-                    text = stringResource(R.string.dlna_receiver_waiting_title),
+                    text = stringResource(Res.string.dlna_receiver_waiting_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    text = stringResource(R.string.dlna_receiver_waiting_desc, deviceName),
+                    text = stringResource(Res.string.dlna_receiver_waiting_desc, deviceName),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -63,22 +62,22 @@ fun DlnaReceiverWaitingScreen() {
         VerticalSpace(16.dp)
         PCard {
             PListItem(
-                title = stringResource(R.string.dlna_receiver_step1_title),
-                subtitle = stringResource(R.string.dlna_receiver_step1_desc),
+                title = stringResource(Res.string.dlna_receiver_step1_title),
+                subtitle = stringResource(Res.string.dlna_receiver_step1_desc),
                 start = { StepNumber(1) },
             )
             PListItem(
-                title = stringResource(R.string.dlna_receiver_step2_title),
-                subtitle = stringResource(R.string.dlna_receiver_step2_desc),
+                title = stringResource(Res.string.dlna_receiver_step2_title),
+                subtitle = stringResource(Res.string.dlna_receiver_step2_desc),
                 start = { StepNumber(2) },
             )
             PListItem(
-                title = stringResource(R.string.dlna_receiver_step3_title),
-                subtitle = stringResource(R.string.dlna_receiver_step3_desc, deviceName),
+                title = stringResource(Res.string.dlna_receiver_step3_title),
+                subtitle = stringResource(Res.string.dlna_receiver_step3_desc, deviceName),
                 start = { StepNumber(3) },
             )
         }
-        Tips(text = stringResource(R.string.dlna_receiver_protocol_note))
+        Tips(text = stringResource(Res.string.dlna_receiver_protocol_note))
     }
 }
 

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.tags
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -15,9 +17,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.ui.base.PSelectionChip
@@ -45,7 +46,7 @@ fun BatchSelectTagsDialog(
             onDismiss()
         },
         title = {
-            Text(text = stringResource(id = if (removeFromTags) R.string.remove_from_tags else R.string.add_to_tags),
+            Text(text = stringResource(if (removeFromTags) Res.string.remove_from_tags else Res.string.add_to_tags),
                 style = MaterialTheme.typography.titleLarge
             )
         },
@@ -86,13 +87,13 @@ fun BatchSelectTagsDialog(
                     onDismiss()
                 },
             ) {
-                Text(stringResource(id = R.string.save))
+                Text(stringResource(Res.string.save))
             }
         }, dismissButton = {
             TextButton(onClick = {
                 onDismiss()
             }) {
-                Text(text = stringResource(id = R.string.cancel))
+                Text(text = stringResource(Res.string.cancel))
             }
         })
 }

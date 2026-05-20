@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.contentResolver
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileTag
@@ -46,7 +47,7 @@ fun FeedsPageEffects(feedsVM: FeedsViewModel) {
                             withIO { FeedHelper.exportAsync(writer) }
                         }
                         val fileName = contentResolver.queryOpenableFileName(event.uri)
-                        DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
+                        DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.exported_to, "name", fileName))
                     }
                 }
             }

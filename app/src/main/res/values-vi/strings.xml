@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Điều khiển từ xa PlainApp</string>
+    <string name="accessibility_service_description">PlainApp sử dụng dịch vụ hỗ trợ tiếp cận này để bật điều khiển từ xa khi phản chiếu màn hình. Nó chèn các sự kiện chạm (chạm, vuốt, cuộn) và các thao tác điều hướng (Quay lại, Trang chủ, Gần đây) được gửi từ giao diện web.</string>
+</resources>

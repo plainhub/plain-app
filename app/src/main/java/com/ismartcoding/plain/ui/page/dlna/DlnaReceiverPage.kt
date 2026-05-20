@@ -26,11 +26,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.dlna.DlnaMediaType
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
@@ -70,13 +69,13 @@ fun DlnaReceiverPage(
 
     pendingCastRequest?.let { pending ->
         var rememberChoice by remember { mutableStateOf(false) }
-        val displayName = pending.senderName.ifEmpty { pending.senderIp.ifEmpty { stringResource(R.string.unknown) } }
+        val displayName = pending.senderName.ifEmpty { pending.senderIp.ifEmpty { stringResource(Res.string.unknown) } }
         AlertDialog(
             onDismissRequest = {},
-            title = { Text(stringResource(R.string.dlna_cast_request_title)) },
+            title = { Text(stringResource(Res.string.dlna_cast_request_title)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(R.string.dlna_cast_request_desc, displayName))
+                    Text(stringResource(Res.string.dlna_cast_request_desc, displayName))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth(),
@@ -86,7 +85,7 @@ fun DlnaReceiverPage(
                             onCheckedChange = { rememberChoice = it },
                         )
                         Text(
-                            text = stringResource(R.string.dlna_cast_remember_choice),
+                            text = stringResource(Res.string.dlna_cast_remember_choice),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
@@ -94,12 +93,12 @@ fun DlnaReceiverPage(
             },
             confirmButton = {
                 Button(onClick = { vm.acceptCastRequest(context, rememberChoice) }) {
-                    Text(stringResource(R.string.dlna_cast_accept))
+                    Text(stringResource(Res.string.dlna_cast_accept))
                 }
             },
             dismissButton = {
                 OutlinedButton(onClick = { vm.rejectCastRequest(context, rememberChoice) }) {
-                    Text(stringResource(R.string.dlna_cast_reject))
+                    Text(stringResource(Res.string.dlna_cast_reject))
                 }
             },
         )
@@ -123,11 +122,11 @@ fun DlnaReceiverPage(
         topBar = {
             PTopAppBar(
                 navController = navController,
-                title = stringResource(R.string.dlna_receiver),
+                title = stringResource(Res.string.dlna_receiver),
                 actions = {
                     PIconButton(
                         icon = Res.drawable.history,
-                        contentDescription = stringResource(R.string.dlna_cast_history),
+                        contentDescription = stringResource(Res.string.dlna_cast_history),
                         tint = MaterialTheme.colorScheme.onSurface
                     ) { navController.navigate(Routing.DlnaCastHistory) }
                 },
@@ -147,7 +146,7 @@ fun DlnaReceiverPage(
                         type = AlertType.ERROR,
                         actions = {
                             PFilledButton(
-                                stringResource(R.string.retry),
+                                stringResource(Res.string.retry),
                                 buttonSize = ButtonSize.SMALL,
                                 isLoading = isRetrying,
                                 onClick = { vm.retryReceiver(context) }

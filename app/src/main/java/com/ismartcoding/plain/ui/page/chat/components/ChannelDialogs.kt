@@ -1,8 +1,9 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 
 @Composable
@@ -11,8 +12,8 @@ fun CreateChannelDialog(
     onConfirm: (String) -> Unit,
 ) {
     TextFieldDialog(
-        title = stringResource(R.string.new_channel),
-        placeholder = stringResource(R.string.channel_name_hint),
+        title = stringResource(Res.string.new_channel),
+        placeholder = stringResource(Res.string.channel_name_hint),
         onDismissRequest = onDismiss,
         onConfirm = { name ->
             onConfirm(name.trim())
@@ -28,9 +29,9 @@ fun RenameChannelDialog(
     onConfirm: (String) -> Unit,
 ) {
     TextFieldDialog(
-        title = stringResource(R.string.rename_channel),
+        title = stringResource(Res.string.rename_channel),
         value = currentName,
-        placeholder = stringResource(R.string.channel_name_hint),
+        placeholder = stringResource(Res.string.channel_name_hint),
         onDismissRequest = onDismiss,
         onConfirm = { name ->
             onConfirm(name.trim())

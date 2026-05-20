@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.web
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,10 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPackage
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -54,7 +55,7 @@ fun NotificationAppListItem(
             Text(text = app.id, style = MaterialTheme.typography.listItemSubtitle())
         }
         TextButton(onClick = onRemove) {
-            Text(stringResource(R.string.remove), color = MaterialTheme.colorScheme.red)
+            Text(stringResource(Res.string.remove), color = MaterialTheme.colorScheme.red)
         }
     }
     VerticalSpace(dp = 8.dp)

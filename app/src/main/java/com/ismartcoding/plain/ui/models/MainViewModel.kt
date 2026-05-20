@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +13,6 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
@@ -52,8 +53,8 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                     sendEvent(StartHttpServerEvent())
                 } else {
                     DialogHelper.showConfirmDialog(
-                        LocaleHelper.getString(R.string.confirm),
-                        LocaleHelper.getString(R.string.foreground_service_notification_prompt)
+                        LocaleHelper.getString(Res.string.confirm),
+                        LocaleHelper.getString(Res.string.foreground_service_notification_prompt)
                     ) {
                         coIO {
                             Permissions.ensureNotificationAsync(context)

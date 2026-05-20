@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -15,14 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DLinkPreview
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
@@ -39,7 +40,7 @@ fun ChatLinkPreview(linkPreview: DLinkPreview, modifier: Modifier = Modifier) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     AsyncImage(
                         model = linkPreview.imageLocalPath.getFinalPath(context),
-                        contentDescription = stringResource(R.string.link_preview_image),
+                        contentDescription = stringResource(Res.string.link_preview_image),
                         modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp, max = 200.dp),
                         contentScale = ContentScale.Fit
                     )

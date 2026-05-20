@@ -11,7 +11,6 @@ import androidx.room.Update
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.SignatureHelper

@@ -9,12 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPackageDetail
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.PackageHelper
@@ -60,7 +59,7 @@ fun AppPage(navController: NavHostController, id: String) {
         topBar = {
             PTopAppBar(navController = navController, title = item?.name ?: "", actions = {
                 if (isShareable) {
-                    PIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(R.string.share),
+                    PIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface) {
                         item?.let { pkg ->
                             ShareHelper.shareFile(context, File(pkg.path), displayName = "${pkg.name.replace(" ", "")}-${pkg.id}.apk")
@@ -77,17 +76,17 @@ fun AppPage(navController: NavHostController, id: String) {
                 item {
                     VerticalSpace(dp = 16.dp)
                     PCard {
-                        PListItem(title = stringResource(R.string.source_directory), subtitle = pkg.appInfo.sourceDir ?: "")
-                        PListItem(title = stringResource(R.string.data_directory), subtitle = pkg.appInfo.dataDir ?: "")
+                        PListItem(title = stringResource(Res.string.source_directory), subtitle = pkg.appInfo.sourceDir ?: "")
+                        PListItem(title = stringResource(Res.string.data_directory), subtitle = pkg.appInfo.dataDir ?: "")
                     }
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
                     PCard {
-                        PListItem(title = stringResource(R.string.app_size), value = pkg.size.formatBytes())
-                        PListItem(title = "SDK", value = LocaleHelper.getStringF(R.string.sdk, "target", pkg.appInfo.targetSdkVersion, "min", pkg.appInfo.minSdkVersion))
-                        PListItem(title = stringResource(R.string.installed_at), value = pkg.installedAt.formatDateTime())
-                        PListItem(title = stringResource(R.string.updated_at), value = pkg.updatedAt.formatDateTime())
+                        PListItem(title = stringResource(Res.string.app_size), value = pkg.size.formatBytes())
+                        PListItem(title = "SDK", value = LocaleHelper.getStringSyncF(Res.string.sdk, "target", pkg.appInfo.targetSdkVersion, "min", pkg.appInfo.minSdkVersion))
+                        PListItem(title = stringResource(Res.string.installed_at), value = pkg.installedAt.formatDateTime())
+                        PListItem(title = stringResource(Res.string.updated_at), value = pkg.updatedAt.formatDateTime())
                     }
                 }
                 item { BottomSpace(paddingValues) }

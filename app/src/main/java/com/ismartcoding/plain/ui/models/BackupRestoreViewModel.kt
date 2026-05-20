@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
@@ -9,11 +11,9 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.contentResolver
 import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.lib.helpers.ZipHelper
@@ -43,11 +43,11 @@ class BackupRestoreViewModel : ViewModel() {
                 tmpFile.copyTo(destFile, overwrite = true)
                 tmpFile.delete()
                 DialogHelper.hideLoading()
-                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.exported_to, "name", destFile.absolutePath))
+                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.exported_to, "name", destFile.absolutePath))
             } catch (e: Throwable) {
                 LogCat.e("Backup failed: ${e.message}")
                 DialogHelper.hideLoading()
-                DialogHelper.showMessage(e.message ?: getString(R.string.error))
+                DialogHelper.showMessage(e.message ?: LocaleHelper.getString(Res.string.error))
             }
         }
     }
@@ -63,11 +63,11 @@ class BackupRestoreViewModel : ViewModel() {
                 }
                 val fileName = contentResolver.queryOpenableFileName(uri)
                 DialogHelper.hideLoading()
-                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
+                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.exported_to, "name", fileName))
             } catch (e: Throwable) {
                 LogCat.e("Backup failed: ${e.message}")
                 DialogHelper.hideLoading()
-                DialogHelper.showMessage(e.message ?: getString(R.string.error))
+                DialogHelper.showMessage(e.message ?: LocaleHelper.getString(Res.string.error))
             }
         }
     }
@@ -79,7 +79,7 @@ class BackupRestoreViewModel : ViewModel() {
                 val fileName = contentResolver.queryOpenableFileName(uri)
                 if (!fileName.endsWith(".zip")) {
                     DialogHelper.hideLoading()
-                    DialogHelper.showMessage(R.string.invalid_file)
+                    DialogHelper.showMessage(Res.string.invalid_file)
                     return@launch
                 }
                 contentResolver.openInputStream(uri)?.use { stream ->
@@ -104,13 +104,13 @@ class BackupRestoreViewModel : ViewModel() {
                     destFile.deleteRecursively()
                 }
                 DialogHelper.hideLoading()
-                DialogHelper.showConfirmDialog("", getString(R.string.app_restored)) {
+                DialogHelper.showConfirmDialog("", LocaleHelper.getString(Res.string.app_restored)) {
                     sendEvent(RestartAppEvent())
                 }
             } catch (e: Throwable) {
                 LogCat.e("Restore failed: ${e.message}")
                 DialogHelper.hideLoading()
-                DialogHelper.showMessage(e.message ?: getString(R.string.error))
+                DialogHelper.showMessage(e.message ?: LocaleHelper.getString(Res.string.error))
             }
         }
     }

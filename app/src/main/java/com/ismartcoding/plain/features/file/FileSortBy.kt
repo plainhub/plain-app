@@ -1,9 +1,11 @@
 package com.ismartcoding.plain.features.file
 
+import com.ismartcoding.plain.i18n.*
+
 import android.provider.MediaStore
+import org.jetbrains.compose.resources.StringResource
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
-import com.ismartcoding.plain.R
 
 enum class FileSortBy {
     DATE_ASC,
@@ -15,28 +17,28 @@ enum class FileSortBy {
     TAKEN_AT_DESC,
     ;
 
-    fun getTextId(): Int {
+    fun getTextId(): StringResource {
         return when (this) {
             NAME_ASC -> {
-                R.string.name_asc
+                Res.string.name_asc
             }
             NAME_DESC -> {
-                R.string.name_desc
+                Res.string.name_desc
             }
             DATE_ASC -> {
-                R.string.oldest_date_first
+                Res.string.oldest_date_first
             }
             DATE_DESC -> {
-                R.string.newest_date_first
+                Res.string.newest_date_first
             }
             SIZE_ASC -> {
-                R.string.smallest_first
+                Res.string.smallest_first
             }
             SIZE_DESC -> {
-                R.string.largest_first
+                Res.string.largest_first
             }
             TAKEN_AT_DESC -> {
-                R.string.group_by_taken_at
+                Res.string.group_by_taken_at
             }
         }
     }

@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.components.mediaviewer
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import com.ismartcoding.plain.R
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
@@ -64,7 +65,7 @@ internal fun ViewMediaActionButtons(
 internal fun ViewMediaPathCard(m: PreviewItem) {
     PCard {
         PListItem(title = m.path, action = {
-            CopyIconButton(text = m.path, clipLabel = stringResource(R.string.file_path))
+            CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
         })
     }
 }

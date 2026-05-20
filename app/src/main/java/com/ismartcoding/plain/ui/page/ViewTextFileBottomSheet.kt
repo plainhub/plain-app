@@ -1,18 +1,19 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.file.DFile
@@ -88,21 +89,21 @@ fun ViewTextFileBottomSheet(
         if (m != null) {
             PCard {
                 PListItem(title = m.path, action = {
-                    CopyIconButton(text = m.path, clipLabel = stringResource(R.string.file_path))
+                    CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
                 })
             }
             VerticalSpace(dp = 16.dp)
             PCard {
-                PListItem(title = stringResource(id = R.string.file_size), value = m.size.formatBytes())
-                PListItem(title = stringResource(id = R.string.type), value = m.path.getMimeType())
+                PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
+                PListItem(title = stringResource(Res.string.type), value = m.path.getMimeType())
                 if (m.createdAt != null) {
-                    PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
                 }
-                PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+                PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
             }
             VerticalSpace(dp = 16.dp)
             PCard {
-                PListItem(title = stringResource(id = R.string.wrap_content), action = {
+                PListItem(title = stringResource(Res.string.wrap_content), action = {
                     PSwitch(
                         activated = textFileVM.wrapContent.value,
                     ) {

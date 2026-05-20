@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.appfiles.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
@@ -11,7 +13,6 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
@@ -70,7 +71,7 @@ fun openAppFile(
             if (file.appFile.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
                 navController.navigateTextFile(path, fileName)
             } else {
-                DialogHelper.showMessage(R.string.text_file_size_limit)
+                DialogHelper.showMessage(Res.string.text_file_size_limit)
             }
         }
 
@@ -78,7 +79,7 @@ fun openAppFile(
             try {
                 navController.navigatePdf(File(path).toUri())
             } catch (ex: Exception) {
-                DialogHelper.showMessage(R.string.pdf_open_error)
+                DialogHelper.showMessage(Res.string.pdf_open_error)
             }
         }
 

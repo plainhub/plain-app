@@ -20,12 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.enums.ButtonSize
@@ -115,8 +114,8 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
 
         needsUpdate -> {
             PBanner(
-                title = stringResource(R.string.get_new_updates, newVersion.toString()),
-                desc = stringResource(R.string.get_new_updates_desc),
+                title = stringResource(Res.string.get_new_updates, newVersion.toString()),
+                desc = stringResource(Res.string.get_new_updates_desc),
                 icon = Res.drawable.lightbulb,
             ) { updateVM.showDialog() }
             VerticalSpace(dp = 12.dp)
@@ -148,13 +147,13 @@ private fun DownloadProgressBanner(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.downloading_update, progress),
+                    text = stringResource(Res.string.downloading_update, progress),
                     style = MaterialTheme.typography.titleMedium,
                     color = contentColor,
                 )
                 TextButton(onClick = onCancel) {
                     Text(
-                        text = stringResource(R.string.cancel),
+                        text = stringResource(Res.string.cancel),
                         color = contentColor,
                     )
                 }
@@ -175,11 +174,11 @@ private fun DownloadCompleteBanner(
     onDismiss: () -> Unit,
 ) {
     PBanner(
-        title = stringResource(R.string.update_downloaded),
+        title = stringResource(Res.string.update_downloaded),
         icon = Res.drawable.lightbulb,
         action = {
             PFilledButton(
-                text = stringResource(R.string.install_update),
+                text = stringResource(Res.string.install_update),
                 buttonSize = ButtonSize.SMALL,
                 onClick = onInstall,
             )
@@ -195,19 +194,19 @@ private fun DownloadFailedBanner(
     onDismiss: () -> Unit,
 ) {
     PBanner(
-        title = stringResource(R.string.download_update_failed),
+        title = stringResource(Res.string.download_update_failed),
         backgroundColor = MaterialTheme.colorScheme.errorContainer,
         contentColor = MaterialTheme.colorScheme.onErrorContainer,
         icon = Res.drawable.lightbulb,
         action = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 PFilledButton(
-                    text = stringResource(R.string.try_again),
+                    text = stringResource(Res.string.try_again),
                     buttonSize = ButtonSize.SMALL,
                     onClick = onRetry,
                 )
                 PFilledButton(
-                    text = stringResource(R.string.download_on_github),
+                    text = stringResource(Res.string.download_on_github),
                     buttonSize = ButtonSize.SMALL,
                     onClick = onGitHub,
                 )

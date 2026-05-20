@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.ClipData
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -9,9 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
@@ -75,7 +76,7 @@ fun ViewFeedEntryBottomSheet(
                     }
                 }
                 VerticalSpace(dp = 16.dp)
-                Subtitle(text = stringResource(id = R.string.tags))
+                Subtitle(text = stringResource(Res.string.tags))
                 TagSelector(
                     data = m,
                     tagsVM = tagsVM,
@@ -90,14 +91,14 @@ fun ViewFeedEntryBottomSheet(
                     PListItem(modifier = Modifier.clickable {
                         WebHelper.open(context, m.url)
                     }, title = m.url, separatedActions = true, action = {
-                        CopyIconButton(text = m.url, clipLabel = stringResource(R.string.link))
+                        CopyIconButton(text = m.url, clipLabel = stringResource(Res.string.link))
                     })
                 }
                 VerticalSpace(dp = 16.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.published_at), value = m.publishedAt.formatDateTime())
-                    PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
-                    PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.published_at), value = m.publishedAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
+                    PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
                 }
                 BottomSpace()
             }

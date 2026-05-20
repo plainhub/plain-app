@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">Удалённое управление PlainApp</string>
+    <string name="accessibility_service_description">PlainApp использует эту службу специальных возможностей, чтобы включить удалённое управление во время трансляции экрана. Она внедряет касания (нажатие, свайп, прокрутка) и действия навигации (Назад, Домой, Недавние), отправленные из веб‑интерфейса.</string>
+</resources>

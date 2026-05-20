@@ -9,12 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -38,7 +37,7 @@ fun PdfPage(
                 actions = {
                     PIconButton(
                         icon = Res.drawable.share_2,
-                        contentDescription = stringResource(R.string.share),
+                        contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
                         if (uri.scheme == "content") {

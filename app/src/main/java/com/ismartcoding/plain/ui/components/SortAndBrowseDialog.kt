@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.i18n.*
+
 import android.content.Context
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,9 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -53,7 +54,7 @@ fun <T : IData> SortAndBrowseDialog(
                 if (isDocs && docsVM != null) {
                     item {
                         Text(
-                            text = stringResource(R.string.view_mode),
+                            text = stringResource(Res.string.view_mode),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -73,7 +74,7 @@ fun <T : IData> SortAndBrowseDialog(
                                     docsVM.loadAsync(context, tagsVM)
                                 }
                             },
-                            text = stringResource(R.string.browse_by_tags)
+                            text = stringResource(Res.string.browse_by_tags)
                         )
                     }
                     // Browse by file type option
@@ -90,7 +91,7 @@ fun <T : IData> SortAndBrowseDialog(
                                     docsVM.loadAsync(context, tagsVM)
                                 }
                             },
-                            text = stringResource(R.string.browse_by_file_type)
+                            text = stringResource(Res.string.browse_by_file_type)
                         )
                     }
                     // Spacing between sections
@@ -102,7 +103,7 @@ fun <T : IData> SortAndBrowseDialog(
                 // Sort rules section
                 item {
                     Text(
-                        text = stringResource(R.string.sort),
+                        text = stringResource(Res.string.sort),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -117,14 +118,14 @@ fun <T : IData> SortAndBrowseDialog(
                             mediaVM.sortBy.value = sortByOption
                             onSortSelected(sortByOption)
                         },
-                        text = stringResource(id = sortByOption.getTextId())
+                        text = stringResource(sortByOption.getTextId())
                     )
                 }
             }
         },
         confirmButton = {
             Button(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.close))
+                Text(text = stringResource(Res.string.close))
             }
         },
         dismissButton = {},

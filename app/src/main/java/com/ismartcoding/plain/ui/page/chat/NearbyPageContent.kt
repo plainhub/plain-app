@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.chat
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,10 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.Subtitle
@@ -42,7 +43,7 @@ internal fun LazyListScope.nearbySearchingItem() {
                 )
                 HorizontalSpace(8.dp)
                 Text(
-                    text = stringResource(R.string.searching_nearby_devices),
+                    text = stringResource(Res.string.searching_nearby_devices),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -58,7 +59,7 @@ internal fun LazyListScope.nearbyDeviceListItems(
     if (nearbyDevices.isNotEmpty()) {
         item {
             VerticalSpace(16.dp)
-            Subtitle(stringResource(R.string.nearby_devices))
+            Subtitle(stringResource(Res.string.nearby_devices))
         }
         nearbyDevices.forEach { item ->
             item {
@@ -87,7 +88,7 @@ internal fun LazyListScope.nearbyDeviceListItems(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = stringResource(R.string.make_sure_devices_same_network),
+                        text = stringResource(Res.string.make_sure_devices_same_network),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         textAlign = TextAlign.Center,

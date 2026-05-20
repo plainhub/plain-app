@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.tags
 
+import com.ismartcoding.plain.i18n.*
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -17,9 +19,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
@@ -57,7 +58,7 @@ fun SelectTagsDialog(
             onDismiss()
         },
         title = {
-            Text(text = stringResource(id = R.string.select_tags),
+            Text(text = stringResource(Res.string.select_tags),
                 style = MaterialTheme.typography.titleLarge
             )
         },
@@ -95,7 +96,7 @@ fun SelectTagsDialog(
                     onDismiss()
                 },
             ) {
-                Text(stringResource(id = R.string.close))
+                Text(stringResource(Res.string.close))
             }
         }
     )
