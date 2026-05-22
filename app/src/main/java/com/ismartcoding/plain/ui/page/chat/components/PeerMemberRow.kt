@@ -21,6 +21,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.DeviceType
 
 @Composable

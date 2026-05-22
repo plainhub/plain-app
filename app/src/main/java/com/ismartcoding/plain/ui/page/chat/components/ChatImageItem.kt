@@ -27,6 +27,7 @@ import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getPreviewPath
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState

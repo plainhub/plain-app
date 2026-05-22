@@ -1,14 +1,15 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.TypeConverter
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import kotlinx.datetime.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+private val converterJson = Json { ignoreUnknownKeys = true }
 
 class ChannelMemberListConverter {
     @TypeConverter
     fun toJSON(list: List<ChannelMember>): String {
-        return jsonEncode(list)
+        return converterJson.encodeToString(list)
     }
 
     @TypeConverter
@@ -16,25 +17,19 @@ class ChannelMemberListConverter {
         if (value.isEmpty()) {
             return emptyList()
         }
-        return jsonDecode<List<ChannelMember>>(value)
+        return converterJson.decodeFromString<List<ChannelMember>>(value)
     }
 }
 
 class DateConverter {
     @TypeConverter
-    fun stringFromDate(date: Instant?): String? {
-        if (date == null) {
-            return null
-        }
-        return date.toString()
+    fun stringFromDate(date: kotlin.time.Instant?): String? {
+        return date?.toString()
     }
 
     @TypeConverter
-    fun dateFromString(date: String?): Instant? {
-        if (date == null) {
-            return null
-        }
-        return kotlin.time.Instant.parse(date)
+    fun dateFromString(date: String?): kotlin.time.Instant? {
+        return date?.let { kotlin.time.Instant.parse(it) }
     }
 }
 

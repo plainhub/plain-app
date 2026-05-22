@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.book
 
-import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ismartcoding.lib.content.ContentWhere
+import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.helpers.QueryHelper
@@ -20,7 +20,7 @@ object BookHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        return bookDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
+        return bookDao.count(rawQuery(sql, where.args.toTypedArray()))
     }
 
     suspend fun search(
@@ -37,7 +37,7 @@ object BookHelper {
 
         sql += " LIMIT $limit OFFSET $offset"
 
-        return bookDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
+        return bookDao.search(rawQuery(sql, where.args.toTypedArray()))
     }
 
     fun updateAsync(

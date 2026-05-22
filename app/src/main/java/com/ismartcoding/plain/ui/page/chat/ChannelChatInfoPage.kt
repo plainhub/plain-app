@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getBestIp
+import com.ismartcoding.plain.db.getPeersAsync
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.ui.base.BottomSpace

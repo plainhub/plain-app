@@ -9,6 +9,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
+import com.ismartcoding.plain.db.getFileUrl
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import okhttp3.Request

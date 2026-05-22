@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.db
 
-import android.util.Base64
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
@@ -8,12 +7,7 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.helpers.SignatureHelper
+import com.ismartcoding.plain.helpers.generateId
 import kotlinx.serialization.Serializable
 
 /** A channel member: peer id + membership status.
@@ -35,7 +29,7 @@ data class ChannelMember(
 
 @Entity(tableName = "chat_channels")
 data class DChatChannel(
-    @PrimaryKey var id: String = StringHelper.shortUUID(),
+    @PrimaryKey var id: String = generateId(),
     @ColumnInfo(name = "name") var name: String = "",
     @ColumnInfo(name = "key") var key: String = "",
     /** peer.id of the device that created this channel.
@@ -54,7 +48,7 @@ data class DChatChannel(
     // ── Helpers ─────────────────────────────────────────────────────
 
     fun memberIds(): List<String> = members.map { it.id }
-    fun memberIdsNotMe(): List<String> = members.filter { it.id != TempData.clientId }.map { it.id }
+    fun memberIdsNotMe(myId: String): List<String> = members.filter { it.id != myId }.map { it.id }
 
     fun joinedMembers(): List<ChannelMember> = members.filter { it.isJoined() }
 
@@ -64,25 +58,6 @@ data class DChatChannel(
 
     fun findMember(peerId: String): ChannelMember? = members.find { it.id == peerId }
 
-    suspend fun getPeersAsync(): List<DPeer> {
-        val ids = memberIds()
-        val dbPeers = AppDatabase.instance.peerDao().getByIds(ids).associateBy { it.id }
-        return ids.mapNotNull { peerId ->
-            if (peerId == TempData.clientId) {
-                DPeer(
-                    id = peerId,
-                    name = TempData.deviceName,
-                    ip = NetworkHelper.getDeviceIP4s().joinToString(","),
-                    port = TempData.httpsPort,
-                    publicKey = SignatureHelper.getRawPublicKeyBase64Async(),
-                    deviceType = DeviceType.PHONE.value,
-                )
-            } else {
-                dbPeers[peerId]
-            }
-        }
-    }
-
     /**
      * Elect a leader for this channel from the joined members.
      *
@@ -91,16 +66,16 @@ data class DChatChannel(
      * 2. Otherwise, the online joined member with the smallest id.
      *
      * @param onlinePeerIds set of peer ids known to be online right now.
-     *        The local device's own id (`TempData.clientId`) is always considered online.
+     *        The local device's own id is always considered online.
+     * @param myId the local device's peer id.
      * @return the peer id of the elected leader, or null if no eligible member is online.
      */
-    fun electLeader(onlinePeerIds: Set<String>): String? {
-        val myId = TempData.clientId
+    fun electLeader(onlinePeerIds: Set<String>, myId: String): String? {
         val joined = joinedMembers()
         val onlineJoined = joined.filter { it.id == myId || onlinePeerIds.contains(it.id) }
         if (onlineJoined.isEmpty()) return null
 
-        // Resolve the owner's real peer id ("me" sentinel → TempData.clientId)
+        // Resolve the owner's real peer id ("me" sentinel → myId)
         val ownerPeerId = if (owner == "me") myId else owner
         if (onlineJoined.any { it.id == ownerPeerId }) return ownerPeerId
 
@@ -109,8 +84,8 @@ data class DChatChannel(
     }
 
     /** Check whether this device is currently the channel leader. */
-    fun isLeader(onlinePeerIds: Set<String>): Boolean {
-        return electLeader(onlinePeerIds) == TempData.clientId
+    fun isLeader(onlinePeerIds: Set<String>, myId: String): Boolean {
+        return electLeader(onlinePeerIds, myId) == myId
     }
 
     companion object {
@@ -142,4 +117,4 @@ interface ChatChannelDao {
 
     @Query("DELETE FROM chat_channels WHERE id in (:ids)")
     fun deleteByIds(ids: List<String>)
-} 
+}

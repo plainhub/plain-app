@@ -12,6 +12,7 @@ import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.toJSONString
+import com.ismartcoding.plain.db.toPeerMessageContent
 import com.ismartcoding.plain.helpers.FileHelper
 
 /**
@@ -56,7 +57,7 @@ object ChannelChatHelper {
         content: DMessageContent,
         onlinePeerIds: Set<String> = emptySet(),
     ): DMessageStatusData? {
-        val leaderId = channel.electLeader(onlinePeerIds)
+        val leaderId = channel.electLeader(onlinePeerIds, TempData.clientId)
         if (leaderId == null) {
             LogCat.e("Channel ${channel.id}: no online leader available")
             return null

@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.devtools.ksp)
+    id("androidx.room")
 }
 
 kotlin {
@@ -46,8 +48,23 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.kotlinx.serialization.json)
+            api(libs.room.runtime)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqlite.bundled)
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
+dependencies {
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
 }
 
 compose.resources {

@@ -36,10 +36,14 @@ fun ChatLinkPreview(linkPreview: DLinkPreview, modifier: Modifier = Modifier) {
             .clickable { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(linkPreview.url))) },
     ) {
         Column {
-            if (!linkPreview.imageLocalPath.isNullOrEmpty() && linkPreview.imageWidth >= 200 && linkPreview.imageHeight >= 200) {
+            val imageLocalPath = linkPreview.imageLocalPath
+            val domain = linkPreview.domain
+            val title = linkPreview.title
+            val description = linkPreview.description
+            if (!imageLocalPath.isNullOrEmpty() && linkPreview.imageWidth >= 200 && linkPreview.imageHeight >= 200) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     AsyncImage(
-                        model = linkPreview.imageLocalPath.getFinalPath(context),
+                        model = imageLocalPath.getFinalPath(context),
                         contentDescription = stringResource(Res.string.link_preview_image),
                         modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp, max = 200.dp),
                         contentScale = ContentScale.Fit
@@ -47,31 +51,31 @@ fun ChatLinkPreview(linkPreview: DLinkPreview, modifier: Modifier = Modifier) {
                 }
             }
             Column(modifier = Modifier.padding(16.dp)) {
-                if (!linkPreview.domain.isNullOrEmpty()) {
+                if (!domain.isNullOrEmpty()) {
                     Surface(modifier = Modifier.wrapContentSize(), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), shape = RoundedCornerShape(4.dp)) {
-                        Text(text = linkPreview.domain.uppercase(), modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        Text(text = domain.uppercase(), modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Medium, fontSize = 10.sp)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                if (!linkPreview.title.isNullOrEmpty()) {
-                    Text(text = linkPreview.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
+                if (!title.isNullOrEmpty()) {
+                    Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 20.sp)
                     Spacer(modifier = Modifier.height(4.dp))
                 }
-                if (!linkPreview.description.isNullOrEmpty()) {
-                    Text(text = linkPreview.description, style = MaterialTheme.typography.bodyMedium,
+                if (!description.isNullOrEmpty()) {
+                    Text(text = description, style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 18.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    val showSmallIcon = (!linkPreview.imageLocalPath.isNullOrEmpty() &&
+                    val showSmallIcon = (!imageLocalPath.isNullOrEmpty() &&
                             (linkPreview.imageWidth < 200 || linkPreview.imageHeight < 200)) ||
-                            (linkPreview.imageLocalPath.isNullOrEmpty() && !linkPreview.imageUrl.isNullOrEmpty())
+                            (imageLocalPath.isNullOrEmpty() && !linkPreview.imageUrl.isNullOrEmpty())
                     if (showSmallIcon) {
                         AsyncImage(
-                            model = if (!linkPreview.imageLocalPath.isNullOrEmpty()) linkPreview.imageLocalPath.getFinalPath(context) else linkPreview.imageUrl,
+                            model = if (!imageLocalPath.isNullOrEmpty()) imageLocalPath.getFinalPath(context) else linkPreview.imageUrl,
                             contentDescription = null,
                             modifier = Modifier.size(18.dp).clip(RoundedCornerShape(3.dp)),
                             contentScale = ContentScale.Fit

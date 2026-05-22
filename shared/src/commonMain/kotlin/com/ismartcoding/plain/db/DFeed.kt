@@ -1,21 +1,29 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
-import com.ismartcoding.lib.helpers.StringHelper
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Index
+import androidx.room.Insert
+import androidx.room.PrimaryKey
+import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.RoomRawQuery
+import androidx.room.Update
 import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.helpers.generateId
 
 @Entity(
     tableName = "feeds",
     indices = [(Index(value = ["url"], unique = true))],
 )
 data class DFeed(
-    @PrimaryKey override var id: String = StringHelper.shortUUID(),
+    @PrimaryKey override var id: String = generateId(),
 ) : IData, DEntityBase() {
     var name: String = ""
     var url: String = ""
 
-    @ColumnInfo(name = "fetch_content")
+    @androidx.room.ColumnInfo(name = "fetch_content")
     var fetchContent: Boolean = false
 
     @Ignore
@@ -28,10 +36,10 @@ interface FeedDao {
     fun getAll(): List<DFeed>
 
     @RawQuery
-    fun search(query: SupportSQLiteQuery): List<DFeed>
+    fun search(query: RoomRawQuery): List<DFeed>
 
     @RawQuery
-    fun count(query: SupportSQLiteQuery): Int
+    fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM feeds WHERE id=:id")
     fun getById(id: String): DFeed?

@@ -1,16 +1,20 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
-import com.ismartcoding.lib.helpers.StringHelper
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.PrimaryKey
+import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.RoomRawQuery
+import androidx.room.Update
 import com.ismartcoding.plain.data.IData
-import kotlinx.datetime.*
+import com.ismartcoding.plain.helpers.generateId
 
-@Entity(
-    tableName = "book_chapters",
-)
+@Entity(tableName = "book_chapters")
 data class DBookChapter(
-    @PrimaryKey override var id: String = StringHelper.shortUUID(),
+    @PrimaryKey override var id: String = generateId(),
 ) : IData, DEntityBase() {
     var name: String = ""
 
@@ -28,14 +32,14 @@ data class DBookChapter(
 
 @Dao
 interface BookChapterDao {
-    @Query("SELECT id,name,parent_id FROM book_chapters WHERE book_id=:bookId")
+    @Query("SELECT * FROM book_chapters WHERE book_id=:bookId")
     fun getAll(bookId: String): List<DBookChapter>
 
     @RawQuery
-    fun search(query: SupportSQLiteQuery): List<DBookChapter>
+    fun search(query: RoomRawQuery): List<DBookChapter>
 
     @RawQuery
-    fun count(query: SupportSQLiteQuery): Int
+    fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM book_chapters WHERE id=:id")
     fun getById(id: String): DBookChapter?

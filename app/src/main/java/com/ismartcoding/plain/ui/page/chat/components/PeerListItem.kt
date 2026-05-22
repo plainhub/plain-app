@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.theme.listItemSubtitle

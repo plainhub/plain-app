@@ -1,16 +1,19 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
-import com.ismartcoding.lib.helpers.StringHelper
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.PrimaryKey
+import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.RoomRawQuery
+import androidx.room.Update
 import com.ismartcoding.plain.data.IData
-import kotlinx.datetime.*
+import com.ismartcoding.plain.helpers.generateId
 
-@Entity(
-    tableName = "books",
-)
+@Entity(tableName = "books")
 data class DBook(
-    @PrimaryKey override var id: String = StringHelper.shortUUID(),
+    @PrimaryKey override var id: String = generateId(),
 ) : IData, DEntityBase() {
     var name: String = ""
     var author: String = ""
@@ -24,10 +27,10 @@ interface BookDao {
     fun getAll(): List<DBook>
 
     @RawQuery
-    fun search(query: SupportSQLiteQuery): List<DBook>
+    fun search(query: RoomRawQuery): List<DBook>
 
     @RawQuery
-    fun count(query: SupportSQLiteQuery): Int
+    fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM books WHERE id=:id")
     fun getById(id: String): DBook?

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getBestIp
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 

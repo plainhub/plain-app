@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.ui.base.PDialogListItem

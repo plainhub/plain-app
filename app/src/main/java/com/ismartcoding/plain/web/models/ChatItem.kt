@@ -46,7 +46,7 @@ data class ChatItem(
             is DMessageText -> {
                 val messageText = _content.value as DMessageText
                 val imageIds = messageText.linkPreviews
-                    .map { if (it.imageLocalPath.isNullOrEmpty()) "" else FileHelper.getFileId(it.imageLocalPath) }
+                    .map { val p = it.imageLocalPath; if (p.isNullOrEmpty()) "" else FileHelper.getFileId(p) }
                 ChatItemContent.MessageText(imageIds)
             }
 

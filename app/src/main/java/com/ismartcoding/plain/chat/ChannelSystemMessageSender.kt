@@ -7,6 +7,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getPeersAsync
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 
@@ -96,7 +97,7 @@ object ChannelSystemMessageSender {
                 version = channel.version,
             )
         )
-        sendToMultiplePeers(channel.memberIdsNotMe(), ChannelSystemMessages.TYPE_UPDATE, payload, channel.id, channel.key)
+        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessages.TYPE_UPDATE, payload, channel.id, channel.key)
     }
 
     /** Send kick notification to a single peer. */
@@ -108,7 +109,7 @@ object ChannelSystemMessageSender {
     /** Broadcast kick to all members (used when owner deletes the channel). */
     suspend fun broadcastKick(channel: DChatChannel) {
         val payload = jsonEncode(ChannelSystemMessages.ChannelKick(channel.id))
-        sendToMultiplePeers(channel.memberIdsNotMe(), ChannelSystemMessages.TYPE_KICK, payload, channel.id, channel.key)
+        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessages.TYPE_KICK, payload, channel.id, channel.key)
     }
 
     /** Send leave notification to the channel owner. */

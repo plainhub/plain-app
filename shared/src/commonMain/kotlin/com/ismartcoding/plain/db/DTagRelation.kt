@@ -1,9 +1,15 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
-import kotlinx.datetime.*
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.RoomRawQuery
+import androidx.room.Update
 import com.ismartcoding.plain.helpers.TimeHelper
+import kotlin.time.Instant
 
 @Entity(tableName = "tag_relations", primaryKeys = ["tag_id", "key", "type"])
 data class DTagRelation(
@@ -21,16 +27,10 @@ data class DTagRelation(
 @Dao
 interface TagRelationDao {
     @Query("SELECT * FROM tag_relations WHERE `key`=:key AND type=:type")
-    fun getAllByKey(
-        key: String,
-        type: Int,
-    ): List<DTagRelation>
+    fun getAllByKey(key: String, type: Int): List<DTagRelation>
 
     @Query("SELECT * FROM tag_relations WHERE `key` in (:keys) AND type=:type")
-    fun getAllByKeys(
-        keys: Set<String>,
-        type: Int,
-    ): List<DTagRelation>
+    fun getAllByKeys(keys: Set<String>, type: Int): List<DTagRelation>
 
     @Query("SELECT `key` FROM tag_relations WHERE tag_id=:tagId")
     fun getKeysByTagId(tagId: String): List<String>
@@ -54,7 +54,7 @@ interface TagRelationDao {
     fun deleteByKeysTagIds(keys: Set<String>, tagIds: Set<String>)
 
     @RawQuery
-    fun delete(query: SupportSQLiteQuery): Int
+    fun delete(query: RoomRawQuery): Int
 
     @Insert
     fun insert(vararg item: DTagRelation)

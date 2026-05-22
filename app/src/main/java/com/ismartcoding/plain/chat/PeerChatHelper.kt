@@ -5,6 +5,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.toJSONString
+import com.ismartcoding.plain.db.toPeerMessageContent
 
 object PeerChatHelper {
     // Maximum allowed time difference for timestamp validation (5 minutes)

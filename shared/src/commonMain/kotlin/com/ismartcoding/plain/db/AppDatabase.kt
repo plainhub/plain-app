@@ -1,19 +1,13 @@
 package com.ismartcoding.plain.db
 
-import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteTable
 import androidx.room.RenameColumn
 import androidx.room.RenameTable
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
-import androidx.sqlite.db.SupportSQLiteDatabase
-
-import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.MainApp
 
 @DeleteTable(tableName = "boxes")
 class BoxesDeletionSpec : AutoMigrationSpec
@@ -60,37 +54,22 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
 @TypeConverters(DateConverter::class, ChannelMemberListConverter::class, ChatItemContentConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
-
     abstract fun sessionDao(): SessionDao
-
     abstract fun tagDao(): TagDao
-
     abstract fun tagRelationDao(): TagRelationDao
-
     abstract fun noteDao(): NoteDao
-
     abstract fun feedDao(): FeedDao
-
     abstract fun feedEntryDao(): FeedEntryDao
-
     abstract fun bookDao(): BookDao
-
+    abstract fun bookChapterDao(): BookChapterDao
     abstract fun pomodoroItemDao(): PomodoroItemDao
-
     abstract fun peerDao(): PeerDao
-
     abstract fun chatChannelDao(): ChatChannelDao
-
     abstract fun bookmarkDao(): BookmarkDao
-
     abstract fun bookmarkGroupDao(): BookmarkGroupDao
-
     abstract fun appFileDao(): AppFileDao
-
     abstract fun imageEmbeddingDao(): ImageEmbeddingDao
-
     abstract fun archivedConversationDao(): ArchivedConversationDao
-
     abstract fun videoPlayProgressDao(): VideoPlayProgressDao
 
     companion object {
@@ -98,27 +77,14 @@ abstract class AppDatabase : RoomDatabase() {
         private var _instance: AppDatabase? = null
 
         val instance: AppDatabase
-            get() {
-                return _instance ?: synchronized(this) {
-                    _instance ?: buildDatabase(MainApp.instance).also { _instance = it }
-                }
-            }
+            get() = _instance ?: error("AppDatabase not initialized")
 
-        private fun buildDatabase(context: Context): AppDatabase {
-            return Room.databaseBuilder(context, AppDatabase::class.java, Constants.DATABASE_NAME)
-                .addMigrations(Migrations.MIGRATION_5_6)
-                .addCallback(
-                    object : RoomDatabase.Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            DataInitializer(context, db).apply {
-                                insertWelcome()
-                                insertTags()
-                                insertNotes()
-                            }
-                        }
-                    },
-                )
-                .build()
+        fun init(db: AppDatabase) {
+            _instance = db
         }
     }
+}
+
+fun initDatabase(db: AppDatabase) {
+    AppDatabase.init(db)
 }

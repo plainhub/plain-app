@@ -4,6 +4,7 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getApiUrl
 import com.ismartcoding.plain.db.toJSONString
 import com.ismartcoding.plain.helpers.SignatureHelper
 import okhttp3.MediaType.Companion.toMediaType

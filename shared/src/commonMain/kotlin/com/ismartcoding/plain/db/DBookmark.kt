@@ -1,32 +1,25 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
-import com.ismartcoding.lib.helpers.StringHelper
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.Insert
+import androidx.room.PrimaryKey
+import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.RoomRawQuery
+import androidx.room.Update
 import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.helpers.generateId
 import kotlin.time.Instant
 
-/**
- * A single bookmarked URL.
- *
- * Table design:
- *  - id            : Short UUID primary key
- *  - url           : The bookmark URL (required)
- *  - title         : User-editable title, initially fetched from the page
- *  - favicon_path  : Local file path to the stored favicon image
- *  - group_id      : FK reference to bookmark_groups.id, empty = ungrouped
- *  - pinned        : Whether the bookmark is pinned to the top
- *  - click_count   : Used for "sort by recent click" (bumped on open)
- *  - last_clicked_at : Timestamp of the most recent click
- *  - sort_order    : Manual sort order within group
- *  - created_at / updated_at : from DEntityBase
- */
 @Entity(
     tableName = "bookmarks",
     indices = [Index(value = ["group_id"])],
 )
 data class DBookmark(
-    @PrimaryKey override var id: String = StringHelper.shortUUID(),
+    @PrimaryKey override var id: String = generateId(),
 ) : IData, DEntityBase() {
     var url: String = ""
     var title: String = ""
@@ -61,10 +54,10 @@ interface BookmarkDao {
     fun getByGroupId(groupId: String): List<DBookmark>
 
     @RawQuery
-    fun search(query: SupportSQLiteQuery): List<DBookmark>
+    fun search(query: RoomRawQuery): List<DBookmark>
 
     @RawQuery
-    fun count(query: SupportSQLiteQuery): Int
+    fun count(query: RoomRawQuery): Int
 
     @Insert
     fun insert(vararg item: DBookmark)
@@ -79,19 +72,9 @@ interface BookmarkDao {
     fun deleteByGroupId(groupId: String)
 }
 
-/**
- * A bookmark group (folder).
- *
- * Table design:
- *  - id         : Short UUID primary key
- *  - name       : Display name
- *  - collapsed  : Whether the group is currently collapsed in UI
- *  - sort_order : Display order of the group
- *  - created_at / updated_at : from DEntityBase
- */
 @Entity(tableName = "bookmark_groups")
 data class DBookmarkGroup(
-    @PrimaryKey override var id: String = StringHelper.shortUUID(),
+    @PrimaryKey override var id: String = generateId(),
 ) : IData, DEntityBase() {
     var name: String = ""
     var collapsed: Boolean = false

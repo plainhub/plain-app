@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.feed
 
-import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ismartcoding.lib.content.ContentWhere
+import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
@@ -25,7 +25,7 @@ object FeedEntryHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        return feedEntryDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
+        return feedEntryDao.count(rawQuery(sql, where.args.toTypedArray()))
     }
 
     suspend fun getIdsAsync(query: String): Set<String> {
@@ -36,7 +36,7 @@ object FeedEntryHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        return feedEntryDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
+        return feedEntryDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
     suspend fun search(
@@ -57,7 +57,7 @@ object FeedEntryHelper {
             " ORDER BY published_at DESC LIMIT $limit OFFSET $offset"
         }
 
-        return feedEntryDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
+        return feedEntryDao.search(rawQuery(sql, where.args.toTypedArray()))
     }
 
     fun getAsync(id: String): DFeedEntry? {

@@ -46,7 +46,7 @@ internal suspend fun deliverToRemoteAsync(state: ChatState, content: DMessageCon
                 channel = channel, content = content, onlinePeerIds = state.onlinePeerIds,
             )
             if (statusData == null) {
-                val leaderId = channel.electLeader(state.onlinePeerIds)
+                val leaderId = channel.electLeader(state.onlinePeerIds, TempData.clientId)
                 if (leaderId != null && leaderId != TempData.clientId) {
                     triggerPeerRediscovery(leaderId)
                 } else {

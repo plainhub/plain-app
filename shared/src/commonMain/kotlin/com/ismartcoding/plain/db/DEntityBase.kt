@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlin.time.Instant
 
-abstract class DEntityBase {
+open class DEntityBase {
     @ColumnInfo(name = "created_at")
     var createdAt: Instant = TimeHelper.now()
 

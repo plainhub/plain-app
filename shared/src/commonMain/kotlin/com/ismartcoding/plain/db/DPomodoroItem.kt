@@ -1,21 +1,28 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.*
-import com.ismartcoding.lib.helpers.StringHelper
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.PrimaryKey
+import androidx.room.Query
+import androidx.room.Update
 import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.helpers.generateId
 
 @Entity(tableName = "pomodoro_items")
 data class DPomodoroItem(
-    @PrimaryKey override var id: String = StringHelper.shortUUID(),
+    @PrimaryKey override var id: String = generateId(),
 ) : IData, DEntityBase() {
     var date: String = "" // YYYY-MM-DD format
-    
+
     @ColumnInfo(name = "completed_count")
     var completedCount: Int = 0
-    
+
     @ColumnInfo(name = "total_work_seconds")
     var totalWorkSeconds: Int = 0
-    
+
     @ColumnInfo(name = "total_break_seconds")
     var totalBreakSeconds: Int = 0
 }
@@ -42,4 +49,4 @@ interface PomodoroItemDao {
 
     @Query("DELETE FROM pomodoro_items WHERE id = :id")
     fun deleteById(id: String)
-} 
+}

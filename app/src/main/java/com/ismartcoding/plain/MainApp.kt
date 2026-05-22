@@ -48,6 +48,9 @@ import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.DataInitializer
+import com.ismartcoding.plain.db.Migrations
+import com.ismartcoding.plain.db.initDatabase
 import com.ismartcoding.plain.helpers.ChatFidUriMigration
 import com.ismartcoding.plain.preferences.ensureKeyPairAsync
 import com.ismartcoding.plain.preferences.ensureValueAsync
@@ -61,6 +64,20 @@ class MainApp : Application() {
 
         instance = this
         initDataStore(dataStore)
+        initDatabase(
+            androidx.room.Room.databaseBuilder(this, AppDatabase::class.java, Constants.DATABASE_NAME)
+                .addMigrations(Migrations.MIGRATION_5_6)
+                .addCallback(object : androidx.room.RoomDatabase.Callback() {
+                    override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                        DataInitializer(this@MainApp, db).apply {
+                            insertWelcome()
+                            insertTags()
+                            insertNotes()
+                        }
+                    }
+                })
+                .build()
+        )
 
         CrashHandler.install(this)
 

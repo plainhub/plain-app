@@ -1,10 +1,5 @@
 package com.ismartcoding.plain.db
 
-import com.ismartcoding.plain.features.locale.LocaleHelper
-
-import com.ismartcoding.plain.i18n.*
-
-import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
@@ -12,68 +7,39 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
-import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.helpers.FileHelper
-import kotlin.time.Instant
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.helpers.generateId
+import kotlin.time.Instant
 import kotlinx.serialization.Serializable
-import org.json.JSONObject
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+
+private val chatJson = Json { ignoreUnknownKeys = true }
 
 fun DMessageContent.toJSONString(): String {
-    val obj = JSONObject()
-    obj.put("type", type)
-    if (value != null) {
-        var valueJSON = "{}"
+    val valueElement = if (value != null) {
         when (type) {
-            DMessageType.TEXT.value -> {
-                valueJSON = jsonEncode(value as DMessageText)
-            }
-
-            DMessageType.IMAGES.value -> {
-                valueJSON = jsonEncode(value as DMessageImages)
-            }
-
-            DMessageType.FILES.value -> {
-                valueJSON = jsonEncode(value as DMessageFiles)
-            }
+            DMessageType.TEXT.value -> chatJson.encodeToJsonElement(DMessageText.serializer(), value as DMessageText)
+            DMessageType.IMAGES.value -> chatJson.encodeToJsonElement(DMessageImages.serializer(), value as DMessageImages)
+            DMessageType.FILES.value -> chatJson.encodeToJsonElement(DMessageFiles.serializer(), value as DMessageFiles)
+            else -> JsonObject(emptyMap())
         }
-        obj.put("value", JSONObject(valueJSON))
+    } else {
+        JsonObject(emptyMap())
     }
-    return obj.toString()
+    return buildJsonObject {
+        put("type", type)
+        put("value", valueElement)
+    }.toString()
 }
 
-class DMessageContent(val type: String, var value: Any? = null) {
-    /**
-     * Rewrite local file/image URIs to `fsid:` references for transmission.
-     */
-    fun toPeerMessageContent(): DMessageContent {
-        return when (type) {
-            DMessageType.FILES.value -> {
-                val files = value as DMessageFiles
-                val modified = files.items.map { file ->
-                    val fileId = FileHelper.getFileId(file.uri)
-                    file.copy(uri = "fsid:$fileId")
-                }
-                DMessageContent(type, DMessageFiles(modified))
-            }
-
-            DMessageType.IMAGES.value -> {
-                val images = value as DMessageImages
-                val modified = images.items.map { image ->
-                    val fileId = FileHelper.getFileId(image.uri)
-                    image.copy(uri = "fsid:$fileId")
-                }
-                DMessageContent(type, DMessageImages(modified))
-            }
-
-            else -> this
-        }
-    }
-}
+class DMessageContent(val type: String, var value: Any? = null)
 
 enum class DMessageType(val value: String) {
     TEXT("text"),
@@ -86,7 +52,7 @@ class DMessageText(val text: String, val linkPreviews: List<DLinkPreview> = empt
 
 @Serializable
 data class DMessageFile(
-    override var id: String = StringHelper.shortUUID(),
+    override var id: String = generateId(),
     val uri: String,
     val size: Long,
     val duration: Long = 0,
@@ -96,39 +62,22 @@ data class DMessageFile(
     val fileName: String = "",
 ) : IData {
     /** True when this file must be downloaded from a remote peer (fsid: scheme). */
-    fun isRemoteFile(): Boolean {
-        return uri.startsWith("fsid:")
-    }
+    fun isRemoteFile(): Boolean = uri.startsWith("fsid:")
 
     /**
      * True when this file is stored in the local content-addressable store.
      * The [uri] has the form  fid:{sha256hex}.
      */
-    fun isFidFile(): Boolean {
-        return uri.startsWith("fid:")
-    }
+    fun isFidFile(): Boolean = uri.startsWith("fid:")
 
     /**
      * Returns the SHA-256 fileId for fid: URIs.
      * Returns an empty string for other URI schemes.
      */
-    fun localFileId(): String {
-        return if (isFidFile()) uri.removePrefix("fid:") else ""
-    }
+    fun localFileId(): String = if (isFidFile()) uri.removePrefix("fid:") else ""
 
     /** Remote fileId extracted from a fsid: URI (used as query param for /fs endpoint). */
-    fun parseFileId(): String {
-        return uri.replace("fsid:", "")
-    }
-
-    fun getPreviewPath(context: Context, peer: DPeer?): String {
-        return if (isRemoteFile()) {
-            peer?.getFileUrl(parseFileId()) + "&w=200&h=200"
-        } else {
-            // Handles fid:, app://, and absolute paths via getFinalPath extension
-            uri.getFinalPath(context)
-        }
-    }
+    fun parseFileId(): String = uri.replace("fsid:", "")
 }
 
 @Serializable
@@ -170,7 +119,7 @@ data class DMessageStatusData(
         fun fromJson(json: String): DMessageStatusData? {
             if (json.isEmpty()) return null
             return try {
-                jsonDecode<DMessageStatusData>(json)
+                chatJson.decodeFromString<DMessageStatusData>(json)
             } catch (e: Exception) {
                 null
             }
@@ -179,7 +128,7 @@ data class DMessageStatusData(
 }
 
 @Serializable
-class DLinkPreview(
+data class DLinkPreview(
     val url: String,
     val title: String? = null,
     val description: String? = null,
@@ -193,11 +142,9 @@ class DLinkPreview(
     val createdAt: Instant = TimeHelper.now()
 )
 
-@Entity(
-    tableName = "chats",
-)
+@Entity(tableName = "chats")
 data class DChat(
-    @PrimaryKey var id: String = StringHelper.shortUUID(),
+    @PrimaryKey var id: String = generateId(),
 ) : DEntityBase() {
     @ColumnInfo(name = "from_id", index = true)
     var fromId: String = "" // me|local|peer_id
@@ -223,68 +170,16 @@ data class DChat(
 
     fun parseStatusData(): DMessageStatusData? = DMessageStatusData.fromJson(statusData)
 
-    fun getMessagePreview(): String {
-        return when (content.type) {
-            DMessageType.TEXT.value -> {
-                val textMessage = content.value as? DMessageText
-                textMessage?.text?.take(50) ?: LocaleHelper.getStringSync(Res.string.message)
-            }
-
-            DMessageType.IMAGES.value -> {
-                val imagesMessage = content.value as? DMessageImages
-                val items = imagesMessage?.items ?: emptyList()
-                val videoCount = items.count { it.duration > 0 }
-                val imageCount = items.size - videoCount
-                when {
-                    imageCount > 0 && videoCount > 0 -> {
-                        val imgPart = if (imageCount > 1) "$imageCount ${LocaleHelper.getStringSync(Res.string.images)}" else LocaleHelper.getStringSync(Res.string.image)
-                        val vidPart = if (videoCount > 1) "$videoCount ${LocaleHelper.getStringSync(Res.string.videos)}" else LocaleHelper.getStringSync(Res.string.video)
-                        "$imgPart, $vidPart"
-                    }
-
-                    videoCount > 0 -> {
-                        if (videoCount > 1) "$videoCount ${LocaleHelper.getStringSync(Res.string.videos)}" else LocaleHelper.getStringSync(Res.string.video)
-                    }
-
-                    else -> {
-                        if (imageCount > 1) "$imageCount ${LocaleHelper.getStringSync(Res.string.images)}" else LocaleHelper.getStringSync(Res.string.image)
-                    }
-                }
-            }
-
-            DMessageType.FILES.value -> {
-                val filesMessage = content.value as? DMessageFiles
-                val count = filesMessage?.items?.size ?: 0
-                if (count > 1) {
-                    "$count ${LocaleHelper.getStringSync(Res.string.files)}"
-                } else {
-                    LocaleHelper.getStringSync(Res.string.file)
-                }
-            }
-
-            else -> LocaleHelper.getStringSync(Res.string.message)
-        }
-    }
-
     companion object {
         fun parseContent(content: String): DMessageContent {
-            val obj = JSONObject(content)
-            val message = DMessageContent(obj.optString("type"))
-            val valueJson = obj.optString("value")
+            val obj = chatJson.parseToJsonElement(content).jsonObject
+            val message = DMessageContent(obj["type"]?.jsonPrimitive?.content ?: "")
+            val valueJson = obj["value"]?.takeIf { it !is JsonNull }?.toString() ?: ""
             when (message.type) {
-                DMessageType.TEXT.value -> {
-                    message.value = jsonDecode<DMessageText>(valueJson)
-                }
-
-                DMessageType.IMAGES.value -> {
-                    message.value = jsonDecode<DMessageImages>(valueJson)
-                }
-
-                DMessageType.FILES.value -> {
-                    message.value = jsonDecode<DMessageFiles>(valueJson)
-                }
+                DMessageType.TEXT.value -> message.value = chatJson.decodeFromString<DMessageText>(valueJson)
+                DMessageType.IMAGES.value -> message.value = chatJson.decodeFromString<DMessageImages>(valueJson)
+                DMessageType.FILES.value -> message.value = chatJson.decodeFromString<DMessageFiles>(valueJson)
             }
-
             return message
         }
     }

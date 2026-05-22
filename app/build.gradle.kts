@@ -6,15 +6,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.android.application")
     id("kotlin-parcelize")
-    id("androidx.room")
-    id("com.google.devtools.ksp")
     kotlin("plugin.serialization") version libs.versions.kotlin
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.play.publisher)
-}
-
-room {
-    schemaDirectory("$projectDir/schemas")
 }
 
 val keystoreProperties = Properties()
@@ -182,11 +176,6 @@ dependencies {
     implementation(libs.camera.camera2)
     implementation(libs.camera.lifecycle)
     implementation(libs.camera.view)
-
-    // https://developer.android.com/jetpack/androidx/releases/room
-    implementation(libs.room.runtime)
-//    annotationProcessor(libs.room.compiler)
-    ksp(libs.room.compiler)
 
     // coil: https://coil-kt.github.io/coil/changelog/
     implementation(libs.coil)

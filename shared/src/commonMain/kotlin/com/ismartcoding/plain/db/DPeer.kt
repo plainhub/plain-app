@@ -1,9 +1,6 @@
 package com.ismartcoding.plain.db
 
 import androidx.compose.runtime.Composable
-import com.ismartcoding.plain.i18n.*
-import org.jetbrains.compose.resources.stringResource
-
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
@@ -11,8 +8,10 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
-import com.ismartcoding.lib.extensions.urlEncode
-import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.paired
+import com.ismartcoding.plain.i18n.unpaired
+import org.jetbrains.compose.resources.stringResource
 
 @Entity(tableName = "peers")
 data class DPeer(
@@ -29,24 +28,6 @@ data class DPeer(
     fun isChannel(): Boolean = status == "channel"
     fun getIpList(): List<String> {
         return ip.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-    }
-
-    fun getBestIp(): String {
-        val ips = getIpList()
-        if (ips.isEmpty()) return ip
-        return NetworkHelper.getBestIp(ips)
-    }
-
-    fun getApiUrl(): String {
-        return "${getBaseUrl()}/peer_graphql"
-    }
-
-    fun getBaseUrl(): String {
-        return "https://${getBestIp()}:${port}"
-    }
-
-    fun getFileUrl(fileId: String): String {
-        return "${getBaseUrl()}/fs?id=${fileId.urlEncode()}"
     }
 
     @Composable
@@ -87,4 +68,4 @@ interface PeerDao {
 
     @Query("DELETE FROM peers WHERE id in (:ids)")
     fun deleteByIds(ids: List<String>)
-} 
+}

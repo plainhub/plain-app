@@ -33,6 +33,7 @@ import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel

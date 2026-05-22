@@ -21,6 +21,7 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.audio.AudioPlayer
+import com.ismartcoding.plain.db.getPreviewPath
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
