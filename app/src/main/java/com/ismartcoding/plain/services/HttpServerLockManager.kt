@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.services
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import android.net.wifi.WifiManager
@@ -53,7 +54,7 @@ internal class HttpServerLockManager(private val context: Context) {
     fun start() {
         acquireLocksOnly()
         eventJob = coIO {
-            keepAwake = KeepAwakePreference.getAsync(context)
+            keepAwake = KeepAwakePreference.getAsync()
             scheduleInactivityTimer()
             Channel.sharedFlow.collect { event ->
                 when (event) {

@@ -24,6 +24,7 @@ kotlinxCoroutinesVersion ="1.10.2"
 ktor = "3.4.3"
 leakcanaryAndroidVersion = "2.14"
 lifecycleViewmodelKtxVersion="2.10.0"
+jetbrainsLifecycleViewmodel = "2.9.5"
 markwon="4.6.2"
 media3 = "1.10.0"
 navigationComposeVersion = "2.9.8"
@@ -48,6 +49,7 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
+jetbrains-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrainsLifecycleViewmodel" }
 androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycleViewmodelKtxVersion" }
 bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bcprovJdk15onVersion" }
 bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15onVersion" }
@@ -65,6 +67,7 @@ androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", vers
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesVersion" }
+androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastorePreferencesVersion" }
 
 # camera
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCoreVersion" }
@@ -160,4 +163,5 @@ pdfium-android = { module = "io.github.oothp:pdfium-android", version.ref = "pdf
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtoolsKspVersion" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 play-publisher = { id = "com.github.triplet.play", version.ref = "playPublisherVersion" }

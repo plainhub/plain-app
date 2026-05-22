@@ -18,8 +18,6 @@ data class Settings(
     val updateInfo: DUpdateInfo,
 )
 
-val LocalDarkTheme = compositionLocalOf { DarkThemePreference.default }
-val LocalAmoledDarkTheme = compositionLocalOf { AmoledDarkThemePreference.default }
 val LocalLocale = compositionLocalOf<Locale?> { null }
 val LocalWeb = compositionLocalOf { WebPreference.default }
 val LocalUpdateInfo = compositionLocalOf { DUpdateInfo() }

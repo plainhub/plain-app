@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
@@ -46,7 +47,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
             ) {
                 scope.launch {
                     withIO {
-                        DarkThemePreference.putAsync(context, if (it) DarkTheme.ON else DarkTheme.OFF)
+                        DarkThemePreference.putAsync(if (it) DarkTheme.ON else DarkTheme.OFF)
                     }
                 }
             }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.services
+import com.ismartcoding.plain.preferences.*
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -47,10 +48,10 @@ class AudioPlayerService : MediaLibraryService() {
                     val context = MainApp.instance
                     val mediaItem = player.currentMediaItem
                     if (mediaItem == null) {
-                        withIO { AudioPlayingPreference.putAsync(context, "") }
+                        withIO { AudioPlayingPreference.putAsync("") }
                         return@coMain
                     }
-                    withIO { AudioPlayingPreference.putAsync(context, mediaItem.mediaId) }
+                    withIO { AudioPlayingPreference.putAsync(mediaItem.mediaId) }
                     AudioPlayer.setChangedNotify(AudioAction.MEDIA_ITEM_TRANSITION)
                 }
             }

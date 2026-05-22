@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
@@ -52,7 +53,7 @@ class PeerViewModel : ViewModel() {
 
     fun updateDiscoverable(context: Context, discoverable: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            NearbyDiscoverablePreference.putAsync(context, discoverable)
+            NearbyDiscoverablePreference.putAsync(discoverable)
             TempData.nearbyDiscoverable = discoverable
         }
     }

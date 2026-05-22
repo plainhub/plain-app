@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
@@ -34,7 +35,7 @@ class NotificationSettingsViewModel : ViewModel() {
 
     suspend fun loadDataAsync(context: Context) {
         try {
-            filterData.value = NotificationFilterPreference.getValueAsync(context)
+            filterData.value = NotificationFilterPreference.getValueAsync()
             val apps = mutableListOf<DPackage>()
             filterData.value.apps.forEach { packageName ->
                 try {
@@ -42,7 +43,7 @@ class NotificationSettingsViewModel : ViewModel() {
                     apps.add(app)
                 } catch (e: Exception) {
                     // App might be uninstalled, remove from list
-                    NotificationFilterPreference.toggleAppAsync(context, packageName)
+                    NotificationFilterPreference.toggleAppAsync(packageName)
                 }
             }
             _selectedAppsFlow.value = apps.sortedBy { it.name }.toMutableStateList()
@@ -75,30 +76,30 @@ class NotificationSettingsViewModel : ViewModel() {
 
     suspend fun toggleModeAsync(context: Context) {
         val newMode = if (filterData.value.mode == "allowlist") "blacklist" else "allowlist"
-        NotificationFilterPreference.setModeAsync(context, newMode)
+        NotificationFilterPreference.setModeAsync(newMode)
         filterData.value = filterData.value.copy(mode = newMode)
         refreshNotifications()
     }
 
     suspend fun removeAppAsync(context: Context, packageName: String) {
-        NotificationFilterPreference.toggleAppAsync(context, packageName)
-        filterData.value = NotificationFilterPreference.getValueAsync(context)
+        NotificationFilterPreference.toggleAppAsync(packageName)
+        filterData.value = NotificationFilterPreference.getValueAsync()
         loadSelectedApps(context)
         refreshNotifications()
     }
 
     suspend fun addAppsAsync(context: Context, packageNames: List<String>) {
         packageNames.forEach { packageName ->
-            NotificationFilterPreference.toggleAppAsync(context, packageName)
+            NotificationFilterPreference.toggleAppAsync(packageName)
         }
-        filterData.value = NotificationFilterPreference.getValueAsync(context)
+        filterData.value = NotificationFilterPreference.getValueAsync()
         loadSelectedApps(context)
         refreshNotifications()
     }
 
     suspend fun clearAllAsync(context: Context) {
-        NotificationFilterPreference.putAsync(context, filterData.value.copy(apps = emptySet()))
-        filterData.value = NotificationFilterPreference.getValueAsync(context)
+        NotificationFilterPreference.putAsync(filterData.value.copy(apps = emptySet()))
+        filterData.value = NotificationFilterPreference.getValueAsync()
         _selectedAppsFlow.value.clear()
         refreshNotifications()
     }
@@ -111,7 +112,7 @@ class NotificationSettingsViewModel : ViewModel() {
                 apps.add(app)
             } catch (e: Exception) {
                 // App might be uninstalled, remove from list
-                NotificationFilterPreference.toggleAppAsync(context, packageName)
+                NotificationFilterPreference.toggleAppAsync(packageName)
             }
         }
         _selectedAppsFlow.value = apps.sortedBy { it.name }.toMutableStateList()

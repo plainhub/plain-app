@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
@@ -16,8 +17,8 @@ class AudioPlaylistViewModel : ViewModel() {
     val selectedPath = mutableStateOf("")
 
     suspend fun loadAsync(context: Context) {
-        selectedPath.value = AudioPlayingPreference.getValueAsync(context)
-        playlistItems.value = AudioPlaylistPreference.getValueAsync(context)
+        selectedPath.value = AudioPlayingPreference.getValueAsync()
+        playlistItems.value = AudioPlaylistPreference.getValueAsync()
     }
 
     fun isInPlaylist(path: String): Boolean {
@@ -26,14 +27,14 @@ class AudioPlaylistViewModel : ViewModel() {
 
     suspend fun addAsync(context: Context, items: List<DAudio>) {
         val audio = items.map { it.toPlaylistAudio() }
-        playlistItems.value = AudioPlaylistPreference.addAsync(context, audio)
+        playlistItems.value = AudioPlaylistPreference.addAsync(audio)
         if (selectedPath.value.isEmpty()) {
             setCurrentPlaying(context, audio.first().path)
         }
     }
 
     suspend fun clearAsync(context: Context) {
-        AudioPlaylistPreference.putAsync(context, listOf())
+        AudioPlaylistPreference.putAsync(listOf())
         playlistItems.value = listOf()
         AudioPlayer.clear()
         setCurrentPlaying(context, "")
@@ -41,26 +42,26 @@ class AudioPlaylistViewModel : ViewModel() {
     }
 
     private suspend fun setCurrentPlaying(context: Context, path: String) {
-        AudioPlayingPreference.putAsync(context, path)
+        AudioPlayingPreference.putAsync(path)
         selectedPath.value = path
     }
 
     suspend fun playAsync(context: Context, item: DAudio) {
         val audio = item.toPlaylistAudio()
-        playlistItems.value = AudioPlaylistPreference.addAsync(context, listOf(audio))
+        playlistItems.value = AudioPlaylistPreference.addAsync(listOf(audio))
         AudioPlayer.justPlay(context, audio)
         setCurrentPlaying(context, audio.path)
     }
 
     suspend fun removeAsync(context: Context, path: String) {
-        val newList = AudioPlaylistPreference.deleteAsync(context, setOf(path))
+        val newList = AudioPlaylistPreference.deleteAsync(setOf(path))
         playlistItems.value = newList
         if (path == selectedPath.value) {
             // If removing currently playing item
             if (newList.isNotEmpty()) {
                 // Play next item if available
                 val nextItem = newList[0]
-                AudioPlayingPreference.putAsync(context, nextItem.path)
+                AudioPlayingPreference.putAsync(nextItem.path)
                 AudioPlayer.justPlay(context, nextItem)
             }
         }
@@ -77,6 +78,6 @@ class AudioPlaylistViewModel : ViewModel() {
             add(to, removeAt(from))
         }
         playlistItems.value = newList
-        AudioPlaylistPreference.putAsync(context, newList)
+        AudioPlaylistPreference.putAsync(newList)
     }
 }

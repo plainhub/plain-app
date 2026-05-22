@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.images
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.foundation.pager.PagerState
@@ -39,8 +40,8 @@ internal fun ImagesPageEffects(
         imagesVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
         if (imagesVM.hasPermission.value) {
             scope.launch(Dispatchers.IO) {
-                cellsPerRow.value = ImageGridCellsPerRowPreference.getAsync(context)
-                imagesVM.sortBy.value = ImageSortByPreference.getValueAsync(context)
+                cellsPerRow.value = ImageGridCellsPerRowPreference.getAsync()
+                imagesVM.sortBy.value = ImageSortByPreference.getValueAsync()
                 imagesVM.loadAsync(context, tagsVM); mediaFoldersVM.loadAsync(context)
             }
         }
@@ -50,7 +51,7 @@ internal fun ImagesPageEffects(
             when (event) {
                 is PermissionsResultEvent -> {
                     imagesVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
-                    scope.launch(Dispatchers.IO) { imagesVM.sortBy.value = ImageSortByPreference.getValueAsync(context); imagesVM.loadAsync(context, tagsVM) }
+                    scope.launch(Dispatchers.IO) { imagesVM.sortBy.value = ImageSortByPreference.getValueAsync(); imagesVM.loadAsync(context, tagsVM) }
                 }
             }
         }

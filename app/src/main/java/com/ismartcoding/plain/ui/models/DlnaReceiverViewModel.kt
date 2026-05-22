@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -58,8 +59,8 @@ class DlnaReceiverViewModel : ViewModel() {
         ruleCheckJob?.cancel()
         ruleCheckJob = viewModelScope.launch(Dispatchers.IO) {
             DlnaRendererState.rawPendingCastRequest.filterNotNull().collect { pending ->
-                val allowed = DlnaAllowedSendersPreference.getAsync(context)
-                val denied = DlnaDeniedSendersPreference.getAsync(context)
+                val allowed = DlnaAllowedSendersPreference.getAsync()
+                val denied = DlnaDeniedSendersPreference.getAsync()
                 when {
                     DlnaAllowedSendersPreference.containsIp(allowed, pending.senderIp) -> {
                         // Auto-accept: send commands directly without showing dialog
@@ -96,8 +97,8 @@ class DlnaReceiverViewModel : ViewModel() {
         }
         if (rememberChoice && pending.senderIp.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
-                DlnaDeniedSendersPreference.removeAsync(context, pending.senderIp)
-                DlnaAllowedSendersPreference.addAsync(context, pending.senderIp, pending.senderName)
+                DlnaDeniedSendersPreference.removeAsync(pending.senderIp)
+                DlnaAllowedSendersPreference.addAsync(pending.senderIp, pending.senderName)
             }
         }
     }
@@ -108,8 +109,8 @@ class DlnaReceiverViewModel : ViewModel() {
         DlnaRendererState.pendingPlayQueued.value = false
         if (rememberChoice && pending.senderIp.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
-                DlnaAllowedSendersPreference.removeAsync(context, pending.senderIp)
-                DlnaDeniedSendersPreference.addAsync(context, pending.senderIp, pending.senderName)
+                DlnaAllowedSendersPreference.removeAsync(pending.senderIp)
+                DlnaDeniedSendersPreference.addAsync(pending.senderIp, pending.senderName)
             }
         }
     }

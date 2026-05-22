@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.images
+import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState

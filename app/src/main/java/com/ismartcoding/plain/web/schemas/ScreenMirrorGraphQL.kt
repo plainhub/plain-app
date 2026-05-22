@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web.schemas
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.kgraphql.Context
 import com.ismartcoding.lib.kgraphql.GraphQLError
@@ -32,12 +33,12 @@ fun SchemaBuilder.addScreenMirrorSchema() {
     }
     query("screenMirrorQuality") {
         resolver { ->
-            ScreenMirrorQualityPreference.getValueAsync(MainApp.instance).toModel()
+            ScreenMirrorQualityPreference.getValueAsync().toModel()
         }
     }
     mutation("startScreenMirror") {
         resolver { audio: Boolean ->
-            ScreenMirrorService.qualityData = ScreenMirrorQualityPreference.getValueAsync(MainApp.instance)
+            ScreenMirrorService.qualityData = ScreenMirrorQualityPreference.getValueAsync()
             sendEvent(StartScreenMirrorEvent(audio))
             true
         }
@@ -67,7 +68,7 @@ fun SchemaBuilder.addScreenMirrorSchema() {
                 ScreenMirrorMode.SMOOTH -> 720
             }
             val qualityData = DScreenMirrorQuality(mode, resolution)
-            ScreenMirrorQualityPreference.putAsync(MainApp.instance, qualityData)
+            ScreenMirrorQualityPreference.putAsync(qualityData)
             ScreenMirrorService.qualityData = qualityData
             ScreenMirrorService.instance?.onQualityChanged()
             true

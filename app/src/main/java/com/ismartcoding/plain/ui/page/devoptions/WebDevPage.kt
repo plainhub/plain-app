@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.devoptions
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -72,7 +73,7 @@ fun WebDevPage(
                             modifier = Modifier.padding(horizontal = 16.dp),
                             onClick = {
                                 scope.launch(Dispatchers.IO) {
-                                    AdbTokenPreference.resetAsync(context)
+                                    AdbTokenPreference.resetAsync()
                                 }
                             },
                         )

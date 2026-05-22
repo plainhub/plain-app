@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.apps
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -64,7 +65,7 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
     if (appsVM.showSortDialog.value) {
         RadioDialog(title = stringResource(Res.string.sort), options = FileSortBy.entries.map {
             RadioDialogOption(text = stringResource(it.getTextId()), selected = it == appsVM.sortBy.value) {
-                scope.launch(Dispatchers.IO) { PackageSortByPreference.putAsync(context, it); appsVM.sortBy.value = it; appsVM.loadAsync() }
+                scope.launch(Dispatchers.IO) { PackageSortByPreference.putAsync(it); appsVM.sortBy.value = it; appsVM.loadAsync() }
             }
         }) { appsVM.showSortDialog.value = false }
     }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.audio
+import com.ismartcoding.plain.preferences.*
 
 import android.content.ComponentName
 import android.content.Context
@@ -82,7 +83,7 @@ object AudioPlayer {
     ) {
         CoroutinesHelper.coMain {
             TempData.audioPlayPosition = 0
-            CoroutinesHelper.withIO { AudioPlaylistPreference.addAsync(context, listOf(playlistAudio)) }
+            CoroutinesHelper.withIO { AudioPlaylistPreference.addAsync(listOf(playlistAudio)) }
             ensurePlayer(context) {
                 doPlay(playlistAudio)
             }
@@ -121,7 +122,7 @@ object AudioPlayer {
             } catch (e: Exception) {
                 LogCat.e(e.toString())
                 if (playlistAudio != null) {
-                    CoroutinesHelper.withIO { AudioPlaylistPreference.deleteAsync(context, setOf(playlistAudio.path)) }
+                    CoroutinesHelper.withIO { AudioPlaylistPreference.deleteAsync(setOf(playlistAudio.path)) }
                 }
                 setChangedNotify(AudioAction.NOT_FOUND)
             }
@@ -130,12 +131,12 @@ object AudioPlayer {
 
     private suspend fun ensureCurrentPlaylistAudio(): DPlaylistAudio? {
         val context = MainApp.Companion.instance
-        val path = CoroutinesHelper.withIO { AudioPlayingPreference.getValueAsync(context) }
+        val path = CoroutinesHelper.withIO { AudioPlayingPreference.getValueAsync() }
         if (path.isEmpty()) {
             return null
         }
         val playlistAudio = CoroutinesHelper.withIO { DPlaylistAudio.Companion.fromPath(context, path) }
-        CoroutinesHelper.withIO { AudioPlaylistPreference.addAsync(context, listOf(playlistAudio)) }
+        CoroutinesHelper.withIO { AudioPlaylistPreference.addAsync(listOf(playlistAudio)) }
         return playlistAudio
     }
 
@@ -164,12 +165,12 @@ object AudioPlayer {
         val context = MainApp.Companion.instance
         CoroutinesHelper.coIO {
             var audio: DPlaylistAudio
-            var playerAudioList = AudioPlaylistPreference.getValueAsync(context)
-            val playingPath = AudioPlayingPreference.getValueAsync(context)
+            var playerAudioList = AudioPlaylistPreference.getValueAsync()
+            val playingPath = AudioPlayingPreference.getValueAsync()
             if (playerAudioList.isEmpty()) {
                 if (playingPath.isNotEmpty()) {
                     audio = DPlaylistAudio.Companion.fromPath(context, playingPath)
-                    AudioPlaylistPreference.addAsync(context, listOf(audio))
+                    AudioPlaylistPreference.addAsync(listOf(audio))
                     playerAudioList = listOf(audio)
                 } else {
                     return@coIO

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -65,7 +66,7 @@ fun WebSecurityPage(navController: NavHostController) {
         LaunchedEffect(password) {
             if (editPassword.value != password) editPassword.value = password
             scope.launch(Dispatchers.IO) {
-                keyStorePassword = KeyStorePasswordPreference.getAsync(context)
+                keyStorePassword = KeyStorePasswordPreference.getAsync()
                 try {
                     sslSignature = HttpServerManager.getSSLSignature(context, keyStorePassword).joinToString(" ") { "%02x".format(it).uppercase() }
                 } catch (ex: Exception) {
@@ -101,7 +102,7 @@ fun WebSecurityPage(navController: NavHostController) {
                             if (passwordType != PasswordType.NONE.value) {
                                 PasswordTextField(
                                     value = editPassword.value, isChanged = { editPassword.value != password },
-                                    onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.IO) { PasswordPreference.putAsync(context, it) } })
+                                    onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.IO) { PasswordPreference.putAsync(it) } })
                                 OutlinedButton(
                                     modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
                                     onClick = { scope.launch(Dispatchers.IO) { editPassword.value = HttpServerManager.resetPasswordAsync() } }) {
@@ -114,10 +115,10 @@ fun WebSecurityPage(navController: NavHostController) {
                         VerticalSpace(dp = 16.dp)
                         PCard {
                             PListItem(
-                                modifier = Modifier.clickable { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(context, !authTwoFactor) } },
+                                modifier = Modifier.clickable { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(!authTwoFactor) } },
                                 title = stringResource(Res.string.require_confirmation)
                             ) {
-                                PSwitch(activated = authTwoFactor) { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(context, it) } }
+                                PSwitch(activated = authTwoFactor) { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(it) } }
                             }
                         }
                         Tips(text = stringResource(Res.string.two_factor_auth_tips)); VerticalSpace(dp = 24.dp)
@@ -128,8 +129,8 @@ fun WebSecurityPage(navController: NavHostController) {
                         VerticalSpace(dp = 16.dp)
                         PFilledButton(text = stringResource(Res.string.reset_ssl_certificate), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             scope.launch(Dispatchers.IO) {
-                                DialogHelper.showLoading(); KeyStorePasswordPreference.resetAsync(context)
-                                keyStorePassword = KeyStorePasswordPreference.getAsync(context)
+                                DialogHelper.showLoading(); KeyStorePasswordPreference.resetAsync()
+                                keyStorePassword = KeyStorePasswordPreference.getAsync()
                                 HttpServerManager.generateSSLKeyStore(File(context.filesDir, Constants.KEY_STORE_FILE_NAME), keyStorePassword)
                                 DialogHelper.hideLoading()
                                 DialogHelper.showConfirmDialog("", LocaleHelper.getString(Res.string.ssl_certificate_reset)) { sendEvent(RestartAppEvent()) }
@@ -140,17 +141,17 @@ fun WebSecurityPage(navController: NavHostController) {
                         Tips(text = stringResource(Res.string.url_token_tips)); VerticalSpace(dp = 16.dp)
                         PCard {
                             PListItem(modifier = Modifier.clickable {
-                                scope.launch(Dispatchers.IO) { RotateUrlTokenOnRestartPreference.putAsync(context, !rotateUrlTokenOnRestart) }
+                                scope.launch(Dispatchers.IO) { RotateUrlTokenOnRestartPreference.putAsync(!rotateUrlTokenOnRestart) }
                             }, title = stringResource(Res.string.rotate_url_token_on_restart)) {
                                 PSwitch(activated = rotateUrlTokenOnRestart) {
-                                    scope.launch(Dispatchers.IO) { RotateUrlTokenOnRestartPreference.putAsync(context, it) }
+                                    scope.launch(Dispatchers.IO) { RotateUrlTokenOnRestartPreference.putAsync(it) }
                                 }
                             }
                         }
                         Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
                         PFilledButton(text = stringResource(Res.string.reset_token), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             scope.launch(Dispatchers.IO) {
-                                UrlTokenPreference.resetAsync(context); urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP); DialogHelper.showMessage(Res.string.the_token_is_reset)
+                                UrlTokenPreference.resetAsync(); urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP); DialogHelper.showMessage(Res.string.the_token_is_reset)
                             }
                         })
                         BottomSpace(paddingValues)

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.pomodoro
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
@@ -31,7 +32,7 @@ import java.io.File
 object PomodoroHelper {
     @SuppressLint("MissingPermission")
     suspend fun showNotificationAsync(context: Context, state: PomodoroState) {
-        val settings = PomodoroSettingsPreference.getValueAsync(context)
+        val settings = PomodoroSettingsPreference.getValueAsync()
         if (!settings.showNotification) {
             return
         }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +25,7 @@ fun HomeSectionCollapseButton(
         tint = MaterialTheme.colorScheme.onSurfaceVariant,
         click = {
             scope.launch {
-                HomeSectionCollapsedPreference.putAsync(context, featureType, !collapsed)
+                HomeSectionCollapsedPreference.putAsync(featureType, !collapsed)
             }
         },
     )

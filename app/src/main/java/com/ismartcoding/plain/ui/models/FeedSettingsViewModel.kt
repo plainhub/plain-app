@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
@@ -29,16 +30,16 @@ class FeedSettingsViewModel : ViewModel() {
 
     fun loadSettings(context: Context) {
         viewModelScope.launch {
-            autoRefresh.value = FeedAutoRefreshPreference.getAsync(context)
-            autoRefreshInterval.intValue = FeedAutoRefreshIntervalPreference.getAsync(context)
-            autoRefreshOnlyWifi.value = FeedAutoRefreshOnlyWifiPreference.getAsync(context)
+            autoRefresh.value = FeedAutoRefreshPreference.getAsync()
+            autoRefreshInterval.intValue = FeedAutoRefreshIntervalPreference.getAsync()
+            autoRefreshOnlyWifi.value = FeedAutoRefreshOnlyWifiPreference.getAsync()
         }
     }
 
     fun setAutoRefresh(context: Context, value: Boolean) {
         autoRefresh.value = value
         viewModelScope.launch(Dispatchers.IO) {
-            FeedAutoRefreshPreference.putAsync(context, value)
+            FeedAutoRefreshPreference.putAsync(value)
             if (value) {
                 FeedFetchWorker.startRepeatWorkerAsync(context)
             } else {
@@ -50,14 +51,14 @@ class FeedSettingsViewModel : ViewModel() {
     fun setAutoRefreshInterval(context: Context, value: Int) {
         autoRefreshInterval.value = value
         viewModelScope.launch(Dispatchers.IO) {
-            FeedAutoRefreshIntervalPreference.putAsync(context, value)
+            FeedAutoRefreshIntervalPreference.putAsync(value)
         }
     }
 
     fun setAutoRefreshOnlyWifi(context: Context, value: Boolean) {
         autoRefreshOnlyWifi.value = value
         viewModelScope.launch(Dispatchers.IO) {
-            FeedAutoRefreshOnlyWifiPreference.putAsync(context, value)
+            FeedAutoRefreshOnlyWifiPreference.putAsync(value)
         }
     }
 

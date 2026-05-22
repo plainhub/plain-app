@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web
+import com.ismartcoding.plain.preferences.*
 
 import android.annotation.SuppressLint
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -188,7 +189,7 @@ object HttpModule {
                     }
                 }
 
-                if (PasswordTypePreference.getValueAsync(MainApp.instance) == PasswordType.NONE) {
+                if (PasswordTypePreference.getValueAsync() == PasswordType.NONE) {
                     call.respondText(HttpServerManager.resetPasswordAsync())
                 } else {
                     call.respond(HttpStatusCode.NoContent)

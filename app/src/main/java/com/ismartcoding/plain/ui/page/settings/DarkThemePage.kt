@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -59,7 +60,7 @@ fun DarkThemePage(navController: NavHostController) {
                                 modifier = Modifier.clickable {
                                     scope.launch {
                                         withIO {
-                                            DarkThemePreference.putAsync(context, it)
+                                            DarkThemePreference.putAsync(it)
                                         }
                                     }
                                 },
@@ -68,7 +69,7 @@ fun DarkThemePage(navController: NavHostController) {
                                 RadioButton(selected = it.value == darkTheme, onClick = {
                                     scope.launch {
                                         withIO {
-                                            DarkThemePreference.putAsync(context, it)
+                                            DarkThemePreference.putAsync(it)
                                         }
                                     }
                                 })
@@ -85,14 +86,14 @@ fun DarkThemePage(navController: NavHostController) {
                         PListItem(
                             modifier = Modifier.clickable {
                                 scope.launch(Dispatchers.IO) {
-                                    AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
+                                    AmoledDarkThemePreference.putAsync(!amoledDarkTheme)
                                 }
                             },
                             title = stringResource(Res.string.amoled_dark_theme),
                         ) {
                             PSwitch(activated = amoledDarkTheme) {
                                 scope.launch(Dispatchers.IO) {
-                                    AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
+                                    AmoledDarkThemePreference.putAsync(!amoledDarkTheme)
                                 }
                             }
                         }

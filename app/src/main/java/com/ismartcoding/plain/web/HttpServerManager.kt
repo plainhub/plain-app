@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import android.content.Intent
@@ -110,7 +111,7 @@ object HttpServerManager {
 
     suspend fun resetPasswordAsync(): String {
         val password = CryptoHelper.randomPassword(6)
-        PasswordPreference.putAsync(MainApp.instance, password)
+        PasswordPreference.putAsync(password)
         return password
     }
 
@@ -207,7 +208,7 @@ object HttpServerManager {
     }
 
     private suspend fun passwordToToken(): ByteArray {
-        return hashToToken(CryptoHelper.sha512(PasswordPreference.getAsync(MainApp.instance).toByteArray()))
+        return hashToToken(CryptoHelper.sha512(PasswordPreference.getAsync().toByteArray()))
     }
 
     fun hashToToken(hash: String): ByteArray {
@@ -274,7 +275,7 @@ object HttpServerManager {
     }
 
     suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
-        val password = KeyStorePasswordPreference.getAsync(context)
+        val password = KeyStorePasswordPreference.getAsync()
         val passwordArray = password.toCharArray()
         val httpPort = TempData.httpPort
         val httpsPort = TempData.httpsPort

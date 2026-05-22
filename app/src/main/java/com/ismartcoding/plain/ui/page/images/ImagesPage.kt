@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.images
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
@@ -111,7 +112,7 @@ fun ImagesPage(
                 scrollToTop = { scope.launch { imagesVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } },
                 defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
                 onSortSelected = { _, sortBy ->
-                    scope.launch(Dispatchers.IO) { ImageSortByPreference.putAsync(context, sortBy); imagesVM.sortBy.value = sortBy; imagesVM.loadAsync(context, tagsVM) }
+                    scope.launch(Dispatchers.IO) { ImageSortByPreference.putAsync(sortBy); imagesVM.sortBy.value = sortBy; imagesVM.loadAsync(context, tagsVM) }
                 },
                 onSearchAction = { ctx, tv -> scope.launch(Dispatchers.IO) { imagesVM.loadWithAiSearchAsync(ctx, tv) } },
             )

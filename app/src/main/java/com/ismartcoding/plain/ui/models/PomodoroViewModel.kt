@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,7 +43,7 @@ class PomodoroViewModel : ViewModel() {
         val today = getCurrentDateString()
         todayRecord.value = pomodoroDao.getByDate(today)
         completedCount.intValue = todayRecord.value?.completedCount ?: 0
-        settings.value = PomodoroSettingsPreference.getValueAsync(context)
+        settings.value = PomodoroSettingsPreference.getValueAsync()
         updateTimeForCurrentState()
     }
 

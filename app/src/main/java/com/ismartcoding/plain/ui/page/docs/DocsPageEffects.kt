@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.docs
+import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -34,8 +35,8 @@ internal fun DocsPageEffects(
         docsVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
         if (docsVM.hasPermission.value) {
             scope.launch(Dispatchers.IO) {
-                docsVM.tabsShowTags.value = DocTabsModePreference.getAsync(context)
-                docsVM.sortBy.value = DocSortByPreference.getValueAsync(context)
+                docsVM.tabsShowTags.value = DocTabsModePreference.getAsync()
+                docsVM.sortBy.value = DocSortByPreference.getValueAsync()
                 tagsVM.loadAsync()
                 mediaFoldersVM.loadAsync(context)
                 docsVM.loadAsync(context, tagsVM)
@@ -48,7 +49,7 @@ internal fun DocsPageEffects(
             if (event is PermissionsResultEvent) {
                 docsVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
                 scope.launch(Dispatchers.IO) {
-                    docsVM.sortBy.value = DocSortByPreference.getValueAsync(context)
+                    docsVM.sortBy.value = DocSortByPreference.getValueAsync()
                     docsVM.loadAsync(context, tagsVM)
                 }
             }

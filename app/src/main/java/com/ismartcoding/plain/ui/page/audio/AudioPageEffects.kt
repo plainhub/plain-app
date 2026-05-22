@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.audio
+import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +37,7 @@ internal fun AudioPageEffects(
         audioVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
         if (audioVM.hasPermission.value) {
             scope.launch(Dispatchers.IO) {
-                audioVM.sortBy.value = AudioSortByPreference.getValueAsync(context)
+                audioVM.sortBy.value = AudioSortByPreference.getValueAsync()
                 audioVM.loadAsync(context, tagsVM)
                 audioPlaylistVM.loadAsync(context)
                 mediaFoldersVM.loadAsync(context)
@@ -49,7 +50,7 @@ internal fun AudioPageEffects(
             if (event is PermissionsResultEvent) {
                 audioVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
                 scope.launch(Dispatchers.IO) {
-                    audioVM.sortBy.value = AudioSortByPreference.getValueAsync(context)
+                    audioVM.sortBy.value = AudioSortByPreference.getValueAsync()
                     audioVM.loadAsync(context, tagsVM)
                 }
             }

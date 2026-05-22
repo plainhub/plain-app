@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.docs
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
@@ -174,7 +175,7 @@ fun DocsPage(
                 defaultNavigationIcon = { NavigationBackIcon { navController.navigateUp() } },
                 onSortSelected = { _, sortBy ->
                     scope.launch(Dispatchers.IO) {
-                        DocSortByPreference.putAsync(context, sortBy)
+                        DocSortByPreference.putAsync(sortBy)
                         docsVM.sortBy.value = sortBy
                         docsVM.loadAsync(context, tagsVM)
                     }

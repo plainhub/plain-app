@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.preferences
 
-import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 
 abstract class BasePreference<T> {
@@ -11,17 +10,11 @@ abstract class BasePreference<T> {
         return preferences[key] ?: default
     }
 
-    suspend fun getAsync(context: Context): T {
-        return context.dataStore.getAsync(key) ?: default
+    suspend fun getAsync(): T {
+        return appDataStore.getAsync(key) ?: default
     }
 
-    open suspend fun putAsync(
-        context: Context,
-        value: T,
-    ) {
-        context.dataStore.put(
-            key,
-            value,
-        )
+    open suspend fun putAsync(value: T) {
+        appDataStore.put(key, value)
     }
 }

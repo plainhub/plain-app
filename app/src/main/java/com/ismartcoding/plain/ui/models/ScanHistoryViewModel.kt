@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -17,7 +18,7 @@ class ScanHistoryViewModel : ViewModel() {
     fun fetch(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             _itemsFlow.update {
-                ScanHistoryPreference.getValueAsync(context)
+                ScanHistoryPreference.getValueAsync()
             }
         }
     }
@@ -30,7 +31,7 @@ class ScanHistoryViewModel : ViewModel() {
             _itemsFlow.update {
                 val mutableList = it.toMutableList()
                 mutableList.remove(value)
-                ScanHistoryPreference.putAsync(context, mutableList)
+                ScanHistoryPreference.putAsync(mutableList)
                 mutableList
             }
         }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.features
+import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.DrawableResource
@@ -80,7 +81,7 @@ enum class Permission {
     }
 
     suspend fun isEnabledAsync(context: Context): Boolean {
-        val apiPermissions = ApiPermissionsPreference.getAsync(context)
+        val apiPermissions = ApiPermissionsPreference.getAsync()
         return apiPermissions.contains(name)
     }
 
@@ -254,7 +255,7 @@ object Permissions {
     private lateinit var multipleLauncher: ActivityResultLauncher<Array<String>>
 
     suspend fun checkAsync(context: Context, permissions: Set<Permission>) {
-        val apiPermissions = ApiPermissionsPreference.getAsync(context).toMutableSet()
+        val apiPermissions = ApiPermissionsPreference.getAsync().toMutableSet()
         if (apiPermissions.contains(Permission.WRITE_CONTACTS.toString())) {
             apiPermissions.add(Permission.READ_CONTACTS.toString())
         }

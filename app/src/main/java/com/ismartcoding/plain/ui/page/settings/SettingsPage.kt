@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -67,7 +68,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
             cacheSize = AppHelper.getCacheSize(context)
-            developerMode = DeveloperModePreference.getAsync(context)
+            developerMode = DeveloperModePreference.getAsync()
         }
     }
 
@@ -108,7 +109,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                         PListItem(
                             modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
                                 developerMode = true
-                                scope.launch(Dispatchers.IO) { DeveloperModePreference.putAsync(context, true) }
+                                scope.launch(Dispatchers.IO) { DeveloperModePreference.putAsync(true) }
                             }),
                             title = stringResource(Res.string.android_version),
                             value = MainApp.getAndroidVersion(),
@@ -119,7 +120,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                     scope.launch {
                                         DialogHelper.showMessage(Res.string.checking_updates)
                                         val r = withIO {
-                                            UpdateInfoPreference.updateAsync(context) { it.copy(skipVersion = "") }
+                                            UpdateInfoPreference.updateAsync { it.copy(skipVersion = "") }
                                             AppHelper.checkUpdateAsync(context, true)
                                         }
                                         if (r != null) {
@@ -130,7 +131,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 })
                             })
                             PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
-                                PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.IO) { UpdateInfoPreference.updateAsync(context) { it.copy(autoCheckUpdate = newValue) } } }
+                                PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.IO) { UpdateInfoPreference.updateAsync { it.copy(autoCheckUpdate = newValue) } } }
                             }
                         } else {
                             PListItem(title = stringResource(Res.string.app_version), value = MainApp.getAppVersion())

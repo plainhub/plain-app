@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.services
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
@@ -143,7 +144,7 @@ class QSTileService : TileService() {
 
                 serviceScope.launch(Dispatchers.IO) {
                     val appContext = applicationContext
-                    WebPreference.putAsync(appContext, false)
+                    WebPreference.putAsync(false)
                     HttpServerManager.stopServiceAsync(appContext)
                     withContext(Dispatchers.Main.immediate) {
                         setState(Tile.STATE_INACTIVE)

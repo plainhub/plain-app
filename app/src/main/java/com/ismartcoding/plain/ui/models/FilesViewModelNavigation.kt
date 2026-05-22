@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
@@ -37,7 +38,7 @@ internal fun FilesViewModel.navigateBackInternal(): Boolean {
 }
 
 internal suspend fun FilesViewModel.loadLastPathAsyncInternal(context: Context) {
-    val data = LastFilePathPreference.getValueAsync(context)
+    val data = LastFilePathPreference.getValueAsync()
     if (data.selectedPath.isNotEmpty() && File(data.selectedPath).exists()) {
         type = inferFileTypeFromRootInternal(context, data.rootPath)
         initSelectedPathInternal(data.rootPath, type, data.fullPath, data.selectedPath)

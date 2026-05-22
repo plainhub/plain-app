@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Row

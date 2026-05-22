@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.components
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -66,7 +67,7 @@ fun <T : IData> SortAndBrowseDialog(
                             selected = docsVM.tabsShowTags.value,
                             onClick = {
                                 scope.launch(Dispatchers.IO) {
-                                    DocTabsModePreference.putAsync(context, true)
+                                    DocTabsModePreference.putAsync(true)
                                     docsVM.tabsShowTags.value = true
                                     docsVM.fileType.value = ""
                                     docsVM.tag.value = null
@@ -83,7 +84,7 @@ fun <T : IData> SortAndBrowseDialog(
                             selected = !docsVM.tabsShowTags.value,
                             onClick = {
                                 scope.launch(Dispatchers.IO) {
-                                    DocTabsModePreference.putAsync(context, false)
+                                    DocTabsModePreference.putAsync(false)
                                     docsVM.tabsShowTags.value = false
                                     docsVM.fileType.value = ""
                                     docsVM.tag.value = null

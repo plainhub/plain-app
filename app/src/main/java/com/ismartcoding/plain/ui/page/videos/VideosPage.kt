@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.videos
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
@@ -111,7 +112,7 @@ fun VideosPage(
                 scrollToTop = { scope.launch { videosVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } },
                 defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
                 onSortSelected = { _, sortBy ->
-                    scope.launch(Dispatchers.IO) { VideoSortByPreference.putAsync(context, sortBy); videosVM.sortBy.value = sortBy; videosVM.loadAsync(context, tagsVM) }
+                    scope.launch(Dispatchers.IO) { VideoSortByPreference.putAsync(sortBy); videosVM.sortBy.value = sortBy; videosVM.loadAsync(context, tagsVM) }
                 },
                 onSearchAction = { ctx, tv -> scope.launch(Dispatchers.IO) { videosVM.loadAsync(ctx, tv) } },
             )

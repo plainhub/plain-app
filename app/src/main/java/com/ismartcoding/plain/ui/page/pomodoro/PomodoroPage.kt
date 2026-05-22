@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.pomodoro
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
@@ -48,7 +49,7 @@ fun PomodoroPage(navController: NavHostController, pomodoroVM: PomodoroViewModel
         PomodoroSettingsDialog(settings = pomodoroVM.settings.value, onSettingsChange = { newSettings ->
             scope.launch {
                 pomodoroVM.settings.value = newSettings
-                withIO { PomodoroSettingsPreference.putAsync(context, newSettings) }
+                withIO { PomodoroSettingsPreference.putAsync(newSettings) }
                 if (!pomodoroVM.isRunning.value) pomodoroVM.updateTimeForCurrentState()
                 sendEvent(WebSocketEvent(EventType.POMODORO_SETTINGS_UPDATE, JsonHelper.jsonEncode(newSettings)))
             }

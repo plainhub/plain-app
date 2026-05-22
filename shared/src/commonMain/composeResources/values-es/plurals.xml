@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%d publicación</item>
-        <item quantity="other">%d publicaciones</item>
+        <item quantity="one">%1$d publicación</item>
+        <item quantity="other">%1$d publicaciones</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%d elemento</item>
-        <item quantity="other">%d elementos</item>
+        <item quantity="one">%1$d elemento</item>
+        <item quantity="other">%1$d elementos</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%d carpeta</item>
-        <item quantity="other">%d carpetas</item>
+        <item quantity="one">%1$d carpeta</item>
+        <item quantity="other">%1$d carpetas</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%d archivo</item>
-        <item quantity="other">%d archivos</item>
+        <item quantity="one">%1$d archivo</item>
+        <item quantity="other">%1$d archivos</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Copiando %d elemento</item>
-        <item quantity="other">Copiando %d elementos</item>
+        <item quantity="one">Copiando %1$d elemento</item>
+        <item quantity="other">Copiando %1$d elementos</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Moviendo %d elemento</item>
-        <item quantity="other">Moviendo %d elementos</item>
+        <item quantity="one">Moviendo %1$d elemento</item>
+        <item quantity="other">Moviendo %1$d elementos</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%d hora</item>
-        <item quantity="other">%d horas</item>
+        <item quantity="one">%1$d hora</item>
+        <item quantity="other">%1$d horas</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%d minuto</item>
-        <item quantity="other">%d minutos</item>
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="other">%1$d minutos</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%d segundo</item>
-        <item quantity="other">%d segundos</item>
+        <item quantity="one">%1$d segundo</item>
+        <item quantity="other">%1$d segundos</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%d pomodoro</item>
-        <item quantity="other">%d pomodoros</item>
+        <item quantity="one">%1$d pomodoro</item>
+        <item quantity="other">%1$d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Hoy: %d pomodoro</item>
-        <item quantity="other">Hoy: %d pomodoros</item>
+        <item quantity="one">Hoy: %1$d pomodoro</item>
+        <item quantity="other">Hoy: %1$d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Total: %d pomodoro</item>
-        <item quantity="other">Total: %d pomodoros</item>
+        <item quantity="one">Total: %1$d pomodoro</item>
+        <item quantity="other">Total: %1$d pomodoros</item>
     </plurals>
 </resources>

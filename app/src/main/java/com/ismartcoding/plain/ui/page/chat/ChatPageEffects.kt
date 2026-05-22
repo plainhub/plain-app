@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.chat
+import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
@@ -42,7 +43,7 @@ fun ChatPageEffects(
     }
 
     LaunchedEffect(Unit) {
-        onInputLoaded(ChatInputTextPreference.getAsync(context))
+        onInputLoaded(ChatInputTextPreference.getAsync())
         scope.launch(Dispatchers.IO) {
             chatVM.initializeChatStateAsync(id)
             chatVM.fetchAsync(chatVM.chatState.value.toId)

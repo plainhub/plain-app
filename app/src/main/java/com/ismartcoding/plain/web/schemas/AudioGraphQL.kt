@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web.schemas
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.kgraphql.schema.execution.Executor
@@ -53,24 +54,24 @@ fun SchemaBuilder.addAudioSchema() {
         resolver { path: String ->
             val context = MainApp.instance
             val audio = DPlaylistAudio.fromPath(context, path)
-            AudioPlayingPreference.putAsync(context, audio.path)
-            if (!AudioPlaylistPreference.getValueAsync(context).any { it.path == audio.path }) {
-                AudioPlaylistPreference.addAsync(context, listOf(audio))
+            AudioPlayingPreference.putAsync(audio.path)
+            if (!AudioPlaylistPreference.getValueAsync().any { it.path == audio.path }) {
+                AudioPlaylistPreference.addAsync(listOf(audio))
             }
             audio.toModel()
         }
     }
     mutation("updateAudioPlayMode") {
         resolver { mode: MediaPlayMode ->
-            AudioPlayModePreference.putAsync(MainApp.instance, mode)
+            AudioPlayModePreference.putAsync(mode)
             true
         }
     }
     mutation("clearAudioPlaylist") {
         resolver { ->
             val context = MainApp.instance
-            AudioPlayingPreference.putAsync(context, "")
-            AudioPlaylistPreference.putAsync(context, arrayListOf())
+            AudioPlayingPreference.putAsync("")
+            AudioPlaylistPreference.putAsync(arrayListOf())
             coMain {
                 AudioPlayer.clear()
             }
@@ -80,7 +81,7 @@ fun SchemaBuilder.addAudioSchema() {
     }
     mutation("deletePlaylistAudio") {
         resolver { path: String ->
-            AudioPlaylistPreference.deleteAsync(MainApp.instance, setOf(path))
+            AudioPlaylistPreference.deleteAsync(setOf(path))
             true
         }
     }
@@ -88,8 +89,8 @@ fun SchemaBuilder.addAudioSchema() {
         resolver { query: String ->
             val context = MainApp.instance
             // 1000 items at most
-            val items = AudioMediaStoreHelper.searchAsync(context, query, 1000, 0, AudioSortByPreference.getValueAsync(context))
-            AudioPlaylistPreference.addAsync(context, items.map { it.toPlaylistAudio() })
+            val items = AudioMediaStoreHelper.searchAsync(context, query, 1000, 0, AudioSortByPreference.getValueAsync())
+            AudioPlaylistPreference.addAsync(items.map { it.toPlaylistAudio() })
             true
         }
     }
@@ -98,7 +99,7 @@ fun SchemaBuilder.addAudioSchema() {
             val context = MainApp.instance
 
             // Get current playlist
-            val currentPlaylist = AudioPlaylistPreference.getValueAsync(context)
+            val currentPlaylist = AudioPlaylistPreference.getValueAsync()
             if (currentPlaylist.isEmpty() || paths.isEmpty()) {
                 return@resolver true
             }
@@ -124,7 +125,7 @@ fun SchemaBuilder.addAudioSchema() {
             }
 
             // Save the reordered playlist
-            AudioPlaylistPreference.putAsync(context, reorderedPlaylist)
+            AudioPlaylistPreference.putAsync(reorderedPlaylist)
 
             true
         }

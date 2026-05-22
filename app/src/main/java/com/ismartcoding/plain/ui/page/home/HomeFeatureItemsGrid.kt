@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
+import com.ismartcoding.plain.preferences.*
 
 import org.jetbrains.compose.resources.DrawableResource
 import com.ismartcoding.plain.i18n.*
@@ -64,7 +65,7 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
     fun persist(newList: List<String>) {
         enabledIds = newList
         scope.launch(Dispatchers.IO) {
-            HomeFeaturesPreference.putAsync(context, HomeFeaturesPreference.formatList(newList))
+            HomeFeaturesPreference.putAsync(HomeFeaturesPreference.formatList(newList))
         }
     }
 

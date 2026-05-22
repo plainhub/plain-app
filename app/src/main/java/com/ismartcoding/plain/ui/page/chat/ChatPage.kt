@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.chat
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
@@ -132,13 +133,13 @@ fun ChatPage(
             focusManager = focusManager, previewerState = previewerState,
             imageWidthDp = imageWidthDp, imageWidthPx = imageWidthPx.value,
             inputValue = inputValue,
-            onInputChange = { inputValue = it; scope.launch(Dispatchers.IO) { ChatInputTextPreference.putAsync(context, it) } },
+            onInputChange = { inputValue = it; scope.launch(Dispatchers.IO) { ChatInputTextPreference.putAsync(it) } },
             onSend = {
                 if (inputValue.isEmpty()) return@ChatPageContent
                 scope.launch {
                     chatVM.sendTextMessage(inputValue, context)
                     inputValue = ""
-                    withIO { ChatInputTextPreference.putAsync(context, "") }
+                    withIO { ChatInputTextPreference.putAsync("") }
                     scrollState.scrollToItem(0)
                 }
             },

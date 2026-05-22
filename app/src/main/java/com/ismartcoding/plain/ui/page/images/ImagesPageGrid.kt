@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.images
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
@@ -72,7 +73,7 @@ internal fun ImagesPageGrid(
                         LazyVerticalGrid(columns = GridCells.Fixed(cellsPerRow.value), state = scrollState, flingBehavior = flingBehavior,
                             modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
                                 .gridDragSelect(items = itemsState, state = dragSelectState)
-                                .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) { ImageGridCellsPerRowPreference.putAsync(context, it) },
+                                .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) { ImageGridCellsPerRowPreference.putAsync(it) },
                             horizontalArrangement = Arrangement.spacedBy(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
                                 && imagesVM.queryText.value.isEmpty()

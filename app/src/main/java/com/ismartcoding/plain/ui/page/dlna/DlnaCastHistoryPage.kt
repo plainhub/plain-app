@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.dlna
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,21 +45,21 @@ class DlnaCastRulesViewModel : ViewModel() {
 
     fun load(context: android.content.Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            allowedFlow.value = DlnaAllowedSendersPreference.getAsync(context).map { decodeSenderEntry(it) }
-            deniedFlow.value = DlnaDeniedSendersPreference.getAsync(context).map { decodeSenderEntry(it) }
+            allowedFlow.value = DlnaAllowedSendersPreference.getAsync().map { decodeSenderEntry(it) }
+            deniedFlow.value = DlnaDeniedSendersPreference.getAsync().map { decodeSenderEntry(it) }
         }
     }
 
     fun removeAllowed(context: android.content.Context, ip: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            DlnaAllowedSendersPreference.removeAsync(context, ip)
+            DlnaAllowedSendersPreference.removeAsync(ip)
             allowedFlow.value = allowedFlow.value.filter { it.first != ip }
         }
     }
 
     fun removeDenied(context: android.content.Context, ip: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            DlnaDeniedSendersPreference.removeAsync(context, ip)
+            DlnaDeniedSendersPreference.removeAsync(ip)
             deniedFlow.value = deniedFlow.value.filter { it.first != ip }
         }
     }

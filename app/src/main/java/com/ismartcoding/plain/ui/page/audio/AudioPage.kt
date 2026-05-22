@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.audio
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
@@ -151,7 +152,7 @@ fun AudioPage(
                 defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
                 onSortSelected = { _, sortBy ->
                     scope.launch(Dispatchers.IO) {
-                        AudioSortByPreference.putAsync(context, sortBy)
+                        AudioSortByPreference.putAsync(sortBy)
                         audioVM.sortBy.value = sortBy
                         audioVM.loadAsync(context, tagsVM)
                     }

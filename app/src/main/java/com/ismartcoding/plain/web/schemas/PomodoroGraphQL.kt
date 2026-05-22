@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web.schemas
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.channel.sendEvent
@@ -16,7 +17,7 @@ import kotlinx.datetime.toLocalDateTime
 fun SchemaBuilder.addPomodoroSchema() {
     query("pomodoroSettings") {
         resolver { ->
-            PomodoroSettingsPreference.getValueAsync(MainApp.instance).toModel()
+            PomodoroSettingsPreference.getValueAsync().toModel()
         }
     }
     query("pomodoroToday") {

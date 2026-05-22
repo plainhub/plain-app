@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,7 +45,7 @@ internal fun WebSettingsEffects(
                     systemAlertWindow.value = Permission.SYSTEM_ALERT_WINDOW.can(context)
                     notificationListenerGranted.value = Permission.NOTIFICATION_LISTENER.can(context)
                     if (event.map[Permission.NOTIFICATION_LISTENER.toSysPermission()] == true) {
-                        PNotificationListenerService.toggle(context, WebPreference.getAsync(context))
+                        PNotificationListenerService.toggle(context, WebPreference.getAsync())
                     }
                 }
                 is WindowFocusChangedEvent -> {
@@ -66,9 +67,9 @@ internal fun WebSettingsEffects(
 
 internal fun togglePermission(scope: CoroutineScope, context: android.content.Context, m: PermissionItem, enable: Boolean) {
     scope.launch {
-        withIO { ApiPermissionsPreference.putAsync(context, m.permission, enable) }
+        withIO { ApiPermissionsPreference.putAsync(m.permission, enable) }
         if (m.permission == Permission.NOTIFICATION_LISTENER) {
-            val webEnabled = WebPreference.getAsync(context)
+            val webEnabled = WebPreference.getAsync()
             PNotificationListenerService.toggle(context, enable && webEnabled)
         }
         if (enable) {

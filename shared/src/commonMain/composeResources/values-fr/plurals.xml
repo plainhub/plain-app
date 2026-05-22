@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%d publication</item>
-        <item quantity="other">%d publications</item>
+        <item quantity="one">%1$d publication</item>
+        <item quantity="other">%1$d publications</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%d élément</item>
-        <item quantity="other">%d éléments</item>
+        <item quantity="one">%1$d élément</item>
+        <item quantity="other">%1$d éléments</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%d dossier</item>
-        <item quantity="other">%d dossiers</item>
+        <item quantity="one">%1$d dossier</item>
+        <item quantity="other">%1$d dossiers</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%d fichier</item>
-        <item quantity="other">%d fichiers</item>
+        <item quantity="one">%1$d fichier</item>
+        <item quantity="other">%1$d fichiers</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Copie de l\'élément %d</item>
-        <item quantity="other">Copie des éléments %d</item>
+        <item quantity="one">Copie de l\'élément %1$d</item>
+        <item quantity="other">Copie des éléments %1$d</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Déplacement de l\'élément %d</item>
-        <item quantity="other">Déplacement des éléments %d</item>
+        <item quantity="one">Déplacement de l\'élément %1$d</item>
+        <item quantity="other">Déplacement des éléments %1$d</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%d heure</item>
-        <item quantity="other">%d heures</item>
+        <item quantity="one">%1$d heure</item>
+        <item quantity="other">%1$d heures</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%d minute</item>
-        <item quantity="other">%d minutes</item>
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%d seconde</item>
-        <item quantity="other">%d secondes</item>
+        <item quantity="one">%1$d seconde</item>
+        <item quantity="other">%1$d secondes</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%d pomodoro</item>
-        <item quantity="other">%d pomodoros</item>
+        <item quantity="one">%1$d pomodoro</item>
+        <item quantity="other">%1$d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Aujourd\'hui: %d pomodoro</item>
-        <item quantity="other">Aujourd\'hui: %d pomodoros</item>
+        <item quantity="one">Aujourd\'hui: %1$d pomodoro</item>
+        <item quantity="other">Aujourd\'hui: %1$d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Total: %d pomodoro</item>
-        <item quantity="other">Total: %d pomodoros</item>
+        <item quantity="one">Total: %1$d pomodoro</item>
+        <item quantity="other">Total: %1$d pomodoros</item>
     </plurals>
 </resources>

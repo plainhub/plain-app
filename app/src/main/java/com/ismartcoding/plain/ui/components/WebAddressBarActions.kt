@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.components
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -19,7 +20,7 @@ fun persistMdnsHostname(
     hostname: String,
 ) {
     scope.launch {
-        withIO { MdnsHostnamePreference.putAsync(context, hostname) }
+        withIO { MdnsHostnamePreference.putAsync(hostname) }
     }
 }
 
@@ -31,9 +32,9 @@ fun persistPort(
 ) {
     scope.launch(Dispatchers.IO) {
         if (isHttps) {
-            HttpsPortPreference.putAsync(context, port)
+            HttpsPortPreference.putAsync(port)
         } else {
-            HttpPortPreference.putAsync(context, port)
+            HttpPortPreference.putAsync(port)
         }
     }
 }

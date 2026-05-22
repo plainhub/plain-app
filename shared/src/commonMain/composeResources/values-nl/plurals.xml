@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%d bericht</item>
-        <item quantity="other">%d berichten</item>
+        <item quantity="one">%1$d bericht</item>
+        <item quantity="other">%1$d berichten</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%d item</item>
-        <item quantity="other">%d items</item>
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%d map</item>
-        <item quantity="other">%d mappen</item>
+        <item quantity="one">%1$d map</item>
+        <item quantity="other">%1$d mappen</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%d bestand</item>
-        <item quantity="other">%d bestanden</item>
+        <item quantity="one">%1$d bestand</item>
+        <item quantity="other">%1$d bestanden</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Kopiëren van %d item</item>
-        <item quantity="other">Kopiëren van %d items</item>
+        <item quantity="one">Kopiëren van %1$d item</item>
+        <item quantity="other">Kopiëren van %1$d items</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Verplaatsen van %d item</item>
-        <item quantity="other">Verplaatsen van %d items</item>
+        <item quantity="one">Verplaatsen van %1$d item</item>
+        <item quantity="other">Verplaatsen van %1$d items</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%d uur</item>
-        <item quantity="other">%d uur</item>
+        <item quantity="one">%1$d uur</item>
+        <item quantity="other">%1$d uur</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%d minuut</item>
-        <item quantity="other">%d minuten</item>
+        <item quantity="one">%1$d minuut</item>
+        <item quantity="other">%1$d minuten</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%d seconde</item>
-        <item quantity="other">%d seconden</item>
+        <item quantity="one">%1$d seconde</item>
+        <item quantity="other">%1$d seconden</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%d pomodoro</item>
-        <item quantity="other">%d pomodoros</item>
+        <item quantity="one">%1$d pomodoro</item>
+        <item quantity="other">%1$d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Vandaag: %d pomodoro</item>
-        <item quantity="other">Vandaag: %d pomodoros</item>
+        <item quantity="one">Vandaag: %1$d pomodoro</item>
+        <item quantity="other">Vandaag: %1$d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Totaal: %d pomodoro</item>
-        <item quantity="other">Totaal: %d pomodoros</item>
+        <item quantity="one">Totaal: %1$d pomodoro</item>
+        <item quantity="other">Totaal: %1$d pomodoros</item>
     </plurals>
 </resources>

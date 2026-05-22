@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -94,7 +95,7 @@ fun AboutLogsAndCacheCard(
                 PSwitch(activated = developerMode) {
                     onDeveloperModeChanged(it)
                     scope.launch(Dispatchers.IO) {
-                        DeveloperModePreference.putAsync(context, it)
+                        DeveloperModePreference.putAsync(it)
                     }
                 }
             }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web.schemas
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.kgraphql.GraphQLError
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -95,17 +96,17 @@ fun SchemaBuilder.addFileMutationSchema() {
     mutation("addFavoriteFolder") {
         resolver { rootPath: String, fullPath: String ->
             val context = MainApp.instance
-            val current = FavoriteFoldersPreference.getValueAsync(context)
+            val current = FavoriteFoldersPreference.getValueAsync()
                 .firstOrNull { it.fullPath == fullPath }
             val folder = DFavoriteFolder(rootPath, fullPath, alias = current?.alias)
-            val updatedFolders = FavoriteFoldersPreference.addAsync(context, folder)
+            val updatedFolders = FavoriteFoldersPreference.addAsync(folder)
             updatedFolders.map { it.toModel() }
         }
     }
     mutation("removeFavoriteFolder") {
         resolver { fullPath: String ->
             val context = MainApp.instance
-            val updatedFolders = FavoriteFoldersPreference.removeAsync(context, fullPath)
+            val updatedFolders = FavoriteFoldersPreference.removeAsync(fullPath)
             updatedFolders.map { it.toModel() }
         }
     }
@@ -113,7 +114,7 @@ fun SchemaBuilder.addFileMutationSchema() {
         resolver { fullPath: String, alias: String ->
             val context = MainApp.instance
             val trimmed = alias.trim()
-            val updated = FavoriteFoldersPreference.getValueAsync(context)
+            val updated = FavoriteFoldersPreference.getValueAsync()
                 .map {
                     if (it.fullPath == fullPath) {
                         it.copy(alias = trimmed)
@@ -121,7 +122,7 @@ fun SchemaBuilder.addFileMutationSchema() {
                         it
                     }
                 }
-            FavoriteFoldersPreference.putAsync(context, updated)
+            FavoriteFoldersPreference.putAsync(updated)
             updated.map { it.toModel() }
         }
     }

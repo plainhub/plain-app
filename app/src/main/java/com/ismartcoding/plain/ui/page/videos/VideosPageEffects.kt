@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.videos
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -40,8 +41,8 @@ internal fun VideosPageEffects(
         videosVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
         if (videosVM.hasPermission.value) {
             scope.launch(Dispatchers.IO) {
-                cellsPerRow.value = VideoGridCellsPerRowPreference.getAsync(context)
-                videosVM.sortBy.value = VideoSortByPreference.getValueAsync(context)
+                cellsPerRow.value = VideoGridCellsPerRowPreference.getAsync()
+                videosVM.sortBy.value = VideoSortByPreference.getValueAsync()
                 videosVM.loadAsync(context, tagsVM); mediaFoldersVM.loadAsync(context)
             }
         }
@@ -51,7 +52,7 @@ internal fun VideosPageEffects(
             when (event) {
                 is PermissionsResultEvent -> {
                     videosVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
-                    scope.launch(Dispatchers.IO) { videosVM.sortBy.value = VideoSortByPreference.getValueAsync(context); videosVM.loadAsync(context, tagsVM) }
+                    scope.launch(Dispatchers.IO) { videosVM.sortBy.value = VideoSortByPreference.getValueAsync(); videosVM.loadAsync(context, tagsVM) }
                 }
             }
         }

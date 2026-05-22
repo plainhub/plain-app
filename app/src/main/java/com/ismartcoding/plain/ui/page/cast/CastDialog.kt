@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.cast
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -106,8 +107,8 @@ fun CastDialog(castVM: CastViewModel) {
                                 castVM.enterCastMode()
                                 AudioPlayer.pause()
                                 scope.launch(Dispatchers.IO) {
-                                    if (!WebPreference.getAsync(context)) {
-                                        WebPreference.putAsync(context, true)
+                                    if (!WebPreference.getAsync()) {
+                                        WebPreference.putAsync(true)
                                         sendEvent(StartHttpServerEvent())
                                     }
                                 }

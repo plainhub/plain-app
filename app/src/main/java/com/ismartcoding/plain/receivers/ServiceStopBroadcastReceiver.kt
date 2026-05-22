@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.receivers
+import com.ismartcoding.plain.preferences.*
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -22,9 +23,9 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
         when (intent.action) {
             Constants.ACTION_START_HTTP_SERVER -> {
                 coIO {
-                    val storedToken = AdbTokenPreference.getAsync(context)
+                    val storedToken = AdbTokenPreference.getAsync()
                     if (intent.getStringExtra("token") != storedToken) return@coIO
-                    WebPreference.putAsync(context, true)
+                    WebPreference.putAsync(true)
                     ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
                 }
             }
@@ -34,10 +35,10 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
                 val appUid = context.applicationInfo.uid
                 if (callerUid != appUid) {
                     // External caller (ADB, third-party app) — require token
-                    val storedToken = AdbTokenPreference.getAsync(context)
+                    val storedToken = AdbTokenPreference.getAsync()
                     if (intent.getStringExtra("token") != storedToken) return@coIO
                 }
-                WebPreference.putAsync(context, false)
+                WebPreference.putAsync(false)
                 HttpServerManager.stopServiceAsync(context)
             }
 

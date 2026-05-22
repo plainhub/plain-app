@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.base.mdeditor
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -57,7 +58,7 @@ fun MdEditorSettingsDialog(
                     ) {
                         mdEditorVM.showLineNumbers = it
                         scope.launch(Dispatchers.IO) {
-                            EditorShowLineNumbersPreference.putAsync(context, it)
+                            EditorShowLineNumbersPreference.putAsync(it)
                         }
                     }
                 }
@@ -69,7 +70,7 @@ fun MdEditorSettingsDialog(
                     ) {
                         mdEditorVM.wrapContent = it
                         scope.launch(Dispatchers.IO) {
-                            EditorWrapContentPreference.putAsync(context, it)
+                            EditorWrapContentPreference.putAsync(it)
                         }
                     }
                 }
@@ -81,7 +82,7 @@ fun MdEditorSettingsDialog(
 //                    ) {
 //                        viewModel.syntaxHighLight = it
 //                        scope.launch(Dispatchers.IO) {
-//                            EditorSyntaxHighlightPreference.putAsync(context, it)
+//                            EditorSyntaxHighlightPreference.putAsync(it)
 //                        }
 //                    }
 //                }

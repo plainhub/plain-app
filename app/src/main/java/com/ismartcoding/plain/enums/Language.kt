@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.enums
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import android.os.LocaleList
@@ -49,7 +50,7 @@ object Language {
     }
 
     suspend fun initLocaleAsync(context: Context) {
-        val locale = LanguagePreference.getLocaleAsync(context)
+        val locale = LanguagePreference.getLocaleAsync()
         if (locale != null) {
             setLocale(context, locale)
         }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.videos
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
@@ -72,7 +73,7 @@ internal fun VideosPageGrid(
                         LazyVerticalGrid(columns = GridCells.Fixed(cellsPerRow.value), state = scrollState, flingBehavior = flingBehavior,
                             modifier = Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
                                 .gridDragSelect(items = itemsState, state = dragSelectState)
-                                .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) { VideoGridCellsPerRowPreference.putAsync(context, it) },
+                                .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) { VideoGridCellsPerRowPreference.putAsync(it) },
                             horizontalArrangement = Arrangement.spacedBy(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             val isGroupMode = videosVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
                                 && videosVM.queryText.value.isEmpty()

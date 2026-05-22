@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.chat.discover
+import com.ismartcoding.plain.preferences.*
 
 import android.net.ConnectivityManager
 import android.net.LinkProperties
@@ -155,7 +156,7 @@ object NearbyDiscoverManager {
                     sendDiscoverReply(senderIP)
                 }
             } else {
-                val discoverable = NearbyDiscoverablePreference.getAsync(MainApp.instance)
+                val discoverable = NearbyDiscoverablePreference.getAsync()
                 if (discoverable) {
                     sendDiscoverReply(senderIP)
                 }

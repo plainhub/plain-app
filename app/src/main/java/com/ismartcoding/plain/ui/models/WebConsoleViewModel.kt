@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
@@ -49,7 +50,7 @@ class WebConsoleViewModel : ViewModel() {
 
     fun enableKeepAwake(context: Context, enable: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            KeepAwakePreference.putAsync(context, enable)
+            KeepAwakePreference.putAsync(enable)
             sendEvent(KeepAwakeChangedEvent(enable))
         }
     }

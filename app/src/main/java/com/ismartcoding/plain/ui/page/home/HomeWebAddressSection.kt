@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import android.content.Context
@@ -68,7 +69,7 @@ fun HomeWebAddressSection(
             val https = page == 1
             if (isHttps != https) {
                 isHttps = https
-                scope.launch { HttpsPreference.putAsync(context, https) }
+                scope.launch { HttpsPreference.putAsync(https) }
             }
         }
     }

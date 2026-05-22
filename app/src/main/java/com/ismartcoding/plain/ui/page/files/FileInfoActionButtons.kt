@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.files
+import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState

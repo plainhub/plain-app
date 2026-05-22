@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.scan
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
@@ -145,9 +146,9 @@ fun ScanPage(navController: NavHostController) {
 
 private fun addScanResult(context: Context, scope: CoroutineScope, value: String) {
     scope.launch {
-        val results = withIO { ScanHistoryPreference.getValueAsync(context).toMutableList() }
+        val results = withIO { ScanHistoryPreference.getValueAsync().toMutableList() }
         results.removeIf { it == value }; results.add(0, value)
-        withIO { ScanHistoryPreference.putAsync(context, results) }
+        withIO { ScanHistoryPreference.putAsync(results) }
     }
 }
 

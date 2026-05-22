@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -35,7 +36,7 @@ import kotlinx.coroutines.delay
 internal fun MainActivity.handleIntent(intent: Intent) {
     if (intent.getBooleanExtra("start_web_service", false)) {
         coIO {
-            WebPreference.putAsync(this@handleIntent, true)
+            WebPreference.putAsync(true)
             sendEvent(StartHttpServerEvent())
         }
     }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.events
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Intent
 import android.media.MediaPlayer
@@ -370,7 +371,7 @@ object AppEvents {
                         downloadJob?.cancel()
                         downloadJob = coIO {
                             val context = MainApp.instance
-                            val url = UpdateInfoPreference.getValueAsync(context).downloadUrl
+                            val url = UpdateInfoPreference.getValueAsync().downloadUrl
                             if (url.isEmpty()) {
                                 sendEvent(UpdateDownloadFailedEvent())
                                 return@coIO
@@ -398,7 +399,7 @@ object AppEvents {
                                         }
                                     }
                                 }
-                                UpdateInfoPreference.updateAsync(context) { it.copy(downloadedApkPath = outputFile.absolutePath) }
+                                UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = outputFile.absolutePath) }
                                 sendEvent(UpdateDownloadCompleteEvent(outputFile.absolutePath))
                             } catch (e: CancellationException) {
                                 call.cancel()
@@ -416,7 +417,7 @@ object AppEvents {
                     is CancelUpdateDownloadEvent -> {
                         downloadJob?.cancel()
                         downloadJob = null
-                        coIO { UpdateInfoPreference.updateAsync(MainApp.instance) { it.copy(downloadedApkPath = "") } }
+                        coIO { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } }
                     }
 
                     is RetryChatItemEvent -> {

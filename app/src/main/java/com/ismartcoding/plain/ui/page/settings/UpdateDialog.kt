@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
@@ -95,7 +96,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
                 TextButton(
                     onClick = {
                         scope.launch {
-                            withIO { UpdateInfoPreference.updateAsync(context) { it.copy(skipVersion = newVersion.toString()) } }
+                            withIO { UpdateInfoPreference.updateAsync { it.copy(skipVersion = newVersion.toString()) } }
                             updateVM.hideDialog()
                         }
                     }

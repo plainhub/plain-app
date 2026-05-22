@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web.schemas
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
@@ -89,14 +90,14 @@ fun SchemaBuilder.addMediaSchema() {
                     ids = AudioMediaStoreHelper.getIdsAsync(context, query)
                     val paths = AudioMediaStoreHelper.getPathsByIdsAsync(context, ids)
                     AudioMediaStoreHelper.trashByIdsAsync(context, ids)
-                    AudioPlaylistPreference.deleteAsync(context, paths)
+                    AudioPlaylistPreference.deleteAsync(paths)
                 }
 
                 DataType.VIDEO -> {
                     ids = VideoMediaStoreHelper.getIdsAsync(context, query)
                     val paths = VideoMediaStoreHelper.getPathsByIdsAsync(context, ids)
                     VideoMediaStoreHelper.trashByIdsAsync(context, ids)
-                    VideoPlaylistPreference.deleteAsync(context, paths)
+                    VideoPlaylistPreference.deleteAsync(paths)
                 }
 
                 DataType.IMAGE -> {

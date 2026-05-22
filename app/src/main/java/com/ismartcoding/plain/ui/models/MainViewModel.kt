@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -42,7 +43,7 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         enable: Boolean,
     ) {
         viewModelScope.launch {
-            withIO { WebPreference.putAsync(context, enable) }
+            withIO { WebPreference.putAsync(enable) }
             if (enable) {
                 httpServerError = ""
                 if (!httpServerState.isProcessing() && httpServerState != HttpServerState.ON) {
@@ -76,7 +77,7 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     fun syncHttpServerState(context: Context) {
         viewModelScope.launch {
-            val webEnabled = withIO { WebPreference.getAsync(context) }
+            val webEnabled = withIO { WebPreference.getAsync() }
             if (!webEnabled) {
                 if (!httpServerState.isProcessing()) {
                     httpServerState = HttpServerState.OFF

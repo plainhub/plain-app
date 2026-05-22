@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui
+import com.ismartcoding.plain.preferences.*
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -224,7 +225,7 @@ class MainActivity : AppCompatActivity() {
         AudioPlayer.ensurePlayer(this)
         coIO {
             try {
-                if (WebPreference.getAsync(this@MainActivity)) mainVM.enableHttpServer(this@MainActivity, true); doWhenReadyAsync()
+                if (WebPreference.getAsync()) mainVM.enableHttpServer(this@MainActivity, true); doWhenReadyAsync()
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
             }

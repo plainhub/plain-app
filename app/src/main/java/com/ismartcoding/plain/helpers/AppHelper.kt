@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.helpers
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -46,7 +47,7 @@ object AppHelper {
         return try {
             val client = HttpClientManager.httpClient()
             val r = client.get(Constants.LATEST_RELEASE_URL)
-            UpdateInfoPreference.updateAsync(context) { it.copy(checkUpdateTime = System.currentTimeMillis()) }
+            UpdateInfoPreference.updateAsync { it.copy(checkUpdateTime = System.currentTimeMillis()) }
             if (r.status == HttpStatusCode.Forbidden) {
                 if (showToast) {
                     DialogHelper.showMessage(Res.string.rate_limit)
@@ -63,7 +64,7 @@ object AppHelper {
             }
 
             val latest = jsonDecode<LatestRelease>(latestJSON)
-            val current = UpdateInfoPreference.getValueAsync(context)
+            val current = UpdateInfoPreference.getValueAsync()
             val skipVersion = Version(current.skipVersion)
             val currentVersion = Version(BuildConfig.VERSION_NAME)
             val latestVersion = Version(latest.tagName.substring(1))
@@ -78,7 +79,7 @@ object AppHelper {
                         it.name.contains("Recommended")
                     }
                 }
-                UpdateInfoPreference.updateAsync(context) {
+                UpdateInfoPreference.updateAsync {
                     it.copy(
                         newVersion = latestVersion.toString(),
                         log = latest.body,

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -46,7 +47,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
                 viewModelScope.launch(Dispatchers.IO) {
                     val breadcrumbsCopy = breadcrumbs.toList()
                     val fullPath = if (breadcrumbsCopy.isNotEmpty()) breadcrumbsCopy.last().path else value
-                    LastFilePathPreference.putAsync(MainApp.instance, FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value))
+                    LastFilePathPreference.putAsync(FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value))
                 }
             }
         }
@@ -102,7 +103,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     suspend fun loadAsync(context: Context) {
         isLoading.value = true
-        val showHiddenFiles = ShowHiddenFilesPreference.getAsync(context)
+        val showHiddenFiles = ShowHiddenFilesPreference.getAsync()
         val query = getQuery()
         val files = when {
             ZipBrowserHelper.isZipPath(selectedPath) -> ZipBrowserHelper.listEntries(selectedPath, sortBy.value)

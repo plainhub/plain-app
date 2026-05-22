@@ -14,7 +14,7 @@ fun String.checkColorHex(): String? {
 @Stable
 fun String.safeHexToColor(): Color =
     try {
-        Color(java.lang.Long.parseLong(this, 16))
+        Color(this.toLong(16))
     } catch (e: Exception) {
         Color.Transparent
     }

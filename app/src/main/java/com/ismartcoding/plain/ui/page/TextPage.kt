@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page
+import com.ismartcoding.plain.preferences.*
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column

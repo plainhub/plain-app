@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -55,14 +56,14 @@ fun LanguagePage(navController: NavHostController) {
                             .getCardModifier(index = if (index > 0) index - 1 else 0, size = if (index > 0) list.size - 1 else 1)
                             .clickable {
                                 scope.launch(Dispatchers.IO) {
-                                    LanguagePreference.putAsync(context, item)
+                                    LanguagePreference.putAsync(item)
                                 }
                             },
                         title = item?.getElegantDisplayName() ?: stringResource(Res.string.use_device_language),
                     ) {
                         RadioButton(selected = (item == null && language == null) || (item?.language == language?.language && item?.country == language?.country), onClick = {
                             scope.launch(Dispatchers.IO) {
-                                LanguagePreference.putAsync(context, item)
+                                LanguagePreference.putAsync(item)
                             }
                         })
                     }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import android.net.Uri
@@ -30,7 +31,7 @@ class TextFileViewModel : ViewModel() {
     val isExternalFile = mutableStateOf(false)
 
     suspend fun loadConfigAsync(context: Context) {
-        wrapContent.value = EditorWrapContentPreference.getAsync(context)
+        wrapContent.value = EditorWrapContentPreference.getAsync()
     }
 
     fun loadFileAsync(context: Context, path: String, mediaId: String) {
@@ -63,7 +64,7 @@ class TextFileViewModel : ViewModel() {
     fun toggleWrapContent(context: Context) {
         wrapContent.value = !wrapContent.value
         viewModelScope.launch(Dispatchers.IO) {
-            EditorWrapContentPreference.putAsync(context, wrapContent.value)
+            EditorWrapContentPreference.putAsync(wrapContent.value)
         }
         webView.value?.evaluateJavascript("editor.session.setUseWrapMode(${wrapContent.value.toJsValue()})") {}
     }

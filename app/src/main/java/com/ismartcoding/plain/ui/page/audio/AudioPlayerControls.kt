@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.audio
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
@@ -54,7 +55,7 @@ fun AudioPlayerControls(
                     }
                     TempData.audioPlayMode = nextMode
                     onPlayModeChange(nextMode)
-                    withIO { AudioPlayModePreference.putAsync(context, nextMode) }
+                    withIO { AudioPlayModePreference.putAsync(nextMode) }
                 }
             },
             modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),

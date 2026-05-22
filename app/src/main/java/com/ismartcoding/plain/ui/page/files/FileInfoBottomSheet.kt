@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.files
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -47,7 +48,7 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
 
     LaunchedEffect(file.path) {
         if (file.isDir) {
-            isFavorite = FavoriteFoldersPreference.isFavoriteAsync(context, file.path)
+            isFavorite = FavoriteFoldersPreference.isFavoriteAsync(file.path)
         }
     }
 
@@ -71,10 +72,10 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                     onFavoriteToggle = {
                         scope.launch(Dispatchers.IO) {
                             if (isFavorite) {
-                                FavoriteFoldersPreference.removeAsync(context, file.path)
+                                FavoriteFoldersPreference.removeAsync(file.path)
                                 isFavorite = false
                             } else {
-                                FavoriteFoldersPreference.addAsync(context, DFavoriteFolder(rootPath = filesVM.rootPath, fullPath = file.path))
+                                FavoriteFoldersPreference.addAsync(DFavoriteFolder(rootPath = filesVM.rootPath, fullPath = file.path))
                                 isFavorite = true
                             }
                         }

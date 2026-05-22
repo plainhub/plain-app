@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.models
+import com.ismartcoding.plain.preferences.*
 
 import org.jetbrains.compose.resources.DrawableResource
 import android.content.Context
@@ -36,31 +37,31 @@ class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     fun load(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            level = EditorAccessoryLevelPreference.getAsync(context)
-            wrapContent = EditorWrapContentPreference.getAsync(context)
-            showLineNumbers = EditorShowLineNumbersPreference.getAsync(context)
-            syntaxHighLight = EditorSyntaxHighlightPreference.getAsync(context)
+            level = EditorAccessoryLevelPreference.getAsync()
+            wrapContent = EditorWrapContentPreference.getAsync()
+            showLineNumbers = EditorShowLineNumbersPreference.getAsync()
+            syntaxHighLight = EditorSyntaxHighlightPreference.getAsync()
         }
     }
 
     fun toggleLevel(context: Context) {
         level = if (level == 1) 0 else 1
         viewModelScope.launch(Dispatchers.IO) {
-            EditorAccessoryLevelPreference.putAsync(context, level)
+            EditorAccessoryLevelPreference.putAsync(level)
         }
     }
 
     fun toggleLineNumbers(context: Context) {
         showLineNumbers = !showLineNumbers
         viewModelScope.launch(Dispatchers.IO) {
-            EditorShowLineNumbersPreference.putAsync(context, showLineNumbers)
+            EditorShowLineNumbersPreference.putAsync(showLineNumbers)
         }
     }
 
     fun toggleWrapContent(context: Context) {
         wrapContent = !wrapContent
         viewModelScope.launch(Dispatchers.IO) {
-            EditorWrapContentPreference.putAsync(context, wrapContent)
+            EditorWrapContentPreference.putAsync(wrapContent)
         }
     }
 

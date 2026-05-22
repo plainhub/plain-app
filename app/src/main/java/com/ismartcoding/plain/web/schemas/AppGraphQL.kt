@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web.schemas
+import com.ismartcoding.plain.preferences.*
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -46,7 +47,7 @@ fun SchemaBuilder.addAppSchema() {
     query("app") {
         resolver { ->
             val context = MainApp.instance
-            val apiPermissions = ApiPermissionsPreference.getAsync(context)
+            val apiPermissions = ApiPermissionsPreference.getAsync()
             val grantedPermissions = Permission.entries.filter { apiPermissions.contains(it.name) && it.can(MainApp.instance) }.toMutableList()
             if (Permission.RECORD_AUDIO.can(context) && !grantedPermissions.contains(Permission.RECORD_AUDIO)) {
                 grantedPermissions.add(Permission.RECORD_AUDIO)
@@ -64,15 +65,15 @@ fun SchemaBuilder.addAppSchema() {
                 Build.VERSION.SDK_INT,
                 BuildConfig.CHANNEL,
                 grantedPermissions,
-                AudioPlaylistPreference.getValueAsync(context).map { it.toModel() },
+                AudioPlaylistPreference.getValueAsync().map { it.toModel() },
                 TempData.audioPlayMode,
-                AudioPlayingPreference.getValueAsync(context),
+                AudioPlayingPreference.getValueAsync(),
                 sdcardPath = FileSystemHelper.getSDCardPath(context),
                 usbDiskPaths = FileSystemHelper.getUsbDiskPaths(),
                 internalStoragePath = FileSystemHelper.getInternalStoragePath(),
                 downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath,
-                developerMode = DeveloperModePreference.getAsync(context),
-                favoriteFolders = FavoriteFoldersPreference.getValueAsync(context).map { it.toModel() },
+                developerMode = DeveloperModePreference.getAsync(),
+                favoriteFolders = FavoriteFoldersPreference.getValueAsync().map { it.toModel() },
             )
         }
     }

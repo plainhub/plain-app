@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%d post</item>
-        <item quantity="other">%d post</item>
+        <item quantity="one">%1$d post</item>
+        <item quantity="other">%1$d post</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%d elemento</item>
-        <item quantity="other">%d elementi</item>
+        <item quantity="one">%1$d elemento</item>
+        <item quantity="other">%1$d elementi</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%d cartella</item>
-        <item quantity="other">%d cartelle</item>
+        <item quantity="one">%1$d cartella</item>
+        <item quantity="other">%1$d cartelle</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%d file</item>
-        <item quantity="other">%d file</item>
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d file</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Copia dell\'elemento %d</item>
-        <item quantity="other">Copia degli elementi %d</item>
+        <item quantity="one">Copia dell\'elemento %1$d</item>
+        <item quantity="other">Copia degli elementi %1$d</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Spostamento dell\'elemento %d</item>
-        <item quantity="other">Spostamento degli elementi %d</item>
+        <item quantity="one">Spostamento dell\'elemento %1$d</item>
+        <item quantity="other">Spostamento degli elementi %1$d</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%d ora</item>
-        <item quantity="other">%d ore</item>
+        <item quantity="one">%1$d ora</item>
+        <item quantity="other">%1$d ore</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%d minuto</item>
-        <item quantity="other">%d minuti</item>
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="other">%1$d minuti</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%d secondo</item>
-        <item quantity="other">%d secondi</item>
+        <item quantity="one">%1$d secondo</item>
+        <item quantity="other">%1$d secondi</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%d pomodoro</item>
-        <item quantity="other">%d pomodoros</item>
+        <item quantity="one">%1$d pomodoro</item>
+        <item quantity="other">%1$d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Oggi: %d pomodoro</item>
-        <item quantity="other">Oggi: %d pomodoros</item>
+        <item quantity="one">Oggi: %1$d pomodoro</item>
+        <item quantity="other">Oggi: %1$d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Totale: %d pomodoro</item>
-        <item quantity="other">Totale: %d pomodoros</item>
+        <item quantity="one">Totale: %1$d pomodoro</item>
+        <item quantity="other">Totale: %1$d pomodoros</item>
     </plurals>
 </resources>

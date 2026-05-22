@@ -3,6 +3,7 @@ plugins {
     id("com.android.kotlin.multiplatform.library")
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -41,6 +42,10 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             api(compose.components.resources)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.androidx.datastore.preferences.core)
+            implementation(libs.kotlinx.serialization.json)
         }
     }
 }

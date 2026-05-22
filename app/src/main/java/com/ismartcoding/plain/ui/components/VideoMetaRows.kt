@@ -35,8 +35,8 @@ fun VideoMetaRows(path: String) {
     }
 
     meta?.let { mt ->
-        if (mt.takenAt != null) {
-            PListItem(title = stringResource(Res.string.taken_at), value = mt.takenAt.formatDateTime())
+        mt.takenAt?.let { takenAt ->
+            PListItem(title = stringResource(Res.string.taken_at), value = takenAt.formatDateTime())
         }
         if (mt.title.isNotEmpty()) {
             PListItem(title = stringResource(Res.string.title), value = mt.title)

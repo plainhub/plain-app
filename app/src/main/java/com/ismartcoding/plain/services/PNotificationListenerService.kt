@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.services
+import com.ismartcoding.plain.preferences.*
 
 import android.app.Notification
 import android.content.ComponentName
@@ -75,7 +76,7 @@ class PNotificationListenerService : NotificationListenerService() {
             coIO {
                 val enable = Permission.NOTIFICATION_LISTENER.isEnabledAsync(applicationContext)
                 if (enable) {
-                    val isAllowed = NotificationFilterPreference.isAllowedAsync(applicationContext, statusBarNotification.packageName)
+                    val isAllowed = NotificationFilterPreference.isAllowedAsync(statusBarNotification.packageName)
                     if (isAllowed) {
                         sendEvent(
                             WebSocketEvent(

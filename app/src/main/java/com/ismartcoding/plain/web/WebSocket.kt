@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.web
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -62,7 +63,7 @@ fun Route.addWebSocket() {
 
                             var r: AuthRequest? = null
                             val hash = CryptoHelper.sha512(
-                                PasswordPreference.getAsync(MainApp.instance).toByteArray()
+                                PasswordPreference.getAsync().toByteArray()
                             )
                             val token = HttpServerManager.hashToToken(hash)
                             val decryptedBytes =
@@ -72,7 +73,7 @@ fun Route.addWebSocket() {
                             }
                             if (r?.password == hash) {
                                 val event = ConfirmToAcceptLoginEvent(this, clientId, r)
-                                if (AuthTwoFactorPreference.getAsync(MainApp.instance)) {
+                                if (AuthTwoFactorPreference.getAsync()) {
                                     send(
                                         CryptoHelper.chaCha20Encrypt(
                                             token,

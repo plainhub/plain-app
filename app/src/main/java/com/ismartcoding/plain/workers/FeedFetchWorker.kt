@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.workers
+import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.work.*
@@ -32,7 +33,7 @@ class FeedFetchWorker(
     override suspend fun doWork(): Result {
         supervisorScope {
             val autoRefresh = inputData.getBoolean("auto_refresh", false)
-            if (autoRefresh && FeedAutoRefreshOnlyWifiPreference.getAsync(context) && context.isWifiConnected()) {
+            if (autoRefresh && FeedAutoRefreshOnlyWifiPreference.getAsync() && context.isWifiConnected()) {
                 return@supervisorScope
             }
 
@@ -133,7 +134,7 @@ class FeedFetchWorker(
             data.putBoolean("auto_refresh", true)
             val request =
                 PeriodicWorkRequestBuilder<FeedFetchWorker>(
-                    FeedAutoRefreshIntervalPreference.getAsync(context).toLong(),
+                    FeedAutoRefreshIntervalPreference.getAsync().toLong(),
                     TimeUnit.SECONDS,
                 ).setInputData(data.build()).setConstraints(
                     Constraints.Builder().build(),

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page
+import com.ismartcoding.plain.preferences.*
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState

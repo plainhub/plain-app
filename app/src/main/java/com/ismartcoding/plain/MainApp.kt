@@ -1,4 +1,5 @@
 package com.ismartcoding.plain
+import com.ismartcoding.plain.preferences.*
 
 import android.app.Application
 import android.os.Build
@@ -37,6 +38,7 @@ import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.preferences.getPreferencesAsync
+import com.ismartcoding.plain.preferences.initDataStore
 import com.ismartcoding.plain.preferences.FidUriExtMigratedPreference
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.features.dlna.receiver.DlnaRenderer
@@ -47,6 +49,9 @@ import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.helpers.ChatFidUriMigration
+import com.ismartcoding.plain.preferences.ensureKeyPairAsync
+import com.ismartcoding.plain.preferences.ensureValueAsync
+import com.ismartcoding.plain.preferences.setDarkMode
 import dalvik.system.ZipPathValidator
 import kotlin.time.Duration.Companion.days
 
@@ -55,6 +60,7 @@ class MainApp : Application() {
         super.onCreate()
 
         instance = this
+        initDataStore(dataStore)
 
         CrashHandler.install(this)
 
@@ -80,23 +86,23 @@ class MainApp : Application() {
         }
 
         coIO {
-            val preferences = dataStore.getPreferencesAsync()
+            val preferences = getPreferencesAsync()
             TempData.webEnabled = WebPreference.get(preferences)
             TempData.webHttps = HttpsPreference.get(preferences)
             TempData.httpPort = HttpPortPreference.get(preferences)
             TempData.httpsPort = HttpsPortPreference.get(preferences)
             TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
-            AdbTokenPreference.ensureValueAsync(instance, preferences)
-            TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync(instance)
-            val updateInfo = UpdateInfoPreference.getValueAsync(instance)
+            AdbTokenPreference.ensureValueAsync(preferences)
+            TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync()
+            val updateInfo = UpdateInfoPreference.getValueAsync()
             val checkUpdateTime = updateInfo.checkUpdateTime
             val autoCheckUpdate = updateInfo.autoCheckUpdate
-            ClientIdPreference.ensureValueAsync(instance, preferences)
+            ClientIdPreference.ensureValueAsync(preferences)
             TempData.deviceName = DeviceNamePreference.get(preferences).ifEmpty { PhoneHelper.getDeviceName(instance) }
-            KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
-            UrlTokenPreference.ensureValueAsync(instance, preferences)
-            SignatureKeyPreference.ensureKeyPairAsync(instance, preferences)
-            MdnsHostnamePreference.ensureValueAsync(instance, preferences)
+            KeyStorePasswordPreference.ensureValueAsync(preferences)
+            UrlTokenPreference.ensureValueAsync(preferences)
+            SignatureKeyPreference.ensureKeyPairAsync(preferences)
+            MdnsHostnamePreference.ensureValueAsync(preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
             if (TempData.webEnabled && PlugInControlReceiver.isUSBConnected(this@MainApp)) {
@@ -109,7 +115,7 @@ class MainApp : Application() {
             ChatCacheManager.loadKeyCacheAsync()
             if (!FidUriExtMigratedPreference.get(preferences)) {
                 ChatFidUriMigration.run(this@MainApp)
-                FidUriExtMigratedPreference.putAsync(this@MainApp, true)
+                FidUriExtMigratedPreference.putAsync(true)
             }
             if (FeedAutoRefreshPreference.get(preferences)) {
                 FeedFetchWorker.startRepeatWorkerAsync(instance)

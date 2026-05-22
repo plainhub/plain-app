@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.components
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -34,7 +35,7 @@ fun DeviceRenameDialog(name: String, onDismiss: () -> Unit, onDone: (String) -> 
         onConfirm = {
             scope.launch {
                 withIO {
-                    DeviceNamePreference.putAsync(context, newName.value)
+                    DeviceNamePreference.putAsync(newName.value)
                 }
                 onDone(newName.value)
                 onDismiss()

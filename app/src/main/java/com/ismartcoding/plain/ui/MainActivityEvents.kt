@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -54,7 +55,7 @@ internal fun MainActivity.initEvents() {
                     mainVM.httpServerState = event.state
                     if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@initEvents)) {
                         DialogHelper.showConfirmDialog(LocaleHelper.getString(Res.string.confirm), LocaleHelper.getString(Res.string.storage_permission_confirm)) {
-                            coIO { ApiPermissionsPreference.putAsync(this@initEvents, Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }
+                            coIO { ApiPermissionsPreference.putAsync(Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }
                         }
                     }
                 }
@@ -152,7 +153,7 @@ internal fun MainActivity.initEvents() {
 }
 
 internal suspend fun MainActivity.doWhenReadyAsync() {
-    val webEnabled = WebPreference.getAsync(this)
+    val webEnabled = WebPreference.getAsync()
     val permEnabled = Permission.NOTIFICATION_LISTENER.isEnabledAsync(this)
     PNotificationListenerService.toggle(this, webEnabled && permEnabled)
 }

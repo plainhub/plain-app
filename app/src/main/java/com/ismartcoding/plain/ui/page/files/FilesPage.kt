@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.files
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -122,7 +123,7 @@ fun FilesPage(
                         var showHiddenFiles by remember { mutableStateOf(false) }
                         LaunchedEffect(Unit) {
                             showHiddenFiles = withContext(Dispatchers.IO) {
-                                ShowHiddenFilesPreference.getAsync(context)
+                                ShowHiddenFilesPreference.getAsync()
                             }
                         }
                         PDropdownMenuItem(

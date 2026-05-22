@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ai
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.logcat.LogCat
@@ -51,7 +52,7 @@ object ImageSearchManager {
     fun totalModelSize(): Long = MODEL_FILES.sumOf { it.size }
 
     suspend fun restoreIfEnabled() = withContext(Dispatchers.IO) {
-        val enabled = AiImageSearchEnabledPreference.getAsync(MainApp.instance)
+        val enabled = AiImageSearchEnabledPreference.getAsync()
         if (enabled && isModelAvailable()) {
             loadModels()
             ImageIndexManager.startup()
@@ -69,7 +70,7 @@ object ImageSearchManager {
             if (!isModelAvailable()) return
         }
         loadModels()
-        AiImageSearchEnabledPreference.putAsync(MainApp.instance, true)
+        AiImageSearchEnabledPreference.putAsync(true)
         ImageIndexManager.startup()
     }
 
@@ -81,7 +82,7 @@ object ImageSearchManager {
         modelsDir.deleteRecursively()
         AppDatabase.instance.imageEmbeddingDao().deleteAll()
         _status.value = ImageSearchStatus.UNAVAILABLE
-        AiImageSearchEnabledPreference.putAsync(MainApp.instance, false)
+        AiImageSearchEnabledPreference.putAsync(false)
         emitStatus()
     }
 

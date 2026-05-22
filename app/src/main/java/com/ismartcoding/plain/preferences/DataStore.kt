@@ -6,62 +6,21 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import com.ismartcoding.lib.logcat.LogCat
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.Flow
-import java.io.IOException
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = "settings",
     corruptionHandler = ReplaceFileCorruptionHandler(
-        produceNewData = { 
+        produceNewData = {
             LogCat.e("DataStore preferences corrupted, creating new empty preferences")
-            emptyPreferences() 
+            emptyPreferences()
         }
     )
 )
 
-suspend fun <T> DataStore<Preferences>.put(
-    key: Preferences.Key<T>,
-    value: T,
-) {
-    this.edit {
-        it[key] = value
-    }
-}
+// Backward-compat Context extensions so existing Android call sites keep compiling.
+// These delegate to the shared (Context-free) implementations.
+suspend fun <T> BasePreference<T>.getAsync(context: Context): T = getAsync()
 
 @Suppress("UNCHECKED_CAST")
-suspend fun <T> DataStore<Preferences>.getAsync(key: Preferences.Key<T>): T? {
-    return data.catch { exception ->
-        if (exception is IOException) {
-            LogCat.e("Get data store error $exception")
-            exception.printStackTrace()
-            emit(emptyPreferences())
-        } else {
-            throw exception
-        }
-    }.first()[key] as T
-}
+suspend fun <T> BasePreference<T>.putAsync(context: Context, value: T) = putAsync(value)
 
-suspend fun DataStore<Preferences>.getPreferencesAsync(): Preferences {
-    return data.catch { exception ->
-        if (exception is IOException) {
-            LogCat.e("Get data store preferences error $exception")
-            exception.printStackTrace()
-            emit(emptyPreferences())
-        } else {
-            throw exception
-        }
-    }.first()
-}
-
-val DataStore<Preferences>.dataFlow: Flow<Preferences>
-    get() = data.catch { exception ->
-        if (exception is IOException) {
-            LogCat.e("Get data store flow error $exception")
-            exception.printStackTrace()
-            emit(emptyPreferences())
-        } else {
-            throw exception
-        }
-    }

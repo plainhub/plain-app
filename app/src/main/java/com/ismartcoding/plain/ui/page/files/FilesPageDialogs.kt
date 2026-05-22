@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.files
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -25,7 +26,7 @@ internal fun FilesPageDialogs(
 ) {
     if (filesVM.showSortDialog.value) {
         FileSortDialog(filesVM.sortBy, onSelected = {
-            scope.launch(Dispatchers.IO) { FileSortByPreference.putAsync(context, it); filesVM.sortBy.value = it; filesVM.loadAsync(context) }
+            scope.launch(Dispatchers.IO) { FileSortByPreference.putAsync(it); filesVM.sortBy.value = it; filesVM.loadAsync(context) }
         }, onDismiss = { filesVM.showSortDialog.value = false })
     }
 

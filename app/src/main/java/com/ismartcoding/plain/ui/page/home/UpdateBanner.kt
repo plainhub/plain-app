@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
+import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
@@ -61,14 +62,14 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     val needsUpdate = newVersion.whetherNeedUpdate(currentVersion, skipVersion)
 
     LaunchedEffect(Unit) {
-        val path = withIO { UpdateInfoPreference.getValueAsync(context).downloadedApkPath }
+        val path = withIO { UpdateInfoPreference.getValueAsync().downloadedApkPath }
         if (path.isNotEmpty()) {
             if (File(path).exists() && newVersion.whetherNeedUpdate(currentVersion, skipVersion)
                 && !updateVM.isDownloading.value && !updateVM.isDownloadComplete.value
             ) {
                 updateVM.onDownloadComplete(path)
             } else {
-                withIO { UpdateInfoPreference.updateAsync(context) { it.copy(downloadedApkPath = "") } }
+                withIO { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } }
             }
         }
     }
@@ -93,7 +94,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
                     exitProcess(0)
                 },
                 onDismiss = {
-                    scope.launch { withIO { UpdateInfoPreference.updateAsync(context) { it.copy(downloadedApkPath = "") } } }
+                    scope.launch { withIO { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } } }
                     updateVM.resetDownload()
                 },
             )
