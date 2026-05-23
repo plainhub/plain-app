@@ -16,6 +16,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.chat.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -144,6 +145,7 @@ class HttpServerService : LifecycleService() {
         } catch (e: Exception) {
             LogCat.e("Error stopping server on task removed: ${e.message}")
         } finally {
+            PeerStatusManager.stop()
             HttpServerManager.server = null
         }
         stopSelf()
@@ -160,6 +162,8 @@ class HttpServerService : LifecycleService() {
         mdnsRegister = null
         // Ensure mDNS responder is stopped
         NsdHelper.unregisterService()
+        PeerStatusManager.stop()
+        try { HttpServerManager.server?.stop(0, 1000) } catch (_: Exception) {}
         HttpServerManager.server = null
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
@@ -186,6 +190,7 @@ class HttpServerService : LifecycleService() {
             }
         }
         HttpServerManager.server = null
+        PeerStatusManager.stop()
         PNotificationListenerService.toggle(this, false)
 
         serverState = HttpServerState.OFF

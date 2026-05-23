@@ -10,25 +10,24 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.chat.PeerStatusManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
-import com.ismartcoding.plain.events.PairingSuccessEvent
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.events.PeerOnlineStatusChangedEvent
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.TempData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.seconds
 
 class PeerViewModel : ViewModel() {
     val pairedPeers = mutableStateListOf<DPeer>()
     val unpairedPeers = mutableStateListOf<DPeer>()
     internal val latestChatCacheInternal = mutableStateMapOf<String, DChat>()
-    val onlineMap = mutableStateOf<Map<String, kotlin.time.Instant>>(emptyMap())
+    val onlineMap = mutableStateOf<Map<String, Boolean>>(emptyMap())
     private var eventJob: Job? = null
 
     init { startEventListening() }
@@ -39,7 +38,7 @@ class PeerViewModel : ViewModel() {
                 when (event) {
                     is HttpApiEvents.MessageCreatedEvent -> viewModelScope.launch { loadPeers() }
                     is NearbyDeviceFoundEvent -> handleDeviceFoundInternal(event)
-                    is PairingSuccessEvent -> updatePeerLastActive(event.deviceId)
+                    is PeerOnlineStatusChangedEvent -> updatePeerOnlineStatus(event.peerId, event.online)
                 }
             }
         }
@@ -76,20 +75,29 @@ class PeerViewModel : ViewModel() {
         }
     }
 
-    fun updatePeerLastActive(peerId: String) {
+    fun updatePeerOnlineStatus(peerId: String, online: Boolean) {
         viewModelScope.launch(Dispatchers.Main) {
+            if (onlineMap.value[peerId] == online) return@launch
+
             val currentMap = onlineMap.value.toMutableMap()
-            currentMap[peerId] = TimeHelper.now()
+            currentMap[peerId] = online
             onlineMap.value = currentMap
+            resortPairedPeersInternal()
+        }
+    }
+
+    fun syncPeerOnlineStatuses() {
+        viewModelScope.launch(Dispatchers.Main) {
+            onlineMap.value = pairedPeers.associate { it.id to PeerStatusManager.isOnline(it.id) }
+            resortPairedPeersInternal()
         }
     }
 
     fun isPeerOnline(peerId: String): Boolean {
-        val lastActive = onlineMap.value[peerId] ?: return false
-        return (TimeHelper.now() - lastActive) <= 15.seconds
+        return onlineMap.value[peerId] == true
     }
 
     fun getPeerOnlineStatus(peerId: String): Boolean? {
-        return if (onlineMap.value.containsKey(peerId)) isPeerOnline(peerId) else false
+        return onlineMap.value[peerId] ?: false
     }
 }

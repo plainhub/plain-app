@@ -28,8 +28,8 @@ object UrlHelper {
         return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/callback/cast"
     }
 
-    fun getWsTestUrl(): String {
-        return "ws://localhost:${TempData.httpPort}?test=1"
+    fun getHealthCheckUrl(): String {
+        return "http://localhost:${TempData.httpPort}/health"
     }
 
     fun getShutdownUrl(): String {

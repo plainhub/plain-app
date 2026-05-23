@@ -103,6 +103,8 @@ class DeleteChatItemViewEvent(val id: String) : ChannelEvent()
 
 data class PeerUpdatedEvent(val peer: DPeer) : ChannelEvent()
 
+data class PeerOnlineStatusChangedEvent(val peerId: String, val online: Boolean) : ChannelEvent()
+
 /** Fired when a channel invite is received from a remote peer. UI shows accept/decline dialog. */
 data class ChannelInviteReceivedEvent(
     val channelId: String,

@@ -21,8 +21,10 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.chat.PeerStatusManager
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
@@ -35,12 +37,15 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
+import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
+import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.models.consumeUpdateDownloadEvent
-import com.ismartcoding.plain.ui.page.chat.ChatPresenceEffects
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,9 +59,18 @@ fun HomePage(
 ) {
     val webEnabled = LocalWeb.current
     val context = LocalContext.current
+    val showOnlineStatus = webEnabled && mainVM.httpServerState == HttpServerState.ON
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
+    val refreshState = rememberRefreshLayoutState {
+        PeerStatusManager.reconnectNow("home_pull_refresh")
+        peerVM.loadPeers()
+        channelVM.refresh()
+        setRefreshState(RefreshContentState.Finished)
+    }
 
-    ChatPresenceEffects(peerVM)
+    LaunchedEffect(Unit) {
+        peerVM.loadPeers()
+    }
 
     LaunchedEffect(Unit) {
         Channel.sharedFlow.collect { event ->
@@ -84,50 +98,54 @@ fun HomePage(
     PScaffold(
         topBar = { TopBarHome(navController, peerVM) },
     ) { paddingValues ->
-        LazyColumn(
-            Modifier
+        PullToRefresh(
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
+            refreshLayoutState = refreshState,
         ) {
-            item {
-                TopSpace()
-                if (webEnabled) {
-                    if (mainVM.isVPNConnected) {
-                        PAlert(
-                            description = stringResource(Res.string.vpn_web_conflict_warning),
-                            AlertType.WARNING,
-                        )
-                    }
-                    if (!systemAlertWindow) {
-                        PAlert(
-                            description = stringResource(Res.string.system_alert_window_warning),
-                            AlertType.WARNING,
-                        ) {
-                            PFilledButton(
-                                text = stringResource(Res.string.grant_permission),
-                                buttonSize = ButtonSize.SMALL,
-                                onClick = {
-                                    sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
-                                },
+            LazyColumn(Modifier.fillMaxSize()) {
+                item {
+                    TopSpace()
+                    if (webEnabled) {
+                        if (mainVM.isVPNConnected) {
+                            PAlert(
+                                description = stringResource(Res.string.vpn_web_conflict_warning),
+                                AlertType.WARNING,
                             )
+                        }
+                        if (!systemAlertWindow) {
+                            PAlert(
+                                description = stringResource(Res.string.system_alert_window_warning),
+                                AlertType.WARNING,
+                            ) {
+                                PFilledButton(
+                                    text = stringResource(Res.string.grant_permission),
+                                    buttonSize = ButtonSize.SMALL,
+                                    onClick = {
+                                        sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
+                                    },
+                                )
+                            }
                         }
                     }
                 }
-            }
-            item {
-                if (AppFeatureType.CHECK_UPDATES.has()) {
-                    UpdateBanner(updateVM)
+                item {
+                    if (AppFeatureType.CHECK_UPDATES.has()) {
+                        UpdateBanner(updateVM)
+                    }
                 }
-            }
-            item {
-                HomeWeb(context, navController, mainVM, webEnabled)
-                VerticalSpace(dp = 16.dp)
-            }
-            item {
-                HomeShortcutGrid(navController = navController, peerVM = peerVM, channelVM = channelVM)
-                VerticalSpace(dp = 16.dp)
-            }
-            item {
-                BottomSpace(paddingValues)
+                item {
+                    HomeWeb(context, navController, mainVM, webEnabled)
+                    VerticalSpace(dp = 16.dp)
+                }
+                item {
+                    HomeShortcutGrid(navController = navController, peerVM = peerVM, channelVM = channelVM, showOnlineStatus = showOnlineStatus)
+                    VerticalSpace(dp = 16.dp)
+                }
+                item {
+                    BottomSpace(paddingValues)
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web
-import com.ismartcoding.plain.preferences.*
 
+import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -10,11 +10,17 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.PeerChatHelper
+import com.ismartcoding.plain.chat.PeerChatHelper.MAX_TIMESTAMP_DIFF_MS
+import com.ismartcoding.plain.chat.PeerStatusManager
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
 import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.server.plugins.origin
+import io.ktor.server.request.receive
+import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.CloseReason
@@ -22,16 +28,49 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readBytes
 import io.ktor.websocket.send
+import kotlin.math.abs
 import kotlin.text.decodeToString
 import kotlin.text.isEmpty
 
 fun Route.addWebSocket() {
-    webSocket("/") {
-        val q = call.request.queryParameters
-        if (q["test"] == "1") {
-            close(CloseReason(CloseReason.Codes.NORMAL, BuildConfig.APPLICATION_ID))
+    webSocket("/status") {
+        val peerId = call.request.queryParameters["cid"] ?: ""
+        if (peerId.isEmpty()) {
+            close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "`cid` is missing"))
             return@webSocket
         }
+        var authenticated = false
+        try {
+            for (frame in incoming) {
+                if (frame !is Frame.Binary) continue
+                if (authenticated) continue
+
+                val token = ChatCacheManager.peerKeyCache[peerId]
+                val publicKey = ChatCacheManager.peerPublicKeyCache[peerId]
+                if (token == null || publicKey == null) {
+                    close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "unknown_peer"))
+                    return@webSocket
+                }
+                val decryptResult = PeerChatHelper.decrypt(token, peerId, publicKey, frame.readBytes())
+                if (decryptResult.content == null) {
+                    close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "invalid_request"))
+                    return@webSocket
+                }
+                authenticated = true
+                PeerStatusManager.setOnline(peerId, true)
+                send("ok")
+            }
+        } catch (ex: Exception) {
+            LogCat.e("status ws: $ex")
+        } finally {
+            if (authenticated) {
+                PeerStatusManager.disconnected(peerId)
+            }
+        }
+    }
+
+    webSocket("/") {
+        val q = call.request.queryParameters
         val clientId = q["cid"] ?: ""
         if (clientId.isEmpty()) {
             LogCat.e("ws: `cid` is missing")

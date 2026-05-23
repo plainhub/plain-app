@@ -52,6 +52,7 @@ enum class EventType(val value: Int) {
     MMS_SENT(17),
     CHANNELS_UPDATED(18),
     IMAGE_SEARCH_UPDATED(19),
+    PEER_STATUS_UPDATED(20),
 }
 
 
@@ -61,3 +62,9 @@ data class PomodoroActionData(
     val totalTime: Int, val completedCount: Int,
     val round: Int, val state: PomodoroState
 ) // action: "start", "pause",  "stop"
+
+@Serializable
+data class PeerStatusData(
+    val id: String,
+    val online: Boolean,
+)

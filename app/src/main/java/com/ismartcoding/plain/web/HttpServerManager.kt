@@ -26,9 +26,10 @@ import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.services.HttpServerService
+import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.web.websocket.WebSocketSession
-import io.ktor.client.plugins.websocket.ws
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.applicationEnvironment
@@ -63,7 +64,6 @@ object HttpServerManager {
     val portsInUse = mutableSetOf<Int>()
     val httpsPorts = setOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943)
     val httpPorts = setOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)
-
     @Volatile
     var server: EmbeddedServer<*, *>? = null
 
@@ -124,17 +124,11 @@ object HttpServerManager {
         sendEvent(HttpServerStateChangedEvent(HttpServerState.STOPPING))
         try {
             val client = HttpClientManager.httpClient()
-            val r = client.get(UrlHelper.getShutdownUrl())
-            if (r.status == HttpStatusCode.Gone) {
-                LogCat.d("http server is stopped")
-            }
-        } catch (ex: Exception) {
-            LogCat.e(ex.toString())
-            ex.printStackTrace()
-        }
+            client.get(UrlHelper.getShutdownUrl())
+        } catch (_: Exception) {}
+        try { server?.stop(0, 1000) } catch (_: Exception) {}
         context.stopService(Intent(context, HttpServerService::class.java))
-        // Ensure notification listener is disabled when server is stopped explicitly
-        com.ismartcoding.plain.services.PNotificationListenerService.toggle(context, false)
+        PNotificationListenerService.toggle(context, false)
         httpServerError = ""
         portsInUse.clear()
         server = null
@@ -188,22 +182,19 @@ object HttpServerManager {
         return withTimeoutOrNull(9000) {
             val client = HttpClientManager.httpClient()
             val deadline = System.currentTimeMillis() + 8500L
-            var websocket = false
-            while (!websocket && System.currentTimeMillis() < deadline) {
+            var healthy = false
+            while (!healthy && System.currentTimeMillis() < deadline) {
                 try {
-                    client.ws(urlString = UrlHelper.getWsTestUrl()) {
-                        val reason = closeReason.await()
-                        LogCat.d("closeReason: $reason")
-                        if (reason?.message == BuildConfig.APPLICATION_ID) {
-                            websocket = true
-                        }
+                    val response = client.get(UrlHelper.getHealthCheckUrl())
+                    if (response.status == HttpStatusCode.OK) {
+                        healthy = true
                     }
                 } catch (ex: Exception) {
                     delay(300)
-                    LogCat.e("WebSocket check failed: ${ex.message}")
+                    LogCat.e("HTTP server check failed: ${ex.message}")
                 }
             }
-            websocket
+            healthy
         } ?: false
     }
 

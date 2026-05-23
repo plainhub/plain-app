@@ -32,6 +32,7 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.forwardedheaders.ForwardedHeaders
 import io.ktor.server.plugins.origin
 import io.ktor.server.plugins.partialcontent.PartialContent
+import io.ktor.server.request.path
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
@@ -90,6 +91,9 @@ object HttpModule {
         }
 
         intercept(ApplicationCallPipeline.Plugins) {
+            if (call.request.path() == "/health") {
+                return@intercept
+            }
             if (!TempData.webEnabled) {
                 call.respond(HttpStatusCode.NotFound)
                 return@intercept finish()
@@ -125,7 +129,7 @@ object HttpModule {
                 }
             }
 
-            get("/health_check") {
+            get("/health") {
                 call.respond(HttpStatusCode.OK, BuildConfig.APPLICATION_ID)
             }
 

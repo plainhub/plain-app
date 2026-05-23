@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.chat.ChannelSystemMessageSender
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.AppDatabase
@@ -12,6 +11,7 @@ import com.ismartcoding.plain.events.PeerUpdatedEvent
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.plain.chat.PeerStatusManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.time.Instant
@@ -40,9 +40,9 @@ internal fun PeerViewModel.loadPeersInternal() {
             }
         }
 
-        val newPairedPeers = allPeers.filter { it.status == "paired" }
-            .sortedWith(compareByDescending<DPeer> { chatCache[it.id]?.createdAt ?: Instant.DISTANT_PAST }.thenBy { Pinyin.toPinyin(it.name) })
-        val newUnpairedPeers = allPeers.filter { it.status == "unpaired" }.sortedBy { Pinyin.toPinyin(it.name) }
+        val newPairedPeers = sortPeersForChatListInternal(allPeers.filter { it.status == "paired" }, chatCache)
+        val newUnpairedPeers = allPeers.filter { it.status == "unpaired" }
+            .sortedWith(compareByDescending<DPeer> { it.createdAt }.thenBy { it.name.lowercase() })
         ChatCacheManager.refreshPeerMap(allPeers)
 
         withContext(Dispatchers.Main) {
@@ -50,8 +50,27 @@ internal fun PeerViewModel.loadPeersInternal() {
             latestChatCacheInternal.putAll(chatCache)
             pairedPeers.clear(); pairedPeers.addAll(newPairedPeers)
             unpairedPeers.clear(); unpairedPeers.addAll(newUnpairedPeers)
+            syncPeerOnlineStatuses()
         }
     }
+}
+
+internal fun PeerViewModel.resortPairedPeersInternal() {
+    val sortedPeers = sortPeersForChatListInternal(pairedPeers.toList(), latestChatCacheInternal)
+    pairedPeers.clear()
+    pairedPeers.addAll(sortedPeers)
+}
+
+private fun PeerViewModel.sortPeersForChatListInternal(
+    peers: List<DPeer>,
+    chatCache: Map<String, DChat>,
+): List<DPeer> {
+    return peers.sortedWith(
+        compareByDescending<DPeer> { chatCache[it.id]?.createdAt ?: Instant.DISTANT_PAST }
+            .thenByDescending { onlineMap.value[it.id] == true }
+            .thenByDescending { it.createdAt }
+            .thenBy { it.name.lowercase() },
+    )
 }
 
 internal fun PeerViewModel.handleDeviceFoundInternal(event: NearbyDeviceFoundEvent) {
@@ -62,20 +81,33 @@ internal fun PeerViewModel.handleDeviceFoundInternal(event: NearbyDeviceFoundEve
             if (peer != null && peer.status == "paired") {
                 var needsUpdate = false
                 val newIpString = device.ips.joinToString(",")
-                if (peer.ip != newIpString) { peer.ip = newIpString; needsUpdate = true }
-                if (peer.port != device.port) { peer.port = device.port; needsUpdate = true }
-                if (peer.name != device.name) { peer.name = device.name; needsUpdate = true }
-                if (peer.deviceType != device.deviceType.value) { peer.deviceType = device.deviceType.value; needsUpdate = true }
+                if (peer.ip != newIpString) {
+                    peer.ip = newIpString
+                    needsUpdate = true
+                }
+                if (peer.port != device.port) {
+                    peer.port = device.port
+                    needsUpdate = true
+                }
+                if (peer.name != device.name) {
+                    peer.name = device.name
+                    needsUpdate = true
+                }
+                if (peer.deviceType != device.deviceType.value) {
+                    peer.deviceType = device.deviceType.value
+                    needsUpdate = true
+                }
                 if (needsUpdate) {
                     peer.updatedAt = TimeHelper.now()
                     AppDatabase.instance.peerDao().update(peer)
                     loadPeersInternal()
                     sendEvent(PeerUpdatedEvent(peer))
                 }
-                updatePeerLastActive(device.id)
+                PeerStatusManager.setOnline(peerId = device.id, true)
                 retryPendingChannelInvitesInternal(peer)
             }
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 }
 
@@ -84,5 +116,6 @@ internal suspend fun PeerViewModel.retryPendingChannelInvitesInternal(peer: DPee
         val channels = AppDatabase.instance.chatChannelDao().getOwnedChannels()
         channels.filter { ch -> ch.findMember(peer.id)?.isPending() == true }
             .forEach { channel -> ChannelSystemMessageSender.sendInvite(channel, peer) }
-    } catch (_: Exception) {}
+    } catch (_: Exception) {
+    }
 }

@@ -14,8 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
+import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.preferences.HomeSectionCollapsedPreference
@@ -39,6 +39,7 @@ fun HomeChatWidget(
     navController: NavHostController,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
+    showOnlineStatus: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -56,18 +57,21 @@ fun HomeChatWidget(
         desc = stringResource(Res.string.local_chat_desc),
         icon = Res.drawable.bot,
         online = null,
+        createdAt = localChat?.createdAt ?: Instant.DISTANT_PAST,
         latestChat = localChat,
         route = Routing.Chat("local"),
     )
     val peerRows = peerVM.pairedPeers
         .map { peer ->
             val latestChat = peerVM.getLatestChat(peer.id)
+            val online = peerVM.getPeerOnlineStatus(peer.id) == true
             ChatRow(
-                sortAt = latestChat?.createdAt ?: peer.updatedAt,
+                sortAt = latestChat?.createdAt ?: Instant.DISTANT_PAST,
                 title = peer.name,
-                desc = onlineText,
+                desc = if (online) onlineText else peer.getBestIp(),
                 icon = DeviceType.fromValue(peer.deviceType).getIcon(),
-                online = true,
+                online = if (showOnlineStatus) online else null,
+                createdAt = peer.createdAt,
                 latestChat = latestChat,
                 route = Routing.Chat("peer:${peer.id}"),
             )
@@ -82,12 +86,16 @@ fun HomeChatWidget(
                 desc = channelsText,
                 icon = Res.drawable.hash,
                 online = null,
+                createdAt = channel.createdAt,
                 latestChat = latestChat,
                 route = Routing.Chat("channel:${channel.id}"),
             )
         }
-    val rows = (listOf(localRow) + (peerRows + channelRows).sortedByDescending { it.sortAt }.take(4))
-        .sortedByDescending { it.sortAt }
+    val rowComparator = compareByDescending<ChatRow> { it.sortAt }
+        .thenByDescending { it.online == true }
+        .thenByDescending { it.createdAt }
+    val rows = (listOf(localRow) + (peerRows + channelRows).sortedWith(rowComparator).take(4))
+        .sortedWith(rowComparator)
 
     Surface(
         modifier = modifier

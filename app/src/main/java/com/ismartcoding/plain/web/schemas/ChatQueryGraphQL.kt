@@ -33,6 +33,11 @@ fun SchemaBuilder.addChatQuerySchema() {
             AppDatabase.instance.peerDao().getAll().map { it.toModel() }
         }
     }
+    query("latestChatItems") {
+        resolver { ->
+            AppDatabase.instance.chatDao().getAllLatestChats().map { it.toModel() }
+        }
+    }
     query("appFiles") {
         resolver { offset: Int, limit: Int ->
             val dao = AppDatabase.instance.appFileDao()

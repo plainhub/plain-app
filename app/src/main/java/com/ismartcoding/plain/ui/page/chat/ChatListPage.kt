@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.chat
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -16,9 +17,11 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.chat.PeerStatusManager
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.dataFlow
@@ -59,15 +62,18 @@ fun ChatListPage(
     val pairedPeers = peerVM.pairedPeers
     val unpairedPeers = peerVM.unpairedPeers
     val webEnabled = LocalWeb.current
+    val showOnlineStatus = webEnabled && mainVM.httpServerState == HttpServerState.ON
     val isDiscoverable = remember { context.dataStore.dataFlow.map { NearbyDiscoverablePreference.get(it) } }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
-    val refreshState = rememberRefreshLayoutState { peerVM.loadPeers(); setRefreshState(RefreshContentState.Finished) }
+    val refreshState = rememberRefreshLayoutState {
+        PeerStatusManager.reconnectNow("chat_list_pull_refresh")
+        peerVM.loadPeers()
+        setRefreshState(RefreshContentState.Finished)
+    }
     var showCreateChannelDialog by channelVM.showCreateChannelDialog
     var renameChannelId by remember { mutableStateOf<String?>(null) }
     var renameChannelName by remember { mutableStateOf("") }
     var manageMembersChannelId by channelVM.manageMembersChannelId
     val channels = channelVM.channels.collectAsStateValue()
-
-    ChatPresenceEffects(peerVM)
 
     PScaffold(
         topBar = { TopBarChat(navController, channelVM, onNavigateBack = { navController.popBackStack() }) },
@@ -123,7 +129,7 @@ fun ChatListPage(
                             title = peer.name,
                             desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
                             icon = DeviceType.fromValue(peer.deviceType).getIcon(),
-                            online = peerVM.getPeerOnlineStatus(peer.id),
+                            online = if (showOnlineStatus) peerVM.getPeerOnlineStatus(peer.id) else null,
                             latestChat = peerVM.getLatestChat(peer.id),
                             peerId = peer.id,
                             onDelete = { peerVM.removePeer(context, it) },

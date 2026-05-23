@@ -1,9 +1,8 @@
 package com.ismartcoding.plain.web
 
-import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.features.locale.LocaleHelper
-
-import android.util.Base64
+import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.kgraphql.Context
 import com.ismartcoding.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.lib.kgraphql.KGraphQL
@@ -11,29 +10,28 @@ import com.ismartcoding.lib.kgraphql.context
 import com.ismartcoding.lib.kgraphql.schema.Schema
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChannelSystemMessageHandler
+import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.chat.PeerChatHelper
 import com.ismartcoding.plain.chat.download.DownloadQueue
-import com.ismartcoding.plain.chat.PeerChatHelper.MAX_TIMESTAMP_DIFF_MS
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
-import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.chat.ChatCacheManager
-import com.ismartcoding.plain.db.getMessagePreview
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.peer_chat
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
@@ -49,9 +47,8 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
-import kotlin.time.Instant
 import kotlinx.serialization.json.Json
-import kotlin.math.abs
+import kotlin.time.Instant
 
 class PeerGraphQL(val schema: Schema) {
     class Configuration : SchemaConfigurationDSL() {
@@ -62,11 +59,6 @@ class PeerGraphQL(val schema: Schema) {
                         resolver { c: ChatItem ->
                             c.getContentData()
                         }
-                    }
-                }
-                query("ping") {
-                    resolver { ->
-                        true
                     }
                 }
                 mutation("channelSystemMessage") {
@@ -231,72 +223,18 @@ class PeerGraphQL(val schema: Schema) {
                         } else {
                             ChatCacheManager.peerKeyCache[clientId]
                         }
-                        if (token == null) {
-                            call.respond(HttpStatusCode.Unauthorized)
-                            return@post
-                        }
-
-                        // Resolve the sender's Ed25519 public key from peerPublicKeyCache.
-                        // Both paired peers and channel-only peers have their public keys
-                        // stored in the peers table and loaded into this cache.
                         val publicKey = ChatCacheManager.peerPublicKeyCache[clientId]
-                        if (publicKey == null) {
-                            LogCat.e("Public key not found for clientId: $clientId (channel: $channelId)")
-                            call.respond(HttpStatusCode.InternalServerError)
-                            return@post
-                        }
-
-                        var decryptedStr = ""
-                        val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, call.receive())
-                        if (decryptedBytes != null) {
-                            decryptedStr = decryptedBytes.decodeToString()
-                        }
-                        if (decryptedStr.isEmpty()) {
+                        if (token == null || publicKey == null) {
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post
                         }
-
-                        // Extract timestamp, signature and GraphQL JSON from decrypted string
-                        // Format: "signature|timestamp|GraphQL_JSON"
-                        var timestamp = 0L
-                        var signature = ""
-                        var requestStr = ""
-
-                        if (decryptedStr.contains("|")) {
-                            val parts = decryptedStr.split("|", limit = 3)
-                            signature = parts[0]
-                            timestamp = parts[1].toLongOrNull() ?: 0L
-                            requestStr = parts[2]
-                        }
-
-                        LogCat.d("[Request] GraphQL: $requestStr")
-
-                        val currentTime = System.currentTimeMillis()
-                        // Verify timestamp is within acceptable range, replay attacks are not allowed
-                        if (abs(currentTime - timestamp) > MAX_TIMESTAMP_DIFF_MS) {
-                            LogCat.e("Message timestamp is too old or in the future: $timestamp - rejected")
-                            call.respond(HttpStatusCode.BadRequest)
+                        val decryptResult = PeerChatHelper.decrypt(token, clientId, publicKey, call.receive())
+                        if (decryptResult.content == null) {
+                            call.respond(decryptResult.code)
                             return@post
                         }
 
-                        val signatureBytes = Base64.decode(signature, Base64.NO_WRAP)
-                        val messageBytes = "$timestamp$requestStr".toByteArray()
-                        val isValid = CryptoHelper.verifySignatureWithRawEd25519PublicKey(
-                            publicKey,
-                            messageBytes,
-                            signatureBytes
-                        )
-                        if (!isValid) {
-                            LogCat.e("Invalid signature from peer $clientId")
-                            call.respond(HttpStatusCode.Unauthorized)
-                            return@post
-                        }
-
-                        val r = executeGraphqlQL(
-                            schema,
-                            requestStr,
-                            call
-                        ) // Signature already verified at route level
+                        val r = executeGraphqlQL(schema, decryptResult.content, call)
                         call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                     }
                 }
