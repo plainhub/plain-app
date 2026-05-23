@@ -89,6 +89,7 @@ class MainApp : Application() {
 
         AppEvents.register()
         HttpServerManager.warmUp()
+        NetworkMonitor.init(this)
 
         // https://stackoverflow.com/questions/77683434/the-getnextentry-method-of-zipinputstream-throws-a-zipexception-invalid-zip-ent
         if (isUPlus()) {

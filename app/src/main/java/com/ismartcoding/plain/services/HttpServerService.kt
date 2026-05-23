@@ -31,9 +31,10 @@ import kotlinx.coroutines.delay
 
 class HttpServerService : LifecycleService() {
     private var serverState: HttpServerState = HttpServerState.OFF
-    private var mdnsRegister: MdnsRegister? = null
+    var mdnsRegister: MdnsRegister? = null
     private var serverJob: Job? = null
     private var lockManager: HttpServerLockManager? = null
+
     // true when this instance was created by START_STICKY (system restart), not by user
     private var isStickyRestart: Boolean = false
 
@@ -50,7 +51,7 @@ class HttpServerService : LifecycleService() {
             httpPortProvider = { TempData.httpPort },
             httpsPortProvider = { TempData.httpsPort },
         ).also { it.start() }
-        
+
         lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 when (event) {
@@ -85,14 +86,14 @@ class HttpServerService : LifecycleService() {
             }
         })
     }
-    
+
     @SuppressLint("InlinedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // intent == null means the system restarted this service via START_STICKY after killing it.
         // In that case we flag it so the startup coroutine can delay before binding ports.
         if (intent == null) isStickyRestart = true
         super.onStartCommand(intent, flags, startId)
-        
+
         try {
             val notification = NotificationHelper.createServiceNotification(
                 this,
@@ -100,21 +101,21 @@ class HttpServerService : LifecycleService() {
                 LocaleHelper.getStringSync(Res.string.api_service_is_running),
                 HttpServerManager.getNotificationContent()
             )
-            
+
             try {
                 ServiceCompat.startForeground(
-                    this, 
+                    this,
                     HttpServerManager.notificationId,
-                    notification, 
+                    notification,
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
                 )
             } catch (e: Exception) {
                 LogCat.e("Error starting foreground service with specialUse: ${e.message}")
                 try {
                     ServiceCompat.startForeground(
-                        this, 
+                        this,
                         HttpServerManager.notificationId,
-                        notification, 
+                        notification,
                         ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
                     )
                 } catch (e2: Exception) {
@@ -128,7 +129,7 @@ class HttpServerService : LifecycleService() {
             stopSelf()
             return START_NOT_STICKY
         }
-        
+
         return START_STICKY
     }
 
@@ -163,7 +164,10 @@ class HttpServerService : LifecycleService() {
         // Ensure mDNS responder is stopped
         NsdHelper.unregisterService()
         PeerStatusManager.stop()
-        try { HttpServerManager.server?.stop(0, 1000) } catch (_: Exception) {}
+        try {
+            HttpServerManager.server?.stop(0, 1000)
+        } catch (_: Exception) {
+        }
         HttpServerManager.server = null
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
@@ -173,7 +177,7 @@ class HttpServerService : LifecycleService() {
         try {
             // Stop mDNS responder
             NsdHelper.unregisterService()
-            
+
             val client = HttpClientManager.httpClient()
             val r = client.get(UrlHelper.getShutdownUrl())
             if (r.status == HttpStatusCode.Gone) {

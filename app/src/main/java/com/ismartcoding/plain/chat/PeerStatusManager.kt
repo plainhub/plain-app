@@ -1,11 +1,5 @@
 package com.ismartcoding.plain.chat
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
-import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
@@ -17,18 +11,10 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getStatusWsUrl
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
-import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.PeerOnlineStatusChangedEvent
 import com.ismartcoding.plain.events.PeerStatusData
-import com.ismartcoding.plain.events.PeerUpdatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.SignatureHelper
-import com.ismartcoding.plain.helpers.TimeHelper
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
-import kotlin.math.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -41,6 +27,9 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString.Companion.toByteString
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
+import kotlin.math.min
 
 object PeerStatusManager {
     private const val INITIAL_RECONNECT_DELAY_MS = 1000L
@@ -64,22 +53,18 @@ object PeerStatusManager {
     private val states = ConcurrentHashMap<String, PeerState>()
 
     private var started = false
-    private var eventJob: Job? = null
 
     @Synchronized
     fun start() {
         if (started) return
         started = true
         LogCat.d("peer status: start")
-        eventJob = scope.launch { collectEvents() }
         scope.launch { reconnectAll() }
     }
 
     @Synchronized
     fun stop() {
         LogCat.d("peer status: stop")
-        eventJob?.cancel()
-        eventJob = null
         started = false
         states.keys.toList().forEach { peerId ->
             val state = state(peerId)
@@ -105,14 +90,6 @@ object PeerStatusManager {
         scope.launch {
             LogCat.d("peer status: reconnect triggered reason=$reason")
             reconnectAll()
-        }
-    }
-
-    private suspend fun collectEvents() {
-        Channel.sharedFlow.collect { event ->
-            when (event) {
-                is WindowFocusChangedEvent -> if (event.hasFocus) reconnectOfflinePeers("foreground")
-            }
         }
     }
 

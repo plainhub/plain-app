@@ -1,10 +1,5 @@
 package com.ismartcoding.plain.chat.discover
-import com.ismartcoding.plain.preferences.*
 
-import android.net.ConnectivityManager
-import android.net.LinkProperties
-import android.net.Network
-import android.net.NetworkRequest
 import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -31,33 +26,15 @@ import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
-/**
- * Central manager for nearby device discovery.
- *
- * Responsibilities:
- *  - Lifecycle: start/stop the multicast listener and network watcher.
- *  - Discovery: periodic broadcast + directed queries, reply to incoming requests.
- *  - Message routing: dispatch incoming datagrams to discovery or [NearbyPairManager].
- */
 object NearbyDiscoverManager {
     private const val BROADCAST_INTERVAL_MS = 5_000L
 
     private var broadcastJob: Job? = null
-    private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var restartJob: Job? = null
 
-    // ---- Lifecycle -------------------------------------------------------------
-
-    /**
-     * Start the multicast listener **and** register a network-change watcher so the
-     * socket is recreated whenever WiFi (dis)connects.  Call once at app startup.
-     */
     fun start() {
         NearbyNetwork.startReceiver(::onDatagram)
-        registerNetworkWatcher()
     }
-
-    // ---- Periodic broadcast discovery ------------------------------------------
 
     fun startPeriodicDiscovery() {
         if (broadcastJob?.isActive == true) return
@@ -75,7 +52,6 @@ object NearbyDiscoverManager {
         broadcastJob = null
     }
 
-    /** Send a directed discovery to a specific paired device. */
     fun discoverSpecificDevice(toId: String, key: ByteArray) {
         broadcastDiscover(
             DDiscoverRequest(
@@ -85,25 +61,7 @@ object NearbyDiscoverManager {
         )
     }
 
-    // ---- Network watcher -------------------------------------------------------
-
-    private fun registerNetworkWatcher() {
-        if (networkCallback != null) return
-        val cm = MainApp.instance.getSystemService(ConnectivityManager::class.java) ?: return
-
-        networkCallback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) = scheduleRestart("onAvailable")
-            override fun onLinkPropertiesChanged(network: Network, lp: LinkProperties) =
-                scheduleRestart("onLinkPropertiesChanged")
-        }
-        runCatching { cm.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback!!) }
-            .onFailure {
-                LogCat.e("Network callback registration failed: ${it.message}")
-                networkCallback = null
-            }
-    }
-
-    private fun scheduleRestart(reason: String) {
+    fun scheduleRestart(reason: String) {
         restartJob?.cancel()
         restartJob = coIO {
             delay(1_500) // debounce rapid network churn
