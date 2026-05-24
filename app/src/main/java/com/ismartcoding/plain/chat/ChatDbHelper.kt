@@ -14,6 +14,7 @@ import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.channel.ChannelChatHelper
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

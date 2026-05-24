@@ -7,6 +7,7 @@
     <string name="scanner">スキャナー</string>
     <string name="nearby">近く</string>
     <string name="nearby_devices">近くのデバイス</string>
+    <string name="devices">デバイス</string>
     <string name="searching_nearby_devices">近くのデバイスを検索中...</string>
     <string name="no_nearby_devices_found">近くにデバイスが見つかりません</string>
     <string name="make_discoverable">発見可能にする</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">Bluetoothを使用するには位置情報の許可が必要です</string>
     <string name="me">私</string>
     <string name="copy_text">テキストをコピー</string>
+    <string name="print">印刷</string>
     <string name="edit_text">テキストを編集</string>
     <string name="share_message">メッセージを共有</string>
     <string name="delete_message">メッセージを削除</string>

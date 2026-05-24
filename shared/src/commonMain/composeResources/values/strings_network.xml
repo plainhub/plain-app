@@ -7,9 +7,9 @@
     <string name="device_name">Device name</string>
     <string name="open_in_web">Open in web browser</string>
     <string name="require_password">Require password</string>
-    <string name="two_factor_auth_tips">When logging in on the webpage, we\'ll display a confirmation popup in the app for added security.</string>
+    <string name="two_factor_auth_tips">When logging in on the webpage, we'll display a confirmation popup in the app for added security.</string>
     <string name="instruction_for_use">Instructions for use</string>
-    <string name="web_how_to">Step 1: Connect your phone and computer to the same wireless network.\n\nMethod 1: Connect your computer and phone to the same Wi-Fi network.\nMethod 2: Turn on your phone\'s hotspot and connect your computer to the phone\'s hotspot.\n\nStep 2: Open a web browser on your computer and enter the web address displayed on the APP homepage.</string>
+    <string name="web_how_to">Step 1: Connect your phone and computer to the same wireless network.\n\nMethod 1: Connect your computer and phone to the same Wi-Fi network.\nMethod 2: Turn on your phone's hotspot and connect your computer to the phone's hotspot.\n\nStep 2: Open a web browser on your computer and enter the web address displayed on the APP homepage.</string>
     <string name="how_to_use">How to use</string>
     <string name="http_server_state_on">Service is running</string>
     <string name="http_server_state_starting">Starting service…</string>
@@ -26,7 +26,7 @@
     <string name="fix">Fix</string>
     <string name="security">Security</string>
     <string name="url_token">URL token</string>
-    <string name="url_token_tips">The URL token encrypts data in URLs. If it\'s reset, old token-encrypted URLs become inaccessible.</string>
+    <string name="url_token_tips">The URL token encrypts data in URLs. If it's reset, old token-encrypted URLs become inaccessible.</string>
     <string name="rotate_url_token_on_restart">Rotate URL token on restart</string>
     <string name="rotate_url_token_on_restart_tips">When enabled, a new URL token is generated every time the app starts. This invalidates all previously generated file URLs. Recommended for advanced users who want stronger security.</string>
     <string name="http_server_ok">HTTP server is running well.</string>
@@ -59,7 +59,7 @@
     <string name="api_service_is_running">Web service is running</string>
     <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
     <string name="screen_mirror_audio_permission_settings_message">Microphone permission is disabled. Please enable it in Settings to mirror system audio.</string>
-    <string name="enter_this_address_tips">Enter the above address in your computer\'s browser, ensuring that your phone and computer are on the same local network.</string>
+    <string name="enter_this_address_tips">Enter the above address in your computer's browser, ensuring that your phone and computer are on the same local network.</string>
     <string name="mdns_hostname">mDNS Hostname</string>
     <string name="mdns_hostname_invalid">Hostname must end with .local</string>
     <string name="last_active">Last active: %1$s</string>
@@ -83,7 +83,7 @@
     <string name="same_network_hint">Make sure your computer and phone are on the same network</string>
     <string name="ready">Ready</string>
     <string name="permission_settings">Permission Settings</string>
-    <string name="web_address_hint">Open any address below in your computer\'s browser.</string>
+    <string name="web_address_hint">Open any address below in your computer's browser.</string>
     <string name="home_web_easy_hint">Tap to start</string>
     <string name="home_web_easy_loading">Please wait…</string>
     <string name="home_web_easy_failed_title">Could not start</string>

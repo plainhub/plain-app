@@ -86,7 +86,7 @@
     <string name="loading">Yükleniyor…</string>
     <string name="searching">Aranıyor…</string>
     <string name="searching_devices">Cihazlar aranıyor…</string>
-    <string name="no_devices_found">Cihazlar aranıyor…\n\nOynatıcının ve telefonunuzun aynı Wi-Fi\'ye bağlı olduğundan emin olun.</string>
+    <string name="no_devices_found">Cihazlar aranıyor…\n\nOynatıcının ve telefonunuzun aynı Wi-Fi'ye bağlı olduğundan emin olun.</string>
     <string name="no_data">Veri yok</string>
     <string name="load_failed">Yükleme başarısız</string>
     <string name="srl_header_pulling">Yenilemek için aşağı çekin</string>

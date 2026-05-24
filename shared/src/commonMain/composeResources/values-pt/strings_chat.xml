@@ -7,6 +7,7 @@
     <string name="scanner">Scanner</string>
     <string name="nearby">Próximo</string>
     <string name="nearby_devices">Dispositivos próximos</string>
+    <string name="devices">Dispositivos</string>
     <string name="searching_nearby_devices">Procurando dispositivos próximos...</string>
     <string name="no_nearby_devices_found">Nenhum dispositivo próximo encontrado</string>
     <string name="make_discoverable">Tornar detectável</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">A permissão de localização deve estar ativada para usar o Bluetooth</string>
     <string name="me">Eu</string>
     <string name="copy_text">Copiar texto</string>
+    <string name="print">Imprimir</string>
     <string name="edit_text">Editar texto</string>
     <string name="share_message">Compartilhar mensagem</string>
     <string name="delete_message">Apagar mensagem</string>

@@ -14,7 +14,7 @@
     <string name="feature_READ_PHONE_NUMBERS">Telefon numaralarını oku</string>
     <string name="feature_QUERY_ALL_PACKAGES">Uygulamaları yönet</string>
     <string name="notification_filter_settings">Bildirim filtre ayarları</string>
-    <string name="notification_filter_settings_desc">Bildirimlerin PC\'ye nasıl gönderileceğini seçin</string>
+    <string name="notification_filter_settings_desc">Bildirimlerin PC'ye nasıl gönderileceğini seçin</string>
     <string name="filter_mode">Filtre modu</string>
     <string name="notification_filter_mode_desc">İzin verilen liste (seçilen uygulamalar yalnızca) veya engellenen liste (seçilen uygulamalar hariç) modunu seçin</string>
     <string name="allowlist_mode">İzin verilen liste</string>
@@ -26,7 +26,7 @@
     <string name="system_permission_not_granted">Sistem izni verilmedi</string>
     <string name="open_permission_settings">İzin ayarlarını aç</string>
     <string name="need_storage_permission">Uygulamanın cihazınızın depolama alanına erişim izni gerekiyor.</string>
-    <string name="need_sms_permission">Uygulamanın SMS\'lerinizi okuma izni gerekiyor.</string>
+    <string name="need_sms_permission">Uygulamanın SMS'lerinizi okuma izni gerekiyor.</string>
     <string name="need_contact_permission">Uygulamanın Kişilerinizi okuma izni gerekiyor.</string>
     <string name="need_call_permission">Uygulamanın Aramalarınızı okuma izni gerekiyor.</string>
     <string name="grant_access">Erişim izni ver</string>

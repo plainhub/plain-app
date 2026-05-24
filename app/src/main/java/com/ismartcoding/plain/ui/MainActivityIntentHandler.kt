@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -12,25 +13,20 @@ import com.ismartcoding.lib.extensions.parcelableArrayList
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.StartHttpServerEvent
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.models.sendTextMessage
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
-import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
 import kotlinx.coroutines.delay
 
 internal fun MainActivity.handleIntent(intent: Intent) {
@@ -60,36 +56,33 @@ internal fun MainActivity.handleIntent(intent: Intent) {
     } else if (intent.action == Intent.ACTION_SEND) {
         if (intent.type?.startsWith("text/") == true) {
             val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return
-            coMain {
-                val item = withIO { ChatDbHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(sharedText))) }
-                val m = item.toModel()
-                m.data = m.getContentData()
-                sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(arrayListOf(m))))
-                navControllerState.value?.navigate(Routing.Chat("local"))
-            }
+            pendingFileUris = null
+            pendingForwardText = sharedText
+            showForwardTargetOptions(peerVM)
             return
         }
         val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri ?: return
-        coMain {
-            DialogHelper.showLoading()
-            withIO { peerVM.loadPeers() }
-            DialogHelper.hideLoading()
-            pendingFileUris = setOf(uri)
-            showForwardTargetDialog = true
-        }
+        pendingFileUris = setOf(uri)
+        pendingForwardText = null
+        showForwardTargetOptions(peerVM)
     } else if (intent.action == Intent.ACTION_SEND_MULTIPLE) {
         val uris = intent.parcelableArrayList<Uri>(Intent.EXTRA_STREAM)
         if (uris != null) {
-            coMain {
-                DialogHelper.showLoading()
-                withIO { peerVM.loadPeers() }
-                DialogHelper.hideLoading()
-                pendingFileUris = uris.toSet()
-                showForwardTargetDialog = true
-            }
+            pendingFileUris = uris.toSet()
+            pendingForwardText = null
+            showForwardTargetOptions(peerVM)
         }
     } else if (intent.action == Constants.ACTION_PLAY_MEDIA) {
         val path = intent.getStringExtra(Constants.EXTRA_MEDIA_PATH) ?: return
         navControllerState.value?.navigate(Routing.PlayMedia(path))
+    }
+}
+
+private fun MainActivity.showForwardTargetOptions(peerVM: PeerViewModel) {
+    coMain {
+        DialogHelper.showLoading()
+        withIO { peerVM.loadPeers() }
+        DialogHelper.hideLoading()
+        showForwardTargetDialog = true
     }
 }

@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui
-import com.ismartcoding.plain.preferences.*
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -54,14 +53,15 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.CrashHandler
+import com.ismartcoding.plain.discover.NearbyPairManager
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
-import com.ismartcoding.plain.events.PairingResponseEvent
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.models.acceptChannelInvite
 import com.ismartcoding.plain.ui.models.declineChannelInvite
+import com.ismartcoding.plain.ui.models.sendTextMessage
 import com.ismartcoding.plain.ui.page.ChannelInvitePage
 import com.ismartcoding.plain.ui.page.CrashReportDialog
 import com.ismartcoding.plain.ui.page.LoginRequestPage
@@ -95,6 +95,7 @@ class MainActivity : AppCompatActivity() {
     internal val navControllerState = mutableStateOf<NavHostController?>(null)
     internal var showForwardTargetDialog by mutableStateOf(false)
     internal var pendingFileUris by mutableStateOf<Set<Uri>?>(null)
+    internal var pendingForwardText by mutableStateOf<String?>(null)
     internal var pendingCrashReport by mutableStateOf<String?>(null)
 
     internal val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -160,16 +161,36 @@ class MainActivity : AppCompatActivity() {
         setContent {
             SettingsProvider {
                 AppTheme(useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
-                    Main(navControllerState, onLaunched = { handleIntent(intent) }, mainVM, audioPlaylistVM, pomodoroVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM)
+                    Main(
+                        navControllerState, onLaunched = { handleIntent(intent) },
+                        mainVM, audioPlaylistVM, pomodoroVM,
+                        chatVM = chatVM, peerVM = peerVM,
+                        channelVM = channelVM
+                    )
                     if (showForwardTargetDialog) {
                         ForwardTargetDialog(
-                            peerVM = peerVM, onDismiss = { showForwardTargetDialog = false; pendingFileUris = null },
+                            peerVM = peerVM, onDismiss = {
+                                showForwardTargetDialog = false
+                                pendingFileUris = null
+                                pendingForwardText = null
+                            },
                             onTargetSelected = { target ->
+                                val route = when (target) {
+                                    is ForwardTarget.Local -> Routing.Chat("local")
+                                    is ForwardTarget.Peer -> Routing.Chat("peer:${target.peer.id}")
+                                }
+                                navControllerState.value?.navigate(route)
                                 pendingFileUris?.let { uris ->
-                                    val route = when (target) {
-                                        is ForwardTarget.Local -> Routing.Chat("local"); is ForwardTarget.Peer -> Routing.Chat("peer:${target.peer.id}")
+                                    coIO {
+                                        delay(500)
+                                        sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris))
                                     }
-                                    navControllerState.value?.navigate(route); coIO { delay(1000); sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris)) }
+                                }
+                                pendingForwardText?.let { text ->
+                                    coIO {
+                                        delay(500)
+                                        chatVM.sendTextMessage(text, this@MainActivity)
+                                    }
                                 }
                             })
                     }
@@ -198,11 +219,15 @@ class MainActivity : AppCompatActivity() {
                             event = event,
                             onDeny = {
                                 pendingPairingEvent = null
-                                sendEvent(PairingResponseEvent(event.request, event.fromIp, false))
+                                coIO {
+                                    NearbyPairManager.respondToPairing(event.request, event.fromIp, false)
+                                }
                             },
                             onAllow = {
                                 pendingPairingEvent = null
-                                sendEvent(PairingResponseEvent(event.request, event.fromIp, true))
+                                coIO {
+                                    NearbyPairManager.respondToPairing(event.request, event.fromIp, true)
+                                }
                             },
                         )
                     }

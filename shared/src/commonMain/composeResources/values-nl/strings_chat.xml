@@ -7,6 +7,7 @@
     <string name="scanner">Scanner</string>
     <string name="nearby">In de buurt</string>
     <string name="nearby_devices">Apparaten in de buurt</string>
+    <string name="devices">Apparaten</string>
     <string name="searching_nearby_devices">Zoeken naar apparaten in de buurt...</string>
     <string name="no_nearby_devices_found">Geen apparaten in de buurt gevonden</string>
     <string name="make_discoverable">Vindbaar maken</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">Locatietoestemming moet ingeschakeld zijn voor het gebruik van Bluetooth</string>
     <string name="me">Ik</string>
     <string name="copy_text">Tekst kopiëren</string>
+    <string name="print">Afdrukken</string>
     <string name="edit_text">Tekst bewerken</string>
     <string name="share_message">Bericht delen</string>
     <string name="delete_message">Bericht verwijderen</string>

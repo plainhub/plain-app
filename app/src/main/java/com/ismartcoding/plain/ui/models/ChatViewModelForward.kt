@@ -6,7 +6,7 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.chat.ChannelChatHelper
+import com.ismartcoding.plain.channel.ChannelChatHelper
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.PeerChatHelper
 import com.ismartcoding.plain.db.AppDatabase

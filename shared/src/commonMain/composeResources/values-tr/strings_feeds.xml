@@ -8,9 +8,9 @@
     <string name="load_full_content">Tam içeriği yükle</string>
     <string name="auto_fetch_full_content">Tam İçeriği Otomatik Getir</string>
     <string name="auto_fetch_full_content_tips">Bu seçenek açıldığında, uygulama her RSS akış öğesinin tam içeriğini otomatik olarak getirecektir.</string>
-    <string name="rss_url">RSS URL\'si</string>
-    <string name="import_opml_file">OPML\'den İçe Aktar</string>
-    <string name="export_opml_file">OPML\'yi Dışa Aktar</string>
+    <string name="rss_url">RSS URL'si</string>
+    <string name="import_opml_file">OPML'den İçe Aktar</string>
+    <string name="export_opml_file">OPML'yi Dışa Aktar</string>
     <string name="books_title">Kitaplar ({{count}})</string>
     <string name="subscriptions_title">Abonelikler ({{count}})</string>
     <string name="feeds">Beslemeler</string>

@@ -16,7 +16,7 @@ import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.chat.discover.NearbyPairManager
+import com.ismartcoding.plain.discover.NearbyPairManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

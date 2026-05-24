@@ -26,8 +26,8 @@
     <string name="work_duration">Werkduur (minuten)</string>
     <string name="short_break_duration">Korte Pauze Duur (minuten)</string>
     <string name="long_break_duration">Lange Pauze Duur (minuten)</string>
-    <string name="pomodoros_before_long_break">Pomodoro\'s Voor Lange Pauze</string>
-    <string name="total_pomodoros">Totaal Pomodoro\'s</string>
+    <string name="pomodoros_before_long_break">Pomodoro's Voor Lange Pauze</string>
+    <string name="total_pomodoros">Totaal Pomodoro's</string>
     <string name="session_complete">Sessie Voltooid!</string>
     <string name="time_for_break">Tijd voor een pauze!</string>
     <string name="back_to_work">Terug aan het werk!</string>

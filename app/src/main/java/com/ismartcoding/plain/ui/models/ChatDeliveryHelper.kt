@@ -2,11 +2,11 @@ package com.ismartcoding.plain.ui.models
 
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChannelChatHelper
+import com.ismartcoding.plain.channel.ChannelChatHelper
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.PeerChatHelper
-import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent

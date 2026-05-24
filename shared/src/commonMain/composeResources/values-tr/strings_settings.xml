@@ -40,9 +40,9 @@
     <string name="features">Özellikler</string>
     <string name="system">Sistem varsayılanı</string>
     <string name="light">Açık</string>
-    <string name="name_asc">İsim (A\'dan Z\'ye)</string>
-    <string name="name_desc">İsim (Z\'den A\'ya)</string>
-    <string name="ip_address_asc">IP adresi (0\'dan 9\'a)</string>
+    <string name="name_asc">İsim (A'dan Z'ye)</string>
+    <string name="name_desc">İsim (Z'den A'ya)</string>
+    <string name="ip_address_asc">IP adresi (0'dan 9'a)</string>
     <string name="last_active_desc">Son etkin</string>
     <string name="app_version">UYGULAMA sürümü</string>
     <string name="android_version">Android sürümü</string>

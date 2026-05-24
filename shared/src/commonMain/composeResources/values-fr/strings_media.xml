@@ -3,13 +3,13 @@
     <string name="pause">Pause</string>
     <string name="play">Lecture</string>
     <string name="change_playback_speed">Modifier la vitesse de lecture</string>
-    <string name="toggle_audio">Activer/désactiver l\'audio</string>
-    <string name="picture_in_picture">Image dans l\'image</string>
+    <string name="toggle_audio">Activer/désactiver l'audio</string>
+    <string name="picture_in_picture">Image dans l'image</string>
     <string name="fullscreen">Plein écran</string>
     <string name="exit_cast_mode">Quitter le mode de diffusion</string>
     <string name="rotate">Faire pivoter</string>
     <string name="select_a_device">Sélectionnez un appareil</string>
-    <string name="add_videos_to_playlist">Veuillez d\'abord ajouter des vidéos à la liste de lecture.</string>
+    <string name="add_videos_to_playlist">Veuillez d'abord ajouter des vidéos à la liste de lecture.</string>
     <string name="video_playlist_no_data">La liste de lecture est utilisée pour diffuser automatiquement plusieurs vidéos en séquence.</string>
     <string name="cast">Diffuser</string>
     <string name="cast_dialog_hint">Choisissez un appareil pour entrer en mode Cast.</string>
@@ -41,7 +41,7 @@
     <string name="add_to_cast_queue">Ajouter à la liste de diffusion</string>
     <string name="remove_from_cast_queue">Supprimer de la liste de diffusion</string>
     <string name="my_phone">Mon téléphone</string>
-    <string name="pdf_open_error">Échec de l\'ouverture du fichier PDF.</string>
+    <string name="pdf_open_error">Échec de l'ouverture du fichier PDF.</string>
     <string name="audio_play_error">Échec de la lecture du fichier audio.</string>
     <string name="clear_all">Tout effacer</string>
     <string name="clear_all_confirm">Êtes-vous sûr de vouloir effacer la liste de lecture ? Cette action est irréversible.</string>
@@ -53,7 +53,7 @@
     <string name="empty_playlist">Votre liste de lecture est vide</string>
     <string name="remove_from_playlist">Supprimer de la liste</string>
     <string name="image">Image</string>
-    <string name="cast_searching_for_screen">Recherche d\'écran</string>
+    <string name="cast_searching_for_screen">Recherche d'écran</string>
     <string name="cast_select_screen">Sélectionner un écran</string>
-    <string name="cast_looking_for_devices">Recherche d\'appareils à proximité...</string>
+    <string name="cast_looking_for_devices">Recherche d'appareils à proximité...</string>
 </resources>

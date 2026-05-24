@@ -6,7 +6,7 @@ import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
-import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getStatusWsUrl

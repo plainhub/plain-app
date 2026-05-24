@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="relative_time_now">À l\'instant</string>
+    <string name="relative_time_now">À l'instant</string>
     <string name="relative_time_minutes_short">%1$s min</string>
     <string name="relative_time_hours_short">%1$s h</string>
     <string name="relative_time_days_short">%1$s j</string>

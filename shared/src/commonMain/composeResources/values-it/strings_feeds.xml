@@ -7,7 +7,7 @@
     <string name="clear_feed_items">Cancella elementi del feed</string>
     <string name="load_full_content">Carica il contenuto completo</string>
     <string name="auto_fetch_full_content">Recupero automatico del contenuto completo</string>
-    <string name="auto_fetch_full_content_tips">Quando questa opzione è attivata, l\'app recupererà automaticamente il contenuto completo di ciascun elemento del feed RSS.</string>
+    <string name="auto_fetch_full_content_tips">Quando questa opzione è attivata, l'app recupererà automaticamente il contenuto completo di ciascun elemento del feed RSS.</string>
     <string name="rss_url">URL RSS</string>
     <string name="import_opml_file">Importa da OPML</string>
     <string name="export_opml_file">Esporta in OPML</string>

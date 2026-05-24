@@ -118,7 +118,7 @@ fun ChatListPage(
                         )
                     }
                 }
-                val allPeers = pairedPeers.toList() + unpairedPeers.toList()
+                val allPeers = pairedPeers + unpairedPeers
                 if (allPeers.isNotEmpty()) {
                     item {
                         VerticalSpace(dp = 16.dp)

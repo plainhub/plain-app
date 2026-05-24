@@ -7,6 +7,7 @@
     <string name="scanner">स्कैनर</string>
     <string name="nearby">पास में</string>
     <string name="nearby_devices">पास के डिवाइस</string>
+    <string name="devices">डिवाइस</string>
     <string name="searching_nearby_devices">पास के डिवाइस खोज रहे हैं...</string>
     <string name="no_nearby_devices_found">पास में कोई डिवाइस नहीं मिला</string>
     <string name="make_discoverable">खोजे जाने योग्य बनाएं</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">ब्लूटूथ का उपयोग करने के लिए स्थान अनुमति सक्षम होनी चाहिए</string>
     <string name="me">मैं</string>
     <string name="copy_text">पाठ की प्रतिलिपि बनाएँ</string>
+    <string name="print">प्रिंट करें</string>
     <string name="edit_text">पाठ संपादित करें</string>
     <string name="share_message">संदेश साझा करें</string>
     <string name="delete_message">संदेश हटाएं</string>

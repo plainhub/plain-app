@@ -7,6 +7,7 @@
     <string name="scanner">Scanner</string>
     <string name="nearby">Nearby</string>
     <string name="nearby_devices">Nearby devices</string>
+    <string name="devices">Devices</string>
     <string name="searching_nearby_devices">Searching for nearby devices...</string>
     <string name="no_nearby_devices_found">No nearby devices found</string>
     <string name="make_discoverable">Make discoverable</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">Location permission should be enabled for bluetooth to use</string>
     <string name="me">Me</string>
     <string name="copy_text">Copy text</string>
+    <string name="print">Print</string>
     <string name="edit_text">Edit text</string>
     <string name="share_message">Share message</string>
     <string name="delete_message">Delete message</string>
@@ -53,7 +55,7 @@
     <string name="allow_web_access_desc">Allow access to your phone data from a web browser</string>
     <string name="allow_desktop_access">Allow Desktop Access</string>
     <string name="allow_desktop_access_desc">Allow access to your phone data from the desktop app</string>
-    <string name="chat_input_hint">What\'s on your mind?</string>
+    <string name="chat_input_hint">What's on your mind?</string>
     <string name="client_id">Client ID</string>
     <string name="peer_id">ID</string>
     <string name="online">Online</string>

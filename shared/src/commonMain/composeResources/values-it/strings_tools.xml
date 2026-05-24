@@ -12,9 +12,9 @@
     <string name="dlna_receiver_step1_title">Connettiti allo stesso Wi-Fi</string>
     <string name="dlna_receiver_step1_desc">Assicurati che entrambi i dispositivi siano connessi alla stessa rete Wi-Fi</string>
     <string name="dlna_receiver_step2_title">Apri PlainApp</string>
-    <string name="dlna_receiver_step2_desc">Apri PlainApp sull\'altro dispositivo e trova il video o la musica che vuoi riprodurre</string>
+    <string name="dlna_receiver_step2_desc">Apri PlainApp sull'altro dispositivo e trova il video o la musica che vuoi riprodurre</string>
     <string name="dlna_receiver_step3_title">Trasmetti</string>
-    <string name="dlna_receiver_step3_desc">Tocca l\'icona di trasmissione, seleziona "%1$s" dall\'elenco e la riproduzione inizierà</string>
+    <string name="dlna_receiver_step3_desc">Tocca l'icona di trasmissione, seleziona "%1$s" dall'elenco e la riproduzione inizierà</string>
     <string name="dlna_receiver_protocol_note">Supporta i protocolli DLNA / UPnP, compatibile con VLC, Kodi e altre popolari app di trasmissione</string>
     <string name="dlna_receiver_enable">Attiva ricevitore</string>
     <string name="dlna_receiver_disable">Disattiva ricevitore</string>
@@ -36,16 +36,16 @@
     <string name="round_counter">Round %1$d di %2$d</string>
     <string name="drag_to_adjust_progress">Trascina per regolare il progresso</string>
     <string name="today_completed">Completati Oggi</string>
-    <string name="pomodoro_notification_prompt">Per mostrare le notifiche Pomodoro e gli avvisi del timer quando le sessioni sono completate, concedi il permesso di ricevere notifiche dall\'app.</string>
+    <string name="pomodoro_notification_prompt">Per mostrare le notifiche Pomodoro e gli avvisi del timer quando le sessioni sono completate, concedi il permesso di ricevere notifiche dall'app.</string>
     <string name="work_session_complete">Sessione di Lavoro Completata!</string>
     <string name="great_job_short_break">Ottimo lavoro! È ora di una pausa breve 😊</string>
     <string name="great_job_long_break">Ottimo lavoro! È ora di una pausa lunga 😊</string>
     <string name="break_complete">Pausa Completata!</string>
     <string name="time_to_work">È ora di tornare al lavoro 💪</string>
     <string name="long_break_complete">Pausa Lunga Completata!</string>
-    <string name="ready_for_work">Pronto per un\'altra sessione di lavoro? 🚀</string>
+    <string name="ready_for_work">Pronto per un'altra sessione di lavoro? 🚀</string>
     <string name="grant_permission_button">Concedi Permesso</string>
-    <string name="sleep_timer_permission_message">Il timer del sonno necessita del permesso di programmare allarmi precisi per funzionare correttamente in background. Questo garantisce che il timer funzioni anche quando l\'app non è attiva.</string>
+    <string name="sleep_timer_permission_message">Il timer del sonno necessita del permesso di programmare allarmi precisi per funzionare correttamente in background. Questo garantisce che il timer funzioni anche quando l'app non è attiva.</string>
     <string name="play_sound_on_complete">Riproduci suono al completamento</string>
     <string name="checked">Selezionato</string>
     <string name="min">MIN</string>
@@ -58,15 +58,15 @@
         <item>30 dB: Biblioteca silenziosa, Musica di sottofondo leggera</item>
         <item>40 dB: Conversazione tranquilla, Frigorifero che ronza</item>
         <item>50 dB: Pioggia moderata, Rumore del traffico leggero</item>
-        <item>60 dB: Conversazione normale, Ambiente d\'ufficio</item>
+        <item>60 dB: Conversazione normale, Ambiente d'ufficio</item>
         <item>70 dB: Aspirapolvere, Traffico intenso in strada</item>
-        <item>80 dB: Clacson dell\'auto, Smaltimento dei rifiuti</item>
+        <item>80 dB: Clacson dell'auto, Smaltimento dei rifiuti</item>
         <item>90 dB: Motocicletta, Treno della metropolitana</item>
         <item>100 dB: Sega elettrica, Musica di un concerto</item>
         <item>110 dB: Concerto rock, Tuono</item>
-        <item>120 dB: Motore di un aereo in decollo, Sirena di un\'ambulanza</item>
+        <item>120 dB: Motore di un aereo in decollo, Sirena di un'ambulanza</item>
         <item>130 dB: Colpo di fucile, Martello pneumatico</item>
-        <item>140 dB: Aereo militare a reazione, Fuochi d\'artificio</item>
+        <item>140 dB: Aereo militare a reazione, Fuochi d'artificio</item>
     </string-array>
     <string name="dlna_cast_request_title">Richiesta di cast</string>
     <string name="dlna_cast_request_desc">Il dispositivo %1$s vuole trasmettere su questo dispositivo</string>

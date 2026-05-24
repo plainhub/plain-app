@@ -12,7 +12,7 @@ import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChannelSystemMessageHandler
+import com.ismartcoding.plain.channel.ChannelSystemMessageHandler
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.PeerChatHelper

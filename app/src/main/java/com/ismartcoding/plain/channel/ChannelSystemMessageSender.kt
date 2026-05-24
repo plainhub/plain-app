@@ -1,9 +1,10 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.channel
 
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.chat.PeerGraphQLClient
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
@@ -11,11 +12,6 @@ import com.ismartcoding.plain.db.getPeersAsync
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 
-/**
- * Encapsulates the logic for sending channel system messages to peers.
- *
- * All public methods are `suspend` and should be called from a coroutine on [Dispatchers.IO].
- */
 object ChannelSystemMessageSender {
 
     /**
@@ -117,8 +113,6 @@ object ChannelSystemMessageSender {
         val payload = jsonEncode(ChannelSystemMessages.ChannelLeave(channelId))
         return sendToPeer(ownerPeer, ChannelSystemMessages.TYPE_LEAVE, payload, channelId, channelKey)
     }
-
-    // ── Private helpers ────────────────────────────────────────────
 
     private suspend fun sendToPeer(peer: DPeer, type: String, payload: String, channelId: String = "", channelKey: String = ""): Boolean {
         return try {

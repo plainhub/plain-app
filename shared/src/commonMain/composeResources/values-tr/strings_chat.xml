@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="confirm_to_send_files_to_file_assistant">Bu dosyaları Dosya Transfer Asistanı\'na göndermek ister misiniz?</string>
-    <string name="confirm_to_send_file_to_file_assistant">Bu dosyayı Dosya Transfer Asistanı\'na göndermek ister misiniz?</string>
+    <string name="confirm_to_send_files_to_file_assistant">Bu dosyaları Dosya Transfer Asistanı'na göndermek ister misiniz?</string>
+    <string name="confirm_to_send_file_to_file_assistant">Bu dosyayı Dosya Transfer Asistanı'na göndermek ister misiniz?</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QR Kodu</string>
     <string name="scanner">Tarayıcı</string>
     <string name="nearby">Yakınlarda</string>
     <string name="nearby_devices">Yakınlardaki cihazlar</string>
+    <string name="devices">Cihazlar</string>
     <string name="searching_nearby_devices">Yakınlardaki cihazlar aranıyor…</string>
     <string name="no_nearby_devices_found">Yakınlarda cihaz bulunamadı</string>
     <string name="make_discoverable">Keşfedilebilir yap</string>
@@ -17,7 +18,7 @@
     <string name="make_sure_devices_same_network">Diğer cihazların aynı ağda ve keşfedilebilir olduğundan emin olun</string>
     <string name="show_qr_code">QR kodunu göster</string>
     <string name="pair_via_qr_title">QR koduyla eşleştir</string>
-    <string name="pair_via_qr_desc">Başka bir cihazda PlainApp\'i açın, tarama düğmesine dokunun ve eşleştirmek için bu QR kodunu tarayın.</string>
+    <string name="pair_via_qr_desc">Başka bir cihazda PlainApp'i açın, tarama düğmesine dokunun ve eşleştirmek için bu QR kodunu tarayın.</string>
     <string name="pair_with_device">%s ile eşleştir</string>
     <string name="confirm_pair_with_device">%s ile eşleştirmek istiyor musunuz?</string>
     <string name="last_seen">Son görülme</string>
@@ -25,8 +26,8 @@
     <string name="link_preview_image">Bağlantı önizleme görüntüsü</string>
     <string name="loading_link_preview">Bağlantı önizleme yükleniyor…</string>
     <string name="link_preview_error">Bağlantı önizleme yüklenemedi</string>
-    <string name="bluetooth_scan_gps_enable_title">GPS\'i etkinleştir</string>
-    <string name="bluetooth_scan_gps_enable_description">Yakındaki cihazları taramak için ayarlarınızda GPS\'i etkinleştirin.</string>
+    <string name="bluetooth_scan_gps_enable_title">GPS'i etkinleştir</string>
+    <string name="bluetooth_scan_gps_enable_description">Yakındaki cihazları taramak için ayarlarınızda GPS'i etkinleştirin.</string>
     <string name="bluetooth_scan_gps_enable_confirm">Ayarlar</string>
     <string name="connect">Bağlan</string>
     <string name="connecting">Bağlanıyor</string>
@@ -37,9 +38,10 @@
     <string name="unknown_ip">Bilinmeyen IP</string>
     <string name="try_again">Tekrar dene</string>
     <string name="added_at">Eklenme zamanı</string>
-    <string name="location_permission_should_be_enabled">Bluetooth\'un kullanılması için konum izni etkinleştirilmelidir</string>
+    <string name="location_permission_should_be_enabled">Bluetooth'un kullanılması için konum izni etkinleştirilmelidir</string>
     <string name="me">Ben</string>
     <string name="copy_text">Metni kopyala</string>
+    <string name="print">Yazdır</string>
     <string name="edit_text">Metni düzenle</string>
     <string name="share_message">Mesajı paylaş</string>
     <string name="delete_message">Mesajı sil</string>

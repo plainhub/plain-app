@@ -42,7 +42,6 @@ import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.models.CastViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,18 +58,19 @@ fun CastDialog(castVM: CastViewModel) {
     val onDismiss = { castVM.showCastDialog.value = false }
 
     LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.IO) {
-            while (true) {
-                job?.cancel()
-                if (itemsState.isEmpty()) job = coIO { castVM.searchAsync(context) }
-                delay(5000)
-            }
+        if (job?.isActive != true) {
+            job = coIO { castVM.searchAsync(context) }
         }
     }
     LaunchedEffect(hasDevices) {
         if (hasDevices) sheetState.expand()
     }
-    DisposableEffect(Unit) { onDispose { job?.cancel() } }
+    DisposableEffect(Unit) {
+        onDispose {
+            job?.cancel()
+            job = null
+        }
+    }
 
     PModalBottomSheet(
         modifier = Modifier.defaultMinSize(minHeight = 360.dp),

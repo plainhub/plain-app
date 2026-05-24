@@ -7,6 +7,7 @@
     <string name="scanner">Máy quét</string>
     <string name="nearby">Gần đây</string>
     <string name="nearby_devices">Thiết bị gần đây</string>
+    <string name="devices">Thiết bị</string>
     <string name="searching_nearby_devices">Đang tìm kiếm thiết bị gần đây...</string>
     <string name="no_nearby_devices_found">Không tìm thấy thiết bị gần đây</string>
     <string name="make_discoverable">Cho phép phát hiện</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">Quyền vị trí phải được bật để sử dụng bluetooth</string>
     <string name="me">Tôi</string>
     <string name="copy_text">Sao chép văn bản</string>
+    <string name="print">In</string>
     <string name="edit_text">Chỉnh sửa văn bản</string>
     <string name="share_message">Chia sẻ tin nhắn</string>
     <string name="delete_message">Xóa tin nhắn</string>

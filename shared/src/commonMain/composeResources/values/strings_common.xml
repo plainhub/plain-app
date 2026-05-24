@@ -145,7 +145,7 @@
     <string name="clear">Clear</string>
     <string name="tools">Tools</string>
     <string name="not_supported_error">Not supported on this device.</string>
-    <string name="no_browser_error">You don\'t have any browser to open web page.</string>
+    <string name="no_browser_error">You don't have any browser to open web page.</string>
     <string name="copy">Copy</string>
     <string name="home">Home</string>
     <string name="copied_to_clipboard_format">"%1$s" copied to clipboard.</string>

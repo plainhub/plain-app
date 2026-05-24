@@ -23,7 +23,7 @@
     <string name="no_results_found">Nessun risultato trovato</string>
     <string name="search">Ricerca</string>
     <string name="change">Cambia</string>
-    <string name="unknown_file_description">Attualmente PlainApp non supporta l\'apertura di questo tipo di file. Puoi utilizzare un\'altra app per aprirlo.</string>
+    <string name="unknown_file_description">Attualmente PlainApp non supporta l'apertura di questo tipo di file. Puoi utilizzare un'altra app per aprirlo.</string>
     <string name="grant_permission">Concedi il permesso</string>
     <string name="load_no_more">Nessun altro dato</string>
     <string name="list_empty">La lista è vuota</string>
@@ -31,8 +31,8 @@
     <string name="scan_result">Risultato scansione</string>
     <string name="view_detail">Visualizza dettagli</string>
     <string name="refresh">Aggiorna</string>
-    <string name="confirm_to_delete">Confermare l\'eliminazione?</string>
-    <string name="confirm_to_clear_logs">Confermare l\'eliminazione dei registri?</string>
+    <string name="confirm_to_delete">Confermare l'eliminazione?</string>
+    <string name="confirm_to_clear_logs">Confermare l'eliminazione dei registri?</string>
     <string name="ok">OK</string>
     <string name="error">Errore</string>
     <string name="more">Altro</string>
@@ -104,7 +104,7 @@
     <string name="on">Attivo</string>
     <string name="off">Disattivo</string>
     <string name="reset">Ripristina</string>
-    <string name="srl_footer_pulling">Scorri verso l\'alto per caricare altri dati</string>
+    <string name="srl_footer_pulling">Scorri verso l'alto per caricare altri dati</string>
     <string name="srl_footer_release">Rilascia per caricare altri dati</string>
     <string name="srl_footer_loading">Caricamento...</string>
     <string name="srl_footer_refreshing">Attesa aggiornamento...</string>
@@ -147,14 +147,14 @@
     <string name="app_files_desc">File condivisi in chat</string>
     <string name="no_app_files">Nessun file ancora</string>
     <string name="web_settings">Impostazioni Web</string>
-    <string name="ui_components">Componenti dell\'interfaccia utente</string>
+    <string name="ui_components">Componenti dell'interfaccia utente</string>
     <string name="donation_title">Supporto per lo sviluppo di PlainApp</string>
     <string name="buy_me_a_coffee">Offrimi un caffè</string>
 
 
     <string name="crash_report_title">App in crash</string>
-    <string name="crash_report_message">L\'app si è arrestata in modo imprevisto. Vuoi condividere il report del crash per aiutarci a risolverlo?</string>
-    <string name="crash_include_app_logs">Includi log dell\'app</string>
+    <string name="crash_report_message">L'app si è arrestata in modo imprevisto. Vuoi condividere il report del crash per aiutarci a risolverlo?</string>
+    <string name="crash_include_app_logs">Includi log dell'app</string>
     <string name="crash_share">Condividi</string>
     <string name="stay_online_mode">Modalità sempre online</string>
     <string name="stay_online_mode_oled_saving">Risparmio OLED</string>

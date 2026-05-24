@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_data">Dati dell\'app</string>
+    <string name="app_data">Dati dell'app</string>
     <string name="developer_mode">Modalità sviluppatore</string>
     <string name="local_cache">Cache locale</string>
     <string name="clear_cache">Cancella cache</string>
@@ -10,7 +10,7 @@
     <string name="rate_limit">Il tasso di richiesta è limitato</string>
     <string name="check_failure">Impossibile controllare gli aggiornamenti</string>
     <string name="check_update">Controlla gli aggiornamenti</string>
-    <string name="is_latest_version">Questa è l\'ultima versione dell\'app</string>
+    <string name="is_latest_version">Questa è l'ultima versione dell'app</string>
     <string name="change_log">Registro modifiche</string>
     <string name="update">Aggiorna</string>
     <string name="get_new_updates">Trovato aggiornamento per %1$s!</string>
@@ -21,10 +21,10 @@
     <string name="usb_connect_recommendation">Collegando il cavo di ricarica USB ci si assicura che il telefono rimanga attivo, evitando così qualsiasi intercettazione o restrizione delle sue funzioni da parte del sistema.</string>
     <string name="performance">Prestazioni</string>
     <string name="disable_battery_optimization">Disattiva ottimizzazione batteria</string>
-    <string name="battery_optimization_disabled">L\'ottimizzazione della batteria è disattivata</string>
-    <string name="battery_optimization_tips">Disattiva l\'ottimizzazione della batteria per mantenere l\'accesso web attivo quando lo schermo è spento.</string>
+    <string name="battery_optimization_disabled">L'ottimizzazione della batteria è disattivata</string>
+    <string name="battery_optimization_tips">Disattiva l'ottimizzazione della batteria per mantenere l'accesso web attivo quando lo schermo è spento.</string>
     <string name="keep_awake">Mantieni sveglio</string>
-    <string name="keep_awake_tips">Mantiene l\'accesso web sempre online (maggior consumo della batteria). Attivalo se smette di funzionare quando il telefono va in standby.</string>
+    <string name="keep_awake_tips">Mantiene l'accesso web sempre online (maggior consumo della batteria). Attivalo se smette di funzionare quando il telefono va in standby.</string>
     <string name="generate_password">Genera password</string>
     <string name="privacy_policy">Informativa sulla privacy</string>
     <string name="terms_of_use">Termini di utilizzo</string>
@@ -55,7 +55,7 @@
     <string name="keywords">Parole chiave</string>
     <string name="name">Nome</string>
     <string name="sort_by_random">Ordina per caso</string>
-    <string name="app_restored">I dati dell\'app sono stati ripristinati, devi chiudere forzatamente questa app e riavviare l\'app come nuova.</string>
+    <string name="app_restored">I dati dell'app sono stati ripristinati, devi chiudere forzatamente questa app e riavviare l'app come nuova.</string>
     <string name="welcome_text">Benvenuto! Puoi facilmente inviare testi, immagini e video su questa pagina e visualizzarli sul tuo computer.\nSe incontri problemi, non esitare a inviare una e-mail a support@plainapp.app per assistenza o unirti alla nostra discussione su Discord su: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Donazione</string>
     <string name="logs">Log</string>
@@ -67,9 +67,9 @@
     <string name="amoled_dark_theme">Tema scuro AMOLED</string>
     <string name="customize_home_features">Personalizza le funzionalità della home</string>
     <string name="auto_check_update">Controlla aggiornamenti automaticamente</string>
-    <string name="auto_check_update_desc">Controlla automaticamente le nuove versioni all\'avvio dell\'app</string>
+    <string name="auto_check_update_desc">Controlla automaticamente le nuove versioni all'avvio dell'app</string>
     <string name="donation_desc">PlainApp è gratuita, open source e sviluppata da un solo sviluppatore. Se ti fa risparmiare tempo, considera di offrirmi un caffè.</string>
-    <string name="drag_number_to_reorder_list">Trascina il numero per riordinare l\'elenco</string>
+    <string name="drag_number_to_reorder_list">Trascina il numero per riordinare l'elenco</string>
     <string name="web_client_connected">Client web connesso</string>
     <string name="clients_online">%1$d client online</string>
     <string name="downloading_update">Download in corso… %1$s%%</string>

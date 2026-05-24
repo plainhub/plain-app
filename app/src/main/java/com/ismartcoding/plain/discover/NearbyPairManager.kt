@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.chat.discover
+package com.ismartcoding.plain.discover
 
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -305,38 +305,22 @@ object NearbyPairManager {
         signaturePublicKey: String
     ) {
         try {
-            val existingPeer = AppDatabase.instance.peerDao().getById(deviceId)
             val currentTime = TimeHelper.now()
             val ipString = deviceIps.joinToString(",")
-
-            if (existingPeer != null) {
-                existingPeer.apply {
-                    name = deviceName
-                    ip = ipString
-                    this.port = port
-                    this.deviceType = deviceType.value
-                    this.key = key
-                    publicKey = signaturePublicKey // Save raw Ed25519 signature public key (32 bytes)
-                    status = "paired"
-                    updatedAt = currentTime
-                }
-                AppDatabase.instance.peerDao().update(existingPeer)
-                LogCat.d("Updated existing peer with signature public key: $deviceId")
-            } else {
-                AppDatabase.instance.peerDao().insert(DPeer(deviceId).apply {
-                    id = deviceId
-                    name = deviceName
-                    ip = ipString
-                    this.port = port
-                    this.deviceType = deviceType.value
-                    this.key = key
-                    publicKey = signaturePublicKey // Save raw Ed25519 signature public key (32 bytes)
-                    status = "paired"
-                    createdAt = currentTime
-                    updatedAt = currentTime
-                })
-                LogCat.d("Inserted new peer with signature public key: $deviceId")
+            val peer = (AppDatabase.instance.peerDao().getById(deviceId) ?: DPeer(deviceId).apply {
+                createdAt = currentTime
+            }).apply {
+                name = deviceName
+                ip = ipString
+                this.port = port
+                this.deviceType = deviceType.value
+                this.key = key
+                publicKey = signaturePublicKey
+                status = "paired"
+                updatedAt = currentTime
             }
+            AppDatabase.instance.peerDao().upsert(peer)
+            LogCat.d("Upserted peer: $deviceId")
             ChatCacheManager.loadKeyCacheAsync()
         } catch (e: Exception) {
             LogCat.e("Error storing peer in database: ${e.message}")

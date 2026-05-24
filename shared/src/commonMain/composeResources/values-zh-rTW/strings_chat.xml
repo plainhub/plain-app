@@ -7,6 +7,7 @@
     <string name="scanner">掃碼</string>
     <string name="nearby">附近</string>
     <string name="nearby_devices">附近裝置</string>
+    <string name="devices">裝置</string>
     <string name="searching_nearby_devices">搜尋附近裝置中...</string>
     <string name="no_nearby_devices_found">未發現附近裝置</string>
     <string name="make_discoverable">設為可被發現</string>
@@ -50,6 +51,7 @@
     <string name="location_permission_should_be_enabled">藍牙功能需要啟用位置權限</string>
     <string name="me">我</string>
     <string name="copy_text">複製文本</string>
+    <string name="print">列印</string>
     <string name="edit_text">編輯文本</string>
     <string name="share_message">分享消息</string>
     <string name="delete_message">刪除消息</string>

@@ -13,7 +13,7 @@
     <string name="video_playlist_no_data">Çalma listesi, birden çok videoyu sırayla otomatik olarak yayınlamak için kullanılır.</string>
     <string name="cast">Yayınla</string>
     <string name="cast_dialog_hint">Cast moduna girmek için bir cihaz seçin.</string>
-    <string name="cast_dialog_wireless_cast_tip">İpucu: Hedef ekranınızla aynı Wi-Fi\'a bağlanın</string>
+    <string name="cast_dialog_wireless_cast_tip">İpucu: Hedef ekranınızla aynı Wi-Fi'a bağlanın</string>
     <string name="images">Resimler</string>
     <string name="video">Video</string>
     <string name="audios">Ses Dosyaları</string>

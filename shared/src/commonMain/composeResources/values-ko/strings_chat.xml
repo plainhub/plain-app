@@ -7,6 +7,7 @@
     <string name="scanner">스캐너</string>
     <string name="nearby">근처</string>
     <string name="nearby_devices">근처 기기</string>
+    <string name="devices">기기</string>
     <string name="searching_nearby_devices">근처 기기 검색 중...</string>
     <string name="no_nearby_devices_found">근처 기기를 찾을 수 없음</string>
     <string name="make_discoverable">검색 가능하게 설정</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">블루투스 사용을 위해 위치 권한이 활성화되어야 합니다</string>
     <string name="me">나</string>
     <string name="copy_text">텍스트 복사</string>
+    <string name="print">인쇄</string>
     <string name="edit_text">텍스트 편집</string>
     <string name="share_message">메시지 공유</string>
     <string name="delete_message">메시지 삭제</string>

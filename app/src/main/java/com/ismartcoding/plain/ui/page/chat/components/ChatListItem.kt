@@ -81,7 +81,9 @@ fun ChatListItem(
                                 showContextMenu.value = true
                             },
                             onDoubleClick = {
-                                if (m.value is DMessageText) navController.navigateChatText((m.value as DMessageText).text)
+                                if (m.value is DMessageText) {
+                                    navController.navigateChatText((m.value as DMessageText).text)
+                                }
                             },
                         ),
                 ) {

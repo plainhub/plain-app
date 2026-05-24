@@ -24,6 +24,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtonTags
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -61,6 +63,7 @@ fun NotePage(
     notesVM: NotesViewModel, tagsVM: TagsViewModel,
     noteVM: NoteViewModel = viewModel(), mdEditorVM: MdEditorViewModel = viewModel(),
 ) {
+    val context = LocalContext.current
     val id = remember { mutableStateOf(initId) }
     val previewerState = rememberPreviewerState()
     val tagsState by tagsVM.itemsFlow.collectAsState()
@@ -90,6 +93,13 @@ fun NotePage(
                     tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.toggleWrapContent(navController.context) }
             } else if (id.value.isNotEmpty()) {
                 ActionButtonTags { noteVM.showSelectTagsDialog.value = true }
+                PIconButton(
+                    icon = Res.drawable.share_2,
+                    contentDescription = stringResource(Res.string.share),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                ) {
+                    ShareHelper.shareText(context, noteVM.content)
+                }
             }
             PIconButton(icon = if (noteVM.editMode) Res.drawable.markdown else Res.drawable.square_pen,
                 contentDescription = stringResource(if (noteVM.editMode) Res.string.view else Res.string.edit),

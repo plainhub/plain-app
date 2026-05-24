@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.events
-import com.ismartcoding.plain.preferences.*
 
 import android.content.Intent
 import android.media.MediaPlayer
@@ -35,8 +34,8 @@ import com.ismartcoding.plain.ai.ImageIndexProgressEvent
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
-import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
-import com.ismartcoding.plain.chat.discover.NearbyPairManager
+import com.ismartcoding.plain.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.discover.NearbyPairManager
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
@@ -59,7 +58,6 @@ data class NearbyDeviceFoundEvent(val device: DNearbyDevice) : ChannelEvent()
 
 // Pairing events
 data class PairingRequestReceivedEvent(val request: DPairingRequest, val fromIp: String) : ChannelEvent()
-data class PairingResponseEvent(val request: DPairingRequest, val fromIp: String, val accepted: Boolean) : ChannelEvent()
 data class PairingSuccessEvent(val deviceId: String, val deviceName: String, val deviceIp: String, val key: String) : ChannelEvent()
 data class PairingFailedEvent(val deviceId: String, val reason: String) : ChannelEvent()
 data class PairingCancelledEvent(val fromId: String) : ChannelEvent()
@@ -296,12 +294,6 @@ object AppEvents {
 
                     is StartNearbyServiceEvent -> {
                         NearbyDiscoverManager.start()
-                    }
-
-                    is PairingResponseEvent -> {
-                        coIO {
-                            NearbyPairManager.respondToPairing(event.request, event.fromIp, event.accepted)
-                        }
                     }
 
                     is StartNearbyDiscoveryEvent -> {

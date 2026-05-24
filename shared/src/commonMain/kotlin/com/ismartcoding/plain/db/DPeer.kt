@@ -8,6 +8,7 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.paired
 import com.ismartcoding.plain.i18n.unpaired
@@ -62,6 +63,9 @@ interface PeerDao {
 
     @Update
     fun update(vararg item: DPeer)
+
+    @Upsert
+    fun upsert(vararg item: DPeer)
 
     @Query("DELETE FROM peers WHERE id = :id")
     fun delete(id: String)

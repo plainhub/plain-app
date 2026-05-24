@@ -7,6 +7,7 @@
     <string name="scanner">Сканер</string>
     <string name="nearby">Рядом</string>
     <string name="nearby_devices">Устройства рядом</string>
+    <string name="devices">Устройства</string>
     <string name="searching_nearby_devices">Поиск устройств рядом...</string>
     <string name="no_nearby_devices_found">Устройства рядом не найдены</string>
     <string name="make_discoverable">Сделать обнаруживаемым</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">Разрешение на местоположение должно быть включено для использования Bluetooth</string>
     <string name="me">Я</string>
     <string name="copy_text">Копировать текст</string>
+    <string name="print">Печать</string>
     <string name="edit_text">Изменить текст</string>
     <string name="share_message">Поделиться сообщением</string>
     <string name="delete_message">Удалить сообщение</string>

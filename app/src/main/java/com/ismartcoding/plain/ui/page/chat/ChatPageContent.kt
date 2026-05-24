@@ -72,7 +72,11 @@ fun ChatPageContent(
 ) {
     var showForwardDialog by remember { mutableStateOf(false) }
     var messageToForward by remember { mutableStateOf<VChat?>(null) }
-    Column(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = paddingValues.calculateTopPadding())
+    ) {
         PullToRefresh(modifier = Modifier.weight(1f), refreshLayoutState = refreshState) {
             LazyColumnScrollbar(state = scrollState) {
                 LazyColumn(state = scrollState, reverseLayout = true, verticalArrangement = Arrangement.Top) {
@@ -85,18 +89,32 @@ fun ChatPageContent(
                                 ?: ChatCacheManager.peerMap[m.fromId],
                             index = index, imageWidthDp = imageWidthDp, imageWidthPx = imageWidthPx,
                             focusManager = focusManager, previewerState = previewerState,
-                            onForward = { message -> messageToForward = message; showForwardDialog = true },
+                            onForward = { message ->
+                                messageToForward = message
+                                showForwardDialog = true
+                            },
                         )
                     }
                 }
             }
         }
         val peer = if (chatState.chatType == ChatType.PEER) ChatCacheManager.peerMap[chatState.toId] else null
-        val channelInactive = channelStatus == DChatChannel.STATUS_LEFT || channelStatus == DChatChannel.STATUS_KICKED
-        if (channelInactive) {
-            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
+        val notAllowChat = channelStatus == DChatChannel.STATUS_LEFT || channelStatus == DChatChannel.STATUS_KICKED || peer?.status == "unpaired"
+        if (notAllowChat) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp), contentAlignment = Alignment.Center
+            ) {
                 Text(
-                    text = stringResource(if (channelStatus == DChatChannel.STATUS_KICKED) Res.string.channel_kicked_notice else Res.string.channel_left_notice),
+                    text = stringResource(
+                        if (peer?.status == "unpaired")
+                            Res.string.unpaired
+                        else if (channelStatus == DChatChannel.STATUS_KICKED)
+                            Res.string.channel_kicked_notice
+                        else
+                            Res.string.channel_left_notice
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, textAlign = TextAlign.Center,
                 )
             }
@@ -106,7 +124,8 @@ fun ChatPageContent(
     }
 
     if (showForwardDialog) {
-        ForwardTargetDialog(peerVM = peerVM, onDismiss = { showForwardDialog = false; messageToForward = null },
+        ForwardTargetDialog(
+            peerVM = peerVM, onDismiss = { showForwardDialog = false; messageToForward = null },
             onTargetSelected = { target ->
                 messageToForward?.let { message ->
                     when (target) {

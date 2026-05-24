@@ -41,9 +41,9 @@ fun ChatName(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = when {
-                m.fromId == "local" -> stringResource(Res.string.local_chat)
-                m.fromId == "me" -> stringResource(Res.string.me)
+            text = when (m.fromId) {
+                "local" -> stringResource(Res.string.local_chat)
+                "me" -> stringResource(Res.string.me)
                 else -> ChatCacheManager.peerMap[m.fromId]?.name ?: stringResource(Res.string.unknown)
             },
 

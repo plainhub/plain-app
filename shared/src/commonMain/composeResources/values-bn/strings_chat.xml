@@ -7,6 +7,7 @@
     <string name="scanner">স্ক্যানার</string>
     <string name="nearby">কাছাকাছি</string>
     <string name="nearby_devices">কাছাকাছি ডিভাইস</string>
+    <string name="devices">ডিভাইস</string>
     <string name="searching_nearby_devices">কাছাকাছি ডিভাইস খুঁজছি...</string>
     <string name="no_nearby_devices_found">কাছাকাছি কোন ডিভাইস পাওয়া যায়নি</string>
     <string name="make_discoverable">খুঁজে পাওয়া যায় এমন করুন</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">ব্লুটুথ ব্যবহার করার জন্য অবস্থান অনুমতি অন করা উচিত</string>
     <string name="me">আমি</string>
     <string name="copy_text">মূল কাগজ অনুলিপি করুন</string>
+    <string name="print">মুদ্রণ</string>
     <string name="edit_text">মূল পাঠ্য সম্পাদনা করুন</string>
     <string name="share_message">বার্তা শেয়ার করুন</string>
     <string name="delete_message">বার্তা মুছে ফেলুন</string>

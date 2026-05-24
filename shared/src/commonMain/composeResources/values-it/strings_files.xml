@@ -3,8 +3,8 @@
     <string name="video_save_to">Video salvato in {{path}}</string>
     <string name="video_save_to_failed">Impossibile salvare il video</string>
     <string name="image_save_to">Immagine salvata in {{path}}</string>
-    <string name="image_save_to_failed">Salvataggio dell\'immagine non riuscito</string>
-    <string name="open_with_other_app">Apri con un\'altra app</string>
+    <string name="image_save_to_failed">Salvataggio dell'immagine non riuscito</string>
+    <string name="open_with_other_app">Apri con un'altra app</string>
     <string name="file_size">Dimensioni file</string>
     <string name="files">File</string>
     <string name="sdcard">Scheda SD</string>
@@ -36,13 +36,13 @@
     <string name="file_name">Nome file</string>
     <string name="cannot_share_system_component">Impossibile condividere il componente del sistema. Questo file è un modulo del sistema protetto.</string>
     <string name="cannot_share_system_file">Impossibile condividere il file del sistema. Questo file non è accessibile.</string>
-    <string name="cannot_share_file_not_accessible">Impossibile condividere il file. Questo file non è accessibile tramite l\'app.</string>
+    <string name="cannot_share_file_not_accessible">Impossibile condividere il file. Questo file non è accessibile tramite l'app.</string>
     <string name="cannot_share_any_files">Impossibile condividere alcun file. Tutti i file selezionati non sono accessibili.</string>
     <string name="some_files_cannot_be_shared">Alcuni file non possono essere condivisi</string>
     <string name="cannot_open_system_component">Impossibile aprire il componente del sistema. Questo file è un modulo del sistema protetto.</string>
     <string name="cannot_open_system_file">Impossibile aprire il file del sistema. Questo file non è accessibile.</string>
-    <string name="cannot_open_file_not_accessible">Impossibile aprire il file. Questo file non è accessibile tramite l\'app.</string>
-    <string name="file_picker_not_available">Nessuna app di selezione file disponibile su questo dispositivo. Si prega di installare un\'app file manager.</string>
+    <string name="cannot_open_file_not_accessible">Impossibile aprire il file. Questo file non è accessibile tramite l'app.</string>
+    <string name="file_picker_not_available">Nessuna app di selezione file disponibile su questo dispositivo. Si prega di installare un'app file manager.</string>
     <string name="cannot_move_folder_into_itself">Impossibile spostare una cartella in se stessa o in una sua sottocartella.</string>
     <string name="cannot_copy_folder_into_itself">Impossibile copiare una cartella in se stessa o in una sua sottocartella.</string>
     <string name="file_save_to">File salvato in {{path}}</string>

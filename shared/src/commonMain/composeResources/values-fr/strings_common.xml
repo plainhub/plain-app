@@ -14,7 +14,7 @@
     <string name="no">Non</string>
     <string name="jump_to_top">Remonter</string>
     <string name="jump_to_bottom">Descendre</string>
-    <string name="today">Aujourd\'hui</string>
+    <string name="today">Aujourd'hui</string>
     <string name="invalid_url">Format URL invalide. Exemple : https://www.example.com</string>
     <string name="undo">Annuler</string>
     <string name="redo">Refaire</string>
@@ -22,8 +22,8 @@
     <string name="docs">Documents</string>
     <string name="no_results_found">Aucun résultat trouvé</string>
     <string name="search">Rechercher</string>
-    <string name="unknown_file_description">PlainApp ne prend pas en charge l\'ouverture de ce type de fichier pour le moment. Vous pouvez utiliser une autre application pour l\'ouvrir.</string>
-    <string name="grant_permission">Accorder l\'autorisation</string>
+    <string name="unknown_file_description">PlainApp ne prend pas en charge l'ouverture de ce type de fichier pour le moment. Vous pouvez utiliser une autre application pour l'ouvrir.</string>
+    <string name="grant_permission">Accorder l'autorisation</string>
     <string name="load_no_more">Pas plus de données</string>
     <string name="list_empty">La liste est vide</string>
     <string name="cancel">Annuler</string>
@@ -85,8 +85,8 @@
     <string name="read_mode">Mode lecture</string>
     <string name="loading">Chargement en cours…</string>
     <string name="searching">Recherche en cours…</string>
-    <string name="searching_devices">Recherche d\'appareils en cours…</string>
-    <string name="no_devices_found">Recherche d\'appareils en cours…\n\nAssurez-vous que le lecteur et votre téléphone sont connectés au même réseau Wi-Fi.</string>
+    <string name="searching_devices">Recherche d'appareils en cours…</string>
+    <string name="no_devices_found">Recherche d'appareils en cours…\n\nAssurez-vous que le lecteur et votre téléphone sont connectés au même réseau Wi-Fi.</string>
     <string name="no_data">Aucune donnée</string>
     <string name="load_failed">Échec du chargement</string>
     <string name="srl_header_pulling">Tirer vers le bas pour rafraîchir</string>
@@ -94,10 +94,10 @@
     <string name="srl_header_refreshing">Actualisation en cours…</string>
     <string name="srl_header_loading">Attendez le chargement…</string>
     <string name="srl_header_finish">Actualisé</string>
-    <string name="srl_header_failed">Échec de l\'actualisation</string>
+    <string name="srl_header_failed">Échec de l'actualisation</string>
     <string name="srl_header_secondary">Relâcher pour le deuxième étage</string>
     <string name="unselect">Désélectionner</string>
-    <string name="select_first">Veuillez d\'abord sélectionner</string>
+    <string name="select_first">Veuillez d'abord sélectionner</string>
     <string name="added">Ajouté</string>
     <string name="paste">Coller</string>
     <string name="added_to_playlist">Ajouté à la liste de lecture</string>
@@ -107,7 +107,7 @@
     <string name="srl_footer_pulling">Tirer vers le haut pour charger plus</string>
     <string name="srl_footer_release">Relâcher pour charger plus</string>
     <string name="srl_footer_loading">Chargement…</string>
-    <string name="srl_footer_refreshing">Attendez l\'actualisation…</string>
+    <string name="srl_footer_refreshing">Attendez l'actualisation…</string>
     <string name="srl_footer_finish">Chargement réussi</string>
     <string name="srl_footer_failed">Échec du chargement</string>
     <string name="srl_footer_nothing">Pas plus de données</string>
@@ -137,30 +137,30 @@
     <string name="clear">Effacer</string>
     <string name="tools">Outils</string>
     <string name="not_supported_error">Non pris en charge sur cet appareil.</string>
-    <string name="no_browser_error">Vous n\'avez aucun navigateur pour ouvrir la page Web.</string>
+    <string name="no_browser_error">Vous n'avez aucun navigateur pour ouvrir la page Web.</string>
     <string name="copy">Copier</string>
     <string name="home">Accueil</string>
     <string name="copied_to_clipboard_format">"%1$s" copié dans le presse-papiers.</string>
     <string name="unknown_error">Une erreur inconnue est survenue.</string>
     <string name="delete_channel_warning">Supprimer ce canal supprimera également tous les messages associés. Cette action est irréversible.</string>
-    <string name="app_files">Fichiers d\'application</string>
+    <string name="app_files">Fichiers d'application</string>
     <string name="app_files_desc">Fichiers partagés dans le chat</string>
-    <string name="no_app_files">Aucun fichier pour l\'instant</string>
+    <string name="no_app_files">Aucun fichier pour l'instant</string>
     <string name="web_settings">Paramètres Web</string>
-    <string name="ui_components">Composants de l\'interface utilisateur</string>
+    <string name="ui_components">Composants de l'interface utilisateur</string>
     <string name="donation_title">Prise en charge du développement PlainApp</string>
     <string name="buy_me_a_coffee">Achetez-moi un café</string>
 
 
     <string name="crash_report_title">Application plantée</string>
-    <string name="crash_report_message">L\'application a planté de façon inattendue. Souhaitez-vous partager le rapport de plantage pour que nous puissions le corriger ?</string>
-    <string name="crash_include_app_logs">Inclure les journaux de l\'application</string>
+    <string name="crash_report_message">L'application a planté de façon inattendue. Souhaitez-vous partager le rapport de plantage pour que nous puissions le corriger ?</string>
+    <string name="crash_include_app_logs">Inclure les journaux de l'application</string>
     <string name="crash_share">Partager</string>
     <string name="stay_online_mode">Mode toujours en ligne</string>
     <string name="stay_online_mode_oled_saving">Économie OLED</string>
     <string name="stay_online_mode_tap_to_exit">Appuyez pour quitter</string>
-    <string name="add_to_home">Ajouter à l\'écran d\'accueil</string>
-    <string name="shortcut_added_to_home">Raccourci ajouté à l\'écran d\'accueil</string>
+    <string name="add_to_home">Ajouter à l'écran d'accueil</string>
+    <string name="shortcut_added_to_home">Raccourci ajouté à l'écran d'accueil</string>
     <string name="shortcut_not_supported">Votre lanceur ne prend pas en charge les raccourcis</string>
     <string name="shortcut_label_hint">Remarque : Certains lanceurs (p. ex. MIUI) pourraient ne pas ajouter les raccourcis avec succès.</string>
 </resources>

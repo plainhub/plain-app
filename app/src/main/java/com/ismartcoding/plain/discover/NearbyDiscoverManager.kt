@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.chat.discover
+package com.ismartcoding.plain.discover
 
 import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
@@ -25,6 +25,7 @@ import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 object NearbyDiscoverManager {
     private const val BROADCAST_INTERVAL_MS = 5_000L
@@ -39,7 +40,7 @@ object NearbyDiscoverManager {
     fun startPeriodicDiscovery() {
         if (broadcastJob?.isActive == true) return
         broadcastJob = coIO {
-            while (true) {
+            while (isActive) {
                 runCatching { broadcastDiscover(DDiscoverRequest()) }
                     .onFailure { LogCat.e("Periodic discovery error: ${it.message}") }
                 delay(BROADCAST_INTERVAL_MS)

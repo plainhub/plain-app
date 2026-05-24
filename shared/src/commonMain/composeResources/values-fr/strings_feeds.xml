@@ -7,7 +7,7 @@
     <string name="clear_feed_items">Effacer les éléments du flux</string>
     <string name="load_full_content">Charger le contenu complet</string>
     <string name="auto_fetch_full_content">Récupération automatique du contenu complet</string>
-    <string name="auto_fetch_full_content_tips">Lorsque cette option est activée, l\'application récupérera automatiquement le contenu complet de chaque élément du flux RSS.</string>
+    <string name="auto_fetch_full_content_tips">Lorsque cette option est activée, l'application récupérera automatiquement le contenu complet de chaque élément du flux RSS.</string>
     <string name="rss_url">URL du flux RSS</string>
     <string name="import_opml_file">Importer depuis OPML</string>
     <string name="export_opml_file">Exporter vers OPML</string>
@@ -18,10 +18,10 @@
     <string name="subscriptions">Abonnements</string>
     <string name="url">URL</string>
     <string name="auto_refresh_feeds">Actualisation automatique des flux</string>
-    <string name="auto_refresh_interval">Intervalle d\'actualisation automatique</string>
+    <string name="auto_refresh_interval">Intervalle d'actualisation automatique</string>
     <string name="auto_refresh_only_over_wifi">Actualisation automatique uniquement sur Wi-Fi</string>
     <string name="add_subscription">Ajouter un abonnement</string>
-    <string name="update_subscription">Mettre à jour l\'abonnement</string>
+    <string name="update_subscription">Mettre à jour l'abonnement</string>
     <string name="already_added">Déjà ajouté</string>
     <string name="syncing_all_feeds">Synchronisation de tous les flux…</string>
     <string name="syncing">Synchronisation…</string>

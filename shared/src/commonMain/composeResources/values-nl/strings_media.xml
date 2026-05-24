@@ -9,15 +9,15 @@
     <string name="exit_cast_mode">Verlaat castmodus</string>
     <string name="rotate">Roterend</string>
     <string name="select_a_device">Selecteer een apparaat</string>
-    <string name="add_videos_to_playlist">Voeg eerst video\'s toe aan de afspeellijst.</string>
-    <string name="video_playlist_no_data">De afspeellijst wordt gebruikt om automatisch meerdere video\'s na elkaar af te spelen.</string>
+    <string name="add_videos_to_playlist">Voeg eerst video's toe aan de afspeellijst.</string>
+    <string name="video_playlist_no_data">De afspeellijst wordt gebruikt om automatisch meerdere video's na elkaar af te spelen.</string>
     <string name="cast">Casten</string>
     <string name="cast_dialog_hint">Kies een apparaat om de Cast-modus in te gaan.</string>
     <string name="cast_dialog_wireless_cast_tip">Tip: Maak verbinding met hetzelfde Wi-Fi als je doelscherm</string>
     <string name="images">Afbeeldingen</string>
     <string name="video">Video</string>
     <string name="audios">Audio</string>
-    <string name="videos">Video\'s</string>
+    <string name="videos">Video's</string>
     <string name="recents">Recente</string>
     <string name="send_message">Bericht sturen</string>
     <string name="playlist_title">Afspeellijst ({{total}})</string>
@@ -28,7 +28,7 @@
     <string name="favorites">Favorieten</string>
     <string name="play_all">Alles afspelen</string>
     <string name="audios_title">Audio ({{count}})</string>
-    <string name="videos_title">Video\'s ({{count}})</string>
+    <string name="videos_title">Video's ({{count}})</string>
     <string name="images_title">Afbeeldingen ({{count}})</string>
     <string name="sleep_timer">Slaaptimer</string>
     <string name="finish_last_audio">Laatste audio afspelen</string>

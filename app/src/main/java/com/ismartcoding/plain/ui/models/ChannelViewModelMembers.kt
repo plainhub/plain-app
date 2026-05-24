@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChannelSystemMessageSender
+import com.ismartcoding.plain.channel.ChannelSystemMessageSender
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.AppDatabase

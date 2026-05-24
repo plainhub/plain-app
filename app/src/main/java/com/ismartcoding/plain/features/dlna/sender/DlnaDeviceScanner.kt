@@ -11,6 +11,7 @@ import kotlinx.coroutines.isActive
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.MulticastSocket
+import java.net.SocketTimeoutException
 import java.util.Locale
 
 object DlnaDeviceScanner {
@@ -24,8 +25,15 @@ object DlnaDeviceScanner {
     fun search(context: Context): Flow<DlnaDevice> = callbackFlow {
         devices.forEach { trySend(it) }
         val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val lock = wifi.createMulticastLock("DlnaDeviceScanner")
-        lock.acquire()
+        val lock = runCatching {
+            wifi.createMulticastLock("DlnaDeviceScanner").apply {
+                // Keep the lock lifecycle one-acquire/one-release per scan instance.
+                setReferenceCounted(false)
+                acquire()
+            }
+        }.onFailure {
+            LogCat.e(it)
+        }.getOrNull()
         var socket: MulticastSocket? = null
         val group = InetAddress.getByName(SSDP_ADDR)
         try {
@@ -38,16 +46,21 @@ object DlnaDeviceScanner {
             socket.soTimeout = 5_000
             while (isActive) {
                 val packet = DatagramPacket(ByteArray(1024), 1024)
-                socket.receive(packet)
-                val response = String(packet.data, 0, packet.length)
-                val prefix = response.take(20).uppercase(Locale.getDefault())
-                if (prefix.startsWith("HTTP/1.1 200") || prefix.startsWith("NOTIFY * HTTP")) {
-                    val device = DlnaDevice(packet.address.hostAddress!!, response)
-                    if (devices.none { it.hostAddress == device.hostAddress }) {
-                        LogCat.d(response)
-                        devices.add(device)
-                        trySend(device)
+                try {
+                    socket.receive(packet)
+                    val response = String(packet.data, 0, packet.length)
+                    val prefix = response.take(20).uppercase(Locale.getDefault())
+                    if (prefix.startsWith("HTTP/1.1 200") || prefix.startsWith("NOTIFY * HTTP")) {
+                        val device = DlnaDevice(packet.address.hostAddress!!, response)
+                        if (devices.none { it.hostAddress == device.hostAddress }) {
+                            LogCat.d(response)
+                            devices.add(device)
+                            trySend(device)
+                        }
                     }
+                } catch (_: SocketTimeoutException) {
+                    // No response in 5s — resend M-SEARCH to pick up newly started servers
+                    socket.send(DatagramPacket(searchQuery.toByteArray(), searchQuery.length, group, SSDP_PORT))
                 }
             }
         } catch (e: Exception) {
@@ -55,7 +68,7 @@ object DlnaDeviceScanner {
         }
         awaitClose {
             try { socket?.leaveGroup(group); socket?.close() } catch (e: Exception) { LogCat.e(e) }
-            lock.release()
+            lock?.let { l -> runCatching { if (l.isHeld) l.release() }.onFailure { LogCat.e(it) } }
         }
     }
 }

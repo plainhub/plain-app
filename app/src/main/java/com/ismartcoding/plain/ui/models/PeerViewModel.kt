@@ -65,7 +65,9 @@ class PeerViewModel : ViewModel() {
                 val peerDao = AppDatabase.instance.peerDao()
                 if (isChannelMember) {
                     val peer = peerDao.getById(peerId)
-                    if (peer != null) { peer.key = ""; peer.status = "channel"; peerDao.update(peer) }
+                    if (peer != null) { peer.key = ""
+                        peer.status = "channel"
+                        peerDao.update(peer) }
                 } else {
                     peerDao.delete(peerId)
                 }

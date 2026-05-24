@@ -1,19 +1,15 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.channel
 
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.PeerGraphQLClient
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageDeliveryResult
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageStatusData
-import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.db.toJSONString
 import com.ismartcoding.plain.db.toPeerMessageContent
-import com.ismartcoding.plain.helpers.FileHelper
 
 /**
  * Handles sending chat messages in a channel using a **star topology**.

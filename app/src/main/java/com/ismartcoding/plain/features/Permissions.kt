@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.features
-import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.DrawableResource

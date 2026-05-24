@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="vpn_web_conflict_warning">VPN attiva. Puoi accedere al telefono usando l\'IP VPN o l\'IP Wi-Fi. Se l\'IP Wi-Fi non funziona, abilita “Consenti traffico LAN” nelle impostazioni di VPN o disabilita la VPN.</string>
+    <string name="vpn_web_conflict_warning">VPN attiva. Puoi accedere al telefono usando l'IP VPN o l'IP Wi-Fi. Se l'IP Wi-Fi non funziona, abilita “Consenti traffico LAN” nelle impostazioni di VPN o disabilita la VPN.</string>
     <string name="ssl_certificate_reset">Certificato SSL resettato</string>
     <string name="the_token_is_reset">Il token è stato resettato</string>
     <string name="reset_ssl_certificate">Ripristina certificato SSL</string>
     <string name="device_name">Nome dispositivo</string>
     <string name="open_in_web">Apri nel browser web</string>
     <string name="require_password">Richiedi password</string>
-    <string name="two_factor_auth_tips">Quando fai il login sulla pagina web, mostreremo una finestra di conferma nell\'app per una maggiore sicurezza.</string>
-    <string name="instruction_for_use">Istruzioni per l\'uso</string>
-    <string name="web_how_to">Passaggio 1: Collega il tuo telefono e il tuo computer alla stessa rete wireless.\n\nMetodo 1: Collega il tuo computer e il tuo telefono alla stessa rete Wi-Fi.\nMetodo 2: Attiva l\'hotspot del tuo telefono e collega il tuo computer all\'hotspot del telefono.\n\nPassaggio 2: Apri un browser web sul tuo computer e inserisci l\'indirizzo web visualizzato sulla homepage dell\'app.</string>
+    <string name="two_factor_auth_tips">Quando fai il login sulla pagina web, mostreremo una finestra di conferma nell'app per una maggiore sicurezza.</string>
+    <string name="instruction_for_use">Istruzioni per l'uso</string>
+    <string name="web_how_to">Passaggio 1: Collega il tuo telefono e il tuo computer alla stessa rete wireless.\n\nMetodo 1: Collega il tuo computer e il tuo telefono alla stessa rete Wi-Fi.\nMetodo 2: Attiva l'hotspot del tuo telefono e collega il tuo computer all'hotspot del telefono.\n\nPassaggio 2: Apri un browser web sul tuo computer e inserisci l'indirizzo web visualizzato sulla homepage dell'app.</string>
     <string name="http_server_state_on">Servizio in esecuzione</string>
     <string name="http_server_state_starting">Avvio del servizio...</string>
     <string name="http_server_state_stopping">Arresto del servizio...</string>
@@ -19,7 +19,7 @@
     <string name="stop_service">Arresta servizio</string>
     <string name="run">Esegui</string>
     <string name="troubleshoot">Risoluzione dei problemi</string>
-    <string name="allow_remote_access_from_pc">Consenti l\'accesso remoto dal PC</string>
+    <string name="allow_remote_access_from_pc">Consenti l'accesso remoto dal PC</string>
     <string name="http_port_conflict_error">La porta {{ port }} è occupata. Tocca "Riavvia app" per risolvere automaticamente.</string>
     <string name="http_port_conflict_errors">Le porte {{ port }} sono occupate. Tocca "Riavvia app" per risolvere automaticamente.</string>
     <string name="fix">Correggi</string>
@@ -27,10 +27,10 @@
     <string name="url_token">Token URL</string>
     <string name="url_token_tips">Il token URL cifra i dati negli URL. Se viene resettato, gli URL cifrati con il vecchio token diventano inaccessibili.</string>
     <string name="rotate_url_token_on_restart">Rinnova token URL al riavvio</string>
-    <string name="rotate_url_token_on_restart_tips">Se abilitato, viene generato un nuovo token URL ogni volta che l\'app si avvia. Questo invalida tutti gli URL di file precedentemente generati. Consigliato per gli utenti avanzati che desiderano una maggiore sicurezza.</string>
+    <string name="rotate_url_token_on_restart_tips">Se abilitato, viene generato un nuovo token URL ogni volta che l'app si avvia. Questo invalida tutti gli URL di file precedentemente generati. Consigliato per gli utenti avanzati che desiderano una maggiore sicurezza.</string>
     <string name="http_server_ok">Server HTTP avviato</string>
     <string name="http_server_error">Il server HTTP non è stato avviato. Riavvia PlainApp e riprova. Assicurati che non ci siano altre applicazioni che occupano le porte HTTP o HTTPS. Se il problema persiste, fornisci ulteriori dettagli sul problema contattando support@plainapp.app.</string>
-    <string name="relaunch_app">Rilancia l\'app</string>
+    <string name="relaunch_app">Rilancia l'app</string>
     <string name="require_confirmation">Richiedi conferma</string>
     <string name="web_service_required_for_chat">Per ricevere messaggi da altri, abilita il Portale Web del telefono.</string>
     <string name="enable_web_service">Abilita servizio Web</string>
@@ -52,12 +52,12 @@
     <string name="token">Gettone</string>
     <string name="api_url">URL API</string>
     <string name="web_url">URL web</string>
-    <string name="auth_dev_token_tips">I client devono includere sia c-id: &lt;client_id&gt; che Authorization: Bearer &lt;token&gt; nelle intestazioni della richiesta, oppure utilizzare la stessa coppia per crittografare il payload dell\'API. Se il token viene fornito nelle intestazioni della richiesta, la risposta verrà restituita in testo normale.</string>
-    <string name="browser_https_error_tips">Se visualizzi l\'errore "La tua connessione non è privata", clicca semplicemente il pulsante "Avanzate" e poi il pulsante "Procedi a …", così Chrome confiderà questo URL per il resto della sessione del browser.</string>
+    <string name="auth_dev_token_tips">I client devono includere sia c-id: &lt;client_id&gt; che Authorization: Bearer &lt;token&gt; nelle intestazioni della richiesta, oppure utilizzare la stessa coppia per crittografare il payload dell'API. Se il token viene fornito nelle intestazioni della richiesta, la risposta verrà restituita in testo normale.</string>
+    <string name="browser_https_error_tips">Se visualizzi l'errore "La tua connessione non è privata", clicca semplicemente il pulsante "Avanzate" e poi il pulsante "Procedi a …", così Chrome confiderà questo URL per il resto della sessione del browser.</string>
     <string name="api_service_is_running">Il servizio API è in esecuzione</string>
     <string name="screen_mirror_service_is_running">Il servizio di duplicazione dello schermo è in esecuzione</string>
-    <string name="screen_mirror_audio_permission_settings_message">L\'autorizzazione del microfono è disattivata. Abilitala nelle Impostazioni per specchiare l\'audio di sistema.</string>
-    <string name="enter_this_address_tips">Inserisci l\'indirizzo sopra nel browser del tuo computer, assicurandoti che il telefono e il computer siano sulla stessa rete locale.</string>
+    <string name="screen_mirror_audio_permission_settings_message">L'autorizzazione del microfono è disattivata. Abilitala nelle Impostazioni per specchiare l'audio di sistema.</string>
+    <string name="enter_this_address_tips">Inserisci l'indirizzo sopra nel browser del tuo computer, assicurandoti che il telefono e il computer siano sulla stessa rete locale.</string>
     <string name="mdns_hostname">Nome host mDNS</string>
     <string name="mdns_hostname_invalid">Il nome host deve terminare con .local</string>
     <string name="restart_app_title">Riavvia app</string>
@@ -65,7 +65,7 @@
     <string name="http_server_stopped">Il server HTTP è stato fermato intenzionalmente. Per riavviarlo, tocca il pulsante "Rilancia APP".</string>
     <string name="restart_app_message">Quasi fatto! Tocca semplicemente "Rilancia APP" per rendere effettive le modifiche.</string>
     <string name="access_phone_web">Accedi al tuo telefono da un browser del computer.</string>
-    <string name="scan_qrcode_to_access_web">Scansiona il codice QR per accedere all\'indirizzo web</string>
+    <string name="scan_qrcode_to_access_web">Scansiona il codice QR per accedere all'indirizzo web</string>
     <string name="phone_web_portal">Accesso web</string>
     <string name="phone_web_portal_desc">Accedi al tuo telefono dal browser di un computer</string>
     <string name="web_portal_off">Accesso web: DISATTIVATO</string>

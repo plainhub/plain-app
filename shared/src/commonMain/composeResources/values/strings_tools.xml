@@ -21,7 +21,7 @@
     <string name="dlna_cast_request_desc">Device %1$s wants to cast to this device</string>
     <string name="dlna_cast_accept">Accept</string>
     <string name="dlna_cast_reject">Reject</string>
-    <string name="dlna_cast_remember_choice">Remember choice, don\'t ask again</string>
+    <string name="dlna_cast_remember_choice">Remember choice, don't ask again</string>
     <string name="dlna_cast_history">Cast Rules</string>
     <string name="dlna_cast_accepted">Accepted</string>
     <string name="dlna_cast_rejected">Rejected</string>

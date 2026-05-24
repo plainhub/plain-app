@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.chat.discover
+package com.ismartcoding.plain.discover
 
 import android.content.Context
 import android.net.wifi.WifiManager
@@ -80,7 +80,9 @@ object NearbyNetwork {
      * @param onMessage called for every incoming datagram with (message, senderIP).
      */
     fun startReceiver(onMessage: (message: String, senderIP: String) -> Unit) {
-        if (receiverJob?.isActive == true) return
+        if (receiverJob?.isActive == true) {
+            return
+        }
 
         receiverJob = coIO {
             while (isActive) {
@@ -89,10 +91,7 @@ object NearbyNetwork {
                 } catch (e: Exception) {
                     LogCat.e("Multicast receiver error: ${e.message}")
                 }
-                if (isActive) {
-                    LogCat.d("Multicast receiver restarting in ${RESTART_DELAY_MS}ms…")
-                    delay(RESTART_DELAY_MS)
-                }
+                delay(RESTART_DELAY_MS)
             }
         }
         LogCat.d("Multicast receiver started")

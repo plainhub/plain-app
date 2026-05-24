@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.services.HttpServerService
 
 object NetworkMonitor {

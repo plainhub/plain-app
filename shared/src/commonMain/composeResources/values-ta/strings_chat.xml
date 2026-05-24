@@ -7,6 +7,7 @@
     <string name="scanner">ஸ்கேனர்</string>
     <string name="nearby">அருகில்</string>
     <string name="nearby_devices">அருகிலுள்ள சாதனங்கள்</string>
+    <string name="devices">சாதனங்கள்</string>
     <string name="searching_nearby_devices">அருகிலுள்ள சாதனங்களைத் தேடுகிறது...</string>
     <string name="no_nearby_devices_found">அருகிலுள்ள சாதனங்கள் எதுவும் கிடைக்கவில்லை</string>
     <string name="make_discoverable">கண்டுபிடிக்கக்கூடியதாக்கு</string>
@@ -40,6 +41,7 @@
     <string name="location_permission_should_be_enabled">புளூடூதுக்கு பயன்படுத்த இருக்கும் எனத் தரவைத் திறக்கலாம்</string>
     <string name="me">எனக்கு</string>
     <string name="copy_text">உரையை நகல் எடு</string>
+    <string name="print">அச்சிடு</string>
     <string name="edit_text">உரையை திருத்து</string>
     <string name="share_message">செய்தி பகிர்</string>
     <string name="delete_message">செய்தியை நீக்கு</string>

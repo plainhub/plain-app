@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.services
-import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
-import android.net.wifi.WifiManager
 import android.os.PowerManager
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -16,9 +14,9 @@ import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
-import com.ismartcoding.plain.wifiManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 
 private const val CHECK_INTERVAL_MS = 60_000L
 private const val INACTIVITY_TIMEOUT_MS = 30 * 60_000L
@@ -130,7 +128,7 @@ internal class HttpServerLockManager(private val context: Context) {
         }
         if (inactivityJob?.isActive == true) return
         inactivityJob = coIO {
-            while (true) {
+            while (isActive) {
                 delay(CHECK_INTERVAL_MS)
                 if (System.currentTimeMillis() - lastActivityMs >= INACTIVITY_TIMEOUT_MS) {
                     LogCat.d("Inactivity timeout: releasing locks")

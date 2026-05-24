@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.ChatCacheManager
-import com.ismartcoding.plain.chat.discover.NearbyPairManager
+import com.ismartcoding.plain.discover.NearbyPairManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingFailedEvent

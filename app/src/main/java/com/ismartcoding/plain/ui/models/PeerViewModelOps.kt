@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.chat.ChannelSystemMessageSender
+import com.ismartcoding.plain.channel.ChannelSystemMessageSender
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
@@ -40,18 +40,17 @@ internal fun PeerViewModel.loadPeersInternal() {
             }
         }
 
-        val newPairedPeers = sortPeersForChatListInternal(allPeers.filter { it.status == "paired" }, chatCache)
-        val newUnpairedPeers = allPeers.filter { it.status == "unpaired" }
-            .sortedWith(compareByDescending<DPeer> { it.createdAt }.thenBy { it.name.lowercase() })
+        val newPairedPeers = allPeers.filter { it.status == "paired" }
+        val newUnpairedPeers = sortPeersForChatListInternal(allPeers.filter { it.status == "unpaired" }, chatCache)
         ChatCacheManager.refreshPeerMap(allPeers)
 
-        withContext(Dispatchers.Main) {
-            latestChatCacheInternal.clear()
-            latestChatCacheInternal.putAll(chatCache)
-            pairedPeers.clear(); pairedPeers.addAll(newPairedPeers)
-            unpairedPeers.clear(); unpairedPeers.addAll(newUnpairedPeers)
-            syncPeerOnlineStatuses()
-        }
+        latestChatCacheInternal.clear()
+        latestChatCacheInternal.putAll(chatCache)
+        pairedPeers.clear()
+        pairedPeers.addAll(newPairedPeers)
+        unpairedPeers.clear()
+        unpairedPeers.addAll(newUnpairedPeers)
+        syncPeerOnlineStatuses()
     }
 }
 

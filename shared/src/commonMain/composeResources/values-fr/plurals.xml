@@ -17,11 +17,11 @@
         <item quantity="other">%1$d fichiers</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Copie de l\'élément %1$d</item>
+        <item quantity="one">Copie de l'élément %1$d</item>
         <item quantity="other">Copie des éléments %1$d</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Déplacement de l\'élément %1$d</item>
+        <item quantity="one">Déplacement de l'élément %1$d</item>
         <item quantity="other">Déplacement des éléments %1$d</item>
     </plurals>
     <plurals name="n_hours">
@@ -41,8 +41,8 @@
         <item quantity="other">%1$d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Aujourd\'hui: %1$d pomodoro</item>
-        <item quantity="other">Aujourd\'hui: %1$d pomodoros</item>
+        <item quantity="one">Aujourd'hui: %1$d pomodoro</item>
+        <item quantity="other">Aujourd'hui: %1$d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
         <item quantity="one">Total: %1$d pomodoro</item>

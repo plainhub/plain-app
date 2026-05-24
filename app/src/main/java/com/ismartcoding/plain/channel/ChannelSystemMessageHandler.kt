@@ -1,9 +1,10 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.channel
 
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
