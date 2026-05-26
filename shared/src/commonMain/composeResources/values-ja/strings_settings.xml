@@ -75,4 +75,7 @@
     <string name="downloading_update">ダウンロード中… %1$s%%</string>
     <string name="download_update_failed">ダウンロードに失敗しました</string>
     <string name="download_on_github">GitHubでダウンロード</string>
+    <string name="official">公式</string>
+    <string name="official_website_title">PlainApp エコシステムを探索</string>
+    <string name="official_website_desc">PlainApp はオープンソースプロジェクトです。公式ウェブサイトにアクセスして、デスクトップクライアント、機能、ロードマップをご確認ください。</string>
 </resources>

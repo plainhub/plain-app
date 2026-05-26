@@ -75,4 +75,7 @@
     <string name="downloading_update">Baixando… %1$s%%</string>
     <string name="download_update_failed">Falha no download</string>
     <string name="download_on_github">Baixar no GitHub</string>
+    <string name="official">OFICIAL</string>
+    <string name="official_website_title">Explore o Ecossistema PlainApp</string>
+    <string name="official_website_desc">PlainApp é um projeto de código aberto. Visite nosso site oficial para explorar o cliente desktop, recursos e roteiros.</string>
 </resources>

@@ -75,4 +75,7 @@
     <string name="downloading_update">Đang tải… %1$s%%</string>
     <string name="download_update_failed">Tải xuống thất bại</string>
     <string name="download_on_github">Tải xuống trên GitHub</string>
+    <string name="official">CHÍNH THỨC</string>
+    <string name="official_website_title">Khám phá hệ sinh thái PlainApp</string>
+    <string name="official_website_desc">PlainApp là một dự án mã nguồn mở. Truy cập trang web chính thức của chúng tôi để khám phá ứng dụng máy tính, tính năng và lộ trình phát triển.</string>
 </resources>

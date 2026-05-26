@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.audio.DAudio
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.media.CastPlayer
@@ -106,7 +107,7 @@ fun AudioListItem(
                                 onClick = {
                                     if (dragSelectState.selectMode) return@ClickableText
                                     val idx = tagsVM.itemsFlow.value.indexOfFirst { it.id == tag.id }
-                                    if (idx != -1) scope.launch { pagerState.scrollToPage(idx + 1) }
+                                    if (idx != -1) scope.launch { pagerState.scrollToPage(idx + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1) }
                                 }
                             )
                         }

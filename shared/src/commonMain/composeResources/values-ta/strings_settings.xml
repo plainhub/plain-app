@@ -75,4 +75,7 @@
     <string name="downloading_update">பதிவிறக்கப்படுகிறது… %1$s%%</string>
     <string name="download_update_failed">பதிவிறக்கம் தோல்வியடைந்தது</string>
     <string name="download_on_github">GitHub-ல் பதிவிறக்கவும்</string>
+    <string name="official">அதிகாரப்பூர்வ</string>
+    <string name="official_website_title">PlainApp சுற்றுச்சூழலை ஆராயுங்கள்</string>
+    <string name="official_website_desc">PlainApp ஒரு திறந்த மூல திட்டம். டெஸ்க்டாப் கிளையன்ட், அம்சங்கள் மற்றும் ரோட்மேப்களை ஆராய எங்கள் அதிகாரப்பூர்வ வலைத்தளத்தை பார்வையிடுங்கள்.</string>
 </resources>

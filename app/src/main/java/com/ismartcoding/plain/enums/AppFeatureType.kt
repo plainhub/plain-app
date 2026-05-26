@@ -28,11 +28,12 @@ enum class AppFeatureType {
     CHECK_UPDATES,
     MIRROR_AUDIO,
     MEDIA_TRASH,
+    DONATION,
     DLNA_RECEIVER;
 
     fun has(): Boolean {
         return when (this) {
-            APPS, SMS, CALLS, NOTIFICATIONS -> {
+            APPS, SMS, CALLS, NOTIFICATIONS, DONATION -> {
                 BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
             }
 

@@ -75,4 +75,7 @@
     <string name="downloading_update">Downloaden… %1$s%%</string>
     <string name="download_update_failed">Download mislukt</string>
     <string name="download_on_github">Downloaden via GitHub</string>
+    <string name="official">OFFICIEEL</string>
+    <string name="official_website_title">Verken het PlainApp-ecosysteem</string>
+    <string name="official_website_desc">PlainApp is een open-sourceproject. Bezoek onze officiële website om de desktopclient, functies en routekaarten te verkennen.</string>
 </resources>

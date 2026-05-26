@@ -72,6 +72,9 @@
     <string name="donation_desc">PlainApp is free, open-source, and built by one developer. If it saves you time, consider buying a coffee.</string>
     <string name="donation_title">Support PlainApp Development</string>
     <string name="buy_me_a_coffee">Buy me a coffee</string>
+    <string name="official">OFFICIAL</string>
+    <string name="official_website_title">Explore PlainApp Ecosystem</string>
+    <string name="official_website_desc">PlainApp is an open-source project. Visit our official website to explore desktop client, features, and roadmaps.</string>
     <string name="logs">Logs</string>
     <string name="primary_color_hint">Like #666666 or 666666</string>
     <string name="dark_theme">Dark theme</string>

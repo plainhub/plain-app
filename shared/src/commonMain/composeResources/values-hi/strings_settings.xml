@@ -77,4 +77,7 @@
     <string name="downloading_update">डाउनलोड हो रहा है… %1$s%%</string>
     <string name="download_update_failed">डाउनलोड विफल हुआ</string>
     <string name="download_on_github">GitHub पर डाउनलोड करें</string>
+    <string name="official">आधिकारिक</string>
+    <string name="official_website_title">PlainApp इकोसिस्टम एक्सप्लोर करें</string>
+    <string name="official_website_desc">PlainApp एक ओपन-सोर्स प्रोजेक्ट है। डेस्कटॉप क्लाइंट, सुविधाओं और रोडमैप को जानने के लिए हमारी आधिकारिक वेबसाइट पर जाएं।</string>
 </resources>

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
@@ -38,6 +39,7 @@ import com.ismartcoding.plain.preferences.LocalAutoCheckUpdate
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDonationBanner
+import com.ismartcoding.plain.ui.base.PExploreBanner
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -91,9 +93,16 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
             ) {
                 item { TopSpace() }
-                item {
-                    PDonationBanner(onClick = { WebHelper.open(context, "https://ko-fi.com/ismartcoding") })
-                    VerticalSpace(dp = 16.dp)
+                if (AppFeatureType.DONATION.has()) {
+                    item {
+                        PDonationBanner(onClick = { WebHelper.open(context, "https://ko-fi.com/ismartcoding") })
+                        VerticalSpace(dp = 16.dp)
+                    }
+                } else {
+                    item {
+                        PExploreBanner(onClick = { WebHelper.open(context, "https://plainapp.app") })
+                        VerticalSpace(dp = 16.dp)
+                    }
                 }
                 item {
                     if (AppFeatureType.CHECK_UPDATES.has()) {

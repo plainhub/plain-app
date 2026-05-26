@@ -75,4 +75,7 @@
     <string name="downloading_update">下載中… %1$s%%</string>
     <string name="download_update_failed">下載失敗</string>
     <string name="download_on_github">在 GitHub 下載</string>
+    <string name="official">官方</string>
+    <string name="official_website_title">探索 PlainApp 生態系統</string>
+    <string name="official_website_desc">PlainApp 是一個開源項目。訪問我們的官方網站，探索桌面客戶端、功能特性和產品路線圖。</string>
 </resources>

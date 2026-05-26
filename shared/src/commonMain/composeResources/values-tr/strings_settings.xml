@@ -75,4 +75,7 @@
     <string name="downloading_update">İndiriliyor… %1$s%%</string>
     <string name="download_update_failed">İndirme başarısız oldu</string>
     <string name="download_on_github">GitHub dan indir</string>
+    <string name="official">RESMİ</string>
+    <string name="official_website_title">PlainApp Ekosistemini Keşfet</string>
+    <string name="official_website_desc">PlainApp açık kaynaklı bir projedir. Masaüstü istemcisini, özellikleri ve yol haritalarını keşfetmek için resmi web sitemizi ziyaret edin.</string>
 </resources>

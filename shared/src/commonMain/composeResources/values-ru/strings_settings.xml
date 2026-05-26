@@ -75,4 +75,7 @@
     <string name="downloading_update">Загрузка… %1$s%%</string>
     <string name="download_update_failed">Ошибка загрузки</string>
     <string name="download_on_github">Скачать на GitHub</string>
+    <string name="official">ОФИЦИАЛЬНО</string>
+    <string name="official_website_title">Исследуйте экосистему PlainApp</string>
+    <string name="official_website_desc">PlainApp — проект с открытым исходным кодом. Посетите наш официальный сайт, чтобы ознакомиться с клиентом для ПК, функциями и планами развития.</string>
 </resources>

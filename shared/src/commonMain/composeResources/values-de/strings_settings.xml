@@ -75,4 +75,7 @@
     <string name="downloading_update">Herunterladen… %1$s%%</string>
     <string name="download_update_failed">Download fehlgeschlagen</string>
     <string name="download_on_github">Auf GitHub herunterladen</string>
+    <string name="official">OFFIZIELL</string>
+    <string name="official_website_title">PlainApp-Ökosystem erkunden</string>
+    <string name="official_website_desc">PlainApp ist ein Open-Source-Projekt. Besuchen Sie unsere offizielle Website, um den Desktop-Client, Funktionen und Roadmaps zu erkunden.</string>
 </resources>

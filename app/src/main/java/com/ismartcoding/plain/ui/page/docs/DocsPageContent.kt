@@ -37,6 +37,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshLayoutState
 import com.ismartcoding.plain.ui.components.DocItem
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.enums.AppFeatureType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,7 +94,7 @@ internal fun ColumnScope.DocsPageContent(
                                         }
                                         val idx = tagsVM.itemsFlow.value.indexOfFirst { it.id == tag.id }
                                         if (idx != -1) {
-                                            scope.launch { pagerState.scrollToPage(idx + 1) }
+                                            scope.launch { pagerState.scrollToPage(idx + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1) }
                                         }
                                     }
                                 )
