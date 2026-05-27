@@ -4,11 +4,10 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.chat.download.PeerFileDownloader
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import kotlinx.serialization.Serializable
 import kotlinx.coroutines.CoroutineScope
@@ -164,7 +163,7 @@ object DownloadQueue {
         }
 
         if (result != null) {
-            sendEvent(HttpApiEvents.DownloadTaskDoneEvent(task))
+            sendEvent(HDownloadTaskDoneEvent(task))
             tasks.remove(task.id)
             updateProgressFlow()
         } else {

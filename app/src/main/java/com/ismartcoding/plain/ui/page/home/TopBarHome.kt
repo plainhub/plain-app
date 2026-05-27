@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
-import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,11 +10,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,8 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,6 +28,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.PhoneHelper
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.close
+import com.ismartcoding.plain.i18n.device_name
+import com.ismartcoding.plain.i18n.eye
+import com.ismartcoding.plain.i18n.eye_off
+import com.ismartcoding.plain.i18n.make_discoverable
+import com.ismartcoding.plain.i18n.make_discoverable_desc
+import com.ismartcoding.plain.i18n.pen
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
@@ -46,6 +49,8 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.flow.map
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,18 +58,16 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
     val context = LocalContext.current
     var showRenameDialog by remember { mutableStateOf(false) }
     var showDiscoverableDialog by remember { mutableStateOf(false) }
-    var deviceName by remember { mutableStateOf("") }
     val isDiscoverable = remember {
         context.dataStore.dataFlow.map { NearbyDiscoverablePreference.get(it) }
     }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
-
-    LaunchedEffect(Unit) { deviceName = TempData.deviceName }
+    val deviceName by TempData.deviceName.collectAsState()
 
     if (showRenameDialog) {
         DeviceRenameDialog(
             name = deviceName,
             onDismiss = { showRenameDialog = false },
-            onDone = { deviceName = TempData.deviceName },
+            onDone = { },
         )
     }
 

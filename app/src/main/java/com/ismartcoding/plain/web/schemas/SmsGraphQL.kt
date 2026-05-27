@@ -9,7 +9,7 @@ import com.ismartcoding.plain.DPendingMms
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.events.StartMmsPollingEvent
+import com.ismartcoding.plain.events.HStartMmsPollingEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.features.sms.MmsHelper
@@ -137,7 +137,7 @@ fun SchemaBuilder.addSmsSchema() {
                     createdAt = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
                 )
                 TempData.pendingMmsMessages.add(pendingEntry)
-                sendEvent(StartMmsPollingEvent(pendingId, launchTimeSec, resolvedAttachments.map { it.first }))
+                sendEvent(HStartMmsPollingEvent(pendingId, launchTimeSec, resolvedAttachments.map { it.first }))
                 pendingId
             } catch (e: Exception) {
                 e.printStackTrace()

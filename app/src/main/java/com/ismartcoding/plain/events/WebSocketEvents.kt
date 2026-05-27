@@ -53,6 +53,7 @@ enum class EventType(val value: Int) {
     CHANNELS_UPDATED(18),
     IMAGE_SEARCH_UPDATED(19),
     PEER_STATUS_UPDATED(20),
+    DEVICE_NAME_UPDATED(21),
 }
 
 

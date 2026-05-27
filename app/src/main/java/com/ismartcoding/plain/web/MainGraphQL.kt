@@ -39,6 +39,8 @@ import com.ismartcoding.plain.web.schemas.addScreenMirrorSchema
 import com.ismartcoding.plain.web.schemas.addSmsSchema
 import com.ismartcoding.plain.web.schemas.addTagSchema
 import com.ismartcoding.plain.web.schemas.addAppLogsSchema
+import com.ismartcoding.plain.web.schemas.addDataStoreSchema
+import com.ismartcoding.plain.web.schemas.addDbSchema
 import com.ismartcoding.plain.web.schemas.addVideoSchema
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -87,6 +89,8 @@ class MainGraphQL(val schema: Schema) {
                 addNotificationSchema()
                 addAppSchema()
                 addAppLogsSchema()
+                addDataStoreSchema()
+                addDbSchema()
                 addBookmarkSchema()
                 addSchemaTypes()
             }

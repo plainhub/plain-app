@@ -4,6 +4,7 @@ import android.app.Notification
 import com.ismartcoding.plain.data.DNotification
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.sms.DMessageAttachment
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Instant
 
 /**
@@ -30,7 +31,7 @@ object TempData {
     var webEnabled = false
     var webHttps = false
     var clientId = ""
-    var deviceName = ""
+    val deviceName = MutableStateFlow("")
     var httpPort: Int = 8080
     var httpsPort: Int = 8443
     var urlToken = ByteArray(0) // use to encrypt or decrypt params in url (kept as raw bytes to avoid base64 decode on every encrypt/decrypt)

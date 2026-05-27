@@ -18,10 +18,14 @@ import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
-import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
+import com.ismartcoding.plain.events.HMessageUpdatedEvent
+import com.ismartcoding.plain.events.HPomodoroPauseEvent
+import com.ismartcoding.plain.events.HPomodoroStartEvent
+import com.ismartcoding.plain.events.HPomodoroStopEvent
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -89,14 +93,14 @@ fun MainEventCollector(
                     }
                 }
 
-                is HttpApiEvents.PomodoroStartEvent -> {
+                is HPomodoroStartEvent -> {
                     pomodoroVM.timeLeft.intValue = event.timeLeft
                     pomodoroVM.startSession()
                 }
-                is HttpApiEvents.PomodoroPauseEvent -> pomodoroVM.pauseSession()
-                is HttpApiEvents.PomodoroStopEvent -> pomodoroVM.resetTimer()
+                is HPomodoroPauseEvent -> pomodoroVM.pauseSession()
+                is HPomodoroStopEvent -> pomodoroVM.resetTimer()
 
-                is HttpApiEvents.DownloadTaskDoneEvent -> {
+                is HDownloadTaskDoneEvent -> {
                     scope.launch(Dispatchers.IO) {
                         val chat = AppDatabase.instance.chatDao().getById(event.downloadTask.messageId)
                         if (chat != null) {
@@ -108,7 +112,7 @@ fun MainEventCollector(
                     }
                 }
 
-                is HttpApiEvents.MessageUpdatedEvent -> {
+                is HMessageUpdatedEvent -> {
                     scope.launch(Dispatchers.IO) {
                         val chat = AppDatabase.instance.chatDao().getById(event.id)
                         if (chat != null) {

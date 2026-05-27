@@ -22,13 +22,6 @@ object NetworkMonitor {
             override fun onLost(network: Network) {
                 check(cm)
             }
-
-            override fun onCapabilitiesChanged(
-                network: Network,
-                caps: NetworkCapabilities
-            ) {
-                check(cm)
-            }
         }
 
         cm.registerDefaultNetworkCallback(callback)

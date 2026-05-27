@@ -128,7 +128,7 @@ object NearbyDiscoverManager {
     private fun sendDiscoverReply(targetIP: String) {
         val reply = DDiscoverReply(
             id = TempData.clientId,
-            name = TempData.deviceName,
+            name = TempData.deviceName.value,
             deviceType = PhoneHelper.getDeviceType(MainApp.instance),
             port = TempData.httpsPort,
             version = BuildConfig.VERSION_NAME,

@@ -12,7 +12,7 @@ suspend fun DChatChannel.getPeersAsync(): List<DPeer> {
         if (peerId == TempData.clientId) {
             DPeer(
                 id = peerId,
-                name = TempData.deviceName,
+                name = TempData.deviceName.value,
                 ip = NetworkHelper.getDeviceIP4s().joinToString(","),
                 port = TempData.httpsPort,
                 publicKey = SignatureHelper.getRawPublicKeyBase64Async(),

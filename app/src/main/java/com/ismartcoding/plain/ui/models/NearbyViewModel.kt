@@ -100,10 +100,9 @@ class NearbyViewModel : ViewModel() {
     suspend fun getQrDataAsync(): DQrPairData {
         val context = MainApp.instance
         val allIps = NetworkHelper.getDeviceIP4s().toList()
-        val deviceName = TempData.deviceName
         return DQrPairData(
             id = TempData.clientId,
-            name = deviceName,
+            name = TempData.deviceName.value,
             port = TempData.httpsPort,
             deviceType = PhoneHelper.getDeviceType(context),
             ips = allIps,

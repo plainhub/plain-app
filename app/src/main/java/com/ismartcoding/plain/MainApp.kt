@@ -116,7 +116,7 @@ class MainApp : Application() {
             val checkUpdateTime = updateInfo.checkUpdateTime
             val autoCheckUpdate = updateInfo.autoCheckUpdate
             ClientIdPreference.ensureValueAsync(preferences)
-            TempData.deviceName = DeviceNamePreference.get(preferences).ifEmpty { PhoneHelper.getDeviceName(instance) }
+            TempData.deviceName.value = DeviceNamePreference.get(preferences).ifEmpty { PhoneHelper.getDeviceName(instance) }
             KeyStorePasswordPreference.ensureValueAsync(preferences)
             UrlTokenPreference.ensureValueAsync(preferences)
             SignatureKeyPreference.ensureKeyPairAsync(preferences)

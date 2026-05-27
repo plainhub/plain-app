@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
@@ -14,11 +13,11 @@ import com.ismartcoding.plain.chat.PeerStatusManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PeerOnlineStatusChangedEvent
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.events.HMessageCreatedEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -36,7 +35,7 @@ class PeerViewModel : ViewModel() {
         eventJob = viewModelScope.launch {
             Channel.sharedFlow.collect { event ->
                 when (event) {
-                    is HttpApiEvents.MessageCreatedEvent -> viewModelScope.launch { loadPeers() }
+                    is HMessageCreatedEvent -> viewModelScope.launch { loadPeers() }
                     is NearbyDeviceFoundEvent -> handleDeviceFoundInternal(event)
                     is PeerOnlineStatusChangedEvent -> updatePeerOnlineStatus(event.peerId, event.online)
                 }

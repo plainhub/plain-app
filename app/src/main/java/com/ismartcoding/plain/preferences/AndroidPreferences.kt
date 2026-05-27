@@ -32,11 +32,6 @@ suspend fun DarkThemePreference.putAsync(value: DarkTheme) {
     setDarkMode(value)
 }
 
-// ── DeviceNamePreference ─────────────────────────────────────────────────────
-// Note: TempData.deviceName must be updated at call sites after putAsync.
-
-// ── LanguagePreference ───────────────────────────────────────────────────────
-
 fun LanguagePreference.getLocale(preferences: Preferences): Locale? {
     return parseLocale(get(preferences))
 }

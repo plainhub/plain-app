@@ -60,7 +60,7 @@ object NearbyPairManager {
     suspend fun startPairingAsync(device: DNearbyDevice) {
         try {
             val context = MainApp.instance
-            val deviceName = TempData.deviceName
+            val deviceName = TempData.deviceName.value
 
             // Generate ECDH key pair for this pairing session
             val keyPair = CryptoHelper.generateECDHKeyPair()

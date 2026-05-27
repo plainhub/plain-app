@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.services
-import com.ismartcoding.plain.preferences.*
 
 import android.app.Notification
 import android.content.ComponentName
@@ -18,7 +17,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.extensions.toDNotification
-import com.ismartcoding.plain.events.CancelNotificationsEvent
+import com.ismartcoding.plain.events.HCancelNotificationsEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.preferences.NotificationFilterPreference
@@ -140,7 +139,7 @@ class PNotificationListenerService : NotificationListenerService() {
 
         try {
 
-            events.add(receiveEventHandler<CancelNotificationsEvent> { event ->
+            events.add(receiveEventHandler<HCancelNotificationsEvent> { event ->
                 if (!isConnected) {
                     LogCat.w("PNotificationListenerService: not connected, ignoring cancel request")
                     return@receiveEventHandler

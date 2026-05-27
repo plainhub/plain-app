@@ -14,8 +14,8 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.RestartAppEvent
-import com.ismartcoding.plain.events.OpenAccessibilitySettingsEvent
-import com.ismartcoding.plain.events.OpenWebSettingsEvent
+import com.ismartcoding.plain.events.HOpenAccessibilitySettingsEvent
+import com.ismartcoding.plain.events.HOpenWebSettingsEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
@@ -59,7 +59,7 @@ fun SchemaBuilder.addAppSchema() {
                 httpPort = TempData.httpPort,
                 httpsPort = TempData.httpsPort,
                 appDir = context.appDir(),
-                deviceName = TempData.deviceName,
+                deviceName = TempData.deviceName.value,
                 PhoneHelper.getBatteryPercentage(context),
                 BuildConfig.VERSION_CODE,
                 Build.VERSION.SDK_INT,
@@ -74,6 +74,7 @@ fun SchemaBuilder.addAppSchema() {
                 downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath,
                 developerMode = DeveloperModePreference.getAsync(),
                 favoriteFolders = FavoriteFoldersPreference.getValueAsync().map { it.toModel() },
+                debug = BuildConfig.DEBUG,
             )
         }
     }
@@ -91,13 +92,13 @@ fun SchemaBuilder.addAppSchema() {
     }
     mutation("openAccessibilitySettings") {
         resolver { ->
-            sendEvent(OpenAccessibilitySettingsEvent())
+            sendEvent(HOpenAccessibilitySettingsEvent())
             true
         }
     }
     mutation("openWebSettings") {
         resolver { ->
-            sendEvent(OpenWebSettingsEvent())
+            sendEvent(HOpenWebSettingsEvent())
             true
         }
     }
@@ -106,6 +107,13 @@ fun SchemaBuilder.addAppSchema() {
             val clipboard = MainApp.instance.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("text", text)
             clipboard.setPrimaryClip(clip)
+            true
+        }
+    }
+    mutation("updateDeviceName") {
+        resolver { name: String ->
+            DeviceNamePreference.putAsync(name)
+            TempData.deviceName.value = name
             true
         }
     }

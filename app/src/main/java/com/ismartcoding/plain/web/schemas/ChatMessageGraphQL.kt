@@ -10,8 +10,8 @@ import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
-import com.ismartcoding.plain.events.HttpApiEvents
-import com.ismartcoding.plain.events.RetryChatItemEvent
+import com.ismartcoding.plain.events.HMessageCreatedEvent
+import com.ismartcoding.plain.events.HRetryChatItemEvent
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
 
@@ -42,7 +42,7 @@ fun SchemaBuilder.addChatMessageSchema() {
             } else if (isPeer && peer != null) {
                 ChatDbHelper.deliverToPeerAsync(item, peer)
             }
-            sendEvent(HttpApiEvents.MessageCreatedEvent(if (isChannel) channelId else if (isPeer) peerId else toId, arrayListOf(item)))
+            sendEvent(HMessageCreatedEvent(if (isChannel) channelId else if (isPeer) peerId else toId, arrayListOf(item)))
             arrayListOf(item).map { it.toModel() }
         }
     }
@@ -61,7 +61,7 @@ fun SchemaBuilder.addChatMessageSchema() {
             val item = ChatDbHelper.getAsync(id.value) ?: return@resolver null
             ChatDbHelper.updateStatusAsync(item.id, "pending")
             item.status = "pending"
-            sendEvent(RetryChatItemEvent(item.id))
+            sendEvent(HRetryChatItemEvent(item.id))
             item.toModel()
         }
     }

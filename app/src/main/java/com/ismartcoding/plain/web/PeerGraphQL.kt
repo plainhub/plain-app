@@ -26,7 +26,7 @@ import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
-import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -121,7 +121,7 @@ class PeerGraphQL(val schema: Schema) {
                             }
                         }
 
-                        sendEvent(HttpApiEvents.MessageCreatedEvent(channelId.ifEmpty { fromId }, arrayListOf(item)))
+                        sendEvent(HMessageCreatedEvent(channelId.ifEmpty { fromId }, arrayListOf(item)))
                         val model = item.toModel()
                         model.data = model.getContentData()
                         sendEvent(

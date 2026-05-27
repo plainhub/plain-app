@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.chat
-import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
@@ -11,7 +10,7 @@ import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
-import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.models.ChatViewModel
@@ -55,7 +54,7 @@ fun ChatPageEffects(
         sharedFlow.collect { event ->
             when (event) {
                 is DeleteChatItemViewEvent -> chatVM.remove(event.id)
-                is HttpApiEvents.MessageCreatedEvent -> {
+                is HMessageCreatedEvent -> {
                     if (chatVM.chatState.value.toId == event.fromId) {
                         chatVM.addAll(event.items)
                         scope.launch { scrollState.scrollToItem(0) }

@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.web.schemas
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.kgraphql.Context
 import com.ismartcoding.lib.kgraphql.GraphQLError
@@ -9,8 +8,8 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.enums.ScreenMirrorMode
-import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
-import com.ismartcoding.plain.events.StartScreenMirrorEvent
+import com.ismartcoding.plain.events.HRequestScreenMirrorAudioEvent
+import com.ismartcoding.plain.events.HStartScreenMirrorEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.preferences.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.services.PlainAccessibilityService
@@ -39,7 +38,7 @@ fun SchemaBuilder.addScreenMirrorSchema() {
     mutation("startScreenMirror") {
         resolver { audio: Boolean ->
             ScreenMirrorService.qualityData = ScreenMirrorQualityPreference.getValueAsync()
-            sendEvent(StartScreenMirrorEvent(audio))
+            sendEvent(HStartScreenMirrorEvent(audio))
             true
         }
     }
@@ -48,7 +47,7 @@ fun SchemaBuilder.addScreenMirrorSchema() {
             if (Permission.RECORD_AUDIO.can(MainApp.instance)) {
                 true
             } else {
-                sendEvent(RequestScreenMirrorAudioEvent())
+                sendEvent(HRequestScreenMirrorAudioEvent())
                 false
             }
         }

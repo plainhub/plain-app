@@ -26,11 +26,11 @@ import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
-import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
+import com.ismartcoding.plain.events.HRequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.events.RestartAppEvent
-import com.ismartcoding.plain.events.StartScreenMirrorEvent
-import com.ismartcoding.plain.events.OpenAccessibilitySettingsEvent
-import com.ismartcoding.plain.events.OpenWebSettingsEvent
+import com.ismartcoding.plain.events.HStartScreenMirrorEvent
+import com.ismartcoding.plain.events.HOpenAccessibilitySettingsEvent
+import com.ismartcoding.plain.events.HOpenWebSettingsEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -64,7 +64,7 @@ internal fun MainActivity.initEvents() {
                     // handled by individual feature flows
                 }
 
-                is StartScreenMirrorEvent -> {
+                is HStartScreenMirrorEvent -> {
                     try {
                         if (event.audio && !Permission.RECORD_AUDIO.can(this@initEvents)) recordAudioForMirror.launch(android.Manifest.permission.RECORD_AUDIO)
                         else screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
@@ -73,7 +73,7 @@ internal fun MainActivity.initEvents() {
                     }
                 }
 
-                is RequestScreenMirrorAudioEvent -> {
+                is HRequestScreenMirrorAudioEvent -> {
                     try {
                         if (Permission.RECORD_AUDIO.can(this@initEvents)) sendScreenMirrorAudioStatus(true)
                         else recordAudioForMirrorLate.launch(android.Manifest.permission.RECORD_AUDIO)
@@ -97,7 +97,7 @@ internal fun MainActivity.initEvents() {
                     Runtime.getRuntime().exit(0)
                 }
 
-                is OpenAccessibilitySettingsEvent -> {
+                is HOpenAccessibilitySettingsEvent -> {
                     try {
                         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -107,7 +107,7 @@ internal fun MainActivity.initEvents() {
                     }
                 }
 
-                is OpenWebSettingsEvent -> {
+                is HOpenWebSettingsEvent -> {
                     try {
                         val nav = navControllerState.value
                         val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute<Routing.WebSettings>() == true

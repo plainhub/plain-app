@@ -25,4 +25,5 @@ data class App(
     val downloadsDir: String,
     val developerMode: Boolean,
     val favoriteFolders: List<FavoriteFolder>,
+    val debug: Boolean,
 )

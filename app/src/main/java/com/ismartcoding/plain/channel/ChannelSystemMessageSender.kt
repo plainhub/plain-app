@@ -62,13 +62,12 @@ object ChannelSystemMessageSender {
     suspend fun sendInviteAccept(channelId: String, ownerPeer: DPeer): Boolean {
         val context = MainApp.instance
         val publicKey = SignatureHelper.getRawPublicKeyBase64Async()
-        val deviceName = TempData.deviceName
         val deviceType = PhoneHelper.getDeviceType(context).value
         val payload = jsonEncode(
             ChannelSystemMessages.ChannelInviteAccept(
                 channelId = channelId,
                 publicKey = publicKey,
-                name = deviceName,
+                name = TempData.deviceName.value,
                 deviceType = deviceType,
             )
         )

@@ -8,7 +8,7 @@ import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.events.CancelNotificationsEvent
+import com.ismartcoding.plain.events.HCancelNotificationsEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.helpers.NotificationsHelper
 import com.ismartcoding.plain.web.models.ID
@@ -24,7 +24,7 @@ fun SchemaBuilder.addNotificationSchema() {
     }
     mutation("cancelNotifications") {
         resolver { ids: List<ID> ->
-            sendEvent(CancelNotificationsEvent(ids.map { it.value }.toSet()))
+            sendEvent(HCancelNotificationsEvent(ids.map { it.value }.toSet()))
             true
         }
     }

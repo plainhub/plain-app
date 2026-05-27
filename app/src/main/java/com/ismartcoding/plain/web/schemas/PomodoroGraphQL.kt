@@ -1,11 +1,11 @@
 package com.ismartcoding.plain.web.schemas
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.HPomodoroPauseEvent
+import com.ismartcoding.plain.events.HPomodoroStartEvent
+import com.ismartcoding.plain.events.HPomodoroStopEvent
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.MainActivity
@@ -39,19 +39,19 @@ fun SchemaBuilder.addPomodoroSchema() {
     }
     mutation("startPomodoro") {
         resolver { timeLeft: Int ->
-            sendEvent(HttpApiEvents.PomodoroStartEvent(timeLeft))
+            sendEvent(HPomodoroStartEvent(timeLeft))
             true
         }
     }
     mutation("pausePomodoro") {
         resolver { ->
-            sendEvent(HttpApiEvents.PomodoroPauseEvent())
+            sendEvent(HPomodoroPauseEvent())
             true
         }
     }
     mutation("stopPomodoro") {
         resolver { ->
-            sendEvent(HttpApiEvents.PomodoroStopEvent())
+            sendEvent(HPomodoroStopEvent())
             true
         }
     }

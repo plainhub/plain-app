@@ -804,7 +804,7 @@ var xf=Object.defineProperty;var Cf=(e,t,n)=>t in e?xf(e,t,{enumerable:!0,config
 `,mq=`
   mutation { disableImageSearch }
 `,pq=`
-  mutation { cancelImageDownload }
+  mutation { cancelImageModelDownload }
 `,fq=`
   mutation startImageIndex($force: Boolean) {
     startImageIndex(force: $force)

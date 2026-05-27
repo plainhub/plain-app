@@ -8,9 +8,9 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.ai.ImageIndexManager
 import com.ismartcoding.plain.ai.ImageSearchIndexer
 import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.events.CancelImageDownloadEvent
-import com.ismartcoding.plain.events.DisableImageSearchEvent
-import com.ismartcoding.plain.events.EnableImageSearchEvent
+import com.ismartcoding.plain.events.HCancelImageModelDownloadEvent
+import com.ismartcoding.plain.events.HDisableImageSearchEvent
+import com.ismartcoding.plain.events.HEnableImageSearchEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.media.ImageSearchHelper
@@ -72,19 +72,19 @@ fun SchemaBuilder.addImageSchema() {
     type<ImageSearchStatus> {}
     mutation("enableImageSearch") {
         resolver { ->
-            sendEvent(EnableImageSearchEvent())
+            sendEvent(HEnableImageSearchEvent())
             true
         }
     }
     mutation("disableImageSearch") {
         resolver { ->
-            sendEvent(DisableImageSearchEvent())
+            sendEvent(HDisableImageSearchEvent())
             true
         }
     }
-    mutation("cancelImageDownload") {
+    mutation("cancelImageModelDownload") {
         resolver { ->
-            sendEvent(CancelImageDownloadEvent())
+            sendEvent(HCancelImageModelDownloadEvent())
             true
         }
     }

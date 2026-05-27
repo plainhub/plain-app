@@ -86,7 +86,7 @@ object DlnaTransportController {
         logResponse: Boolean = true,
     ): String {
         val service = device.getAVTransportService() ?: return ""
-        val senderName = TempData.deviceName.ifEmpty { PhoneHelper.getDeviceName(MainApp.instance) }
+        val senderName = TempData.deviceName.value.ifEmpty { PhoneHelper.getDeviceName(MainApp.instance) }
         return try {
             val client = HttpClient(CIO)
             val response = withIO {

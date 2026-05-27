@@ -35,7 +35,6 @@ import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
-import com.ismartcoding.plain.discover.NearbyPairManager
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
@@ -69,15 +68,7 @@ class StartHttpServerEvent : ChannelEvent()
 
 class HttpServerStateChangedEvent(val state: HttpServerState) : ChannelEvent()
 
-class StartScreenMirrorEvent(val audio: Boolean) : ChannelEvent()
-
-class RequestScreenMirrorAudioEvent : ChannelEvent()
-
 class RestartAppEvent : ChannelEvent()
-
-class OpenAccessibilitySettingsEvent : ChannelEvent()
-
-class OpenWebSettingsEvent : ChannelEvent()
 
 class FetchLinkPreviewsEvent(val chat: DChat) : ChannelEvent()
 
@@ -147,25 +138,7 @@ data class KeepAwakeChangedEvent(val enabled: Boolean) : ChannelEvent()
 
 class IgnoreBatteryOptimizationResultEvent : ChannelEvent()
 
-class CancelNotificationsEvent(val ids: Set<String>) : ChannelEvent()
-
 class ClearAudioPlaylistEvent : ChannelEvent()
-
-/**
- * Fired after the default SMS app is launched for an MMS send.
- * AppEvents will poll content://mms until the row appears, then
- * remove the pending entry from TempData, delete the attachment
- * files on device, and emit MMS_SENT to all web clients.
- */
-data class StartMmsPollingEvent(
-    val pendingId: String,
-    val launchTimeSec: Long,
-    val attachmentPaths: List<String>,
-) : ChannelEvent()
-
-class EnableImageSearchEvent : ChannelEvent()
-class DisableImageSearchEvent : ChannelEvent()
-class CancelImageDownloadEvent : ChannelEvent()
 
 class DownloadUpdateEvent : ChannelEvent()
 class CancelUpdateDownloadEvent : ChannelEvent()
@@ -182,8 +155,6 @@ class CancelSleepTimerEvent : ChannelEvent()
 class StartNearbyServiceEvent : ChannelEvent()
 class StartNearbyDiscoveryEvent : ChannelEvent()
 class StopNearbyDiscoveryEvent : ChannelEvent()
-
-class RetryChatItemEvent(val id: String) : ChannelEvent()
 
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
@@ -322,19 +293,19 @@ object AppEvents {
                         )
                     }
 
-                    is EnableImageSearchEvent -> {
+                    is HEnableImageSearchEvent -> {
                         coIO { ImageSearchManager.enableAsync() }
                     }
 
-                    is DisableImageSearchEvent -> {
+                    is HDisableImageSearchEvent -> {
                         coIO { ImageSearchManager.disableAsync() }
                     }
 
-                    is CancelImageDownloadEvent -> {
+                    is HCancelImageModelDownloadEvent -> {
                         ImageSearchManager.cancelDownload()
                     }
 
-                    is StartMmsPollingEvent -> {
+                    is HStartMmsPollingEvent -> {
                         coIO {
                             val context = MainApp.instance
                             repeat(150) { // 2 s × 150 = 5 minutes max
@@ -414,7 +385,7 @@ object AppEvents {
                         coIO { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } }
                     }
 
-                    is RetryChatItemEvent -> {
+                    is HRetryChatItemEvent -> {
                         coIO {
                             val item = ChatDbHelper.getAsync(event.id) ?: return@coIO
                             val isPeer = item.toId.isNotEmpty() && item.channelId.isEmpty()
@@ -424,7 +395,7 @@ object AppEvents {
                             } else if (item.channelId.isNotEmpty()) {
                                 ChatDbHelper.deliverToChannelAsync(item)
                             }
-                            sendEvent(HttpApiEvents.MessageUpdatedEvent(item.id))
+                            sendEvent(HMessageUpdatedEvent(item.id))
                         }
                     }
                 }
