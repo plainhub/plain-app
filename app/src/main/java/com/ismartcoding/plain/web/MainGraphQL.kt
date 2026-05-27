@@ -38,6 +38,7 @@ import com.ismartcoding.plain.web.schemas.addSchemaTypes
 import com.ismartcoding.plain.web.schemas.addScreenMirrorSchema
 import com.ismartcoding.plain.web.schemas.addSmsSchema
 import com.ismartcoding.plain.web.schemas.addTagSchema
+import com.ismartcoding.plain.web.schemas.addAppLogsSchema
 import com.ismartcoding.plain.web.schemas.addVideoSchema
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -85,6 +86,7 @@ class MainGraphQL(val schema: Schema) {
                 addPomodoroSchema()
                 addNotificationSchema()
                 addAppSchema()
+                addAppLogsSchema()
                 addBookmarkSchema()
                 addSchemaTypes()
             }

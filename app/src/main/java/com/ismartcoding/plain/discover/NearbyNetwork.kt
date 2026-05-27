@@ -30,6 +30,7 @@ object NearbyNetwork {
     private const val RESTART_DELAY_MS = 2000L
 
     private var receiverJob: Job? = null
+    private var multicastLock: WifiManager.MulticastLock? = null
 
     // ---- Sending ---------------------------------------------------------------
 
@@ -84,6 +85,22 @@ object NearbyNetwork {
             return
         }
 
+        // Acquire a single MulticastLock for the lifetime of the receiver.
+        // Creating a new lock on every restart iteration eventually trips
+        // Android's per-UID lock cap ("Exceeded maximum number of wifi locks").
+        if (multicastLock == null) {
+            runCatching {
+                val wifiManager = MainApp.instance.applicationContext
+                    .getSystemService(Context.WIFI_SERVICE) as WifiManager
+                multicastLock = wifiManager.createMulticastLock("PlainApp:discover").apply {
+                    setReferenceCounted(false)
+                    acquire()
+                }
+            }.onFailure { LogCat.e("Multicast lock acquire error: ${it.message}") }
+        } else if (multicastLock?.isHeld == false) {
+            runCatching { multicastLock?.acquire() }
+        }
+
         receiverJob = coIO {
             while (isActive) {
                 try {
@@ -101,24 +118,24 @@ object NearbyNetwork {
     fun stopReceiver() {
         receiverJob?.cancel()
         receiverJob = null
+        runCatching {
+            if (multicastLock?.isHeld == true) multicastLock?.release()
+        }
+        multicastLock = null
         LogCat.d("Multicast receiver stopped")
     }
 
     // ---- Internal --------------------------------------------------------------
 
     /**
-     * One iteration of the receive loop: acquire lock → open socket → listen until
-     * error or cancellation → clean up. The caller restarts this when it returns.
+     * One iteration of the receive loop: open socket → listen until
+     * error or cancellation → close socket. The MulticastLock is owned by
+     * [startReceiver]/[stopReceiver] and is shared across iterations, so we do
+     * NOT create a new lock here (Android caps WifiLocks per UID).
      */
     private suspend fun receiveLoop(
         onMessage: (message: String, senderIP: String) -> Unit,
     ) {
-        val wifiManager = MainApp.instance.applicationContext
-            .getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val lock = wifiManager.createMulticastLock("PlainApp:discover")
-        lock.setReferenceCounted(false)
-        lock.acquire()
-
         var socket: MulticastSocket? = null
         try {
             socket = MulticastSocket(null as SocketAddress?).apply {
@@ -146,9 +163,6 @@ object NearbyNetwork {
             runCatching {
                 socket?.leaveGroup(InetAddress.getByName(MULTICAST_ADDRESS))
                 socket?.close()
-            }
-            runCatching {
-                if (lock.isHeld) lock.release()
             }
         }
     }
