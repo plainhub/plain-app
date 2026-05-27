@@ -66,7 +66,7 @@ fun SchemaBuilder.addAppSchema() {
                 BuildConfig.CHANNEL,
                 grantedPermissions,
                 AudioPlaylistPreference.getValueAsync().map { it.toModel() },
-                TempData.audioPlayMode,
+                TempData.audioPlayMode.value,
                 AudioPlayingPreference.getValueAsync(),
                 sdcardPath = FileSystemHelper.getSDCardPath(context),
                 usbDiskPaths = FileSystemHelper.getUsbDiskPaths(),

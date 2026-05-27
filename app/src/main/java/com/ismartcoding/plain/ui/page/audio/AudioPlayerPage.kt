@@ -50,7 +50,7 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
     var title by remember { mutableStateOf("") }
     var artist by remember { mutableStateOf("") }
     val isPlaying by AudioPlayer.isPlayingFlow.collectAsState()
-    var playMode by remember { mutableStateOf(TempData.audioPlayMode) }
+    val playMode by TempData.audioPlayMode.collectAsState()
     var showPlaylist by remember { mutableStateOf(false) }
     var showSleepTimer by remember { mutableStateOf(false) }
     var isDragging by remember { mutableStateOf(false) }
@@ -66,7 +66,6 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
                 if (!isDragging) progress = AudioPlayer.playerProgress / 1000f
                 title = audio.title; artist = audio.artist
             }
-            playMode = TempData.audioPlayMode
             isTimerActive = TempData.audioSleepTimerFutureTime > SystemClock.elapsedRealtime()
         }
     }
@@ -99,7 +98,7 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
             }
             Spacer(modifier = Modifier.height(32.dp))
             AudioPlayerControls(
-                playMode = playMode, onPlayModeChange = { playMode = it }, isTimerActive = isTimerActive,
+                playMode = playMode, onPlayModeChange = {}, isTimerActive = isTimerActive,
                 onSleepTimer = { showSleepTimer = true }, onPlaylist = { showPlaylist = true }, isPlaying = isPlaying, scope = scope,
             )
         }

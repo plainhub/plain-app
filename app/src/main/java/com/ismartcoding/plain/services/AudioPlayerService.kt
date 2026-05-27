@@ -63,7 +63,7 @@ class AudioPlayerService : MediaLibraryService() {
 
         override fun onPlaybackStateChanged(playbackState: Int) {
             if (playbackState == Player.STATE_ENDED) {
-                if (TempData.audioPlayMode == MediaPlayMode.REPEAT_ONE) {
+                if (TempData.audioPlayMode.value == MediaPlayMode.REPEAT_ONE) {
                     AudioPlayer.seekTo(0)
                 } else {
                     AudioPlayer.skipToNext()

@@ -109,7 +109,7 @@ class MainApp : Application() {
             TempData.webHttps = HttpsPreference.get(preferences)
             TempData.httpPort = HttpPortPreference.get(preferences)
             TempData.httpsPort = HttpsPortPreference.get(preferences)
-            TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
+            TempData.audioPlayMode.value = AudioPlayModePreference.getValue(preferences)
             AdbTokenPreference.ensureValueAsync(preferences)
             TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync()
             val updateInfo = UpdateInfoPreference.getValueAsync()

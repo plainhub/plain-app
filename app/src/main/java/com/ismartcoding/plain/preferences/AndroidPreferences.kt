@@ -68,7 +68,7 @@ suspend fun LanguagePreference.putAsync(locale: Locale?) {
 
 suspend fun AudioPlayModePreference.putAsync(value: MediaPlayMode) {
     putAsync(value.ordinal)   // calls base member putAsync(Int)
-    TempData.audioPlayMode = value
+    TempData.audioPlayMode.value = value
 }
 
 suspend fun AudioPlayModePreference.getValueAsync(): MediaPlayMode =

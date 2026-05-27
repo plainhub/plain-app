@@ -39,7 +39,7 @@ object TempData {
     val notifications = mutableListOf<DNotification>()
     // Stores notification actions (including RemoteInput reply actions) keyed by notification id
     val notificationActions = mutableMapOf<String, Array<out Notification.Action>>()
-    var audioPlayMode = MediaPlayMode.REPEAT
+    val audioPlayMode = MutableStateFlow(MediaPlayMode.REPEAT)
 
     var adbToken = "" // in-memory cache of the ADB automation token
 

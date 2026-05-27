@@ -53,7 +53,7 @@ fun AudioPlayerControls(
                         MediaPlayMode.REPEAT_ONE -> MediaPlayMode.SHUFFLE
                         MediaPlayMode.SHUFFLE -> MediaPlayMode.REPEAT
                     }
-                    TempData.audioPlayMode = nextMode
+                    TempData.audioPlayMode.value = nextMode
                     onPlayModeChange(nextMode)
                     withIO { AudioPlayModePreference.putAsync(nextMode) }
                 }

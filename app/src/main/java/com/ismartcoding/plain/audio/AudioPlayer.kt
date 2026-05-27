@@ -177,7 +177,7 @@ object AudioPlayer {
                 }
             }
 
-            if (TempData.audioPlayMode == MediaPlayMode.SHUFFLE) {
+            if (TempData.audioPlayMode.value == MediaPlayMode.SHUFFLE) {
                 audio = playerAudioList.random()
             } else {
                 if (playingPath.isNotEmpty()) {

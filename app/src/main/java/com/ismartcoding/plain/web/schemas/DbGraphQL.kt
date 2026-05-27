@@ -65,6 +65,12 @@ private fun dbTableRows(table: String, offset: Int, limit: Int): List<String> {
 }
 
 fun SchemaBuilder.addDbSchema() {
+    query("dbPath") {
+        resolver { ->
+            AppDatabase.instance.openHelper.readableDatabase.path ?: ""
+        }
+    }
+
     query("dbTables") {
         resolver { -> dbTableNames() }
     }
