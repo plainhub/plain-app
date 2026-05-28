@@ -1,72 +1,109 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DDeviceInfo
+import com.ismartcoding.plain.data.DevicePlatform
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlin.time.Instant
 
-class DeviceInfo {
-    var deviceName: String = ""
-    var releaseBuildVersion: String = ""
+class AndroidDeviceInfo {
+    var sdkVersion: Int = 0
     var versionCodeName: String = ""
     var securityPatch: String = ""
     var bootloader: String = ""
-    var manufacturer: String = ""
-    var deviceId: String = ""
-    var model: String = ""
-    var product: String = ""
     var fingerprint: String = ""
     var hardware: String = ""
     var radioVersion: String = ""
-    var device: String = ""
     var board: String = ""
-    var displayVersion: String = ""
     var buildBrand: String = ""
     var buildHost: String = ""
-    var buildTime: Instant = TimeHelper.now()
-    var uptime = 0L
     var buildUser: String = ""
-    var serial: String = ""
-    var osVersion: String = ""
-    var language: String = ""
-    var sdkVersion: Int = 0
-    var screenDensity: String = ""
+    var buildNumber: String = ""
+    var product: String = ""
+    var device: String = ""
     var javaVmVersion: String = ""
-    var kernelVersion: String = ""
     var glEsVersion: String = ""
-    var screenHeight: Int = 0
-    var screenWidth: Int = 0
+    var serial: String = ""
+    var buildTime: Instant = TimeHelper.now()
+}
+
+class DesktopDeviceInfo {
+    var hostname: String = ""
+    var cpuModel: String = ""
+    var gpuModel: String = ""
+    var desktopEnvironment: String = ""
+    var windowManager: String = ""
+}
+
+class DisplayInfo {
+    var width: Int = 0
+    var height: Int = 0
+    var density: String = ""
+}
+
+class DeviceInfo {
+    var name: String = ""
+    var platform: DevicePlatform = DevicePlatform.ANDROID
+    var manufacturer: String = ""
+    var model: String = ""
+    var osName: String = ""
+    var osVersion: String = ""
+    var kernelVersion: String = ""
+    var appVersion: String = ""
+    var appBuildNumber: String = ""
+    var language: String = ""
+    var uptime: Long = 0L
+    var cpuArch: String = ""
+    var totalMemory: Long = 0L
+    var totalStorage: Long = 0L
+    var display: DisplayInfo? = null
+    var android: AndroidDeviceInfo? = null
+    var desktop: DesktopDeviceInfo? = null
 }
 
 fun DDeviceInfo.toModel(): DeviceInfo {
-    val model = DeviceInfo()
-    model.deviceName = this.deviceName
-    model.releaseBuildVersion = this.releaseBuildVersion
-    model.versionCodeName = this.versionCodeName
-    model.securityPatch = this.securityPatch
-    model.bootloader = this.bootloader
-    model.manufacturer = this.manufacturer
-    model.deviceId = this.deviceId
-    model.model = this.model
-    model.product = this.product
-    model.fingerprint = this.fingerprint
-    model.hardware = this.hardware
-    model.radioVersion = this.radioVersion
-    model.device = this.device
-    model.board = this.board
-    model.displayVersion = this.displayVersion
-    model.buildBrand = this.buildBrand
-    model.buildHost = this.buildHost
-    model.buildTime = this.buildTime
-    model.uptime = this.uptime
-    model.buildUser = this.buildUser
-    model.serial = this.serial
-    model.language = this.language
-    model.sdkVersion = this.sdkVersion
-    model.javaVmVersion = this.javaVmVersion
-    model.kernelVersion = this.kernelVersion
-    model.glEsVersion = this.glEsVersion
-    model.screenDensity = this.screenDensity
-    model.screenHeight = this.screenHeight
-    model.screenWidth = this.screenWidth
-    return model
+    val m = DeviceInfo()
+    m.name = this.name
+    m.platform = this.platform
+    m.manufacturer = this.manufacturer
+    m.model = this.model
+    m.osName = this.osName
+    m.osVersion = this.osVersion
+    m.kernelVersion = this.kernelVersion
+    m.appVersion = this.appVersion
+    m.appBuildNumber = this.appBuildNumber
+    m.language = this.language
+    m.uptime = this.uptime
+    m.cpuArch = this.cpuArch
+    m.totalMemory = this.totalMemory
+    m.totalStorage = this.totalStorage
+    this.display?.let { d ->
+        val md = DisplayInfo()
+        md.width = d.width
+        md.height = d.height
+        md.density = d.density
+        m.display = md
+    }
+    this.android?.let { a ->
+        val ma = AndroidDeviceInfo()
+        ma.sdkVersion = a.sdkVersion
+        ma.versionCodeName = a.versionCodeName
+        ma.securityPatch = a.securityPatch
+        ma.bootloader = a.bootloader
+        ma.fingerprint = a.fingerprint
+        ma.hardware = a.hardware
+        ma.radioVersion = a.radioVersion
+        ma.board = a.board
+        ma.buildBrand = a.buildBrand
+        ma.buildHost = a.buildHost
+        ma.buildUser = a.buildUser
+        ma.buildNumber = a.buildNumber
+        ma.product = a.product
+        ma.device = a.device
+        ma.javaVmVersion = a.javaVmVersion
+        ma.glEsVersion = a.glEsVersion
+        ma.serial = a.serial
+        ma.buildTime = a.buildTime
+        m.android = ma
+    }
+    return m
 }
