@@ -18,11 +18,14 @@ import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.enums.NearbyMessageType
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
+import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -85,7 +88,9 @@ object NearbyDiscoverManager {
             NearbyMessageType.DISCOVER_REPLY -> handleDiscoverReply(payload)
             NearbyMessageType.PAIR_REQUEST -> {
                 val request = JsonHelper.jsonDecode<DPairingRequest>(payload)
-                sendEvent(PairingRequestReceivedEvent(request, senderIP))
+                request.fromIp = senderIP
+                sendEvent(PairingRequestReceivedEvent(request))
+                sendEvent(WebSocketEvent(EventType.PAIRING_REQUEST_RECEIVED, JsonHelper.jsonEncode(request)))
             }
 
             NearbyMessageType.PAIR_RESPONSE -> {

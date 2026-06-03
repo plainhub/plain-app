@@ -78,7 +78,7 @@
     <string name="same_network_hint">请确保你的电脑和手机在同一网络下</string>
     <string name="ready">就绪</string>
     <string name="permission_settings">权限设置</string>
-    <string name="web_address_hint">在电脑浏览器中打开下方任一地址。</string>
+    <string name="web_address_hint">将电脑和手机连接到同一网络，然后在浏览器中打开对应的地址。</string>
     <string name="home_web_easy_hint">点击开始</string>
     <string name="home_web_easy_loading">请稍候…</string>
     <string name="home_web_easy_failed_title">无法启动</string>

@@ -56,10 +56,10 @@ import java.io.File
 data class NearbyDeviceFoundEvent(val device: DNearbyDevice) : ChannelEvent()
 
 // Pairing events
-data class PairingRequestReceivedEvent(val request: DPairingRequest, val fromIp: String) : ChannelEvent()
+data class PairingRequestReceivedEvent(val request: DPairingRequest) : ChannelEvent()
 data class PairingSuccessEvent(val deviceId: String, val deviceName: String, val deviceIp: String, val key: String) : ChannelEvent()
 data class PairingFailedEvent(val deviceId: String, val reason: String) : ChannelEvent()
-data class PairingCancelledEvent(val fromId: String) : ChannelEvent()
+data class PairingCanceledEvent(val fromId: String) : ChannelEvent()
 
 class FolderKanbanSelectEvent(val data: FolderOption) : ChannelEvent()
 

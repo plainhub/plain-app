@@ -12,7 +12,7 @@ object DlnaXmlTemplates {
   <URLBase>http://$ip:$port</URLBase>
   <device>
     <deviceType>urn:schemas-upnp-org:device:MediaRenderer:1</deviceType>
-    <friendlyName>Plain (${TempData.deviceName})</friendlyName>
+    <friendlyName>Plain (${TempData.deviceName.value})</friendlyName>
     <manufacturer>PlainApp</manufacturer>
     <modelName>PlainApp MediaRenderer</modelName>
     <modelNumber>1</modelNumber>

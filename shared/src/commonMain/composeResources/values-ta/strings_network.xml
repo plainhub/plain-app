@@ -78,7 +78,7 @@
     <string name="same_network_hint">உங்கள் கணினியும் தொலைபேசியும் ஒரே நெட்வொர்க்கில் உள்ளதா என்பதை உறுதிப்படுத்துங்கள்</string>
     <string name="ready">தயார்</string>
     <string name="permission_settings">அனுமதி அமைப்புகள்</string>
-    <string name="web_address_hint">கீழே உள்ள எந்த முகவரியையும் உங்கள் கணினி உலாவியில் திறக்கவும்.</string>
+    <string name="web_address_hint">கணினி மற்றும் தொலைபேசியை ஒரே நெட்வொர்க்கில் இணைத்து, உங்கள் உலாவியில் பொருத்தமான முகவரியைத் திறக்கவும்.</string>
     <string name="home_web_easy_hint">தொடங்கத் தட்டவும்</string>
     <string name="home_web_easy_loading">தயவு செய்து காத்திருக்கவும்…</string>
     <string name="home_web_easy_failed_title">தொடங்க முடியவில்லை</string>

@@ -87,7 +87,7 @@ fun PairingRequestPage(
         item {
             PCard {
                 PListItem(title = stringResource(Res.string.device_name), value = request.fromName)
-                PListItem(title = stringResource(Res.string.ip_address), value = event.fromIp)
+                PListItem(title = stringResource(Res.string.ip_address), value = request.fromIp)
             }
         }
         item {

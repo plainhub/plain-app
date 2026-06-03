@@ -78,7 +78,7 @@
     <string name="same_network_hint">請確認你的電腦與手機位於同一網路</string>
     <string name="ready">就緒</string>
     <string name="permission_settings">權限設定</string>
-    <string name="web_address_hint">在電腦瀏覽器中開啟下方任一地址。</string>
+    <string name="web_address_hint">將電腦和手機連線到同一個網路，然後在瀏覽器中開啟對應的網址。</string>
     <string name="home_web_easy_hint">點一下開始</string>
     <string name="home_web_easy_loading">請稍候…</string>
     <string name="home_web_easy_failed_title">無法啟動</string>

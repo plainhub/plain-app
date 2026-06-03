@@ -76,7 +76,7 @@
     <string name="same_network_hint">নিশ্চিত করুন আপনার কম্পিউটার ও ফোন একই নেটওয়ার্কে আছে</string>
     <string name="ready">প্রস্তুত</string>
     <string name="permission_settings">অনুমতির সেটিংস</string>
-    <string name="web_address_hint">নিচের যেকোনো ঠিকানা আপনার কম্পিউটারের ব্রাউজারে খুলুন।</string>
+    <string name="web_address_hint">কম্পিউটার এবং ফোনকে একই নেটওয়ার্কে সংযুক্ত করুন, তারপর আপনার ব্রাউজারে সংশ্লিষ্ট ঠিকানাটি খুলুন।</string>
     <string name="home_web_easy_hint">শুরু করতে ট্যাপ করুন</string>
     <string name="home_web_easy_loading">অনুগ্রহ করে অপেক্ষা করুন…</string>
     <string name="home_web_easy_failed_title">শুরু করা যায়নি</string>

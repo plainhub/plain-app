@@ -220,13 +220,13 @@ class MainActivity : AppCompatActivity() {
                             onDeny = {
                                 pendingPairingEvent = null
                                 coIO {
-                                    NearbyPairManager.respondToPairing(event.request, event.fromIp, false)
+                                    NearbyPairManager.respondToPairing(event.request, false)
                                 }
                             },
                             onAllow = {
                                 pendingPairingEvent = null
                                 coIO {
-                                    NearbyPairManager.respondToPairing(event.request, event.fromIp, true)
+                                    NearbyPairManager.respondToPairing(event.request, true)
                                 }
                             },
                         )

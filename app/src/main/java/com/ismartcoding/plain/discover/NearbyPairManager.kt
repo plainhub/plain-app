@@ -16,7 +16,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.NearbyMessageType
-import com.ismartcoding.plain.events.PairingCancelledEvent
+import com.ismartcoding.plain.events.PairingCanceledEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
@@ -25,11 +25,14 @@ import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.chat.ChatCacheManager
 import java.util.concurrent.ConcurrentHashMap
 import android.util.Base64
+import com.ismartcoding.plain.data.DPairingResult
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
 import kotlin.math.abs
 
 object NearbyPairManager {
     private val activePairingSessions = ConcurrentHashMap<String, DPairingSession>()
-    
+
     // Maximum allowed time difference for timestamp validation (5 minutes)
     private const val MAX_TIMESTAMP_DIFF_MS = 5 * 60 * 1000L
 
@@ -64,7 +67,7 @@ object NearbyPairManager {
 
             // Generate ECDH key pair for this pairing session
             val keyPair = CryptoHelper.generateECDHKeyPair()
-            
+
             // Get our raw Ed25519 signature public key (32 bytes)
             val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
             // Create pairing session
@@ -80,7 +83,7 @@ object NearbyPairManager {
             val currentTimestamp = System.currentTimeMillis()
             val ecdhPublicKeyBytes = CryptoHelper.getPublicKeyBytes(keyPair)
             val ecdhPublicKey = Base64.encodeToString(ecdhPublicKeyBytes, Base64.NO_WRAP)
-            
+
             val request = DPairingRequest(
                 fromId = TempData.clientId,
                 fromName = deviceName,
@@ -96,48 +99,54 @@ object NearbyPairManager {
             sendPairingMessage(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request), bestIp)
         } catch (e: Exception) {
             LogCat.e("Error starting pairing: ${e.message}")
-            sendEvent(PairingFailedEvent(device.id, "Failed to send pairing request"))
+            val event = PairingFailedEvent(device.id, "Failed to send pairing request")
+            sendEvent(event)
+            sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
         }
     }
 
-    suspend fun respondToPairing(request: DPairingRequest, fromIp: String, accepted: Boolean) {
+    suspend fun respondToPairing(request: DPairingRequest, accepted: Boolean) {
         try {
             // Verify timestamp to prevent replay attacks
             val currentTime = System.currentTimeMillis()
             if (abs(currentTime - request.timestamp) > MAX_TIMESTAMP_DIFF_MS) {
                 LogCat.e("Pairing request timestamp is too old or in the future")
-                sendEvent(PairingFailedEvent(request.fromId, "Invalid timestamp"))
+                val event = PairingFailedEvent(request.fromId, "Invalid timestamp")
+                sendEvent(event)
+                sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
                 return
             }
-            
+
             // Verify signature
             if (!verifyPairingRequestSignature(request)) {
                 LogCat.e("Pairing request signature verification failed")
-                sendEvent(PairingFailedEvent(request.fromId, "Signature verification failed"))
+                val event = PairingFailedEvent(request.fromId, "Signature verification failed")
+                sendEvent(event)
+                sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
                 return
             }
-            
+
             LogCat.d("Pairing request signature verified successfully")
-            
+
             if (accepted) {
                 // Generate ECDH key pair for this pairing session
                 val keyPair = CryptoHelper.generateECDHKeyPair()
-                
+
                 // Get our raw Ed25519 signature public key (32 bytes)
                 val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
                 // Create pairing session
                 val session = DPairingSession(
                     deviceId = request.fromId,
                     deviceName = request.fromName,
-                    deviceIp = fromIp,
+                    deviceIp = request.fromIp,
                     keyPair = keyPair,
                 )
                 activePairingSessions[request.fromId] = session
-                
+
                 val responseTimestamp = System.currentTimeMillis()
                 val ecdhPublicKeyBytes = CryptoHelper.getPublicKeyBytes(keyPair)
                 val ecdhPublicKey = Base64.encodeToString(ecdhPublicKeyBytes, Base64.NO_WRAP)
-                
+
                 val response = DPairingResponse(
                     fromId = TempData.clientId,
                     toId = request.fromId,
@@ -156,18 +165,19 @@ object NearbyPairManager {
                 val encryptKey = CryptoHelper.computeECDHSharedKey(keyPair.private, requestEcdhPublicKey)
                 if (encryptKey != null) {
                     // Store peer in database with signature public key
-                    val peerIps = (listOf(fromIp) + request.ips).distinct()
+                    val peerIps = (listOf(request.fromIp) + request.ips).distinct()
                     storePeerInDatabase(
-                        request.fromId, 
-                        request.fromName, 
-                        peerIps, 
-                        request.port, 
-                        request.deviceType, 
+                        request.fromId,
+                        request.fromName,
+                        peerIps,
+                        request.port,
+                        request.deviceType,
                         encryptKey,
                         request.signaturePublicKey
                     )
-                    sendPairingMessage(NearbyMessageType.PAIR_RESPONSE, JsonHelper.jsonEncode(response), fromIp)
-                    sendEvent(PairingSuccessEvent(request.fromId, request.fromName, fromIp, encryptKey))
+                    sendPairingMessage(NearbyMessageType.PAIR_RESPONSE, JsonHelper.jsonEncode(response), request.fromIp)
+                    sendEvent(PairingSuccessEvent(request.fromId, request.fromName, request.fromIp, encryptKey))
+                    sendEvent(WebSocketEvent(EventType.PAIRING_SUCCESS, JsonHelper.jsonEncode(DPairingResult(response.fromId))))
                 } else {
                     throw Exception("Failed to compute shared key")
                 }
@@ -175,7 +185,7 @@ object NearbyPairManager {
                 // Send rejection response with signature for security
                 val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
                 val rejectionTimestamp = System.currentTimeMillis()
-                
+
                 val response = DPairingResponse(
                     fromId = TempData.clientId,
                     toId = request.fromId,
@@ -186,15 +196,17 @@ object NearbyPairManager {
                     accepted = false,
                     timestamp = rejectionTimestamp,
                 )
-                
+
                 response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
 
-                sendPairingMessage(NearbyMessageType.PAIR_RESPONSE, JsonHelper.jsonEncode(response), fromIp)
+                sendPairingMessage(NearbyMessageType.PAIR_RESPONSE, JsonHelper.jsonEncode(response), request.fromIp)
                 LogCat.d("Signed pairing rejection response sent to ${request.fromName}")
             }
         } catch (e: Exception) {
             LogCat.e("Error responding to pairing: ${e.message}")
-            sendEvent(PairingFailedEvent(request.fromId, "Failed to respond to pairing request"))
+            val event = PairingFailedEvent(request.fromId, "Failed to respond to pairing request")
+            sendEvent(event)
+            sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
         } finally {
             // Clean up session if not accepted
             if (!accepted) {
@@ -224,7 +236,9 @@ object NearbyPairManager {
         }
 
         activePairingSessions.remove(deviceId)
-        sendEvent(PairingFailedEvent(deviceId, "Pairing cancelled by user"))
+        val event = PairingFailedEvent(deviceId, "Pairing cancelled by user")
+        sendEvent(event)
+        sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
         LogCat.d("Pairing cancelled for device: $deviceId")
     }
 
@@ -241,17 +255,21 @@ object NearbyPairManager {
             val currentTime = System.currentTimeMillis()
             if (abs(currentTime - response.timestamp) > MAX_TIMESTAMP_DIFF_MS) {
                 LogCat.e("Pairing response timestamp is too old or in the future")
-                sendEvent(PairingFailedEvent(response.fromId, "Invalid timestamp"))
+                val event = PairingFailedEvent(response.fromId, "Invalid timestamp")
+                sendEvent(event)
+                sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
                 return
             }
-            
+
             // Verify signature for all responses (acceptance and rejection)
             if (!verifyPairingResponseSignature(response)) {
                 LogCat.e("Pairing response signature verification failed")
-                sendEvent(PairingFailedEvent(response.fromId, "Signature verification failed"))
+                val event = PairingFailedEvent(response.fromId, "Signature verification failed")
+                sendEvent(event)
+                sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
                 return
             }
-            
+
             LogCat.d("Pairing response signature verified successfully")
 
             if (response.accepted) {
@@ -261,26 +279,31 @@ object NearbyPairManager {
                     // Store peer in database with signature public key
                     val peerIps = (listOf(senderIP) + response.ips).distinct()
                     storePeerInDatabase(
-                        response.fromId, 
-                        session.deviceName, 
-                        peerIps, 
-                        response.port, 
-                        response.deviceType, 
+                        response.fromId,
+                        session.deviceName,
+                        peerIps,
+                        response.port,
+                        response.deviceType,
                         encryptKey,
                         response.signaturePublicKey
                     )
                     sendEvent(PairingSuccessEvent(response.fromId, session.deviceName, senderIP, encryptKey))
+                    sendEvent(WebSocketEvent(EventType.PAIRING_SUCCESS, JsonHelper.jsonEncode(DPairingResult(response.fromId))))
                     LogCat.d("Pairing completed successfully with ${session.deviceName}")
                 } else {
                     throw Exception("Failed to compute shared key")
                 }
             } else {
-                sendEvent(PairingFailedEvent(response.fromId, "Pairing request was rejected"))
+                val event = PairingFailedEvent(response.fromId, "Pairing request was rejected")
+                sendEvent(event)
+                sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
                 LogCat.d("Verified pairing rejection from ${session.deviceName}")
             }
         } catch (e: Exception) {
             LogCat.e("Error processing pairing response: ${e.message}")
-            sendEvent(PairingFailedEvent(response.fromId, "Failed to process pairing response"))
+            val event = PairingFailedEvent(response.fromId, "Failed to process pairing response")
+            sendEvent(event)
+            sendEvent(WebSocketEvent(EventType.PAIRING_FAILED, JsonHelper.jsonEncode(DPairingResult(event.deviceId, event.reason))))
         }
 
         // Clean up session
@@ -289,8 +312,8 @@ object NearbyPairManager {
 
     fun handlePairingCancel(cancel: DPairingCancel) {
         LogCat.d("Pairing cancelled by remote device: ${cancel.fromId}")
-        sendEvent(PairingCancelledEvent(cancel.fromId))
-
+        sendEvent(PairingCanceledEvent(cancel.fromId))
+        sendEvent(WebSocketEvent(EventType.PAIRING_CANCELED, JsonHelper.jsonEncode(DPairingResult(cancel.fromId))))
         // Clean up session if exists
         activePairingSessions.remove(cancel.fromId)
     }

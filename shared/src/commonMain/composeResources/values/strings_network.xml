@@ -83,7 +83,7 @@
     <string name="same_network_hint">Make sure your computer and phone are on the same network</string>
     <string name="ready">Ready</string>
     <string name="permission_settings">Permission Settings</string>
-    <string name="web_address_hint">Open any address below in your computer's browser.</string>
+    <string name="web_address_hint">Connect computer and phone to the same network, then open the matching address in your browser.</string>
     <string name="home_web_easy_hint">Tap to start</string>
     <string name="home_web_easy_loading">Please wait…</string>
     <string name="home_web_easy_failed_title">Could not start</string>

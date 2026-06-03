@@ -3,6 +3,7 @@ package com.ismartcoding.plain.web.schemas
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.data.DevicePlatform
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.enums.ScreenMirrorMode
@@ -19,6 +20,7 @@ import kotlin.time.Instant
 fun SchemaBuilder.addSchemaTypes() {
     enum<MediaPlayMode>()
     enum<DataType>()
+    enum<DeviceType>()
     enum<Permission>()
     enum<FileSortBy>()
     enum<PomodoroState>()

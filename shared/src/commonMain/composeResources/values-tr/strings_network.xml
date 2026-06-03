@@ -78,7 +78,7 @@
     <string name="same_network_hint">Bilgisayarınızın ve telefonunuzun aynı ağda olduğundan emin olun</string>
     <string name="ready">Hazır</string>
     <string name="permission_settings">İzin ayarları</string>
-    <string name="web_address_hint">Aşağıdaki adreslerden herhangi birini bilgisayarınızın tarayıcısında açın.</string>
+    <string name="web_address_hint">Bilgisayarı ve telefonu aynı ağa bağlayın, ardından eşleşen adresi tarayıcınızda açın.</string>
     <string name="home_web_easy_hint">Başlamak için dokunun</string>
     <string name="home_web_easy_loading">Lütfen bekleyin…</string>
     <string name="home_web_easy_failed_title">Başlatılamadı</string>

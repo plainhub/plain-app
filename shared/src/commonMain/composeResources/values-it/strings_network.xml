@@ -78,7 +78,7 @@
     <string name="same_network_hint">Assicurati che il computer e il telefono siano sulla stessa rete</string>
     <string name="ready">Pronto</string>
     <string name="permission_settings">Impostazioni autorizzazioni</string>
-    <string name="web_address_hint">Apri uno degli indirizzi qui sotto nel browser del tuo computer.</string>
+    <string name="web_address_hint">Collega computer e telefono alla stessa rete, quindi apri l'indirizzo corrispondente nel tuo browser.</string>
     <string name="home_web_easy_hint">Tocca per avviare</string>
     <string name="home_web_easy_loading">Attendi…</string>
     <string name="home_web_easy_failed_title">Impossibile avviare</string>

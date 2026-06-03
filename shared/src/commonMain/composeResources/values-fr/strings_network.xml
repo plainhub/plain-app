@@ -78,7 +78,7 @@
     <string name="same_network_hint">Assurez-vous que votre ordinateur et votre téléphone sont sur le même réseau</string>
     <string name="ready">Prêt</string>
     <string name="permission_settings">Paramètres des autorisations</string>
-    <string name="web_address_hint">Ouvrez l'une des adresses ci-dessous dans le navigateur de votre ordinateur.</string>
+    <string name="web_address_hint">Connectez l'ordinateur et le téléphone au même réseau, puis ouvrez l'adresse correspondante dans votre navigateur.</string>
     <string name="home_web_easy_hint">Appuyez pour démarrer</string>
     <string name="home_web_easy_loading">Veuillez patienter…</string>
     <string name="home_web_easy_failed_title">Impossible de démarrer</string>

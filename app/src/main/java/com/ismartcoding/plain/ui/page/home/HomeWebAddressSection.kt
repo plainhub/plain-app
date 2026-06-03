@@ -137,7 +137,5 @@ fun HomeWebAddressSection(
                 }
             }
         }
-        VerticalSpace(8.dp)
-        Tips(text = stringResource(Res.string.same_network_hint))
     }
 }

@@ -36,7 +36,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 
 @Composable
 fun DlnaReceiverWaitingScreen() {
-    val deviceName = TempData.deviceName
+    val deviceName = TempData.deviceName.value
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {

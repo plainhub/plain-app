@@ -78,7 +78,7 @@
     <string name="same_network_hint">Убедитесь, что компьютер и телефон подключены к одной сети</string>
     <string name="ready">Готово</string>
     <string name="permission_settings">Настройки разрешений</string>
-    <string name="web_address_hint">Откройте любой адрес ниже в браузере на компьютере.</string>
+    <string name="web_address_hint">Подключите компьютер и телефон к одной сети, затем откройте соответствующий адрес в браузере.</string>
     <string name="home_web_easy_hint">Нажмите, чтобы начать</string>
     <string name="home_web_easy_loading">Пожалуйста, подождите…</string>
     <string name="home_web_easy_failed_title">Не удалось запустить</string>

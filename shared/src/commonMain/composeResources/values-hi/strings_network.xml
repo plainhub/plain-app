@@ -78,7 +78,7 @@
     <string name="same_network_hint">सुनिश्चित करें कि आपका कंप्यूटर और फ़ोन एक ही नेटवर्क पर हैं</string>
     <string name="ready">तैयार</string>
     <string name="permission_settings">अनुमति सेटिंग्स</string>
-    <string name="web_address_hint">नीचे दिए गए किसी भी पते को अपने कंप्यूटर के ब्राउज़र में खोलें।</string>
+    <string name="web_address_hint">कंप्यूटर और फ़ोन को एक ही नेटवर्क से कनेक्ट करें, फिर अपने ब्राउज़र में संबंधित पता खोलें।</string>
     <string name="home_web_easy_hint">शुरू करने के लिए टैप करें</string>
     <string name="home_web_easy_loading">कृपया प्रतीक्षा करें…</string>
     <string name="home_web_easy_failed_title">शुरू नहीं हो सका</string>

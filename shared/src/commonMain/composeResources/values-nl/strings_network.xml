@@ -78,7 +78,7 @@
     <string name="same_network_hint">Zorg dat je computer en telefoon met hetzelfde netwerk zijn verbonden</string>
     <string name="ready">Gereed</string>
     <string name="permission_settings">Machtigingsinstellingen</string>
-    <string name="web_address_hint">Open een van de onderstaande adressen in de browser op je computer.</string>
+    <string name="web_address_hint">Verbind de computer en telefoon met hetzelfde netwerk en open vervolgens het bijbehorende adres in je browser.</string>
     <string name="home_web_easy_hint">Tik om te starten</string>
     <string name="home_web_easy_loading">Even geduld…</string>
     <string name="home_web_easy_failed_title">Kon niet starten</string>

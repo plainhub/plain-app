@@ -33,6 +33,7 @@ import com.ismartcoding.plain.web.schemas.addMediaSchema
 import com.ismartcoding.plain.web.schemas.addNoteSchema
 import com.ismartcoding.plain.web.schemas.addNotificationSchema
 import com.ismartcoding.plain.web.schemas.addPackageSchema
+import com.ismartcoding.plain.web.schemas.addPairingSchema
 import com.ismartcoding.plain.web.schemas.addPomodoroSchema
 import com.ismartcoding.plain.web.schemas.addSchemaTypes
 import com.ismartcoding.plain.web.schemas.addScreenMirrorSchema
@@ -92,6 +93,7 @@ class MainGraphQL(val schema: Schema) {
                 addDataStoreSchema()
                 addDbSchema()
                 addBookmarkSchema()
+                addPairingSchema()
                 addSchemaTypes()
             }
         }

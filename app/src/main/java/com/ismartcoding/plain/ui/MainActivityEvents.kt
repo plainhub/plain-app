@@ -20,7 +20,7 @@ import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
-import com.ismartcoding.plain.events.PairingCancelledEvent
+import com.ismartcoding.plain.events.PairingCanceledEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
@@ -142,7 +142,9 @@ internal fun MainActivity.initEvents() {
                     openNew()
                 }
 
-                is PairingCancelledEvent -> pendingPairingEvent = null
+                is PairingCanceledEvent -> {
+                    pendingPairingEvent = null
+                }
                 is PairingSuccessEvent -> {
                     withIO { peerVM.loadPeers() }
                     navControllerState.value?.navigate(Routing.Chat("peer:${event.deviceId}")) { popUpTo<Routing.Nearby> { inclusive = true } }

@@ -15,12 +15,19 @@ data class DPairingRequest(
     val signaturePublicKey: String, // Raw Ed25519 signature public key (32 bytes, Base64 encoded)
     val timestamp: Long, // Timestamp for replay attack prevention
     val ips: List<String> = emptyList(), // All IP addresses of the requesting device
-    var signature: String = "" // Ed25519 signature of request content (Base64 encoded)
+    var signature: String = "", // Ed25519 signature of request content (Base64 encoded)
+    var fromIp: String = ""
 ) {
     fun toSignatureData(): String {
         return "$fromId|$fromName|$port|${deviceType.value}|$ecdhPublicKey|$signaturePublicKey|$timestamp|${ips.joinToString(",")}"
     }
 }
+
+@Serializable
+data class DPairingResult(
+    val deviceId: String,
+    val error: String = "",
+)
 
 @Serializable
 data class DPairingResponse(
@@ -33,7 +40,7 @@ data class DPairingResponse(
     val accepted: Boolean,
     val timestamp: Long, // Timestamp for replay attack prevention
     val ips: List<String> = emptyList(), // All IP addresses of the responding device
-    var signature: String  = ""// Ed25519 signature of response content (Base64 encoded)
+    var signature: String = ""// Ed25519 signature of response content (Base64 encoded)
 ) {
     fun toSignatureData(): String {
         return "$fromId|$toId|$port|${deviceType.value}|$ecdhPublicKey|$signaturePublicKey|$accepted|$timestamp|${ips.joinToString(",")}"

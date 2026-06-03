@@ -171,7 +171,6 @@ object PeerGraphQLClient {
             val responseBody = response.body.string()
 
             if (response.isSuccessful) {
-                LogCat.d("GraphQL response: $responseBody")
                 parseGraphQLResponse(responseBody)
             } else {
                 LogCat.e("GraphQL request failed: ${response.code} - $responseBody")

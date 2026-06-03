@@ -2,13 +2,18 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.data.DPairingResult
 import com.ismartcoding.plain.discover.NearbyPairManager
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

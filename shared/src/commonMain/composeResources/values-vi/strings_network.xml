@@ -78,7 +78,7 @@
     <string name="same_network_hint">Đảm bảo máy tính và điện thoại của bạn cùng một mạng</string>
     <string name="ready">Sẵn sàng</string>
     <string name="permission_settings">Cài đặt quyền</string>
-    <string name="web_address_hint">Mở một trong các địa chỉ bên dưới trên trình duyệt máy tính của bạn.</string>
+    <string name="web_address_hint">Kết nối máy tính và điện thoại vào cùng một mạng, sau đó mở địa chỉ tương ứng trong trình duyệt của bạn.</string>
     <string name="home_web_easy_hint">Nhấn để bắt đầu</string>
     <string name="home_web_easy_loading">Vui lòng chờ…</string>
     <string name="home_web_easy_failed_title">Không thể khởi động</string>
