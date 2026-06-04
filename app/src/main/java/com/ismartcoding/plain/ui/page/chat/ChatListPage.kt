@@ -108,7 +108,7 @@ fun ChatListPage(
                     itemsIndexed(items = channels.toList(), key = { _, i -> i.id }) { index, channel ->
                         PeerListItem(
                             title = channel.name,
-                            desc = stringResource(Res.string.channels),
+                            desc = "",
                             icon = Res.drawable.hash,
                             latestChat = peerVM.getLatestChat(channel.id),
                             onClick = {
