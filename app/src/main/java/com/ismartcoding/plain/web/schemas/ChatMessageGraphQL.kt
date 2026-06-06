@@ -2,6 +2,7 @@ package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.AppDatabase
@@ -9,9 +10,11 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.HRetryChatItemEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
 
@@ -42,8 +45,10 @@ fun SchemaBuilder.addChatMessageSchema() {
             } else if (isPeer && peer != null) {
                 ChatDbHelper.deliverToPeerAsync(item, peer)
             }
+            val model = item.toModel().apply { data = getContentData() }
+            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
             sendEvent(HMessageCreatedEvent(if (isChannel) channelId else if (isPeer) peerId else toId, arrayListOf(item)))
-            arrayListOf(item).map { it.toModel() }
+            arrayListOf(model)
         }
     }
     mutation("deleteChatItem") {
