@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.data.DScreenMirrorQuality
@@ -69,13 +70,21 @@ object UpdateInfoPreference : BasePreference<String>() {
     fun getValue(preferences: Preferences): DUpdateInfo {
         val str = get(preferences)
         if (str.isEmpty()) return DUpdateInfo()
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { DUpdateInfo() }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            DUpdateInfo()
+        }
     }
 
     suspend fun getValueAsync(): DUpdateInfo {
         val str = getAsync()
         if (str.isEmpty()) return DUpdateInfo()
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { DUpdateInfo() }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            DUpdateInfo()
+        }
     }
 
     suspend fun putAsync(value: DUpdateInfo) {
@@ -100,11 +109,21 @@ object ApiPermissionsPreference : BasePreference<Set<String>>() {
 object HttpPortPreference : BasePreference<Int>() {
     override val default = 8080
     override val key = intPreferencesKey("http_port")
+
+    override suspend fun putAsync(value: Int) {
+        super.putAsync(value)
+        TempData.httpPort.value = value
+    }
 }
 
 object HttpsPortPreference : BasePreference<Int>() {
     override val default = 8443
     override val key = intPreferencesKey("https_port")
+
+    override suspend fun putAsync(value: Int) {
+        super.putAsync(value)
+        TempData.httpsPort.value = value
+    }
 }
 
 object DarkThemePreference : BasePreference<Int>() {
@@ -130,6 +149,11 @@ object LanguagePreference : BasePreference<String>() {
 object WebPreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("web")
+
+    override suspend fun putAsync(value: Boolean) {
+        super.putAsync(value)
+        TempData.webEnabled.value = value
+    }
 }
 
 object DeveloperModePreference : BasePreference<Boolean>() {
@@ -145,6 +169,11 @@ object DeviceNamePreference : BasePreference<String>() {
 object HttpsPreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("https")
+
+    override suspend fun putAsync(value: Boolean) {
+        super.putAsync(value)
+        TempData.webHttps.value = value
+    }
 }
 
 object ScreenMirrorQualityPreference : BasePreference<String>() {
@@ -154,7 +183,11 @@ object ScreenMirrorQualityPreference : BasePreference<String>() {
     suspend fun getValueAsync(): DScreenMirrorQuality {
         val str = getAsync()
         if (str.isEmpty()) return DScreenMirrorQuality()
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { DScreenMirrorQuality() }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            DScreenMirrorQuality()
+        }
     }
 
     suspend fun putAsync(value: DScreenMirrorQuality) {
@@ -184,6 +217,11 @@ object AudioPlayModePreference : BasePreference<Int>() {
     fun getValue(preferences: Preferences): MediaPlayMode {
         val value = preferences[key]
         return MediaPlayMode.entries.find { it.ordinal == value } ?: MediaPlayMode.REPEAT
+    }
+
+    suspend fun putAsync(value: MediaPlayMode) {
+        super.putAsync(value.ordinal)
+        TempData.audioPlayMode.value = value
     }
 }
 
@@ -259,7 +297,11 @@ object LastFilePathPreference : BasePreference<String>() {
     suspend fun getValueAsync(): FilePathData {
         val str = getAsync()
         if (str.isEmpty()) return FilePathData("", "", "")
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { FilePathData("", "", "") }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            FilePathData("", "", "")
+        }
     }
 
     suspend fun putAsync(data: FilePathData) {
@@ -274,7 +316,11 @@ object FavoriteFoldersPreference : BasePreference<String>() {
     suspend fun getValueAsync(): List<DFavoriteFolder> {
         val str = getAsync()
         if (str.isEmpty()) return listOf()
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { listOf() }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            listOf()
+        }
     }
 
     suspend fun putAsync(value: List<DFavoriteFolder>) {
@@ -308,7 +354,11 @@ object ScanHistoryPreference : BasePreference<String>() {
     suspend fun getValueAsync(): List<String> {
         val str = getAsync()
         if (str.isEmpty()) return listOf()
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { listOf() }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            listOf()
+        }
     }
 
     suspend fun putAsync(value: List<String>) {
@@ -364,7 +414,11 @@ object NotificationFilterPreference : BasePreference<String>() {
     suspend fun getValueAsync(): NotificationFilterData {
         val str = getAsync()
         if (str.isEmpty()) return NotificationFilterData()
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { NotificationFilterData() }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            NotificationFilterData()
+        }
     }
 
     suspend fun putAsync(data: NotificationFilterData) {
@@ -400,7 +454,11 @@ object PomodoroSettingsPreference : BasePreference<String>() {
     suspend fun getValueAsync(): DPomodoroSettings {
         val str = getAsync()
         if (str.isEmpty()) return DPomodoroSettings()
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { DPomodoroSettings() }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            DPomodoroSettings()
+        }
     }
 
     suspend fun putAsync(value: DPomodoroSettings) {
@@ -420,7 +478,11 @@ object VideoPlaylistPreference : BasePreference<String>() {
     suspend fun getValueAsync(): List<DVideo> {
         val str = getAsync()
         if (str.isEmpty()) return listOf()
-        return try { preferencesJson.decodeFromString(str) } catch (_: Exception) { listOf() }
+        return try {
+            preferencesJson.decodeFromString(str)
+        } catch (_: Exception) {
+            listOf()
+        }
     }
 
     suspend fun putAsync(value: List<DVideo>) {

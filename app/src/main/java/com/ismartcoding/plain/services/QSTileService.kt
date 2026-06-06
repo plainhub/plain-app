@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.services
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
@@ -71,7 +70,7 @@ class QSTileService : TileService() {
         stateCheckJob = serviceScope.launch(Dispatchers.IO) {
             try {
                 // First check if webEnabled is true in TempData
-                if (TempData.webEnabled) {
+                if (TempData.webEnabled.value) {
                     val serverUp = HttpServerManager.checkServerAsync()
                     if (serverUp) {
                         withContext(Dispatchers.Main.immediate) {

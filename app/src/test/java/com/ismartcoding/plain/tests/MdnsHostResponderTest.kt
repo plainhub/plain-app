@@ -39,16 +39,6 @@ class MdnsHostResponderTest {
     @Test fun `blank string returns empty`() =
         assertEquals("", MdnsHostResponder.normalizeHostname("   "))
 
-    // ── isMobileDataInterface ─────────────────────────────────────────────────
-
-    @Test fun `rmnet_data0 is mobile data`() = assertTrue(isMobileDataInterface("rmnet_data0"))
-    @Test fun `rmnet0 is mobile data`() = assertTrue(isMobileDataInterface("rmnet0"))
-    @Test fun `ccmni0 is mobile data`() = assertTrue(isMobileDataInterface("ccmni0"))
-    @Test fun `wlan0 is not mobile data`() = assertFalse(isMobileDataInterface("wlan0"))
-    @Test fun `ap0 is not mobile data`() = assertFalse(isMobileDataInterface("ap0"))
-    @Test fun `eth0 is not mobile data`() = assertFalse(isMobileDataInterface("eth0"))
-    @Test fun `wlan1 is not mobile data`() = assertFalse(isMobileDataInterface("wlan1"))
-
     // ── ipToInt ───────────────────────────────────────────────────────────────
 
     @Test fun `192 168 1 1 converts correctly`() {

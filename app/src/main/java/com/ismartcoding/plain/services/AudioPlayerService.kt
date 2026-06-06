@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.services
-import com.ismartcoding.plain.preferences.*
 
 import android.app.PendingIntent
 import android.content.Intent

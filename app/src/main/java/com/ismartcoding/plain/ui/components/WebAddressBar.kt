@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,7 +18,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.models.MainViewModel
@@ -30,7 +29,7 @@ fun WebAddressBar(
     mainVM: MainViewModel,
     isHttps: Boolean,
 ) {
-    val port = if (isHttps) TempData.httpsPort else TempData.httpPort
+    val port = if (isHttps) TempData.httpsPort.collectAsState() else TempData.httpPort.collectAsState()
     var portDialogVisible by remember { mutableStateOf(false) }
     var qrCodeDialogVisible by remember { mutableStateOf(false) }
     var mdnsEditDialogVisible by remember { mutableStateOf(false) }
@@ -49,7 +48,7 @@ fun WebAddressBar(
             .padding(vertical = 8.dp),
     ) {
         for (ip in ip4s) {
-            val url = "${if (isHttps) "https" else "http"}://$ip:${port}"
+            val url = "${if (isHttps) "https" else "http"}://$ip:${port.value}"
             Row(
                 modifier = Modifier.height(40.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -77,11 +76,11 @@ fun WebAddressBar(
         MdnsAndPortEditDialog(
             isHttps = isHttps,
             currentHostname = hostname,
-            currentPort = port,
+            currentPort = port.value,
             onDismiss = { mdnsEditDialogVisible = false },
             onSave = { newHostname, newPort ->
                 val hostnameChanged = newHostname != hostname
-                val portChanged = newPort != port
+                val portChanged = newPort != port.value
                 if (hostnameChanged) {
                     hostname = newHostname
                     TempData.mdnsHostname = newHostname
@@ -101,7 +100,7 @@ fun WebAddressBar(
     if (portDialogVisible) {
         PortSelectionDialog(
             isHttps = isHttps,
-            currentPort = port,
+            currentPort = port.value,
             onDismiss = { portDialogVisible = false },
             onSelect = {
                 persistPort(context, scope, isHttps, it)

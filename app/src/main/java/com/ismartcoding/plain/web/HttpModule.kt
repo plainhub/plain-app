@@ -1,11 +1,9 @@
 package com.ismartcoding.plain.web
-import com.ismartcoding.plain.preferences.*
 
 import android.annotation.SuppressLint
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.preferences.PasswordTypePreference
@@ -94,7 +92,7 @@ object HttpModule {
             if (call.request.path() == "/health") {
                 return@intercept
             }
-            if (!TempData.webEnabled) {
+            if (!TempData.webEnabled.value) {
                 call.respond(HttpStatusCode.NotFound)
                 return@intercept finish()
             }
@@ -174,7 +172,7 @@ object HttpModule {
                     call.respond(HttpStatusCode.BadRequest, "`c-id` is missing in the headers")
                     return@post
                 }
-                if (!TempData.webEnabled) {
+                if (!TempData.webEnabled.value) {
                     call.respond(HttpStatusCode.Forbidden, "web_access_disabled")
                     return@post
                 }

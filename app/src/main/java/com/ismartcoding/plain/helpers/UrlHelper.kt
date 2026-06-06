@@ -15,25 +15,25 @@ object UrlHelper {
         val id = System.currentTimeMillis().toString()
         mediaPathMap[id] = path
         val extension = path.getFilenameExtension()
-        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/media/$id.$extension"
+        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort.value}/media/$id.$extension"
     }
 
     fun getAlbumArtHttpUrl(albumUri: Uri): String {
         val id = "art_${System.currentTimeMillis()}"
         mediaPathMap[id] = albumUri.toString()
-        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/media/$id.jpg"
+        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort.value}/media/$id.jpg"
     }
 
     fun getCastCallbackUrl(): String {
-        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/callback/cast"
+        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort.value}/callback/cast"
     }
 
     fun getHealthCheckUrl(): String {
-        return "http://localhost:${TempData.httpPort}/health"
+        return "http://localhost:${TempData.httpPort.value}/health"
     }
 
     fun getShutdownUrl(): String {
-        return "http://localhost:${TempData.httpPort}/shutdown"
+        return "http://localhost:${TempData.httpPort.value}/shutdown"
     }
 
     fun getMediaPath(id: String): String {

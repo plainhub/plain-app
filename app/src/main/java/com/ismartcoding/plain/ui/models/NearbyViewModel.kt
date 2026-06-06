@@ -103,7 +103,7 @@ class NearbyViewModel : ViewModel() {
         return DQrPairData(
             id = TempData.clientId,
             name = TempData.deviceName.value,
-            port = TempData.httpsPort,
+            port = TempData.httpsPort.value,
             deviceType = PhoneHelper.getDeviceType(context),
             ips = allIps,
         )

@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.audio
-import com.ismartcoding.plain.preferences.*
 
 import android.content.ComponentName
 import android.content.Context
@@ -12,7 +11,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.events.AudioActionEvent

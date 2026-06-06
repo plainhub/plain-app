@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.preferences
 
-import android.content.Context
 import android.os.LocaleList
 import android.util.Base64
 import androidx.appcompat.app.AppCompatDelegate
@@ -13,11 +12,7 @@ import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.helpers.PhoneHelper
 import java.util.Locale
-
-// ── DarkThemePreference ──────────────────────────────────────────────────────
-// DarkTheme type ≠ Int (stored type), so this extension is unambiguous.
 
 fun DarkThemePreference.setDarkMode(theme: DarkTheme) {
     when (theme) {
@@ -57,33 +52,15 @@ suspend fun LanguagePreference.putAsync(locale: Locale?) {
     Language.setLocale(MainApp.instance, locale ?: LocaleList.getDefault().get(0))
 }
 
-// ── WebPreference ────────────────────────────────────────────────────────────
-// Note: TempData.webEnabled must be updated at call sites after putAsync.
-
-// ── HttpsPreference ──────────────────────────────────────────────────────────
-// Note: TempData.webHttps must be updated at call sites after putAsync.
-
-// ── AudioPlayModePreference ──────────────────────────────────────────────────
-// MediaPlayMode ≠ Int, no ambiguity.
-
-suspend fun AudioPlayModePreference.putAsync(value: MediaPlayMode) {
-    putAsync(value.ordinal)   // calls base member putAsync(Int)
-    TempData.audioPlayMode.value = value
-}
 
 suspend fun AudioPlayModePreference.getValueAsync(): MediaPlayMode =
     MediaPlayMode.entries.getOrElse(getAsync()) { MediaPlayMode.REPEAT }
-
-// ── ApiPermissionsPreference ─────────────────────────────────────────────────
-// 2-param overload, unambiguous.
 
 suspend fun ApiPermissionsPreference.putAsync(permission: Permission, enable: Boolean) {
     val permissions = getAsync().toMutableSet()
     if (enable) permissions.add(permission.name) else permissions.remove(permission.name)
     putAsync(permissions)   // calls base member putAsync(Set<String>)
 }
-
-// ── AdbTokenPreference ───────────────────────────────────────────────────────
 
 suspend fun AdbTokenPreference.ensureValueAsync(preferences: Preferences) {
     TempData.adbToken = get(preferences)
@@ -147,8 +124,6 @@ suspend fun KeyStorePasswordPreference.ensureValueAsync(preferences: Preferences
 suspend fun KeyStorePasswordPreference.resetAsync() {
     putAsync(StringHelper.shortUUID())
 }
-
-// ── MdnsHostnamePreference ───────────────────────────────────────────────────
 
 suspend fun MdnsHostnamePreference.ensureValueAsync(preferences: Preferences) {
     val stored = preferences[key]

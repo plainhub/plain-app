@@ -10,7 +10,6 @@ import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.DSession
@@ -131,7 +130,7 @@ class MainGraphQL(val schema: Schema) {
             pipeline.routing {
                 route("/graphql") {
                     post {
-                        if (!TempData.webEnabled) {
+                        if (!TempData.webEnabled.value) {
                             call.respond(HttpStatusCode.Forbidden)
                             return@post
                         }

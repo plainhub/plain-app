@@ -8,7 +8,6 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.toPeerMessageContent
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.routing.RoutingCall
 import kotlin.math.abs
 
 data class PeerChatParseResult(val code: HttpStatusCode, val content: String? = null)

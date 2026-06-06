@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.home
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import android.content.Context
@@ -14,11 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,7 +27,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -37,7 +35,6 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.preferences.HttpsPreference
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconTextButton
-import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.WebAddressBar
 import com.ismartcoding.plain.ui.helpers.WebHelper
@@ -52,10 +49,10 @@ fun HomeWebAddressSection(
     mainVM: MainViewModel,
     isError: Boolean
 ) {
-    var isHttps by remember { mutableStateOf(TempData.webHttps) }
+    val isHttps = TempData.webHttps.collectAsState()
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(
-        initialPage = if (isHttps) 1 else 0,
+        initialPage = if (isHttps.value) 1 else 0,
         pageCount = { 2 },
     )
     var showStayOnlineOverlay by remember { mutableStateOf(false) }
@@ -67,8 +64,7 @@ fun HomeWebAddressSection(
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->
             val https = page == 1
-            if (isHttps != https) {
-                isHttps = https
+            if (isHttps.value != https) {
                 scope.launch { HttpsPreference.putAsync(https) }
             }
         }

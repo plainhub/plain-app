@@ -209,7 +209,7 @@ class PeerGraphQL(val schema: Schema) {
             pipeline.routing {
                 route("/peer_graphql") {
                     post {
-                        if (!TempData.webEnabled) {
+                        if (!TempData.webEnabled.value) {
                             call.respond(HttpStatusCode.Forbidden)
                             return@post
                         }

@@ -6,6 +6,7 @@ import android.os.Bundle
 import com.ismartcoding.lib.kgraphql.GraphQLError
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.HCancelNotificationsEvent
@@ -30,7 +31,7 @@ fun SchemaBuilder.addNotificationSchema() {
     }
     mutation("replyNotification") {
         resolver { id: ID, actionIndex: Int, text: String ->
-            val actions = TempData.notificationActions[id.value]
+            val actions = AndroidTempData.notificationActions[id.value]
                 ?: throw GraphQLError("notification_not_found")
             // Only consider reply-capable actions (those with remoteInputs)
             val replyActions = actions.filter { it.remoteInputs != null && it.remoteInputs.isNotEmpty() }

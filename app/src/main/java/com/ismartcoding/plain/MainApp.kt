@@ -1,5 +1,4 @@
 package com.ismartcoding.plain
-import com.ismartcoding.plain.preferences.*
 
 import android.app.Application
 import android.os.Build
@@ -41,7 +40,6 @@ import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.preferences.initDataStore
 import com.ismartcoding.plain.preferences.FidUriExtMigratedPreference
 import com.ismartcoding.plain.ai.ImageSearchManager
-import com.ismartcoding.plain.features.dlna.receiver.DlnaRenderer
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.chat.ChatCacheManager
@@ -105,10 +103,10 @@ class MainApp : Application() {
 
         coIO {
             val preferences = getPreferencesAsync()
-            TempData.webEnabled = WebPreference.get(preferences)
-            TempData.webHttps = HttpsPreference.get(preferences)
-            TempData.httpPort = HttpPortPreference.get(preferences)
-            TempData.httpsPort = HttpsPortPreference.get(preferences)
+            TempData.webEnabled.value = WebPreference.get(preferences)
+            TempData.webHttps.value = HttpsPreference.get(preferences)
+            TempData.httpPort.value = HttpPortPreference.get(preferences)
+            TempData.httpsPort.value = HttpsPortPreference.get(preferences)
             TempData.audioPlayMode.value = AudioPlayModePreference.getValue(preferences)
             AdbTokenPreference.ensureValueAsync(preferences)
             TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync()
@@ -123,7 +121,7 @@ class MainApp : Application() {
             MdnsHostnamePreference.ensureValueAsync(preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
-            if (TempData.webEnabled && PlugInControlReceiver.isUSBConnected(this@MainApp)) {
+            if (TempData.webEnabled.value && PlugInControlReceiver.isUSBConnected(this@MainApp)) {
                 sendEvent(PowerConnectedEvent())
             }
             if (PasswordPreference.get(preferences).isEmpty()) {

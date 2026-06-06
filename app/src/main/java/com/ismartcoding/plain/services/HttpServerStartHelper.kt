@@ -31,9 +31,9 @@ object HttpServerStartHelper {
         HttpServerManager.httpServerError = ""
 
         HttpServerManager.stopPreviousServer()
-        if (PortHelper.isPortInUse(TempData.httpPort) || PortHelper.isPortInUse(TempData.httpsPort)) {
+        if (PortHelper.isPortInUse(TempData.httpPort.value) || PortHelper.isPortInUse(TempData.httpsPort.value)) {
             LogCat.d("Ports still in use after stopping previous server, waiting...")
-            HttpServerManager.waitForPortsAvailable(TempData.httpPort, TempData.httpsPort)
+            HttpServerManager.waitForPortsAvailable(TempData.httpPort.value, TempData.httpsPort.value)
             attemptServerStart(1)
         } else {
             attemptServerStart(2)
@@ -67,7 +67,7 @@ object HttpServerStartHelper {
                     if (attempt < maxRetries) {
                         HttpServerManager.stopPreviousServer()
                         HttpServerManager.waitForPortsAvailable(
-                            TempData.httpPort, TempData.httpsPort, maxWaitMs = 3000,
+                            TempData.httpPort.value, TempData.httpsPort.value, maxWaitMs = 3000,
                         )
                     }
                 } else {
@@ -82,7 +82,7 @@ object HttpServerStartHelper {
     ) {
         HttpServerManager.httpServerError = ""
         HttpServerManager.portsInUse.clear()
-        NsdHelper.registerServices(service, httpPort = TempData.httpPort, httpsPort = TempData.httpsPort)
+        NsdHelper.registerServices(service, httpPort = TempData.httpPort.value, httpsPort = TempData.httpsPort.value)
         onStateChanged(HttpServerState.ON)
         sendEvent(HttpServerStateChangedEvent(HttpServerState.ON))
         PNotificationListenerService.toggle(service, Permission.NOTIFICATION_LISTENER.isEnabledAsync(service))
@@ -100,8 +100,8 @@ object HttpServerStartHelper {
 
         if (!serverWasRunning) {
             // Server never started — check if ports are occupied by another process.
-            if (PortHelper.isPortInUse(TempData.httpPort)) HttpServerManager.portsInUse.add(TempData.httpPort)
-            if (PortHelper.isPortInUse(TempData.httpsPort)) HttpServerManager.portsInUse.add(TempData.httpsPort)
+            if (PortHelper.isPortInUse(TempData.httpPort.value)) HttpServerManager.portsInUse.add(TempData.httpPort.value)
+            if (PortHelper.isPortInUse(TempData.httpsPort.value)) HttpServerManager.portsInUse.add(TempData.httpsPort.value)
         }
         HttpServerManager.httpServerError = when {
             HttpServerManager.portsInUse.isNotEmpty() -> LocaleHelper.getStringSyncF(

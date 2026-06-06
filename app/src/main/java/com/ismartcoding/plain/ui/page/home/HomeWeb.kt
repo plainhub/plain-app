@@ -51,17 +51,15 @@ fun HomeWeb(
     val onRestartFix: () -> Unit = {
         scope.launch {
             withIO {
-                if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
+                if (HttpServerManager.portsInUse.contains(TempData.httpPort.value)) {
                     val nextHttp =
-                        HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random()
+                        HttpServerManager.httpPorts.filter { it != TempData.httpPort.value }.random()
                     HttpPortPreference.putAsync(nextHttp)
-                    TempData.httpPort = nextHttp
                 }
-                if (HttpServerManager.portsInUse.contains(TempData.httpsPort)) {
+                if (HttpServerManager.portsInUse.contains(TempData.httpsPort.value)) {
                     val nextHttps =
-                        HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random()
+                        HttpServerManager.httpsPorts.filter { it != TempData.httpsPort.value }.random()
                     HttpsPortPreference.putAsync(nextHttps)
-                    TempData.httpsPort = nextHttps
                 }
             }
             AppHelper.relaunch(context)

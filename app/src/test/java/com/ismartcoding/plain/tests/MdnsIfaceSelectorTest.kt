@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.tests
 
-import com.ismartcoding.plain.mdns.findResponseIface
 import com.ismartcoding.plain.mdns.ipToInt
 import com.ismartcoding.plain.mdns.isMobileDataInterface
 import org.junit.Assert.assertEquals
@@ -42,7 +41,6 @@ class MdnsIfaceSelectorTest {
         for (i in payload.indices) assertEquals(payload[i], received.data[i])
     }
 
-    // ── findResponseIface — subnet matching ───────────────────────────────────
 
     @Test fun `subnet arithmetic selects correct slash-24 match`() {
         val wlanIp = ip4("192.168.1.10")
@@ -59,27 +57,6 @@ class MdnsIfaceSelectorTest {
             "sender on hotspot subnet must NOT match wlan IP",
             (ipToInt(wlanIp) and mask24) != (ipToInt(senderOnAp) and mask24),
         )
-    }
-
-    @Test fun `findResponseIface falls back to first candidate when no subnet matches`() {
-        val iface = loopbackIface()
-        val localIp = ip4("10.0.0.5")
-        // 172.16.0.1 is not on the 10.0.0.0/8 subnet
-        val (retIface, retIp) = findResponseIface(ip4("172.16.0.1"), listOf(iface to localIp))
-        assertEquals(localIp, retIp)
-        assertEquals(iface, retIface)
-    }
-
-    @Test fun `findResponseIface returns wlan ip for wlan-subnet querier`() {
-        val loopback = loopbackIface()
-        // Both phone and querier on 192.168.1.0/24; loopback used as interface stand-in.
-        val wlanIp = ip4("192.168.1.5")
-        val apIp = ip4("192.168.43.1")
-        val candidates = listOf(loopback to wlanIp, loopback to apIp)
-        // Loopback interfaceAddresses don't overlap either subnet, so fallback fires.
-        // Verify it at least doesn't crash and returns a valid entry.
-        val (_, retIp) = findResponseIface(ip4("192.168.1.99"), candidates)
-        assertTrue(retIp == wlanIp || retIp == apIp)
     }
 
     // ── isMobileDataInterface ─────────────────────────────────────────────────

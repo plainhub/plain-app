@@ -34,9 +34,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DVideoPlayProgress
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.ui.components.mediaviewer.*
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
 
 @kotlin.OptIn(ExperimentalFoundationApi::class)

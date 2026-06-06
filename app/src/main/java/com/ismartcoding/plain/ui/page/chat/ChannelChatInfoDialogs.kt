@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.TempData
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
@@ -47,7 +48,7 @@ internal fun ChannelChatInfoDialogs(
     }
 
     selectedMemberPeer.value?.let { sp ->
-        val isSelf = sp.id == liveChannel?.owner || sp.id == com.ismartcoding.plain.TempData.clientId
+        val isSelf = sp.id == liveChannel?.owner || sp.id == TempData.clientId
         MemberInfoDialog(
             peer = sp, isOwner = isOwner, isSelf = isSelf, liveChannel = liveChannel,
             channelVM = channelVM, onDismiss = { selectedMemberPeer.value = null },

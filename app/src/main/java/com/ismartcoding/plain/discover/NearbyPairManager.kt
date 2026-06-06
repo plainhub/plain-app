@@ -87,7 +87,7 @@ object NearbyPairManager {
             val request = DPairingRequest(
                 fromId = TempData.clientId,
                 fromName = deviceName,
-                port = TempData.httpsPort,
+                port = TempData.httpsPort.value,
                 deviceType = PhoneHelper.getDeviceType(context),
                 ecdhPublicKey = ecdhPublicKey,
                 signaturePublicKey = signaturePublicKey,
@@ -150,7 +150,7 @@ object NearbyPairManager {
                 val response = DPairingResponse(
                     fromId = TempData.clientId,
                     toId = request.fromId,
-                    port = TempData.httpsPort,
+                    port = TempData.httpsPort.value,
                     deviceType = PhoneHelper.getDeviceType(MainApp.instance),
                     ecdhPublicKey = ecdhPublicKey,
                     signaturePublicKey = signaturePublicKey,
@@ -189,7 +189,7 @@ object NearbyPairManager {
                 val response = DPairingResponse(
                     fromId = TempData.clientId,
                     toId = request.fromId,
-                    port = TempData.httpsPort,
+                    port = TempData.httpsPort.value,
                     deviceType = request.deviceType,
                     ecdhPublicKey = "",
                     signaturePublicKey = signaturePublicKey,

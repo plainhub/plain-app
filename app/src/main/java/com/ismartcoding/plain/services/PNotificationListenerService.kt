@@ -12,6 +12,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.activityManager
@@ -60,17 +61,17 @@ class PNotificationListenerService : NotificationListenerService() {
     override fun onNotificationPosted(statusBarNotification: StatusBarNotification) {
         if (isValidNotification(statusBarNotification)) {
             val n = statusBarNotification.toDNotification()
-            val old = TempData.notifications.find { it.id == n.id }
+            val old = AndroidTempData.notifications.find { it.id == n.id }
             if (old != null) {
-                TempData.notifications.remove(old)
+                AndroidTempData.notifications.remove(old)
             }
-            TempData.notifications.add(n)
+            AndroidTempData.notifications.add(n)
             // Store raw actions for reply support
             val rawActions = statusBarNotification.notification.actions
             if (rawActions != null) {
-                TempData.notificationActions[n.id] = rawActions
+                AndroidTempData.notificationActions[n.id] = rawActions
             } else {
-                TempData.notificationActions.remove(n.id)
+                AndroidTempData.notificationActions.remove(n.id)
             }
             coIO {
                 val enable = Permission.NOTIFICATION_LISTENER.isEnabledAsync(applicationContext)
@@ -93,10 +94,10 @@ class PNotificationListenerService : NotificationListenerService() {
 
     override fun onNotificationRemoved(statusBarNotification: StatusBarNotification) {
         if (isValidNotification(statusBarNotification)) {
-            val old = TempData.notifications.find { it.id == statusBarNotification.key }
+            val old = AndroidTempData.notifications.find { it.id == statusBarNotification.key }
             if (old != null) {
-                TempData.notifications.remove(old)
-                TempData.notificationActions.remove(old.id)
+                AndroidTempData.notifications.remove(old)
+                AndroidTempData.notificationActions.remove(old.id)
                 sendEvent(
                     WebSocketEvent(
                         EventType.NOTIFICATION_DELETED,
@@ -116,15 +117,15 @@ class PNotificationListenerService : NotificationListenerService() {
         try {
             val notifications = activeNotifications
             if (notifications != null) {
-                TempData.notifications.clear()
-                TempData.notificationActions.clear()
+                AndroidTempData.notifications.clear()
+                AndroidTempData.notificationActions.clear()
                 for (notification in notifications) {
                     if (isValidNotification(notification)) {
                         val n = notification.toDNotification()
-                        TempData.notifications.add(n)
+                        AndroidTempData.notifications.add(n)
                         val rawActions = notification.notification.actions
                         if (rawActions != null) {
-                            TempData.notificationActions[n.id] = rawActions
+                            AndroidTempData.notificationActions[n.id] = rawActions
                         }
                     }
                 }
@@ -151,9 +152,9 @@ class PNotificationListenerService : NotificationListenerService() {
                 }
                 
                 try {
-                    if (event.ids.size == TempData.notifications.size) {
+                    if (event.ids.size == AndroidTempData.notifications.size) {
                         cancelAllNotifications()
-                        TempData.notifications.clear()
+                        AndroidTempData.notifications.clear()
                     } else {
                         event.ids.forEach { id ->
                             try {

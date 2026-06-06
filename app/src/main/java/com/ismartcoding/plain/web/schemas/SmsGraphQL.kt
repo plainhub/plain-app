@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.web.schemas
 
 import android.webkit.MimeTypeMap
+import com.ismartcoding.plain.features.sms.DPendingMms
 import com.ismartcoding.lib.kgraphql.GraphQLError
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.DPendingMms
+import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.DataType
@@ -136,7 +137,7 @@ fun SchemaBuilder.addSmsSchema() {
                     launchTimeSec = launchTimeSec,
                     createdAt = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
                 )
-                TempData.pendingMmsMessages.add(pendingEntry)
+                AndroidTempData.pendingMmsMessages.add(pendingEntry)
                 sendEvent(HStartMmsPollingEvent(pendingId, launchTimeSec, resolvedAttachments.map { it.first }))
                 pendingId
             } catch (e: Exception) {

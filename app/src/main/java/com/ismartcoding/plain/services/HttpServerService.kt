@@ -48,8 +48,8 @@ class HttpServerService : LifecycleService() {
             context = this,
             isActive = { serverState == HttpServerState.ON },
             hostnameProvider = { TempData.mdnsHostname },
-            httpPortProvider = { TempData.httpPort },
-            httpsPortProvider = { TempData.httpsPort },
+            httpPortProvider = { TempData.httpPort.value },
+            httpsPortProvider = { TempData.httpsPort.value },
         ).also { it.start() }
 
         lifecycle.addObserver(object : LifecycleEventObserver {

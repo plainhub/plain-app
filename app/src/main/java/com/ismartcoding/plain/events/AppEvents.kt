@@ -10,6 +10,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice
@@ -318,7 +319,7 @@ object AppEvents {
                                     null
                                 )?.use { cursor -> cursor.count > 0 } ?: false
                                 if (found) {
-                                    TempData.pendingMmsMessages.removeIf { it.id == event.pendingId }
+                                    AndroidTempData.pendingMmsMessages.removeIf { it.id == event.pendingId }
                                     event.attachmentPaths.forEach { path ->
                                         try {
                                             java.io.File(path).delete()

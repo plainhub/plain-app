@@ -25,7 +25,6 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
-import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -135,7 +134,7 @@ object NearbyDiscoverManager {
             id = TempData.clientId,
             name = TempData.deviceName.value,
             deviceType = PhoneHelper.getDeviceType(MainApp.instance),
-            port = TempData.httpsPort,
+            port = TempData.httpsPort.value,
             version = BuildConfig.VERSION_NAME,
             platform = "android",
             ips = NetworkHelper.getDeviceIP4s().toList(),

@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.web
-import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import android.content.Intent
@@ -11,7 +10,6 @@ import com.ismartcoding.lib.helpers.JksHelper
 import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
@@ -29,7 +27,6 @@ import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.applicationEnvironment
@@ -117,7 +114,7 @@ object HttpServerManager {
 
     fun getNotificationContent(): String {
         val ip = TempData.mdnsHostname
-        return "http://$ip:${TempData.httpPort}\nhttps://$ip:${TempData.httpsPort}"
+        return "http://$ip:${TempData.httpPort.value}\nhttps://$ip:${TempData.httpsPort.value}"
     }
 
     suspend fun stopServiceAsync(context: Context) {
@@ -268,8 +265,8 @@ object HttpServerManager {
     suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         val password = KeyStorePasswordPreference.getAsync()
         val passwordArray = password.toCharArray()
-        val httpPort = TempData.httpPort
-        val httpsPort = TempData.httpsPort
+        val httpPort = TempData.httpPort.value
+        val httpsPort = TempData.httpsPort.value
         val environment = applicationEnvironment {
             log = LoggerFactory.getLogger("ktor.application")
         }

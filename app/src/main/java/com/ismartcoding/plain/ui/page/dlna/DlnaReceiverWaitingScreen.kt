@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.dlna
 
 import com.ismartcoding.plain.i18n.*
-import android.os.Build
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
