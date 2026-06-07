@@ -34,6 +34,8 @@ built-in HTTP server by name.
 - Re-fetch `candidateInterfaces()` to pick the correct local IP for the A record.
 - `MdnsPacketCodec.buildResponseIfMatch()` — returns `null` if the query is not for our hostname.
 - Send response via the **same** MulticastSocket (source port = 5353, RFC 6762 §6.7).
+  QU/legacy-unicast queries are replied to the querier address/port; ordinary
+  multicast queries are replied to `224.0.0.251:5353`.
 - Log each sent reply for diagnostics.
 
 ### Re-registration
@@ -232,7 +234,7 @@ When a user reports "mDNS not working", check the log for:
 
 1. `mDNS joined <iface> (<ip>)` — did the multicast group join succeed?
 2. `mDNS responder started for <hostname> on N interface(s)` — is the responder running?
-3. `mDNS reply <hostname> → <ip> to <querier>` — is the responder answering queries?
+3. `mDNS reply <hostname> → <ip> from <querier>:<port> ... dest=<addr>:<port>` — is the responder answering queries, and did it choose unicast or multicast?
 4. `mDNS re-register (...)` — is the responder being restarted excessively?
 
 If (1) and (2) succeed but (3) never appears, possible causes:

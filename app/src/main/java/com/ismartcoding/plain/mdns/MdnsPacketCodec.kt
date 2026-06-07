@@ -15,7 +15,13 @@ internal object MdnsPacketCodec {
         query: ByteArray,
         hostname: String,
         ips: List<Inet4Address>,
-    ): ByteArray? {
+    ): ByteArray? = buildResponseIfMatchDetails(query, hostname, ips)?.bytes
+
+    fun buildResponseIfMatchDetails(
+        query: ByteArray,
+        hostname: String,
+        ips: List<Inet4Address>,
+    ): MdnsResponse? {
         if (query.size < 12 || ips.isEmpty()) return null
 
         val flags = readU16(query, 2)
@@ -26,7 +32,8 @@ internal object MdnsPacketCodec {
         if (qdCount <= 0) return null
 
         var offset = 12
-        var matched = false
+        val questions = mutableListOf<MdnsQuestion>()
+        val matchedQuestions = mutableListOf<MdnsQuestion>()
         repeat(qdCount) {
             val parsed = readName(query, offset) ?: return null
             val qname = parsed.first
@@ -34,7 +41,15 @@ internal object MdnsPacketCodec {
             if (offset + 4 > query.size) return null
 
             val qtype = readU16(query, offset)
-            val qclass = readU16(query, offset + 2) and 0x7FFF
+            val qclassRaw = readU16(query, offset + 2)
+            val qclass = qclassRaw and 0x7FFF
+            val question = MdnsQuestion(
+                name = qname,
+                qtype = qtype,
+                qclass = qclass,
+                unicastResponseRequested = qclassRaw and 0x8000 != 0,
+            )
+            questions.add(question)
             offset += 4
 
             if (
@@ -42,10 +57,10 @@ internal object MdnsPacketCodec {
                 qclass == DNS_CLASS_IN &&
                 (qtype == DNS_TYPE_A || qtype == DNS_TYPE_ANY)
             ) {
-                matched = true
+                matchedQuestions.add(question)
             }
         }
-        if (!matched) return null
+        if (matchedQuestions.isEmpty()) return null
 
         val nameBytes = encodeName(hostname)
         val out = ByteArrayOutputStream()
@@ -64,7 +79,7 @@ internal object MdnsPacketCodec {
             writeU16(out, 4)
             out.write(ip.address)
         }
-        return out.toByteArray()
+        return MdnsResponse(out.toByteArray(), questions, matchedQuestions)
     }
 
     private fun encodeName(name: String): ByteArray {
@@ -120,4 +135,20 @@ internal object MdnsPacketCodec {
         out.write((value ushr 8) and 0xFF)
         out.write(value and 0xFF)
     }
+}
+
+internal data class MdnsQuestion(
+    val name: String,
+    val qtype: Int,
+    val qclass: Int,
+    val unicastResponseRequested: Boolean,
+)
+
+internal data class MdnsResponse(
+    val bytes: ByteArray,
+    val questions: List<MdnsQuestion>,
+    val matchedQuestions: List<MdnsQuestion>,
+) {
+    val unicastResponseRequested: Boolean
+        get() = matchedQuestions.any { it.unicastResponseRequested }
 }

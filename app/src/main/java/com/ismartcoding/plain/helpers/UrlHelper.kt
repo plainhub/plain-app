@@ -29,11 +29,15 @@ object UrlHelper {
     }
 
     fun getHealthCheckUrl(): String {
-        return "http://localhost:${TempData.httpPort.value}/health"
+        // Use 127.0.0.1 instead of localhost to skip DNS resolution — on some
+        // Android ROMs localhost lookup blocks or fails, which races with the
+        // health check and produces a false "Connection refused" right after
+        // Ktor's `start(wait = false)` returns (port not yet bound).
+        return "http://127.0.0.1:${TempData.httpPort.value}/health"
     }
 
     fun getShutdownUrl(): String {
-        return "http://localhost:${TempData.httpPort.value}/shutdown"
+        return "http://127.0.0.1:${TempData.httpPort.value}/shutdown"
     }
 
     fun getMediaPath(id: String): String {

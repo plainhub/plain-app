@@ -99,6 +99,24 @@ class MdnsHostResponderTest {
         assertTrue("IP bytes should appear in the DNS response payload", found)
     }
 
+    @Test fun `plain multicast query does not request unicast response`() {
+        val query = mdnsQuery("plainapp.local", type = 1)
+        val result = MdnsPacketCodec.buildResponseIfMatchDetails(query, "plainapp.local", listOf(ip4("192.168.1.55")))
+        assertNotNull(result)
+        assertFalse(result!!.unicastResponseRequested)
+        assertEquals(1, result.matchedQuestions.single().qtype)
+        assertEquals(1, result.matchedQuestions.single().qclass)
+    }
+
+    @Test fun `query with QU bit requests unicast response`() {
+        val query = mdnsQuery("plainapp.local", type = 1, qu = true)
+        val result = MdnsPacketCodec.buildResponseIfMatchDetails(query, "plainapp.local", listOf(ip4("192.168.1.55")))
+        assertNotNull(result)
+        assertTrue(result!!.unicastResponseRequested)
+        assertEquals(1, result.matchedQuestions.single().qtype)
+        assertEquals(1, result.matchedQuestions.single().qclass)
+    }
+
     @Test fun `response packet with QR bit set yields null — no reply loop`() {
         val q = mdnsQuery("plainapp.local", 1).copyOf()
         q[2] = 0x84.toByte() // set QR=1 (response), AA=1 — simulate an incoming response
@@ -124,7 +142,7 @@ class MdnsHostResponderTest {
     }
 
     private fun ip4(addr: String) = InetAddress.getByName(addr) as Inet4Address
-    private fun mdnsQuery(name: String, type: Int): ByteArray {
+    private fun mdnsQuery(name: String, type: Int, qu: Boolean = false): ByteArray {
         val out = ByteArrayOutputStream()
         out.write(byteArrayOf(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0))
         name.split('.').filter { it.isNotEmpty() }.forEach { label ->
@@ -133,8 +151,8 @@ class MdnsHostResponderTest {
             out.write(b)
         }
         out.write(0)
-        out.write(byteArrayOf((type ushr 8).toByte(), type.toByte(), 0, 1))
+        val qclass = if (qu) 0x8001 else 0x0001
+        out.write(byteArrayOf((type ushr 8).toByte(), type.toByte(), (qclass ushr 8).toByte(), qclass.toByte()))
         return out.toByteArray()
     }
 }
-

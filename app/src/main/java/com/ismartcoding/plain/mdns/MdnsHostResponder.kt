@@ -12,16 +12,18 @@ import java.net.MulticastSocket
 import java.net.SocketTimeoutException
 
 /**
- * Lightweight mDNS responder — single receive socket, direct unicast reply.
+ * Lightweight mDNS responder — single receive socket, standards-aware reply.
  *
  * RECEIVE: One MulticastSocket bound to 0.0.0.0:5353 (IPv4 wildcard; see bind
  * comment for why explicit) joins 224.0.0.251 on every valid LAN interface.
  * A single socket avoids the Linux SO_REUSEPORT limitation.
  *
- * SEND: Replies are sent back via the same MulticastSocket so the source port is
- * always 5353. RFC 6762 §6.7 requires this — resolvers on macOS/Windows/iOS
- * silently discard mDNS responses whose source port ≠ 5353. candidateInterfaces()
- * is re-fetched per packet to select the correct local IP for the A record.
+ * SEND: Replies are sent via the same MulticastSocket so the source port is always
+ * 5353. RFC 6762 §6.7 requires this — resolvers on macOS/Windows/iOS silently
+ * discard mDNS responses whose source port ≠ 5353. QU/legacy-unicast queries are
+ * answered directly; ordinary multicast queries are answered to 224.0.0.251:5353.
+ * candidateInterfaces() is re-fetched per packet to select the correct local IP
+ * for the A record.
  *
  * Restart lifecycle: MdnsReregistrar (ConnectivityManager) + MdnsHotspotWatcher
  * (WIFI_AP_STATE_CHANGED) recreate the socket whenever the active interface set
@@ -123,18 +125,28 @@ object MdnsHostResponder {
                 val senderIp = extractInet4Address(packet.address) ?: continue
                 val fresh = candidateInterfaces()
                 if (fresh.isEmpty()) continue
-                val (_, localIp) = findResponseIface(senderIp, fresh)
-                val response = MdnsPacketCodec.buildResponseIfMatch(
+                val (responseIface, localIp) = findResponseIface(senderIp, fresh)
+                val response = MdnsPacketCodec.buildResponseIfMatchDetails(
                     query = packet.data.copyOf(packet.length),
                     hostname = hostname,
                     ips = listOf(localIp),
                 ) ?: continue
+                val useUnicast = response.unicastResponseRequested || packet.port != MDNS_PORT
+                val destAddress = if (useUnicast) senderIp else InetAddress.getByName(MDNS_GROUP)
+                val destPort = if (useUnicast) packet.port else MDNS_PORT
+                val dest = "${destAddress.hostAddress}:$destPort"
+                val queryInfo = formatQuestions(response.matchedQuestions)
+
                 // Reply via the receive socket so source port = 5353 (RFC 6762 §6.7).
                 // A throwaway socket bound to :0 uses a random source port which many
                 // mDNS resolvers (macOS, Windows, Android) silently reject.
                 runCatching {
-                    s.send(DatagramPacket(response, response.size, senderIp, MDNS_PORT))
-                    LogCat.d("mDNS reply $hostname → ${localIp.hostAddress} to ${senderIp.hostAddress}")
+                    if (!useUnicast) s.networkInterface = responseIface
+                    s.send(DatagramPacket(response.bytes, response.bytes.size, destAddress, destPort))
+                    LogCat.d(
+                        "mDNS reply $hostname → ${localIp.hostAddress} from " +
+                            "${senderIp.hostAddress}:${packet.port} $queryInfo dest=$dest",
+                    )
                 }.onFailure { LogCat.e("mDNS send to ${senderIp.hostAddress}: ${it.message}") }
             } catch (_: SocketTimeoutException) {
                 // expected — keeps thread responsive to socket close
@@ -160,6 +172,12 @@ object MdnsHostResponder {
             }
         }
         return null
+    }
+
+    private fun formatQuestions(questions: List<MdnsQuestion>): String {
+        return questions.joinToString(separator = ",", prefix = "[", postfix = "]") {
+            "qtype=${it.qtype} qclass=${it.qclass} QU=${it.unicastResponseRequested}"
+        }
     }
 
     internal fun normalizeHostname(value: String): String {
