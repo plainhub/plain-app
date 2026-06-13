@@ -6,7 +6,6 @@ import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import com.ismartcoding.plain.web.models.ChatChannel
 import com.ismartcoding.plain.web.models.ChatChannelMember
 import com.ismartcoding.plain.web.models.ChatItem
-import com.ismartcoding.plain.web.models.Peer
 import com.ismartcoding.plain.web.models.toModel
 
 fun SchemaBuilder.addChatQuerySchema() {
@@ -28,11 +27,6 @@ fun SchemaBuilder.addChatQuerySchema() {
                 .map { it.toModel() }
         }
     }
-    query("peers") {
-        resolver { ->
-            AppDatabase.instance.peerDao().getAll().map { it.toModel() }
-        }
-    }
     query("latestChatItems") {
         resolver { ->
             AppDatabase.instance.chatDao().getAllLatestChats().map { it.toModel() }
@@ -52,7 +46,6 @@ fun SchemaBuilder.addChatQuerySchema() {
             AppDatabase.instance.appFileDao().count()
         }
     }
-    type<Peer> {}
     type<ChatChannel> {}
     type<ChatChannelMember> {}
     type<ChatItem> {

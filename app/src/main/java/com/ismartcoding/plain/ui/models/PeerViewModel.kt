@@ -7,10 +7,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.plain.chat.ChatCacheManager
-import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.chat.PeerManager
 import com.ismartcoding.plain.chat.PeerStatusManager
-import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
@@ -59,18 +57,7 @@ class PeerViewModel : ViewModel() {
     fun removePeer(context: Context, peerId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                ChatDbHelper.deleteAllChatsByPeerAsync(context, peerId)
-                val isChannelMember = AppDatabase.instance.chatChannelDao().getAll().any { it.hasMember(peerId) }
-                val peerDao = AppDatabase.instance.peerDao()
-                if (isChannelMember) {
-                    val peer = peerDao.getById(peerId)
-                    if (peer != null) { peer.key = ""
-                        peer.status = "channel"
-                        peerDao.update(peer) }
-                } else {
-                    peerDao.delete(peerId)
-                }
-                ChatCacheManager.loadKeyCacheAsync()
+                PeerManager.deletePeerAsync(context, peerId)
                 loadPeers()
             } catch (_: Exception) {}
         }
