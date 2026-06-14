@@ -35,7 +35,7 @@ fun SchemaBuilder.addCallSchema() {
     query("callCount") {
         resolver { query: String ->
             val context = MainApp.instance
-            if (Permission.WRITE_CALL_LOG.enabledAndCanAsync(context)) {
+            if (Permission.READ_CALL_LOG.enabledAndCanAsync(context)) {
                 CallMediaStoreHelper.countAsync(context, query)
             } else {
                 0

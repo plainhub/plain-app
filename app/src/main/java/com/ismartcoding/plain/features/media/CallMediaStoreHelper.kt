@@ -6,10 +6,7 @@ import android.net.Uri
 import android.provider.BaseColumns
 import android.provider.CallLog
 import com.ismartcoding.lib.content.ContentWhere
-import com.ismartcoding.lib.data.SortBy
-import com.ismartcoding.lib.data.enums.SortDirection
 import com.ismartcoding.lib.extensions.getIntValue
-import com.ismartcoding.lib.extensions.getPagingCursor
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
@@ -75,9 +72,17 @@ object CallMediaStoreHelper : BaseContentHelper() {
         limit: Int,
         offset: Int,
     ): List<DCall> {
-        return context.contentResolver.getPagingCursor(
-            uriExternal, getProjection(), buildWhereAsync(query),
-            limit, offset, SortBy(CallLog.Calls._ID, SortDirection.DESC)
+        if (limit <= 0) {
+            return emptyList()
+        }
+
+        val where = buildWhereAsync(query)
+        return context.contentResolver.query(
+            uriExternal.withCallLogPaging(limit, offset),
+            getProjection(),
+            where.toSelection(),
+            where.args.toTypedArray(),
+            "${CallLog.Calls._ID} DESC",
         )?.map { cursor, cache ->
             val id = cursor.getStringValue(CallLog.Calls._ID, cache)
             val number = cursor.getStringValue(CallLog.Calls.NUMBER, cache)
@@ -89,6 +94,20 @@ object CallMediaStoreHelper : BaseContentHelper() {
             val accountId = cursor.getStringValue(CallLog.Calls.PHONE_ACCOUNT_ID, cache)
             DCall(id, number, name, photoUri, startTS, duration, type, accountId)
         } ?: emptyList()
+    }
+
+    private fun Uri.withCallLogPaging(
+        limit: Int,
+        offset: Int,
+    ): Uri {
+        return buildUpon()
+            .appendQueryParameter(CallLog.Calls.LIMIT_PARAM_KEY, limit.toString())
+            .apply {
+                if (offset > 0) {
+                    appendQueryParameter(CallLog.Calls.OFFSET_PARAM_KEY, offset.toString())
+                }
+            }
+            .build()
     }
 
     fun call(
