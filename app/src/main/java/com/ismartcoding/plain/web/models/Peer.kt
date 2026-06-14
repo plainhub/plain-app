@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.chat.PeerStatusManager
+import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getBestIp
 import kotlin.time.Instant

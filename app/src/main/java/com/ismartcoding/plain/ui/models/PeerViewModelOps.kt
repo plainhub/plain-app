@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.channel.ChannelSystemMessageSender
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessageSender
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
@@ -11,9 +11,8 @@ import com.ismartcoding.plain.events.PeerUpdatedEvent
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.chat.PeerStatusManager
+import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.time.Instant
 
 internal fun PeerViewModel.loadPeersInternal() {

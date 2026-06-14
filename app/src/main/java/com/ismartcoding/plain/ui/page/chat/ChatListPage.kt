@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.chat
 
-import com.ismartcoding.plain.preferences.*
-
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.chat.PeerStatusManager
+import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DeviceType
@@ -48,7 +46,6 @@ import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.ChannelMembersDialog
 import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
-import com.ismartcoding.plain.ui.page.chat.TopBarChat
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.flow.map

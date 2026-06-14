@@ -5,7 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.chat.ChatManager
+import com.ismartcoding.plain.chat.ChatSender
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
@@ -25,26 +26,21 @@ fun ChatViewModel.sendMessage(content: DMessageContent, onResult: (Boolean) -> U
     viewModelScope.launch(Dispatchers.IO) {
         val state = chatState.value
 
-        if (state.chatType == ChatType.PEER) {
-            val peer = AppDatabase.instance.peerDao().getById(state.toId)
+        if (state.target.type == ChatTargetType.PEER) {
+            val peer = AppDatabase.instance.peerDao().getById(state.target.toId)
             if (peer == null || peer.status != "paired") {
                 onResult(false)
                 return@launch
             }
         }
 
-        val encodedToId = when (state.chatType) {
-            ChatType.CHANNEL -> "channel:${state.toId}"
-            else -> state.toId
-        }
-        val item = ChatManager.sendChatItem(encodedToId, content)
+        val item = ChatSender.createChatItem(state.target, content)
         addAll(listOf(item))
 
-        if (state.isRemote()) {
-            val outcome = deliverToRemoteAsync(state, content)
-            applyDeliveryOutcome(item, outcome)
+        if (state.target.type != ChatTargetType.LOCAL) {
+            ChatSender.send(item, state.target, state.onlinePeerIds)
             update(item)
-            onResult(outcome.success)
+            onResult(item.status == "sent")
         } else {
             onResult(true)
         }
@@ -72,8 +68,8 @@ suspend fun ChatViewModel.sendFilesImmediate(files: List<DMessageFile>, isImageV
     val item = AppDatabase.instance.chatDao().let { dao ->
         val chat = DChat()
         chat.fromId = "me"
-        chat.toId = if (state.chatType == ChatType.CHANNEL) "" else state.toId
-        chat.channelId = if (state.chatType == ChatType.CHANNEL) state.toId else ""
+        chat.toId = if (state.target.type == ChatTargetType.CHANNEL) "" else state.target.toId
+        chat.channelId = if (state.target.type == ChatTargetType.CHANNEL) state.target.toId else ""
         chat.content = content
         chat.status = "pending"
         dao.insert(chat)
@@ -91,7 +87,7 @@ fun ChatViewModel.updateFilesMessage(messageId: String, files: List<DMessageFile
         } else {
             DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
         }
-        val newStatus = if (state.isRemote()) "pending" else "sent"
+        val newStatus = if (state.target.type == ChatTargetType.LOCAL) "sent" else "pending"
         val dao = AppDatabase.instance.chatDao()
         dao.getById(messageId)?.let { item ->
             item.content = content
@@ -99,9 +95,8 @@ fun ChatViewModel.updateFilesMessage(messageId: String, files: List<DMessageFile
             dao.update(item)
             val model = item.toModel().apply { data = getContentData() }
             sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-            if (state.isRemote()) {
-                val outcome = deliverToRemoteAsync(state, content)
-                applyDeliveryOutcome(item, outcome)
+            if (state.target.type != ChatTargetType.LOCAL) {
+                ChatSender.send(item, state.target, state.onlinePeerIds)
             }
             update(item)
         }

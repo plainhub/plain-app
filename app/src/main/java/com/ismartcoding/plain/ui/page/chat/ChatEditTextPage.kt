@@ -98,7 +98,7 @@ fun ChatEditTextPage(
                                 if (linksChanged) {
                                     val addedUrls = newUrls - originalUrls.toSet()
                                     if (addedUrls.isNotEmpty()) {
-                                        val linkPreviews = withIO { ChatDbHelper.fetchLinkPreviewsAsync(context, addedUrls) }
+                                        val linkPreviews = withIO { LinkPreviewHelper.fetchLinkPreviewsAsync(context, addedUrls) }
                                         updatedLinkPreviews.addAll(linkPreviews.filter { !it.hasError })
                                     }
                                 }

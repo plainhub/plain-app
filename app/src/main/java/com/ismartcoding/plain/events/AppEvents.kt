@@ -12,7 +12,6 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.db.DChat
@@ -36,7 +35,7 @@ import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
-import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.chat.ChatSender
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
@@ -388,13 +387,16 @@ object AppEvents {
 
                     is HRetryChatItemEvent -> {
                         coIO {
-                            val item = ChatDbHelper.getAsync(event.id) ?: return@coIO
+                            val item = event.item
                             val isPeer = item.toId.isNotEmpty() && item.channelId.isEmpty()
                             val peer: DPeer? = if (isPeer) AppDatabase.instance.peerDao().getById(item.toId) else null
                             if (isPeer && peer != null) {
-                                ChatDbHelper.deliverToPeerAsync(item, peer)
+                                ChatSender.sendToPeer(item, peer)
                             } else if (item.channelId.isNotEmpty()) {
-                                ChatDbHelper.deliverToChannelAsync(item)
+                                val channel = AppDatabase.instance.chatChannelDao().getById(item.channelId)
+                                if (channel != null) {
+                                    ChatSender.sendToChannel(item, channel)
+                                }
                             }
                             sendEvent(HMessageUpdatedEvent(item.id))
                         }

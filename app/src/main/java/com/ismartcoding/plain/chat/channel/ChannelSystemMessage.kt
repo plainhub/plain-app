@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.channel
+package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.plain.db.ChannelMember
 import kotlinx.serialization.Serializable

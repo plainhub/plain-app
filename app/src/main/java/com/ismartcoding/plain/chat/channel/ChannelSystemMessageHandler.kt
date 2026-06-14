@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.channel
+package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode

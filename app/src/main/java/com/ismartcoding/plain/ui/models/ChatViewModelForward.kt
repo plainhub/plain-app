@@ -6,106 +6,52 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.channel.ChannelChatHelper
+import com.ismartcoding.plain.chat.channel.ChannelChatSender
 import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.chat.PeerChatHelper
+import com.ismartcoding.plain.chat.ChatSender
+import com.ismartcoding.plain.chat.data.ChatTarget
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageStatusData
-import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 
-fun ChatViewModel.retryMessage(messageId: String) {
+fun ChatViewModel.resendMessage(messageId: String) {
     viewModelScope.launch(Dispatchers.IO) {
+        val item = ChatDbHelper.getChatItem(messageId) ?: return@launch
+        ChatDbHelper.updateChatItemStatus(item, "pending")
+        update(item)
         val state = chatState.value
-        val item = ChatDbHelper.getAsync(messageId) ?: return@launch
-        if (state.isRemote()) {
-            ChatDbHelper.updateStatusAsync(messageId, "pending")
-            item.status = "pending"
-            update(item)
-            val outcome = deliverToRemoteAsync(state, item.content)
-            applyDeliveryOutcome(item, outcome)
-            update(item)
-        }
+        ChatSender.send(item, state.target, state.onlinePeerIds)
+        update(item)
     }
 }
 
 fun ChatViewModel.resendToMembers(messageId: String, peerIds: List<String>) {
     viewModelScope.launch(Dispatchers.IO) {
         val state = chatState.value
-        if (state.chatType != ChatType.CHANNEL) return@launch
-        val channel = AppDatabase.instance.chatChannelDao().getById(state.toId) ?: return@launch
-        val item = ChatDbHelper.getAsync(messageId) ?: return@launch
-
-        ChatDbHelper.updateStatusAsync(messageId, "pending")
-        item.status = "pending"
+        val channel = AppDatabase.instance.chatChannelDao().getById(state.target.toId) ?: return@launch
+        val item = ChatDbHelper.getChatItem(messageId) ?: return@launch
+        ChatDbHelper.updateChatItemStatus(item, "pending")
         update(item)
-
-        val peerDao = AppDatabase.instance.peerDao()
-        val newResults = mutableListOf<DMessageDeliveryResult>()
-        for (peerId in peerIds) {
-            val peer = peerDao.getById(peerId)
-            if (peer == null) {
-                newResults.add(DMessageDeliveryResult(peerId, peerId, "Peer not found in database"))
-                continue
-            }
-            newResults.add(ChannelChatHelper.sendToMemberAsync(channel, peer, item.content))
-        }
-
-        val existing = item.parseStatusData()?.results ?: emptyList()
-        val retriedIds = peerIds.toSet()
-        val merged = existing.filter { it.peerId !in retriedIds } + newResults
-        val mergedStatusData = DMessageStatusData(merged)
-
-        ChatDbHelper.updateStatusAndDataAsync(item.id, mergedStatusData)
-        item.status = when {
-            mergedStatusData.total == 0 -> "sent"
-            mergedStatusData.allDelivered -> "sent"
-            mergedStatusData.allFailed -> "failed"
-            else -> "partial"
-        }
-        item.statusData = if (mergedStatusData.total > 0) JsonHelper.jsonEncode(mergedStatusData) else ""
+        ChatSender.sendToChannelMembers(item, channel, peerIds)
         update(item)
     }
 }
 
-fun ChatViewModel.forwardMessage(messageId: String, targetPeer: DPeer, onResult: (Boolean) -> Unit = {}) {
+fun ChatViewModel.forwardMessage(messageId: String, target: ChatTarget, onResult: (Boolean) -> Unit = {}) {
     viewModelScope.launch(Dispatchers.IO) {
-        val item = ChatDbHelper.getAsync(messageId) ?: return@launch
-        val newItem = ChatDbHelper.sendAsync(message = item.content, fromId = "me", toId = targetPeer.id, peer = targetPeer)
-        val model = newItem.toModel().apply { data = getContentData() }
-        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-        if (newItem.content.type == DMessageType.TEXT.value) sendEvent(FetchLinkPreviewsEvent(newItem))
-
-        val error = PeerChatHelper.sendToPeerAsync(targetPeer, newItem.content)
-        val outcome = if (error != null) {
-            triggerPeerRediscovery(targetPeer.id)
-            DeliveryOutcome(false, DMessageStatusData(listOf(DMessageDeliveryResult(targetPeer.id, targetPeer.name, error))))
-        } else {
-            DeliveryOutcome(true)
-        }
-        applyDeliveryOutcome(newItem, outcome)
+        val item = ChatDbHelper.getChatItem(messageId) ?: return@launch
+        val newItem = ChatSender.createChatItem(target, item.content)
+        val state = chatState.value
+        ChatSender.send(newItem, target, state.onlinePeerIds)
         update(newItem)
-        onResult(error == null)
-    }
-}
-
-fun ChatViewModel.forwardMessageToLocal(messageId: String, onResult: (Boolean) -> Unit = {}) {
-    viewModelScope.launch(Dispatchers.IO) {
-        val item = ChatDbHelper.getAsync(messageId) ?: return@launch
-        val newItem = ChatDbHelper.sendAsync(message = item.content, fromId = "me", toId = "local", peer = null)
-        val model = newItem.toModel().apply { data = getContentData() }
-        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-        if (newItem.content.type == DMessageType.TEXT.value) sendEvent(FetchLinkPreviewsEvent(newItem))
-        onResult(true)
+        onResult(newItem.status == "sent")
     }
 }
 
@@ -114,7 +60,7 @@ fun ChatViewModel.delete(context: Context, ids: Set<String>) {
         val json = JSONArray()
         val items = itemsFlow.value.filter { ids.contains(it.id) }
         for (m in items) {
-            ChatDbHelper.deleteAsync(context, m.id, m.value)
+            ChatDbHelper.deleteAsync(context, m.id)
             json.put(m.id)
         }
         _itemsFlow.update {
@@ -129,12 +75,12 @@ fun ChatViewModel.delete(context: Context, ids: Set<String>) {
 fun ChatViewModel.clearAllMessages(context: Context) {
     viewModelScope.launch(Dispatchers.IO) {
         val state = chatState.value
-        if (state.chatType == ChatType.CHANNEL) {
-            ChatDbHelper.deleteAllChannelChatsAsync(context, state.toId)
+        if (state.target.type == ChatTargetType.CHANNEL) {
+            ChatDbHelper.deleteAllChannelChatsAsync(context, state.target.toId)
         } else {
-            ChatDbHelper.deleteAllChatsAsync(context, state.toId)
+            ChatDbHelper.deleteAllChatsAsync(context, state.target.toId)
         }
         _itemsFlow.value = mutableStateListOf()
-        sendEvent(WebSocketEvent(EventType.MESSAGE_CLEARED, JsonHelper.jsonEncode(state.toId)))
+        sendEvent(WebSocketEvent(EventType.MESSAGE_CLEARED, JsonHelper.jsonEncode(state.target.toId)))
     }
 }

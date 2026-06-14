@@ -1,12 +1,11 @@
 package com.ismartcoding.plain.events
 
 import com.ismartcoding.lib.channel.ChannelEvent
+import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DChat
 
-
-// H prefix means event from http api
-class HMessageCreatedEvent(val fromId: String, val items: List<DChat>) : ChannelEvent()
+class HMessageCreatedEvent(val target: ChatTarget, val items: List<DChat>) : ChannelEvent()
 
 class HMessageUpdatedEvent(val id: String) : ChannelEvent()
 
@@ -28,7 +27,7 @@ class HOpenAccessibilitySettingsEvent : ChannelEvent()
 
 class HOpenWebSettingsEvent : ChannelEvent()
 
-class HRetryChatItemEvent(val id: String) : ChannelEvent()
+class HRetryChatItemEvent(val item: DChat) : ChannelEvent()
 /**
  * Fired after the default SMS app is launched for an MMS send.
  * AppEvents will poll content://mms until the row appears, then

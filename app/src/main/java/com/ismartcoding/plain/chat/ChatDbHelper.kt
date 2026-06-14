@@ -1,26 +1,20 @@
 package com.ismartcoding.plain.chat
 
 import android.content.Context
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DLinkPreview
 import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.plain.channel.ChannelChatHelper
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import com.ismartcoding.plain.db.ChatMessageStatus
+import com.ismartcoding.plain.db.DMessageDeliveryResult
 
 object ChatDbHelper {
-    suspend fun sendAsync(message: DMessageContent, fromId: String = "me", toId: String = "local", channelId: String = "", peer: DPeer? = null, isRemote: Boolean = peer != null): DChat {
+    suspend fun insertChatItem(message: DMessageContent, fromId: String = "me", toId: String = "local", channelId: String = "", isRemote: Boolean): DChat {
         val item = DChat()
         item.fromId = fromId
         item.toId = toId
@@ -31,12 +25,24 @@ object ChatDbHelper {
         return item
     }
 
-    suspend fun getAsync(id: String): DChat? {
+    suspend fun getChatItem(id: String): DChat? {
         return AppDatabase.instance.chatDao().getById(id)
     }
 
-    suspend fun updateStatusAsync(id: String, status: String) {
-        AppDatabase.instance.chatDao().updateStatus(id, status)
+    suspend fun updateChatItemStatus(item: DChat, status: String) {
+        item.status = status
+        AppDatabase.instance.chatDao().updateStatus(item.id, status)
+    }
+
+    suspend fun updateChatItemStatus(item: DChat, peer: DPeer, error: String?) {
+        val statusData = if (error == null) {
+            DMessageStatusData()
+        } else {
+            DMessageStatusData(listOf(DMessageDeliveryResult(peerId = peer.id, peerName = peer.name, error = error)))
+        }
+        item.status = statusData.aggregateStatus()
+        item.statusData = if (statusData.total > 0) jsonEncode(statusData) else ""
+        AppDatabase.instance.chatDao().updateStatusAndData(item.id, item.status, item.statusData)
     }
 
     /**
@@ -46,120 +52,41 @@ object ChatDbHelper {
      * - "partial" → some delivered, some failed
      * - "failed"  → all failed (or null statusData = no leader)
      */
-    suspend fun updateStatusAndDataAsync(id: String, statusData: DMessageStatusData?) {
-        val status = when {
-            statusData == null -> "failed"
-            statusData.total == 0 -> "sent"  // no recipients (empty channel)
-            statusData.allDelivered -> "sent"
-            statusData.allFailed -> "failed"
-            else -> "partial"
-        }
-        val json = if (statusData != null && statusData.total > 0) jsonEncode(statusData) else ""
-        AppDatabase.instance.chatDao().updateStatusAndData(id, status, json)
-    }
-
-    /**
-     * Deliver [item] to a peer, update the DB, and reflect the result in [item.status]/[item.statusData].
-     */
-    suspend fun deliverToPeerAsync(item: DChat, peer: DPeer) {
-        val error = PeerChatHelper.sendToPeerAsync(peer, item.content)
-        val statusData = if (error == null) {
-            DMessageStatusData()
-        } else {
-            DMessageStatusData(listOf(DMessageDeliveryResult(peerId = peer.id, peerName = peer.name, error = error)))
-        }
-        updateStatusAndDataAsync(item.id, statusData)
-        item.status = if (error == null) "sent" else "failed"
-        item.statusData = if (error == null) "" else jsonEncode(statusData)
-    }
-
-    /**
-     * Deliver [item] to its channel, update the DB, and reflect the result in [item.status].
-     */
-    suspend fun deliverToChannelAsync(item: DChat) {
-        val channel = AppDatabase.instance.chatChannelDao().getById(item.channelId) ?: return
-        val statusData = ChannelChatHelper.sendAsync(channel, item.content)
-        updateStatusAndDataAsync(item.id, statusData)
-        item.status = when {
-            statusData == null -> "failed"
-            statusData.total == 0 || statusData.allDelivered -> "sent"
-            statusData.allFailed -> "failed"
-            else -> "partial"
-        }
-    }
-
-    suspend fun fetchLinkPreviewsAsync(context: Context, urls: List<String>): List<DLinkPreview> {
-        if (urls.isEmpty()) return emptyList()
-
-        try {
-            return coroutineScope {
-                urls.map { url ->
-                    async { LinkPreviewHelper.fetchLinkPreview(context, url) }
-                }.awaitAll()
-            }
-        } catch (e: Exception) {
-            LogCat.e(e.toString())
-        }
-
-        return emptyList()
+    suspend fun updateChannelChatItemStatus(item: DChat, statusData: DMessageStatusData?) {
+        item.status = statusData?.aggregateStatus() ?: ChatMessageStatus.FAILED
+        item.statusData = if (statusData != null && statusData.total > 0) jsonEncode(statusData) else ""
+        AppDatabase.instance.chatDao().updateStatusAndData(item.id, item.status, item.statusData)
     }
 
     suspend fun deleteAsync(
         context: Context,
         id: String,
-        value: Any?,
     ) {
-        AppDatabase.Companion.instance.chatDao().delete(id)
-        // Release content-addressable file references (decrements refCount, deletes file when 0)
+        val chat = AppDatabase.instance.chatDao().getById(id) ?: return
+        releaseFidFiles(context, chat.content.value)
+        AppDatabase.instance.chatDao().delete(id)
+    }
+
+    suspend fun deleteAllChatsAsync(context: Context, peerId: String) {
+        val chatDao = AppDatabase.instance.chatDao()
+        releaseChatsFiles(context, chatDao.getByPeerId(peerId))
+        chatDao.deleteByPeerId(peerId)
+    }
+
+    suspend fun deleteAllChannelChatsAsync(context: Context, channelId: String) {
+        val chatDao = AppDatabase.instance.chatDao()
+        releaseChatsFiles(context, chatDao.getByChannelId(channelId))
+        chatDao.deleteByChannelId(channelId)
+    }
+
+    private fun releaseFidFiles(context: Context, value: Any?) {
         when (value) {
             is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
             is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
         }
     }
 
-    suspend fun deleteAllChatsByPeerAsync(context: Context, peerId: String) {
-        val chatDao = AppDatabase.instance.chatDao()
-        val chats = chatDao.getByChatId(peerId)
-
-        // Release file references for all chats before deleting
-        for (chat in chats) {
-            when (val value = chat.content.value) {
-                is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
-                is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
-            }
-        }
-
-        // Delete all chat records for this peer using SQL query
-        chatDao.deleteByChatId(peerId)
-    }
-
-    suspend fun deleteAllChatsAsync(context: Context, toId: String) {
-        val chatDao = AppDatabase.instance.chatDao()
-        val chats = chatDao.getByChatId(toId)
-
-        // Release file references for all chats before deleting
-        for (chat in chats) {
-            when (val value = chat.content.value) {
-                is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
-                is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
-            }
-        }
-
-        chatDao.deleteByChatId(toId)
-    }
-
-    suspend fun deleteAllChannelChatsAsync(context: Context, channelId: String) {
-        val chatDao = AppDatabase.instance.chatDao()
-        val chats = chatDao.getByChannelId(channelId)
-
-        // Release file references for all chats before deleting
-        for (chat in chats) {
-            when (val value = chat.content.value) {
-                is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
-                is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
-            }
-        }
-
-        chatDao.deleteByChannelId(channelId)
+    private fun releaseChatsFiles(context: Context, chats: List<DChat>) {
+        for (chat in chats) releaseFidFiles(context, chat.content.value)
     }
 }

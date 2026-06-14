@@ -53,6 +53,7 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.CrashHandler
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.discover.NearbyPairManager
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
@@ -68,9 +69,8 @@ import com.ismartcoding.plain.ui.page.LoginRequestPage
 import com.ismartcoding.plain.ui.page.PairingRequestPage
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.Main
-import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.ui.theme.AppTheme
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
@@ -175,9 +175,10 @@ class MainActivity : AppCompatActivity() {
                                 pendingForwardText = null
                             },
                             onTargetSelected = { target ->
-                                val route = when (target) {
-                                    is ForwardTarget.Local -> Routing.Chat("local")
-                                    is ForwardTarget.Peer -> Routing.Chat("peer:${target.peer.id}")
+                                val route = when (target.type) {
+                                    ChatTargetType.LOCAL -> Routing.Chat("local")
+                                    ChatTargetType.PEER -> Routing.Chat("peer:${target.toId}")
+                                    ChatTargetType.CHANNEL -> Routing.Chat("channel:${target.toId}")
                                 }
                                 navControllerState.value?.navigate(route)
                                 pendingFileUris?.let { uris ->

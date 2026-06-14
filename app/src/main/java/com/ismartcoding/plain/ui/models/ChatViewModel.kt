@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.data.ChatTarget
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.events.ChannelUpdatedEvent
@@ -21,12 +23,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-enum class ChatType { LOCAL, PEER, CHANNEL }
-
 data class ChatState(
-    val toId: String = "",
+    val target: ChatTarget = ChatTarget("", ChatTargetType.LOCAL),
     val toName: String = "",
-    val chatType: ChatType = ChatType.LOCAL,
     val onlinePeerIds: Set<String> = emptySet(),
 )
 
@@ -46,13 +45,13 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                 when (event) {
                     is PeerUpdatedEvent -> {
                         ChatCacheManager.peerMap[event.peer.id] = event.peer
-                        if (_chatState.value.chatType == ChatType.PEER && _chatState.value.toId == event.peer.id) {
+                        if (_chatState.value.target.type == ChatTargetType.PEER && _chatState.value.target.toId == event.peer.id) {
                             _chatState.value = _chatState.value.copy(toName = event.peer.name)
                         }
                     }
                     is ChannelUpdatedEvent -> {
-                        if (_chatState.value.chatType != ChatType.CHANNEL) return@collect
-                        val channelId = _chatState.value.toId
+                        if (_chatState.value.target.type != ChatTargetType.CHANNEL) return@collect
+                        val channelId = _chatState.value.target.toId
                         val updated = withContext(Dispatchers.IO) {
                             AppDatabase.instance.chatChannelDao().getById(channelId)
                         }
@@ -64,19 +63,21 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     suspend fun initializeChatStateAsync(chatId: String) {
-        when {
-            chatId.startsWith("peer:") -> {
-                val toId = chatId.removePrefix("peer:")
-                val peer = AppDatabase.instance.peerDao().getById(toId)
-                _chatState.value = _chatState.value.copy(toId = toId, toName = peer?.name ?: "", chatType = ChatType.PEER)
+        val target = ChatTarget.parseId(chatId)
+        when (target.type) {
+            ChatTargetType.PEER -> {
+                val peer = AppDatabase.instance.peerDao().getById(target.toId)
+                _chatState.value = _chatState.value.copy(target = target, toName = peer?.name ?: "")
             }
-            chatId.startsWith("channel:") -> {
-                val toId = chatId.removePrefix("channel:")
-                val channel = AppDatabase.instance.chatChannelDao().getById(toId)
-                _chatState.value = _chatState.value.copy(toId = toId, toName = channel?.name ?: "", chatType = ChatType.CHANNEL)
+            ChatTargetType.CHANNEL -> {
+                val channel = AppDatabase.instance.chatChannelDao().getById(target.toId)
+                _chatState.value = _chatState.value.copy(target = target, toName = channel?.name ?: "")
             }
-            else -> {
-                _chatState.value = _chatState.value.copy(toId = "local", toName = LocaleHelper.getString(Res.string.local_chat), chatType = ChatType.LOCAL)
+            ChatTargetType.LOCAL -> {
+                _chatState.value = _chatState.value.copy(
+                    target = ChatTarget("local", ChatTargetType.LOCAL),
+                    toName = LocaleHelper.getString(Res.string.local_chat),
+                )
             }
         }
     }
@@ -84,8 +85,8 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     suspend fun fetchAsync(toId: String) {
         val state = _chatState.value
         val dao = AppDatabase.instance.chatDao()
-        val isChannel = state.chatType == ChatType.CHANNEL
-        val list = if (isChannel) dao.getByChannelId(state.toId) else dao.getByChatId(toId)
+        val isChannel = state.target.type == ChatTargetType.CHANNEL
+        val list = if (isChannel) dao.getByChannelId(state.target.toId) else dao.getByPeerId(toId)
         _itemsFlow.value = list.sortedByDescending { it.createdAt }.map { chat ->
             val fromName = if (isChannel && chat.fromId != "me") {
                 AppDatabase.instance.peerDao().getById(chat.fromId)?.name ?: ""

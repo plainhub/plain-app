@@ -54,7 +54,7 @@ fun ChannelChatInfoPage(
     val context = androidx.compose.ui.platform.LocalContext.current
     val chatState = chatVM.chatState.collectAsState()
     val channels = channelVM.channels.collectAsStateValue()
-    val liveChannel = channels.find { it.id == chatState.value.toId }
+    val liveChannel = channels.find { it.id == chatState.value.target.toId }
     val isOwner = liveChannel?.owner == "me"
 
     val showRenameDialog = remember { mutableStateOf(false) }

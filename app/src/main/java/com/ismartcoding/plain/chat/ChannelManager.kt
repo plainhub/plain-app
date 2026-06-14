@@ -4,7 +4,7 @@ import android.content.Context
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.channel.ChannelSystemMessageSender
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessageSender
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel

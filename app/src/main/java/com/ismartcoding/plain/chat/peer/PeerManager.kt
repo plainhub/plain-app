@@ -1,6 +1,8 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.chat.peer
 
 import android.content.Context
+import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.AppDatabase
 
 object PeerManager {
@@ -8,7 +10,7 @@ object PeerManager {
         val peerDao = AppDatabase.instance.peerDao()
         if (peerDao.getById(peerId) == null) return false
 
-        ChatDbHelper.deleteAllChatsByPeerAsync(context, peerId)
+        ChatDbHelper.deleteAllChatsAsync(context, peerId)
         val isChannelMember = AppDatabase.instance.chatChannelDao().getAll().any { it.hasMember(peerId) }
         if (isChannelMember) {
             val peer = peerDao.getById(peerId)!!

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.chat.peer
 
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.api.HttpClientManager

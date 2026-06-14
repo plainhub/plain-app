@@ -1,9 +1,5 @@
 package com.ismartcoding.plain.ui
 
-import com.ismartcoding.plain.preferences.*
-
-import com.ismartcoding.plain.i18n.*
-
 import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -14,20 +10,16 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.enums.PickFileTag
-import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.not_supported_error
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.PeerViewModel
-import com.ismartcoding.plain.ui.models.sendTextMessage
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
-import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
-import kotlinx.coroutines.delay
 
 internal fun MainActivity.handleIntent(intent: Intent) {
     if (intent.getBooleanExtra("start_web_service", false)) {

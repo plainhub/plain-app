@@ -2,7 +2,7 @@ package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.chat.PeerManager
+import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.Peer

@@ -36,7 +36,7 @@ fun PeerChatInfoPage(
 ) {
     val context = LocalContext.current
     val chatState = chatVM.chatState.collectAsState()
-    val peer = peerVM.pairedPeers.find { it.id == chatState.value.toId }
+    val peer = peerVM.pairedPeers.find { it.id == chatState.value.target.toId }
 
     val clearMessagesText = stringResource(Res.string.clear_messages)
     val clearMessagesConfirmText = stringResource(Res.string.clear_messages_confirm)

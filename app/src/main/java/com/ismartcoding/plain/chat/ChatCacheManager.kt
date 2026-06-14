@@ -11,11 +11,7 @@ object ChatCacheManager {
     /** Cache of peer id → DPeer used by chat UI to resolve sender info (name, avatar, etc.). */
     val peerMap = mutableMapOf<String, DPeer>()
 
-    // The peer ID whose ChatPage is currently open; empty when no peer chat is active.
-    var activeChatPeerId = ""
-
-    // The channel ID whose ChatPage is currently open; empty when no channel chat is active.
-    var activeChatChannelId = ""
+    var activeToId = ""
 
     suspend fun loadKeyCacheAsync() {
         peerKeyCache.clear()

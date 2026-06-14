@@ -22,6 +22,17 @@ import kotlinx.serialization.json.put
 
 private val chatJson = Json { ignoreUnknownKeys = true }
 
+/**
+ * Coarse-grained delivery status stored on [DChat.status]. Kept as string
+ * constants to match the existing column shape; new code should reference
+ * these instead of inline literals.
+ */
+object ChatMessageStatus {
+    const val SENT = "sent"
+    const val PARTIAL = "partial"
+    const val FAILED = "failed"
+}
+
 fun DMessageContent.toJSONString(): String {
     val valueElement = if (value != null) {
         when (type) {
@@ -115,6 +126,17 @@ data class DMessageStatusData(
     val hasPartialFailure: Boolean get() = deliveredCount > 0 && failedCount > 0
     fun deliveryLabel(): String = "$deliveredCount/$total"
 
+    /**
+     * Roll this delivery result up into the coarse-grained status string
+     * stored on [DChat.status]. Empty / all-delivered -> "sent"; all-failed
+     * -> "failed"; mixed -> "partial".
+     */
+    fun aggregateStatus(): String = when {
+        total == 0 || allDelivered -> ChatMessageStatus.SENT
+        allFailed -> ChatMessageStatus.FAILED
+        else -> ChatMessageStatus.PARTIAL
+    }
+
     companion object {
         fun fromJson(json: String): DMessageStatusData? {
             if (json.isEmpty()) return null
@@ -207,7 +229,7 @@ interface ChatDao {
     fun getAll(): List<DChat>
 
     @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at ASC")
-    fun getByChatId(toId: String): List<DChat>
+    fun getByPeerId(toId: String): List<DChat>
 
     @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at ASC")
     fun getByChannelId(channelId: String): List<DChat>
@@ -263,7 +285,7 @@ interface ChatDao {
     fun deleteByIds(ids: List<String>)
 
     @Query("DELETE FROM chats WHERE channel_id = '' AND (to_id = :peerId OR from_id = :peerId)")
-    fun deleteByChatId(peerId: String)
+    fun deleteByPeerId(peerId: String)
 
     @Query("DELETE FROM chats WHERE channel_id = :channelId")
     fun deleteByChannelId(channelId: String)

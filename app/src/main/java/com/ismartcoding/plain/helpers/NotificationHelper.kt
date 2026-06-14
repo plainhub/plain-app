@@ -72,16 +72,15 @@ object NotificationHelper {
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    fun sendPeerMessageNotification(context: Context, peerId: String, peerName: String, messageText: String) {
-        if (!Permission.POST_NOTIFICATIONS.can(context)) return
+    fun sendChatMessageNotification(context: Context, targetId: String, targetName: String, messageText: String) {
         ensureChatChannel()
 
-        val notificationId = ("peer_chat_$peerId").hashCode()
+        val notificationId = ("chat_$targetId").hashCode()
 
         val replyIntent = Intent(context, PeerChatReplyReceiver::class.java).apply {
             `package` = context.packageName
             action = Constants.ACTION_PEER_CHAT_REPLY
-            putExtra(PeerChatReplyReceiver.EXTRA_PEER_ID, peerId)
+            putExtra(PeerChatReplyReceiver.EXTRA_TARGET_ID, targetId)
         }
         val replyPendingIntent = PendingIntent.getBroadcast(
             context,
@@ -104,7 +103,7 @@ object NotificationHelper {
 
         val notification = NotificationCompat.Builder(context, Constants.CHAT_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.notification)
-            .setContentTitle(peerName)
+            .setContentTitle(targetName)
             .setContentText(messageText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)

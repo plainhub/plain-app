@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.generateId
 import kotlinx.serialization.Serializable
 
@@ -86,6 +87,17 @@ data class DChatChannel(
     /** Check whether this device is currently the channel leader. */
     fun isLeader(onlinePeerIds: Set<String>, myId: String): Boolean {
         return electLeader(onlinePeerIds, myId) == myId
+    }
+
+    /**
+     * Compute the list of peer IDs that should receive a channel message (everyone except self).
+     * Only includes joined members.
+     */
+    fun getRecipientIds(): List<String> {
+        return joinedMembers()
+            .map { it.id }
+            .distinct()
+            .filter { it != TempData.clientId }
     }
 
     companion object {

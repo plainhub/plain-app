@@ -7,7 +7,7 @@ import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.PeerStatusManager
+import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.features.Permission

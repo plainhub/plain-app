@@ -15,23 +15,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.chat.data.ChatTarget
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.models.PeerViewModel
-
-sealed class ForwardTarget {
-    data class Peer(val peer: DPeer) : ForwardTarget()
-    object Local : ForwardTarget()
-}
 
 @Composable
 fun ForwardTargetDialog(
     peerVM: PeerViewModel,
     onDismiss: () -> Unit,
-    onTargetSelected: (ForwardTarget) -> Unit
+    onTargetSelected: (ChatTarget) -> Unit
 ) {
     val pairedPeers = peerVM.pairedPeers
-    
+
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         modifier = Modifier.fillMaxWidth(),
@@ -47,7 +44,7 @@ fun ForwardTargetDialog(
                 item {
                     PDialogListItem(
                         modifier = Modifier.clickable {
-                            onTargetSelected(ForwardTarget.Local)
+                            onTargetSelected(ChatTarget("me", ChatTargetType.LOCAL))
                             onDismiss()
                         },
                         title = stringResource(Res.string.local_chat),
@@ -55,12 +52,12 @@ fun ForwardTargetDialog(
                         showMore = true
                     )
                 }
-                
+
                 if (pairedPeers.isNotEmpty()) {
                     items(pairedPeers, key = { it.id }) { peer ->
                         PDialogListItem(
                             modifier = Modifier.clickable {
-                                onTargetSelected(ForwardTarget.Peer(peer))
+                                onTargetSelected(ChatTarget(peer.id, ChatTargetType.PEER))
                                 onDismiss()
                             },
                             title = peer.name,

@@ -1,10 +1,10 @@
-package com.ismartcoding.plain.channel
+package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.chat.PeerGraphQLClient
+import com.ismartcoding.plain.chat.peer.PeerGraphQLClient
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer

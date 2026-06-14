@@ -20,7 +20,6 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
 import com.ismartcoding.plain.events.HPomodoroPauseEvent
@@ -77,7 +76,7 @@ fun MainEventCollector(
                         val data = event.chat.content.value as DMessageText
                         val urls = LinkPreviewHelper.extractUrls(data.text)
                         if (urls.isNotEmpty()) {
-                            val links = ChatDbHelper.fetchLinkPreviewsAsync(context, urls).filter { !it.hasError }
+                            val links = LinkPreviewHelper.fetchLinkPreviewsAsync(context, urls).filter { !it.hasError }
                             if (links.isNotEmpty()) {
                                 val updatedMessageText = DMessageText(data.text, links)
                                 event.chat.content = DMessageContent(DMessageType.TEXT.value, updatedMessageText)

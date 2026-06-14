@@ -8,8 +8,9 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatCacheManager
-import com.ismartcoding.plain.chat.PeerChatHelper
-import com.ismartcoding.plain.chat.PeerStatusManager
+import com.ismartcoding.plain.chat.peer.PeerChatParser
+import com.ismartcoding.plain.chat.peer.PeerChatSender
+import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
 import com.ismartcoding.plain.preferences.PasswordPreference
@@ -44,7 +45,7 @@ fun Route.addWebSocket() {
                     close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "unknown_peer"))
                     return@webSocket
                 }
-                val decryptResult = PeerChatHelper.decrypt(token, peerId, publicKey, frame.readBytes())
+                val decryptResult = PeerChatParser.decrypt(token, peerId, publicKey, frame.readBytes())
                 if (decryptResult.content == null) {
                     close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "invalid_request"))
                     return@webSocket

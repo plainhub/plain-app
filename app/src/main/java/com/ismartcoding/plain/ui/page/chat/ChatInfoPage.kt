@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.ChatType
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 
@@ -20,7 +20,7 @@ fun ChatInfoPage(
     channelVM: ChannelViewModel,
 ) {
     val chatState = chatVM.chatState.collectAsState()
-    if (chatState.value.chatType == ChatType.PEER) {
+    if (chatState.value.target.type == ChatTargetType.PEER) {
         PeerChatInfoPage(navController, chatVM, peerVM)
     } else {
         ChannelChatInfoPage(navController, chatVM, peerVM, channelVM)

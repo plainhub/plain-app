@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.chat
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
@@ -41,7 +40,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.ChatType
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -76,7 +75,7 @@ fun ChatPage(
     val imageWidthPx = remember(imageWidthDp) { derivedStateOf { density.run { imageWidthDp.toPx().toInt() } } }
     val refreshState = rememberRefreshLayoutState {
         scope.launch(Dispatchers.IO) {
-            chatVM.fetchAsync(chatState.value.toId)
+            chatVM.fetchAsync(chatState.value.target.toId)
             setRefreshState(RefreshContentState.Finished)
         }
     }
@@ -95,13 +94,13 @@ fun ChatPage(
         LocaleHelper.getStringSyncF(Res.string.x_selected, "count", chatVM.selectedIds.size)
     } else {
         val state = chatState.value
-        if (state.chatType == ChatType.CHANNEL) {
-            val channel = channelsState.value.find { it.id == state.toId }
+        if (state.target.type == ChatTargetType.CHANNEL) {
+            val channel = channelsState.value.find { it.id == state.target.toId }
             if (channel != null) "${state.toName} (${channel.joinedMembers().size})" else state.toName
         } else state.toName
     }
 
-    val channel = if (chatState.value.chatType == ChatType.CHANNEL) channelsState.value.find { it.id == chatState.value.toId } else null
+    val channel = if (chatState.value.target.type == ChatTargetType.CHANNEL) channelsState.value.find { it.id == chatState.value.target.toId } else null
 
     PScaffold(
         modifier = Modifier.imePadding(),

@@ -15,6 +15,9 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.readRawBytes
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URL
@@ -276,6 +279,22 @@ object LinkPreviewHelper {
             LogCat.e("Error downloading preview image: ${e.message}")
             Triple(null, 0, 0)
         }
+    }
+
+    suspend fun fetchLinkPreviewsAsync(context: Context, urls: List<String>): List<DLinkPreview> {
+        if (urls.isEmpty()) return emptyList()
+
+        try {
+            return coroutineScope {
+                urls.map { url ->
+                    async { fetchLinkPreview(context, url) }
+                }.awaitAll()
+            }
+        } catch (e: Exception) {
+            LogCat.e(e.toString())
+        }
+
+        return emptyList()
     }
 
     fun deletePreviewImage(context: Context, imagePath: String) {

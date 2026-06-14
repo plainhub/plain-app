@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
@@ -33,22 +34,19 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshLayoutState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatState
-import com.ismartcoding.plain.ui.models.ChatType
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.forwardMessage
-import com.ismartcoding.plain.ui.models.forwardMessageToLocal
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.page.chat.components.ChatInput
 import com.ismartcoding.plain.ui.page.chat.components.ChatListItem
-import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
-import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 
 @Composable
 fun ChatPageContent(
@@ -85,7 +83,7 @@ fun ChatPageContent(
                         ChatListItem(
                             navController = navController, chatVM = chatVM, audioPlaylistVM,
                             itemsState, m = m,
-                            peer = (if (chatState.chatType == ChatType.PEER) ChatCacheManager.peerMap[chatState.toId] else null)
+                            peer = (if (chatState.target.type == ChatTargetType.PEER) ChatCacheManager.peerMap[chatState.target.toId] else null)
                                 ?: ChatCacheManager.peerMap[m.fromId],
                             index = index, imageWidthDp = imageWidthDp, imageWidthPx = imageWidthPx,
                             focusManager = focusManager, previewerState = previewerState,
@@ -98,7 +96,7 @@ fun ChatPageContent(
                 }
             }
         }
-        val peer = if (chatState.chatType == ChatType.PEER) ChatCacheManager.peerMap[chatState.toId] else null
+        val peer = if (chatState.target.type == ChatTargetType.PEER) ChatCacheManager.peerMap[chatState.target.toId] else null
         val notAllowChat = channelStatus == DChatChannel.STATUS_LEFT || channelStatus == DChatChannel.STATUS_KICKED || peer?.status == "unpaired"
         if (notAllowChat) {
             Box(
@@ -128,10 +126,7 @@ fun ChatPageContent(
             peerVM = peerVM, onDismiss = { showForwardDialog = false; messageToForward = null },
             onTargetSelected = { target ->
                 messageToForward?.let { message ->
-                    when (target) {
-                        is ForwardTarget.Local -> chatVM.forwardMessageToLocal(message.id) { DialogHelper.showSuccess(Res.string.sent) }
-                        is ForwardTarget.Peer -> chatVM.forwardMessage(message.id, target.peer) { DialogHelper.showSuccess(Res.string.sent) }
-                    }
+                    chatVM.forwardMessage(message.id, target) { DialogHelper.showSuccess(Res.string.sent) }
                 }
             })
     }

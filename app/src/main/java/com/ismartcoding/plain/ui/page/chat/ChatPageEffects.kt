@@ -8,6 +8,8 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.data.ChatTarget
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.HMessageCreatedEvent
@@ -33,11 +35,9 @@ fun ChatPageEffects(
     val sharedFlow = Channel.sharedFlow
 
     DisposableEffect(id) {
-        if (id.startsWith("peer:")) ChatCacheManager.activeChatPeerId = id.removePrefix("peer:")
-        else if (id.startsWith("channel:")) ChatCacheManager.activeChatChannelId = id.removePrefix("channel:")
+        ChatCacheManager.activeToId = id
         onDispose {
-            if (id.startsWith("peer:")) ChatCacheManager.activeChatPeerId = ""
-            else if (id.startsWith("channel:")) ChatCacheManager.activeChatChannelId = ""
+            ChatCacheManager.activeToId = ""
         }
     }
 
@@ -45,7 +45,7 @@ fun ChatPageEffects(
         onInputLoaded(ChatInputTextPreference.getAsync())
         scope.launch(Dispatchers.IO) {
             chatVM.initializeChatStateAsync(id)
-            chatVM.fetchAsync(chatVM.chatState.value.toId)
+            chatVM.fetchAsync(chatVM.chatState.value.target.toId)
         }
         peerVM.loadPeers()
     }
@@ -55,11 +55,12 @@ fun ChatPageEffects(
             when (event) {
                 is DeleteChatItemViewEvent -> chatVM.remove(event.id)
                 is HMessageCreatedEvent -> {
-                    if (chatVM.chatState.value.toId == event.fromId) {
+                    if (chatVM.chatState.value.target == event.target) {
                         chatVM.addAll(event.items)
                         scope.launch { scrollState.scrollToItem(0) }
                     }
                 }
+
                 is PickFileResultEvent -> {
                     if (event.tag != PickFileTag.SEND_MESSAGE) return@collect
                     handleFileSelection(event, context, chatVM, scrollState, focusManager)

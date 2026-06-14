@@ -33,11 +33,11 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.ChatType
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.resendToMembers
-import com.ismartcoding.plain.ui.models.retryMessage
+import com.ismartcoding.plain.ui.models.resendMessage
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.nav.navigateChatText
 import com.ismartcoding.plain.ui.theme.cardBackgroundActive
@@ -87,9 +87,14 @@ fun ChatListItem(
                             },
                         ),
                 ) {
-                    ChatName(m = m, isPeerChat = peer != null, isLocal = chatVM.chatState.value.chatType == ChatType.LOCAL,
-                        onRetry = if (chatVM.chatState.value.chatType != ChatType.LOCAL) { { chatVM.retryMessage(m.id) } } else null,
-                        onShowDeliveryDetails = if (chatVM.chatState.value.chatType != ChatType.LOCAL) { { statusData -> showDeliveryDialog.value = statusData } } else null)
+                    ChatName(
+                        m = m, isPeerChat = peer != null, isLocal = chatVM.chatState.value.target.type == ChatTargetType.LOCAL,
+                        onRetry = if (chatVM.chatState.value.target.type != ChatTargetType.LOCAL) {
+                            { chatVM.resendMessage(m.id) }
+                        } else null,
+                        onShowDeliveryDetails = if (chatVM.chatState.value.target.type != ChatTargetType.LOCAL) {
+                            { statusData -> showDeliveryDialog.value = statusData }
+                        } else null)
                     when (m.type) {
                         DMessageType.IMAGES.value -> ChatImages(context, items, m, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
                         DMessageType.FILES.value -> ChatFiles(context, items, navController, m, peer, audioPlaylistVM, previewerState)
@@ -103,7 +108,10 @@ fun ChatListItem(
                     }
                     VerticalSpace(4.dp)
                 }
-                Box(modifier = Modifier.fillMaxSize().padding(top = 32.dp).wrapContentSize(Alignment.Center)) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 32.dp)
+                    .wrapContentSize(Alignment.Center)) {
                     ChatListItemContextMenu(navController, chatVM, m, showContextMenu, onForward)
                 }
             }
@@ -112,7 +120,7 @@ fun ChatListItem(
 
         showDeliveryDialog.value?.let { statusData ->
             if (peer != null) {
-                PeerDeliveryStatusDialog(statusData = statusData, onRetry = { chatVM.retryMessage(m.id) }, onDismiss = { showDeliveryDialog.value = null })
+                PeerDeliveryStatusDialog(statusData = statusData, onRetry = { chatVM.resendMessage(m.id) }, onDismiss = { showDeliveryDialog.value = null })
             } else {
                 ChannelDeliveryStatusDialog(statusData = statusData, onResend = { peerIds -> chatVM.resendToMembers(m.id, peerIds) }, onDismiss = { showDeliveryDialog.value = null })
             }
