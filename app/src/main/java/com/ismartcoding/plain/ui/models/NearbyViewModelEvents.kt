@@ -5,16 +5,14 @@ import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DPairingResult
 import com.ismartcoding.plain.discover.NearbyPairManager
-import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -53,16 +51,8 @@ internal fun NearbyViewModel.loadPairedDevicesAsync() {
 internal fun NearbyViewModel.unpairDeviceAsync(deviceId: String) {
     viewModelScope.launch(Dispatchers.IO) {
         try {
-            val peer = AppDatabase.instance.peerDao().getById(deviceId)
-            if (peer != null) {
-                peer.status = "unpaired"
-                peer.updatedAt = TimeHelper.now()
-                AppDatabase.instance.peerDao().update(peer)
-                ChatCacheManager.loadKeyCacheAsync()
+            if (PeerManager.markUnpaired(deviceId)) {
                 loadAsync()
-                LogCat.d("Device unpaired: $deviceId")
-            } else {
-                LogCat.w("Device not found for unpair: $deviceId")
             }
         } catch (e: Exception) {
             LogCat.e("Error unpairing device: ${e.message}")

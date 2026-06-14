@@ -36,7 +36,6 @@ import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.chat.ChatSender
-import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.services.HttpServerService
@@ -387,18 +386,7 @@ object AppEvents {
 
                     is HRetryChatItemEvent -> {
                         coIO {
-                            val item = event.item
-                            val isPeer = item.toId.isNotEmpty() && item.channelId.isEmpty()
-                            val peer: DPeer? = if (isPeer) AppDatabase.instance.peerDao().getById(item.toId) else null
-                            if (isPeer && peer != null) {
-                                ChatSender.sendToPeer(item, peer)
-                            } else if (item.channelId.isNotEmpty()) {
-                                val channel = AppDatabase.instance.chatChannelDao().getById(item.channelId)
-                                if (channel != null) {
-                                    ChatSender.sendToChannel(item, channel)
-                                }
-                            }
-                            sendEvent(HMessageUpdatedEvent(item.id))
+                            ChatSender.resend(event.item)
                         }
                     }
                 }

@@ -44,7 +44,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             Channel.sharedFlow.collect { event ->
                 when (event) {
                     is PeerUpdatedEvent -> {
-                        ChatCacheManager.peerMap[event.peer.id] = event.peer
+                        ChatCacheManager.updatePeer(event.peer)
                         if (_chatState.value.target.type == ChatTargetType.PEER && _chatState.value.target.toId == event.peer.id) {
                             _chatState.value = _chatState.value.copy(toName = event.peer.name)
                         }

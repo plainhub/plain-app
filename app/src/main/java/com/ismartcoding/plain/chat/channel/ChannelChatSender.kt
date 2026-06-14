@@ -73,12 +73,23 @@ object ChannelChatSender {
      * Returns [DMessageStatusData] with a [DMessageDeliveryResult] per recipient.
      */
     private suspend fun broadcastAsLeader(channel: DChatChannel, content: DMessageContent): DMessageStatusData {
-        val recipientIds = channel.getRecipientIds()
+        return sendToRecipients(channel, channel.getRecipientIds(), content)
+    }
+
+    /**
+     * Send [content] to an explicit [recipientIds] list. Used by the leader
+     * (every joined member) and by the UI when retrying to a chosen subset.
+     * Missing peer records become error entries in the returned status data.
+     */
+    suspend fun sendToRecipients(
+        channel: DChatChannel,
+        recipientIds: List<String>,
+        content: DMessageContent,
+    ): DMessageStatusData {
         if (recipientIds.isEmpty()) {
-            LogCat.d("Channel ${channel.id}: no recipients to broadcast to")
+            LogCat.d("Channel ${channel.id}: no recipients to send to")
             return DMessageStatusData()
         }
-
         val peerDao = AppDatabase.instance.peerDao()
         val results = mutableListOf<DMessageDeliveryResult>()
         for (memberId in recipientIds) {
@@ -88,8 +99,7 @@ object ChannelChatSender {
                 results.add(DMessageDeliveryResult(memberId, memberId, "Peer not found in database"))
                 continue
             }
-            val result = sendToMember(channel, memberPeer, content)
-            results.add(result)
+            results.add(sendToMember(channel, memberPeer, content))
         }
         return DMessageStatusData(results)
     }

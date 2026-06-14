@@ -24,11 +24,10 @@ import org.json.JSONArray
 fun ChatViewModel.resendMessage(messageId: String) {
     viewModelScope.launch(Dispatchers.IO) {
         val item = ChatDbHelper.getChatItem(messageId) ?: return@launch
+        val state = chatState.value
         ChatDbHelper.updateChatItemStatus(item, "pending")
         update(item)
-        val state = chatState.value
-        ChatSender.send(item, state.target, state.onlinePeerIds)
-        update(item)
+        ChatSender.resend(item, state.onlinePeerIds)
     }
 }
 

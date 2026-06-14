@@ -7,12 +7,12 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.data.DPairingSession
-import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.NearbyMessageType
@@ -21,8 +21,6 @@ import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
-import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.chat.ChatCacheManager
 import java.util.concurrent.ConcurrentHashMap
 import android.util.Base64
 import com.ismartcoding.plain.data.DPairingResult
@@ -328,23 +326,15 @@ object NearbyPairManager {
         signaturePublicKey: String
     ) {
         try {
-            val currentTime = TimeHelper.now()
-            val ipString = deviceIps.joinToString(",")
-            val peer = (AppDatabase.instance.peerDao().getById(deviceId) ?: DPeer(deviceId).apply {
-                createdAt = currentTime
-            }).apply {
-                name = deviceName
-                ip = ipString
-                this.port = port
-                this.deviceType = deviceType.value
-                this.key = key
-                publicKey = signaturePublicKey
-                status = "paired"
-                updatedAt = currentTime
-            }
-            AppDatabase.instance.peerDao().upsert(peer)
-            LogCat.d("Upserted peer: $deviceId")
-            ChatCacheManager.loadKeyCacheAsync()
+            PeerManager.upsertPaired(
+                deviceId = deviceId,
+                deviceName = deviceName,
+                deviceIps = deviceIps,
+                port = port,
+                deviceType = deviceType,
+                key = key,
+                signaturePublicKey = signaturePublicKey,
+            )
         } catch (e: Exception) {
             LogCat.e("Error storing peer in database: ${e.message}")
             throw e

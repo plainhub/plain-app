@@ -3,12 +3,12 @@ package com.ismartcoding.plain.ui.models
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageSender
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PeerUpdatedEvent
-import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
@@ -75,35 +75,22 @@ internal fun PeerViewModel.handleDeviceFoundInternal(event: NearbyDeviceFoundEve
     viewModelScope.launch(Dispatchers.IO) {
         try {
             val device = event.device
-            val peer = AppDatabase.instance.peerDao().getById(device.id)
-            if (peer != null && peer.status == "paired") {
-                var needsUpdate = false
-                val newIpString = device.ips.joinToString(",")
-                if (peer.ip != newIpString) {
-                    peer.ip = newIpString
-                    needsUpdate = true
-                }
-                if (peer.port != device.port) {
-                    peer.port = device.port
-                    needsUpdate = true
-                }
-                if (peer.name != device.name) {
-                    peer.name = device.name
-                    needsUpdate = true
-                }
-                if (peer.deviceType != device.deviceType.value) {
-                    peer.deviceType = device.deviceType.value
-                    needsUpdate = true
-                }
-                if (needsUpdate) {
-                    peer.updatedAt = TimeHelper.now()
-                    AppDatabase.instance.peerDao().update(peer)
+            val updated = PeerManager.applyDeviceDiscovered(
+                deviceId = device.id,
+                ips = device.ips,
+                port = device.port,
+                name = device.name,
+                deviceType = device.deviceType,
+            )
+            val existing = if (updated != null) updated else AppDatabase.instance.peerDao().getById(device.id)
+            if (existing != null && existing.status == "paired") {
+                if (updated != null) {
                     loadPeersInternal()
-                    sendEvent(PeerUpdatedEvent(peer))
+                    sendEvent(PeerUpdatedEvent(updated))
                 }
-                PeerStatusManager.setOnline(peerId = device.id, true)
-                retryPendingChannelInvitesInternal(peer)
+                retryPendingChannelInvitesInternal(existing)
             }
+            PeerStatusManager.setOnline(peerId = device.id, true)
         } catch (_: Exception) {
         }
     }

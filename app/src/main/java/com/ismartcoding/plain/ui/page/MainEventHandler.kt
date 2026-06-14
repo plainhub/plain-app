@@ -8,10 +8,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.db.ChatItemDataUpdate
-import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.events.ChannelUpdatedEvent
@@ -25,6 +22,7 @@ import com.ismartcoding.plain.events.HMessageUpdatedEvent
 import com.ismartcoding.plain.events.HPomodoroPauseEvent
 import com.ismartcoding.plain.events.HPomodoroStartEvent
 import com.ismartcoding.plain.events.HPomodoroStopEvent
+import com.ismartcoding.plain.features.ChatMessageEditor
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -73,22 +71,11 @@ fun MainEventCollector(
 
                 is FetchLinkPreviewsEvent -> {
                     scope.launch(Dispatchers.IO) {
-                        val data = event.chat.content.value as DMessageText
+                        val data = event.chat.content.value as? DMessageText ?: return@launch
                         val urls = LinkPreviewHelper.extractUrls(data.text)
-                        if (urls.isNotEmpty()) {
-                            val links = LinkPreviewHelper.fetchLinkPreviewsAsync(context, urls).filter { !it.hasError }
-                            if (links.isNotEmpty()) {
-                                val updatedMessageText = DMessageText(data.text, links)
-                                event.chat.content = DMessageContent(DMessageType.TEXT.value, updatedMessageText)
-                                AppDatabase.instance.chatDao().updateData(
-                                    ChatItemDataUpdate(event.chat.id, event.chat.content)
-                                )
-                                chatVM.update(event.chat)
-                                val m = event.chat.toModel()
-                                m.data = m.getContentData()
-                                sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(m))))
-                            }
-                        }
+                        if (urls.isEmpty()) return@launch
+                        ChatMessageEditor.updateTextAsync(context, event.chat, data.text)
+                        chatVM.update(event.chat)
                     }
                 }
 

@@ -41,6 +41,36 @@ object ChannelSystemMessageHandler {
 
     // ── Individual handlers ────────────────────────────────────────
 
+    /**
+     * Insert a `status = "channel"` peer record for a member we don't already
+     * know. Returns true when a new row was inserted.
+     */
+    private fun ensureChannelPeer(
+        id: String,
+        name: String,
+        publicKey: String,
+        deviceType: String,
+        ip: String = "",
+        port: Int = 0,
+        logTag: String = "member",
+    ): Boolean {
+        val peerDao = AppDatabase.instance.peerDao()
+        if (peerDao.getById(id) != null) return false
+        peerDao.insert(
+            DPeer(
+                id = id,
+                name = name,
+                publicKey = publicKey,
+                status = "channel",
+                deviceType = deviceType,
+                ip = ip,
+                port = port,
+            ),
+        )
+        LogCat.d("Created channel peer record for $logTag $id")
+        return true
+    }
+
     private fun handleInvite(fromId: String, msg: ChannelSystemMessages.ChannelInvite) {
         val dao = AppDatabase.instance.chatChannelDao()
         val peerDao = AppDatabase.instance.peerDao()
@@ -64,19 +94,14 @@ object ChannelSystemMessageHandler {
         // Create peer records for channel members we don't already know.
         // These are created with status="channel" and key="" (no shared encryption key).
         for (memberInfo in msg.memberPeers) {
-            if (peerDao.getById(memberInfo.id) == null) {
-                val newPeer = DPeer(
-                    id = memberInfo.id,
-                    name = memberInfo.name,
-                    publicKey = memberInfo.publicKey,
-                    status = "channel",
-                    deviceType = memberInfo.deviceType,
-                    ip = memberInfo.ip,
-                    port = memberInfo.port,
-                )
-                peerDao.insert(newPeer)
-                LogCat.d("Created channel peer record for ${memberInfo.id}")
-            }
+            ensureChannelPeer(
+                id = memberInfo.id,
+                name = memberInfo.name,
+                publicKey = memberInfo.publicKey,
+                deviceType = memberInfo.deviceType,
+                ip = memberInfo.ip,
+                port = memberInfo.port,
+            )
         }
 
         if (isReinvite) {
@@ -139,15 +164,13 @@ object ChannelSystemMessageHandler {
         // If the peer doesn't exist, create a channel peer using the info from the accept message.
         val existingPeer = peerDao.getById(fromId)
         if (existingPeer == null) {
-            val newPeer = DPeer(
+            ensureChannelPeer(
                 id = fromId,
                 name = msg.name,
                 publicKey = msg.publicKey,
-                status = "channel",
                 deviceType = msg.deviceType,
+                logTag = "accepting member",
             )
-            peerDao.insert(newPeer)
-            LogCat.d("Created channel peer record for accepting member $fromId")
         } else if (existingPeer.publicKey.isEmpty() && msg.publicKey.isNotEmpty()) {
             // Update public key if we didn't have it
             existingPeer.publicKey = msg.publicKey
@@ -224,19 +247,15 @@ object ChannelSystemMessageHandler {
 
         // Create peer records for any new members we don't already know
         for (memberInfo in msg.memberPeers) {
-            if (peerDao.getById(memberInfo.id) == null) {
-                val newPeer = DPeer(
-                    id = memberInfo.id,
-                    name = memberInfo.name,
-                    publicKey = memberInfo.publicKey,
-                    status = "channel",
-                    deviceType = memberInfo.deviceType,
-                    ip = memberInfo.ip,
-                    port = memberInfo.port,
-                )
-                peerDao.insert(newPeer)
-                LogCat.d("Created channel peer record for ${memberInfo.id} via update")
-            }
+            ensureChannelPeer(
+                id = memberInfo.id,
+                name = memberInfo.name,
+                publicKey = memberInfo.publicKey,
+                deviceType = memberInfo.deviceType,
+                ip = memberInfo.ip,
+                port = memberInfo.port,
+                logTag = "member via update",
+            )
         }
 
         channel.name = msg.channelName

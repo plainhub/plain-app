@@ -23,3 +23,19 @@ suspend fun DChatChannel.getPeersAsync(): List<DPeer> {
         }
     }
 }
+
+/** True when this device owns the channel. */
+fun DChatChannel.isOwnedByMe(): Boolean = owner == "me"
+
+/** True when the channel is still actively joined on this device. */
+fun DChatChannel.isJoined(): Boolean = status == DChatChannel.STATUS_JOINED
+
+/**
+ * The owning device must call `delete` rather than `leave`; everyone else
+ * can call `delete` once they've left or been kicked.
+ */
+fun DChatChannel.canDeleteFromThisDevice(): Boolean =
+    isOwnedByMe() || status == DChatChannel.STATUS_LEFT || status == DChatChannel.STATUS_KICKED
+
+/** Only non-owners can leave. Owners should delete the channel. */
+fun DChatChannel.canLeave(): Boolean = !isOwnedByMe() && isJoined()

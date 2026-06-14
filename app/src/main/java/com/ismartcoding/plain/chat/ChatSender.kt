@@ -11,13 +11,13 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
+import com.ismartcoding.plain.events.HMessageUpdatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.web.models.toModel
 
@@ -62,6 +62,25 @@ object ChatSender {
         }
     }
 
+    /**
+     * Resend a previously-sent message. Caller must have already set the
+     * item's status to "pending" and refreshed its own view-model state
+     * so the UI shows a "sending" indicator before the network round-trip
+     * completes. This function sends via the existing target route and
+     * then broadcasts MESSAGE_UPDATED so the UI and WebSocket clients
+     * refresh to the final delivery status.
+     */
+    suspend fun resend(item: DChat, onlinePeerIds: Set<String> = emptySet()) {
+        send(item, item.target(), onlinePeerIds)
+        sendEvent(HMessageUpdatedEvent(item.id))
+    }
+
+    private fun DChat.target(): ChatTarget = when {
+        channelId.isNotEmpty() -> ChatTarget(channelId, ChatTargetType.CHANNEL)
+        toId.isEmpty() || toId == "local" -> ChatTarget("local", ChatTargetType.LOCAL)
+        else -> ChatTarget(toId, ChatTargetType.PEER)
+    }
+
     fun triggerPeerRediscovery(peerId: String) {
         val key = ChatCacheManager.peerKeyCache[peerId]
         if (key != null) {
@@ -91,20 +110,10 @@ object ChatSender {
     }
 
     suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) {
-        val peerDao = AppDatabase.instance.peerDao()
-        val newResults = mutableListOf<DMessageDeliveryResult>()
-        for (peerId in peerIds) {
-            val peer = peerDao.getById(peerId)
-            if (peer == null) {
-                newResults.add(DMessageDeliveryResult(peerId, peerId, "Peer not found in database"))
-                continue
-            }
-            newResults.add(ChannelChatSender.sendToMember(channel, peer, item.content))
-        }
-
+        val newResults = ChannelChatSender.sendToRecipients(channel, peerIds, item.content)
         val existing = item.parseStatusData()?.results ?: emptyList()
         val retriedIds = peerIds.toSet()
-        val merged = existing.filter { it.peerId !in retriedIds } + newResults
+        val merged = existing.filter { it.peerId !in retriedIds } + newResults.results
         val mergedStatusData = DMessageStatusData(merged)
 
         ChatDbHelper.updateChannelChatItemStatus(item, mergedStatusData)

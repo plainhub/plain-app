@@ -23,10 +23,12 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.canLeave
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.db.getPeersAsync
+import com.ismartcoding.plain.db.isJoined
+import com.ismartcoding.plain.db.isOwnedByMe
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -55,7 +57,7 @@ fun ChannelChatInfoPage(
     val chatState = chatVM.chatState.collectAsState()
     val channels = channelVM.channels.collectAsStateValue()
     val liveChannel = channels.find { it.id == chatState.value.target.toId }
-    val isOwner = liveChannel?.owner == "me"
+    val ownedByMe = liveChannel?.isOwnedByMe() == true
 
     val showRenameDialog = remember { mutableStateOf(false) }
     val showMembersDialog = remember { mutableStateOf(false) }
@@ -85,10 +87,10 @@ fun ChannelChatInfoPage(
                 item {
                     FlowRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         joinedMemberPeers.forEach { MemberGridItem(name = it.name.ifBlank { it.getBestIp() }, iconRes = DeviceType.fromValue(it.deviceType).getIcon(), onClick = { selectedMemberPeer.value = it }) }
-                        if (isOwner) AddMemberGridItem(onClick = { showMembersDialog.value = true })
+                        if (ownedByMe) AddMemberGridItem(onClick = { showMembersDialog.value = true })
                     }
                 }
-                if (isOwner && pendingMemberPeers.isNotEmpty()) {
+                if (ownedByMe && pendingMemberPeers.isNotEmpty()) {
                     item { VerticalSpace(dp = 16.dp) }
                     item { Subtitle(text = "${stringResource(Res.string.pending_members)} (${pendingMemberPeers.size})") }
                     item {
@@ -98,7 +100,7 @@ fun ChannelChatInfoPage(
                     }
                 }
                 item { VerticalSpace(dp = 16.dp) }
-                item { PCard { PListItem(modifier = if (isOwner) Modifier.clickable { showRenameDialog.value = true } else Modifier, title = stringResource(Res.string.channel_name), value = liveChannel.name, showMore = isOwner) } }
+                item { PCard { PListItem(modifier = if (ownedByMe) Modifier.clickable { showRenameDialog.value = true } else Modifier, title = stringResource(Res.string.channel_name), value = liveChannel.name, showMore = ownedByMe) } }
             }
             item { VerticalSpace(dp = 24.dp) }
             item {
@@ -106,17 +108,17 @@ fun ChannelChatInfoPage(
                     DialogHelper.showConfirmDialog(title = clearMessagesText, message = clearMessagesConfirmText, confirmButton = Pair(clearMessagesText) { chatVM.clearAllMessages(context); navController.navigateUp(); DialogHelper.showSuccess(Res.string.messages_cleared) }, dismissButton = Pair(cancelText) {})
                 })
             }
-            if (liveChannel != null && isOwner) {
+            if (liveChannel != null && ownedByMe) {
                 item { VerticalSpace(dp = 16.dp); POutlinedButton(text = deleteChannelText, type = ButtonType.DANGER, modifier = Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 16.dp), onClick = {
                     DialogHelper.showConfirmDialog(title = deleteChannelText, message = deleteChannelWarningText, confirmButton = Pair(deleteChannelText) { channelVM.removeChannel(context, liveChannel.id); navController.popBackStack(navController.graph.startDestinationId, false) }, dismissButton = Pair(cancelText) {})
                 }) }
             }
-            if (liveChannel != null && !isOwner && liveChannel.status == DChatChannel.STATUS_JOINED) {
+            if (liveChannel != null && liveChannel.canLeave()) {
                 item { VerticalSpace(dp = 16.dp); POutlinedButton(text = leaveChannelText, type = ButtonType.DANGER, modifier = Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 16.dp), onClick = {
                     DialogHelper.showConfirmDialog(title = leaveChannelText, message = leaveChannelWarningText, confirmButton = Pair(leaveChannelText) { channelVM.leaveChannel(context, liveChannel.id); navController.navigateUp() }, dismissButton = Pair(cancelText) {})
                 }) }
             }
-            if (liveChannel != null && !isOwner && (liveChannel.status == DChatChannel.STATUS_LEFT || liveChannel.status == DChatChannel.STATUS_KICKED)) {
+            if (liveChannel != null && !ownedByMe && !liveChannel.isJoined()) {
                 item { VerticalSpace(dp = 16.dp); POutlinedButton(text = deleteChannelText, type = ButtonType.DANGER, modifier = Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 16.dp), onClick = {
                     DialogHelper.showConfirmDialog(title = deleteChannelText, message = deleteChannelWarningText, confirmButton = Pair(deleteChannelText) { channelVM.removeChannel(context, liveChannel.id); navController.popBackStack(navController.graph.startDestinationId, false) }, dismissButton = Pair(cancelText) {})
                 }) }
@@ -126,7 +128,7 @@ fun ChannelChatInfoPage(
     }
 
     ChannelChatInfoDialogs(
-        liveChannel = liveChannel, isOwner = isOwner,
+        liveChannel = liveChannel, isOwner = ownedByMe,
         showRenameDialog = showRenameDialog.value, onDismissRename = { showRenameDialog.value = false },
         channelVM = channelVM, selectedMemberPeer = selectedMemberPeer, selectedPendingMemberPeer = selectedPendingMemberPeer,
         showMembersDialog = showMembersDialog.value, onDismissMembers = { showMembersDialog.value = false },

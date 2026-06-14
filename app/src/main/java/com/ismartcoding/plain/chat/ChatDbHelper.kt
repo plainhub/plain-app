@@ -2,6 +2,7 @@ package com.ismartcoding.plain.chat
 
 import android.content.Context
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFiles
@@ -12,6 +13,7 @@ import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.db.ChatMessageStatus
 import com.ismartcoding.plain.db.DMessageDeliveryResult
+import com.ismartcoding.plain.db.DMessageType
 
 object ChatDbHelper {
     suspend fun insertChatItem(message: DMessageContent, fromId: String = "me", toId: String = "local", channelId: String = "", isRemote: Boolean): DChat {
@@ -56,6 +58,30 @@ object ChatDbHelper {
         item.status = statusData?.aggregateStatus() ?: ChatMessageStatus.FAILED
         item.statusData = if (statusData != null && statusData.total > 0) jsonEncode(statusData) else ""
         AppDatabase.instance.chatDao().updateStatusAndData(item.id, item.status, item.statusData)
+    }
+
+    /**
+     * Persist new [content] for an existing chat item. The in-memory [item]
+     * is also mutated so callers can re-emit events / update UI without
+     * re-fetching. Caller owns any "message updated" WebSocket broadcast.
+     */
+    suspend fun updateChatItemContent(item: DChat, content: DMessageContent) {
+        item.content = content
+        AppDatabase.instance.chatDao().updateData(ChatItemDataUpdate(id = item.id, content = content))
+    }
+
+    /**
+     * Replace the file list of a FILES/IMAGES message — the two content
+     * types whose [com.ismartcoding.plain.db.DMessageFile.uri] may transition
+     * from `fsid:` (remote) to `fid:` (local) after download.
+     */
+    suspend fun updateChatItemFilesContent(item: DChat, files: List<com.ismartcoding.plain.db.DMessageFile>) {
+        val content = when (item.content.type) {
+            DMessageType.IMAGES.value -> DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
+            DMessageType.FILES.value -> DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
+            else -> return
+        }
+        updateChatItemContent(item, content)
     }
 
     suspend fun deleteAsync(

@@ -3,7 +3,6 @@ package com.ismartcoding.plain.web
 import android.annotation.SuppressLint
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.kgraphql.Context
 import com.ismartcoding.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.lib.kgraphql.KGraphQL
@@ -11,31 +10,12 @@ import com.ismartcoding.lib.kgraphql.context
 import com.ismartcoding.lib.kgraphql.schema.Schema
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageHandler
 import com.ismartcoding.plain.chat.ChatCacheManager
-import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.chat.data.ChatTarget
-import com.ismartcoding.plain.chat.data.ChatTargetType
-import com.ismartcoding.plain.chat.download.DownloadQueue
+import com.ismartcoding.plain.chat.ChatMessageReceiver
 import com.ismartcoding.plain.chat.peer.PeerChatParser
-import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DChatChannel
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.db.getMessagePreview
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
-import com.ismartcoding.plain.events.HMessageCreatedEvent
-import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.helpers.NotificationHelper
-import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.peer_chat
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
@@ -75,99 +55,17 @@ class PeerGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("createChatItem") {
-                    resolver @androidx.annotation.RequiresPermission(android.Manifest.permission.POST_NOTIFICATIONS) { content: String, context: Context ->
+                    resolver { content: String, context: Context ->
                         val call = context.get<ApplicationCall>()!!
-
                         val fromPeerId = call.request.header("c-id") ?: ""
                         val fromChannelId = call.request.header("c-cid") ?: ""
 
-                        val fromPeer = AppDatabase.instance.peerDao().getById(fromPeerId) ?: throw Exception("invalid peer")
-
-                        // Reject channel messages if we have left or been kicked
-                        var fromChannel: DChatChannel? = null
-                        if (fromChannelId.isNotEmpty()) {
-                            fromChannel = AppDatabase.instance.chatChannelDao().getById(fromChannelId)
-                            if (fromChannel == null || fromChannel.status != DChatChannel.STATUS_JOINED) {
-                                throw IllegalStateException("Channel not joined")
-                            }
-                        }
-
-                        val item = ChatDbHelper.insertChatItem(
-                            DChat.parseContent(content),
-                            fromPeerId,
-                            toId = if (fromChannelId.isEmpty()) "me" else "",
-                            channelId = fromChannelId,
-                            isRemote = false
+                        val item = ChatMessageReceiver.receive(
+                            fromPeerId = fromPeerId,
+                            content = DChat.parseContent(content),
+                            fromChannelId = fromChannelId,
                         )
-
-                        if (item.content.type == DMessageType.TEXT.value) {
-                            sendEvent(FetchLinkPreviewsEvent(item))
-                        }
-
-                        // Download files from peer automatically using queue
-                        if (setOf(
-                                DMessageType.FILES.value,
-                                DMessageType.IMAGES.value
-                            ).contains(item.content.type)
-                        ) {
-                            val files = when (item.content.value) {
-                                is DMessageFiles -> (item.content.value as DMessageFiles).items
-                                is DMessageImages -> (item.content.value as DMessageImages).items
-                                else -> emptyList()
-                            }
-
-                            // Add files to download queue instead of downloading directly
-                            files.forEach { file ->
-                                DownloadQueue.addDownloadTask(
-                                    messageFile = file,
-                                    peer = fromPeer,
-                                    messageId = item.id
-                                )
-                            }
-                        }
-
-                        sendEvent(
-                            HMessageCreatedEvent(
-                                if (fromChannelId.isNotEmpty()) ChatTarget(fromChannelId, ChatTargetType.CHANNEL)
-                                else ChatTarget(fromPeerId, ChatTargetType.PEER),
-                                arrayListOf(item),
-                            )
-                        )
-                        val model = item.toModel()
-                        model.data = model.getContentData()
-                        sendEvent(
-                            WebSocketEvent(
-                                EventType.MESSAGE_CREATED,
-                                JsonHelper.jsonEncode(listOf(model))
-                            )
-                        )
-
-                        if (Permission.POST_NOTIFICATIONS.can(MainApp.instance)) {
-                            val preview = item.getMessagePreview()
-                            val (targetId, targetName, messageText) = if (fromChannel == null) {
-                                NotificationPayload(
-                                    targetId = "peer:$fromPeerId",
-                                    targetName = fromPeer.name.ifEmpty { LocaleHelper.getStringSync(Res.string.peer_chat) },
-                                    messageText = preview,
-                                )
-                            } else {
-                                NotificationPayload(
-                                    targetId = "channel:$fromChannel",
-                                    targetName = fromChannel.name.ifEmpty { LocaleHelper.getStringSync(Res.string.peer_chat) },
-                                    messageText = "${fromPeer.name}: $preview",
-                                )
-                            }
-                            if (ChatCacheManager.activeToId != targetId) {
-                                NotificationHelper.sendChatMessageNotification(
-                                    context = MainApp.instance,
-                                    targetId = targetId,
-                                    targetName = targetName,
-                                    messageText = messageText,
-                                )
-                            }
-                        }
-
-                        arrayListOf(item).map { it.toModel() }
+                        listOf(item.toModel())
                     }
                 }
                 stringScalar<Instant> {
@@ -247,9 +145,3 @@ class PeerGraphQL(val schema: Schema) {
         }
     }
 }
-
-private data class NotificationPayload(
-    val targetId: String,
-    val targetName: String,
-    val messageText: String,
-)

@@ -3,22 +3,19 @@ package com.ismartcoding.plain.ui.models
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
+import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.ChatSender
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.events.HMessageUpdatedEvent
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -65,16 +62,13 @@ suspend fun ChatViewModel.sendFilesImmediate(files: List<DMessageFile>, isImageV
     } else {
         DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
     }
-    val item = AppDatabase.instance.chatDao().let { dao ->
-        val chat = DChat()
-        chat.fromId = "me"
-        chat.toId = if (state.target.type == ChatTargetType.CHANNEL) "" else state.target.toId
-        chat.channelId = if (state.target.type == ChatTargetType.CHANNEL) state.target.toId else ""
-        chat.content = content
-        chat.status = "pending"
-        dao.insert(chat)
-        chat
-    }
+    val item = ChatDbHelper.insertChatItem(
+        message = content,
+        fromId = "me",
+        toId = if (state.target.type == ChatTargetType.CHANNEL) "" else state.target.toId,
+        channelId = if (state.target.type == ChatTargetType.CHANNEL) state.target.toId else "",
+        isRemote = state.target.type != ChatTargetType.LOCAL,
+    )
     addAll(listOf(item))
     return item.id
 }
@@ -82,24 +76,16 @@ suspend fun ChatViewModel.sendFilesImmediate(files: List<DMessageFile>, isImageV
 fun ChatViewModel.updateFilesMessage(messageId: String, files: List<DMessageFile>, isImageVideo: Boolean) {
     viewModelScope.launch(Dispatchers.IO) {
         val state = chatState.value
-        val content = if (isImageVideo) {
-            DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
+        val item = ChatDbHelper.getChatItem(messageId) ?: return@launch
+        ChatDbHelper.updateChatItemFilesContent(item, files)
+        if (state.target.type == ChatTargetType.LOCAL) {
+            ChatDbHelper.updateChatItemStatus(item, "sent")
         } else {
-            DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
+            ChatDbHelper.updateChatItemStatus(item, "pending")
+            ChatSender.send(item, state.target, state.onlinePeerIds)
         }
-        val newStatus = if (state.target.type == ChatTargetType.LOCAL) "sent" else "pending"
-        val dao = AppDatabase.instance.chatDao()
-        dao.getById(messageId)?.let { item ->
-            item.content = content
-            item.status = newStatus
-            dao.update(item)
-            val model = item.toModel().apply { data = getContentData() }
-            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-            if (state.target.type != ChatTargetType.LOCAL) {
-                ChatSender.send(item, state.target, state.onlinePeerIds)
-            }
-            update(item)
-        }
+        sendEvent(HMessageUpdatedEvent(item.id))
+        update(item)
     }
 }
 

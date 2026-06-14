@@ -57,4 +57,9 @@ object ChatCacheManager {
         peerMap.clear()
         peerMap.putAll(cache)
     }
+
+    /** Update a single entry in [peerMap]. */
+    fun updatePeer(peer: DPeer) {
+        peerMap[peer.id] = peer
+    }
 }
