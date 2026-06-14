@@ -1,0 +1,1 @@
+import{zt as e}from"./query-CWZJUnY1.js";function t(t){let n=``;n=e(t.firstName)||e(t.lastName)?`${t.lastName}${t.middleName}${t.firstName}`:[t.firstName,t.middleName,t.lastName].filter(e=>e).join(` `);let r=t.suffix?`, ${t.suffix}`:``;return`${t.prefix} ${n} ${r}`.trim()||(t.emails.length?t.emails[0].value:``)}export{t};

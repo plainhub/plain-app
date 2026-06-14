@@ -1,0 +1,1 @@
+var e=`/ficons/default.svg`;export{e as t};

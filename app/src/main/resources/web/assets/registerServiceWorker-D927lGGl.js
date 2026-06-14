@@ -1,1 +1,0 @@
-"serviceWorker"in navigator?navigator.serviceWorker.register("/sw.js").then(e=>{console.log("Service worker registration succeeded:",e)},e=>{console.error(`Service worker registration failed: ${e}`)}):console.error("Service workers are not supported.");
