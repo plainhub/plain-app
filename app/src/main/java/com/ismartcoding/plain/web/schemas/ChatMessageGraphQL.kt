@@ -2,52 +2,57 @@ package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.HRetryChatItemEvent
-import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
 
 fun SchemaBuilder.addChatMessageSchema() {
+    query("chatItems") {
+        resolver { id: String ->
+            val dao = AppDatabase.instance.chatDao()
+            val items = if (id.startsWith("channel:")) {
+                dao.getByChannelId(id.removePrefix("channel:"))
+            } else {
+                dao.getByChatId(id.replace("peer:", ""))
+            }
+            items.map { it.toModel() }
+        }
+    }
+
+    query("latestChatItems") {
+        resolver { ->
+            AppDatabase.instance.chatDao().getAllLatestChats().map { it.toModel() }
+        }
+    }
+    type<ChatItem> {
+        property("data") {
+            resolver { c: ChatItem ->
+                c.getContentData()
+            }
+        }
+    }
     mutation("sendChatItem") {
         resolver { toId: String, content: String ->
+            val item = ChatManager.sendChatItem(toId, DChat.parseContent(content))
             val isChannel = toId.startsWith("channel:")
-            val channelId = if (isChannel) toId.removePrefix("channel:") else ""
-            val peerId = toId.removePrefix("peer:")
             val isPeer = toId.startsWith("peer:")
-            val peer: DPeer? = if (isPeer) AppDatabase.instance.peerDao().getById(peerId) else null
-            val item = ChatDbHelper.sendAsync(
-                DChat.parseContent(content),
-                fromId = "me",
-                toId = when {
-                    isChannel -> ""
-                    isPeer -> peerId
-                    else -> toId
-                },
-                channelId = channelId,
-                peer = peer
-            )
-            if (item.content.type == DMessageType.TEXT.value) {
-                sendEvent(FetchLinkPreviewsEvent(item))
-            }
+            val peer: DPeer? = if (isPeer) AppDatabase.instance.peerDao().getById(toId.removePrefix("peer:")) else null
             if (isChannel) {
                 ChatDbHelper.deliverToChannelAsync(item)
             } else if (isPeer && peer != null) {
                 ChatDbHelper.deliverToPeerAsync(item, peer)
             }
             val model = item.toModel().apply { data = getContentData() }
-            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-            sendEvent(HMessageCreatedEvent(if (isChannel) channelId else if (isPeer) peerId else toId, arrayListOf(item)))
+            sendEvent(HMessageCreatedEvent(toId, arrayListOf(item)))
             arrayListOf(model)
         }
     }

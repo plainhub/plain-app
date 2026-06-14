@@ -14,13 +14,14 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.DSession
 import com.ismartcoding.plain.events.WebRequestReceivedEvent
+import com.ismartcoding.plain.web.schemas.addAppFileSchema
+import com.ismartcoding.plain.web.schemas.addAppLogsSchema
 import com.ismartcoding.plain.web.schemas.addAppSchema
 import com.ismartcoding.plain.web.schemas.addAudioSchema
 import com.ismartcoding.plain.web.schemas.addBookmarkSchema
 import com.ismartcoding.plain.web.schemas.addCallSchema
 import com.ismartcoding.plain.web.schemas.addChatChannelSchema
 import com.ismartcoding.plain.web.schemas.addChatMessageSchema
-import com.ismartcoding.plain.web.schemas.addChatQuerySchema
 import com.ismartcoding.plain.web.schemas.addContactSchema
 import com.ismartcoding.plain.web.schemas.addDocSchema
 import com.ismartcoding.plain.web.schemas.addFeedSchema
@@ -39,7 +40,6 @@ import com.ismartcoding.plain.web.schemas.addSchemaTypes
 import com.ismartcoding.plain.web.schemas.addScreenMirrorSchema
 import com.ismartcoding.plain.web.schemas.addSmsSchema
 import com.ismartcoding.plain.web.schemas.addTagSchema
-import com.ismartcoding.plain.web.schemas.addAppLogsSchema
 import com.ismartcoding.plain.web.schemas.addDataStoreSchema
 import com.ismartcoding.plain.web.schemas.addDbSchema
 import com.ismartcoding.plain.web.schemas.addVideoSchema
@@ -67,7 +67,6 @@ class MainGraphQL(val schema: Schema) {
     class Configuration : SchemaConfigurationDSL() {
         fun init() {
             schemaBlock = {
-                addChatQuerySchema()
                 addChatMessageSchema()
                 addChatChannelSchema()
                 addSmsSchema()
@@ -89,6 +88,7 @@ class MainGraphQL(val schema: Schema) {
                 addPomodoroSchema()
                 addNotificationSchema()
                 addAppSchema()
+                addAppFileSchema()
                 addAppLogsSchema()
                 addDataStoreSchema()
                 addDbSchema()

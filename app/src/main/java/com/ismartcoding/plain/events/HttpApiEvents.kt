@@ -4,6 +4,8 @@ import com.ismartcoding.lib.channel.ChannelEvent
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DChat
 
+
+// H prefix means event from http api
 class HMessageCreatedEvent(val fromId: String, val items: List<DChat>) : ChannelEvent()
 
 class HMessageUpdatedEvent(val id: String) : ChannelEvent()

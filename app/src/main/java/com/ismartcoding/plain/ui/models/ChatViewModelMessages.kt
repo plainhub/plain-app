@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
@@ -15,7 +15,6 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.web.models.toModel
@@ -34,17 +33,12 @@ fun ChatViewModel.sendMessage(content: DMessageContent, onResult: (Boolean) -> U
             }
         }
 
-        val item = ChatDbHelper.sendAsync(
-            message = content, fromId = "me",
-            toId = if (state.chatType == ChatType.CHANNEL) "" else state.toId,
-            channelId = if (state.chatType == ChatType.CHANNEL) state.toId else "",
-            peer = if (state.chatType == ChatType.PEER) AppDatabase.instance.peerDao().getById(state.toId) else null,
-            isRemote = state.isRemote()
-        )
+        val encodedToId = when (state.chatType) {
+            ChatType.CHANNEL -> "channel:${state.toId}"
+            else -> state.toId
+        }
+        val item = ChatManager.sendChatItem(encodedToId, content)
         addAll(listOf(item))
-        val model = item.toModel().apply { data = getContentData() }
-        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-        if (item.content.type == DMessageType.TEXT.value) sendEvent(FetchLinkPreviewsEvent(item))
 
         if (state.isRemote()) {
             val outcome = deliverToRemoteAsync(state, content)

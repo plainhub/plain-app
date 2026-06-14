@@ -57,7 +57,7 @@ class PeerViewModel : ViewModel() {
     fun removePeer(context: Context, peerId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                PeerManager.deletePeerAsync(context, peerId)
+                PeerManager.deletePeer(context, peerId)
                 loadPeers()
             } catch (_: Exception) {}
         }

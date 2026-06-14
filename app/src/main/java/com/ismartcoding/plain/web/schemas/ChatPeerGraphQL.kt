@@ -16,7 +16,7 @@ fun SchemaBuilder.addPeerSchema() {
     }
     mutation("deletePeer") {
         resolver { id: ID ->
-            PeerManager.deletePeerAsync(MainApp.instance, id.value)
+            PeerManager.deletePeer(MainApp.instance, id.value)
             true
         }
     }
