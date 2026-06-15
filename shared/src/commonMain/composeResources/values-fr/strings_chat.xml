@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">Permettre aux autres appareils de détecter cet appareil sur le réseau</string>
     <string name="discover_nearby_devices">Découvrir les appareils à proximité</string>
     <string name="stop_discovering">Arrêter la recherche</string>
-    <string name="tap_discover_to_start">Appuyez sur \"Découvrir les appareils à proximité\" pour commencer la recherche</string>
+    <string name="tap_discover_to_start">Appuyez sur "Découvrir les appareils à proximité" pour commencer la recherche</string>
     <string name="make_sure_devices_same_network">Assurez-vous que les autres appareils sont sur le même réseau et détectables</string>
     <string name="show_qr_code">Afficher le code QR</string>
     <string name="pair_via_qr_title">Associer via un code QR</string>
@@ -91,6 +91,9 @@
     <string name="device_type">Type d'appareil</string>
     <string name="port">Port</string>
     <string name="chat_info">Infos du chat</string>
+    <string name="channel_info">Infos du canal</string>
+    <string name="peer_info">Infos du pair</string>
+    <string name="owner">Propriétaire</string>
     <string name="clear_messages">Effacer les messages</string>
     <string name="clear_messages_confirm">Êtes-vous sûr de vouloir effacer tous les messages ? Cette action est irréversible.</string>
     <string name="messages_cleared">Messages effacés !</string>

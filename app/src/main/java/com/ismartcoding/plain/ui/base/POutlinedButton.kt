@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.theme.red
 
@@ -31,9 +33,9 @@ fun POutlinedButton(
     modifier: Modifier = Modifier,
     icon: Painter? = null,
     type: ButtonType = ButtonType.PRIMARY,
+    buttonSize: ButtonSize = ButtonSize.MEDIUM,
     isLoading: Boolean = false,
     enabled: Boolean = true,
-    small: Boolean = false,
     block: Boolean = false,
     contentColor: Color? = null,
 ) {
@@ -43,14 +45,14 @@ fun POutlinedButton(
         ButtonType.DANGER -> MaterialTheme.colorScheme.red
     }
     val borderColor = resolvedColor.copy(alpha = 0.5f)
-    val height = if (small) 32.dp else 40.dp
-    val shape = if (small) RoundedCornerShape(32.dp) else RoundedCornerShape(40.dp)
-    val padding = PaddingValues(horizontal = 16.dp)
+    val padding = if (buttonSize == ButtonSize.SMALL) PaddingValues(horizontal = 12.dp) else ButtonDefaults.ContentPadding
 
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier.then(if (block) Modifier.fillMaxWidth() else Modifier).height(height),
-        shape = shape,
+        modifier = modifier
+            .then(if (block || buttonSize != ButtonSize.SMALL) Modifier.fillMaxWidth() else Modifier)
+            .height(buttonSize.height),
+        shape = RoundedCornerShape(buttonSize.cornerRadius),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = resolvedColor),
         border = BorderStroke(1.dp, borderColor),
         contentPadding = padding,
@@ -58,16 +60,19 @@ fun POutlinedButton(
     ) {
         Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = resolvedColor)
+                CircularProgressIndicator(modifier = Modifier.size(if (buttonSize == ButtonSize.SMALL) 14.dp else 16.dp), strokeWidth = 2.dp, color = resolvedColor)
                 HorizontalSpace(8.dp)
             } else if (icon != null) {
-                Icon(painter = icon, contentDescription = null, modifier = Modifier.size(if (small) 16.dp else 20.dp), tint = resolvedColor)
+                Icon(painter = icon, contentDescription = null, modifier = Modifier.size(if (buttonSize == ButtonSize.SMALL) 16.dp else 20.dp), tint = resolvedColor)
                 HorizontalSpace(8.dp)
             }
             Text(
                 text = text,
-                style = if (small) MaterialTheme.typography.labelSmall
-                else MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                style = when (buttonSize) {
+                    ButtonSize.SMALL -> MaterialTheme.typography.labelMedium
+                    ButtonSize.MEDIUM -> MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    ButtonSize.LARGE -> MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                },
             )
         }
     }

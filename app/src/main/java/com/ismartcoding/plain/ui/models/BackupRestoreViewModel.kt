@@ -43,11 +43,11 @@ class BackupRestoreViewModel : ViewModel() {
                 tmpFile.copyTo(destFile, overwrite = true)
                 tmpFile.delete()
                 DialogHelper.hideLoading()
-                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.exported_to, "name", destFile.absolutePath))
+                DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, "name", destFile.absolutePath))
             } catch (e: Throwable) {
                 LogCat.e("Backup failed: ${e.message}")
                 DialogHelper.hideLoading()
-                DialogHelper.showMessage(e.message ?: LocaleHelper.getString(Res.string.error))
+                DialogHelper.showMessage(e.message ?: LocaleHelper.getStringAsync(Res.string.error))
             }
         }
     }
@@ -63,11 +63,11 @@ class BackupRestoreViewModel : ViewModel() {
                 }
                 val fileName = contentResolver.queryOpenableFileName(uri)
                 DialogHelper.hideLoading()
-                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.exported_to, "name", fileName))
+                DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, "name", fileName))
             } catch (e: Throwable) {
                 LogCat.e("Backup failed: ${e.message}")
                 DialogHelper.hideLoading()
-                DialogHelper.showMessage(e.message ?: LocaleHelper.getString(Res.string.error))
+                DialogHelper.showMessage(e.message ?: LocaleHelper.getStringAsync(Res.string.error))
             }
         }
     }
@@ -104,13 +104,13 @@ class BackupRestoreViewModel : ViewModel() {
                     destFile.deleteRecursively()
                 }
                 DialogHelper.hideLoading()
-                DialogHelper.showConfirmDialog("", LocaleHelper.getString(Res.string.app_restored)) {
+                DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.app_restored)) {
                     sendEvent(RestartAppEvent())
                 }
             } catch (e: Throwable) {
                 LogCat.e("Restore failed: ${e.message}")
                 DialogHelper.hideLoading()
-                DialogHelper.showMessage(e.message ?: LocaleHelper.getString(Res.string.error))
+                DialogHelper.showMessage(e.message ?: LocaleHelper.getStringAsync(Res.string.error))
             }
         }
     }

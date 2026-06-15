@@ -19,6 +19,11 @@ data class DownloadTask(
     var aborted: Boolean = false
 )  {
     fun isDownloading(): Boolean {
+        return status == DownloadStatus.PENDING || status == DownloadStatus.DOWNLOADING
+    }
+
+    /** True when a progress overlay / pause-resume controls should be shown. */
+    fun isActive(): Boolean {
         return setOf(DownloadStatus.PENDING, DownloadStatus.DOWNLOADING, DownloadStatus.PAUSED, DownloadStatus.FAILED).contains(status)
     }
 }

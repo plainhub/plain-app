@@ -62,8 +62,8 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
     FeedsPageEffects(feedsVM)
     BackHandler(enabled = feedsVM.selectMode.value) { feedsVM.exitSelectMode() }
     AddFeedDialog(feedsVM); EditFeedDialog(feedsVM); ViewFeedBottomSheet(feedsVM)
-    val pageTitle = if (feedsVM.selectMode.value) LocaleHelper.getStringSyncF(Res.string.x_selected, "count", feedsVM.selectedIds.size)
-    else LocaleHelper.getStringSyncF(Res.string.subscriptions_title, "count", itemsState.size)
+    val pageTitle = if (feedsVM.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, "count", feedsVM.selectedIds.size)
+    else LocaleHelper.getStringF(Res.string.subscriptions_title, "count", itemsState.size)
 
     PScaffold(
         topBar = {

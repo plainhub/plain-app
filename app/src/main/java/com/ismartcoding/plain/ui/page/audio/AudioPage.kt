@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.audio
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
@@ -32,7 +31,6 @@ import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.MediaTopBar
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
-import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
@@ -80,8 +78,8 @@ fun AudioPage(
     val isAudioPlaying by AudioPlayer.isPlayingFlow.collectAsState()
 
     val tabs = remember(tagsState, audioVM.total.intValue, audioVM.totalTrash.intValue) {
-        val baseTabs = mutableListOf(VTabData(LocaleHelper.getStringSync(Res.string.all), "all", audioVM.total.intValue))
-        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getStringSync(Res.string.trash), "trash", audioVM.totalTrash.intValue))
+        val baseTabs = mutableListOf(VTabData(LocaleHelper.getString(Res.string.all), "all", audioVM.total.intValue))
+        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(Res.string.trash), "trash", audioVM.totalTrash.intValue))
         baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) })
         baseTabs
     }

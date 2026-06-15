@@ -14,6 +14,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
@@ -54,7 +55,7 @@ internal fun MainActivity.initEvents() {
                     mainVM.httpServerError = HttpServerManager.httpServerError
                     mainVM.httpServerState = event.state
                     if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@initEvents)) {
-                        DialogHelper.showConfirmDialog(LocaleHelper.getString(Res.string.confirm), LocaleHelper.getString(Res.string.storage_permission_confirm)) {
+                        DialogHelper.showConfirmDialog(LocaleHelper.getStringAsync(Res.string.confirm), LocaleHelper.getStringAsync(Res.string.storage_permission_confirm)) {
                             coIO { ApiPermissionsPreference.putAsync(Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }
                         }
                     }
@@ -147,6 +148,7 @@ internal fun MainActivity.initEvents() {
                 }
                 is PairingSuccessEvent -> {
                     withIO { peerVM.loadPeers() }
+                    PeerStatusManager.reconnectNow("post_pairing")
                     navControllerState.value?.navigate(Routing.Chat("peer:${event.deviceId}")) { popUpTo<Routing.Nearby> { inclusive = true } }
                 }
             }

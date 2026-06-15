@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">允许其他设备在网络中发现此设备</string>
     <string name="discover_nearby_devices">发现附近设备</string>
     <string name="stop_discovering">停止发现</string>
-    <string name="tap_discover_to_start">点击\"发现附近设备\"开始搜索</string>
+    <string name="tap_discover_to_start">点击"发现附近设备"开始搜索</string>
     <string name="make_sure_devices_same_network">确保其他设备在同一网络中且可被发现</string>
     <string name="show_qr_code">显示二维码</string>
     <string name="pair_via_qr_title">通过二维码配对</string>
@@ -84,6 +84,9 @@
     <string name="device_type">设备类型</string>
     <string name="port">端口</string>
     <string name="chat_info">聊天信息</string>
+    <string name="channel_info">频道信息</string>
+    <string name="peer_info">设备信息</string>
+    <string name="owner">所有者</string>
     <string name="clear_messages">清空消息</string>
     <string name="clear_messages_confirm">确定要清空所有消息吗？此操作无法撤销。</string>
     <string name="messages_cleared">消息已清空！</string>

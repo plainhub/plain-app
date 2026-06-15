@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">Allow other devices to discover this device on the network</string>
     <string name="discover_nearby_devices">Discover nearby devices</string>
     <string name="stop_discovering">Stop discovering</string>
-    <string name="tap_discover_to_start">Tap \"Discover nearby devices\" to start searching</string>
+    <string name="tap_discover_to_start">Tap "Discover nearby devices" to start searching</string>
     <string name="make_sure_devices_same_network">Make sure other devices are on the same network and discoverable</string>
     <string name="show_qr_code">Show QR code</string>
     <string name="pair_via_qr_title">Pair via QR code</string>
@@ -101,7 +101,7 @@
     <string name="channel_left_notice">You have left this channel and can no longer send messages.</string>
     <string name="channel_kicked_notice">You were removed from this channel and can no longer send messages.</string>
     <string name="channel_invite">Channel Invite</string>
-    <string name="channel_invite_message">%1$s invited you to join channel \"%2$s\"</string>
+    <string name="channel_invite_message">%1$s invited you to join channel "%2$s"</string>
     <string name="inviter">Inviter</string>
     <string name="decline">Decline</string>
     <string name="pending_invite">Pending invite</string>
@@ -121,6 +121,9 @@
     <string name="device_type">Device type</string>
     <string name="port">Port</string>
     <string name="chat_info">Chat Info</string>
+    <string name="channel_info">Channel Info</string>
+    <string name="peer_info">Peer Info</string>
+    <string name="owner">Owner</string>
     <string name="clear_messages">Clear Messages</string>
     <string name="clear_messages_confirm">Are you sure you want to clear all messages? This action cannot be undone.</string>
     <string name="messages_cleared">Messages cleared!</string>

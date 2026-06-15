@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 data class ChatState(
-    val target: ChatTarget = ChatTarget("", ChatTargetType.LOCAL),
+    val target: ChatTarget = ChatTarget("local", ChatTargetType.PEER),
     val toName: String = "",
 )
 
@@ -52,12 +52,14 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                             else current - event.peerId
                         }
                     }
+
                     is PeerUpdatedEvent -> {
                         ChatCacheManager.updatePeer(event.peer)
                         if (_chatState.value.target.type == ChatTargetType.PEER && _chatState.value.target.toId == event.peer.id) {
                             _chatState.value = _chatState.value.copy(toName = event.peer.name)
                         }
                     }
+
                     is ChannelUpdatedEvent -> {
                         if (_chatState.value.target.type != ChatTargetType.CHANNEL) return@collect
                         val channelId = _chatState.value.target.toId
@@ -73,20 +75,19 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     suspend fun initializeChatStateAsync(chatId: String) {
         val target = ChatTarget.parseId(chatId)
+        if (target.isLocal()) {
+            _chatState.value = _chatState.value.copy(target = target, toName = LocaleHelper.getStringAsync(Res.string.local_chat))
+            return
+        }
         when (target.type) {
             ChatTargetType.PEER -> {
                 val peer = AppDatabase.instance.peerDao().getById(target.toId)
                 _chatState.value = _chatState.value.copy(target = target, toName = peer?.name ?: "")
             }
+
             ChatTargetType.CHANNEL -> {
                 val channel = AppDatabase.instance.chatChannelDao().getById(target.toId)
                 _chatState.value = _chatState.value.copy(target = target, toName = channel?.name ?: "")
-            }
-            ChatTargetType.LOCAL -> {
-                _chatState.value = _chatState.value.copy(
-                    target = ChatTarget("local", ChatTargetType.LOCAL),
-                    toName = LocaleHelper.getString(Res.string.local_chat),
-                )
             }
         }
     }
@@ -119,5 +120,10 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     fun remove(id: String) {
         _itemsFlow.value.removeIf { it.id == id }
+    }
+
+    fun removeIds(ids: Set<String>) {
+        if (ids.isEmpty()) return
+        _itemsFlow.value.removeIf { ids.contains(it.id) }
     }
 }

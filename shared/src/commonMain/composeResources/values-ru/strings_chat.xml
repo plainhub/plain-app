@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">Разрешить другим устройствам обнаруживать это устройство в сети</string>
     <string name="discover_nearby_devices">Обнаружить устройства рядом</string>
     <string name="stop_discovering">Остановить поиск</string>
-    <string name="tap_discover_to_start">Нажмите \"Обнаружить устройства рядом\" для начала поиска</string>
+    <string name="tap_discover_to_start">Нажмите "Обнаружить устройства рядом" для начала поиска</string>
     <string name="make_sure_devices_same_network">Убедитесь, что другие устройства находятся в той же сети и обнаруживаемы</string>
     <string name="show_qr_code">Показать QR-код</string>
     <string name="pair_via_qr_title">Сопряжение по QR-коду</string>
@@ -91,6 +91,9 @@
     <string name="device_type">Тип устройства</string>
     <string name="port">Порт</string>
     <string name="chat_info">Сведения о чате</string>
+    <string name="channel_info">Сведения о канале</string>
+    <string name="peer_info">Сведения о узле</string>
+    <string name="owner">Владелец</string>
     <string name="clear_messages">Очистить сообщения</string>
     <string name="clear_messages_confirm">Вы уверены, что хотите очистить все сообщения? Это действие невозможно отменить.</string>
     <string name="messages_cleared">Сообщения удалены!</string>

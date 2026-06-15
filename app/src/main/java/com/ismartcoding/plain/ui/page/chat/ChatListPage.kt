@@ -60,7 +60,12 @@ fun ChatListPage(
     val unpairedPeers = peerVM.unpairedPeers
     val webEnabled = LocalWeb.current
     val showOnlineStatus = webEnabled && mainVM.httpServerState == HttpServerState.ON
-    val isDiscoverable = remember { context.dataStore.dataFlow.map { NearbyDiscoverablePreference.get(it) } }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
+    val isDiscoverable = remember {
+        context.dataStore.dataFlow.map {
+            NearbyDiscoverablePreference.get(it)
+        }
+    }
+        .collectAsStateValue(initial = NearbyDiscoverablePreference.default)
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("chat_list_pull_refresh")
         peerVM.loadPeers()
@@ -86,7 +91,14 @@ fun ChatListPage(
                     if (!webEnabled) PAlert(
                         description = stringResource(Res.string.web_service_required_for_chat),
                         AlertType.WARNING
-                    ) { PFilledButton(text = stringResource(Res.string.enable_web_service), buttonSize = ButtonSize.SMALL, onClick = { mainVM.enableHttpServer(context, true) }) }
+                    ) {
+                        PFilledButton(
+                            text = stringResource(Res.string.enable_web_service),
+                            buttonSize = ButtonSize.SMALL,
+                            onClick = {
+                                mainVM.enableHttpServer(context, true)
+                            })
+                    }
                 }
                 item {
                     PeerListItem(
@@ -95,7 +107,7 @@ fun ChatListPage(
                         icon = Res.drawable.bot,
                         latestChat = peerVM.getLatestChat("local"),
                         modifier = PlainTheme.getCardModifier(),
-                        onClick = { navController.navigate(Routing.Chat("local")) })
+                        onClick = { navController.navigate(Routing.Chat("peer:local")) })
                 }
                 if (channels.isNotEmpty()) {
                     item {
@@ -119,7 +131,7 @@ fun ChatListPage(
                 if (allPeers.isNotEmpty()) {
                     item {
                         VerticalSpace(dp = 16.dp)
-                        Subtitle(stringResource(Res.string.nearby_devices))
+                        Subtitle(stringResource(Res.string.devices))
                     }
                     itemsIndexed(items = allPeers, key = { _, i -> i.id }) { index, peer ->
                         PeerListItem(

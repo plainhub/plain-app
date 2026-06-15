@@ -5,7 +5,6 @@ import com.ismartcoding.plain.i18n.*
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.os.Parcelable
-import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
@@ -54,7 +53,7 @@ data class DPlaylistAudio(
             val retriever = MediaMetadataRetriever()
             var title = path.getFilenameWithoutExtensionFromPath()
             var duration = 0L
-            var artist = LocaleHelper.getStringSync(Res.string.unknown)
+            var artist = LocaleHelper.getString(Res.string.unknown)
 
             try {
                 retriever.setDataSource(context, path.pathToUri())

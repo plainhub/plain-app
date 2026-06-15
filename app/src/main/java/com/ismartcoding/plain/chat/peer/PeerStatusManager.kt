@@ -87,6 +87,10 @@ object PeerStatusManager {
     @Synchronized
     fun isOnline(peerId: String): Boolean = states[peerId]?.online == true
 
+    /** Snapshot of every peer whose outgoing status socket is currently up. */
+    @Synchronized
+    fun onlinePeers(): Set<String> = states.entries.filter { it.value.online }.map { it.key }.toSet()
+
     fun reconnectNow(reason: String) {
         scope.launch {
             LogCat.d("peer status: reconnect triggered reason=$reason")

@@ -55,7 +55,7 @@ fun ChatFileItem(
     val showContextMenu = remember { mutableStateOf(false) }
 
     val downloadTask = downloadProgressMap[item.id]
-    val isDownloading = downloadTask?.isDownloading() == true
+    val taskActive = downloadTask?.isActive() == true
     val downloadProgress = downloadTask?.let {
         if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
     } ?: 0f
@@ -105,7 +105,7 @@ fun ChatFileItem(
             fileName = fileName,
             path = path,
             previewPath = previewPath,
-            isDownloading = isDownloading,
+            isActive = taskActive,
             downloadProgress = downloadProgress,
             downloadTask = downloadTask,
             isCurrentlyPlaying = isCurrentlyPlaying,

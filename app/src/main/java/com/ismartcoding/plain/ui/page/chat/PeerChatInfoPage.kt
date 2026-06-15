@@ -13,12 +13,15 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.getBestIp
+import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -36,14 +39,7 @@ fun PeerChatInfoPage(
 ) {
     val context = LocalContext.current
     val chatState = chatVM.chatState.collectAsState()
-    val peer = peerVM.pairedPeers.find { it.id == chatState.value.target.toId }
-
-    val clearMessagesText = stringResource(Res.string.clear_messages)
-    val clearMessagesConfirmText = stringResource(Res.string.clear_messages_confirm)
-    val cancelText = stringResource(Res.string.cancel)
-    val deleteDeviceText = stringResource(Res.string.delete_device)
-    val deleteText = stringResource(Res.string.delete)
-    val deleteDeviceWarningText = stringResource(Res.string.delete_peer_warning)
+    val peer = ChatCacheManager.peerMap[chatState.value.target.toId]
 
     PScaffold(
         topBar = {
@@ -52,7 +48,7 @@ fun PeerChatInfoPage(
                 navigationIcon = {
                     NavigationBackIcon { navController.navigateUp() }
                 },
-                title = stringResource(Res.string.chat_info),
+                title = stringResource(Res.string.peer_info),
             )
         },
     ) { paddingValues ->
@@ -78,28 +74,55 @@ fun PeerChatInfoPage(
 
             item { VerticalSpace(dp = 24.dp) }
 
-            clearMessagesItem(
-                clearMessagesText = clearMessagesText,
-                clearMessagesConfirmText = clearMessagesConfirmText,
-                cancelText = cancelText,
-                onClear = {
-                    chatVM.clearAllMessages(context)
-                    navController.navigateUp()
-                    DialogHelper.showSuccess(Res.string.messages_cleared)
-                },
-            )
-
-            if (peer != null) {
-                deleteDeviceItem(
-                    deleteDeviceText = deleteDeviceText,
-                    deleteText = deleteText,
-                    deleteDeviceWarningText = deleteDeviceWarningText,
-                    cancelText = cancelText,
-                    onDelete = {
-                        peerVM.removePeer(context, peer.id)
-                        navController.popBackStack(navController.graph.startDestinationId, false)
+            item {
+                val clearMessagesText = stringResource(Res.string.clear_messages)
+                val clearMessagesConfirmText = stringResource(Res.string.clear_messages_confirm)
+                val cancelText = stringResource(Res.string.cancel)
+                POutlinedButton(
+                    text = clearMessagesText,
+                    type = ButtonType.DANGER,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    block = true,
+                    onClick = {
+                        DialogHelper.showConfirmDialog(
+                            title = clearMessagesText,
+                            message = clearMessagesConfirmText,
+                            confirmButton = Pair(clearMessagesText) {
+                                chatVM.clearAllMessages(context)
+                                navController.navigateUp()
+                                DialogHelper.showSuccess(Res.string.messages_cleared)
+                            },
+                            dismissButton = Pair(cancelText) {},
+                        )
                     },
                 )
+            }
+
+            if (peer != null) {
+                item {
+                    val deleteDeviceText = stringResource(Res.string.delete_device)
+                    val deleteText = stringResource(Res.string.delete)
+                    val deleteDeviceWarningText = stringResource(Res.string.delete_peer_warning)
+                    val cancelText = stringResource(Res.string.cancel)
+                    VerticalSpace(dp = 16.dp)
+                    POutlinedButton(
+                        text = deleteDeviceText,
+                        type = ButtonType.DANGER,
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        block = true,
+                        onClick = {
+                            DialogHelper.showConfirmDialog(
+                                title = deleteDeviceText,
+                                message = deleteDeviceWarningText,
+                                confirmButton = Pair(deleteText) {
+                                    peerVM.removePeer(context, peer.id)
+                                    navController.popBackStack(navController.graph.startDestinationId, false)
+                                },
+                                dismissButton = Pair(cancelText) {},
+                            )
+                        },
+                    )
+                }
             }
 
             item { BottomSpace(paddingValues) }

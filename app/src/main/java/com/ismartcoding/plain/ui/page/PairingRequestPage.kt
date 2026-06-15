@@ -73,11 +73,11 @@ fun PairingRequestPage(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             )
-            VerticalSpace(dp = 8.dp)
+            VerticalSpace(dp = 16.dp)
             Text(
                 text = stringResource(Res.string.pairing_request_message, request.fromName),
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurface,
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -91,7 +91,7 @@ fun PairingRequestPage(
             }
         }
         item {
-            VerticalSpace(dp = 40.dp)
+            VerticalSpace(dp = 56.dp)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

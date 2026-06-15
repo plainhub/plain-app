@@ -91,6 +91,9 @@
     <string name="device_type">デバイスタイプ</string>
     <string name="port">ポート</string>
     <string name="chat_info">チャット情報</string>
+    <string name="channel_info">チャンネル情報</string>
+    <string name="peer_info">ピア情報</string>
+    <string name="owner">オーナー</string>
     <string name="clear_messages">メッセージを削除</string>
     <string name="clear_messages_confirm">すべてのメッセージを削除しますか？この操作は取り消せません。</string>
     <string name="messages_cleared">メッセージを削除しました！</string>

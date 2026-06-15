@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.pomodoro
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
@@ -52,17 +51,17 @@ object PomodoroHelper {
                 val shouldBeLongBreak = newCount % settings.pomodorosBeforeLongBreak == 0 && newCount > 0
                 val messageRes = if (shouldBeLongBreak) Res.string.great_job_long_break else Res.string.great_job_short_break
                 Pair(
-                    LocaleHelper.getString(Res.string.work_session_complete),
-                    LocaleHelper.getString(messageRes)
+                    LocaleHelper.getStringAsync(Res.string.work_session_complete),
+                    LocaleHelper.getStringAsync(messageRes)
                 )
             }
 
             PomodoroState.SHORT_BREAK -> {
-                Pair(LocaleHelper.getString(Res.string.break_complete), LocaleHelper.getString(Res.string.time_to_work))
+                Pair(LocaleHelper.getStringAsync(Res.string.break_complete), LocaleHelper.getStringAsync(Res.string.time_to_work))
             }
 
             PomodoroState.LONG_BREAK -> {
-                Pair(LocaleHelper.getString(Res.string.long_break_complete), LocaleHelper.getString(Res.string.ready_for_work))
+                Pair(LocaleHelper.getStringAsync(Res.string.long_break_complete), LocaleHelper.getStringAsync(Res.string.ready_for_work))
             }
         }
 

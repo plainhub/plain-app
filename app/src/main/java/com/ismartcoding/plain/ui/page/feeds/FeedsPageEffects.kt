@@ -47,7 +47,7 @@ fun FeedsPageEffects(feedsVM: FeedsViewModel) {
                             withIO { FeedHelper.exportAsync(writer) }
                         }
                         val fileName = contentResolver.queryOpenableFileName(event.uri)
-                        DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.exported_to, "name", fileName))
+                        DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, "name", fileName))
                     }
                 }
             }

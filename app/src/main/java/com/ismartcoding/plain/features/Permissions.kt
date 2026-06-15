@@ -428,9 +428,9 @@ object Permissions {
             callback()
         } else {
             coIO {
-                val message = LocaleHelper.getString(stringResource)
-                val okText = LocaleHelper.getString(Res.string.ok)
-                val confirmText = LocaleHelper.getString(Res.string.confirm)
+                val message = LocaleHelper.getStringAsync(stringResource)
+                val okText = LocaleHelper.getStringAsync(Res.string.ok)
+                val confirmText = LocaleHelper.getStringAsync(Res.string.confirm)
                 DialogHelper.showConfirmDialog(confirmText, message, confirmButton = Pair(okText) {
                     coIO {
                         ensureNotificationAsync(context)

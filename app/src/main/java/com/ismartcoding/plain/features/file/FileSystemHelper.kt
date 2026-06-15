@@ -11,15 +11,11 @@ import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
 import com.ismartcoding.lib.helpers.FilterField
-import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.plain.extensions.getDirectChildrenCount
 import com.ismartcoding.plain.extensions.normalizeComparison
-import com.ismartcoding.plain.extensions.parseSizeToBytes
 import com.ismartcoding.lib.isRPlus
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.helpers.QueryHelper
-import com.ismartcoding.plain.helpers.RootHelper
 import com.ismartcoding.plain.storageManager
 import com.ismartcoding.plain.storageStatsManager
 import kotlin.time.Instant
@@ -87,7 +83,7 @@ object FileSystemHelper {
     }
 
     fun getInternalStorageName(): String {
-        return LocaleHelper.getStringSync(Res.string.internal_storage)
+        return LocaleHelper.getString(Res.string.internal_storage)
     }
 
     fun getSDCardPath(context: Context): String {

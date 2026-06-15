@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.discover
 
+import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
@@ -12,20 +13,18 @@ import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
+import com.ismartcoding.plain.data.DPairingResult
 import com.ismartcoding.plain.data.DPairingSession
-import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.NearbyMessageType
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PairingCanceledEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 import java.util.concurrent.ConcurrentHashMap
-import android.util.Base64
-import com.ismartcoding.plain.data.DPairingResult
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
 import kotlin.math.abs
 
 object NearbyPairManager {

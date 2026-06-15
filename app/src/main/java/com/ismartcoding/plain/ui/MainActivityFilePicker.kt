@@ -7,15 +7,12 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.ExportFileEvent
-import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
-import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 
@@ -76,7 +73,7 @@ internal fun MainActivity.doPickFile(event: PickFileEvent) {
         pickFileActivityLauncher.launch(intent)
     } catch (e: ActivityNotFoundException) {
         LogCat.e("No file picker available on this device")
-        DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.file_picker_not_available))
+        DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.file_picker_not_available))
     } catch (e: IllegalStateException) {
         LogCat.e("Error launching pick file activity: ${e.message}")
     }

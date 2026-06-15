@@ -71,5 +71,7 @@ sealed class ChatItemContent {
 }
 
 fun DChat.toModel(): ChatItem {
-    return ChatItem(ID(id), fromId, toId, channelId, content.toJSONString(), createdAt, updatedAt, content, status = status, statusData = statusData)
+    return ChatItem(ID(id), fromId, toId, channelId, content.toJSONString(), createdAt, updatedAt, content, status = status, statusData = statusData).apply {
+        data = getContentData()
+    }
 }

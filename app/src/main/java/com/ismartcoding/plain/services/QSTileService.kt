@@ -34,11 +34,11 @@ class QSTileService : TileService() {
     private fun setState(state: Int) {
         if (state == Tile.STATE_INACTIVE) {
             qsTile?.state = Tile.STATE_INACTIVE
-            qsTile?.label = LocaleHelper.getStringSync(Res.string.app_name)
+            qsTile?.label = LocaleHelper.getString(Res.string.app_name)
             qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.app_icon)
         } else if (state == Tile.STATE_ACTIVE) {
             qsTile?.state = Tile.STATE_ACTIVE
-            qsTile?.label = LocaleHelper.getStringSync(Res.string.app_name)
+            qsTile?.label = LocaleHelper.getString(Res.string.app_name)
             qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.app_icon)
         }
 

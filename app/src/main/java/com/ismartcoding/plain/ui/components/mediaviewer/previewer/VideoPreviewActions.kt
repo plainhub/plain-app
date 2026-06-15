@@ -40,6 +40,7 @@ import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DMessageFile
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
@@ -78,9 +79,9 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
             if (castViewModel.castMode.value) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Row(modifier = Modifier.align(Alignment.BottomCenter).clip(RoundedCornerShape(50)).background(MaterialTheme.colorScheme.darkMask()).padding(horizontal = 20.dp, vertical = 8.dp)) {
-                        POutlinedButton(text = stringResource(Res.string.cast), small = true, onClick = { castViewModel.cast(m.path) })
+                        POutlinedButton(text = stringResource(Res.string.cast), buttonSize = ButtonSize.SMALL, onClick = { castViewModel.cast(m.path) })
                         HorizontalSpace(dp = 20.dp)
-                        POutlinedButton(text = stringResource(Res.string.exit_cast_mode), small = true, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
+                        POutlinedButton(text = stringResource(Res.string.exit_cast_mode), buttonSize = ButtonSize.SMALL, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
                     }
                 }
                 return
@@ -97,8 +98,8 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
                     HorizontalSpace(dp = 20.dp)
                     ActionIconButton(icon = Res.drawable.save, contentDescription = stringResource(Res.string.save)) {
                         scope.launch {
-                            if (m.path.isUrl()) { DialogHelper.showLoading(); val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_MOVIES); val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }; DialogHelper.hideLoading(); if (r.success) DialogHelper.showMessage(LocaleHelper.getStringF(Res.string.video_save_to, "path", r.path)) else DialogHelper.showMessage(r.message) }
-                            else { val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""; val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_MOVIES, newName = newName) }; if (r.isNotEmpty()) DialogHelper.showMessage(LocaleHelper.getStringF(Res.string.video_save_to, "path", r)) else DialogHelper.showMessage(LocaleHelper.getString(Res.string.video_save_to_failed)) }
+                            if (m.path.isUrl()) { DialogHelper.showLoading(); val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_MOVIES); val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }; DialogHelper.hideLoading(); if (r.success) DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.video_save_to, "path", r.path)) else DialogHelper.showMessage(r.message) }
+                            else { val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""; val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_MOVIES, newName = newName) }; if (r.isNotEmpty()) DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.video_save_to, "path", r)) else DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.video_save_to_failed)) }
                         }
                     }
                 }

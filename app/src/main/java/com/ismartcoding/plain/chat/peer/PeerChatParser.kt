@@ -6,7 +6,12 @@ import com.ismartcoding.lib.logcat.LogCat
 import io.ktor.http.HttpStatusCode
 import kotlin.math.abs
 
-data class PeerChatParseResult(val code: HttpStatusCode, val content: String? = null)
+data class PeerChatParseResult(
+    val code: HttpStatusCode,
+    val content: String? = null,
+    val signature: String = "",
+    val timestamp: Long = 0L,
+)
 
 object PeerChatParser {
     // Maximum allowed time difference for timestamp validation (5 minutes)
@@ -59,6 +64,6 @@ object PeerChatParser {
             return PeerChatParseResult(HttpStatusCode.Unauthorized)
         }
 
-        return PeerChatParseResult(HttpStatusCode.OK, requestStr)
+        return PeerChatParseResult(HttpStatusCode.OK, requestStr, signature, timestamp)
     }
 }

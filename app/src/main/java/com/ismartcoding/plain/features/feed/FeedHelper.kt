@@ -110,7 +110,7 @@ object FeedHelper {
                 Opml(
                     "2.0",
                     Head(
-                        LocaleHelper.getStringSync(Res.string.app_name),
+                        LocaleHelper.getString(Res.string.app_name),
                         Date().toString(),
                     ),
                     Body(

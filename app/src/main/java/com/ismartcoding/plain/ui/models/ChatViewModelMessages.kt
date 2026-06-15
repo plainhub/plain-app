@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.models
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.ChatSender
@@ -14,8 +15,11 @@ import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -34,9 +38,10 @@ fun ChatViewModel.sendMessage(content: DMessageContent, onResult: (Boolean) -> U
         val item = ChatSender.createChatItem(state.target, content)
         addAll(listOf(item))
 
-        if (state.target.type != ChatTargetType.LOCAL) {
+        if (!state.target.isLocal()) {
             ChatSender.send(item, state.target, onlinePeerIds.value)
             update(item)
+            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
             onResult(item.status == "sent")
         } else {
             onResult(true)
@@ -65,9 +70,9 @@ suspend fun ChatViewModel.sendFilesImmediate(files: List<DMessageFile>, isImageV
     val item = ChatDbHelper.insertChatItem(
         message = content,
         fromId = "me",
-        toId = if (state.target.type == ChatTargetType.CHANNEL) "" else state.target.toId,
+        toId = if (state.target.type == ChatTargetType.PEER) state.target.toId else "",
         channelId = if (state.target.type == ChatTargetType.CHANNEL) state.target.toId else "",
-        isRemote = state.target.type != ChatTargetType.LOCAL,
+        isRemote = !state.target.isLocal(),
     )
     addAll(listOf(item))
     return item.id
@@ -78,7 +83,7 @@ fun ChatViewModel.updateFilesMessage(messageId: String, files: List<DMessageFile
         val state = chatState.value
         val item = ChatDbHelper.getChatItem(messageId) ?: return@launch
         ChatDbHelper.updateChatItemFilesContent(item, files)
-        if (state.target.type == ChatTargetType.LOCAL) {
+        if (state.target.isLocal()) {
             ChatDbHelper.updateChatItemStatus(item, "sent")
         } else {
             ChatDbHelper.updateChatItemStatus(item, "pending")

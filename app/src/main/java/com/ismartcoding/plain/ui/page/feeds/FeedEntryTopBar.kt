@@ -66,7 +66,7 @@ internal fun FeedEntryTopBar(
                     leadingIcon = { Icon(painter = painterResource(Res.drawable.link), contentDescription = stringResource(Res.string.copy_link)) },
                     onClick = {
                         dismiss(); val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
-                        val clip = ClipData.newPlainText(LocaleHelper.getStringSync(Res.string.link), m.url)
+                        val clip = ClipData.newPlainText(LocaleHelper.getString(Res.string.link), m.url)
                         clipboardManager.setPrimaryClip(clip); DialogHelper.showTextCopiedMessage(m.url)
                     })
             }

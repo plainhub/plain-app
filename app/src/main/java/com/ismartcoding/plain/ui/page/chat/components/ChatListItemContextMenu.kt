@@ -61,7 +61,7 @@ fun ChatListItemContextMenu(
                     chatVM.selectedItem.value = null
                     showContextMenu.value = false
                     val text = (m.value as DMessageText).text
-                    val clip = ClipData.newPlainText(LocaleHelper.getStringSync(Res.string.message), text)
+                    val clip = ClipData.newPlainText(LocaleHelper.getString(Res.string.message), text)
                     clipboardManager.setPrimaryClip(clip)
                     DialogHelper.showTextCopiedMessage(text)
                 },

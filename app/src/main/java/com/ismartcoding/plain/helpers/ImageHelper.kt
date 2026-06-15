@@ -275,49 +275,49 @@ object ImageHelper {
 
     fun getExposureProgramText(exposureProgram: Int): String {
         return when (exposureProgram.toShort()) {
-            ExifInterface.EXPOSURE_PROGRAM_MANUAL -> LocaleHelper.getStringSync(Res.string.exposure_program_manual)
-            ExifInterface.EXPOSURE_PROGRAM_NORMAL -> LocaleHelper.getStringSync(Res.string.exposure_program_normal)
-            ExifInterface.EXPOSURE_PROGRAM_APERTURE_PRIORITY -> LocaleHelper.getStringSync(Res.string.exposure_program_aperture_priority)
-            ExifInterface.EXPOSURE_PROGRAM_SHUTTER_PRIORITY -> LocaleHelper.getStringSync(Res.string.exposure_program_shutter_priority)
-            ExifInterface.EXPOSURE_PROGRAM_CREATIVE -> LocaleHelper.getStringSync(Res.string.exposure_program_creative)
-            ExifInterface.EXPOSURE_PROGRAM_ACTION -> LocaleHelper.getStringSync(Res.string.exposure_program_action)
-            ExifInterface.EXPOSURE_PROGRAM_PORTRAIT_MODE -> LocaleHelper.getStringSync(Res.string.exposure_program_portrait)
-            ExifInterface.EXPOSURE_PROGRAM_LANDSCAPE_MODE -> LocaleHelper.getStringSync(Res.string.exposure_program_landscape)
+            ExifInterface.EXPOSURE_PROGRAM_MANUAL -> LocaleHelper.getString(Res.string.exposure_program_manual)
+            ExifInterface.EXPOSURE_PROGRAM_NORMAL -> LocaleHelper.getString(Res.string.exposure_program_normal)
+            ExifInterface.EXPOSURE_PROGRAM_APERTURE_PRIORITY -> LocaleHelper.getString(Res.string.exposure_program_aperture_priority)
+            ExifInterface.EXPOSURE_PROGRAM_SHUTTER_PRIORITY -> LocaleHelper.getString(Res.string.exposure_program_shutter_priority)
+            ExifInterface.EXPOSURE_PROGRAM_CREATIVE -> LocaleHelper.getString(Res.string.exposure_program_creative)
+            ExifInterface.EXPOSURE_PROGRAM_ACTION -> LocaleHelper.getString(Res.string.exposure_program_action)
+            ExifInterface.EXPOSURE_PROGRAM_PORTRAIT_MODE -> LocaleHelper.getString(Res.string.exposure_program_portrait)
+            ExifInterface.EXPOSURE_PROGRAM_LANDSCAPE_MODE -> LocaleHelper.getString(Res.string.exposure_program_landscape)
             else -> ""
         }
     }
 
     fun getMeteringModeText(meteringMode: Int): String {
         return when (meteringMode.toShort()) {
-            ExifInterface.METERING_MODE_AVERAGE -> LocaleHelper.getStringSync(Res.string.metering_mode_average)
-            ExifInterface.METERING_MODE_CENTER_WEIGHT_AVERAGE -> LocaleHelper.getStringSync(Res.string.metering_mode_center_weight_average)
-            ExifInterface.METERING_MODE_MULTI_SPOT -> LocaleHelper.getStringSync(Res.string.metering_mode_multi_spot)
-            ExifInterface.METERING_MODE_OTHER -> LocaleHelper.getStringSync(Res.string.metering_mode_other)
-            ExifInterface.METERING_MODE_PARTIAL -> LocaleHelper.getStringSync(Res.string.metering_mode_partial)
-            ExifInterface.METERING_MODE_PATTERN -> LocaleHelper.getStringSync(Res.string.metering_mode_pattern)
-            ExifInterface.METERING_MODE_SPOT -> LocaleHelper.getStringSync(Res.string.metering_mode_spot)
+            ExifInterface.METERING_MODE_AVERAGE -> LocaleHelper.getString(Res.string.metering_mode_average)
+            ExifInterface.METERING_MODE_CENTER_WEIGHT_AVERAGE -> LocaleHelper.getString(Res.string.metering_mode_center_weight_average)
+            ExifInterface.METERING_MODE_MULTI_SPOT -> LocaleHelper.getString(Res.string.metering_mode_multi_spot)
+            ExifInterface.METERING_MODE_OTHER -> LocaleHelper.getString(Res.string.metering_mode_other)
+            ExifInterface.METERING_MODE_PARTIAL -> LocaleHelper.getString(Res.string.metering_mode_partial)
+            ExifInterface.METERING_MODE_PATTERN -> LocaleHelper.getString(Res.string.metering_mode_pattern)
+            ExifInterface.METERING_MODE_SPOT -> LocaleHelper.getString(Res.string.metering_mode_spot)
             else -> ""
         }
     }
 
     fun getWhiteBalanceText(whiteBalance: Int): String {
         return when (whiteBalance.toShort()) {
-            ExifInterface.WHITE_BALANCE_AUTO -> LocaleHelper.getStringSync(Res.string.white_balance_auto)
-            ExifInterface.WHITE_BALANCE_MANUAL -> LocaleHelper.getStringSync(Res.string.white_balance_manual)
+            ExifInterface.WHITE_BALANCE_AUTO -> LocaleHelper.getString(Res.string.white_balance_auto)
+            ExifInterface.WHITE_BALANCE_MANUAL -> LocaleHelper.getString(Res.string.white_balance_manual)
             else -> ""
         }
     }
 
     fun getFlashText(flash: Int): String {
         return when (flash.toShort()) {
-            ExifInterface.FLAG_FLASH_FIRED -> LocaleHelper.getStringSync(Res.string.flash_fired)
-            ExifInterface.FLAG_FLASH_RETURN_LIGHT_NOT_DETECTED -> LocaleHelper.getStringSync(Res.string.flash_return_light_not_detected)
-            ExifInterface.FLAG_FLASH_RETURN_LIGHT_DETECTED -> LocaleHelper.getStringSync(Res.string.flash_return_light_detected)
-            ExifInterface.FLAG_FLASH_MODE_COMPULSORY_FIRING -> LocaleHelper.getStringSync(Res.string.flash_mode_compulsory_firing)
-            ExifInterface.FLAG_FLASH_MODE_COMPULSORY_SUPPRESSION -> LocaleHelper.getStringSync(Res.string.flash_mode_compulsory_suppression)
-            ExifInterface.FLAG_FLASH_MODE_AUTO -> LocaleHelper.getStringSync(Res.string.flash_mode_auto)
-            ExifInterface.FLAG_FLASH_NO_FLASH_FUNCTION -> LocaleHelper.getStringSync(Res.string.flash_no_flash_function)
-            ExifInterface.FLAG_FLASH_RED_EYE_SUPPORTED -> LocaleHelper.getStringSync(Res.string.flash_red_eye_supported)
+            ExifInterface.FLAG_FLASH_FIRED -> LocaleHelper.getString(Res.string.flash_fired)
+            ExifInterface.FLAG_FLASH_RETURN_LIGHT_NOT_DETECTED -> LocaleHelper.getString(Res.string.flash_return_light_not_detected)
+            ExifInterface.FLAG_FLASH_RETURN_LIGHT_DETECTED -> LocaleHelper.getString(Res.string.flash_return_light_detected)
+            ExifInterface.FLAG_FLASH_MODE_COMPULSORY_FIRING -> LocaleHelper.getString(Res.string.flash_mode_compulsory_firing)
+            ExifInterface.FLAG_FLASH_MODE_COMPULSORY_SUPPRESSION -> LocaleHelper.getString(Res.string.flash_mode_compulsory_suppression)
+            ExifInterface.FLAG_FLASH_MODE_AUTO -> LocaleHelper.getString(Res.string.flash_mode_auto)
+            ExifInterface.FLAG_FLASH_NO_FLASH_FUNCTION -> LocaleHelper.getString(Res.string.flash_no_flash_function)
+            ExifInterface.FLAG_FLASH_RED_EYE_SUPPORTED -> LocaleHelper.getString(Res.string.flash_red_eye_supported)
             else -> ""
         }
     }

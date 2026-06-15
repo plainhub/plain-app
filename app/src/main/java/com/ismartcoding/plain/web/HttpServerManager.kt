@@ -191,6 +191,7 @@ object HttpServerManager {
                     LogCat.e("HTTP server check failed: ${ex.message}")
                 }
             }
+            LogCat.d("HTTP server check healthy: $healthy")
             healthy
         } ?: false
     }

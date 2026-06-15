@@ -74,7 +74,7 @@ fun ChannelInvitePage(
             Text(
                 text = stringResource(Res.string.channel_invite_message, event.ownerPeerName, event.channelName),
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurface,
                 ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -88,7 +88,7 @@ fun ChannelInvitePage(
             }
         }
         item {
-            VerticalSpace(dp = 40.dp)
+            VerticalSpace(dp = 56.dp)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

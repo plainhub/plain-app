@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.data.DNearbyDevice
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
@@ -37,6 +38,7 @@ fun NearbyDeviceItem(
                             text = stringResource(Res.string.cancel),
                             onClick = onCancelClick,
                             type = ButtonType.DANGER,
+                            buttonSize = ButtonSize.SMALL,
                             isLoading = true
                         )
                     }
@@ -46,6 +48,7 @@ fun NearbyDeviceItem(
                             text = stringResource(Res.string.unpair),
                             onClick = onUnpairClick,
                             type = ButtonType.DANGER,
+                            buttonSize = ButtonSize.SMALL,
                         )
                     }
 
@@ -53,6 +56,7 @@ fun NearbyDeviceItem(
                         POutlinedButton(
                             text = stringResource(Res.string.pair),
                             onClick = onPairClick,
+                            buttonSize = ButtonSize.SMALL,
                         )
                     }
                 }

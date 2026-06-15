@@ -30,7 +30,7 @@ fun ChatFileThumbnail(
     item: DMessageFile,
     itemState: TransformItemState,
     previewerState: MediaPreviewerState,
-    isDownloading: Boolean,
+    isActive: Boolean,
     downloadProgress: Float,
     downloadTask: DownloadTask?,
 ) {
@@ -57,7 +57,7 @@ fun ChatFileThumbnail(
             )
         }
 
-        if (isDownloading && downloadTask != null) {
+        if (isActive && downloadTask != null) {
             DownloadProgressOverlay(
                 modifier = Modifier.size(48.dp),
                 downloadProgress = downloadProgress,

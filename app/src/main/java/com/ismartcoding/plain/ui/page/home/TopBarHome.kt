@@ -79,7 +79,7 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
             text = {
                 PDialogListItem(title = stringResource(Res.string.make_discoverable_desc)) {
                     PSwitch(activated = isDiscoverable) {
-                        peerVM.updateDiscoverable(context, it)
+                        peerVM.updateDiscoverable(it)
                     }
                 }
             },

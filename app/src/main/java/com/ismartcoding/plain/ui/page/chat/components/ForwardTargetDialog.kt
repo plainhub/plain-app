@@ -44,7 +44,7 @@ fun ForwardTargetDialog(
                 item {
                     PDialogListItem(
                         modifier = Modifier.clickable {
-                            onTargetSelected(ChatTarget("local", ChatTargetType.LOCAL))
+                            onTargetSelected(ChatTarget("local", ChatTargetType.PEER))
                             onDismiss()
                         },
                         title = stringResource(Res.string.local_chat),

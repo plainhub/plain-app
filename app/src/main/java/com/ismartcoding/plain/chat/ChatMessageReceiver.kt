@@ -7,6 +7,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.download.DownloadQueue
+import com.ismartcoding.plain.chat.peer.PeerChatParser
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
@@ -26,6 +27,7 @@ import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.peer_chat
 import com.ismartcoding.plain.web.models.toModel
+import java.util.Collections
 
 /**
  * Handles a chat message just arrived from a remote peer: validate sender +
@@ -37,17 +39,42 @@ import com.ismartcoding.plain.web.models.toModel
 object ChatMessageReceiver {
 
     /**
+     * Replay protection: tracks every (fromPeerId, signature, timestamp) we have
+     * processed within [PeerChatParser.MAX_TIMESTAMP_DIFF_MS]. Without this, an
+     * attacker who captured a signed chat packet could replay it within the
+     * 5-minute timestamp window and create duplicate rows. The bounded set is
+     * pruned lazily; one entry per (signature, timestamp) is enough to dedupe.
+     */
+    private val seenSignatures: MutableSet<String> =
+        Collections.synchronizedSet(HashSet())
+
+    /**
      * @param fromPeerId sender's peer id (from the `c-id` header).
      * @param fromChannelId sender's channel id (from the `c-cid` header),
      *                      or empty for a 1:1 peer chat.
+     * @param signature Ed25519 signature base64 of the decrypted packet, used
+     *                  for in-memory replay dedupe. Pass empty string to skip.
+     * @param timestamp the signed packet's timestamp (ms), used together with
+     *                  signature to form the dedupe key. Pass 0 to skip.
      * @throws IllegalStateException when the channel is unknown or left.
      * @throws Exception when the sender is unknown.
+     * @throws ReplayedMessageException when [signature] + [timestamp] match a
+     *         packet we already processed (i.e. this is a replay).
      */
     suspend fun receive(
         fromPeerId: String,
         content: DMessageContent,
         fromChannelId: String = "",
+        signature: String = "",
+        timestamp: Long = 0L,
     ): DChat {
+        if (signature.isNotEmpty() && timestamp > 0L) {
+            val key = "$fromPeerId|$signature|$timestamp"
+            if (!seenSignatures.add(key)) {
+                throw ReplayedMessageException(fromPeerId, timestamp)
+            }
+        }
+
         val fromPeer = AppDatabase.instance.peerDao().getById(fromPeerId)
             ?: throw Exception("invalid peer")
 
@@ -122,13 +149,13 @@ object ChatMessageReceiver {
         val (targetId, targetName, messageText) = if (fromChannel == null) {
             NotificationPayload(
                 targetId = "peer:${fromPeer.id}",
-                targetName = fromPeer.name.ifEmpty { LocaleHelper.getStringSync(Res.string.peer_chat) },
+                targetName = fromPeer.name.ifEmpty { LocaleHelper.getString(Res.string.peer_chat) },
                 messageText = preview,
             )
         } else {
             NotificationPayload(
                 targetId = "channel:${fromChannel.id}",
-                targetName = fromChannel.name.ifEmpty { LocaleHelper.getStringSync(Res.string.peer_chat) },
+                targetName = fromChannel.name.ifEmpty { LocaleHelper.getString(Res.string.peer_chat) },
                 messageText = "${fromPeer.name}: $preview",
             )
         }
@@ -147,3 +174,6 @@ private data class NotificationPayload(
     val targetName: String,
     val messageText: String,
 )
+
+class ReplayedMessageException(val fromPeerId: String, val timestamp: Long) :
+    Exception("Replayed message from $fromPeerId at $timestamp")

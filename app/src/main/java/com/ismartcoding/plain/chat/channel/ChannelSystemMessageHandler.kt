@@ -79,6 +79,15 @@ object ChannelSystemMessageHandler {
         val isReinvite = existingChannel != null &&
             (existingChannel.status == DChatChannel.STATUS_LEFT || existingChannel.status == DChatChannel.STATUS_KICKED)
 
+        // Sanity check: the signed `fromId` (Ed25519 verified upstream) must equal the
+        // owner the inviter is claiming in the payload. Otherwise an attacker who
+        // forwarded us an invite payload could try to seed us with a channel whose
+        // owner is a peer they control.
+        if (msg.owner != fromId) {
+            LogCat.e("Invite from $fromId but payload claims owner=${msg.owner} — rejected")
+            return
+        }
+
         // Avoid duplicate processing for channels that are already active
         if (existingChannel != null && !isReinvite) {
             LogCat.d("Channel ${msg.channelId} already exists locally, ignoring invite")
@@ -180,15 +189,23 @@ object ChannelSystemMessageHandler {
             peerDao.update(existingPeer)
         }
 
-        // Move from pending → joined
+        // Only accept invites from peers that were already on the pending list.
+        // Any peer not previously invited is rejected — otherwise anyone who knew the
+        // channel id could self-add and start receiving future broadcast updates
+        // (which include the channelKey via ChannelSystemMessageSender.broadcastUpdate).
         val member = channel.findMember(fromId)
-        if (member != null && member.isPending()) {
-            channel.members = channel.members.map {
-                if (it.id == fromId) it.copy(status = ChannelMember.STATUS_JOINED) else it
-            }
-        } else if (member == null) {
-            // Peer was not in the members list at all — add as joined
-            channel.members += ChannelMember(id = fromId, status = ChannelMember.STATUS_JOINED)
+        if (member == null) {
+            LogCat.e("InviteAccept from $fromId for channel ${msg.channelId} but peer is not in members list — rejected")
+            return
+        }
+        if (!member.isPending()) {
+            LogCat.d("InviteAccept from $fromId but member is not pending (status=${member.status}), ignoring")
+            return
+        }
+
+        // Move from pending → joined
+        channel.members = channel.members.map {
+            if (it.id == fromId) it.copy(status = ChannelMember.STATUS_JOINED) else it
         }
 
         channel.version++

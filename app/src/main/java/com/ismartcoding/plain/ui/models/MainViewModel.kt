@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -54,8 +53,8 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                     sendEvent(StartHttpServerEvent())
                 } else {
                     DialogHelper.showConfirmDialog(
-                        LocaleHelper.getString(Res.string.confirm),
-                        LocaleHelper.getString(Res.string.foreground_service_notification_prompt)
+                        LocaleHelper.getStringAsync(Res.string.confirm),
+                        LocaleHelper.getStringAsync(Res.string.foreground_service_notification_prompt)
                     ) {
                         coIO {
                             Permissions.ensureNotificationAsync(context)

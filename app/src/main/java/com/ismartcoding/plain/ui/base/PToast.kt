@@ -31,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.ui.theme.green
-import com.ismartcoding.plain.ui.theme.yellow
+import com.ismartcoding.plain.preferences.LocalDarkTheme
+import com.ismartcoding.plain.enums.DarkTheme
 
 enum class ToastType {
     INFO,
@@ -70,14 +70,9 @@ fun PToast(
                     ) {
                         onDismiss()
                     },
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(10.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = when (type) {
-                        ToastType.INFO -> MaterialTheme.colorScheme.primary.copy(alpha = 0.95f)
-                        ToastType.SUCCESS -> MaterialTheme.colorScheme.green.copy(alpha = 0.95f)
-                        ToastType.WARNING -> MaterialTheme.colorScheme.yellow.copy(alpha = 0.95f)
-                        ToastType.ERROR -> MaterialTheme.colorScheme.error.copy(alpha = 0.95f)
-                    }
+                    containerColor = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xCC3A3A3C) else Color(0xCC1C1C1E)
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 6.dp
@@ -86,7 +81,7 @@ fun PToast(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val iconRes = when (type) {
@@ -100,14 +95,14 @@ fun PToast(
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier
-                            .padding(end = 12.dp)
-                            .size(24.dp)
+                            .padding(end = 8.dp)
+                            .size(20.dp)
                     )
                     Text(
                         text = message,
                         color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Start,
                         modifier = Modifier.weight(1f)
                     )

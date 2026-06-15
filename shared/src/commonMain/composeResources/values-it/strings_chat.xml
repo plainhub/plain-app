@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">Consenti ad altri dispositivi di rilevare questo dispositivo sulla rete</string>
     <string name="discover_nearby_devices">Scopri dispositivi nelle vicinanze</string>
     <string name="stop_discovering">Interrompi ricerca</string>
-    <string name="tap_discover_to_start">Tocca \"Scopri dispositivi nelle vicinanze\" per iniziare la ricerca</string>
+    <string name="tap_discover_to_start">Tocca "Scopri dispositivi nelle vicinanze" per iniziare la ricerca</string>
     <string name="make_sure_devices_same_network">Assicurati che altri dispositivi siano sulla stessa rete e rilevabili</string>
     <string name="show_qr_code">Mostra codice QR</string>
     <string name="pair_via_qr_title">Associa tramite codice QR</string>
@@ -91,6 +91,9 @@
     <string name="device_type">Tipo di dispositivo</string>
     <string name="port">Porta</string>
     <string name="chat_info">Info chat</string>
+    <string name="channel_info">Info canale</string>
+    <string name="peer_info">Info peer</string>
+    <string name="owner">Proprietario</string>
     <string name="clear_messages">Cancella messaggi</string>
     <string name="clear_messages_confirm">Sei sicuro di voler cancellare tutti i messaggi? Questa azione non può essere annullata.</string>
     <string name="messages_cleared">Messaggi cancellati!</string>

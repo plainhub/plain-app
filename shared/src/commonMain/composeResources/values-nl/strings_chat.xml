@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">Andere apparaten toestaan dit apparaat op het netwerk te ontdekken</string>
     <string name="discover_nearby_devices">Ontdek apparaten in de buurt</string>
     <string name="stop_discovering">Stop zoeken</string>
-    <string name="tap_discover_to_start">Tik op \"Ontdek apparaten in de buurt\" om te beginnen met zoeken</string>
+    <string name="tap_discover_to_start">Tik op "Ontdek apparaten in de buurt" om te beginnen met zoeken</string>
     <string name="make_sure_devices_same_network">Zorg ervoor dat andere apparaten op hetzelfde netwerk zijn en vindbaar zijn</string>
     <string name="show_qr_code">QR-code tonen</string>
     <string name="pair_via_qr_title">Koppelen via QR-code</string>
@@ -91,6 +91,9 @@
     <string name="device_type">Apparaattype</string>
     <string name="port">Poort</string>
     <string name="chat_info">Chatinfo</string>
+    <string name="channel_info">Kanaalinfo</string>
+    <string name="peer_info">Peerinfo</string>
+    <string name="owner">Eigenaar</string>
     <string name="clear_messages">Berichten wissen</string>
     <string name="clear_messages_confirm">Weet u zeker dat u alle berichten wilt wissen? Deze actie kan niet ongedaan worden gemaakt.</string>
     <string name="messages_cleared">Berichten gewist!</string>

@@ -9,7 +9,6 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
@@ -27,7 +26,7 @@ internal fun MainActivity.openAppDetailsSettingsForAudio() {
         try {
             appDetailsSettingsForAudioLauncher.launch(Intent(Settings.ACTION_SETTINGS))
         } catch (e2: Exception) {
-            DialogHelper.showMessage(LocaleHelper.getStringSync(Res.string.open_permission_settings))
+            DialogHelper.showMessage(LocaleHelper.getString(Res.string.open_permission_settings))
             sendScreenMirrorAudioStatus(false)
         }
     }
@@ -35,9 +34,9 @@ internal fun MainActivity.openAppDetailsSettingsForAudio() {
 
 internal fun MainActivity.showRecordAudioPermissionSettingsGuide() {
     DialogHelper.showConfirmDialog(
-        LocaleHelper.getStringSync(Res.string.permission_required),
-        LocaleHelper.getStringSync(Res.string.screen_mirror_audio_permission_settings_message),
-        confirmButton = Pair(LocaleHelper.getStringSync(Res.string.view_in_settings)) { openAppDetailsSettingsForAudio() },
-        dismissButton = Pair(LocaleHelper.getStringSync(Res.string.cancel)) { sendScreenMirrorAudioStatus(false) },
+        LocaleHelper.getString(Res.string.permission_required),
+        LocaleHelper.getString(Res.string.screen_mirror_audio_permission_settings_message),
+        confirmButton = Pair(LocaleHelper.getString(Res.string.view_in_settings)) { openAppDetailsSettingsForAudio() },
+        dismissButton = Pair(LocaleHelper.getString(Res.string.cancel)) { sendScreenMirrorAudioStatus(false) },
     )
 }

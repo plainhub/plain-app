@@ -106,7 +106,7 @@ object AppLogHelper {
             }
             DialogHelper.hideLoading()
             if (!success) {
-                DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.error))
+                DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.error))
                 return@coMain
             }
             share(context, zipFile)
@@ -120,11 +120,11 @@ object AppLogHelper {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "*/*"
         val appVersion = MainApp.getAppVersion()
-        intent.putExtra(Intent.EXTRA_SUBJECT, LocaleHelper.getStringSync(Res.string.share_logs) + " - PlainApp $appVersion")
+        intent.putExtra(Intent.EXTRA_SUBJECT, LocaleHelper.getString(Res.string.share_logs) + " - PlainApp $appVersion")
         intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.SUPPORT_EMAIL))
         intent.putExtra(Intent.EXTRA_TEXT, buildDeviceInfoText())
         intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, file))
-        val chooserIntent = Intent.createChooser(intent, LocaleHelper.getStringSync(Res.string.share_logs))
+        val chooserIntent = Intent.createChooser(intent, LocaleHelper.getString(Res.string.share_logs))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, ShareHelper.getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
     }

@@ -107,7 +107,7 @@ class MediaFoldersViewModel : ViewModel() {
             }
         }
 
-        totalBucket.value = DMediaBucket("all", LocaleHelper.getStringSync(Res.string.all), totalValue, sizeValue, subItems.toMutableList())
+        totalBucket.value = DMediaBucket("all", LocaleHelper.getString(Res.string.all), totalValue, sizeValue, subItems.toMutableList())
 
         LoadingHelper.ensureMinimumLoadingTime(
             viewModel = this,

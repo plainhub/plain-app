@@ -42,7 +42,7 @@ fun WebAddressBarRow(
                         fontSize = 18.sp,
                     ),
                 onClick = {
-                    val clip = ClipData.newPlainText(LocaleHelper.getStringSync(Res.string.link), url)
+                    val clip = ClipData.newPlainText(LocaleHelper.getString(Res.string.link), url)
                     clipboardManager.setPrimaryClip(clip)
                     DialogHelper.showTextCopiedMessage(url)
                 },

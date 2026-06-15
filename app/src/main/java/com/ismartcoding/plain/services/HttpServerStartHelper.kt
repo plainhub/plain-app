@@ -104,15 +104,15 @@ object HttpServerStartHelper {
             if (PortHelper.isPortInUse(TempData.httpsPort.value)) HttpServerManager.portsInUse.add(TempData.httpsPort.value)
         }
         HttpServerManager.httpServerError = when {
-            HttpServerManager.portsInUse.isNotEmpty() -> LocaleHelper.getStringSyncF(
+            HttpServerManager.portsInUse.isNotEmpty() -> LocaleHelper.getStringF(
                 if (HttpServerManager.portsInUse.size > 1) Res.string.http_port_conflict_errors
                 else Res.string.http_port_conflict_error,
                 "port", HttpServerManager.portsInUse.joinToString(", "),
             )
-            serverWasRunning -> LocaleHelper.getStringSync(Res.string.http_server_health_check_failed)
+            serverWasRunning -> LocaleHelper.getString(Res.string.http_server_health_check_failed)
             HttpServerManager.httpServerError.isNotEmpty() ->
-                LocaleHelper.getStringSync(Res.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
-            else -> LocaleHelper.getStringSync(Res.string.http_server_failed)
+                LocaleHelper.getString(Res.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
+            else -> LocaleHelper.getString(Res.string.http_server_failed)
         }
         onStateChanged(HttpServerState.ERROR)
         sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))

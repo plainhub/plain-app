@@ -52,9 +52,9 @@ internal suspend fun savePreviewImage(context: Context, m: PreviewItem) {
             val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = m.path.getFilenameFromPath()) }
             DialogHelper.hideLoading()
             if (r.isNotEmpty()) {
-                DialogHelper.showMessage(LocaleHelper.getStringF(Res.string.image_save_to, "path", r))
+                DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, "path", r))
             } else {
-                DialogHelper.showMessage(LocaleHelper.getString(Res.string.image_save_to_failed))
+                DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.image_save_to_failed))
             }
             return
         }
@@ -62,7 +62,7 @@ internal suspend fun savePreviewImage(context: Context, m: PreviewItem) {
         val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
         DialogHelper.hideLoading()
         if (r.success) {
-            DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.image_save_to, "path", r.path))
+            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.image_save_to, "path", r.path))
         } else {
             DialogHelper.showMessage(r.message)
         }
@@ -70,9 +70,9 @@ internal suspend fun savePreviewImage(context: Context, m: PreviewItem) {
         val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""
         val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES, newName = newName) }
         if (r.isNotEmpty()) {
-            DialogHelper.showMessage(LocaleHelper.getStringF(Res.string.image_save_to, "path", r))
+            DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, "path", r))
         } else {
-            DialogHelper.showMessage(LocaleHelper.getString(Res.string.image_save_to_failed))
+            DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.image_save_to_failed))
         }
     }
 }

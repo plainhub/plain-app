@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
+import com.ismartcoding.plain.ui.theme.listItemValue
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -125,7 +126,7 @@ fun PListItem(
                             SelectionContainer {
                                 Text(
                                     text = it,
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface),
+                                    style = MaterialTheme.typography.listItemValue(),
                                 )
                             }
                         }

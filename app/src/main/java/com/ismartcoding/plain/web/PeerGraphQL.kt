@@ -3,6 +3,7 @@ package com.ismartcoding.plain.web
 import android.annotation.SuppressLint
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.kgraphql.Context
 import com.ismartcoding.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.lib.kgraphql.KGraphQL
@@ -14,6 +15,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageHandler
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.ChatMessageReceiver
+import com.ismartcoding.plain.chat.ReplayedMessageException
 import com.ismartcoding.plain.chat.peer.PeerChatParser
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.web.models.ChatItem
@@ -59,12 +61,21 @@ class PeerGraphQL(val schema: Schema) {
                         val call = context.get<ApplicationCall>()!!
                         val fromPeerId = call.request.header("c-id") ?: ""
                         val fromChannelId = call.request.header("c-cid") ?: ""
+                        val signature = call.attributes.getOrNull(SignatureAttrKey) ?: ""
+                        val timestamp = call.attributes.getOrNull(TimestampAttrKey) ?: 0L
 
-                        val item = ChatMessageReceiver.receive(
-                            fromPeerId = fromPeerId,
-                            content = DChat.parseContent(content),
-                            fromChannelId = fromChannelId,
-                        )
+                        val item = try {
+                            ChatMessageReceiver.receive(
+                                fromPeerId = fromPeerId,
+                                content = DChat.parseContent(content),
+                                fromChannelId = fromChannelId,
+                                signature = signature,
+                                timestamp = timestamp,
+                            )
+                        } catch (e: ReplayedMessageException) {
+                            LogCat.d("Dropped replayed message from $fromPeerId")
+                            return@resolver emptyList<ChatItem>()
+                        }
                         listOf(item.toModel())
                     }
                 }
@@ -85,6 +96,8 @@ class PeerGraphQL(val schema: Schema) {
 
     companion object Feature : BaseApplicationPlugin<Application, Configuration, PeerGraphQL> {
         override val key = AttributeKey<PeerGraphQL>("PeerGraphQL")
+        private val SignatureAttrKey = AttributeKey<String>("PeerGraphQL.Signature")
+        private val TimestampAttrKey = AttributeKey<Long>("PeerGraphQL.Timestamp")
 
         private suspend fun executeGraphqlQL(
             schema: Schema,
@@ -135,6 +148,9 @@ class PeerGraphQL(val schema: Schema) {
                             call.respond(decryptResult.code)
                             return@post
                         }
+
+                        call.attributes.put(SignatureAttrKey, decryptResult.signature)
+                        call.attributes.put(TimestampAttrKey, decryptResult.timestamp)
 
                         val r = executeGraphqlQL(schema, decryptResult.content, call)
                         call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))

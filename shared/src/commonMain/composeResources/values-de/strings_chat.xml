@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">Anderen Geräten erlauben, dieses Gerät im Netzwerk zu entdecken</string>
     <string name="discover_nearby_devices">Geräte in der Nähe entdecken</string>
     <string name="stop_discovering">Suche stoppen</string>
-    <string name="tap_discover_to_start">Tippe auf \"Geräte in der Nähe entdecken\", um die Suche zu starten</string>
+    <string name="tap_discover_to_start">Tippe auf "Geräte in der Nähe entdecken", um die Suche zu starten</string>
     <string name="make_sure_devices_same_network">Stelle sicher, dass andere Geräte im selben Netzwerk sind und auffindbar sind</string>
     <string name="show_qr_code">QR-Code anzeigen</string>
     <string name="pair_via_qr_title">Per QR-Code koppeln</string>
@@ -91,6 +91,9 @@
     <string name="device_type">Gerätetyp</string>
     <string name="port">Anschluss</string>
     <string name="chat_info">Chat-Info</string>
+    <string name="channel_info">Kanalinfo</string>
+    <string name="peer_info">Peer-Info</string>
+    <string name="owner">Besitzer</string>
     <string name="clear_messages">Nachrichten löschen</string>
     <string name="clear_messages_confirm">Möchten Sie wirklich alle Nachrichten löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="messages_cleared">Nachrichten gelöscht!</string>

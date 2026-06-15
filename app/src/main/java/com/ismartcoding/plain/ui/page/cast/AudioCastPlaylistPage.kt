@@ -80,7 +80,7 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
     PModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
         Column {
             PBottomSheetTopAppBar(
-                title = if (castItems.isNotEmpty()) LocaleHelper.getStringSyncF(Res.string.playlist_title, "total", castItems.size) else stringResource(Res.string.cast_playlist),
+                title = if (castItems.isNotEmpty()) LocaleHelper.getStringF(Res.string.playlist_title, "total", castItems.size) else stringResource(Res.string.cast_playlist),
                 subtitle = if (castItems.isEmpty()) "" else stringResource(Res.string.drag_number_to_reorder_list),
                 actions = {
                     if (castItems.isNotEmpty()) {

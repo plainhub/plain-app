@@ -27,6 +27,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.POutlinedButton
@@ -60,9 +61,9 @@ fun ImagePreviewActions(
                     .background(MaterialTheme.colorScheme.darkMask())
                     .padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
-                POutlinedButton(text = stringResource(Res.string.cast), small = true, onClick = { castViewModel.cast(m.path) })
+                POutlinedButton(text = stringResource(Res.string.cast), buttonSize = ButtonSize.SMALL, onClick = { castViewModel.cast(m.path) })
                 HorizontalSpace(dp = 20.dp)
-                POutlinedButton(text = stringResource(Res.string.exit_cast_mode), small = true, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
+                POutlinedButton(text = stringResource(Res.string.exit_cast_mode), buttonSize = ButtonSize.SMALL, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
             }
             return
         }

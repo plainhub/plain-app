@@ -12,6 +12,6 @@ data class ApiResult(val response: HttpResponse?, val exception: Throwable? = nu
     }
 
     fun errorMessage(): String {
-        return exception?.toString() ?: response?.toString() ?: LocaleHelper.getStringSync(Res.string.unknown)
+        return exception?.toString() ?: response?.toString() ?: LocaleHelper.getString(Res.string.unknown)
     }
 }

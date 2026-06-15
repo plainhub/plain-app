@@ -77,7 +77,7 @@ private fun ShowcaseAlerts() {
     PAlert(description = "This is an error alert.", type = AlertType.ERROR)
     VerticalSpace(8.dp)
     PAlert(description = "Alert with action.", type = AlertType.WARNING) {
-        POutlinedButton(text = "Fix Now", small = true, onClick = {})
+        POutlinedButton(text = "Fix Now", buttonSize = ButtonSize.SMALL, onClick = {})
     }
     VerticalSpace(16.dp)
 }
@@ -112,7 +112,7 @@ private fun ShowcaseButtons() {
         POutlinedButton(text = "Outlined Block", block = true, onClick = {})
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             PFilledButton(text = "Small Filled", buttonSize = ButtonSize.SMALL, onClick = {})
-            POutlinedButton(text = "Small Outlined", small = true, onClick = {})
+            POutlinedButton(text = "Small Outlined", buttonSize = ButtonSize.SMALL, onClick = {})
         }
     }
     VerticalSpace(16.dp)

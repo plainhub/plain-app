@@ -48,7 +48,7 @@ internal fun ChatImageItem(
 ) {
     val itemState = rememberTransformItemState()
     val isRemoteFile = item.isRemoteFile()
-    val isDownloading = downloadTask?.isDownloading() == true
+    val taskActive = downloadTask?.isActive() == true
     val downloadProgress = downloadTask?.let {
         if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
     } ?: 0f
@@ -61,7 +61,7 @@ internal fun ChatImageItem(
 
     Box(
         modifier = Modifier.clickable {
-            if (isDownloading) return@clickable
+            if (taskActive) return@clickable
             coMain {
                 withIO { MediaPreviewData.setDataAsync(context, itemState, items.reversed(), item) }
                 previewerState.openTransform(
@@ -82,7 +82,7 @@ internal fun ChatImageItem(
             forceVideoDecoder = item.fileName.isVideoFast() && !item.isRemoteFile(),
         )
 
-        if (isDownloading) {
+        if (taskActive) {
             DownloadProgressOverlay(
                 modifier = Modifier.size(imageWidthDp),
                 downloadProgress = downloadProgress,

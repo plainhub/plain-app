@@ -53,7 +53,7 @@ fun Typography.listItemTitle() = titleMedium.copy(
 )
 
 @Composable
-fun Typography.listItemValue() = bodyMedium.copy(fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
+fun Typography.listItemValue() = bodyMedium.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface)
 
 @Composable
 fun Typography.listItemDescription() = titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)

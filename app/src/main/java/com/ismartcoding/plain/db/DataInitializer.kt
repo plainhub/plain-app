@@ -40,7 +40,7 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
                 SQLiteDatabase.CONFLICT_NONE,
                 ContentValues().apply {
                     put("id", StringHelper.shortUUID())
-                    put("name", LocaleHelper.getStringSync(tag.nameKey))
+                    put("name", LocaleHelper.getString(tag.nameKey))
                     put("type", tag.type.value)
                     put("count", 0)
                     put("created_at", now)
@@ -52,7 +52,7 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
 
     fun insertNotes() {
         setOf(Res.string.note_sample1).forEach {
-            val sample = LocaleHelper.getStringSync(it)
+            val sample = LocaleHelper.getString(it)
             db.insert(
                 "notes",
                 SQLiteDatabase.CONFLICT_NONE,
@@ -69,7 +69,7 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
 
     fun insertWelcome() {
         setOf<MessageItem>(
-            MessageItem("""{"type":"text","value":{"text":"${LocaleHelper.getStringSync(Res.string.welcome_text)}"}}""", "local", "me"),
+            MessageItem("""{"type":"text","value":{"text":"${LocaleHelper.getString(Res.string.welcome_text)}"}}""", "local", "me"),
         ).forEach {
             db.insert(
                 "chats",

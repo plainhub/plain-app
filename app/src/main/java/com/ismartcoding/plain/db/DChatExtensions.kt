@@ -49,7 +49,7 @@ fun DChat.getMessagePreview(): String {
     return when (content.type) {
         DMessageType.TEXT.value -> {
             val textMessage = content.value as? DMessageText
-            textMessage?.text?.take(50) ?: LocaleHelper.getStringSync(Res.string.message)
+            textMessage?.text?.take(50) ?: LocaleHelper.getString(Res.string.message)
         }
 
         DMessageType.IMAGES.value -> {
@@ -59,17 +59,17 @@ fun DChat.getMessagePreview(): String {
             val imageCount = items.size - videoCount
             when {
                 imageCount > 0 && videoCount > 0 -> {
-                    val imgPart = if (imageCount > 1) "$imageCount ${LocaleHelper.getStringSync(Res.string.images)}" else LocaleHelper.getStringSync(Res.string.image)
-                    val vidPart = if (videoCount > 1) "$videoCount ${LocaleHelper.getStringSync(Res.string.videos)}" else LocaleHelper.getStringSync(Res.string.video)
+                    val imgPart = if (imageCount > 1) "$imageCount ${LocaleHelper.getString(Res.string.images)}" else LocaleHelper.getString(Res.string.image)
+                    val vidPart = if (videoCount > 1) "$videoCount ${LocaleHelper.getString(Res.string.videos)}" else LocaleHelper.getString(Res.string.video)
                     "$imgPart, $vidPart"
                 }
 
                 videoCount > 0 -> {
-                    if (videoCount > 1) "$videoCount ${LocaleHelper.getStringSync(Res.string.videos)}" else LocaleHelper.getStringSync(Res.string.video)
+                    if (videoCount > 1) "$videoCount ${LocaleHelper.getString(Res.string.videos)}" else LocaleHelper.getString(Res.string.video)
                 }
 
                 else -> {
-                    if (imageCount > 1) "$imageCount ${LocaleHelper.getStringSync(Res.string.images)}" else LocaleHelper.getStringSync(Res.string.image)
+                    if (imageCount > 1) "$imageCount ${LocaleHelper.getString(Res.string.images)}" else LocaleHelper.getString(Res.string.image)
                 }
             }
         }
@@ -77,9 +77,9 @@ fun DChat.getMessagePreview(): String {
         DMessageType.FILES.value -> {
             val filesMessage = content.value as? DMessageFiles
             val count = filesMessage?.items?.size ?: 0
-            if (count > 1) "$count ${LocaleHelper.getStringSync(Res.string.files)}" else LocaleHelper.getStringSync(Res.string.file)
+            if (count > 1) "$count ${LocaleHelper.getString(Res.string.files)}" else LocaleHelper.getString(Res.string.file)
         }
 
-        else -> LocaleHelper.getStringSync(Res.string.message)
+        else -> LocaleHelper.getString(Res.string.message)
     }
 }

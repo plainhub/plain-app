@@ -45,3 +45,4 @@ class HDisableImageSearchEvent : ChannelEvent()
 class HCancelImageModelDownloadEvent : ChannelEvent()
 
 class HCancelNotificationsEvent(val ids: Set<String>) : ChannelEvent()
+class HChatItemsDeletedEvent(val ids: Set<String>) : ChannelEvent()

@@ -133,7 +133,7 @@ fun WebSecurityPage(navController: NavHostController) {
                                 keyStorePassword = KeyStorePasswordPreference.getAsync()
                                 HttpServerManager.generateSSLKeyStore(File(context.filesDir, Constants.KEY_STORE_FILE_NAME), keyStorePassword)
                                 DialogHelper.hideLoading()
-                                DialogHelper.showConfirmDialog("", LocaleHelper.getString(Res.string.ssl_certificate_reset)) { sendEvent(RestartAppEvent()) }
+                                DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset)) { sendEvent(RestartAppEvent()) }
                             }
                         })
                         VerticalSpace(dp = 24.dp); Subtitle(text = stringResource(Res.string.url_token))

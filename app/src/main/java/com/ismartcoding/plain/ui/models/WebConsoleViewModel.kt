@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
@@ -26,18 +25,18 @@ class WebConsoleViewModel : ViewModel() {
     fun dig(context: Context) {
         viewModelScope.launch {
             DialogHelper.showLoading()
-            val errorMessage = LocaleHelper.getString(Res.string.http_server_error)
+            val errorMessage = LocaleHelper.getStringAsync(Res.string.http_server_error)
             val serverUp = withIO { HttpServerManager.checkServerAsync() }
             DialogHelper.hideLoading()
             if (!serverUp) {
                 AlertDialog.Builder(context)
-                    .setTitle(LocaleHelper.getString(Res.string.error))
+                    .setTitle(LocaleHelper.getStringAsync(Res.string.error))
                     .setMessage(errorMessage)
-                    .setPositiveButton(LocaleHelper.getString(Res.string.ok)) { _, _ -> }
-                    .setNegativeButton(LocaleHelper.getString(Res.string.relaunch_app)) { _, _ -> AppHelper.relaunch(context) }
+                    .setPositiveButton(LocaleHelper.getStringAsync(Res.string.ok)) { _, _ -> }
+                    .setNegativeButton(LocaleHelper.getStringAsync(Res.string.relaunch_app)) { _, _ -> AppHelper.relaunch(context) }
                     .create().show()
             } else {
-                DialogHelper.showConfirmDialog(LocaleHelper.getString(Res.string.confirm), LocaleHelper.getString(Res.string.http_server_ok))
+                DialogHelper.showConfirmDialog(LocaleHelper.getStringAsync(Res.string.confirm), LocaleHelper.getStringAsync(Res.string.http_server_ok))
             }
         }
     }

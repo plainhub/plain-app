@@ -98,7 +98,7 @@ class HttpServerService : LifecycleService() {
             val notification = NotificationHelper.createServiceNotification(
                 this,
                 Constants.ACTION_STOP_HTTP_SERVER,
-                LocaleHelper.getStringSync(Res.string.api_service_is_running),
+                LocaleHelper.getString(Res.string.api_service_is_running),
                 HttpServerManager.getNotificationContent()
             )
 

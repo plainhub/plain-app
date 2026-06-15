@@ -26,16 +26,10 @@ object ChatSender {
         val item = ChatDbHelper.insertChatItem(
             message = content,
             fromId = "me",
-            toId = when (target.type) {
-                ChatTargetType.CHANNEL -> ""
-                ChatTargetType.PEER, ChatTargetType.LOCAL -> target.toId
-            },
+            toId = if (target.type == ChatTargetType.PEER) target.toId else "",
             channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
-            isRemote = target.type != ChatTargetType.LOCAL,
+            isRemote = !target.isLocal(),
         )
-
-        val model = item.toModel().apply { data = getContentData() }
-        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
         if (item.content.type == DMessageType.TEXT.value) {
             sendEvent(FetchLinkPreviewsEvent(item))
         }
@@ -47,7 +41,11 @@ object ChatSender {
         target: ChatTarget,
         onlinePeerIds: Set<String>,
     ) {
-        return when (target.type) {
+        if (target.isLocal()) {
+            return
+        }
+
+        when (target.type) {
             ChatTargetType.PEER -> {
                 val peer = AppDatabase.instance.peerDao().getById(target.toId) ?: return
                 sendToPeer(item, peer)
@@ -57,27 +55,21 @@ object ChatSender {
                 val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return
                 sendToChannel(item, channel, onlinePeerIds)
             }
-
-            ChatTargetType.LOCAL -> {}
         }
     }
 
-    /**
-     * Resend a previously-sent message. Caller must have already set the
-     * item's status to "pending" and refreshed its own view-model state
-     * so the UI shows a "sending" indicator before the network round-trip
-     * completes. This function sends via the existing target route and
-     * then broadcasts MESSAGE_UPDATED so the UI and WebSocket clients
-     * refresh to the final delivery status.
-     */
-    suspend fun resend(item: DChat, onlinePeerIds: Set<String> = emptySet()) {
-        send(item, item.target(), onlinePeerIds)
+    suspend fun resend(item: DChat) {
+        send(item, item.target(), currentOnlinePeers())
         sendEvent(HMessageUpdatedEvent(item.id))
+    }
+
+    private fun currentOnlinePeers(): Set<String> {
+        return com.ismartcoding.plain.chat.peer.PeerStatusManager.onlinePeers()
     }
 
     private fun DChat.target(): ChatTarget = when {
         channelId.isNotEmpty() -> ChatTarget(channelId, ChatTargetType.CHANNEL)
-        toId.isEmpty() || toId == "local" -> ChatTarget("local", ChatTargetType.LOCAL)
+        toId.isEmpty() || toId == "local" -> ChatTarget("local", ChatTargetType.PEER)
         else -> ChatTarget(toId, ChatTargetType.PEER)
     }
 
@@ -97,16 +89,29 @@ object ChatSender {
     }
 
     suspend fun sendToChannel(item: DChat, channel: DChatChannel, onlinePeerIds: Set<String> = emptySet()) {
-        val statusData = ChannelChatSender.send(channel, item.content)
-        if (statusData == null) {
-            val leaderId = channel.electLeader(onlinePeerIds, TempData.clientId)
-            if (leaderId != null && leaderId != TempData.clientId) {
-                triggerPeerRediscovery(leaderId)
-            } else {
+        when (val result = ChannelChatSender.send(channel, item.content)) {
+            is ChannelChatSender.Result.Status -> {
+                ChatDbHelper.updateChannelChatItemStatus(item, result.data)
+            }
+
+            ChannelChatSender.Result.NoLeader -> {
+                // No joined member is reachable right now — trigger rediscovery for everyone
+                // so the next send / heartbeat can re-elect a leader.
                 channel.getRecipientIds().forEach { triggerPeerRediscovery(it) }
+                ChatDbHelper.updateChannelChatItemStatus(item, null)
+            }
+
+            is ChannelChatSender.Result.LeaderPeerMissing -> {
+                // We have a leader id from election but their peer record is gone locally
+                // (DB row was deleted / not yet cached). Refresh that peer first, then try
+                // the rest of the members.
+                triggerPeerRediscovery(result.leaderId)
+                channel.getRecipientIds()
+                    .filter { it != result.leaderId }
+                    .forEach { triggerPeerRediscovery(it) }
+                ChatDbHelper.updateChannelChatItemStatus(item, null)
             }
         }
-        ChatDbHelper.updateChannelChatItemStatus(item, statusData)
     }
 
     suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) {

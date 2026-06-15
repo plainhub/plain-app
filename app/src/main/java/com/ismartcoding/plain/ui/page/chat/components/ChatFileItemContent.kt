@@ -58,7 +58,7 @@ internal fun ChatFileItemContent(
     fileName: String,
     path: String,
     previewPath: String,
-    isDownloading: Boolean,
+    isActive: Boolean,
     downloadProgress: Float,
     downloadTask: DownloadTask?,
     isCurrentlyPlaying: Boolean,
@@ -72,7 +72,7 @@ internal fun ChatFileItemContent(
             .fillMaxWidth()
             .combinedClickable(
                 onClick = {
-                    if (isDownloading) return@combinedClickable
+                    if (isActive) return@combinedClickable
                     if (fileName.isImageFast() || fileName.isVideoFast()) {
                         coMain {
                             keyboardController?.hide()
@@ -110,7 +110,7 @@ internal fun ChatFileItemContent(
                     coMain {
                         val result = withIO { FileHelper.copyFileToDownloads(path, fileName) }
                         if (result.isNotEmpty()) {
-                            DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(Res.string.file_save_to, "path", result))
+                            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, "path", result))
                         } else {
                             DialogHelper.showErrorMessage(result)
                         }
@@ -140,7 +140,7 @@ internal fun ChatFileItemContent(
                 item = item,
                 itemState = itemState,
                 previewerState = previewerState,
-                isDownloading = isDownloading,
+                isActive = isActive,
                 downloadProgress = downloadProgress,
                 downloadTask = downloadTask,
             )

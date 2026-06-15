@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">অন্য ডিভাইসগুলিকে নেটওয়ার্কে এই ডিভাইসটি খুঁজে পেতে অনুমতি দিন</string>
     <string name="discover_nearby_devices">কাছাকাছি ডিভাইস খুঁজে বের করুন</string>
     <string name="stop_discovering">খোঁজা বন্ধ করুন</string>
-    <string name="tap_discover_to_start">খোঁজা শুরু করতে \"কাছাকাছি ডিভাইস খুঁজে বের করুন\" ট্যাপ করুন</string>
+    <string name="tap_discover_to_start">খোঁজা শুরু করতে "কাছাকাছি ডিভাইস খুঁজে বের করুন" ট্যাপ করুন</string>
     <string name="make_sure_devices_same_network">নিশ্চিত করুন যে অন্য ডিভাইসগুলি একই নেটওয়ার্কে আছে এবং খুঁজে পাওয়া যায়</string>
     <string name="show_qr_code">QR কোড দেখান</string>
     <string name="pair_via_qr_title">QR কোডের মাধ্যমে জোড়া লাগান</string>
@@ -91,6 +91,9 @@
     <string name="device_type">ডিভাইসের ধরণ</string>
     <string name="port">পোর্ট</string>
     <string name="chat_info">চ্যাট তথ্য</string>
+    <string name="channel_info">চ্যানেল তথ্য</string>
+    <string name="peer_info">পিয়ার তথ্য</string>
+    <string name="owner">মালিক</string>
     <string name="clear_messages">বার্তা মুছুন</string>
     <string name="clear_messages_confirm">আপনি কি সব বার্তা মুছতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
     <string name="messages_cleared">বার্তাগুলি মুছে ফেলা হয়েছে!</string>

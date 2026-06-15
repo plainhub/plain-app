@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">மற்ற சாதனங்கள் நெட்வொர்க்கில் இந்த சாதனத்தைக் கண்டுபிடிக்க அனுமதிக்கவும்</string>
     <string name="discover_nearby_devices">அருகிலுள்ள சாதனங்களைக் கண்டுபிடி</string>
     <string name="stop_discovering">கண்டுபிடிப்பதை நிறுத்து</string>
-    <string name="tap_discover_to_start">தேடலைத் தொடங்க \"அருகிலுள்ள சாதனங்களைக் கண்டுபிடி\" என்பதைத் தட்டவும்</string>
+    <string name="tap_discover_to_start">தேடலைத் தொடங்க "அருகிலுள்ள சாதனங்களைக் கண்டுபிடி" என்பதைத் தட்டவும்</string>
     <string name="make_sure_devices_same_network">மற்ற சாதனங்கள் அதே நெட்வொர்க்கில் உள்ளன மற்றும் கண்டுபிடிக்கக்கூடியவை என்பதை உறுதிசெய்யவும்</string>
     <string name="show_qr_code">QR குறியீட்டை காட்டு</string>
     <string name="pair_via_qr_title">QR குறியீடு மூலம் இணை</string>
@@ -91,6 +91,9 @@
     <string name="device_type">சாதன வகை</string>
     <string name="port">போர்ட்</string>
     <string name="chat_info">சாட் தகவல்</string>
+    <string name="channel_info">சேனல் தகவல்</string>
+    <string name="peer_info">பியர் தகவல்</string>
+    <string name="owner">உரிமையாளர்</string>
     <string name="clear_messages">செய்திகளை அழி</string>
     <string name="clear_messages_confirm">அனைத்து செய்திகளையும் அழிக்க விரும்புகிறீர்களா? இந்த செயலை மீட்டெடுக்க முடியாது.</string>
     <string name="messages_cleared">செய்திகள் அழிக்கப்பட்டன!</string>

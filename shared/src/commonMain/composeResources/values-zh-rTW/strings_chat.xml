@@ -91,6 +91,9 @@
     <string name="device_type">設備類型</string>
     <string name="port">連接埠</string>
     <string name="chat_info">聊天資訊</string>
+    <string name="channel_info">頻道資訊</string>
+    <string name="peer_info">裝置資訊</string>
+    <string name="owner">擁有者</string>
     <string name="clear_messages">清空訊息</string>
     <string name="clear_messages_confirm">確定要清空所有訊息嗎？此操作無法復原。</string>
     <string name="messages_cleared">訊息已清空！</string>

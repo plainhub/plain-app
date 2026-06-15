@@ -73,13 +73,13 @@ fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM:
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !notesVM.selectMode.value })
     val isFirstTime = remember { mutableStateOf(true) }
     val tabs = remember(tagsState, notesVM.total.intValue, notesVM.totalTrash.intValue) {
-        listOf(VTabData(LocaleHelper.getStringSync(Res.string.all), "all", notesVM.total.intValue), VTabData(LocaleHelper.getStringSync(Res.string.trash), "trash", notesVM.totalTrash.intValue), *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray())
+        listOf(VTabData(LocaleHelper.getString(Res.string.all), "all", notesVM.total.intValue), VTabData(LocaleHelper.getString(Res.string.trash), "trash", notesVM.totalTrash.intValue), *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray())
     }
     val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { withIO { notesVM.loadAsync(tagsVM) } }; setRefreshState(RefreshContentState.Finished) }
 
     NotesPageEffects(notesVM, tagsVM, scrollBehavior, scrollStateMap, pagerState, scope, isFirstTime)
 
-    val pageTitle = if (notesVM.selectMode.value) LocaleHelper.getStringSyncF(Res.string.x_selected, "count", notesVM.selectedIds.size)
+    val pageTitle = if (notesVM.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, "count", notesVM.selectedIds.size)
         else if (notesVM.tag.value != null) stringResource(Res.string.notes) + " - " + notesVM.tag.value!!.name
         else if (notesVM.trash.value) stringResource(Res.string.notes) + " - " + stringResource(Res.string.trash)
         else stringResource(Res.string.notes)

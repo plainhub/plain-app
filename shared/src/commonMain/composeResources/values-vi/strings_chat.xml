@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">Cho phép các thiết bị khác phát hiện thiết bị này trên mạng</string>
     <string name="discover_nearby_devices">Khám phá thiết bị gần đây</string>
     <string name="stop_discovering">Dừng tìm kiếm</string>
-    <string name="tap_discover_to_start">Nhấn \"Khám phá thiết bị gần đây\" để bắt đầu tìm kiếm</string>
+    <string name="tap_discover_to_start">Nhấn "Khám phá thiết bị gần đây" để bắt đầu tìm kiếm</string>
     <string name="make_sure_devices_same_network">Đảm bảo các thiết bị khác cùng mạng và có thể phát hiện được</string>
     <string name="show_qr_code">Hiển thị mã QR</string>
     <string name="pair_via_qr_title">Ghép đôi qua mã QR</string>
@@ -91,6 +91,9 @@
     <string name="device_type">Loại thiết bị</string>
     <string name="port">Cổng</string>
     <string name="chat_info">Thông tin chat</string>
+    <string name="channel_info">Thông tin kênh</string>
+    <string name="peer_info">Thông tin peer</string>
+    <string name="owner">Chủ sở hữu</string>
     <string name="clear_messages">Xóa tin nhắn</string>
     <string name="clear_messages_confirm">Bạn có chắc chắn muốn xóa tất cả tin nhắn không? Hành động này không thể hoàn tác.</string>
     <string name="messages_cleared">Tin nhắn đã được xóa!</string>

@@ -88,11 +88,13 @@ fun ChatListItem(
                         ),
                 ) {
                     ChatName(
-                        m = m, isPeerChat = peer != null, isLocal = chatVM.chatState.value.target.type == ChatTargetType.LOCAL,
-                        onRetry = if (chatVM.chatState.value.target.type != ChatTargetType.LOCAL) {
+                        m = m,
+                        isPeerChat = peer != null,
+                        isLocal = chatVM.chatState.value.target.isLocal(),
+                        onRetry = if (!chatVM.chatState.value.target.isLocal()) {
                             { chatVM.resendMessage(m.id) }
                         } else null,
-                        onShowDeliveryDetails = if (chatVM.chatState.value.target.type != ChatTargetType.LOCAL) {
+                        onShowDeliveryDetails = if (!chatVM.chatState.value.target.isLocal()) {
                             { statusData -> showDeliveryDialog.value = statusData }
                         } else null)
                     when (m.type) {
@@ -108,10 +110,12 @@ fun ChatListItem(
                     }
                     VerticalSpace(4.dp)
                 }
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 32.dp)
-                    .wrapContentSize(Alignment.Center)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 32.dp)
+                        .wrapContentSize(Alignment.Center)
+                ) {
                     ChatListItemContextMenu(navController, chatVM, m, showContextMenu, onForward)
                 }
             }

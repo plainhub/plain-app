@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -114,23 +116,43 @@ class MainActivity : AppCompatActivity() {
         }
     }
     internal val recordAudioForMirrorLate = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) sendScreenMirrorAudioStatus(true)
-        else if (!shouldShowRequestPermissionRationale(android.Manifest.permission.RECORD_AUDIO) && !Permission.RECORD_AUDIO.can(this)) showRecordAudioPermissionSettingsGuide()
-        else sendScreenMirrorAudioStatus(false)
+        if (granted) {
+            sendScreenMirrorAudioStatus(true)
+        } else if (!shouldShowRequestPermissionRationale(android.Manifest.permission.RECORD_AUDIO)
+            && !Permission.RECORD_AUDIO.can(this)
+        ) {
+            showRecordAudioPermissionSettingsGuide()
+        } else {
+            sendScreenMirrorAudioStatus(false)
+        }
     }
-    internal val appDetailsSettingsForAudioLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { sendScreenMirrorAudioStatus(Permission.RECORD_AUDIO.can(this)) }
-    internal val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null) sendEvent(PickFileResultEvent(pickFileTag, pickFileType, setOf(uri))) }
+    internal val appDetailsSettingsForAudioLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        sendScreenMirrorAudioStatus(Permission.RECORD_AUDIO.can(this))
+    }
+    internal val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) sendEvent(PickFileResultEvent(pickFileTag, pickFileType, setOf(uri)))
+    }
     internal val pickMultipleMedia =
-        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris -> if (uris.isNotEmpty()) sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris.toSet())) }
+        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
+            if (uris.isNotEmpty()) {
+                sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris.toSet()))
+            }
+        }
     internal val pickFileActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val uris = result.data?.let { FilePickHelper.getUris(it) } ?: emptySet()
-        if (uris.isNotEmpty()) sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris))
+        if (uris.isNotEmpty()) {
+            sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris))
+        }
     }
     internal val exportFileActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val uri = result.data?.data
-        if (uri != null) sendEvent(ExportFileResultEvent(exportFileType, uri))
+        if (uri != null) {
+            sendEvent(ExportFileResultEvent(exportFileType, uri))
+        }
     }
-    internal val ignoreBatteryOptimizationActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { sendEvent(IgnoreBatteryOptimizationResultEvent()) }
+    internal val ignoreBatteryOptimizationActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        sendEvent(IgnoreBatteryOptimizationResultEvent())
+    }
 
     private val plugInReceiver = PlugInControlReceiver()
     private val networkStateReceiver = NetworkStateReceiver()
@@ -175,12 +197,7 @@ class MainActivity : AppCompatActivity() {
                                 pendingForwardText = null
                             },
                             onTargetSelected = { target ->
-                                val route = when (target.type) {
-                                    ChatTargetType.LOCAL -> Routing.Chat("local")
-                                    ChatTargetType.PEER -> Routing.Chat("peer:${target.toId}")
-                                    ChatTargetType.CHANNEL -> Routing.Chat("channel:${target.toId}")
-                                }
-                                navControllerState.value?.navigate(route)
+                                navControllerState.value?.navigate(Routing.Chat(target.encodedToId))
                                 pendingFileUris?.let { uris ->
                                     coIO {
                                         delay(500)
@@ -211,7 +228,9 @@ class MainActivity : AppCompatActivity() {
                             },
                             onAllow = {
                                 pendingLoginEvent = null
-                                lifecycleScope.launch(Dispatchers.IO) { HttpServerManager.respondTokenAsync(event, clientIp) }
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    HttpServerManager.respondTokenAsync(event, clientIp)
+                                }
                             },
                         )
                     }
@@ -251,7 +270,10 @@ class MainActivity : AppCompatActivity() {
         AudioPlayer.ensurePlayer(this)
         coIO {
             try {
-                if (WebPreference.getAsync()) mainVM.enableHttpServer(this@MainActivity, true); doWhenReadyAsync()
+                if (WebPreference.getAsync()) {
+                    mainVM.enableHttpServer(this@MainActivity, true)
+                    doWhenReadyAsync()
+                }
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
             }
@@ -259,11 +281,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy(); Permissions.release(); unregisterReceiver(plugInReceiver); unregisterReceiver(networkStateReceiver)
+        super.onDestroy()
+        Permissions.release()
+        unregisterReceiver(plugInReceiver)
+        unregisterReceiver(networkStateReceiver)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig); PlainAccessibilityService.invalidateScreenSizeCache(); lifecycleScope.launch(Dispatchers.IO) { Language.initLocaleAsync(this@MainActivity) }
+        super.onConfigurationChanged(newConfig)
+        PlainAccessibilityService.invalidateScreenSizeCache()
+        lifecycleScope.launch(Dispatchers.IO) {
+            Language.initLocaleAsync(this@MainActivity)
+        }
     }
 
     override fun onNewIntent(intent: Intent) {

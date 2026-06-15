@@ -49,7 +49,7 @@ object NotificationHelper {
             notificationManager.createNotificationChannel(
                 NotificationChannel(
                     Constants.NOTIFICATION_CHANNEL_ID,
-                    LocaleHelper.getStringSync(Res.string.app_name),
+                    LocaleHelper.getString(Res.string.app_name),
                     NotificationManager.IMPORTANCE_DEFAULT,
                 ).apply {
                     setShowBadge(false)
@@ -64,7 +64,7 @@ object NotificationHelper {
             notificationManager.createNotificationChannel(
                 NotificationChannel(
                     Constants.CHAT_NOTIFICATION_CHANNEL_ID,
-                    LocaleHelper.getStringSync(Res.string.peer_chat),
+                    LocaleHelper.getString(Res.string.peer_chat),
                     NotificationManager.IMPORTANCE_HIGH,
                 ),
             )
@@ -90,12 +90,12 @@ object NotificationHelper {
         )
 
         val remoteInput = RemoteInput.Builder(PeerChatReplyReceiver.KEY_TEXT_REPLY)
-            .setLabel(LocaleHelper.getStringSync(Res.string.peer_chat_type_reply))
+            .setLabel(LocaleHelper.getString(Res.string.peer_chat_type_reply))
             .build()
 
         val replyAction = NotificationCompat.Action.Builder(
             R.drawable.notification,
-            LocaleHelper.getStringSync(Res.string.peer_chat_reply),
+            LocaleHelper.getString(Res.string.peer_chat_reply),
             replyPendingIntent,
         )
             .addRemoteInput(remoteInput)
@@ -122,7 +122,7 @@ object NotificationHelper {
         val description = listOf(clientIp, browserDisplay, "$osName $osVersion").filter { it.isNotBlank() }.joinToString(" · ")
         val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.notification)
-            .setContentTitle(LocaleHelper.getStringSync(Res.string.web_client_connected))
+            .setContentTitle(LocaleHelper.getString(Res.string.web_client_connected))
             .setContentText(description)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
@@ -176,7 +176,7 @@ object NotificationHelper {
                 foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
             }
             setContentIntent(createContentIntent(context))
-            addAction(-1, LocaleHelper.getStringSync(Res.string.stop_service), stopPendingIntent)
+            addAction(-1, LocaleHelper.getString(Res.string.stop_service), stopPendingIntent)
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
         }.build()
     }

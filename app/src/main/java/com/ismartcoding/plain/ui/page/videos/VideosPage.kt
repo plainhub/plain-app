@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.videos
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -73,8 +71,8 @@ fun VideosPage(
     val density = LocalDensity.current
     val imageWidthPx = remember(cellsPerRow.value) { density.run { ((configuration.screenWidthDp.dp - ((cellsPerRow.value - 1) * 2).dp) / cellsPerRow.value).toPx().toInt() } }
     val tabs = remember(tagsState, videosVM.total.intValue, videosVM.totalTrash.intValue) {
-        val baseTabs = mutableListOf(VTabData(LocaleHelper.getStringSync(Res.string.all), "all", videosVM.total.intValue))
-        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getStringSync(Res.string.trash), "trash", videosVM.totalTrash.intValue))
+        val baseTabs = mutableListOf(VTabData(LocaleHelper.getString(Res.string.all), "all", videosVM.total.intValue))
+        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(Res.string.trash), "trash", videosVM.totalTrash.intValue))
         baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) }); baseTabs
     }
     val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { withIO { videosVM.loadAsync(context, tagsVM); mediaFoldersVM.loadAsync(context) }; setRefreshState(RefreshContentState.Finished) } }

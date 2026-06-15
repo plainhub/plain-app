@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.components
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -41,9 +40,9 @@ fun persistPort(
 
 fun showRestartAppDialog(context: Context) {
     androidx.appcompat.app.AlertDialog.Builder(context)
-        .setTitle(LocaleHelper.getStringSync(Res.string.restart_app_title))
-        .setMessage(LocaleHelper.getStringSync(Res.string.restart_app_message))
-        .setPositiveButton(LocaleHelper.getStringSync(Res.string.relaunch_app)) { _, _ ->
+        .setTitle(LocaleHelper.getString(Res.string.restart_app_title))
+        .setMessage(LocaleHelper.getString(Res.string.restart_app_message))
+        .setPositiveButton(LocaleHelper.getString(Res.string.relaunch_app)) { _, _ ->
             AppHelper.relaunch(context)
         }
         .setCancelable(false)

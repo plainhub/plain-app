@@ -42,7 +42,7 @@ internal fun PeerIconWithStatus(
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.primary
         )
-        if (online != null) {
+        if (online == true) {
             Box(
                 modifier = Modifier
                     .size(10.dp)
@@ -53,8 +53,7 @@ internal fun PeerIconWithStatus(
                     .padding(1.dp)
                     .clip(CircleShape)
                     .background(
-                        if (online) MaterialTheme.colorScheme.green
-                        else MaterialTheme.colorScheme.grey
+                        MaterialTheme.colorScheme.green
                     )
             )
         }

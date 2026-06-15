@@ -6,9 +6,11 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -42,11 +44,11 @@ import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.isJoined
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
+import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
@@ -61,7 +63,6 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPrevie
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.ChatState
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.VChat
@@ -119,7 +120,7 @@ fun ChatPage(
     }
 
     val pageTitle = if (chatVM.selectMode.value) {
-        LocaleHelper.getStringSyncF(Res.string.x_selected, "count", chatVM.selectedIds.size)
+        LocaleHelper.getStringF(Res.string.x_selected, "count", chatVM.selectedIds.size)
     } else {
         val state = chatState.value
         if (state.target.type == ChatTargetType.CHANNEL) {
@@ -146,7 +147,9 @@ fun ChatPage(
                         PTopRightButton(label = stringResource(if (chatVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { chatVM.toggleSelectAll() })
                         HorizontalSpace(dp = 8.dp)
                     } else {
-                        PIconButton(icon = Res.drawable.ellipsis_vertical, contentDescription = stringResource(Res.string.more), click = { navController.navigate(Routing.ChatInfo(id.ifEmpty { "local" })) })
+                        ActionButtonMore(onClick = {
+                            navController.navigate(Routing.ChatInfo(id))
+                        })
                     }
                 },
             )
@@ -196,19 +199,24 @@ fun ChatPage(
                             else
                                 Res.string.channel_left_notice
                         ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, textAlign = TextAlign.Center,
                     )
                 }
+                Spacer(modifier = Modifier.navigationBarsPadding())
             } else if (!chatVM.showBottomActions() && (peer == null || peer.status == "paired")) {
-                ChatInput(value = inputValue, hint = stringResource(Res.string.chat_input_hint), onValueChange = { inputValue = it; scope.launch(Dispatchers.IO) { ChatInputTextPreference.putAsync(it) } }, onSend = {
-                    if (inputValue.isEmpty()) return@ChatInput
-                    scope.launch {
-                        chatVM.sendTextMessage(inputValue, context)
-                        inputValue = ""
-                        withIO { ChatInputTextPreference.putAsync("") }
-                        scrollState.scrollToItem(0)
-                    }
-                })
+                ChatInput(
+                    value = inputValue,
+                    hint = stringResource(Res.string.chat_input_hint),
+                    onValueChange = { inputValue = it; scope.launch(Dispatchers.IO) { ChatInputTextPreference.putAsync(it) } },
+                    onSend = {
+                        if (inputValue.isEmpty()) return@ChatInput
+                        scope.launch {
+                            chatVM.sendTextMessage(inputValue, context)
+                            inputValue = ""
+                            withIO { ChatInputTextPreference.putAsync("") }
+                            scrollState.scrollToItem(0)
+                        }
+                    })
             }
         }
     }

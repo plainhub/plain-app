@@ -55,7 +55,7 @@
     <string name="api_url">API URL</string>
     <string name="web_url">Web URL</string>
     <string name="auth_dev_token_tips">Clients must include both c-id: &lt;client_id&gt; and Authorization: Bearer &lt;token&gt; in the request headers, or use the same pair to encrypt the API payload. If the token is provided in the request headers, the response will be returned in plain text.</string>
-    <string name="browser_https_error_tips">If you see \"Your connection is not private\" error, simply click the "Advanced" button and click "Proceed to …" button, then Chrome will trust this URL for the remainder of the browser session.</string>
+    <string name="browser_https_error_tips">If you see "Your connection is not private" error, simply click the "Advanced" button and click "Proceed to …" button, then Chrome will trust this URL for the remainder of the browser session.</string>
     <string name="api_service_is_running">Web service is running</string>
     <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
     <string name="screen_mirror_audio_permission_settings_message">Microphone permission is disabled. Please enable it in Settings to mirror system audio.</string>

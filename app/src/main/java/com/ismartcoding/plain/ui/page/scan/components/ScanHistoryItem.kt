@@ -106,7 +106,7 @@ fun ScanHistoryItem(
                     text = stringResource(Res.string.copy),
                     tint = MaterialTheme.colorScheme.onSurface,
                     onClick = {
-                        val clip = ClipData.newPlainText(LocaleHelper.getStringSync(Res.string.scan_result), text)
+                        val clip = ClipData.newPlainText(LocaleHelper.getString(Res.string.scan_result), text)
                         clipboardManager.setPrimaryClip(clip)
                         DialogHelper.showTextCopiedMessage(text)
                     },

@@ -26,7 +26,7 @@ import com.ismartcoding.plain.db.toPeerMessageContent
  * All messages flow:  client → leader → broadcast to all other members.
  *
  * - If this device **is** the leader: broadcast directly to every other member.
- * - If this device **is not** the leader: send to the leader only;
+ * - If this device **is not** the leader: send only to the leader;
  *   the leader is responsible for relaying.
  *
  * Encryption:
@@ -38,13 +38,22 @@ import com.ismartcoding.plain.db.toPeerMessageContent
 object ChannelChatSender {
 
     /**
+     * Outcome of [send]. [Status] carries per-member delivery results;
+     * [NoLeader] means no joined member (including self) is reachable right now;
+     * [LeaderPeerMissing] means the elected leader was elected but its
+     * peer record vanished from the local DB.
+     */
+    sealed class Result {
+        data class Status(val data: DMessageStatusData) : Result()
+        data object NoLeader : Result()
+        data class LeaderPeerMissing(val leaderId: String) : Result()
+    }
+
+    /**
      * Send [content] from this device into the channel.
      *
      * If this device is the leader, broadcast to all other members.
      * Otherwise, send only to the leader (who will relay).
-     *
-     * Returns [DMessageStatusData] with per-member delivery results, or null when
-     * no leader is available.
      *
      * @param onlinePeerIds set of peer ids known to be online, used for leader election.
      */
@@ -52,16 +61,16 @@ object ChannelChatSender {
         channel: DChatChannel,
         content: DMessageContent,
         onlinePeerIds: Set<String> = emptySet(),
-    ): DMessageStatusData? {
+    ): Result {
         val leaderId = channel.electLeader(onlinePeerIds, TempData.clientId)
         if (leaderId == null) {
             LogCat.e("Channel ${channel.id}: no online leader available")
-            return null
+            return Result.NoLeader
         }
 
         return if (leaderId == TempData.clientId) {
             // We are the leader — broadcast to everyone else
-            broadcastAsLeader(channel, content)
+            Result.Status(broadcastAsLeader(channel, content))
         } else {
             // Send to leader only
             sendToLeader(channel, leaderId, content)
@@ -106,21 +115,20 @@ object ChannelChatSender {
 
     /**
      * Send [content] to the channel leader for relaying.
-     * Returns [DMessageStatusData] with a single entry for the leader, or null if leader not found.
      */
     private suspend fun sendToLeader(
         channel: DChatChannel,
         leaderId: String,
         content: DMessageContent,
-    ): DMessageStatusData? {
+    ): Result {
         val peerDao = AppDatabase.instance.peerDao()
         val leaderPeer = peerDao.getById(leaderId)
         if (leaderPeer == null) {
             LogCat.e("Channel ${channel.id}: leader peer $leaderId not found in DB")
-            return null
+            return Result.LeaderPeerMissing(leaderId)
         }
         val result = sendToMember(channel, leaderPeer, content)
-        return DMessageStatusData(listOf(result))
+        return Result.Status(DMessageStatusData(listOf(result)))
     }
 
     /**

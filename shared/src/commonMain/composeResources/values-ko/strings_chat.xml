@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">다른 기기가 네트워크에서 이 기기를 검색할 수 있도록 허용</string>
     <string name="discover_nearby_devices">근처 기기 검색</string>
     <string name="stop_discovering">검색 중지</string>
-    <string name="tap_discover_to_start">\"근처 기기 검색\"을 눌러 검색 시작</string>
+    <string name="tap_discover_to_start">"근처 기기 검색"을 눌러 검색 시작</string>
     <string name="make_sure_devices_same_network">다른 기기가 같은 네트워크에 있고 검색 가능한지 확인하세요</string>
     <string name="show_qr_code">QR 코드 표시</string>
     <string name="pair_via_qr_title">QR 코드로 페어링</string>
@@ -91,6 +91,9 @@
     <string name="device_type">장치 유형</string>
     <string name="port">포트</string>
     <string name="chat_info">채팅 정보</string>
+    <string name="channel_info">채널 정보</string>
+    <string name="peer_info">피어 정보</string>
+    <string name="owner">소유자</string>
     <string name="clear_messages">메시지 지우기</string>
     <string name="clear_messages_confirm">모든 메시지를 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
     <string name="messages_cleared">메시지가 삭제되었습니다!</string>

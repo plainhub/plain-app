@@ -39,8 +39,8 @@ object RelativeTimeFormatter {
         }
     }
 
-    private fun str(resource: StringResource) = LocaleHelper.getStringSync(resource)
+    private fun str(resource: StringResource) = LocaleHelper.getString(resource)
 
     private fun fmt(n: Long, style: Style, shortRes: StringResource, longRes: StringResource): String =
-        LocaleHelper.getStringSync(if (style == Style.SHORT) shortRes else longRes).format(n)
+        LocaleHelper.getString(if (style == Style.SHORT) shortRes else longRes).format(n)
 }

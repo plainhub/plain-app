@@ -89,6 +89,7 @@ class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
 
 class DeleteChatItemViewEvent(val id: String) : ChannelEvent()
 
+
 data class PeerUpdatedEvent(val peer: DPeer) : ChannelEvent()
 
 data class PeerOnlineStatusChangedEvent(val peerId: String, val online: Boolean) : ChannelEvent()

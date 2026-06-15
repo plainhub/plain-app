@@ -177,7 +177,7 @@ fun ContentResolver.getPagingCursorWithSql(
         projection,
         where.toSelection(),
         where.args.toTypedArray(),
-        if (sortBy != null) "${sortBy.field} ${sortBy.direction} LIMIT $offset, $limit" else "LIMIT $offset, $limit",
+        if (sortBy != null) "${sortBy.field} ${sortBy.direction} LIMIT $limit OFFSET $offset" else "LIMIT $limit OFFSET $offset",
     )
 }
 

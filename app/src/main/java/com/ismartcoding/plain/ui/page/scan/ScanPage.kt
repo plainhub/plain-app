@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.scan
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
@@ -100,7 +99,7 @@ fun ScanPage(navController: NavHostController) {
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
             when (event) {
-                is PermissionsResultEvent -> { hasCamPermission = Permission.CAMERA.can(context); if (!hasCamPermission) DialogHelper.showMessage(LocaleHelper.getString(Res.string.scan_needs_camera_warning)) }
+                is PermissionsResultEvent -> { hasCamPermission = Permission.CAMERA.can(context); if (!hasCamPermission) DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.scan_needs_camera_warning)) }
                 is PickFileResultEvent -> {
                     if (event.tag != PickFileTag.SCAN) return@collect
                     coIO {

@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -74,8 +73,8 @@ fun FeedEntriesPage(
     })
     val isFirstTime = remember { mutableStateOf(true) }
     val tabs = remember(tagsState, feedEntriesVM.total.intValue) {
-        listOf(VTabData(LocaleHelper.getStringSync(Res.string.all), "all", feedEntriesVM.total.intValue),
-            VTabData(LocaleHelper.getStringSync(Res.string.today), "today", feedEntriesVM.totalToday.value),
+        listOf(VTabData(LocaleHelper.getString(Res.string.all), "all", feedEntriesVM.total.intValue),
+            VTabData(LocaleHelper.getString(Res.string.today), "today", feedEntriesVM.totalToday.value),
             *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray())
     }
     val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { feedEntriesVM.sync() } }
@@ -90,7 +89,7 @@ fun FeedEntriesPage(
 
     val feed = if (feedEntriesVM.feedId.value.isEmpty()) null else feedsMap.value[feedEntriesVM.feedId.value]
     val feedName = feed?.name ?: stringResource(Res.string.feeds)
-    val pageTitle = if (feedEntriesVM.selectMode.value) LocaleHelper.getStringSyncF(Res.string.x_selected, "count", feedEntriesVM.selectedIds.size)
+    val pageTitle = if (feedEntriesVM.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, "count", feedEntriesVM.selectedIds.size)
         else if (feedEntriesVM.tag.value != null) listOf(feedName, feedEntriesVM.tag.value!!.name).joinToString(" - ")
         else if (feedEntriesVM.filterType == FeedEntryFilterType.TODAY) feedName + " - " + stringResource(Res.string.today) else feedName
 

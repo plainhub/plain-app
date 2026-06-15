@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.home.chat
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -59,7 +60,7 @@ fun HomeChatWidget(
         online = null,
         createdAt = localChat?.createdAt ?: Instant.DISTANT_PAST,
         latestChat = localChat,
-        route = Routing.Chat("local"),
+        route = Routing.Chat("peer:local"),
     )
     val peerRows = peerVM.pairedPeers
         .map { peer ->

@@ -41,9 +41,9 @@ internal fun MainActivity.handleIntent(intent: Intent) {
         if (mimeType != null) {
             if (mimeType.startsWith("text/")) navControllerState.value?.navigateTextFile(uri.toString())
             else if (mimeType == "application/pdf") navControllerState.value?.navigatePdf(uri)
-            else DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.not_supported_error))
+            else DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.not_supported_error))
         } else {
-            DialogHelper.showErrorMessage(LocaleHelper.getStringSync(Res.string.not_supported_error))
+            DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.not_supported_error))
         }
     } else if (intent.action == Intent.ACTION_SEND) {
         if (intent.type?.startsWith("text/") == true) {

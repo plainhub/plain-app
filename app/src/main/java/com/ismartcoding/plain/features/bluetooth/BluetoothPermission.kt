@@ -83,13 +83,13 @@ object BluetoothPermission {
                     }
                     is RequestBluetoothLocationGPSPermissionEvent -> {
                         AlertDialog.Builder(activity)
-                            .setTitle(LocaleHelper.getStringSync(Res.string.bluetooth_scan_gps_enable_title))
-                            .setMessage(LocaleHelper.getStringSync(Res.string.bluetooth_scan_gps_enable_description))
-                            .setPositiveButton(LocaleHelper.getStringSync(Res.string.bluetooth_scan_gps_enable_confirm)) { _, _ ->
+                            .setTitle(LocaleHelper.getString(Res.string.bluetooth_scan_gps_enable_title))
+                            .setMessage(LocaleHelper.getString(Res.string.bluetooth_scan_gps_enable_description))
+                            .setPositiveButton(LocaleHelper.getString(Res.string.bluetooth_scan_gps_enable_confirm)) { _, _ ->
                                 activity.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                             }
                             .setCancelable(false)
-                            .setNegativeButton(LocaleHelper.getStringSync(Res.string.cancel)) { _, _ ->
+                            .setNegativeButton(LocaleHelper.getString(Res.string.cancel)) { _, _ ->
                                 if (BluetoothUtil.isBluetoothReadyToUse()) {
                                     sendEvent(BluetoothPermissionResultEvent())
                                 } else {

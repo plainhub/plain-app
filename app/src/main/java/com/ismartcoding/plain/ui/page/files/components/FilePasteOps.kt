@@ -26,7 +26,7 @@ internal suspend fun executeCutFiles(
                 (dstCanonical.path == srcCanonical.path ||
                         dstCanonical.path.startsWith(srcCanonical.path + "/"))
             ) {
-                DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.cannot_move_folder_into_itself))
+                DialogHelper.showErrorMessage(LocaleHelper.getStringAsync(Res.string.cannot_move_folder_into_itself))
                 return@forEach
             }
 
@@ -48,7 +48,7 @@ internal suspend fun executeCutFiles(
                         srcCanonical.delete()
                     }
                 } catch (ex: Exception) {
-                    DialogHelper.showErrorMessage(ex.message ?: LocaleHelper.getString(Res.string.unknown_error))
+                    DialogHelper.showErrorMessage(ex.message ?: LocaleHelper.getStringAsync(Res.string.unknown_error))
                 }
             }
         }
@@ -75,7 +75,7 @@ internal suspend fun executeCopyFiles(
                 (dstCanonical.path == srcCanonical.path ||
                         dstCanonical.path.startsWith(srcCanonical.path + "/"))
             ) {
-                DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.cannot_copy_folder_into_itself))
+                DialogHelper.showErrorMessage(LocaleHelper.getStringAsync(Res.string.cannot_copy_folder_into_itself))
                 return@forEach
             }
 
@@ -87,7 +87,7 @@ internal suspend fun executeCopyFiles(
                     srcCanonical.copyRecursively(File(dstFile.newPath()), true)
                 }
             } catch (e: Exception) {
-                DialogHelper.showErrorMessage(e.message ?: LocaleHelper.getString(Res.string.unknown_error))
+                DialogHelper.showErrorMessage(e.message ?: LocaleHelper.getStringAsync(Res.string.unknown_error))
             }
         }
         filesVM.copyFiles.clear()

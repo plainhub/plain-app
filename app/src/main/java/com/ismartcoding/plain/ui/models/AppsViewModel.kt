@@ -49,9 +49,9 @@ class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ISearchabl
         totalSystem.intValue = PackageHelper.count("${queryText.value} type:system")
         noMore.value = _itemsFlow.value.size < limit.intValue
         tabs.value = listOf(
-            VTabData(LocaleHelper.getString(Res.string.all), "", total.intValue),
-            VTabData(LocaleHelper.getString(Res.string.app_type_system), "system", totalSystem.intValue),
-            VTabData(LocaleHelper.getString(Res.string.app_type_user), "user", total.intValue - totalSystem.intValue)
+            VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue),
+            VTabData(LocaleHelper.getStringAsync(Res.string.app_type_system), "system", totalSystem.intValue),
+            VTabData(LocaleHelper.getStringAsync(Res.string.app_type_user), "user", total.intValue - totalSystem.intValue)
         )
         showLoading.value = false
     }

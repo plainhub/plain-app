@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.home
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -99,12 +98,12 @@ fun HomeWeb(
 
 private fun buildHomeWebErrorMessage(mainVM: MainViewModel): String {
     return if (HttpServerManager.portsInUse.isNotEmpty()) {
-        LocaleHelper.getStringSyncF(
+        LocaleHelper.getStringF(
             if (HttpServerManager.portsInUse.size > 1) Res.string.http_port_conflict_errors else Res.string.http_port_conflict_error,
             "port",
             HttpServerManager.portsInUse.joinToString(", "),
         )
     } else {
-        mainVM.httpServerError.ifEmpty { LocaleHelper.getStringSync(Res.string.http_server_failed) }
+        mainVM.httpServerError.ifEmpty { LocaleHelper.getString(Res.string.http_server_failed) }
     }
 }

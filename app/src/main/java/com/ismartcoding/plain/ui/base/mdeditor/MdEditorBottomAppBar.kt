@@ -62,7 +62,7 @@ fun MdEditorBottomAppBar(
                 if (hex != null) {
                     mdEditorVM.insertColor("#$hex")
                 } else {
-                    DialogHelper.showMessage(LocaleHelper.getStringSync(Res.string.invalid_value))
+                    DialogHelper.showMessage(LocaleHelper.getString(Res.string.invalid_value))
                 }
             })
     }

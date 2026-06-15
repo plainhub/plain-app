@@ -8,9 +8,8 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.plain.chat.ChatCacheManager
-import com.ismartcoding.plain.chat.data.ChatTarget
-import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.events.HChatItemsDeletedEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -54,6 +53,7 @@ fun ChatPageEffects(
         sharedFlow.collect { event ->
             when (event) {
                 is DeleteChatItemViewEvent -> chatVM.remove(event.id)
+                is HChatItemsDeletedEvent -> chatVM.removeIds(event.ids)
                 is HMessageCreatedEvent -> {
                     if (chatVM.chatState.value.target == event.target) {
                         chatVM.addAll(event.items)

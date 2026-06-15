@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -92,10 +91,10 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     fun getRootDisplayName(): String = when (type) {
         FilesType.INTERNAL_STORAGE -> FileSystemHelper.getInternalStorageName()
-        FilesType.APP -> LocaleHelper.getStringSync(Res.string.app_data)
-        FilesType.SDCARD -> LocaleHelper.getStringSync(Res.string.sdcard)
-        FilesType.USB_STORAGE -> LocaleHelper.getStringSync(Res.string.usb_storage)
-        FilesType.RECENTS -> LocaleHelper.getStringSync(Res.string.recents)
+        FilesType.APP -> LocaleHelper.getString(Res.string.app_data)
+        FilesType.SDCARD -> LocaleHelper.getString(Res.string.sdcard)
+        FilesType.USB_STORAGE -> LocaleHelper.getString(Res.string.usb_storage)
+        FilesType.RECENTS -> LocaleHelper.getString(Res.string.recents)
     }
 
     fun updateRootBreadcrumb() { if (breadcrumbs.isNotEmpty()) breadcrumbs[0] = BreadcrumbItem(getRootDisplayName(), rootPath) }

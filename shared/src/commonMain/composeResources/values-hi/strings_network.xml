@@ -53,7 +53,7 @@
     <string name="api_url">एपीआई URL</string>
     <string name="web_url">वेब URL</string>
     <string name="auth_dev_token_tips">क्लाइंट को अनुरोध हेडर में c-id: &lt;client_id&gt; और Authorization: Bearer &lt;token&gt; दोनों शामिल करने होंगे, या API पेलोड को एन्क्रिप्ट करने के लिए उसी जोड़े का उपयोग करना होगा। यदि टोकन अनुरोध हेडर में प्रदान किया जाता है, तो प्रतिक्रिया प्लेन टेक्स्ट में लौटाई जाएगी।</string>
-    <string name="browser_https_error_tips">अगर आपको \"आपका कनेक्शन निजी नहीं है\" त्रुटि दिखाई देती है, तो सीधे \"उन्नत\" बटन पर क्लिक करें और \"पर जाएं ...\" बटन पर क्लिक करें, तब क्रोम इस URL को ब्राउज़र सत्र के लिए विश्वसनीय बना देगा।</string>
+    <string name="browser_https_error_tips">अगर आपको "आपका कनेक्शन निजी नहीं है" त्रुटि दिखाई देती है, तो सीधे "उन्नत" बटन पर क्लिक करें और "पर जाएं ..." बटन पर क्लिक करें, तब क्रोम इस URL को ब्राउज़र सत्र के लिए विश्वसनीय बना देगा।</string>
     <string name="api_service_is_running">एपीआई सेवा चल रही है</string>
     <string name="screen_mirror_service_is_running">स्क्रीन मिरर सेवा चल रही है</string>
     <string name="screen_mirror_audio_permission_settings_message">माइक्रोफोन अनुमति बंद है। सिस्टम ऑडियो मिरर करने के लिए इसे सेटिंग्स में चालू करें।</string>

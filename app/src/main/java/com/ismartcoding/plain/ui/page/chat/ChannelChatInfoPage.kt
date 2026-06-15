@@ -4,12 +4,8 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.clickable
 import com.ismartcoding.plain.ui.models.leaveChannel
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +19,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.canLeave
 import com.ismartcoding.plain.db.getBestIp
@@ -48,7 +45,7 @@ import com.ismartcoding.plain.ui.models.clearAllMessages
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChannelChatInfoPage(
     navController: NavHostController, chatVM: ChatViewModel, peerVM: PeerViewModel, channelVM: ChannelViewModel,
@@ -69,59 +66,153 @@ fun ChannelChatInfoPage(
     }
     val joinedMemberPeers = memberPeers.value.filter { peer -> liveChannel?.findMember(peer.id)?.isJoined() != false }
     val pendingMemberPeers = memberPeers.value.filter { peer -> liveChannel?.findMember(peer.id)?.isPending() == true }
+    val visibleJoinedMembers = joinedMemberPeers.filter { it.id != TempData.clientId }
 
-    val clearMessagesText = stringResource(Res.string.clear_messages)
-    val clearMessagesConfirmText = stringResource(Res.string.clear_messages_confirm)
-    val cancelText = stringResource(Res.string.cancel)
-    val deleteChannelText = stringResource(Res.string.delete_channel)
-    val deleteChannelWarningText = stringResource(Res.string.delete_channel_warning)
-    val leaveChannelText = stringResource(Res.string.leave_channel)
-    val leaveChannelWarningText = stringResource(Res.string.leave_channel_warning)
+    val meLabel = stringResource(Res.string.me)
+    val ownerDisplayName: String = liveChannel?.owner?.let { ownerId ->
+        if (ownerId == "me" || ownerId == TempData.clientId) {
+            TempData.deviceName.value.ifBlank { meLabel }
+        } else {
+            com.ismartcoding.plain.chat.ChatCacheManager.peerMap[ownerId]?.name?.ifBlank { null }
+                ?: memberPeers.value.find { it.id == ownerId }?.name?.ifBlank { null }
+                ?: memberPeers.value.find { it.id == ownerId }?.getBestIp()
+                ?: ownerId
+        }
+    } ?: ""
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController, navigationIcon = { NavigationBackIcon { navController.navigateUp() } }, title = stringResource(Res.string.chat_info))
+        PTopAppBar(navController = navController, navigationIcon = { NavigationBackIcon { navController.navigateUp() } }, title = stringResource(Res.string.channel_info))
     }) { paddingValues ->
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .padding(top = paddingValues.calculateTopPadding())) {
             if (liveChannel != null) {
-                item { Subtitle(text = "${stringResource(Res.string.members)} (${joinedMemberPeers.size})") }
+                item { VerticalSpace(dp = 16.dp) }
                 item {
-                    FlowRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        joinedMemberPeers.forEach { MemberGridItem(name = it.name.ifBlank { it.getBestIp() }, iconRes = DeviceType.fromValue(it.deviceType).getIcon(), onClick = { selectedMemberPeer.value = it }) }
-                        if (ownedByMe) AddMemberGridItem(onClick = { showMembersDialog.value = true })
+                    PCard {
+                        PListItem(
+                            modifier = if (ownedByMe) Modifier.clickable { showRenameDialog.value = true } else Modifier,
+                            title = stringResource(Res.string.channel_name),
+                            value = liveChannel.name,
+                            showMore = ownedByMe,
+                        )
+                        PListItem(
+                            title = stringResource(Res.string.owner),
+                            value = ownerDisplayName,
+                        )
                     }
                 }
+
+                item { VerticalSpace(dp = 16.dp) }
+                item { Subtitle(text = "${stringResource(Res.string.members)} (${visibleJoinedMembers.size})") }
+                item {
+                    PCard {
+                        visibleJoinedMembers.forEach { peer ->
+                            PListItem(
+                                modifier = Modifier.clickable { selectedMemberPeer.value = peer },
+                                title = peer.name.ifBlank { peer.getBestIp() },
+                                subtitle = DeviceType.fromValue(peer.deviceType).getText(),
+                                showMore = true,
+                            )
+                        }
+                        if (ownedByMe) {
+                            PListItem(
+                                modifier = Modifier.clickable { showMembersDialog.value = true },
+                                title = stringResource(Res.string.manage_members),
+                                showMore = true,
+                            )
+                        }
+                    }
+                }
+
                 if (ownedByMe && pendingMemberPeers.isNotEmpty()) {
                     item { VerticalSpace(dp = 16.dp) }
                     item { Subtitle(text = "${stringResource(Res.string.pending_members)} (${pendingMemberPeers.size})") }
                     item {
-                        FlowRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            pendingMemberPeers.forEach { MemberGridItem(name = it.name.ifBlank { it.getBestIp() }, iconRes = DeviceType.fromValue(it.deviceType).getIcon(), onClick = { selectedPendingMemberPeer.value = it }) }
+                        PCard {
+                            pendingMemberPeers.forEach { peer ->
+                                PListItem(
+                                    modifier = Modifier.clickable { selectedPendingMemberPeer.value = peer },
+                                    title = peer.name.ifBlank { peer.getBestIp() },
+                                    subtitle = DeviceType.fromValue(peer.deviceType).getText(),
+                                    showMore = true,
+                                )
+                            }
                         }
                     }
                 }
-                item { VerticalSpace(dp = 16.dp) }
-                item { PCard { PListItem(modifier = if (ownedByMe) Modifier.clickable { showRenameDialog.value = true } else Modifier, title = stringResource(Res.string.channel_name), value = liveChannel.name, showMore = ownedByMe) } }
             }
             item { VerticalSpace(dp = 24.dp) }
             item {
-                POutlinedButton(text = clearMessagesText, type = ButtonType.DANGER, modifier = Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 16.dp), onClick = {
-                    DialogHelper.showConfirmDialog(title = clearMessagesText, message = clearMessagesConfirmText, confirmButton = Pair(clearMessagesText) { chatVM.clearAllMessages(context); navController.navigateUp(); DialogHelper.showSuccess(Res.string.messages_cleared) }, dismissButton = Pair(cancelText) {})
+                val clearMessagesText = stringResource(Res.string.clear_messages)
+                val clearMessagesConfirmText = stringResource(Res.string.clear_messages_confirm)
+                val cancelText = stringResource(Res.string.cancel)
+                POutlinedButton(text = clearMessagesText, type = ButtonType.DANGER, modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp), onClick = {
+                    DialogHelper.showConfirmDialog(
+                        title = clearMessagesText,
+                        message = clearMessagesConfirmText,
+                        confirmButton = Pair(clearMessagesText) { chatVM.clearAllMessages(context); navController.navigateUp(); DialogHelper.showSuccess(Res.string.messages_cleared) },
+                        dismissButton = Pair(cancelText) {})
                 })
             }
             if (liveChannel != null && ownedByMe) {
-                item { VerticalSpace(dp = 16.dp); POutlinedButton(text = deleteChannelText, type = ButtonType.DANGER, modifier = Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 16.dp), onClick = {
-                    DialogHelper.showConfirmDialog(title = deleteChannelText, message = deleteChannelWarningText, confirmButton = Pair(deleteChannelText) { channelVM.removeChannel(context, liveChannel.id); navController.popBackStack(navController.graph.startDestinationId, false) }, dismissButton = Pair(cancelText) {})
-                }) }
+                item {
+                    val deleteChannelText = stringResource(Res.string.delete_channel);
+                    val deleteChannelWarningText = stringResource(Res.string.delete_channel_warning);
+                    val cancelText = stringResource(Res.string.cancel); VerticalSpace(dp = 16.dp); POutlinedButton(
+                    text = deleteChannelText,
+                    type = ButtonType.DANGER,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    onClick = {
+                        DialogHelper.showConfirmDialog(
+                            title = deleteChannelText,
+                            message = deleteChannelWarningText,
+                            confirmButton = Pair(deleteChannelText) { channelVM.removeChannel(context, liveChannel.id); navController.popBackStack(navController.graph.startDestinationId, false) },
+                            dismissButton = Pair(cancelText) {})
+                    })
+                }
             }
             if (liveChannel != null && liveChannel.canLeave()) {
-                item { VerticalSpace(dp = 16.dp); POutlinedButton(text = leaveChannelText, type = ButtonType.DANGER, modifier = Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 16.dp), onClick = {
-                    DialogHelper.showConfirmDialog(title = leaveChannelText, message = leaveChannelWarningText, confirmButton = Pair(leaveChannelText) { channelVM.leaveChannel(context, liveChannel.id); navController.navigateUp() }, dismissButton = Pair(cancelText) {})
-                }) }
+                item {
+                    val leaveChannelText = stringResource(Res.string.leave_channel);
+                    val leaveChannelWarningText = stringResource(Res.string.leave_channel_warning);
+                    val cancelText = stringResource(Res.string.cancel); VerticalSpace(dp = 16.dp); POutlinedButton(
+                    text = leaveChannelText,
+                    type = ButtonType.DANGER,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    onClick = {
+                        DialogHelper.showConfirmDialog(
+                            title = leaveChannelText,
+                            message = leaveChannelWarningText,
+                            confirmButton = Pair(leaveChannelText) { channelVM.leaveChannel(context, liveChannel.id); navController.navigateUp() },
+                            dismissButton = Pair(cancelText) {})
+                    })
+                }
             }
             if (liveChannel != null && !ownedByMe && !liveChannel.isJoined()) {
-                item { VerticalSpace(dp = 16.dp); POutlinedButton(text = deleteChannelText, type = ButtonType.DANGER, modifier = Modifier.fillMaxWidth().height(40.dp).padding(horizontal = 16.dp), onClick = {
-                    DialogHelper.showConfirmDialog(title = deleteChannelText, message = deleteChannelWarningText, confirmButton = Pair(deleteChannelText) { channelVM.removeChannel(context, liveChannel.id); navController.popBackStack(navController.graph.startDestinationId, false) }, dismissButton = Pair(cancelText) {})
-                }) }
+                item {
+                    val deleteChannelText = stringResource(Res.string.delete_channel);
+                    val deleteChannelWarningText = stringResource(Res.string.delete_channel_warning);
+                    val cancelText = stringResource(Res.string.cancel); VerticalSpace(dp = 16.dp); POutlinedButton(
+                    text = deleteChannelText,
+                    type = ButtonType.DANGER,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    onClick = {
+                        DialogHelper.showConfirmDialog(
+                            title = deleteChannelText,
+                            message = deleteChannelWarningText,
+                            confirmButton = Pair(deleteChannelText) { channelVM.removeChannel(context, liveChannel.id); navController.popBackStack(navController.graph.startDestinationId, false) },
+                            dismissButton = Pair(cancelText) {})
+                    })
+                }
             }
             item { BottomSpace(paddingValues) }
         }

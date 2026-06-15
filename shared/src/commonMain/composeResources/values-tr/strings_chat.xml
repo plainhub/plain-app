@@ -14,7 +14,7 @@
     <string name="make_discoverable_desc">Diğer cihazların bu cihazı ağda keşfetmesine izin ver</string>
     <string name="discover_nearby_devices">Yakınlardaki cihazları keşfet</string>
     <string name="stop_discovering">Aramayı durdur</string>
-    <string name="tap_discover_to_start">Aramaya başlamak için \"Yakınlardaki cihazları keşfet\"e dokunun</string>
+    <string name="tap_discover_to_start">Aramaya başlamak için "Yakınlardaki cihazları keşfet"e dokunun</string>
     <string name="make_sure_devices_same_network">Diğer cihazların aynı ağda ve keşfedilebilir olduğundan emin olun</string>
     <string name="show_qr_code">QR kodunu göster</string>
     <string name="pair_via_qr_title">QR koduyla eşleştir</string>
@@ -91,6 +91,9 @@
     <string name="device_type">Cihaz türü</string>
     <string name="port">Bağlantı Noktası</string>
     <string name="chat_info">Sohbet Bilgisi</string>
+    <string name="channel_info">Kanal Bilgisi</string>
+    <string name="peer_info">Eş Bilgisi</string>
+    <string name="owner">Sahip</string>
     <string name="clear_messages">Mesajları Temizle</string>
     <string name="clear_messages_confirm">Tüm mesajları temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
     <string name="messages_cleared">Mesajlar temizlendi!</string>
