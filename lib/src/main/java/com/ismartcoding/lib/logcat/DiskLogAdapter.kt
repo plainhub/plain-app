@@ -1,11 +1,14 @@
 package com.ismartcoding.lib.logcat
 
-class DiskLogAdapter(private val formatStrategy: FormatStrategy) : LogAdapter {
+class DiskLogAdapter(
+    private val formatStrategy: FormatStrategy,
+    private val minPriority: Int = LogCat.VERBOSE,
+) : LogAdapter {
     override fun isLoggable(
         priority: Int,
         tag: String?,
     ): Boolean {
-        return true
+        return priority >= minPriority
     }
 
     override fun log(

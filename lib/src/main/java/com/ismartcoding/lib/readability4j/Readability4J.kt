@@ -1,6 +1,5 @@
 package com.ismartcoding.lib.readability4j
 
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.readability4j.processor.ArticleGrabber
 import com.ismartcoding.lib.readability4j.processor.MetadataParser
 import com.ismartcoding.lib.readability4j.processor.Postprocessor
@@ -32,7 +31,6 @@ object Readability4J {
         val metadata = metadataParser.getArticleMetadata(document)
 
         val articleContent = articleGrabber.grabArticle(document, metadata)
-        LogCat.d("Grabbed: $articleContent")
 
         articleContent?.let {
             postprocessor.postProcessContent(document, articleContent, uri)

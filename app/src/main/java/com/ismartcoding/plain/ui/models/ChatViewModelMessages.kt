@@ -35,7 +35,7 @@ fun ChatViewModel.sendMessage(content: DMessageContent, onResult: (Boolean) -> U
         addAll(listOf(item))
 
         if (state.target.type != ChatTargetType.LOCAL) {
-            ChatSender.send(item, state.target, state.onlinePeerIds)
+            ChatSender.send(item, state.target, onlinePeerIds.value)
             update(item)
             onResult(item.status == "sent")
         } else {
@@ -82,7 +82,7 @@ fun ChatViewModel.updateFilesMessage(messageId: String, files: List<DMessageFile
             ChatDbHelper.updateChatItemStatus(item, "sent")
         } else {
             ChatDbHelper.updateChatItemStatus(item, "pending")
-            ChatSender.send(item, state.target, state.onlinePeerIds)
+            ChatSender.send(item, state.target, onlinePeerIds.value)
         }
         sendEvent(HMessageUpdatedEvent(item.id))
         update(item)

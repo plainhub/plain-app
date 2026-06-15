@@ -92,10 +92,8 @@ internal class ArticleGrabber(val options: ReadabilityOptions) {
             var articleContent = createArticleContent(doc, topCandidate, isPaging)
 
 
-            LogCat.d("Article content pre-prep: ${articleContent.html()}")
             // So we have all of the content that we need. Now we clean it up for presentation.
             prepArticle(articleContent, options, metadata)
-            LogCat.d("Article content post-prep: ${articleContent.html()}")
 
             if (neededToCreateTopCandidate) {
                 // We already created a fake div thing, and there wouldn't have been any siblings left
@@ -116,8 +114,6 @@ internal class ArticleGrabber(val options: ReadabilityOptions) {
 
                 articleContent.appendChild(div)
             }
-
-            LogCat.d("Article content after paging: ${articleContent.html()}")
 
             var parseSuccessful = true
             val attempts = ArrayList<Pair<Element, Int>>()

@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter
 
 object CrashHandler {
     private const val CRASH_FILE_NAME = "crash_report.txt"
+    private const val CRASH_LOG_NAME = "crash_log.txt"
     private val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     fun install(context: Context) {
@@ -52,6 +53,10 @@ object CrashHandler {
                 append(sw.toString())
             }
             File(context.filesDir, CRASH_FILE_NAME).writeText(report)
+            // Append to the permanent crash history so it ships with the
+            // user's app-log zip even if the pending report has been
+            // consumed by the crash dialog already.
+            File(context.filesDir, CRASH_LOG_NAME).appendText(report + "\n\n")
         } catch (_: Exception) {}
     }
 }

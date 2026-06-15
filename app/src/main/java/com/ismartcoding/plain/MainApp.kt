@@ -83,7 +83,12 @@ class MainApp : Application() {
             newImageLoader(context)
         }
 
-        LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
+        LogCat.addLogAdapter(
+            DiskLogAdapter(
+                DiskLogFormatStrategy.getInstance(this),
+                minPriority = if (BuildConfig.DEBUG) LogCat.VERBOSE else LogCat.WARN,
+            ),
+        )
 
         AppEvents.register()
         HttpServerManager.warmUp()

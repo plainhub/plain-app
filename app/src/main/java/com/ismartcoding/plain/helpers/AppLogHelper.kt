@@ -87,8 +87,9 @@ object AppLogHelper {
             val logFolder = DiskLogFormatStrategy.getLogFolder(context)
             val logFolderFile = File(logFolder)
             val crashReportFile = File(context.filesDir, "crash_report.txt")
+            val crashLogFile = File(context.filesDir, "crash_log.txt")
 
-            if (!logFolderFile.exists() && !crashReportFile.exists()) {
+            if (!logFolderFile.exists() && !crashReportFile.exists() && !crashLogFile.exists()) {
                 DialogHelper.showMessage(Res.string.no_logs_error)
                 return@coMain
             }
@@ -98,6 +99,7 @@ object AppLogHelper {
             val sourcePaths = buildList {
                 if (logFolderFile.exists()) add(logFolder)
                 if (crashReportFile.exists()) add(crashReportFile.absolutePath)
+                if (crashLogFile.exists()) add(crashLogFile.absolutePath)
             }
             val success = withIO {
                 ZipHelper.zip(sourcePaths, zipFile.absolutePath)

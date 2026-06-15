@@ -15,6 +15,7 @@ import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.events.ChannelUpdatedEvent
+import com.ismartcoding.plain.events.PeerOnlineStatusChangedEvent
 import com.ismartcoding.plain.events.PeerUpdatedEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,6 @@ import kotlinx.coroutines.withContext
 data class ChatState(
     val target: ChatTarget = ChatTarget("", ChatTargetType.LOCAL),
     val toName: String = "",
-    val onlinePeerIds: Set<String> = emptySet(),
 )
 
 class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
@@ -39,10 +39,19 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     private val _chatState = MutableStateFlow(ChatState())
     val chatState: StateFlow<ChatState> get() = _chatState
 
+    private val _onlinePeerIds = MutableStateFlow<Set<String>>(emptySet())
+    val onlinePeerIds: StateFlow<Set<String>> get() = _onlinePeerIds
+
     init {
         viewModelScope.launch {
             Channel.sharedFlow.collect { event ->
                 when (event) {
+                    is PeerOnlineStatusChangedEvent -> {
+                        _onlinePeerIds.update { current ->
+                            if (event.online) current + event.peerId
+                            else current - event.peerId
+                        }
+                    }
                     is PeerUpdatedEvent -> {
                         ChatCacheManager.updatePeer(event.peer)
                         if (_chatState.value.target.type == ChatTargetType.PEER && _chatState.value.target.toId == event.peer.id) {

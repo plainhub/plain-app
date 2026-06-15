@@ -27,7 +27,7 @@ fun ChatViewModel.resendMessage(messageId: String) {
         val state = chatState.value
         ChatDbHelper.updateChatItemStatus(item, "pending")
         update(item)
-        ChatSender.resend(item, state.onlinePeerIds)
+        ChatSender.resend(item, onlinePeerIds.value)
     }
 }
 
@@ -48,7 +48,7 @@ fun ChatViewModel.forwardMessage(messageId: String, target: ChatTarget, onResult
         val item = ChatDbHelper.getChatItem(messageId) ?: return@launch
         val newItem = ChatSender.createChatItem(target, item.content)
         val state = chatState.value
-        ChatSender.send(newItem, target, state.onlinePeerIds)
+        ChatSender.send(newItem, target, onlinePeerIds.value)
         update(newItem)
         onResult(newItem.status == "sent")
     }
