@@ -57,7 +57,7 @@ object ChannelManager {
         if (channel.owner == "me") {
             ChannelSystemMessageSender.broadcastKick(channel)
         }
-        ChatDbHelper.deleteAllChatsAsync(context, channelId)
+        ChatDbHelper.deleteAllChannelChatsAsync(context, channelId)
         AppDatabase.instance.chatChannelDao().delete(channelId)
         ChatCacheManager.loadKeyCacheAsync()
         sendEvent(ChannelUpdatedEvent())
@@ -148,7 +148,7 @@ object ChannelManager {
         if (ownerPeer != null) {
             ChannelSystemMessageSender.sendInviteDecline(channel.id, ownerPeer)
         }
-        ChatDbHelper.deleteAllChatsAsync(context, channelId)
+        ChatDbHelper.deleteAllChannelChatsAsync(context, channelId)
         AppDatabase.instance.chatChannelDao().delete(channelId)
         ChatCacheManager.loadKeyCacheAsync()
         sendEvent(ChannelUpdatedEvent())
