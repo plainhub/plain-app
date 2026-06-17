@@ -10,6 +10,7 @@ import com.ismartcoding.lib.extensions.getPagingCursor
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.extensions.queryCursor
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.extensions.normalizeComparison
 import com.ismartcoding.plain.extensions.parseSizeToBytes
@@ -80,7 +81,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
         limit: Int,
         offset: Int,
         sortBy: FileSortBy,
-    ): List<DFile> {
+    ): List<DFile> = withIO {
         val items = context.contentResolver.getPagingCursor(
             uriExternal, getProjection(), buildWhereAsync(query),
             limit, offset, sortBy.toFileSortBy()
@@ -89,7 +90,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
         } ?: emptyList()
         val folderIds = items.filter { it.isDir }.map { it.mediaId }
         val counts = getChildrenCountAsync(context, folderIds)
-        return items.map {
+        return@withIO items.map {
             it.copy(children = counts[it.mediaId] ?: 0)
         }
     }
@@ -125,10 +126,10 @@ object FileMediaStoreHelper : BaseContentHelper() {
     }
 
 
-    suspend fun getRecentFilesAsync(context: Context): List<DFile> {
+    suspend fun getRecentFilesAsync(context: Context): List<DFile> = withIO {
         val where = ContentWhere()
         where.addNotEqual(MediaStore.Files.FileColumns.MIME_TYPE,  "vnd.android.document/directory")
-        return context.contentResolver.getPagingCursor(
+        return@withIO context.contentResolver.getPagingCursor(
             uriExternal, getProjection(), where,
             100, 0, FileSortBy.DATE_DESC.toFileSortBy()
         )?.map { cursor, cache ->

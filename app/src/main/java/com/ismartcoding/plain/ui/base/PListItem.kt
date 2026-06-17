@@ -43,6 +43,7 @@ fun PListItem(
     icon: DrawableResource? = null,
     start: (@Composable () -> Unit)? = null,
     titleTrailing: (@Composable () -> Unit)? = null,
+    titleSuffix: (@Composable () -> Unit)? = null,
     separatedActions: Boolean = false,
     showMore: Boolean = false,
     action: (@Composable () -> Unit)? = null,
@@ -81,23 +82,39 @@ fun PListItem(
                     .weight(1f)
                     .padding(vertical = 8.dp)
             ) {
-                if (titleTrailing != null) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                when {
+                    titleTrailing != null -> {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.listItemTitle(),
+                                modifier = Modifier.weight(1f),
+                            )
+                            titleTrailing()
+                        }
+                    }
+                    titleSuffix != null -> {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.listItemTitle(),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false),
+                            )
+                            HorizontalSpace(4.dp)
+                            titleSuffix()
+                        }
+                    }
+                    else -> {
                         Text(
                             text = title,
                             style = MaterialTheme.typography.listItemTitle(),
-                            modifier = Modifier.weight(1f),
                         )
-                        titleTrailing()
                     }
-                } else {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.listItemTitle(),
-                    )
                 }
                 if (subtitle.isNotEmpty()) {
                     VerticalSpace(dp = 8.dp)

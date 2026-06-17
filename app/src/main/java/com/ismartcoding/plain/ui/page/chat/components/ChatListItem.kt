@@ -36,8 +36,6 @@ import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.models.resendToMembers
-import com.ismartcoding.plain.ui.models.resendMessage
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.nav.navigateChatText
 import com.ismartcoding.plain.ui.theme.cardBackgroundActive
@@ -90,11 +88,11 @@ fun ChatListItem(
                     ChatName(
                         m = m,
                         isPeerChat = peer != null,
-                        isLocal = chatVM.chatState.value.target.isLocal(),
-                        onRetry = if (!chatVM.chatState.value.target.isLocal()) {
+                        isLocal = chatVM.target.value.isLocal(),
+                        onRetry = if (!chatVM.target.value.isLocal()) {
                             { chatVM.resendMessage(m.id) }
                         } else null,
-                        onShowDeliveryDetails = if (!chatVM.chatState.value.target.isLocal()) {
+                        onShowDeliveryDetails = if (!chatVM.target.value.isLocal()) {
                             { statusData -> showDeliveryDialog.value = statusData }
                         } else null)
                     when (m.type) {

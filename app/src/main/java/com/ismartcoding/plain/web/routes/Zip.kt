@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.routes
 
 import com.ismartcoding.lib.extensions.urlEncode
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.plain.MainApp
@@ -124,8 +125,10 @@ fun Route.addZip() {
                     val appFileDao = AppDatabase.instance.appFileDao()
                     val chatDao = AppDatabase.instance.chatDao()
                     val ids = q.removePrefix("ids:").split(",").filter { it.isNotEmpty() }
-                    val appFiles = if (ids.isNotEmpty()) appFileDao.getByIds(ids) else appFileDao.getAll()
-                    val nameMap = AppFileDisplayNameHelper.buildNameMap(chatDao.getAll())
+                    val appFiles = withIO {
+                        if (ids.isNotEmpty()) appFileDao.getByIds(ids) else appFileDao.getAll()
+                    }
+                    val nameMap = withIO { AppFileDisplayNameHelper.buildNameMap(chatDao.getAll()) }
                     paths = appFiles.map { file ->
                         val displayName = AppFileDisplayNameHelper.resolveDisplayName(file, nameMap)
                         DownloadFileItem(file.realPath, displayName)

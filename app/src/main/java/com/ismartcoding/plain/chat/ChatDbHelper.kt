@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat
 
 import android.content.Context
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AppDatabase
@@ -17,7 +18,7 @@ import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.helpers.AppFileStore
 
 object ChatDbHelper {
-    suspend fun insertChatItem(message: DMessageContent, fromId: String = "me", toId: String = "local", channelId: String = "", isRemote: Boolean): DChat {
+    suspend fun insertChatItem(message: DMessageContent, fromId: String = "me", toId: String = "local", channelId: String = "", isRemote: Boolean): DChat = withIO {
         val item = DChat()
         item.fromId = fromId
         item.toId = toId
@@ -25,19 +26,19 @@ object ChatDbHelper {
         item.content = message
         item.status = if (isRemote) "pending" else "sent"
         AppDatabase.instance.chatDao().insert(item)
-        return item
+        item
     }
 
-    suspend fun getChatItem(id: String): DChat? {
-        return AppDatabase.instance.chatDao().getById(id)
+    suspend fun getChatItem(id: String): DChat? = withIO {
+        AppDatabase.instance.chatDao().getById(id)
     }
 
-    suspend fun updateChatItemStatus(item: DChat, status: String) {
+    suspend fun updateChatItemStatus(item: DChat, status: String) = withIO {
         item.status = status
         AppDatabase.instance.chatDao().updateStatus(item.id, status)
     }
 
-    suspend fun updateChatItemStatus(item: DChat, peer: DPeer, error: String?) {
+    suspend fun updateChatItemStatus(item: DChat, peer: DPeer, error: String?) = withIO {
         val statusData = if (error == null) {
             DMessageStatusData()
         } else {
@@ -55,7 +56,7 @@ object ChatDbHelper {
      * - "partial" → some delivered, some failed
      * - "failed"  → all failed (or null statusData = no leader)
      */
-    suspend fun updateChannelChatItemStatus(item: DChat, statusData: DMessageStatusData?) {
+    suspend fun updateChannelChatItemStatus(item: DChat, statusData: DMessageStatusData?) = withIO {
         item.status = statusData?.aggregateStatus() ?: ChatMessageStatus.FAILED
         item.statusData = if (statusData != null && statusData.total > 0) jsonEncode(statusData) else ""
         AppDatabase.instance.chatDao().updateStatusAndData(item.id, item.status, item.statusData)
@@ -66,7 +67,7 @@ object ChatDbHelper {
      * is also mutated so callers can re-emit events / update UI without
      * re-fetching. Caller owns any "message updated" WebSocket broadcast.
      */
-    suspend fun updateChatItemContent(item: DChat, content: DMessageContent) {
+    suspend fun updateChatItemContent(item: DChat, content: DMessageContent) = withIO {
         item.content = content
         AppDatabase.instance.chatDao().updateData(ChatItemDataUpdate(id = item.id, content = content))
     }
@@ -76,11 +77,11 @@ object ChatDbHelper {
      * types whose [com.ismartcoding.plain.db.DMessageFile.uri] may transition
      * from `fsid:` (remote) to `fid:` (local) after download.
      */
-    suspend fun updateChatItemFilesContent(item: DChat, files: List<com.ismartcoding.plain.db.DMessageFile>) {
+    suspend fun updateChatItemFilesContent(item: DChat, files: List<com.ismartcoding.plain.db.DMessageFile>) = withIO {
         val content = when (item.content.type) {
             DMessageType.IMAGES.value -> DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
             DMessageType.FILES.value -> DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
-            else -> return
+            else -> return@withIO
         }
         updateChatItemContent(item, content)
     }
@@ -88,8 +89,8 @@ object ChatDbHelper {
     suspend fun deleteAsync(
         context: Context,
         id: String,
-    ) {
-        val chat = AppDatabase.instance.chatDao().getById(id) ?: return
+    ) = withIO {
+        val chat = AppDatabase.instance.chatDao().getById(id) ?: return@withIO
         releaseFidFiles(context, chat.content.value)
         AppDatabase.instance.chatDao().delete(id)
     }
@@ -102,27 +103,27 @@ object ChatDbHelper {
      * - `peer:xxx` / `peer:local` — every item in the given peer conversation
      * Returns an empty set when the query is unrecognized.
      */
-    suspend fun getIdsAsync(query: String): Set<String> {
-        if (query.isEmpty()) return emptySet()
+    suspend fun getIdsAsync(query: String): Set<String> = withIO {
+        if (query.isEmpty()) return@withIO emptySet()
         val fields = SearchHelper.parse(query)
         val idsField = fields.firstOrNull { it.name == "ids" }
         if (idsField != null) {
-            return idsField.value.split(",").filter { it.isNotBlank() }.toSet()
+            return@withIO idsField.value.split(",").filter { it.isNotBlank() }.toSet()
         }
         val dao = AppDatabase.instance.chatDao()
         val channelField = fields.firstOrNull { it.name == "channel" }
         if (channelField != null) {
-            return dao.getByChannelId(channelField.value).map { it.id }.toSet()
+            return@withIO dao.getByChannelId(channelField.value).map { it.id }.toSet()
         }
         val peerField = fields.firstOrNull { it.name == "peer" }
         if (peerField != null) {
             val peerId = if (peerField.value == "local") "local" else peerField.value
-            return dao.getByPeerId(peerId).map { it.id }.toSet()
+            return@withIO dao.getByPeerId(peerId).map { it.id }.toSet()
         }
-        return emptySet()
+        emptySet()
     }
 
-    suspend fun deleteByIdsAsync(context: Context, ids: Set<String>) {
+    suspend fun deleteByIdsAsync(context: Context, ids: Set<String>) = withIO {
         val dao = AppDatabase.instance.chatDao()
         ids.chunked(500).forEach { chunk ->
             val chats = ids.mapNotNull { dao.getById(it) }
@@ -131,26 +132,26 @@ object ChatDbHelper {
         }
     }
 
-    suspend fun deleteAllChatsAsync(context: Context, peerId: String) {
+    suspend fun deleteAllChatsAsync(context: Context, peerId: String) = withIO {
         val chatDao = AppDatabase.instance.chatDao()
         releaseChatsFiles(context, chatDao.getByPeerId(peerId))
         chatDao.deleteByPeerId(peerId)
     }
 
-    suspend fun deleteAllChannelChatsAsync(context: Context, channelId: String) {
+    suspend fun deleteAllChannelChatsAsync(context: Context, channelId: String) = withIO {
         val chatDao = AppDatabase.instance.chatDao()
         releaseChatsFiles(context, chatDao.getByChannelId(channelId))
         chatDao.deleteByChannelId(channelId)
     }
 
-    private fun releaseFidFiles(context: Context, value: Any?) {
+    private suspend fun releaseFidFiles(context: Context, value: Any?) {
         when (value) {
             is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
             is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
         }
     }
 
-    private fun releaseChatsFiles(context: Context, chats: List<DChat>) {
+    private suspend fun releaseChatsFiles(context: Context, chats: List<DChat>) {
         for (chat in chats) releaseFidFiles(context, chat.content.value)
     }
 }

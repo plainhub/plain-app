@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features
 
 import com.ismartcoding.lib.content.ContentWhere
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.plain.db.DNote
@@ -13,16 +14,16 @@ object NoteHelper {
         AppDatabase.instance.noteDao()
     }
 
-    suspend fun count(query: String): Int {
+    suspend fun count(query: String): Int = withIO {
         var sql = "SELECT COUNT(id) FROM notes"
         val where = ContentWhere()
         parseQuery(where, query)
         sql += " WHERE ${where.toSelection()}"
 
-        return noteDao.count(rawQuery(sql, where.args.toTypedArray()))
+        noteDao.count(rawQuery(sql, where.args.toTypedArray()))
     }
 
-    suspend fun getIdsAsync(query: String): Set<String> {
+    suspend fun getIdsAsync(query: String): Set<String> = withIO {
         var sql = "SELECT id FROM notes"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -30,10 +31,10 @@ object NoteHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        return noteDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
+        noteDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
-    suspend fun getTrashedIdsAsync(query: String): Set<String> {
+    suspend fun getTrashedIdsAsync(query: String): Set<String> = withIO {
         var sql = "SELECT id FROM notes"
         val where = ContentWhere()
         where.trash = true
@@ -42,14 +43,14 @@ object NoteHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        return noteDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
+        return@withIO noteDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
     suspend fun search(
         query: String,
         limit: Int,
         offset: Int,
-    ): List<DNote> {
+    ): List<DNote> = withIO {
         var sql = "SELECT * FROM notes"
         val where = ContentWhere()
         parseQuery(where, query)
@@ -60,10 +61,10 @@ object NoteHelper {
         } else {
             " ORDER BY updated_at DESC LIMIT $limit OFFSET $offset"
         }
-        return noteDao.search(rawQuery(sql, where.args.toTypedArray()))
+        noteDao.search(rawQuery(sql, where.args.toTypedArray()))
     }
 
-    suspend fun deleteAsync(query: String) {
+    suspend fun deleteAsync(query: String) = withIO {
         var sql = "DELETE FROM notes"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -74,14 +75,14 @@ object NoteHelper {
         noteDao.delete(rawQuery(sql, where.args.toTypedArray()))
     }
 
-    fun getById(id: String): DNote? {
-        return noteDao.getById(id)
+    suspend fun getById(id: String): DNote? = withIO {
+        noteDao.getById(id)
     }
 
-    fun saveToNotesAsync(
+    suspend fun saveToNotesAsync(
         id: String,
         updateItem: DNote.() -> Unit,
-    ): String {
+    ): String = withIO {
         var item = noteDao.getById(id)
         var isInsert = false
         if (item == null) {
@@ -99,14 +100,14 @@ object NoteHelper {
             noteDao.update(item)
         }
 
-        return item.id
+        item.id
     }
 
 
-    fun addOrUpdateAsync(
+    suspend fun addOrUpdateAsync(
         id: String,
         updateItem: DNote.() -> Unit,
-    ): DNote {
+    ): DNote = withIO {
         var item = if (id.isNotEmpty()) noteDao.getById(id) else null
         var isInsert = false
         if (item == null) {
@@ -124,19 +125,19 @@ object NoteHelper {
             noteDao.update(item)
         }
 
-        return item
+        item
     }
 
-    fun trashAsync(ids: Set<String>) {
+    suspend fun trashAsync(ids: Set<String>) = withIO {
         val now = TimeHelper.now()
         noteDao.trash(ids, now, now)
     }
 
-    fun restoreAsync(ids: Set<String>) {
+    suspend fun restoreAsync(ids: Set<String>) = withIO {
         noteDao.trash(ids, null, TimeHelper.now())
     }
 
-    fun deleteAsync(ids: Set<String>) {
+    suspend fun deleteAsync(ids: Set<String>) = withIO {
         noteDao.delete(ids)
     }
 

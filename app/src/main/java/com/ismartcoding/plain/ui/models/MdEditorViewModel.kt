@@ -36,7 +36,7 @@ class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     var level by savedStateHandle.saveable { mutableIntStateOf(0) }
 
     fun load(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             level = EditorAccessoryLevelPreference.getAsync()
             wrapContent = EditorWrapContentPreference.getAsync()
             showLineNumbers = EditorShowLineNumbersPreference.getAsync()
@@ -46,21 +46,21 @@ class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     fun toggleLevel(context: Context) {
         level = if (level == 1) 0 else 1
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             EditorAccessoryLevelPreference.putAsync(level)
         }
     }
 
     fun toggleLineNumbers(context: Context) {
         showLineNumbers = !showLineNumbers
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             EditorShowLineNumbersPreference.putAsync(showLineNumbers)
         }
     }
 
     fun toggleWrapContent(context: Context) {
         wrapContent = !wrapContent
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             EditorWrapContentPreference.putAsync(wrapContent)
         }
     }

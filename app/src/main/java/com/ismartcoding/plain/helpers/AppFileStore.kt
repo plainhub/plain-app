@@ -4,6 +4,7 @@ import android.content.Context
 import android.webkit.MimeTypeMap
 import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.getFilenameExtension
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DAppFile
@@ -78,12 +79,12 @@ object AppFileStore {
      * @param deleteSrc  When true the srcFile is deleted after a successful
      *                   copy (move semantics).
      */
-    fun importFile(
+    suspend fun importFile(
         context: Context,
         srcFile: File,
         mimeType: String = "",
         deleteSrc: Boolean = false,
-    ): DAppFile {
+    ): DAppFile = withIO {
         val dao = AppDatabase.instance.appFileDao()
         val size = srcFile.length()
         val strongHash by lazy { FileHashHelper.strongHash(srcFile) }
@@ -94,25 +95,25 @@ object AppFileStore {
 
         if (candidates.isNotEmpty()) {
             // ── Step 2: strong check ──────────────────────────────────────
-            tryReuseExisting(context, dao, srcFile, strongHash, deleteSrc)?.let { return it }
+            tryReuseExisting(context, dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
             // Weak matched but strong differs – fall through to insert new
-            return insertNew(context, dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
+            return@withIO insertNew(context, dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
         }
 
         // No weak match. Double-check by id in case another thread raced us.
-        tryReuseExisting(context, dao, srcFile, strongHash, deleteSrc)?.let { return it }
+        tryReuseExisting(context, dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
 
-        return insertNew(context, dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
+        insertNew(context, dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
     }
 
     /**
      * Import raw bytes (e.g. a completed download) into the store.
      */
-    fun importBytes(
+    suspend fun importBytes(
         context: Context,
         data: ByteArray,
         mimeType: String = "",
-    ): DAppFile {
+    ): DAppFile = withIO {
         val dao = AppDatabase.instance.appFileDao()
         val size = data.size.toLong()
         val strongHash = FileHashHelper.strongHash(data)
@@ -120,7 +121,7 @@ object AppFileStore {
         val existing = dao.getById(strongHash)
         if (existing != null) {
             dao.incrementRefCount(strongHash)
-            return existing
+            return@withIO existing
         }
 
         // Compute weak hash from the same data
@@ -140,7 +141,7 @@ object AppFileStore {
             this.weakHash = weakHash
         }
         dao.insert(record)
-        return record
+        record
     }
 
     // ── Reference counting ──────────────────────────────────────────────────
@@ -150,11 +151,11 @@ object AppFileStore {
      * e.g. "{hash}.{ext}" or legacy "{hash}").
      * When refCount reaches 0 the physical file is deleted.
      */
-    fun release(context: Context, fidSuffix: String) {
+    suspend fun release(context: Context, fidSuffix: String) = withIO {
         val hash = fidSuffix.substringBefore(".")
         val dao = AppDatabase.instance.appFileDao()
         dao.decrementRefCount(hash)
-        val updated = dao.getById(hash) ?: return
+        val updated = dao.getById(hash) ?: return@withIO
         if (updated.refCount <= 0) {
             dao.delete(hash)
             File(updated.realPath).delete()
@@ -170,7 +171,7 @@ object AppFileStore {
         return File("$base/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$name")
     }
 
-    private fun tryReuseExisting(
+    private suspend fun tryReuseExisting(
         context: Context,
         dao: AppFileDao,
         srcFile: File,
@@ -226,7 +227,7 @@ object AppFileStore {
         }
     }
 
-    private fun insertNew(
+    private suspend fun insertNew(
         context: Context,
         dao: AppFileDao,
         srcFile: File,

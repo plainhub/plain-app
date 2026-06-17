@@ -12,7 +12,7 @@ object ChatFileSaveHelper {
      *
      * Returns a `fid:{sha256}` URI to embed in [com.ismartcoding.plain.db.DMessageFile.uri].
      */
-    fun importFromUri(
+    suspend fun importFromUri(
         context: Context,
         uri: Uri,
         mimeType: String = "",
@@ -36,7 +36,7 @@ object ChatFileSaveHelper {
      * [srcFile] is deleted on success (move semantics via [deleteSrc]).
      * Returns a `fid:{sha256}` URI to embed in [com.ismartcoding.plain.db.DMessageFile.uri].
      */
-    fun importDownloadedFile(
+    suspend fun importDownloadedFile(
         context: Context,
         srcFile: File,
         mimeType: String = "",

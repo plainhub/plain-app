@@ -89,7 +89,7 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
             Row(modifier = Modifier.clip(RoundedCornerShape(50)).align(Alignment.CenterHorizontally).background(MaterialTheme.colorScheme.darkMask()).padding(horizontal = 20.dp, vertical = 8.dp)) {
                 ActionIconButton(icon = Res.drawable.share_2, contentDescription = stringResource(Res.string.share)) {
                     if (m.mediaId.isNotEmpty()) { ShareHelper.shareUris(context, listOf(VideoMediaStoreHelper.getItemUri(m.mediaId))) }
-                    else if (m.path.isUrl()) { scope.launch { val tempFile = File.createTempFile("videoPreviewShare", "." + m.path.getFilenameExtension(), File(context.cacheDir, "/video_cache")); DialogHelper.showLoading(); val r = withIO { DownloadHelper.downloadToTempAsync(m.path, tempFile) }; DialogHelper.hideLoading(); if (r.success) ShareHelper.shareFile(context, File(r.path), m.getMimeType().ifEmpty { "video/*" }) else DialogHelper.showMessage(r.message) } }
+                    else if (m.path.isUrl()) { scope.launch { val tempFile = File.createTempFile("videoPreviewShare", "." + m.path.getFilenameExtension(), File(context.cacheDir, "/video_cache")); DialogHelper.showLoading(); val r = DownloadHelper.downloadToTempAsync(m.path, tempFile); DialogHelper.hideLoading(); if (r.success) ShareHelper.shareFile(context, File(r.path), m.getMimeType().ifEmpty { "video/*" }) else DialogHelper.showMessage(r.message) } }
                     else ShareHelper.shareFile(context, File(m.path), m.getMimeType().ifEmpty { "video/*" })
                 }
                 HorizontalSpace(dp = 20.dp)
@@ -98,7 +98,7 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
                     HorizontalSpace(dp = 20.dp)
                     ActionIconButton(icon = Res.drawable.save, contentDescription = stringResource(Res.string.save)) {
                         scope.launch {
-                            if (m.path.isUrl()) { DialogHelper.showLoading(); val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_MOVIES); val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }; DialogHelper.hideLoading(); if (r.success) DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.video_save_to, "path", r.path)) else DialogHelper.showMessage(r.message) }
+                            if (m.path.isUrl()) { DialogHelper.showLoading(); val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_MOVIES); val r = DownloadHelper.downloadAsync(m.path, dir.absolutePath); DialogHelper.hideLoading(); if (r.success) DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.video_save_to, "path", r.path)) else DialogHelper.showMessage(r.message) }
                             else { val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""; val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_MOVIES, newName = newName) }; if (r.isNotEmpty()) DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.video_save_to, "path", r)) else DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.video_save_to_failed)) }
                         }
                     }

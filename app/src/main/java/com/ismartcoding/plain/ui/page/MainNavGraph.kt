@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page
 
-import android.net.Uri
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -11,12 +10,18 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.ismartcoding.plain.ui.MainActivity
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
@@ -31,42 +36,44 @@ import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.audio.AudioPage
+import com.ismartcoding.plain.ui.page.chat.ChannelInfoPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
-import com.ismartcoding.plain.ui.page.chat.ChatInfoPage
 import com.ismartcoding.plain.ui.page.chat.ChatListPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.chat.NearbyPage
+import com.ismartcoding.plain.ui.page.chat.PeerInfoPage
+import com.ismartcoding.plain.ui.page.connections.ConnectionsPage
+import com.ismartcoding.plain.ui.page.devoptions.WebDevPage
+import com.ismartcoding.plain.ui.page.dlna.DlnaCastHistoryPage
+import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.files.FilesPage
+import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
+import com.ismartcoding.plain.ui.page.home.HomePage
 import com.ismartcoding.plain.ui.page.images.ImagesPage
+import com.ismartcoding.plain.ui.page.media.PlayMediaPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroPage
-import com.ismartcoding.plain.ui.page.home.HomePage
-import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
-import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
-import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
+import com.ismartcoding.plain.ui.page.settings.ComponentShowcasePage
 import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
-import com.ismartcoding.plain.ui.page.settings.ComponentShowcasePage
-import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
-import com.ismartcoding.plain.ui.page.connections.ConnectionsPage
-import com.ismartcoding.plain.ui.page.devoptions.WebDevPage
+import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
+import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.web.HowToUsePage
+import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
-import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
-import com.ismartcoding.plain.ui.page.dlna.DlnaCastHistoryPage
-import com.ismartcoding.plain.ui.page.media.PlayMediaPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
+import androidx.core.net.toUri
 
 @Composable
 fun MainNavGraph(
@@ -136,7 +143,12 @@ fun MainNavGraph(
             ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM, r.id)
         }
         composable<Routing.ChatInfo> {
-            ChatInfoPage(navController, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM)
+            val chatTarget = chatVM.target.collectAsState()
+            if (chatTarget.value.type == ChatTargetType.PEER) {
+                PeerInfoPage(navController, chatVM, peerVM)
+            } else {
+                ChannelInfoPage(navController, chatVM, peerVM, channelVM)
+            }
         }
         composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
         composable<Routing.Scan> { ScanPage(navController) }
@@ -185,7 +197,7 @@ fun MainNavGraph(
         }
         composable<Routing.PdfViewer> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PdfViewer>()
-            PdfPage(navController, Uri.parse(r.uri), r.fileName)
+            PdfPage(navController, r.uri.toUri(), r.fileName)
         }
         composable<Routing.Files> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Files>()
@@ -194,9 +206,8 @@ fun MainNavGraph(
         composable<Routing.AppFiles> {
             AppFilesPage(navController)
         }
-        composable<Routing.Nearby> { backStackEntry ->
-            val r = backStackEntry.toRoute<Routing.Nearby>()
-            NearbyPage(navController, pairDeviceJson = r.pairDeviceJson)
+        composable<Routing.Nearby> {
+            NearbyPage(navController)
         }
         composable<Routing.ComponentShowcase> { ComponentShowcasePage(navController) }
         composable<Routing.DlnaReceiver> { DlnaReceiverPage(navController) }
@@ -204,6 +215,41 @@ fun MainNavGraph(
         composable<Routing.PlayMedia> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlayMedia>()
             PlayMediaPage(navController, r.path, audioPlaylistVM)
+        }
+        composable<Routing.PairingRequest> {
+            val request = mainVM.pendingPairingRequest
+            if (request != null) {
+                PairingRequestPage(request = request, navController = navController)
+            } else {
+                navController.popBackStack<Routing.PairingRequest>(inclusive = true)
+            }
+        }
+        composable<Routing.LoginRequest> {
+            val lifecycleOwner = LocalLifecycleOwner.current
+            val event = mainVM.pendingLoginEvent
+            if (event != null) {
+                LoginRequestPage(
+                    event = event,
+                    navController = navController,
+                    scope = lifecycleOwner.lifecycleScope,
+                )
+            } else {
+                navController.popBackStack<Routing.LoginRequest>(inclusive = true)
+            }
+        }
+        composable<Routing.ChannelInviteRequest> { backStackEntry ->
+            val context = LocalContext.current
+            val activity = context as MainActivity
+            val r = backStackEntry.toRoute<Routing.ChannelInviteRequest>()
+            ChannelInvitePage(
+                channelId = r.channelId,
+                channelName = r.channelName,
+                ownerPeerId = r.ownerPeerId,
+                ownerPeerName = r.ownerPeerName,
+                channelVM = channelVM,
+                activity = activity,
+                navController = navController,
+            )
         }
     }
 }

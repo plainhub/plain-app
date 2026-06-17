@@ -22,19 +22,25 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
+import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.models.ChannelViewModel
 
 @Composable
 fun ChannelInvitePage(
-    event: ChannelInviteReceivedEvent,
-    onDecline: () -> Unit,
-    onAccept: () -> Unit,
+    channelId: String,
+    channelName: String,
+    ownerPeerId: String,
+    ownerPeerName: String,
+    channelVM: ChannelViewModel,
+    activity: MainActivity,
+    navController: NavHostController,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -72,7 +78,7 @@ fun ChannelInvitePage(
             )
             VerticalSpace(dp = 8.dp)
             Text(
-                text = stringResource(Res.string.channel_invite_message, event.ownerPeerName, event.channelName),
+                text = stringResource(Res.string.channel_invite_message, ownerPeerName, channelName),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                 ),
@@ -83,8 +89,8 @@ fun ChannelInvitePage(
         }
         item {
             PCard {
-                PListItem(title = stringResource(Res.string.channel_name), value = event.channelName)
-                PListItem(title = stringResource(Res.string.inviter), value = event.ownerPeerName)
+                PListItem(title = stringResource(Res.string.channel_name), value = channelName)
+                PListItem(title = stringResource(Res.string.inviter), value = ownerPeerName)
             }
         }
         item {
@@ -97,14 +103,20 @@ fun ChannelInvitePage(
                 PFilledButton(
                     text = stringResource(Res.string.accept),
                     buttonSize = ButtonSize.LARGE,
-                    onClick = onAccept,
+                    onClick = {
+                        channelVM.acceptChannelInvite(channelId)
+                        navController.popBackStack()
+                    },
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
                     text = stringResource(Res.string.decline),
                     buttonSize = ButtonSize.LARGE,
-                    onClick = onDecline,
                     type = ButtonType.DANGER,
+                    onClick = {
+                        channelVM.declineChannelInvite(activity, channelId)
+                        navController.popBackStack()
+                    },
                 )
             }
         }

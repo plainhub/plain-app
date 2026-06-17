@@ -2,22 +2,26 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.docs.DocMediaStoreHelper
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
 abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewModel() {
-    internal val _itemsFlow = MutableStateFlow(mutableStateListOf<T>())
-    val itemsFlow: StateFlow<List<T>> get() = _itemsFlow
+    internal val _itemsFlow = MutableStateFlow<List<T>>(emptyList())
+    val itemsFlow: StateFlow<List<T>> = _itemsFlow
     var tag = mutableStateOf<DTag?>(null)
     var trash = mutableStateOf(false)
     var bucketId = mutableStateOf("")
@@ -57,7 +61,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         return query
     }
 
-    internal open fun getQuery(): String {
+    internal open suspend fun getQuery(): String {
         var query = "${queryText.value} trash:${trash.value}"
         if (tag.value != null) {
             val tagId = tag.value!!.id
@@ -70,22 +74,18 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         return query
     }
 
-    suspend fun moreAsync(context: Context, tagsVM: TagsViewModel) {
+    suspend fun moreAsync(context: Context, tagsVM: TagsViewModel) = withIO {
         offset.intValue += limit.intValue
         val items = searchMediaAsync(context, getQuery())
-        _itemsFlow.update {
-            val mutableList = it.toMutableStateList()
-            mutableList.addAll(items)
-            mutableList
-        }
+        _itemsFlow.update { it + items }
         tagsVM.loadMoreAsync(items.map { it.id }.toSet())
         noMore.value = items.size < limit.intValue
         showLoading.value = false
     }
 
-    open suspend fun loadAsync(context: Context, tagsVM: TagsViewModel) {
+    open suspend fun loadAsync(context: Context, tagsVM: TagsViewModel) = withIO {
         offset.intValue = 0
-        _itemsFlow.value = searchMediaAsync(context, getQuery()).toMutableStateList()
+        _itemsFlow.value = searchMediaAsync(context, getQuery())
         tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.intValue = countMediaAsync(context, getTotalQuery())
         totalTrash.intValue = countMediaAsync(context, getTrashQuery())
@@ -99,5 +99,67 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
 
     fun restore(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
         restoreItems(context, tagsVM, ids)
+    }
+
+    fun trashItems(
+        context: Context, tagsVM: TagsViewModel, ids: Set<String>,
+    ) {
+        launchIO {
+            DialogHelper.showLoading()
+            TagHelper.deleteTagRelationByKeys(ids, dataType)
+            when (dataType) {
+                DataType.AUDIO -> AudioMediaStoreHelper.trashByIdsAsync(context, ids)
+                DataType.DOC -> DocMediaStoreHelper.trashByIdsAsync(context, ids)
+                DataType.IMAGE -> ImageMediaStoreHelper.trashByIdsAsync(context, ids)
+                DataType.VIDEO -> VideoMediaStoreHelper.trashByIdsAsync(context, ids)
+                else -> {}
+            }
+            loadAsync(context, tagsVM)
+            DialogHelper.hideLoading()
+            _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
+        }
+    }
+
+    fun restoreItems(
+        context: Context, tagsVM: TagsViewModel, ids: Set<String>,
+    ) {
+        launchIO {
+            DialogHelper.showLoading()
+            when (dataType) {
+                DataType.AUDIO -> AudioMediaStoreHelper.restoreByIdsAsync(context, ids)
+                DataType.DOC -> DocMediaStoreHelper.restoreByIdsAsync(context, ids)
+                DataType.IMAGE -> ImageMediaStoreHelper.restoreByIdsAsync(context, ids)
+                DataType.VIDEO -> VideoMediaStoreHelper.restoreByIdsAsync(context, ids)
+                else -> {}
+            }
+            loadAsync(context, tagsVM)
+            DialogHelper.hideLoading()
+            _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
+        }
+    }
+
+    suspend fun countMediaAsync(
+        context: Context, query: String,
+    ): Int = withIO {
+        when (dataType) {
+            DataType.AUDIO -> AudioMediaStoreHelper.countAsync(context, query)
+            DataType.DOC -> DocMediaStoreHelper.countAsync(context, query)
+            DataType.IMAGE -> ImageMediaStoreHelper.countAsync(context, query)
+            DataType.VIDEO -> VideoMediaStoreHelper.countAsync(context, query)
+            else -> 0
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    suspend fun searchMediaAsync(
+        context: Context, query: String,
+    ): List<T> = withIO {
+        when (dataType) {
+            DataType.AUDIO -> AudioMediaStoreHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
+            DataType.DOC -> DocMediaStoreHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
+            DataType.IMAGE -> ImageMediaStoreHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
+            DataType.VIDEO -> VideoMediaStoreHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
+            else -> emptyList()
+        } as List<T>
     }
 }

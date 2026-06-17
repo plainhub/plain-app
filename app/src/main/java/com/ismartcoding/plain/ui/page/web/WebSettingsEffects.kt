@@ -9,7 +9,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
@@ -67,7 +66,7 @@ internal fun WebSettingsEffects(
 
 internal fun togglePermission(scope: CoroutineScope, context: android.content.Context, m: PermissionItem, enable: Boolean) {
     scope.launch {
-        withIO { ApiPermissionsPreference.putAsync(m.permission, enable) }
+        ApiPermissionsPreference.putAsync(m.permission, enable)
         if (m.permission == Permission.NOTIFICATION_LISTENER) {
             val webEnabled = WebPreference.getAsync()
             PNotificationListenerService.toggle(context, enable && webEnabled)

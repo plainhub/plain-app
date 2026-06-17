@@ -2,31 +2,17 @@ package com.ismartcoding.plain.ui.page.connections
 
 import com.ismartcoding.plain.i18n.*
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.enums.BadgeType
+import com.ismartcoding.plain.ui.base.PStatusBadge
 import com.ismartcoding.plain.ui.models.VSession
-import com.ismartcoding.plain.ui.theme.greenDot
 
 @Composable
 fun SessionBadge(m: VSession, isOnline: Boolean) {
     val label = if (m.isCustom) stringResource(Res.string.custom_token) else if (isOnline) stringResource(Res.string.online) else stringResource(Res.string.offline)
-    val textColor = if (!m.isCustom && isOnline) Color.White else MaterialTheme.colorScheme.onSurface
-    val bgColor = if (!m.isCustom && isOnline) MaterialTheme.colorScheme.greenDot else MaterialTheme.colorScheme.surfaceVariant
-    Surface(shape = RoundedCornerShape(6.dp), color = bgColor) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = textColor,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-        )
-    }
+    PStatusBadge(
+        text = label,
+        type = if (!m.isCustom && isOnline) BadgeType.SUCCESS else BadgeType.NEUTRAL,
+    )
 }

@@ -1,14 +1,13 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.DlnaCommand
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.features.dlna.PendingCastRequest
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
@@ -18,7 +17,7 @@ import java.net.Socket
 /** Lightweight HTTP server that handles UPnP/DLNA AVTransport SOAP requests. */
 object DlnaHttpServer {
 
-    suspend fun run(serverSocket: ServerSocket) = withContext(Dispatchers.IO) {
+    suspend fun run(serverSocket: ServerSocket) = withIO {
         try {
             LogCat.d("DLNA HTTP server started on port ${serverSocket.localPort}")
             while (isActive) {
@@ -32,14 +31,14 @@ object DlnaHttpServer {
         }
     }
 
-    private suspend fun handleClient(socket: Socket, senderIp: String) = withContext(Dispatchers.IO) {
+    private suspend fun handleClient(socket: Socket, senderIp: String) = withIO {
         try {
             socket.soTimeout = 5_000
             val bis = BufferedInputStream(socket.inputStream)
             val writer = PrintWriter(OutputStreamWriter(socket.outputStream, Charsets.UTF_8), false)
-            val requestLine = bis.readHttpLine() ?: return@withContext
+            val requestLine = bis.readHttpLine() ?: return@withIO
             val parts = requestLine.split(" ")
-            if (parts.size < 2) return@withContext
+            if (parts.size < 2) return@withIO
             val method = parts[0]
             val path = parts[1]
 

@@ -39,7 +39,6 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.FeedListItem
 import com.ismartcoding.plain.ui.models.FeedsViewModel
-import com.ismartcoding.plain.ui.models.showAddDialog
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.select

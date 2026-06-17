@@ -43,7 +43,7 @@ internal fun FilesPageDialogs(
                         val error = withIO { runCatching { FileSystemHelper.createDirectory(filesVM.selectedPath + "/" + name) }.exceptionOrNull() }
                         DialogHelper.hideLoading()
                         if (error != null) { DialogHelper.showMessage(error); return@launch }
-                        withIO { filesVM.loadAsync(context) }
+                        filesVM.loadAsync(context)
                     filesVM.showCreateFolderDialog.value = false
                 }
             }
@@ -63,7 +63,7 @@ internal fun FilesPageDialogs(
                         val error = withIO { runCatching { FileSystemHelper.createFile(filesVM.selectedPath + "/" + name) }.exceptionOrNull() }
                         DialogHelper.hideLoading()
                         if (error != null) { DialogHelper.showMessage(error); return@launch }
-                        withIO { filesVM.loadAsync(context) }
+                        filesVM.loadAsync(context)
                     filesVM.showCreateFileDialog.value = false
                 }
             }

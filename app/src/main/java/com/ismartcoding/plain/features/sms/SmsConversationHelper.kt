@@ -11,6 +11,7 @@ import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.extensions.queryCursor
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.helpers.QueryHelper
 import kotlin.time.Instant
@@ -24,11 +25,11 @@ object SmsConversationHelper {
      * Returns the set of archived conversation IDs that have NO new messages
      * after the archive date (i.e., still effectively archived).
      */
-    private suspend fun getActiveArchivedIds(context: Context): Set<String> {
+    private suspend fun getActiveArchivedIds(context: Context): Set<String> = withIO {
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
-        if (archivedRecords.isEmpty()) return emptySet()
+        if (archivedRecords.isEmpty()) return@withIO emptySet()
         val convDates = queryConversationsByThreadIds(context, archivedRecords.map { it.conversationId })
-        return archivedRecords.filter { archived ->
+        return@withIO archivedRecords.filter { archived ->
             val conv = convDates[archived.conversationId]
             conv == null || conv.date.toEpochMilliseconds() <= archived.conversationDate
         }.map { it.conversationId }.toSet()
@@ -53,13 +54,13 @@ object SmsConversationHelper {
      * Returns archived conversations sorted by archive date descending,
      * with snippet/date adjusted to reflect state at archive time.
      */
-    suspend fun getArchivedConversations(context: Context): List<DMessageConversation> {
+    suspend fun getArchivedConversations(context: Context): List<DMessageConversation> = withIO {
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
             .sortedByDescending { it.conversationDate }
-        if (archivedRecords.isEmpty()) return emptyList()
+        if (archivedRecords.isEmpty()) return@withIO emptyList()
         val conversations = getConversationsByIds(context, archivedRecords.map { it.conversationId })
         val archivedMap = archivedRecords.associateBy { it.conversationId }
-        return conversations.map { conv ->
+        return@withIO conversations.map { conv ->
             val archiveDate = archivedMap[conv.id]?.conversationDate ?: return@map conv
             val oldSnippet = getSnippetBeforeDate(context, conv.id, archiveDate)
             conv.copy(
@@ -205,9 +206,9 @@ object SmsConversationHelper {
         return where
     }
 
-    private suspend fun getMatchedThreadIdsAsync(context: Context, query: String): List<String> {
+    private suspend fun getMatchedThreadIdsAsync(context: Context, query: String): List<String> = withIO {
         if (query.isEmpty()) {
-            return emptyList()
+            return@withIO emptyList()
         }
 
         val conditions = QueryHelper.parseAsync(query)
@@ -256,13 +257,13 @@ object SmsConversationHelper {
             }
         }
 
-        return ids.toList()
+        return@withIO ids.toList()
     }
 
-    suspend fun getConversationsByIds(context: Context, ids: List<String>): List<DMessageConversation> {
-        if (ids.isEmpty()) return emptyList()
+    suspend fun getConversationsByIds(context: Context, ids: List<String>): List<DMessageConversation> = withIO {
+        if (ids.isEmpty()) return@withIO emptyList()
         val conversationMap = queryConversationsWithAddresses(context, ids)
-        return ids.mapNotNull { conversationMap[it] }
+        return@withIO ids.mapNotNull { conversationMap[it] }
     }
 
     suspend fun searchConversationsAsync(
@@ -270,15 +271,15 @@ object SmsConversationHelper {
         query: String,
         limit: Int,
         offset: Int,
-    ): List<DMessageConversation> {
+    ): List<DMessageConversation> = withIO {
         if (query.isNotEmpty()) {
             val activeArchivedIds = getActiveArchivedIds(context)
             val threadIds = getMatchedThreadIdsAsync(context, query)
                 .filter { !activeArchivedIds.contains(it) }
                 .drop(offset).take(limit)
-            if (threadIds.isEmpty()) return emptyList()
+            if (threadIds.isEmpty()) return@withIO emptyList()
             val conversationMap = queryConversationsWithAddresses(context, threadIds)
-            return threadIds.mapNotNull { conversationMap[it] }
+            return@withIO threadIds.mapNotNull { conversationMap[it] }
         }
 
         // Single-pass: read conversations with full data, filter archived, paginate, resolve addresses
@@ -331,11 +332,11 @@ object SmsConversationHelper {
             }
         }
 
-        if (conversations.isEmpty()) return emptyList()
+        if (conversations.isEmpty()) return@withIO emptyList()
 
         // Batch resolve addresses
         val addressMap = batchGetCanonicalAddresses(context, recipientMap.values.toSet())
-        return conversations.map { conv ->
+        return@withIO conversations.map { conv ->
             val recipientId = recipientMap[conv.id]
             if (recipientId != null) {
                 val address = addressMap[recipientId]
@@ -344,11 +345,11 @@ object SmsConversationHelper {
         }
     }
 
-    suspend fun conversationCountAsync(context: Context, query: String): Int {
+    suspend fun conversationCountAsync(context: Context, query: String): Int = withIO {
         val activeArchivedIds = getActiveArchivedIds(context)
 
         if (query.isNotEmpty()) {
-            return getMatchedThreadIdsAsync(context, query).count { !activeArchivedIds.contains(it) }
+            return@withIO getMatchedThreadIdsAsync(context, query).count { !activeArchivedIds.contains(it) }
         }
 
         // Count all conversations properly, minus truly archived ones.
@@ -368,6 +369,6 @@ object SmsConversationHelper {
             count = cursor.count
         }
 
-        return count - activeArchivedIds.size
+        return@withIO count - activeArchivedIds.size
     }
 }

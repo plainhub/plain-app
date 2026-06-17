@@ -52,7 +52,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.enums.PickFileTag
@@ -91,15 +90,23 @@ fun ScanPage(navController: NavHostController) {
     var pendingPairData by remember { mutableStateOf<DQrPairData?>(null) }
 
     fun handleScanResult(text: String) {
-        scanResult = text; addScanResult(context, scope, text)
+        scanResult = text
+        addScanResult(context, scope, text)
         val pairData = DQrPairData.fromQrContent(text)
-        if (pairData != null) pendingPairData = pairData else showScanResultSheet = true
+        if (pairData != null) {
+            pendingPairData = pairData
+        } else {
+            showScanResultSheet = true
+        }
     }
 
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
             when (event) {
-                is PermissionsResultEvent -> { hasCamPermission = Permission.CAMERA.can(context); if (!hasCamPermission) DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.scan_needs_camera_warning)) }
+                is PermissionsResultEvent -> {
+                    hasCamPermission = Permission.CAMERA.can(context); if (!hasCamPermission) DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.scan_needs_camera_warning))
+                }
+
                 is PickFileResultEvent -> {
                     if (event.tag != PickFileTag.SCAN) return@collect
                     coIO {
@@ -109,7 +116,9 @@ fun ScanPage(navController: NavHostController) {
                             val result = QrCodeScanHelper.tryDecode(img)
                             DialogHelper.hideLoading()
                             if (result != null) handleScanResult(result.text)
-                        } catch (ex: Exception) { DialogHelper.hideLoading(); cameraDetecting.value = true; ex.printStackTrace() }
+                        } catch (ex: Exception) {
+                            DialogHelper.hideLoading(); cameraDetecting.value = true; ex.printStackTrace()
+                        }
                     }
                 }
             }
@@ -117,25 +126,62 @@ fun ScanPage(navController: NavHostController) {
     }
     if (!hasCamPermission) sendEvent(RequestPermissionsEvent(Permission.CAMERA))
     DisposableEffect(Unit) { onDispose { cameraProvider?.unbindAll() } }
-    if (showScanResultSheet) { QrScanResultBottomSheet(context, scanResult) { showScanResultSheet = false; cameraDetecting.value = true } }
+    if (showScanResultSheet) {
+        QrScanResultBottomSheet(context, scanResult) { showScanResultSheet = false; cameraDetecting.value = true }
+    }
     pendingPairData?.let { pairData ->
-        AlertDialog(onDismissRequest = { pendingPairData = null; cameraDetecting.value = true },
+        AlertDialog(
+            onDismissRequest = {
+                pendingPairData = null
+                cameraDetecting.value = true
+            },
             title = { Text(stringResource(Res.string.pair_via_qr_title)) },
             text = { Text(stringResource(Res.string.confirm_pair_with_device, pairData.name)) },
-            confirmButton = { Button(onClick = { navController.navigate(Routing.Nearby(JsonHelper.jsonEncode(pairData))) { popUpTo(Routing.Scan) { inclusive = true } }; pendingPairData = null }) { Text(stringResource(Res.string.pair)) } },
-            dismissButton = { TextButton(onClick = { pendingPairData = null; cameraDetecting.value = true }) { Text(stringResource(Res.string.cancel)) } })
+            confirmButton = {
+                Button(onClick = {
+                    // TODO: paring
+                    pendingPairData = null
+                }) { Text(stringResource(Res.string.pair)) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    pendingPairData = null
+                    cameraDetecting.value = true
+                }) {
+                    Text(stringResource(Res.string.cancel))
+                }
+            })
     }
 
     PScaffold(topBar = {
         PTopAppBar(navController = navController, title = stringResource(Res.string.scan_qrcode), actions = {
-            PIconButton(icon = Res.drawable.history, contentDescription = stringResource(Res.string.scan_history), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.ScanHistory) }
+            PIconButton(
+                icon = Res.drawable.history,
+                contentDescription = stringResource(Res.string.scan_history),
+                tint = MaterialTheme.colorScheme.onSurface
+            ) { navController.navigate(Routing.ScanHistory) }
         })
     }, content = { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding())
+        ) {
             if (hasCamPermission) ScanCameraView(lifecycleOwner, cameraDetecting, onCameraProvider = { cameraProvider = it }, onScanResult = { handleScanResult(it) })
             if (hasCamPermission) ScanOverlay()
-            Row(modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 64.dp).align(Alignment.BottomCenter), horizontalArrangement = Arrangement.End) {
-                Box(modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.darkMask(0.2f)).clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) }, contentAlignment = Alignment.Center) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 24.dp, end = 24.dp, bottom = 64.dp)
+                    .align(Alignment.BottomCenter), horizontalArrangement = Arrangement.End
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.darkMask(0.2f))
+                        .clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) }, contentAlignment = Alignment.Center
+                ) {
                     Icon(painter = painterResource(Res.drawable.image), contentDescription = stringResource(Res.string.images), tint = Color.White)
                 }
             }
@@ -145,9 +191,9 @@ fun ScanPage(navController: NavHostController) {
 
 private fun addScanResult(context: Context, scope: CoroutineScope, value: String) {
     scope.launch {
-        val results = withIO { ScanHistoryPreference.getValueAsync().toMutableList() }
+        val results = ScanHistoryPreference.getValueAsync().toMutableList()
         results.removeIf { it == value }; results.add(0, value)
-        withIO { ScanHistoryPreference.putAsync(results) }
+        ScanHistoryPreference.putAsync(results)
     }
 }
 

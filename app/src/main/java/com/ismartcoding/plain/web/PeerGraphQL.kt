@@ -2,6 +2,7 @@ package com.ismartcoding.plain.web
 
 import android.annotation.SuppressLint
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.kgraphql.Context
@@ -103,9 +104,9 @@ class PeerGraphQL(val schema: Schema) {
             schema: Schema,
             query: String,
             call: ApplicationCall
-        ): String {
+        ): String = withIO {
             val request = Json.decodeFromString(GraphqlRequest.serializer(), query)
-            return schema.execute(request.query, request.variables?.toString(), context {
+            schema.execute(request.query, request.variables?.toString(), context {
                 +call
             })
         }

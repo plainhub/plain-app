@@ -35,6 +35,7 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.models.launchIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -44,21 +45,21 @@ class DlnaCastRulesViewModel : ViewModel() {
     val deniedFlow = MutableStateFlow<List<Pair<String, String>>>(emptyList())
 
     fun load(context: android.content.Context) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             allowedFlow.value = DlnaAllowedSendersPreference.getAsync().map { decodeSenderEntry(it) }
             deniedFlow.value = DlnaDeniedSendersPreference.getAsync().map { decodeSenderEntry(it) }
         }
     }
 
     fun removeAllowed(context: android.content.Context, ip: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DlnaAllowedSendersPreference.removeAsync(ip)
             allowedFlow.value = allowedFlow.value.filter { it.first != ip }
         }
     }
 
     fun removeDenied(context: android.content.Context, ip: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DlnaDeniedSendersPreference.removeAsync(ip)
             deniedFlow.value = deniedFlow.value.filter { it.first != ip }
         }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
@@ -38,7 +39,7 @@ class FeedSettingsViewModel : ViewModel() {
 
     fun setAutoRefresh(context: Context, value: Boolean) {
         autoRefresh.value = value
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             FeedAutoRefreshPreference.putAsync(value)
             if (value) {
                 FeedFetchWorker.startRepeatWorkerAsync(context)
@@ -50,30 +51,32 @@ class FeedSettingsViewModel : ViewModel() {
 
     fun setAutoRefreshInterval(context: Context, value: Int) {
         autoRefreshInterval.value = value
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             FeedAutoRefreshIntervalPreference.putAsync(value)
         }
     }
 
     fun setAutoRefreshOnlyWifi(context: Context, value: Boolean) {
         autoRefreshOnlyWifi.value = value
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             FeedAutoRefreshOnlyWifiPreference.putAsync(value)
         }
     }
 
-    suspend fun clearByFeedIdAsync(feedId: String) {
+    suspend fun clearByFeedIdAsync(feedId: String) = withIO {
         val ids = FeedEntryHelper.getIdsAsync("feed_id:$feedId")
         TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
         FeedEntryHelper.deleteAsync(ids)
     }
 
     fun clearAllAsync() {
-        TagHelper.deleteByTypeAsync(DataType.FEED_ENTRY)
-        FeedEntryHelper.deleteAllAsync()
+        launchIO {
+            TagHelper.deleteByTypeAsync(DataType.FEED_ENTRY)
+            FeedEntryHelper.deleteAllAsync()
+        }
     }
 
-    suspend fun clearByTimeAsync(ts: Long) {
+    suspend fun clearByTimeAsync(ts: Long) = withIO {
         val time = TimeHelper.now().epochSeconds - ts
         val ids = FeedEntryHelper.getIdsAsync("created_at:<${Instant.fromEpochSeconds(time)}")
         TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)

@@ -19,6 +19,7 @@ import com.ismartcoding.lib.extensions.getSearchCursor
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.extensions.toSortName
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pinyin.Pinyin
@@ -37,8 +38,8 @@ abstract class BaseMediaContentHelper {
         return Uri.withAppendedPath(uriExternal, id)
     }
 
-    suspend fun countAsync(context: Context, query: String): Int {
-        return buildWheres(query).sumOf { where ->
+    suspend fun countAsync(context: Context, query: String): Int = withIO {
+        buildWheres(query).sumOf { where ->
             context.contentResolver.count(uriExternal, where)
         }
     }
@@ -82,8 +83,8 @@ abstract class BaseMediaContentHelper {
         limit: Int,
         offset: Int,
         sortBy: SortBy,
-    ): Cursor? {
-        return context.contentResolver.getPagingCursor(
+    ): Cursor? = withIO {
+        context.contentResolver.getPagingCursor(
             uriExternal,
             getProjection(),
             buildWhere(query),
@@ -96,8 +97,8 @@ abstract class BaseMediaContentHelper {
     suspend fun getIdsAsync(
         context: Context,
         query: String,
-    ): Set<String> {
-        return context.contentResolver.getSearchCursor(
+    ): Set<String> = withIO {
+        context.contentResolver.getSearchCursor(
             uriExternal, arrayOf(BaseColumns._ID), buildWhere(query)
         )?.map { cursor, cache ->
             cursor.getStringValue(BaseColumns._ID, cache)
@@ -107,8 +108,8 @@ abstract class BaseMediaContentHelper {
     suspend fun getTrashedIdsAsync(
         context: Context,
         query: String,
-    ): Set<String> {
-        return context.contentResolver.getSearchCursor(
+    ): Set<String> = withIO {
+        context.contentResolver.getSearchCursor(
             uriExternal, arrayOf(BaseColumns._ID), buildWhere(query).apply { trash = true }
         )?.map { cursor, cache ->
             cursor.getStringValue(BaseColumns._ID, cache)
@@ -118,8 +119,8 @@ abstract class BaseMediaContentHelper {
     protected suspend fun getSearchCursorAsync(
         context: Context,
         query: String,
-    ): Cursor? {
-        return context.contentResolver.getSearchCursor(
+    ): Cursor? = withIO {
+        context.contentResolver.getSearchCursor(
             uriExternal, getProjection(), buildWhere(query)
         )
     }

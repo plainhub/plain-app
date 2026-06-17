@@ -59,7 +59,7 @@ internal fun performZipFiles(
                 false
             }
         }
-        if (success) withIO { filesVM.loadAsync(context) }
+        if (success) filesVM.loadAsync(context)
         DialogHelper.hideLoading()
         onDone()
     }

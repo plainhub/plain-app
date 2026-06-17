@@ -69,7 +69,8 @@ fun DocsPage(
 
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
-            withIO { docsVM.loadAsync(context, tagsVM); mediaFoldersVM.loadAsync(context) }
+            docsVM.loadAsync(context, tagsVM)
+            withIO { mediaFoldersVM.loadAsync(context) }
             setRefreshState(RefreshContentState.Finished)
         }
     }

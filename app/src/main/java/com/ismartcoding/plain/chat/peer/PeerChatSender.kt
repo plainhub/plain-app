@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.chat.peer
 
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DMessageContent
@@ -8,7 +9,7 @@ import com.ismartcoding.plain.db.toPeerMessageContent
 
 
 object PeerChatSender {
-    suspend fun send(peer: DPeer, content: DMessageContent): String? {
+    suspend fun send(peer: DPeer, content: DMessageContent): String? = withIO {
         try {
             val response = PeerGraphQLClient.createChatItem(
                 peer = peer,
@@ -18,7 +19,7 @@ object PeerChatSender {
 
             if (response != null && response.errors.isNullOrEmpty()) {
                 LogCat.d("Message sent successfully to peer ${peer.id}: ${response.data}")
-                return null
+                null
             } else {
                 val errorMessage = if (response == null) {
                     "No response received (host unreachable or connection refused)"
@@ -26,13 +27,13 @@ object PeerChatSender {
                     response.errors?.joinToString(", ") { it.message } ?: "Empty error list in response"
                 }
                 LogCat.e("Failed to send message to peer ${peer.id}: $errorMessage")
-                return errorMessage
+                errorMessage
             }
 
         } catch (e: Exception) {
             val errorMessage = e.message ?: "Unknown error"
             LogCat.e("Error sending message to peer ${peer.id}: $e")
-            return errorMessage
+            errorMessage
         }
     }
 }

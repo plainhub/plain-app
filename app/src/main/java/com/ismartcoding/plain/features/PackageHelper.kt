@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.data.DCertificate
@@ -47,7 +48,7 @@ object PackageHelper {
         return !isInstalled(packageName)
     }
 
-    suspend fun searchAsync(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> {
+    suspend fun searchAsync(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> = withIO {
         try {
             var type = ""
             var text = ""
@@ -85,7 +86,7 @@ object PackageHelper {
             }
 
             if (query.isEmpty() || text.isEmpty()) {
-                return apps.map {
+                return@withIO apps.map {
                     try {
                         getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
                     } catch (ex: Exception) {
@@ -97,7 +98,7 @@ object PackageHelper {
                 }.sorted(sortBy).drop(offset).take(limit)
             }
 
-            return apps.map {
+            return@withIO apps.map {
                 try {
                     getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
                 } catch (ex: Exception) {
@@ -117,7 +118,7 @@ object PackageHelper {
             }.sorted(sortBy).drop(offset).take(limit).toList()
         } catch (ex: Exception) {
             LogCat.d(ex.toString())
-            return emptyList()
+            return@withIO emptyList()
         }
     }
 
@@ -221,22 +222,22 @@ object PackageHelper {
         }
     }
 
-    suspend fun count(query: String): Int {
+    suspend fun count(query: String): Int = withIO {
         if (query.isEmpty()) {
-            return packageManager.getInstalledApplications(0).count()
+            return@withIO packageManager.getInstalledApplications(0).count()
         } else {
             val parsed = QueryHelper.parseAsync(query)
             if (parsed.size == 1) {
                 val t = parsed.find { it.name == "type" }
                 if (t != null) {
                     val type = t.value
-                    return packageManager.getInstalledApplications(0).count { appInfo ->
+                    return@withIO packageManager.getInstalledApplications(0).count { appInfo ->
                         getAppType(appInfo) == type
                     }
                 }
             }
         }
-        return searchAsync(query, Int.MAX_VALUE, 0, FileSortBy.SIZE_ASC).count()
+        return@withIO searchAsync(query, Int.MAX_VALUE, 0, FileSortBy.SIZE_ASC).count()
     }
 
     private fun getLabel(packageInfo: ApplicationInfo): String {

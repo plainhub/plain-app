@@ -1,129 +1,211 @@
 package com.ismartcoding.plain.ui.models
 
+import android.content.Context
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.features.locale.LocaleHelper
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.Constants
+import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.chat.ChatSender
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.events.ChannelUpdatedEvent
-import com.ismartcoding.plain.events.PeerOnlineStatusChangedEvent
-import com.ismartcoding.plain.events.PeerUpdatedEvent
+import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.DMessageFile
+import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.db.DMessageImages
+import com.ismartcoding.plain.db.DMessageText
+import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.HMessageUpdatedEvent
+import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
-data class ChatState(
-    val target: ChatTarget = ChatTarget("local", ChatTargetType.PEER),
-    val toName: String = "",
-)
 
 class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
-    internal val _itemsFlow = MutableStateFlow(mutableStateListOf<VChat>())
-    override val itemsFlow: StateFlow<List<VChat>> get() = _itemsFlow
+    internal val _itemsFlow = MutableStateFlow<List<VChat>>(emptyList())
+    override val itemsFlow: StateFlow<List<VChat>> = _itemsFlow
     val selectedItem = mutableStateOf<VChat?>(null)
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    private val _chatState = MutableStateFlow(ChatState())
-    val chatState: StateFlow<ChatState> get() = _chatState
+    private val _target = MutableStateFlow(ChatTarget("local", ChatTargetType.PEER))
+    val target = _target.asStateFlow()
 
-    private val _onlinePeerIds = MutableStateFlow<Set<String>>(emptySet())
-    val onlinePeerIds: StateFlow<Set<String>> get() = _onlinePeerIds
-
-    init {
-        viewModelScope.launch {
-            Channel.sharedFlow.collect { event ->
-                when (event) {
-                    is PeerOnlineStatusChangedEvent -> {
-                        _onlinePeerIds.update { current ->
-                            if (event.online) current + event.peerId
-                            else current - event.peerId
-                        }
-                    }
-
-                    is PeerUpdatedEvent -> {
-                        ChatCacheManager.updatePeer(event.peer)
-                        if (_chatState.value.target.type == ChatTargetType.PEER && _chatState.value.target.toId == event.peer.id) {
-                            _chatState.value = _chatState.value.copy(toName = event.peer.name)
-                        }
-                    }
-
-                    is ChannelUpdatedEvent -> {
-                        if (_chatState.value.target.type != ChatTargetType.CHANNEL) return@collect
-                        val channelId = _chatState.value.target.toId
-                        val updated = withContext(Dispatchers.IO) {
-                            AppDatabase.instance.chatChannelDao().getById(channelId)
-                        }
-                        _chatState.update { state -> state.copy(toName = updated?.name ?: state.toName) }
-                    }
-                }
-            }
-        }
+    suspend fun initializeTargetAsync(chatId: String) = withIO {
+        _target.value = ChatTarget.parseId(chatId)
     }
 
-    suspend fun initializeChatStateAsync(chatId: String) {
-        val target = ChatTarget.parseId(chatId)
-        if (target.isLocal()) {
-            _chatState.value = _chatState.value.copy(target = target, toName = LocaleHelper.getStringAsync(Res.string.local_chat))
-            return
-        }
-        when (target.type) {
-            ChatTargetType.PEER -> {
-                val peer = AppDatabase.instance.peerDao().getById(target.toId)
-                _chatState.value = _chatState.value.copy(target = target, toName = peer?.name ?: "")
-            }
-
-            ChatTargetType.CHANNEL -> {
-                val channel = AppDatabase.instance.chatChannelDao().getById(target.toId)
-                _chatState.value = _chatState.value.copy(target = target, toName = channel?.name ?: "")
-            }
-        }
-    }
-
-    suspend fun fetchAsync(toId: String) {
-        val state = _chatState.value
+    suspend fun fetchAsync(toId: String) = withIO {
+        val current = _target.value
         val dao = AppDatabase.instance.chatDao()
-        val isChannel = state.target.type == ChatTargetType.CHANNEL
-        val list = if (isChannel) dao.getByChannelId(state.target.toId) else dao.getByPeerId(toId)
+        val isChannel = current.type == ChatTargetType.CHANNEL
+        val list = if (isChannel) dao.getByChannelId(current.toId) else dao.getByPeerId(toId)
         _itemsFlow.value = list.sortedByDescending { it.createdAt }.map { chat ->
             val fromName = if (isChannel && chat.fromId != "me") {
                 AppDatabase.instance.peerDao().getById(chat.fromId)?.name ?: ""
             } else ""
             VChat.from(chat, fromName)
-        }.toMutableStateList()
+        }
     }
 
     fun addAll(items: List<DChat>) {
-        _itemsFlow.value.addAll(0, items.map { VChat.from(it) })
+        _itemsFlow.update { items.map { VChat.from(it) } + it }
     }
 
     fun update(item: DChat) {
         _itemsFlow.update { currentList ->
-            val mutableList = currentList.toMutableStateList()
-            val index = mutableList.indexOfFirst { it.id == item.id }
-            if (index >= 0) mutableList[index] = VChat.from(item)
-            mutableList
+            val index = currentList.indexOfFirst { it.id == item.id }
+            if (index >= 0) currentList.toMutableList().also { it[index] = VChat.from(item) }
+            else currentList
         }
     }
 
     fun remove(id: String) {
-        _itemsFlow.value.removeIf { it.id == id }
+        _itemsFlow.update { it.filterNot { chat -> chat.id == id } }
     }
 
     fun removeIds(ids: Set<String>) {
         if (ids.isEmpty()) return
-        _itemsFlow.value.removeIf { ids.contains(it.id) }
+        _itemsFlow.update { it.filterNot { chat -> ids.contains(chat.id) } }
+    }
+
+    fun clearAllMessages(context: Context) {
+        launchIO {
+            val target = target.value
+            if (target.type == ChatTargetType.CHANNEL) {
+                ChatDbHelper.deleteAllChannelChatsAsync(context, target.toId)
+            } else {
+                ChatDbHelper.deleteAllChatsAsync(context, target.toId)
+            }
+            _itemsFlow.value = emptyList()
+            sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode(target.encodedToId)))
+        }
+    }
+
+    fun resendMessage(messageId: String) {
+        launchIO {
+            val item = ChatDbHelper.getChatItem(messageId) ?: return@launchIO
+            ChatDbHelper.updateChatItemStatus(item, "pending")
+            update(item)
+            ChatSender.resend(item)
+        }
+    }
+
+    fun resendToMembers(messageId: String, peerIds: List<String>) {
+        launchIO {
+            val target = target.value
+            val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return@launchIO
+            val item = ChatDbHelper.getChatItem(messageId) ?: return@launchIO
+            ChatDbHelper.updateChatItemStatus(item, "pending")
+            update(item)
+            ChatSender.sendToChannelMembers(item, channel, peerIds)
+            update(item)
+        }
+    }
+
+    fun forwardMessage(messageId: String, target: ChatTarget, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
+        launchIO {
+            val item = ChatDbHelper.getChatItem(messageId) ?: return@launchIO
+            onResult(doSendMessage(target, item.content, onlinePeerIds))
+        }
+    }
+
+    fun delete(context: Context, ids: Set<String>) {
+        launchIO {
+            val items = itemsFlow.value.filter { ids.contains(it.id) }
+            for (m in items) {
+                ChatDbHelper.deleteAsync(context, m.id)
+            }
+            _itemsFlow.update { it.filterNot { m -> ids.contains(m.id) } }
+            sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode("ids=${ids.joinToString(",")}")))
+        }
+    }
+
+    fun sendMessage(content: DMessageContent, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
+        launchIO {
+            onResult(doSendMessage(target.value, content, onlinePeerIds))
+        }
+    }
+
+    private suspend fun doSendMessage(target: ChatTarget, content: DMessageContent, onlinePeerIds: Set<String>): Boolean = withIO {
+        val item = ChatSender.createChatItem(target, content)
+        addAll(listOf(item))
+
+        if (!target.isLocal()) {
+            ChatSender.send(item, target, onlinePeerIds)
+            update(item)
+        }
+        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
+        item.status == "sent"
+    }
+
+    fun sendTextMessage(text: String, context: Context, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
+        launchIO {
+            val content = if (text.length > Constants.MAX_MESSAGE_LENGTH) {
+                createLongTextFile(text, context)
+            } else {
+                DMessageContent(DMessageType.TEXT.value, DMessageText(text))
+            }
+            sendMessage(content, onlinePeerIds, onResult)
+        }
+    }
+
+    suspend fun sendFilesImmediate(files: List<DMessageFile>, isImageVideo: Boolean): String = withIO {
+        val target = target.value
+        val content = if (isImageVideo) {
+            DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
+        } else {
+            DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
+        }
+        val item = ChatDbHelper.insertChatItem(
+            message = content,
+            fromId = "me",
+            toId = if (target.type == ChatTargetType.PEER) target.toId else "",
+            channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
+            isRemote = !target.isLocal(),
+        )
+        addAll(listOf(item))
+        item.id
+    }
+
+    fun updateFilesMessage(messageId: String, files: List<DMessageFile>, isImageVideo: Boolean, onlinePeerIds: Set<String>) {
+        launchIO {
+            val item = ChatDbHelper.getChatItem(messageId) ?: return@launchIO
+            ChatDbHelper.updateChatItemFilesContent(item, files)
+            if (target.value.isLocal()) {
+                ChatDbHelper.updateChatItemStatus(item, "sent")
+            } else {
+                ChatDbHelper.updateChatItemStatus(item, "pending")
+                ChatSender.send(item, target.value, onlinePeerIds)
+            }
+            sendEvent(HMessageUpdatedEvent(item.id))
+            update(item)
+        }
+    }
+
+    fun createLongTextFile(text: String, context: Context): DMessageContent {
+        val timestamp = TimeHelper.now().toEpochMilliseconds()
+        val fileName = "message-$timestamp.txt"
+        val dir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS)
+        if (!dir!!.exists()) dir.mkdirs()
+        val file = java.io.File(dir, fileName)
+        file.writeText(text)
+        val summary = text.substring(0, minOf(text.length, Constants.TEXT_FILE_SUMMARY_LENGTH))
+        val messageFile = DMessageFile(uri = file.absolutePath, size = file.length(), summary = summary, fileName = fileName)
+        return DMessageContent(DMessageType.FILES.value, DMessageFiles(listOf(messageFile)))
     }
 }

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat
 
 import android.util.Base64
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 
@@ -13,7 +14,7 @@ object ChatCacheManager {
 
     var activeToId = ""
 
-    suspend fun loadKeyCacheAsync() {
+    suspend fun loadKeyCacheAsync() = withIO {
         peerKeyCache.clear()
         peerPublicKeyCache.clear()
         channelKeyCache.clear()

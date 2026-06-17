@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
@@ -49,7 +48,7 @@ fun PomodoroPage(navController: NavHostController, pomodoroVM: PomodoroViewModel
         PomodoroSettingsDialog(settings = pomodoroVM.settings.value, onSettingsChange = { newSettings ->
             scope.launch {
                 pomodoroVM.settings.value = newSettings
-                withIO { PomodoroSettingsPreference.putAsync(newSettings) }
+                PomodoroSettingsPreference.putAsync(newSettings)
                 if (!pomodoroVM.isRunning.value) pomodoroVM.updateTimeForCurrentState()
                 sendEvent(WebSocketEvent(EventType.POMODORO_SETTINGS_UPDATE, JsonHelper.jsonEncode(newSettings)))
             }

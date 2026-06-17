@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.KeepAwakeChangedEvent
@@ -26,7 +25,7 @@ class WebConsoleViewModel : ViewModel() {
         viewModelScope.launch {
             DialogHelper.showLoading()
             val errorMessage = LocaleHelper.getStringAsync(Res.string.http_server_error)
-            val serverUp = withIO { HttpServerManager.checkServerAsync() }
+            val serverUp = HttpServerManager.checkServerAsync()
             DialogHelper.hideLoading()
             if (!serverUp) {
                 AlertDialog.Builder(context)
@@ -48,7 +47,7 @@ class WebConsoleViewModel : ViewModel() {
     }
 
     fun enableKeepAwake(context: Context, enable: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             KeepAwakePreference.putAsync(enable)
             sendEvent(KeepAwakeChangedEvent(enable))
         }

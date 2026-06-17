@@ -37,7 +37,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChatChannel
@@ -46,9 +45,12 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
+import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
+import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
@@ -67,9 +69,7 @@ import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.exitSelectMode
-import com.ismartcoding.plain.ui.models.forwardMessage
 import com.ismartcoding.plain.ui.models.isAllSelected
-import com.ismartcoding.plain.ui.models.sendTextMessage
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.nav.Routing
@@ -91,7 +91,7 @@ fun ChatPage(
 ) {
     val context = LocalContext.current
     val itemsState = chatVM.itemsFlow.collectAsState()
-    val chatState = chatVM.chatState.collectAsState()
+    val chatTarget = chatVM.target.collectAsState()
     val channelsState = channelVM.channels.collectAsState()
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf("") }
@@ -104,7 +104,7 @@ fun ChatPage(
     val imageWidthPx = remember(imageWidthDp) { derivedStateOf { density.run { imageWidthDp.toPx().toInt() } } }
     val refreshState = rememberRefreshLayoutState {
         scope.launch(Dispatchers.IO) {
-            chatVM.fetchAsync(chatState.value.target.toId)
+            chatVM.fetchAsync(chatTarget.value.toId)
             setRefreshState(RefreshContentState.Finished)
         }
     }
@@ -122,14 +122,18 @@ fun ChatPage(
     val pageTitle = if (chatVM.selectMode.value) {
         LocaleHelper.getStringF(Res.string.x_selected, "count", chatVM.selectedIds.size)
     } else {
-        val state = chatState.value
-        if (state.target.type == ChatTargetType.CHANNEL) {
-            val channel = channelsState.value.find { it.id == state.target.toId }
-            if (channel != null) "${state.toName} (${channel.joinedMembers().size})" else state.toName
-        } else state.toName
+        val target = chatTarget.value
+        if (target.type == ChatTargetType.CHANNEL) {
+            val channel = channelsState.value.find { it.id == target.toId }
+            if (channel != null) "${channel.name} (${channel.joinedMembers().size})" else ""
+        } else if (target.isLocal()) {
+            LocaleHelper.getString(Res.string.local_chat)
+        } else {
+            ChatCacheManager.peerMap[target.toId]?.name ?: ""
+        }
     }
 
-    val channel = if (chatState.value.target.type == ChatTargetType.CHANNEL) channelsState.value.find { it.id == chatState.value.target.toId } else null
+    val channel = if (chatTarget.value.type == ChatTargetType.CHANNEL) channelsState.value.find { it.id == chatTarget.value.toId } else null
 
     PScaffold(
         modifier = Modifier.imePadding(),
@@ -154,7 +158,18 @@ fun ChatPage(
                 },
             )
         },
-        bottomBar = { AnimatedBottomAction(visible = chatVM.showBottomActions()) { ChatSelectModeBottomActions(chatVM) } },
+        bottomBar = {
+            AnimatedBottomAction(visible = chatVM.showBottomActions()) {
+                PBottomAppBar {
+                    BottomActionButtons {
+                        IconTextSmallButtonDelete {
+                            chatVM.delete(context, chatVM.selectedIds.toSet())
+                            chatVM.exitSelectMode()
+                        }
+                    }
+                }
+            }
+        },
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -162,17 +177,23 @@ fun ChatPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             PullToRefresh(modifier = Modifier.weight(1f), refreshLayoutState = refreshState) {
-                LazyColumnScrollbar(state = scrollState) {
-                    LazyColumn(state = scrollState, reverseLayout = true, verticalArrangement = Arrangement.Top) {
+                LazyColumnScrollbar(state = scrollState, modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(state = scrollState, reverseLayout = true, verticalArrangement = Arrangement.Top, modifier = Modifier.fillMaxSize()) {
                         item(key = "bottomSpace") { VerticalSpace(dp = paddingValues.calculateBottomPadding()) }
                         itemsIndexed(itemsState.value, key = { _, a -> a.id }) { index, m ->
                             ChatListItem(
-                                navController = navController, chatVM = chatVM, audioPlaylistVM,
-                                itemsState.value, m = m,
-                                peer = (if (chatState.value.target.type == ChatTargetType.PEER) ChatCacheManager.peerMap[chatState.value.target.toId] else null)
+                                navController = navController,
+                                chatVM = chatVM,
+                                audioPlaylistVM,
+                                itemsState.value,
+                                m = m,
+                                peer = (if (chatTarget.value.type == ChatTargetType.PEER) ChatCacheManager.peerMap[chatTarget.value.toId] else null)
                                     ?: ChatCacheManager.peerMap[m.fromId],
-                                index = index, imageWidthDp = imageWidthDp, imageWidthPx = imageWidthPx.value,
-                                focusManager = focusManager, previewerState = previewerState,
+                                index = index,
+                                imageWidthDp = imageWidthDp,
+                                imageWidthPx = imageWidthPx.value,
+                                focusManager = focusManager,
+                                previewerState = previewerState,
                                 onForward = { message ->
                                     messageToForward = message
                                     showForwardDialog = true
@@ -182,7 +203,7 @@ fun ChatPage(
                     }
                 }
             }
-            val peer = if (chatState.value.target.type == ChatTargetType.PEER) ChatCacheManager.peerMap[chatState.value.target.toId] else null
+            val peer = if (chatTarget.value.type == ChatTargetType.PEER) ChatCacheManager.peerMap[chatTarget.value.toId] else null
             val notAllowChat = (channel != null && !channel.isJoined()) || peer?.status == "unpaired"
             if (notAllowChat) {
                 Box(
@@ -207,13 +228,18 @@ fun ChatPage(
                 ChatInput(
                     value = inputValue,
                     hint = stringResource(Res.string.chat_input_hint),
-                    onValueChange = { inputValue = it; scope.launch(Dispatchers.IO) { ChatInputTextPreference.putAsync(it) } },
+                    onValueChange = {
+                        inputValue = it
+                        scope.launch(Dispatchers.IO) {
+                            ChatInputTextPreference.putAsync(it)
+                        }
+                    },
                     onSend = {
                         if (inputValue.isEmpty()) return@ChatInput
                         scope.launch {
-                            chatVM.sendTextMessage(inputValue, context)
+                            chatVM.sendTextMessage(inputValue, context, peerVM.onlinePeerIds.value)
                             inputValue = ""
-                            withIO { ChatInputTextPreference.putAsync("") }
+                            ChatInputTextPreference.putAsync("")
                             scrollState.scrollToItem(0)
                         }
                     })
@@ -228,7 +254,9 @@ fun ChatPage(
             peerVM = peerVM, onDismiss = { showForwardDialog = false; messageToForward = null },
             onTargetSelected = { target ->
                 messageToForward?.let { message ->
-                    chatVM.forwardMessage(message.id, target) { DialogHelper.showSuccess(Res.string.sent) }
+                    chatVM.forwardMessage(message.id, target, peerVM.onlinePeerIds.value) {
+                        DialogHelper.showSuccess(Res.string.sent)
+                    }
                 }
             })
     }

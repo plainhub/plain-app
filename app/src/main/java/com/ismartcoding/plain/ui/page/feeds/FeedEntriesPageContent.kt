@@ -29,7 +29,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
@@ -125,7 +124,7 @@ internal fun FeedEntriesPageContent(
                             }
                             item(key = "bottom") {
                                 if (itemsState.isNotEmpty() && !feedEntriesVM.noMore.value) {
-                                    LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { withIO { feedEntriesVM.moreAsync(tagsVM) } } }
+                                    LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { feedEntriesVM.moreAsync(tagsVM) } }
                                 }
                                 LoadMoreRefreshContent(feedEntriesVM.noMore.value)
                                 VerticalSpace(dp = bottomPadding.dp)

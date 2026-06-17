@@ -15,7 +15,6 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.AmoledDarkThemePreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
@@ -59,18 +58,14 @@ fun DarkThemePage(navController: NavHostController) {
                             PListItem(
                                 modifier = Modifier.clickable {
                                     scope.launch {
-                                        withIO {
-                                            DarkThemePreference.putAsync(it)
-                                        }
+                                        DarkThemePreference.putAsync(it)
                                     }
                                 },
                                 title = it.getText(),
                             ) {
                                 RadioButton(selected = it.value == darkTheme, onClick = {
                                     scope.launch {
-                                        withIO {
-                                            DarkThemePreference.putAsync(it)
-                                        }
+                                        DarkThemePreference.putAsync(it)
                                     }
                                 })
                             }

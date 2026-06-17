@@ -2,14 +2,13 @@ package com.ismartcoding.plain.ai
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.preferences.AiImageSearchEnabledPreference
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.withContext
 import java.io.File
 
 data class SemanticSearchResult(val imageId: String, val score: Float)
@@ -51,7 +50,7 @@ object ImageSearchManager {
 
     fun totalModelSize(): Long = MODEL_FILES.sumOf { it.size }
 
-    suspend fun restoreIfEnabled() = withContext(Dispatchers.IO) {
+    suspend fun restoreIfEnabled() = withIO {
         val enabled = AiImageSearchEnabledPreference.getAsync()
         if (enabled && isModelAvailable()) {
             loadModels()
@@ -59,22 +58,22 @@ object ImageSearchManager {
         }
     }
 
-    suspend fun enableAsync() {
+    suspend fun enableAsync() = withIO {
         if (_status.value == ImageSearchStatus.DOWNLOADING ||
             _status.value == ImageSearchStatus.LOADING
         ) {
-            return
+            return@withIO
         }
         if (!isModelAvailable()) {
             downloadModels()
-            if (!isModelAvailable()) return
+            if (!isModelAvailable()) return@withIO
         }
         loadModels()
         AiImageSearchEnabledPreference.putAsync(true)
         ImageIndexManager.startup()
     }
 
-    suspend fun disableAsync() {
+    suspend fun disableAsync() = withIO {
         ImageIndexManager.shutdown()
         ImageEmbedHelper.close()
         TextEmbedHelper.close()
@@ -94,8 +93,8 @@ object ImageSearchManager {
     }
 
     suspend fun search(query: String, limit: Int = 50): List<SemanticSearchResult> =
-        withContext(Dispatchers.IO) {
-            val textEmb = TextEmbedHelper.embed(query) ?: return@withContext emptyList()
+        withIO {
+            val textEmb = TextEmbedHelper.embed(query) ?: return@withIO emptyList()
             val dao = AppDatabase.instance.imageEmbeddingDao()
             val all = dao.getAll()
             all.mapNotNull { vec ->

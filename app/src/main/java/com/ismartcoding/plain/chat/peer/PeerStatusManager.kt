@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat.peer
 
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
@@ -98,30 +99,30 @@ object PeerStatusManager {
         }
     }
 
-    private suspend fun reconnectAll() {
-        if (!started) return
+    private suspend fun reconnectAll() = withIO {
+        if (!started) return@withIO
         loadConnectablePeers().forEach { forceReconnectPeer(it, reason = "reconnect_all") }
     }
 
-    private suspend fun reconnectOfflinePeers(reason: String) {
-        if (!started) return
+    private suspend fun reconnectOfflinePeers(reason: String) = withIO {
+        if (!started) return@withIO
         LogCat.d("peer status: reconnect triggered reason=$reason")
         loadConnectablePeers()
             .filter { !isOnline(it.id) }
             .forEach { forceReconnectPeer(it, reason = reason) }
     }
 
-    private suspend fun reconnectPeer(peerId: String, reason: String) {
-        if (!started) return
+    private suspend fun reconnectPeer(peerId: String, reason: String) = withIO {
+        if (!started) return@withIO
         val state = state(peerId)
         state.reconnectJob = null
         if (state.socket != null) {
             LogCat.d("peer status: reconnect skipped peer=$peerId reason=$reason active_socket=true")
-            return
+            return@withIO
         }
-        val peer = AppDatabase.instance.peerDao().getById(peerId) ?: return
-        if (!shouldConnect(peer)) return
-        val key = ChatCacheManager.peerKeyCache[peer.id] ?: return
+        val peer = AppDatabase.instance.peerDao().getById(peerId) ?: return@withIO
+        if (!shouldConnect(peer)) return@withIO
+        val key = ChatCacheManager.peerKeyCache[peer.id] ?: return@withIO
 
         LogCat.d("peer status: reconnect peer=$peerId reason=$reason")
         NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
@@ -130,26 +131,26 @@ object PeerStatusManager {
         val refreshedPeer = AppDatabase.instance.peerDao().getById(peer.id) ?: peer
         if (refreshedPeer.ip.isEmpty() || refreshedPeer.port <= 0) {
             scheduleReconnect(peer.id)
-            return
+            return@withIO
         }
         openSocket(refreshedPeer, key)
     }
 
-    private suspend fun forceReconnectPeer(peer: DPeer, reason: String) {
-        if (!started) return
+    private suspend fun forceReconnectPeer(peer: DPeer, reason: String) = withIO {
+        if (!started) return@withIO
         val state = state(peer.id)
         state.reconnectJob?.cancel()
         state.reconnectJob = null
         if (state.socket != null) {
             LogCat.d("peer status: reconnect skipped peer=$peer.Id reason=$reason active_socket=true")
-            return
+            return@withIO
         }
-        val key = ChatCacheManager.peerKeyCache[peer.id] ?: return
+        val key = ChatCacheManager.peerKeyCache[peer.id] ?: return@withIO
         LogCat.d("peer status: reconnect peer=$peer.Id reason=$reason")
         openSocket(peer, key)
     }
 
-    private suspend fun openSocket(peer: DPeer, key: ByteArray) {
+    private suspend fun openSocket(peer: DPeer, key: ByteArray) = withIO {
         val peerId = peer.id
         LogCat.d("peer status: open socket peer=$peerId url=${peer.getStatusWsUrl()}")
 
@@ -240,11 +241,11 @@ object PeerStatusManager {
         }
     }
 
-    private suspend fun loadConnectablePeers(): List<DPeer> {
+    private suspend fun loadConnectablePeers(): List<DPeer> = withIO {
         val peers = AppDatabase.instance.peerDao().getAllPaired()
         val connectable = peers.filter { shouldConnect(it) }
         LogCat.d("peer status: peers total=${peers.size} connectable=${connectable.size}")
-        return connectable
+        connectable
     }
 
     private fun shouldConnect(peer: DPeer): Boolean {

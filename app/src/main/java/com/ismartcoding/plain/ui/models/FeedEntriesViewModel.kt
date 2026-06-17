@@ -3,11 +3,11 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
@@ -28,8 +28,8 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     ISelectableViewModel<DFeedEntry>,
     ISearchableViewModel<DFeedEntry>,
     ViewModel() {
-    private val _itemsFlow = MutableStateFlow(mutableStateListOf<DFeedEntry>())
-    override val itemsFlow: StateFlow<List<DFeedEntry>> get() = _itemsFlow
+    private val _itemsFlow = MutableStateFlow<List<DFeedEntry>>(emptyList())
+    override val itemsFlow: StateFlow<List<DFeedEntry>> = _itemsFlow
     var showLoading = mutableStateOf(true)
     var offset = mutableIntStateOf(0)
     var limit = mutableIntStateOf(200)
@@ -50,19 +50,19 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    suspend fun moreAsync(tagsViewModel: TagsViewModel) {
+    suspend fun moreAsync(tagsViewModel: TagsViewModel) = withIO {
         offset.value += limit.intValue
         val items = FeedEntryHelper.search(getQuery(), limit.intValue, offset.intValue)
-        _itemsFlow.value.addAll(items)
+        _itemsFlow.update { it + items }
         tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
         noMore.value = items.size < limit.intValue
     }
 
-    suspend fun loadAsync(tagsViewModel: TagsViewModel) {
+    suspend fun loadAsync(tagsViewModel: TagsViewModel) = withIO {
         offset.intValue = 0
         val query = getQuery()
-        _itemsFlow.value = FeedEntryHelper.search(query, limit.intValue, offset.intValue).toMutableStateList()
+        _itemsFlow.value = FeedEntryHelper.search(query, limit.intValue, offset.intValue)
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.intValue = FeedEntryHelper.count(getTotalAllQuery())
         totalToday.intValue = FeedEntryHelper.count(getTotalTodayQuery())
@@ -75,7 +75,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     }
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,
@@ -103,7 +103,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
         return query
     }
 
-    private fun getQuery(): String {
+    private suspend fun getQuery(): String {
         var query = queryText.value
         if (filterType == FeedEntryFilterType.TODAY) {
             query += " today:true"

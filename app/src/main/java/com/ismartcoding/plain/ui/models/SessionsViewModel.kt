@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.models
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.db.DSession
@@ -51,36 +49,36 @@ data class VSession(
 }
 
 class SessionsViewModel : ViewModel() {
-    private val _itemsFlow = MutableStateFlow(mutableStateListOf<VSession>())
-    val itemsFlow: StateFlow<List<VSession>> get() = _itemsFlow
+    private val _itemsFlow = MutableStateFlow<List<VSession>>(emptyList())
+    val itemsFlow: StateFlow<List<VSession>> = _itemsFlow
 
     fun fetch() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }.toMutableStateList()
+        launchIO {
+            _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }
         }
     }
 
     fun delete(clientId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             SessionList.deleteAsync(clientId)
-            _itemsFlow.value = _itemsFlow.value.filter { it.clientId != clientId }.toMutableStateList()
+            _itemsFlow.value = _itemsFlow.value.filter { it.clientId != clientId }
             HttpServerManager.loadTokenCache()
         }
     }
 
     fun createCustomToken(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             SessionList.createCustomTokenAsync(name)
-            _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }.toMutableStateList()
+            _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }
             HttpServerManager.loadTokenCache()
         }
     }
 
     fun rename(clientId: String, name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             val changed = SessionList.renameAsync(clientId, name)
             if (changed) {
-                _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }.toMutableStateList()
+                _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }
             }
         }
     }

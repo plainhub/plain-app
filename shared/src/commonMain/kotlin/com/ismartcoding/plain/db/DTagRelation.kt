@@ -27,45 +27,45 @@ data class DTagRelation(
 @Dao
 interface TagRelationDao {
     @Query("SELECT * FROM tag_relations WHERE `key`=:key AND type=:type")
-    fun getAllByKey(key: String, type: Int): List<DTagRelation>
+    suspend fun getAllByKey(key: String, type: Int): List<DTagRelation>
 
     @Query("SELECT * FROM tag_relations WHERE `key` in (:keys) AND type=:type")
-    fun getAllByKeys(keys: Set<String>, type: Int): List<DTagRelation>
+    suspend fun getAllByKeys(keys: Set<String>, type: Int): List<DTagRelation>
 
     @Query("SELECT `key` FROM tag_relations WHERE tag_id=:tagId")
-    fun getKeysByTagId(tagId: String): List<String>
+    suspend fun getKeysByTagId(tagId: String): List<String>
 
     @Query("SELECT * FROM tag_relations WHERE tag_id in (:tagIds)")
-    fun getAllByTagIds(tagIds: Set<String>): List<DTagRelation>
+    suspend fun getAllByTagIds(tagIds: Set<String>): List<DTagRelation>
 
     @Query("DELETE FROM tag_relations WHERE `key` in (:keys) AND type=:type")
-    fun deleteByKeys(keys: Set<String>, type: Int)
+    suspend fun deleteByKeys(keys: Set<String>, type: Int)
 
     @Query("DELETE FROM tag_relations WHERE type=:type")
-    fun deleteByType(type: Int)
+    suspend fun deleteByType(type: Int)
 
     @Query("DELETE FROM tag_relations WHERE tag_id=:tagId")
-    fun deleteByTagId(tagId: String)
+    suspend fun deleteByTagId(tagId: String)
 
     @Query("DELETE FROM tag_relations WHERE `key` in (:keys) AND tag_id=:tagId")
-    fun deleteByKeysTagId(keys: Set<String>, tagId: String)
+    suspend fun deleteByKeysTagId(keys: Set<String>, tagId: String)
 
     @Query("DELETE FROM tag_relations WHERE `key` in (:keys) AND tag_id in (:tagIds)")
-    fun deleteByKeysTagIds(keys: Set<String>, tagIds: Set<String>)
+    suspend fun deleteByKeysTagIds(keys: Set<String>, tagIds: Set<String>)
 
     @RawQuery
-    fun delete(query: RoomRawQuery): Int
+    suspend fun delete(query: RoomRawQuery): Int
 
     @Insert
-    fun insert(vararg item: DTagRelation)
+    suspend fun insert(vararg item: DTagRelation)
 
     @Update
-    fun update(vararg item: DTagRelation)
+    suspend fun update(vararg item: DTagRelation)
 
     @Query(
         "SELECT tags.id AS id, count(tag_relations.tag_id) AS count FROM tags JOIN tag_relations ON tags.id = tag_relations.tag_id WHERE tags.type=:type GROUP BY tags.id",
     )
-    fun getAll(type: Int): List<DTagCount>
+    suspend fun getAll(type: Int): List<DTagCount>
 }
 
 data class DTagCount(var id: String, var count: Int)

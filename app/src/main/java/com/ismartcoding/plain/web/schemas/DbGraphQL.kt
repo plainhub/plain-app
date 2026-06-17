@@ -2,6 +2,7 @@ package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.web.models.DbTableInfo
 import org.json.JSONObject
 
 private val ALLOWED_NAME_REGEX = Regex("^[a-zA-Z_][a-zA-Z0-9_]*$")
@@ -17,6 +18,22 @@ private fun getValidatedTableName(table: String): String {
     val exists = cursor.use { it.moveToFirst() }
     require(exists) { "Table not found: $table" }
     return table
+}
+
+private fun primaryKeyColumn(table: String): String {
+    val safeName = getValidatedTableName(table)
+    val db = AppDatabase.instance.openHelper.readableDatabase
+    val cursor = db.query("PRAGMA table_info(`$safeName`)", emptyArray())
+    cursor.use { c ->
+        while (c.moveToNext()) {
+            if (c.getInt(5) > 0) {
+                val colName = c.getString(1)
+                requireSafeName(colName)
+                return colName
+            }
+        }
+    }
+    return "id"
 }
 
 private fun dbTableNames(): List<String> {
@@ -83,6 +100,10 @@ fun SchemaBuilder.addDbSchema() {
         resolver { table: String, offset: Int, limit: Int -> dbTableRows(table, offset, limit) }
     }
 
+    query("dbTableInfo") {
+        resolver { table: String -> DbTableInfo(idKey = primaryKeyColumn(table)) }
+    }
+
     mutation("createDbTableRow") {
         resolver { table: String, row: String ->
             val safeName = getValidatedTableName(table)
@@ -103,9 +124,10 @@ fun SchemaBuilder.addDbSchema() {
         resolver { table: String, ids: List<String> ->
             require(ids.isNotEmpty()) { "ids must not be empty" }
             val safeName = getValidatedTableName(table)
+            val idKey = primaryKeyColumn(safeName)
             val placeholders = ids.joinToString(", ") { "?" }
             val db = AppDatabase.instance.openHelper.writableDatabase
-            db.execSQL("DELETE FROM `$safeName` WHERE id IN ($placeholders)", ids.toTypedArray())
+            db.execSQL("DELETE FROM `$safeName` WHERE `$idKey` IN ($placeholders)", ids.toTypedArray())
             true
         }
     }

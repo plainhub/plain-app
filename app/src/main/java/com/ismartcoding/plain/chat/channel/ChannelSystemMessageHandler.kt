@@ -23,7 +23,7 @@ import kotlinx.coroutines.runBlocking
  */
 object ChannelSystemMessageHandler {
 
-    fun handle(fromId: String, type: String, payload: String) {
+    suspend fun handle(fromId: String, type: String, payload: String) {
         try {
             when (type) {
                 ChannelSystemMessages.TYPE_INVITE -> handleInvite(fromId, jsonDecode(payload))
@@ -45,7 +45,7 @@ object ChannelSystemMessageHandler {
      * Insert a `status = "channel"` peer record for a member we don't already
      * know. Returns true when a new row was inserted.
      */
-    private fun ensureChannelPeer(
+    private suspend fun ensureChannelPeer(
         id: String,
         name: String,
         publicKey: String,
@@ -71,13 +71,13 @@ object ChannelSystemMessageHandler {
         return true
     }
 
-    private fun handleInvite(fromId: String, msg: ChannelSystemMessages.ChannelInvite) {
+    private suspend fun handleInvite(fromId: String, msg: ChannelSystemMessages.ChannelInvite) {
         val dao = AppDatabase.instance.chatChannelDao()
         val peerDao = AppDatabase.instance.peerDao()
 
         val existingChannel = dao.getById(msg.channelId)
         val isReinvite = existingChannel != null &&
-            (existingChannel.status == DChatChannel.STATUS_LEFT || existingChannel.status == DChatChannel.STATUS_KICKED)
+                (existingChannel.status == DChatChannel.STATUS_LEFT || existingChannel.status == DChatChannel.STATUS_KICKED)
 
         // Sanity check: the signed `fromId` (Ed25519 verified upstream) must equal the
         // owner the inviter is claiming in the payload. Otherwise an attacker who
@@ -156,7 +156,7 @@ object ChannelSystemMessageHandler {
         LogCat.d("Channel invite received: ${msg.channelName} from $fromId")
     }
 
-    private fun handleInviteAccept(fromId: String, msg: ChannelSystemMessages.ChannelInviteAccept) {
+    private suspend fun handleInviteAccept(fromId: String, msg: ChannelSystemMessages.ChannelInviteAccept) {
         val dao = AppDatabase.instance.chatChannelDao()
         val peerDao = AppDatabase.instance.peerDao()
         val channel = dao.getById(msg.channelId) ?: run {
@@ -222,7 +222,7 @@ object ChannelSystemMessageHandler {
         LogCat.d("Peer $fromId accepted invite for channel ${msg.channelId}")
     }
 
-    private fun handleInviteDecline(fromId: String, msg: ChannelSystemMessages.ChannelInviteDecline) {
+    private suspend fun handleInviteDecline(fromId: String, msg: ChannelSystemMessages.ChannelInviteDecline) {
         val dao = AppDatabase.instance.chatChannelDao()
         val channel = dao.getById(msg.channelId) ?: return
 
@@ -240,7 +240,7 @@ object ChannelSystemMessageHandler {
         LogCat.d("Peer $fromId declined invite for channel ${msg.channelId}")
     }
 
-    private fun handleUpdate(fromId: String, msg: ChannelSystemMessages.ChannelUpdate) {
+    private suspend fun handleUpdate(fromId: String, msg: ChannelSystemMessages.ChannelUpdate) {
         val dao = AppDatabase.instance.chatChannelDao()
         val peerDao = AppDatabase.instance.peerDao()
         val channel = dao.getById(msg.channelId)
@@ -290,7 +290,7 @@ object ChannelSystemMessageHandler {
         LogCat.d("Channel ${msg.channelId} updated to version ${msg.version}")
     }
 
-    private fun handleKick(fromId: String, msg: ChannelSystemMessages.ChannelKick) {
+    private suspend fun handleKick(fromId: String, msg: ChannelSystemMessages.ChannelKick) {
         val dao = AppDatabase.instance.chatChannelDao()
         val channel = dao.getById(msg.channelId) ?: return
 
@@ -314,7 +314,7 @@ object ChannelSystemMessageHandler {
         LogCat.d("Kicked from channel ${msg.channelId} by $fromId")
     }
 
-    private fun handleLeave(fromId: String, msg: ChannelSystemMessages.ChannelLeave) {
+    private suspend fun handleLeave(fromId: String, msg: ChannelSystemMessages.ChannelLeave) {
         val dao = AppDatabase.instance.chatChannelDao()
         val channel = dao.getById(msg.channelId) ?: return
 

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.chat.channel
 
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerGraphQLClient
@@ -94,23 +95,24 @@ object ChannelChatSender {
         channel: DChatChannel,
         recipientIds: List<String>,
         content: DMessageContent,
-    ): DMessageStatusData {
+    ): DMessageStatusData = withIO {
         if (recipientIds.isEmpty()) {
             LogCat.d("Channel ${channel.id}: no recipients to send to")
-            return DMessageStatusData()
-        }
-        val peerDao = AppDatabase.instance.peerDao()
-        val results = mutableListOf<DMessageDeliveryResult>()
-        for (memberId in recipientIds) {
-            val memberPeer = peerDao.getById(memberId)
-            if (memberPeer == null) {
-                LogCat.e("Channel ${channel.id}: peer $memberId not found in DB, skipping")
-                results.add(DMessageDeliveryResult(memberId, memberId, "Peer not found in database"))
-                continue
+            DMessageStatusData()
+        } else {
+            val peerDao = AppDatabase.instance.peerDao()
+            val results = mutableListOf<DMessageDeliveryResult>()
+            for (memberId in recipientIds) {
+                val memberPeer = peerDao.getById(memberId)
+                if (memberPeer == null) {
+                    LogCat.e("Channel ${channel.id}: peer $memberId not found in DB, skipping")
+                    results.add(DMessageDeliveryResult(memberId, memberId, "Peer not found in database"))
+                    continue
+                }
+                results.add(sendToMember(channel, memberPeer, content))
             }
-            results.add(sendToMember(channel, memberPeer, content))
+            DMessageStatusData(results)
         }
-        return DMessageStatusData(results)
     }
 
     /**
@@ -142,8 +144,8 @@ object ChannelChatSender {
         channel: DChatChannel,
         peer: DPeer,
         content: DMessageContent,
-    ): DMessageDeliveryResult {
-        return try {
+    ): DMessageDeliveryResult = withIO {
+        try {
             val modifiedContent = content.toPeerMessageContent()
             val response = PeerGraphQLClient.createChannelChatItem(
                 peer = peer,

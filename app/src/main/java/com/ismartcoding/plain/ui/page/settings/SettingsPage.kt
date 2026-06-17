@@ -128,10 +128,8 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 PFilledButton(text = stringResource(Res.string.check_update), buttonSize = ButtonSize.SMALL, onClick = {
                                     scope.launch {
                                         DialogHelper.showMessage(Res.string.checking_updates)
-                                        val r = withIO {
-                                            UpdateInfoPreference.updateAsync { it.copy(skipVersion = "") }
-                                            AppHelper.checkUpdateAsync(context, true)
-                                        }
+                                        UpdateInfoPreference.updateAsync { it.copy(skipVersion = "") }
+                                        val r = withIO { AppHelper.checkUpdateAsync(context, true) }
                                         if (r != null) {
                                             if (r) updateViewModel.showDialog()
                                             else DialogHelper.showMessage(Res.string.is_latest_version)

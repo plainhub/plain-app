@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat
 
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.channel.ChannelChatSender
@@ -22,7 +23,7 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.web.models.toModel
 
 object ChatSender {
-    suspend fun createChatItem(target: ChatTarget, content: DMessageContent): DChat {
+    suspend fun createChatItem(target: ChatTarget, content: DMessageContent): DChat = withIO {
         val item = ChatDbHelper.insertChatItem(
             message = content,
             fromId = "me",
@@ -33,32 +34,32 @@ object ChatSender {
         if (item.content.type == DMessageType.TEXT.value) {
             sendEvent(FetchLinkPreviewsEvent(item))
         }
-        return item
+        item
     }
 
     suspend fun send(
         item: DChat,
         target: ChatTarget,
         onlinePeerIds: Set<String>,
-    ) {
+    ) = withIO {
         if (target.isLocal()) {
-            return
+            return@withIO
         }
 
         when (target.type) {
             ChatTargetType.PEER -> {
-                val peer = AppDatabase.instance.peerDao().getById(target.toId) ?: return
+                val peer = AppDatabase.instance.peerDao().getById(target.toId) ?: return@withIO
                 sendToPeer(item, peer)
             }
 
             ChatTargetType.CHANNEL -> {
-                val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return
+                val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return@withIO
                 sendToChannel(item, channel, onlinePeerIds)
             }
         }
     }
 
-    suspend fun resend(item: DChat) {
+    suspend fun resend(item: DChat) = withIO {
         send(item, item.target(), currentOnlinePeers())
         sendEvent(HMessageUpdatedEvent(item.id))
     }
@@ -80,7 +81,7 @@ object ChatSender {
         }
     }
 
-    suspend fun sendToPeer(item: DChat, peer: DPeer) {
+    suspend fun sendToPeer(item: DChat, peer: DPeer) = withIO {
         val error = PeerChatSender.send(peer, item.content)
         if (error != null) {
             triggerPeerRediscovery(peer.id)
@@ -88,7 +89,7 @@ object ChatSender {
         ChatDbHelper.updateChatItemStatus(item, peer, error)
     }
 
-    suspend fun sendToChannel(item: DChat, channel: DChatChannel, onlinePeerIds: Set<String> = emptySet()) {
+    suspend fun sendToChannel(item: DChat, channel: DChatChannel, onlinePeerIds: Set<String> = emptySet()) = withIO {
         when (val result = ChannelChatSender.send(channel, item.content)) {
             is ChannelChatSender.Result.Status -> {
                 ChatDbHelper.updateChannelChatItemStatus(item, result.data)
@@ -114,7 +115,7 @@ object ChatSender {
         }
     }
 
-    suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) {
+    suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) = withIO {
         val newResults = ChannelChatSender.sendToRecipients(channel, peerIds, item.content)
         val existing = item.parseStatusData()?.results ?: emptyList()
         val retriedIds = peerIds.toSet()

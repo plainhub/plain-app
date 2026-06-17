@@ -9,6 +9,7 @@ import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.extensions.map
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.data.DVideo
@@ -67,8 +68,8 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         limit: Int,
         offset: Int,
         sortBy: FileSortBy,
-    ): List<DVideo> {
-        return getPagingCursorAsync(context, query, limit, offset, sortBy.toSortBy())?.map { cursor, cache ->
+    ): List<DVideo> = withIO {
+        getPagingCursorAsync(context, query, limit, offset, sortBy.toSortBy())?.map { cursor, cache ->
             val id = cursor.getStringValue(MediaStore.Video.Media._ID, cache)
             val title = cursor.getStringValue(MediaStore.Video.Media.TITLE, cache)
             val size = cursor.getLongValue(MediaStore.Video.Media.SIZE, cache)
@@ -90,8 +91,8 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
     suspend fun getTagRelationStubsAsync(
         context: Context,
         query: String,
-    ): List<TagRelationStub> {
-        return getSearchCursorAsync(context, query)?.map { cursor, cache ->
+    ): List<TagRelationStub> = withIO {
+        return@withIO getSearchCursorAsync(context, query)?.map { cursor, cache ->
             val id = cursor.getStringValue(MediaStore.Video.Media._ID, cache)
             val title = cursor.getStringValue(MediaStore.Video.Media.TITLE, cache)
             val size = cursor.getLongValue(MediaStore.Video.Media.SIZE, cache)

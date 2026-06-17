@@ -9,7 +9,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.DarkThemePreference
 import com.ismartcoding.plain.preferences.LocalDarkTheme
@@ -42,9 +41,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
                 activated = DarkTheme.isDarkTheme(darkTheme),
             ) {
                 scope.launch {
-                    withIO {
-                        DarkThemePreference.putAsync(if (it) DarkTheme.ON else DarkTheme.OFF)
-                    }
+                    DarkThemePreference.putAsync(if (it) DarkTheme.ON else DarkTheme.OFF)
                 }
             }
         }

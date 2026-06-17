@@ -5,7 +5,7 @@ This document describes how devices discover and pair with each other securely.
 ## Core Components
 
 - **`NearbyDiscoverManager`** - Device discovery and message routing
-- **`NearbyPairManager`** - Pairing process and key exchange
+- **`NearbyPairing`** - Pairing process and key exchange
 - **`NearbyViewModel`** - UI state management
 
 ## Message Types

@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.components
 import com.ismartcoding.plain.i18n.*
 
 import android.content.Context
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preferences.HttpPortPreference
@@ -19,7 +18,7 @@ fun persistMdnsHostname(
     hostname: String,
 ) {
     scope.launch {
-        withIO { MdnsHostnamePreference.putAsync(hostname) }
+        MdnsHostnamePreference.putAsync(hostname)
     }
 }
 

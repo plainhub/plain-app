@@ -18,7 +18,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
@@ -72,7 +71,7 @@ internal fun NotesPageContent(
                         }
                         item {
                             if (itemsState.isNotEmpty() && !notesVM.noMore.value) {
-                                LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { withIO { notesVM.moreAsync(tagsVM) } } }
+                                LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { notesVM.moreAsync(tagsVM) } }
                             }
                             LoadMoreRefreshContent(notesVM.noMore.value)
                         }

@@ -86,7 +86,9 @@ fun AudioPage(
 
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
-            withIO { audioVM.loadAsync(context, tagsVM); audioPlaylistVM.loadAsync(context); mediaFoldersVM.loadAsync(context) }
+            audioVM.loadAsync(context, tagsVM)
+            audioPlaylistVM.loadAsync(context)
+            withIO { mediaFoldersVM.loadAsync(context) }
             setRefreshState(RefreshContentState.Finished)
         }
     }

@@ -3,6 +3,7 @@ package com.ismartcoding.plain.services
 import com.ismartcoding.plain.i18n.*
 
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
@@ -22,7 +23,7 @@ import io.ktor.server.netty.NettyApplicationEngine
  */
 object HttpServerStartHelper {
 
-    suspend fun startServer(service: HttpServerService, onStateChanged: (HttpServerState) -> Unit) {
+    suspend fun startServer(service: HttpServerService, onStateChanged: (HttpServerState) -> Unit) = withIO {
         LogCat.d("startHttpServer")
         onStateChanged(HttpServerState.STARTING)
         sendEvent(HttpServerStateChangedEvent(HttpServerState.STARTING))
@@ -50,7 +51,7 @@ object HttpServerStartHelper {
         }
     }
 
-    private suspend fun attemptServerStart(maxRetries: Int) {
+    private suspend fun attemptServerStart(maxRetries: Int) = withIO {
         for (attempt in 1..maxRetries) {
             var newServer: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
             try {

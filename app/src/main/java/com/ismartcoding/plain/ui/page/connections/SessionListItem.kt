@@ -10,11 +10,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +36,7 @@ import com.ismartcoding.plain.ui.base.ClipboardCard
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
@@ -56,36 +56,20 @@ internal fun SessionListItem(
     var showFullTime by remember { mutableStateOf(false) }
     var showTokenTipsDialog by remember { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
-    var inputName by remember(m.clientId, m.name) { mutableStateOf(m.name) }
     val lastActiveText = if (showFullTime) m.lastActiveAt?.formatDateTime() else m.lastActiveAt?.timeAgo()
     val displayName = m.name.ifEmpty { stringResource(Res.string.unknown) }
     val title = if (m.isCustom) displayName else osDisplay
 
     if (showRenameDialog) {
-        AlertDialog(
+        TextFieldDialog(
+            title = stringResource(Res.string.rename),
+            value = m.name.ifEmpty { osDisplay },
+            placeholder = stringResource(Res.string.name),
+            confirmText = stringResource(Res.string.save),
             onDismissRequest = { showRenameDialog = false },
-            title = { Text(stringResource(Res.string.rename)) },
-            text = {
-                OutlinedTextField(
-                    value = inputName,
-                    onValueChange = { inputName = it },
-                    label = { Text(stringResource(Res.string.name)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    onRename(m.clientId, inputName.trim())
-                    showRenameDialog = false
-                }) {
-                    Text(stringResource(Res.string.save))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showRenameDialog = false }) {
-                    Text(stringResource(Res.string.cancel))
-                }
+            onConfirm = { newName ->
+                onRename(m.clientId, newName.trim())
+                showRenameDialog = false
             },
         )
     }
@@ -101,7 +85,6 @@ internal fun SessionListItem(
                 subtitle = if (m.name.isEmpty()) "" else osDisplay,
                 icon = if (m.isCustom) Res.drawable.lock else Res.drawable.laptop,
                 onEditTitle = {
-                    inputName = m.name
                     showRenameDialog = true
                 },
                 action = { SessionBadge(m = m, isOnline = isOnline) },
@@ -163,10 +146,10 @@ internal fun SessionListItem(
 private fun ApiTokenTipsDialog(m: VSession, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val hostname = remember { TempData.mdnsHostname }
-    val httpsPort = remember { TempData.httpsPort }
+    val httpPort = TempData.httpPort.collectAsState()
 
-    val curlReal = remember(m, hostname, httpsPort) {
-        """curl -X POST "https://$hostname:$httpsPort/graphql" -H "c-id: ${m.clientId}" -H "Authorization: Bearer ${m.token}" -H "Content-Type: application/json" --data '{"query":"{ app { version } }"}'"""
+    val curlReal = remember(m, hostname, httpPort) {
+        """curl -X POST "http://$hostname:${httpPort.value}/graphql" -H "c-id: ${m.clientId}" -H "Authorization: Bearer ${m.token}" -H "Content-Type: application/json" --data '{"query":"{ app { appVersion } }"}'"""
     }
 
     AlertDialog(

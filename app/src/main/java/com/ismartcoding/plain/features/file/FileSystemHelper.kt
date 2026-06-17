@@ -10,6 +10,7 @@ import android.os.StatFs
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.plain.extensions.getDirectChildrenCount
 import com.ismartcoding.plain.extensions.normalizeComparison
@@ -230,7 +231,7 @@ object FileSystemHelper {
         query: String,
         root: String,
         sortBy: FileSortBy,
-    ): List<DFile> {
+    ): List<DFile> = withIO {
         val filterFields = QueryHelper.parseAsync(query)
         val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
         val text = filterFields.find { it.name == "text" }?.value ?: ""
@@ -245,8 +246,8 @@ object FileSystemHelper {
             getFilesList(dir, showHidden, sortBy)
         }
 
-        if (fileSizeFields.isEmpty()) return items
-        return items.filter { !it.isDir && matchFileSizeFilters(it.size, fileSizeFields) }
+        if (fileSizeFields.isEmpty()) return@withIO items
+        return@withIO items.filter { !it.isDir && matchFileSizeFilters(it.size, fileSizeFields) }
     }
 
     private fun matchFileSizeFilters(size: Long, fileSizeFields: List<FilterField>): Boolean {

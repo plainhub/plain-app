@@ -41,6 +41,7 @@ object NearbyDiscoverManager {
 
     fun startPeriodicDiscovery() {
         if (broadcastJob?.isActive == true) return
+        sendEvent(WebSocketEvent(EventType.NEARBY_DISCOVERY_STARTED, "{}"))
         broadcastJob = coIO {
             while (isActive) {
                 runCatching { broadcastDiscover(DDiscoverRequest()) }
@@ -53,6 +54,11 @@ object NearbyDiscoverManager {
     fun stopPeriodicDiscovery() {
         broadcastJob?.cancel()
         broadcastJob = null
+        sendEvent(WebSocketEvent(EventType.NEARBY_DISCOVERY_STOPPED, "{}"))
+    }
+
+    fun isDiscovering(): Boolean {
+        return broadcastJob?.isActive == true
     }
 
     fun discoverSpecificDevice(toId: String, key: ByteArray) {
@@ -94,12 +100,12 @@ object NearbyDiscoverManager {
 
             NearbyMessageType.PAIR_RESPONSE -> {
                 val response = JsonHelper.jsonDecode<DPairingResponse>(payload)
-                coIO { NearbyPairManager.handlePairingResponse(response, senderIP) }
+                coIO { NearbyPairing.handlePairingResponse(response, senderIP) }
             }
 
             NearbyMessageType.PAIR_CANCEL -> {
                 val cancel = JsonHelper.jsonDecode<DPairingCancel>(payload)
-                NearbyPairManager.handlePairingCancel(cancel)
+                NearbyPairing.handlePairingCancel(cancel)
             }
         }
     }
@@ -146,26 +152,24 @@ object NearbyDiscoverManager {
     private fun handleDiscoverReply(payload: String) {
         try {
             val reply = JsonHelper.jsonDecode<DDiscoverReply>(payload)
-            sendEvent(
-                NearbyDeviceFoundEvent(
-                    DNearbyDevice(
-                        id = reply.id,
-                        name = reply.name,
-                        ips = reply.ips,
-                        port = reply.port,
-                        deviceType = reply.deviceType,
-                        version = reply.version,
-                        platform = reply.platform,
-                        lastSeen = TimeHelper.now(),
-                    )
-                )
+            val device = DNearbyDevice(
+                id = reply.id,
+                name = reply.name,
+                ips = reply.ips,
+                port = reply.port,
+                deviceType = reply.deviceType,
+                version = reply.version,
+                platform = reply.platform,
+                lastSeen = TimeHelper.now(),
             )
+            sendEvent(NearbyDeviceFoundEvent(device))
+            sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(device)))
         } catch (e: Exception) {
             LogCat.e("Error handling discover reply: ${e.message}")
         }
     }
 
-    private fun isDirectedQueryForUs(request: DDiscoverRequest): Boolean {
+    private suspend fun isDirectedQueryForUs(request: DDiscoverRequest): Boolean {
         if (request.fromId.isEmpty() || request.toId.isEmpty()) return false
 
         val peer = AppDatabase.instance.peerDao().getById(request.fromId)

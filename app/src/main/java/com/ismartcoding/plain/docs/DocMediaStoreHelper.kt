@@ -11,6 +11,7 @@ import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.lib.extensions.toSortName
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.pinyin.Pinyin
@@ -91,8 +92,8 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
         limit: Int,
         offset: Int,
         sortBy: FileSortBy,
-    ): List<DDoc> {
-        return getPagingCursorAsync(context, query, limit, offset, sortBy.toSortBy())?.map { cursor, cache ->
+    ): List<DDoc> = withIO {
+        getPagingCursorAsync(context, query, limit, offset, sortBy.toSortBy())?.map { cursor, cache ->
             val id = cursor.getStringValue(MediaStore.Files.FileColumns._ID, cache)
             val title = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME, cache)
             val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, cache)

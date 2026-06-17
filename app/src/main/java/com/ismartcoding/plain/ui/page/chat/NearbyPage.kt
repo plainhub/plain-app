@@ -1,11 +1,19 @@
 package com.ismartcoding.plain.ui.page.chat
 
 import com.ismartcoding.plain.i18n.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -13,25 +21,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NearbyViewModel
+import com.ismartcoding.plain.ui.page.chat.components.NearbyDeviceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NearbyPage(
     navController: NavHostController,
-    pairDeviceJson: String = "",
     nearbyVM: NearbyViewModel = viewModel()
 ) {
     val nearbyDevices = nearbyVM.nearbyDevices
@@ -40,30 +54,16 @@ fun NearbyPage(
     var showQrSheet by remember { mutableStateOf(false) }
     var qrData by remember { mutableStateOf<DQrPairData?>(null) }
 
-    // Auto start discovering when entering the page
     LaunchedEffect(Unit) {
         if (!isDiscovering) {
-            nearbyVM.toggleDiscovering()
+            nearbyVM.startDiscovering()
         }
-
-        // Handle incoming pair request from QR scan (navigated from ScanPage)
-        if (pairDeviceJson.isNotEmpty()) {
-            try {
-                val device = JsonHelper.jsonDecode<DQrPairData>(pairDeviceJson).toDNearbyDevice()
-                nearbyVM.startPairingFromDevice(device)
-            } catch (e: Exception) {
-                // ignore parse errors
-            }
-        }
-
     }
 
     // Load QR data when the sheet is about to be shown
     LaunchedEffect(showQrSheet) {
         if (showQrSheet && qrData == null) {
-            withIO {
-                qrData = nearbyVM.getQrDataAsync()
-            }
+            qrData = nearbyVM.getQrDataAsync()
         }
     }
 
@@ -71,7 +71,7 @@ fun NearbyPage(
     DisposableEffect(Unit) {
         onDispose {
             if (isDiscovering) {
-                nearbyVM.toggleDiscovering()
+                nearbyVM.stopDiscovering()
             }
         }
     }
@@ -119,3 +119,77 @@ fun NearbyPage(
     }
 }
 
+internal fun LazyListScope.nearbySearchingItem() {
+    item {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                HorizontalSpace(8.dp)
+                Text(
+                    text = stringResource(Res.string.searching_nearby_devices),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
+internal fun LazyListScope.nearbyDeviceListItems(
+    nearbyDevices: List<DNearbyDevice>,
+    nearbyVM: NearbyViewModel,
+) {
+    if (nearbyDevices.isNotEmpty()) {
+        item {
+            VerticalSpace(16.dp)
+            Subtitle(stringResource(Res.string.nearby_devices))
+        }
+        nearbyDevices.forEach { item ->
+            item {
+                val isPaired = nearbyVM.isPaired(item.id)
+                val isPairing = nearbyVM.isPairing(item.id)
+                NearbyDeviceItem(
+                    item = item,
+                    isPaired = isPaired,
+                    isPairing = isPairing,
+                    onPairClick = { nearbyVM.startPairing(item) },
+                    onUnpairClick = { nearbyVM.unpairDevice(item.id) },
+                    onCancelClick = { nearbyVM.cancelPairing(item.id) }
+                )
+                VerticalSpace(8.dp)
+            }
+        }
+    } else {
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(Res.string.make_sure_devices_same_network),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
+                }
+            }
+        }
+    }
+}

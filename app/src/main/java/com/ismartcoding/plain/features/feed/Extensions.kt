@@ -4,6 +4,7 @@ import android.os.Environment
 import androidx.core.text.HtmlCompat
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isOk
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.html2md.MDConverter
 import com.ismartcoding.lib.logcat.LogCat
@@ -61,7 +62,7 @@ fun RssItem.toDFeedEntry(
     return item
 }
 
-suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
+suspend fun DFeedEntry.fetchContentAsync(): ApiResult = withIO {
     try {
         val httpClient = HttpClientManager.browserClient()
         val response = httpClient.get(url)
@@ -112,14 +113,14 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                         content = description
                     }
                     updatedAt = TimeHelper.now()
-                    FeedEntryHelper.updateAsync(this)
+                    FeedEntryHelper.updateAsync(this@fetchContentAsync)
                 }
             }
         }
 
-        return ApiResult(response)
+        return@withIO ApiResult(response)
     } catch (ex: Throwable) {
         ex.printStackTrace()
-        return ApiResult(null, ex)
+        return@withIO ApiResult(null, ex)
     }
 }

@@ -39,8 +39,6 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.models.addChannelMember
-import com.ismartcoding.plain.ui.models.removeChannelMember
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
@@ -58,21 +56,11 @@ fun ChatListPage(
     val pairedPeers = peerVM.pairedPeers
     val unpairedPeers = peerVM.unpairedPeers
     val webEnabled = LocalWeb.current
-    val showOnlineStatus = webEnabled && mainVM.httpServerState == HttpServerState.ON
-    val isDiscoverable = remember {
-        context.dataStore.dataFlow.map {
-            NearbyDiscoverablePreference.get(it)
-        }
-    }
-        .collectAsStateValue(initial = NearbyDiscoverablePreference.default)
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("chat_list_pull_refresh")
         peerVM.loadPeers()
         setRefreshState(RefreshContentState.Finished)
     }
-    var showCreateChannelDialog by channelVM.showCreateChannelDialog
-    var renameChannelId by remember { mutableStateOf<String?>(null) }
-    var renameChannelName by remember { mutableStateOf("") }
     val channels = channelVM.channels.collectAsStateValue()
 
     PScaffold(
@@ -136,7 +124,7 @@ fun ChatListPage(
                             title = peer.name,
                             desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
                             icon = DeviceType.fromValue(peer.deviceType).getIcon(),
-                            online = if (showOnlineStatus) peerVM.getPeerOnlineStatus(peer.id) else null,
+                            online = peerVM.getPeerOnlineStatus(peer.id),
                             latestChat = peerVM.getLatestChat(peer.id),
                             peerId = peer.id,
                             onDelete = { peerVM.removePeer(context, it) },
@@ -149,14 +137,10 @@ fun ChatListPage(
             }
         }
 
-        if (showCreateChannelDialog) {
-            CreateChannelDialog(onDismiss = { showCreateChannelDialog = false }, onConfirm = { showCreateChannelDialog = false; channelVM.createChannel(it) })
-        }
-        if (renameChannelId != null) {
-            RenameChannelDialog(
-                currentName = renameChannelName,
-                onDismiss = { renameChannelId = null },
-                onConfirm = { val id = renameChannelId!!; renameChannelId = null; channelVM.renameChannel(id, it) })
-        }
+        CreateChannelDialog(
+            channelVM.showCreateChannelDialog,
+            onConfirm = {
+                channelVM.createChannel(it)
+            })
     }
 }

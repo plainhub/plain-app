@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
 import com.ismartcoding.lib.helpers.PortHelper
@@ -117,7 +118,7 @@ object HttpServerManager {
         return "http://$ip:${TempData.httpPort.value}\nhttps://$ip:${TempData.httpsPort.value}"
     }
 
-    suspend fun stopServiceAsync(context: Context) {
+    suspend fun stopServiceAsync(context: Context) = withIO {
         sendEvent(HttpServerStateChangedEvent(HttpServerState.STOPPING))
         try {
             val client = HttpClientManager.httpClient()
@@ -147,7 +148,7 @@ object HttpServerManager {
      * Wait for ports to become available after stopping a previous server.
      * Returns true if both ports are free within the timeout.
      */
-    suspend fun waitForPortsAvailable(httpPort: Int, httpsPort: Int, maxWaitMs: Long = 3000): Boolean {
+    suspend fun waitForPortsAvailable(httpPort: Int, httpsPort: Int, maxWaitMs: Long = 3000): Boolean = withIO {
         val interval = 200L
         var elapsed = 0L
         while (elapsed < maxWaitMs) {
@@ -155,13 +156,13 @@ object HttpServerManager {
             val httpsFree = !PortHelper.isPortInUse(httpsPort)
             if (httpFree && httpsFree) {
                 LogCat.d("Ports $httpPort and $httpsPort are free after ${elapsed}ms")
-                return true
+                return@withIO true
             }
             delay(interval)
             elapsed += interval
         }
         LogCat.e("Ports still in use after ${maxWaitMs}ms - http:${PortHelper.isPortInUse(httpPort)}, https:${PortHelper.isPortInUse(httpsPort)}")
-        return false
+        false
     }
 
     fun warmUp() {
@@ -175,8 +176,8 @@ object HttpServerManager {
         }
     }
 
-    suspend fun checkServerAsync(): Boolean {
-        return withTimeoutOrNull(9000) {
+    suspend fun checkServerAsync(): Boolean = withIO {
+        withTimeoutOrNull(9000) {
             val client = HttpClientManager.httpClient()
             val deadline = System.currentTimeMillis() + 8500L
             var healthy = false
@@ -197,14 +198,15 @@ object HttpServerManager {
     }
 
     private suspend fun passwordToToken(): ByteArray {
-        return hashToToken(CryptoHelper.sha512(PasswordPreference.getAsync().toByteArray()))
+        val password = PasswordPreference.getAsync()
+        return withIO { hashToToken(CryptoHelper.sha512(password.toByteArray())) }
     }
 
     fun hashToToken(hash: String): ByteArray {
         return hash.substring(0, 32).toByteArray()
     }
 
-    suspend fun loadTokenCache() {
+    suspend fun loadTokenCache() = withIO {
         tokenCache.clear()
         SessionList.getItemsAsync().forEach {
             if (it.token.isNotEmpty()) {
@@ -265,30 +267,32 @@ object HttpServerManager {
 
     suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         val password = KeyStorePasswordPreference.getAsync()
-        val passwordArray = password.toCharArray()
-        val httpPort = TempData.httpPort.value
-        val httpsPort = TempData.httpsPort.value
-        val environment = applicationEnvironment {
-            log = LoggerFactory.getLogger("ktor.application")
+        return withIO {
+            val passwordArray = password.toCharArray()
+            val httpPort = TempData.httpPort.value
+            val httpsPort = TempData.httpsPort.value
+            val environment = applicationEnvironment {
+                log = LoggerFactory.getLogger("ktor.application")
+            }
+
+            embeddedServer(Netty, environment, configure = {
+                runningLimit = 1000
+                tcpKeepAlive = true
+                enableHttp2 = false
+
+                connector {
+                    port = httpPort
+                }
+                sslConnector(
+                    keyStore = getSSLKeyStore(context, password),
+                    keyAlias = SSL_KEY_ALIAS,
+                    keyStorePassword = { passwordArray },
+                    privateKeyPassword = { passwordArray },
+                ) {
+                    port = httpsPort
+                }
+            }, HttpModule.module)
         }
-
-        return embeddedServer(Netty, environment, configure = {
-            runningLimit = 1000
-            tcpKeepAlive = true
-            enableHttp2 = false
-
-            connector {
-                port = httpPort
-            }
-            sslConnector(
-                keyStore = getSSLKeyStore(context, password),
-                keyAlias = SSL_KEY_ALIAS,
-                keyStorePassword = { passwordArray },
-                privateKeyPassword = { passwordArray },
-            ) {
-                port = httpsPort
-            }
-        }, HttpModule.module)
     }
 
     fun getSSLSignature(context: Context, password: String): ByteArray {
@@ -329,7 +333,7 @@ object HttpServerManager {
     suspend fun respondTokenAsync(
         event: ConfirmToAcceptLoginEvent,
         clientIp: String,
-    ) {
+    ) = withIO {
         val token = CryptoHelper.generateChaCha20Key()
         val r = event.request
         SessionList.addOrUpdateAsync(event.clientId) {

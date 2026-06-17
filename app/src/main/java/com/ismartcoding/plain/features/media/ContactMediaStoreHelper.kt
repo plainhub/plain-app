@@ -16,6 +16,7 @@ import com.ismartcoding.lib.extensions.getSearchCursor
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DContact
@@ -72,8 +73,8 @@ object ContactMediaStoreHelper {
         return where
     }
 
-    suspend fun countAsync(context: Context, query: String): Int {
-        return context.contentResolver.count(uriExternal, buildWhereAsync(query))
+    suspend fun countAsync(context: Context, query: String): Int = withIO {
+        context.contentResolver.count(uriExternal, buildWhereAsync(query))
     }
 
     fun deleteByIdsAsync(
@@ -94,9 +95,9 @@ object ContactMediaStoreHelper {
         return searchAsync(context, "id=$id", 1, 0).firstOrNull()
     }
 
-    suspend fun getIdsAsync(context: Context, query: String): Set<String> {
+    suspend fun getIdsAsync(context: Context, query: String): Set<String> = withIO {
         val where = buildWhereAsync(query)
-        return context.contentResolver.getSearchCursor(uriExternal, arrayOf(ContactsContract.Data.RAW_CONTACT_ID), where)?.map { cursor, cache ->
+        context.contentResolver.getSearchCursor(uriExternal, arrayOf(ContactsContract.Data.RAW_CONTACT_ID), where)?.map { cursor, cache ->
             cursor.getStringValue(ContactsContract.Data.RAW_CONTACT_ID, cache)
         }?.toSet() ?: emptySet()
     }
@@ -257,9 +258,9 @@ object ContactMediaStoreHelper {
         query: String,
         limit: Int,
         offset: Int,
-    ): List<DContact> {
+    ): List<DContact> = withIO {
         val contentMap = ContentHelper.getMap(context)
-        return context.contentResolver.getPagingCursor(
+        context.contentResolver.getPagingCursor(
             uriExternal, getProjection(), buildWhereAsync(query), limit, offset,
             SortBy(ContactsContract.Data.DISPLAY_NAME_PRIMARY, SortDirection.ASC)
         )?.map { cursor, cache ->

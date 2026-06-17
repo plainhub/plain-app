@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
@@ -69,7 +68,6 @@ import com.ismartcoding.plain.ui.page.files.components.FilePasteBar
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -83,7 +81,7 @@ fun FilesPage(
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
     val topRefreshLayoutState = rememberRefreshLayoutState {
-        scope.launch { withIO { filesVM.loadAsync(context) }; setRefreshState(RefreshContentState.Finished) }
+        scope.launch { filesVM.loadAsync(context); setRefreshState(RefreshContentState.Finished) }
     }
 
     FilesPageEffects(filesVM, context, scope, folderPath, previewerState, audioPlaylistVM)
@@ -122,9 +120,7 @@ fun FilesPage(
                     ActionButtonMoreWithMenu { dismiss ->
                         var showHiddenFiles by remember { mutableStateOf(false) }
                         LaunchedEffect(Unit) {
-                            showHiddenFiles = withContext(Dispatchers.IO) {
-                                ShowHiddenFilesPreference.getAsync()
-                            }
+                            showHiddenFiles = ShowHiddenFilesPreference.getAsync()
                         }
                         PDropdownMenuItem(
                             text = { Text(stringResource(Res.string.show_hidden_files)) },

@@ -63,7 +63,7 @@ class TextFileViewModel : ViewModel() {
 
     fun toggleWrapContent(context: Context) {
         wrapContent.value = !wrapContent.value
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             EditorWrapContentPreference.putAsync(wrapContent.value)
         }
         webView.value?.evaluateJavascript("editor.session.setUseWrapMode(${wrapContent.value.toJsValue()})") {}

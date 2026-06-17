@@ -1,17 +1,20 @@
 package com.ismartcoding.plain.ui.models
 
 import android.content.Context
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.features.dlna.common.DlnaDevice
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.features.dlna.sender.DlnaDeviceScanner
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -22,16 +25,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 class CastViewModel : ViewModel() {
-    private val _itemsFlow = MutableStateFlow(mutableStateListOf<DlnaDevice>())
-    val itemsFlow: StateFlow<List<DlnaDevice>> get() = _itemsFlow
+    private val _itemsFlow = MutableStateFlow<List<DlnaDevice>>(emptyList())
+    val itemsFlow: StateFlow<List<DlnaDevice>> = _itemsFlow
     var castMode = mutableStateOf(false)
     var showCastDialog = mutableStateOf(false)
     val isLoading = mutableStateOf(false)
-    
+
     internal var positionUpdateJob: Job? = null
 
     fun enterCastMode() {
@@ -46,10 +51,10 @@ class CastViewModel : ViewModel() {
     fun exitCastMode() {
         castMode.value = false
         val device = CastPlayer.currentDevice ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DlnaTransportController.stopAVTransportAsync(device)
             CastPlayer.isPlaying.value = false
-            
+
             // 清理投屏状态
             if (CastPlayer.sid.isNotEmpty()) {
                 DlnaTransportController.unsubscribeEvent(device, CastPlayer.sid)
@@ -58,7 +63,7 @@ class CastViewModel : ViewModel() {
             CastPlayer.supportsCallback.value = false
             CastPlayer.progress.value = 0f
             CastPlayer.duration.value = 0f
-            
+
             // 取消位置更新作业
             positionUpdateJob?.cancel()
             positionUpdateJob = null
@@ -91,13 +96,13 @@ class CastViewModel : ViewModel() {
 
     private fun addDevice(device: DlnaDevice) {
         if (!_itemsFlow.value.any { it.hostAddress == device.hostAddress }) {
-            _itemsFlow.value.add(device)
+            _itemsFlow.update { it + device }
         }
     }
 
     fun playCast() {
         val device = CastPlayer.currentDevice ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DlnaTransportController.playAVTransportAsync(device)
             CastPlayer.isPlaying.value = true
         }
@@ -105,9 +110,99 @@ class CastViewModel : ViewModel() {
 
     fun pauseCast() {
         val device = CastPlayer.currentDevice ?: return
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DlnaTransportController.pauseAVTransportAsync(device)
             CastPlayer.isPlaying.value = false
         }
     }
+
+    fun castPath(path: String) {
+        val device = CastPlayer.currentDevice ?: return
+        launchIO {
+            isLoading.value = true
+            CastPlayer.setCurrentUri(path)
+            try {
+                val title = path.getFilenameWithoutExtensionFromPath()
+                DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(path), title)
+                DlnaTransportController.playAVTransportAsync(device)
+                CastPlayer.isPlaying.value = true
+                if (CastPlayer.sid.isNotEmpty()) {
+                    DlnaTransportController.unsubscribeEvent(device, CastPlayer.sid)
+                    CastPlayer.sid = ""
+                }
+                trySubscribeEvent()
+            } catch (e: Exception) {
+                DialogHelper.showErrorMessage(e.message ?: "Cast failed")
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+    fun castItem(item: IMedia) {
+        val device = CastPlayer.currentDevice ?: return
+        launchIO {
+            CastPlayer.setCurrentUri(item.path)
+            isLoading.value = true
+            val castItems = CastPlayer.items.value
+            val isInQueue = castItems.any { it.path == item.path }
+            if (!isInQueue) {
+                CastPlayer.addItem(item)
+            }
+            try {
+                val mediaUrl = UrlHelper.getMediaHttpUrl(item.path)
+                val albumArtUri = if (item is DAudio) UrlHelper.getAlbumArtHttpUrl(item.getAlbumUri()).toString() else ""
+                DlnaTransportController.setAVTransportURIAsync(device, mediaUrl, item.title, albumArtUri)
+                DlnaTransportController.playAVTransportAsync(device)
+                CastPlayer.isPlaying.value = true
+                if (CastPlayer.sid.isNotEmpty()) {
+                    DlnaTransportController.unsubscribeEvent(device, CastPlayer.sid)
+                    CastPlayer.sid = ""
+                }
+                trySubscribeEvent()
+            } catch (e: Exception) {
+                DialogHelper.showErrorMessage(e.message ?: "Cast failed")
+            } finally {
+                isLoading.value = false
+            }
+        }
+    }
+
+    suspend fun trySubscribeEvent() = withIO {
+        val device = CastPlayer.currentDevice ?: return@withIO
+        try {
+            val sid = DlnaTransportController.subscribeEvent(device, UrlHelper.getCastCallbackUrl())
+            if (sid.isNotEmpty()) {
+                CastPlayer.sid = sid
+                CastPlayer.supportsCallback.value = true
+                startPositionUpdater()
+            } else {
+                CastPlayer.supportsCallback.value = false
+            }
+        } catch (e: Exception) {
+            CastPlayer.supportsCallback.value = false
+        }
+    }
+
+    fun startPositionUpdater() {
+        val device = CastPlayer.currentDevice ?: return
+        if (!CastPlayer.supportsCallback.value) return
+
+        positionUpdateJob?.cancel()
+
+        positionUpdateJob = launchIO {
+            while (CastPlayer.currentUri.value.isNotEmpty() && CastPlayer.supportsCallback.value) {
+                try {
+                    if (CastPlayer.isPlaying.value) {
+                        val positionInfo = DlnaTransportController.getPositionInfoAsync(device)
+                        CastPlayer.updatePositionInfo(positionInfo.relTime, positionInfo.trackDuration)
+                    }
+                } catch (e: Exception) {
+                    break
+                }
+                delay(1000)
+            }
+        }
+    }
+
 }

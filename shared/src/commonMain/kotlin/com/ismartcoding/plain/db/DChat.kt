@@ -226,13 +226,13 @@ data class ChatItemStatusUpdate(
 @Dao
 interface ChatDao {
     @Query("SELECT * FROM chats")
-    fun getAll(): List<DChat>
+    suspend fun getAll(): List<DChat>
 
     @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at ASC")
-    fun getByPeerId(toId: String): List<DChat>
+    suspend fun getByPeerId(toId: String): List<DChat>
 
     @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at ASC")
-    fun getByChannelId(channelId: String): List<DChat>
+    suspend fun getByChannelId(channelId: String): List<DChat>
 
     @Query(
         """
@@ -255,38 +255,38 @@ interface ChatDao {
         ORDER BY c.created_at DESC
     """
     )
-    fun getAllLatestChats(): List<DChat>
+    suspend fun getAllLatestChats(): List<DChat>
 
     @Insert
-    fun insert(vararg item: DChat)
+    suspend fun insert(vararg item: DChat)
 
     @Query("SELECT * FROM chats WHERE id=:id")
-    fun getById(id: String): DChat?
+    suspend fun getById(id: String): DChat?
 
     @Update
-    fun update(vararg item: DChat)
+    suspend fun update(vararg item: DChat)
 
     @Query("UPDATE chats SET status = :status WHERE id = :id")
-    fun updateStatus(id: String, status: String)
+    suspend fun updateStatus(id: String, status: String)
 
     @Query("UPDATE chats SET status = :status, status_data = :statusData WHERE id = :id")
-    fun updateStatusAndData(id: String, status: String, statusData: String)
+    suspend fun updateStatusAndData(id: String, status: String, statusData: String)
 
     @Update(entity = DChat::class)
-    fun updateStatusData(item: ChatItemStatusUpdate)
+    suspend fun updateStatusData(item: ChatItemStatusUpdate)
 
     @Update(entity = DChat::class)
-    fun updateData(item: ChatItemDataUpdate)
+    suspend fun updateData(item: ChatItemDataUpdate)
 
     @Query("DELETE FROM chats WHERE id = :id")
-    fun delete(id: String)
+    suspend fun delete(id: String)
 
     @Query("DELETE FROM chats WHERE id in (:ids)")
-    fun deleteByIds(ids: List<String>)
+    suspend fun deleteByIds(ids: List<String>)
 
     @Query("DELETE FROM chats WHERE channel_id = '' AND (to_id = :peerId OR from_id = :peerId)")
-    fun deleteByPeerId(peerId: String)
+    suspend fun deleteByPeerId(peerId: String)
 
     @Query("DELETE FROM chats WHERE channel_id = :channelId")
-    fun deleteByChannelId(channelId: String)
+    suspend fun deleteByChannelId(channelId: String)
 }

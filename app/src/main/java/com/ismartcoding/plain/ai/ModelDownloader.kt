@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ai
 
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import java.io.File
 import java.io.FileOutputStream
@@ -28,7 +29,7 @@ object ModelDownloader {
         destDir: File,
         onProgress: (Int) -> Unit,
         onError: (Exception) -> Unit,
-    ): Boolean {
+    ): Boolean = withIO {
         cancelled = false
         destDir.mkdirs()
         val totalSize = files.sumOf { it.size }
@@ -37,22 +38,22 @@ object ModelDownloader {
             for (f in files) {
                 if (cancelled) {
                     destDir.deleteRecursively()
-                    return false
+                    return@withIO false
                 }
                 downloaded = downloadFile(f.url, File(destDir, f.filename), downloaded, totalSize, onProgress)
             }
             if (cancelled) {
                 destDir.deleteRecursively()
-                return false
+                return@withIO false
             }
             onProgress(100)
-            return true
+            return@withIO true
         } catch (e: Exception) {
             destDir.deleteRecursively()
-            if (cancelled) return false
+            if (cancelled) return@withIO false
             LogCat.e("Model download failed", e)
             onError(e)
-            return false
+            return@withIO false
         }
     }
 

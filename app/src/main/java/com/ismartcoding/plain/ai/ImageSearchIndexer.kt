@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ai
 
 import android.graphics.Bitmap
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
@@ -14,7 +15,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -30,8 +30,8 @@ object ImageSearchIndexer {
     var indexedImages = 0; private set
 
     /** Index specific images incrementally (single worker, no progress UI). */
-    suspend fun indexImages(images: List<com.ismartcoding.plain.data.DImage>) = withContext(Dispatchers.IO) {
-        if (images.isEmpty()) return@withContext
+    suspend fun indexImages(images: List<com.ismartcoding.plain.data.DImage>) = withIO {
+        if (images.isEmpty()) return@withIO
         val dao = AppDatabase.instance.imageEmbeddingDao()
         val modelFile = File(ImageSearchManager.getModelDir(), "mobileclip_s2_image.tflite")
         val worker = ImageEmbedWorker(modelFile)
@@ -53,14 +53,14 @@ object ImageSearchIndexer {
     }
 
     /** Full scan with progress tracking (parallel workers). */
-    suspend fun start(forceReindex: Boolean = false) = withContext(Dispatchers.IO) {
-        if (isRunning) return@withContext
-        if (ImageSearchManager.status.value != ImageSearchStatus.READY) return@withContext
+    suspend fun start(forceReindex: Boolean = false) = withIO {
+        if (isRunning) return@withIO
+        if (ImageSearchManager.status.value != ImageSearchStatus.READY) return@withIO
         isRunning = true
         cancelled = false
         try {
             val context = MainApp.instance
-            if (!Permission.WRITE_EXTERNAL_STORAGE.can(context)) return@withContext
+            if (!Permission.WRITE_EXTERNAL_STORAGE.can(context)) return@withIO
             val allImages = ImageMediaStoreHelper.searchAsync(
                 context, "", Int.MAX_VALUE, 0, FileSortBy.DATE_DESC,
             )

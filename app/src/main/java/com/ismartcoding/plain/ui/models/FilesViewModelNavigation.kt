@@ -1,19 +1,12 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.extensions.getParentPath
-import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.data.FilePathData
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.preferences.LastFilePathPreference
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 
 internal fun FilesViewModel.navigateToDirectoryInternal(context: Context, newPath: String) {
@@ -21,7 +14,7 @@ internal fun FilesViewModel.navigateToDirectoryInternal(context: Context, newPat
         navigationHistoryInternal.add(selectedPath)
         selectedPath = newPath
         rebuildBreadcrumbsInternal(newPath)
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             isLoading.value = true
             updateItemsInternal(emptyList())
             loadAsync(context)
@@ -39,12 +32,14 @@ internal fun FilesViewModel.navigateBackInternal(): Boolean {
 
 internal suspend fun FilesViewModel.loadLastPathAsyncInternal(context: Context) {
     val data = LastFilePathPreference.getValueAsync()
-    if (data.selectedPath.isNotEmpty() && File(data.selectedPath).exists()) {
-        type = inferFileTypeFromRootInternal(context, data.rootPath)
-        initSelectedPathInternal(data.rootPath, type, data.fullPath, data.selectedPath)
-    } else {
-        type = inferFileTypeFromRootInternal(context, rootPath)
-        updateRootBreadcrumb()
+    withIO {
+        if (data.selectedPath.isNotEmpty() && File(data.selectedPath).exists()) {
+            type = inferFileTypeFromRootInternal(context, data.rootPath)
+            initSelectedPathInternal(data.rootPath, type, data.fullPath, data.selectedPath)
+        } else {
+            type = inferFileTypeFromRootInternal(context, rootPath)
+            updateRootBreadcrumb()
+        }
     }
 }
 
@@ -123,16 +118,3 @@ internal fun FilesViewModel.initSelectedPathInternal(rootPath: String, type: Fil
     navigationHistoryInternal.clear()
 }
 
-internal fun FilesViewModel.getAndUpdateSelectedIndexInternal(): Int {
-    var index = breadcrumbs.indexOfFirst { it.path == selectedPath }
-    if (index == -1) {
-        val parent = selectedPath.getParentPath()
-        breadcrumbs.reversed().forEach { b ->
-            if (b.path != parent && !("$parent/").startsWith(b.path + "/")) breadcrumbs.remove(b)
-        }
-        breadcrumbs.add(BreadcrumbItem(selectedPath.getFilenameFromPath(), selectedPath))
-        index = breadcrumbs.size - 1
-    }
-    selectedBreadcrumbIndex.value = index
-    return index
-}

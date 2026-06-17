@@ -52,46 +52,46 @@ data class DFeedEntry(
 @Dao
 interface FeedEntryDao {
     @Query("SELECT * FROM feed_entries")
-    fun getAll(): List<DFeedEntry>
+    suspend fun getAll(): List<DFeedEntry>
 
     @RawQuery
-    fun getIds(query: RoomRawQuery): List<IDData>
+    suspend fun getIds(query: RoomRawQuery): List<IDData>
 
     @RawQuery
-    fun search(query: RoomRawQuery): List<DFeedEntry>
+    suspend fun search(query: RoomRawQuery): List<DFeedEntry>
 
     @RawQuery
-    fun count(query: RoomRawQuery): Int
+    suspend fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM feed_entries WHERE id=:id")
-    fun getById(id: String): DFeedEntry?
+    suspend fun getById(id: String): DFeedEntry?
 
     @Insert
-    fun insert(vararg item: DFeedEntry)
+    suspend fun insert(vararg item: DFeedEntry)
 
     @Update
-    fun update(vararg item: DFeedEntry)
+    suspend fun update(vararg item: DFeedEntry)
 
     @Query("DELETE FROM feed_entries")
-    fun deleteAll()
+    suspend fun deleteAll()
 
     @Query("DELETE FROM feed_entries WHERE id in (:ids)")
-    fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>)
 
     @Query("DELETE FROM feed_entries WHERE feed_id in (:ids)")
-    fun deleteByFeedIds(ids: Set<String>)
+    suspend fun deleteByFeedIds(ids: Set<String>)
 
     @Query("SELECT * from feed_entries WHERE url=:url AND feed_id=:feedId")
-    fun getByUrl(url: String, feedId: String): DFeedEntry?
+    suspend fun getByUrl(url: String, feedId: String): DFeedEntry?
 
     @Query("SELECT id from feed_entries WHERE feed_id in (:ids)")
-    fun getIds(ids: Set<String>): List<String>
+    suspend fun getIds(ids: Set<String>): List<String>
 
     @Insert
-    fun insertList(entries: List<DFeedEntry>): List<Long>
+    suspend fun insertList(entries: List<DFeedEntry>): List<Long>
 
     @Transaction
-    fun insertListIfNotExist(entries: List<DFeedEntry>): List<DFeedEntry> {
+    suspend fun insertListIfNotExist(entries: List<DFeedEntry>): List<DFeedEntry> {
         return entries.mapNotNull {
             if (getByUrl(url = it.url, feedId = it.feedId) == null) it else null
         }.also {

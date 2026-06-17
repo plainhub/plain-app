@@ -17,7 +17,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -46,13 +45,13 @@ fun AppFilesPage(
 
     val refreshState = rememberRefreshLayoutState {
         scope.launch {
-            withIO { appFilesVM.loadAsync() }
+            appFilesVM.loadAsync()
             setRefreshState(RefreshContentState.Finished)
         }
     }
 
     LaunchedEffect(Unit) {
-        withIO { appFilesVM.loadAsync() }
+        appFilesVM.loadAsync()
     }
 
     PScaffold(
@@ -85,12 +84,12 @@ fun AppFilesPage(
                         previewerState = previewerState,
                         onRefresh = {
                             scope.launch {
-                                withIO { appFilesVM.loadAsync() }
+                                appFilesVM.loadAsync()
                             }
                         },
                         onLoadMore = {
                             scope.launch {
-                                withIO { appFilesVM.moreAsync() }
+                                appFilesVM.moreAsync()
                             }
                         },
                     )

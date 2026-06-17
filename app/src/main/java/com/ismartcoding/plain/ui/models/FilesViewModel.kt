@@ -6,7 +6,6 @@ import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.extensions.scanFileByConnection
@@ -43,7 +42,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
             val isChanged = _selectedPath != value
             _selectedPath = value
             if (isChanged) {
-                viewModelScope.launch(Dispatchers.IO) {
+                launchIO {
                     val breadcrumbsCopy = breadcrumbs.toList()
                     val fullPath = if (breadcrumbsCopy.isNotEmpty()) breadcrumbsCopy.last().path else value
                     LastFilePathPreference.putAsync(FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value))
@@ -85,7 +84,9 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     fun navigateToDirectory(context: Context, newPath: String) = navigateToDirectoryInternal(context, newPath)
     fun navigateBack(): Boolean = navigateBackInternal()
-    suspend fun loadLastPathAsync(context: Context) = loadLastPathAsyncInternal(context)
+    suspend fun loadLastPathAsync(context: Context) = withIO {
+        loadLastPathAsyncInternal(context)
+    }
     fun canNavigateBack(): Boolean = navigationHistoryInternal.isNotEmpty()
     fun initSelectedPath(rootPath: String, type: FilesType, fullPath: String, selectedPath: String) = initSelectedPathInternal(rootPath, type, fullPath, selectedPath)
 
@@ -101,17 +102,19 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     fun getQuery(): String = queryText.value.trim()
 
     suspend fun loadAsync(context: Context) {
-        isLoading.value = true
         val showHiddenFiles = ShowHiddenFilesPreference.getAsync()
-        val query = getQuery()
-        val files = when {
-            ZipBrowserHelper.isZipPath(selectedPath) -> ZipBrowserHelper.listEntries(selectedPath, sortBy.value)
-            showSearchBar.value && query.isNotEmpty() -> FileSystemHelper.search(query, selectedPath, showHiddenFiles)
-            type == FilesType.RECENTS -> FileMediaStoreHelper.getRecentFilesAsync(context)
-            else -> FileSystemHelper.getFilesList(selectedPath, showHiddenFiles, sortBy.value)
+        withIO {
+            isLoading.value = true
+            val query = getQuery()
+            val files = when {
+                ZipBrowserHelper.isZipPath(selectedPath) -> ZipBrowserHelper.listEntries(selectedPath, sortBy.value)
+                showSearchBar.value && query.isNotEmpty() -> FileSystemHelper.search(query, selectedPath, showHiddenFiles)
+                type == FilesType.RECENTS -> FileMediaStoreHelper.getRecentFilesAsync(context)
+                else -> FileSystemHelper.getFilesList(selectedPath, showHiddenFiles, sortBy.value)
+            }
+            _itemsFlow.value = files
+            isLoading.value = false
         }
-        _itemsFlow.value = files
-        isLoading.value = false
     }
 
     fun deleteFiles(paths: Set<String>) {
@@ -123,7 +126,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
                 MainApp.instance.scanFileByConnection(paths.toTypedArray())
             }
             DialogHelper.hideLoading()
-            _itemsFlow.update { it.toMutableStateList().apply { removeIf { i -> paths.contains(i.path) } } }
+            _itemsFlow.update { it.filterNot { i -> paths.contains(i.path) } }
         }
     }
 }

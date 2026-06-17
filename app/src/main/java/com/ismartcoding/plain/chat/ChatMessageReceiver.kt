@@ -2,6 +2,7 @@ package com.ismartcoding.plain.chat
 
 import android.annotation.SuppressLint
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.chat.data.ChatTarget
@@ -67,7 +68,7 @@ object ChatMessageReceiver {
         fromChannelId: String = "",
         signature: String = "",
         timestamp: Long = 0L,
-    ): DChat {
+    ): DChat = withIO {
         if (signature.isNotEmpty() && timestamp > 0L) {
             val key = "$fromPeerId|$signature|$timestamp"
             if (!seenSignatures.add(key)) {
@@ -135,7 +136,7 @@ object ChatMessageReceiver {
         )
 
         emitNotificationIfNeeded(item, fromPeer, fromChannel)
-        return item
+        item
     }
 
     @SuppressLint("MissingPermission")

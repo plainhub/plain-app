@@ -4,21 +4,21 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 @OptIn(SavedStateHandleSaveableApi::class)
 class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ISearchableViewModel<VPackage>, ViewModel() {
-    private val _itemsFlow = MutableStateFlow(mutableStateListOf<VPackage>())
-    val itemsFlow: StateFlow<List<VPackage>> get() = _itemsFlow
+    private val _itemsFlow = MutableStateFlow<List<VPackage>>(emptyList())
+    val itemsFlow: StateFlow<List<VPackage>> = _itemsFlow
     var showLoading = mutableStateOf(true)
     var offset = mutableIntStateOf(0)
     var limit = mutableIntStateOf(50)
@@ -34,17 +34,17 @@ class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ISearchabl
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")
 
-    suspend fun moreAsync() {
+    suspend fun moreAsync() = withIO {
         offset.value += limit.intValue
         val items = PackageHelper.searchAsync(getQuery(), limit.intValue, offset.intValue, sortBy.value).map { VPackage.from(it) }
-        _itemsFlow.value.addAll(items)
+        _itemsFlow.update { it + items }
         showLoading.value = false
         noMore.value = items.size < limit.intValue
     }
 
-    suspend fun loadAsync() {
+    suspend fun loadAsync() = withIO {
         offset.intValue = 0
-        _itemsFlow.value = PackageHelper.searchAsync(getQuery(), limit.intValue, 0, sortBy.value).map { VPackage.from(it) }.toMutableStateList()
+        _itemsFlow.value = PackageHelper.searchAsync(getQuery(), limit.intValue, 0, sortBy.value).map { VPackage.from(it) }
         total.intValue = PackageHelper.count(queryText.value)
         totalSystem.intValue = PackageHelper.count("${queryText.value} type:system")
         noMore.value = _itemsFlow.value.size < limit.intValue

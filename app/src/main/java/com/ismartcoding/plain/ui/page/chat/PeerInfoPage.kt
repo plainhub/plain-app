@@ -28,26 +28,22 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
-import com.ismartcoding.plain.ui.models.clearAllMessages
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PeerChatInfoPage(
+fun PeerInfoPage(
     navController: NavHostController,
     chatVM: ChatViewModel,
     peerVM: PeerViewModel,
 ) {
     val context = LocalContext.current
-    val chatState = chatVM.chatState.collectAsState()
-    val peer = ChatCacheManager.peerMap[chatState.value.target.toId]
+    val chatTarget = chatVM.target.collectAsState()
+    val peer = ChatCacheManager.peerMap[chatTarget.value.toId]
 
     PScaffold(
         topBar = {
             PTopAppBar(
                 navController = navController,
-                navigationIcon = {
-                    NavigationBackIcon { navController.navigateUp() }
-                },
                 title = stringResource(Res.string.peer_info),
             )
         },

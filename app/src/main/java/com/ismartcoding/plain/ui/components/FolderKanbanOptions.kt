@@ -8,8 +8,7 @@ import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.FolderOption
 import android.content.Context
 import com.ismartcoding.lib.extensions.appDir
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 
 suspend fun buildFolderOptions(
     context: Context,
@@ -19,7 +18,7 @@ suspend fun buildFolderOptions(
     sdcardText: String,
     usbStorageText: String,
     fileTransferAssistantText: String,
-): List<FolderOption> = withContext(Dispatchers.IO) {
+): List<FolderOption> = withIO {
     val internalStoragePath = FileSystemHelper.getInternalStoragePath()
     val externalFilesDirPath = context.appDir()
     val sdCardPath = FileSystemHelper.getSDCardPath(context)

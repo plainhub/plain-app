@@ -4,9 +4,9 @@ import com.ismartcoding.plain.i18n.*
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.DataType
@@ -19,16 +19,16 @@ import com.ismartcoding.plain.ui.helpers.LoadingHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+
 import java.io.File
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class MediaFoldersViewModel : ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<DMediaBucket>>(emptyList())
-    val itemsFlow: StateFlow<List<DMediaBucket>> get() = _itemsFlow
+    val itemsFlow = _itemsFlow.asStateFlow()
     val totalBucket = mutableStateOf<DMediaBucket?>(null)
 
     val bucketsMapFlow: StateFlow<Map<String, DMediaBucket>> =
@@ -41,7 +41,7 @@ class MediaFoldersViewModel : ViewModel() {
 
     fun loadAsync(context: Context) {
         val startTime = System.currentTimeMillis()
-        _itemsFlow.value = (when (dataType.value) {
+        _itemsFlow.value = when (dataType.value) {
             DataType.IMAGE -> {
                 ImageMediaStoreHelper.getBucketsAsync(context)
             }
@@ -65,7 +65,7 @@ class MediaFoldersViewModel : ViewModel() {
             else -> {
                 emptyList()
             }
-        }).toMutableStateList()
+        }
 
         var totalValue = 0
         var sizeValue = 0L
@@ -120,7 +120,7 @@ class MediaFoldersViewModel : ViewModel() {
      * 异步预验证文件存在性，可以在后台线程中调用
      * 这样可以提前过滤掉不存在的文件，减少UI线程的负担
      */
-    suspend fun preValidateFilesAsync() = withContext(Dispatchers.IO) {
+    suspend fun preValidateFilesAsync() = withIO {
         _itemsFlow.value.forEach { bucket ->
             // 过滤掉不存在的文件
             bucket.topItems.removeAll { !File(it).exists() }

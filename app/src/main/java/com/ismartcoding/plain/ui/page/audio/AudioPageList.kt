@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -79,7 +79,7 @@ internal fun ColumnScope.AudioPageList(
                             item(key = "loadMore") {
                                 if (itemsState.isNotEmpty() && !audioVM.noMore.value) {
                                     LaunchedEffect(Unit) {
-                                        scope.launch(Dispatchers.IO) { withIO { audioVM.moreAsync(context, tagsVM) } }
+                                        scope.launch(Dispatchers.IO) { audioVM.moreAsync(context, tagsVM) }
                                     }
                                 }
                                 LoadMoreRefreshContent(audioVM.noMore.value)

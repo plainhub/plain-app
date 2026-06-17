@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.extensions.timeAgo
@@ -87,7 +86,7 @@ fun FeedEntryPage(navController: NavHostController, id: String, tagsVM: TagsView
     val previewerState = rememberPreviewerState()
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
-            feedEntryVM.item.value?.let { m -> val r = withIO { m.fetchContentAsync() }; if (r.isOk()) { feedEntryVM.content.value = m.content; setRefreshState(RefreshContentState.Finished) } else { setRefreshState(RefreshContentState.Failed); DialogHelper.showErrorDialog(r.errorMessage()) } }
+            feedEntryVM.item.value?.let { m -> val r = m.fetchContentAsync(); if (r.isOk()) { feedEntryVM.content.value = m.content; setRefreshState(RefreshContentState.Finished) } else { setRefreshState(RefreshContentState.Failed); DialogHelper.showErrorDialog(r.errorMessage()) } }
                 .also { if (it == null) setRefreshState(RefreshContentState.Finished) }
         }
     }
@@ -123,7 +122,7 @@ fun FeedEntryPage(navController: NavHostController, id: String, tagsVM: TagsView
                         item {
                             VerticalSpace(dp = 32.dp)
                             if (feedEntryVM.fetchingContent.value) { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) { CircularProgressIndicator(modifier = Modifier.size(32.dp), color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp) } }
-                            else { POutlinedButton(text = stringResource(Res.string.load_full_content), block = true, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), enabled = !feedEntryVM.fetchingContent.value, onClick = { scope.launch { feedEntryVM.item.value?.let { mm -> feedEntryVM.fetchingContent.value = true; val r = withIO { mm.fetchContentAsync() }; feedEntryVM.fetchingContent.value = false; if (r.isOk()) feedEntryVM.content.value = mm.content else DialogHelper.showErrorDialog(r.errorMessage()) } } }) }
+                            else { POutlinedButton(text = stringResource(Res.string.load_full_content), block = true, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), enabled = !feedEntryVM.fetchingContent.value, onClick = { scope.launch { feedEntryVM.item.value?.let { mm -> feedEntryVM.fetchingContent.value = true; val r = mm.fetchContentAsync(); feedEntryVM.fetchingContent.value = false; if (r.isOk()) feedEntryVM.content.value = mm.content else DialogHelper.showErrorDialog(r.errorMessage()) } } }) }
                         }
                     }
                     item { BottomSpace(paddingValues) }

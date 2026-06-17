@@ -1,10 +1,9 @@
 package com.ismartcoding.plain.ui.models
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
@@ -15,15 +14,16 @@ import com.ismartcoding.plain.ui.helpers.LoadingHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class TagsViewModel : ViewModel() {
-    private val _itemsFlow = MutableStateFlow(mutableStateListOf<DTag>())
-    val itemsFlow: StateFlow<List<DTag>> get() = _itemsFlow
+    private val _itemsFlow = MutableStateFlow<List<DTag>>(emptyList())
+    val itemsFlow: StateFlow<List<DTag>> = _itemsFlow
     private val _tagsMapFlow = MutableStateFlow(mutableMapOf<String, List<DTagRelation>>())
-    val tagsMapFlow: StateFlow<Map<String, List<DTagRelation>>> get() = _tagsMapFlow
+    val tagsMapFlow = _tagsMapFlow.asStateFlow()
     var showLoading = mutableStateOf(true)
     var tagNameDialogVisible = mutableStateOf(false)
     var editItem = mutableStateOf<DTag?>(null)
@@ -34,18 +34,18 @@ class TagsViewModel : ViewModel() {
         _tagsMapFlow.value = map.toMutableMap()
     }
 
-    fun loadAsync(keys: Set<String> = emptySet()) {
+    suspend fun loadAsync(keys: Set<String> = emptySet()) = withIO {
         val startTime = System.currentTimeMillis()
         val tagCountMap = TagHelper.count(dataType.value).associate { it.id to it.count }
         _itemsFlow.value = TagHelper.getAll(dataType.value).map { tag ->
             tag.count = tagCountMap[tag.id] ?: 0
             tag
-        }.toMutableStateList()
+        }
         if (keys.isNotEmpty()) {
             _tagsMapFlow.value += TagHelper.getTagRelationsByKeysMap(keys, dataType.value).toMutableMap()
         }
         LoadingHelper.ensureMinimumLoadingTime(
-            viewModel = this,
+            viewModel = this@TagsViewModel,
             startTime = startTime,
             updateLoadingState = { isLoading -> showLoading.value = isLoading }
         )
@@ -53,47 +53,39 @@ class TagsViewModel : ViewModel() {
 
     fun loadMoreAsync(keys: Set<String>) {
         if (keys.isNotEmpty()) {
-            _tagsMapFlow.value += TagHelper.getTagRelationsByKeysMap(keys, dataType.value)
+            launchIO {
+                _tagsMapFlow.value += TagHelper.getTagRelationsByKeysMap(keys, dataType.value)
+            }
         }
     }
 
-    suspend fun addTagAsync(name: String) {
+    suspend fun addTagAsync(name: String) = withIO {
         val id = TagHelper.addOrUpdate("") {
             this.name = name
             type = dataType.value.value
         }
-        _itemsFlow.update {
-            val mutableList = it.toMutableStateList()
-            mutableList.add(DTag(id).apply {
-                this.name = name
-                type = dataType.value.value
-            })
-            mutableList
-        }
+        _itemsFlow.update { it + DTag(id).apply {
+            this.name = name
+            type = dataType.value.value
+        } }
         tagNameDialogVisible.value = false
     }
 
-    suspend fun editTagAsync(name: String) {
+    suspend fun editTagAsync(name: String) = withIO {
         val id = TagHelper.addOrUpdate(editItem.value!!.id) {
             this.name = name
         }
-        _itemsFlow.update {
-            it.toMutableStateList().apply {
-                find { i -> i.id == id }?.name = name
-            }
+        _itemsFlow.update { list ->
+            list.map { if (it.id == id) it.apply { this.name = name } else it }
         }
         tagNameDialogVisible.value = false
     }
 
     fun deleteTag(id: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             TagHelper.deleteTagRelationsByTagId(id)
             TagHelper.delete(id)
-            _itemsFlow.update {
-                it.toMutableStateList().apply {
-                    removeIf { i -> i.id == id }
-                }
-            }
+            _itemsFlow.update { it.filterNot { i -> i.id == id } }
             for (key in _tagsMapFlow.value.keys) {
                 _tagsMapFlow.value[key] = _tagsMapFlow.value[key]?.filter { it.tagId != id } ?: emptyList()
             }

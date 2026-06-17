@@ -75,7 +75,13 @@ fun VideosPage(
         if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(Res.string.trash), "trash", videosVM.totalTrash.intValue))
         baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) }); baseTabs
     }
-    val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { withIO { videosVM.loadAsync(context, tagsVM); mediaFoldersVM.loadAsync(context) }; setRefreshState(RefreshContentState.Finished) } }
+    val topRefreshLayoutState = rememberRefreshLayoutState {
+        scope.launch {
+            videosVM.loadAsync(context, tagsVM)
+            withIO { mediaFoldersVM.loadAsync(context) }
+            setRefreshState(RefreshContentState.Finished)
+        }
+    }
 
     BackHandler(enabled = previewerState.visible || dragSelectState.selectMode || castVM.castMode.value || videosVM.showSearchBar.value) {
         when {

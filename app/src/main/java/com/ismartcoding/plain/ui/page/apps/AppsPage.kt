@@ -23,7 +23,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preferences.PackageSortByPreference
 import com.ismartcoding.plain.ui.base.*
@@ -49,7 +48,7 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 })
     var isFirstTime by remember { mutableStateOf(true) }
     val topRefreshLayoutState = rememberRefreshLayoutState {
-        scope.launch { withIO { appsVM.loadAsync() }; setRefreshState(RefreshContentState.Finished) }
+        scope.launch { appsVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
     val once = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) { if (!once.value) { once.value = true; scope.launch(Dispatchers.IO) { appsVM.loadAsync() } } }

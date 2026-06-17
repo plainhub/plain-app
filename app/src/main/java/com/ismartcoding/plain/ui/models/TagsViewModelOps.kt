@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.TagRelationStub
@@ -9,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 internal fun TagsViewModel.removeFromTags(ids: Set<String>, tagIds: Set<String>) {
-    viewModelScope.launch(Dispatchers.IO) {
+    launchIO {
         for (tagId in tagIds) {
             TagHelper.deleteTagRelationByKeysTagId(ids, tagId)
         }
@@ -24,7 +25,7 @@ internal fun TagsViewModel.removeFromTags(ids: Set<String>, tagIds: Set<String>)
 }
 
 internal fun TagsViewModel.addToTags(items: List<IData>, tagIds: Set<String>) {
-    viewModelScope.launch(Dispatchers.IO) {
+    launchIO {
         for (tagId in tagIds) {
             val existingKeys = TagHelper.getKeysByTagId(tagId)
             val newItems = items.filter { !existingKeys.contains(it.id) }
@@ -47,7 +48,7 @@ internal fun TagsViewModel.addToTags(items: List<IData>, tagIds: Set<String>) {
     }
 }
 
-internal suspend fun TagsViewModel.toggleTagAsync(data: IData, tagId: String) {
+internal suspend fun TagsViewModel.toggleTagAsync(data: IData, tagId: String) = withIO {
     val tagIds = tagsMapFlow.value[data.id]?.map { it.tagId } ?: emptyList()
     try {
         if (tagIds.contains(tagId)) {

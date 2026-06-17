@@ -2,6 +2,7 @@ package com.ismartcoding.plain.features.feed
 
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.plain.db.rawQuery
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
@@ -17,7 +18,7 @@ object FeedEntryHelper {
         AppDatabase.instance.feedEntryDao()
     }
 
-    suspend fun count(query: String): Int {
+    suspend fun count(query: String): Int = withIO {
         var sql = "SELECT COUNT(id) FROM feed_entries"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -25,10 +26,10 @@ object FeedEntryHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        return feedEntryDao.count(rawQuery(sql, where.args.toTypedArray()))
+        feedEntryDao.count(rawQuery(sql, where.args.toTypedArray()))
     }
 
-    suspend fun getIdsAsync(query: String): Set<String> {
+    suspend fun getIdsAsync(query: String): Set<String> = withIO {
         var sql = "SELECT id FROM feed_entries"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -36,14 +37,14 @@ object FeedEntryHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        return feedEntryDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
+        feedEntryDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
     suspend fun search(
         query: String,
         limit: Int,
         offset: Int,
-    ): List<DFeedEntry> {
+    ): List<DFeedEntry> = withIO {
         var sql = "SELECT * FROM feed_entries"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -57,46 +58,46 @@ object FeedEntryHelper {
             " ORDER BY published_at DESC LIMIT $limit OFFSET $offset"
         }
 
-        return feedEntryDao.search(rawQuery(sql, where.args.toTypedArray()))
+        feedEntryDao.search(rawQuery(sql, where.args.toTypedArray()))
     }
 
-    fun getAsync(id: String): DFeedEntry? {
-        return feedEntryDao.getById(id)
+    suspend fun getAsync(id: String): DFeedEntry? = withIO {
+        feedEntryDao.getById(id)
     }
 
-    fun updateAsync(
+    suspend fun updateAsync(
         id: String,
         updateItem: DFeedEntry.() -> Unit,
-    ): String {
-        val item = feedEntryDao.getById(id) ?: return id
+    ): String = withIO {
+        val item = feedEntryDao.getById(id) ?: return@withIO id
         item.updatedAt = TimeHelper.now()
         updateItem(item)
         feedEntryDao.update(item)
 
-        return item.id
+        item.id
     }
 
-    fun updateAsync(
+    suspend fun updateAsync(
         item: DFeedEntry,
-    ) {
+    ) = withIO {
         item.updatedAt = TimeHelper.now()
         feedEntryDao.update(item)
     }
 
-    fun deleteAsync(ids: Set<String>) {
+    suspend fun deleteAsync(ids: Set<String>) = withIO {
         ids.chunked(50).forEach { chunk ->
             feedEntryDao.delete(chunk.toSet())
         }
     }
 
-    fun deleteAllAsync() {
+    suspend fun deleteAllAsync() = withIO {
         feedEntryDao.deleteAll()
     }
 
     private suspend fun parseQuery(
         where: ContentWhere,
         query: String,
-    ) {
+    ) = withIO {
         QueryHelper.parseAsync(query).forEach {
             if (it.name == "text") {
                 where.addLikes(listOf("title", "description", "content"), listOf(it.value, it.value, it.value))

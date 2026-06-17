@@ -2,6 +2,7 @@ package com.ismartcoding.plain.features
 
 import android.content.Context
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.DChat
@@ -30,7 +31,7 @@ object ChatMessageEditor {
         context: Context,
         item: DChat,
         newText: String,
-    ): Boolean {
+    ): Boolean = withIO {
         val originalText = item.content.value as? DMessageText
         val originalPreviews = originalText?.linkPreviews ?: emptyList()
         val originalUrls = originalPreviews.map { it.url }
@@ -60,7 +61,7 @@ object ChatMessageEditor {
         }
 
         if (originalText?.text == newText && originalPreviews == resolvedPreviews) {
-            return false
+            return@withIO false
         }
 
         val content = DMessageContent(
@@ -76,6 +77,6 @@ object ChatMessageEditor {
                 JsonHelper.jsonEncode(listOf(model)),
             ),
         )
-        return true
+        return@withIO true
     }
 }

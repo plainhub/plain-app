@@ -7,7 +7,7 @@ import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.lib.kdataloader.ExecutionResult
 
 object FeedsLoader {
-    fun load(
+    suspend fun load(
         ids: List<String>,
     ): List<ExecutionResult<Feed?>> {
         val map = FeedHelper.getAll().associateBy { it.id }

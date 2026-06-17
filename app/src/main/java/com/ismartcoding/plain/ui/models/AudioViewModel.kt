@@ -4,7 +4,6 @@ import com.ismartcoding.plain.preferences.*
 import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.DataType
@@ -21,7 +20,7 @@ class AudioViewModel : BaseMediaViewModel<DAudio>() {
     val scrollStateMap = mutableStateMapOf<Int, LazyListState>()
 
     fun delete(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             AudioMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, trash.value)

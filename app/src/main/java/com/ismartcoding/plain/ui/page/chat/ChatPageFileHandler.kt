@@ -22,14 +22,14 @@ import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.ui.models.sendFilesImmediate
-import com.ismartcoding.plain.ui.models.updateFilesMessage
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import kotlinx.coroutines.delay
 
 internal fun handleFileSelection(
     event: PickFileResultEvent,
     context: Context,
     chatVM: ChatViewModel,
+    peerVM: PeerViewModel,
     scrollState: LazyListState,
     focusManager: FocusManager,
 ) {
@@ -54,7 +54,7 @@ internal fun handleFileSelection(
         if (placeholderItems.isEmpty()) return@coMain
 
         val isImageVideo = event.type == PickFileType.IMAGE_VIDEO
-        val messageId = withIO { chatVM.sendFilesImmediate(placeholderItems, isImageVideo) }
+        val messageId = chatVM.sendFilesImmediate(placeholderItems, isImageVideo)
         scrollToLatest(chatVM, scrollState, null)
         delay(200)
         focusManager.clearFocus()
@@ -86,7 +86,7 @@ internal fun handleFileSelection(
                     finalItems.add(placeholderItems[index])
                 }
             }
-            chatVM.updateFilesMessage(messageId, finalItems, isImageVideo)
+            chatVM.updateFilesMessage(messageId, finalItems, isImageVideo, peerVM.onlinePeerIds.value)
         }
     }
 }

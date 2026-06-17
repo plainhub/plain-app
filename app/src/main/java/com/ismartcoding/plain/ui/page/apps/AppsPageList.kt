@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
@@ -62,7 +61,7 @@ fun AppsPageList(
                         }
                         item {
                             if (items.isNotEmpty() && !appsVM.noMore.value) {
-                                LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { withIO { appsVM.moreAsync() } } }
+                                LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { appsVM.moreAsync() } }
                             }
                             LoadMoreRefreshContent(appsVM.noMore.value)
                             BottomSpace(paddingValues)

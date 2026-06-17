@@ -130,7 +130,7 @@ class Routing {
     object AppFiles
 
     @Serializable
-    data class Nearby(val pairDeviceJson: String = "")
+    object Nearby
 
     @Serializable
     object ComponentShowcase
@@ -143,4 +143,18 @@ class Routing {
 
     @Serializable
     data class PlayMedia(val path: String)
+
+    @Serializable
+    object PairingRequest
+
+    @Serializable
+    object LoginRequest
+
+    @Serializable
+    data class ChannelInviteRequest(
+        val channelId: String,
+        val channelName: String,
+        val ownerPeerId: String,
+        val ownerPeerName: String,
+    )
 }

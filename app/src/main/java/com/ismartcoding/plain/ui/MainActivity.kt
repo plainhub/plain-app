@@ -55,27 +55,13 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.CrashHandler
-import com.ismartcoding.plain.chat.data.ChatTargetType
-import com.ismartcoding.plain.discover.NearbyPairManager
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
-import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
-import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.ui.models.acceptChannelInvite
-import com.ismartcoding.plain.ui.models.declineChannelInvite
-import com.ismartcoding.plain.ui.models.sendTextMessage
-import com.ismartcoding.plain.ui.page.ChannelInvitePage
 import com.ismartcoding.plain.ui.page.CrashReportDialog
-import com.ismartcoding.plain.ui.page.LoginRequestPage
-import com.ismartcoding.plain.ui.page.PairingRequestPage
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
-import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.ui.theme.AppTheme
-import io.ktor.websocket.CloseReason
-import io.ktor.websocket.close
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -85,9 +71,6 @@ class MainActivity : AppCompatActivity() {
     internal var pickFileType = PickFileType.IMAGE
     internal var pickFileTag = PickFileTag.SEND_MESSAGE
     internal var exportFileType = ExportFileType.OPML
-    internal var pendingLoginEvent by mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
-    internal var pendingPairingEvent by mutableStateOf<PairingRequestReceivedEvent?>(null)
-    internal var pendingChannelInviteEvent by mutableStateOf<ChannelInviteReceivedEvent?>(null)
     internal val mainVM: MainViewModel by viewModels()
     internal val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
     val pomodoroVM: PomodoroViewModel by viewModels()
@@ -207,62 +190,13 @@ class MainActivity : AppCompatActivity() {
                                 pendingForwardText?.let { text ->
                                     coIO {
                                         delay(500)
-                                        chatVM.sendTextMessage(text, this@MainActivity)
+                                        chatVM.sendTextMessage(text, this@MainActivity, peerVM.onlinePeerIds.value)
                                     }
                                 }
                             })
                     }
                     pendingCrashReport?.let { report ->
                         CrashReportDialog(crashReport = report, onDismiss = { pendingCrashReport = null })
-                    }
-                    pendingLoginEvent?.let { event ->
-                        val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
-                        LoginRequestPage(
-                            clientIp = clientIp,
-                            request = event.request,
-                            onDeny = {
-                                pendingLoginEvent = null
-                                lifecycleScope.launch(Dispatchers.IO) {
-                                    event.session.close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "rejected"))
-                                }
-                            },
-                            onAllow = {
-                                pendingLoginEvent = null
-                                lifecycleScope.launch(Dispatchers.IO) {
-                                    HttpServerManager.respondTokenAsync(event, clientIp)
-                                }
-                            },
-                        )
-                    }
-                    pendingPairingEvent?.let { event ->
-                        PairingRequestPage(
-                            event = event,
-                            onDeny = {
-                                pendingPairingEvent = null
-                                coIO {
-                                    NearbyPairManager.respondToPairing(event.request, false)
-                                }
-                            },
-                            onAllow = {
-                                pendingPairingEvent = null
-                                coIO {
-                                    NearbyPairManager.respondToPairing(event.request, true)
-                                }
-                            },
-                        )
-                    }
-                    pendingChannelInviteEvent?.let { event ->
-                        ChannelInvitePage(
-                            event = event,
-                            onDecline = {
-                                pendingChannelInviteEvent = null
-                                channelVM.declineChannelInvite(this@MainActivity, event.channelId)
-                            },
-                            onAccept = {
-                                pendingChannelInviteEvent = null
-                                channelVM.acceptChannelInvite(event.channelId)
-                            },
-                        )
                     }
                 }
             }

@@ -8,15 +8,16 @@ import com.ismartcoding.plain.preferences.ScanHistoryPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ScanHistoryViewModel : ViewModel() {
     private val _itemsFlow = MutableStateFlow(emptyList<String>())
-    val itemsFlow: StateFlow<List<String>> get() = _itemsFlow
+    val itemsFlow = _itemsFlow.asStateFlow()
 
     fun fetch(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             _itemsFlow.update {
                 ScanHistoryPreference.getValueAsync()
             }
@@ -27,7 +28,7 @@ class ScanHistoryViewModel : ViewModel() {
         context: Context,
         value: String,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             _itemsFlow.update {
                 val mutableList = it.toMutableList()
                 mutableList.remove(value)

@@ -23,6 +23,7 @@ import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DArchivedConversation
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.smsManager
@@ -133,12 +134,12 @@ object SmsHelper {
         query: String,
         limit: Int,
         offset: Int,
-    ): List<DMessage> {
+    ): List<DMessage> = withIO {
         val conditions = QueryHelper.parseAsync(query)
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
         val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
         if (threadId.isNotEmpty()) {
-            return searchByThreadAsync(context, threadId, conditions, archivedRecords, limit, offset)
+            return@withIO searchByThreadAsync(context, threadId, conditions, archivedRecords, limit, offset)
         }
 
         val where = buildWhere(conditions, archivedRecords)
@@ -146,7 +147,7 @@ object SmsHelper {
 
         // When filtering by text/ids (SMS-specific columns), skip MMS, use normal paging
         if (hasTextOrIdsFilter) {
-            return context.contentResolver.getPagingCursorWithSql(
+            return@withIO context.contentResolver.getPagingCursorWithSql(
                 smsUri, getProjection(), where,
                 limit, offset, SortBy(Telephony.Sms.DATE, SortDirection.DESC)
             )?.map { cursor, cache ->
@@ -199,7 +200,7 @@ object SmsHelper {
             )
         } ?: emptyList()
 
-        return smsItems.plus(mmsItems)
+        return@withIO smsItems.plus(mmsItems)
             .sortedByDescending { it.date }
             .drop(offset)
             .take(limit)
@@ -430,13 +431,13 @@ object SmsHelper {
         )
     }
 
-    suspend fun countAsync(context: Context, query: String): Int {
+    suspend fun countAsync(context: Context, query: String): Int = withIO {
         val conditions = QueryHelper.parseAsync(query)
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
         val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
 
         if (threadId.isNotEmpty()) {
-            return countByThread(context, threadId, conditions, archivedRecords)
+            return@withIO countByThread(context, threadId, conditions, archivedRecords)
         }
 
         val where = buildWhere(conditions, archivedRecords)
@@ -455,7 +456,7 @@ object SmsHelper {
             }
         } else 0
 
-        return smsCount + mmsCount
+        return@withIO smsCount + mmsCount
     }
 
     private fun countByThread(
@@ -479,11 +480,11 @@ object SmsHelper {
         return smsCount + mmsCount
     }
 
-    suspend fun getIdsAsync(context: Context, query: String): Set<String> {
+    suspend fun getIdsAsync(context: Context, query: String): Set<String> = withIO {
         val conditions = QueryHelper.parseAsync(query)
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
         val where = buildWhere(conditions, archivedRecords)
-        return context.contentResolver.queryCursor(
+        context.contentResolver.queryCursor(
             smsUri,
             arrayOf(BaseColumns._ID),
             where.toSelection(),

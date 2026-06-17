@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.ai.ImageIndexManager
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.data.DImage
@@ -22,7 +22,7 @@ class ImagesViewModel : BaseMediaViewModel<DImage>() {
     val scrollStateMap = mutableStateMapOf<Int, LazyGridState>()
     val useAiSearch = mutableStateOf(false)
 
-    suspend fun loadWithAiSearchAsync(context: Context, tagsVM: TagsViewModel) {
+    suspend fun loadWithAiSearchAsync(context: Context, tagsVM: TagsViewModel) = withIO {
         val query = queryText.value.trim()
         val combined = com.ismartcoding.plain.features.media.ImageSearchHelper.searchCombinedAsync(
             context = context,
@@ -34,7 +34,7 @@ class ImagesViewModel : BaseMediaViewModel<DImage>() {
         )
         useAiSearch.value = query.isNotEmpty() && com.ismartcoding.plain.ai.ImageSearchManager.isModelReady()
         offset.intValue = 0
-        _itemsFlow.value = combined.toMutableStateList()
+        _itemsFlow.value = combined
         tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.intValue = combined.size
         totalTrash.intValue = 0
@@ -47,7 +47,7 @@ class ImagesViewModel : BaseMediaViewModel<DImage>() {
     }
 
     fun delete(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             ImageMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, trash.value)

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.web.websocket
 
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketData
@@ -8,7 +9,7 @@ import com.ismartcoding.plain.web.HttpServerManager
 import io.ktor.websocket.send
 
 object WebSocketHelper {
-    suspend fun sendEventAsync(event: WebSocketEvent) {
+    suspend fun sendEventAsync(event: WebSocketEvent) = withIO {
 //            if (BuildConfig.DEBUG) {
 //                LogCat.d("sendEventAsync: ${event.data}")
 //            }
@@ -24,7 +25,7 @@ object WebSocketHelper {
         }
     }
 
-    suspend fun sendSignalingToClientAsync(clientId: String, json: String) {
+    suspend fun sendSignalingToClientAsync(clientId: String, json: String) = withIO {
         HttpServerManager.wsSessions
             .toList()
             .filter { it.clientId == clientId }

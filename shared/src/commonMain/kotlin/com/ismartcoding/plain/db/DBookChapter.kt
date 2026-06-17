@@ -33,23 +33,23 @@ data class DBookChapter(
 @Dao
 interface BookChapterDao {
     @Query("SELECT * FROM book_chapters WHERE book_id=:bookId")
-    fun getAll(bookId: String): List<DBookChapter>
+    suspend fun getAll(bookId: String): List<DBookChapter>
 
     @RawQuery
-    fun search(query: RoomRawQuery): List<DBookChapter>
+    suspend fun search(query: RoomRawQuery): List<DBookChapter>
 
     @RawQuery
-    fun count(query: RoomRawQuery): Int
+    suspend fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM book_chapters WHERE id=:id")
-    fun getById(id: String): DBookChapter?
+    suspend fun getById(id: String): DBookChapter?
 
     @Insert
-    fun insert(vararg item: DBookChapter)
+    suspend fun insert(vararg item: DBookChapter)
 
     @Update
-    fun update(vararg item: DBookChapter)
+    suspend fun update(vararg item: DBookChapter)
 
     @Query("DELETE FROM book_chapters WHERE id in (:ids)")
-    fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>)
 }

@@ -39,7 +39,7 @@ private fun plainDarkColorScheme(): ColorScheme {
         errorContainer = Color(0xFF3A1C1C), onErrorContainer = Color(0xFFFFDAD6),
         background = bg, onBackground = Color(0xFFFFFFFF),
         surface = surface, onSurface = Color(0xFFFFFFFF),
-        surfaceVariant = surfaceVariant, onSurfaceVariant = Color(0xFF8D8D93),
+        surfaceVariant = surfaceVariant, onSurfaceVariant = Color(0xFFB8B8BE),
         surfaceTint = Color(0xFF0A84FF).copy(alpha = 0.08f),
         inverseSurface = Color(0xFFF2F2F7), inverseOnSurface = Color(0xFF000000),
         outline = Color(0xFF38383A), outlineVariant = Color(0xFF48484A),

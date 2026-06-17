@@ -45,31 +45,31 @@ data class DBookmark(
 @Dao
 interface BookmarkDao {
     @Query("SELECT * FROM bookmarks ORDER BY pinned DESC, sort_order ASC, created_at ASC")
-    fun getAll(): List<DBookmark>
+    suspend fun getAll(): List<DBookmark>
 
     @Query("SELECT * FROM bookmarks WHERE id = :id")
-    fun getById(id: String): DBookmark?
+    suspend fun getById(id: String): DBookmark?
 
     @Query("SELECT * FROM bookmarks WHERE group_id = :groupId ORDER BY pinned DESC, sort_order ASC, created_at ASC")
-    fun getByGroupId(groupId: String): List<DBookmark>
+    suspend fun getByGroupId(groupId: String): List<DBookmark>
 
     @RawQuery
-    fun search(query: RoomRawQuery): List<DBookmark>
+    suspend fun search(query: RoomRawQuery): List<DBookmark>
 
     @RawQuery
-    fun count(query: RoomRawQuery): Int
+    suspend fun count(query: RoomRawQuery): Int
 
     @Insert
-    fun insert(vararg item: DBookmark)
+    suspend fun insert(vararg item: DBookmark)
 
     @Update
-    fun update(vararg item: DBookmark)
+    suspend fun update(vararg item: DBookmark)
 
     @Query("DELETE FROM bookmarks WHERE id IN (:ids)")
-    fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>)
 
     @Query("DELETE FROM bookmarks WHERE group_id = :groupId")
-    fun deleteByGroupId(groupId: String)
+    suspend fun deleteByGroupId(groupId: String)
 }
 
 @Entity(tableName = "bookmark_groups")
@@ -86,17 +86,17 @@ data class DBookmarkGroup(
 @Dao
 interface BookmarkGroupDao {
     @Query("SELECT * FROM bookmark_groups ORDER BY sort_order ASC, created_at ASC")
-    fun getAll(): List<DBookmarkGroup>
+    suspend fun getAll(): List<DBookmarkGroup>
 
     @Query("SELECT * FROM bookmark_groups WHERE id = :id")
-    fun getById(id: String): DBookmarkGroup?
+    suspend fun getById(id: String): DBookmarkGroup?
 
     @Insert
-    fun insert(vararg item: DBookmarkGroup)
+    suspend fun insert(vararg item: DBookmarkGroup)
 
     @Update
-    fun update(vararg item: DBookmarkGroup)
+    suspend fun update(vararg item: DBookmarkGroup)
 
     @Query("DELETE FROM bookmark_groups WHERE id IN (:ids)")
-    fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>)
 }

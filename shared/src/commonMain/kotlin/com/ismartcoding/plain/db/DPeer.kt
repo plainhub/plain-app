@@ -44,32 +44,32 @@ data class DPeer(
 @Dao
 interface PeerDao {
     @Query("SELECT * FROM peers")
-    fun getAll(): List<DPeer>
+    suspend fun getAll(): List<DPeer>
 
     @Query("SELECT * FROM peers where status = 'paired'")
-    fun getAllPaired(): List<DPeer>
+    suspend fun getAllPaired(): List<DPeer>
 
     @Query("SELECT * FROM peers where status IN ('paired', 'channel')")
-    fun getAllWithPublicKey(): List<DPeer>
+    suspend fun getAllWithPublicKey(): List<DPeer>
 
     @Query("SELECT * FROM peers WHERE id = :id")
-    fun getById(id: String): DPeer?
+    suspend fun getById(id: String): DPeer?
 
     @Query("SELECT * FROM peers WHERE id IN (:ids)")
-    fun getByIds(ids: List<String>): List<DPeer>
+    suspend fun getByIds(ids: List<String>): List<DPeer>
 
     @Insert
-    fun insert(vararg item: DPeer)
+    suspend fun insert(vararg item: DPeer)
 
     @Update
-    fun update(vararg item: DPeer)
+    suspend fun update(vararg item: DPeer)
 
     @Upsert
-    fun upsert(vararg item: DPeer)
+    suspend fun upsert(vararg item: DPeer)
 
     @Query("DELETE FROM peers WHERE id = :id")
-    fun delete(id: String)
+    suspend fun delete(id: String)
 
     @Query("DELETE FROM peers WHERE id in (:ids)")
-    fun deleteByIds(ids: List<String>)
+    suspend fun deleteByIds(ids: List<String>)
 }

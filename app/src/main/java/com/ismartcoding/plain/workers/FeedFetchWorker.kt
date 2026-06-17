@@ -6,6 +6,7 @@ import androidx.work.*
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isWifiConnected
 import com.ismartcoding.lib.helpers.CoroutinesHelper.pmap
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
@@ -75,7 +76,7 @@ class FeedFetchWorker(
         return Result.success()
     }
 
-    private suspend fun syncFeedAsync(feed: DFeed) {
+    private suspend fun syncFeedAsync(feed: DFeed) = withIO {
         setStatusMap(feed.id, FeedWorkerStatus.PENDING)
         try {
             LogCat.d("Syncing feed: ${feed.id}, ${feed.name}, ${feed.url}")
@@ -129,7 +130,7 @@ class FeedFetchWorker(
             errorMap.clear()
         }
 
-        suspend fun startRepeatWorkerAsync(context: Context) {
+        suspend fun startRepeatWorkerAsync(context: Context) = withIO {
             val data = Data.Builder()
             data.putBoolean("auto_refresh", true)
             val request =

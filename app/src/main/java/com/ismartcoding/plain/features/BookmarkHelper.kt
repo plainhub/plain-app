@@ -25,31 +25,30 @@ object BookmarkHelper {
 
     // ─── Bookmark Group CRUD ──────────────────────────────────────────────────
 
-    fun getAllGroups(): List<DBookmarkGroup> {
-        return AppDatabase.instance.bookmarkGroupDao().getAll()
+    suspend fun getAllGroups(): List<DBookmarkGroup> = withIO {
+        AppDatabase.instance.bookmarkGroupDao().getAll()
     }
 
-    fun getGroupById(id: String): DBookmarkGroup? {
-        return AppDatabase.instance.bookmarkGroupDao().getById(id)
+    suspend fun getGroupById(id: String): DBookmarkGroup? = withIO {
+        AppDatabase.instance.bookmarkGroupDao().getById(id)
     }
 
-    fun createGroup(name: String): DBookmarkGroup {
+    suspend fun createGroup(name: String): DBookmarkGroup = withIO {
         val group = DBookmarkGroup().apply { this.name = name }
         AppDatabase.instance.bookmarkGroupDao().insert(group)
-        return group
+        group
     }
 
-    fun updateGroup(id: String, block: DBookmarkGroup.() -> Unit): DBookmarkGroup? {
-        val group = AppDatabase.instance.bookmarkGroupDao().getById(id) ?: return null
+    suspend fun updateGroup(id: String, block: DBookmarkGroup.() -> Unit): DBookmarkGroup? = withIO {
+        val group = AppDatabase.instance.bookmarkGroupDao().getById(id) ?: return@withIO null
         group.apply(block)
         group.updatedAt = TimeHelper.now()
         AppDatabase.instance.bookmarkGroupDao().update(group)
-        return group
+        group
     }
 
-    fun deleteGroup(id: String) {
+    suspend fun deleteGroup(id: String) = withIO {
         AppDatabase.instance.bookmarkGroupDao().delete(setOf(id))
-        // Move all bookmarks in this group to ungrouped
         val bookmarks = AppDatabase.instance.bookmarkDao().getByGroupId(id)
         bookmarks.forEach { b ->
             b.groupId = ""
@@ -60,19 +59,19 @@ object BookmarkHelper {
 
     // ─── Bookmark CRUD ────────────────────────────────────────────────────────
 
-    fun getAll(): List<DBookmark> {
-        return AppDatabase.instance.bookmarkDao().getAll()
+    suspend fun getAll(): List<DBookmark> = withIO {
+        AppDatabase.instance.bookmarkDao().getAll()
     }
 
-    fun getById(id: String): DBookmark? {
-        return AppDatabase.instance.bookmarkDao().getById(id)
+    suspend fun getById(id: String): DBookmark? = withIO {
+        AppDatabase.instance.bookmarkDao().getById(id)
     }
 
     /**
      * Batch-add bookmarks from a list of URLs.
      * Returns the newly created bookmarks so callers can trigger metadata fetch.
      */
-    fun addBookmarks(urls: List<String>, groupId: String = ""): List<DBookmark> {
+    suspend fun addBookmarks(urls: List<String>, groupId: String = ""): List<DBookmark> = withIO {
         val created = mutableListOf<DBookmark>()
         urls.forEach { url ->
             val trimmed = url.trim()
@@ -85,18 +84,18 @@ object BookmarkHelper {
             AppDatabase.instance.bookmarkDao().insert(bookmark)
             created.add(bookmark)
         }
-        return created
+        created
     }
 
-    fun updateBookmark(id: String, block: DBookmark.() -> Unit): DBookmark? {
-        val bookmark = AppDatabase.instance.bookmarkDao().getById(id) ?: return null
+    suspend fun updateBookmark(id: String, block: DBookmark.() -> Unit): DBookmark? = withIO {
+        val bookmark = AppDatabase.instance.bookmarkDao().getById(id) ?: return@withIO null
         bookmark.apply(block)
         bookmark.updatedAt = TimeHelper.now()
         AppDatabase.instance.bookmarkDao().update(bookmark)
-        return bookmark
+        bookmark
     }
 
-    fun deleteBookmarks(ids: Set<String>, context: Context) {
+    suspend fun deleteBookmarks(ids: Set<String>, context: Context) = withIO {
         ids.forEach { id ->
             val b = AppDatabase.instance.bookmarkDao().getById(id)
             if (b != null && b.faviconPath.isNotEmpty()) {
@@ -106,8 +105,8 @@ object BookmarkHelper {
         AppDatabase.instance.bookmarkDao().delete(ids)
     }
 
-    fun recordClick(id: String) {
-        val bookmark = AppDatabase.instance.bookmarkDao().getById(id) ?: return
+    suspend fun recordClick(id: String) = withIO {
+        val bookmark = AppDatabase.instance.bookmarkDao().getById(id) ?: return@withIO
         bookmark.clickCount++
         bookmark.lastClickedAt = TimeHelper.now()
         bookmark.updatedAt = TimeHelper.now()
@@ -121,9 +120,9 @@ object BookmarkHelper {
      * Returns the updated DBookmark if any field changed so the caller can push a WebSocket event,
      * or null if nothing changed.
      */
-    suspend fun fetchAndUpdateSingle(context: Context, bookmarkId: String): DBookmark? {
-        val b = AppDatabase.instance.bookmarkDao().getById(bookmarkId) ?: return null
-        return try {
+    suspend fun fetchAndUpdateSingle(context: Context, bookmarkId: String): DBookmark? = withIO {
+        val b = AppDatabase.instance.bookmarkDao().getById(bookmarkId) ?: return@withIO null
+        return@withIO try {
             val result = fetchPageMeta(context, b.url)
             var changed = false
             result.first?.takeIf { it.isNotEmpty() }?.let {
@@ -132,7 +131,7 @@ object BookmarkHelper {
             result.second?.let {
                 if (b.faviconPath != it) { b.faviconPath = it; changed = true }
             }
-            if (!changed) return null
+            if (!changed) return@withIO null
             b.updatedAt = TimeHelper.now()
             AppDatabase.instance.bookmarkDao().update(b)
             b
@@ -146,8 +145,8 @@ object BookmarkHelper {
      * Fetch title and favicon for each newly created bookmark.
      * Mirrors the pattern used in FetchLinkPreviewsEvent / ChatHelper.
      */
-    suspend fun fetchMetadataAsync(context: Context, bookmarkIds: List<String>) {
-        if (bookmarkIds.isEmpty()) return
+    suspend fun fetchMetadataAsync(context: Context, bookmarkIds: List<String>) = withIO {
+        if (bookmarkIds.isEmpty()) return@withIO
         try {
             coroutineScope {
                 bookmarkIds.map { id ->

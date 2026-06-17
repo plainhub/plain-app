@@ -129,27 +129,56 @@ internal fun MainActivity.initEvents() {
                 is PickFileEvent -> handlePickFileEvent(event)
                 is ExportFileEvent -> handleExportFileEvent(event)
                 is ConfirmToAcceptLoginEvent -> {
-                    pendingLoginEvent = event
+                    mainVM.pendingLoginEvent = event
+                    val nav = navControllerState.value
+                    if (nav?.currentBackStackEntry?.destination?.hasRoute<Routing.LoginRequest>() != true) {
+                        nav?.navigate(Routing.LoginRequest)
+                    }
                     openNew()
                 }
 
                 is PairingRequestReceivedEvent -> {
-                    pendingPairingEvent = event
-                    openNew()
+                    mainVM.pendingPairingRequest = event.request
+                    val nav = navControllerState.value
+                    if (nav?.currentBackStackEntry?.destination?.hasRoute<Routing.PairingRequest>() != true) {
+                        nav?.navigate(Routing.PairingRequest)
+                    }
+                    if (!AppHelper.foregrounded()) {
+                        openNew()
+                    }
                 }
 
                 is ChannelInviteReceivedEvent -> {
-                    pendingChannelInviteEvent = event
+                    val nav = navControllerState.value
+                    if (nav?.currentBackStackEntry?.destination?.hasRoute<Routing.ChannelInviteRequest>() != true) {
+                        nav?.navigate(
+                            Routing.ChannelInviteRequest(
+                                channelId = event.channelId,
+                                channelName = event.channelName,
+                                ownerPeerId = event.ownerPeerId,
+                                ownerPeerName = event.ownerPeerName,
+                            )
+                        )
+                    }
                     openNew()
                 }
 
                 is PairingCanceledEvent -> {
-                    pendingPairingEvent = null
+                    val nav = navControllerState.value
+                    val current = nav?.currentBackStackEntry
+                    if (current != null && current.destination.hasRoute<Routing.PairingRequest>() &&
+                        mainVM.pendingPairingRequest?.fromId == event.fromId
+                    ) {
+                        nav.popBackStack<Routing.PairingRequest>(inclusive = true)
+                    }
                 }
                 is PairingSuccessEvent -> {
                     withIO { peerVM.loadPeers() }
                     PeerStatusManager.reconnectNow("post_pairing")
-                    navControllerState.value?.navigate(Routing.Chat("peer:${event.deviceId}")) { popUpTo<Routing.Nearby> { inclusive = true } }
+                    navControllerState.value?.navigate(Routing.Chat("peer:${event.deviceId}")) {
+                        popUpTo<Routing.PairingRequest> { inclusive = true }
+                        popUpTo<Routing.Nearby> { inclusive = true }
+                    }
                 }
             }
         }

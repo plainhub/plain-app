@@ -2,7 +2,6 @@ package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.kgraphql.schema.execution.Executor
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
@@ -87,7 +86,7 @@ fun SchemaBuilder.addFeedSchema() {
     }
     mutation("createFeed") {
         resolver { url: String, fetchContent: Boolean ->
-            val syndFeed = withIO { FeedHelper.fetchAsync(url) }
+            val syndFeed = FeedHelper.fetchAsync(url)
             val id =
                 FeedHelper.addAsync {
                     this.url = url

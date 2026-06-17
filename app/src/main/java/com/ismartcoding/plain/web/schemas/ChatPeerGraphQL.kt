@@ -20,5 +20,12 @@ fun SchemaBuilder.addPeerSchema() {
             true
         }
     }
+
+    mutation("unpairPeer") {
+        resolver { id: ID ->
+            PeerManager.markUnpaired(id.value)
+            true
+        }
+    }
     type<Peer> {}
 }

@@ -13,6 +13,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.api.HttpClientManager
@@ -172,7 +173,7 @@ class HttpServerService : LifecycleService() {
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
-    private suspend fun stopHttpServerAsync() {
+    private suspend fun stopHttpServerAsync() = withIO {
         LogCat.d("stopHttpServer")
         try {
             // Stop mDNS responder
@@ -195,7 +196,8 @@ class HttpServerService : LifecycleService() {
         }
         HttpServerManager.server = null
         PeerStatusManager.stop()
-        PNotificationListenerService.toggle(this, false)
+        val ctx = this@HttpServerService
+        PNotificationListenerService.toggle(ctx, false)
 
         serverState = HttpServerState.OFF
     }

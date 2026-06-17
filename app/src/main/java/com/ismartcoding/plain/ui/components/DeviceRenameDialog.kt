@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.EventType
@@ -37,11 +36,9 @@ fun DeviceRenameDialog(name: String, onDismiss: () -> Unit, onDone: (String) -> 
         confirmText = stringResource(Res.string.save),
         onConfirm = {
             scope.launch {
-                withIO {
-                    DeviceNamePreference.putAsync(newName.value)
-                    TempData.deviceName.value = newName.value
-                    sendEvent(WebSocketEvent(EventType.DEVICE_NAME_UPDATED, jsonEncode(newName.value)))
-                }
+                DeviceNamePreference.putAsync(newName.value)
+                TempData.deviceName.value = newName.value
+                sendEvent(WebSocketEvent(EventType.DEVICE_NAME_UPDATED, jsonEncode(newName.value)))
                 onDone(newName.value)
                 onDismiss()
             }

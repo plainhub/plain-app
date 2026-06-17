@@ -20,7 +20,7 @@ class VideosViewModel : BaseMediaViewModel<DVideo>() {
     val scrollStateMap = mutableStateMapOf<Int, LazyGridState>()
 
     fun delete(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             VideoMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, trash.value)

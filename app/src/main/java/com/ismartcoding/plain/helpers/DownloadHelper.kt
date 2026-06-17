@@ -3,6 +3,7 @@ package com.ismartcoding.plain.helpers
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isOk
 import com.ismartcoding.lib.extensions.scanFileByConnection
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
@@ -15,9 +16,9 @@ import io.ktor.utils.io.copyAndClose
 import java.io.File
 
 object DownloadHelper {
-    suspend fun downloadAsync(url: String, dir: String): DownloadResult {
+    suspend fun downloadAsync(url: String, dir: String): DownloadResult = withIO {
         val httpClient = HttpClientManager.browserClient()
-        return try {
+        try {
             val r = httpClient.get(url)
             if (r.isOk()) {
                 File(dir).mkdirs()
@@ -41,9 +42,9 @@ object DownloadHelper {
         }
     }
 
-    suspend fun downloadToTempAsync(url: String, tempFile: File): DownloadResult {
+    suspend fun downloadToTempAsync(url: String, tempFile: File): DownloadResult = withIO {
         val httpClient = HttpClientManager.browserClient()
-        return try {
+        try {
             val r = httpClient.get(url)
             if (r.isOk()) {
                 r.bodyAsChannel().copyAndClose(tempFile.writeChannel())

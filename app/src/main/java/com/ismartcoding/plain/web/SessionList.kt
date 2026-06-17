@@ -2,23 +2,24 @@ package com.ismartcoding.plain.web
 
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DSession
 import com.ismartcoding.plain.helpers.TimeHelper
 
 object SessionList {
-    fun getItemsAsync(): List<DSession> {
-        return AppDatabase.instance.sessionDao().getAll()
+    suspend fun getItemsAsync(): List<DSession> = withIO {
+        AppDatabase.instance.sessionDao().getAll()
     }
 
-    fun getByClientIdAsync(clientId: String): DSession? {
-        return AppDatabase.instance.sessionDao().getByClientId(clientId)
+    suspend fun getByClientIdAsync(clientId: String): DSession? = withIO {
+        AppDatabase.instance.sessionDao().getByClientId(clientId)
     }
 
-    fun addOrUpdateAsync(
+    suspend fun addOrUpdateAsync(
         clientId: String,
         updateItem: (DSession) -> Unit,
-    ) {
+    ) = withIO {
         var item = AppDatabase.instance.sessionDao().getByClientId(clientId)
         var isInsert = false
         if (item == null) {
@@ -39,25 +40,25 @@ object SessionList {
         }
     }
 
-    fun deleteAsync(clientId: String) {
+    suspend fun deleteAsync(clientId: String) = withIO {
         AppDatabase.instance.sessionDao().delete(clientId)
     }
 
-    fun createCustomTokenAsync(name: String): DSession {
+    suspend fun createCustomTokenAsync(name: String): DSession = withIO {
         val item = DSession()
         item.clientId = StringHelper.shortUUID()
         item.name = name
         item.type = DSession.TYPE_CUSTOM
         item.token = CryptoHelper.generateChaCha20Key()
         AppDatabase.instance.sessionDao().insert(item)
-        return item
+        item
     }
 
-    fun renameAsync(clientId: String, name: String): Boolean {
-        val item = AppDatabase.instance.sessionDao().getByClientId(clientId) ?: return false
+    suspend fun renameAsync(clientId: String, name: String): Boolean = withIO {
+        val item = AppDatabase.instance.sessionDao().getByClientId(clientId) ?: return@withIO false
         item.name = name
         item.updatedAt = TimeHelper.now()
         AppDatabase.instance.sessionDao().update(item)
-        return true
+        true
     }
 }

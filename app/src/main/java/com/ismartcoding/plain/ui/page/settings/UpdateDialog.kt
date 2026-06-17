@@ -24,7 +24,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.extensions.formatDateTime
@@ -96,7 +95,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
                 TextButton(
                     onClick = {
                         scope.launch {
-                            withIO { UpdateInfoPreference.updateAsync { it.copy(skipVersion = newVersion.toString()) } }
+                            UpdateInfoPreference.updateAsync { it.copy(skipVersion = newVersion.toString()) }
                             updateVM.hideDialog()
                         }
                     }

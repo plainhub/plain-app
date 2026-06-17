@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat.peer
 
 import android.content.Context
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.ChatDbHelper
@@ -10,14 +11,13 @@ import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.TimeHelper
 
 object PeerManager {
-    suspend fun deletePeer(context: Context, peerId: String): Boolean {
+    suspend fun deletePeer(context: Context, peerId: String): Boolean = withIO {
         val peerDao = AppDatabase.instance.peerDao()
-        if (peerDao.getById(peerId) == null) return false
+        val peer = peerDao.getById(peerId) ?: return@withIO false
 
         ChatDbHelper.deleteAllChatsAsync(context, peerId)
         val isChannelMember = AppDatabase.instance.chatChannelDao().getAll().any { it.hasMember(peerId) }
         if (isChannelMember) {
-            val peer = peerDao.getById(peerId)!!
             peer.key = ""
             peer.status = "channel"
             peerDao.update(peer)
@@ -25,7 +25,7 @@ object PeerManager {
             peerDao.delete(peerId)
         }
         ChatCacheManager.loadKeyCacheAsync()
-        return true
+        true
     }
 
     /**
@@ -33,18 +33,15 @@ object PeerManager {
      * any view-model state that mirrors the peer list. Returns true when the
      * peer existed and was updated.
      */
-    suspend fun markUnpaired(peerId: String): Boolean {
+    suspend fun markUnpaired(peerId: String): Boolean = withIO {
         val peerDao = AppDatabase.instance.peerDao()
-        val peer = peerDao.getById(peerId) ?: run {
-            LogCat.w("Peer not found for unpair: $peerId")
-            return false
-        }
+        val peer = peerDao.getById(peerId) ?: return@withIO false
         peer.status = "unpaired"
         peer.updatedAt = TimeHelper.now()
         peerDao.update(peer)
         ChatCacheManager.loadKeyCacheAsync()
         LogCat.d("Device unpaired: $peerId")
-        return true
+        true
     }
 
     /**
@@ -58,22 +55,30 @@ object PeerManager {
         port: Int,
         name: String,
         deviceType: DeviceType,
-    ): DPeer? {
+    ): DPeer? = withIO {
         val peerDao = AppDatabase.instance.peerDao()
-        val peer = peerDao.getById(deviceId) ?: return null
-        if (peer.status != "paired") return null
+        val peer = peerDao.getById(deviceId) ?: return@withIO null
+        if (peer.status != "paired") return@withIO null
 
         val newIpString = ips.joinToString(",")
         var changed = false
-        if (peer.ip != newIpString) { peer.ip = newIpString; changed = true }
-        if (peer.port != port) { peer.port = port; changed = true }
-        if (peer.name != name) { peer.name = name; changed = true }
-        if (peer.deviceType != deviceType.value) { peer.deviceType = deviceType.value; changed = true }
-        if (!changed) return null
+        if (peer.ip != newIpString) {
+            peer.ip = newIpString; changed = true
+        }
+        if (peer.port != port) {
+            peer.port = port; changed = true
+        }
+        if (peer.name != name) {
+            peer.name = name; changed = true
+        }
+        if (peer.deviceType != deviceType.value) {
+            peer.deviceType = deviceType.value; changed = true
+        }
+        if (!changed) return@withIO null
 
         peer.updatedAt = TimeHelper.now()
         peerDao.update(peer)
-        return peer
+        peer
     }
 
     /**
@@ -88,7 +93,7 @@ object PeerManager {
         deviceType: DeviceType,
         key: String,
         signaturePublicKey: String,
-    ) {
+    ) = withIO {
         val now = TimeHelper.now()
         val ipString = deviceIps.joinToString(",")
         val peer = (AppDatabase.instance.peerDao().getById(deviceId) ?: DPeer(deviceId).apply {

@@ -24,9 +24,12 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.data.DPairingRequest
+import com.ismartcoding.plain.discover.NearbyPairing
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -34,11 +37,9 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 
 @Composable
 fun PairingRequestPage(
-    event: PairingRequestReceivedEvent,
-    onDeny: () -> Unit,
-    onAllow: () -> Unit,
+    request: DPairingRequest,
+    navController: NavHostController,
 ) {
-    val request = event.request
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -100,14 +101,20 @@ fun PairingRequestPage(
                 PFilledButton(
                     text = stringResource(Res.string.allow),
                     buttonSize = ButtonSize.LARGE,
-                    onClick = onAllow,
+                    onClick = {
+                        coIO { NearbyPairing.respondToPairing(request, true) }
+                        navController.popBackStack()
+                    },
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
                     text = stringResource(Res.string.deny),
                     buttonSize = ButtonSize.LARGE,
-                    onClick = onDeny,
                     type = ButtonType.DANGER,
+                    onClick = {
+                        coIO { NearbyPairing.respondToPairing(request, false) }
+                        navController.popBackStack()
+                    },
                 )
             }
         }

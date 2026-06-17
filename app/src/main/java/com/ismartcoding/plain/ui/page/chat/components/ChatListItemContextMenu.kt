@@ -16,7 +16,6 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.models.delete
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.nav.navigateChatEditText

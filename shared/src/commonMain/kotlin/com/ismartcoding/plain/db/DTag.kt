@@ -20,17 +20,17 @@ data class DTag(
 @Dao
 interface TagDao {
     @Query("SELECT * FROM tags WHERE `type`=:type")
-    fun getAll(type: Int): List<DTag>
+    suspend fun getAll(type: Int): List<DTag>
 
     @Query("SELECT * FROM tags WHERE id=:id")
-    fun getById(id: String): DTag?
+    suspend fun getById(id: String): DTag?
 
     @Insert
-    fun insert(vararg item: DTag)
+    suspend fun insert(vararg item: DTag)
 
     @Update
-    fun update(vararg item: DTag)
+    suspend fun update(vararg item: DTag)
 
     @Query("DELETE FROM tags WHERE id=:id")
-    fun delete(id: String)
+    suspend fun delete(id: String)
 }

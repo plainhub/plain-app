@@ -52,39 +52,39 @@ data class DAppFile(
 interface AppFileDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(file: DAppFile): Long
+    suspend fun insert(file: DAppFile): Long
 
     @Query("SELECT * FROM files WHERE id = :id")
-    fun getById(id: String): DAppFile?
+    suspend fun getById(id: String): DAppFile?
 
     /** Cheap first-pass lookup – returns candidate rows before full-hash check. */
     @Query("SELECT * FROM files WHERE size = :size AND weak_hash = :weakHash")
-    fun findByWeakKey(size: Long, weakHash: String): List<DAppFile>
+    suspend fun findByWeakKey(size: Long, weakHash: String): List<DAppFile>
 
     @Query("UPDATE files SET ref_count = ref_count + 1 WHERE id = :id")
-    fun incrementRefCount(id: String)
+    suspend fun incrementRefCount(id: String)
 
     @Query("UPDATE files SET ref_count = ref_count - 1 WHERE id = :id")
-    fun decrementRefCount(id: String)
+    suspend fun decrementRefCount(id: String)
 
     @Query("SELECT * FROM files WHERE ref_count <= 0")
-    fun getOrphans(): List<DAppFile>
+    suspend fun getOrphans(): List<DAppFile>
 
     @Query("DELETE FROM files WHERE id = :id")
-    fun delete(id: String)
+    suspend fun delete(id: String)
 
     @Update
-    fun update(file: DAppFile)
+    suspend fun update(file: DAppFile)
 
     @Query("SELECT * FROM files ORDER BY created_at DESC")
-    fun getAll(): List<DAppFile>
+    suspend fun getAll(): List<DAppFile>
 
     @Query("SELECT * FROM files ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
-    fun getPage(limit: Int, offset: Int): List<DAppFile>
+    suspend fun getPage(limit: Int, offset: Int): List<DAppFile>
 
     @Query("SELECT COUNT(*) FROM files")
-    fun count(): Int
+    suspend fun count(): Int
 
     @Query("SELECT * FROM files WHERE id IN (:ids)")
-    fun getByIds(ids: List<String>): List<DAppFile>
+    suspend fun getByIds(ids: List<String>): List<DAppFile>
 }

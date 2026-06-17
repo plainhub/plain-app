@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.media
 
 import android.content.Context
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.features.file.FileSortBy
 
@@ -23,7 +24,7 @@ object ImageSearchHelper {
         limit: Int,
         offset: Int,
         sortBy: FileSortBy
-    ): List<com.ismartcoding.plain.data.DImage> {
+    ): List<com.ismartcoding.plain.data.DImage> = withIO {
         if (queryText.isNotBlank() && ImageSearchManager.isModelReady()) {
             val semanticResults = ImageSearchManager.search(queryText)
             val filenameItems = ImageMediaStoreHelper.searchAsync(context, extraQuery, Int.MAX_VALUE, 0, sortBy)
@@ -36,9 +37,9 @@ object ImageSearchHelper {
                 val idOrder = semanticOnlyIds.withIndex().associate { it.value to it.index }
                 combined.addAll(semanticItems.sortedBy { idOrder[it.id] ?: Int.MAX_VALUE })
             }
-            return combined.drop(offset).take(limit)
+            return@withIO combined.drop(offset).take(limit)
         } else {
-            return ImageMediaStoreHelper.searchAsync(context, extraQuery, limit, offset, sortBy)
+            return@withIO ImageMediaStoreHelper.searchAsync(context, extraQuery, limit, offset, sortBy)
         }
     }
 
@@ -46,14 +47,14 @@ object ImageSearchHelper {
         context: Context,
         queryText: String,
         extraQuery: String
-    ): Int {
+    ): Int = withIO {
         if (queryText.isNotBlank() && ImageSearchManager.isModelReady()) {
             val semanticResults = ImageSearchManager.search(queryText)
             val filenameIds = ImageMediaStoreHelper.getIdsAsync(context, extraQuery)
             val semanticOnlyIds = semanticResults.map { it.imageId }.filter { it !in filenameIds }.toSet()
-            return filenameIds.size + semanticOnlyIds.size
+            return@withIO filenameIds.size + semanticOnlyIds.size
         } else {
-            return ImageMediaStoreHelper.countAsync(context, extraQuery)
+            return@withIO ImageMediaStoreHelper.countAsync(context, extraQuery)
         }
     }
 }

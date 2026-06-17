@@ -109,7 +109,7 @@ object PeerFileDownloader {
         }
     }
 
-    private fun updateMessageFileUri(messageId: String, originalUri: String, newUri: String) {
+    private suspend fun updateMessageFileUri(messageId: String, originalUri: String, newUri: String) {
         val message = AppDatabase.Companion.instance.chatDao().getById(messageId) ?: return
         val content = message.content
 

@@ -33,33 +33,33 @@ data class DFeed(
 @Dao
 interface FeedDao {
     @Query("SELECT * FROM feeds")
-    fun getAll(): List<DFeed>
+    suspend fun getAll(): List<DFeed>
 
     @RawQuery
-    fun search(query: RoomRawQuery): List<DFeed>
+    suspend fun search(query: RoomRawQuery): List<DFeed>
 
     @RawQuery
-    fun count(query: RoomRawQuery): Int
+    suspend fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM feeds WHERE id=:id")
-    fun getById(id: String): DFeed?
+    suspend fun getById(id: String): DFeed?
 
     @Query("SELECT * FROM feeds WHERE url=:url")
-    fun getByUrl(url: String): DFeed?
+    suspend fun getByUrl(url: String): DFeed?
 
     @Insert
-    fun insert(vararg item: DFeed)
+    suspend fun insert(vararg item: DFeed)
 
     @Update
-    fun update(vararg item: DFeed)
+    suspend fun update(vararg item: DFeed)
 
     @Query("DELETE FROM feeds WHERE id in (:ids)")
-    fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>)
 
     @Query(
         "SELECT feed_entries.feed_id AS id, count(feed_entries.feed_id) AS count FROM feed_entries GROUP BY feed_entries.feed_id",
     )
-    fun getFeedCounts(): List<DFeedCount>
+    suspend fun getFeedCounts(): List<DFeedCount>
 }
 
 data class DFeedCount(var id: String, var count: Int)

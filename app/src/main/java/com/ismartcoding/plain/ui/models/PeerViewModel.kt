@@ -8,21 +8,31 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageSender
+import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PeerOnlineStatusChangedEvent
 import com.ismartcoding.plain.events.PeerUpdatedEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
@@ -31,30 +41,31 @@ class PeerViewModel : ViewModel() {
     val unpairedPeers = mutableStateListOf<DPeer>()
     internal val latestChatCacheInternal = mutableStateMapOf<String, DChat>()
     val onlineMap = mutableStateOf<Map<String, Boolean>>(emptyMap())
-    private var eventJob: Job? = null
+
+    private val _onlinePeerIds = MutableStateFlow<Set<String>>(emptySet())
+    val onlinePeerIds = _onlinePeerIds.asStateFlow()
 
     init {
-        startEventListening()
-    }
-
-    private fun startEventListening() {
-        eventJob = viewModelScope.launch {
+        viewModelScope.launch {
             Channel.sharedFlow.collect { event ->
                 when (event) {
                     is HMessageCreatedEvent -> loadPeers()
                     is NearbyDeviceFoundEvent -> handleDeviceFound(event)
-                    is PeerOnlineStatusChangedEvent -> updatePeerOnlineStatus(event.peerId, event.online)
+                    is PeerOnlineStatusChangedEvent -> {
+                        updatePeerOnlineStatus(event.peerId, event.online)
+                        _onlinePeerIds.update { current ->
+                            if (event.online) current + event.peerId
+                            else current - event.peerId
+                        }
+                    }
+                    is PeerUpdatedEvent -> ChatCacheManager.updatePeer(event.peer)
                 }
             }
         }
     }
 
-    override fun onCleared() {
-        super.onCleared(); eventJob?.cancel()
-    }
-
     fun loadPeers() {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             val allPeers = AppDatabase.instance.peerDao().getAll()
             val allChannels = AppDatabase.instance.chatChannelDao().getAll()
             val chatDao = AppDatabase.instance.chatDao()
@@ -94,14 +105,14 @@ class PeerViewModel : ViewModel() {
     fun getLatestChat(chatId: String): DChat? = latestChatCacheInternal[chatId]
 
     fun updateDiscoverable(discoverable: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             NearbyDiscoverablePreference.putAsync(discoverable)
             TempData.nearbyDiscoverable = discoverable
         }
     }
 
     fun removePeer(context: Context, peerId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             try {
                 PeerManager.deletePeer(context, peerId)
                 loadPeers()
@@ -155,7 +166,7 @@ class PeerViewModel : ViewModel() {
     }
 
     internal fun handleDeviceFound(event: NearbyDeviceFoundEvent) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             try {
                 val device = event.device
                 val updated = PeerManager.applyDeviceDiscovered(
@@ -179,7 +190,7 @@ class PeerViewModel : ViewModel() {
         }
     }
 
-    private suspend fun retryPendingChannelInvites(peer: DPeer) {
+    private suspend fun retryPendingChannelInvites(peer: DPeer) = withIO {
         try {
             val channels = AppDatabase.instance.chatChannelDao().getOwnedChannels()
             channels.filter { ch -> ch.findMember(peer.id)?.isPending() == true }

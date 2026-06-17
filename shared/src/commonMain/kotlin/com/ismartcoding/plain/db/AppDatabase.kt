@@ -73,7 +73,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun videoPlayProgressDao(): VideoPlayProgressDao
 
     companion object {
-        @Volatile
+        @kotlin.concurrent.Volatile
         private var _instance: AppDatabase? = null
 
         val instance: AppDatabase

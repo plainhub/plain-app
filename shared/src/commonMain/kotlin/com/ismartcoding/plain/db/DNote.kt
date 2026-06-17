@@ -34,32 +34,32 @@ data class DNote(
 @Dao
 interface NoteDao {
     @Query("SELECT * FROM notes")
-    fun getAll(): List<DNote>
+    suspend fun getAll(): List<DNote>
 
     @RawQuery
-    fun getIds(query: RoomRawQuery): List<IDData>
+    suspend fun getIds(query: RoomRawQuery): List<IDData>
 
     @RawQuery
-    fun search(query: RoomRawQuery): List<DNote>
+    suspend fun search(query: RoomRawQuery): List<DNote>
 
     @RawQuery
-    fun delete(query: RoomRawQuery): Int
+    suspend fun delete(query: RoomRawQuery): Int
 
     @RawQuery
-    fun count(query: RoomRawQuery): Int
+    suspend fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM notes WHERE id=:id")
-    fun getById(id: String): DNote?
+    suspend fun getById(id: String): DNote?
 
     @Query("UPDATE notes SET deleted_at=:deletedAt, updated_at=:updatedAt WHERE id in (:ids)")
-    fun trash(ids: Set<String>, deletedAt: Instant?, updatedAt: Instant)
+    suspend fun trash(ids: Set<String>, deletedAt: Instant?, updatedAt: Instant)
 
     @Insert
-    fun insert(vararg item: DNote)
+    suspend fun insert(vararg item: DNote)
 
     @Update
-    fun update(vararg item: DNote)
+    suspend fun update(vararg item: DNote)
 
     @Query("DELETE FROM notes WHERE id in (:ids)")
-    fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>)
 }

@@ -21,7 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.audio.AudioPlayer
@@ -55,7 +54,7 @@ fun AudioPlayerControls(
                     }
                     TempData.audioPlayMode.value = nextMode
                     onPlayModeChange(nextMode)
-                    withIO { AudioPlayModePreference.putAsync(nextMode) }
+                    AudioPlayModePreference.putAsync(nextMode)
                 }
             },
             modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),

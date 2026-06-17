@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
@@ -62,14 +61,14 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     val needsUpdate = newVersion.whetherNeedUpdate(currentVersion, skipVersion)
 
     LaunchedEffect(Unit) {
-        val path = withIO { UpdateInfoPreference.getValueAsync().downloadedApkPath }
+        val path = UpdateInfoPreference.getValueAsync().downloadedApkPath
         if (path.isNotEmpty()) {
             if (File(path).exists() && newVersion.whetherNeedUpdate(currentVersion, skipVersion)
                 && !updateVM.isDownloading.value && !updateVM.isDownloadComplete.value
             ) {
                 updateVM.onDownloadComplete(path)
             } else {
-                withIO { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } }
+                UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") }
             }
         }
     }
@@ -94,7 +93,7 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
                     exitProcess(0)
                 },
                 onDismiss = {
-                    scope.launch { withIO { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } } }
+                    scope.launch { UpdateInfoPreference.updateAsync { it.copy(downloadedApkPath = "") } }
                     updateVM.resetDownload()
                 },
             )

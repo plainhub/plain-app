@@ -2,6 +2,7 @@ package com.ismartcoding.plain.features.feed
 
 import com.ismartcoding.plain.i18n.*
 
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.opml.OpmlParser
 import com.ismartcoding.lib.opml.OpmlWriter
 import com.ismartcoding.lib.opml.entity.Body
@@ -30,41 +31,41 @@ object FeedHelper {
         AppDatabase.instance.feedDao()
     }
 
-    fun getAll(): List<DFeed> {
-        return feedDao.getAll()
+    suspend fun getAll(): List<DFeed> = withIO {
+        feedDao.getAll()
     }
 
-    fun getFeedCounts(): List<DFeedCount> {
-        return feedDao.getFeedCounts()
+    suspend fun getFeedCounts(): List<DFeedCount> = withIO {
+        feedDao.getFeedCounts()
     }
 
-    fun getById(id: String): DFeed? {
-        return feedDao.getById(id)
+    suspend fun getById(id: String): DFeed? = withIO {
+        feedDao.getById(id)
     }
 
-    fun getByUrl(url: String): DFeed? {
-        return feedDao.getByUrl(url)
+    suspend fun getByUrl(url: String): DFeed? = withIO {
+        feedDao.getByUrl(url)
     }
 
-    fun addAsync(updateItem: DFeed.() -> Unit): String {
+    suspend fun addAsync(updateItem: DFeed.() -> Unit): String = withIO {
         val item = DFeed()
         updateItem(item)
         feedDao.insert(item)
-        return item.id
+        item.id
     }
 
-    fun updateAsync(
+    suspend fun updateAsync(
         id: String,
         updateItem: DFeed.() -> Unit,
-    ): String {
-        val item = feedDao.getById(id) ?: return id
+    ): String = withIO {
+        val item = feedDao.getById(id) ?: return@withIO id
         item.updatedAt = TimeHelper.now()
         updateItem(item)
         feedDao.update(item)
-        return id
+        id
     }
 
-    fun deleteAsync(ids: Set<String>) {
+    suspend fun deleteAsync(ids: Set<String>) = withIO {
         ids.forEach {
             FeedFetchWorker.errorMap.remove(it)
             FeedFetchWorker.statusMap.remove(it)
@@ -72,7 +73,7 @@ object FeedHelper {
         feedDao.delete(ids)
     }
 
-    fun importAsync(reader: Reader) {
+    suspend fun importAsync(reader: Reader) = withIO {
         val feedList = mutableListOf<DFeed>()
         val opml = OpmlParser().parse(reader)
         opml.body.outlines.forEach {
@@ -99,12 +100,12 @@ object FeedHelper {
             }
         }
 
-        val urls = getAll().map { it.url }
+        val urls = feedDao.getAll().map { it.url }
         feedDao.insert(*feedList.distinctBy { it.url }.filter { !urls.contains(it.url) }.toTypedArray())
     }
 
-    fun exportAsync(writer: Writer) {
-        val feeds = getAll()
+    suspend fun exportAsync(writer: Writer) = withIO {
+        val feeds = feedDao.getAll()
         val result =
             OpmlWriter().write(
                 Opml(
@@ -132,13 +133,13 @@ object FeedHelper {
         writer.close()
     }
 
-    suspend fun fetchAsync(url: String): RssChannel {
+    suspend fun fetchAsync(url: String): RssChannel = withIO {
         val r = HttpClientManager.httpClient().get(url)
         if (r.status != HttpStatusCode.OK) {
             throw Exception("HTTP ${r.status.value} ${r.status.description}")
         }
         val xmlString = r.bodyAsText()
         val rssParser = RssParser()
-        return rssParser.parse(xmlString)
+        rssParser.parse(xmlString)
     }
 }

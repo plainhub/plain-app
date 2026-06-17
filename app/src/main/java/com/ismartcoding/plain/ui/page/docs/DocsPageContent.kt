@@ -21,7 +21,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.docs.DDoc
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -103,7 +102,7 @@ internal fun ColumnScope.DocsPageContent(
                             item(key = "loadMore") {
                                 if (itemsState.isNotEmpty() && !docsVM.noMore.value) {
                                     LaunchedEffect(Unit) {
-                                        scope.launch(Dispatchers.IO) { withIO { docsVM.moreAsync(context, tagsVM) } }
+                                        scope.launch(Dispatchers.IO) { docsVM.moreAsync(context, tagsVM) }
                                     }
                                 }
                                 LoadMoreRefreshContent(docsVM.noMore.value)

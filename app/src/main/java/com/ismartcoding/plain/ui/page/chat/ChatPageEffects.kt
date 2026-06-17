@@ -43,8 +43,8 @@ fun ChatPageEffects(
     LaunchedEffect(Unit) {
         onInputLoaded(ChatInputTextPreference.getAsync())
         scope.launch(Dispatchers.IO) {
-            chatVM.initializeChatStateAsync(id)
-            chatVM.fetchAsync(chatVM.chatState.value.target.toId)
+            chatVM.initializeTargetAsync(id)
+            chatVM.fetchAsync(chatVM.target.value.toId)
         }
         peerVM.loadPeers()
     }
@@ -55,7 +55,7 @@ fun ChatPageEffects(
                 is DeleteChatItemViewEvent -> chatVM.remove(event.id)
                 is HChatItemsDeletedEvent -> chatVM.removeIds(event.ids)
                 is HMessageCreatedEvent -> {
-                    if (chatVM.chatState.value.target == event.target) {
+                    if (chatVM.target.value == event.target) {
                         chatVM.addAll(event.items)
                         scope.launch { scrollState.scrollToItem(0) }
                     }
@@ -63,7 +63,7 @@ fun ChatPageEffects(
 
                 is PickFileResultEvent -> {
                     if (event.tag != PickFileTag.SEND_MESSAGE) return@collect
-                    handleFileSelection(event, context, chatVM, scrollState, focusManager)
+                    handleFileSelection(event, context, chatVM, peerVM, scrollState, focusManager)
                 }
             }
         }

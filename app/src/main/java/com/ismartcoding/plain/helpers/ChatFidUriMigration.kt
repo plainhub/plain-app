@@ -2,6 +2,7 @@ package com.ismartcoding.plain.helpers
 
 import android.content.Context
 import com.ismartcoding.lib.extensions.appDir
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
@@ -22,7 +23,7 @@ import java.io.File
  */
 object ChatFidUriMigration {
 
-    fun run(context: Context) {
+    suspend fun run(context: Context) = withIO {
         val chatDao = AppDatabase.instance.chatDao()
         val fileDao = AppDatabase.instance.appFileDao()
         val renamedHashes = mutableSetOf<String>()
@@ -91,7 +92,7 @@ object ChatFidUriMigration {
         LogCat.d("ChatFidUriMigration: done, processed ${chats.size} chats")
     }
 
-    private fun renameLegacyFile(
+    private suspend fun renameLegacyFile(
         context: Context,
         hash: String,
         ext: String,

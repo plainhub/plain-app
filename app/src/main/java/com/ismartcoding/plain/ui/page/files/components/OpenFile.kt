@@ -100,7 +100,7 @@ fun openFile(
                     val audio = DPlaylistAudio.fromPath(context, path)
                     if (audioPlaylistVM != null) {
                         coMain {
-                            withIO { audioPlaylistVM.playlistItems.value = listOf(audio) }
+                            audioPlaylistVM.playlistItems.value = listOf(audio)
                             audioPlaylistVM.selectedPath.value = path
                             AudioPlayer.play(context, audio)
                         }

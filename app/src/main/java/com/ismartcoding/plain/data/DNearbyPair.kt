@@ -26,6 +26,7 @@ data class DPairingRequest(
 @Serializable
 data class DPairingResult(
     val deviceId: String,
+    val deviceName: String,
     val error: String = "",
 )
 

@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preferences.VideoGridCellsPerRowPreference
@@ -93,7 +92,7 @@ internal fun VideosPageGrid(
                                 }
                             }
                             item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
-                                if (itemsState.isNotEmpty() && !videosVM.noMore.value) { LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { withIO { videosVM.moreAsync(context, tagsVM) } } } }
+                                if (itemsState.isNotEmpty() && !videosVM.noMore.value) { LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { videosVM.moreAsync(context, tagsVM) } } }
                                 LoadMoreRefreshContent(videosVM.noMore.value)
                             }
                             item(span = { GridItemSpan(maxLineSpan) }, key = "bottomSpace") { BottomSpace(paddingValues) }

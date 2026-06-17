@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features
 
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DTag
@@ -18,19 +19,19 @@ object TagHelper {
         AppDatabase.instance.tagRelationDao()
     }
 
-    fun count(type: DataType): List<DTagCount> {
-        return tagRelationDao.getAll(type.value)
+    suspend fun count(type: DataType): List<DTagCount> = withIO {
+        tagRelationDao.getAll(type.value)
     }
 
-    fun getAll(type: DataType): List<DTag> {
-        return tagDao.getAll(type.value)
+    suspend fun getAll(type: DataType): List<DTag> = withIO {
+        tagDao.getAll(type.value)
     }
 
-    fun get(id: String): DTag? {
-        return tagDao.getById(id)
+    suspend fun get(id: String): DTag? = withIO {
+        tagDao.getById(id)
     }
 
-    fun addOrUpdate(id: String, updateItem: DTag.() -> Unit): String {
+    suspend fun addOrUpdate(id: String, updateItem: DTag.() -> Unit): String = withIO {
         var item = if (id.isNotEmpty()) tagDao.getById(id) else null
         var isInsert = false
         if (item == null) {
@@ -48,72 +49,72 @@ object TagHelper {
             tagDao.update(item)
         }
 
-        return item.id
+        item.id
     }
 
-    fun delete(id: String) {
-        return tagDao.delete(id)
+    suspend fun delete(id: String) = withIO {
+        tagDao.delete(id)
     }
 
-    fun getTagRelationsByKeys(
+    suspend fun getTagRelationsByKeys(
         keys: Set<String>,
         type: DataType,
-    ): List<DTagRelation> {
+    ): List<DTagRelation> = withIO {
         val items = mutableListOf<DTagRelation>()
         keys.chunked(50).forEach { chunk ->
             items.addAll(tagRelationDao.getAllByKeys(chunk.toSet(), type.value))
         }
-        return items
+        items
     }
 
-    fun getTagRelationsByKeysMap(
+    suspend fun getTagRelationsByKeysMap(
         keys: Set<String>,
         type: DataType,
-    ): Map<String, List<DTagRelation>> {
-        return getTagRelationsByKeys(keys, type).groupBy { it.key }
+    ): Map<String, List<DTagRelation>> = withIO {
+        getTagRelationsByKeys(keys, type).groupBy { it.key }
     }
 
-    fun getTagRelationsByKey(
+    suspend fun getTagRelationsByKey(
         key: String,
         type: DataType,
-    ): List<DTagRelation> {
-        return tagRelationDao.getAllByKey(key, type.value)
+    ): List<DTagRelation> = withIO {
+        tagRelationDao.getAllByKey(key, type.value)
     }
 
-    fun getKeysByTagId(tagId: String): List<String> {
-        return tagRelationDao.getKeysByTagId(tagId)
+    suspend fun getKeysByTagId(tagId: String): List<String> = withIO {
+        tagRelationDao.getKeysByTagId(tagId)
     }
 
-    suspend fun getKeysByTagIdsAsync(tagIds: Set<String>): List<String> {
+    suspend fun getKeysByTagIdsAsync(tagIds: Set<String>): List<String> = withIO {
         val items = tagRelationDao.getAllByTagIds(tagIds)
-        return items.groupBy { it.key }.filter { it.value.size == tagIds.size }.map { it.key }
+        items.groupBy { it.key }.filter { it.value.size == tagIds.size }.map { it.key }
     }
 
-    fun addTagRelations(items: List<DTagRelation>) {
+    suspend fun addTagRelations(items: List<DTagRelation>) = withIO {
         tagRelationDao.insert(*items.toTypedArray())
     }
 
-    fun deleteTagRelationsByTagId(tagId: String) {
+    suspend fun deleteTagRelationsByTagId(tagId: String) = withIO {
         tagRelationDao.deleteByTagId(tagId)
     }
 
-    fun deleteByTypeAsync(type: DataType) {
+    suspend fun deleteByTypeAsync(type: DataType) = withIO {
         tagRelationDao.deleteByType(type.value)
     }
 
-    fun deleteTagRelationByKeys(keys: Set<String>, type: DataType) {
+    suspend fun deleteTagRelationByKeys(keys: Set<String>, type: DataType) = withIO {
         keys.chunked(50).forEach { chunk ->
             tagRelationDao.deleteByKeys(chunk.toSet(), type.value)
         }
     }
 
-    fun deleteTagRelationByKeysTagId(keys: Set<String>, tagId: String) {
+    suspend fun deleteTagRelationByKeysTagId(keys: Set<String>, tagId: String) = withIO {
         keys.chunked(50).forEach { chunk ->
             tagRelationDao.deleteByKeysTagId(chunk.toSet(), tagId)
         }
     }
 
-    fun deleteTagRelationByKeysTagIds(keys: Set<String>, tagIds: Set<String>) {
+    suspend fun deleteTagRelationByKeysTagIds(keys: Set<String>, tagIds: Set<String>) = withIO {
         keys.chunked(50).forEach { chunk ->
             tagRelationDao.deleteByKeysTagIds(chunk.toSet(), tagIds)
         }

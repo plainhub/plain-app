@@ -8,6 +8,7 @@ import com.ismartcoding.lib.extensions.count
 import com.ismartcoding.lib.extensions.getSearchCursor
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.map
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.StringHelper
 
 abstract class BaseContentHelper {
@@ -15,13 +16,13 @@ abstract class BaseContentHelper {
     protected abstract suspend fun buildWhereAsync(query: String): ContentWhere
     protected abstract fun getProjection(): Array<String>
 
-    suspend fun countAsync(context: Context, query: String): Int {
-        return context.contentResolver.count(uriExternal, buildWhereAsync(query))
+    suspend fun countAsync(context: Context, query: String): Int = withIO {
+        context.contentResolver.count(uriExternal, buildWhereAsync(query))
     }
 
-    suspend fun getIdsAsync(context: Context, query: String): Set<String> {
+    suspend fun getIdsAsync(context: Context, query: String): Set<String> = withIO {
         val where = buildWhereAsync(query)
-        return context.contentResolver.getSearchCursor(uriExternal, getProjection(), where)?.map { cursor, cache ->
+        context.contentResolver.getSearchCursor(uriExternal, getProjection(), where)?.map { cursor, cache ->
             cursor.getStringValue(BaseColumns._ID, cache)
         }?.toSet() ?: emptySet()
     }

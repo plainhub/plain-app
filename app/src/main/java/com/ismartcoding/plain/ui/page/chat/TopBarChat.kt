@@ -62,7 +62,7 @@ fun TopBarChat(
                     },
                     onClick = {
                         dismiss()
-                        navController.navigate(Routing.Nearby())
+                        navController.navigate(Routing.Nearby)
                     },
                 )
             }

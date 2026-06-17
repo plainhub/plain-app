@@ -16,3 +16,7 @@ fun DPeer.getApiUrl(): String = "${getBaseUrl()}/peer_graphql"
 fun DPeer.getStatusWsUrl(): String = "wss://${getBestIp()}:$port/status"
 
 fun DPeer.getFileUrl(fileId: String): String = "${getBaseUrl()}/fs?id=${fileId.urlEncode()}"
+
+fun DPeer.getName(): String {
+    return name.ifBlank { getBestIp() }
+}

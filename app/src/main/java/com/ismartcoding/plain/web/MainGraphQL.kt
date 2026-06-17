@@ -8,6 +8,7 @@ import com.ismartcoding.lib.kgraphql.schema.Schema
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
@@ -42,6 +43,7 @@ import com.ismartcoding.plain.web.schemas.addSmsSchema
 import com.ismartcoding.plain.web.schemas.addTagSchema
 import com.ismartcoding.plain.web.schemas.addDataStoreSchema
 import com.ismartcoding.plain.web.schemas.addDbSchema
+import com.ismartcoding.plain.web.schemas.addDiscoverSchema
 import com.ismartcoding.plain.web.schemas.addVideoSchema
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -92,6 +94,7 @@ class MainGraphQL(val schema: Schema) {
                 addAppLogsSchema()
                 addDataStoreSchema()
                 addDbSchema()
+                addDiscoverSchema()
                 addBookmarkSchema()
                 addPairingSchema()
                 addPeerSchema()
@@ -109,9 +112,9 @@ class MainGraphQL(val schema: Schema) {
             schema: Schema,
             query: String,
             call: ApplicationCall,
-        ): String {
+        ): String = withIO {
             val request = Json.decodeFromString(GraphqlRequest.serializer(), query)
-            return schema.execute(
+            schema.execute(
                 request.query,
                 request.variables?.toString(),
                 context { +call },
@@ -137,7 +140,13 @@ class MainGraphQL(val schema: Schema) {
                             return@post
                         }
                         val clientId = call.request.header("c-id") ?: ""
-                        if (clientId.isNotEmpty()) {
+                        if (clientId.isEmpty()) {
+                            call.respond(HttpStatusCode.Unauthorized)
+                            return@post
+                        }
+
+                        val authStr = call.request.header("authorization")?.split(" ")
+                        if (authStr.isNullOrEmpty()) {
                             val token = HttpServerManager.tokenCache[clientId]
                             if (token == null) {
                                 call.respond(HttpStatusCode.Unauthorized)
@@ -167,15 +176,7 @@ class MainGraphQL(val schema: Schema) {
                             val r = executeGraphqlQL(schema, parsed.body, call)
                             call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                         } else {
-                            if (clientId.isEmpty()) {
-                                call.respondText(
-                                    """{"errors":[{"message":"Unauthorized"}]}""",
-                                    contentType = ContentType.Application.Json,
-                                )
-                                return@post
-                            }
-                            val authStr = call.request.header("authorization")?.split(" ")
-                            val bearerToken = authStr?.getOrNull(1) ?: ""
+                            val bearerToken = authStr.getOrNull(1) ?: ""
                             val session = SessionList.getByClientIdAsync(clientId)
                             if (
                                 bearerToken.isEmpty() ||
@@ -183,10 +184,7 @@ class MainGraphQL(val schema: Schema) {
                                 session.type != DSession.TYPE_CUSTOM ||
                                 session.token != bearerToken
                             ) {
-                                call.respondText(
-                                    """{"errors":[{"message":"Unauthorized"}]}""",
-                                    contentType = ContentType.Application.Json,
-                                )
+                                call.respond(HttpStatusCode.Unauthorized)
                                 return@post
                             }
 
@@ -211,7 +209,8 @@ class MainGraphQL(val schema: Schema) {
                         val clientId = call.request.header("c-id") ?: ""
                         val type = call.request.header("c-type") ?: "" // peer
                         val channelId = call.request.header("c-cid") ?: "" // chat channel id
-                        if (clientId.isNotEmpty()) {
+                        val authStr = call.request.header("authorization")?.split(" ")
+                        if (authStr.isNullOrEmpty()) {
                             val token = if (channelId.isNotEmpty()) {
                                 ChatCacheManager.channelKeyCache[channelId]
                             } else if (type == "peer") {

@@ -7,8 +7,8 @@ import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.docs.DDoc
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
@@ -25,7 +25,7 @@ class DocsViewModel : BaseMediaViewModel<DDoc>() {
     var tabsShowTags = mutableStateOf(false)
     var tabs = mutableStateOf(listOf<VTabData>())
 
-    override fun getQuery(): String {
+    override suspend fun getQuery(): String {
         val query = super.getQuery()
         if (!tabsShowTags.value && fileType.value.isNotEmpty()) {
             return "$query ext:${fileType.value}"
@@ -33,9 +33,9 @@ class DocsViewModel : BaseMediaViewModel<DDoc>() {
         return query
     }
 
-    override suspend fun loadAsync(context: Context, tagsVM: TagsViewModel) {
+    override suspend fun loadAsync(context: Context, tagsVM: TagsViewModel) = withIO {
         offset.intValue = 0
-        _itemsFlow.value = searchMediaAsync(context, getQuery()).toMutableStateList()
+        _itemsFlow.value = searchMediaAsync(context, getQuery())
         tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.intValue = countMediaAsync(context, getTotalQuery())
         totalTrash.intValue = countMediaAsync(context, getTrashQuery())
@@ -55,7 +55,7 @@ class DocsViewModel : BaseMediaViewModel<DDoc>() {
     }
 
     fun delete(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             DocMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, trash.value)

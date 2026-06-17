@@ -31,7 +31,7 @@ internal suspend fun sharePreviewImage(context: Context, m: PreviewItem) {
             ShareHelper.shareFile(context, tempFile, m.getMimeType().ifEmpty { "image/*" })
         } else {
             DialogHelper.showLoading()
-            val r = withIO { DownloadHelper.downloadToTempAsync(m.path, tempFile) }
+            val r = DownloadHelper.downloadToTempAsync(m.path, tempFile)
             DialogHelper.hideLoading()
             if (r.success) {
                 ShareHelper.shareFile(context, File(r.path), m.getMimeType().ifEmpty { "image/*" })
@@ -59,7 +59,7 @@ internal suspend fun savePreviewImage(context: Context, m: PreviewItem) {
             return
         }
         val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_PICTURES)
-        val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
+        val r = DownloadHelper.downloadAsync(m.path, dir.absolutePath)
         DialogHelper.hideLoading()
         if (r.success) {
             DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.image_save_to, "path", r.path))

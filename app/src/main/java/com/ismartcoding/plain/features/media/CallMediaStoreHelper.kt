@@ -10,6 +10,7 @@ import com.ismartcoding.lib.extensions.getIntValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DCall
 import com.ismartcoding.plain.extensions.normalizeComparison
 import com.ismartcoding.plain.extensions.parseEpochMillis
@@ -71,13 +72,13 @@ object CallMediaStoreHelper : BaseContentHelper() {
         query: String,
         limit: Int,
         offset: Int,
-    ): List<DCall> {
+    ): List<DCall> = withIO {
         if (limit <= 0) {
-            return emptyList()
+            return@withIO emptyList()
         }
 
         val where = buildWhereAsync(query)
-        return context.contentResolver.query(
+        context.contentResolver.query(
             uriExternal.withCallLogPaging(limit, offset),
             getProjection(),
             where.toSelection(),

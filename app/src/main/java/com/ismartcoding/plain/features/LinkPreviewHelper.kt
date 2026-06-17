@@ -14,11 +14,9 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.readRawBytes
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.URL
 import java.util.regex.Pattern
@@ -208,13 +206,13 @@ object LinkPreviewHelper {
 
     private suspend fun downloadImageWithSize(context: Context, imageUrl: String, originalUrl: String): Triple<String?, Int, Int> {
         return try {
-            withContext(Dispatchers.IO) {
+            withIO {
                 val client = HttpClientManager.browserClient()
                 val response = client.get(imageUrl)
 
                 if (!response.status.isSuccess()) {
                     client.close()
-                    return@withContext Triple(null, 0, 0)
+                    return@withIO Triple(null, 0, 0)
                 }
 
                 val contentType = response.headers["Content-Type"]?.lowercase() ?: ""
@@ -223,13 +221,13 @@ object LinkPreviewHelper {
                     !(isFaviconFile && (contentType.contains("icon") || contentType.contains("octet-stream")))
                 ) {
                     client.close()
-                    return@withContext Triple(null, 0, 0)
+                    return@withIO Triple(null, 0, 0)
                 }
 
                 val imageBytes = response.readRawBytes()
                 if (imageBytes.size > MAX_IMAGE_SIZE) {
                     client.close()
-                    return@withContext Triple(null, 0, 0)
+                    return@withIO Triple(null, 0, 0)
                 }
 
                 val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -243,7 +241,7 @@ object LinkPreviewHelper {
                 if (imageWidth < 100 || imageHeight < 100) {
                     if (!isFavicon) {
                         client.close()
-                        return@withContext Triple(null, imageWidth, imageHeight)
+                        return@withIO Triple(null, imageWidth, imageHeight)
                     }
                 }
 
@@ -267,7 +265,7 @@ object LinkPreviewHelper {
 
                 if (file.exists()) {
                     client.close()
-                    return@withContext Triple("app://${Environment.DIRECTORY_PICTURES}/link_previews/${fileName}", imageWidth, imageHeight)
+                    return@withIO Triple("app://${Environment.DIRECTORY_PICTURES}/link_previews/${fileName}", imageWidth, imageHeight)
                 }
 
                 file.writeBytes(imageBytes)

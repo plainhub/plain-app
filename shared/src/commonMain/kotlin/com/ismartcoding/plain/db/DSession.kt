@@ -59,20 +59,20 @@ data class SessionClientTsUpdate(
 @Dao
 interface SessionDao {
     @Query("SELECT * FROM sessions ORDER BY last_active_at DESC")
-    fun getAll(): List<DSession>
+    suspend fun getAll(): List<DSession>
 
     @Query("SELECT * FROM sessions WHERE client_id=:clientId")
-    fun getByClientId(clientId: String): DSession?
+    suspend fun getByClientId(clientId: String): DSession?
 
     @Insert
-    fun insert(vararg item: DSession)
+    suspend fun insert(vararg item: DSession)
 
     @Update
-    fun update(vararg item: DSession)
+    suspend fun update(vararg item: DSession)
 
     @Update(entity = DSession::class)
-    fun updateTs(items: List<SessionClientTsUpdate>)
+    suspend fun updateTs(items: List<SessionClientTsUpdate>)
 
     @Query("DELETE FROM sessions WHERE client_id=:clientId")
-    fun delete(clientId: String)
+    suspend fun delete(clientId: String)
 }

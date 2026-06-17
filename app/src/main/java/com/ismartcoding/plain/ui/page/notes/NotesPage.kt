@@ -30,7 +30,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonTags
@@ -75,7 +74,7 @@ fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM:
     val tabs = remember(tagsState, notesVM.total.intValue, notesVM.totalTrash.intValue) {
         listOf(VTabData(LocaleHelper.getString(Res.string.all), "all", notesVM.total.intValue), VTabData(LocaleHelper.getString(Res.string.trash), "trash", notesVM.totalTrash.intValue), *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray())
     }
-    val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { withIO { notesVM.loadAsync(tagsVM) } }; setRefreshState(RefreshContentState.Finished) }
+    val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { notesVM.loadAsync(tagsVM) }; setRefreshState(RefreshContentState.Finished) }
 
     NotesPageEffects(notesVM, tagsVM, scrollBehavior, scrollStateMap, pagerState, scope, isFirstTime)
 

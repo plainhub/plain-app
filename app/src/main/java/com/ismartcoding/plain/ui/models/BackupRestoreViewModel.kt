@@ -32,7 +32,7 @@ class BackupRestoreViewModel : ViewModel() {
      * Writes the backup zip directly to app-specific external storage (no permission required).
      */
     fun backupToFile(context: Context, fileName: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DialogHelper.showLoading()
             try {
                 val tmpFile = File(context.cacheDir, fileName)
@@ -53,7 +53,7 @@ class BackupRestoreViewModel : ViewModel() {
     }
 
     fun backup(context: Context, uri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DialogHelper.showLoading()
             try {
                 val stream = contentResolver.openOutputStream(uri)
@@ -73,14 +73,14 @@ class BackupRestoreViewModel : ViewModel() {
     }
 
     fun restore(context: Context, uri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
+        launchIO {
             DialogHelper.showLoading()
             try {
                 val fileName = contentResolver.queryOpenableFileName(uri)
                 if (!fileName.endsWith(".zip")) {
                     DialogHelper.hideLoading()
                     DialogHelper.showMessage(Res.string.invalid_file)
-                    return@launch
+                    return@launchIO
                 }
                 contentResolver.openInputStream(uri)?.use { stream ->
                     val destFile = File(context.cacheDir, "restore")

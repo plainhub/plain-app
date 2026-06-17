@@ -2,6 +2,7 @@ package com.ismartcoding.plain.features.book
 
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.plain.db.rawQuery
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.helpers.QueryHelper
@@ -12,7 +13,11 @@ object BookHelper {
         AppDatabase.instance.bookDao()
     }
 
-    suspend fun count(query: String): Int {
+    val bookChapterDao: BookChapterDao by lazy {
+        AppDatabase.instance.bookChapterDao()
+    }
+
+    suspend fun count(query: String): Int = withIO {
         var sql = "SELECT COUNT(id) FROM books"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -20,14 +25,14 @@ object BookHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        return bookDao.count(rawQuery(sql, where.args.toTypedArray()))
+        bookDao.count(rawQuery(sql, where.args.toTypedArray()))
     }
 
     suspend fun search(
         query: String,
         limit: Int,
         offset: Int,
-    ): List<DBook> {
+    ): List<DBook> = withIO {
         var sql = "SELECT * FROM books"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -37,19 +42,47 @@ object BookHelper {
 
         sql += " LIMIT $limit OFFSET $offset"
 
-        return bookDao.search(rawQuery(sql, where.args.toTypedArray()))
+        bookDao.search(rawQuery(sql, where.args.toTypedArray()))
     }
 
-    fun updateAsync(
-        id: String,
-        updateItem: DBook.() -> Unit,
-    ): String {
-        val item = bookDao.getById(id) ?: return id
-        item.updatedAt = TimeHelper.now()
-        updateItem(item)
-        bookDao.update(item)
+    suspend fun getById(id: String): DBook? = withIO {
+        bookDao.getById(id)
+    }
 
-        return item.id
+    suspend fun getAll(): List<DBook> = withIO {
+        bookDao.getAll()
+    }
+
+    suspend fun addAsync(book: DBook) = withIO {
+        bookDao.insert(book)
+    }
+
+    suspend fun updateAsync(book: DBook) = withIO {
+        bookDao.update(book)
+    }
+
+    suspend fun deleteAsync(ids: Set<String>) = withIO {
+        bookDao.delete(ids)
+    }
+
+    suspend fun getChaptersAsync(bookId: String): List<DBookChapter> = withIO {
+        bookChapterDao.getAll(bookId)
+    }
+
+    suspend fun getChapter(id: String): DBookChapter? = withIO {
+        bookChapterDao.getById(id)
+    }
+
+    suspend fun updateChapter(chapter: DBookChapter) = withIO {
+        bookChapterDao.update(chapter)
+    }
+
+    suspend fun addChapter(chapter: DBookChapter) = withIO {
+        bookChapterDao.insert(chapter)
+    }
+
+    suspend fun deleteChapters(ids: Set<String>) = withIO {
+        bookChapterDao.delete(ids)
     }
 
     private suspend fun parseQuery(

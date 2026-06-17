@@ -22,22 +22,30 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.capitalize
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.web.AuthRequest
+import com.ismartcoding.plain.web.HttpServerManager
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.close
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginRequestPage(
-    clientIp: String,
-    request: AuthRequest,
-    onDeny: () -> Unit,
-    onAllow: () -> Unit,
+    event: ConfirmToAcceptLoginEvent,
+    navController: NavHostController,
+    scope: LifecycleCoroutineScope,
 ) {
+    val request = event.request
+    val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
     val isWeb = request.browserName != "PlainApp"
     val titleRes = if (isWeb) Res.string.allow_web_access else Res.string.allow_desktop_access
     val descRes = if (isWeb) Res.string.allow_web_access_desc else Res.string.allow_desktop_access_desc
@@ -114,14 +122,24 @@ fun LoginRequestPage(
                 PFilledButton(
                     text = stringResource(Res.string.allow),
                     buttonSize = ButtonSize.LARGE,
-                    onClick = onAllow,
+                    onClick = {
+                        navController.popBackStack()
+                        scope.launch(Dispatchers.IO) {
+                            HttpServerManager.respondTokenAsync(event, clientIp)
+                        }
+                    },
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
                     text = stringResource(Res.string.deny),
                     buttonSize = ButtonSize.LARGE,
-                    onClick = onDeny,
                     type = ButtonType.DANGER,
+                    onClick = {
+                        navController.popBackStack()
+                        scope.launch(Dispatchers.IO) {
+                            event.session.close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "rejected"))
+                        }
+                    },
                 )
             }
         }

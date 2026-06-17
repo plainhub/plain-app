@@ -3,17 +3,21 @@ package com.ismartcoding.plain.ui.models
 import com.ismartcoding.plain.i18n.*
 
 import android.content.Context
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.events.StartHttpServerEvent
@@ -36,13 +40,15 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     var ip4s by savedStateHandle.saveable { mutableStateOf(emptyList<String>()) }
     var ip4 by savedStateHandle.saveable { mutableStateOf("") }
     var currentRootTab by savedStateHandle.saveable { mutableIntStateOf(0) }
+    var pendingLoginEvent by mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
+    var pendingPairingRequest by mutableStateOf<DPairingRequest?>(null)
 
     fun enableHttpServer(
         context: Context,
         enable: Boolean,
     ) {
         viewModelScope.launch {
-            withIO { WebPreference.putAsync(enable) }
+            WebPreference.putAsync(enable)
             if (enable) {
                 httpServerError = ""
                 if (!httpServerState.isProcessing() && httpServerState != HttpServerState.ON) {
@@ -67,16 +73,14 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                     }
                 }
             } else {
-                withIO {
-                    HttpServerManager.stopServiceAsync(context)
-                }
+                HttpServerManager.stopServiceAsync(context)
             }
         }
     }
 
     fun syncHttpServerState(context: Context) {
         viewModelScope.launch {
-            val webEnabled = withIO { WebPreference.getAsync() }
+            val webEnabled = WebPreference.getAsync()
             if (!webEnabled) {
                 if (!httpServerState.isProcessing()) {
                     httpServerState = HttpServerState.OFF
@@ -92,7 +96,7 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                 httpServerState = HttpServerState.STARTING
             }
 
-            val serverUp = withIO { HttpServerManager.checkServerAsync() }
+            val serverUp = HttpServerManager.checkServerAsync()
             if (serverUp) {
                 httpServerError = ""
                 httpServerState = HttpServerState.ON

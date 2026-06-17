@@ -2,12 +2,11 @@ package com.ismartcoding.plain.features.dlna.receiver
 
 import android.content.Context
 import android.net.wifi.WifiManager
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
 import java.net.DatagramPacket
 import java.net.InetAddress
 import java.net.MulticastSocket
@@ -20,7 +19,7 @@ object DlnaSsdpAdvertiser {
     private const val DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1"
     private const val AVT_TYPE = "urn:schemas-upnp-org:service:AVTransport:1"
 
-    suspend fun run(context: Context) = withContext(Dispatchers.IO) {
+    suspend fun run(context: Context) = withIO {
         val wifiMgr = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val lock = wifiMgr.createMulticastLock("DlnaRendererSsdp")
         lock.acquire()

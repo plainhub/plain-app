@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.appfiles
 
 import android.webkit.MimeTypeMap
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.DChat
@@ -33,14 +34,14 @@ object AppFileDisplayNameHelper {
         return if (ext.isNotEmpty()) "file.$ext" else "file"
     }
 
-    suspend fun resolveDisplayNameByPath(path: String, title: String): String {
-        if (title.isNotEmpty()) return title
+    suspend fun resolveDisplayNameByPath(path: String, title: String): String = withIO {
+        if (title.isNotEmpty()) return@withIO title
         // File may be stored as "{hash}.{ext}" or legacy "{hash}"; strip extension to get DB id
         val fileId = File(path).nameWithoutExtension
         val appFile = AppDatabase.instance.appFileDao().getById(fileId)
-            ?: return fileId
+            ?: return@withIO fileId
         val nameMap = buildNameMap(AppDatabase.instance.chatDao().getAll())
-        return resolveDisplayName(appFile, nameMap)
+        resolveDisplayName(appFile, nameMap)
     }
 
     private fun bindItems(items: List<DMessageFile>, map: MutableMap<String, String>) {

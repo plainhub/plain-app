@@ -7,7 +7,7 @@ import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.lib.kdataloader.ExecutionResult
 
 object TagsLoader {
-    fun load(
+    suspend fun load(
         ids: List<String>,
         type: DataType,
     ): List<ExecutionResult<List<Tag>>> {
@@ -31,7 +31,7 @@ object TagsLoader {
         }
     }
 
-    fun load(
+    suspend fun load(
         id: String,
         type: DataType,
     ): List<Tag> {

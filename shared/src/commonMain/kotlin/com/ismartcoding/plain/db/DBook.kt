@@ -24,23 +24,23 @@ data class DBook(
 @Dao
 interface BookDao {
     @Query("SELECT * FROM books")
-    fun getAll(): List<DBook>
+    suspend fun getAll(): List<DBook>
 
     @RawQuery
-    fun search(query: RoomRawQuery): List<DBook>
+    suspend fun search(query: RoomRawQuery): List<DBook>
 
     @RawQuery
-    fun count(query: RoomRawQuery): Int
+    suspend fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM books WHERE id=:id")
-    fun getById(id: String): DBook?
+    suspend fun getById(id: String): DBook?
 
     @Insert
-    fun insert(vararg item: DBook)
+    suspend fun insert(vararg item: DBook)
 
     @Update
-    fun update(vararg item: DBook)
+    suspend fun update(vararg item: DBook)
 
     @Query("DELETE FROM books WHERE id in (:ids)")
-    fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>)
 }

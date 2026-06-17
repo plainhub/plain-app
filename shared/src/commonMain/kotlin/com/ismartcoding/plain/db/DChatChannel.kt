@@ -110,23 +110,23 @@ data class DChatChannel(
 @Dao
 interface ChatChannelDao {
     @Query("SELECT * FROM chat_channels")
-    fun getAll(): List<DChatChannel>
+    suspend fun getAll(): List<DChatChannel>
 
     @Query("SELECT * FROM chat_channels WHERE id = :id")
-    fun getById(id: String): DChatChannel?
+    suspend fun getById(id: String): DChatChannel?
 
     @Query("SELECT * FROM chat_channels WHERE owner = 'me'")
-    fun getOwnedChannels(): List<DChatChannel>
+    suspend fun getOwnedChannels(): List<DChatChannel>
 
     @Insert
-    fun insert(vararg item: DChatChannel)
+    suspend fun insert(vararg item: DChatChannel)
 
     @Update
-    fun update(vararg item: DChatChannel)
+    suspend fun update(vararg item: DChatChannel)
 
     @Query("DELETE FROM chat_channels WHERE id = :id")
-    fun delete(id: String)
+    suspend fun delete(id: String)
 
     @Query("DELETE FROM chat_channels WHERE id in (:ids)")
-    fun deleteByIds(ids: List<String>)
+    suspend fun deleteByIds(ids: List<String>)
 }
