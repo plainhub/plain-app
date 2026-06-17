@@ -107,7 +107,6 @@
     <string name="channel_created">Kênh đã được tạo!</string>
     <string name="no_channels">Chưa có kênh nào</string>
     <string name="rename_channel">Đổi tên kênh</string>
-    <string name="manage_members">Quản lý thành viên</string>
     <string name="channel_members">Thành viên kênh</string>
     <string name="members">Thành viên</string>
     <string name="add_member">Thêm</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">Thành viên đang chờ</string>
     <string name="resend_invite">Gửi lại lời mời</string>
     <string name="kick_member">Xóa</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">Xóa thiết bị</string>
     <string name="delivery_status">Trạng thái giao</string>
     <string name="delivery_status_summary">%1$d / %2$d đã giao</string>

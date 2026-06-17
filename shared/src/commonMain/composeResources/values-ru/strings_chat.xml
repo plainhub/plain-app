@@ -107,7 +107,6 @@
     <string name="channel_created">Канал создан!</string>
     <string name="no_channels">Пока нет каналов</string>
     <string name="rename_channel">Переименовать канал</string>
-    <string name="manage_members">Управление участниками</string>
     <string name="channel_members">Участники канала</string>
     <string name="members">Участники</string>
     <string name="add_member">Добавить</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">Ожидающие участники</string>
     <string name="resend_invite">Повторить приглашение</string>
     <string name="kick_member">Удалить</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">Удалить устройство</string>
     <string name="delivery_status">Статус доставки</string>
     <string name="delivery_status_summary">%1$d / %2$d доставлено</string>

@@ -43,7 +43,6 @@ import com.ismartcoding.plain.ui.models.addChannelMember
 import com.ismartcoding.plain.ui.models.removeChannelMember
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
-import com.ismartcoding.plain.ui.page.chat.components.ChannelMembersDialog
 import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -74,7 +73,6 @@ fun ChatListPage(
     var showCreateChannelDialog by channelVM.showCreateChannelDialog
     var renameChannelId by remember { mutableStateOf<String?>(null) }
     var renameChannelName by remember { mutableStateOf("") }
-    var manageMembersChannelId by channelVM.manageMembersChannelId
     val channels = channelVM.channels.collectAsStateValue()
 
     PScaffold(
@@ -159,15 +157,6 @@ fun ChatListPage(
                 currentName = renameChannelName,
                 onDismiss = { renameChannelId = null },
                 onConfirm = { val id = renameChannelId!!; renameChannelId = null; channelVM.renameChannel(id, it) })
-        }
-        val managedChannel = manageMembersChannelId?.let { id -> channels.find { it.id == id } }
-        if (managedChannel != null) {
-            ChannelMembersDialog(
-                channel = managedChannel,
-                pairedPeers = peerVM.pairedPeers.toList(),
-                onAddMember = { channelVM.addChannelMember(managedChannel.id, it) },
-                onRemoveMember = { channelVM.removeChannelMember(managedChannel.id, it) },
-                onDismiss = { manageMembersChannelId = null })
         }
     }
 }

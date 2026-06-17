@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.page.chat
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.clickable
-import com.ismartcoding.plain.ui.models.addChannelMember
 import com.ismartcoding.plain.ui.models.removeChannelMember
 import com.ismartcoding.plain.ui.models.resendInvite
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.page.chat.components.ChannelMembersDialog
 import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
 
 @Composable
@@ -35,9 +33,6 @@ internal fun ChannelChatInfoDialogs(
     channelVM: ChannelViewModel,
     selectedMemberPeer: MutableState<DPeer?>,
     selectedPendingMemberPeer: MutableState<DPeer?>,
-    showMembersDialog: Boolean,
-    onDismissMembers: () -> Unit,
-    pairedPeers: List<DPeer>,
 ) {
     if (showRenameDialog && liveChannel != null) {
         RenameChannelDialog(
@@ -62,15 +57,6 @@ internal fun ChannelChatInfoDialogs(
                 onDismiss = { selectedPendingMemberPeer.value = null },
             )
         }
-    }
-
-    if (showMembersDialog && liveChannel != null) {
-        ChannelMembersDialog(
-            channel = liveChannel, pairedPeers = pairedPeers,
-            onAddMember = { peerId -> channelVM.addChannelMember(liveChannel.id, peerId) },
-            onRemoveMember = { peerId -> channelVM.removeChannelMember(liveChannel.id, peerId) },
-            onDismiss = onDismissMembers,
-        )
     }
 }
 

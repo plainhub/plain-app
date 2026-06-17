@@ -107,7 +107,6 @@
     <string name="channel_created">চ্যানেল তৈরি হয়েছে!</string>
     <string name="no_channels">এখনও কোনো চ্যানেল নেই</string>
     <string name="rename_channel">চ্যানেলের নাম পরিবর্তন করুন</string>
-    <string name="manage_members">সদস্য পরিচালনা করুন</string>
     <string name="channel_members">চ্যানেল সদস্য</string>
     <string name="members">সদস্য</string>
     <string name="add_member">যোগ করুন</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">মুলতুবি সদস্য</string>
     <string name="resend_invite">আমন্ত্রণ পুনরায় পাঠান</string>
     <string name="kick_member">বহিষ্কার</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">ডিভাইস মুছে ফেলুন</string>
     <string name="delivery_status">ডেলিভারি স্ট্যাটাস</string>
     <string name="delivery_status_summary">%1$d / %2$d ডেলিভারি হয়েছে</string>

@@ -107,7 +107,6 @@
     <string name="channel_created">頻道已建立！</string>
     <string name="no_channels">尚無頻道</string>
     <string name="rename_channel">重新命名頻道</string>
-    <string name="manage_members">管理成員</string>
     <string name="channel_members">頻道成員</string>
     <string name="members">成員</string>
     <string name="add_member">新增</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">待處理成員</string>
     <string name="resend_invite">重新發送邀請</string>
     <string name="kick_member">踢出</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">刪除裝置</string>
     <string name="delivery_status">傳送狀態</string>
     <string name="delivery_status_summary">%1$d / %2$d 已送達</string>

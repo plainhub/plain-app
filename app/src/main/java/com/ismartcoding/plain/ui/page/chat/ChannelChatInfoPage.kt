@@ -41,6 +41,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.models.addChannelMember
 import com.ismartcoding.plain.ui.models.clearAllMessages
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -57,7 +58,6 @@ fun ChannelChatInfoPage(
     val ownedByMe = liveChannel?.isOwnedByMe() == true
 
     val showRenameDialog = remember { mutableStateOf(false) }
-    val showMembersDialog = remember { mutableStateOf(false) }
     val selectedMemberPeer = remember { mutableStateOf<DPeer?>(null) }
     val selectedPendingMemberPeer = remember { mutableStateOf<DPeer?>(null) }
 
@@ -66,7 +66,6 @@ fun ChannelChatInfoPage(
     }
     val joinedMemberPeers = memberPeers.value.filter { peer -> liveChannel?.findMember(peer.id)?.isJoined() != false }
     val pendingMemberPeers = memberPeers.value.filter { peer -> liveChannel?.findMember(peer.id)?.isPending() == true }
-    val visibleJoinedMembers = joinedMemberPeers.filter { it.id != TempData.clientId }
 
     val meLabel = stringResource(Res.string.me)
     val ownerDisplayName: String = liveChannel?.owner?.let { ownerId ->
@@ -79,6 +78,34 @@ fun ChannelChatInfoPage(
                 ?: ownerId
         }
     } ?: ""
+
+    // Resolve owner's peer id ('me' sentinel maps to this device's clientId).
+    val ownerPeerId: String? = liveChannel?.let { c ->
+        if (c.owner == "me" || c.owner == TempData.clientId) TempData.clientId else c.owner
+    }
+    // Members shown in the list: owner pinned to the top, the rest sorted A-Z by display name.
+    val displayMembers: List<DPeer> = buildList {
+        val ownerPeer = ownerPeerId?.let { id -> joinedMemberPeers.find { it.id == id } }
+        if (ownerPeer != null) {
+            add(ownerPeer)
+            addAll(
+                joinedMemberPeers
+                    .filter { it.id != ownerPeer.id }
+                    .sortedBy { it.name.ifBlank { it.getBestIp() } },
+            )
+        } else {
+            addAll(joinedMemberPeers.sortedBy { it.name.ifBlank { it.getBestIp() } })
+        }
+    }
+    // Paired peers that are not yet members of this channel (and not the owner). A-Z.
+    val addablePeers: List<DPeer> = if (ownedByMe) {
+        val presentIds = (liveChannel?.members?.map { it.id } ?: emptyList()).toMutableSet().apply {
+            ownerPeerId?.let { add(it) }
+        }
+        peerVM.pairedPeers
+            .filter { it.id !in presentIds }
+            .sortedBy { it.name.ifBlank { it.getBestIp() } }
+    } else emptyList()
 
     PScaffold(topBar = {
         PTopAppBar(navController = navController, navigationIcon = { NavigationBackIcon { navController.navigateUp() } }, title = stringResource(Res.string.channel_info))
@@ -104,10 +131,10 @@ fun ChannelChatInfoPage(
                 }
 
                 item { VerticalSpace(dp = 16.dp) }
-                item { Subtitle(text = "${stringResource(Res.string.members)} (${visibleJoinedMembers.size})") }
+                item { Subtitle(text = "${stringResource(Res.string.members)} (${displayMembers.size})") }
                 item {
                     PCard {
-                        visibleJoinedMembers.forEach { peer ->
+                        displayMembers.forEach { peer ->
                             PListItem(
                                 modifier = Modifier.clickable { selectedMemberPeer.value = peer },
                                 title = peer.name.ifBlank { peer.getBestIp() },
@@ -115,12 +142,22 @@ fun ChannelChatInfoPage(
                                 showMore = true,
                             )
                         }
-                        if (ownedByMe) {
-                            PListItem(
-                                modifier = Modifier.clickable { showMembersDialog.value = true },
-                                title = stringResource(Res.string.manage_members),
-                                showMore = true,
-                            )
+                    }
+                }
+
+                if (ownedByMe && addablePeers.isNotEmpty()) {
+                    item { VerticalSpace(dp = 16.dp) }
+                    item { Subtitle(text = "${stringResource(Res.string.add_member)} (${addablePeers.size})") }
+                    item {
+                        PCard {
+                            addablePeers.forEach { peer ->
+                                PListItem(
+                                    modifier = Modifier.clickable { channelVM.addChannelMember(liveChannel.id, peer.id) },
+                                    title = peer.name.ifBlank { peer.getBestIp() },
+                                    subtitle = peer.getBestIp(),
+                                    showMore = true,
+                                )
+                            }
                         }
                     }
                 }
@@ -222,7 +259,5 @@ fun ChannelChatInfoPage(
         liveChannel = liveChannel, isOwner = ownedByMe,
         showRenameDialog = showRenameDialog.value, onDismissRename = { showRenameDialog.value = false },
         channelVM = channelVM, selectedMemberPeer = selectedMemberPeer, selectedPendingMemberPeer = selectedPendingMemberPeer,
-        showMembersDialog = showMembersDialog.value, onDismissMembers = { showMembersDialog.value = false },
-        pairedPeers = peerVM.pairedPeers.toList(),
     )
 }

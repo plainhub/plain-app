@@ -107,7 +107,6 @@
     <string name="channel_created">Canal créé !</string>
     <string name="no_channels">Pas encore de canaux</string>
     <string name="rename_channel">Renommer le canal</string>
-    <string name="manage_members">Gérer les membres</string>
     <string name="channel_members">Membres du canal</string>
     <string name="members">Membres</string>
     <string name="add_member">Ajouter</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">Membres en attente</string>
     <string name="resend_invite">Renvoyer l'invitation</string>
     <string name="kick_member">Expulser</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">Supprimer l'appareil</string>
     <string name="delivery_status">Statut de livraison</string>
     <string name="delivery_status_summary">%1$d / %2$d livrés</string>

@@ -107,7 +107,6 @@
     <string name="channel_created">Kanal oluşturuldu!</string>
     <string name="no_channels">Henüz kanal yok</string>
     <string name="rename_channel">Kanalı yeniden adlandır</string>
-    <string name="manage_members">Üyeleri yönet</string>
     <string name="channel_members">Kanal üyeleri</string>
     <string name="members">Üyeler</string>
     <string name="add_member">Ekle</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">Bekleyen üyeler</string>
     <string name="resend_invite">Daveti yeniden gönder</string>
     <string name="kick_member">Çıkar</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">Cihazı sil</string>
     <string name="delivery_status">Gönderim durumu</string>
     <string name="delivery_status_summary">%1$d / %2$d teslim edildi</string>

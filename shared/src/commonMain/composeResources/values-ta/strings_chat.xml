@@ -107,7 +107,6 @@
     <string name="channel_created">சேனல் உருவாக்கப்பட்டது!</string>
     <string name="no_channels">இன்னும் சேனல்கள் இல்லை</string>
     <string name="rename_channel">சேனலின் பெயரை மாற்று</string>
-    <string name="manage_members">உறுப்பினர்களை நிர்வகி</string>
     <string name="channel_members">சேனல் உறுப்பினர்கள்</string>
     <string name="members">உறுப்பினர்கள்</string>
     <string name="add_member">சேர்</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">நிலுவையில் உள்ள உறுப்பினர்கள்</string>
     <string name="resend_invite">அழைப்பை மீண்டும் அனுப்பு</string>
     <string name="kick_member">நீக்கு</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">சாதனத்தை நீக்கு</string>
     <string name="delivery_status">டெலிவரி நிலை</string>
     <string name="delivery_status_summary">%1$d / %2$d டெலிவர் செய்யப்பட்டது</string>

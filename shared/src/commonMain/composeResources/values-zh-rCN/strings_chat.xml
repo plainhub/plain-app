@@ -110,7 +110,6 @@
     <string name="channel_created">频道已创建！</string>
     <string name="no_channels">暂无频道</string>
     <string name="rename_channel">重命名频道</string>
-    <string name="manage_members">管理成员</string>
     <string name="channel_members">频道成员</string>
     <string name="members">成员</string>
     <string name="add_member">添加</string>
@@ -129,5 +128,6 @@
     <string name="pending_members">待处理成员</string>
     <string name="resend_invite">重新发送邀请</string>
     <string name="kick_member">踢出</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">删除设备</string>
 </resources>

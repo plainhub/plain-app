@@ -23,7 +23,6 @@ class ChannelViewModel : ViewModel() {
     val channels: StateFlow<List<DChatChannel>> = _channels.asStateFlow()
 
     val showCreateChannelDialog = mutableStateOf(false)
-    val manageMembersChannelId = mutableStateOf<String?>(null)
 
     init {
         refresh()

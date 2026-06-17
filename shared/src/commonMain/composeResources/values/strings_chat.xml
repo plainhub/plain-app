@@ -89,7 +89,6 @@
     <string name="channel_created">Channel created!</string>
     <string name="no_channels">No channels yet</string>
     <string name="rename_channel">Rename Channel</string>
-    <string name="manage_members">Manage Members</string>
     <string name="channel_members">Channel Members</string>
     <string name="members">Members</string>
     <string name="add_member">Add</string>
@@ -108,6 +107,7 @@
     <string name="pending_members">Pending Members</string>
     <string name="resend_invite">Resend Invite</string>
     <string name="kick_member">Kick</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">Delete Device</string>
     <string name="pair_devices_hint">Go to Nearby tab to pair with devices</string>
     <string name="add_device">Add device</string>

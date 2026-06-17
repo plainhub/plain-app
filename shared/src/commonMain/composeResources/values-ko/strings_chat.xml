@@ -107,7 +107,6 @@
     <string name="channel_created">채널이 생성되었습니다!</string>
     <string name="no_channels">아직 채널이 없습니다</string>
     <string name="rename_channel">채널 이름 변경</string>
-    <string name="manage_members">멤버 관리</string>
     <string name="channel_members">채널 멤버</string>
     <string name="members">멤버</string>
     <string name="add_member">추가</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">대기 중인 멤버</string>
     <string name="resend_invite">초대 재전송</string>
     <string name="kick_member">추방</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">장치 삭제</string>
     <string name="delivery_status">전송 상태</string>
     <string name="delivery_status_summary">%1$d / %2$d 전달됨</string>

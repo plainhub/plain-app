@@ -107,7 +107,6 @@
     <string name="channel_created">Kanaal aangemaakt!</string>
     <string name="no_channels">Nog geen kanalen</string>
     <string name="rename_channel">Kanaal hernoemen</string>
-    <string name="manage_members">Leden beheren</string>
     <string name="channel_members">Kanaalleden</string>
     <string name="members">Leden</string>
     <string name="add_member">Toevoegen</string>
@@ -126,6 +125,7 @@
     <string name="pending_members">Openstaande leden</string>
     <string name="resend_invite">Uitnodiging opnieuw verzenden</string>
     <string name="kick_member">Verwijderen</string>
+    <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">Apparaat verwijderen</string>
     <string name="delivery_status">Leveringsstatus</string>
     <string name="delivery_status_summary">%1$d / %2$d geleverd</string>
