@@ -69,7 +69,7 @@ fun ChatName(
                 }
 
                 // Message with delivery data.
-                m.fromId == "me" && m.statusData != null && m.statusData.total > 0 -> {
+                m.fromId == "me" && m.statusData != null && m.statusData.failedCount > 0 -> {
                     val statusData = m.statusData
                     val isAllFailed = statusData.allFailed
                     val isPeerFailureBadge = isPeerChat && isAllFailed

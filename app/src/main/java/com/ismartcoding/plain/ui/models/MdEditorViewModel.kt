@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import org.jetbrains.compose.resources.DrawableResource
 import android.content.Context
@@ -9,7 +8,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.plain.preferences.EditorAccessoryLevelPreference
@@ -17,8 +15,6 @@ import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
 import com.ismartcoding.plain.preferences.EditorSyntaxHighlightPreference
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.extensions.inlineWrap
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 data class MdAccessoryItem(val text: String, val before: String, val after: String = "")
 data class MdAccessoryItem2(val icon: DrawableResource, val click: (MdEditorViewModel) -> Unit = {})
@@ -36,7 +32,7 @@ class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     var level by savedStateHandle.saveable { mutableIntStateOf(0) }
 
     fun load(context: Context) {
-        launchIO {
+        launchSafe {
             level = EditorAccessoryLevelPreference.getAsync()
             wrapContent = EditorWrapContentPreference.getAsync()
             showLineNumbers = EditorShowLineNumbersPreference.getAsync()
@@ -46,21 +42,21 @@ class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     fun toggleLevel(context: Context) {
         level = if (level == 1) 0 else 1
-        launchIO {
+        launchSafe {
             EditorAccessoryLevelPreference.putAsync(level)
         }
     }
 
     fun toggleLineNumbers(context: Context) {
         showLineNumbers = !showLineNumbers
-        launchIO {
+        launchSafe {
             EditorShowLineNumbersPreference.putAsync(showLineNumbers)
         }
     }
 
     fun toggleWrapContent(context: Context) {
         wrapContent = !wrapContent
-        launchIO {
+        launchSafe {
             EditorWrapContentPreference.putAsync(wrapContent)
         }
     }

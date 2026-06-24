@@ -41,12 +41,12 @@ fun SchemaBuilder.addChatChannelSchema() {
     }
     mutation("addChatChannelMember") {
         resolver { id: ID, peerId: String ->
-            ChannelManager.addMember(id.value, peerId).toModel()
+            ChannelManager.inviteMember(id.value, peerId).toModel()
         }
     }
     mutation("removeChatChannelMember") {
         resolver { id: ID, peerId: String ->
-            ChannelManager.removeMember(id.value, peerId).toModel()
+            ChannelManager.kickMember(id.value, peerId).toModel()
         }
     }
     mutation("acceptChatChannelInvite") {

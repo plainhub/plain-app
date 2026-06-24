@@ -246,10 +246,51 @@ Owner device                            Invitee device
       │──── ChannelUpdate ──────────────────▶ │  (all current members)
       │     (includes memberPeers for new)    │
       │                                       │
-      │◀─── ChannelInviteDecline ─────────── │  3b. User declines
-      │                                       │
-      │  4b. Remove peerId from members       │
+       │◀─── ChannelInviteDecline ─────────── │  3b. User declines
+       │                                       │
+       │  4b. Remove peerId from members       │
 ```
+
+### Owner Cancels a Pending Invite
+
+The owner can revoke a pending invite (e.g. via the "Cancel" button on a pending
+member in `ChannelInfoPage`). The cancellation reuses the `channel_kick` wire
+message — the same `ChannelManager.kickMember` call that removes a joined member
+also removes a pending one. The receiver distinguishes the two cases by checking
+whether the local `ChannelMember` for self was `STATUS_PENDING` before the
+update.
+
+```
+Owner device                            Invitee device
+      │                                       │
+      │  1. Remove peerId from members;       │
+      │     version++ (kickMember)            │
+      │                                       │
+      │──── ChannelKick ────────────────────▶ │
+      │     (signed by owner for our peer id) │  2. findMember(self) was PENDING
+      │                                       │     → mark channel KICKED, remove
+      │                                       │       self from members
+      │                                       │     → fire ChannelInviteCanceledEvent
+      │                                       │     → MainActivityEvents pops
+      │                                       │       ChannelInviteRequest if it's on
+      │                                       │       top for this channel
+      │                                       │
+      │                                       │  3. If invitee had already tapped
+      │                                       │     Accept before the kick arrived:
+      │                                       │     ChannelManager.acceptInvite
+      │                                       │     re-checks self member status,
+      │                                       │     throws "Invite no longer valid"
+      │                                       │     (toast via launchSafe). Page
+      │                                       │     stays open since onSuccess
+      │                                       │     callback is not fired.
+```
+
+The accept-side guard is intentional: without it, the invitee would happily send
+`ChannelInviteAccept` to an owner who has already removed them, and the owner's
+`handleInviteAccept` would silently drop it — the invitee UI would pop with no
+indication that anything went wrong. By throwing on the invitee side, the user
+sees the error and the local state stays consistent (`channel.status = KICKED`,
+self absent from `members`).
 
 ### Metadata Update (rename / manage members)
 

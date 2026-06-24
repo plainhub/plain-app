@@ -123,7 +123,6 @@ data class DMessageStatusData(
     val deliveredResults: List<DMessageDeliveryResult> get() = results.filter { it.error == null }
     val allDelivered: Boolean get() = total > 0 && failedCount == 0
     val allFailed: Boolean get() = total > 0 && deliveredCount == 0
-    val hasPartialFailure: Boolean get() = deliveredCount > 0 && failedCount > 0
     fun deliveryLabel(): String = "$deliveredCount/$total"
 
     /**

@@ -120,8 +120,9 @@ fun LoginRequestPage(
                     .padding(horizontal = 16.dp),
             ) {
                 PFilledButton(
+                    modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.allow),
-                    buttonSize = ButtonSize.LARGE,
+                    buttonSize = ButtonSize.EXTRA_LARGE,
                     onClick = {
                         navController.popBackStack()
                         scope.launch(Dispatchers.IO) {
@@ -131,8 +132,9 @@ fun LoginRequestPage(
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
+                    modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.deny),
-                    buttonSize = ButtonSize.LARGE,
+                    buttonSize = ButtonSize.EXTRA_LARGE,
                     type = ButtonType.DANGER,
                     onClick = {
                         navController.popBackStack()

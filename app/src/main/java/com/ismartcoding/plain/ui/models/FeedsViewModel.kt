@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.rss.model.RssChannel
 import com.ismartcoding.plain.enums.DataType
@@ -18,11 +17,9 @@ import com.ismartcoding.plain.i18n.already_added
 import com.ismartcoding.plain.i18n.error
 import com.ismartcoding.plain.i18n.invalid_url
 import com.ismartcoding.plain.workers.FeedFetchWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectableViewModel<DFeed>, ViewModel() {
@@ -43,7 +40,7 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     override val selectedIds = mutableStateListOf<String>()
 
     fun loadAsync(withCount: Boolean = false) {
-        launchIO {
+        launchSafe {
             val countMap = if (withCount) {
                 FeedHelper.getFeedCounts().associate { it.id to it.count }
             } else {
@@ -58,7 +55,7 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     }
 
     fun updateFetchContent(id: String, value: Boolean) {
-        launchIO {
+        launchSafe {
             FeedHelper.updateAsync(id) {
                 this.fetchContent = value
             }
@@ -66,7 +63,7 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     }
 
     fun delete(ids: Set<String>) {
-        launchIO {
+        launchSafe {
             val entryIds = FeedEntryHelper.feedEntryDao.getIds(ids)
             if (entryIds.isNotEmpty()) {
                 TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
@@ -79,7 +76,7 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
 
     fun add() {
         editUrlError.value = ""
-        launchIO {
+        launchSafe {
             val id = FeedHelper.addAsync {
                 this.url = editUrl.value
                 this.name = editName.value
@@ -97,10 +94,10 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
             editUrlError.value = LocaleHelper.getString(Res.string.invalid_url)
             return
         }
-        launchIO {
+        launchSafe {
             if (FeedHelper.getByUrl(editUrl.value) != null) {
                 editUrlError.value = LocaleHelper.getStringAsync(Res.string.already_added)
-                return@launchIO
+                return@launchSafe
             }
             try {
                 rssChannel.value = FeedHelper.fetchAsync(editUrl.value)
@@ -119,11 +116,11 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
             editUrlError.value = LocaleHelper.getString(Res.string.invalid_url)
             return
         }
-        launchIO {
+        launchSafe {
             val a = FeedHelper.getByUrl(editUrl.value)
             if (a != null && a.id != editId.value) {
                 editUrlError.value = LocaleHelper.getStringAsync(Res.string.already_added)
-                return@launchIO
+                return@launchSafe
             }
             FeedHelper.updateAsync(editId.value) {
                 this.name = editName.value

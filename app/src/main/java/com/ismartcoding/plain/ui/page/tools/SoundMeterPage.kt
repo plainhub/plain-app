@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.events.RequestPermissionsEvent
@@ -65,27 +65,42 @@ fun SoundMeterPage(navController: NavHostController) {
     SoundMeterRecorder(audioRecord, isRunning, decibel, total, count, min, avg, max)
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController,
+        PTopAppBar(
+            navController = navController,
             title = stringResource(Res.string.sound_meter), actions = {
-                PIconButton(icon = Res.drawable.info, contentDescription = stringResource(Res.string.decibel_values),
-                    tint = MaterialTheme.colorScheme.onSurface) { decibelValuesDialogVisible.value = true }
+                PIconButton(
+                    icon = Res.drawable.info, contentDescription = stringResource(Res.string.decibel_values),
+                    tint = MaterialTheme.colorScheme.onSurface
+                ) { decibelValuesDialogVisible.value = true }
             })
     }, content = { paddingValues ->
         LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             item {
-                Column(modifier = Modifier.fillMaxWidth().padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 56.dp), horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Row(verticalAlignment = Alignment.Bottom) {
-                        Text(text = FormatHelper.formatFloat(abs(decibel.floatValue), digits = 1),
+                        Text(
+                            text = FormatHelper.formatFloat(abs(decibel.floatValue), digits = 1),
                             style = MaterialTheme.typography.displayLarge.copy(fontSize = 80.sp, fontWeight = FontWeight.Medium),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                         HorizontalSpace(dp = 16.dp)
-                        Text(modifier = Modifier.padding(bottom = 12.dp), text = "dB",
-                            style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            modifier = Modifier.padding(bottom = 12.dp), text = "dB",
+                            style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
             item {
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp, vertical = 24.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp, vertical = 24.dp), horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(text = stringResource(Res.string.min)); Text(text = FormatHelper.formatFloat(min.floatValue, digits = 1))
                     }
@@ -96,22 +111,71 @@ fun SoundMeterPage(navController: NavHostController) {
                         Text(text = stringResource(Res.string.max)); Text(text = FormatHelper.formatFloat(max.floatValue, digits = 1))
                     }
                 }
-                Text(text = decibelValueString, color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.fillMaxWidth().height(96.dp).padding(16.dp), textAlign = TextAlign.Center)
+                Text(
+                    text = decibelValueString, color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(96.dp)
+                        .padding(16.dp), textAlign = TextAlign.Center
+                )
                 if (isRunning.value) {
-                    PFilledButton(text = stringResource(Res.string.stop), modifier = Modifier.padding(horizontal = 16.dp), onClick = { isRunning.value = false })
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        PFilledButton(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.stop),
+                            buttonSize = ButtonSize.EXTRA_LARGE,
+                            onClick = { isRunning.value = false })
+                        PFilledButton(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.reset),
+                            buttonSize = ButtonSize.EXTRA_LARGE,
+                            type = ButtonType.DANGER,
+                            onClick = {
+                                total.floatValue = 0f; count.intValue = 0; decibel.floatValue = 0f
+                                min.floatValue = 0f; max.floatValue = 0f; avg.floatValue = 0f
+                            })
+                    }
+                } else if (count.intValue > 0) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        PFilledButton(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.start),
+                            buttonSize = ButtonSize.EXTRA_LARGE,
+                            onClick = {
+                                if (Permission.RECORD_AUDIO.can(context)) isRunning.value = true
+                                else sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))
+                            })
+                        PFilledButton(
+                            modifier = Modifier.weight(1f),
+                            text = stringResource(Res.string.reset),
+                            buttonSize = ButtonSize.EXTRA_LARGE,
+                            type = ButtonType.DANGER,
+                            onClick = {
+                                total.floatValue = 0f; count.intValue = 0; decibel.floatValue = 0f
+                                min.floatValue = 0f; max.floatValue = 0f; avg.floatValue = 0f
+                            })
+                    }
                 } else {
-                    PFilledButton(text = stringResource(Res.string.start), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
-                        if (Permission.RECORD_AUDIO.can(context)) isRunning.value = true
-                        else sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))
-                    })
-                }
-                if (count.intValue > 0) {
-                    VerticalSpace(dp = 40.dp)
-                    PFilledButton(text = stringResource(Res.string.reset), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
-                        total.floatValue = 0f; count.intValue = 0; decibel.floatValue = 0f
-                        min.floatValue = 0f; max.floatValue = 0f; avg.floatValue = 0f
-                    })
+                    PFilledButton(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .fillMaxWidth(),
+                        text = stringResource(Res.string.start),
+                        buttonSize = ButtonSize.EXTRA_LARGE,
+                        onClick = {
+                            if (Permission.RECORD_AUDIO.can(context)) isRunning.value = true
+                            else sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))
+                        })
                 }
                 BottomSpace(paddingValues)
             }
@@ -119,9 +183,10 @@ fun SoundMeterPage(navController: NavHostController) {
     })
 
     if (decibelValuesDialogVisible.value) {
-        AlertDialog(containerColor = MaterialTheme.colorScheme.surface,
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = { decibelValuesDialogVisible.value = false },
-            confirmButton = { Button(onClick = { decibelValuesDialogVisible.value = false }) { Text(stringResource(Res.string.close)) } },
+            confirmButton = { PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = { decibelValuesDialogVisible.value = false }) },
             title = { Text(text = stringResource(Res.string.decibel_values), style = MaterialTheme.typography.titleLarge) },
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {

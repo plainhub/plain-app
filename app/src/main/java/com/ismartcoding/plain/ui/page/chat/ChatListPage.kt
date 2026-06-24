@@ -69,7 +69,8 @@ fun ChatListPage(
         PullToRefresh(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = refreshState
+                .padding(top = paddingValues.calculateTopPadding()),
+            refreshLayoutState = refreshState
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item { TopSpace() }

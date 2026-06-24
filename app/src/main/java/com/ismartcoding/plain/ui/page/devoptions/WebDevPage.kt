@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.devoptions
+import androidx.compose.foundation.layout.fillMaxWidth
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -68,9 +69,9 @@ fun WebDevPage(
                         Tips(text = stringResource(Res.string.adb_token_desc))
                         VerticalSpace(dp = 16.dp)
                         PFilledButton(
+                            modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                             text = stringResource(Res.string.reset_token),
                             type = ButtonType.DANGER,
-                            modifier = Modifier.padding(horizontal = 16.dp),
                             onClick = {
                                 scope.launch(Dispatchers.IO) {
                                     AdbTokenPreference.resetAsync()

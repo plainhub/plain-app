@@ -7,7 +7,6 @@ import android.content.Context
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.docs.DDoc
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -15,8 +14,6 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.docs.DocMediaStoreHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class DocsViewModel : BaseMediaViewModel<DDoc>() {
     override val dataType = DataType.DOC
@@ -55,7 +52,7 @@ class DocsViewModel : BaseMediaViewModel<DDoc>() {
     }
 
     fun delete(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
-        launchIO {
+        launchSafe {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             DocMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, trash.value)

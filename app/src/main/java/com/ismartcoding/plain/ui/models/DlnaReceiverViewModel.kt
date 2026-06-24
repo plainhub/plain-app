@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -11,7 +10,6 @@ import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.features.dlna.receiver.DlnaRenderer
 import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
 import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,7 +55,7 @@ class DlnaReceiverViewModel : ViewModel() {
 
     private fun startRuleCheck(context: Context) {
         ruleCheckJob?.cancel()
-        ruleCheckJob = launchIO {
+        ruleCheckJob = launchSafe {
             DlnaRendererState.rawPendingCastRequest.filterNotNull().collect { pending ->
                 val allowed = DlnaAllowedSendersPreference.getAsync()
                 val denied = DlnaDeniedSendersPreference.getAsync()
@@ -96,7 +94,7 @@ class DlnaReceiverViewModel : ViewModel() {
             DlnaRendererState.commandChannel.trySend(DlnaCommand.Play)
         }
         if (rememberChoice && pending.senderIp.isNotEmpty()) {
-            launchIO {
+            launchSafe {
                 DlnaDeniedSendersPreference.removeAsync(pending.senderIp)
                 DlnaAllowedSendersPreference.addAsync(pending.senderIp, pending.senderName)
             }
@@ -108,7 +106,7 @@ class DlnaReceiverViewModel : ViewModel() {
         DlnaRendererState.pendingCastRequest.value = null
         DlnaRendererState.pendingPlayQueued.value = false
         if (rememberChoice && pending.senderIp.isNotEmpty()) {
-            launchIO {
+            launchSafe {
                 DlnaAllowedSendersPreference.removeAsync(pending.senderIp)
                 DlnaDeniedSendersPreference.addAsync(pending.senderIp, pending.senderName)
             }

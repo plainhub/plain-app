@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +23,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.enums.ButtonSize
 
 @Composable
 fun TextFieldDialog(
@@ -109,7 +109,9 @@ fun TextFieldDialog(
             }
         },
         confirmButton = {
-            Button(
+            PFilledButton(
+                text = confirmText,
+                buttonSize = ButtonSize.MEDIUM,
                 enabled = currentValue.isNotBlank(),
                 onClick = {
                     if (validator(currentValue)) {
@@ -119,14 +121,10 @@ fun TextFieldDialog(
                         showValidationError = true
                     }
                 },
-            ) {
-                Text(confirmText)
-            }
+            )
         },
         dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = dismissText)
-            }
+            PTextButton(text = dismissText, onClick = onDismissRequest)
         },
     )
 }

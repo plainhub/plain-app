@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.home
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import android.content.Context
@@ -97,20 +96,23 @@ fun HomeWebMainSection(
                         VerticalSpace(24.dp)
                         when (webState) {
                             WebState.OFF -> PFilledButton(
+                                modifier = Modifier.fillMaxWidth(),
                                 text = stringResource(Res.string.start_service),
                                 onClick = onRun ?: {},
-                                buttonSize = ButtonSize.LARGE,
+                                buttonSize = ButtonSize.EXTRA_LARGE,
                                 isLoading = isLoading,
                             )
 
                             WebState.ERROR -> PFilledButton(
+                                modifier = Modifier.fillMaxWidth(),
                                 text = stringResource(Res.string.relaunch_app),
                                 onClick = onRestartFix,
                                 type = ButtonType.TERTIARY,
-                                buttonSize = ButtonSize.LARGE,
+                                buttonSize = ButtonSize.EXTRA_LARGE,
                             )
 
                             else -> PFilledButton(
+                                modifier = Modifier.fillMaxWidth(),
                                 text = stringResource(Res.string.stop_service),
                                 onClick = {
                                     mainVM.enableHttpServer(
@@ -119,7 +121,7 @@ fun HomeWebMainSection(
                                     )
                                 },
                                 type = ButtonType.DANGER,
-                                buttonSize = ButtonSize.LARGE,
+                                buttonSize = ButtonSize.EXTRA_LARGE,
                             )
                         }
                         if (webState == WebState.ON && onlineCount > 0) {

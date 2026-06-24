@@ -15,8 +15,18 @@ import org.json.JSONObject
 data class GraphQLResponse(
     val data: JSONObject? = null,
     val errors: List<GraphQLError>? = null,
-    val isSuccess: Boolean = false
-)
+    val exception: Throwable? = null,
+) {
+    val isSuccess: Boolean = errors.isNullOrEmpty() || exception == null
+
+    fun getError(): String {
+        if (errors?.isNotEmpty() == true) {
+            return errors.joinToString(", ") { it.message }
+        }
+
+        return exception?.message ?: "Unknown error"
+    }
+}
 
 data class GraphQLError(
     val message: String
@@ -31,7 +41,7 @@ object PeerGraphQLClient {
         peer: DPeer,
         clientId: String,
         content: DMessageContent,
-    ): GraphQLResponse? {
+    ): GraphQLResponse {
         val mutation = $$"""
                 mutation CreateChatItem($content: String!) {
                     createChatItem(content: $content) {
@@ -63,7 +73,7 @@ object PeerGraphQLClient {
         payload: String,
         channelId: String = "",
         channelKey: String = "",
-    ): GraphQLResponse? {
+    ): GraphQLResponse {
         val mutation = $$"""
                 mutation ChannelSystemMessage($type: String!, $payload: String!) {
                     channelSystemMessage(type: $type, payload: $payload)
@@ -102,7 +112,7 @@ object PeerGraphQLClient {
         channelKey: String,
         clientId: String,
         content: DMessageContent,
-    ): GraphQLResponse? {
+    ): GraphQLResponse {
         val mutation = $$"""
                 mutation CreateChatItem($content: String!) {
                     createChatItem(content: $content) {
@@ -139,7 +149,7 @@ object PeerGraphQLClient {
         query: String,
         variables: Map<String, String>,
         channelId: String = "",
-    ): GraphQLResponse? {
+    ): GraphQLResponse {
         return try {
 
             val requestJson = JSONObject().apply {
@@ -174,15 +184,15 @@ object PeerGraphQLClient {
                 parseGraphQLResponse(responseBody)
             } else {
                 LogCat.e("GraphQL request failed: ${response.code} - $responseBody")
-                null
+                GraphQLResponse(null, null, Exception("${response.code} - ${response.message}"))
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            null
+            GraphQLResponse(null, null, e)
         }
     }
 
-    private fun parseGraphQLResponse(responseBody: String): GraphQLResponse? {
+    private fun parseGraphQLResponse(responseBody: String): GraphQLResponse {
         return try {
             val json = JSONObject(responseBody)
             val data = if (json.has("data") && !json.isNull("data")) {
@@ -202,10 +212,10 @@ object PeerGraphQLClient {
             } else {
                 null
             }
-            GraphQLResponse(data = data, errors = errors, isSuccess = errors.isNullOrEmpty())
+            GraphQLResponse(data = data, errors = errors)
         } catch (e: Exception) {
             LogCat.e("Failed to parse GraphQL response: ${e.message}")
-            null
+            GraphQLResponse(null, null, e)
         }
     }
 } 

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
 import com.ismartcoding.plain.ui.components.TagNameDialog
@@ -91,13 +92,13 @@ fun SelectTagsDialog(
                 })
             }
         }, confirmButton = {
-            Button(
+            PFilledButton(
+                text = stringResource(Res.string.close),
+                buttonSize = ButtonSize.MEDIUM,
                 onClick = {
                     onDismiss()
                 },
-            ) {
-                Text(stringResource(Res.string.close))
-            }
+            )
         }
     )
 }

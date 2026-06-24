@@ -9,19 +9,13 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.verifyEd25519Signature
+import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.helpers.TimeHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 
-/**
- * Handles incoming channel system messages received via [PeerGraphQL].
- *
- * Each handler updates the local DB and fires UI events as needed.
- * Methods run on the caller's thread (the Ktor request thread); DB calls are lightweight.
- */
-object ChannelSystemMessageHandler {
+object ChannelSystemMessageReceiver {
 
     suspend fun handle(fromId: String, type: String, payload: String) {
         try {
@@ -88,6 +82,27 @@ object ChannelSystemMessageHandler {
             return
         }
 
+        // Cryptographic ownership check: the per-message [signature] must verify
+        // against the owner's public key (sourced from memberPeers) over the
+        // canonical payload `"$channelId|$version|invite|<our peer id>"`. The
+        // target binding prevents an invite meant for peer A from being replayed
+        // to peer B.
+        val ownerMemberInfo = msg.memberPeers.find { it.id == msg.owner }
+        if (ownerMemberInfo == null) {
+            LogCat.e("Invite for channel ${msg.channelId} has no owner memberPeerInfo — rejected")
+            return
+        }
+        val invitePayload = channelMessagePayload(
+            channelId = msg.channelId,
+            version = msg.version,
+            action = ChannelSystemMessages.ACTION_INVITE,
+            target = TempData.clientId,
+        )
+        if (!verifyEd25519Signature(ownerMemberInfo.publicKey, invitePayload, msg.signature)) {
+            LogCat.e("Invite signature failed for channel ${msg.channelId} from $fromId — rejected")
+            return
+        }
+
         // Avoid duplicate processing for channels that are already active
         if (existingChannel != null && !isReinvite) {
             LogCat.d("Channel ${msg.channelId} already exists locally, ignoring invite")
@@ -136,10 +151,7 @@ object ChannelSystemMessageHandler {
             dao.insert(channel)
         }
 
-        // Refresh key cache so we can decrypt channel messages
-        runBlocking(Dispatchers.IO) {
-            ChatCacheManager.loadKeyCacheAsync()
-        }
+        ChatCacheManager.loadKeyCacheAsync()
 
         // Notify UI to show the invite dialog
         val peerName = peer.name.ifEmpty { fromId }
@@ -164,7 +176,7 @@ object ChannelSystemMessageHandler {
             return
         }
 
-        if (channel.owner != "me") {
+        if (!channel.isOwnedByMe()) {
             LogCat.e("InviteAccept received but we are not the owner of ${msg.channelId}")
             return
         }
@@ -212,11 +224,8 @@ object ChannelSystemMessageHandler {
         channel.updatedAt = TimeHelper.now()
         dao.update(channel)
 
-        // Broadcast updated membership to all
-        runBlocking(Dispatchers.IO) {
-            ChannelSystemMessageSender.broadcastUpdate(channel)
-            ChatCacheManager.loadKeyCacheAsync()
-        }
+        ChannelSystemMessageSender.broadcastUpdate(channel)
+        ChatCacheManager.loadKeyCacheAsync()
 
         sendEvent(ChannelUpdatedEvent())
         LogCat.d("Peer $fromId accepted invite for channel ${msg.channelId}")
@@ -226,7 +235,7 @@ object ChannelSystemMessageHandler {
         val dao = AppDatabase.instance.chatChannelDao()
         val channel = dao.getById(msg.channelId) ?: return
 
-        if (channel.owner != "me") return
+        if (!channel.isOwnedByMe()) return
 
         // Remove the declining peer from members
         if (channel.hasMember(fromId)) {
@@ -256,6 +265,27 @@ object ChannelSystemMessageHandler {
             return
         }
 
+        // Cryptographic ownership check: the per-message [signature] must verify
+        // against the owner's public key (from local DPeer row) over the
+        // canonical payload `"$channelId|$version|update|"`. Transport-layer
+        // Ed25519 already proves fromId is who they say they are; this check
+        // proves they actually control the channel's owner private key.
+        val ownerPeer = peerDao.getById(channel.owner)
+        if (ownerPeer == null) {
+            LogCat.e("ChannelUpdate: owner peer ${channel.owner} not found locally — rejected")
+            return
+        }
+        val updatePayload = channelMessagePayload(
+            channelId = msg.channelId,
+            version = msg.version,
+            action = ChannelSystemMessages.ACTION_UPDATE,
+            target = "",
+        )
+        if (!verifyEd25519Signature(ownerPeer.publicKey, updatePayload, msg.signature)) {
+            LogCat.e("ChannelUpdate signature failed for channel ${msg.channelId} from $fromId — rejected")
+            return
+        }
+
         // Only accept updates with a higher version (optimistic concurrency)
         if (msg.version <= channel.version) {
             LogCat.d("Ignoring stale ChannelUpdate (local=${channel.version}, remote=${msg.version})")
@@ -281,10 +311,7 @@ object ChannelSystemMessageHandler {
         channel.updatedAt = TimeHelper.now()
         dao.update(channel)
 
-        // Refresh cached keys
-        runBlocking(Dispatchers.IO) {
-            ChatCacheManager.loadKeyCacheAsync()
-        }
+        ChatCacheManager.loadKeyCacheAsync()
 
         sendEvent(ChannelUpdatedEvent())
         LogCat.d("Channel ${msg.channelId} updated to version ${msg.version}")
@@ -292,6 +319,7 @@ object ChannelSystemMessageHandler {
 
     private suspend fun handleKick(fromId: String, msg: ChannelSystemMessages.ChannelKick) {
         val dao = AppDatabase.instance.chatChannelDao()
+        val peerDao = AppDatabase.instance.peerDao()
         val channel = dao.getById(msg.channelId) ?: return
 
         // Only the channel owner may kick members
@@ -300,16 +328,39 @@ object ChannelSystemMessageHandler {
             return
         }
 
+        // Cryptographic ownership check: per-message [signature] must verify
+        // against owner's public key over `"$channelId|$version|kick|<our peer id>"`.
+        // The target binding ensures this kick was addressed to us specifically,
+        // not replayed to another member.
+        val ownerPeer = peerDao.getById(channel.owner)
+        if (ownerPeer == null) {
+            LogCat.e("ChannelKick: owner peer ${channel.owner} not found locally — rejected")
+            return
+        }
+        val kickPayload = channelMessagePayload(
+            channelId = msg.channelId,
+            version = msg.version,
+            action = ChannelSystemMessages.ACTION_KICK,
+            target = TempData.clientId,
+        )
+        if (!verifyEd25519Signature(ownerPeer.publicKey, kickPayload, msg.signature)) {
+            LogCat.e("ChannelKick signature failed for channel ${msg.channelId} from $fromId — rejected")
+            return
+        }
+
         // Update channel status to kicked; keep channel and chat history intact
+        val wasPending = channel.findMember(TempData.clientId)?.isPending() == true
         channel.status = DChatChannel.STATUS_KICKED
         // Remove self from the members list so we no longer appear in the members grid
         channel.members = channel.members.filter { it.id != TempData.clientId }
         dao.update(channel)
 
-        runBlocking(Dispatchers.IO) {
-            ChatCacheManager.loadKeyCacheAsync()
-        }
+        ChatCacheManager.loadKeyCacheAsync()
 
+        if (wasPending) {
+            // Owner cancelled a pending invite — dismiss the auto-opened accept page on our side.
+            sendEvent(ChannelInviteCanceledEvent(channelId = msg.channelId, ownerPeerId = fromId))
+        }
         sendEvent(ChannelUpdatedEvent())
         LogCat.d("Kicked from channel ${msg.channelId} by $fromId")
     }
@@ -318,7 +369,7 @@ object ChannelSystemMessageHandler {
         val dao = AppDatabase.instance.chatChannelDao()
         val channel = dao.getById(msg.channelId) ?: return
 
-        if (channel.owner != "me") {
+        if (!channel.isOwnedByMe()) {
             LogCat.e("ChannelLeave received but we are not the owner of ${msg.channelId}")
             return
         }
@@ -329,10 +380,7 @@ object ChannelSystemMessageHandler {
         channel.updatedAt = TimeHelper.now()
         dao.update(channel)
 
-        // Broadcast updated membership to remaining members
-        runBlocking(Dispatchers.IO) {
-            ChannelSystemMessageSender.broadcastUpdate(channel)
-        }
+        ChannelSystemMessageSender.broadcastUpdate(channel)
 
         sendEvent(ChannelUpdatedEvent())
         LogCat.d("Peer $fromId left channel ${msg.channelId}")

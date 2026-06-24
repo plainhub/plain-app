@@ -14,7 +14,7 @@ internal fun FilesViewModel.navigateToDirectoryInternal(context: Context, newPat
         navigationHistoryInternal.add(selectedPath)
         selectedPath = newPath
         rebuildBreadcrumbsInternal(newPath)
-        launchIO {
+        launchSafe {
             isLoading.value = true
             updateItemsInternal(emptyList())
             loadAsync(context)

@@ -5,17 +5,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.ui.base.PToast
@@ -50,15 +51,18 @@ fun MainDialogs(
             title = { if (it.title.isNotEmpty()) Text(it.title) },
             text = { Text(it.message) },
             confirmButton = {
-                Button(onClick = { it.confirmButton.second(); onDismissConfirm() }) {
-                    Text(it.confirmButton.first)
-                }
+                PFilledButton(
+                    text = it.confirmButton.first,
+                    buttonSize = ButtonSize.MEDIUM,
+                    onClick = { it.confirmButton.second(); onDismissConfirm() },
+                )
             },
             dismissButton = {
                 if (it.dismissButton != null) {
-                    TextButton(onClick = { it.dismissButton.second(); onDismissConfirm() }) {
-                        Text(it.dismissButton.first)
-                    }
+                    PTextButton(
+                        text = it.dismissButton.first,
+                        onClick = { it.dismissButton.second(); onDismissConfirm() },
+                    )
                 }
             },
         )

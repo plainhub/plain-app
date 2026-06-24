@@ -36,7 +36,6 @@ fun POutlinedButton(
     buttonSize: ButtonSize = ButtonSize.MEDIUM,
     isLoading: Boolean = false,
     enabled: Boolean = true,
-    block: Boolean = false,
     contentColor: Color? = null,
 ) {
     val resolvedColor = contentColor ?: when (type) {
@@ -50,7 +49,6 @@ fun POutlinedButton(
     OutlinedButton(
         onClick = onClick,
         modifier = modifier
-            .then(if (block || buttonSize != ButtonSize.SMALL) Modifier.fillMaxWidth() else Modifier)
             .height(buttonSize.height),
         shape = RoundedCornerShape(buttonSize.cornerRadius),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = resolvedColor),
@@ -68,11 +66,8 @@ fun POutlinedButton(
             }
             Text(
                 text = text,
-                style = when (buttonSize) {
-                    ButtonSize.SMALL -> MaterialTheme.typography.labelMedium
-                    ButtonSize.MEDIUM -> MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    ButtonSize.LARGE -> MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
-                },
+                style = buttonSize.textStyle(),
+                fontWeight = buttonSize.fontWeight()
             )
         }
     }

@@ -40,13 +40,15 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NearbyViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.page.chat.components.NearbyDeviceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NearbyPage(
     navController: NavHostController,
-    nearbyVM: NearbyViewModel = viewModel()
+    peerVM: PeerViewModel,
+    nearbyVM: NearbyViewModel = viewModel(),
 ) {
     val nearbyDevices = nearbyVM.nearbyDevices
     val isDiscovering by nearbyVM.isDiscovering
@@ -104,7 +106,7 @@ fun NearbyPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             nearbySearchingItem()
-            nearbyDeviceListItems(nearbyDevices, nearbyVM)
+            nearbyDeviceListItems(nearbyDevices, nearbyVM, peerVM)
             item {
                 BottomSpace(paddingValues)
             }
@@ -149,6 +151,7 @@ internal fun LazyListScope.nearbySearchingItem() {
 internal fun LazyListScope.nearbyDeviceListItems(
     nearbyDevices: List<DNearbyDevice>,
     nearbyVM: NearbyViewModel,
+    peerVM: PeerViewModel,
 ) {
     if (nearbyDevices.isNotEmpty()) {
         item {
@@ -157,7 +160,7 @@ internal fun LazyListScope.nearbyDeviceListItems(
         }
         nearbyDevices.forEach { item ->
             item {
-                val isPaired = nearbyVM.isPaired(item.id)
+                val isPaired = peerVM.pairedPeers.any { it.id == item.id }
                 val isPairing = nearbyVM.isPairing(item.id)
                 NearbyDeviceItem(
                     item = item,

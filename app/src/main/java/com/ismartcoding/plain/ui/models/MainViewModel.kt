@@ -18,6 +18,7 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DPairingRequest
+import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.events.StartHttpServerEvent
@@ -42,6 +43,10 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     var currentRootTab by savedStateHandle.saveable { mutableIntStateOf(0) }
     var pendingLoginEvent by mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
     var pendingPairingRequest by mutableStateOf<DPairingRequest?>(null)
+    // The channel invite currently on top of the back stack (if any). Used by
+    // ChannelInviteCanceledEvent handling to pop the right page. Not saved across
+    // process death — a fresh invite will re-fire ChannelInviteReceivedEvent.
+    var pendingChannelInvite by mutableStateOf<ChannelInviteReceivedEvent?>(null)
 
     fun enableHttpServer(
         context: Context,

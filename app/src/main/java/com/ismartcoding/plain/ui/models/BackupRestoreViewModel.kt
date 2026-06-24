@@ -6,7 +6,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.queryOpenableFileName
@@ -17,8 +16,6 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.lib.helpers.ZipHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
@@ -32,7 +29,7 @@ class BackupRestoreViewModel : ViewModel() {
      * Writes the backup zip directly to app-specific external storage (no permission required).
      */
     fun backupToFile(context: Context, fileName: String) {
-        launchIO {
+        launchSafe {
             DialogHelper.showLoading()
             try {
                 val tmpFile = File(context.cacheDir, fileName)
@@ -53,7 +50,7 @@ class BackupRestoreViewModel : ViewModel() {
     }
 
     fun backup(context: Context, uri: Uri) {
-        launchIO {
+        launchSafe {
             DialogHelper.showLoading()
             try {
                 val stream = contentResolver.openOutputStream(uri)
@@ -73,14 +70,14 @@ class BackupRestoreViewModel : ViewModel() {
     }
 
     fun restore(context: Context, uri: Uri) {
-        launchIO {
+        launchSafe {
             DialogHelper.showLoading()
             try {
                 val fileName = contentResolver.queryOpenableFileName(uri)
                 if (!fileName.endsWith(".zip")) {
                     DialogHelper.hideLoading()
                     DialogHelper.showMessage(Res.string.invalid_file)
-                    return@launchIO
+                    return@launchSafe
                 }
                 contentResolver.openInputStream(uri)?.use { stream ->
                     val destFile = File(context.cacheDir, "restore")

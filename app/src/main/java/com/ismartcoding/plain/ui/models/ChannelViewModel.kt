@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
@@ -10,6 +11,7 @@ import com.ismartcoding.plain.chat.ChannelManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.events.ChannelUpdatedEvent
+import com.ismartcoding.plain.ui.base.ToastManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,84 +22,92 @@ class ChannelViewModel : ViewModel() {
     private val _channels = MutableStateFlow<List<DChatChannel>>(emptyList())
     val channels: StateFlow<List<DChatChannel>> = _channels.asStateFlow()
 
-    private val _loadingIds = MutableStateFlow<Set<String>>(emptySet())
-    val loadingIds: StateFlow<Set<String>> = _loadingIds.asStateFlow()
+    val invitingIds = mutableStateSetOf<String>()
+    val kickingIds = mutableStateSetOf<String>()
 
     val showCreateChannelDialog = mutableStateOf(false)
     val renameChannelId = mutableStateOf("")
-    val renameChannelName = mutableStateOf("")
 
     init {
-        refresh()
+        loadAll()
 
         viewModelScope.launch {
             Channel.sharedFlow.collect { event ->
                 if (event is ChannelUpdatedEvent) {
-                    refresh()
+                    loadAll()
                 }
             }
         }
     }
 
-    fun refresh() {
-        launchIO {
+    fun loadAll() {
+        launchSafe {
             _channels.value = AppDatabase.instance.chatChannelDao().getAll()
                 .sortedBy { it.name.toSortName() }
         }
     }
 
     fun createChannel(name: String) {
-        launchIO {
+        launchSafe {
             ChannelManager.createChannel(name)
             showCreateChannelDialog.value = false
         }
     }
 
     fun renameChannel(channelId: String, newName: String) {
-        launchIO {
+        launchSafe {
             ChannelManager.renameChannel(channelId, newName)
             renameChannelId.value = ""
         }
     }
 
     fun removeChannel(context: Context, channelId: String) {
-        launchIO {
+        launchSafe {
             ChannelManager.deleteChannel(context, channelId)
         }
     }
 
-    fun addChannelMember(channelId: String, peerId: String) {
-        launchIO {
-            ChannelManager.addMember(channelId, peerId)
-        }
-    }
-
-    fun resendInvite(channelId: String, peerId: String) {
-        launchIO {
-            ChannelManager.resendInvite(channelId, peerId)
-        }
-    }
-
-    fun removeChannelMember(channelId: String, peerId: String) {
-        launchIO {
-            ChannelManager.removeMember(channelId, peerId)
-        }
-    }
-
     fun leaveChannel(channelId: String) {
-        launchIO {
+        launchSafe {
             ChannelManager.leaveChannel(channelId)
         }
     }
 
-    fun acceptChannelInvite(channelId: String) {
-        launchIO {
-            ChannelManager.acceptInvite(channelId)
+    fun inviteMember(channelId: String, peerId: String) {
+        launchSafe {
+            invitingIds.add(peerId)
+            ChannelManager.inviteMember(channelId, peerId)
+            invitingIds.remove(peerId)
         }
     }
 
-    fun declineChannelInvite(context: Context, channelId: String) {
-        launchIO {
+    fun resendInvite(channelId: String, peerId: String) {
+        launchSafe {
+            ChannelManager.resendInvite(channelId, peerId)
+        }
+    }
+
+    fun kickMember(channelId: String, peerId: String) {
+        launchSafe {
+            kickingIds.add(peerId)
+            ChannelManager.kickMember(channelId, peerId)
+            kickingIds.remove(peerId)
+        }
+    }
+
+    fun acceptInvite(channelId: String, onSuccess: () -> Unit = {}) {
+        launchSafe {
+            val r = ChannelManager.acceptInvite(channelId)
+            if (r.isSuccess) {
+                onSuccess()
+            } else {
+                ToastManager.showErrorToast(r.getError())
+            }
+        }
+    }
+
+    fun declineInvite(context: Context, channelId: String) {
+        launchSafe {
             ChannelManager.declineInvite(context, channelId)
         }
     }

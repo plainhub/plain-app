@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.ui.page.connections
 
 import com.ismartcoding.plain.i18n.*
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,7 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,25 +18,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.capitalize
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.CopyIconButton
-import com.ismartcoding.plain.ui.base.ClipboardCard
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.VSession
 import com.ismartcoding.plain.ui.theme.red
 import com.ismartcoding.plain.web.HttpServerManager
@@ -49,12 +42,12 @@ internal fun SessionListItem(
     m: VSession,
     onDelete: (String) -> Unit,
     onRename: (String, String) -> Unit,
+    onHowToUse: () -> Unit,
 ) {
     val isOnline = HttpServerManager.wsSessions.any { it.clientId == m.clientId }
     val osDisplay = (m.osName.capitalize() + " " + m.osVersion).trim()
     val browserDisplay = (m.browserName.capitalize() + " " + m.browserVersion).trim()
     var showFullTime by remember { mutableStateOf(false) }
-    var showTokenTipsDialog by remember { mutableStateOf(false) }
     var showRenameDialog by remember { mutableStateOf(false) }
     val lastActiveText = if (showFullTime) m.lastActiveAt?.formatDateTime() else m.lastActiveAt?.timeAgo()
     val displayName = m.name.ifEmpty { stringResource(Res.string.unknown) }
@@ -74,10 +67,6 @@ internal fun SessionListItem(
         )
     }
 
-    if (showTokenTipsDialog) {
-        ApiTokenTipsDialog(m = m, onDismiss = { showTokenTipsDialog = false })
-    }
-
     PCard {
         Column {
             SessionMainListItem(
@@ -94,9 +83,7 @@ internal fun SessionListItem(
                 subtitle = m.clientId + "-" + m.token, action = {
                     Column(horizontalAlignment = Alignment.End) {
                         if (m.isCustom) {
-                            PFilledButton(stringResource(Res.string.how_to_use), buttonSize = ButtonSize.SMALL, onClick = {
-                                showTokenTipsDialog = true
-                            })
+                            PFilledButton(stringResource(Res.string.how_to_use), buttonSize = ButtonSize.SMALL, onClick = onHowToUse)
                         }
                         CopyIconButton(text = m.clientId + "-" + m.token, clipLabel = stringResource(Res.string.token))
                     }
@@ -141,39 +128,3 @@ internal fun SessionListItem(
     }
     VerticalSpace(dp = 16.dp)
 }
-
-@Composable
-private fun ApiTokenTipsDialog(m: VSession, onDismiss: () -> Unit) {
-    val context = LocalContext.current
-    val hostname = remember { TempData.mdnsHostname }
-    val httpPort = TempData.httpPort.collectAsState()
-
-    val curlReal = remember(m, hostname, httpPort) {
-        """curl -X POST "http://$hostname:${httpPort.value}/graphql" -H "c-id: ${m.clientId}" -H "Authorization: Bearer ${m.token}" -H "Content-Type: application/json" --data '{"query":"{ app { appVersion } }"}'"""
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = stringResource(Res.string.api_tokens) + " · " + stringResource(Res.string.how_to_use))
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(
-                    text = stringResource(Res.string.auth_dev_token_tips),
-                    style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface)
-                )
-                ClipboardCard(
-                    horizontal = 0.dp,
-                    label = "CURL",
-                    text = curlReal,
-                )
-                PFilledButton(text = stringResource(Res.string.docs), onClick = { WebHelper.open(context, "https://plainapp.app/api-docs") })
-            }
-        },
-        confirmButton = {
-            Button(onClick = onDismiss) { Text(stringResource(Res.string.close)) }
-        },
-    )
-}
-

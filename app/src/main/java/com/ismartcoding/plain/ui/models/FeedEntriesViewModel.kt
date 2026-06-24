@@ -5,23 +5,18 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
@@ -75,7 +70,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     }
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchIO {
+        launchSafe {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,

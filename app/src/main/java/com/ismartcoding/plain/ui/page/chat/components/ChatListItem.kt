@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
@@ -45,6 +46,7 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundActive
 fun ChatListItem(
     navController: NavHostController,
     chatVM: ChatViewModel,
+    chatTarget: ChatTarget,
     audioPlaylistVM: AudioPlaylistViewModel,
     items: List<VChat>,
     m: VChat,
@@ -88,11 +90,11 @@ fun ChatListItem(
                     ChatName(
                         m = m,
                         isPeerChat = peer != null,
-                        isLocal = chatVM.target.value.isLocal(),
-                        onRetry = if (!chatVM.target.value.isLocal()) {
+                        isLocal = chatTarget.isLocal(),
+                        onRetry = if (!chatTarget.isLocal()) {
                             { chatVM.resendMessage(m.id) }
                         } else null,
-                        onShowDeliveryDetails = if (!chatVM.target.value.isLocal()) {
+                        onShowDeliveryDetails = if (!chatTarget.isLocal()) {
                             { statusData -> showDeliveryDialog.value = statusData }
                         } else null)
                     when (m.type) {

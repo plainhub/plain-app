@@ -104,7 +104,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     fun trashItems(
         context: Context, tagsVM: TagsViewModel, ids: Set<String>,
     ) {
-        launchIO {
+        launchSafe {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             when (dataType) {
@@ -123,7 +123,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     fun restoreItems(
         context: Context, tagsVM: TagsViewModel, ids: Set<String>,
     ) {
-        launchIO {
+        launchSafe {
             DialogHelper.showLoading()
             when (dataType) {
                 DataType.AUDIO -> AudioMediaStoreHelper.restoreByIdsAsync(context, ids)

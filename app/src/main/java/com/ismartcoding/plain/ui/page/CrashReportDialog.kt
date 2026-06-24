@@ -16,7 +16,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +31,9 @@ import androidx.core.content.FileProvider
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.CrashHandler
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.helpers.AppLogHelper
+import com.ismartcoding.plain.ui.base.PFilledButton
 import java.io.File
 
 @Composable
@@ -63,62 +65,62 @@ fun CrashReportDialog(crashReport: String, onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            TextButton(onClick = {
-                val appVersion = MainApp.getAppVersion()
-                val deviceInfo = AppLogHelper.buildDeviceInfoText()
-                val bodyText = buildString {
-                    append(deviceInfo)
-                    appendLine()
-                    appendLine("--- Crash Report ---")
-                    append(crashReport)
-                    if (includeAppLogs) {
-                        val logs = CrashHandler.getAppLogs(context)
-                        if (logs.isNotEmpty()) {
-                            appendLine()
-                            appendLine()
-                            appendLine("--- App Logs ---")
-                            append(logs)
+            PFilledButton(
+                text = stringResource(Res.string.crash_share),
+                buttonSize = ButtonSize.MEDIUM,
+                onClick = {
+                    val appVersion = MainApp.getAppVersion()
+                    val deviceInfo = AppLogHelper.buildDeviceInfoText()
+                    val bodyText = buildString {
+                        append(deviceInfo)
+                        appendLine()
+                        appendLine("--- Crash Report ---")
+                        append(crashReport)
+                        if (includeAppLogs) {
+                            val logs = CrashHandler.getAppLogs(context)
+                            if (logs.isNotEmpty()) {
+                                appendLine()
+                                appendLine()
+                                appendLine("--- App Logs ---")
+                                append(logs)
+                            }
                         }
                     }
-                }
 
-                // Write crash report to a temp file so it can be attached to the email
-                val crashFile = File(context.cacheDir, "crash_report.txt")
-                try {
-                    crashFile.writeText(bodyText)
-                } catch (_: Exception) {}
-
-                val attachmentUri: Uri? = try {
-                    FileProvider.getUriForFile(context, Constants.AUTHORITY, crashFile)
-                } catch (_: Exception) {
-                    null
-                }
-
-                val intent = if (attachmentUri != null) {
-                    Intent(Intent.ACTION_SEND).apply {
-                        type = "message/rfc822"
-                        putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.SUPPORT_EMAIL))
-                        putExtra(Intent.EXTRA_SUBJECT, "Crash Report - PlainApp $appVersion")
-                        putExtra(Intent.EXTRA_TEXT, bodyText)
-                        putExtra(Intent.EXTRA_STREAM, attachmentUri)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    // Write crash report to a temp file so it can be attached to the email
+                    val crashFile = File(context.cacheDir, "crash_report.txt")
+                    try {
+                        crashFile.writeText(bodyText)
+                    } catch (_: Exception) {
                     }
-                } else {
-                    Intent(Intent.ACTION_SENDTO).apply {
-                        data = Uri.parse("mailto:${Constants.SUPPORT_EMAIL}")
-                        putExtra(Intent.EXTRA_SUBJECT, "Crash Report - PlainApp $appVersion")
-                        putExtra(Intent.EXTRA_TEXT, bodyText)
+
+                    val attachmentUri: Uri? = try {
+                        FileProvider.getUriForFile(context, Constants.AUTHORITY, crashFile)
+                    } catch (_: Exception) {
+                        null
                     }
-                }
-                context.startActivity(Intent.createChooser(intent, null))
-            }) {
-                Text(stringResource(Res.string.crash_share))
-            }
+
+                    val intent = if (attachmentUri != null) {
+                        Intent(Intent.ACTION_SEND).apply {
+                            type = "message/rfc822"
+                            putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.SUPPORT_EMAIL))
+                            putExtra(Intent.EXTRA_SUBJECT, "Crash Report - PlainApp $appVersion")
+                            putExtra(Intent.EXTRA_TEXT, bodyText)
+                            putExtra(Intent.EXTRA_STREAM, attachmentUri)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                    } else {
+                        Intent(Intent.ACTION_SENDTO).apply {
+                            data = Uri.parse("mailto:${Constants.SUPPORT_EMAIL}")
+                            putExtra(Intent.EXTRA_SUBJECT, "Crash Report - PlainApp $appVersion")
+                            putExtra(Intent.EXTRA_TEXT, bodyText)
+                        }
+                    }
+                    context.startActivity(Intent.createChooser(intent, null))
+                })
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.cancel))
-            }
+            PTextButton(text = stringResource(Res.string.cancel), onClick = onDismiss)
         },
     )
 }

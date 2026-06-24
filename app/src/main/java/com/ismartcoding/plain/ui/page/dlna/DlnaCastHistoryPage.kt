@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.dlna
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
@@ -35,31 +33,29 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.models.launchIO
-import kotlinx.coroutines.Dispatchers
+import com.ismartcoding.plain.ui.models.launchSafe
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 
 class DlnaCastRulesViewModel : ViewModel() {
     val allowedFlow = MutableStateFlow<List<Pair<String, String>>>(emptyList())
     val deniedFlow = MutableStateFlow<List<Pair<String, String>>>(emptyList())
 
     fun load(context: android.content.Context) {
-        launchIO {
+        launchSafe {
             allowedFlow.value = DlnaAllowedSendersPreference.getAsync().map { decodeSenderEntry(it) }
             deniedFlow.value = DlnaDeniedSendersPreference.getAsync().map { decodeSenderEntry(it) }
         }
     }
 
     fun removeAllowed(context: android.content.Context, ip: String) {
-        launchIO {
+        launchSafe {
             DlnaAllowedSendersPreference.removeAsync(ip)
             allowedFlow.value = allowedFlow.value.filter { it.first != ip }
         }
     }
 
     fun removeDenied(context: android.content.Context, ip: String) {
-        launchIO {
+        launchSafe {
             DlnaDeniedSendersPreference.removeAsync(ip)
             deniedFlow.value = deniedFlow.value.filter { it.first != ip }
         }

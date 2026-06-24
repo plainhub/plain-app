@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
@@ -17,7 +16,6 @@ import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference
 import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
@@ -39,7 +37,7 @@ class FeedSettingsViewModel : ViewModel() {
 
     fun setAutoRefresh(context: Context, value: Boolean) {
         autoRefresh.value = value
-        launchIO {
+        launchSafe {
             FeedAutoRefreshPreference.putAsync(value)
             if (value) {
                 FeedFetchWorker.startRepeatWorkerAsync(context)
@@ -51,14 +49,14 @@ class FeedSettingsViewModel : ViewModel() {
 
     fun setAutoRefreshInterval(context: Context, value: Int) {
         autoRefreshInterval.value = value
-        launchIO {
+        launchSafe {
             FeedAutoRefreshIntervalPreference.putAsync(value)
         }
     }
 
     fun setAutoRefreshOnlyWifi(context: Context, value: Boolean) {
         autoRefreshOnlyWifi.value = value
-        launchIO {
+        launchSafe {
             FeedAutoRefreshOnlyWifiPreference.putAsync(value)
         }
     }
@@ -70,7 +68,7 @@ class FeedSettingsViewModel : ViewModel() {
     }
 
     fun clearAllAsync() {
-        launchIO {
+        launchSafe {
             TagHelper.deleteByTypeAsync(DataType.FEED_ENTRY)
             FeedEntryHelper.deleteAllAsync()
         }

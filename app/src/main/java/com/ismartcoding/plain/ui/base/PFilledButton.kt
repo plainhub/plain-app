@@ -23,12 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.theme.red
+
 
 @Composable
 fun PFilledButton(
@@ -37,7 +36,7 @@ fun PFilledButton(
     modifier: Modifier = Modifier,
     icon: Painter? = null,
     type: ButtonType = ButtonType.PRIMARY,
-    buttonSize: ButtonSize = ButtonSize.MEDIUM,
+    buttonSize: ButtonSize = ButtonSize.LARGE,
     isLoading: Boolean = false,
     enabled: Boolean = true,
 ) {
@@ -56,13 +55,9 @@ fun PFilledButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .then(if (buttonSize == ButtonSize.SMALL) Modifier else Modifier.fillMaxWidth())
             .height(buttonSize.height),
         shape = RoundedCornerShape(buttonSize.cornerRadius),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 2.dp,
-        ),
+        elevation = buttonSize.elevation(),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor,
@@ -96,11 +91,8 @@ fun PFilledButton(
                     }
                     Text(
                         text = text,
-                        style = when (buttonSize) {
-                            ButtonSize.SMALL -> MaterialTheme.typography.labelMedium
-                            ButtonSize.MEDIUM -> MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            ButtonSize.LARGE -> MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
-                        },
+                        style = buttonSize.textStyle(),
+                        fontWeight = buttonSize.fontWeight()
                     )
                 }
             }

@@ -5,12 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -18,6 +17,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 
@@ -80,22 +81,18 @@ fun EditFeedDialog(feedsVM: FeedsViewModel) {
                 }
             },
             confirmButton = {
-                Button(
+                PFilledButton(
+                    text = stringResource(Res.string.save),
+                    buttonSize = ButtonSize.MEDIUM,
                     enabled = feedsVM.editUrl.value.isNotBlank() && feedsVM.editName.value.isNotBlank(),
                     onClick = {
                         focusManager.clearFocus()
                         feedsVM.edit()
                     },
-                ) {
-                    Text(stringResource(Res.string.save))
-                }
+                )
             },
             dismissButton = {
-                TextButton(onClick = {
-                    feedsVM.showEditDialog.value = false
-                }) {
-                    Text(text = stringResource(Res.string.cancel))
-                }
+                PTextButton(text = stringResource(Res.string.cancel), onClick = { feedsVM.showEditDialog.value = false })
             },
         )
     }

@@ -8,12 +8,11 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,9 +24,11 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.add
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
@@ -51,7 +52,9 @@ fun MdEditorInsertImageDialog(
             mdEditorVM.showInsertImage = false
         },
         confirmButton = {
-            Button(
+            PFilledButton(
+                text = stringResource(Res.string.confirm),
+                buttonSize = ButtonSize.MEDIUM,
                 onClick = {
                     var html = "<img src=\"${imageUrl}\""
                     if (width.isNotEmpty()) {
@@ -64,17 +67,11 @@ fun MdEditorInsertImageDialog(
                         add("$html />")
                     }
                     mdEditorVM.showInsertImage = false
-                }
-            ) {
-                Text(stringResource(Res.string.confirm))
-            }
+                },
+            )
         },
         dismissButton = {
-            TextButton(onClick = {
-                mdEditorVM.showInsertImage = false
-            }) {
-                Text(stringResource(Res.string.cancel))
-            }
+            PTextButton(text = stringResource(Res.string.cancel), onClick = { mdEditorVM.showInsertImage = false })
         },
         title = {
             Text(
@@ -95,17 +92,15 @@ fun MdEditorInsertImageDialog(
                             Text(text = stringResource(Res.string.image_url))
                         }
                     )
-                    Button(
+                    PFilledButton(
+                        text = stringResource(Res.string.browse),
+                        buttonSize = ButtonSize.MEDIUM,
                         onClick = {
                             sendEvent(PickFileEvent(PickFileTag.EDITOR, PickFileType.IMAGE, multiple = false))
-                        }, modifier = Modifier
+                        },
+                        modifier = Modifier
                             .padding(start = 8.dp)
-                    ) {
-                        Text(
-                            stringResource(Res.string.browse),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                    }
+                    )
                 }
                 VerticalSpace(dp = 8.dp)
                 OutlinedTextField(value = description, onValueChange = { description = it },

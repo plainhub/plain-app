@@ -63,16 +63,20 @@ object PeerManager {
         val newIpString = ips.joinToString(",")
         var changed = false
         if (peer.ip != newIpString) {
-            peer.ip = newIpString; changed = true
+            peer.ip = newIpString
+            changed = true
         }
         if (peer.port != port) {
-            peer.port = port; changed = true
+            peer.port = port
+            changed = true
         }
         if (peer.name != name) {
-            peer.name = name; changed = true
+            peer.name = name
+            changed = true
         }
         if (peer.deviceType != deviceType.value) {
-            peer.deviceType = deviceType.value; changed = true
+            peer.deviceType = deviceType.value
+            changed = true
         }
         if (!changed) return@withIO null
 

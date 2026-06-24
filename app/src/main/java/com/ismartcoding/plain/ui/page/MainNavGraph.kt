@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.ui.page
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -10,10 +13,13 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +28,7 @@ import com.ismartcoding.plain.ui.MainActivity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.plain.chat.data.ChatTargetType
+import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
@@ -43,6 +50,7 @@ import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.chat.NearbyPage
 import com.ismartcoding.plain.ui.page.chat.PeerInfoPage
+import com.ismartcoding.plain.ui.page.connections.ApiTokenTipsPage
 import com.ismartcoding.plain.ui.page.connections.ConnectionsPage
 import com.ismartcoding.plain.ui.page.devoptions.WebDevPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaCastHistoryPage
@@ -136,6 +144,10 @@ fun MainNavGraph(
         composable<Routing.CustomFeatures> { HomeFeaturesSelectionPage(navController) }
         composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }
         composable<Routing.Connections> { ConnectionsPage(navController) }
+        composable<Routing.ApiTokenTips> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.ApiTokenTips>()
+            ApiTokenTipsPage(navController, r.clientId, r.token)
+        }
         composable<Routing.WebDev> { WebDevPage(navController) }
         composable<Routing.WebSecurity> { WebSecurityPage(navController) }
         composable<Routing.Chat> { backStackEntry ->
@@ -207,7 +219,7 @@ fun MainNavGraph(
             AppFilesPage(navController)
         }
         composable<Routing.Nearby> {
-            NearbyPage(navController)
+            NearbyPage(navController, peerVM = peerVM)
         }
         composable<Routing.ComponentShowcase> { ComponentShowcasePage(navController) }
         composable<Routing.DlnaReceiver> { DlnaReceiverPage(navController) }
@@ -216,7 +228,7 @@ fun MainNavGraph(
             val r = backStackEntry.toRoute<Routing.PlayMedia>()
             PlayMediaPage(navController, r.path, audioPlaylistVM)
         }
-        composable<Routing.PairingRequest> {
+        composableNoAnim<Routing.PairingRequest> {
             val request = mainVM.pendingPairingRequest
             if (request != null) {
                 PairingRequestPage(request = request, navController = navController)
@@ -224,7 +236,7 @@ fun MainNavGraph(
                 navController.popBackStack<Routing.PairingRequest>(inclusive = true)
             }
         }
-        composable<Routing.LoginRequest> {
+        composableNoAnim<Routing.LoginRequest> {
             val lifecycleOwner = LocalLifecycleOwner.current
             val event = mainVM.pendingLoginEvent
             if (event != null) {
@@ -237,10 +249,25 @@ fun MainNavGraph(
                 navController.popBackStack<Routing.LoginRequest>(inclusive = true)
             }
         }
-        composable<Routing.ChannelInviteRequest> { backStackEntry ->
+        composableNoAnim<Routing.ChannelInviteRequest> { backStackEntry ->
             val context = LocalContext.current
             val activity = context as MainActivity
             val r = backStackEntry.toRoute<Routing.ChannelInviteRequest>()
+
+            DisposableEffect(r.channelId) {
+                mainVM.pendingChannelInvite = ChannelInviteReceivedEvent(
+                    channelId = r.channelId,
+                    channelName = r.channelName,
+                    ownerPeerId = r.ownerPeerId,
+                    ownerPeerName = r.ownerPeerName,
+                )
+                onDispose {
+                    if (mainVM.pendingChannelInvite?.channelId == r.channelId) {
+                        mainVM.pendingChannelInvite = null
+                    }
+                }
+            }
+
             ChannelInvitePage(
                 channelId = r.channelId,
                 channelName = r.channelName,
@@ -252,4 +279,16 @@ fun MainNavGraph(
             )
         }
     }
+}
+
+private inline fun <reified T : Any> NavGraphBuilder.composableNoAnim(
+    noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
+) {
+    composable<T>(
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None },
+        popEnterTransition = { EnterTransition.None },
+        popExitTransition = { ExitTransition.None },
+        content = content,
+    )
 }

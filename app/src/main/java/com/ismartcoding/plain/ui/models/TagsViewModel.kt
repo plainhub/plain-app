@@ -2,21 +2,16 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.ui.helpers.LoadingHelper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class TagsViewModel : ViewModel() {
@@ -53,7 +48,7 @@ class TagsViewModel : ViewModel() {
 
     fun loadMoreAsync(keys: Set<String>) {
         if (keys.isNotEmpty()) {
-            launchIO {
+            launchSafe {
                 _tagsMapFlow.value += TagHelper.getTagRelationsByKeysMap(keys, dataType.value)
             }
         }
@@ -82,7 +77,7 @@ class TagsViewModel : ViewModel() {
     }
 
     fun deleteTag(id: String) {
-        launchIO {
+        launchSafe {
             TagHelper.deleteTagRelationsByTagId(id)
             TagHelper.delete(id)
             _itemsFlow.update { it.filterNot { i -> i.id == id } }

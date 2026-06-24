@@ -101,20 +101,21 @@ fun ChannelInvitePage(
                     .padding(horizontal = 16.dp),
             ) {
                 PFilledButton(
+                    modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.accept),
-                    buttonSize = ButtonSize.LARGE,
+                    buttonSize = ButtonSize.EXTRA_LARGE,
                     onClick = {
-                        channelVM.acceptChannelInvite(channelId)
-                        navController.popBackStack()
+                        channelVM.acceptInvite(channelId) { navController.popBackStack() }
                     },
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
+                    modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.decline),
-                    buttonSize = ButtonSize.LARGE,
+                    buttonSize = ButtonSize.EXTRA_LARGE,
                     type = ButtonType.DANGER,
                     onClick = {
-                        channelVM.declineChannelInvite(activity, channelId)
+                        channelVM.declineInvite(activity, channelId)
                         navController.popBackStack()
                     },
                 )

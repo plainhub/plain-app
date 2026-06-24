@@ -6,7 +6,6 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,7 +15,9 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.ui.base.PDialogListItem
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import kotlinx.coroutines.Dispatchers
@@ -35,13 +36,13 @@ fun MdEditorSettingsDialog(
             mdEditorVM.showSettings = false
         },
         confirmButton = {
-            Button(
+            PFilledButton(
+                text = stringResource(Res.string.close),
+                buttonSize = ButtonSize.MEDIUM,
                 onClick = {
                     mdEditorVM.showSettings = false
-                }
-            ) {
-                Text(stringResource(Res.string.close))
-            }
+                },
+            )
         },
         title = {
             Text(text = stringResource(Res.string.editor_settings),

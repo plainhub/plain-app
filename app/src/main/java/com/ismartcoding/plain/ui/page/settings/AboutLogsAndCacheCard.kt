@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -56,9 +57,11 @@ fun AboutLogsAndCacheCard(
             separatedActions = true,
             action = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    PFilledButton(text = stringResource(Res.string.share), buttonSize = ButtonSize.SMALL, onClick = {
-                        AppLogHelper.export(context)
-                    })
+                    PFilledButton(
+                        text = stringResource(Res.string.share),
+                        buttonSize = ButtonSize.SMALL, onClick = {
+                            AppLogHelper.export(context)
+                        })
                     if (fileSize > 0L) {
                         PFilledButton(text = stringResource(Res.string.clear_logs), buttonSize = ButtonSize.SMALL, onClick = {
                             DialogHelper.confirmToAction(Res.string.confirm_to_clear_logs) {

@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -19,6 +17,8 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DMessageStatusData
+import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.ui.base.PFilledButton
 
 @Composable
 fun ChannelDeliveryStatusDialog(
@@ -77,20 +77,18 @@ fun ChannelDeliveryStatusDialog(
             }
         },
         confirmButton = {
-            Button(
+            PFilledButton(
+                text = stringResource(Res.string.resend_selected),
+                buttonSize = ButtonSize.MEDIUM,
                 enabled = selectedIds.isNotEmpty(),
                 onClick = {
                     onResend(selectedIds.toList())
                     onDismiss()
                 },
-            ) {
-                Text(text = stringResource(Res.string.resend_selected))
-            }
+            )
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
-                Text(text = stringResource(Res.string.close))
-            }
+            PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
         },
     )
 }

@@ -1,14 +1,11 @@
 package com.ismartcoding.plain.ui.models
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.db.DSession
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.SessionList
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
 data class VSession(
@@ -53,13 +50,13 @@ class SessionsViewModel : ViewModel() {
     val itemsFlow: StateFlow<List<VSession>> = _itemsFlow
 
     fun fetch() {
-        launchIO {
+        launchSafe {
             _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }
         }
     }
 
     fun delete(clientId: String) {
-        launchIO {
+        launchSafe {
             SessionList.deleteAsync(clientId)
             _itemsFlow.value = _itemsFlow.value.filter { it.clientId != clientId }
             HttpServerManager.loadTokenCache()
@@ -67,7 +64,7 @@ class SessionsViewModel : ViewModel() {
     }
 
     fun createCustomToken(name: String) {
-        launchIO {
+        launchSafe {
             SessionList.createCustomTokenAsync(name)
             _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }
             HttpServerManager.loadTokenCache()
@@ -75,7 +72,7 @@ class SessionsViewModel : ViewModel() {
     }
 
     fun rename(clientId: String, name: String) {
-        launchIO {
+        launchSafe {
             val changed = SessionList.renameAsync(clientId, name)
             if (changed) {
                 _itemsFlow.value = SessionList.getItemsAsync().map { VSession.from(it) }

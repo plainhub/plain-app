@@ -63,7 +63,7 @@ fun HomePage(
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("home_pull_refresh")
         peerVM.loadPeers()
-        channelVM.refresh()
+        channelVM.loadAll()
         setRefreshState(RefreshContentState.Finished)
     }
 

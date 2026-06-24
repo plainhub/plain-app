@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.base.PTextButton
 
 @Composable
 fun CreateApiTokenDialog(
@@ -40,9 +41,7 @@ fun CreateApiTokenDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.cancel))
-            }
+            PTextButton(text = stringResource(Res.string.cancel), onClick = onDismiss)
         },
     )
 }

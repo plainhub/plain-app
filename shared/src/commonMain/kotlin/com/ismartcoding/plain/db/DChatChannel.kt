@@ -26,6 +26,7 @@ data class ChannelMember(
 
     fun isJoined(): Boolean = status == STATUS_JOINED
     fun isPending(): Boolean = status == STATUS_PENDING
+    fun isMe(): Boolean = id == TempData.clientId
 }
 
 @Entity(tableName = "chat_channels")
@@ -58,6 +59,17 @@ data class DChatChannel(
     fun hasMember(peerId: String): Boolean = members.any { it.id == peerId }
 
     fun findMember(peerId: String): ChannelMember? = members.find { it.id == peerId }
+
+    fun isJoined(): Boolean = status == DChatChannel.STATUS_JOINED
+
+    fun isOwnedByMe(): Boolean {
+        return owner == "me" || owner == TempData.clientId
+    }
+
+    fun canLeave(): Boolean = !isOwnedByMe() && isJoined()
+
+    fun canDeleteFromThisDevice(): Boolean =
+        isOwnedByMe() || status == STATUS_LEFT || status == STATUS_KICKED
 
     /**
      * Elect a leader for this channel from the joined members.

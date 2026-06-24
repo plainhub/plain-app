@@ -51,7 +51,6 @@ fun HomeChatWidget(
 
     val localChat = peerVM.getLatestChat("local")
     val onlineText = stringResource(Res.string.online)
-    val channelsText = stringResource(Res.string.channels)
     val localRow = ChatRow(
         sortAt = localChat?.createdAt ?: Instant.DISTANT_PAST,
         title = stringResource(Res.string.local_chat),
@@ -84,7 +83,7 @@ fun HomeChatWidget(
             ChatRow(
                 sortAt = latestChat?.createdAt ?: channel.updatedAt,
                 title = channel.name,
-                desc = channelsText,
+                desc = "",
                 icon = Res.drawable.hash,
                 online = null,
                 createdAt = channel.createdAt,

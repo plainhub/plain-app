@@ -23,7 +23,6 @@ import com.ismartcoding.plain.preferences.LastFilePathPreference
 import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.helpers.FilePathValidator
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,7 +41,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
             val isChanged = _selectedPath != value
             _selectedPath = value
             if (isChanged) {
-                launchIO {
+                launchSafe {
                     val breadcrumbsCopy = breadcrumbs.toList()
                     val fullPath = if (breadcrumbsCopy.isNotEmpty()) breadcrumbsCopy.last().path else value
                     LastFilePathPreference.putAsync(FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value))

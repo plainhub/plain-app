@@ -7,11 +7,10 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -21,6 +20,8 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
 import com.ismartcoding.plain.ui.components.TagNameDialog
@@ -76,7 +77,9 @@ fun BatchSelectTagsDialog(
                 })
             }
         }, confirmButton = {
-            Button(
+            PFilledButton(
+                text = stringResource(Res.string.save),
+                buttonSize = ButtonSize.MEDIUM,
                 enabled = tagIds.isNotEmpty(),
                 onClick = {
                     if (removeFromTags) {
@@ -86,15 +89,9 @@ fun BatchSelectTagsDialog(
                     }
                     onDismiss()
                 },
-            ) {
-                Text(stringResource(Res.string.save))
-            }
+            )
         }, dismissButton = {
-            TextButton(onClick = {
-                onDismiss()
-            }) {
-                Text(text = stringResource(Res.string.cancel))
-            }
+            PTextButton(text = stringResource(Res.string.cancel), onClick = { onDismiss() })
         })
 }
 

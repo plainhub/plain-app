@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.page.chat
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -77,8 +78,7 @@ fun PeerInfoPage(
                 POutlinedButton(
                     text = clearMessagesText,
                     type = ButtonType.DANGER,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    block = true,
+                    modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                     onClick = {
                         DialogHelper.showConfirmDialog(
                             title = clearMessagesText,
@@ -104,8 +104,7 @@ fun PeerInfoPage(
                     POutlinedButton(
                         text = deleteDeviceText,
                         type = ButtonType.DANGER,
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        block = true,
+                        modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
                         onClick = {
                             DialogHelper.showConfirmDialog(
                                 title = deleteDeviceText,

@@ -8,12 +8,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -25,9 +24,11 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.plain.data.toVersion
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.preferences.LocalNewVersion
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.preferences.LocalNewVersionLog
 import com.ismartcoding.plain.preferences.LocalNewVersionPublishDate
 import com.ismartcoding.plain.preferences.LocalNewVersionSize
@@ -81,27 +82,26 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
                 }
             },
             confirmButton = {
-                Button(
+                PFilledButton(
+                    text = stringResource(Res.string.update),
+                    buttonSize = ButtonSize.MEDIUM,
                     onClick = {
                         updateVM.hideDialog()
                         updateVM.startDownload()
                         sendEvent(DownloadUpdateEvent())
-                    }
-                ) {
-                    Text(text = stringResource(Res.string.update))
-                }
+                    },
+                )
             },
             dismissButton = {
-                TextButton(
+                PTextButton(
+                    text = stringResource(Res.string.skip_this_version),
                     onClick = {
                         scope.launch {
                             UpdateInfoPreference.updateAsync { it.copy(skipVersion = newVersion.toString()) }
                             updateVM.hideDialog()
                         }
-                    }
-                ) {
-                    Text(text = stringResource(Res.string.skip_this_version))
-                }
+                    },
+                )
             },
         )
     }

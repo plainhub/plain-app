@@ -92,3 +92,9 @@ scripts/i18n-translated.json
 
 # AI model files (too large for git)
 ai_models/
+
+# apitest — raw per-run API responses (may contain PII from device data)
+apitest/results/
+
+# apitest — config has the bearer token / cid for /graphql auth
+apitest/config.json

@@ -14,24 +14,20 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
-import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.discover.NearbyPairing
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
-import com.ismartcoding.plain.events.PairingSuccessEvent
+import com.ismartcoding.plain.events.PeerUnpairedEvent
 import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.TimeHelper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class NearbyViewModel : ViewModel() {
     val nearbyDevices = mutableStateListOf<DNearbyDevice>()
-    val pairedDevices = mutableStateListOf<DPeer>()
     var isDiscovering = mutableStateOf(false)
     val pairingInProgress = mutableStateListOf<String>()
 
@@ -40,7 +36,6 @@ class NearbyViewModel : ViewModel() {
 
     init {
         startEventListening()
-        loadPairedDevicesAsync()
     }
 
     override fun onCleared() {
@@ -83,13 +78,9 @@ class NearbyViewModel : ViewModel() {
     }
 
     fun unpairDevice(deviceId: String) {
-        launchIO {
-            try {
-                if (PeerManager.markUnpaired(deviceId)) {
-                    loadAsync()
-                }
-            } catch (e: Exception) {
-                LogCat.e("Error unpairing device: ${e.message}")
+        launchSafe {
+            if (PeerManager.markUnpaired(deviceId)) {
+                sendEvent(PeerUnpairedEvent(deviceId))
             }
         }
     }
@@ -100,7 +91,7 @@ class NearbyViewModel : ViewModel() {
     }
 
     private fun startPairingDevice(device: DNearbyDevice) {
-        launchIO {
+        launchSafe {
             NearbyPairing.startPairingAsync(device)
         }
     }
@@ -115,10 +106,6 @@ class NearbyViewModel : ViewModel() {
             deviceType = PhoneHelper.getDeviceType(context),
             ips = allIps,
         )
-    }
-
-    fun isPaired(deviceId: String): Boolean {
-        return pairedDevices.any { it.id == deviceId && it.status == "paired" }
     }
 
     fun isPairing(deviceId: String): Boolean {
@@ -138,28 +125,11 @@ class NearbyViewModel : ViewModel() {
                         }
                     }
 
-                    is PairingSuccessEvent -> {
-                        pairingInProgress.removeIf { it == event.deviceId }
-                        loadPairedDevicesAsync()
-                    }
-
                     is PairingFailedEvent -> {
                         pairingInProgress.removeIf { it == event.deviceId }
                     }
                 }
             }
         }
-    }
-
-    private fun loadPairedDevicesAsync() {
-        launchIO {
-            loadAsync()
-        }
-    }
-
-    internal suspend fun loadAsync() = withIO {
-        val peers = AppDatabase.instance.peerDao().getAll()
-        pairedDevices.clear()
-        pairedDevices.addAll(peers)
     }
 }

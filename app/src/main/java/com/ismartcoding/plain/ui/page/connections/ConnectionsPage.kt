@@ -44,6 +44,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.models.SessionsViewModel
+import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -126,6 +127,7 @@ fun ConnectionsPage(
                                     m = m,
                                     onDelete = { sessionsVM.delete(it) },
                                     onRename = { clientId, name -> sessionsVM.rename(clientId, name) },
+                                    onHowToUse = { navController.navigate(Routing.ApiTokenTips(m.clientId, m.token)) },
                                 )
                             }
                             item { BottomSpace(paddingValues) }

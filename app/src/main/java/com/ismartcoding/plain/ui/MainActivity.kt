@@ -174,7 +174,8 @@ class MainActivity : AppCompatActivity() {
                     )
                     if (showForwardTargetDialog) {
                         ForwardTargetDialog(
-                            peerVM = peerVM, onDismiss = {
+                            peerVM = peerVM, channelVM = channelVM,
+                            onDismiss = {
                                 showForwardTargetDialog = false
                                 pendingFileUris = null
                                 pendingForwardText = null
@@ -190,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                                 pendingForwardText?.let { text ->
                                     coIO {
                                         delay(500)
-                                        chatVM.sendTextMessage(text, this@MainActivity, peerVM.onlinePeerIds.value)
+                                        chatVM.sendTextMessage(text, this@MainActivity, peerVM.onlinePeerIds)
                                     }
                                 }
                             })

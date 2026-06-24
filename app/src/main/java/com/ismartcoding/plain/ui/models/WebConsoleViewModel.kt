@@ -17,7 +17,6 @@ import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.web.HttpServerManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class WebConsoleViewModel : ViewModel() {
@@ -47,7 +46,7 @@ class WebConsoleViewModel : ViewModel() {
     }
 
     fun enableKeepAwake(context: Context, enable: Boolean) {
-        launchIO {
+        launchSafe {
             KeepAwakePreference.putAsync(enable)
             sendEvent(KeepAwakeChangedEvent(enable))
         }

@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
+
+import androidx.compose.foundation.layout.fillMaxWidth
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -66,9 +68,14 @@ fun HowToUsePage(navController: NavHostController, webVM: WebConsoleViewModel = 
                     item {
                         if (webEnabled) {
                             VerticalSpace(dp = 16.dp)
-                            PFilledButton(text = stringResource(Res.string.http_server_diagnostics), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
-                                webVM.dig(context)
-                            })
+                            PFilledButton(
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .fillMaxWidth(),
+                                text = stringResource(Res.string.http_server_diagnostics),
+                                onClick = {
+                                    webVM.dig(context)
+                                })
                         }
                         BottomSpace(paddingValues)
                     }

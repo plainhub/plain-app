@@ -39,6 +39,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
 import com.ismartcoding.plain.ui.models.CastViewModel
@@ -74,7 +75,7 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) { Text(stringResource(Res.string.confirm)) }
             },
-            dismissButton = { TextButton(onClick = { showClearConfirmDialog = false }) { Text(stringResource(Res.string.cancel)) } })
+            dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = { showClearConfirmDialog = false }) })
     }
 
     PModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {

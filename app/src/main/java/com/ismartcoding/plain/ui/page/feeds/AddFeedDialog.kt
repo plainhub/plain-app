@@ -3,21 +3,22 @@ package com.ismartcoding.plain.ui.page.feeds
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalFocusManager
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PDialogTips
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
@@ -88,7 +89,9 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
             },
             confirmButton = {
                 val buttonText = if (feedsVM.rssChannel.value == null) Res.string.search else Res.string.add
-                Button(
+                PFilledButton(
+                    text = stringResource(buttonText),
+                    buttonSize = ButtonSize.MEDIUM,
                     enabled = feedsVM.editUrl.value.isNotBlank(),
                     onClick = {
                         focusManager.clearFocus()
@@ -98,16 +101,10 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                             feedsVM.add()
                         }
                     },
-                ) {
-                    Text(stringResource(buttonText))
-                }
+                )
             },
             dismissButton = {
-                TextButton(onClick = {
-                    feedsVM.showAddDialog.value = false
-                }) {
-                    Text(text = stringResource(Res.string.cancel))
-                }
+                PTextButton(text = stringResource(Res.string.cancel), onClick = { feedsVM.showAddDialog.value = false })
             },
         )
     }

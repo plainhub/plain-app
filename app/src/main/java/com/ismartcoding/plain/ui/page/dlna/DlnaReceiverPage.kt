@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -92,9 +91,11 @@ fun DlnaReceiverPage(
                 }
             },
             confirmButton = {
-                Button(onClick = { vm.acceptCastRequest(context, rememberChoice) }) {
-                    Text(stringResource(Res.string.dlna_cast_accept))
-                }
+                PFilledButton(
+                    text = stringResource(Res.string.dlna_cast_accept),
+                    buttonSize = ButtonSize.MEDIUM,
+                    onClick = { vm.acceptCastRequest(context, rememberChoice) },
+                )
             },
             dismissButton = {
                 OutlinedButton(onClick = { vm.rejectCastRequest(context, rememberChoice) }) {

@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import coil3.compose.AsyncImage
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
 @Composable
@@ -77,9 +77,7 @@ private fun WeChatDonateDialog(onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("关闭")
-            }
+            PFilledButton(text = "关闭", buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
         },
     )
 }

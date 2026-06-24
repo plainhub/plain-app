@@ -89,10 +89,10 @@ class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
 
 class DeleteChatItemViewEvent(val id: String) : ChannelEvent()
 
-
-data class PeerUpdatedEvent(val peer: DPeer) : ChannelEvent()
-
 data class PeerOnlineStatusChangedEvent(val peerId: String, val online: Boolean) : ChannelEvent()
+
+/** Fired after a peer's status flips to unpaired. Listeners reload their peer list. */
+data class PeerUnpairedEvent(val peerId: String) : ChannelEvent()
 
 /** Fired when a channel invite is received from a remote peer. UI shows accept/decline dialog. */
 data class ChannelInviteReceivedEvent(
@@ -100,6 +100,14 @@ data class ChannelInviteReceivedEvent(
     val channelName: String,
     val ownerPeerId: String,
     val ownerPeerName: String,
+) : ChannelEvent()
+
+/** Fired when the channel owner cancels a pending invite (i.e. removes us before we accept).
+ *  The auto-opened [com.ismartcoding.plain.ui.nav.Routing.ChannelInviteRequest] page pops
+ *  itself when it sees this event for the matching channel. */
+data class ChannelInviteCanceledEvent(
+    val channelId: String,
+    val ownerPeerId: String,
 ) : ChannelEvent()
 
 /** Fired when channel membership/metadata changes so UI can refresh. */

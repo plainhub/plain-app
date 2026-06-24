@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,10 +19,12 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preferences.DocTabsModePreference
 import com.ismartcoding.plain.ui.base.PDialogRadioRow
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.models.BaseMediaViewModel
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -125,9 +126,7 @@ fun <T : IData> SortAndBrowseDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onDismiss) {
-                Text(text = stringResource(Res.string.close))
-            }
+            PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
         },
         dismissButton = {},
     )

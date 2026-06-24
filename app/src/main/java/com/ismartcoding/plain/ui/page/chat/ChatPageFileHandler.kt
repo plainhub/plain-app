@@ -86,7 +86,7 @@ internal fun handleFileSelection(
                     finalItems.add(placeholderItems[index])
                 }
             }
-            chatVM.updateFilesMessage(messageId, finalItems, isImageVideo, peerVM.onlinePeerIds.value)
+            chatVM.updateFilesMessage(messageId, finalItems, isImageVideo, peerVM.onlinePeerIds)
         }
     }
 }

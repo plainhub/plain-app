@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -22,10 +23,12 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import android.util.Base64
+import androidx.compose.foundation.layout.fillMaxWidth
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.events.RestartAppEvent
@@ -103,11 +106,11 @@ fun WebSecurityPage(navController: NavHostController) {
                                 PasswordTextField(
                                     value = editPassword.value, isChanged = { editPassword.value != password },
                                     onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.IO) { PasswordPreference.putAsync(it) } })
-                                OutlinedButton(
+                                PFilledButton(
                                     modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
-                                    onClick = { scope.launch(Dispatchers.IO) { editPassword.value = HttpServerManager.resetPasswordAsync() } }) {
-                                    Text(stringResource(Res.string.generate_password))
-                                }
+                                    text = stringResource(Res.string.generate_password),
+                                    buttonSize = ButtonSize.MEDIUM,
+                                    onClick = { scope.launch(Dispatchers.IO) { editPassword.value = HttpServerManager.resetPasswordAsync() } })
                             }
                         }
                     }
@@ -127,15 +130,21 @@ fun WebSecurityPage(navController: NavHostController) {
                         Subtitle(text = stringResource(Res.string.https_certificate_signature))
                         ClipboardCard(label = stringResource(Res.string.https_certificate_signature), text = sslSignature)
                         VerticalSpace(dp = 16.dp)
-                        PFilledButton(text = stringResource(Res.string.reset_ssl_certificate), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
-                            scope.launch(Dispatchers.IO) {
-                                DialogHelper.showLoading(); KeyStorePasswordPreference.resetAsync()
-                                keyStorePassword = KeyStorePasswordPreference.getAsync()
-                                HttpServerManager.generateSSLKeyStore(File(context.filesDir, Constants.KEY_STORE_FILE_NAME), keyStorePassword)
-                                DialogHelper.hideLoading()
-                                DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset)) { sendEvent(RestartAppEvent()) }
-                            }
-                        })
+                        PFilledButton(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            text = stringResource(Res.string.reset_ssl_certificate),
+                            type = ButtonType.DANGER, onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    DialogHelper.showLoading()
+                                    KeyStorePasswordPreference.resetAsync()
+                                    keyStorePassword = KeyStorePasswordPreference.getAsync()
+                                    HttpServerManager.generateSSLKeyStore(File(context.filesDir, Constants.KEY_STORE_FILE_NAME), keyStorePassword)
+                                    DialogHelper.hideLoading()
+                                    DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset)) { sendEvent(RestartAppEvent()) }
+                                }
+                            })
                         VerticalSpace(dp = 24.dp); Subtitle(text = stringResource(Res.string.url_token))
                         ClipboardCard(label = stringResource(Res.string.url_token), text = urlToken)
                         Tips(text = stringResource(Res.string.url_token_tips)); VerticalSpace(dp = 16.dp)
@@ -149,11 +158,19 @@ fun WebSecurityPage(navController: NavHostController) {
                             }
                         }
                         Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
-                        PFilledButton(text = stringResource(Res.string.reset_token), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
-                            scope.launch(Dispatchers.IO) {
-                                UrlTokenPreference.resetAsync(); urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP); DialogHelper.showMessage(Res.string.the_token_is_reset)
-                            }
-                        })
+                        PFilledButton(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            text = stringResource(Res.string.reset_token),
+                            type = ButtonType.DANGER,
+                            onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    UrlTokenPreference.resetAsync()
+                                    urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP)
+                                    DialogHelper.showMessage(Res.string.the_token_is_reset)
+                                }
+                            })
                         BottomSpace(paddingValues)
                     }
                 }

@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.models
 
-import com.ismartcoding.plain.preferences.*
-
 import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -142,7 +140,7 @@ class PomodoroViewModel : ViewModel() {
 
     fun startCountdownTimer() {
         cancelTimer()
-        timerJob = launchIO {
+        timerJob = launchSafe {
             while (isRunning.value && !isPaused.value && timeLeft.intValue > 0) {
                 delay(1000L)
                 if (isRunning.value && !isPaused.value && timeLeft.intValue > 0) {

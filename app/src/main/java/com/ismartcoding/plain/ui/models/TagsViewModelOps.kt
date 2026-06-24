@@ -1,16 +1,13 @@
 package com.ismartcoding.plain.ui.models
 
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.features.TagHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 internal fun TagsViewModel.removeFromTags(ids: Set<String>, tagIds: Set<String>) {
-    launchIO {
+    launchSafe {
         for (tagId in tagIds) {
             TagHelper.deleteTagRelationByKeysTagId(ids, tagId)
         }
@@ -25,7 +22,7 @@ internal fun TagsViewModel.removeFromTags(ids: Set<String>, tagIds: Set<String>)
 }
 
 internal fun TagsViewModel.addToTags(items: List<IData>, tagIds: Set<String>) {
-    launchIO {
+    launchSafe {
         for (tagId in tagIds) {
             val existingKeys = TagHelper.getKeysByTagId(tagId)
             val newItems = items.filter { !existingKeys.contains(it.id) }

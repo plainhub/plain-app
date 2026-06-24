@@ -40,7 +40,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChatChannel
-import com.ismartcoding.plain.db.isJoined
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMore
@@ -184,6 +183,7 @@ fun ChatPage(
                             ChatListItem(
                                 navController = navController,
                                 chatVM = chatVM,
+                                chatTarget = chatTarget.value,
                                 audioPlaylistVM,
                                 itemsState.value,
                                 m = m,
@@ -236,11 +236,12 @@ fun ChatPage(
                     },
                     onSend = {
                         if (inputValue.isEmpty()) return@ChatInput
+                        val previousTopId = itemsState.value.firstOrNull()?.id
                         scope.launch {
-                            chatVM.sendTextMessage(inputValue, context, peerVM.onlinePeerIds.value)
+                            chatVM.sendTextMessage(inputValue, context, peerVM.onlinePeerIds)
                             inputValue = ""
                             ChatInputTextPreference.putAsync("")
-                            scrollState.scrollToItem(0)
+                            scrollToLatest(chatVM, scrollState, previousTopId)
                         }
                     })
             }
@@ -251,11 +252,16 @@ fun ChatPage(
 
     if (showForwardDialog) {
         ForwardTargetDialog(
-            peerVM = peerVM, onDismiss = { showForwardDialog = false; messageToForward = null },
+            peerVM = peerVM, channelVM = channelVM,
+            onDismiss = { showForwardDialog = false; messageToForward = null },
             onTargetSelected = { target ->
                 messageToForward?.let { message ->
-                    chatVM.forwardMessage(message.id, target, peerVM.onlinePeerIds.value) {
-                        DialogHelper.showSuccess(Res.string.sent)
+                    val forwardToCurrent = target == chatVM.target.value
+                    val previousTopId = chatVM.itemsFlow.value.firstOrNull()?.id
+                    chatVM.forwardMessage(message.id, target, peerVM.onlinePeerIds)
+                    peerVM.loadPeers()
+                    if (forwardToCurrent) {
+                        scope.launch { scrollToLatest(chatVM, scrollState, previousTopId) }
                     }
                 }
             })

@@ -17,6 +17,7 @@ import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
@@ -51,7 +52,7 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) { Text(stringResource(Res.string.confirm)) }
             },
-            dismissButton = { TextButton(onClick = { showClearConfirmDialog = false }) { Text(stringResource(Res.string.cancel)) } },
+            dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = { showClearConfirmDialog = false }) },
         )
     }
 

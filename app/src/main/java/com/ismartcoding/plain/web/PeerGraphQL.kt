@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.web
 
 import android.annotation.SuppressLint
-import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
@@ -13,7 +12,7 @@ import com.ismartcoding.lib.kgraphql.schema.Schema
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.channel.ChannelSystemMessageHandler
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.ChatMessageReceiver
 import com.ismartcoding.plain.chat.ReplayedMessageException
@@ -53,7 +52,7 @@ class PeerGraphQL(val schema: Schema) {
                     resolver { type: String, payload: String, context: Context ->
                         val call = context.get<ApplicationCall>()!!
                         val fromId = call.request.header("c-id") ?: ""
-                        ChannelSystemMessageHandler.handle(fromId, type, payload)
+                        ChannelSystemMessageReceiver.handle(fromId, type, payload)
                         true
                     }
                 }

@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.page.scan
 
 import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
-import android.content.Context
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -16,18 +15,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -51,9 +51,11 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.data.DQrPairData
+import com.ismartcoding.plain.discover.NearbyPairing
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.Permission
@@ -65,8 +67,10 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.QrCodeBitmapHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
 import com.ismartcoding.plain.preferences.ScanHistoryPreference
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -91,7 +95,7 @@ fun ScanPage(navController: NavHostController) {
 
     fun handleScanResult(text: String) {
         scanResult = text
-        addScanResult(context, scope, text)
+        addScanResult(scope, text)
         val pairData = DQrPairData.fromQrContent(text)
         if (pairData != null) {
             pendingPairData = pairData
@@ -136,20 +140,27 @@ fun ScanPage(navController: NavHostController) {
                 cameraDetecting.value = true
             },
             title = { Text(stringResource(Res.string.pair_via_qr_title)) },
-            text = { Text(stringResource(Res.string.confirm_pair_with_device, pairData.name)) },
+            text = { Text(stringResource(Res.string.pairing_request_message, pairData.name)) },
             confirmButton = {
-                Button(onClick = {
-                    // TODO: paring
-                    pendingPairData = null
-                }) { Text(stringResource(Res.string.pair)) }
+                PFilledButton(
+                    text = stringResource(Res.string.pair),
+                    buttonSize = ButtonSize.MEDIUM,
+                    onClick = {
+                        scope.launch {
+                            NearbyPairing.startPairingAsync(pairData.toDNearbyDevice())
+                            pendingPairData = null
+                            cameraDetecting.value = true
+                        }
+                    },
+                )
             },
             dismissButton = {
-                TextButton(onClick = {
-                    pendingPairData = null
-                    cameraDetecting.value = true
-                }) {
-                    Text(stringResource(Res.string.cancel))
-                }
+                PTextButton(
+                    text = stringResource(Res.string.cancel),
+                    onClick = {
+                        pendingPairData = null
+                        cameraDetecting.value = true
+                    })
             })
     }
 
@@ -189,7 +200,7 @@ fun ScanPage(navController: NavHostController) {
     })
 }
 
-private fun addScanResult(context: Context, scope: CoroutineScope, value: String) {
+private fun addScanResult(scope: CoroutineScope, value: String) {
     scope.launch {
         val results = ScanHistoryPreference.getValueAsync().toMutableList()
         results.removeIf { it == value }; results.add(0, value)
@@ -199,6 +210,12 @@ private fun addScanResult(context: Context, scope: CoroutineScope, value: String
 
 @Composable
 private fun ScanOverlay(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val bottomInset = if (context.isGestureInteractionMode()) {
+        0.dp
+    } else {
+        WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    }
     val infiniteTransition = rememberInfiniteTransition(label = "scan")
     val scanProgress by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -209,7 +226,11 @@ private fun ScanOverlay(modifier: Modifier = Modifier) {
         ),
         label = "scan_line",
     )
-    Canvas(modifier = modifier.fillMaxSize()) {
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(bottom = bottomInset)
+    ) {
         val boxSize = minOf(size.width, size.height) * 0.65f
         val left = (size.width - boxSize) / 2f
         val top = (size.height - boxSize) / 2f

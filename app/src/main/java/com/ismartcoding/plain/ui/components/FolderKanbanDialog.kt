@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.components
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -63,17 +64,25 @@ fun FolderKanbanDialog(filesVM: FilesViewModel, onDismiss: () -> Unit = {}) {
                     item { TopSpace() }
                     items(options) { item ->
                         Row(
-                            modifier = Modifier.fillMaxWidth().clickable { sendEvent(FolderKanbanSelectEvent(item)); onDismiss() }
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { sendEvent(FolderKanbanSelectEvent(item)); onDismiss() }
                                 .padding(horizontal = 12.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(selected = item.isChecked, onClick = { sendEvent(FolderKanbanSelectEvent(item)); onDismiss() })
                             HorizontalSpace(8.dp)
-                            Text(text = item.title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                            Text(
+                                text = item.title + if (item.isFavoriteFolder) " ⭐" else "",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.weight(1f)
+                            )
                             if (item.isFavoriteFolder) {
-                                PIconButton(icon = Res.drawable.delete_forever, tint = MaterialTheme.colorScheme.red, contentDescription = stringResource(Res.string.delete), click = {
-                                    DialogHelper.confirmToDelete {
-                                        scope.launch(Dispatchers.IO) { FavoriteFoldersPreference.removeAsync(item.fullPath); options.remove(item) }
+                                PIconButton(icon = Res.drawable.x, contentDescription = stringResource(Res.string.remove), click = {
+                                    scope.launch {
+                                        FavoriteFoldersPreference.removeAsync(item.fullPath)
+                                        options.remove(item)
                                     }
                                 })
                             }

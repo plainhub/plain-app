@@ -109,7 +109,7 @@ private fun ShowcaseButtons() {
     Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         PFilledButton(text = "Filled Button", onClick = {})
         PFilledButton(text = "Filled Danger", type = ButtonType.DANGER, onClick = {})
-        POutlinedButton(text = "Outlined Block", block = true, onClick = {})
+        POutlinedButton(modifier = Modifier.fillMaxWidth(), text = "Outlined Block", onClick = {})
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             PFilledButton(text = "Small Filled", buttonSize = ButtonSize.SMALL, onClick = {})
             POutlinedButton(text = "Small Outlined", buttonSize = ButtonSize.SMALL, onClick = {})

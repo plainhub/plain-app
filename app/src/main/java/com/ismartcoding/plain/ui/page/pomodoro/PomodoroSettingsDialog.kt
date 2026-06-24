@@ -15,11 +15,14 @@ import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.queryOpenableFile
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DPomodoroSettings
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.base.PDialogListItem
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import kotlinx.coroutines.launch
 import java.io.File
@@ -92,16 +95,20 @@ fun PomodoroSettingsDialog(
             }
         },
         confirmButton = {
-            Button(onClick = {
-                onSettingsChange(DPomodoroSettings(
-                    workDuration = workDuration.toIntOrNull() ?: 25, shortBreakDuration = shortBreakDuration.toIntOrNull() ?: 5,
-                    longBreakDuration = longBreakDuration.toIntOrNull() ?: 15, pomodorosBeforeLongBreak = pomodorosBeforeLongBreak.toIntOrNull() ?: 4,
-                    showNotification = showNotification, playSoundOnComplete = playSoundOnComplete,
-                    soundPath = soundPath, originalSoundName = originalFileName,
-                ))
-                onDismiss()
-            }) { Text(stringResource(Res.string.save)) }
+            PFilledButton(
+                text = stringResource(Res.string.save),
+                buttonSize = ButtonSize.MEDIUM,
+                onClick = {
+                    onSettingsChange(DPomodoroSettings(
+                        workDuration = workDuration.toIntOrNull() ?: 25, shortBreakDuration = shortBreakDuration.toIntOrNull() ?: 5,
+                        longBreakDuration = longBreakDuration.toIntOrNull() ?: 15, pomodorosBeforeLongBreak = pomodorosBeforeLongBreak.toIntOrNull() ?: 4,
+                        showNotification = showNotification, playSoundOnComplete = playSoundOnComplete,
+                        soundPath = soundPath, originalSoundName = originalFileName,
+                    ))
+                    onDismiss()
+                },
+            )
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(Res.string.cancel)) } },
+        dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = onDismiss) },
     )
 }

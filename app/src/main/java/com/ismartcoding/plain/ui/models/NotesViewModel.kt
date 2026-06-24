@@ -5,18 +5,15 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>, ViewModel() {
@@ -62,7 +59,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
     }
 
     fun trash(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchIO {
+        launchSafe {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,
@@ -84,7 +81,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
     }
 
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchIO {
+        launchSafe {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,
@@ -95,7 +92,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
     }
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchIO {
+        launchSafe {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,

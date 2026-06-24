@@ -1,0 +1,12 @@
+{
+  "_comment_1": "Copy this file to config.json and fill in the four values below.",
+  "_comment_2": "config.json is gitignored — it holds the bearer token for /graphql auth, which must never be committed.",
+  "_comment_3": "Token sources (pick one):",
+  "_comment_4": "  (a) Web UI: Settings → API Access → Create Token, copy cid + token.",
+  "_comment_5": "  (b) ./apitest/setup-session.sh — force-stops the app, pulls plain.db, inserts a TYPE_CUSTOM row, pushes it back, restarts. ~5s, no data loss.",
+
+  "adb_id": "adb-XXXXXXXX._adb-tls-connect._tcp",
+  "url": "http://<device-hostname>.local:8080/graphql",
+  "cid": "REPLACE_ME",
+  "token": "REPLACE_ME"
+}

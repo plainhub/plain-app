@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.page
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -99,8 +98,9 @@ fun PairingRequestPage(
                     .padding(horizontal = 16.dp),
             ) {
                 PFilledButton(
+                    modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.allow),
-                    buttonSize = ButtonSize.LARGE,
+                    buttonSize = ButtonSize.EXTRA_LARGE,
                     onClick = {
                         coIO { NearbyPairing.respondToPairing(request, true) }
                         navController.popBackStack()
@@ -108,8 +108,9 @@ fun PairingRequestPage(
                 )
                 VerticalSpace(24.dp)
                 PFilledButton(
+                    modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.deny),
-                    buttonSize = ButtonSize.LARGE,
+                    buttonSize = ButtonSize.EXTRA_LARGE,
                     type = ButtonType.DANGER,
                     onClick = {
                         coIO { NearbyPairing.respondToPairing(request, false) }

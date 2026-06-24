@@ -16,6 +16,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.ExportFileEvent
@@ -172,13 +173,19 @@ internal fun MainActivity.initEvents() {
                         nav.popBackStack<Routing.PairingRequest>(inclusive = true)
                     }
                 }
+
+                is ChannelInviteCanceledEvent -> {
+                    val nav = navControllerState.value
+                    val current = nav?.currentBackStackEntry
+                    if (current != null && current.destination.hasRoute<Routing.ChannelInviteRequest>() &&
+                        mainVM.pendingChannelInvite?.channelId == event.channelId
+                    ) {
+                        nav.popBackStack<Routing.ChannelInviteRequest>(inclusive = true)
+                    }
+                }
                 is PairingSuccessEvent -> {
                     withIO { peerVM.loadPeers() }
                     PeerStatusManager.reconnectNow("post_pairing")
-                    navControllerState.value?.navigate(Routing.Chat("peer:${event.deviceId}")) {
-                        popUpTo<Routing.PairingRequest> { inclusive = true }
-                        popUpTo<Routing.Nearby> { inclusive = true }
-                    }
                 }
             }
         }

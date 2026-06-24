@@ -40,6 +40,9 @@ class Routing {
     object Connections
 
     @Serializable
+    data class ApiTokenTips(val clientId: String, val token: String)
+
+    @Serializable
     object WebDev
 
     @Serializable

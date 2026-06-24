@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.db
 
+import android.util.Base64
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatCacheManager
@@ -26,27 +28,6 @@ suspend fun DChatChannel.getPeersAsync(): List<DPeer> = withIO {
     }
 }
 
-/** True when this device owns the channel. */
-fun DChatChannel.isOwnedByMe(): Boolean = owner == "me"
-
-/** True when the channel is still actively joined on this device. */
-fun DChatChannel.isJoined(): Boolean = status == DChatChannel.STATUS_JOINED
-
-/**
- * The owning device must call `delete` rather than `leave`; everyone else
- * can call `delete` once they've left or been kicked.
- */
-fun DChatChannel.canDeleteFromThisDevice(): Boolean =
-    isOwnedByMe() || status == DChatChannel.STATUS_LEFT || status == DChatChannel.STATUS_KICKED
-
-/** Only non-owners can leave. Owners should delete the channel. */
-fun DChatChannel.canLeave(): Boolean = !isOwnedByMe() && isJoined()
-
-/**
- * Build a [DPeer] representation of this device. The local device is never
- * a row in the `peers` table, so anywhere we need a peer for "me" we
- * synthesize it from in-memory state ([TempData] + [NetworkHelper]).
- */
 internal fun mePeer(): DPeer = DPeer(
     id = TempData.clientId,
     name = TempData.deviceName.value,
@@ -55,14 +36,27 @@ internal fun mePeer(): DPeer = DPeer(
     deviceType = DeviceType.PHONE.value,
 )
 
-/**
- * Resolve this channel's owner to a [DPeer]. The owner field carries the
- * "me" sentinel when this device is the owner; in that case we synthesize
- * a peer for this device via [mePeer]. For remote owners we look the peer
- * up in [ChatCacheManager.peerMap]. Returns null when the owner peer is
- * not in the cache (e.g. not yet discovered / stale).
- */
 fun DChatChannel.getOwner(): DPeer? {
-    val ownerId = if (owner == "me" || owner == TempData.clientId) TempData.clientId else owner
-    return if (ownerId == TempData.clientId) mePeer() else ChatCacheManager.peerMap[ownerId]
+    return if (isOwnedByMe()) mePeer() else ChatCacheManager.peerMap[owner]
+}
+
+/**
+ * Verify an Ed25519 signature with the given raw public key (Base64) against
+ * a UTF-8 string payload (Base64 signature).
+ *
+ * Returns false on missing/empty fields, bad Base64, or any verification error.
+ */
+fun verifyEd25519Signature(
+    publicKeyBase64: String,
+    payload: String,
+    signatureBase64: String,
+): Boolean {
+    if (publicKeyBase64.isEmpty() || signatureBase64.isEmpty()) return true
+    return try {
+        val publicKey = Base64.decode(publicKeyBase64, Base64.NO_WRAP)
+        val signature = Base64.decode(signatureBase64, Base64.NO_WRAP)
+        CryptoHelper.verifySignatureWithRawEd25519PublicKey(publicKey, payload.toByteArray(), signature)
+    } catch (_: Exception) {
+        false
+    }
 }

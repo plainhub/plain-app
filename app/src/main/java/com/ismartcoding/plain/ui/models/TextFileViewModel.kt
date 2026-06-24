@@ -1,20 +1,16 @@
 package com.ismartcoding.plain.ui.models
-import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import android.net.Uri
 import android.webkit.WebView
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.extensions.toJsValue
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.File
 
@@ -63,7 +59,7 @@ class TextFileViewModel : ViewModel() {
 
     fun toggleWrapContent(context: Context) {
         wrapContent.value = !wrapContent.value
-        launchIO {
+        launchSafe {
             EditorWrapContentPreference.putAsync(wrapContent.value)
         }
         webView.value?.evaluateJavascript("editor.session.setUseWrapMode(${wrapContent.value.toJsValue()})") {}
