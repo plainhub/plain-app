@@ -2,9 +2,9 @@ package com.ismartcoding.plain.services
 
 import android.content.Context
 import android.os.PowerManager
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.events.KeepAwakeChangedEvent
 import com.ismartcoding.plain.events.PowerConnectedEvent

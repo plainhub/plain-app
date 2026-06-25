@@ -12,15 +12,15 @@ import coil3.SingletonImageLoader
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.size.Scale
-import com.ismartcoding.lib.androidsvg.SVG
-import com.ismartcoding.lib.extensions.getMediaContentUri
-import com.ismartcoding.lib.extensions.isAudioFast
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isPartialSupportVideo
-import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.extensions.pathToMediaStoreUri
-import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.androidsvg.SVG
+import com.ismartcoding.plain.lib.extensions.getMediaContentUri
+import com.ismartcoding.plain.lib.extensions.isAudioFast
+import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isPartialSupportVideo
+import com.ismartcoding.plain.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.extensions.pathToMediaStoreUri
+import com.ismartcoding.plain.lib.isQPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.ByteArrayOutputStream
 import java.io.File
 

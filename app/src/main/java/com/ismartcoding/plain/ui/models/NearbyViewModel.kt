@@ -4,11 +4,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerManager
@@ -17,7 +17,6 @@ import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.discover.NearbyPairing
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
-import com.ismartcoding.plain.events.PeerUnpairedEvent
 import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
@@ -79,9 +78,7 @@ class NearbyViewModel : ViewModel() {
 
     fun unpairDevice(deviceId: String) {
         launchSafe {
-            if (PeerManager.markUnpaired(deviceId)) {
-                sendEvent(PeerUnpairedEvent(deviceId))
-            }
+            PeerManager.markUnpaired(deviceId)
         }
     }
 

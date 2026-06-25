@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.web
 
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.helpers.StringHelper
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DSession
 import com.ismartcoding.plain.helpers.TimeHelper

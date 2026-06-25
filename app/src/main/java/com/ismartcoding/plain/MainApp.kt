@@ -5,12 +5,12 @@ import android.os.Build
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextClassifier
 import coil3.SingletonImageLoader
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.isUPlus
-import com.ismartcoding.lib.logcat.DiskLogAdapter
-import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.isUPlus
+import com.ismartcoding.plain.lib.logcat.DiskLogAdapter
+import com.ismartcoding.plain.lib.logcat.DiskLogFormatStrategy
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.PowerConnectedEvent
@@ -42,7 +42,8 @@ import com.ismartcoding.plain.preferences.FidUriExtMigratedPreference
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import com.ismartcoding.plain.db.AppDatabase
@@ -133,7 +134,8 @@ class MainApp : Application() {
                 HttpServerManager.resetPasswordAsync()
             }
             HttpServerManager.loadTokenCache()
-            ChatCacheManager.loadKeyCacheAsync()
+            PeerCacher.load()
+            ChannelCacher.load()
             if (!FidUriExtMigratedPreference.get(preferences)) {
                 ChatFidUriMigration.run(this@MainApp)
                 FidUriExtMigratedPreference.putAsync(true)

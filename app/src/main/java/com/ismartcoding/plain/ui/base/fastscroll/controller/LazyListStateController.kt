@@ -7,7 +7,7 @@ import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSelectionMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

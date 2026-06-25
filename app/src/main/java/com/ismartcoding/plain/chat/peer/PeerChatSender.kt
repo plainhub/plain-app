@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat.peer
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DPeer

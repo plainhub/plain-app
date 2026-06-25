@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.features.feed.FeedEntryHelper

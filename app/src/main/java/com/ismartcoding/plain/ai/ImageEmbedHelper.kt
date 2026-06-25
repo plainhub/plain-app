@@ -6,7 +6,7 @@ import android.graphics.Matrix
 import androidx.exifinterface.media.ExifInterface
 import com.google.ai.edge.litert.CompiledModel
 import com.google.ai.edge.litert.TensorBuffer
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.File
 
 object ImageEmbedHelper {

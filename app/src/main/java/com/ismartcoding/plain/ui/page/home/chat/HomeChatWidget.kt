@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.home.chat
 
-import com.ismartcoding.plain.preferences.*
-
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,8 +11,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.ChatCacher
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -22,9 +22,7 @@ import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.preferences.HomeSectionCollapsedPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
-import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
@@ -39,7 +37,6 @@ import kotlin.time.Instant
 fun HomeChatWidget(
     navController: NavHostController,
     peerVM: PeerViewModel,
-    channelVM: ChannelViewModel,
     showOnlineStatus: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -47,9 +44,10 @@ fun HomeChatWidget(
     val collapsed = remember {
         context.dataStore.dataFlow.map { HomeSectionCollapsedPreference.get(it, AppFeatureType.CHAT) }
     }.collectAsStateValue(initial = false)
-    val channels = channelVM.channels.collectAsStateValue()
+    val channels = ChannelCacher.channels.collectAsStateValue()
+    val pairedPeers = PeerCacher.pairedPeers.collectAsStateValue()
 
-    val localChat = peerVM.getLatestChat("local")
+    val localChat = ChatCacher.getLatestChat("local")
     val onlineText = stringResource(Res.string.online)
     val localRow = ChatRow(
         sortAt = localChat?.createdAt ?: Instant.DISTANT_PAST,
@@ -61,10 +59,10 @@ fun HomeChatWidget(
         latestChat = localChat,
         route = Routing.Chat("peer:local"),
     )
-    val peerRows = peerVM.pairedPeers
+    val peerRows = pairedPeers
         .map { peer ->
-            val latestChat = peerVM.getLatestChat(peer.id)
-            val online = peerVM.getPeerOnlineStatus(peer.id) == true
+            val latestChat = ChatCacher.getLatestChat(peer.id)
+            val online = PeerCacher.isPeerOnline(peer.id)
             ChatRow(
                 sortAt = latestChat?.createdAt ?: Instant.DISTANT_PAST,
                 title = peer.name,
@@ -79,7 +77,7 @@ fun HomeChatWidget(
     val channelRows = channels
         .filter { it.status == DChatChannel.STATUS_JOINED }
         .map { channel ->
-            val latestChat = peerVM.getLatestChat(channel.id)
+            val latestChat = ChatCacher.getLatestChat(channel.id)
             ChatRow(
                 sortAt = latestChat?.createdAt ?: channel.updatedAt,
                 title = channel.name,

@@ -26,8 +26,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference

@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import kotlinx.coroutines.flow.MutableStateFlow

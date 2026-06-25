@@ -3,13 +3,13 @@ package com.ismartcoding.plain.features.media
 import android.content.Context
 import android.net.Uri
 import android.provider.BaseColumns
-import com.ismartcoding.lib.content.ContentWhere
-import com.ismartcoding.lib.extensions.count
-import com.ismartcoding.lib.extensions.getSearchCursor
-import com.ismartcoding.lib.extensions.getStringValue
-import com.ismartcoding.lib.extensions.map
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.lib.content.ContentWhere
+import com.ismartcoding.plain.lib.extensions.count
+import com.ismartcoding.plain.lib.extensions.getSearchCursor
+import com.ismartcoding.plain.lib.extensions.getStringValue
+import com.ismartcoding.plain.lib.extensions.map
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.StringHelper
 
 abstract class BaseContentHelper {
     protected abstract val uriExternal: Uri

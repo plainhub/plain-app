@@ -24,7 +24,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.discover.NearbyPairing
 import com.ismartcoding.plain.enums.ButtonSize

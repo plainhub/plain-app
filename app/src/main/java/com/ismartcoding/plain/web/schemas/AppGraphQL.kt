@@ -7,9 +7,9 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.util.Base64
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.appDir
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData

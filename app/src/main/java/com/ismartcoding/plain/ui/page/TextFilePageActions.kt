@@ -19,8 +19,8 @@ import com.ismartcoding.plain.ui.models.TextFileViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
-import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.scanFileByConnection
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import kotlinx.coroutines.delay
 import android.content.Context
 

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.events.HPomodoroPauseEvent
 import com.ismartcoding.plain.events.HPomodoroStartEvent

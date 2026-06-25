@@ -2,7 +2,7 @@ package com.ismartcoding.plain.services.webrtc
 
 import android.os.Handler
 import android.os.Looper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import kotlin.math.max

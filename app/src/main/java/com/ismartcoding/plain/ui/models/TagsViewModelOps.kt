@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.features.TagHelper

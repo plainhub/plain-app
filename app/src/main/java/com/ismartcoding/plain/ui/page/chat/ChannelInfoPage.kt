@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.chat
 
-import com.ismartcoding.plain.i18n.*
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,18 +12,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.extensions.toSortName
+import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getBestIp
@@ -35,15 +31,37 @@ import com.ismartcoding.plain.db.mePeer
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.add_member
+import com.ismartcoding.plain.i18n.cancel
+import com.ismartcoding.plain.i18n.channel_info
+import com.ismartcoding.plain.i18n.channel_name
+import com.ismartcoding.plain.i18n.clear_messages
+import com.ismartcoding.plain.i18n.clear_messages_confirm
+import com.ismartcoding.plain.i18n.close
+import com.ismartcoding.plain.i18n.delete_channel
+import com.ismartcoding.plain.i18n.delete_channel_warning
+import com.ismartcoding.plain.i18n.device_type
+import com.ismartcoding.plain.i18n.invite
+import com.ismartcoding.plain.i18n.ip_address
+import com.ismartcoding.plain.i18n.kick_member
+import com.ismartcoding.plain.i18n.leave_channel
+import com.ismartcoding.plain.i18n.leave_channel_warning
+import com.ismartcoding.plain.i18n.members
+import com.ismartcoding.plain.i18n.messages_cleared
+import com.ismartcoding.plain.i18n.peer_id
+import com.ismartcoding.plain.i18n.port
+import com.ismartcoding.plain.i18n.resend_invite
+import com.ismartcoding.plain.i18n.status
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChannelViewModel
@@ -54,6 +72,7 @@ import com.ismartcoding.plain.ui.page.chat.components.ChannelMemberListItem
 import com.ismartcoding.plain.ui.page.chat.components.PeerIconWithStatus
 import com.ismartcoding.plain.ui.page.chat.components.PeerMember
 import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,10 +81,8 @@ fun ChannelInfoPage(
 ) {
     val context = LocalContext.current
     val chatTarget = chatVM.target.collectAsState()
-    val channels = channelVM.channels.collectAsStateValue()
-    val liveChannel = channels.find { it.id == chatTarget.value.toId }
+    val liveChannel = ChannelCacher.getChannel(chatTarget.value.toId)
     val ownedByMe = liveChannel?.isOwnedByMe() == true
-
     val showRenameDialog = remember { mutableStateOf(false) }
     val selectedMemberPeer = remember { mutableStateOf<PeerMember?>(null) }
 
@@ -76,7 +93,7 @@ fun ChannelInfoPage(
     }
     val memberPeers: List<PeerMember> = remember(liveChannel?.members, ownerPeerId) {
         liveChannel?.members?.mapNotNull { m ->
-            val peer = if (m.isMe()) mePeer() else ChatCacheManager.peerMap[m.id] ?: return@mapNotNull null
+            val peer = if (m.isMe()) mePeer() else PeerCacher.getPeer(m.id) ?: return@mapNotNull null
             PeerMember(peer, m, isSelf = m.isMe(), isOwner = m.id == ownerPeerId)
         } ?: emptyList()
     }
@@ -105,7 +122,7 @@ fun ChannelInfoPage(
         val presentIds = liveChannel.members.map { it.id }.toMutableSet().apply {
             ownerPeerId?.let { add(it) }
         }
-        peerVM.pairedPeers
+        PeerCacher.pairedPeers.collectAsState().value
             .filter { it.id !in presentIds }
             .sortedBy { it.getName().toSortName() }
     } else emptyList()

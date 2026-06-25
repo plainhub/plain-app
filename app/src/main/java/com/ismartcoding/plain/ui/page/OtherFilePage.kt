@@ -28,8 +28,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton

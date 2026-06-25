@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.data.DImageMeta
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.helpers.FormatHelper

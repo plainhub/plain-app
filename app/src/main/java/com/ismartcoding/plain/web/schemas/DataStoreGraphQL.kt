@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
 import androidx.datastore.preferences.core.edit
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.preferences.appDataStore
 import com.ismartcoding.plain.preferences.getPreferencesAsync

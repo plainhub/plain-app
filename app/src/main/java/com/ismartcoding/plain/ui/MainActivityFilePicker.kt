@@ -7,8 +7,8 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.isQPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.ExportFileEvent

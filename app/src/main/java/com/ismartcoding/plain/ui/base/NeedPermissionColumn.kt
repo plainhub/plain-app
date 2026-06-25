@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.data.DFeaturePermission
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 

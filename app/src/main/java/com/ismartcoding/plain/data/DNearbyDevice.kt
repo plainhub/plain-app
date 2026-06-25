@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.data
 
-import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.enums.DeviceType
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant

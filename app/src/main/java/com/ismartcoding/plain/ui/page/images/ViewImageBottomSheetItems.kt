@@ -33,7 +33,7 @@ import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.lib.extensions.isUrl
+import com.ismartcoding.plain.lib.extensions.isUrl
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.base.CopyIconButton
 

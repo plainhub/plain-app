@@ -5,7 +5,7 @@ import android.net.Uri
 import android.webkit.WebView
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.extensions.toJsValue
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper

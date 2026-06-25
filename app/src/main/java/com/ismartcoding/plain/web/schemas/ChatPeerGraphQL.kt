@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.web.models.ID
@@ -16,7 +15,7 @@ fun SchemaBuilder.addPeerSchema() {
     }
     mutation("deletePeer") {
         resolver { id: ID ->
-            PeerManager.deletePeer(MainApp.instance, id.value)
+            PeerManager.deletePeer(id.value)
             true
         }
     }

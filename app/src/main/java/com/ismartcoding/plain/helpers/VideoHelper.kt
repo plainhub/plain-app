@@ -2,7 +2,7 @@ package com.ismartcoding.plain.helpers
 
 import android.media.MediaMetadataRetriever
 import androidx.compose.ui.unit.IntSize
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DVideoMeta
 import kotlin.time.Instant
 import java.io.File

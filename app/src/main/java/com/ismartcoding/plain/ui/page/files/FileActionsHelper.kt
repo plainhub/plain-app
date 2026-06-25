@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.ui.page.files
 
 import android.content.Context
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.ZipHelper
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.ZipHelper
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.ui.helpers.DialogHelper

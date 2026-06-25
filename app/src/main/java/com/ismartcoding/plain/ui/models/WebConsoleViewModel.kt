@@ -8,7 +8,7 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.KeepAwakeChangedEvent

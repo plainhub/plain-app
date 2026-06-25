@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation

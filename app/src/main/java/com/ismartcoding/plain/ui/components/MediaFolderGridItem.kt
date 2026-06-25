@@ -30,8 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.helpers.BitmapHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace

@@ -1,11 +1,10 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.chat.ChatSender
+import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.AppDatabase
@@ -49,8 +48,8 @@ fun SchemaBuilder.addChatMessageSchema() {
     mutation("sendChatItem") {
         resolver { toId: String, content: String ->
             val target = ChatTarget.parseId(toId)
-            val item = ChatSender.createChatItem(target, DChat.parseContent(content))
-            ChatSender.send(item, target, emptySet())
+            val item = ChatManager.createChatItem(target, DChat.parseContent(content))
+            ChatManager.sendMessage(item, target, emptySet())
             val model = item.toModel()
             sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
             sendEvent(HMessageCreatedEvent(target, arrayListOf(item)))
@@ -59,9 +58,9 @@ fun SchemaBuilder.addChatMessageSchema() {
     }
     mutation("deleteChatItem") {
         resolver { id: ID ->
-            val item = ChatDbHelper.getChatItem(id.value)
+            val item = ChatManager.getChatItem(id.value)
             if (item != null) {
-                ChatDbHelper.deleteAsync(MainApp.instance, item.id)
+                ChatManager.deleteOne(item.id)
                 sendEvent(DeleteChatItemViewEvent(item.id))
             }
             true
@@ -70,8 +69,8 @@ fun SchemaBuilder.addChatMessageSchema() {
     mutation("deleteChatItems") {
         resolver { query: String ->
             val context = MainApp.instance
-            val ids = ChatDbHelper.getIdsAsync(query)
-            ChatDbHelper.deleteByIdsAsync(context, ids)
+            val ids = ChatManager.getIdsAsync(query)
+            ChatManager.deleteByIds(ids)
             sendEvent(HChatItemsDeletedEvent(ids))
             sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode(query)))
             true
@@ -79,8 +78,8 @@ fun SchemaBuilder.addChatMessageSchema() {
     }
     mutation("retryChatItem") {
         resolver { id: ID ->
-            val item = ChatDbHelper.getChatItem(id.value) ?: return@resolver null
-            ChatDbHelper.updateChatItemStatus(item, "pending")
+            val item = ChatManager.getChatItem(id.value) ?: return@resolver null
+            ChatManager.updateStatus(item, "pending")
             sendEvent(HRetryChatItemEvent(item))
             item.toModel()
         }

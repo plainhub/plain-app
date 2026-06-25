@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.chat.ChannelManager
+import com.ismartcoding.plain.chat.channel.ChannelManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.web.models.ChatChannel
 import com.ismartcoding.plain.web.models.ChatChannelMember
@@ -57,7 +57,7 @@ fun SchemaBuilder.addChatChannelSchema() {
     }
     mutation("declineChatChannelInvite") {
         resolver { id: ID ->
-            ChannelManager.declineInvite(MainApp.instance, id.value)
+            ChannelManager.declineInvite(id.value)
             true
         }
     }

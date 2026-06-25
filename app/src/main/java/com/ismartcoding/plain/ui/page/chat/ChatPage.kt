@@ -37,7 +37,8 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -61,7 +62,6 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
@@ -91,7 +91,7 @@ fun ChatPage(
     val context = LocalContext.current
     val itemsState = chatVM.itemsFlow.collectAsState()
     val chatTarget = chatVM.target.collectAsState()
-    val channelsState = channelVM.channels.collectAsState()
+    val channelsState = ChannelCacher.channels.collectAsState()
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf("") }
     var showForwardDialog by remember { mutableStateOf(false) }
@@ -128,7 +128,7 @@ fun ChatPage(
         } else if (target.isLocal()) {
             LocaleHelper.getString(Res.string.local_chat)
         } else {
-            ChatCacheManager.peerMap[target.toId]?.name ?: ""
+            PeerCacher.getPeer(target.toId)?.name ?: ""
         }
     }
 
@@ -187,8 +187,8 @@ fun ChatPage(
                                 audioPlaylistVM,
                                 itemsState.value,
                                 m = m,
-                                peer = (if (chatTarget.value.type == ChatTargetType.PEER) ChatCacheManager.peerMap[chatTarget.value.toId] else null)
-                                    ?: ChatCacheManager.peerMap[m.fromId],
+                                peer = (if (chatTarget.value.type == ChatTargetType.PEER) PeerCacher.getPeer(chatTarget.value.toId) else null)
+                                    ?: PeerCacher.getPeer(m.fromId),
                                 index = index,
                                 imageWidthDp = imageWidthDp,
                                 imageWidthPx = imageWidthPx.value,
@@ -203,7 +203,7 @@ fun ChatPage(
                     }
                 }
             }
-            val peer = if (chatTarget.value.type == ChatTargetType.PEER) ChatCacheManager.peerMap[chatTarget.value.toId] else null
+            val peer = if (chatTarget.value.type == ChatTargetType.PEER) PeerCacher.getPeer(chatTarget.value.toId) else null
             val notAllowChat = (channel != null && !channel.isJoined()) || peer?.status == "unpaired"
             if (notAllowChat) {
                 Box(
@@ -238,7 +238,7 @@ fun ChatPage(
                         if (inputValue.isEmpty()) return@ChatInput
                         val previousTopId = itemsState.value.firstOrNull()?.id
                         scope.launch {
-                            chatVM.sendTextMessage(inputValue, context, peerVM.onlinePeerIds)
+                            chatVM.sendTextMessage(inputValue, context, PeerCacher.getOnlinePeerIds())
                             inputValue = ""
                             ChatInputTextPreference.putAsync("")
                             scrollToLatest(chatVM, scrollState, previousTopId)
@@ -258,8 +258,7 @@ fun ChatPage(
                 messageToForward?.let { message ->
                     val forwardToCurrent = target == chatVM.target.value
                     val previousTopId = chatVM.itemsFlow.value.firstOrNull()?.id
-                    chatVM.forwardMessage(message.id, target, peerVM.onlinePeerIds)
-                    peerVM.loadPeers()
+                    chatVM.forwardMessage(message.id, target, PeerCacher.getOnlinePeerIds())
                     if (forwardToCurrent) {
                         scope.launch { scrollToLatest(chatVM, scrollState, previousTopId) }
                     }

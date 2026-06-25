@@ -6,24 +6,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.ChatCacher
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.preferences.LocalWeb
-import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
-import com.ismartcoding.plain.preferences.dataFlow
-import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
@@ -41,27 +36,28 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
-import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import kotlinx.coroutines.flow.map
 
 @Composable
 fun ChatListPage(
-    navController: NavHostController, mainVM: MainViewModel, peerVM: PeerViewModel,
+    navController: NavHostController,
+    mainVM: MainViewModel,
+    peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
 ) {
     val context = LocalContext.current
-    val pairedPeers = peerVM.pairedPeers
-    val unpairedPeers = peerVM.unpairedPeers
+    val pairedPeers = PeerCacher.pairedPeers.collectAsStateValue()
+    val unpairedPeers = PeerCacher.unpairedPeers.collectAsStateValue()
     val webEnabled = LocalWeb.current
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("chat_list_pull_refresh")
-        peerVM.loadPeers()
+        peerVM.load()
+        channelVM.load()
         setRefreshState(RefreshContentState.Finished)
     }
-    val channels = channelVM.channels.collectAsStateValue()
+    val channels = ChannelCacher.channels.collectAsStateValue()
 
     PScaffold(
         topBar = { TopBarChat(navController, channelVM, onNavigateBack = { navController.popBackStack() }) },
@@ -92,7 +88,7 @@ fun ChatListPage(
                         title = stringResource(Res.string.local_chat),
                         desc = stringResource(Res.string.local_chat_desc),
                         icon = Res.drawable.bot,
-                        latestChat = peerVM.getLatestChat("local"),
+                        latestChat = ChatCacher.getLatestChat("local"),
                         modifier = PlainTheme.getCardModifier(),
                         onClick = { navController.navigate(Routing.Chat("peer:local")) })
                 }
@@ -106,7 +102,7 @@ fun ChatListPage(
                             title = channel.name,
                             desc = "",
                             icon = Res.drawable.hash,
-                            latestChat = peerVM.getLatestChat(channel.id),
+                            latestChat = ChatCacher.getLatestChat(channel.id),
                             onClick = {
                                 navController.navigate(Routing.Chat("channel:${channel.id}"))
                             },
@@ -125,8 +121,8 @@ fun ChatListPage(
                             title = peer.name,
                             desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
                             icon = DeviceType.fromValue(peer.deviceType).getIcon(),
-                            online = peerVM.getPeerOnlineStatus(peer.id),
-                            latestChat = peerVM.getLatestChat(peer.id),
+                            online = PeerCacher.getPeerOnlineStatus(peer.id),
+                            latestChat = ChatCacher.getLatestChat(peer.id),
                             peerId = peer.id,
                             onDelete = { peerVM.removePeer(context, it) },
                             onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) },

@@ -1,12 +1,12 @@
 package com.ismartcoding.plain.discover
 
 import android.util.Base64
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice

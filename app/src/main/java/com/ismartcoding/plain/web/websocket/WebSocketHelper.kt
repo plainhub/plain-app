@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.websocket
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketData
 import com.ismartcoding.plain.events.WebSocketEvent

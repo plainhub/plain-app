@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
-import com.ismartcoding.lib.extensions.isUrl
+import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem

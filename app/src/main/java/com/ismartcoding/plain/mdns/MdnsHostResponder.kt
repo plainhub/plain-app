@@ -2,7 +2,7 @@ package com.ismartcoding.plain.mdns
 
 import android.content.Context
 import android.net.wifi.WifiManager
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import java.net.DatagramPacket
 import java.net.Inet4Address
 import java.net.Inet6Address

@@ -15,8 +15,8 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
-import com.ismartcoding.lib.extensions.notificationManager
-import com.ismartcoding.lib.isSPlus
+import com.ismartcoding.plain.lib.extensions.notificationManager
+import com.ismartcoding.plain.lib.isSPlus
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R

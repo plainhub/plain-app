@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.kgraphql.schema.execution.Executor
-import com.ismartcoding.lib.kgraphql.schema.execution.Execution
-import com.ismartcoding.lib.kgraphql.helpers.getFields
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Execution
+import com.ismartcoding.plain.lib.kgraphql.helpers.getFields
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.Permission

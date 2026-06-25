@@ -2,10 +2,11 @@ package com.ismartcoding.plain.helpers
 
 import android.content.Context
 import android.webkit.MimeTypeMap
-import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.appDir
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.AppFileDao
@@ -39,9 +40,9 @@ object AppFileStore {
      * fidSuffix may be "{hash}" (legacy) or "{hash}.{ext}" (current).
      * Returns the absolute path whether or not the file currently exists.
      */
-    fun realPathFromId(context: Context, fidSuffix: String): String {
+    fun realPathFromId(fidSuffix: String): String {
         val hash = fidSuffix.substringBefore(".")
-        val base = context.appDir()
+        val base = MainApp.instance.appDir()
         return "$base/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$fidSuffix"
     }
 
@@ -52,9 +53,9 @@ object AppFileStore {
      *   - "app://{rel}"      → existing app:// resolution handled by getFinalPath
      *   - absolute path      → returned as-is
      */
-    fun resolveUri(context: Context, uri: String): String {
+    fun resolveUri( uri: String): String {
         if (uri.startsWith("fid:", ignoreCase = true)) {
-            return realPathFromId(context, uri.removePrefix("fid:"))
+            return realPathFromId(uri.removePrefix("fid:"))
         }
         return uri
     }
@@ -80,7 +81,6 @@ object AppFileStore {
      *                   copy (move semantics).
      */
     suspend fun importFile(
-        context: Context,
         srcFile: File,
         mimeType: String = "",
         deleteSrc: Boolean = false,
@@ -95,22 +95,21 @@ object AppFileStore {
 
         if (candidates.isNotEmpty()) {
             // ── Step 2: strong check ──────────────────────────────────────
-            tryReuseExisting(context, dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
+            tryReuseExisting( dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
             // Weak matched but strong differs – fall through to insert new
-            return@withIO insertNew(context, dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
+            return@withIO insertNew( dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
         }
 
         // No weak match. Double-check by id in case another thread raced us.
-        tryReuseExisting(context, dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
+        tryReuseExisting( dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
 
-        insertNew(context, dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
+        insertNew( dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
     }
 
     /**
      * Import raw bytes (e.g. a completed download) into the store.
      */
     suspend fun importBytes(
-        context: Context,
         data: ByteArray,
         mimeType: String = "",
     ): DAppFile = withIO {
@@ -129,7 +128,7 @@ object AppFileStore {
 
         val effectiveMime = mimeType.ifEmpty { "application/octet-stream" }
         val ext = extFromMime(effectiveMime)
-        val destFile = destFile(context, strongHash, ext)
+        val destFile = destFile( strongHash, ext)
         destFile.parentFile?.mkdirs()
         destFile.writeBytes(data)
 
@@ -151,7 +150,7 @@ object AppFileStore {
      * e.g. "{hash}.{ext}" or legacy "{hash}").
      * When refCount reaches 0 the physical file is deleted.
      */
-    suspend fun release(context: Context, fidSuffix: String) = withIO {
+    suspend fun release(fidSuffix: String) = withIO {
         val hash = fidSuffix.substringBefore(".")
         val dao = AppDatabase.instance.appFileDao()
         dao.decrementRefCount(hash)
@@ -165,14 +164,13 @@ object AppFileStore {
 
     // ── Internals ───────────────────────────────────────────────────────────
 
-    private fun destFile(context: Context, hash: String, ext: String = ""): File {
-        val base = context.appDir()
+    private fun destFile(hash: String, ext: String = ""): File {
+        val base = MainApp.instance.appDir()
         val name = if (ext.isNotEmpty()) "$hash.$ext" else hash
         return File("$base/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$name")
     }
 
     private suspend fun tryReuseExisting(
-        context: Context,
         dao: AppFileDao,
         srcFile: File,
         strongHash: String,
@@ -180,12 +178,12 @@ object AppFileStore {
     ): DAppFile? {
         val existing = dao.getById(strongHash) ?: return null
         val ext = extFromMime(existing.mimeType)
-        val targetFile = destFile(context, strongHash, ext)
+        val targetFile = destFile(strongHash, ext)
 
         // DB row may exist while the backing file was deleted; restore it.
         if (!targetFile.exists()) {
             // Check if old file without extension exists (pre-migration) and rename it
-            val legacyFile = destFile(context, strongHash)
+            val legacyFile = destFile(strongHash)
             if (legacyFile.exists()) {
                 legacyFile.renameTo(targetFile)
                 LogCat.d("ChatFileStore: renamed legacy file $strongHash to include extension")
@@ -228,7 +226,6 @@ object AppFileStore {
     }
 
     private suspend fun insertNew(
-        context: Context,
         dao: AppFileDao,
         srcFile: File,
         size: Long,
@@ -242,7 +239,7 @@ object AppFileStore {
             MimeTypeMap.getSingleton().getMimeTypeFromExtension(srcExt) ?: "application/octet-stream"
         }
         val ext = extFromMime(effectiveMime)
-        val destFile = destFile(context, strongHash, ext)
+        val destFile = destFile(strongHash, ext)
         storeSourceFile(srcFile, destFile, deleteSrc)
 
         val record = DAppFile(strongHash).apply {

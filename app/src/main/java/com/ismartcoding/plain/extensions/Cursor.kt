@@ -2,11 +2,11 @@ package com.ismartcoding.plain.extensions
 
 import android.database.Cursor
 import android.provider.MediaStore
-import com.ismartcoding.lib.extensions.getIntValue
-import com.ismartcoding.lib.extensions.getLongValue
-import com.ismartcoding.lib.extensions.getStringValue
-import com.ismartcoding.lib.extensions.getTimeSecondsValue
-import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.plain.lib.extensions.getIntValue
+import com.ismartcoding.plain.lib.extensions.getLongValue
+import com.ismartcoding.plain.lib.extensions.getStringValue
+import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
+import com.ismartcoding.plain.lib.isQPlus
 import com.ismartcoding.plain.features.file.DFile
 
 fun Cursor.toFile(cache: MutableMap<String, Int>): DFile {

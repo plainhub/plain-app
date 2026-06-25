@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ai
 
 import com.google.ai.edge.litert.Accelerator
 import com.google.ai.edge.litert.CompiledModel
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.File
 
 object DelegateHelper {

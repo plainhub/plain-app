@@ -143,8 +143,65 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.ext.junit)
-    implementation(project(":lib"))
     implementation(project(":shared"))
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+
+    implementation(kotlin("reflect"))
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+
+//    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+
+    implementation(libs.pdfium.android)
+
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.service)
+
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.transition)
+
+//    implementation(libs.exoplayer)
+
+    implementation(libs.bcprov.jdk15on)
+    implementation(libs.bcpkix.jdk15on)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.logging)
+
+    implementation(libs.markwon.core)
+    implementation(libs.markwon.html)
+    implementation(libs.markwon.strikethrough)
+    implementation(libs.markwon.tasklist)
+    implementation(libs.markwon.tables)
+    implementation(libs.markwon.latex)
+    implementation(libs.markwon.linkify)
+    implementation(libs.okhttp)
+
+    implementation(libs.jsoup)
+
+    // Google Tink for cryptography (Ed25519 support on all Android versions)
+    implementation(libs.tink.android)
+
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.websockets)
+    implementation(libs.ktor.server.compression)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.network.tls.certificates)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.server.caching.headers)
+    implementation(libs.ktor.server.cors)
+    implementation(libs.ktor.server.forwarded.header)
+    implementation(libs.ktor.server.partial.content)
+    implementation(libs.ktor.server.auto.head.response)
+    implementation(libs.ktor.server.conditional.headers)
+
 
     implementation(platform(libs.compose.bom))
 

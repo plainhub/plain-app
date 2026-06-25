@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.file
 
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.extensions.sorted
 import java.io.File
 import java.util.zip.ZipInputStream

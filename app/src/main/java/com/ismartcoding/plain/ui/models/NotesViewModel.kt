@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType

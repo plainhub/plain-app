@@ -18,11 +18,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.extensions.formatDuration
-import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DMessageFile

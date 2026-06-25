@@ -1,12 +1,12 @@
 package com.ismartcoding.plain.discover
 
 import android.util.Base64
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
@@ -16,6 +16,8 @@ import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
+import com.ismartcoding.plain.chat.peer.PeerManager
+import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.events.EventType
@@ -164,6 +166,16 @@ object NearbyDiscoverManager {
             )
             sendEvent(NearbyDeviceFoundEvent(device))
             sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(device)))
+            PeerStatusManager.setOnline(device.id, true)
+            coIO {
+                PeerManager.applyDeviceDiscovered(
+                    deviceId = device.id,
+                    ips = device.ips,
+                    port = device.port,
+                    name = device.name,
+                    deviceType = device.deviceType,
+                )
+            }
         } catch (e: Exception) {
             LogCat.e("Error handling discover reply: ${e.message}")
         }

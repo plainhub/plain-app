@@ -5,10 +5,10 @@ import com.ismartcoding.plain.i18n.*
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.ZipHelper
-import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.ZipHelper
+import com.ismartcoding.plain.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.features.locale.LocaleHelper

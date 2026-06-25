@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.enums
 
 import android.content.Context
-import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.lib.isRPlus
+import com.ismartcoding.plain.lib.isQPlus
+import com.ismartcoding.plain.lib.isRPlus
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.data.DFeaturePermission
 import com.ismartcoding.plain.features.Permission

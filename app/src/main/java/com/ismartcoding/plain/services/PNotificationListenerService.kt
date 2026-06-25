@@ -7,11 +7,11 @@ import android.content.pm.PackageManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
-import com.ismartcoding.lib.channel.receiveEventHandler
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.receiveEventHandler
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.TempData

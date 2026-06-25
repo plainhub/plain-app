@@ -8,8 +8,8 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.extensions.isGestureInteractionMode
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.events.PermissionsResultEvent

@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.services.webrtc
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage
 import com.ismartcoding.plain.web.websocket.WebSocketHelper

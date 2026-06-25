@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.kgraphql.schema.execution.Executor
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.SearchHelper
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.ai.ImageIndexManager
 import com.ismartcoding.plain.ai.ImageSearchIndexer

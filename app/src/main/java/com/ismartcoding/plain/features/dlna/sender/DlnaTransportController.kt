@@ -2,9 +2,9 @@ package com.ismartcoding.plain.features.dlna.sender
 
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.XmlHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.XmlHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.common.DlnaDevice
 import com.ismartcoding.plain.features.dlna.common.DlnaPositionInfoResponse
 import com.ismartcoding.plain.features.dlna.common.DlnaSoap

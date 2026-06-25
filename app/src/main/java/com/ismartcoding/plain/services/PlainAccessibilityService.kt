@@ -8,7 +8,7 @@ import android.graphics.Path
 import android.graphics.Point
 import android.provider.Settings
 import android.view.accessibility.AccessibilityEvent
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction

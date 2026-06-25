@@ -2,7 +2,7 @@ package com.ismartcoding.plain.helpers
 import com.ismartcoding.plain.preferences.*
 
 import android.util.Base64
-import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.preferences.SignatureKeyPreference
 

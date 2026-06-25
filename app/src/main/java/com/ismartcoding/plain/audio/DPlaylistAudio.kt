@@ -8,9 +8,9 @@ import android.os.Parcelable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
-import com.ismartcoding.lib.extensions.formatDuration
-import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
-import com.ismartcoding.lib.extensions.pathToUri
+import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
+import com.ismartcoding.plain.lib.extensions.pathToUri
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable

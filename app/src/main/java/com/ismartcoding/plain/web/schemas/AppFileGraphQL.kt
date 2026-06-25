@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import com.ismartcoding.plain.web.models.toModel

@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.ismartcoding.lib.extensions.getFinalPath
+import com.ismartcoding.plain.lib.extensions.getFinalPath
 import com.ismartcoding.plain.db.DLinkPreview
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 

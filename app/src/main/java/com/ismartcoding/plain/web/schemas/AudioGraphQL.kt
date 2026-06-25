@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.web.schemas
 import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.kgraphql.schema.execution.Executor
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.enums.DataType

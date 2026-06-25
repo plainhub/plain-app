@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.media
 
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.common.DlnaDevice
 import com.ismartcoding.plain.data.IMedia
 import kotlinx.coroutines.flow.MutableStateFlow

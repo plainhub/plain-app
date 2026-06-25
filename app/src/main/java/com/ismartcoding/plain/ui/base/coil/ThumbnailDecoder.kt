@@ -25,7 +25,7 @@ import coil3.size.pxOrElse
 import coil3.svg.internal.MIME_TYPE_SVG
 import coil3.svg.isSvg
 import coil3.toAndroidUri
-import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.plain.lib.isQPlus
 import kotlin.math.roundToInt
 
 class ThumbnailDecoder(

@@ -3,9 +3,9 @@ package com.ismartcoding.plain.web.schemas
 import android.app.RemoteInput
 import android.content.Intent
 import android.os.Bundle
-import com.ismartcoding.lib.kgraphql.GraphQLError
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData

@@ -1,11 +1,11 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.extensions.isAudioFast
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.lib.extensions.isAudioFast
+import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.isQPlus
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.Permission

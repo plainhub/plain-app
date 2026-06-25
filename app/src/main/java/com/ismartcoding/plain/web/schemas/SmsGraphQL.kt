@@ -2,10 +2,10 @@ package com.ismartcoding.plain.web.schemas
 
 import android.webkit.MimeTypeMap
 import com.ismartcoding.plain.features.sms.DPendingMms
-import com.ismartcoding.lib.kgraphql.GraphQLError
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.kgraphql.schema.execution.Executor
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
+import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
@@ -112,7 +112,7 @@ fun SchemaBuilder.addSmsSchema() {
             try {
                 val context = MainApp.instance
                 val resolvedAttachments = attachmentPaths.map { path ->
-                    val resolvedPath = AppFileStore.resolveUri(context, path)
+                    val resolvedPath = AppFileStore.resolveUri(path)
                     val file = File(resolvedPath)
                     if (!file.exists()) {
                         throw IllegalArgumentException("Attachment file not found: $resolvedPath")

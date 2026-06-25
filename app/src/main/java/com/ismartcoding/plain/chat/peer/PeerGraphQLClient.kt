@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.chat.peer
 
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DPeer

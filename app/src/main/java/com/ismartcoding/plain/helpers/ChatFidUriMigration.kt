@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.helpers
 
 import android.content.Context
-import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.appDir
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles

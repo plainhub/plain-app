@@ -5,13 +5,13 @@ import android.webkit.MimeTypeMap
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.unit.IntSize
-import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.extensions.queryOpenableFile
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtension
+import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.extensions.queryOpenableFile
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.StringHelper
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -20,6 +20,7 @@ import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -66,7 +67,7 @@ internal fun handleFileSelection(
                     val placeholder = placeholderItems[index]
                     val mimeType = context.contentResolver.getType(uri) ?: ""
                     val fidUri = ChatFileSaveHelper.importFromUri(context, uri, mimeType)
-                    val realPath = AppFileStore.resolveUri(context, fidUri)
+                    val realPath = AppFileStore.resolveUri(fidUri)
                     val intrinsicSize = if (placeholder.fileName.isImageFast())
                         ImageHelper.getIntrinsicSize(realPath, ImageHelper.getRotation(realPath))
                     else if (placeholder.fileName.isVideoFast())
@@ -86,7 +87,7 @@ internal fun handleFileSelection(
                     finalItems.add(placeholderItems[index])
                 }
             }
-            chatVM.updateFilesMessage(messageId, finalItems, isImageVideo, peerVM.onlinePeerIds)
+            chatVM.updateFilesMessage(messageId, finalItems, isImageVideo, PeerCacher.getOnlinePeerIds())
         }
     }
 }

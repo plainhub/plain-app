@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.helpers.AppLogHelper
 import java.io.File

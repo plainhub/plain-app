@@ -7,8 +7,8 @@ import com.ismartcoding.plain.i18n.*
 import android.graphics.BitmapFactory
 import androidx.compose.ui.unit.IntSize
 import androidx.exifinterface.media.ExifInterface
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DImageMeta
 import com.ismartcoding.plain.enums.ImageType
 import kotlin.time.Instant

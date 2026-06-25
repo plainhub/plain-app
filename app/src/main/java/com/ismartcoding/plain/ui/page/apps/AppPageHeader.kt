@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import com.ismartcoding.lib.apk.ApkParsers
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.apk.ApkParsers
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DPackageDetail
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.packageManager

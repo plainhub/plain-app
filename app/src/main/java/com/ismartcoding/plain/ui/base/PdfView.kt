@@ -6,10 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.lib.pdfviewer.PDFView
-import com.ismartcoding.lib.pdfviewer.listener.OnPageErrorListener
-import com.ismartcoding.lib.pdfviewer.util.FitPolicy
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.pdfviewer.PDFView
+import com.ismartcoding.plain.lib.pdfviewer.listener.OnPageErrorListener
+import com.ismartcoding.plain.lib.pdfviewer.util.FitPolicy
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 

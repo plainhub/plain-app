@@ -10,10 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ismartcoding.lib.extensions.dp2px
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.extensions.dp2px
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DMessageFile

@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.extensions.getFileName
-import com.ismartcoding.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.extensions.appDir
+import com.ismartcoding.plain.lib.extensions.getFileName
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.extensions.newPath

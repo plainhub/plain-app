@@ -10,9 +10,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.lib.pinyin.Pinyin
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.pinyin.Pinyin
 import com.ismartcoding.plain.data.DCertificate
 import com.ismartcoding.plain.data.DPackage
 import com.ismartcoding.plain.data.DPackageDetail

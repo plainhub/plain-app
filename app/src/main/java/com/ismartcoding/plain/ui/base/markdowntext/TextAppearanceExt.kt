@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.TextViewCompat
-import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.plain.lib.isQPlus
 
 fun TextView.applyFontWeight(fontWeight: FontWeight) {
     typeface = Typeface.create(typeface, fontWeight.weight, false)

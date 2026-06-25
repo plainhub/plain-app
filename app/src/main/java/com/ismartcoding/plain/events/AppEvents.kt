@@ -3,13 +3,13 @@ package com.ismartcoding.plain.events
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.channel.ChannelEvent
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.ChannelEvent
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DNearbyDevice
@@ -35,7 +35,7 @@ import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
-import com.ismartcoding.plain.chat.ChatSender
+import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.services.HttpServerService
@@ -89,11 +89,6 @@ class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
 
 class DeleteChatItemViewEvent(val id: String) : ChannelEvent()
 
-data class PeerOnlineStatusChangedEvent(val peerId: String, val online: Boolean) : ChannelEvent()
-
-/** Fired after a peer's status flips to unpaired. Listeners reload their peer list. */
-data class PeerUnpairedEvent(val peerId: String) : ChannelEvent()
-
 /** Fired when a channel invite is received from a remote peer. UI shows accept/decline dialog. */
 data class ChannelInviteReceivedEvent(
     val channelId: String,
@@ -109,9 +104,6 @@ data class ChannelInviteCanceledEvent(
     val channelId: String,
     val ownerPeerId: String,
 ) : ChannelEvent()
-
-/** Fired when channel membership/metadata changes so UI can refresh. */
-class ChannelUpdatedEvent : ChannelEvent()
 
 class ConfirmToAcceptLoginEvent(
     val session: DefaultWebSocketServerSession,
@@ -217,20 +209,6 @@ object AppEvents {
                                     ),
                                 )
                             }
-                        }
-                    }
-
-                    is ChannelUpdatedEvent -> {
-                        coIO {
-                            val channels = com.ismartcoding.plain.db.AppDatabase.instance.chatChannelDao().getAll()
-                                .sortedBy { it.name.lowercase() }
-                                .map { it.toModel() }
-                            sendEvent(
-                                WebSocketEvent(
-                                    EventType.CHANNELS_UPDATED,
-                                    jsonEncode(channels),
-                                ),
-                            )
                         }
                     }
 
@@ -395,7 +373,7 @@ object AppEvents {
 
                     is HRetryChatItemEvent -> {
                         coIO {
-                            ChatSender.resend(event.item)
+                            ChatManager.resendMessage(event.item)
                         }
                     }
                 }

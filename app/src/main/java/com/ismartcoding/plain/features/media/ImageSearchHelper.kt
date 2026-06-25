@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.media
 
 import android.content.Context
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.features.file.FileSortBy
 

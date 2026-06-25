@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.db
 
-import com.ismartcoding.lib.extensions.urlEncode
-import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.extensions.urlEncode
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
 
 fun DPeer.getBestIp(): String {
     val ips = getIpList()

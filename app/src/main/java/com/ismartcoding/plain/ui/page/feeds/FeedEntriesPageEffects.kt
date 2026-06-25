@@ -8,7 +8,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.Channel
 import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.events.FeedStatusEvent
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus

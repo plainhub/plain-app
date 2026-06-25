@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.ui.components.mediaviewer
 
 import androidx.compose.ui.unit.IntSize
-import com.ismartcoding.lib.extensions.getMimeType
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.extensions.getMimeType
+import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.IData

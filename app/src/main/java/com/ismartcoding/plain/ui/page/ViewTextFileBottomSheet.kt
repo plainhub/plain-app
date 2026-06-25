@@ -10,9 +10,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.extensions.getMimeType
-import com.ismartcoding.lib.extensions.scanFileByConnection
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.getMimeType
+import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.extensions.formatDateTime

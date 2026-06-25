@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent

@@ -12,11 +12,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.features.Permission

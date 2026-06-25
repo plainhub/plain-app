@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.web
 
 import android.annotation.SuppressLint
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.PasswordType

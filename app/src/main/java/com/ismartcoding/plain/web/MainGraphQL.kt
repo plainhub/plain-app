@@ -1,18 +1,19 @@
 package com.ismartcoding.plain.web
 
-import com.ismartcoding.lib.kgraphql.GraphQLError
-import com.ismartcoding.lib.kgraphql.GraphqlRequest
-import com.ismartcoding.lib.kgraphql.KGraphQL
-import com.ismartcoding.lib.kgraphql.context
-import com.ismartcoding.lib.kgraphql.schema.Schema
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
+import com.ismartcoding.plain.lib.kgraphql.KGraphQL
+import com.ismartcoding.plain.lib.kgraphql.context
+import com.ismartcoding.plain.lib.kgraphql.schema.Schema
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DSession
 import com.ismartcoding.plain.events.WebRequestReceivedEvent
 import com.ismartcoding.plain.web.schemas.addAppFileSchema
@@ -212,9 +213,9 @@ class MainGraphQL(val schema: Schema) {
                         val authStr = call.request.header("authorization")?.split(" ")
                         if (authStr.isNullOrEmpty()) {
                             val token = if (channelId.isNotEmpty()) {
-                                ChatCacheManager.channelKeyCache[channelId]
+                                ChannelCacher.getKeyBytes(channelId)
                             } else if (type == "peer") {
-                                ChatCacheManager.peerKeyCache[channelId]
+                                PeerCacher.getKeyBytes(channelId)
                             } else {
                                 HttpServerManager.tokenCache[clientId]
                             }

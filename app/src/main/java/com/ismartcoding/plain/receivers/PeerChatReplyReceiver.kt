@@ -5,10 +5,10 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.chat.ChatSender
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
@@ -29,8 +29,8 @@ class PeerChatReplyReceiver : BroadcastReceiver() {
 
         coIO {
             val content = DMessageContent(DMessageType.TEXT.value, DMessageText(replyText))
-            val item = ChatSender.createChatItem(target, content)
-            ChatSender.send(item, target, emptySet())
+            val item = ChatManager.createChatItem(target, content)
+            ChatManager.sendMessage(item, target, emptySet())
             sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
             NotificationManagerCompat.from(context).cancel(notificationId)
         }

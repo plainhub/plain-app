@@ -3,10 +3,10 @@ package com.ismartcoding.plain.features.call
 import android.content.ContentValues
 import android.provider.BlockedNumberContract
 import android.telephony.PhoneNumberUtils
-import com.ismartcoding.lib.extensions.getStringValue
-import com.ismartcoding.lib.extensions.map
-import com.ismartcoding.lib.extensions.queryCursor
-import com.ismartcoding.lib.extensions.trimToComparableNumber
+import com.ismartcoding.plain.lib.extensions.getStringValue
+import com.ismartcoding.plain.lib.extensions.map
+import com.ismartcoding.plain.lib.extensions.queryCursor
+import com.ismartcoding.plain.lib.extensions.trimToComparableNumber
 import com.ismartcoding.plain.contentResolver
 import com.ismartcoding.plain.data.BlockedNumber
 

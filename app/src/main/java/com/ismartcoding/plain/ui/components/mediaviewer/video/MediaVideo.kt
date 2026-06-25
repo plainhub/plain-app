@@ -27,8 +27,8 @@ import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerView
 import android.content.Context
 import android.media.AudioManager
-import com.ismartcoding.lib.extensions.pathToUri
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.extensions.pathToUri
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DVideoPlayProgress

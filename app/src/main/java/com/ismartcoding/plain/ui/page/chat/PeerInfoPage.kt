@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
@@ -39,7 +39,7 @@ fun PeerInfoPage(
 ) {
     val context = LocalContext.current
     val chatTarget = chatVM.target.collectAsState()
-    val peer = ChatCacheManager.peerMap[chatTarget.value.toId]
+    val peer = PeerCacher.getPeer(chatTarget.value.toId)
 
     PScaffold(
         topBar = {

@@ -5,12 +5,11 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.chat.ChatSender
+import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.AppDatabase
@@ -18,7 +17,6 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.events.EventType
@@ -85,11 +83,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     fun clearAllMessages(context: Context) {
         launchSafe {
             val target = target.value
-            if (target.type == ChatTargetType.CHANNEL) {
-                ChatDbHelper.deleteAllChannelChatsAsync(context, target.toId)
-            } else {
-                ChatDbHelper.deleteAllChatsAsync(context, target.toId)
-            }
+            ChatManager.clearAllMessages(target)
             _itemsFlow.value = emptyList()
             sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode(target.encodedToId)))
         }
@@ -97,10 +91,10 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     fun resendMessage(messageId: String) {
         launchSafe {
-            val item = ChatDbHelper.getChatItem(messageId) ?: return@launchSafe
-            ChatDbHelper.updateChatItemStatus(item, "pending")
+            val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
+            ChatManager.updateStatus(item, "pending")
             update(item)
-            ChatSender.resend(item)
+            ChatManager.resendMessage(item)
         }
     }
 
@@ -108,20 +102,20 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
         launchSafe {
             val target = target.value
             val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return@launchSafe
-            val item = ChatDbHelper.getChatItem(messageId) ?: return@launchSafe
-            ChatDbHelper.updateChatItemStatus(item, "pending")
+            val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
+            ChatManager.updateStatus(item, "pending")
             update(item)
-            ChatSender.sendToChannelMembers(item, channel, peerIds)
+            ChatManager.sendToChannelMembers(item, channel, peerIds)
             update(item)
         }
     }
 
     fun forwardMessage(messageId: String, target: ChatTarget, onlinePeerIds: Set<String>) {
         launchSafe {
-            val item = ChatDbHelper.getChatItem(messageId) ?: return@launchSafe
-            val item2 = ChatSender.createChatItem(target, item.content)
+            val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
+            val item2 = ChatManager.createChatItem(target, item.content)
             if (!target.isLocal()) {
-                ChatSender.send(item2, target, onlinePeerIds)
+                ChatManager.sendMessage(item2, target, onlinePeerIds)
             }
             sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item2.toModel()))))
             if (_target.value == target) {
@@ -135,10 +129,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     fun delete(context: Context, ids: Set<String>) {
         launchSafe {
-            val items = itemsFlow.value.filter { ids.contains(it.id) }
-            for (m in items) {
-                ChatDbHelper.deleteAsync(context, m.id)
-            }
+            ChatManager.deleteByIds(ids)
             _itemsFlow.update { it.filterNot { m -> ids.contains(m.id) } }
             sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode("ids=${ids.joinToString(",")}")))
         }
@@ -151,11 +142,11 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     private suspend fun doSendMessage(target: ChatTarget, content: DMessageContent, onlinePeerIds: Set<String>): Boolean = withIO {
-        val item = ChatSender.createChatItem(target, content)
+        val item = ChatManager.createChatItem(target, content)
         addAll(listOf(item))
 
         if (!target.isLocal()) {
-            ChatSender.send(item, target, onlinePeerIds)
+            ChatManager.sendMessage(item, target, onlinePeerIds)
             update(item)
         }
         sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
@@ -174,33 +165,15 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     suspend fun sendFilesImmediate(files: List<DMessageFile>, isImageVideo: Boolean): String = withIO {
-        val target = target.value
-        val content = if (isImageVideo) {
-            DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
-        } else {
-            DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
-        }
-        val item = ChatDbHelper.insertChatItem(
-            message = content,
-            fromId = "me",
-            toId = if (target.type == ChatTargetType.PEER) target.toId else "",
-            channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
-            isRemote = !target.isLocal(),
-        )
+        val item = ChatManager.insertFilesImmediate(target.value, files, isImageVideo)
         addAll(listOf(item))
         item.id
     }
 
     fun updateFilesMessage(messageId: String, files: List<DMessageFile>, isImageVideo: Boolean, onlinePeerIds: Set<String>) {
         launchSafe {
-            val item = ChatDbHelper.getChatItem(messageId) ?: return@launchSafe
-            ChatDbHelper.updateChatItemFilesContent(item, files)
-            if (target.value.isLocal()) {
-                ChatDbHelper.updateChatItemStatus(item, "sent")
-            } else {
-                ChatDbHelper.updateChatItemStatus(item, "pending")
-                ChatSender.send(item, target.value, onlinePeerIds)
-            }
+            val target = target.value
+            val item = ChatManager.updateFilesMessage(messageId, files, isImageVideo, target, onlinePeerIds) ?: return@launchSafe
             sendEvent(HMessageUpdatedEvent(item.id))
             update(item)
         }

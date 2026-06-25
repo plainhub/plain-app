@@ -13,10 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState

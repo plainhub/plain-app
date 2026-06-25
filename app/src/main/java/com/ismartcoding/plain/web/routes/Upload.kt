@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.web.routes
 
-import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.scanFileByConnection
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.UploadChunkInfo
 import com.ismartcoding.plain.data.UploadInfo
@@ -77,7 +77,7 @@ fun Route.addUploads() {
                                         tempFile.delete()
                                         throw IOException("Size mismatch: expected ${info.size}, got $actual")
                                     }
-                                    val dFile = AppFileStore.importFile(MainApp.instance, tempFile, part.contentType?.toString() ?: "", deleteSrc = true)
+                                    val dFile = AppFileStore.importFile( tempFile, part.contentType?.toString() ?: "", deleteSrc = true)
                                     val fidSuffix = java.io.File(dFile.realPath).name  // "{hash}.{ext}"
                                     fileName = fidSuffix // client forms fid:{fidSuffix}
                                 } else {

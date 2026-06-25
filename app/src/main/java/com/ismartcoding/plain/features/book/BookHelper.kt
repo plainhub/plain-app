@@ -1,12 +1,10 @@
 package com.ismartcoding.plain.features.book
 
-import com.ismartcoding.lib.content.ContentWhere
+import com.ismartcoding.plain.lib.content.ContentWhere
 import com.ismartcoding.plain.db.rawQuery
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.SearchHelper
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.helpers.QueryHelper
-import com.ismartcoding.plain.helpers.TimeHelper
 
 object BookHelper {
     val bookDao: BookDao by lazy {

@@ -16,7 +16,6 @@ import com.ismartcoding.plain.preferences.HomeFeaturesPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
-import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.page.home.chat.HomeChatWidget
 import kotlinx.coroutines.flow.map
@@ -25,7 +24,6 @@ import kotlinx.coroutines.flow.map
 fun HomeShortcutGrid(
     navController: NavHostController,
     peerVM: PeerViewModel,
-    channelVM: ChannelViewModel,
     showOnlineStatus: Boolean,
 ) {
     val context = LocalContext.current
@@ -41,7 +39,7 @@ fun HomeShortcutGrid(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         if (AppFeatureType.CHAT.name in enabledIds) {
-            HomeChatWidget(navController, peerVM, channelVM, showOnlineStatus)
+            HomeChatWidget(navController, peerVM, showOnlineStatus)
         }
         HomeFeatureItemsGrid(navController)
     }

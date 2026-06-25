@@ -25,4 +25,9 @@ object TempData {
     var audioPlayPosition = 0L // audio play position in milliseconds
     // mediaId -> playback position in milliseconds; pre-loaded from DB on startup as cache
     val videoPlayProgressMap = mutableMapOf<String, Long>()
+
+    // Encoded target id of the chat page currently in the foreground. Set by
+    // ChatPageEffects so the chat receiver can suppress notifications for the
+    // active conversation. Format: "peer:<id>" / "channel:<id>" / "local".
+    var activeToId = ""
 }

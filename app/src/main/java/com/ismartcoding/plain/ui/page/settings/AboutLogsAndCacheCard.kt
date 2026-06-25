@@ -12,9 +12,9 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.helpers.AppHelper

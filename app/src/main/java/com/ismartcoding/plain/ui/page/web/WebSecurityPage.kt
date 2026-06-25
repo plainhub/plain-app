@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import android.util.Base64
 import androidx.compose.foundation.layout.fillMaxWidth
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize

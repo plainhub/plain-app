@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.extensions.cut
+import com.ismartcoding.plain.lib.extensions.cut
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper

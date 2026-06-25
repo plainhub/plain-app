@@ -6,9 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent

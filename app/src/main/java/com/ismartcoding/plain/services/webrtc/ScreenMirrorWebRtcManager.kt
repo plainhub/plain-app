@@ -5,8 +5,8 @@ import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.projection.MediaProjection
 import android.view.Surface
-import com.ismartcoding.lib.isUPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.isUPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage

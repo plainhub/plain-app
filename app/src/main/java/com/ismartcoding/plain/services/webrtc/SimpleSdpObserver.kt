@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.services.webrtc
 
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import org.webrtc.SessionDescription
 
 internal open class SimpleSdpObserver : org.webrtc.SdpObserver {

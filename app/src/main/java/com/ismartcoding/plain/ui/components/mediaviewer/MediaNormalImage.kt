@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
 import androidx.media3.common.util.UnstableApi
 import coil3.imageLoader
-import com.ismartcoding.lib.extensions.isUrl
+import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.launch
 

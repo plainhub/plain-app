@@ -26,7 +26,7 @@ import org.jetbrains.compose.resources.painterResource
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
-import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.ui.base.coil.ForceVideoDecoder
 import kotlinx.coroutines.launch
 

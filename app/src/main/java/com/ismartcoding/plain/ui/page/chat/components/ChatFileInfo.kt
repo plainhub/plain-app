@@ -8,9 +8,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.extensions.formatDuration
-import com.ismartcoding.lib.extensions.isTextFile
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 

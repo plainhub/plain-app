@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.extensions.pathToAceMode
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.pathToAceMode
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.preferences.LocalDarkTheme

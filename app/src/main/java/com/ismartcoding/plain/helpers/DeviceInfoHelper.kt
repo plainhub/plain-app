@@ -9,8 +9,8 @@ import android.os.StatFs
 import android.os.SystemClock
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
-import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.isQPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.data.DAndroidDeviceInfo

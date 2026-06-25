@@ -9,11 +9,12 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hasRoute
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
@@ -184,7 +185,7 @@ internal fun MainActivity.initEvents() {
                     }
                 }
                 is PairingSuccessEvent -> {
-                    withIO { peerVM.loadPeers() }
+                    withIO { PeerManager.load() }
                     PeerStatusManager.reconnectNow("post_pairing")
                 }
             }

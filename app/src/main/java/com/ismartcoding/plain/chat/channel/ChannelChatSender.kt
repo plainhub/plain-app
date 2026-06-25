@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat.channel
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerGraphQLClient
 import com.ismartcoding.plain.db.AppDatabase
@@ -37,27 +37,12 @@ import com.ismartcoding.plain.db.toPeerMessageContent
  *   receiver selects the correct decryption path.
  */
 object ChannelChatSender {
-
-    /**
-     * Outcome of [send]. [Status] carries per-member delivery results;
-     * [NoLeader] means no joined member (including self) is reachable right now;
-     * [LeaderPeerMissing] means the elected leader was elected but its
-     * peer record vanished from the local DB.
-     */
     sealed class Result {
         data class Status(val data: DMessageStatusData) : Result()
         data object NoLeader : Result()
         data class LeaderPeerMissing(val leaderId: String) : Result()
     }
 
-    /**
-     * Send [content] from this device into the channel.
-     *
-     * If this device is the leader, broadcast to all other members.
-     * Otherwise, send only to the leader (who will relay).
-     *
-     * @param onlinePeerIds set of peer ids known to be online, used for leader election.
-     */
     suspend fun send(
         channel: DChatChannel,
         content: DMessageContent,
@@ -78,19 +63,10 @@ object ChannelChatSender {
         }
     }
 
-    /**
-     * Leader broadcasts [content] to all other joined members.
-     * Returns [DMessageStatusData] with a [DMessageDeliveryResult] per recipient.
-     */
     private suspend fun broadcastAsLeader(channel: DChatChannel, content: DMessageContent): DMessageStatusData {
         return sendToRecipients(channel, channel.getRecipientIds(), content)
     }
 
-    /**
-     * Send [content] to an explicit [recipientIds] list. Used by the leader
-     * (every joined member) and by the UI when retrying to a chosen subset.
-     * Missing peer records become error entries in the returned status data.
-     */
     suspend fun sendToRecipients(
         channel: DChatChannel,
         recipientIds: List<String>,
@@ -115,9 +91,6 @@ object ChannelChatSender {
         }
     }
 
-    /**
-     * Send [content] to the channel leader for relaying.
-     */
     private suspend fun sendToLeader(
         channel: DChatChannel,
         leaderId: String,
@@ -133,13 +106,6 @@ object ChannelChatSender {
         return Result.Status(DMessageStatusData(listOf(result)))
     }
 
-    /**
-     * Send [content] to a single channel member.
-     * Returns [DMessageDeliveryResult] with error = null on success, or an error message.
-     *
-     * If the member is a paired peer (peer.key is non-empty), uses the peer's shared key.
-     * Otherwise, uses the channel key with `c-cid` header.
-     */
     suspend fun sendToMember(
         channel: DChatChannel,
         peer: DPeer,

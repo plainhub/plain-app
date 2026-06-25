@@ -25,14 +25,15 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.isTPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.isTPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -191,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                                 pendingForwardText?.let { text ->
                                     coIO {
                                         delay(500)
-                                        chatVM.sendTextMessage(text, this@MainActivity, peerVM.onlinePeerIds)
+                                        chatVM.sendTextMessage(text, this@MainActivity, PeerCacher.getOnlinePeerIds())
                                     }
                                 }
                             })

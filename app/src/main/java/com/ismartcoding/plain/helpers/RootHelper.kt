@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.file.DFile
 import kotlin.time.Instant
 import java.io.DataOutputStream

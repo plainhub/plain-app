@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ai
 
-import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.isQPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.features.Permission

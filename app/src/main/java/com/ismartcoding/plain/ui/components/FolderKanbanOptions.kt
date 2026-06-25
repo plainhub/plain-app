@@ -7,8 +7,8 @@ import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.FolderOption
 import android.content.Context
-import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.appDir
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 
 suspend fun buildFolderOptions(
     context: Context,

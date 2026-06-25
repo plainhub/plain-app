@@ -3,12 +3,10 @@ package com.ismartcoding.plain.ui
 import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavDestination.Companion.hasRoute
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.parcelable
-import com.ismartcoding.lib.extensions.parcelableArrayList
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.extensions.parcelable
+import com.ismartcoding.plain.lib.extensions.parcelableArrayList
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -16,7 +14,6 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.not_supported_error
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
@@ -50,31 +47,22 @@ internal fun MainActivity.handleIntent(intent: Intent) {
             val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return
             pendingFileUris = null
             pendingForwardText = sharedText
-            showForwardTargetOptions(peerVM)
+            showForwardTargetDialog = true
             return
         }
         val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri ?: return
         pendingFileUris = setOf(uri)
         pendingForwardText = null
-        showForwardTargetOptions(peerVM)
+        showForwardTargetDialog = true
     } else if (intent.action == Intent.ACTION_SEND_MULTIPLE) {
         val uris = intent.parcelableArrayList<Uri>(Intent.EXTRA_STREAM)
         if (uris != null) {
             pendingFileUris = uris.toSet()
             pendingForwardText = null
-            showForwardTargetOptions(peerVM)
+            showForwardTargetDialog = true
         }
     } else if (intent.action == Constants.ACTION_PLAY_MEDIA) {
         val path = intent.getStringExtra(Constants.EXTRA_MEDIA_PATH) ?: return
         navControllerState.value?.navigate(Routing.PlayMedia(path))
-    }
-}
-
-private fun MainActivity.showForwardTargetOptions(peerVM: PeerViewModel) {
-    coMain {
-        DialogHelper.showLoading()
-        withIO { peerVM.loadPeers() }
-        DialogHelper.hideLoading()
-        showForwardTargetDialog = true
     }
 }

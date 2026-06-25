@@ -15,8 +15,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.bot
@@ -31,6 +33,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -43,8 +46,8 @@ fun ForwardTargetDialog(
     onDismiss: () -> Unit,
     onTargetSelected: (ChatTarget) -> Unit
 ) {
-    val pairedPeers = peerVM.pairedPeers
-    val channels by channelVM.channels.collectAsState()
+    val pairedPeers = PeerCacher.pairedPeers.collectAsStateValue()
+    val channels by ChannelCacher.channels.collectAsState()
     val joinedChannels = channels.filter { it.isJoined() }
 
     PModalBottomSheet(onDismissRequest = onDismiss) {

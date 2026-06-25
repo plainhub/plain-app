@@ -8,7 +8,7 @@ import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.IOException
 
 object QrCodeBitmapHelper {

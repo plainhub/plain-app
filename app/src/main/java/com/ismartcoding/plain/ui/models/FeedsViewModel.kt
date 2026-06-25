@@ -4,8 +4,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.rss.model.RssChannel
+import com.ismartcoding.plain.lib.extensions.isUrl
+import com.ismartcoding.plain.lib.rss.model.RssChannel
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.features.feed.FeedEntryHelper

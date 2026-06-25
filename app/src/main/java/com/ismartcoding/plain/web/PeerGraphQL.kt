@@ -1,23 +1,24 @@
 package com.ismartcoding.plain.web
 
 import android.annotation.SuppressLint
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.lib.kgraphql.Context
-import com.ismartcoding.lib.kgraphql.GraphqlRequest
-import com.ismartcoding.lib.kgraphql.KGraphQL
-import com.ismartcoding.lib.kgraphql.context
-import com.ismartcoding.lib.kgraphql.schema.Schema
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.kgraphql.Context
+import com.ismartcoding.plain.lib.kgraphql.KGraphQL
+import com.ismartcoding.plain.lib.kgraphql.context
+import com.ismartcoding.plain.lib.kgraphql.schema.Schema
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.ChatMessageReceiver
 import com.ismartcoding.plain.chat.ReplayedMessageException
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerChatParser
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
@@ -134,11 +135,11 @@ class PeerGraphQL(val schema: Schema) {
                         // 1. If c-cid is present, always use the channel key (supports non-paired members).
                         // 2. Otherwise, use the peer's shared key (paired peer-to-peer chat).
                         val token = if (channelId.isNotEmpty()) {
-                            ChatCacheManager.channelKeyCache[channelId]
+                            ChannelCacher.getKeyBytes(channelId)
                         } else {
-                            ChatCacheManager.peerKeyCache[clientId]
+                            PeerCacher.getKeyBytes(clientId)
                         }
-                        val publicKey = ChatCacheManager.peerPublicKeyCache[clientId]
+                        val publicKey = PeerCacher.getPublicKeyBytes(clientId)
                         if (token == null || publicKey == null) {
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post

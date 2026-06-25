@@ -10,10 +10,10 @@ import android.view.OrientationEventListener
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import android.media.projection.MediaProjection
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.isPortrait
-import com.ismartcoding.lib.extensions.parcelable
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.extensions.isPortrait
+import com.ismartcoding.plain.lib.extensions.parcelable
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.events.EventType

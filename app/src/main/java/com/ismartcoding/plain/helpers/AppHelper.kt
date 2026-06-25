@@ -9,7 +9,7 @@ import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import android.os.Handler
 import android.os.Looper
 import android.os.Process

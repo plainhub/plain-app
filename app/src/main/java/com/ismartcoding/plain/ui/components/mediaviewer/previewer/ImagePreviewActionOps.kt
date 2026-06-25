@@ -5,10 +5,10 @@ import com.ismartcoding.plain.i18n.*
 import android.content.Context
 import android.os.Environment
 import coil3.imageLoader
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.isUrl
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper

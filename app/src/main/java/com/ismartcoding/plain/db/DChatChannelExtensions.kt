@@ -1,11 +1,11 @@
 package com.ismartcoding.plain.db
 
 import android.util.Base64
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.SignatureHelper
 
@@ -37,7 +37,7 @@ internal fun mePeer(): DPeer = DPeer(
 )
 
 fun DChatChannel.getOwner(): DPeer? {
-    return if (isOwnedByMe()) mePeer() else ChatCacheManager.peerMap[owner]
+    return if (isOwnedByMe()) mePeer() else PeerCacher.getPeer(owner)
 }
 
 /**

@@ -5,8 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.extensions.isGestureInteractionMode
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.preferences.AudioSortByPreference

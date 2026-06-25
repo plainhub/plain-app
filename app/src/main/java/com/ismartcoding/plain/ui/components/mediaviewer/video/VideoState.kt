@@ -9,7 +9,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.media3.exoplayer.ExoPlayer
-import com.ismartcoding.lib.isTPlus
+import com.ismartcoding.plain.lib.isTPlus
 import android.util.Rational
 import androidx.compose.runtime.getValue
 

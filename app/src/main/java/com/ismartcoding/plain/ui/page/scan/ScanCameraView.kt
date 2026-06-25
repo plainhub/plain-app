@@ -23,7 +23,7 @@ import com.google.zxing.NotFoundException
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.Result
 import com.google.zxing.common.HybridBinarizer
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors

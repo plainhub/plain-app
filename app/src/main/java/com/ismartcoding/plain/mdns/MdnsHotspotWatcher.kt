@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
-import com.ismartcoding.lib.isTPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.isTPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 
 /**
  * Listens for Android Wi-Fi AP (hotspot) state changes and invokes [onStateChanged].

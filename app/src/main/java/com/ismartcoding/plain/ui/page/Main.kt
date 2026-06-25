@@ -22,8 +22,8 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.ismartcoding.lib.extensions.isGestureInteractionMode
-import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
+import com.ismartcoding.plain.lib.isQPlus
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent

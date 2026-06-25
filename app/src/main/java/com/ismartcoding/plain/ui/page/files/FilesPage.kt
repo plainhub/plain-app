@@ -32,7 +32,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference

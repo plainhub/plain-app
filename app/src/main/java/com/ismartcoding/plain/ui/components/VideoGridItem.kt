@@ -13,11 +13,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.extensions.formatDuration
-import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper

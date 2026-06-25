@@ -7,11 +7,11 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.extensions.isAudioFast
-import com.ismartcoding.lib.helpers.CoroutinesHelper
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.lib.extensions.isAudioFast
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DPlaylistAudio

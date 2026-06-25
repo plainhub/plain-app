@@ -14,8 +14,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.ismartcoding.lib.extensions.cut
-import com.ismartcoding.lib.extensions.isGestureInteractionMode
+import com.ismartcoding.plain.lib.extensions.cut
+import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper

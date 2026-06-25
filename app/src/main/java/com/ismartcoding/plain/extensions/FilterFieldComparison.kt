@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.extensions
 
-import com.ismartcoding.lib.helpers.FilterField
+import com.ismartcoding.plain.helpers.FilterField
 
 /**
  * Normalizes comparison operator/value pairs for query fields.

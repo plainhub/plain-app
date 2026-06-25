@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.dlna.sender
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.common.DlnaDevice
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

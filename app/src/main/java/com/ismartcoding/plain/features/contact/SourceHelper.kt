@@ -3,9 +3,9 @@ package com.ismartcoding.plain.features.contact
 import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
-import com.ismartcoding.lib.extensions.forEach
-import com.ismartcoding.lib.extensions.getStringValue
-import com.ismartcoding.lib.extensions.queryCursor
+import com.ismartcoding.plain.lib.extensions.forEach
+import com.ismartcoding.plain.lib.extensions.getStringValue
+import com.ismartcoding.plain.lib.extensions.queryCursor
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DContactSource
 

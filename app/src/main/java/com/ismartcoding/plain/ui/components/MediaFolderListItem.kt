@@ -20,7 +20,7 @@ import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace

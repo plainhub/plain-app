@@ -11,9 +11,9 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
-import com.ismartcoding.lib.extensions.dp2px
-import com.ismartcoding.lib.pdfviewer.PDFView
-import com.ismartcoding.lib.pdfviewer.scroll.ScrollHandle
+import com.ismartcoding.plain.lib.extensions.dp2px
+import com.ismartcoding.plain.lib.pdfviewer.PDFView
+import com.ismartcoding.plain.lib.pdfviewer.scroll.ScrollHandle
 import com.ismartcoding.plain.R
 
 class MinimalScrollHandle(context: Context) : View(context), ScrollHandle {

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.discover
 
-import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse

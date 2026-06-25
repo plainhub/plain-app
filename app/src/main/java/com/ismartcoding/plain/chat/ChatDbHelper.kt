@@ -1,9 +1,5 @@
 package com.ismartcoding.plain.chat
 
-import android.content.Context
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.ChatMessageStatus
@@ -16,6 +12,9 @@ import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.helpers.AppFileStore
+import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.helpers.SearchHelper
+import com.ismartcoding.plain.helpers.withIO
 
 object ChatDbHelper {
     suspend fun insertChatItem(message: DMessageContent, fromId: String = "me", toId: String = "local", channelId: String = "", isRemote: Boolean): DChat = withIO {
@@ -87,12 +86,12 @@ object ChatDbHelper {
     }
 
     suspend fun deleteAsync(
-        context: Context,
         id: String,
     ) = withIO {
         val chat = AppDatabase.instance.chatDao().getById(id) ?: return@withIO
-        releaseFidFiles(context, chat.content.value)
+        releaseFidFiles(chat.content.value)
         AppDatabase.instance.chatDao().delete(id)
+        ChatManager.refreshLatestChats()
     }
 
     /**
@@ -123,35 +122,38 @@ object ChatDbHelper {
         emptySet()
     }
 
-    suspend fun deleteByIdsAsync(context: Context, ids: Set<String>) = withIO {
+    suspend fun deleteByIdsAsync(ids: Set<String>) = withIO {
         val dao = AppDatabase.instance.chatDao()
         ids.chunked(500).forEach { chunk ->
             val chats = ids.mapNotNull { dao.getById(it) }
-            releaseChatsFiles(context, chats)
+            releaseChatsFiles( chats)
             dao.deleteByIds(chats.map { it.id })
         }
+        ChatManager.refreshLatestChats()
     }
 
-    suspend fun deleteAllChatsAsync(context: Context, peerId: String) = withIO {
+    suspend fun deleteAllChatsAsync(peerId: String) = withIO {
         val chatDao = AppDatabase.instance.chatDao()
-        releaseChatsFiles(context, chatDao.getByPeerId(peerId))
+        releaseChatsFiles(chatDao.getByPeerId(peerId))
         chatDao.deleteByPeerId(peerId)
+        ChatManager.refreshLatestChats()
     }
 
-    suspend fun deleteAllChannelChatsAsync(context: Context, channelId: String) = withIO {
+    suspend fun deleteAllChannelChatsAsync(channelId: String) = withIO {
         val chatDao = AppDatabase.instance.chatDao()
-        releaseChatsFiles(context, chatDao.getByChannelId(channelId))
+        releaseChatsFiles(chatDao.getByChannelId(channelId))
         chatDao.deleteByChannelId(channelId)
+        ChatManager.refreshLatestChats()
     }
 
-    private suspend fun releaseFidFiles(context: Context, value: Any?) {
+    private suspend fun releaseFidFiles(value: Any?) {
         when (value) {
-            is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
-            is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
+            is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(it.localFileId()) }
+            is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(it.localFileId()) }
         }
     }
 
-    private suspend fun releaseChatsFiles(context: Context, chats: List<DChat>) {
-        for (chat in chats) releaseFidFiles(context, chat.content.value)
+    private suspend fun releaseChatsFiles(chats: List<DChat>) {
+        for (chat in chats) releaseFidFiles(chat.content.value)
     }
 }

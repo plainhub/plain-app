@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 import android.content.Context
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

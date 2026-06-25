@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.kgraphql.schema.execution.Executor
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper

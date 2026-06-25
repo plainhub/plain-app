@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.GraphQLError
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.extensions.scanFileByConnection
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.helpers.AppFileStore
@@ -126,7 +126,7 @@ fun SchemaBuilder.addFileUploadSchema() {
             chunkDir.deleteRecursively()
             if (isAppFile) {
                 // Import into content-addressable store; returns "{hash}.{ext}" as fid suffix
-                val dFile = AppFileStore.importFile(MainApp.instance, outputFile, "", deleteSrc = true)
+                val dFile = AppFileStore.importFile(outputFile, "", deleteSrc = true)
                 val fidSuffix = java.io.File(dFile.realPath).name  // "{hash}.{ext}"
                 "${fidSuffix}:$mergedSize"
             } else {

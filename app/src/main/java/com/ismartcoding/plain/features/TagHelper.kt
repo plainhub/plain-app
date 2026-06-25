@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DTag

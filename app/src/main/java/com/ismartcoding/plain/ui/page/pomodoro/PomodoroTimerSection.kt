@@ -21,7 +21,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.Permissions

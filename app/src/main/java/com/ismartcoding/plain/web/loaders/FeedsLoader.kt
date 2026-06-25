@@ -4,7 +4,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.web.models.Feed
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.lib.kdataloader.ExecutionResult
+import com.ismartcoding.plain.lib.kdataloader.ExecutionResult
 
 object FeedsLoader {
     suspend fun load(

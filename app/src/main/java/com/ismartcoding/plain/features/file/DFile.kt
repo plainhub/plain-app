@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.file
 
-import com.ismartcoding.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.data.IData
 import kotlin.time.Instant
 

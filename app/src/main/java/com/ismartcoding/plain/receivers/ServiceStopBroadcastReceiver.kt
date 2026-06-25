@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import androidx.core.content.ContextCompat
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.preferences.AdbTokenPreference

@@ -4,8 +4,8 @@ import com.ismartcoding.plain.i18n.*
 
 import android.provider.MediaStore
 import org.jetbrains.compose.resources.StringResource
-import com.ismartcoding.lib.data.SortBy
-import com.ismartcoding.lib.data.enums.SortDirection
+import com.ismartcoding.plain.lib.data.SortBy
+import com.ismartcoding.plain.lib.data.enums.SortDirection
 
 enum class FileSortBy {
     DATE_ASC,

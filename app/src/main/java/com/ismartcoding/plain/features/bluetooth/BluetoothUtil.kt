@@ -14,10 +14,10 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.ParcelUuid
 import androidx.annotation.RequiresApi
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.hasPermission
-import com.ismartcoding.lib.isSPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.extensions.hasPermission
+import com.ismartcoding.plain.lib.isSPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay

@@ -21,7 +21,7 @@ object ChatFileSaveHelper {
         tempFile.parentFile?.mkdirs()
         try {
             FileHelper.copyFile(context, uri, tempFile.absolutePath)
-            val dFile = AppFileStore.importFile(context, tempFile, mimeType, deleteSrc = true)
+            val dFile = AppFileStore.importFile(tempFile, mimeType, deleteSrc = true)
             return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
         } finally {
             // Guard: if importFile did not consume (due to error path), clean up
@@ -37,11 +37,10 @@ object ChatFileSaveHelper {
      * Returns a `fid:{sha256}` URI to embed in [com.ismartcoding.plain.db.DMessageFile.uri].
      */
     suspend fun importDownloadedFile(
-        context: Context,
         srcFile: File,
         mimeType: String = "",
     ): String {
-        val dFile = AppFileStore.importFile(context, srcFile, mimeType, deleteSrc = true)
+        val dFile = AppFileStore.importFile(srcFile, mimeType, deleteSrc = true)
         return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
     }
 }

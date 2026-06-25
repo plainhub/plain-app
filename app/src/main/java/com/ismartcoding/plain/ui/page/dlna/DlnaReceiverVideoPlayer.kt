@@ -47,7 +47,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import com.ismartcoding.lib.extensions.formatMinSec
+import com.ismartcoding.plain.lib.extensions.formatMinSec
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.ui.base.PlayerSlider

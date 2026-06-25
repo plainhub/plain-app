@@ -3,15 +3,15 @@ package com.ismartcoding.plain.ui.page
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.enums.AudioAction
+import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.events.AudioActionEvent
-import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
@@ -110,7 +110,6 @@ fun MainEventCollector(
                     }
                 }
 
-                is ChannelUpdatedEvent -> peerVM.loadPeers()
                 else -> {}
             }
         }

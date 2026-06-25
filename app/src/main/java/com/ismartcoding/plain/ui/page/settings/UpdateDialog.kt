@@ -21,8 +21,8 @@ import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.DownloadUpdateEvent

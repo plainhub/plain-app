@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.features
 
 import android.content.Context
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DLinkPreview

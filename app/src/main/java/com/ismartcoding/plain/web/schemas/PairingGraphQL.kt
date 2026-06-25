@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.discover.NearbyPairing
 import com.ismartcoding.plain.web.models.PairingDeviceInput
 import com.ismartcoding.plain.web.models.PairingRequestInput

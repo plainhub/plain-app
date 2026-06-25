@@ -3,10 +3,10 @@ package com.ismartcoding.plain.features.contact
 import android.content.ContentProviderOperation
 import android.content.ContentUris
 import android.provider.ContactsContract
-import com.ismartcoding.lib.extensions.forEach
-import com.ismartcoding.lib.extensions.getLongValue
-import com.ismartcoding.lib.extensions.getStringValue
-import com.ismartcoding.lib.extensions.queryCursor
+import com.ismartcoding.plain.lib.extensions.forEach
+import com.ismartcoding.plain.lib.extensions.getLongValue
+import com.ismartcoding.plain.lib.extensions.getStringValue
+import com.ismartcoding.plain.lib.extensions.queryCursor
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.contentResolver
 import com.ismartcoding.plain.data.DGroup

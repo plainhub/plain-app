@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.extensions.capitalize
+import com.ismartcoding.plain.lib.extensions.capitalize
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent

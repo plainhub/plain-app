@@ -10,10 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.extensions.queryOpenableFile
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.extensions.appDir
+import com.ismartcoding.plain.lib.extensions.queryOpenableFile
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.PickFileTag

@@ -2,10 +2,10 @@ package com.ismartcoding.plain.features
 
 import android.content.Context
 import android.os.Environment
-import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.appDir
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DBookmark

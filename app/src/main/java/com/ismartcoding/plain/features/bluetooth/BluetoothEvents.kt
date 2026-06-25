@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.features.bluetooth
 
-import com.ismartcoding.lib.channel.ChannelEvent
-import com.ismartcoding.lib.channel.receiveEventHandler
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.channel.ChannelEvent
+import com.ismartcoding.plain.lib.channel.receiveEventHandler
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import kotlinx.coroutines.withTimeoutOrNull
 
 class RequestEnableBluetoothEvent: ChannelEvent()

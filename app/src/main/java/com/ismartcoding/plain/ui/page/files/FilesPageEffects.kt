@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.extensions.appDir
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.events.ActionEvent

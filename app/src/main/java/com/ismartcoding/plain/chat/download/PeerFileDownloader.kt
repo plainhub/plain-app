@@ -2,8 +2,8 @@ package com.ismartcoding.plain.chat.download
 
 import android.content.Context
 import android.webkit.MimeTypeMap
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
@@ -87,8 +87,8 @@ object PeerFileDownloader {
                     .getMimeTypeFromExtension(fileName.getFilenameExtension()) ?: ""
 
                 // Import into content-addressable store (dedup, deleteSrc=true moves the temp file)
-                val fidUri = ChatFileSaveHelper.importDownloadedFile(context, tempFile, mimeType)
-                val realPath = AppFileStore.resolveUri(context, fidUri)
+                val fidUri = ChatFileSaveHelper.importDownloadedFile(tempFile, mimeType)
+                val realPath = AppFileStore.resolveUri(fidUri)
 
                 updateMessageFileUri(task.messageId, messageFile.uri, fidUri)
                 return realPath

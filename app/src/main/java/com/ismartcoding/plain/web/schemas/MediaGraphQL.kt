@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.web.schemas
 import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.lib.isRPlus
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.isQPlus
+import com.ismartcoding.plain.lib.isRPlus
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.ai.ImageIndexManager
 import com.ismartcoding.plain.audio.AudioMediaStoreHelper

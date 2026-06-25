@@ -3,11 +3,11 @@ import com.ismartcoding.plain.preferences.*
 
 import android.content.Context
 import androidx.work.*
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.isWifiConnected
-import com.ismartcoding.lib.helpers.CoroutinesHelper.pmap
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.extensions.isWifiConnected
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.pmap
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
 import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference

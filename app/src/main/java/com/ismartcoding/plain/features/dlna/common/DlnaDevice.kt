@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.dlna.common
 
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.lib.helpers.XmlHelper
+import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.helpers.XmlHelper
 import kotlinx.serialization.Serializable
 import java.net.URL
 

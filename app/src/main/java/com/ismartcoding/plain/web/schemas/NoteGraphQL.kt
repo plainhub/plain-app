@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.kgraphql.schema.execution.Executor
-import com.ismartcoding.lib.extensions.cut
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
+import com.ismartcoding.plain.lib.extensions.cut
+import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper

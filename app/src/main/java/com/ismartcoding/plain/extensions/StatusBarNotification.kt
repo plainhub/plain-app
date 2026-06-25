@@ -3,7 +3,7 @@ package com.ismartcoding.plain.extensions
 import android.app.Notification
 import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
-import com.ismartcoding.lib.extensions.getString2
+import com.ismartcoding.plain.lib.extensions.getString2
 import com.ismartcoding.plain.data.DNotification
 import com.ismartcoding.plain.features.PackageHelper
 import kotlin.time.Instant

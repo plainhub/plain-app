@@ -8,7 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.wifi.WifiManager
 import androidx.core.app.NotificationManagerCompat
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper

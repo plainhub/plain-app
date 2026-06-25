@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.bluetooth
 
 import android.bluetooth.BluetoothProfile
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.mdns
 
 import android.content.Context
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import java.util.concurrent.atomic.AtomicBoolean
 

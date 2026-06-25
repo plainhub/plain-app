@@ -1,13 +1,13 @@
 package com.ismartcoding.plain.web
 
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerChatParser
 import com.ismartcoding.plain.chat.peer.PeerChatSender
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
@@ -39,8 +39,8 @@ fun Route.addWebSocket() {
                 if (frame !is Frame.Binary) continue
                 if (authenticated) continue
 
-                val token = ChatCacheManager.peerKeyCache[peerId]
-                val publicKey = ChatCacheManager.peerPublicKeyCache[peerId]
+                val token = PeerCacher.getKeyBytes(peerId)
+                val publicKey = PeerCacher.getPublicKeyBytes(peerId)
                 if (token == null || publicKey == null) {
                     close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "unknown_peer"))
                     return@webSocket

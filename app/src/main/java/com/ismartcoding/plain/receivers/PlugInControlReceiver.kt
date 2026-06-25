@@ -4,9 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.isTPlus
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.isTPlus
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.events.PowerConnectedEvent
 import com.ismartcoding.plain.events.PowerDisconnectedEvent
 

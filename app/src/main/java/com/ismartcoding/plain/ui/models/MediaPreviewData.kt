@@ -2,9 +2,9 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import androidx.compose.ui.unit.toSize
-import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DMessageFile

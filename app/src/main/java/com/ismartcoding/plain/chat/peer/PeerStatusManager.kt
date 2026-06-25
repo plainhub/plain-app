@@ -1,19 +1,17 @@
 package com.ismartcoding.plain.chat.peer
 
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
-import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getStatusWsUrl
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.PeerOnlineStatusChangedEvent
 import com.ismartcoding.plain.events.PeerStatusData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.SignatureHelper
@@ -122,7 +120,7 @@ object PeerStatusManager {
         }
         val peer = AppDatabase.instance.peerDao().getById(peerId) ?: return@withIO
         if (!shouldConnect(peer)) return@withIO
-        val key = ChatCacheManager.peerKeyCache[peer.id] ?: return@withIO
+        val key = PeerCacher.getKeyBytes(peer.id) ?: return@withIO
 
         LogCat.d("peer status: reconnect peer=$peerId reason=$reason")
         NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
@@ -145,7 +143,7 @@ object PeerStatusManager {
             LogCat.d("peer status: reconnect skipped peer=$peer.Id reason=$reason active_socket=true")
             return@withIO
         }
-        val key = ChatCacheManager.peerKeyCache[peer.id] ?: return@withIO
+        val key = PeerCacher.getKeyBytes(peer.id) ?: return@withIO
         LogCat.d("peer status: reconnect peer=$peer.Id reason=$reason")
         openSocket(peer, key)
     }
@@ -258,7 +256,7 @@ object PeerStatusManager {
         if (state.online == online) return
         state.online = online
         LogCat.d("peer status: online peer=$peerId value=$online")
-        sendEvent(PeerOnlineStatusChangedEvent(peerId, online))
+        PeerManager.setOnlineStatus(peerId, online)
         sendEvent(WebSocketEvent(EventType.PEER_STATUS_UPDATED, JsonHelper.jsonEncode(PeerStatusData(peerId, online))))
     }
 

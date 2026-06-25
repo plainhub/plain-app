@@ -3,11 +3,11 @@ package com.ismartcoding.plain.features
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Environment
-import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.DLinkPreview
 import io.ktor.client.request.get

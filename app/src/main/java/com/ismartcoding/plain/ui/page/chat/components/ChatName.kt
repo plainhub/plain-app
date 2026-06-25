@@ -19,7 +19,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.extensions.formatTime
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -44,7 +44,7 @@ fun ChatName(
             text = when (m.fromId) {
                 "local" -> stringResource(Res.string.local_chat)
                 "me" -> stringResource(Res.string.me)
-                else -> ChatCacheManager.peerMap[m.fromId]?.name ?: stringResource(Res.string.unknown)
+                else -> PeerCacher.getPeer(m.fromId)?.name ?: stringResource(Res.string.unknown)
             },
 
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),

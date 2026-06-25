@@ -4,8 +4,8 @@ import android.os.LocaleList
 import android.util.Base64
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.Preferences
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.helpers.StringHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.DarkTheme

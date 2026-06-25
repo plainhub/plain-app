@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ai
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.File
 import java.io.FileOutputStream
 import java.net.HttpURLConnection

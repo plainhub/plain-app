@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.mdns
 
-import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
 import java.net.Inet4Address
 import java.net.NetworkInterface
 

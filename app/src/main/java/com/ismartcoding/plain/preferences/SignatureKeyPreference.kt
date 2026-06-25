@@ -2,9 +2,9 @@ package com.ismartcoding.plain.preferences
 
 import android.util.Base64
 import androidx.datastore.preferences.core.Preferences
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DSignatureKeyPair
 
 // The SignatureKeyPreference object is defined in shared/commonMain.

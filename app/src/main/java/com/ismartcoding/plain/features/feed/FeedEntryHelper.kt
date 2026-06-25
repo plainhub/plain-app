@@ -1,9 +1,8 @@
 package com.ismartcoding.plain.features.feed
 
-import com.ismartcoding.lib.content.ContentWhere
+import com.ismartcoding.plain.lib.content.ContentWhere
 import com.ismartcoding.plain.db.rawQuery
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.SearchHelper
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao

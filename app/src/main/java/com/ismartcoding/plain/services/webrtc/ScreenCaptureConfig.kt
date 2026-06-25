@@ -7,7 +7,7 @@ import android.util.DisplayMetrics
 import android.view.Display
 import android.view.Surface
 import android.view.WindowManager
-import com.ismartcoding.lib.isSPlus
+import com.ismartcoding.plain.lib.isSPlus
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import kotlin.math.max

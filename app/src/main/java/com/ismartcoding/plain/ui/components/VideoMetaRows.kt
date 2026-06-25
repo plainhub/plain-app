@@ -10,8 +10,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.lib.extensions.formatBitrate
-import com.ismartcoding.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatBitrate
+import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.data.DVideoMeta
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.helpers.VideoHelper

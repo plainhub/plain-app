@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.ismartcoding.lib.extensions.isUrl
+import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.AppFeatureType

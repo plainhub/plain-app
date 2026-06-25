@@ -22,7 +22,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.capitalize
+import com.ismartcoding.plain.lib.extensions.capitalize
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.extensions.timeAgo

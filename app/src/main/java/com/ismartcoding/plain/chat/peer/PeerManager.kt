@@ -1,9 +1,8 @@
 package com.ismartcoding.plain.chat.peer
 
-import android.content.Context
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
@@ -11,11 +10,11 @@ import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.TimeHelper
 
 object PeerManager {
-    suspend fun deletePeer(context: Context, peerId: String): Boolean = withIO {
+    suspend fun deletePeer(peerId: String): Boolean = withIO {
         val peerDao = AppDatabase.instance.peerDao()
         val peer = peerDao.getById(peerId) ?: return@withIO false
 
-        ChatDbHelper.deleteAllChatsAsync(context, peerId)
+        ChatDbHelper.deleteAllChatsAsync(peerId)
         val isChannelMember = AppDatabase.instance.chatChannelDao().getAll().any { it.hasMember(peerId) }
         if (isChannelMember) {
             peer.key = ""
@@ -24,31 +23,24 @@ object PeerManager {
         } else {
             peerDao.delete(peerId)
         }
-        ChatCacheManager.loadKeyCacheAsync()
+        PeerCacher.removePeer(peerId)
+        PeerCacher.load()
+        ChatCacher.load()
         true
     }
 
-    /**
-     * Mark an existing peer as unpaired. Caller is responsible for re-loading
-     * any view-model state that mirrors the peer list. Returns true when the
-     * peer existed and was updated.
-     */
     suspend fun markUnpaired(peerId: String): Boolean = withIO {
         val peerDao = AppDatabase.instance.peerDao()
         val peer = peerDao.getById(peerId) ?: return@withIO false
         peer.status = "unpaired"
         peer.updatedAt = TimeHelper.now()
         peerDao.update(peer)
-        ChatCacheManager.loadKeyCacheAsync()
+        PeerCacher.removePeer(peerId)
+        PeerCacher.load()
         LogCat.d("Device unpaired: $peerId")
         true
     }
 
-    /**
-     * Apply discovery metadata (IP, port, name, device type) to an already-paired
-     * peer. Returns the freshly-persisted peer when at least one field changed;
-     * null when the peer is missing, not paired, or unchanged.
-     */
     suspend fun applyDeviceDiscovered(
         deviceId: String,
         ips: List<String>,
@@ -82,13 +74,11 @@ object PeerManager {
 
         peer.updatedAt = TimeHelper.now()
         peerDao.update(peer)
+
+        PeerCacher.updatePeer(peer)
         peer
     }
 
-    /**
-     * Upsert a freshly-paired peer with the negotiated key + signature public
-     * key. Preserves `createdAt` when the peer already exists.
-     */
     suspend fun upsertPaired(
         deviceId: String,
         deviceName: String,
@@ -113,7 +103,20 @@ object PeerManager {
             updatedAt = now
         }
         AppDatabase.instance.peerDao().upsert(peer)
-        ChatCacheManager.loadKeyCacheAsync()
+        PeerCacher.load()
         LogCat.d("Upserted peer: $deviceId")
+    }
+
+    fun setOnlineStatus(peerId: String, online: Boolean) {
+        PeerCacher.setOnline(peerId, online)
+    }
+
+    suspend fun load() = withIO {
+        PeerCacher.load()
+        PeerCacher.setOnlineMap(
+            PeerCacher.peersMap.value.values
+                .filter { it.peer.isPaired() }
+                .associate { it.peer.id to PeerStatusManager.isOnline(it.peer.id) }
+        )
     }
 }

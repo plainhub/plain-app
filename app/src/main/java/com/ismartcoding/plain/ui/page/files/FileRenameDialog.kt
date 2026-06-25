@@ -8,8 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.scanFileByConnection
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.FileHelper

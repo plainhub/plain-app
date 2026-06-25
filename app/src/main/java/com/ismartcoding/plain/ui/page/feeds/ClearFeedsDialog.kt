@@ -12,7 +12,7 @@ import com.ismartcoding.plain.ui.base.PTextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.ui.base.PDialogRadioRow

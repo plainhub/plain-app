@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.features.call
 
 import androidx.collection.LruCache
-import com.ismartcoding.lib.phonegeo.PhoneNumberLookup
-import com.ismartcoding.lib.phonegeo.algo.LookupAlgorithm
+import com.ismartcoding.plain.lib.phonegeo.PhoneNumberLookup
+import com.ismartcoding.plain.lib.phonegeo.algo.LookupAlgorithm
 import com.ismartcoding.plain.web.models.PhoneGeo
 
 /**

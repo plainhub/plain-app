@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.formatMinSec
+import com.ismartcoding.plain.lib.extensions.formatMinSec
 import com.ismartcoding.plain.ui.base.PlayerSlider
 
 @Composable

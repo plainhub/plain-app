@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.chat
 
 import android.annotation.SuppressLint
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.download.DownloadQueue
@@ -24,6 +24,7 @@ import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.peer_chat
@@ -127,6 +128,7 @@ object ChatMessageReceiver {
                 items = arrayListOf(item),
             ),
         )
+        ChatManager.refreshLatestChats()
         val model = item.toModel().apply { data = getContentData() }
         sendEvent(
             WebSocketEvent(
@@ -160,7 +162,7 @@ object ChatMessageReceiver {
                 messageText = "${fromPeer.name}: $preview",
             )
         }
-        if (ChatCacheManager.activeToId == targetId) return
+        if (TempData.activeToId == targetId) return
         NotificationHelper.sendChatMessageNotification(
             context = MainApp.instance,
             targetId = targetId,

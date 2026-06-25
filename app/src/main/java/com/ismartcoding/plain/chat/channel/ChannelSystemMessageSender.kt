@@ -1,27 +1,20 @@
 package com.ismartcoding.plain.chat.channel
 
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.api.ApiResult
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerGraphQLClient
-import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getPeersAsync
+import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 
 object ChannelSystemMessageSender {
 
-    /**
-     * Build lightweight peer info for all channel members from the local peers table.
-     * This is included in ChannelInvite/ChannelUpdate so receivers can create
-     * peer records for members they don't already know.
-     */
     private suspend fun buildMemberPeers(channel: DChatChannel): List<ChannelSystemMessages.MemberPeerInfo> {
         return channel.getPeersAsync().map { peer ->
             ChannelSystemMessages.MemberPeerInfo(
@@ -35,17 +28,6 @@ object ChannelSystemMessageSender {
         }
     }
 
-    /**
-     * Send a [ChannelSystemMessages.ChannelInvite] to a single peer.
-     * The channel key is sent as-is because the PeerGraphQL transport layer
-     * already encrypts the entire payload with the peer's shared key and
-     * verifies the Ed25519 signature.
-     *
-     * Includes [ChannelSystemMessages.MemberPeerInfo] for all current members so
-     * the invitee can create peer records for members it doesn't already have
-     * locally, and dynamically signs `"$channelId|$version|invite|<peer id>"`
-     * with the owner's private key.
-     */
     suspend fun sendInvite(channel: DChatChannel, peer: DPeer): GraphQLResponse = withIO {
         val payload = jsonEncode(
             ChannelSystemMessages.ChannelInvite(
@@ -64,9 +46,6 @@ object ChannelSystemMessageSender {
         sendToPeer(peer, ChannelSystemMessages.TYPE_INVITE, payload)
     }
 
-    /** Send accept response to the channel owner.
-     *  Includes the accepter's publicKey, name, and deviceType so the owner
-     *  can create/update a peer record. */
     suspend fun sendInviteAccept(channelId: String, ownerPeer: DPeer): GraphQLResponse = withIO {
         val context = MainApp.instance
         val publicKey = SignatureHelper.getRawPublicKeyBase64Async()
@@ -157,9 +136,8 @@ object ChannelSystemMessageSender {
     }
 
     private suspend fun sendToMultiplePeers(peerIds: List<String>, type: String, payload: String, channelId: String = "", channelKey: String = "") = withIO {
-        val peerDao = AppDatabase.instance.peerDao()
         for (peerId in peerIds) {
-            val peer = peerDao.getById(peerId) ?: continue
+            val peer = PeerCacher.getPeer(peerId) ?: continue
             sendToPeer(peer, type, payload, channelId, channelKey)
         }
     }

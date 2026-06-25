@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.ui.helpers
 
 import android.widget.Toast
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.isTPlus
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.lib.isTPlus
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent

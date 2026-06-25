@@ -9,10 +9,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
-import com.ismartcoding.lib.extensions.getMimeType
-import com.ismartcoding.lib.extensions.getMimeTypeFromUri
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.extensions.getMimeType
+import com.ismartcoding.plain.lib.extensions.getMimeTypeFromUri
+import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import java.io.File

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features.dlna.sender
 
 import android.content.Context
 import android.net.wifi.WifiManager
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.common.DlnaDevice
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

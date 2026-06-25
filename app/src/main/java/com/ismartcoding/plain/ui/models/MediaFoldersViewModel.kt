@@ -6,8 +6,8 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.locale.LocaleHelper

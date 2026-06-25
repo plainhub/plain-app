@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.lib.androidsvg.SVG
+import com.ismartcoding.plain.lib.androidsvg.SVG
 import java.io.File
 import androidx.compose.ui.unit.IntSize
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 
 object SvgHelper {
     fun getSize(path:String): IntSize {

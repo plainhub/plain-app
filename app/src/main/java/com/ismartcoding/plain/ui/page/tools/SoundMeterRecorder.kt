@@ -12,7 +12,7 @@ import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.Channel
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.helpers.SoundMeterHelper

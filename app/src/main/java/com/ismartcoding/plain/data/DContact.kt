@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.data
 
-import com.ismartcoding.lib.extensions.containsChinese
+import com.ismartcoding.plain.lib.extensions.containsChinese
 import com.ismartcoding.plain.features.contact.DContactPhoneNumber
 import com.ismartcoding.plain.features.contact.DContentItem
 import com.ismartcoding.plain.features.contact.DOrganization

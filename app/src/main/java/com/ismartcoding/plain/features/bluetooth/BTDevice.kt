@@ -5,7 +5,7 @@ import android.bluetooth.*
 import android.bluetooth.BluetoothGatt.GATT_SUCCESS
 import android.os.Handler
 import android.os.Looper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import kotlinx.coroutines.channels.Channel
 import org.json.JSONObject

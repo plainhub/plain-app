@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.db
 
 import android.content.Context
-import com.ismartcoding.lib.extensions.getFinalPath
+import com.ismartcoding.plain.lib.extensions.getFinalPath
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.i18n.Res

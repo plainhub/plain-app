@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.ui.models
 
 import android.content.Context
-import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.extensions.appDir
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.file.ZipBrowserHelper

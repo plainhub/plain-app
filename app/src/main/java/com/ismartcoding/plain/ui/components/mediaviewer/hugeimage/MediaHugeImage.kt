@@ -17,7 +17,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_OFFSET_X
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_OFFSET_Y
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_ROTATION

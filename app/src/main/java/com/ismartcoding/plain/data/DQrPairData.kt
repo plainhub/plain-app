@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.data
 
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.serialization.Serializable

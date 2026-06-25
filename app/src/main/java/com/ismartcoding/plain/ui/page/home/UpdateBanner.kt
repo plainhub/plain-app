@@ -23,7 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion

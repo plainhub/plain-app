@@ -4,7 +4,7 @@ import com.ismartcoding.plain.preferences.*
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.AudioPlayer

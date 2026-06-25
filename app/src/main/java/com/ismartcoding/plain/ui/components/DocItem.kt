@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.extensions.isPdfFile
-import com.ismartcoding.lib.extensions.isTextFile
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.extensions.isPdfFile
+import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.docs.DDoc

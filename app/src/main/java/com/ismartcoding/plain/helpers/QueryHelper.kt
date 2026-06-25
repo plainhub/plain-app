@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.lib.helpers.FilterField
-import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.features.TagHelper
 
 object QueryHelper {

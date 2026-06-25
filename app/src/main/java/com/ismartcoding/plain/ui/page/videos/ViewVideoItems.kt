@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.lib.extensions.isUrl
+import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DTag

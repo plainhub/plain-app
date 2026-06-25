@@ -13,8 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.isSPlus
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.isSPlus
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.ImageDecoder
 import kotlinx.coroutines.launch
 import java.io.InputStream

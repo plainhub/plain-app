@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.web.schemas
 import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.lib.kgraphql.GraphQLError
-import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.extensions.scanFileByConnection
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.extensions.newPath

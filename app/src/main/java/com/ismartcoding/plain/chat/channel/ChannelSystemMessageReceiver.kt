@@ -1,10 +1,9 @@
 package com.ismartcoding.plain.chat.channel
 
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
@@ -12,7 +11,7 @@ import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.verifyEd25519Signature
 import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
-import com.ismartcoding.plain.events.ChannelUpdatedEvent
+import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.TimeHelper
 
 object ChannelSystemMessageReceiver {
@@ -48,9 +47,8 @@ object ChannelSystemMessageReceiver {
         port: Int = 0,
         logTag: String = "member",
     ): Boolean {
-        val peerDao = AppDatabase.instance.peerDao()
-        if (peerDao.getById(id) != null) return false
-        peerDao.insert(
+        if (PeerCacher.getPeer(id) != null) return false
+        AppDatabase.instance.peerDao().insert(
             DPeer(
                 id = id,
                 name = name,
@@ -66,10 +64,7 @@ object ChannelSystemMessageReceiver {
     }
 
     private suspend fun handleInvite(fromId: String, msg: ChannelSystemMessages.ChannelInvite) {
-        val dao = AppDatabase.instance.chatChannelDao()
-        val peerDao = AppDatabase.instance.peerDao()
-
-        val existingChannel = dao.getById(msg.channelId)
+        val existingChannel = ChannelCacher.getChannel(msg.channelId)
         val isReinvite = existingChannel != null &&
                 (existingChannel.status == DChatChannel.STATUS_LEFT || existingChannel.status == DChatChannel.STATUS_KICKED)
 
@@ -110,7 +105,7 @@ object ChannelSystemMessageReceiver {
         }
 
         // Verify the sender is a known paired peer
-        val peer = peerDao.getById(fromId) ?: run {
+        val peer = PeerCacher.getPeer(fromId) ?: run {
             LogCat.e("Invite from unknown peer $fromId — ignored")
             return
         }
@@ -137,7 +132,8 @@ object ChannelSystemMessageReceiver {
             channel.members = msg.members
             channel.version = msg.version
             channel.status = DChatChannel.STATUS_JOINED
-            dao.update(channel)
+            AppDatabase.instance.chatChannelDao().update(channel)
+            ChannelCacher.updateChannel(channel)
             LogCat.d("Re-invite for channel ${msg.channelId} (was ${existingChannel.status}), restored to joined")
         } else {
             // Store channel locally with members carrying only id + status
@@ -148,10 +144,11 @@ object ChannelSystemMessageReceiver {
             channel.owner = fromId
             channel.members = msg.members
             channel.version = msg.version
-            dao.insert(channel)
+            AppDatabase.instance.chatChannelDao().insert(channel)
         }
 
-        ChatCacheManager.loadKeyCacheAsync()
+        PeerCacher.load()
+        ChannelCacher.load()
 
         // Notify UI to show the invite dialog
         val peerName = peer.name.ifEmpty { fromId }
@@ -164,14 +161,11 @@ object ChannelSystemMessageReceiver {
             )
         )
 
-        sendEvent(ChannelUpdatedEvent())
         LogCat.d("Channel invite received: ${msg.channelName} from $fromId")
     }
 
     private suspend fun handleInviteAccept(fromId: String, msg: ChannelSystemMessages.ChannelInviteAccept) {
-        val dao = AppDatabase.instance.chatChannelDao()
-        val peerDao = AppDatabase.instance.peerDao()
-        val channel = dao.getById(msg.channelId) ?: run {
+        val channel = ChannelCacher.getChannel(msg.channelId) ?: run {
             LogCat.e("InviteAccept for unknown channel ${msg.channelId}")
             return
         }
@@ -183,7 +177,7 @@ object ChannelSystemMessageReceiver {
 
         // Ensure we have a peer record for the accepting member.
         // If the peer doesn't exist, create a channel peer using the info from the accept message.
-        val existingPeer = peerDao.getById(fromId)
+        val existingPeer = PeerCacher.getPeer(fromId)
         if (existingPeer == null) {
             ensureChannelPeer(
                 id = fromId,
@@ -198,7 +192,8 @@ object ChannelSystemMessageReceiver {
             if (msg.name.isNotEmpty() && existingPeer.name.isEmpty()) {
                 existingPeer.name = msg.name
             }
-            peerDao.update(existingPeer)
+            AppDatabase.instance.peerDao().update(existingPeer)
+            PeerCacher.updatePeer(existingPeer)
         }
 
         // Only accept invites from peers that were already on the pending list.
@@ -222,18 +217,16 @@ object ChannelSystemMessageReceiver {
 
         channel.version++
         channel.updatedAt = TimeHelper.now()
-        dao.update(channel)
+        AppDatabase.instance.chatChannelDao().update(channel)
+        ChannelCacher.updateChannel(channel)
 
         ChannelSystemMessageSender.broadcastUpdate(channel)
-        ChatCacheManager.loadKeyCacheAsync()
 
-        sendEvent(ChannelUpdatedEvent())
         LogCat.d("Peer $fromId accepted invite for channel ${msg.channelId}")
     }
 
     private suspend fun handleInviteDecline(fromId: String, msg: ChannelSystemMessages.ChannelInviteDecline) {
-        val dao = AppDatabase.instance.chatChannelDao()
-        val channel = dao.getById(msg.channelId) ?: return
+        val channel = ChannelCacher.getChannel(msg.channelId) ?: return
 
         if (!channel.isOwnedByMe()) return
 
@@ -242,17 +235,15 @@ object ChannelSystemMessageReceiver {
             channel.members = channel.members.filter { it.id != fromId }
             channel.version++
             channel.updatedAt = TimeHelper.now()
-            dao.update(channel)
+            AppDatabase.instance.chatChannelDao().update(channel)
+            ChannelCacher.updateChannel(channel)
         }
 
-        sendEvent(ChannelUpdatedEvent())
         LogCat.d("Peer $fromId declined invite for channel ${msg.channelId}")
     }
 
     private suspend fun handleUpdate(fromId: String, msg: ChannelSystemMessages.ChannelUpdate) {
-        val dao = AppDatabase.instance.chatChannelDao()
-        val peerDao = AppDatabase.instance.peerDao()
-        val channel = dao.getById(msg.channelId)
+        val channel = ChannelCacher.getChannel(msg.channelId)
 
         if (channel == null) {
             LogCat.e("ChannelUpdate for unknown channel ${msg.channelId}")
@@ -270,7 +261,7 @@ object ChannelSystemMessageReceiver {
         // canonical payload `"$channelId|$version|update|"`. Transport-layer
         // Ed25519 already proves fromId is who they say they are; this check
         // proves they actually control the channel's owner private key.
-        val ownerPeer = peerDao.getById(channel.owner)
+        val ownerPeer = PeerCacher.getPeer(channel.owner)
         if (ownerPeer == null) {
             LogCat.e("ChannelUpdate: owner peer ${channel.owner} not found locally — rejected")
             return
@@ -309,18 +300,16 @@ object ChannelSystemMessageReceiver {
         channel.members = msg.members
         channel.version = msg.version
         channel.updatedAt = TimeHelper.now()
-        dao.update(channel)
+        AppDatabase.instance.chatChannelDao().update(channel)
+        ChannelCacher.updateChannel(channel)
 
-        ChatCacheManager.loadKeyCacheAsync()
+        PeerCacher.load()
 
-        sendEvent(ChannelUpdatedEvent())
         LogCat.d("Channel ${msg.channelId} updated to version ${msg.version}")
     }
 
     private suspend fun handleKick(fromId: String, msg: ChannelSystemMessages.ChannelKick) {
-        val dao = AppDatabase.instance.chatChannelDao()
-        val peerDao = AppDatabase.instance.peerDao()
-        val channel = dao.getById(msg.channelId) ?: return
+        val channel = ChannelCacher.getChannel(msg.channelId) ?: return
 
         // Only the channel owner may kick members
         if (channel.owner != fromId) {
@@ -332,7 +321,7 @@ object ChannelSystemMessageReceiver {
         // against owner's public key over `"$channelId|$version|kick|<our peer id>"`.
         // The target binding ensures this kick was addressed to us specifically,
         // not replayed to another member.
-        val ownerPeer = peerDao.getById(channel.owner)
+        val ownerPeer = PeerCacher.getPeer(channel.owner)
         if (ownerPeer == null) {
             LogCat.e("ChannelKick: owner peer ${channel.owner} not found locally — rejected")
             return
@@ -353,21 +342,18 @@ object ChannelSystemMessageReceiver {
         channel.status = DChatChannel.STATUS_KICKED
         // Remove self from the members list so we no longer appear in the members grid
         channel.members = channel.members.filter { it.id != TempData.clientId }
-        dao.update(channel)
-
-        ChatCacheManager.loadKeyCacheAsync()
+        AppDatabase.instance.chatChannelDao().update(channel)
+        ChannelCacher.updateChannel(channel)
 
         if (wasPending) {
             // Owner cancelled a pending invite — dismiss the auto-opened accept page on our side.
             sendEvent(ChannelInviteCanceledEvent(channelId = msg.channelId, ownerPeerId = fromId))
         }
-        sendEvent(ChannelUpdatedEvent())
         LogCat.d("Kicked from channel ${msg.channelId} by $fromId")
     }
 
     private suspend fun handleLeave(fromId: String, msg: ChannelSystemMessages.ChannelLeave) {
-        val dao = AppDatabase.instance.chatChannelDao()
-        val channel = dao.getById(msg.channelId) ?: return
+        val channel = ChannelCacher.getChannel(msg.channelId) ?: return
 
         if (!channel.isOwnedByMe()) {
             LogCat.e("ChannelLeave received but we are not the owner of ${msg.channelId}")
@@ -378,11 +364,11 @@ object ChannelSystemMessageReceiver {
         channel.members = channel.members.filter { it.id != fromId }
         channel.version++
         channel.updatedAt = TimeHelper.now()
-        dao.update(channel)
+        AppDatabase.instance.chatChannelDao().update(channel)
+        ChannelCacher.updateChannel(channel)
 
         ChannelSystemMessageSender.broadcastUpdate(channel)
 
-        sendEvent(ChannelUpdatedEvent())
         LogCat.d("Peer $fromId left channel ${msg.channelId}")
     }
 }

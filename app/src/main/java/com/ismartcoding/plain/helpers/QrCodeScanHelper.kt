@@ -9,7 +9,7 @@ import com.google.zxing.RGBLuminanceSource
 import java.util.EnumMap
 import com.google.zxing.Result
 import com.google.zxing.common.HybridBinarizer
-import com.ismartcoding.lib.extensions.scaleDown
+import com.ismartcoding.plain.lib.extensions.scaleDown
 
 object QrCodeScanHelper {
     fun tryDecode(source: Bitmap): Result? {

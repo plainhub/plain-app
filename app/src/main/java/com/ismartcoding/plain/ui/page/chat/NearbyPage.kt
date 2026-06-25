@@ -28,7 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -153,6 +154,9 @@ internal fun LazyListScope.nearbyDeviceListItems(
     nearbyVM: NearbyViewModel,
     peerVM: PeerViewModel,
 ) {
+    // Snapshot read — re-evaluated only when this scope recomposes, which
+    // happens alongside nearbyDevices updates from NearbyViewModel.
+    val pairedPeers = PeerCacher.pairedPeers.value
     if (nearbyDevices.isNotEmpty()) {
         item {
             VerticalSpace(16.dp)
@@ -160,7 +164,7 @@ internal fun LazyListScope.nearbyDeviceListItems(
         }
         nearbyDevices.forEach { item ->
             item {
-                val isPaired = peerVM.pairedPeers.any { it.id == item.id }
+                val isPaired = pairedPeers.any { it.id == item.id }
                 val isPairing = nearbyVM.isPairing(item.id)
                 NearbyDeviceItem(
                     item = item,

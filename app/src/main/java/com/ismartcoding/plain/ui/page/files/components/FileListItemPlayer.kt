@@ -22,7 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider

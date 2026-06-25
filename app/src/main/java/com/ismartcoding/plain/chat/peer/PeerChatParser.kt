@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.chat.peer
 
 import android.util.Base64
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import io.ktor.http.HttpStatusCode
 import kotlin.math.abs
 

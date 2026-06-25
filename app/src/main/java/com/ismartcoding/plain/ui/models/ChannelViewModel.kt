@@ -4,23 +4,11 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.extensions.toSortName
-import com.ismartcoding.plain.chat.ChannelManager
-import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.db.DChatChannel
-import com.ismartcoding.plain.events.ChannelUpdatedEvent
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.channel.ChannelManager
 import com.ismartcoding.plain.ui.base.ToastManager
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class ChannelViewModel : ViewModel() {
-
-    private val _channels = MutableStateFlow<List<DChatChannel>>(emptyList())
-    val channels: StateFlow<List<DChatChannel>> = _channels.asStateFlow()
 
     val invitingIds = mutableStateSetOf<String>()
     val kickingIds = mutableStateSetOf<String>()
@@ -28,23 +16,8 @@ class ChannelViewModel : ViewModel() {
     val showCreateChannelDialog = mutableStateOf(false)
     val renameChannelId = mutableStateOf("")
 
-    init {
-        loadAll()
-
-        viewModelScope.launch {
-            Channel.sharedFlow.collect { event ->
-                if (event is ChannelUpdatedEvent) {
-                    loadAll()
-                }
-            }
-        }
-    }
-
-    fun loadAll() {
-        launchSafe {
-            _channels.value = AppDatabase.instance.chatChannelDao().getAll()
-                .sortedBy { it.name.toSortName() }
-        }
+    fun load() {
+        launchSafe { ChannelCacher.load() }
     }
 
     fun createChannel(name: String) {
@@ -108,7 +81,7 @@ class ChannelViewModel : ViewModel() {
 
     fun declineInvite(context: Context, channelId: String) {
         launchSafe {
-            ChannelManager.declineInvite(context, channelId)
+            ChannelManager.declineInvite(channelId)
         }
     }
 }

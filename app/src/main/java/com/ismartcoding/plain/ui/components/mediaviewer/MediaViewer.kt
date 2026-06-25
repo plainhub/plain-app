@@ -6,7 +6,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.ismartcoding.lib.extensions.isUrl
+import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.ImageDecoder
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.MediaHugeImage
 import com.ismartcoding.plain.ui.components.mediaviewer.video.MediaVideo

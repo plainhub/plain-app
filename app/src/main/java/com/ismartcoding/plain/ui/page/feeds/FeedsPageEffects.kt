@@ -4,9 +4,9 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.extensions.queryOpenableFileName
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.contentResolver
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileTag

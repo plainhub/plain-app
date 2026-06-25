@@ -3,9 +3,9 @@ package com.ismartcoding.plain.ui.models
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.features.dlna.common.DlnaDevice
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController

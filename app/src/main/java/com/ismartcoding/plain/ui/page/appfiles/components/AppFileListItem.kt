@@ -20,17 +20,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import android.webkit.MimeTypeMap
 import coil3.compose.AsyncImage
-import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
-import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.plain.lib.extensions.dp2px
 import com.ismartcoding.plain.ui.models.VAppFile
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 

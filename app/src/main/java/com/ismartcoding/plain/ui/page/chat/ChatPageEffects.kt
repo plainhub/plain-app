@@ -6,8 +6,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalContext
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.HChatItemsDeletedEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
@@ -34,9 +34,9 @@ fun ChatPageEffects(
     val sharedFlow = Channel.sharedFlow
 
     DisposableEffect(id) {
-        ChatCacheManager.activeToId = id
+        TempData.activeToId = id
         onDispose {
-            ChatCacheManager.activeToId = ""
+            TempData.activeToId = ""
         }
     }
 
@@ -46,7 +46,6 @@ fun ChatPageEffects(
             chatVM.initializeTargetAsync(id)
             chatVM.fetchAsync(chatVM.target.value.toId)
         }
-        peerVM.loadPeers()
     }
 
     LaunchedEffect(sharedFlow) {

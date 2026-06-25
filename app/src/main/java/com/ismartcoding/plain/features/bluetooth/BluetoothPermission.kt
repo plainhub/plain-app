@@ -16,8 +16,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

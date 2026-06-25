@@ -2,9 +2,9 @@ package com.ismartcoding.plain.features.dlna.receiver
 
 import android.content.Context
 import android.net.wifi.WifiManager
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import kotlinx.coroutines.isActive
 import java.net.DatagramPacket

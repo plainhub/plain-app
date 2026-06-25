@@ -10,11 +10,11 @@ import android.os.StatFs
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.FilterField
+import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.extensions.getDirectChildrenCount
 import com.ismartcoding.plain.extensions.normalizeComparison
-import com.ismartcoding.lib.isRPlus
+import com.ismartcoding.plain.lib.isRPlus
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.storageManager

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
-import com.ismartcoding.lib.channel.ChannelEvent
+import com.ismartcoding.plain.lib.channel.ChannelEvent
 import com.ismartcoding.plain.events.UpdateDownloadCompleteEvent
 import com.ismartcoding.plain.events.UpdateDownloadFailedEvent
 import com.ismartcoding.plain.events.UpdateDownloadProgressEvent

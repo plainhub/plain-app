@@ -24,8 +24,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
-import com.ismartcoding.lib.extensions.isGestureInteractionMode
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
+import com.ismartcoding.plain.lib.logcat.LogCat
 
 @SuppressLint("UnsafeOptInUsageError")
 @Composable

@@ -2,9 +2,9 @@ package com.ismartcoding.plain.helpers
 
 import android.net.Uri
 import android.util.Base64
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.TempData
 
 object UrlHelper {
