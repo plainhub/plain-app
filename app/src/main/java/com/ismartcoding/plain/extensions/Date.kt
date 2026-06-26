@@ -9,7 +9,8 @@ import java.util.Date
 import java.util.Locale
 
 fun Date.formatDateTime(): String {
-    return DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, LocaleHelper.currentLocale()).format(this)
+    val l = LocaleHelper.currentLocale()
+    return DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale(l.language, l.country)).format(this)
 }
 
 fun Date.formatTime(): String {

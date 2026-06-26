@@ -63,6 +63,7 @@ class MainApp : Application() {
 
         instance = this
         com.ismartcoding.plain.db.setAppContext(this)
+        com.ismartcoding.plain.features.locale.setAppContext(this)
         initDataStore(dataStore)
         initDatabase(
             com.ismartcoding.plain.db.buildAppDatabase(Constants.DATABASE_NAME)

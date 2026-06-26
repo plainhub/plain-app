@@ -71,7 +71,7 @@ fun DocItem(
                             if (m.path.isTextFile()) {
                                 navController.navigateTextFile(m.path, mediaId = m.id)
                             } else if (m.path.isPdfFile()) {
-                                navController.navigatePdf(File(m.path).toUri())
+                                navController.navigatePdf(File(m.path).toUri().toString())
                             } else {
                                 navController.navigateOtherFile(m.path)
                             }

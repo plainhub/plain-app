@@ -123,7 +123,7 @@ fun openFile(
 
         path.isPdfFile() -> {
             try {
-                navController.navigatePdf(File(path).toUri())
+                navController.navigatePdf(File(path).toUri().toString())
             } catch (ex: Exception) {
                 DialogHelper.showMessage(Res.string.pdf_open_error)
             }

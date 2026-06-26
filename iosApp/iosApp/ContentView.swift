@@ -4,14 +4,14 @@ import UIKit
 
 struct ContentView: View {
     var body: some View {
-        PlainHomeComposeView()
+        SharedAppNavHostRepresentable()
             .ignoresSafeArea()
     }
 }
 
-private struct PlainHomeComposeView: UIViewControllerRepresentable {
+private struct SharedAppNavHostRepresentable: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        PlainHomeViewControllerKt.PlainHomeViewController()
+        SharedAppNavHostKt.SharedAppNavHost()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

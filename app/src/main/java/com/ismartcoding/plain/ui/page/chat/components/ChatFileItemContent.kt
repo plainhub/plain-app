@@ -89,7 +89,7 @@ internal fun ChatFileItemContent(
                     } else if (fileName.isTextFile()) {
                         navController.navigateTextFile(path, fileName, mediaId = "", type = TextFileType.CHAT)
                     } else if (fileName.isPdfFile()) {
-                        navController.navigatePdf(File(path).toUri(), fileName)
+                        navController.navigatePdf(File(path).toUri().toString(), fileName)
                     } else {
                         navController.navigateOtherFile(path, fileName)
                     }

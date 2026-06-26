@@ -22,5 +22,25 @@
     <dict/>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Plain needs access to your photo library to import and back up images and videos.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Plain needs access to save images and videos to your photo library.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Plain needs camera access to scan QR codes and capture media.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Plain needs microphone access for screen mirroring audio.</string>
+    <key>NSContactsUsageDescription</key>
+    <string>Plain needs contacts access to back up your address book.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Plain uses your local network to discover and connect to nearby Plain-enabled devices.</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_plain._tcp</string>
+    </array>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>fetch</string>
+    </array>
 </dict>
 </plist>

@@ -37,7 +37,7 @@ internal fun MainActivity.handleIntent(intent: Intent) {
         val mimeType = contentResolver.getType(uri)
         if (mimeType != null) {
             if (mimeType.startsWith("text/")) navControllerState.value?.navigateTextFile(uri.toString())
-            else if (mimeType == "application/pdf") navControllerState.value?.navigatePdf(uri)
+            else if (mimeType == "application/pdf") navControllerState.value?.navigatePdf(uri.toString())
             else DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.not_supported_error))
         } else {
             DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.not_supported_error))

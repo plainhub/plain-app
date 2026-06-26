@@ -74,18 +74,6 @@ class FetchLinkPreviewsEvent(val chat: DChat) : ChannelEvent()
 
 class FetchBookmarkMetadataEvent(val bookmarkId: String, val url: String) : ChannelEvent()
 
-class ConfirmDialogEvent(
-    val title: String,
-    val message: String,
-    val confirmButton: Pair<String, () -> Unit>,
-    val dismissButton: Pair<String, () -> Unit>?
-) : ChannelEvent()
-
-class LoadingDialogEvent(
-    val show: Boolean,
-    val message: String = ""
-) : ChannelEvent()
-
 class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
 
 class DeleteChatItemViewEvent(val id: String) : ChannelEvent()

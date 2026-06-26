@@ -58,10 +58,10 @@ fun MainDialogs(
                 )
             },
             dismissButton = {
-                if (it.dismissButton != null) {
+                it.dismissButton?.let { dismiss ->
                     PTextButton(
-                        text = it.dismissButton.first,
-                        onClick = { it.dismissButton.second(); onDismissConfirm() },
+                        text = dismiss.first,
+                        onClick = { dismiss.second(); onDismissConfirm() },
                     )
                 }
             },
