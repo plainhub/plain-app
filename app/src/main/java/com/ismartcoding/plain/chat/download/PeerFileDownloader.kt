@@ -4,7 +4,8 @@ import android.content.Context
 import android.webkit.MimeTypeMap
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
@@ -36,7 +37,7 @@ object PeerFileDownloader {
             tempFile.createNewFile()
 
             var downloadedBytes = 0L
-            val client = HttpClientManager.createUnsafeOkHttpClient()
+            val client = OkHttpClientFactory.createUnsafeOkHttpClient()
             task.httpClient = client
 
             val response = client.newCall(Request.Builder().url(downloadUrl).build()).execute()

@@ -7,7 +7,8 @@ import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -49,7 +50,7 @@ fun Route.addDLNA() {
 
             if (path.isUrl()) {
                 try {
-                    val client = HttpClientManager.browserClient()
+                    val client = KtorClientFactory.browserClient()
                     val r = client.get(path)
                     call.respondBytes(
                         r.readRawBytes(),

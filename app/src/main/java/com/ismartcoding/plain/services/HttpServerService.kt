@@ -16,7 +16,8 @@ import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -179,7 +180,7 @@ class HttpServerService : LifecycleService() {
             // Stop mDNS responder
             NsdHelper.unregisterService()
 
-            val client = HttpClientManager.httpClient()
+            val client = KtorClientFactory.httpClient()
             val r = client.get(UrlHelper.getShutdownUrl())
             if (r.status == HttpStatusCode.Gone) {
                 LogCat.d("http server is stopped")

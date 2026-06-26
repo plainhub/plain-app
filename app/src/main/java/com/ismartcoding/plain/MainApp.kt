@@ -62,10 +62,10 @@ class MainApp : Application() {
         super.onCreate()
 
         instance = this
+        com.ismartcoding.plain.db.setAppContext(this)
         initDataStore(dataStore)
         initDatabase(
-            androidx.room.Room.databaseBuilder(this, AppDatabase::class.java, Constants.DATABASE_NAME)
-                .addMigrations(Migrations.MIGRATION_5_6)
+            com.ismartcoding.plain.db.buildAppDatabase(Constants.DATABASE_NAME)
                 .addCallback(object : androidx.room.RoomDatabase.Callback() {
                     override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                         DataInitializer(this@MainApp, db).apply {
@@ -90,6 +90,8 @@ class MainApp : Application() {
                 minPriority = if (BuildConfig.DEBUG) LogCat.VERBOSE else LogCat.WARN,
             ),
         )
+
+        com.ismartcoding.plain.api.httpLogSink = com.ismartcoding.plain.api.HttpLogSink { LogCat.v(it) }
 
         AppEvents.register()
         HttpServerManager.warmUp()

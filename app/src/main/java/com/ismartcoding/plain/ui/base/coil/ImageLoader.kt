@@ -11,7 +11,8 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import com.ismartcoding.plain.activityManager
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 
 fun newImageLoader(context: PlatformContext): ImageLoader {
     // Always use applicationContext to avoid leaking Activity instances through
@@ -19,7 +20,7 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
     val appContext = context.applicationContext
     val memoryPercent = if (activityManager.isLowRamDevice) 0.25 else 0.75
     
-    val unsafeOkHttpClient = HttpClientManager.createUnsafeOkHttpClient()
+    val unsafeOkHttpClient = OkHttpClientFactory.createUnsafeOkHttpClient()
     
     return ImageLoader.Builder(appContext)
         .components {

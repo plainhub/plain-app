@@ -33,19 +33,19 @@ object Migrations {
                     updated_at TEXT NOT NULL
                 )
             """)
-            
+
             // Copy and transform data
             db.execSQL("""
                 INSERT INTO chats_new (id, from_id, to_id, group_id, status, content, created_at, updated_at)
-                SELECT id, 
+                SELECT id,
                        CASE WHEN is_me = 1 THEN 'me' ELSE 'local' END as from_id,
                        CASE WHEN is_me = 1 THEN 'local' ELSE 'me' END as to_id,
                        '',
                        'sent',
-                       content, created_at, updated_at 
+                       content, created_at, updated_at
                 FROM chats
             """)
-            
+
             // Create new tables
             db.execSQL("""
                 CREATE TABLE peers (
@@ -61,7 +61,7 @@ object Migrations {
                     updated_at TEXT NOT NULL
                 )
             """)
-            
+
             db.execSQL("""
                 CREATE TABLE chat_groups (
                     id TEXT PRIMARY KEY NOT NULL,
@@ -72,11 +72,11 @@ object Migrations {
                     updated_at TEXT NOT NULL
                 )
             """)
-            
+
             // Replace old table
             db.execSQL("DROP TABLE chats")
             db.execSQL("ALTER TABLE chats_new RENAME TO chats")
-            
+
             // Create indexes for chats table
             db.execSQL("CREATE INDEX index_chats_from_id ON chats(from_id)")
             db.execSQL("CREATE INDEX index_chats_to_id ON chats(to_id)")
@@ -84,4 +84,4 @@ object Migrations {
         }
     }
 
-} 
+}

@@ -170,9 +170,7 @@ dependencies {
 
     implementation(libs.bcprov.jdk15on)
     implementation(libs.bcpkix.jdk15on)
-    implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.logging)
 
     implementation(libs.markwon.core)
     implementation(libs.markwon.html)

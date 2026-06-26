@@ -8,7 +8,8 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.db.DLinkPreview
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
@@ -86,7 +87,7 @@ object LinkPreviewHelper {
     suspend fun fetchLinkPreview(context: Context, url: String): DLinkPreview {
         return withIO {
             try {
-                val client = HttpClientManager.browserClient()
+                val client = KtorClientFactory.browserClient()
                 val response = client.get(url)
 
                 if (!response.status.isSuccess()) {
@@ -207,7 +208,7 @@ object LinkPreviewHelper {
     private suspend fun downloadImageWithSize(context: Context, imageUrl: String, originalUrl: String): Triple<String?, Int, Int> {
         return try {
             withIO {
-                val client = HttpClientManager.browserClient()
+                val client = KtorClientFactory.browserClient()
                 val response = client.get(imageUrl)
 
                 if (!response.status.isSuccess()) {

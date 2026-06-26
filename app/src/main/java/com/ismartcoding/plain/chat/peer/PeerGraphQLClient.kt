@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.chat.peer
 
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getApiUrl
@@ -176,7 +177,7 @@ object PeerGraphQLClient {
                 requestBuilder.addHeader("c-cid", channelId)
             }
 
-            val httpClient = HttpClientManager.createCryptoHttpClient(encryptionKey, 10)
+            val httpClient = OkHttpClientFactory.createCryptoHttpClient(encryptionKey, 10)
             val response = httpClient.newCall(requestBuilder.build()).execute()
             val responseBody = response.body.string()
 

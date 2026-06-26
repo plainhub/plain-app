@@ -16,7 +16,8 @@ import android.os.Process
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
@@ -45,7 +46,7 @@ object AppHelper {
 
     suspend fun checkUpdateAsync(context: Context, showToast: Boolean): Boolean? {
         return try {
-            val client = HttpClientManager.httpClient()
+            val client = KtorClientFactory.httpClient()
             val r = client.get(Constants.LATEST_RELEASE_URL)
             UpdateInfoPreference.updateAsync { it.copy(checkUpdateTime = System.currentTimeMillis()) }
             if (r.status == HttpStatusCode.Forbidden) {

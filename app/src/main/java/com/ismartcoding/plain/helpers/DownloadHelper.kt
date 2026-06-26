@@ -7,7 +7,8 @@ import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.data.DownloadResult
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
@@ -17,7 +18,7 @@ import java.io.File
 
 object DownloadHelper {
     suspend fun downloadAsync(url: String, dir: String): DownloadResult = withIO {
-        val httpClient = HttpClientManager.browserClient()
+        val httpClient = KtorClientFactory.browserClient()
         try {
             val r = httpClient.get(url)
             if (r.isOk()) {
@@ -43,7 +44,7 @@ object DownloadHelper {
     }
 
     suspend fun downloadToTempAsync(url: String, tempFile: File): DownloadResult = withIO {
-        val httpClient = HttpClientManager.browserClient()
+        val httpClient = KtorClientFactory.browserClient()
         try {
             val r = httpClient.get(url)
             if (r.isOk()) {

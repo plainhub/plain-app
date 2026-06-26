@@ -13,7 +13,8 @@ import com.ismartcoding.plain.lib.rss.DateParser
 import com.ismartcoding.plain.lib.rss.model.RssItem
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.api.ApiResult
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.helpers.TimeHelper
 import io.ktor.client.call.body
@@ -64,7 +65,7 @@ fun RssItem.toDFeedEntry(
 
 suspend fun DFeedEntry.fetchContentAsync(): ApiResult = withIO {
     try {
-        val httpClient = HttpClientManager.browserClient()
+        val httpClient = KtorClientFactory.browserClient()
         val response = httpClient.get(url)
 
         if (response.isOk()) {

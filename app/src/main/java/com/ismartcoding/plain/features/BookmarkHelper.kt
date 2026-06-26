@@ -6,7 +6,8 @@ import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DBookmark
 import com.ismartcoding.plain.db.DBookmarkGroup
@@ -169,7 +170,7 @@ object BookmarkHelper {
     private suspend fun fetchPageMeta(context: Context, url: String): Pair<String?, String?> {
         return withIO {
             try {
-                val client = HttpClientManager.browserClient()
+                val client = KtorClientFactory.browserClient()
                 val response = client.get(url)
                 if (!response.status.isSuccess()) {
                     client.close()
@@ -236,7 +237,7 @@ object BookmarkHelper {
     private suspend fun downloadFavicon(context: Context, faviconUrl: String, pageUrl: String): String? {
         return try {
             withIO {
-                val client = HttpClientManager.browserClient()
+                val client = KtorClientFactory.browserClient()
                 val resp = client.get(faviconUrl)
                 if (!resp.status.isSuccess()) { client.close(); return@withIO null }
                 val bytes = resp.readRawBytes()

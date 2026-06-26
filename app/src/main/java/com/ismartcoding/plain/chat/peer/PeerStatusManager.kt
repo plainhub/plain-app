@@ -6,7 +6,8 @@ import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
@@ -44,7 +45,7 @@ object PeerStatusManager {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val client: OkHttpClient by lazy {
-        HttpClientManager.createUnsafeOkHttpClient()
+        OkHttpClientFactory.createUnsafeOkHttpClient()
             .newBuilder()
             .connectTimeout(500, TimeUnit.MILLISECONDS)
             .pingInterval(15, TimeUnit.SECONDS)

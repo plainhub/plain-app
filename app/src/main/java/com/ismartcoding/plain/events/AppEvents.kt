@@ -31,7 +31,8 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.ai.ImageSearchStatusChangedEvent
 import com.ismartcoding.plain.ai.ImageIndexProgressEvent
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
@@ -160,7 +161,7 @@ object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
     private var sleepTimerJob: Job? = null
     private var downloadJob: Job? = null
-    private val downloadHttpClient by lazy { HttpClientManager.downloadClient() }
+    private val downloadHttpClient by lazy { OkHttpClientFactory.downloadClient() }
 
     fun register() {
         mediaPlayer = MediaPlayer()

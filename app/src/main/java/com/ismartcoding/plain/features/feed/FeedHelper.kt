@@ -11,7 +11,8 @@ import com.ismartcoding.plain.lib.opml.entity.Opml
 import com.ismartcoding.plain.lib.opml.entity.Outline
 import com.ismartcoding.plain.lib.rss.RssParser
 import com.ismartcoding.plain.lib.rss.model.RssChannel
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedCount
@@ -134,7 +135,7 @@ object FeedHelper {
     }
 
     suspend fun fetchAsync(url: String): RssChannel = withIO {
-        val r = HttpClientManager.httpClient().get(url)
+        val r = KtorClientFactory.httpClient().get(url)
         if (r.status != HttpStatusCode.OK) {
             throw Exception("HTTP ${r.status.value} ${r.status.description}")
         }

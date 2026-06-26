@@ -11,7 +11,8 @@ import com.ismartcoding.plain.lib.extensions.urlEncode
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.helpers.ImageHelper
@@ -199,7 +200,7 @@ fun Route.addFiles() {
                 return@get
             }
 
-            val client = HttpClientManager.createUnsafeOkHttpClient()
+            val client = OkHttpClientFactory.createUnsafeOkHttpClient()
             val request = Request.Builder().url(peerUrl).build()
 
             val response = withIO { client.newCall(request).execute() }

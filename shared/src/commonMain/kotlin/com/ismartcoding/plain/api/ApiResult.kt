@@ -1,10 +1,9 @@
 package com.ismartcoding.plain.api
 
 import com.ismartcoding.plain.i18n.*
-
-import com.ismartcoding.plain.lib.extensions.isOk
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import io.ktor.client.statement.*
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.getString as getComposeString
 
 data class ApiResult(val response: HttpResponse?, val exception: Throwable? = null) {
     fun isOk(): Boolean {
@@ -12,6 +11,6 @@ data class ApiResult(val response: HttpResponse?, val exception: Throwable? = nu
     }
 
     fun errorMessage(): String {
-        return exception?.toString() ?: response?.toString() ?: LocaleHelper.getString(Res.string.unknown)
+        return exception?.toString() ?: response?.toString() ?: runBlocking { getComposeString(Res.string.unknown) }
     }
 }

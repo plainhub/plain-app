@@ -49,9 +49,15 @@ kotlin {
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.kotlinx.serialization.json)
             api(libs.room.runtime)
+            api(libs.ktor.client.core)
+        }
+        androidMain.dependencies {
+            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.logging)
         }
         iosMain.dependencies {
             implementation(libs.sqlite.bundled)
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

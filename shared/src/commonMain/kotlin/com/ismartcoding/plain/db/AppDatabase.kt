@@ -88,3 +88,5 @@ abstract class AppDatabase : RoomDatabase() {
 fun initDatabase(db: AppDatabase) {
     AppDatabase.init(db)
 }
+
+expect fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase>

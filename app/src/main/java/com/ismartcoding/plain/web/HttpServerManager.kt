@@ -14,7 +14,8 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.api.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.db.AppDatabase
@@ -121,7 +122,7 @@ object HttpServerManager {
     suspend fun stopServiceAsync(context: Context) = withIO {
         sendEvent(HttpServerStateChangedEvent(HttpServerState.STOPPING))
         try {
-            val client = HttpClientManager.httpClient()
+            val client = KtorClientFactory.httpClient()
             client.get(UrlHelper.getShutdownUrl())
         } catch (_: Exception) {}
         try { server?.stop(0, 1000) } catch (_: Exception) {}
@@ -178,7 +179,7 @@ object HttpServerManager {
 
     suspend fun checkServerAsync(): Boolean = withIO {
         withTimeoutOrNull(9000) {
-            val client = HttpClientManager.httpClient()
+            val client = KtorClientFactory.httpClient()
             val deadline = System.currentTimeMillis() + 8500L
             var healthy = false
             while (!healthy && System.currentTimeMillis() < deadline) {
