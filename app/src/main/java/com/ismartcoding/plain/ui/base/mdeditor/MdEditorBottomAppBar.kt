@@ -45,18 +45,18 @@ fun MdEditorBottomAppBar(
     val scrollState2 = rememberScrollState()
     val context = LocalContext.current
 
-    if (mdEditorVM.showSettings) {
+    if (mdEditorVM.showSettings.value) {
         MdEditorSettingsDialog(mdEditorVM = mdEditorVM)
     }
-    if (mdEditorVM.showInsertImage) {
+    if (mdEditorVM.showInsertImage.value) {
         MdEditorInsertImageDialog(mdEditorVM = mdEditorVM)
     }
-    if (mdEditorVM.showColorPicker) {
+    if (mdEditorVM.showColorPicker.value) {
         ColorPickerDialog(
             stringResource(Res.string.pick_color),
             initValue = "FFFFFFFF",
             onDismiss = {
-                mdEditorVM.showColorPicker = false
+                mdEditorVM.showColorPicker.value = false
             }, onConfirm = {
                 val hex = it.checkColorHex()
                 if (hex != null) {
@@ -78,7 +78,7 @@ fun MdEditorBottomAppBar(
             .height(56.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (mdEditorVM.level == 0) {
+        if (mdEditorVM.level.intValue == 0) {
             Row(
                 modifier =
                 Modifier
@@ -119,7 +119,7 @@ fun MdEditorBottomAppBar(
             contentAlignment = Alignment.CenterEnd
         ) {
             PIconButton(
-                icon = if (mdEditorVM.level == 0) Res.drawable.looks_one else Res.drawable.looks_two,
+                icon = if (mdEditorVM.level.intValue == 0) Res.drawable.looks_one else Res.drawable.looks_two,
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.onPrimary,
                 click = {

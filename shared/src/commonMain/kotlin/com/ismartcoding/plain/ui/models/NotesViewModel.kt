@@ -3,9 +3,9 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.helpers.launchSafe
+import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
@@ -15,8 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-@OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>, ViewModel() {
+class NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>, ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<DNote>>(emptyList())
     override val itemsFlow: StateFlow<List<DNote>> = _itemsFlow
     var showLoading = mutableStateOf(true)
@@ -40,7 +39,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
 
     suspend fun moreAsync(tagsVM: TagsViewModel) = withIO {
         offset.value += limit.intValue
-        val items = NoteHelper.search(getQuery(), limit.intValue, offset.intValue)
+        val items = NoteHelper.search(getQuery(), limit.intValue, offset.value)
         _itemsFlow.update { it + items }
         tagsVM.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
@@ -50,7 +49,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
     suspend fun loadAsync(tagsVM: TagsViewModel) = withIO {
         offset.intValue = 0
         val query = getQuery()
-        _itemsFlow.value = NoteHelper.search(query, limit.intValue, offset.intValue)
+        _itemsFlow.value = NoteHelper.search(query, limit.intValue, offset.value)
         tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.intValue = NoteHelper.count(getTotalQuery())
         totalTrash.intValue = NoteHelper.count(getTrashQuery())
@@ -60,10 +59,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
 
     fun trash(tagsVM: TagsViewModel, ids: Set<String>) {
         launchSafe {
-            TagHelper.deleteTagRelationByKeys(
-                ids,
-                dataType,
-            )
+            TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.trashAsync(ids)
             loadAsync(tagsVM)
         }
@@ -82,10 +78,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
 
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
         launchSafe {
-            TagHelper.deleteTagRelationByKeys(
-                ids,
-                dataType,
-            )
+            TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.restoreAsync(ids)
             loadAsync(tagsVM)
         }
@@ -93,10 +86,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
         launchSafe {
-            TagHelper.deleteTagRelationByKeys(
-                ids,
-                dataType,
-            )
+            TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.deleteAsync(ids)
             loadAsync(tagsVM)
         }
@@ -120,5 +110,4 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
 
         return query
     }
-
 }

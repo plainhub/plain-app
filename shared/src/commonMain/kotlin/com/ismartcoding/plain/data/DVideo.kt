@@ -9,7 +9,7 @@ data class DVideo(
     override val title: String,
     override val path: String,
     override val duration: Long,
-    val size: Long,
+    override val size: Long,
     val width: Int,
     val height: Int,
     val rotation: Int,
@@ -18,7 +18,7 @@ data class DVideo(
     val updatedAt: Instant,
     val takenAt: Instant?,
     val isFavorite: Boolean = false,
-) : IMedia, IData {
+) : IItemMetadata, IMedia, IData {
 
     fun getRotatedSize(): IntSize {
         if (rotation == 90 || rotation == 270) {

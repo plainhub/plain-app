@@ -8,10 +8,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.enums.HttpServerState
@@ -30,23 +28,19 @@ import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-// https://developer.android.com/topic/libraries/architecture/viewmodel/viewmodel-savedstate#savedstate-compose-state
-@OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
-    var httpServerError by savedStateHandle.saveable { mutableStateOf("") }
-    var httpServerState by savedStateHandle.saveable {
-        mutableStateOf(HttpServerState.OFF)
-    }
-    var isVPNConnected by savedStateHandle.saveable { mutableStateOf(false) }
-    var ip4s by savedStateHandle.saveable { mutableStateOf(emptyList<String>()) }
-    var ip4 by savedStateHandle.saveable { mutableStateOf("") }
-    var currentRootTab by savedStateHandle.saveable { mutableIntStateOf(0) }
-    var pendingLoginEvent by mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
-    var pendingPairingRequest by mutableStateOf<DPairingRequest?>(null)
+class MainViewModel : ViewModel() {
+    var httpServerError = mutableStateOf("")
+    var httpServerState = mutableStateOf(HttpServerState.OFF)
+    var isVPNConnected = mutableStateOf(false)
+    var ip4s = mutableStateOf(emptyList<String>())
+    var ip4 = mutableStateOf("")
+    var currentRootTab = mutableIntStateOf(0)
+    var pendingLoginEvent = mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
+    var pendingPairingRequest = mutableStateOf<DPairingRequest?>(null)
     // The channel invite currently on top of the back stack (if any). Used by
     // ChannelInviteCanceledEvent handling to pop the right page. Not saved across
     // process death — a fresh invite will re-fire ChannelInviteReceivedEvent.
-    var pendingChannelInvite by mutableStateOf<ChannelInviteReceivedEvent?>(null)
+    var pendingChannelInvite = mutableStateOf<ChannelInviteReceivedEvent?>(null)
 
     fun enableHttpServer(
         context: Context,
@@ -55,9 +49,9 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         viewModelScope.launch {
             WebPreference.putAsync(enable)
             if (enable) {
-                httpServerError = ""
-                if (!httpServerState.isProcessing() && httpServerState != HttpServerState.ON) {
-                    httpServerState = HttpServerState.STARTING
+                httpServerError.value = ""
+                if (!httpServerState.value.isProcessing() && httpServerState.value != HttpServerState.ON) {
+                    httpServerState.value = HttpServerState.STARTING
                 }
                 val permission = Permission.POST_NOTIFICATIONS
                 if (permission.can(context)) {
@@ -87,24 +81,24 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         viewModelScope.launch {
             val webEnabled = WebPreference.getAsync()
             if (!webEnabled) {
-                if (!httpServerState.isProcessing()) {
-                    httpServerState = HttpServerState.OFF
+                if (!httpServerState.value.isProcessing()) {
+                    httpServerState.value = HttpServerState.OFF
                 }
                 return@launch
             }
 
-            if (httpServerState == HttpServerState.ERROR) {
+            if (httpServerState.value == HttpServerState.ERROR) {
                 return@launch
             }
 
-            if (!httpServerState.isProcessing() && httpServerState != HttpServerState.ON) {
-                httpServerState = HttpServerState.STARTING
+            if (!httpServerState.value.isProcessing() && httpServerState.value != HttpServerState.ON) {
+                httpServerState.value = HttpServerState.STARTING
             }
 
             val serverUp = HttpServerManager.checkServerAsync()
             if (serverUp) {
-                httpServerError = ""
-                httpServerState = HttpServerState.ON
+                httpServerError.value = ""
+                httpServerState.value = HttpServerState.ON
             } else {
                 enableHttpServer(context, true)
             }

@@ -6,9 +6,9 @@ import kotlin.time.Instant
 
 data class DImage(
     override var id: String,
-    val title: String,
+    override val title: String,
     val path: String,
-    val size: Long,
+    override val size: Long,
     val width: Int,
     val height: Int,
     val rotation: Int,
@@ -17,7 +17,7 @@ data class DImage(
     val updatedAt: Instant,
     val takenAt: Instant?,
     val isFavorite: Boolean = false,
-) : IData {
+) : IItemMetadata, IData {
     fun getRotatedSize(): IntSize {
         if (rotation == 90 || rotation == 270) {
             return IntSize(height, width)

@@ -229,7 +229,7 @@ fun MainNavGraph(
             PlayMediaPage(navController, r.path, audioPlaylistVM)
         }
         composableNoAnim<Routing.PairingRequest> {
-            val request = mainVM.pendingPairingRequest
+            val request = mainVM.pendingPairingRequest.value
             if (request != null) {
                 PairingRequestPage(request = request, navController = navController)
             } else {
@@ -238,7 +238,7 @@ fun MainNavGraph(
         }
         composableNoAnim<Routing.LoginRequest> {
             val lifecycleOwner = LocalLifecycleOwner.current
-            val event = mainVM.pendingLoginEvent
+            val event = mainVM.pendingLoginEvent.value
             if (event != null) {
                 LoginRequestPage(
                     event = event,
@@ -255,15 +255,15 @@ fun MainNavGraph(
             val r = backStackEntry.toRoute<Routing.ChannelInviteRequest>()
 
             DisposableEffect(r.channelId) {
-                mainVM.pendingChannelInvite = ChannelInviteReceivedEvent(
+                mainVM.pendingChannelInvite.value = ChannelInviteReceivedEvent(
                     channelId = r.channelId,
                     channelName = r.channelName,
                     ownerPeerId = r.ownerPeerId,
                     ownerPeerName = r.ownerPeerName,
                 )
                 onDispose {
-                    if (mainVM.pendingChannelInvite?.channelId == r.channelId) {
-                        mainVM.pendingChannelInvite = null
+                    if (mainVM.pendingChannelInvite.value?.channelId == r.channelId) {
+                        mainVM.pendingChannelInvite.value = null
                     }
                 }
             }

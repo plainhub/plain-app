@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
@@ -81,13 +82,114 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     internal fun updateItemsInternal(items: List<DFile>) { _itemsFlow.value = items }
 
-    fun navigateToDirectory(context: Context, newPath: String) = navigateToDirectoryInternal(context, newPath)
-    fun navigateBack(): Boolean = navigateBackInternal()
-    suspend fun loadLastPathAsync(context: Context) = withIO {
-        loadLastPathAsyncInternal(context)
+    fun navigateToDirectory(context: Context, newPath: String) {
+        if (selectedPath != newPath) {
+            navigationHistoryInternal.add(selectedPath)
+            selectedPath = newPath
+            rebuildBreadcrumbs(newPath)
+            launchSafe {
+                isLoading.value = true
+                updateItemsInternal(emptyList())
+                loadAsync(context)
+            }
+        }
     }
+
+    fun navigateBack(): Boolean {
+        return if (navigationHistoryInternal.isNotEmpty()) {
+            selectedPath = navigationHistoryInternal.removeLastOrNull() ?: selectedPath
+            rebuildBreadcrumbs(selectedPath)
+            true
+        } else false
+    }
+
+    suspend fun loadLastPathAsync(context: Context) = withIO {
+        val data = LastFilePathPreference.getValueAsync()
+        if (data.selectedPath.isNotEmpty() && File(data.selectedPath).exists()) {
+            type = inferFileTypeFromRoot(context, data.rootPath)
+            initSelectedPath(data.rootPath, type, data.fullPath, data.selectedPath)
+        } else {
+            type = inferFileTypeFromRoot(context, rootPath)
+            updateRootBreadcrumb()
+        }
+    }
+
+    fun inferFileTypeFromRoot(context: Context, rootPath: String): FilesType {
+        val internalStoragePath = FileSystemHelper.getInternalStoragePath()
+        val appDataPath = context.appDir()
+        val sdCardPath = FileSystemHelper.getSDCardPath(context)
+        val usbPaths = FileSystemHelper.getUsbDiskPaths()
+        return when {
+            rootPath == appDataPath -> FilesType.APP
+            rootPath == sdCardPath -> FilesType.SDCARD
+            usbPaths.contains(rootPath) -> FilesType.USB_STORAGE
+            rootPath == internalStoragePath -> FilesType.INTERNAL_STORAGE
+            else -> FilesType.INTERNAL_STORAGE
+        }
+    }
+
+    fun rebuildBreadcrumbs(targetPath: String) {
+        breadcrumbs.clear()
+        breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), rootPath))
+        if (targetPath == rootPath) {
+            selectedBreadcrumbIndex.value = 0
+            return
+        }
+        if (ZipBrowserHelper.isZipPath(targetPath)) {
+            // Build filesystem breadcrumbs up to the zip file
+            val zipFilePath = ZipBrowserHelper.getZipFilePath(targetPath)
+            val relativeToRoot = zipFilePath.removePrefix(rootPath).trimStart('/')
+            if (relativeToRoot.isNotEmpty()) {
+                var currentPath = rootPath
+                relativeToRoot.split("/").forEach { segment ->
+                    if (segment.isNotEmpty()) {
+                        currentPath += "/$segment"
+                        // Zip file breadcrumb navigates to the zip root
+                        val bcPath = if (currentPath == zipFilePath) {
+                            ZipBrowserHelper.joinPath(zipFilePath, "")
+                        } else {
+                            currentPath
+                        }
+                        breadcrumbs.add(BreadcrumbItem(segment, bcPath))
+                    }
+                }
+            }
+            // Build breadcrumbs for each internal directory component
+            val internalPath = ZipBrowserHelper.getInternalPath(targetPath)
+            val segments = internalPath.trimEnd('/').split("/").filter { it.isNotEmpty() }
+            var currentInternalPath = ZipBrowserHelper.joinPath(zipFilePath, "")
+            segments.forEach { segment ->
+                val prevInternal = ZipBrowserHelper.getInternalPath(currentInternalPath)
+                val newInternal = if (prevInternal.isEmpty()) "$segment/" else "$prevInternal$segment/"
+                currentInternalPath = ZipBrowserHelper.joinPath(zipFilePath, newInternal)
+                breadcrumbs.add(BreadcrumbItem(segment, currentInternalPath))
+            }
+        } else {
+            val relativePath = targetPath.removePrefix(rootPath).trimStart('/')
+            if (relativePath.isNotEmpty()) {
+                var currentPath = rootPath
+                relativePath.split("/").forEach { segment ->
+                    if (segment.isNotEmpty()) {
+                        currentPath += "/$segment"
+                        breadcrumbs.add(BreadcrumbItem(segment, currentPath))
+                    }
+                }
+            }
+        }
+        selectedBreadcrumbIndex.value = breadcrumbs.size - 1
+    }
+
+    fun initSelectedPath(rootPath: String, type: FilesType, fullPath: String, selectedPath: String) {
+        this.rootPath = rootPath
+        this.type = type
+        rebuildBreadcrumbs(fullPath)
+        this.selectedPath = selectedPath
+        selectedBreadcrumbIndex.value = breadcrumbs.indexOfFirst { it.path == selectedPath }
+        if (selectedBreadcrumbIndex.value == -1) selectedBreadcrumbIndex.value = breadcrumbs.size - 1
+        navigationHistoryInternal.clear()
+    }
+
     fun canNavigateBack(): Boolean = navigationHistoryInternal.isNotEmpty()
-    fun initSelectedPath(rootPath: String, type: FilesType, fullPath: String, selectedPath: String) = initSelectedPathInternal(rootPath, type, fullPath, selectedPath)
 
     fun getRootDisplayName(): String = when (type) {
         FilesType.INTERNAL_STORAGE -> FileSystemHelper.getInternalStorageName()

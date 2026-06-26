@@ -73,10 +73,10 @@ val mdAccessoryItems2 =
             it.textFieldState.edit { inlineWrap("[Link](", ")") }
         }),
         MdAccessoryItem2(Res.drawable.image, click = {
-            it.showInsertImage = true
+            it.showInsertImage.value = true
         }),
         MdAccessoryItem2(Res.drawable.paint_bucket, click = {
-            it.showColorPicker = true
+            it.showColorPicker.value = true
         }),
         MdAccessoryItem2(Res.drawable.arrow_up_to_line, click = {
             it.textFieldState.edit { setSelection(0) }
@@ -88,6 +88,6 @@ val mdAccessoryItems2 =
             WebHelper.open(MainActivity.instance.get()!!, "https://www.markdownguide.org/basic-syntax")
         }),
         MdAccessoryItem2(Res.drawable.settings, click = {
-            it.showSettings = true
+            it.showSettings.value = true
         }),
     )

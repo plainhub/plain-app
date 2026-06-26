@@ -143,9 +143,9 @@ class ClearAudioPlaylistEvent : ChannelEvent()
 
 class DownloadUpdateEvent : ChannelEvent()
 class CancelUpdateDownloadEvent : ChannelEvent()
-class UpdateDownloadProgressEvent(val progress: Int) : ChannelEvent()
-class UpdateDownloadCompleteEvent(val filePath: String) : ChannelEvent()
-class UpdateDownloadFailedEvent : ChannelEvent()
+// UpdateDownloadProgressEvent / UpdateDownloadCompleteEvent / UpdateDownloadFailedEvent
+// moved to shared/.../events/UpdateDownloadEvents.kt so UpdateViewModel can pattern-match
+// on them without app/-side references.
 
 class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
 

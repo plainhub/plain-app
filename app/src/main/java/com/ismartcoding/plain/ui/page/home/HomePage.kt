@@ -44,7 +44,6 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
-import com.ismartcoding.plain.ui.models.consumeUpdateDownloadEvent
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +57,7 @@ fun HomePage(
 ) {
     val webEnabled = LocalWeb.current
     val context = LocalContext.current
-    val showOnlineStatus = webEnabled && mainVM.httpServerState == HttpServerState.ON
+    val showOnlineStatus = webEnabled && mainVM.httpServerState.value == HttpServerState.ON
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("home_pull_refresh")
@@ -79,9 +78,9 @@ fun HomePage(
                 }
 
                 is WindowFocusChangedEvent -> {
-                    mainVM.isVPNConnected = NetworkHelper.isVPNConnected(context)
-                    mainVM.ip4s = NetworkHelper.getDeviceIP4s().filter { it.isNotEmpty() }
-                    mainVM.ip4 = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
+                    mainVM.isVPNConnected.value = NetworkHelper.isVPNConnected(context)
+                    mainVM.ip4s.value = NetworkHelper.getDeviceIP4s().filter { it.isNotEmpty() }
+                    mainVM.ip4.value = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
                 }
             }
@@ -103,7 +102,7 @@ fun HomePage(
                 item {
                     TopSpace()
                     if (webEnabled) {
-                        if (mainVM.isVPNConnected) {
+                        if (mainVM.isVPNConnected.value) {
                             PAlert(
                                 description = stringResource(Res.string.vpn_web_conflict_warning),
                                 AlertType.WARNING,

@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.stateIn
 
 import java.io.File
 
-@OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class MediaFoldersViewModel : ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<DMediaBucket>>(emptyList())
     val itemsFlow = _itemsFlow.asStateFlow()

@@ -70,8 +70,8 @@ fun MdEditor(
         modifier = modifier
             .fillMaxSize()
     ) {
-        val lineNumberWidth = if (mdEditorVM.showLineNumbers) measureTextWidth(" ${lineCount + 1} ", MaterialTheme.typography.bodyLarge) else 0.dp
-        if (mdEditorVM.showLineNumbers) {
+        val lineNumberWidth = if (mdEditorVM.showLineNumbers.value) measureTextWidth(" ${lineCount + 1} ", MaterialTheme.typography.bodyLarge) else 0.dp
+        if (mdEditorVM.showLineNumbers.value) {
             Column(
                 modifier = Modifier
                     .width(lineNumberWidth)
@@ -79,7 +79,7 @@ fun MdEditor(
                     .verticalScroll(lineNumberState, enabled = false),
             ) {
                 Text(
-                    text = mdEditorVM.linesText,
+                    text = mdEditorVM.linesText.value,
                     style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier
                         .fillMaxHeight(),
@@ -88,13 +88,13 @@ fun MdEditor(
             }
         }
         Box(
-            modifier = if (mdEditorVM.wrapContent) {
+            modifier = if (mdEditorVM.wrapContent.value) {
                 Modifier
-                    .padding(start = if (mdEditorVM.showLineNumbers) lineNumberWidth + 8.dp else PlainTheme.PAGE_HORIZONTAL_MARGIN, end = PlainTheme.PAGE_HORIZONTAL_MARGIN)
+                    .padding(start = if (mdEditorVM.showLineNumbers.value) lineNumberWidth + 8.dp else PlainTheme.PAGE_HORIZONTAL_MARGIN, end = PlainTheme.PAGE_HORIZONTAL_MARGIN)
                     .fillMaxSize()
             } else {
                 Modifier
-                    .padding(if (mdEditorVM.showLineNumbers) lineNumberWidth + 8.dp else PlainTheme.PAGE_HORIZONTAL_MARGIN, end = PlainTheme.PAGE_HORIZONTAL_MARGIN)
+                    .padding(if (mdEditorVM.showLineNumbers.value) lineNumberWidth + 8.dp else PlainTheme.PAGE_HORIZONTAL_MARGIN, end = PlainTheme.PAGE_HORIZONTAL_MARGIN)
                     .fillMaxSize()
                     .horizontalScroll(rememberScrollState())
             }
@@ -112,7 +112,7 @@ fun MdEditor(
                     if (r != null) {
                         if (lineCount != r.lineCount) {
                             lineCount = r.lineCount
-                            mdEditorVM.linesText = MdEditorLineHelper.getLinesText(
+                            mdEditorVM.linesText.value = MdEditorLineHelper.getLinesText(
                                 lineCount,
                                 r,
                                 mdEditorVM.textFieldState.text.toString(),

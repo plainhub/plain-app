@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.lib.rss.model.RssChannel
@@ -21,8 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-@OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectableViewModel<DFeed>, ViewModel() {
+class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<DFeed>>(emptyList())
     override val itemsFlow: StateFlow<List<DFeed>> = _itemsFlow
     var showLoading = mutableStateOf(true)

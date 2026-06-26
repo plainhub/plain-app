@@ -21,5 +21,10 @@ data class TagRelationStub(
         }
     }
 
-    companion object
+    companion object {
+        fun create(data: IData): TagRelationStub = when (data) {
+            is IItemMetadata -> TagRelationStub(data.id, data.title, data.size)
+            else -> TagRelationStub(data.id)
+        }
+    }
 }

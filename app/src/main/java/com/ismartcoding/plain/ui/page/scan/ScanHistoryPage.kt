@@ -42,12 +42,12 @@ fun ScanHistoryPage(
     val itemsState by scanHistoryVM.itemsFlow.collectAsState()
     val refreshState =
         rememberRefreshLayoutState {
-            scanHistoryVM.fetch(context)
+            scanHistoryVM.fetch()
             setRefreshState(RefreshContentState.Finished)
         }
 
     LaunchedEffect(Unit) {
-        scanHistoryVM.fetch(context)
+        scanHistoryVM.fetch()
     }
 
     PScaffold(
@@ -70,7 +70,7 @@ fun ScanHistoryPage(
                                 text = m,
                                 onDelete = {
                                     DialogHelper.confirmToDelete {
-                                        scanHistoryVM.delete(context, m)
+                                        scanHistoryVM.delete(m)
                                     }
                                 }
                             )

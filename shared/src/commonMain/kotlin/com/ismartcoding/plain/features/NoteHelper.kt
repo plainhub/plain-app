@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features
 
-import com.ismartcoding.plain.lib.content.ContentWhere
-import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.helpers.ContentWhere
+import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.plain.db.DNote

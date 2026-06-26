@@ -3,9 +3,7 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
@@ -18,8 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-@OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
+class FeedEntriesViewModel :
     ISelectableViewModel<DFeedEntry>,
     ISearchableViewModel<DFeedEntry>,
     ViewModel() {
@@ -29,7 +26,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     var offset = mutableIntStateOf(0)
     var limit = mutableIntStateOf(200)
     var noMore = mutableStateOf(false)
-    var filterType by savedStateHandle.saveable { mutableStateOf(FeedEntryFilterType.DEFAULT) }
+    var filterType = mutableStateOf(FeedEntryFilterType.DEFAULT)
     var total = mutableIntStateOf(0)
     var totalToday = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
@@ -100,7 +97,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
 
     private suspend fun getQuery(): String {
         var query = queryText.value
-        if (filterType == FeedEntryFilterType.TODAY) {
+        if (filterType.value == FeedEntryFilterType.TODAY) {
             query += " today:true"
         }
         if (tag.value != null) {

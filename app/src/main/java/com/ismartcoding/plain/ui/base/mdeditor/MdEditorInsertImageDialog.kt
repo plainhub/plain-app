@@ -49,7 +49,7 @@ fun MdEditorInsertImageDialog(
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = {
-            mdEditorVM.showInsertImage = false
+            mdEditorVM.showInsertImage.value = false
         },
         confirmButton = {
             PFilledButton(
@@ -66,12 +66,12 @@ fun MdEditorInsertImageDialog(
                     mdEditorVM.textFieldState.edit {
                         add("$html />")
                     }
-                    mdEditorVM.showInsertImage = false
+                    mdEditorVM.showInsertImage.value = false
                 },
             )
         },
         dismissButton = {
-            PTextButton(text = stringResource(Res.string.cancel), onClick = { mdEditorVM.showInsertImage = false })
+            PTextButton(text = stringResource(Res.string.cancel), onClick = { mdEditorVM.showInsertImage.value = false })
         },
         title = {
             Text(

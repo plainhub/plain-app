@@ -54,8 +54,8 @@ internal fun MainActivity.initEvents() {
 
             when (event) {
                 is HttpServerStateChangedEvent -> {
-                    mainVM.httpServerError = HttpServerManager.httpServerError
-                    mainVM.httpServerState = event.state
+                    mainVM.httpServerError.value = HttpServerManager.httpServerError
+                    mainVM.httpServerState.value = event.state
                     if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@initEvents)) {
                         DialogHelper.showConfirmDialog(LocaleHelper.getStringAsync(Res.string.confirm), LocaleHelper.getStringAsync(Res.string.storage_permission_confirm)) {
                             coIO { ApiPermissionsPreference.putAsync(Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }
@@ -131,7 +131,7 @@ internal fun MainActivity.initEvents() {
                 is PickFileEvent -> handlePickFileEvent(event)
                 is ExportFileEvent -> handleExportFileEvent(event)
                 is ConfirmToAcceptLoginEvent -> {
-                    mainVM.pendingLoginEvent = event
+                    mainVM.pendingLoginEvent.value = event
                     val nav = navControllerState.value
                     if (nav?.currentBackStackEntry?.destination?.hasRoute<Routing.LoginRequest>() != true) {
                         nav?.navigate(Routing.LoginRequest)
@@ -140,7 +140,7 @@ internal fun MainActivity.initEvents() {
                 }
 
                 is PairingRequestReceivedEvent -> {
-                    mainVM.pendingPairingRequest = event.request
+                    mainVM.pendingPairingRequest.value = event.request
                     val nav = navControllerState.value
                     if (nav?.currentBackStackEntry?.destination?.hasRoute<Routing.PairingRequest>() != true) {
                         nav?.navigate(Routing.PairingRequest)
@@ -169,7 +169,7 @@ internal fun MainActivity.initEvents() {
                     val nav = navControllerState.value
                     val current = nav?.currentBackStackEntry
                     if (current != null && current.destination.hasRoute<Routing.PairingRequest>() &&
-                        mainVM.pendingPairingRequest?.fromId == event.fromId
+                        mainVM.pendingPairingRequest.value?.fromId == event.fromId
                     ) {
                         nav.popBackStack<Routing.PairingRequest>(inclusive = true)
                     }
@@ -179,7 +179,7 @@ internal fun MainActivity.initEvents() {
                     val nav = navControllerState.value
                     val current = nav?.currentBackStackEntry
                     if (current != null && current.destination.hasRoute<Routing.ChannelInviteRequest>() &&
-                        mainVM.pendingChannelInvite?.channelId == event.channelId
+                        mainVM.pendingChannelInvite.value?.channelId == event.channelId
                     ) {
                         nav.popBackStack<Routing.ChannelInviteRequest>(inclusive = true)
                     }

@@ -3,6 +3,10 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.ismartcoding.plain.events.UpdateDownloadCompleteEvent
+import com.ismartcoding.plain.events.UpdateDownloadFailedEvent
+import com.ismartcoding.plain.events.UpdateDownloadProgressEvent
+import com.ismartcoding.plain.lib.channel.ChannelEvent
 
 class UpdateViewModel : ViewModel() {
     var updateDialogVisible = mutableStateOf(false)
@@ -52,5 +56,23 @@ class UpdateViewModel : ViewModel() {
         downloadFailed.value = false
         isDownloadComplete.value = false
         downloadedFilePath.value = ""
+    }
+
+    fun consumeUpdateDownloadEvent(event: ChannelEvent): Boolean {
+        return when (event) {
+            is UpdateDownloadProgressEvent -> {
+                onDownloadProgress(event.progress)
+                true
+            }
+            is UpdateDownloadCompleteEvent -> {
+                onDownloadComplete(event.filePath)
+                true
+            }
+            is UpdateDownloadFailedEvent -> {
+                onDownloadFailed()
+                true
+            }
+            else -> false
+        }
     }
 }

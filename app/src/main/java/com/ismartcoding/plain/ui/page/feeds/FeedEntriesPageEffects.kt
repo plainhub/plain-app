@@ -70,9 +70,9 @@ internal fun FeedEntriesPageEffects(
         val tab = tabs.getOrNull(pagerState.currentPage)
         if (tab != null) {
             when (tab.value) {
-                "all" -> { feedEntriesVM.filterType = FeedEntryFilterType.DEFAULT; feedEntriesVM.tag.value = null }
-                "today" -> { feedEntriesVM.filterType = FeedEntryFilterType.TODAY; feedEntriesVM.tag.value = null }
-                else -> { feedEntriesVM.filterType = FeedEntryFilterType.DEFAULT; feedEntriesVM.tag.value = tagsVM.itemsFlow.value.find { it.id == tab.value } }
+                "all" -> { feedEntriesVM.filterType.value = FeedEntryFilterType.DEFAULT; feedEntriesVM.tag.value = null }
+                "today" -> { feedEntriesVM.filterType.value = FeedEntryFilterType.TODAY; feedEntriesVM.tag.value = null }
+                else -> { feedEntriesVM.filterType.value = FeedEntryFilterType.DEFAULT; feedEntriesVM.tag.value = tagsVM.itemsFlow.value.find { it.id == tab.value } }
             }
         }
         scope.launch { scrollBehavior.reset(); scrollStateMap[pagerState.currentPage]?.scrollToItem(0) }

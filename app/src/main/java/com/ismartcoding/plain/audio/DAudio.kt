@@ -4,6 +4,7 @@ import android.net.Uri
 import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.data.IItemMetadata
 import com.ismartcoding.plain.data.IMedia
 import kotlin.time.Instant
 
@@ -13,13 +14,13 @@ data class DAudio(
     val artist: String,
     override val path: String,
     override val duration: Long,
-    val size: Long,
+    override val size: Long,
     val bucketId: String,
     val albumId: String,
     val createdAt: Instant,
     val updatedAt: Instant,
     val isFavorite: Boolean = false,
-) : IMedia, IData {
+) : IItemMetadata, IMedia, IData {
     fun toPlaylistAudio(): DPlaylistAudio {
         return DPlaylistAudio(title, path, artist, duration)
     }

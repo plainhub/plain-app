@@ -72,7 +72,7 @@ fun NotePage(
     val editorScrollState = rememberScrollState()
     val focusRequester = remember { FocusRequester() }
     val shouldRequestFocus = remember { mutableStateOf(true) }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { !noteVM.editMode })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { !noteVM.editMode.value })
     val tagIds = tagsMapState[id.value]?.map { it.tagId } ?: emptyList()
 
     NotePageEffects(id, tagId, noteVM, notesVM, tagsVM, mdEditorVM, previewerState)
@@ -84,7 +84,7 @@ fun NotePage(
 
     PScaffold(topBar = {
         PTopAppBar(navController = navController, title = "", scrollBehavior = scrollBehavior, actions = {
-            if (noteVM.editMode) {
+            if (noteVM.editMode.value) {
                 PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.textFieldState.undoState.canUndo,
                     tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.textFieldState.undoState.undo() }
                 PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(Res.string.redo), enabled = mdEditorVM.textFieldState.undoState.canRedo,
@@ -98,19 +98,19 @@ fun NotePage(
                     contentDescription = stringResource(Res.string.share),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {
-                    ShareHelper.shareText(context, noteVM.content)
+                    ShareHelper.shareText(context, noteVM.content.value)
                 }
             }
-            PIconButton(icon = if (noteVM.editMode) Res.drawable.markdown else Res.drawable.square_pen,
-                contentDescription = stringResource(if (noteVM.editMode) Res.string.view else Res.string.edit),
-                tint = MaterialTheme.colorScheme.onSurface) { noteVM.editMode = !noteVM.editMode }
+            PIconButton(icon = if (noteVM.editMode.value) Res.drawable.markdown else Res.drawable.square_pen,
+                contentDescription = stringResource(if (noteVM.editMode.value) Res.string.view else Res.string.edit),
+                tint = MaterialTheme.colorScheme.onSurface) { noteVM.editMode.value = !noteVM.editMode.value }
         })
     }, modifier = Modifier.imePadding(), bottomBar = {
-        AnimatedVisibility(visible = noteVM.editMode, enter = slideInVertically { it }, exit = slideOutVertically { it }) {
+        AnimatedVisibility(visible = noteVM.editMode.value, enter = slideInVertically { it }, exit = slideOutVertically { it }) {
             MdEditorBottomAppBar(mdEditorVM)
         }
     }, content = { paddingValues ->
-        if (noteVM.editMode) {
+        if (noteVM.editMode.value) {
             MdEditor(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding(), top = paddingValues.calculateTopPadding()),
                 mdEditorVM = mdEditorVM, scrollState = editorScrollState, focusRequester = focusRequester,
                 shouldRequestFocus = shouldRequestFocus.value, onFocusRequested = { shouldRequestFocus.value = false })
@@ -130,7 +130,7 @@ fun NotePage(
                         VerticalSpace(dp = 16.dp)
                     }
                 }
-                item { MarkdownText(text = noteVM.content, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), previewerState = previewerState) }
+                item { MarkdownText(text = noteVM.content.value, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), previewerState = previewerState) }
                 item { BottomSpace(paddingValues) }
             }
         }

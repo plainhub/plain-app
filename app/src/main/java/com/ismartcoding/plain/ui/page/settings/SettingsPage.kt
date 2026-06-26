@@ -51,7 +51,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
-import com.ismartcoding.plain.ui.models.consumeUpdateDownloadEvent
 import com.ismartcoding.plain.ui.page.home.UpdateBanner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -2,10 +2,14 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.helpers.launchSafe
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.ui.helpers.LoadingHelper
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +17,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-@OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class TagsViewModel : ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<DTag>>(emptyList())
     val itemsFlow: StateFlow<List<DTag>> = _itemsFlow
@@ -25,12 +28,12 @@ class TagsViewModel : ViewModel() {
     var editTagName = mutableStateOf("")
     var dataType = mutableStateOf(DataType.DEFAULT)
 
-    internal fun updateTagsMap(map: Map<String, List<DTagRelation>>) {
+    fun updateTagsMap(map: Map<String, List<DTagRelation>>) {
         _tagsMapFlow.value = map.toMutableMap()
     }
 
     suspend fun loadAsync(keys: Set<String> = emptySet()) = withIO {
-        val startTime = System.currentTimeMillis()
+        val startTime = TimeHelper.now().toEpochMilliseconds()
         val tagCountMap = TagHelper.count(dataType.value).associate { it.id to it.count }
         _itemsFlow.value = TagHelper.getAll(dataType.value).map { tag ->
             tag.count = tagCountMap[tag.id] ?: 0
@@ -97,5 +100,66 @@ class TagsViewModel : ViewModel() {
         editTagName.value = tag.name
         editItem.value = tag
         tagNameDialogVisible.value = true
+    }
+
+    fun removeFromTags(ids: Set<String>, tagIds: Set<String>) {
+        launchSafe {
+            for (tagId in tagIds) {
+                TagHelper.deleteTagRelationByKeysTagId(ids, tagId)
+            }
+            for (id in ids) {
+                tagsMapFlow.value.toMutableMap().let { map ->
+                    map[id] = map[id]?.filter { !tagIds.contains(it.tagId) } ?: emptyList()
+                    updateTagsMap(map)
+                }
+            }
+            loadAsync()
+        }
+    }
+
+    fun addToTags(items: List<IData>, tagIds: Set<String>) {
+        launchSafe {
+            for (tagId in tagIds) {
+                val existingKeys = TagHelper.getKeysByTagId(tagId)
+                val newItems = items.filter { !existingKeys.contains(it.id) }
+                if (newItems.isNotEmpty()) {
+                    val relations = newItems.map { item ->
+                        TagRelationStub.create(item).toTagRelation(tagId, dataType.value)
+                    }
+                    TagHelper.addTagRelations(relations)
+                    val mutableMap = tagsMapFlow.value.toMutableMap()
+                    for (item in newItems) {
+                        val id = item.id
+                        mutableMap[id] = mutableMap[id]?.toMutableList()?.apply {
+                            addAll(relations.filter { it.key == id })
+                        } ?: relations.filter { it.key == id }
+                    }
+                    updateTagsMap(mutableMap)
+                }
+            }
+            loadAsync()
+        }
+    }
+
+    suspend fun toggleTagAsync(data: IData, tagId: String) = withIO {
+        val tagIds = tagsMapFlow.value[data.id]?.map { it.tagId } ?: emptyList()
+        try {
+            if (tagIds.contains(tagId)) {
+                TagHelper.deleteTagRelationByKeysTagId(setOf(data.id), tagId)
+                val mutableMap = tagsMapFlow.value.toMutableMap()
+                mutableMap[data.id] = mutableMap[data.id]?.filter { it.tagId != tagId } ?: emptyList()
+                updateTagsMap(mutableMap)
+            } else {
+                val relation = TagRelationStub.create(data).toTagRelation(tagId, dataType.value)
+                TagHelper.addTagRelations(listOf(relation))
+                val mutableMap = tagsMapFlow.value.toMutableMap()
+                mutableMap[data.id] = mutableMap[data.id]?.toMutableList()?.apply {
+                    add(relation)
+                } ?: listOf(relation)
+                updateTagsMap(mutableMap)
+            }
+            loadAsync()
+        } catch (_: Exception) {
+        }
     }
 }

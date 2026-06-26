@@ -50,22 +50,22 @@ internal fun NotePageEffects(
 
     LaunchedEffect(Unit) {
         tagsVM.dataType.value = DataType.NOTE
-        noteVM.editMode = id.value.isEmpty()
+        noteVM.editMode.value = id.value.isEmpty()
         mdEditorVM.load(context)
         scope.launch(Dispatchers.IO) {
             if (id.value.isNotEmpty()) {
                 val item = NoteHelper.getById(id.value)
                 noteVM.item.value = item
-                noteVM.content = item?.content ?: ""
-                mdEditorVM.textFieldState.edit { append(noteVM.content); setSelection(0) }
+                noteVM.content.value = item?.content ?: ""
+                mdEditorVM.textFieldState.edit { append(noteVM.content.value); setSelection(0) }
             }
             snapshotFlow { mdEditorVM.textFieldState.text }.debounce(200).collectLatest { t ->
                 val isNew = id.value.isEmpty()
                 val text = t.toString()
-                if (noteVM.content == text) return@collectLatest
+                if (noteVM.content.value == text) return@collectLatest
                 scope.launch(Dispatchers.IO) {
                     val newItem = NoteHelper.addOrUpdateAsync(id.value) {
-                        title = text.cut(250).replace("\n", ""); content = text; noteVM.content = text
+                        title = text.cut(250).replace("\n", ""); content = text; noteVM.content.value = text
                     }
                     id.value = newItem.id
                     if (isNew && tagId.isNotEmpty()) {
@@ -81,13 +81,13 @@ internal fun NotePageEffects(
     DisposableEffect(Unit) { onDispose { insetsController.show(WindowInsetsCompat.Type.navigationBars()) } }
     BackHandler(previewerState.visible) { scope.launch { previewerState.close() } }
 
-    LaunchedEffect(noteVM.editMode) {
-        if (noteVM.editMode) keyboardController?.show()
+    LaunchedEffect(noteVM.editMode.value) {
+        if (noteVM.editMode.value) keyboardController?.show()
         else { keyboardController?.hide(); focusManager.clearFocus() }
     }
 
     SideEffect {
-        if (noteVM.editMode && context.isGestureInteractionMode()) insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        if (noteVM.editMode.value && context.isGestureInteractionMode()) insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         else insetsController.show(WindowInsetsCompat.Type.navigationBars())
     }
 }

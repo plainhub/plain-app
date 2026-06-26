@@ -33,14 +33,14 @@ fun MdEditorSettingsDialog(
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = {
-            mdEditorVM.showSettings = false
+            mdEditorVM.showSettings.value = false
         },
         confirmButton = {
             PFilledButton(
                 text = stringResource(Res.string.close),
                 buttonSize = ButtonSize.MEDIUM,
                 onClick = {
-                    mdEditorVM.showSettings = false
+                    mdEditorVM.showSettings.value = false
                 },
             )
         },
@@ -55,9 +55,9 @@ fun MdEditorSettingsDialog(
                     title = stringResource(Res.string.show_line_numbers),
                 ) {
                     PSwitch(
-                        activated = mdEditorVM.showLineNumbers,
+                        activated = mdEditorVM.showLineNumbers.value,
                     ) {
-                        mdEditorVM.showLineNumbers = it
+                        mdEditorVM.showLineNumbers.value = it
                         scope.launch(Dispatchers.IO) {
                             EditorShowLineNumbersPreference.putAsync(it)
                         }
@@ -67,9 +67,9 @@ fun MdEditorSettingsDialog(
                     title = stringResource(Res.string.wrap_content),
                 ) {
                     PSwitch(
-                        activated = mdEditorVM.wrapContent,
+                        activated = mdEditorVM.wrapContent.value,
                     ) {
-                        mdEditorVM.wrapContent = it
+                        mdEditorVM.wrapContent.value = it
                         scope.launch(Dispatchers.IO) {
                             EditorWrapContentPreference.putAsync(it)
                         }

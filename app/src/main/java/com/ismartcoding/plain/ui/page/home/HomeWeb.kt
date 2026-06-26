@@ -34,7 +34,7 @@ fun HomeWeb(
     webEnabled: Boolean,
 ) {
     val scope = rememberCoroutineScope()
-    val state = mainVM.httpServerState
+    val state = mainVM.httpServerState.value
 
     LaunchedEffect(webEnabled) {
         if (webEnabled) {
@@ -104,6 +104,6 @@ private fun buildHomeWebErrorMessage(mainVM: MainViewModel): String {
             HttpServerManager.portsInUse.joinToString(", "),
         )
     } else {
-        mainVM.httpServerError.ifEmpty { LocaleHelper.getString(Res.string.http_server_failed) }
+        mainVM.httpServerError.value.ifEmpty { LocaleHelper.getString(Res.string.http_server_failed) }
     }
 }

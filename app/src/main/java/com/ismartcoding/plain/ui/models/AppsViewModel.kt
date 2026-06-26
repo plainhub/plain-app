@@ -5,9 +5,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -15,8 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-@OptIn(SavedStateHandleSaveableApi::class)
-class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ISearchableViewModel<VPackage>, ViewModel() {
+class AppsViewModel : ISearchableViewModel<VPackage>, ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<VPackage>>(emptyList())
     val itemsFlow: StateFlow<List<VPackage>> = _itemsFlow
     var showLoading = mutableStateOf(true)
