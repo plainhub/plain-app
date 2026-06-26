@@ -1,0 +1,82 @@
+package com.ismartcoding.plain.lib.extensions
+
+import android.content.ContentResolver
+import android.os.Bundle
+import android.os.Parcelable
+import android.text.SpannableString
+import com.ismartcoding.plain.data.SortBy
+import com.ismartcoding.plain.data.SortDirection
+import com.ismartcoding.plain.lib.isTPlus
+
+fun Bundle.sort(sortBy: SortBy) {
+    val isExpression = sortBy.field.contains(' ') || sortBy.field.contains('(')
+    if (isExpression) {
+        // Raw SQL sort expression (e.g. CASE WHEN ... END) — use SQL_SORT_ORDER
+        // which is supported on API 26+ and works with QUERY_ARG_LIMIT/OFFSET.
+        putString(
+            ContentResolver.QUERY_ARG_SQL_SORT_ORDER,
+            "${sortBy.field} ${sortBy.direction}",
+        )
+    } else {
+        putStringArray(
+            ContentResolver.QUERY_ARG_SORT_COLUMNS,
+            arrayOf(sortBy.field),
+        )
+        putInt(
+            ContentResolver.QUERY_ARG_SORT_DIRECTION,
+            if (sortBy.direction == SortDirection.ASC) ContentResolver.QUERY_SORT_DIRECTION_ASCENDING else ContentResolver.QUERY_SORT_DIRECTION_DESCENDING,
+        )
+    }
+}
+
+fun Bundle.where(
+    selection: String,
+    args: List<String>,
+) {
+    putString(
+        ContentResolver.QUERY_ARG_SQL_SELECTION,
+        selection,
+    )
+    putStringArray(
+        ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,
+        args.toTypedArray(),
+    )
+}
+
+fun Bundle.paging(
+    offset: Int,
+    limit: Int,
+) {
+    if (offset > 0) {
+        putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
+    }
+    putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
+}
+
+fun Bundle.getString2(key: String): String {
+    return when (val extra = get(key)) {
+        null -> {
+            ""
+        }
+        is String -> {
+            extra
+        }
+
+        is SpannableString -> {
+            extra.toString()
+        }
+
+        else -> {
+            ""
+        }
+    }
+}
+
+inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? =
+    when {
+        isTPlus() -> getParcelable(key, T::class.java)
+        else ->
+            @Suppress("DEPRECATION")
+            getParcelable(key)
+                as? T
+    }

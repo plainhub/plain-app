@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DCall
+import com.ismartcoding.plain.data.getGeo
 import com.ismartcoding.plain.helpers.FileHelper
 import kotlin.time.Instant
 

@@ -4,7 +4,7 @@ import android.content.Context
 import android.provider.BaseColumns
 import android.provider.Telephony
 import androidx.core.net.toUri
-import com.ismartcoding.plain.lib.content.ContentWhere
+import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.lib.extensions.find
 import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getStringValue

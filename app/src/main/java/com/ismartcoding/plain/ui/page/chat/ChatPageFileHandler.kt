@@ -11,7 +11,7 @@ import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.extensions.queryOpenableFile
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.lib.helpers.StringHelper
+import com.ismartcoding.plain.helpers.StringHelper
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileResultEvent

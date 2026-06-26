@@ -1,0 +1,31 @@
+package com.ismartcoding.plain.lib.logcat
+
+interface Printer {
+    fun t(tag: String?): Printer
+
+    fun d(message: String, vararg args: Any?)
+
+    fun d(`object`: Any?)
+
+    fun e(message: String, vararg args: Any?)
+
+    fun e(throwable: Throwable?, message: String?, vararg args: Any?)
+
+    fun w(message: String, vararg args: Any?)
+
+    fun i(message: String, vararg args: Any?)
+
+    fun v(message: String, vararg args: Any?)
+
+    fun wtf(message: String, vararg args: Any?)
+
+    fun json(json: String?)
+
+    fun xml(xml: String?)
+
+    fun log(priority: Int, tag: String?, message: String?, throwable: Throwable?)
+
+    fun clearLogAdapters()
+
+    fun addAdapter(adapter: LogAdapter)
+}

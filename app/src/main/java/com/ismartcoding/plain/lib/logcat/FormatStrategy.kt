@@ -1,9 +1,0 @@
-package com.ismartcoding.plain.lib.logcat
-
-interface FormatStrategy {
-    fun log(
-        priority: Int,
-        tag: String?,
-        message: String,
-    )
-}

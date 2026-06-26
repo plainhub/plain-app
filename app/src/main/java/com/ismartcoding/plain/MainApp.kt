@@ -62,6 +62,7 @@ class MainApp : Application() {
         super.onCreate()
 
         instance = this
+        com.ismartcoding.plain.setAppContext(this)
         com.ismartcoding.plain.db.setAppContext(this)
         com.ismartcoding.plain.features.locale.setAppContext(this)
         initDataStore(dataStore)
@@ -85,9 +86,10 @@ class MainApp : Application() {
             newImageLoader(context)
         }
 
+        LogCat.init(this)
         LogCat.addLogAdapter(
             DiskLogAdapter(
-                DiskLogFormatStrategy.getInstance(this),
+                DiskLogFormatStrategy.getInstance(),
                 minPriority = if (BuildConfig.DEBUG) LogCat.VERBOSE else LogCat.WARN,
             ),
         )

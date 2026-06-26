@@ -14,13 +14,14 @@ object WebSocketHelper {
 //                LogCat.d("sendEventAsync: ${event.data}")
 //            }
         HttpServerManager.wsSessions.toList().forEach {
-            if (event.data is WebSocketData.Text) {
+            val data = event.data
+            if (data is WebSocketData.Text) {
                 val token = HttpServerManager.tokenCache[it.clientId]
                 if (token != null) {
-                    it.session.send(addIntPrefixToByteArray(event.type.value, CryptoHelper.chaCha20Encrypt(token, event.data.value)))
+                    it.session.send(addIntPrefixToByteArray(event.type.value, CryptoHelper.chaCha20Encrypt(token, data.value)))
                 }
-            } else if (event.data is WebSocketData.Binary) {
-                it.session.send(addIntPrefixToByteArray(event.type.value, event.data.value as ByteArray))
+            } else if (data is WebSocketData.Binary) {
+                it.session.send(addIntPrefixToByteArray(event.type.value, data.value))
             }
         }
     }

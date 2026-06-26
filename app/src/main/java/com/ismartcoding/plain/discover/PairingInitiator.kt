@@ -36,7 +36,7 @@ object PairingInitiator {
             // Get our raw Ed25519 signature public key (32 bytes)
             val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
 
-            val bestIp = device.getBestIp()
+            val bestIp = com.ismartcoding.plain.lib.helpers.NetworkHelper.getBestIp(device.ips)
             val session = DPairingSession(
                 deviceId = device.id,
                 deviceName = device.name,

@@ -12,12 +12,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.data.DNearbyDevice
-import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.enums.ActionSourceType
-import com.ismartcoding.plain.enums.ActionType
-import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.PickFileTag
@@ -40,7 +35,6 @@ import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.services.HttpServerService
-import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
@@ -53,46 +47,10 @@ import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Request
 import java.io.File
 
-data class NearbyDeviceFoundEvent(val device: DNearbyDevice) : ChannelEvent()
-
-// Pairing events
-data class PairingRequestReceivedEvent(val request: DPairingRequest) : ChannelEvent()
-data class PairingSuccessEvent(val deviceId: String, val deviceName: String, val deviceIp: String, val key: String) : ChannelEvent()
-data class PairingFailedEvent(val deviceId: String, val reason: String) : ChannelEvent()
-data class PairingCanceledEvent(val fromId: String) : ChannelEvent()
-
-class FolderKanbanSelectEvent(val data: FolderOption) : ChannelEvent()
-
-// The events raised by the app
-class StartHttpServerEvent : ChannelEvent()
+// Android-only events that depend on Android types (Uri/Parcelable/Permission/DefaultWebSocketServerSession).
+// Pure events live in shared/commonMain/events/AppEvents.kt.
 
 class HttpServerStateChangedEvent(val state: HttpServerState) : ChannelEvent()
-
-class RestartAppEvent : ChannelEvent()
-
-class FetchLinkPreviewsEvent(val chat: DChat) : ChannelEvent()
-
-class FetchBookmarkMetadataEvent(val bookmarkId: String, val url: String) : ChannelEvent()
-
-class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
-
-class DeleteChatItemViewEvent(val id: String) : ChannelEvent()
-
-/** Fired when a channel invite is received from a remote peer. UI shows accept/decline dialog. */
-data class ChannelInviteReceivedEvent(
-    val channelId: String,
-    val channelName: String,
-    val ownerPeerId: String,
-    val ownerPeerName: String,
-) : ChannelEvent()
-
-/** Fired when the channel owner cancels a pending invite (i.e. removes us before we accept).
- *  The auto-opened [com.ismartcoding.plain.ui.nav.Routing.ChannelInviteRequest] page pops
- *  itself when it sees this event for the matching channel. */
-data class ChannelInviteCanceledEvent(
-    val channelId: String,
-    val ownerPeerId: String,
-) : ChannelEvent()
 
 class ConfirmToAcceptLoginEvent(
     val session: DefaultWebSocketServerSession,
@@ -111,39 +69,9 @@ class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: 
 
 class PickFileResultEvent(val tag: PickFileTag, val type: PickFileType, val uris: Set<Uri>) : ChannelEvent()
 
-class ExportFileEvent(val type: ExportFileType, val fileName: String) : ChannelEvent()
-
 class ExportFileResultEvent(val type: ExportFileType, val uri: Uri) : ChannelEvent()
 
-class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids: Set<String>, val extra: Any? = null) : ChannelEvent()
-
-class AudioActionEvent(val action: AudioAction) : ChannelEvent()
-
-class IgnoreBatteryOptimizationEvent : ChannelEvent()
-class PowerConnectedEvent : ChannelEvent()
-class PowerDisconnectedEvent : ChannelEvent()
-class WebRequestReceivedEvent : ChannelEvent()
-data class KeepAwakeChangedEvent(val enabled: Boolean) : ChannelEvent()
-
-class IgnoreBatteryOptimizationResultEvent : ChannelEvent()
-
-class ClearAudioPlaylistEvent : ChannelEvent()
-
-class DownloadUpdateEvent : ChannelEvent()
-class CancelUpdateDownloadEvent : ChannelEvent()
-// UpdateDownloadProgressEvent / UpdateDownloadCompleteEvent / UpdateDownloadFailedEvent
-// moved to shared/.../events/UpdateDownloadEvents.kt so UpdateViewModel can pattern-match
-// on them without app/-side references.
-
 class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
-
-class SleepTimerEvent(val durationMs: Long) : ChannelEvent()
-
-class CancelSleepTimerEvent : ChannelEvent()
-
-class StartNearbyServiceEvent : ChannelEvent()
-class StartNearbyDiscoveryEvent : ChannelEvent()
-class StopNearbyDiscoveryEvent : ChannelEvent()
 
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
@@ -333,8 +261,8 @@ object AppEvents {
                                             output.write(buffer, 0, read)
                                             downloaded += read
                                             val progress = if (contentLength > 0) {
-                                                ((downloaded * 100) / contentLength).toInt().coerceIn(0, 99)
-                                            } else 0
+                                ((downloaded * 100) / contentLength).toInt().coerceIn(0, 99)
+                            } else 0
                                             sendEvent(UpdateDownloadProgressEvent(progress))
                                         }
                                     }

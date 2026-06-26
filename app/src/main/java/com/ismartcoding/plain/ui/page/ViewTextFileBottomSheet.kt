@@ -96,8 +96,8 @@ fun ViewTextFileBottomSheet(
             PCard {
                 PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
                 PListItem(title = stringResource(Res.string.type), value = m.path.getMimeType())
-                if (m.createdAt != null) {
-                    PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
+                m.createdAt?.let { createdAt ->
+                    PListItem(title = stringResource(Res.string.created_at), value = createdAt.formatDateTime())
                 }
                 PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
             }

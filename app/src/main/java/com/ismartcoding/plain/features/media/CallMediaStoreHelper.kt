@@ -5,7 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.BaseColumns
 import android.provider.CallLog
-import com.ismartcoding.plain.lib.content.ContentWhere
+import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.getTimeValue

@@ -8,8 +8,8 @@ import android.os.Build
 import android.provider.BaseColumns
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
-import com.ismartcoding.plain.lib.content.ContentWhere
-import com.ismartcoding.plain.lib.data.SortBy
+import com.ismartcoding.plain.helpers.ContentWhere
+import com.ismartcoding.plain.data.SortBy
 import com.ismartcoding.plain.lib.extensions.count
 import com.ismartcoding.plain.lib.extensions.forEach
 import com.ismartcoding.plain.lib.extensions.getLongValue

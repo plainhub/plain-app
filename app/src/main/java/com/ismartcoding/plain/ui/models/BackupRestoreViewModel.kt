@@ -15,7 +15,7 @@ import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.lib.helpers.ZipHelper
+import com.ismartcoding.plain.helpers.ZipHelper
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry

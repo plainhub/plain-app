@@ -3,7 +3,7 @@ package com.ismartcoding.plain.audio
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import com.ismartcoding.plain.lib.content.ContentWhere
+import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getLongValue
 import com.ismartcoding.plain.lib.extensions.getStringValue

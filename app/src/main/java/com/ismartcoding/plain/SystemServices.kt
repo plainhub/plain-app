@@ -41,10 +41,6 @@ val powerManager: PowerManager by lazy {
     MainApp.instance.getSystemServiceCompat(PowerManager::class.java)
 }
 
-val storageManager: StorageManager by lazy {
-    MainApp.instance.getSystemServiceCompat(StorageManager::class.java)
-}
-
 val wifiManager: WifiManager by lazy {
     MainApp.instance.getSystemServiceCompat(WifiManager::class.java)
 }

@@ -10,7 +10,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.lib.helpers.ZipHelper
+import com.ismartcoding.plain.helpers.ZipHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.helpers.ShareHelper

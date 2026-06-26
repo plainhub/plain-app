@@ -34,7 +34,7 @@ fun NearbyDeviceItem(
             titleSuffix = if (isPairing) {
                 { PStatusBadge(text = stringResource(Res.string.pending), type = BadgeType.WARN) }
             } else null,
-            subtitle = item.getBestIp(),
+            subtitle = com.ismartcoding.plain.lib.helpers.NetworkHelper.getBestIp(item.ips),
             icon = item.deviceType.getIcon(),
             action = {
                 when {

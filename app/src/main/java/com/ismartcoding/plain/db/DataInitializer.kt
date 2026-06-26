@@ -9,7 +9,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ismartcoding.plain.lib.extensions.cut
-import com.ismartcoding.plain.lib.helpers.StringHelper
+import com.ismartcoding.plain.helpers.StringHelper
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.helpers.TimeHelper
 

@@ -7,7 +7,7 @@ import android.content.Intent
 import androidx.core.content.FileProvider
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.lib.helpers.ZipHelper
+import com.ismartcoding.plain.helpers.ZipHelper
 import com.ismartcoding.plain.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
@@ -69,7 +69,7 @@ object AppLogHelper {
     }
 
     fun getFileSize(context: Context): Long {
-        val dir = File(DiskLogFormatStrategy.getLogFolder(context))
+        val dir = File(DiskLogFormatStrategy.getLogFolder())
         if (!dir.exists()) {
             return 0
         }
@@ -84,7 +84,7 @@ object AppLogHelper {
 
     fun export(context: Context) {
         coMain {
-            val logFolder = DiskLogFormatStrategy.getLogFolder(context)
+            val logFolder = DiskLogFormatStrategy.getLogFolder()
             val logFolderFile = File(logFolder)
             val crashReportFile = File(context.filesDir, "crash_report.txt")
             val crashLogFile = File(context.filesDir, "crash_log.txt")

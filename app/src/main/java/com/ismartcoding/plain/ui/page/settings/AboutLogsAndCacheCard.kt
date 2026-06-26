@@ -49,7 +49,7 @@ fun AboutLogsAndCacheCard(
         PListItem(
             modifier = Modifier.clickable {
                 navController.navigateTextFile(
-                    DiskLogFormatStrategy.getLogFolder(context) + "/latest.log", logsTitle, "", TextFileType.APP_LOG
+                    DiskLogFormatStrategy.getLogFolder() + "/latest.log", logsTitle, "", TextFileType.APP_LOG
                 )
             },
             title = stringResource(Res.string.logs),
@@ -65,7 +65,7 @@ fun AboutLogsAndCacheCard(
                     if (fileSize > 0L) {
                         PFilledButton(text = stringResource(Res.string.clear_logs), buttonSize = ButtonSize.SMALL, onClick = {
                             DialogHelper.confirmToAction(Res.string.confirm_to_clear_logs) {
-                                val dir = File(DiskLogFormatStrategy.getLogFolder(context))
+                                val dir = File(DiskLogFormatStrategy.getLogFolder())
                                 if (dir.exists()) dir.deleteRecursively()
                                 onFileSizeCleared()
                             }

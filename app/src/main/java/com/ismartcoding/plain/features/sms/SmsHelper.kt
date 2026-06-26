@@ -7,9 +7,9 @@ import android.provider.BaseColumns
 import android.provider.Telephony
 import android.telephony.SmsManager
 import androidx.core.net.toUri
-import com.ismartcoding.plain.lib.content.ContentWhere
-import com.ismartcoding.plain.lib.data.SortBy
-import com.ismartcoding.plain.lib.data.enums.SortDirection
+import com.ismartcoding.plain.helpers.ContentWhere
+import com.ismartcoding.plain.data.SortBy
+import com.ismartcoding.plain.data.SortDirection
 import com.ismartcoding.plain.lib.extensions.find
 import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getPagingCursorWithSql
