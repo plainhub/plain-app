@@ -52,12 +52,25 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             api(libs.room.runtime)
             api(libs.ktor.client.core)
+            implementation(libs.coil.compose)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.logging)
             implementation(libs.okhttp)
             implementation(libs.tink.android)
+            implementation(libs.androidx.exifinterface)
+            implementation(libs.coil)
+            implementation(libs.coil.svg)
+            implementation(libs.coil.gif)
+            implementation(libs.coil.video)
+            implementation(libs.coil.network.okhttp)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqlite.bundled)
+            implementation(libs.ktor.client.darwin)
+            implementation(libs.coil)
+            implementation(libs.coil.network.ktor3)
         }
         iosMain.dependencies {
             implementation(libs.sqlite.bundled)

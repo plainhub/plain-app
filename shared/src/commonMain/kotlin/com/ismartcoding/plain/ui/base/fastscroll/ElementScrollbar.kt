@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base.fastscroll
 
-import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -8,7 +7,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import com.ismartcoding.plain.ui.base.fastscroll.controller.StateController
 import com.ismartcoding.plain.ui.base.fastscroll.foundation.ScrollbarLayoutSettings
 import com.ismartcoding.plain.ui.base.fastscroll.foundation.VerticalScrollbarLayout
@@ -20,7 +20,7 @@ internal fun <IndicatorValue> ElementScrollbar(
     settings: ScrollbarSettings,
     indicatorContent: (@Composable (indicatorValue: IndicatorValue, isThumbSelected: Boolean) -> Unit)?,
 ) {
-    val view = LocalView.current
+    val hapticFeedback = LocalHapticFeedback.current
     val layoutSettings = remember(settings) {
         ScrollbarLayoutSettings(
             scrollbarPadding = settings.scrollbarPadding,
@@ -53,8 +53,8 @@ internal fun <IndicatorValue> ElementScrollbar(
                 orientation = Orientation.Vertical,
                 enabled = settings.selectionMode != ScrollbarSelectionMode.Disabled,
                 startDragImmediately = true,
-                onDragStarted = { offsetPixel ->
-                    view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+onDragStarted = { offsetPixel ->
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                     stateController.onDragStarted(
                         offsetPixels = offsetPixel.y,
                         maxLengthPixels = maxLengthPixels

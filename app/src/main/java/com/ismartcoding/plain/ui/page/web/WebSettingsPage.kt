@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.ismartcoding.plain.platform.openAppSettings
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -130,11 +131,7 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     VerticalSpace(dp = 16.dp)
                     val m = PermissionItem(null, Permission.NONE, setOf(Permission.NONE))
                     PCard {
-                        PListItem(modifier = Modifier.clickable {
-                            val intent = Intent(if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                            intent.addCategory(Intent.CATEGORY_DEFAULT); intent.data = Uri.fromParts("package", context.packageName, null)
-                            if (intent.resolveActivity(packageManager) != null) context.startActivity(intent) else DialogHelper.showMessage(Res.string.not_supported_error)
-                        }, icon = m.icon, title = m.permission.getText(), showMore = true)
+                        PListItem(modifier = Modifier.clickable { openAppSettings() }, icon = m.icon, title = m.permission.getText(), showMore = true)
                     }
                 }
                 item {

@@ -20,6 +20,7 @@ import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.extensions.normalizeComparison
 import com.ismartcoding.plain.extensions.parseSizeToBytes
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.file.toSortBy
 import com.ismartcoding.plain.features.media.BaseMediaContentHelper
 import com.ismartcoding.plain.helpers.QueryHelper
 

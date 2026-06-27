@@ -78,7 +78,7 @@ fun ChatTextPage(
                                 fontSize = 20.sp,
                                 lineHeight = 36.sp,
                             ),
-                        onClick = { position -> text.urlAt(context, position) },
+                        onClick = { position -> text.urlAt(position) },
                     )
                 }
             }

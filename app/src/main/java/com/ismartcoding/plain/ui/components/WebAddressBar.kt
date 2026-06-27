@@ -84,10 +84,10 @@ fun WebAddressBar(
                 if (hostnameChanged) {
                     hostname = newHostname
                     TempData.mdnsHostname = newHostname
-                    persistMdnsHostname(context, scope, newHostname)
+                    persistMdnsHostname(scope, newHostname)
                 }
                 if (portChanged) {
-                    persistPort(context, scope, isHttps, newPort)
+                    persistPort(scope, isHttps, newPort)
                 }
                 mdnsEditDialogVisible = false
                 if (hostnameChanged || portChanged) {
@@ -103,7 +103,7 @@ fun WebAddressBar(
             currentPort = port.value,
             onDismiss = { portDialogVisible = false },
             onSelect = {
-                persistPort(context, scope, isHttps, it)
+                persistPort(scope, isHttps, it)
                 portDialogVisible = false
                 showRestartAppDialog(context)
             },

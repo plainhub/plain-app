@@ -43,7 +43,7 @@ fun ChatText(
                     chatVM.select(m.id)
                 } else {
                     focusManager.clearFocus()
-                    text.urlAt(context, position)
+                    text.urlAt(position)
                 }
             },
             onDoubleClick = onDoubleClick,

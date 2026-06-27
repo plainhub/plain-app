@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.lib.extensions.getFinalPath
 import com.ismartcoding.plain.db.DLinkPreview
+import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
@@ -33,7 +34,7 @@ fun ChatLinkPreview(linkPreview: DLinkPreview, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
             .clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.cardBackgroundNormal)
-            .clickable { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(linkPreview.url))) },
+            .clickable { launchUrl(linkPreview.url) },
     ) {
         Column {
             val imageLocalPath = linkPreview.imageLocalPath

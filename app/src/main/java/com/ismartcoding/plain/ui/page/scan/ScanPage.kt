@@ -131,7 +131,7 @@ fun ScanPage(navController: NavHostController) {
     if (!hasCamPermission) sendEvent(RequestPermissionsEvent(Permission.CAMERA))
     DisposableEffect(Unit) { onDispose { cameraProvider?.unbindAll() } }
     if (showScanResultSheet) {
-        QrScanResultBottomSheet(context, scanResult) { showScanResultSheet = false; cameraDetecting.value = true }
+        QrScanResultBottomSheet(scanResult) { showScanResultSheet = false; cameraDetecting.value = true }
     }
     pendingPairData?.let { pairData ->
         AlertDialog(

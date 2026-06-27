@@ -129,6 +129,6 @@ fun ViewMediaBottomSheet(
     }
 
     if (showQrScanResult) {
-        QrScanResultBottomSheet(context, qrScanResult) { showQrScanResult = false }
+        QrScanResultBottomSheet(qrScanResult) { showQrScanResult = false }
     }
 }

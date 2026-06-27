@@ -6,8 +6,12 @@ import android.os.Build
 @PublishedApi
 internal var appContextValue: Context? = null
 
-fun setAppContext(context: Context) {
+@PublishedApi
+internal var buildTypeValue: String = ""
+
+fun setAppContext(context: Context, buildType: String = "") {
     appContextValue = context
+    buildTypeValue = buildType
 }
 
 val appContext: Context

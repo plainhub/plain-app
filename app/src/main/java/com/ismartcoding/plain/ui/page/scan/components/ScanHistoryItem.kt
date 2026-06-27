@@ -86,7 +86,7 @@ fun ScanHistoryItem(
                 ClickableText(
                     text = newText,
                     style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                    onClick = { position -> newText.urlAt(context, position) },
+                    onClick = { position -> newText.urlAt(position) },
                 )
             }
 

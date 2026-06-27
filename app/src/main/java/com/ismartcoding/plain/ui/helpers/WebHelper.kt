@@ -3,8 +3,7 @@ package com.ismartcoding.plain.ui.helpers
 import com.ismartcoding.plain.i18n.*
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
+import com.ismartcoding.plain.platform.launchUrl
 
 object WebHelper {
     fun open(
@@ -12,7 +11,7 @@ object WebHelper {
         url: String,
     ) {
         try {
-            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            launchUrl(url)
         } catch (ex: java.lang.Exception) {
             DialogHelper.showMessage(Res.string.no_browser_error)
         }

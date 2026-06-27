@@ -2,11 +2,11 @@ package com.ismartcoding.plain.ui.base
 
 import org.jetbrains.compose.resources.DrawableResource
 import com.ismartcoding.plain.i18n.*
-import android.content.ClipData
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 @Composable
@@ -19,13 +19,13 @@ fun CopyIconButton(
     copiedMessage: String = text,
     onCopied: (() -> Unit)? = null,
 ) {
+    val clipboard = LocalClipboardManager.current
     PIconButton(
         icon = icon,
         modifier = modifier,
         contentDescription = contentDescription,
         click = {
-            val clip = ClipData.newPlainText(clipLabel, text)
-            clipboardManager.setPrimaryClip(clip)
+            clipboard.setText(AnnotatedString(text))
             DialogHelper.showTextCopiedMessage(copiedMessage)
             onCopied?.invoke()
         },

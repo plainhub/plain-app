@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.scan.components
 
-import android.content.Context
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,7 +16,6 @@ import com.ismartcoding.plain.ui.base.urlAt
 
 @Composable
 fun ScanResult(
-    context: Context,
     text: String,
 ) {
     PCard {

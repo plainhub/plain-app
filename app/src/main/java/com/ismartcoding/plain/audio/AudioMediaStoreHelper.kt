@@ -15,6 +15,7 @@ import com.ismartcoding.plain.lib.isQPlus
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.file.toSortBy
 import com.ismartcoding.plain.features.media.BaseMediaContentHelper
 
 object AudioMediaStoreHelper : BaseMediaContentHelper() {

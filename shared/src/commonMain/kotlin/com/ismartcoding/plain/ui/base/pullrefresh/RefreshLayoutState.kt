@@ -8,13 +8,13 @@ import kotlin.math.abs
 
 @Stable
 class RefreshLayoutState(
-    internal val onRefreshListener: RefreshLayoutState.() -> Unit
+    val onRefreshListener: RefreshLayoutState.() -> Unit
 ) {
-    internal val refreshContentState = mutableStateOf(RefreshContentState.Finished)
-    internal val refreshContentOffsetState = Animatable(0f)
-    internal val composePositionState = mutableStateOf(ComposePosition.Top)
-    internal val refreshContentThresholdState = mutableFloatStateOf(0f)
-    internal lateinit var coroutineScope: CoroutineScope
+    val refreshContentState = mutableStateOf(RefreshContentState.Finished)
+    val refreshContentOffsetState = Animatable(0f)
+    val composePositionState = mutableStateOf(ComposePosition.Top)
+    val refreshContentThresholdState = mutableFloatStateOf(0f)
+    lateinit var coroutineScope: CoroutineScope
     var canCallRefreshListener = true
 
     internal val isScopeInitialized: Boolean get() = ::coroutineScope.isInitialized

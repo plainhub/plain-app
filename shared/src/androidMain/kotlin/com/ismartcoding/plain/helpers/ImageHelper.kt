@@ -148,19 +148,15 @@ object ImageHelper {
         if (!file.exists()) {
             return IntSize.Zero
         }
-        
-        val size = if (path.endsWith(".svg", true)) {
-            SvgHelper.getSize(path)
-        } else {
-            try {
-                val options = BitmapFactory.Options()
-                options.inJustDecodeBounds = true
-                BitmapFactory.decodeFile(path, options)
-                IntSize(options.outWidth, options.outHeight)
-            } catch (e: Exception) {
-                LogCat.e(e.toString())
-                IntSize.Zero
-            }
+
+        val size = try {
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            BitmapFactory.decodeFile(path, options)
+            IntSize(options.outWidth, options.outHeight)
+        } catch (e: Exception) {
+            LogCat.e(e.toString())
+            IntSize.Zero
         }
 
         if (rotation == 90 || rotation == 270) {

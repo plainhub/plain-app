@@ -2,8 +2,6 @@ package com.ismartcoding.plain.ui.page.chat.components
 
 import com.ismartcoding.plain.i18n.*
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,7 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import com.ismartcoding.plain.platform.launchUrl
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,11 +41,10 @@ fun ChatLinkPreviewLoading(url: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun ChatLinkPreviewError(url: String, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
     Card(
         modifier = modifier.fillMaxWidth().padding(vertical = 6.dp)
             .border(width = 1.dp, color = MaterialTheme.colorScheme.error.copy(alpha = 0.3f), shape = RoundedCornerShape(12.dp))
-            .clickable { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) },
+            .clickable { launchUrl(url) },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)

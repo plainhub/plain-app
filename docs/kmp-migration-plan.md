@@ -384,3 +384,270 @@ plain-app/
 | 2026-06-27 | 全 build 验证 | `:shared:compileCommonMainKotlinMetadata :app:assembleFdroidDebug :app:assembleGithubDebug :app:assembleGoogleDebug` 全绿 (141 task, 1 executed, 140 up-to-date, 1s) |
 | 2026-06-27 | Phase 19 — chat/ 目录全迁移 (用户指定 "chat 目录功能全 Migrate")| **目标**：`app/chat/` (26 文件, 2888 行) 全部搬到 shared。<br>**最终结果**：26 文件全到 `shared/androidMain/chat/`，`app/chat/` 空。<br>**核心 trick** — **干掉 ahocorasick Java 库做纯 KMP**：<br>- 原 ahocorasick 是 Java Aho-Corasick 库 (31 个 .java 文件)，Pinyin 引擎用它做多模式匹配。新的 KMP `com.android.kotlin.multiplatform.library` 插件默认不启用 Java，需要 `withJava()` 但与纯 KMP 哲学冲突。<br>- 解决方案：写**纯 Kotlin 版 Trie + Emit**（`shared/.../ahocorasick/trie/Trie.kt`，~40 行）替代。整个 ahocorasick 库 31 个 Java 文件全部删除。<br>- 新 Trie API：`Trie()` + `addKeyword(keyword)` + `parseText(text): Collection<Emit>`。<br>- 新 Emit API：`data class Emit(val start: Int, val keyword: String)` + `val end: Int` + `fun size()`。<br>- `Engine.kt` / `ForwardLongestSelector.kt` / `SegmentationSelector.kt` / `Utils.kt` 全部改用新 API（`emit.end` 用新 getter，`emit.size()` 仍可用）。<br>- Pinyin `mTrieDict: Trie?` 字段保持 public（原本 internal 但作为 var 必须 public 给 Pinyin 用）。<br>**主链迁移** (26 个 chat 文件)：<br>- `chat/data/{ChatTarget,ChatTargetType}.kt` → `shared/commonMain/chat/data/` (pure data)<br>- `chat/download/{DownloadStatus,DownloadProgress,DownloadTask,DownloadQueue,PeerFileDownloader}.kt` → `shared/androidMain/chat/download/` (用 OkHttpClient 5.3.2 KMP-ready)<br>- `chat/peer/{PeerCacher,PeerChatParser,PeerChatSender,PeerGraphQLClient,PeerManager,PeerRuntime,PeerStatusManager}.kt` → `shared/androidMain/chat/peer/`<br>- `chat/channel/{ChannelCacher,ChannelChatSender,ChannelManager,ChannelRuntime,ChannelSystemMessage,ChannelSystemMessageReceiver,ChannelSystemMessageSender}.kt` → `shared/androidMain/chat/channel/`<br>- `chat/{ChatCacher,ChatDbHelper,ChatManager,ChatMessageReceiver,ChatSender}.kt` → `shared/androidMain/chat/`<br>**链上 deps 一并搬到 shared**：<br>- `lib/extensions/{Context,Cursor,Bundle,ContentResolver,Bitmap,HttpResponse,Intent,List,Long,Uri}.kt` + `lib/extensions/String.kt` (881 行) + `lib/Constants.kt` (PHOTO/VIDEO/AUDIO/RAW 扩展) + `lib/pinyin/*.kt` (13 文件含 ahocorasick 替代) + `lib/helpers/{NetworkHelper,CryptoHelper}.kt`<br>- `extensions/{File,List,Cursor,Locale}.kt`<br>- `db/{DPeerExtensions,DChatChannelExtensions,DChatExtensions}.kt`<br>- `helpers/{FileHelper,AppFileStore,ChatFileSaveHelper,PhoneHelper,SignatureHelper,NotificationHelper,ZipHelper,PathHelper}.kt`<br>- `api/OkHttpClientFactory.kt`<br>- `data/DPairingSession.kt` (含 `java.security.KeyPair` JVM-only，放 androidMain)<br>- `discover/{NearbyDiscoverManager,NearbyNetwork,NearbyPairing,PairingInitiator,PairingMessenger,PairingPeerStore,PairingResponder,PairingSecurity,PairingSessionStore}.kt` (8 文件，NearbyDiscoverManager + 7 Pairing* 全部到 shared)<br>- `events/AppEvents.kt` 部分事件 + `events/HttpApiEvents.kt` (HDownloadTaskDoneEvent + HMessageCreatedEvent → shared/androidMain/events/)<br>- `web/models/*.kt` 35 个 (纯 data + toModel extension) 搬到 `shared/androidMain/web/models/`；12 个有 Android-only deps (App/Audio/Call/Contact/FeedEntry/File/ImageSearchModels/Message/MessageConversation/Package/Peer/PomodoroToday) 留 app/<br>- `SystemServices.kt` (20+ system service 顶层 val) → `shared/androidMain/`<br>- `enums/AppFeatureType.kt` (BuildConfig + Permission 依赖) → `shared/androidMain/`<br>- `data/ContactGroups.kt` (DGroup + DContactSource) → `shared/commonMain/data/`<br>- `db/DDoc.kt` (用 String.kt 的 getFilenameExtension) → `shared/androidMain/db/`<br>- `AppContext.kt` (已有 Phase 18.1，新增 `getAppVersion()` + `getAndroidVersion()` 替代 `MainApp.getAppVersion()`)<br>- `lib/extensions/SortNameExt.kt` (toSortName 用 Pinyin.toPinyin，在 shared 引用 Pinyin 即可)<br>**关键 fix**：<br>1. **`web.models.toModel` import 模糊**：包内有 40+ `fun X.toModel()` extensions，`import com.ismartcoding.plain.web.models.toModel` 在 Kotlin 里会引入所有，导致 `it.toModel()` ambiguity。**Fix**：在 `web/models/ChatChannel.kt` 加 2 个 wrapper 函数 `dchatChannelToModel(c: DChatChannel): ChatChannel = c.toModel()` + `dchatToModel(c: DChat): ChatItem = c.toModel()`，callers 改用 wrapper。`ChannelManager.kt` 用 `dchatChannelToModel`，`ChatMessageReceiver.kt` 用 `dchatToModel`。<br>2. **`MainApp.getAppVersion()` 不可用**：在 `shared/.../AppContext.kt` 加 `fun getAppVersion(): String` 读 `appContext.packageManager.getPackageInfo()`，`NearbyDiscoverManager.kt` 用 `getAppVersion()` 替代 `BuildConfig.VERSION_NAME`。<br>3. **`BuildConfig` (app/-only) 在 shared 不可用**：`NearbyDiscoverManager.kt` 改用 `getAppVersion()`；`AppFeatureType.kt` 退回 app/（只在 Permissions.kt 用）。<br>4. **`Permission` + `Permissions` (449 行, Android-only) 在 shared 不可用**：`Permissions.kt` 整个留 app/。`ChatMessageReceiver.kt` 原本用 `Permission.POST_NOTIFICATIONS.can(context)`，改用 inline check `canShowNotifications(context)` helper (用 `isTPlus()` + `NotificationManagerCompat`)。`App.kt` web model 留 app/（用 Permission）。<br>5. **`NotificationHelper` (Android-only, 用 MainActivity + R + Permission + receivers)**：留 app/。`ChatMessageReceiver.kt` 改用新 event `ChatMessageNotificationEvent` (in shared/commonMain/events/AppEvents.kt) 替代直接调用 `NotificationHelper.sendChatMessageNotification`。app/ 端 listener 处理 notification（在 MainApp 注册 event handler 时调用 `NotificationHelper.sendChatMessageNotification`）。<br>6. **`getContentData()` 在 `data = getContentData()` 上下文触发 Kotlin 解析歧义**：`ChatItem.kt` 的 `DChat.toModel()` 改成 `val ci = ChatItem(...); ci.data = ci.getContentData(); return ci`（避免 `apply { data = getContentData() }` 的 `data` soft keyword 冲突）。callers 也改成不用 `apply`。<br>7. **跨 module smart cast**：`PeerGraphQL.kt:156` `decryptResult.content` 跨模块 public API，smart cast 失败。改用 `!!` 强制非空（已在 null check 之后）。<br>**回滚 (留 app/)**：<br>- `helpers/NotificationHelper.kt` (用 MainActivity + R + Permission + receivers)<br>- `features/Permissions.kt` (449 行, 用 MainActivity + AppCompat + services + Permission chain)<br>- `features/Notifications.kt` 之类重 app/ 端<br>- `enums/AppFeatureType.kt` (用 BuildConfig + Permission)<br>- `web/models/{App,Audio,Call,Contact,FeedEntry,File,ImageSearchModels,Message,MessageConversation,Package,Peer,PomodoroToday}.kt` (12 个有 Android-only deps)<br>- `discover/` 中没动的部分（NsdHelper 等 mdns 标永远 Android-Only）<br>**Build 验证**：`./gradlew :shared:compileCommonMainKotlinMetadata :app:assembleFdroidDebug :app:assembleGithubDebug :app:assembleGoogleDebug` 全绿 (141 task, 37 executed, 104 up-to-date, 41s)。<br>**净迁移 Phase 19**：app/ -7 kt (1034→1027, 含 5 个回滚 + 一些 app/-only helper); shared/commonMain: 269 → 273 (+4, DPairingMessages 重 + ContactGroups); shared/androidMain: 40 → 141 (+101, 含 chat 全 26 + 链上 deps ~75); **app/chat/ 0 文件，app/discover/ 0 文件**；**app/web/models/ 12 文件留 (Android-only)**。|
 | 2026-06-27 | 累计进度 (Phase 15-19) | shared/commonMain: 269 → 273 (+4) ; shared/androidMain: 40 → 141 (+101) ; shared/iosMain: 11 → 11 (0) ; app/src/main: 1133 → 1027 (-106) ; **净迁移 +105 文件 (4 轮累加: Phase 15-16 +5, Phase 18 +18, Phase 19 +82)** |
+
+| 2026-06-27 | **用户目标**：Migrate 大部分代码特别是 ui/ 目录，让 iOS app 直接用同样界面（隐藏 Android-only 功能）。当前基线：app/ 1027 文件 / shared/ 425 文件 (29%)。本规划拆为 Phase 20-26。 |
+
+## Phase 20 — Platform Abstraction Layer (PAL) expect/actual 化
+
+**目标**：把 285 处 `MainActivity.instance` / 124 处 `LocalContext.current` / 13 处 Intent / 5 处 Service / 5 处 WebView / 6 处 PdfRenderer / 3 处 PowerManager 等 Android-only API 全部封装成 `expect/actual`，让 ui/ 文件可以无修改搬到 shared。
+
+**新增 expect/actual 清单**（集中在 `shared/.../platform/`）：
+
+| expect fun | androidMain actual | iosMain actual | 替换的 Android-only API |
+|------------|--------------------|-----------------|-------------------------|
+| `expect fun showToast(text: String, long: Boolean = false)` | `Toast.makeText(...).show()` | UIAlertController 简短弹窗 | Toast |
+| `expect fun launchUrl(url: String)` | `Intent(ACTION_VIEW).startActivity()` | `UIApplication.openURL` | Intent ACTION_VIEW |
+| `expect fun shareText(text: String)` | `Intent(ACTION_SEND)` + `chooser` | `UIActivityViewController` | Intent ACTION_SEND |
+| `expect fun shareFiles(paths: List<String>)` | FileProvider + Intent | `UIActivityViewController` | FileProvider |
+| `expect fun pickFile(type: String): Flow<File?>` | SAF `ACTION_OPEN_DOCUMENT` | `UIDocumentPickerViewController` | SAF |
+| `expect fun pickFiles(types: List<String>): Flow<List<File>>` | SAF multi | UIDocumentPicker multi | SAF multi |
+| `expect fun pickFileOutput(name: String, type: String): Flow<File?>` | SAF `ACTION_CREATE_DOCUMENT` | `UIDocumentPicker` export | SAF create |
+| `expect fun registerScreenCapture(): Flow<Bitmap>` | `MediaProjectionManager` | `ReplayKit.RPScreenRecorder` | MediaProjection |
+| `expect fun requirePermission(p: Permission): Flow<Boolean>` | `ActivityResultContracts` | 自定义 iOS permission handler | Android Activity result |
+| `expect fun isPermissionGranted(p: Permission): Boolean` | `ContextCompat.checkSelfPermission` | 系统 API | checkSelfPermission |
+| `expect fun openAppSettings()` | `Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)` | `UIApplication.openSettingsURLString` | App settings |
+| `expect fun wakeLock(timeoutMs: Long): WakeLock` | `PowerManager.newWakeLock` | `UIApplication.beginBackgroundTask` | PowerManager |
+| `expect fun getBatteryLevel(): Int` | `BatteryManager` | `UIDevice.current.batteryLevel` | Battery |
+| `expect fun getNetworkType(): NetworkType` | `ConnectivityManager` | `NWPathMonitor` | ConnectivityManager |
+| `expect fun isBluetoothEnabled(): Boolean` | `BluetoothAdapter` | `CBCentralManager.state` | Bluetooth |
+| `expect fun isCameraAvailable(): Boolean` | `PackageManager.hasFeature(FEATURE_CAMERA)` | `AVCaptureDevice.authorizationStatus` | Camera |
+| `expect fun capturePhoto(): File?` | `ActivityResultContracts.TakePicture` | `UIImagePickerController` | Camera intent |
+| `expect fun getDeviceName(): String` | `Build.MODEL` + `Build.MANUFACTURER` | `UIDevice.current.name` | Build |
+| `expect fun getInstallSource(): String` | `packageManager.getInstallerPackageName` | bundle URL | Installer |
+| `expect fun MainActivity(): Any?` | `MainActivity.instance` | `null` (UIViewController) | MainActivity.instance |
+| `expect fun getBuildType(): BuildType` (Fdroid/Github/Google × debug/release) | `BuildConfig.BUILD_TYPE + FLAVOR` | `Bundle.main.bundleIdentifier` | BuildConfig |
+
+**核心 trick**:
+- `MainActivity.instance` 5 处 → `expect fun MainActivity(): Any?` (androidMain returns activity, iosMain returns null). 在需要 `ComponentActivity` 的地方用 `as? ComponentActivity ?: null`.
+- 124 处 `LocalContext.current as Context` → 已经有 shared `appContext` (Phase 18 AppContext.kt), 优先用 `appContext`, 必要时 `LocalContext.current`.
+- `BuildConfig` 在 shared 不可用 → Phase 19 已经在 `getAppVersion()` 用 `appContext.packageManager.getPackageInfo()`, `getBuildType()` 同理.
+- `expect/actual` 不能跨 platform 修改 `MainActivity.instance` 这种静态字段 → 必须替换调用方代码, 不能 hook.
+
+**新建文件**:
+- `shared/commonMain/.../platform/PlatformAbstractions.kt` (35+ expect fun)
+- `shared/commonMain/.../platform/FilePicker.kt`
+- `shared/commonMain/.../platform/Permissions.kt`
+- `shared/commonMain/.../platform/Share.kt`
+- `shared/commonMain/.../platform/ScreenCapture.kt`
+- `shared/commonMain/.../platform/AppInfo.kt`
+- `shared/commonMain/.../platform/Battery.kt`
+- `shared/commonMain/.../platform/Power.kt`
+- `shared/commonMain/.../platform/Bluetooth.kt`
+- `shared/commonMain/.../platform/Camera.kt`
+- `shared/commonMain/.../platform/Connectivity.kt`
+- `shared/androidMain/.../platform/Platform.android.kt` (所有 actual)
+- `shared/iosMain/.../platform/Platform.ios.kt` (所有 actual)
+
+**预计改动**: 1 个 PlanEntry + ~12 个新 shared 文件 + ~285 处 MainActivity.instance 替换 + ~50 处 Intent 替换.
+
+**Build 验证**: 全绿 + 各 expect/actual 都有 androidMain + iosMain 实现.
+
+---
+
+## Phase 21 — UI base 第三方依赖子目录 expect/actual 化 (61 个 .kt → shared)
+
+**目标**：app/ui/base/ 第三方子目录 (61 个 .kt) 全部搬到 shared/commonMain/ui/base/ 对应子目录.
+
+| 子目录 | .kt 数 | Android-only 依赖 | 跨平台方案 |
+|--------|--------|-------------------|------------|
+| `coil/` | 3 | Coil 2.x (AsyncImage) | `expect fun AsyncImage(model: Any, ...)` — androidMain 用 Coil, iosMain 用 `UIImage` + Kingfisher 或 Ktor HTTP client |
+| `colorpicker/` | 18 | 纯 Compose + Canvas | 全部搬到 shared/commonMain (无 Android-only) |
+| `fastscroll/` | 16 | 纯 Compose LazyColumn/Grid | 全部搬到 shared/commonMain |
+| `markdowntext/` | 3 | `compose-markdown` | 用 multiplatform-markdown-renderer (jetbrains/compose) |
+| `mdeditor/` | 10 | Compose TextField + markdown live preview | 自己实现: shared/commonMain `MDEditorTextField` + markdown preview |
+| `pullrefresh/` | 11 | Material3 PullToRefresh | Material3 1.3+ 已经有跨平台 PullToRefresh, 直接搬 |
+
+**核心 trick**:
+- Coil 2.x 不支持 iOS KMP target. **方案 1**: 用 expect/actual 包 AsyncImage, androidMain = Coil, iosMain = 简单 Box + `Painter` (用 Ktor 下载图片到本地 cache). **方案 2**: 换 multiplatform Coil 3.x. 选 2 (改造成本低).
+- `colorpicker/` 18 个 .kt 看起来多但都是 HsvColorPicker 的派生组件 + state class, 纯 Compose 无 Android API, 应该全部 commonMain.
+- `fastscroll/` 16 个 .kt 是 LazyColumn fast scroll thumb + 状态管理, 纯 Compose, 全 commonMain.
+- `markdowntext/` 用 jetbrains 官方 `org.jetbrains.compose.markdown` (KMP-ready) 替换.
+
+**app/ui/base 顶层 10 个简单文件**:
+- `AceEditor.kt`, `ClipboardCard.kt`, `CopyIconButton.kt`, `MediaPageTitle.kt`, `MediaTopBar.kt`, `MinimalScrollHandle.kt`, `NeedPermissionColumn.kt`, `PDonationBanner.kt`, `PdfView.kt`, `TextLinkActions.kt` → 检查后大部分搬到 shared (PdfView 用 multiplatform-pdf-renderer, NeedPermissionColumn 用 Phase 20 `requirePermission`).
+- `PdfView.kt`: 用 expect/actual PdfRenderer (androidMain = `android.graphics.pdf.PdfRenderer`, iosMain = PDFKit `PDFDocument`).
+
+**预计改动**: 71 个 .kt 文件全部到 shared.
+
+---
+
+## Phase 22 — UI components 全迁移 (81 → 0)
+
+**目标**：app/ui/components/ 81 个文件全搬到 shared/commonMain/ui/components/.
+
+**分批** (按依赖深度):
+
+### Phase 22.1 — 纯 Compose (28 个, 无 Android-only)
+- `AddToHomeDialog.kt`, `ColorPickerDialog.kt`, `DeviceRenameDialog.kt`, `FileRenameDialog.kt`, `FileSortDialog.kt`, `FolderKanbanDialog.kt`, `FolderKanbanOptions.kt`, `FeedEntryListItem.kt`, `FeedListItem.kt`, `ImageMetaRows.kt`, `MediaFilesSelectModeBottomActions.kt`, `MediaFolderGridItem.kt`, `MediaFolderListItem.kt`, `NoteListItem.kt`, `SortAndBrowseDialog.kt`, `TagSelector.kt`, `VideoMetaRows.kt`, `WebAddressBarActions.kt`, `WebAddressBarEditDialogs.kt`, `WebAddressBarRow.kt`
+
+### Phase 22.2 — Coil 依赖 (5 个, 等 Phase 21.1 完成)
+- `DocItem.kt`, `ImageGridItem.kt`, `PackageListItem.kt`, `VideoGridItem.kt` (用 `AsyncImage` from Phase 21.1)
+
+### Phase 22.3 — Intent/Activity 依赖 (10 个, 用 Phase 20 PAL)
+- `QrScanResultBottomSheet.kt` (相机 → Phase 20 `capturePhoto`)
+- `WebAddressBar.kt`, `WebAddressBarQrDialog.kt` (扫码 → Phase 20)
+- 其余用 `launchUrl` / `shareText` 替换
+
+### Phase 22.4 — WebView 依赖 (5 个, expect/actual WebView)
+- `EditorWebViewClient.kt`, `EditorWebViewInterface.kt` → expect/actual `WebView` (androidMain = `android.webkit.WebView`, iosMain = `WKWebView` via `UIKit.UIViewControllerRepresentable`)
+
+### Phase 22.5 — mediaviewer/ (子目录)
+- 17 个左右文件, 纯 Compose, 全搬.
+
+**预计改动**: 81 → 0.
+
+---
+
+## Phase 23 — UI page 全迁移 (184 → 0)
+
+**目标**：app/ui/page/ 184 个文件全搬到 shared/commonMain/ui/page/.
+
+**Hide Android-only 模式**:
+```kotlin
+@Composable
+fun SomePage() {
+    if (isAndroidOnly()) {
+        AndroidOnlyFeature()
+    }
+    // 全平台 feature
+    CommonFeature()
+}
+```
+
+**分批** (按 feature 域):
+
+| Phase | 子目录 | 文件数 | 关键 trick | 风险 |
+|-------|--------|--------|-----------|------|
+| 23.1 | settings/ | 9 | `BuildConfig.BUILD_TYPE` → `getBuildType()`, `ComponentShowcasePage` 直接搬 | low |
+| 23.2 | home/ | 20 | `OnlineSessionsIndicator` 用 Ktor client (shared), `UpdateBanner` 用 `appContext.packageManager` | medium |
+| 23.3 | chat/ | 37 | `ChatPage` 最大 page 之一, 用 Phase 19 ChatManager (已 shared), WebSocketHelper (shared), `TopBarChat` 部分用 Android-only 菜单 (hide) | high |
+| 23.4 | tools/ | 2 | `SoundMeterRecorder` 用 `getAudioRecord()` expect/actual (androidMediaRecorder / iOS AVAudioRecorder) | medium |
+| 23.5 | files/ | 15 | `FileActionsHelper` 用 Phase 20 Intent helpers, 子 components 用 Coil | medium |
+| 23.6 | media/ (含 audio 22 + images 7 + docs 7 + cast 8 + dlna 7 + scan 5) | 56 | audio/video 用 Media3 expect/actual (androidMain = Media3 ExoPlayer, iosMain = AVPlayer); cast/DLNA iOS hide | high |
+| 23.7 | pomodoro/ | 7 | `PomodoroHelper` 用 NotificationManager (Phase 20 PAL) | medium |
+| 23.8 | feeds/ | 15 | `FeedWorkerStatus` 已迁 shared (Phase 15) | medium |
+| 23.9 | connections/ | 6 | Bluetooth 用 Phase 20 `isBluetoothEnabled()`, Nearby 用已经迁的 `NearbyDiscoverManager` | medium |
+| 23.10 | appfiles/ | 5 | 用 Phase 20 file picker | low |
+| 23.11 | devoptions/ | 1 | `WebDevPage` 用 WebView (Phase 22.4) | low |
+| 23.12 | tools 外的杂项 | ~2 | `TextFilePage`, `OtherFilePage`, `ViewTextContentBottomSheet`, `CrashReportDialog` | low |
+
+**预计改动**: 184 → 0.
+
+---
+
+## Phase 24 — ViewModel 全迁移 (17 → 0)
+
+**目标**: app/src/main/java/com/ismartcoding/plain/ui/models/ 下 26 个 ViewModel, shared 9 个已迁 (Files/Notes/Note/Tags/FeedEntry/ScanHistory/Update + ISelectable/ISearchable interface), 剩 17 个.
+
+**chain move 模式**: 每个 VM 5-15 个 chain 文件, 按 FilesViewModel 模式 (Phase 18.1-18.3) 走.
+
+| VM | chain 文件数 | 关键依赖 | 估计工作量 |
+|----|--------------|----------|------------|
+| MainViewModel | ~5 | HttpServerManager (Android-only Ktor), Permission | 2h |
+| ChatViewModel + ChannelViewModel + PeerViewModel | ~3 | ChatManager/ChannelManager/PeerManager (Phase 19 已 shared) | 1h |
+| AppsViewModel + NotificationSettingsViewModel | ~3 | DPackage (Android-only), PackageHelper | 1h |
+| AudioViewModel + AudioPlaylistViewModel + VideosViewModel + ImagesViewModel + DocsViewModel | ~10 | DAudio/DPlaylistAudio (Phase 19 留 app/Media3-only), MediaStore | 4h |
+| FeedsViewModel + FeedEntriesViewModel + FeedSettingsViewModel | ~5 | FeedEntryHelper (已 shared) | 1.5h |
+| PomodoroViewModel | ~3 | PomodoroHelper (Notification + MediaPlayer) | 1.5h |
+| SessionsViewModel + WebConsoleViewModel | ~5 | HttpServerManager (Android-only) | 2h |
+| CastViewModel + DlnaReceiverViewModel | ~5 | CastPlayer/DLNA receiver (Android-only) | 2h |
+| NearbyViewModel | ~3 | Bluetooth + NearbyDiscoverManager (Phase 19 已 shared) | 1h |
+| MediaFoldersViewModel + TextFileViewModel | ~5 | MediaStore + FileSystemHelper (shared) | 1.5h |
+| BackupRestoreViewModel | ~3 | ZipHelper + FileSystemHelper (shared) | 1h |
+| MdEditorViewModel | ~3 | mdeditor (Phase 21 跨平台化) | 1h |
+
+**iOS hide 策略**: Android-only 依赖的 VM 在 iOS 上不实例化, ViewModelProvider 用 `if (isAndroidOnly()) { RealVM() } else { StubVM() }`.
+
+**预计改动**: 17 VM → 0 (剩 stub 给 iOS).
+
+---
+
+## Phase 25 — iOS 适配 + 业务逻辑跨平台化
+
+**目标**: 让 iOS app 真正能 build + run + 用大部分功能.
+
+**现状**: iosApp/iosApp/ContentView.swift 用 `UIViewControllerRepresentable` 包 `SharedAppNavHostKt.SharedAppNavHost()`, 已能跑 Compose UI.
+
+**iOS 必须有的适配**:
+
+1. **MainApp.onCreate 适配** (app/MainApp.kt onCreate 140 行)
+   - 拆 expect/actual: `expect fun initApp()`, `expect fun initHttpServer()`, `expect fun initNotification()`, `expect fun initDatabase()`, `expect fun initLogging()`
+   - androidMain actual 跑 MainApp.onCreate 全部逻辑
+   - iosMain actual 跑 ios-equivalent (init AppDatabase + Logging + Channel 事件订阅)
+
+2. **Service 适配** (app/services/ 8 文件)
+   - `AudioPlayerService`, `HttpServerService`, `ScreenMirrorService`, `PNotificationListenerService`, `PlainAccessibilityService`, `QSTileService` → 全部 Android-only, iosMain actual = 空操作
+   - 用 Phase 20 `expect fun startService(s: ServiceType): Boolean`
+
+3. **BroadcastReceiver 适配** (app/receivers/ 5 文件)
+   - `BatteryReceiver`, `NetworkStateReceiver`, `PeerChatReplyReceiver`, `PlugInControlReceiver`, `ServiceStopBroadcastReceiver` → Android-only
+   - 用 Phase 20 `expect fun registerReceiver(...)`, iosMain actual = iOS NotificationCenter
+
+4. **MainActivity.kt** (app/ui/MainActivity.kt)
+   - Android-only (ComponentActivity 子类)
+   - iosApp 直接用 Compose, 不需要 MainActivity.kt
+
+5. **AppFeature visibility**:
+   - 在 NavHost 注册路由时, 用 `if (isAndroidOnly()) composable("feature_x") { ... }`
+   - iOS nav drawer / home page 不显示 Bluetooth, DLNA, Cast, Screen Mirror, SMS, Call, Notification Listener, Android Auto 等菜单项
+
+6. **kmmbridge / xcframework**:
+   - shared/build.gradle.kts 加 `XCFramework` config, 用 kmmbridge 或直接 `embedAndSignAppleFrameworkForXcode`
+   - iosApp.xcodeproj 配置 framework search path
+
+7. **iOS-specific 修复**:
+   - iOS 不支持 Compose 的 `Modifier.windowInsetsPadding(WindowInsets.systemBars)` → 用 `safeContentPadding()` 替代
+   - iOS keyboard 不触发 `WindowInsets.ime` → 自己 implement keyboard listener
+   - iOS 文件路径 sandbox 限制 → expect/actual `getDocumentDir()` (androidMain = `filesDir`, iosMain = `NSDocumentDirectory`)
+   - iOS 启动慢 → 用 baseline profile (Compose Multiplatform 1.6+ 支持)
+
+**预计改动**: 
+- 1 个新 shared/.../platform/Service.kt (expect/actual)
+- 1 个新 shared/.../platform/Receiver.kt (expect/actual)
+- 1 个新 shared/.../platform/AppInit.kt (expect/actual)
+- iosApp/iosApp/Info.plist 加权限说明 (NSCameraUsageDescription, NSBluetoothAlwaysUsageDescription, NSPhotoLibraryUsageDescription)
+- iosApp.xcodeproj 改 framework 引用
+
+**Build 验证**: `xcodebuild -project iosApp.xcodeproj -scheme iosApp build` 全绿.
+
+---
+
+## Phase 26 — 收尾 + 性能调优 + 文档
+
+1. **全 build 验证**:
+   - `:shared:compileCommonMainKotlinMetadata` ✓
+   - `:app:assembleFdroidDebug :app:assembleGithubDebug :app:assembleGoogleDebug` ✓
+   - `xcodebuild -project iosApp.xcodeproj -scheme iosApp build` ✓
+
+2. **启动速度优化**:
+   - iOS: Compose Multiplatform baseline profile (kotlin 1.9.20+ 支持, 启动时间从 ~3s 降到 ~1s)
+   - Android: startup profile (Macrobenchmark + BaselineProfileRule)
+
+3. **内存优化**:
+   - iOS: 检查 Compose recomposition scope, 用 `derivedStateOf` 缓存
+   - 跨平台: 用 `key()` block 避免无谓重组
+
+4. **跨平台架构文档**:
+   - `docs/kmp-architecture.md` (新建): 说明 shared/app/iosApp 边界, expect/actual 列表, Android-only 留 app/ 的模块
+   - 更新 `README.md` 加 iOS build 说明
+
+5. **总结 entry**:
+   - 在 plan doc 加最终 entry: `| YYYY-MM-DD | Phase 20-26 完成 | shared/commonMain 273 → 600+ ; shared/androidMain 141 → 300+ ; shared/iosMain 11 → 80+ ; app/src/main 1027 → 100 (剩 MainActivity/MainApp + Android-only 模块) ; iosApp 从 stub 变 fully functional |`
+
+**预计总改动**: Phase 20-26 全部完成后, 大约:
+- shared/commonMain: 273 → 600+ (+327)
+- shared/androidMain: 141 → 300+ (+159)
+- shared/iosMain: 11 → 80+ (+69)
+- app/src/main: 1027 → 100 (-927)
+- **净迁移**: app/ 90% 内容搬到 shared, 剩 100 个 Android-only 模块留 app/
+
+**风险评估**:
+- **high**: Phase 23.3 (chat/), Phase 23.6 (media/) — 最大 page, 最多 Android-only 依赖
+- **medium**: Phase 22.4 (WebView expect/actual), Phase 24 (audio/video VM)
+- **low**: 其它
+
+**总时间预估**: Phase 20 (1 周) + Phase 21 (3 天) + Phase 22 (1 周) + Phase 23 (3 周, 大头) + Phase 24 (1 周) + Phase 25 (1 周) + Phase 26 (3 天) = **~8 周**
+
+| 2026-06-27 | Phase 20 — Platform Abstraction Layer (PAL) | **6 个 expect/actual 模块, 13 个 expect fun, 5 处 Intent 调用替换**。<br>**新建**：`shared/.../platform/` 下 6 个 commonMain + 6 个 androidMain + 6 个 iosMain 文件：<br>- `AppInfo` (4 fun: getAppVersion/getOSVersion/getDeviceName/getBuildType)<br>- `Launcher` (4 fun: launchUrl/openAppSettings/shareText/shareFile)<br>- `Permission` (1 fun: isPermissionGranted)<br>- `Network` (1 fun: getNetworkType + NetworkType enum)<br>- `Bluetooth` (2 fun: isBluetoothEnabled/isBluetoothSupported)<br>- `Battery` (1 fun: getBatteryLevel)<br>**修 AppContext.kt**: 加 `buildTypeValue: String` 参数, `setAppContext(context, buildType)`。<br>**替换 5 处 Intent** (8 个修改点):<br>- `ChatLinkPreview.kt` ACTION_VIEW → `launchUrl`<br>- `ChatLinkPreviewStates.kt` ACTION_VIEW → `launchUrl`<br>- `WebHelper.kt` ACTION_VIEW → `launchUrl`<br>- `TextLinkActions.kt` SENDTO/ACTION_DIAL → `launchUrl("mailto:")`/`launchUrl("tel:")`<br>- `WebSettingsPage.kt` ACTION_APPLICATION_DETAILS_SETTINGS → `openAppSettings()`<br>**推迟 (留 Phase 22/25)**:<br>- `requirePermission` / `pickFile*` (Activity launcher, 需 UIViewController 桥接)<br>- `capturePhoto` / `registerScreenCapture` (MediaProjection/ReplayKit)<br>- `wakeLock` / `MainActivity()` accessor<br>- MainActivity.kt / MainActivityEvents.kt / MainActivityIntentHandler.kt / PomodoroHelper.kt / CrashReportDialog.kt 的 Intent (Activity 本身或附件逻辑复杂)<br>**iOS 占位**: shareText/shareFile 在 iosMain no-op (Phase 25 桥接 UIViewController)。<br>**Build 验证**: Android 3 flavor 全绿, iOS commonMain/iosMain compile OK (KSP @Database error 是 Phase 19 pre-existing, Phase 25 修)。Tests 74/77 pass (3 pre-existing macOS-only)。<br>**Uncommitted 文件** (user 自己 commit): 19 新 platform/ 文件 + 5 modified app/ 文件 + 1 modified AppContext.kt。MainApp.onCreate 还要改成 `setAppContext(this, "fdroid-debug")` 才能让 `getBuildType()` 返回正确值。 |
+
+| 2026-06-27 | Phase 21 — UI base 第三方依赖迁移 (部分) | **3 个简单子目录全迁 + 顶层 2 个文件**。已迁 29/71 = 41%。<br>**完成迁移**:<br>- `pullrefresh/` (11 文件) — 纯 Compose, 全 commonMain。修 `RefreshLayoutState.kt` 的 `internal val` → `val` (跨 module 不可见, 同 Phase 19 `mePeer` 处理)<br>- `fastscroll/` (16 文件) — HapticFeedback 用 `LocalHapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)` 替换 `view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)`<br>- 顶层 `ClipboardCard.kt` + `CopyIconButton.kt` — `LocalClipboardManager.setText(AnnotatedString)` 替换 `clipboardManager.setPrimaryClip(ClipData.newPlainText(...))`<br>**留 app/** (依赖 Android-only 库/类):<br>- 顶层 7 个文件: `AceEditor` (WebView), `MediaPageTitle` (CastPlayer), `MediaTopBar` (BaseMediaViewModel+CastViewModel+FileSortBy), `MinimalScrollHandle` (PDFView+View), `NeedPermissionColumn` (Permission enum), `PDonationBanner` (Coil), `PdfView` (PdfRenderer)<br>- `coil/` (3) — Coil 3 KMP-ready 部分, 待 Phase 21.1 expect/actual `AsyncImage`<br>- `colorpicker/` (18) — 1214 行 android.graphics 重写为 Compose Graphics 工作量大, 待评估用 `compose-colorpicker` 第三方库替换<br>- `markdowntext/` (3) — `AndroidView` + `TextView` + `Spanned`, iOS 上 `AndroidView` 是 stub 不工作, 待用 `org.jetbrains.compose.markdown` 替换<br>- `mdeditor/` (10) — 整体依赖 `MdEditorViewModel` (Permission + inlineWrap), 待 Phase 24 VM 链迁<br>**Build 验证**: Android 3 flavor 全绿。<br>**下一步**: 评估 colorpicker 用 `compose-colorpicker` 库替换 (Phase 21.2) + markdowntext 用 jetbrains compose markdown 替换 (Phase 21.3) + 顶层 WebView/PdfView/Coil expect/actual (Phase 22.4 之后)。 |

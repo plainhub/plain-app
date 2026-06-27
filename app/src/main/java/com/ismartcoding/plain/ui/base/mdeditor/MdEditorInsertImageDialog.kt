@@ -44,7 +44,7 @@ fun MdEditorInsertImageDialog(
     var description by remember { mutableStateOf("") }
     var width by remember { mutableStateOf("") }
 
-    PickImageEffect(context = context, imageUrl = imageUrlState)
+    PickImageEffect(imageUrl = imageUrlState)
 
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.surface,

@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base.mdeditor
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -12,13 +11,14 @@ import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.appContext
 import java.io.File
 
 @Composable
 internal fun PickImageEffect(
-    context: Context,
     imageUrl: MutableState<String>,
 ) {
+    val context = appContext
     val sharedFlow = Channel.sharedFlow
 
     LaunchedEffect(sharedFlow) {

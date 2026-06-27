@@ -16,9 +16,9 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.helpers.IODispatcher
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -50,7 +50,7 @@ fun TagSelector(
             PSelectionChip(
                 selected = tagIds.contains(tag.id),
                 onClick = {
-                    scope.launch(Dispatchers.IO) {
+                    scope.launch(IODispatcher) {
                         tagsVM.toggleTagAsync(data, tag.id)
                         if (tagIds.contains(tag.id)) {
                             tagIds.remove(tag.id)

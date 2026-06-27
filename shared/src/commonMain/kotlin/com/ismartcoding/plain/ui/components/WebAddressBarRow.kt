@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.plain.i18n.*
-import android.content.ClipData
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -12,12 +12,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.clipboardManager
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -29,6 +28,7 @@ fun WebAddressBarRow(
     onEditClick: () -> Unit,
     onQrClick: () -> Unit,
 ) {
+    val clipboard = LocalClipboardManager.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -42,8 +42,7 @@ fun WebAddressBarRow(
                         fontSize = 18.sp,
                     ),
                 onClick = {
-                    val clip = ClipData.newPlainText(LocaleHelper.getString(Res.string.link), url)
-                    clipboardManager.setPrimaryClip(clip)
+                    clipboard.setText(AnnotatedString(url))
                     DialogHelper.showTextCopiedMessage(url)
                 },
             )

@@ -17,6 +17,7 @@ import com.ismartcoding.plain.extensions.parseSizeToBytes
 import com.ismartcoding.plain.extensions.toFile
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.file.toFileSortBy
 import com.ismartcoding.plain.helpers.QueryHelper
 
 object FileMediaStoreHelper : BaseContentHelper() {
