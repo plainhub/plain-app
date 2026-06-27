@@ -77,3 +77,9 @@ class CancelSleepTimerEvent : ChannelEvent()
 class StartNearbyServiceEvent : ChannelEvent()
 class StartNearbyDiscoveryEvent : ChannelEvent()
 class StopNearbyDiscoveryEvent : ChannelEvent()
+
+data class ChatMessageNotificationEvent(
+    val targetId: String,
+    val targetName: String,
+    val messageText: String,
+) : ChannelEvent()

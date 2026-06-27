@@ -6,12 +6,6 @@ import com.ismartcoding.plain.features.contact.DContentItem
 import com.ismartcoding.plain.features.contact.DOrganization
 import kotlin.time.Instant
 
-data class DContactSource(var name: String, var type: String)
-
-data class DGroup(
-    var id: Long,
-    var name: String,
-)
 
 data class DContact(
     override var id: String,

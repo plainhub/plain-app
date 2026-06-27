@@ -153,7 +153,7 @@ class PeerGraphQL(val schema: Schema) {
                         call.attributes.put(SignatureAttrKey, decryptResult.signature)
                         call.attributes.put(TimestampAttrKey, decryptResult.timestamp)
 
-                        val r = executeGraphqlQL(schema, decryptResult.content, call)
+                        val r = executeGraphqlQL(schema, decryptResult.content!!, call)
                         call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                     }
                 }

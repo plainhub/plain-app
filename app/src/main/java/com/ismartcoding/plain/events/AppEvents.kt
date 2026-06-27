@@ -10,6 +10,7 @@ import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.DChat
@@ -292,6 +293,15 @@ object AppEvents {
                         coIO {
                             ChatManager.resendMessage(event.item)
                         }
+                    }
+
+                    is ChatMessageNotificationEvent -> {
+                        NotificationHelper.sendChatMessageNotification(
+                            context = MainApp.instance,
+                            targetId = event.targetId,
+                            targetName = event.targetName,
+                            messageText = event.messageText,
+                        )
                     }
                 }
             }

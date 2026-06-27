@@ -56,6 +56,8 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.logging)
+            implementation(libs.okhttp)
+            implementation(libs.tink.android)
         }
         iosMain.dependencies {
             implementation(libs.sqlite.bundled)

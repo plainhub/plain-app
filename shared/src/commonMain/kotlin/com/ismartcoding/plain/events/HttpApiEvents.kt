@@ -39,3 +39,5 @@ class HCancelImageModelDownloadEvent : ChannelEvent()
 
 class HCancelNotificationsEvent(val ids: Set<String>) : ChannelEvent()
 class HChatItemsDeletedEvent(val ids: Set<String>) : ChannelEvent()
+
+// Download events moved to shared/androidMain/events/HttpApiEvents.kt (uses DownloadTask with OkHttpClient)
