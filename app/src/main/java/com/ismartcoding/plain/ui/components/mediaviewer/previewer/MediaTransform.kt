@@ -15,9 +15,14 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class TransformContentState(
     var scope: CoroutineScope = MainScope(),
@@ -82,10 +87,12 @@ class TransformContentState(
     val fitSize: Size
         get() {
             return if (intrinsicRatio > containerRatio) {
-                val uW = containerSize.width; val uH = uW / intrinsicRatio
+                val uW = containerSize.width;
+                val uH = uW / intrinsicRatio
                 Size(uW.toFloat(), uH)
             } else {
-                val uH = containerSize.height; val uW = uH * intrinsicRatio
+                val uH = containerSize.height;
+                val uW = uH * intrinsicRatio
                 Size(uW, uH.toFloat())
             }
         }
@@ -112,11 +119,81 @@ class TransformContentState(
         specifierSizeFlow.takeWhile { !it }.collect {}
     }
 
-    fun findTransformItem(key: Any) = transformItemStateMap[key]
-    fun clearTransformItems() = transformItemStateMap.clear()
+    fun setEnterState() {
+        onAction = true
+        onActionTarget = null
+    }
 
-    fun setEnterState() { onAction = true; onActionTarget = null }
-    fun setExitState() { onAction = false; onActionTarget = null }
+    fun setExitState() {
+        onAction = false
+        onActionTarget = null
+    }
+
+    suspend fun notifyEnterChanged() {
+        scope.launch {
+            listOf(
+                scope.async { displayWidth.snapTo(displayRatioSize.width) },
+                scope.async { displayHeight.snapTo(displayRatioSize.height) },
+                scope.async { graphicScaleX.snapTo(fitScale) },
+                scope.async { graphicScaleY.snapTo(fitScale) },
+                scope.async { offsetX.snapTo(fitOffsetX) },
+                scope.async { offsetY.snapTo(fitOffsetY) },
+            ).awaitAll()
+        }
+    }
+
+    suspend fun exitTransform(
+        animationSpec: AnimationSpec<Float>? = null
+    ) = suspendCancellableCoroutine { c ->
+        val currentAnimateSpec = animationSpec ?: defaultAnimationSpec
+        scope.launch {
+            listOf(
+                scope.async { displayWidth.animateTo(srcSize.width.toFloat(), currentAnimateSpec) },
+                scope.async { displayHeight.animateTo(srcSize.height.toFloat(), currentAnimateSpec) },
+                scope.async { graphicScaleX.animateTo(1F, currentAnimateSpec) },
+                scope.async { graphicScaleY.animateTo(1F, currentAnimateSpec) },
+                scope.async { offsetX.animateTo(srcPosition.x, currentAnimateSpec) },
+                scope.async { offsetY.animateTo(srcPosition.y, currentAnimateSpec) },
+            ).awaitAll()
+            onAction = false
+            onActionTarget = null
+            c.resume(Unit)
+        }
+    }
+
+    suspend fun enterTransform(
+        itemState: TransformItemState,
+        animationSpec: AnimationSpec<Float>? = null
+    ) = suspendCancellableCoroutine { c ->
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
+        this.itemState = itemState
+        displayWidth = androidx.compose.animation.core.Animatable(srcSize.width.toFloat())
+        displayHeight = androidx.compose.animation.core.Animatable(srcSize.height.toFloat())
+        graphicScaleX = androidx.compose.animation.core.Animatable(1F)
+        graphicScaleY = androidx.compose.animation.core.Animatable(1F)
+        offsetX = androidx.compose.animation.core.Animatable(srcPosition.x)
+        offsetY = androidx.compose.animation.core.Animatable(srcPosition.y)
+        onActionTarget = true
+        onAction = true
+        scope.launch {
+            reset(currentAnimationSpec)
+            c.resume(Unit)
+            onActionTarget = null
+        }
+    }
+
+    suspend fun reset(animationSpec: AnimationSpec<Float>? = null) {
+        val currentAnimationSpec = animationSpec ?: defaultAnimationSpec
+        listOf(
+            scope.async { displayWidth.animateTo(displayRatioSize.width, currentAnimationSpec) },
+            scope.async { displayHeight.animateTo(displayRatioSize.height, currentAnimationSpec) },
+            scope.async { graphicScaleX.animateTo(fitScale, currentAnimationSpec) },
+            scope.async { graphicScaleY.animateTo(fitScale, currentAnimationSpec) },
+            scope.async { offsetX.animateTo(fitOffsetX, currentAnimationSpec) },
+            scope.async { offsetY.animateTo(fitOffsetY, currentAnimationSpec) },
+        ).awaitAll()
+    }
+
 
     companion object {
         val Saver: Saver<TransformContentState, *> = listSaver(
@@ -134,6 +211,7 @@ fun rememberTransformContentState(
     animationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC
 ): TransformContentState {
     val state = rememberSaveable(saver = TransformContentState.Saver) { TransformContentState() }
-    state.scope = scope; state.defaultAnimationSpec = animationSpec
+    state.scope = scope
+    state.defaultAnimationSpec = animationSpec
     return state
 }

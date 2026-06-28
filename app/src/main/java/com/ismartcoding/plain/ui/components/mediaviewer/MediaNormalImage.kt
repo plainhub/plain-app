@@ -2,9 +2,12 @@ package com.ismartcoding.plain.ui.components.mediaviewer
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -15,18 +18,40 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.media3.common.util.UnstableApi
+import coil3.compose.AsyncImage
 import coil3.imageLoader
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.launch
+
+class RawGesture(
+    val onTap: (Offset) -> Unit = {},
+    val onDoubleTap: (Offset) -> Unit = {},
+    val onLongPress: (Offset) -> Unit = {},
+    val gestureStart: () -> Unit = {},
+    val gestureEnd: (transformOnly: Boolean) -> Unit = {},
+    val onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float, event: PointerEvent) -> Boolean = { _, _, _, _, _ -> true },
+)
+
+data class SizeChangeContent(
+    val defaultSize: IntSize,
+    val containerSize: IntSize,
+    val maxScale: Float,
+)
+
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -114,6 +139,37 @@ fun MediaNormalImage(
         val imageModifier = Modifier.graphicsLayer {
             if (imageSpecified) { scaleX = scale; scaleY = scale; translationX = offsetX; translationY = offsetY; rotationZ = rotation }
         }
-        MediaNormalImageContent(imageModifier = imageModifier, painter = painter, model = model, uSize = uSize)
+        if (painter != null) {
+            Image(
+                painter = painter!!,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = imageModifier.size(
+                    LocalDensity.current.run { uSize.width.toDp() },
+                    LocalDensity.current.run { uSize.height.toDp() }
+                ),
+            )
+        } else {
+            if (model.path.endsWith(".svg", true)) {
+                AsyncImage(
+                    model = model.path,
+                    contentDescription = model.path,
+                    contentScale = ContentScale.Fit,
+                    modifier = imageModifier
+                        .background(Color.White)
+                        .size(
+                            LocalDensity.current.run { uSize.width.toDp() },
+                            LocalDensity.current.run { uSize.height.toDp() }
+                        ),
+                )
+            } else {
+                AsyncImage(
+                    model = model.path,
+                    contentDescription = model.path,
+                    contentScale = ContentScale.Fit,
+                    modifier = imageModifier.fillMaxSize(),
+                )
+            }
+        }
     }
 }

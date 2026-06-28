@@ -46,9 +46,19 @@ fun TransformImageView(
             )
             val imageModifier = Modifier.fillMaxSize()
             if (painter.state.value is AsyncImagePainter.State.Error) {
-                Image(modifier = imageModifier, painter = painterResource(if (fileName.isImageFast()) Res.drawable.image else Res.drawable.file_video), contentDescription = path, contentScale = ContentScale.Crop)
+                Image(
+                    modifier = imageModifier,
+                    painter = painterResource(if (fileName.isImageFast()) Res.drawable.image else Res.drawable.file_video),
+                    contentDescription = path,
+                    contentScale = ContentScale.Crop
+                )
             } else {
-                Image(modifier = if (fileName.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier, painter = painter, contentDescription = path, contentScale = ContentScale.Crop)
+                Image(
+                    modifier = if (fileName.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier,
+                    painter = painter,
+                    contentDescription = path,
+                    contentScale = ContentScale.Crop
+                )
             }
         }
     }
@@ -79,21 +89,39 @@ fun TransformItemView(
         scope.launch { itemState.addItem() }
         onDispose { itemState.removeItem() }
     }
-    Box(modifier = modifier.onGloballyPositioned { itemState.onPositionChange(position = it.positionInRoot(), size = it.size) }.fillMaxSize()) {
-        if (contentState?.itemState != itemState || !contentState.onAction) { itemState.blockCompose(key) }
+    Box(
+        modifier = modifier
+            .onGloballyPositioned { itemState.onPositionChange(position = it.positionInRoot(), size = it.size) }
+            .fillMaxSize()) {
+        if (contentState?.itemState != itemState || !contentState.onAction) {
+            itemState.blockCompose(key)
+        }
     }
 }
 
 @Composable
 fun TransformContentView(transformContentState: TransformContentState = rememberTransformContentState()) {
-    Box(modifier = Modifier.fillMaxSize().onGloballyPositioned {
-        transformContentState.containerSize = it.size; transformContentState.containerOffset = it.positionInRoot()
-    }) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned {
+                transformContentState.containerSize = it.size
+                transformContentState.containerOffset = it.positionInRoot()
+            }) {
         if (transformContentState.srcCompose != null && transformContentState.onAction) {
-            Box(modifier = Modifier
-                .offset(x = LocalDensity.current.run { transformContentState.offsetX.value.toDp() }, y = LocalDensity.current.run { transformContentState.offsetY.value.toDp() })
-                .size(width = LocalDensity.current.run { transformContentState.displayWidth.value.toDp() }, height = LocalDensity.current.run { transformContentState.displayHeight.value.toDp() })
-                .graphicsLayer { transformOrigin = TransformOrigin(0F, 0F); scaleX = transformContentState.graphicScaleX.value; scaleY = transformContentState.graphicScaleY.value }
+            Box(
+                modifier = Modifier
+                    .offset(
+                        x = LocalDensity.current.run { transformContentState.offsetX.value.toDp() },
+                        y = LocalDensity.current.run { transformContentState.offsetY.value.toDp() })
+                    .size(
+                        width = LocalDensity.current.run { transformContentState.displayWidth.value.toDp() },
+                        height = LocalDensity.current.run { transformContentState.displayHeight.value.toDp() })
+                    .graphicsLayer {
+                        transformOrigin = TransformOrigin(0F, 0F)
+                        scaleX = transformContentState.graphicScaleX.value
+                        scaleY = transformContentState.graphicScaleY.value
+                    }
             ) { transformContentState.srcCompose!!(transformContentState.itemState?.key ?: Unit) }
         }
     }

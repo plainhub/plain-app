@@ -11,7 +11,7 @@ plugins {
 kotlin {
     jvmToolchain(17)
 
-    androidLibrary {
+    android {
         namespace = "com.ismartcoding.plain.shared"
         compileSdk = 37
         minSdk = 28

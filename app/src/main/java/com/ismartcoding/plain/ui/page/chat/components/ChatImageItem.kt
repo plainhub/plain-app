@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +34,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImage
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.VChat
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun ChatImageItem(
@@ -52,6 +54,7 @@ internal fun ChatImageItem(
     val downloadProgress = downloadTask?.let {
         if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
     } ?: 0f
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(item.uri) {
         if (isRemoteFile && downloadTask == null && peer != null) {
@@ -62,7 +65,7 @@ internal fun ChatImageItem(
     Box(
         modifier = Modifier.clickable {
             if (taskActive) return@clickable
-            coMain {
+            scope.launch {
                 withIO { MediaPreviewData.setDataAsync(context, itemState, items.reversed(), item) }
                 previewerState.openTransform(
                     index = MediaPreviewData.items.indexOfFirst { it.id == item.id },

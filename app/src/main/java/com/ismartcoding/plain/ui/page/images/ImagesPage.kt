@@ -2,38 +2,78 @@ package com.ismartcoding.plain.ui.page.images
 
 import com.ismartcoding.plain.i18n.*
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.events.PermissionsResultEvent
+import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
+import com.ismartcoding.plain.preferences.ImageGridCellsPerRowPreference
 import com.ismartcoding.plain.preferences.ImageSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.MediaTopBar
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
+import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
+import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
+import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
+import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
+import com.ismartcoding.plain.ui.base.pinchZoomGrid
+import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
+import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.base.rememberBoostFlingBehavior
+import com.ismartcoding.plain.ui.components.ImageGridItem
+import com.ismartcoding.plain.ui.components.MediaFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+import com.ismartcoding.plain.ui.extensions.reset
+import com.ismartcoding.plain.ui.helpers.groupMediaByDate
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -57,28 +97,42 @@ fun ImagesPage(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val imagesState = ImagesPageState.create(imagesVM, tagsVM, mediaFoldersVM)
-    val itemsState = imagesState.itemsState
     val configuration = LocalConfiguration.current
-    val pagerState = imagesState.pagerState
-    val scrollBehavior = imagesState.scrollBehavior
-    val tagsState = imagesState.tagsState
-    val previewerState = imagesState.previewerState
-    val tagsMapState = imagesState.tagsMapState
-    val dragSelectState = imagesState.dragSelectState
-    val cellsPerRow = imagesState.cellsPerRow
+    tagsVM.dataType.value = imagesVM.dataType
+    mediaFoldersVM.dataType.value = imagesVM.dataType
+    val tagsState by tagsVM.itemsFlow.collectAsState()
+    val pagerState = rememberPagerState(pageCount = {
+        tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1
+    })
+    val hapticFeedback = LocalHapticFeedback.current
+    val itemsState by imagesVM.itemsFlow.collectAsState()
+    val dragSelectState = rememberDragSelectState({
+        imagesVM.scrollStateMap[pagerState.currentPage]
+    })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
+        (imagesVM.scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !dragSelectState.selectMode
+    })
+    val previewerState = rememberPreviewerState()
+    val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
+    val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
+    val cellsPerRow = remember { mutableIntStateOf(ImageGridCellsPerRowPreference.default) }
     val isFirstTime = remember { mutableStateOf(true) }
     val density = LocalDensity.current
     val imageWidthPx = remember(cellsPerRow.value) { density.run { ((configuration.screenWidthDp.dp - ((cellsPerRow.value - 1) * 2).dp) / cellsPerRow.value).toPx().toInt() } }
     val tabs = remember(tagsState, imagesVM.total.intValue, imagesVM.totalTrash.intValue) {
         val baseTabs = mutableListOf(VTabData(LocaleHelper.getString(Res.string.all), "all", imagesVM.total.intValue))
-        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(Res.string.trash), "trash", imagesVM.totalTrash.intValue))
-        baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) }); baseTabs
+        if (AppFeatureType.MEDIA_TRASH.has()) {
+            baseTabs.add(VTabData(LocaleHelper.getString(Res.string.trash), "trash", imagesVM.totalTrash.intValue))
+        }
+        baseTabs.addAll(tagsState.map {
+            VTabData(it.name, it.id, it.count)
+        })
+        baseTabs
     }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
             imagesVM.loadWithAiSearchAsync(context, tagsVM)
-            withIO { mediaFoldersVM.loadAsync(context) }
+            mediaFoldersVM.loadAsync(context)
             setRefreshState(RefreshContentState.Finished)
         }
     }
@@ -89,17 +143,81 @@ fun ImagesPage(
             dragSelectState.selectMode -> dragSelectState.exitSelectMode()
             castVM.castMode.value -> castVM.exitCastMode()
             imagesVM.showSearchBar.value && (!imagesVM.searchActive.value || imagesVM.queryText.value.isEmpty()) -> {
-                imagesVM.exitSearchMode(); imagesVM.showLoading.value = true
-                scope.launch(Dispatchers.IO) { imagesVM.loadAsync(context, tagsVM) }
+                imagesVM.exitSearchMode()
+                imagesVM.showLoading.value = true
+                scope.launch {
+                    imagesVM.loadAsync(context, tagsVM)
+                }
             }
         }
     }
 
-    ImagesPageEffects(context, imagesVM, tagsVM, mediaFoldersVM, scrollBehavior, pagerState, scope, dragSelectState, previewerState, cellsPerRow, isFirstTime, tabs, tagsState)
+    LaunchedEffect(Unit) {
+        imagesVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
+        if (imagesVM.hasPermission.value) {
+            scope.launch {
+                cellsPerRow.value = ImageGridCellsPerRowPreference.getAsync()
+                imagesVM.sortBy.value = ImageSortByPreference.getValueAsync()
+                imagesVM.loadAsync(context, tagsVM)
+                mediaFoldersVM.loadAsync(context)
+            }
+        }
+    }
+    LaunchedEffect(Channel.sharedFlow) {
+        Channel.sharedFlow.collect { event ->
+            when (event) {
+                is PermissionsResultEvent -> {
+                    imagesVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
+                    scope.launch {
+                        imagesVM.sortBy.value = ImageSortByPreference.getValueAsync()
+                        imagesVM.loadAsync(context, tagsVM)
+                    }
+                }
+            }
+        }
+    }
+    LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !context.isGestureInteractionMode())) {
+        if (dragSelectState.selectMode || (previewerState.visible && !context.isGestureInteractionMode())) {
+            scrollBehavior.reset()
+        }
+    }
+    LaunchedEffect(pagerState.currentPage) {
+        if (isFirstTime.value) {
+            isFirstTime.value = false; return@LaunchedEffect
+        }
+        val tab = tabs.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
+        when (tab.value) {
+            "all" -> {
+                imagesVM.trash.value = false; imagesVM.tag.value = null
+            }
+
+            "trash" -> {
+                imagesVM.trash.value = true; imagesVM.tag.value = null
+            }
+
+            else -> {
+                imagesVM.trash.value = false; imagesVM.tag.value = tagsState.find { it.id == tab.value }
+            }
+        }
+        scope.launch {
+            scrollBehavior.reset()
+            imagesVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
+        }
+        scope.launch {
+            imagesVM.loadAsync(context, tagsVM)
+        }
+    }
 
     ViewImageBottomSheet(imagesVM, tagsVM, tagsMapState, tagsState, dragSelectState)
+
     MediaFoldersBottomSheet(imagesVM, mediaFoldersVM, tagsVM)
-    if (imagesVM.showTagsDialog.value) { TagsBottomSheet(tagsVM) { imagesVM.showTagsDialog.value = false } }
+
+    if (imagesVM.showTagsDialog.value) {
+        TagsBottomSheet(tagsVM) {
+            imagesVM.showTagsDialog.value = false
+        }
+    }
+
     CastDialog(castVM)
 
     PScaffold(
@@ -111,33 +229,142 @@ fun ImagesPage(
                 castVM = castVM,
                 dragSelectState = dragSelectState,
                 scrollBehavior = scrollBehavior,
-                bucketsMap = imagesState.bucketsMap,
+                bucketsMap = bucketsMap,
                 itemsState = itemsState,
-                scrollToTop = { scope.launch { imagesVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } },
-                defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
-                onSortSelected = { _, sortBy ->
-                    scope.launch(Dispatchers.IO) { ImageSortByPreference.putAsync(sortBy); imagesVM.sortBy.value = sortBy; imagesVM.loadAsync(context, tagsVM) }
+                scrollToTop = {
+                    scope.launch {
+                        imagesVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
+                    }
                 },
-                onSearchAction = { ctx, tv -> scope.launch(Dispatchers.IO) { imagesVM.loadWithAiSearchAsync(ctx, tv) } },
+                defaultNavigationIcon = {
+                    NavigationBackIcon {
+                        navController.popBackStack()
+                    }
+                },
+                onSortSelected = { _, sortBy ->
+                    scope.launch {
+                        ImageSortByPreference.putAsync(sortBy)
+                        imagesVM.sortBy.value = sortBy
+                        imagesVM.loadAsync(context, tagsVM)
+                    }
+                },
+                onSearchAction = { ctx, tv ->
+                    scope.launch {
+                        imagesVM.loadWithAiSearchAsync(ctx, tv)
+                    }
+                },
             )
         },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
-                ImageFilesSelectModeBottomActions(imagesVM, tagsVM, tagsState, dragSelectState)
+                MediaFilesSelectModeBottomActions(
+                    vm = imagesVM,
+                    tagsVM = tagsVM,
+                    tagsState = tagsState,
+                    dragSelectState = dragSelectState,
+                    getItemUri = { ImageMediaStoreHelper.getItemUri(it) },
+                    getCollectableItems = { imagesVM.itemsFlow.collectAsStateValue() },
+                    isInTrashMode = imagesVM.trash.value
+                )
             }
         },
     ) { paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
-            if (!imagesVM.hasPermission.value) { NeedPermissionColumn(Res.drawable.image, AppFeatureType.FILES.getPermission()!!); return@PScaffold }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding())
+        ) {
+            if (!imagesVM.hasPermission.value) {
+                NeedPermissionColumn(Res.drawable.image, AppFeatureType.FILES.getPermission()!!); return@PScaffold
+            }
             if (!dragSelectState.selectMode) {
                 PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
                     tabs.forEachIndexed { index, s ->
-                        PFilterChip(modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp), selected = pagerState.currentPage == index, onClick = { scope.launch { pagerState.scrollToPage(index) } },
+                        PFilterChip(
+                            modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
+                            selected = pagerState.currentPage == index,
+                            onClick = { scope.launch { pagerState.scrollToPage(index) } },
                             label = { if (index == 0) Text(text = s.title + " (" + s.count + ")") else Text(if (imagesVM.bucketId.value.isNotEmpty() || imagesVM.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})") })
                     }
                 }
             }
-            ImagesPageGrid(context, imagesVM, tagsVM, castVM, itemsState, pagerState, scrollBehavior, topRefreshLayoutState, dragSelectState, previewerState, cellsPerRow, imageWidthPx, scope, paddingValues)
+            if (pagerState.pageCount == 0) {
+                NoDataColumn(loading = imagesVM.showLoading.value, search = imagesVM.showSearchBar.value)
+                return@Column
+            }
+            HorizontalPager(state = pagerState) { index ->
+                PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
+                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                        if (itemsState.isNotEmpty()) {
+                            val scrollState = rememberLazyGridState()
+                            imagesVM.scrollStateMap[index] = scrollState
+                            val flingBehavior = rememberBoostFlingBehavior(cellsPerRow.value / 3f)
+                            LazyVerticalGridScrollbar(state = scrollState) {
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(cellsPerRow.value), state = scrollState, flingBehavior = flingBehavior,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .nestedScroll(scrollBehavior.nestedScrollConnection)
+                                        .gridDragSelect(items = itemsState, state = dragSelectState)
+                                        .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
+                                            ImageGridCellsPerRowPreference.putAsync(it)
+                                        },
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+                                            && imagesVM.queryText.value.isEmpty()
+                                            && !imagesVM.useAiSearch.value
+                                    if (isGroupMode) {
+                                        val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
+                                        groupedItems.forEach { group ->
+                                            item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.dateKey}", contentType = "header") {
+                                                Text(text = group.dateLabel, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.titleSmall)
+                                            }
+                                            items(group.items, key = { it.id }, contentType = { "image" }, span = { GridItemSpan(1) }) { m ->
+                                                ImageGridItem(
+                                                    scope,
+                                                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                                                    imagesVM,
+                                                    castVM,
+                                                    m,
+                                                    showSize = cellsPerRow.value < 6,
+                                                    previewerState,
+                                                    dragSelectState,
+                                                    imageWidthPx
+                                                )
+                                            }
+                                        }
+                                    } else {
+                                        items(itemsState, key = { it.id }, contentType = { "image" }, span = { GridItemSpan(1) }) { m ->
+                                            ImageGridItem(
+                                                scope,
+                                                modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                                                imagesVM,
+                                                castVM,
+                                                m,
+                                                showSize = cellsPerRow.value < 6,
+                                                previewerState,
+                                                dragSelectState,
+                                                imageWidthPx
+                                            )
+                                        }
+                                    }
+                                    item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
+                                        if (itemsState.isNotEmpty() && !imagesVM.noMore.value) {
+                                            LaunchedEffect(Unit) { scope.launch(Dispatchers.IO) { imagesVM.moreAsync(context, tagsVM) } }
+                                        }
+                                        LoadMoreRefreshContent(imagesVM.noMore.value)
+                                    }
+                                    item(span = { GridItemSpan(maxLineSpan) }, key = "bottomSpace") { BottomSpace(paddingValues) }
+                                }
+                            }
+                        } else {
+                            NoDataColumn(loading = imagesVM.showLoading.value, search = imagesVM.showSearchBar.value)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -146,8 +373,17 @@ fun ImagesPage(
         tagsVM = tagsVM,
         tagsMap = tagsMapState,
         tagsState = tagsState,
-        onRenamed = { scope.launch(Dispatchers.IO) { imagesVM.loadAsync(context, tagsVM) } },
-        deleteAction = { item -> scope.launch(Dispatchers.IO) { imagesVM.delete(context, tagsVM, setOf(item.mediaId)); previewerState.closeTransform() } },
+        onRenamed = {
+            scope.launch {
+                imagesVM.loadAsync(context, tagsVM)
+            }
+        },
+        deleteAction = { item ->
+            scope.launch {
+                imagesVM.delete(context, tagsVM, setOf(item.mediaId))
+                previewerState.closeTransform()
+            }
+        },
         onTagsChanged = {},
     )
 }

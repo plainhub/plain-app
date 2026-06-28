@@ -1,17 +1,12 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
-import com.ismartcoding.plain.i18n.*
 import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,10 +18,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.change_playback_speed
+import com.ismartcoding.plain.i18n.gauge
+import com.ismartcoding.plain.i18n.picture_in_picture
+import com.ismartcoding.plain.i18n.pip
+import com.ismartcoding.plain.i18n.toggle_audio
+import com.ismartcoding.plain.i18n.volume_2
+import com.ismartcoding.plain.i18n.volume_x
+import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 
 data class PlaybackSpeed(val speed: Float, val label: String)
 

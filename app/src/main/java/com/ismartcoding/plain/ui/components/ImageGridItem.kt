@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.lib.extensions.formatBytes
@@ -26,10 +27,13 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransf
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageGridItem(
+    scope: CoroutineScope,
     modifier: Modifier = Modifier,
     imagesVM: ImagesViewModel,
     castVM: CastViewModel,
@@ -43,6 +47,7 @@ fun ImageGridItem(
     val inSelectionMode = dragSelectState.selectMode
     val selected = isSelected || imagesVM.selectedItem.value?.id == m.id
     val itemState = rememberTransformItemState()
+
     Box(
         modifier = modifier
             .combinedClickable(
@@ -52,7 +57,7 @@ fun ImageGridItem(
                     } else if (inSelectionMode) {
                         dragSelectState.addSelected(m.id)
                     } else {
-                        coMain {
+                        scope.launch {
                             withIO { MediaPreviewData.setDataAsync(itemState, imagesVM.itemsFlow.value, m) }
                             previewerState.openTransform(
                                 index = MediaPreviewData.items.indexOfFirst { it.id == m.id },

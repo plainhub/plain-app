@@ -51,7 +51,7 @@ fun panTransformAndScale(
             val upy = (uh * fromScale - uh).div(2)
             (upy - offset + center) / (fromScale * uh)
         }
-        srcH > bh || bh > uh -> {
+        bh !in srcH..uh -> {
             val upy = (srcH - uh).div(2)
             (upy - gapH - offset + center) / (fromScale * uh)
         }
