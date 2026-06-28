@@ -19,7 +19,7 @@ rootProject.file("keystore.properties").let {
 }
 
 android {
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
@@ -172,13 +172,6 @@ dependencies {
     implementation(libs.bcpkix.jdk15on)
     implementation(libs.ktor.client.cio)
 
-    implementation(libs.markwon.core)
-    implementation(libs.markwon.html)
-    implementation(libs.markwon.strikethrough)
-    implementation(libs.markwon.tasklist)
-    implementation(libs.markwon.tables)
-    implementation(libs.markwon.latex)
-    implementation(libs.markwon.linkify)
     implementation(libs.okhttp)
 
     implementation(libs.jsoup)

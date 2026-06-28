@@ -13,7 +13,7 @@ kotlin {
 
     androidLibrary {
         namespace = "com.ismartcoding.plain.shared"
-        compileSdk = 36
+        compileSdk = 37
         minSdk = 28
 
         // Required so that Compose Multiplatform resources (drawable/strings/etc.)
@@ -24,10 +24,16 @@ kotlin {
         androidResources {
             enable = true
         }
+
+        // Enable Android host-side unit tests so `commonTest` (and any
+        // androidUnitTest-specific sources) get compiled and runnable via
+        // `testDebugUnitTest` / `testReleaseUnitTest`. Without this the
+        // plugin silently ignores both source sets and `:shared:commonTest`
+        // emits a warning on every build.
+        withHostTest {}
     }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
@@ -53,6 +59,16 @@ kotlin {
             api(libs.room.runtime)
             api(libs.ktor.client.core)
             implementation(libs.coil.compose)
+
+            // Vendored multiplatform-markdown-renderer (lib/markdown/) depends on these.
+            api(libs.jetbrains.markdown)
+            api(libs.kotlinx.collections.immutable)
+            api(libs.kotlinx.coroutines.core)
+
+            // LaTeX math rendering (KMP — Compose Multiplatform renderer)
+            api(libs.latex.base)
+            api(libs.latex.parser)
+            api(libs.latex.renderer)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.cio)
@@ -72,9 +88,8 @@ kotlin {
             implementation(libs.coil)
             implementation(libs.coil.network.ktor3)
         }
-        iosMain.dependencies {
-            implementation(libs.sqlite.bundled)
-            implementation(libs.ktor.client.darwin)
+        commonTest.dependencies {
+            implementation(kotlin("test"))
         }
     }
 }
@@ -85,7 +100,6 @@ room {
 
 dependencies {
     add("kspAndroid", libs.room.compiler)
-    add("kspIosX64", libs.room.compiler)
     add("kspIosArm64", libs.room.compiler)
     add("kspIosSimulatorArm64", libs.room.compiler)
 }

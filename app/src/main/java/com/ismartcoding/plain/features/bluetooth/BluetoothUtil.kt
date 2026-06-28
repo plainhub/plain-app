@@ -161,7 +161,7 @@ object BluetoothUtil {
                     }
                 }
             val filters = arrayListOf(ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(BTDevice.SERVICE_UUID.toString())).build())
-            getBluetoothAdapter().bluetoothLeScanner.startScan(filters, ScanSettings.Builder().build(), scanCallback)
+            getBluetoothAdapter().bluetoothLeScanner?.startScan(filters, ScanSettings.Builder().build(), scanCallback)
             isScanning = true
 
             awaitClose {

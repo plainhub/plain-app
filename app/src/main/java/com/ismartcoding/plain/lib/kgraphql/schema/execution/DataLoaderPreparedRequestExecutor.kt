@@ -157,7 +157,6 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
                 serializeScalar(unwrapped, value, node)
             }
             is Type.Enum<*> -> JsonPrimitive(value.toString())
-            is TypeDef.Object<*> -> throw ExecutionException("Cannot handle object return type, schema structure exception", node)
             else -> throw ExecutionException("Invalid Type:  ${returnType.name}", node)
         }
     }

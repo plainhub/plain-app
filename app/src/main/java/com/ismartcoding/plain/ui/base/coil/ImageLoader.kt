@@ -19,9 +19,16 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
     // the lazy diskCache / memoryCache initializer lambdas held by RealImageLoader.
     val appContext = context.applicationContext
     val memoryPercent = if (activityManager.isLowRamDevice) 0.25 else 0.75
-    
-    val unsafeOkHttpClient = OkHttpClientFactory.createUnsafeOkHttpClient()
-    
+
+    // Dedicated OkHttp client for image loading. It uses the system trust store and
+    // OkHttp's default OkHostnameVerifier, which is what every other Android image
+    // fetcher does. We deliberately do NOT reuse `createUnsafeOkHttpClient()` here:
+    // that client is built for the in-app HTTP server and only accepts
+    // `isLocalNetworkAddress` hostnames, which silently broke every public https
+    // image (the request fails with `SSLPeerUnverifiedException` before the
+    // network is even reached).
+    val imageLoaderClient = OkHttpClientFactory.createImageLoaderClient()
+
     return ImageLoader.Builder(appContext)
         .components {
             add(SvgDecoder.Factory(true))
@@ -33,7 +40,7 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
             // content:// URIs (ContentMetadata check), so file-based paths still reach VideoFrameDecoder.
             add(ThumbnailDecoder.Factory())
             add(VideoFrameDecoder.Factory()) // fallback for file:// video paths without content URI
-            add(OkHttpNetworkFetcherFactory(unsafeOkHttpClient))
+            add(OkHttpNetworkFetcherFactory(imageLoaderClient))
         }
         .memoryCache {
             MemoryCache.Builder()

@@ -117,6 +117,29 @@ object OkHttpClientFactory {
             .build()
     }
 
+    /**
+     * OkHttpClient used by the [coil3.network.okhttp.OkHttpNetworkFetcherFactory] for
+     * image loading.
+     *
+     * `createUnsafeOkHttpClient()` was previously wired in here too, but that client is
+     * built for the in-app HTTP server (which uses self-signed certs on the local network)
+     * and intentionally only accepts hostnames that match
+     * [NetworkHelper.isLocalNetworkAddress]. Public hostnames like `img2.baidu.com` are
+     * therefore rejected with `SSLPeerUnverifiedException` even when the server's
+     * certificate is otherwise valid, which silently broke every markdown image whose
+     * source was a public https URL.
+     *
+     * This factory returns a stock OkHttp client: it trusts the system CA bundle
+     * (so public CAs work normally) and uses OkHttp's [okhttp3.internal.tls.OkHostnameVerifier]
+     * (so SAN-based hostname checks behave like every other Android app). The local-server
+     * self-signed-cert use case stays covered by [createUnsafeOkHttpClient].
+     */
+    fun createImageLoaderClient(): OkHttpClient =
+        OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+
     private fun bodyToString(request: RequestBody): String {
         val buffer = okio.Buffer()
         request.writeTo(buffer)
