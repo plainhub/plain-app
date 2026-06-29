@@ -4,8 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -13,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
@@ -91,7 +91,7 @@ fun VideoGridItem(
             ),
     ) {
         TransformImageView(
-            modifier = Modifier.fillMaxSize().align(Alignment.Center).aspectRatio(1f),
+            modifier = Modifier.size(with(LocalDensity.current) { widthPx.toDp() }),
             path = m.path,
             fileName = m.path.getFilenameFromPath(),
             key = m.id,

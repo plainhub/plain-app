@@ -49,7 +49,6 @@ class MediaPreviewerState(
     val pagerState: PagerState,
 ) {
     var verticalDragType by mutableStateOf(VerticalDragType.None)
-    private var scaleToCloseMinValue by mutableFloatStateOf(DEFAULT_SCALE_TO_CLOSE_MIN_VALUE)
     val videoState = VideoState()
     private var mutex = Mutex()
     internal var openCallback: (() -> Unit)? = null
@@ -102,7 +101,7 @@ class MediaPreviewerState(
     var pagerUserScrollEnabled by mutableStateOf(true)
 
     var animating by mutableStateOf(false)
-        internal set
+        private set
     var visible by mutableStateOf(false)
         internal set
     private var visibleTarget by mutableStateOf<Boolean?>(null)
@@ -286,7 +285,7 @@ class MediaPreviewerState(
                         dragActivated && event.type == PointerEventType.Release -> {
                             pagerUserScrollEnabled = true; mediaViewerState?.allowGestureInput = true
                             vStartOffset = null; vOrientationDown = null; dragActivated = false
-                            if ((viewerContainerState?.scale?.value ?: 1F) < scaleToCloseMinValue) {
+                            if ((viewerContainerState?.scale?.value ?: 1F) < DEFAULT_SCALE_TO_CLOSE_MIN_VALUE) {
                                 scope.launch {
                                     if (canTransformOut) {
                                         val key = getKey(pagerState.currentPage)

@@ -40,7 +40,13 @@ class TransformItemState(
     fun addItem(key: Any? = null) {
         val currentKey = key ?: this.key
         if (checkInBound != null) return
-        synchronized(imageTransformMutex) { transformItemStateMap[currentKey] = this }
+        synchronized(imageTransformMutex) {
+            val prev = transformItemStateMap[currentKey]
+            if (prev != null && prev !== this && prev.blockSize.width > 0 && prev.blockSize.height > 0) {
+                return
+            }
+            transformItemStateMap[currentKey] = this
+        }
     }
 
     fun removeItem(key: Any? = null) {
