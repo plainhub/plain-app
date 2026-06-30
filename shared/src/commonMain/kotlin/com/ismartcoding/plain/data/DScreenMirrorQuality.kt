@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DScreenMirrorQuality(
-    val mode: ScreenMirrorMode = ScreenMirrorMode.AUTO,
+    val mode: ScreenMirrorMode = ScreenMirrorMode.HD,
     val resolution: Int = 1080,
 )

@@ -25,23 +25,6 @@ object WebSocketHelper {
             }
         }
     }
-
-    suspend fun sendSignalingToClientAsync(clientId: String, json: String) = withIO {
-        HttpServerManager.wsSessions
-            .toList()
-            .filter { it.clientId == clientId }
-            .forEach {
-                val token = HttpServerManager.tokenCache[it.clientId]
-                if (token != null) {
-                    it.session.send(
-                        addIntPrefixToByteArray(
-                            EventType.WEBRTC_SIGNALING.value,
-                            CryptoHelper.chaCha20Encrypt(token, json),
-                        ),
-                    )
-                }
-            }
-    }
 }
 
 fun addIntPrefixToByteArray(value: Int, byteArray: ByteArray): ByteArray {

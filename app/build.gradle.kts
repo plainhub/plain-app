@@ -52,6 +52,17 @@ android {
             storeFile = file(keystoreProperties.getProperty("storeFile", "release.jks"))
             storePassword = keystoreProperties.getProperty("storePassword")
         }
+        // Pin debug keystore to user-level ~/.android/debug.keystore so CI/agent builds
+        // sign with the same key as Android Studio (avoids INSTALL_FAILED_UPDATE_INCOMPATIBLE).
+        create("debugPinned") {
+            val userKeystore = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            if (userKeystore.exists()) {
+                storeFile = userKeystore
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
     }
 
 
@@ -65,6 +76,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
+            signingConfig = signingConfigs.getByName("debugPinned")
             isShrinkResources = false
             isMinifyEnabled = false
             isDebuggable = true
@@ -245,9 +257,6 @@ dependencies {
 
     // For cryptography (Ed25519 support on all Android versions)
     implementation(libs.tink.android)
-
-    // WebRTC for screen mirroring
-    implementation(libs.webrtc.sdk.android)
 
     // AI Image Search: MediaPipe is open source (included for all flavors).
     // LiteRT is excluded from fdroid to pass F-Droid FOSS checks.

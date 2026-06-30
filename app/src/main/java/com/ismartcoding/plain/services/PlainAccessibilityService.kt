@@ -12,7 +12,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
-import com.ismartcoding.plain.services.webrtc.getRealScreenSize as getMirrorRealScreenSize
+import com.ismartcoding.plain.services.screenmirror.getRealScreenSize as getMirrorRealScreenSize
 
 /**
  * Accessibility Service for injecting touch/gesture events during screen mirror remote control.

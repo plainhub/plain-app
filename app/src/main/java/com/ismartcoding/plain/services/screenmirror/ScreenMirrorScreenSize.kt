@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.services.webrtc
+package com.ismartcoding.plain.services.screenmirror
 
 import android.content.Context
 import android.graphics.Point
@@ -8,48 +8,6 @@ import android.view.Display
 import android.view.Surface
 import android.view.WindowManager
 import com.ismartcoding.plain.lib.isSPlus
-import com.ismartcoding.plain.data.DScreenMirrorQuality
-import com.ismartcoding.plain.enums.ScreenMirrorMode
-import kotlin.math.max
-import kotlin.math.min
-
-internal fun getEffectiveResolution(quality: DScreenMirrorQuality, adaptiveResolution: Int): Int {
-    return when (quality.mode) {
-        ScreenMirrorMode.AUTO -> adaptiveResolution
-        ScreenMirrorMode.HD -> 1080
-        ScreenMirrorMode.SMOOTH -> 720
-    }
-}
-
-internal fun computeTargetBitrateKbps(resolution: Int): Int {
-    return when {
-        resolution >= 1080 -> 4000
-        resolution >= 720 -> 2000
-        else -> 1000
-    }
-}
-
-internal fun computeStartBitrateKbps(resolution: Int): Int {
-    return when {
-        resolution >= 1080 -> 3000
-        resolution >= 720 -> 1500
-        else -> 800
-    }
-}
-
-internal fun computeCaptureSize(
-    context: Context,
-    quality: DScreenMirrorQuality,
-    adaptiveResolution: Int,
-): Triple<Int, Int, Int> {
-    val realSize = getRealScreenSize(context)
-    val shortSide = min(realSize.x, realSize.y)
-    val targetShort = getEffectiveResolution(quality, adaptiveResolution)
-    val scale = min(1f, targetShort.toFloat() / shortSide.toFloat())
-    val targetWidth = makeEven(max(2, (realSize.x * scale).toInt()))
-    val targetHeight = makeEven(max(2, (realSize.y * scale).toInt()))
-    return Triple(targetWidth, targetHeight, context.resources.displayMetrics.densityDpi)
-}
 
 /**
  * Get the real physical screen dimensions including system bars.
@@ -95,5 +53,3 @@ internal fun getRealScreenSize(context: Context): Point {
         }
     }
 }
-
-internal fun makeEven(value: Int): Int = if (value % 2 == 0) value else value - 1

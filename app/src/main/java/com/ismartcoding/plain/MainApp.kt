@@ -1,6 +1,8 @@
 package com.ismartcoding.plain
 
 import android.app.Application
+import android.media.AudioAttributes
+import android.media.AudioManager
 import android.os.Build
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextClassifier
@@ -51,6 +53,7 @@ import com.ismartcoding.plain.db.DataInitializer
 import com.ismartcoding.plain.db.Migrations
 import com.ismartcoding.plain.db.initDatabase
 import com.ismartcoding.plain.helpers.ChatFidUriMigration
+import com.ismartcoding.plain.lib.isQPlus
 import com.ismartcoding.plain.preferences.ensureKeyPairAsync
 import com.ismartcoding.plain.preferences.ensureValueAsync
 import com.ismartcoding.plain.preferences.setDarkMode
@@ -99,6 +102,12 @@ class MainApp : Application() {
         AppEvents.register()
         HttpServerManager.warmUp()
         NetworkMonitor.init(this)
+        if (isQPlus()) {
+            try {
+                audioManager.allowedCapturePolicy = AudioAttributes.ALLOW_CAPTURE_BY_ALL
+            } catch (_: Exception) {
+            }
+        }
 
         // https://stackoverflow.com/questions/77683434/the-getnextentry-method-of-zipinputstream-throws-a-zipexception-invalid-zip-ent
         if (isUPlus()) {

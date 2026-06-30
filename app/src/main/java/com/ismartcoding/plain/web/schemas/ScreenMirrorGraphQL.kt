@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.channel.sendEvent
@@ -15,14 +14,19 @@ import com.ismartcoding.plain.preferences.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.services.PlainAccessibilityService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.request.header
+import com.ismartcoding.plain.web.models.ScreenMirrorVideoCodec
 
 fun SchemaBuilder.addScreenMirrorSchema() {
     query("screenMirrorState") {
         resolver { ->
             ScreenMirrorService.instance?.isRunning() == true
+        }
+    }
+    query("screenMirrorVideoCodec") {
+        resolver { ->
+            ScreenMirrorService.instance?.let { svc ->
+                svc.getPipeline()?.getScreenMirrorVideoCodec()
+            }
         }
     }
     query("screenMirrorControlEnabled") {
@@ -62,22 +66,13 @@ fun SchemaBuilder.addScreenMirrorSchema() {
     mutation("updateScreenMirrorQuality") {
         resolver { mode: ScreenMirrorMode ->
             val resolution = when (mode) {
-                ScreenMirrorMode.AUTO -> 1080
-                ScreenMirrorMode.HD -> 1080
                 ScreenMirrorMode.SMOOTH -> 720
+                ScreenMirrorMode.HD -> 1080
             }
             val qualityData = DScreenMirrorQuality(mode, resolution)
             ScreenMirrorQualityPreference.putAsync(qualityData)
             ScreenMirrorService.qualityData = qualityData
             ScreenMirrorService.instance?.onQualityChanged()
-            true
-        }
-    }
-    mutation("sendWebRtcSignaling") {
-        resolver { payload: WebRtcSignalingMessage, context: Context ->
-            val call = context.get<ApplicationCall>()
-            val clientId = call?.request?.header("c-id") ?: ""
-            ScreenMirrorService.instance?.handleWebRtcSignaling(clientId, payload)
             true
         }
     }
@@ -90,4 +85,5 @@ fun SchemaBuilder.addScreenMirrorSchema() {
             true
         }
     }
+    type<ScreenMirrorVideoCodec> {}
 }

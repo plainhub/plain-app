@@ -143,13 +143,16 @@ Cases:
 - `appLogs` returns last N log lines
 - `appFiles` returns internal storage listing
 
-### `screen-mirror` — WebRTC signaling
+### `screen-mirror` — MediaCodec + WebCodecs pipeline
 
-`ScreenMirrorGraphQL`.
+`ScreenMirrorGraphQL`. Phone captures via `MediaProjection` and encodes
+H.264 (video) + Opus (audio) with `MediaCodec`; web decodes with
+`WebCodecs` (`VideoDecoder` / `AudioDecoder`).
 
-State machine: `screenMirrorOffer` (generates SDP) → `screenMirrorAnswer`
-(consumes remote SDP) → `screenMirrorIce` (relay candidates) → `stopScreenMirror`.
-Verify state via `dumpsys media_session` and `screenMirrorStatus` query.
+State machine: `screenMirrorVideoCodec` (proactive avcC config pull) →
+`startScreenMirror` (begins capture) → binary ws frames
+`screen_mirror_video` / `screen_mirror_audio` → `stopScreenMirror`.
+Verify state via `dumpsys media_session` and `screenMirrorState` query.
 
 ### `discovery` — mDNS discover / pairing / peer
 

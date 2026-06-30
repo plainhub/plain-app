@@ -6,12 +6,14 @@ import com.ismartcoding.plain.i18n.*
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.hardware.display.DisplayManager
+import android.view.Display
+import android.view.Surface
 import android.view.OrientationEventListener
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import android.media.projection.MediaProjection
 import com.ismartcoding.plain.lib.channel.sendEvent
-import com.ismartcoding.plain.lib.extensions.isPortrait
 import com.ismartcoding.plain.lib.extensions.parcelable
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
@@ -20,8 +22,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.mediaProjectionManager
-import com.ismartcoding.plain.services.webrtc.ScreenMirrorWebRtcManager
-import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage
+import com.ismartcoding.plain.services.screenmirror.ScreenMirrorPipeline
 
 class ScreenMirrorService : LifecycleService() {
 
@@ -29,7 +30,7 @@ class ScreenMirrorService : LifecycleService() {
     private var isPortrait = true
     private var notificationId: Int = 0
 
-    private lateinit var webRtcManager: ScreenMirrorWebRtcManager
+    private var pipeline: ScreenMirrorPipeline? = null
 
     @Volatile
     private var running = false
@@ -38,24 +39,26 @@ class ScreenMirrorService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         instance = this
-        webRtcManager = ScreenMirrorWebRtcManager(
-            context = this,
-            getQuality = { qualityData },
-            getIsPortrait = { isPortrait },
-        )
         NotificationHelper.ensureDefaultChannel()
-        isPortrait = isPortrait()
+        isPortrait = currentDisplayIsPortrait()
         orientationEventListener =
             object : OrientationEventListener(this) {
                 override fun onOrientationChanged(orientation: Int) {
-                    val newIsPortrait = isPortrait()
+                    val newIsPortrait = currentDisplayIsPortrait()
+                    LogCat.d("screen mirror: sensor=$orientation newIsPortrait=$newIsPortrait (was $isPortrait)")
                     if (isPortrait != newIsPortrait) {
                         isPortrait = newIsPortrait
                         PlainAccessibilityService.invalidateScreenSizeCache()
-                        webRtcManager.onOrientationChanged()
+                        pipeline?.onOrientationChanged()
                     }
                 }
             }
+    }
+
+    private fun currentDisplayIsPortrait(): Boolean {
+        val rotation = (getSystemService(DisplayManager::class.java))
+            ?.getDisplay(Display.DEFAULT_DISPLAY)?.rotation ?: Surface.ROTATION_0
+        return rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180
     }
 
     @SuppressLint("WrongConstant")
@@ -120,12 +123,20 @@ class ScreenMirrorService : LifecycleService() {
         orientationEventListener?.enable()
         running = true
 
-        val captureStarted = webRtcManager.initCapture(mMediaProjection)
-        if (!captureStarted) {
-            LogCat.e("screen mirror: initCapture failed (VirtualDisplay could not be created), stopping service")
+        val p = ScreenMirrorPipeline(
+            context = this,
+            projection = mMediaProjection,
+            quality = qualityData,
+            getIsPortrait = { isPortrait },
+        )
+        try {
+            p.start()
+        } catch (e: Exception) {
+            LogCat.e("screen mirror: pipeline start failed: ${e.message}", e)
             stop()
             return START_NOT_STICKY
         }
+        pipeline = p
         sendEvent(
             WebSocketEvent(
                 EventType.SCREEN_MIRRORING,
@@ -139,19 +150,18 @@ class ScreenMirrorService : LifecycleService() {
     override fun onDestroy() {
         super.onDestroy()
         running = false
-        webRtcManager.releaseAll()
+        pipeline?.stop()
+        pipeline = null
         orientationEventListener?.disable()
         instance = null
     }
 
     fun isRunning(): Boolean = running
 
-    fun handleWebRtcSignaling(clientId: String, message: WebRtcSignalingMessage) {
-        webRtcManager.handleSignaling(clientId, message)
-    }
+    fun getPipeline(): ScreenMirrorPipeline? = pipeline
 
     fun onQualityChanged() {
-        webRtcManager.onQualityChanged()
+        pipeline?.setQuality(qualityData)
     }
 
     fun stop() {

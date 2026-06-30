@@ -7,7 +7,7 @@
 > - 音频 **Phase 1 必须支持** (Opus 编码),不再是 Phase 4 增强项。
 > - 浏览器 WebCodecs 不支持 → 提示用户升级,不做兼容。
 > - 控制流 (touch/key) 继续走 GraphQL mutation。
-> - **加密按现状分通道**: Text 走 ChaCha20(业务通道,行为不变), Binary 走 raw(高吞吐通道,现状故意如此)。三个新 EventType (`SCREEN_MIRROR_VIDEO` / `SCREEN_MIRROR_CONFIG` / `SCREEN_MIRROR_AUDIO`) 全是 Binary,**不加密** — 保住 0 copy 目标,跟 scrcpy 一致。
+> - **加密按现状分通道**: Text 走 ChaCha20(业务通道,行为不变), Binary 走 raw(高吞吐通道,现状故意如此)。三个新 EventType (`SCREEN_MIRROR_VIDEO` / `SCREEN_MIRROR_VIDEO_CODEC` / `SCREEN_MIRROR_AUDIO`) 全是 Binary,**不加密** — 保住 0 copy 目标,跟 scrcpy 一致。
 
 ## 1. 现状摘要 (读完代码后)
 
@@ -133,7 +133,7 @@ phone → MediaProjection 授权
 phone → 创建 VirtualDisplay
 phone → 创建 MediaCodec encoder (硬编 H.264 baseline)
 phone → 把 VirtualDisplay surface 接到 encoder input surface
-phone → ws push { EventType.SCREEN_MIRROR_CONFIG, SPS+PPS+profile+level }   ← 一次性
+phone → ws push { EventType.SCREEN_MIRROR_VIDEO_CODEC, SPS+PPS+profile+level }   ← 一次性
 phone → encoder → ws push { EventType.SCREEN_MIRROR_VIDEO, nalu bytes }      ← 持续
 web   → 收到 CONFIG → 调 VideoDecoder.configure({ codec: 'avc1.xxxxx', description: avccBox })
 web   → 收到 VIDEO chunk → VideoDecoder.decode(EncodedVideoChunk) → callback(VideoFrame)
@@ -146,7 +146,7 @@ web   → canvas.drawImage(frame) → 显示
 新增两个 EventType(在 `WebSocketEvents.kt` enum 末尾):
 ```kotlin
 SCREEN_MIRROR_VIDEO(31),     // phone → web, binary, 一帧一包,内容是 annex-b NAL unit (或 access unit 切片)
-SCREEN_MIRROR_CONFIG(32),    // phone → web, binary, 一次性,内容是 avcC box (SPS+PPS+extradata)
+SCREEN_MIRROR_VIDEO_CODEC(32),    // phone → web, binary, 一次性,内容是 avcC box (SPS+PPS+extradata)
 ```
 
 下行控制(quality 切换、stop)继续走 GraphQL mutation(低频,无延迟要求)。
@@ -180,7 +180,7 @@ SCREEN_MIRROR_CONFIG(32),    // phone → web, binary, 一次性,内容是 avcC 
 | Text (chat/file/control 等业务消息) | ✅ ChaCha20 | 保护业务数据 |
 | Binary (高吞吐通道,含 mirror 三个新 EventType) | ❌ Raw | 现状故意,保 0 copy / 0 解密,跟 scrcpy 裸 TCP 设计一致 |
 | `SCREEN_MIRROR_VIDEO (31)` | ❌ Raw | Binary 通道,0 copy 保 0 中转 |
-| `SCREEN_MIRROR_CONFIG (32)` | ❌ Raw | 同上,SPS/PPS 无敏感信息 |
+| `SCREEN_MIRROR_VIDEO_CODEC (32)` | ❌ Raw | 同上,SPS/PPS 无敏感信息 |
 | `SCREEN_MIRROR_AUDIO (33)` | ❌ Raw | 同上,音频解码链保 0 中转 |
 
 实现: 三个 mirror EventType 用 `WebSocketData.Binary` + `addIntPrefixToByteArray(type, bytes)`,**不调** `CryptoHelper.chaCha20Encrypt` — 跟现有 `WebSocketHelper.kt:23-25` 的 Binary 分支行为一致,零新增加密代码。
@@ -222,7 +222,7 @@ Android (`plain-app/app/src/main/java/com/ismartcoding/plain/services/`):
 - [ ] `services/ScreenMirrorService.kt`:
   - 改持有 `ScreenMirrorPipeline` 而非 `ScreenMirrorWebRtcManager`
   - 保留所有 OEM AppOp fix 逻辑
-- [ ] `shared/.../events/WebSocketEvents.kt`:加 `SCREEN_MIRROR_VIDEO(31)`, `SCREEN_MIRROR_CONFIG(32)`, `SCREEN_MIRROR_AUDIO(33)`
+- [ ] `shared/.../events/WebSocketEvents.kt`:加 `SCREEN_MIRROR_VIDEO(31)`, `SCREEN_MIRROR_VIDEO_CODEC(32)`, `SCREEN_MIRROR_AUDIO(33)`
 - [ ] `web/websocket/WebSocketHelper.kt`:
   - **新增方法**: `sendVideoToClientAsync` / `sendConfigToClientAsync` / `sendAudioToClientAsync` — **走 Binary 不加密路径**(跟现有 `sendEventAsync` Binary 分支一致)
   - 实现: `addIntPrefixToByteArray(type, bytes)` → `session.send(...)`,**不调** `CryptoHelper.chaCha20Encrypt`
@@ -388,9 +388,9 @@ Web (`plain-web/`):
 
 ## 8. 不动的部分 (硬约束)
 
-- Android 11 VirtualDisplay resize 黑条 fix  (`docs/screen-mirror-webrtc.md:123-152`)
+- Android 11 VirtualDisplay resize 黑条 fix  (`ScreenMirrorScreenSize.kt`, 从旧 `ScreenCaptureConfig.kt` 搬过来)
 - AOSP/OEM startForeground + getMediaProjection 顺序 (`ScreenMirrorService.kt:82-118`)
-- orientation 旋转后 recreate VirtualDisplay 路径(`ScreenMirrorWebRtcManager.kt:170-188`)
+- orientation 旋转后 invalidateScreenSizeCache + `ScreenMirrorPipeline.onOrientationChanged()`
 - 权限弹窗 UX 流程 (30s 倒计时等)
 - `screen-mirror-ux.md` 描述的状态机 (idle / requesting / connecting / streaming / failed)
 - 控制流 (`screen-mirror-control.ts` 392 行不动)

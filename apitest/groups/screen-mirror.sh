@@ -4,9 +4,9 @@
 #
 # Schemas covered:
 #   ScreenMirrorGraphQL : screenMirrorState, screenMirrorControlEnabled,
-#                         screenMirrorQuality, startScreenMirror,
-#                         requestScreenMirrorAudio, stopScreenMirror,
-#                         updateScreenMirrorQuality, sendWebRtcSignaling,
+#                         screenMirrorQuality, screenMirrorVideoCodec,
+#                         startScreenMirror, requestScreenMirrorAudio,
+#                         stopScreenMirror, updateScreenMirrorQuality,
 #                         sendScreenMirrorControl
 #
 # Screen mirror requires the AccessibilityService to be enabled. On a
@@ -14,7 +14,7 @@
 # input via the accessibility service will throw — we record them as
 # gated rather than as failures. The read-side queries always work.
 
-run_group "screen-mirror" "WebRTC signaling + control" "docs/api-test-plan.md#screen-mirror"
+run_group "screen-mirror" "Screen mirror control" "docs/api-test-plan.md#screen-mirror"
 
 # ----------------------------------------------------------------------------
 # screen-mirror-C01  screenMirrorState (initially false)
@@ -91,12 +91,7 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# screen-mirror-C08  sendWebRtcSignaling — needs running mirror session
-# ----------------------------------------------------------------------------
-skip "screen-mirror-C08 sendWebRtcSignaling (skipped: needs running mirror session)"
-
-# ----------------------------------------------------------------------------
-# screen-mirror-C09  sendScreenMirrorControl — requires AccessibilityService
+# screen-mirror-C08  sendScreenMirrorControl — requires AccessibilityService
 # ----------------------------------------------------------------------------
 # Try a benign no-op control (tap at origin) and expect it to throw if
 # the AccessibilityService is disabled.
@@ -104,11 +99,11 @@ SSMC=$(call_gql 'mutation { sendScreenMirrorControl(input: { action: TAP, x: 0.5
 api_ssmc_err=$(printf '%s' "$SSMC" | jq -r '.errors[0].message // empty')
 api_ssmc=$(printf '%s' "$SSMC" | jq -r '.data.sendScreenMirrorControl // empty')
 if [[ "$api_ssmc_err" == *"Accessibility"* ]] || [[ "$api_ssmc_err" == *"not enabled"* ]]; then
-  pass "screen-mirror-C09 sendScreenMirrorControl correctly errored: AccessibilityService not enabled"
+  pass "screen-mirror-C08 sendScreenMirrorControl correctly errored: AccessibilityService not enabled"
 elif [[ "$api_ssmc" == "true" ]]; then
-  pass "screen-mirror-C09 sendScreenMirrorControl → true (AccessibilityService enabled)"
+  pass "screen-mirror-C08 sendScreenMirrorControl → true (AccessibilityService enabled)"
 else
-  fail "screen-mirror-C09 sendScreenMirrorControl returned: $SSMC"
+  fail "screen-mirror-C08 sendScreenMirrorControl returned: $SSMC"
 fi
 
 end_group
