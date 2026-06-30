@@ -81,6 +81,7 @@ kotlin {
             implementation(libs.coil.gif)
             implementation(libs.coil.video)
             implementation(libs.coil.network.okhttp)
+            implementation(libs.zxing.core)
         }
         iosMain.dependencies {
             implementation(libs.sqlite.bundled)
