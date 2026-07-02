@@ -182,9 +182,9 @@ fun Route.addUploads() {
                                 val chunkDir = File(MainApp.instance.filesDir, "upload_tmp/${chunkInfo.fileId}")
                                 chunkDir.mkdirs()
 
-                                // Stream chunk directly to disk — never load the entire 5 MB
-                                // chunk as a byte array.  With 3 parallel workers, toByteArray()
-                                // caused ~30 MB of simultaneous heap allocations which triggered
+                                // Stream chunk directly to disk — never load the entire chunk
+                                // as a byte array. With multiple parallel workers, toByteArray()
+                                // caused large simultaneous heap allocations which triggered
                                 // OOM kills on Huawei/EMUI devices mid-transfer.
                                 val chunkFile = File(chunkDir, "chunk_${chunkInfo.index}")
                                 val tempFile = File(chunkDir, ".tmp_chunk_${chunkInfo.index}_${System.nanoTime()}")

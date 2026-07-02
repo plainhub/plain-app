@@ -169,6 +169,8 @@ class ChunkUploadTest {
     @Test
     fun `merge produces correct file from chunks`() {
         val chunkDir = tmp.newFolder("upload_tmp", "merge1")
+        val cacheDir = tmp.newFolder("cache")
+        val outputDir = tmp.newFolder("storage")
         val totalChunks = 3
 
         // Create chunks with distinct content
@@ -188,22 +190,15 @@ class ChunkUploadTest {
         }
         assertEquals(12582912L, expectedSize) // 5+5+2 MB
 
-        // Merge
-        val outputFile = File(tmp.root, "output.bin")
-        val tempMergeFile = File(tmp.root, ".merge_tmp_${System.currentTimeMillis()}")
+        // Merge into cacheDir (simulates internal storage temp)
+        val outputFile = File(outputDir, "output.bin")
+        val tempMergeFile = File(cacheDir, ".merge_tmp_${System.currentTimeMillis()}")
 
         FileOutputStream(tempMergeFile).use { fos ->
-            val outputChannel = fos.channel
             for (i in 0 until totalChunks) {
                 val chunkFile = File(chunkDir, "chunk_$i")
-                chunkFile.inputStream().channel.use { inputChannel ->
-                    var position = 0L
-                    val size = inputChannel.size()
-                    while (position < size) {
-                        val transferred = inputChannel.transferTo(position, size - position, outputChannel)
-                        if (transferred <= 0) break
-                        position += transferred
-                    }
+                chunkFile.inputStream().use { input ->
+                    input.copyTo(fos)
                 }
             }
             fos.fd.sync()
@@ -212,8 +207,10 @@ class ChunkUploadTest {
         val mergedSize = tempMergeFile.length()
         assertEquals(expectedSize, mergedSize)
 
-        // Atomic rename
-        assertTrue(tempMergeFile.renameTo(outputFile))
+        // Cross-mount copy: cacheDir → outputDir (rename won't work across mounts)
+        assertEquals(outputFile, tempMergeFile.copyTo(outputFile, overwrite = true))
+        tempMergeFile.delete()
+
         assertEquals(expectedSize, outputFile.length())
 
         // Verify content
@@ -224,6 +221,35 @@ class ChunkUploadTest {
 
         // Cleanup
         chunkDir.deleteRecursively()
+    }
+
+    @Test
+    fun `merge temp file lives in cache dir not output parent`() {
+        val chunkDir = tmp.newFolder("upload_tmp", "merge_temp_loc")
+        val cacheDir = tmp.newFolder("cache")
+        val outputDir = tmp.newFolder("storage")
+        val outputFile = File(outputDir, "out.bin")
+
+        File(chunkDir, "chunk_0").writeBytes(ByteArray(1024) { 0x42.toByte() })
+        File(chunkDir, "chunk_1").writeBytes(ByteArray(2048) { 0x43.toByte() })
+
+        val tempMergeFile = File(cacheDir, ".merge_tmp_x_${System.currentTimeMillis()}")
+
+        FileOutputStream(tempMergeFile).use { fos ->
+            for (i in 0 until 2) {
+                File(chunkDir, "chunk_$i").inputStream().use { it.copyTo(fos) }
+            }
+            fos.fd.sync()
+        }
+
+        assertTrue(tempMergeFile.exists())
+        assertFalse(File(outputDir, tempMergeFile.name).exists())
+
+        tempMergeFile.copyTo(outputFile, overwrite = true)
+        tempMergeFile.delete()
+
+        assertEquals(3072L, outputFile.length())
+        assertFalse(tempMergeFile.exists())
     }
 
     @Test
@@ -241,14 +267,8 @@ class ChunkUploadTest {
         FileOutputStream(tempFile).use { fos ->
             for (i in 0 until 2) {
                 val chunkFile = File(chunkDir, "chunk_$i")
-                chunkFile.inputStream().channel.use { inputChannel ->
-                    var pos = 0L
-                    val size = inputChannel.size()
-                    while (pos < size) {
-                        val t = inputChannel.transferTo(pos, size - pos, fos.channel)
-                        if (t <= 0) break
-                        pos += t
-                    }
+                chunkFile.inputStream().use { input ->
+                    input.copyTo(fos)
                 }
             }
             fos.fd.sync()

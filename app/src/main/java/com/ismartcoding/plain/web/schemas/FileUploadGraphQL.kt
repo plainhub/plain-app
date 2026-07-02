@@ -8,7 +8,6 @@ import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.helpers.AppFileStore
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 
 fun SchemaBuilder.addFileUploadSchema() {
     val uploadTmpDir = File(MainApp.instance.filesDir, "upload_tmp")
@@ -66,56 +65,31 @@ fun SchemaBuilder.addFileUploadSchema() {
             }
             outputFile.parentFile?.mkdirs()
 
-            // Merge into a temp file first, then rename atomically.
-            // This prevents the file from appearing in listings with a partial size.
-            val tempMergeFile = File(outputFile.parentFile, ".merge_tmp_${fileId}_${System.currentTimeMillis()}")
+            val cacheMergeDir = File(MainApp.instance.cacheDir, "upload_merge").apply { mkdirs() }
+            val tempMergeFile = File(cacheMergeDir, ".merge_tmp_${fileId}_${System.currentTimeMillis()}")
             try {
                 FileOutputStream(tempMergeFile).use { fos ->
-                    val outputChannel = fos.channel
                     for (i in 0 until totalChunks) {
                         val chunkFile = File(chunkDir, "chunk_$i")
-
-                        chunkFile.inputStream().channel.use { inputChannel ->
-                            var position = 0L
-                            val size = inputChannel.size()
-                            while (position < size) {
-                                val transferred = inputChannel.transferTo(position, size - position, outputChannel)
-                                if (transferred < 0) throw IOException("transferTo failed at position $position")
-                                if (transferred == 0L) {
-                                    // transferTo can transiently return 0; yield and retry
-                                    Thread.sleep(1)
-                                    continue
-                                }
-                                position += transferred
-                            }
+                        chunkFile.inputStream().use { input ->
+                            input.copyTo(fos)
                         }
                     }
-                    // Force all data to disk before checking size
-                    fos.fd.sync()
                 }
 
                 val mergedSize = tempMergeFile.length()
 
-                // Cross-check: merged file must equal sum of all chunk sizes
                 if (mergedSize != expectedMergedSize) {
                     tempMergeFile.delete()
                     throw GraphQLError("Merge integrity failed: expected $expectedMergedSize, got $mergedSize")
                 }
 
-                // Atomic rename: file appears with correct size instantly
                 if (outputFile.exists() && replace) {
                     outputFile.delete()
                 }
-                if (!tempMergeFile.renameTo(outputFile)) {
-                    // renameTo can move the file but still return false on some
-                    // Android file systems. Only use copyTo when source still exists.
-                    if (tempMergeFile.exists()) {
-                        tempMergeFile.copyTo(outputFile, overwrite = true)
-                        tempMergeFile.delete()
-                    } else if (!outputFile.exists()) {
-                        throw GraphQLError("Failed to save merged file: rename failed and source file is missing")
-                    }
-                }
+                tempMergeFile.copyTo(outputFile, overwrite = true)
+                FileOutputStream(outputFile, true).use { it.fd.sync() }
+                tempMergeFile.delete()
             } catch (e: Exception) {
                 tempMergeFile.delete()
                 throw e
