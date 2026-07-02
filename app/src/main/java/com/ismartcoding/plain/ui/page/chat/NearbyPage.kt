@@ -28,10 +28,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
+import com.ismartcoding.plain.features.bluetooth.BlePairingCandidate
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
@@ -42,6 +42,7 @@ import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.page.chat.components.BleDeviceItem
 import com.ismartcoding.plain.ui.page.chat.components.NearbyDeviceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +54,8 @@ fun NearbyPage(
 ) {
     val nearbyDevices = nearbyVM.nearbyDevices
     val isDiscovering by nearbyVM.isDiscovering
+    val bleCandidates = nearbyVM.bleCandidates
+    val isBleScanning by nearbyVM.isBleScanning
 
     var showQrSheet by remember { mutableStateOf(false) }
     var qrData by remember { mutableStateOf<DQrPairData?>(null) }
@@ -61,21 +64,21 @@ fun NearbyPage(
         if (!isDiscovering) {
             nearbyVM.startDiscovering()
         }
+        if (!isBleScanning) {
+            nearbyVM.startBleScanning()
+        }
     }
 
-    // Load QR data when the sheet is about to be shown
     LaunchedEffect(showQrSheet) {
         if (showQrSheet && qrData == null) {
             qrData = nearbyVM.getQrDataAsync()
         }
     }
 
-    // Stop discovering when leaving the page
     DisposableEffect(Unit) {
         onDispose {
-            if (isDiscovering) {
-                nearbyVM.stopDiscovering()
-            }
+            if (isDiscovering) nearbyVM.stopDiscovering()
+            if (isBleScanning) nearbyVM.stopBleScanning()
         }
     }
 
@@ -106,8 +109,9 @@ fun NearbyPage(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            nearbySearchingItem()
+            nearbySearchingItem(isDiscovering || isBleScanning)
             nearbyDeviceListItems(nearbyDevices, nearbyVM, peerVM)
+            bleCandidateListItems(bleCandidates, nearbyVM)
             item {
                 BottomSpace(paddingValues)
             }
@@ -122,40 +126,11 @@ fun NearbyPage(
     }
 }
 
-internal fun LazyListScope.nearbySearchingItem() {
-    item {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                HorizontalSpace(8.dp)
-                Text(
-                    text = stringResource(Res.string.searching_nearby_devices),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-    }
-}
-
 internal fun LazyListScope.nearbyDeviceListItems(
     nearbyDevices: List<DNearbyDevice>,
     nearbyVM: NearbyViewModel,
     peerVM: PeerViewModel,
 ) {
-    // Snapshot read — re-evaluated only when this scope recomposes, which
-    // happens alongside nearbyDevices updates from NearbyViewModel.
     val pairedPeers = PeerCacher.pairedPeers.value
     if (nearbyDevices.isNotEmpty()) {
         item {
@@ -177,17 +152,35 @@ internal fun LazyListScope.nearbyDeviceListItems(
                 VerticalSpace(8.dp)
             }
         }
+    }
+}
+
+private fun LazyListScope.bleCandidateListItems(
+    candidates: List<BlePairingCandidate>,
+    nearbyVM: NearbyViewModel,
+) {
+    if (candidates.isNotEmpty()) {
+        item {
+            VerticalSpace(16.dp)
+            Subtitle(stringResource(Res.string.bluetooth))
+        }
+        candidates.forEach { candidate ->
+            item {
+                BleDeviceItem(
+                    candidate = candidate,
+                    isPairing = nearbyVM.isBleCandidatePairing(candidate.mac),
+                    onPairClick = { nearbyVM.pairViaBle(candidate) },
+                )
+                VerticalSpace(8.dp)
+            }
+        }
     } else {
         item {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 48.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(Res.string.make_sure_devices_same_network),
                         style = MaterialTheme.typography.bodyMedium,
@@ -196,6 +189,30 @@ internal fun LazyListScope.nearbyDeviceListItems(
                         modifier = Modifier.padding(horizontal = 32.dp)
                     )
                 }
+            }
+        }
+    }
+}
+
+internal fun LazyListScope.nearbySearchingItem(isLoading: Boolean) {
+    if (!isLoading) return
+    item {
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                HorizontalSpace(8.dp)
+                Text(
+                    text = stringResource(Res.string.searching_nearby_devices),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
         }
     }

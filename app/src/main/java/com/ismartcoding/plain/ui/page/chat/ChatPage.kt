@@ -19,6 +19,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -37,11 +39,18 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChatChannel
+import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.events.DeleteChatItemViewEvent
+import com.ismartcoding.plain.events.HChatItemsDeletedEvent
+import com.ismartcoding.plain.events.HMessageCreatedEvent
+import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.lib.channel.Channel
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
@@ -111,7 +120,47 @@ fun ChatPage(
     val focusManager = LocalFocusManager.current
     val previewerState = rememberPreviewerState()
 
-    ChatPageEffects(id, chatVM, peerVM, scrollState, focusManager, scope, onInputLoaded = { inputValue = it })
+    val sharedFlow = Channel.sharedFlow
+
+    DisposableEffect(id) {
+        TempData.activeToId = id
+        onDispose {
+            TempData.activeToId = ""
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        inputValue = ChatInputTextPreference.getAsync()
+        scope.launch(Dispatchers.IO) {
+            chatVM.initializeTargetAsync(id)
+            chatVM.fetchAsync(chatVM.target.value.toId)
+        }
+    }
+
+    LaunchedEffect(sharedFlow) {
+        sharedFlow.collect { event ->
+            when (event) {
+                is DeleteChatItemViewEvent -> chatVM.remove(event.id)
+                is HChatItemsDeletedEvent -> chatVM.removeIds(event.ids)
+                is HMessageCreatedEvent -> {
+                    if (chatVM.target.value == event.target) {
+                        chatVM.addAllAndScroll(event.items)
+                    }
+                }
+
+                is PickFileResultEvent -> {
+                    if (event.tag != PickFileTag.SEND_MESSAGE) return@collect
+                    handleFileSelection(event, context, chatVM, peerVM, focusManager)
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(chatVM) {
+        chatVM.scrollToLatest.collect { previousTopId ->
+            scrollToLatest(chatVM, scrollState, previousTopId)
+        }
+    }
 
     BackHandler(enabled = chatVM.selectMode.value || previewerState.visible) {
         if (previewerState.visible) scope.launch { previewerState.closeTransform() }
@@ -236,12 +285,10 @@ fun ChatPage(
                     },
                     onSend = {
                         if (inputValue.isEmpty()) return@ChatInput
-                        val previousTopId = itemsState.value.firstOrNull()?.id
                         scope.launch {
                             chatVM.sendTextMessage(inputValue, context, PeerCacher.getOnlinePeerIds())
                             inputValue = ""
                             ChatInputTextPreference.putAsync("")
-                            scrollToLatest(chatVM, scrollState, previousTopId)
                         }
                     })
             }
@@ -256,12 +303,7 @@ fun ChatPage(
             onDismiss = { showForwardDialog = false; messageToForward = null },
             onTargetSelected = { target ->
                 messageToForward?.let { message ->
-                    val forwardToCurrent = target == chatVM.target.value
-                    val previousTopId = chatVM.itemsFlow.value.firstOrNull()?.id
                     chatVM.forwardMessage(message.id, target, PeerCacher.getOnlinePeerIds())
-                    if (forwardToCurrent) {
-                        scope.launch { scrollToLatest(chatVM, scrollState, previousTopId) }
-                    }
                 }
             })
     }

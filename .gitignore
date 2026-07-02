@@ -93,6 +93,9 @@ scripts/i18n-translated.json
 # AI model files (too large for git)
 ai_models/
 
+# Project-local skills (symlink to private harness repo, do not leak path)
+.harness/
+
 # apitest — raw per-run API responses (may contain PII from device data)
 apitest/results/
 

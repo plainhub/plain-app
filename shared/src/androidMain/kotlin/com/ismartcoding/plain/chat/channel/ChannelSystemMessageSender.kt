@@ -84,7 +84,7 @@ object ChannelSystemMessageSender {
                 ),
             )
         )
-        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessages.TYPE_UPDATE, payload, channel.id, channel.key)
+        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessages.TYPE_UPDATE, payload, channel.id)
     }
 
     /** Send kick notification to a single peer, signed with
@@ -100,7 +100,7 @@ object ChannelSystemMessageSender {
                 ),
             )
         )
-        sendToPeer(peer, ChannelSystemMessages.TYPE_KICK, payload, channel.id, channel.key)
+        sendToPeer(peer, ChannelSystemMessages.TYPE_KICK, payload, channel.id)
     }
 
     /** Broadcast kick to all members (used when owner deletes the channel).
@@ -115,30 +115,29 @@ object ChannelSystemMessageSender {
                 ),
             )
         )
-        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessages.TYPE_KICK, payload, channel.id, channel.key)
+        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessages.TYPE_KICK, payload, channel.id)
     }
 
     /** Send leave notification to the channel owner. */
-    suspend fun sendLeave(channelId: String, ownerPeer: DPeer, channelKey: String = ""): GraphQLResponse = withIO {
+    suspend fun sendLeave(channelId: String, ownerPeer: DPeer): GraphQLResponse = withIO {
         val payload = jsonEncode(ChannelSystemMessages.ChannelLeave(channelId))
-        sendToPeer(ownerPeer, ChannelSystemMessages.TYPE_LEAVE, payload, channelId, channelKey)
+        sendToPeer(ownerPeer, ChannelSystemMessages.TYPE_LEAVE, payload, channelId)
     }
 
-    private suspend fun sendToPeer(peer: DPeer, type: String, payload: String, channelId: String = "", channelKey: String = ""): GraphQLResponse = withIO {
+    private suspend fun sendToPeer(peer: DPeer, type: String, payload: String, channelId: String = ""): GraphQLResponse = withIO {
         PeerGraphQLClient.sendChannelSystemMessage(
             peer = peer,
             clientId = TempData.clientId,
             type = type,
             payload = payload,
             channelId = channelId,
-            channelKey = channelKey,
         )
     }
 
-    private suspend fun sendToMultiplePeers(peerIds: List<String>, type: String, payload: String, channelId: String = "", channelKey: String = "") = withIO {
+    private suspend fun sendToMultiplePeers(peerIds: List<String>, type: String, payload: String, channelId: String = "") = withIO {
         for (peerId in peerIds) {
             val peer = PeerCacher.getPeer(peerId) ?: continue
-            sendToPeer(peer, type, payload, channelId, channelKey)
+            sendToPeer(peer, type, payload, channelId)
         }
     }
 }

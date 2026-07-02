@@ -93,7 +93,7 @@ object ChannelManager {
 
             val ownerPeer = AppDatabase.instance.peerDao().getById(channel.owner)
             if (ownerPeer != null) {
-                ChannelSystemMessageSender.sendLeave(channel.id, ownerPeer, channel.key)
+                ChannelSystemMessageSender.sendLeave(channel.id, ownerPeer)
             }
             channel.status = DChatChannel.STATUS_LEFT
             channel.members = channel.members.filter { it.id != TempData.clientId }

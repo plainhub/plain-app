@@ -45,6 +45,7 @@ import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -150,6 +151,7 @@ class MainApp : Application() {
             HttpServerManager.loadTokenCache()
             PeerCacher.load()
             ChannelCacher.load()
+            ChatCacher.load()
             if (!FidUriExtMigratedPreference.get(preferences)) {
                 ChatFidUriMigration.run(this@MainApp)
                 FidUriExtMigratedPreference.putAsync(true)

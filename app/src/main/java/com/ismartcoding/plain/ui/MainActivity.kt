@@ -184,16 +184,10 @@ class MainActivity : AppCompatActivity() {
                             onTargetSelected = { target ->
                                 navControllerState.value?.navigate(Routing.Chat(target.encodedToId))
                                 pendingFileUris?.let { uris ->
-                                    coIO {
-                                        delay(500)
-                                        sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris))
-                                    }
+                                    sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris))
                                 }
                                 pendingForwardText?.let { text ->
-                                    coIO {
-                                        delay(500)
-                                        chatVM.sendTextMessage(text, this@MainActivity, PeerCacher.getOnlinePeerIds())
-                                    }
+                                    chatVM.sendTextMessage(text, this@MainActivity, PeerCacher.getOnlinePeerIds())
                                 }
                             })
                     }

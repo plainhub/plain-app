@@ -1,21 +1,18 @@
 package com.ismartcoding.plain.api
 
-import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.getAppVersion
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
+import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody.Companion.toResponseBody
-import android.util.Base64
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
+import javax.net.SocketFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.KeyManager
 import javax.net.ssl.TrustManager
@@ -60,42 +57,42 @@ object OkHttpClientFactory {
     }
 
     fun createCryptoHttpClient(
-        token: String,
+        keyBytes: ByteArray,
         timeout: Int,
+        socketFactory: SocketFactory? = null,
+        dns: Dns? = null,
+        connectTimeoutMs: Long = 1_000L,
     ): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor { chain ->
-                val request = chain.request()
-                val requestBody = request.body!!
-                val requestBodyStr = bodyToString(requestBody)
-                LogCat.d("[Request] $requestBodyStr")
-                val response =
-                    chain.proceed(
-                        request.newBuilder()
-                            .addHeader("c-id", TempData.clientId)
-                            .addHeader("c-platform", "android")
-                            .addHeader(
-                                "c-name",
-                                Base64.encodeToString(PhoneHelper.getDeviceName(appContext).toByteArray(), Base64.NO_WRAP),
-                            )
-                            .addHeader("c-version", getAppVersion())
-                            .post(CryptoHelper.chaCha20Encrypt(token, requestBodyStr).toRequestBody(requestBody.contentType()))
-                            .build(),
-                    )
-                val responseBody = response.body
-                val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, responseBody.bytes())
-                if (decryptedBytes != null) {
-                    val json = decryptedBytes.decodeToString()
-                    LogCat.d("[Response] $json")
-                    return@addInterceptor response.newBuilder().body(json.toResponseBody(responseBody.contentType())).build()
+        val builder =
+            OkHttpClient.Builder()
+                .addInterceptor { chain ->
+                    val request = chain.request()
+                    val requestBody = request.body!!
+                    val requestBodyStr = bodyToString(requestBody)
+                    LogCat.d("[Request] $requestBodyStr")
+                    val response =
+                        chain.proceed(
+                            request.newBuilder()
+                                .addClientHeaders()
+                                .post(CryptoHelper.chaCha20Encrypt(keyBytes, requestBodyStr).toRequestBody(requestBody.contentType()))
+                                .build(),
+                        )
+                    val responseBody = response.body
+                    val decryptedBytes = CryptoHelper.chaCha20Decrypt(keyBytes, responseBody.bytes())
+                    if (decryptedBytes != null) {
+                        val json = decryptedBytes.decodeToString()
+                        LogCat.d("[Response] $json")
+                        return@addInterceptor response.newBuilder().body(json.toResponseBody(responseBody.contentType())).build()
+                    }
+                    response.newBuilder().build()
                 }
-                response.newBuilder().build()
-            }
-            .connectTimeout(500, TimeUnit.MILLISECONDS)
-            .writeTimeout(timeout.toLong(), TimeUnit.SECONDS)
-            .readTimeout(timeout.toLong(), TimeUnit.SECONDS)
-            .ignoreAllSSLErrors()
-            .build()
+                .connectTimeout(connectTimeoutMs, TimeUnit.MILLISECONDS)
+                .writeTimeout(timeout.toLong(), TimeUnit.SECONDS)
+                .readTimeout(timeout.toLong(), TimeUnit.SECONDS)
+                .ignoreAllSSLErrors()
+        if (socketFactory != null) builder.socketFactory(socketFactory)
+        if (dns != null) builder.dns(dns)
+        return builder.build()
     }
 
     fun createUnsafeOkHttpClient(): OkHttpClient {
@@ -146,3 +143,12 @@ object OkHttpClientFactory {
         return buffer.readUtf8()
     }
 }
+
+fun OkHttpClient.Builder.applyDownloadConfig(): OkHttpClient.Builder =
+    connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(120, TimeUnit.SECONDS)
+        .writeTimeout(120, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
+        .addInterceptor { chain ->
+            chain.proceed(chain.request().newBuilder().addClientHeaders().build())
+        }

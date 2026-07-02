@@ -126,11 +126,13 @@ class PeerGraphQL(val schema: Schema) {
                 route("/peer_graphql") {
                     post {
                         if (!TempData.webEnabled.value) {
+                            LogCat.w("[AWARE] recv /peer_graphql reject webDisabled")
                             call.respond(HttpStatusCode.Forbidden)
                             return@post
                         }
                         val clientId = call.request.header("c-id") ?: ""
                         val channelId = call.request.header("c-cid") ?: ""
+                        LogCat.d("[AWARE] recv /peer_graphql from=$clientId cid=$channelId")
                         // Determine the decryption key:
                         // 1. If c-cid is present, always use the channel key (supports non-paired members).
                         // 2. Otherwise, use the peer's shared key (paired peer-to-peer chat).
@@ -141,11 +143,13 @@ class PeerGraphQL(val schema: Schema) {
                         }
                         val publicKey = PeerCacher.getPublicKeyBytes(clientId)
                         if (token == null || publicKey == null) {
+                            LogCat.w("[AWARE] recv /peer_graphql unauthorized from=$clientId token=${token != null} pub=${publicKey != null}")
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post
                         }
                         val decryptResult = PeerChatParser.decrypt(token, clientId, publicKey, call.receive())
                         if (decryptResult.content == null) {
+                            LogCat.w("[AWARE] recv /peer_graphql decrypt fail from=$clientId code=${decryptResult.code}")
                             call.respond(decryptResult.code)
                             return@post
                         }
@@ -155,6 +159,7 @@ class PeerGraphQL(val schema: Schema) {
 
                         val r = executeGraphqlQL(schema, decryptResult.content!!, call)
                         call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
+                        LogCat.d("[AWARE] recv /peer_graphql done from=$clientId")
                     }
                 }
             }

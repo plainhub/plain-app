@@ -59,12 +59,12 @@ fun String.linkify(
 
             withStyle(linkStyle) {
                 addStringAnnotation(
-                    tag = m!!.tag,
-                    annotation = m!!.text,
+                    tag = m.tag,
+                    annotation = m.text,
                     start = length,
-                    end = length + m!!.text.length,
+                    end = length + m.text.length,
                 )
-                append(m!!.text)
+                append(m.text)
             }
 
             raw = raw.substring(end)

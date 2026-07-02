@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.chat.peer
 
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.helpers.CryptoHelper
@@ -8,7 +11,9 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.KtorClientFactory
 import com.ismartcoding.plain.api.OkHttpClientFactory
+import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.chat.peer.transport.WifiAwareTransport
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getStatusWsUrl
@@ -16,6 +21,9 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PeerStatusData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.SignatureHelper
+import com.ismartcoding.plain.lib.extensions.hasPermission
+import com.ismartcoding.plain.lib.isQPlus
+import com.ismartcoding.plain.lib.isTPlus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -61,6 +69,33 @@ object PeerStatusManager {
         started = true
         LogCat.d("peer status: start")
         scope.launch { reconnectAll() }
+        if (isQPlus()) {
+            ensureAwareStarted()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    @RequiresApi(Build.VERSION_CODES.Q)
+    fun ensureAwareStarted() {
+        // Wi-Fi Aware publish/subscribe requires:
+        //   - Android 13+ (T): NEARBY_WIFI_DEVICES
+        //   - Android 12 and below: ACCESS_FINE_LOCATION
+        // Starting without the matching permission throws a SecurityException at publish/subscribe.
+        val hasAwarePermission = if (isTPlus()) {
+            appContext.hasPermission(android.Manifest.permission.NEARBY_WIFI_DEVICES)
+        } else {
+            appContext.hasPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if (hasAwarePermission) {
+            WifiAwareTransport.start()
+            scope.launch { notifyAwareOfPairedPeers() }
+        }
+    }
+
+    private suspend fun notifyAwareOfPairedPeers() {
+        val peers = AppDatabase.instance.peerDao().getAllPaired()
+        LogCat.d("peer status: feeding ${peers.size} paired peers to Aware")
+        peers.forEach { WifiAwareTransport.subscribe(it) }
     }
 
     @Synchronized

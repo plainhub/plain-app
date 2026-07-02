@@ -35,5 +35,7 @@
     <string name="scan_needs_camera_warning">Scanner needs camera permission!</string>
     <string name="audio_notification_prompt">To view media controls in the notifications center, kindly grant permission to receive push notifications from the app.</string>
     <string name="foreground_service_notification_prompt">Please allow this app to run in the background and show notifications to provide essential functionality or services.</string>
+    <string name="nearby_wifi_devices_required_for_chat">Nearby devices permission is required to send and receive messages with nearby devices.</string>
+    <string name="location_required_for_aware_chat">On some Android devices, Location permission is required for nearby device communication. PlainApp does not use your location to track you.</string>
     <string name="call_phone_permission_required">In order to make phone calls through the app, please allow phone access.</string>
 </resources>

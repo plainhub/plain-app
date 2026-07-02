@@ -57,6 +57,12 @@
     <string name="last_active_desc">Last active</string>
     <string name="app_version">APP version</string>
     <string name="android_version">Android version</string>
+    <string name="nearby_share">Nearby Share</string>
+    <string name="supported">Supported</string>
+    <string name="not_supported">Not supported</string>
+    <string name="aware_data_interfaces">Aware data interfaces</string>
+    <string name="aware_data_paths">Aware data paths</string>
+    <string name="not_available">N/A</string>
     <string name="clear_history">Clear history</string>
     <string name="clear_logs">Clear logs</string>
     <string name="no_logs_error">No logs can be shared</string>

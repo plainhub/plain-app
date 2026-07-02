@@ -116,20 +116,13 @@ object ChannelChatSender {
             val response = PeerGraphQLClient.createChannelChatItem(
                 peer = peer,
                 channelId = channel.id,
-                channelKey = channel.key,
-                clientId = TempData.clientId,
                 content = modifiedContent,
             )
-
-            if (response != null && response.errors.isNullOrEmpty()) {
+            if (response.errors.isNullOrEmpty()) {
                 LogCat.d("Channel message sent to ${peer.id} via channel ${channel.id}")
                 DMessageDeliveryResult(peer.id, peer.name, null)
             } else {
-                val errors = if (response == null) {
-                    "No response received (host unreachable or connection refused)"
-                } else {
-                    response.errors?.joinToString("; ") { it.message } ?: "Empty error list in response"
-                }
+                val errors = response.errors.joinToString("; ") { it.message }
                 LogCat.e("Failed to send channel message to ${peer.id}: $errors")
                 DMessageDeliveryResult(peer.id, peer.name, errors)
             }

@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.helpers.TimeHelper.nowMillis
+import androidx.compose.runtime.Composable
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 object RelativeTimeFormatter {
 
@@ -16,27 +16,34 @@ object RelativeTimeFormatter {
     private const val MONTH = 30 * DAY
     private const val YEAR  = 365 * DAY
 
-    fun format(
-        timestamp: Long,
-        now: Long = nowMillis(),
-        style: Style = Style.SHORT,
-    ): String {
+    data class Formatted(val resource: StringResource, val arg: Long?, val style: Style)
+
+    fun select(timestamp: Long, now: Long, style: Style): Formatted {
         val diff = now - timestamp
+        fun s(short: StringResource, long: StringResource) =
+            if (style == Style.SHORT) short else long
         return when {
-            diff < MIN      -> str(Res.string.relative_time_now)
-            diff < HOUR     -> fmt((diff / MIN).coerceAtLeast(1), style, Res.string.relative_time_minutes_short, Res.string.relative_time_minutes_long)
-            diff < DAY      -> fmt((diff / HOUR).coerceAtLeast(1), style, Res.string.relative_time_hours_short, Res.string.relative_time_hours_long)
-            diff < WEEK     -> fmt((diff / DAY).coerceAtLeast(1), style, Res.string.relative_time_days_short, Res.string.relative_time_days_long)
-            diff < 4 * WEEK -> fmt((diff / WEEK).coerceAtLeast(1), style, Res.string.relative_time_weeks_short, Res.string.relative_time_weeks_long)
-            diff < YEAR     -> fmt((diff / MONTH).coerceAtLeast(1), style, Res.string.relative_time_months_short, Res.string.relative_time_months_long)
-            else            -> fmt((diff / YEAR).coerceAtLeast(1), style, Res.string.relative_time_years_short, Res.string.relative_time_years_long)
+            diff < MIN      -> Formatted(Res.string.relative_time_now, null, style)
+            diff < HOUR     -> Formatted(s(Res.string.relative_time_minutes_short, Res.string.relative_time_minutes_long), (diff / MIN).coerceAtLeast(1), style)
+            diff < DAY      -> Formatted(s(Res.string.relative_time_hours_short, Res.string.relative_time_hours_long), (diff / HOUR).coerceAtLeast(1), style)
+            diff < WEEK     -> Formatted(s(Res.string.relative_time_days_short, Res.string.relative_time_days_long), (diff / DAY).coerceAtLeast(1), style)
+            diff < 4 * WEEK -> Formatted(s(Res.string.relative_time_weeks_short, Res.string.relative_time_weeks_long), (diff / WEEK).coerceAtLeast(1), style)
+            diff < YEAR     -> Formatted(s(Res.string.relative_time_months_short, Res.string.relative_time_months_long), (diff / MONTH).coerceAtLeast(1), style)
+            else            -> Formatted(s(Res.string.relative_time_years_short, Res.string.relative_time_years_long), (diff / YEAR).coerceAtLeast(1), style)
         }
     }
 
-    private fun str(resource: StringResource) = LocaleHelper.getString(resource)
-
-    private fun fmt(n: Long, style: Style, shortRes: StringResource, longRes: StringResource): String {
-        val template = LocaleHelper.getString(if (style == Style.SHORT) shortRes else longRes)
-        return template.replace("%d", n.toString()).replace("%1\$d", n.toString())
+    @Composable
+    fun format(
+        timestamp: Long,
+        now: Long = TimeHelper.nowMillis(),
+        style: Style = Style.SHORT,
+    ): String {
+        val f = select(timestamp, now, style)
+        return when {
+            f.arg == null      -> stringResource(f.resource)
+            style == Style.SHORT -> "${f.arg}${stringResource(f.resource)}"
+            else               -> stringResource(f.resource, f.arg)
+        }
     }
 }

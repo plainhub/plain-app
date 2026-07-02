@@ -135,7 +135,7 @@ object FileHelper {
                     .build()
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
-                    val inputStream = response.body?.byteStream()
+                    val inputStream = response.body.byteStream()
                     inputStream?.copyTo(outputStream)
                     inputStream?.close()
                     outputStream.close()

@@ -1,16 +1,12 @@
 package com.ismartcoding.plain.chat.peer
 
-import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.api.KtorClientFactory
-import com.ismartcoding.plain.api.OkHttpClientFactory
+import com.ismartcoding.plain.helpers.SignatureHelper
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.peer.transport.PeerTransportRouter
+import com.ismartcoding.plain.chat.peer.transport.SignedRequest
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.db.getApiUrl
 import com.ismartcoding.plain.db.toJSONString
-import com.ismartcoding.plain.helpers.SignatureHelper
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 data class GraphQLResponse(
@@ -36,7 +32,7 @@ data class GraphQLError(
 object PeerGraphQLClient {
     /**
      * Send a chat message to a paired peer (peer-to-peer chat).
-     * Uses [DPeer.key] for encryption.
+     * Uses [PeerCacher.getKeyBytes] for encryption.
      */
     suspend fun createChatItem(
         peer: DPeer,
@@ -54,18 +50,21 @@ object PeerGraphQLClient {
                 }
             """.trimIndent()
 
-        return execute(
-            peer = peer,
-            clientId = clientId,
+        val request = buildSignedRequest(
             query = mutation,
-            variables = mapOf("content" to content.toJSONString())
+            variables = mapOf("content" to content.toJSONString()),
+            channelId = "",
         )
+        val keyBytes = requireNotNull(PeerCacher.getKeyBytes(peer.id)) {
+            "PeerCacher has no key bytes for peer ${peer.id}"
+        }
+        return PeerTransportRouter.send(peer, request, keyBytes)
     }
 
     /**
      * Send a channel system message to a peer.
-     * If the peer is paired (peer.key is non-empty), uses the peer's shared key.
-     * Otherwise, uses [channelKey] with c-cid header for non-paired channel members.
+     * If the peer is paired (peer.key is non-empty), uses [PeerCacher.getKeyBytes].
+     * Otherwise, uses [ChannelCacher.getKeyBytes] with c-cid header for non-paired channel members.
      */
     suspend fun sendChannelSystemMessage(
         peer: DPeer,
@@ -73,7 +72,6 @@ object PeerGraphQLClient {
         type: String,
         payload: String,
         channelId: String = "",
-        channelKey: String = "",
     ): GraphQLResponse {
         val mutation = $$"""
                 mutation ChannelSystemMessage($type: String!, $payload: String!) {
@@ -86,32 +84,32 @@ object PeerGraphQLClient {
             "payload" to payload,
         )
 
-        // Use channel key if peer is not paired
-        val useChannelKey = peer.key.isEmpty() && channelKey.isNotEmpty()
-        return if (useChannelKey) {
-            execute(
-                peer = peer,
-                encryptionKey = channelKey,
-                clientId = clientId,
-                query = mutation,
-                variables = variables,
-                channelId = channelId,
-            )
+        val keyBytes = if (peer.key.isNotEmpty()) {
+            requireNotNull(PeerCacher.getKeyBytes(peer.id)) {
+                "PeerCacher has no key bytes for peer ${peer.id}"
+            }
         } else {
-            execute(peer = peer, clientId = clientId, query = mutation, variables = variables)
+            requireNotNull(ChannelCacher.getKeyBytes(channelId)) {
+                "ChannelCacher has no key bytes for channel $channelId"
+            }
         }
+
+        val request = buildSignedRequest(
+            query = mutation,
+            variables = variables,
+            channelId = channelId,
+        )
+        return PeerTransportRouter.send(peer, request, keyBytes)
     }
 
     /**
      * Send a chat message to a channel member.
-     * Uses [channelKey] for ChaCha20 encryption and includes [channelId] via the c-cid header
+     * Uses [ChannelCacher.getKeyBytes] for ChaCha20 encryption and includes [channelId] via the c-cid header
      * so the receiver can look up the correct decryption key and member public keys.
      */
     suspend fun createChannelChatItem(
         peer: DPeer,
         channelId: String,
-        channelKey: String,
-        clientId: String,
         content: DMessageContent,
     ): GraphQLResponse {
         val mutation = $$"""
@@ -125,98 +123,35 @@ object PeerGraphQLClient {
                 }
             """.trimIndent()
 
-        return execute(
-            peer = peer,
-            encryptionKey = channelKey,
-            clientId = clientId,
+        val keyBytes = requireNotNull(ChannelCacher.getKeyBytes(channelId)) {
+            "ChannelCacher has no key bytes for channel $channelId"
+        }
+
+        val request = buildSignedRequest(
             query = mutation,
             variables = mapOf("content" to content.toJSONString()),
             channelId = channelId,
         )
+        return PeerTransportRouter.send(peer, request, keyBytes)
     }
 
-    /**
-     * Core execution: signs, encrypts and sends a GraphQL request to [peer].
-     *
-     * @param encryptionKey  ChaCha20 key – either [DPeer.key] (peer chat) or
-     *                       [DChatChannel.key] (channel chat).
-     * @param channelId      When non-empty the `c-cid` header is added so the
-     *                       receiver selects the channel-key path.
-     */
-    private suspend fun execute(
-        peer: DPeer,
-        encryptionKey: String = peer.key,
-        clientId: String,
+    private suspend fun buildSignedRequest(
         query: String,
         variables: Map<String, String>,
-        channelId: String = "",
-    ): GraphQLResponse {
-        return try {
-
-            val requestJson = JSONObject().apply {
-                put("query", query)
-                val variablesJson = JSONObject()
-                variables.forEach { (key, value) ->
-                    variablesJson.put(key, value)
-                }
-                put("variables", variablesJson)
-            }.toString()
-
-            // Generate timestamp and signature
-            val timestamp = System.currentTimeMillis().toString()
-            val signature = SignatureHelper.signTextAsync("$timestamp$requestJson")
-
-            // Format: signature|timestamp|GraphQL_JSON
-            val requestBody = "$signature|$timestamp|$requestJson".toRequestBody("application/json".toMediaType())
-
-            val requestBuilder = Request.Builder()
-                .url(peer.getApiUrl())
-                .post(requestBody)
-                .addHeader("c-id", clientId)
-            if (channelId.isNotEmpty()) {
-                requestBuilder.addHeader("c-cid", channelId)
+        channelId: String,
+    ): SignedRequest {
+        val requestJson = JSONObject().apply {
+            put("query", query)
+            val variablesJson = JSONObject()
+            variables.forEach { (key, value) ->
+                variablesJson.put(key, value)
             }
+            put("variables", variablesJson)
+        }.toString()
 
-            val httpClient = OkHttpClientFactory.createCryptoHttpClient(encryptionKey, 10)
-            val response = httpClient.newCall(requestBuilder.build()).execute()
-            val responseBody = response.body.string()
-
-            if (response.isSuccessful) {
-                parseGraphQLResponse(responseBody)
-            } else {
-                LogCat.e("GraphQL request failed: ${response.code} - $responseBody")
-                GraphQLResponse(null, null, Exception("${response.code} - ${response.message}"))
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            GraphQLResponse(null, null, e)
-        }
+        val timestamp = System.currentTimeMillis().toString()
+        val signature = SignatureHelper.signTextAsync("$timestamp$requestJson")
+        val body = "$signature|$timestamp|$requestJson"
+        return SignedRequest(body = body, channelId = channelId)
     }
-
-    private fun parseGraphQLResponse(responseBody: String): GraphQLResponse {
-        return try {
-            val json = JSONObject(responseBody)
-            val data = if (json.has("data") && !json.isNull("data")) {
-                json.getJSONObject("data")
-            } else {
-                null
-            }
-
-            val errors = if (json.has("errors")) {
-                val errorsArray = json.getJSONArray("errors")
-                (0 until errorsArray.length()).map { i ->
-                    val errorObj = errorsArray.getJSONObject(i)
-                    GraphQLError(
-                        message = errorObj.getString("message")
-                    )
-                }
-            } else {
-                null
-            }
-            GraphQLResponse(data = data, errors = errors)
-        } catch (e: Exception) {
-            LogCat.e("Failed to parse GraphQL response: ${e.message}")
-            GraphQLResponse(null, null, e)
-        }
-    }
-} 
+}

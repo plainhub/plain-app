@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
+import android.net.wifi.aware.WifiAwareManager
 import android.os.BatteryManager
 import android.os.PowerManager
 import android.os.storage.StorageManager
@@ -88,6 +89,11 @@ val audioManager: android.media.AudioManager by lazy {
 val uiModeManager: UiModeManager by lazy {
     appContext.getSystemServiceCompat(UiModeManager::class.java)
 }
+
+val wifiAwareManager: WifiAwareManager by lazy {
+    appContext.getSystemServiceCompat(WifiAwareManager::class.java)
+}
+
 
 val smsManager: SmsManager by lazy {
     if (isSPlus()) {

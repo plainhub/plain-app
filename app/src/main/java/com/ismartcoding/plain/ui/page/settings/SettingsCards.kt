@@ -19,6 +19,11 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.nav.Routing
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.peer.transport.WifiAwareTransport
+import com.ismartcoding.plain.lib.isTPlus
+import com.ismartcoding.plain.wifiAwareManager
+import android.net.wifi.aware.Characteristics
+import androidx.compose.runtime.remember
 import kotlinx.coroutines.launch
 
 @Composable
@@ -76,6 +81,19 @@ internal fun SettingsCardItems(navController: NavHostController) {
 internal fun DeveloperSettingsCard(navController: NavHostController) {
     PCard {
         PListItem(title = stringResource(Res.string.client_id), value = TempData.clientId)
+        if (WifiAwareTransport.isSupported()) {
+            val chars = rememberAwareCharacteristics()
+            PListItem(
+                title = stringResource(Res.string.aware_data_interfaces),
+                value = chars?.getNumberOfSupportedDataInterfaces()?.toString()
+                    ?: stringResource(Res.string.not_available),
+            )
+            PListItem(
+                title = stringResource(Res.string.aware_data_paths),
+                value = chars?.getNumberOfSupportedDataPaths()?.toString()
+                    ?: stringResource(Res.string.not_available),
+            )
+        }
         PListItem(
             modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
             title = stringResource(Res.string.developer_options),
@@ -94,5 +112,13 @@ internal fun DeveloperSettingsCard(navController: NavHostController) {
             subtitle = stringResource(Res.string.simulate_crash_desc),
             icon = Res.drawable.circle_alert,
         )
+    }
+}
+
+@Composable
+private fun rememberAwareCharacteristics(): Characteristics? {
+    if (!isTPlus()) return null
+    return remember {
+        runCatching { wifiAwareManager.getCharacteristics() }.getOrNull()
     }
 }

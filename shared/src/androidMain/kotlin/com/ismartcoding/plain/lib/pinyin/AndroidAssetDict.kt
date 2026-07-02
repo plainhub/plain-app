@@ -20,7 +20,6 @@ abstract class AndroidAssetDict(context: Context) : PinyinMapDict() {
      */
     protected abstract fun assetFileName(): String?
 
-    val mContext: Context
     val mDict: MutableMap<String, Array<String>> = hashMapOf()
 
     override fun mapping(): Map<String, Array<String>> {
@@ -47,7 +46,7 @@ abstract class AndroidAssetDict(context: Context) : PinyinMapDict() {
         } finally {
             if (reader != null) {
                 try {
-                    reader?.close()
+                    reader.close()
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -56,7 +55,6 @@ abstract class AndroidAssetDict(context: Context) : PinyinMapDict() {
     }
 
     init {
-        mContext = context.applicationContext
         init()
     }
 }

@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.extensions
 
-import com.ismartcoding.plain.helpers.TimeAgoHelper
+import androidx.compose.runtime.Composable
+import com.ismartcoding.plain.helpers.RelativeTimeFormatter
 import kotlin.time.Instant
 
+@Composable
 fun Instant.timeAgo(): String {
-    return TimeAgoHelper.getString(toEpochMilliseconds())
+    return RelativeTimeFormatter.format(toEpochMilliseconds())
 }

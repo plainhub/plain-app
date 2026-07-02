@@ -5,15 +5,13 @@ import android.webkit.MimeTypeMap
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.api.KtorClientFactory
-import com.ismartcoding.plain.api.OkHttpClientFactory
+import com.ismartcoding.plain.chat.peer.transport.PeerTransportRouter
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.getFileUrl
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
-import okhttp3.Request
 import java.io.File
 
 object PeerFileDownloader {
@@ -23,10 +21,8 @@ object PeerFileDownloader {
     ): String? {
         val messageFile = task.messageFile
         val fileName = messageFile.fileName
-        val downloadUrl = task.peer.getFileUrl(messageFile.parseFileId())
+        val fileId = messageFile.parseFileId()
 
-        // Stage download into a temp file; imported into the content-addressable
-        // store only after a successful, complete download.
         val tempFile = File(context.cacheDir, "dl_${task.messageFile.id}_${System.currentTimeMillis()}")
         tempFile.parentFile?.mkdirs()
 
@@ -37,42 +33,44 @@ object PeerFileDownloader {
             tempFile.createNewFile()
 
             var downloadedBytes = 0L
-            val client = OkHttpClientFactory.createUnsafeOkHttpClient()
-            task.httpClient = client
+            val downloaded = PeerTransportRouter.downloadFile(task.peer, fileId)
+            task.httpClient = downloaded.client
 
-            val response = client.newCall(Request.Builder().url(downloadUrl).build()).execute()
-            if (!response.isSuccessful) {
-                val error = "HTTP ${response.code}"
-                LogCat.e("HTTP request failed: $downloadUrl $error")
-                task.status = DownloadStatus.FAILED
-                task.error = error
-                return null
-            }
+            downloaded.use { d ->
+                val r = d.response
+                if (!r.isSuccessful) {
+                    val error = "HTTP ${r.code}"
+                    LogCat.e("HTTP request failed: $error")
+                    task.status = DownloadStatus.FAILED
+                    task.error = error
+                    return null
+                }
 
-            response.body.byteStream().use { inputStream ->
-                tempFile.outputStream().use { outputStream ->
-                    val buffer = ByteArray(8192)
-                    var lastProgressUpdate = System.currentTimeMillis()
-                    var lastDownloadedSize = 0L
+                r.body.byteStream().use { inputStream ->
+                    tempFile.outputStream().use { outputStream ->
+                        val buffer = ByteArray(8192)
+                        var lastProgressUpdate = System.currentTimeMillis()
+                        var lastDownloadedSize = 0L
 
-                    while (task.status == DownloadStatus.DOWNLOADING) {
-                        val bytesRead = inputStream.read(buffer)
-                        if (bytesRead == -1) break
+                        while (task.status == DownloadStatus.DOWNLOADING) {
+                            val bytesRead = inputStream.read(buffer)
+                            if (bytesRead == -1) break
 
-                        outputStream.write(buffer, 0, bytesRead)
-                        downloadedBytes += bytesRead
-                        val now = System.currentTimeMillis()
+                            outputStream.write(buffer, 0, bytesRead)
+                            downloadedBytes += bytesRead
+                            val now = System.currentTimeMillis()
 
-                        task.downloadedSize = downloadedBytes
-                        if (now - lastProgressUpdate > 1000) {
-                            val downloadedSinceLast = downloadedBytes - lastDownloadedSize
-                            val timeElapsed = (now - lastProgressUpdate) / 1000.0
-                            task.downloadSpeed = (downloadedSinceLast / timeElapsed).toLong()
-                            task.lastDownloadedSize = downloadedBytes
-                            task.lastUpdateTime = now
-                            lastProgressUpdate = now
-                            lastDownloadedSize = downloadedBytes
-                            DownloadQueue.notifyProgressUpdate()
+                            task.downloadedSize = downloadedBytes
+                            if (now - lastProgressUpdate > 1000) {
+                                val downloadedSinceLast = downloadedBytes - lastDownloadedSize
+                                val timeElapsed = (now - lastProgressUpdate) / 1000.0
+                                task.downloadSpeed = (downloadedSinceLast / timeElapsed).toLong()
+                                task.lastDownloadedSize = downloadedBytes
+                                task.lastUpdateTime = now
+                                lastProgressUpdate = now
+                                lastDownloadedSize = downloadedBytes
+                                DownloadQueue.notifyProgressUpdate()
+                            }
                         }
                     }
                 }
@@ -83,11 +81,9 @@ object PeerFileDownloader {
                 task.downloadedSize = downloadedBytes
                 task.downloadSpeed = 0
 
-                // Infer MIME type from file name extension
                 val mimeType = MimeTypeMap.getSingleton()
                     .getMimeTypeFromExtension(fileName.getFilenameExtension()) ?: ""
 
-                // Import into content-addressable store (dedup, deleteSrc=true moves the temp file)
                 val fidUri = ChatFileSaveHelper.importDownloadedFile(tempFile, mimeType)
                 val realPath = AppFileStore.resolveUri(fidUri)
 

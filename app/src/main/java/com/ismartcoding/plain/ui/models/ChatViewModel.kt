@@ -27,9 +27,12 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.sent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.web.models.toModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 
 class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
@@ -41,6 +44,9 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     private val _target = MutableStateFlow(ChatTarget("local", ChatTargetType.PEER))
     val target = _target.asStateFlow()
+
+    private val _scrollToLatest = Channel<String?>(Channel.BUFFERED)
+    val scrollToLatest: Flow<String?> = _scrollToLatest.receiveAsFlow()
 
     suspend fun initializeTargetAsync(chatId: String) = withIO {
         _target.value = ChatTarget.parseId(chatId)
@@ -61,6 +67,12 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     fun addAll(items: List<DChat>) {
         _itemsFlow.update { items.map { VChat.from(it) } + it }
+    }
+
+    fun addAllAndScroll(items: List<DChat>) {
+        val previousTopId = _itemsFlow.value.firstOrNull()?.id
+        addAll(items)
+        _scrollToLatest.trySend(previousTopId)
     }
 
     fun update(item: DChat) {
@@ -119,7 +131,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             }
             sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item2.toModel()))))
             if (_target.value == target) {
-                addAll(listOf(item2))
+                addAllAndScroll(listOf(item2))
             }
             if (item2.status == "sent") {
                 DialogHelper.showSuccess(Res.string.sent)
@@ -135,15 +147,9 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
         }
     }
 
-    fun sendMessage(content: DMessageContent, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
-        launchSafe {
-            onResult(doSendMessage(target.value, content, onlinePeerIds))
-        }
-    }
-
     private suspend fun doSendMessage(target: ChatTarget, content: DMessageContent, onlinePeerIds: Set<String>): Boolean = withIO {
         val item = ChatManager.createChatItem(target, content)
-        addAll(listOf(item))
+        addAllAndScroll(listOf(item))
 
         if (!target.isLocal()) {
             ChatManager.sendMessage(item, target, onlinePeerIds)
@@ -160,13 +166,13 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             } else {
                 DMessageContent(DMessageType.TEXT.value, DMessageText(text))
             }
-            sendMessage(content, onlinePeerIds, onResult)
+            onResult(doSendMessage(target.value, content, onlinePeerIds))
         }
     }
 
     suspend fun sendFilesImmediate(files: List<DMessageFile>, isImageVideo: Boolean): String = withIO {
         val item = ChatManager.insertFilesImmediate(target.value, files, isImageVideo)
-        addAll(listOf(item))
+        addAllAndScroll(listOf(item))
         item.id
     }
 

@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.settings
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -25,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.channel.Channel
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.chat.peer.transport.WifiAwareTransport
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.DownloadUpdateEvent
@@ -45,7 +44,6 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -121,6 +119,13 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                             }),
                             title = stringResource(Res.string.android_version),
                             value = MainApp.getAndroidVersion(),
+                        )
+                        PListItem(
+                            title = stringResource(Res.string.nearby_share),
+                            value = stringResource(
+                                if (WifiAwareTransport.isSupported()) Res.string.supported
+                                else Res.string.not_supported
+                            ),
                         )
                         if (AppFeatureType.CHECK_UPDATES.has()) {
                             PListItem(title = stringResource(Res.string.app_version), subtitle = MainApp.getAppVersion(), action = {

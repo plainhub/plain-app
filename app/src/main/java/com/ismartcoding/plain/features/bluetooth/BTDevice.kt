@@ -40,10 +40,9 @@ open class BTDevice(val device: BluetoothDevice, var rssi: Int = 0) {
                         GATT_SUCCESS -> {
                             try {
                                 val jsonData = characteristic.getStringValue(0)
-                                val json = JSONObject(jsonData)
-                                publish(BluetoothActionType.CHARACTERISTIC_READ, BluetoothResult(uuid, json, BluetoothActionResult.SUCCESS))
+                                publish(BluetoothActionType.CHARACTERISTIC_READ, BluetoothResult(uuid, jsonData, BluetoothActionResult.SUCCESS))
                             } catch (ex: Exception) {
-                                LogCat.e("Failed to parse json data: $value, error: $ex")
+                                LogCat.e("Failed to read string value: $value, error: $ex")
                                 publish(BluetoothActionType.CHARACTERISTIC_READ, BluetoothResult(uuid, null, BluetoothActionResult.FAIL))
                             }
                         }

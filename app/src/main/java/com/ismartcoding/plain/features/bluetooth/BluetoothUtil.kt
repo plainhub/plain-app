@@ -47,6 +47,10 @@ object BluetoothUtil {
                 requestScanConnectBluetooth()
                 return false
             }
+            if (!isAdvertiseGranted(MainApp.instance)) {
+                requestScanConnectBluetooth()
+                return false
+            }
         } else {
             if (!isBluetoothEnabled()) {
                 requestEnableBluetooth()
@@ -141,15 +145,15 @@ object BluetoothUtil {
             return null
         }
 
-        return scan().firstOrNull { device ->
+        return scan(serviceUuid = null).firstOrNull { device ->
             return@firstOrNull mac.equals(device.mac, true)
         }
     }
 
     @SuppressLint("MissingPermission")
-    fun scan(): Flow<BTDevice> {
+    fun scan(serviceUuid: UUID? = BTDevice.SERVICE_UUID): Flow<BTDevice> {
         return callbackFlow {
-            LogCat.d("Scan bluetooth devices")
+            LogCat.d("Scan bluetooth devices for $serviceUuid")
 
             scanCallback =
                 object : ScanCallback() {
@@ -160,7 +164,11 @@ object BluetoothUtil {
                         trySend(addBTDevice(result.device, result.rssi))
                     }
                 }
-            val filters = arrayListOf(ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(BTDevice.SERVICE_UUID.toString())).build())
+            val filters = if (serviceUuid != null) {
+                arrayListOf(ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(serviceUuid.toString())).build())
+            } else {
+                arrayListOf<ScanFilter>()
+            }
             getBluetoothAdapter().bluetoothLeScanner?.startScan(filters, ScanSettings.Builder().build(), scanCallback)
             isScanning = true
 
@@ -289,6 +297,11 @@ object BluetoothUtil {
     @RequiresApi(Build.VERSION_CODES.S)
     private fun isScanConnectGranted(context: Context): Boolean {
         return context.hasPermission(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun isAdvertiseGranted(context: Context): Boolean {
+        return context.hasPermission(Manifest.permission.BLUETOOTH_ADVERTISE)
     }
 
     private fun requestLocationPermission() {

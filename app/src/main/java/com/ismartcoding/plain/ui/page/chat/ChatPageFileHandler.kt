@@ -31,7 +31,6 @@ internal fun handleFileSelection(
     context: Context,
     chatVM: ChatViewModel,
     peerVM: PeerViewModel,
-    scrollState: LazyListState,
     focusManager: FocusManager,
 ) {
     coMain {
@@ -56,7 +55,6 @@ internal fun handleFileSelection(
 
         val isImageVideo = event.type == PickFileType.IMAGE_VIDEO
         val messageId = chatVM.sendFilesImmediate(placeholderItems, isImageVideo)
-        scrollToLatest(chatVM, scrollState, null)
         delay(200)
         focusManager.clearFocus()
 
