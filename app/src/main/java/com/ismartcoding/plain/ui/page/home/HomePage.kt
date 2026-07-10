@@ -90,7 +90,7 @@ fun HomePage(
     UpdateDialog(updateVM)
 
     PScaffold(
-        topBar = { TopBarHome(navController, peerVM) },
+        topBar = { TopBarHome(navController) },
     ) { paddingValues ->
         PullToRefresh(
             modifier = Modifier

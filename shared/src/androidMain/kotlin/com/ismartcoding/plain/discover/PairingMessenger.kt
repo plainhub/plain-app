@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.discover
 
-import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.enums.NearbyMessageType
+import com.ismartcoding.plain.helpers.JsonHelper
 
 object PairingMessenger {
     fun sendRequest(request: DPairingRequest, targetIp: String) {
@@ -20,6 +20,6 @@ object PairingMessenger {
     }
 
     private fun send(type: NearbyMessageType, message: String, targetIp: String) {
-        NearbyNetwork.sendUnicast("${type.toPrefix()}$message", targetIp)
+        NearbyNetwork.sendUnicast(PairingCore.formatMessage(type, message), targetIp)
     }
 }

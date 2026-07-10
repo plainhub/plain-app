@@ -1,12 +1,12 @@
 package com.ismartcoding.plain.ui.models
 
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.features.bluetooth.BlePairingCandidate
-import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
-import com.ismartcoding.plain.features.bluetooth.PairingTransport
+import com.ismartcoding.plain.features.bluetooth.client.BluetoothUtil
+import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.lib.channel.Channel
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.withIO
@@ -17,30 +17,34 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
-import com.ismartcoding.plain.discover.NearbyPairing
+import com.ismartcoding.plain.discover.PairingInitiator
+import com.ismartcoding.plain.discover.PairingSessionStore
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
+import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
+import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class NearbyViewModel : ViewModel() {
     val nearbyDevices = mutableStateListOf<DNearbyDevice>()
     var isDiscovering = mutableStateOf(false)
-    val pairingInProgress = mutableStateListOf<String>()
+    val itemStatus = mutableStateMapOf<String, NearbyItemStatus>()
 
-    val bleCandidates = mutableStateListOf<BlePairingCandidate>()
     var isBleScanning = mutableStateOf(false)
-    val isBlePairing = mutableStateListOf<String>()
-    val bleErrors = mutableStateOf<String?>(null)
+    var blePermissionReady = mutableStateOf(BluetoothUtil.isBluetoothReadyToUse())
 
     internal var eventJob: Job? = null
     private var cleanupJob: Job? = null
     private var bleJob: Job? = null
+    private var blePermissionJob: Job? = null
+    private val blePairingJobs = mutableMapOf<String, Job>()
 
     init {
         startEventListening()
@@ -51,8 +55,10 @@ class NearbyViewModel : ViewModel() {
         eventJob?.cancel()
         cleanupJob?.cancel()
         bleJob?.cancel()
+        blePermissionJob?.cancel()
+        blePairingJobs.values.forEach { it.cancel() }
+        blePairingJobs.clear()
         sendEvent(StopNearbyDiscoveryEvent())
-        PairingTransport.stopAdvertising()
     }
 
     fun startDiscovering() {
@@ -69,8 +75,8 @@ class NearbyViewModel : ViewModel() {
 
     private fun startDeviceCleanup() {
         cleanupJob = viewModelScope.launch {
-            while (isDiscovering.value) {
-                delay(20000)
+            while (isDiscovering.value || isBleScanning.value) {
+                delay(20000.milliseconds)
                 val currentTime = TimeHelper.now()
                 nearbyDevices.removeIf { (currentTime - it.lastSeen).inWholeSeconds > 60 }
             }
@@ -78,42 +84,45 @@ class NearbyViewModel : ViewModel() {
     }
 
     private fun stopDeviceCleanup() {
+        if (isDiscovering.value || isBleScanning.value) return
         cleanupJob?.cancel()
         cleanupJob = null
     }
 
+    fun requestBlePermission() {
+        if (blePermissionJob?.isActive == true) return
+        blePermissionJob = launchSafe(
+            onError = {
+                LogCat.e("BLE permission error: ${it.message}", it)
+            },
+            block = {
+                val granted = BluetoothUtil.ensurePermissionAsync()
+                blePermissionReady.value = granted
+                if (granted) {
+                    startBleScanning()
+                }
+            }
+        )
+    }
+
     fun startBleScanning() {
-        LogCat.d("NearbyViewModel.startBleScanning called")
         if (isBleScanning.value) return
+        if (!BluetoothUtil.isBluetoothReadyToUse()) return
         bleJob = launchSafe(
             onError = {
                 LogCat.e("BLE scan error: ${it.message}", it)
-                bleErrors.value = it.message
                 isBleScanning.value = false
             },
             block = {
-                LogCat.d("BLE scan: requesting permission")
-                val granted = BluetoothUtil.ensurePermissionAsync()
-                LogCat.d("BLE scan: permission granted=$granted")
-                if (!granted) {
-                    LogCat.d("BLE permission not granted, skipping")
-                    isBleScanning.value = false
-                    return@launchSafe
-                }
-                LogCat.d("BLE scan: startAdvertising")
-                PairingTransport.startAdvertising()
-                LogCat.d("BLE scan: advertising started, scanning...")
                 isBleScanning.value = true
+                startDeviceCleanup()
                 try {
-                    PairingTransport.scanForPairingCandidates().collect { candidate ->
-                        LogCat.d("BLE scan: found ${candidate.mac} ${candidate.name}")
-                        if (bleCandidates.none { it.mac == candidate.mac }) {
-                            bleCandidates.add(candidate)
-                        }
+                    PairingTransport.scanAndDiscover().collect { device ->
+                        sendEvent(NearbyDeviceFoundEvent(device))
                     }
                 } finally {
-                    PairingTransport.stopAdvertising()
                     isBleScanning.value = false
+                    stopDeviceCleanup()
                 }
             }
         )
@@ -123,42 +132,51 @@ class NearbyViewModel : ViewModel() {
         isBleScanning.value = false
         bleJob?.cancel()
         bleJob = null
-        PairingTransport.stopAdvertising()
+        stopDeviceCleanup()
     }
 
-    fun pairViaBle(candidate: BlePairingCandidate) {
-        if (isBlePairing.contains(candidate.mac)) return
-        isBlePairing.add(candidate.mac)
+    fun startPairing(device: DNearbyDevice) {
+        if (itemStatus[device.id] != null) return
+        itemStatus[device.id] = NearbyItemStatus.PAIRING
+
+        if (device.discoveredViaLan && device.ips.isNotEmpty()) {
+            launchSafe {
+                PairingInitiator.start(device)
+                delay(PAIRING_TIMEOUT_MS)
+                if (itemStatus[device.id] == NearbyItemStatus.PAIRING) {
+                    PairingSessionStore.remove(device.id)
+                    itemStatus.remove(device.id)
+                }
+            }
+        } else if (device.discoveredViaBle && device.bleClient != null) {
+            blePairingJobs[device.id] = launchSafe {
+                PairingTransport.pairViaBle(device)
+                blePairingJobs.remove(device.id)
+            }
+        } else {
+            itemStatus.remove(device.id)
+        }
+    }
+
+    fun unpairDevice(deviceId: String) {
+        if (itemStatus[deviceId] != null) return
+        itemStatus[deviceId] = NearbyItemStatus.UNPAIRING
         launchSafe {
-            val ok = PairingTransport.pairViaBle(candidate)
-            isBlePairing.remove(candidate.mac)
-            if (ok) {
-                bleCandidates.removeAll { it.mac == candidate.mac }
-                PeerManager.load()
+            try {
+                PeerManager.markUnpaired(deviceId)
+            } finally {
+                itemStatus.remove(deviceId)
             }
         }
     }
 
-    fun startPairing(device: DNearbyDevice) {
-        pairingInProgress.add(device.id)
-        startPairingDevice(device)
-    }
-
-    fun unpairDevice(deviceId: String) {
-        launchSafe {
-            PeerManager.markUnpaired(deviceId)
-        }
-    }
-
     fun cancelPairing(deviceId: String) {
-        pairingInProgress.removeIf { it == deviceId }
-        NearbyPairing.cancelPairing(deviceId)
-    }
-
-    private fun startPairingDevice(device: DNearbyDevice) {
-        launchSafe {
-            NearbyPairing.startPairingAsync(device)
+        itemStatus.remove(deviceId)
+        blePairingJobs.remove(deviceId)?.let {
+            it.cancel()
+            return
         }
+        PairingInitiator.cancel(deviceId)
     }
 
     suspend fun getQrDataAsync(): DQrPairData = withIO {
@@ -173,30 +191,52 @@ class NearbyViewModel : ViewModel() {
         )
     }
 
-    fun isPairing(deviceId: String): Boolean {
-        return pairingInProgress.contains(deviceId)
+    fun getStatus(deviceId: String, isPaired: Boolean): NearbyItemStatus {
+        return when (itemStatus[deviceId]) {
+            NearbyItemStatus.UNPAIRING -> NearbyItemStatus.UNPAIRING
+            NearbyItemStatus.PAIRING -> if (isPaired) NearbyItemStatus.COMPLETING else NearbyItemStatus.PAIRING
+            NearbyItemStatus.COMPLETING -> NearbyItemStatus.COMPLETING
+            else -> if (isPaired) NearbyItemStatus.PAIRED else NearbyItemStatus.UNPAIRED
+        }
     }
 
-    fun isBleCandidatePairing(mac: String): Boolean = isBlePairing.contains(mac)
+    fun clearStatus(deviceId: String) {
+        itemStatus.remove(deviceId)
+    }
 
     private fun startEventListening() {
         eventJob = viewModelScope.launch {
             Channel.sharedFlow.collect { event ->
                 when (event) {
                     is NearbyDeviceFoundEvent -> {
-                        val existingIndex = nearbyDevices.indexOfFirst { it.id == event.device.id }
+                        val incoming = event.device
+                        val existingIndex = nearbyDevices.indexOfFirst { it.id == incoming.id }
                         if (existingIndex >= 0) {
-                            nearbyDevices[existingIndex] = event.device
+                            val existing = nearbyDevices[existingIndex]
+                            val merged = incoming.copy(
+                                discoveredViaLan = existing.discoveredViaLan || incoming.discoveredViaLan,
+                                discoveredViaBle = existing.discoveredViaBle || incoming.discoveredViaBle,
+                                bleClient = incoming.bleClient ?: existing.bleClient,
+                                ips = (existing.ips + incoming.ips).distinct(),
+                                lastSeen = maxOf(existing.lastSeen, incoming.lastSeen),
+                            )
+                            nearbyDevices[existingIndex] = merged
                         } else {
-                            nearbyDevices.add(event.device)
+                            nearbyDevices.add(incoming)
                         }
                     }
 
                     is PairingFailedEvent -> {
-                        pairingInProgress.removeIf { it == event.deviceId }
+                        itemStatus.remove(event.deviceId)
+                    }
+
+                    is PairingSuccessEvent -> {
+                        itemStatus[event.deviceId] = NearbyItemStatus.COMPLETING
                     }
                 }
             }
         }
     }
 }
+
+private const val PAIRING_TIMEOUT_MS = 90_000L

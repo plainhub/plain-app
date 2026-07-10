@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.chat
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.chat.channel.ChannelChatSender
 import com.ismartcoding.plain.chat.data.ChatTarget
@@ -12,7 +11,7 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.discover.LANDiscoverManager
 
 /**
  * Transport-only dispatcher for outbound chat messages. Higher-level business
@@ -47,7 +46,7 @@ object ChatSender {
     fun triggerPeerRediscovery(peerId: String) {
         val key = PeerCacher.getKeyBytes(peerId)
         if (key != null) {
-            NearbyDiscoverManager.discoverSpecificDevice(peerId, key)
+            LANDiscoverManager.discoverSpecificDevice(peerId, key)
         }
     }
 

@@ -138,7 +138,7 @@ class MainApp : Application() {
             TempData.deviceName.value = DeviceNamePreference.get(preferences).ifEmpty { PhoneHelper.getDeviceName(instance) }
             KeyStorePasswordPreference.ensureValueAsync(preferences)
             UrlTokenPreference.ensureValueAsync(preferences)
-            SignatureKeyPreference.ensureKeyPairAsync(preferences)
+            SignatureKeyPreference.ensureKeyPairAsync()
             MdnsHostnamePreference.ensureValueAsync(preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))

@@ -9,10 +9,9 @@ import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.api.KtorClientFactory
 import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.chat.peer.transport.WifiAwareTransport
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
@@ -159,7 +158,7 @@ object PeerStatusManager {
         val key = PeerCacher.getKeyBytes(peer.id) ?: return@withIO
 
         LogCat.d("peer status: reconnect peer=$peerId reason=$reason")
-        NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
+        LANDiscoverManager.discoverSpecificDevice(peer.id, key)
         delay(500)
 
         val refreshedPeer = AppDatabase.instance.peerDao().getById(peer.id) ?: peer
@@ -175,6 +174,9 @@ object PeerStatusManager {
         val state = state(peer.id)
         state.reconnectJob?.cancel()
         state.reconnectJob = null
+        if (peer.ip.isEmpty()) {
+            return@withIO
+        }
         if (state.socket != null) {
             LogCat.d("peer status: reconnect skipped peer=$peer.Id reason=$reason active_socket=true")
             return@withIO
@@ -186,13 +188,14 @@ object PeerStatusManager {
 
     private suspend fun openSocket(peer: DPeer, key: ByteArray) = withIO {
         val peerId = peer.id
-        LogCat.d("peer status: open socket peer=$peerId url=${peer.getStatusWsUrl()}")
+        val wsUrl = peer.getStatusWsUrl()
+        LogCat.d("peer status: open socket peer=$peerId url=$wsUrl")
 
         val timestamp = System.currentTimeMillis().toString()
         val signature = SignatureHelper.signTextAsync("$timestamp${TempData.clientId}")
         val payload = CryptoHelper.chaCha20Encrypt(key, "$signature|$timestamp|${TempData.clientId}")
         val request = Request.Builder()
-            .url("${peer.getStatusWsUrl()}?cid=${TempData.clientId}")
+            .url("$wsUrl?cid=${TempData.clientId}")
             .build()
 
         val listener = object : WebSocketListener() {

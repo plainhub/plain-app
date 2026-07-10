@@ -29,6 +29,21 @@ data class DQrPairData(
         )
     }
 
+    fun toDPairingRequest(): DPairingRequest {
+        return DPairingRequest(
+            fromId = id,
+            fromName = name,
+            port = port,
+            deviceType = deviceType,
+            ecdhPublicKey = "",
+            signaturePublicKey = "",
+            timestamp = TimeHelper.nowMillis(),
+            ips = ips,
+            fromIp = ips.firstOrNull() ?: "",
+            isQrInitiated = true,
+        )
+    }
+
     companion object {
         const val QR_PREFIX = "plainapp://pair/"
 

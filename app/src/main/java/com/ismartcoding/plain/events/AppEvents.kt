@@ -13,7 +13,6 @@ import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.PickFileTag
@@ -21,19 +20,17 @@ import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.BookmarkHelper
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.bluetooth.BluetoothFindOneEvent
-import com.ismartcoding.plain.features.bluetooth.BluetoothPermissionResultEvent
-import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
+import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermissionResultEvent
+import com.ismartcoding.plain.features.bluetooth.client.BluetoothUtil
+import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.ai.ImageSearchStatusChangedEvent
 import com.ismartcoding.plain.ai.ImageIndexProgressEvent
-import com.ismartcoding.plain.api.KtorClientFactory
 import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
-import com.ismartcoding.plain.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.chat.ChatManager
-import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.AuthRequest
@@ -44,9 +41,9 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.Request
 import java.io.File
+import kotlin.time.Duration.Companion.milliseconds
 
 // Android-only events that depend on Android types (Uri/Parcelable/Permission/DefaultWebSocketServerSession).
 // Pure events live in shared/commonMain/events/AppEvents.kt.
@@ -90,23 +87,10 @@ object AppEvents {
                         BluetoothUtil.canContinue = true
                     }
 
-                    is BluetoothFindOneEvent -> {
-                        if (BluetoothUtil.isScanning) {
-                            return@collect
-                        }
-                        coIO {
-                            withTimeoutOrNull(3000) {
-                                BluetoothUtil.currentBTDevice = BluetoothUtil.findOneAsync(event.mac)
-                            }
-                        }
-
-                        BluetoothUtil.stopScan()
-                    }
-
                     is SleepTimerEvent -> {
                         sleepTimerJob?.cancel()
                         sleepTimerJob = coIO {
-                            delay(event.durationMs)
+                            delay(event.durationMs.milliseconds)
                             AudioPlayer.pause()
                         }
                     }
@@ -160,7 +144,7 @@ object AppEvents {
                                     break
                                 } catch (ex: Exception) {
                                     LogCat.e(ex.toString())
-                                    delay(500)
+                                    delay(500.milliseconds)
                                     retry--
                                 }
                             }
@@ -168,15 +152,18 @@ object AppEvents {
                     }
 
                     is StartNearbyServiceEvent -> {
-                        NearbyDiscoverManager.start()
+                        LANDiscoverManager.startReceiver()
+                        if (BluetoothUtil.isAdvertiseReady()) {
+                            PairingTransport.startAdvertising()
+                        }
                     }
 
                     is StartNearbyDiscoveryEvent -> {
-                        NearbyDiscoverManager.startPeriodicDiscovery()
+                        LANDiscoverManager.startPeriodicDiscovery()
                     }
 
                     is StopNearbyDiscoveryEvent -> {
-                        NearbyDiscoverManager.stopPeriodicDiscovery()
+                        LANDiscoverManager.stopPeriodicDiscovery()
                     }
 
                     is ImageSearchStatusChangedEvent -> {

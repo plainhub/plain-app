@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.enums.DeviceType
+
 /**
  * App version as displayed to the user (e.g. "1.0.0 (100)").
  */
@@ -23,3 +25,18 @@ expect fun getDeviceName(): String
  * Build flavor + variant identifier (e.g. "fdroid-debug", "google-release").
  */
 expect fun getBuildType(): String
+
+/**
+ * Platform name for protocol headers: "android" or "ios".
+ */
+expect fun getPlatformName(): String
+
+/**
+ * Device type for discovery/pairing protocol.
+ */
+expect fun getDeviceType(): DeviceType
+
+/**
+ * All IPv4 addresses of the device. Empty list on iOS (BLE-only).
+ */
+expect fun getDeviceIP4s(): List<String>

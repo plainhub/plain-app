@@ -49,6 +49,8 @@
     <string name="try_again">重试</string>
     <string name="added_at">添加时间</string>
     <string name="location_permission_should_be_enabled">蓝牙功能需要启用位置权限</string>
+    <string name="bluetooth_permission_required_for_nearby">需要蓝牙权限才能通过蓝牙发现附近设备。</string>
+    <string name="nearby_wifi_devices_required_for_chat">需要蓝牙和附近设备权限才能发现附近设备。</string>
     <string name="me">我</string>
     <string name="copy_text">复制文本</string>
     <string name="print">打印</string>
@@ -66,6 +68,7 @@
     <string name="discovered_devices">发现的设备</string>
     <string name="pairing_request">配对请求</string>
     <string name="pairing_request_message">是否要与设备"%1$s"配对？</string>
+    <string name="pairing_request_expired">配对请求已过期</string>
     <string name="allow">允许</string>
     <string name="deny">拒绝</string>
     <string name="chat">聊天</string>

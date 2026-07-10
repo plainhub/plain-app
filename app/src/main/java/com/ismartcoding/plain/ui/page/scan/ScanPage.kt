@@ -23,11 +23,9 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -54,11 +52,10 @@ import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.plain.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.data.DQrPairData
-import com.ismartcoding.plain.discover.NearbyPairing
-import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -67,10 +64,8 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.QrCodeBitmapHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
 import com.ismartcoding.plain.preferences.ScanHistoryPreference
-import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -91,14 +86,14 @@ fun ScanPage(navController: NavHostController) {
     var hasCamPermission by remember { mutableStateOf(Permission.CAMERA.can(context)) }
     var showScanResultSheet by remember { mutableStateOf(false) }
     var scanResult by remember { mutableStateOf("") }
-    var pendingPairData by remember { mutableStateOf<DQrPairData?>(null) }
 
     fun handleScanResult(text: String) {
         scanResult = text
         addScanResult(scope, text)
         val pairData = DQrPairData.fromQrContent(text)
         if (pairData != null) {
-            pendingPairData = pairData
+            sendEvent(PairingRequestReceivedEvent(pairData.toDPairingRequest()))
+            cameraDetecting.value = false
         } else {
             showScanResultSheet = true
         }
@@ -132,36 +127,6 @@ fun ScanPage(navController: NavHostController) {
     DisposableEffect(Unit) { onDispose { cameraProvider?.unbindAll() } }
     if (showScanResultSheet) {
         QrScanResultBottomSheet(scanResult) { showScanResultSheet = false; cameraDetecting.value = true }
-    }
-    pendingPairData?.let { pairData ->
-        AlertDialog(
-            onDismissRequest = {
-                pendingPairData = null
-                cameraDetecting.value = true
-            },
-            title = { Text(stringResource(Res.string.pair_via_qr_title)) },
-            text = { Text(stringResource(Res.string.pairing_request_message, pairData.name)) },
-            confirmButton = {
-                PFilledButton(
-                    text = stringResource(Res.string.pair),
-                    buttonSize = ButtonSize.MEDIUM,
-                    onClick = {
-                        scope.launch {
-                            NearbyPairing.startPairingAsync(pairData.toDNearbyDevice())
-                            pendingPairData = null
-                            cameraDetecting.value = true
-                        }
-                    },
-                )
-            },
-            dismissButton = {
-                PTextButton(
-                    text = stringResource(Res.string.cancel),
-                    onClick = {
-                        pendingPairData = null
-                        cameraDetecting.value = true
-                    })
-            })
     }
 
     PScaffold(topBar = {

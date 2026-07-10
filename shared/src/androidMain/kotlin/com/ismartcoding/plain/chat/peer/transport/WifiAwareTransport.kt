@@ -12,6 +12,7 @@ import com.ismartcoding.plain.connectivityManager
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getAwareFileUrl
 import com.ismartcoding.plain.lib.isSPlus
+import com.ismartcoding.plain.lib.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -22,8 +23,9 @@ object WifiAwareTransport : PeerTransport {
     private val httpFactory = AwareHttpClientFactory()
     private val pool = AwareLinkPool(session, connectivityManager, httpFactory)
 
+    // aware only starts from android 13+
     @RequiresPermission(allOf = [Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.ACCESS_WIFI_STATE])
-    fun isSupported(): Boolean = isSPlus() && session.isAvailable()
+    fun isSupported(): Boolean = isTPlus() && session.isAvailable()
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.NEARBY_WIFI_DEVICES])
     fun start() {

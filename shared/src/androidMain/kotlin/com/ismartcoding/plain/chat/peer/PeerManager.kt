@@ -79,34 +79,6 @@ object PeerManager {
         peer
     }
 
-    suspend fun upsertPaired(
-        deviceId: String,
-        deviceName: String,
-        deviceIps: List<String>,
-        port: Int,
-        deviceType: DeviceType,
-        key: String,
-        signaturePublicKey: String,
-    ) = withIO {
-        val now = TimeHelper.now()
-        val ipString = deviceIps.joinToString(",")
-        val peer = (AppDatabase.instance.peerDao().getById(deviceId) ?: DPeer(deviceId).apply {
-            createdAt = now
-        }).apply {
-            name = deviceName
-            ip = ipString
-            this.port = port
-            this.deviceType = deviceType.value
-            this.key = key
-            publicKey = signaturePublicKey
-            status = "paired"
-            updatedAt = now
-        }
-        AppDatabase.instance.peerDao().upsert(peer)
-        PeerCacher.load()
-        LogCat.d("Upserted peer: $deviceId")
-    }
-
     fun setOnlineStatus(peerId: String, online: Boolean) {
         PeerCacher.setOnline(peerId, online)
     }

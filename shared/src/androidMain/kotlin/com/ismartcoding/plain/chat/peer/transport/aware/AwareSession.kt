@@ -194,6 +194,7 @@ class AwareSession {
         runCatching { session?.close() }
         session = null
         attaching.set(false)
+        TempData.awareRunning.value = false
         clearPeerHandles()
         if (!ready.isCompleted) {
             ready.cancel()
@@ -238,6 +239,7 @@ class AwareSession {
             LogCat.d("[AWARE] attach onAttached")
             session = s
             attaching.set(false)
+            TempData.awareRunning.value = true
             if (!ready.isCompleted) ready.complete(s)
             publishOwnService(s)
             subscribeOwnService(s)
@@ -254,6 +256,7 @@ class AwareSession {
             subscribe = null
             publish = null
             session = null
+            TempData.awareRunning.value = false
             clearPeerHandles()
             if (!ready.isCompleted) {
                 ready.completeExceptionally(IllegalStateException("session terminated"))

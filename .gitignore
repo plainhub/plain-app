@@ -101,3 +101,5 @@ apitest/results/
 
 # apitest — config has the bearer token / cid for /graphql auth
 apitest/config.json
+.trae
+/docs

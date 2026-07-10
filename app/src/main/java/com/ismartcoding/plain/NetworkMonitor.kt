@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import com.ismartcoding.plain.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.services.HttpServerService
 
 object NetworkMonitor {
@@ -37,7 +37,7 @@ object NetworkMonitor {
                 NetworkCapabilities.NET_CAPABILITY_VALIDATED
             ) == true
         val reason = if (connected) "Connected" else "Disconnected"
-        NearbyDiscoverManager.scheduleRestart(reason)
+        LANDiscoverManager.scheduleRestart(reason)
         HttpServerService.instance?.mdnsRegister?.schedule(reason)
     }
 }

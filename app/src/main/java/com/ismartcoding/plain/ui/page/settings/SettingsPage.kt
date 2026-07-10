@@ -35,6 +35,12 @@ import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.LocalAutoCheckUpdate
+import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
+import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.preferences.dataStore
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+import com.ismartcoding.plain.ui.models.PeerViewModel
+import kotlinx.coroutines.flow.map
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDonationBanner
@@ -55,7 +61,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewModel) {
+fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewModel, peerVM: PeerViewModel) {
     val autoCheckUpdate = LocalAutoCheckUpdate.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -63,6 +69,9 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     var developerMode by remember { mutableStateOf(false) }
     var cacheSize by remember { mutableLongStateOf(0L) }
     var fileSize by remember { mutableLongStateOf(AppLogHelper.getFileSize(context)) }
+    val isDiscoverable = remember {
+        context.dataStore.dataFlow.map { NearbyDiscoverablePreference.get(it) }
+    }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
@@ -127,6 +136,14 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 else Res.string.not_supported
                             ),
                         )
+                        PListItem(
+                            title = stringResource(Res.string.make_discoverable),
+                            subtitle = stringResource(Res.string.make_discoverable_desc),
+                        ) {
+                            PSwitch(activated = isDiscoverable) { newValue ->
+                                peerVM.updateDiscoverable(newValue)
+                            }
+                        }
                         if (AppFeatureType.CHECK_UPDATES.has()) {
                             PListItem(title = stringResource(Res.string.app_version), subtitle = MainApp.getAppVersion(), action = {
                                 PFilledButton(text = stringResource(Res.string.check_update), buttonSize = ButtonSize.SMALL, onClick = {

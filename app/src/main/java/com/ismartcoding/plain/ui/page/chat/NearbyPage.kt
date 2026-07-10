@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,18 +32,21 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
-import com.ismartcoding.plain.features.bluetooth.BlePairingCandidate
+import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
+import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.models.NearbyItemStatus
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
-import com.ismartcoding.plain.ui.page.chat.components.BleDeviceItem
 import com.ismartcoding.plain.ui.page.chat.components.NearbyDeviceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,8 +58,10 @@ fun NearbyPage(
 ) {
     val nearbyDevices = nearbyVM.nearbyDevices
     val isDiscovering by nearbyVM.isDiscovering
-    val bleCandidates = nearbyVM.bleCandidates
     val isBleScanning by nearbyVM.isBleScanning
+    val blePermissionReady by nearbyVM.blePermissionReady
+    val isSearching = isDiscovering || isBleScanning
+    val pairedPeers by PeerCacher.pairedPeers.collectAsState()
 
     var showQrSheet by remember { mutableStateOf(false) }
     var qrData by remember { mutableStateOf<DQrPairData?>(null) }
@@ -64,7 +70,7 @@ fun NearbyPage(
         if (!isDiscovering) {
             nearbyVM.startDiscovering()
         }
-        if (!isBleScanning) {
+        if (blePermissionReady && !isBleScanning) {
             nearbyVM.startBleScanning()
         }
     }
@@ -92,14 +98,14 @@ fun NearbyPage(
                 },
                 title = stringResource(Res.string.nearby_devices),
                 actions = {
-                    PIconButton(
-                        icon = Res.drawable.qr_code,
-                        contentDescription = stringResource(Res.string.show_qr_code),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    ) {
-                        qrData = null
-                        showQrSheet = true
-                    }
+//                    PIconButton(
+//                        icon = Res.drawable.qr_code,
+//                        contentDescription = stringResource(Res.string.show_qr_code),
+//                        tint = MaterialTheme.colorScheme.onSurface,
+//                    ) {
+//                        qrData = null
+//                        showQrSheet = true
+//                    }
                 }
             )
         }
@@ -109,9 +115,40 @@ fun NearbyPage(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            nearbySearchingItem(isDiscovering || isBleScanning)
-            nearbyDeviceListItems(nearbyDevices, nearbyVM, peerVM)
-            bleCandidateListItems(bleCandidates, nearbyVM)
+            if (!blePermissionReady) {
+                item {
+                    PAlert(
+                        description = stringResource(Res.string.bluetooth_permission_required_for_nearby),
+                        AlertType.WARNING,
+                    ) {
+                        PFilledButton(
+                            text = stringResource(Res.string.grant_permission),
+                            buttonSize = ButtonSize.SMALL,
+                            onClick = { nearbyVM.requestBlePermission() },
+                        )
+                    }
+                }
+            }
+            nearbySearchingItem(isSearching)
+            nearbyDeviceListItems(nearbyDevices, nearbyVM, peerVM, pairedPeers)
+            if (nearbyDevices.isEmpty() && !isSearching) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = stringResource(Res.string.make_sure_devices_same_network),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 32.dp)
+                            )
+                        }
+                    }
+                }
+            }
             item {
                 BottomSpace(paddingValues)
             }
@@ -130,65 +167,26 @@ internal fun LazyListScope.nearbyDeviceListItems(
     nearbyDevices: List<DNearbyDevice>,
     nearbyVM: NearbyViewModel,
     peerVM: PeerViewModel,
+    pairedPeers: List<com.ismartcoding.plain.db.DPeer>,
 ) {
-    val pairedPeers = PeerCacher.pairedPeers.value
     if (nearbyDevices.isNotEmpty()) {
-        item {
-            VerticalSpace(16.dp)
-            Subtitle(stringResource(Res.string.nearby_devices))
-        }
         nearbyDevices.forEach { item ->
             item {
                 val isPaired = pairedPeers.any { it.id == item.id }
-                val isPairing = nearbyVM.isPairing(item.id)
+                val status = nearbyVM.getStatus(item.id, isPaired)
+                LaunchedEffect(status) {
+                    if (status == NearbyItemStatus.COMPLETING && isPaired) {
+                        nearbyVM.clearStatus(item.id)
+                    }
+                }
                 NearbyDeviceItem(
                     item = item,
-                    isPaired = isPaired,
-                    isPairing = isPairing,
+                    status = status,
                     onPairClick = { nearbyVM.startPairing(item) },
                     onUnpairClick = { nearbyVM.unpairDevice(item.id) },
-                    onCancelClick = { nearbyVM.cancelPairing(item.id) }
+                    onCancelClick = { nearbyVM.cancelPairing(item.id) },
                 )
                 VerticalSpace(8.dp)
-            }
-        }
-    }
-}
-
-private fun LazyListScope.bleCandidateListItems(
-    candidates: List<BlePairingCandidate>,
-    nearbyVM: NearbyViewModel,
-) {
-    if (candidates.isNotEmpty()) {
-        item {
-            VerticalSpace(16.dp)
-            Subtitle(stringResource(Res.string.bluetooth))
-        }
-        candidates.forEach { candidate ->
-            item {
-                BleDeviceItem(
-                    candidate = candidate,
-                    isPairing = nearbyVM.isBleCandidatePairing(candidate.mac),
-                    onPairClick = { nearbyVM.pairViaBle(candidate) },
-                )
-                VerticalSpace(8.dp)
-            }
-        }
-    } else {
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(Res.string.make_sure_devices_same_network),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 32.dp)
-                    )
-                }
             }
         }
     }

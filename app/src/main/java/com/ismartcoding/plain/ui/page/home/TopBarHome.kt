@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.page.home
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,42 +25,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.close
 import com.ismartcoding.plain.i18n.device_name
-import com.ismartcoding.plain.i18n.eye
-import com.ismartcoding.plain.i18n.eye_off
-import com.ismartcoding.plain.i18n.make_discoverable
-import com.ismartcoding.plain.i18n.make_discoverable_desc
 import com.ismartcoding.plain.i18n.pen
-import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
-import com.ismartcoding.plain.preferences.dataFlow
-import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.ActionButtonScan
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
-import com.ismartcoding.plain.ui.base.PDialogListItem
-import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.components.DeviceRenameDialog
-import com.ismartcoding.plain.ui.extensions.collectAsStateValue
-import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import kotlinx.coroutines.flow.map
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
+fun TopBarHome(navController: NavHostController) {
     val context = LocalContext.current
     var showRenameDialog by remember { mutableStateOf(false) }
-    var showDiscoverableDialog by remember { mutableStateOf(false) }
-    val isDiscoverable = remember {
-        context.dataStore.dataFlow.map { NearbyDiscoverablePreference.get(it) }
-    }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
     val deviceName by TempData.deviceName.collectAsState()
 
     if (showRenameDialog) {
@@ -69,28 +48,6 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
             name = deviceName,
             onDismiss = { showRenameDialog = false },
             onDone = { },
-        )
-    }
-
-    if (showDiscoverableDialog) {
-        AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surface,
-            onDismissRequest = { showDiscoverableDialog = false },
-            title = { Text(stringResource(Res.string.make_discoverable), style = MaterialTheme.typography.titleLarge) },
-            text = {
-                PDialogListItem(title = stringResource(Res.string.make_discoverable_desc)) {
-                    PSwitch(activated = isDiscoverable) {
-                        peerVM.updateDiscoverable(it)
-                    }
-                }
-            },
-            confirmButton = {
-                PFilledButton(
-                    text = stringResource(Res.string.close),
-                    buttonSize = ButtonSize.MEDIUM,
-                    onClick = { showDiscoverableDialog = false },
-                )
-            },
         )
     }
 
@@ -120,12 +77,6 @@ fun TopBarHome(navController: NavHostController, peerVM: PeerViewModel) {
             }
         },
         actions = {
-            PIconButton(
-                icon = if (isDiscoverable) Res.drawable.eye else Res.drawable.eye_off,
-                contentDescription = stringResource(Res.string.make_discoverable),
-                tint = MaterialTheme.colorScheme.onSurface,
-                click = { showDiscoverableDialog = true },
-            )
             ActionButtonSettings(
                 onClick = { navController.navigate(Routing.Settings) },
             )

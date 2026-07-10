@@ -49,6 +49,8 @@
     <string name="try_again">重試</string>
     <string name="added_at">添加時間</string>
     <string name="location_permission_should_be_enabled">藍牙功能需要啟用位置權限</string>
+    <string name="bluetooth_permission_required_for_nearby">需要藍牙權限才能透過藍牙發現附近設備。</string>
+    <string name="nearby_wifi_devices_required_for_chat">需要藍牙和附近設備權限才能發現附近設備。</string>
     <string name="me">我</string>
     <string name="copy_text">複製文本</string>
     <string name="print">列印</string>

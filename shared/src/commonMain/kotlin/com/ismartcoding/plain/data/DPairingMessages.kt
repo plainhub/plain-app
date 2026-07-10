@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,11 +15,27 @@ data class DPairingRequest(
     val timestamp: Long, // Timestamp for replay attack prevention
     val ips: List<String> = emptyList(), // All IP addresses of the requesting device
     var signature: String = "", // Ed25519 signature of request content (Base64 encoded)
-    var fromIp: String = ""
+    var fromIp: String = "",
+    var bleMac: String = "",
+    var isQrInitiated: Boolean = false
 ) {
     fun toSignatureData(): String {
         return "$fromId|$fromName|$port|${deviceType.value}|$ecdhPublicKey|$signaturePublicKey|$timestamp|${ips.joinToString(",")}"
     }
+}
+
+fun DPairingRequest.toDNearbyDevice(): DNearbyDevice {
+    return DNearbyDevice(
+        id = fromId,
+        name = fromName,
+        ips = ips,
+        port = port,
+        deviceType = deviceType,
+        version = "",
+        platform = "android",
+        lastSeen = TimeHelper.now(),
+        discoveredViaLan = true,
+    )
 }
 
 @Serializable

@@ -136,7 +136,7 @@ fun MainNavGraph(
         composable<Routing.Notes> { NotesPage(navController, notesVM = notesVM, tagsVM = noteTagsVM) }
         composable<Routing.SoundMeter> { SoundMeterPage(navController) }
         composable<Routing.PomodoroTimer> { PomodoroPage(navController, pomodoroVM = pomodoroVM) }
-        composable<Routing.Settings> { SettingsPage(navController, updateVM) }
+        composable<Routing.Settings> { SettingsPage(navController, updateVM, peerVM) }
         composable<Routing.DarkTheme> { DarkThemePage(navController) }
         composable<Routing.Language> { LanguagePage(navController) }
         composable<Routing.BackupRestore> { BackupRestorePage(navController) }
@@ -231,7 +231,10 @@ fun MainNavGraph(
         composableNoAnim<Routing.PairingRequest> {
             val request = mainVM.pendingPairingRequest.value
             if (request != null) {
-                PairingRequestPage(request = request, navController = navController)
+                PairingRequestPage(
+                    request = request,
+                    navController = navController,
+                )
             } else {
                 navController.popBackStack<Routing.PairingRequest>(inclusive = true)
             }
