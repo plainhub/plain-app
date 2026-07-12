@@ -13,6 +13,7 @@ import com.ismartcoding.plain.data.DUpdateInfo
 import com.ismartcoding.plain.data.FilePathData
 import com.ismartcoding.plain.data.NotificationFilterData
 import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PasswordType
@@ -549,4 +550,52 @@ fun decodeSenderEntry(entry: String): Pair<String, String> {
     val idx = entry.indexOf(DLNA_SEP)
     return if (idx >= 0) entry.substring(0, idx) to entry.substring(idx + 1)
     else entry to ""
+}
+
+object HomeFeaturesPreference : BasePreference<String>() {
+    private const val SEPARATOR = "|"
+    override val default = listOf(
+        AppFeatureType.IMAGES, AppFeatureType.VIDEOS, AppFeatureType.AUDIO,
+        AppFeatureType.DOCS, AppFeatureType.FILES, AppFeatureType.CHAT,
+    ).joinToString(SEPARATOR) { it.name }
+    override val key = stringPreferencesKey("home_features_v2")
+
+    fun parseList(value: String): List<String> =
+        if (value.isEmpty()) emptyList() else value.split(SEPARATOR).filter { it.isNotBlank() }
+
+    fun formatList(list: List<String>): String = list.joinToString(SEPARATOR)
+}
+
+object HomeSectionCollapsedPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("home_section_collapsed")
+
+    fun get(preferences: Preferences, feature: AppFeatureType): Boolean {
+        return parseMap(get(preferences))[feature] ?: false
+    }
+
+    suspend fun putAsync(feature: AppFeatureType, collapsed: Boolean) {
+        val updated = getValueAsync().toMutableMap()
+        updated[feature] = collapsed
+        putAsync(formatMap(updated))
+    }
+
+    suspend fun getValueAsync(): Map<AppFeatureType, Boolean> {
+        return parseMap(getAsync())
+    }
+
+    private fun parseMap(value: String): Map<AppFeatureType, Boolean> {
+        if (value.isEmpty()) return emptyMap()
+        return try {
+            preferencesJson.decodeFromString<Map<String, Boolean>>(value).mapNotNull { (key, collapsed) ->
+                runCatching { AppFeatureType.valueOf(key) }.getOrNull()?.let { it to collapsed }
+            }.toMap()
+        } catch (_: Exception) {
+            emptyMap()
+        }
+    }
+
+    private fun formatMap(value: Map<AppFeatureType, Boolean>): String {
+        return preferencesJson.encodeToString(value.mapKeys { it.key.name })
+    }
 }

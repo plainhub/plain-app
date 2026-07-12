@@ -21,3 +21,18 @@ expect fun shareText(text: String)
  * Share a single file via the system share sheet (uses FileProvider on Android).
  */
 expect fun shareFile(path: String)
+
+/**
+ * Share multiple files via the system share sheet.
+ */
+expect fun shareFiles(paths: List<String>)
+
+/**
+ * Open a file with the default external app (ACTION_VIEW on Android).
+ */
+expect fun openFileExternal(path: String)
+
+/**
+ * Restart the app process.
+ */
+expect fun relaunchApp()

@@ -8,7 +8,7 @@ import android.os.BatteryManager
 import android.os.Build
 import android.provider.Settings
 import com.ismartcoding.plain.lib.extensions.capitalize
-import com.ismartcoding.plain.lib.isTPlus
+import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.uiModeManager

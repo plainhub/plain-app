@@ -2,12 +2,15 @@ package com.ismartcoding.plain.chat.peer.transport.aware
 
 import android.net.Network
 import com.ismartcoding.plain.api.OkHttpClientFactory
-import com.ismartcoding.plain.api.applyDownloadConfig
 import com.ismartcoding.plain.chat.peer.PeerCacher
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.websocket.WebSockets
 import okhttp3.Dns
-import okhttp3.OkHttpClient
 import java.net.Inet6Address
 import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 
 class AwareHttpClientFactory {
     fun build(
@@ -15,38 +18,55 @@ class AwareHttpClientFactory {
         network: Network,
         peerIpv6: Inet6Address,
         peerPort: Int,
-    ): OkHttpClient {
+    ): HttpClient {
         val keyBytes = requireNotNull(PeerCacher.getKeyBytes(peerId)) {
             "PeerCacher has no key bytes for peer $peerId"
         }
-        return OkHttpClientFactory.createCryptoHttpClient(
+        val okHttpClient = OkHttpClientFactory.createCryptoHttpClient(
             keyBytes = keyBytes,
             timeout = 30,
             socketFactory = network.socketFactory,
             dns = awareDns(peerIpv6),
             connectTimeoutMs = 5_000L,
+            addHeaders = false,
         ).newBuilder()
             .retryOnConnectionFailure(true)
             .build()
+        return HttpClient(OkHttp) {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 30_000L
+                connectTimeoutMillis = 5_000L
+            }
+            install(WebSockets)
+            engine {
+                preconfigured = okHttpClient
+            }
+        }
     }
 
     fun buildFileDownload(
         network: Network,
         peerIpv6: Inet6Address,
-    ): OkHttpClient {
-        // The file server uses the same self-signed cert as the GraphQL endpoint.
-        // createUnsafeOkHttpClient provides the trust-all SSL layer; we then route
-        // TCP through the Aware network's socketFactory and resolve the AWARE_HOST
-        // pseudo-hostname to the peer's IPv6. The hostnameVerifier is overridden
-        // because createUnsafeOkHttpClient only accepts isLocalNetworkAddress names,
-        // whereas the Aware transport uses the "plain-aware-peer" pseudo-hostname.
-        return OkHttpClientFactory.createUnsafeOkHttpClient()
+    ): HttpClient {
+        val okHttpClient = OkHttpClientFactory.createUnsafeOkHttpClient()
             .newBuilder()
             .socketFactory(network.socketFactory)
             .dns(awareDns(peerIpv6))
             .hostnameVerifier { _, _ -> true }
-            .applyDownloadConfig()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .writeTimeout(120, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
             .build()
+        return HttpClient(OkHttp) {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 120_000L
+                connectTimeoutMillis = 10_000L
+            }
+            engine {
+                preconfigured = okHttpClient
+            }
+        }
     }
 
     companion object {

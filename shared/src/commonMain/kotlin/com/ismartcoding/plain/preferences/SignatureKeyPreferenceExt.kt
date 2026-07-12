@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.preferences
 
-import com.ismartcoding.plain.crypto.PairingCrypto
+import com.ismartcoding.plain.platform.PairingCrypto
 import com.ismartcoding.plain.data.DSignatureKeyPair
+import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -25,5 +26,5 @@ suspend fun SignatureKeyPreference.getKeyPairAsync(): DSignatureKeyPair {
 
 suspend fun SignatureKeyPreference.getPublicKeyBytesAsync(): ByteArray {
     val keyPair = getKeyPairAsync()
-    return Base64.decode(keyPair.publicKey)
+    return Base64Lenient.decode(keyPair.publicKey)
 }

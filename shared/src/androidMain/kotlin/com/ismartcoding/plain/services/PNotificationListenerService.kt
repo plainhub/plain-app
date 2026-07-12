@@ -1,0 +1,247 @@
+package com.ismartcoding.plain.services
+import com.ismartcoding.plain.isDebugBuild
+
+import android.app.Notification
+import android.content.ComponentName
+import android.content.Context
+import android.content.pm.PackageManager
+import android.service.notification.NotificationListenerService
+import android.service.notification.StatusBarNotification
+import androidx.core.app.NotificationCompat
+import com.ismartcoding.plain.lib.channel.receiveEventHandler
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.AndroidTempData
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.activityManager
+import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.extensions.toDNotification
+import com.ismartcoding.plain.events.HCancelNotificationsEvent
+import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.platform.isGranted
+import com.ismartcoding.plain.platform.isEnabledAsync
+import com.ismartcoding.plain.packageManager
+import com.ismartcoding.plain.preferences.NotificationFilterPreference
+import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
+import kotlinx.coroutines.Job
+
+class PNotificationListenerService : NotificationListenerService() {
+    private val events = mutableListOf<Job>()
+    var isConnected = false
+        private set
+
+    private fun isValidNotification(statusBarNotification: StatusBarNotification): Boolean {
+        val notification = statusBarNotification.notification
+        if (notification.flags and Notification.FLAG_FOREGROUND_SERVICE != 0
+            || notification.flags and Notification.FLAG_ONGOING_EVENT != 0
+            || notification.flags and Notification.FLAG_LOCAL_ONLY != 0
+            || notification.flags and NotificationCompat.FLAG_GROUP_SUMMARY != 0 //The notification that groups other notifications
+        ) {
+            //This is not a notification we want!
+            return false
+        }
+
+        val packageName = statusBarNotification.packageName
+
+        if ("com.facebook.orca" == packageName && statusBarNotification.id == 10012 && notification.tickerText == null) {
+            //HACK: Hide weird Facebook empty "Messenger" notification that is actually not shown in the phone
+            return false
+        }
+
+        if (applicationContext.packageName == packageName && !isDebugBuild()) {
+            // Don't send our own notifications (allow in DEBUG for testing)
+            return false
+        }
+
+        return true
+    }
+
+    override fun onNotificationPosted(statusBarNotification: StatusBarNotification) {
+        if (isValidNotification(statusBarNotification)) {
+            val n = statusBarNotification.toDNotification()
+            val old = AndroidTempData.notifications.find { it.id == n.id }
+            if (old != null) {
+                AndroidTempData.notifications.remove(old)
+            }
+            AndroidTempData.notifications.add(n)
+            // Store raw actions for reply support
+            val rawActions = statusBarNotification.notification.actions
+            if (rawActions != null) {
+                AndroidTempData.notificationActions[n.id] = rawActions
+            } else {
+                AndroidTempData.notificationActions.remove(n.id)
+            }
+            coIO {
+                val enable = Permission.NOTIFICATION_LISTENER.isEnabledAsync()
+                if (enable) {
+                    val isAllowed = NotificationFilterPreference.isAllowedAsync(statusBarNotification.packageName)
+                    if (isAllowed) {
+                        sendEvent(
+                            WebSocketEvent(
+                                if (old == null) EventType.NOTIFICATION_CREATED else EventType.NOTIFICATION_UPDATED,
+                                JsonHelper.jsonEncode(
+                                    n.toModel()
+                                ),
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onNotificationRemoved(statusBarNotification: StatusBarNotification) {
+        if (isValidNotification(statusBarNotification)) {
+            val old = AndroidTempData.notifications.find { it.id == statusBarNotification.key }
+            if (old != null) {
+                AndroidTempData.notifications.remove(old)
+                AndroidTempData.notificationActions.remove(old.id)
+                sendEvent(
+                    WebSocketEvent(
+                        EventType.NOTIFICATION_DELETED,
+                        JsonHelper.jsonEncode(
+                            old.toModel()
+                        ),
+                    )
+                )
+            }
+        }
+    }
+
+    override fun onListenerConnected() {
+        super.onListenerConnected()
+        isConnected = true
+        LogCat.d("PNotificationListenerService: onListenerConnected")
+        try {
+            val notifications = activeNotifications
+            if (notifications != null) {
+                AndroidTempData.notifications.clear()
+                AndroidTempData.notificationActions.clear()
+                for (notification in notifications) {
+                    if (isValidNotification(notification)) {
+                        val n = notification.toDNotification()
+                        AndroidTempData.notifications.add(n)
+                        val rawActions = notification.notification.actions
+                        if (rawActions != null) {
+                            AndroidTempData.notificationActions[n.id] = rawActions
+                        }
+                    }
+                }
+            }
+        } catch (ex: SecurityException) {
+            LogCat.e("SecurityException when getting active notifications: ${ex.message}")
+            isConnected = false
+            return
+        } catch (ex: Exception) {
+            LogCat.e("Error getting active notifications: ${ex.message}")
+        }
+
+        try {
+
+            events.add(receiveEventHandler<HCancelNotificationsEvent> { event ->
+                if (!isConnected) {
+                    LogCat.w("PNotificationListenerService: not connected, ignoring cancel request")
+                    return@receiveEventHandler
+                }
+                if (!Permission.NOTIFICATION_LISTENER.isGranted()) {
+                    LogCat.w("PNotificationListenerService: permission not granted, ignoring cancel request")
+                    isConnected = false
+                    return@receiveEventHandler
+                }
+                
+                try {
+                    if (event.ids.size == AndroidTempData.notifications.size) {
+                        cancelAllNotifications()
+                        AndroidTempData.notifications.clear()
+                    } else {
+                        event.ids.forEach { id ->
+                            try {
+                                cancelNotification(id)
+                            } catch (ex: Exception) {
+                                LogCat.e("Failed to cancel notification $id: ${ex.message}")
+                            }
+                        }
+                    }
+                } catch (ex: SecurityException) {
+                    LogCat.e("SecurityException when canceling notifications: ${ex.message}")
+                    // Service might have lost permission, mark as disconnected
+                    isConnected = false
+                } catch (ex: Exception) {
+                    LogCat.e("Error canceling notifications: ${ex.message}")
+                }
+            })
+        } catch (ex: Exception) {
+            LogCat.e("Error setting up event handlers: ${ex.message}")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        isConnected = false
+        try {
+            events.forEach { it.cancel() }
+            events.clear()
+        } catch (ex: Exception) {
+            LogCat.e("Error cleaning up events in onDestroy: ${ex.message}")
+        }
+    }
+
+    override fun onListenerDisconnected() {
+        super.onListenerDisconnected()
+        isConnected = false
+        LogCat.d("PNotificationListenerService: onListenerDisconnected")
+        try {
+            events.forEach { it.cancel() }
+            events.clear()
+        } catch (ex: Exception) {
+            LogCat.e("Error cleaning up events: ${ex.message}")
+        }
+        try {
+            requestRebind(ComponentName(applicationContext, PNotificationListenerService::class.java))
+        } catch (ex: Exception) {
+            LogCat.e("Error requesting rebind: ${ex.message}")
+        }
+    }
+
+    companion object {
+        fun toggle(context: Context, enable: Boolean) {
+            if (!AppFeatureType.NOTIFICATIONS.has()) {
+                return
+            }
+            if (enable) {
+                val collectorComponent = ComponentName(context, PNotificationListenerService::class.java)
+                LogCat.d("ensureCollectorRunning collectorComponent: $collectorComponent")
+                var collectorRunning = false
+                val runningServices = activityManager.getRunningServices(Int.MAX_VALUE)
+                if (runningServices == null) {
+                    LogCat.d("ensureCollectorRunning() runningServices is NULL")
+                    return
+                }
+                for (service in runningServices) {
+                    if (service.service == collectorComponent) {
+                        if (service.pid == android.os.Process.myPid()) {
+                            collectorRunning = true
+                        }
+                    }
+                }
+                if (collectorRunning) {
+                    LogCat.d("ensureCollectorRunning: collector is running")
+                    return
+                }
+                LogCat.d("ensureCollectorRunning: collector not running, reviving...")
+                val thisComponent = ComponentName(context, PNotificationListenerService::class.java)
+                packageManager.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+                packageManager.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+            } else {
+                val thisComponent = ComponentName(context, PNotificationListenerService::class.java)
+                packageManager.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+            }
+        }
+    }
+}
+

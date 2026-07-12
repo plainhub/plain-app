@@ -1,0 +1,73 @@
+package com.ismartcoding.plain.preferences
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+import kotlinx.coroutines.flow.map
+
+data class WebSettings(
+    val passwordType: Int,
+    val password: String,
+    val authTwoFactor: Boolean,
+    val authDevToken: String,
+    val adbToken: String,
+    val keepAwake: Boolean,
+    val apiPermissions: Set<String>,
+    val rotateUrlTokenOnRestart: Boolean,
+)
+
+val LocalPasswordType = compositionLocalOf { PasswordTypePreference.default }
+val LocalPassword = compositionLocalOf { PasswordPreference.default }
+val LocalAuthTwoFactor = compositionLocalOf { AuthTwoFactorPreference.default }
+val LocalApiPermissions = compositionLocalOf { ApiPermissionsPreference.default }
+val LocalAuthDevToken = compositionLocalOf { AuthDevTokenPreference.default }
+val LocalAdbToken = compositionLocalOf { AdbTokenPreference.default }
+val LocalKeepAwake = compositionLocalOf { KeepAwakePreference.default }
+val LocalRotateUrlTokenOnRestart = compositionLocalOf { RotateUrlTokenOnRestartPreference.default }
+
+@Composable
+fun WebSettingsProvider(content: @Composable () -> Unit) {
+    val defaultSettings =
+        WebSettings(
+            passwordType = PasswordTypePreference.default,
+            password = PasswordPreference.default,
+            authTwoFactor = AuthTwoFactorPreference.default,
+            authDevToken = AuthDevTokenPreference.default,
+            adbToken = AdbTokenPreference.default,
+            keepAwake = KeepAwakePreference.default,
+            apiPermissions = ApiPermissionsPreference.default,
+            rotateUrlTokenOnRestart = RotateUrlTokenOnRestartPreference.default,
+        )
+    val settings =
+        remember {
+            appDataStore.dataFlow.map {
+                WebSettings(
+                    passwordType = PasswordTypePreference.get(it),
+                    password = PasswordPreference.get(it),
+                    authTwoFactor = AuthTwoFactorPreference.get(it),
+                    authDevToken = AuthDevTokenPreference.get(it),
+                    adbToken = AdbTokenPreference.get(it),
+                    keepAwake = KeepAwakePreference.get(it),
+                    apiPermissions = ApiPermissionsPreference.get(it),
+                    rotateUrlTokenOnRestart = RotateUrlTokenOnRestartPreference.get(it),
+                )
+            }
+        }.collectAsStateValue(
+            initial = defaultSettings,
+        )
+
+    CompositionLocalProvider(
+        LocalPasswordType provides settings.passwordType,
+        LocalPassword provides settings.password,
+        LocalAuthTwoFactor provides settings.authTwoFactor,
+        LocalAuthDevToken provides settings.authDevToken,
+        LocalAdbToken provides settings.adbToken,
+        LocalKeepAwake provides settings.keepAwake,
+        LocalApiPermissions provides settings.apiPermissions,
+        LocalRotateUrlTokenOnRestart provides settings.rotateUrlTokenOnRestart,
+    ) {
+        content()
+    }
+}

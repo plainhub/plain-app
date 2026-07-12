@@ -1,0 +1,494 @@
+package com.ismartcoding.plain.features.sms
+
+import android.content.Context
+import android.database.Cursor
+import android.net.Uri
+import android.provider.BaseColumns
+import android.provider.Telephony
+import android.telephony.SmsManager
+import androidx.core.net.toUri
+import com.ismartcoding.plain.helpers.ContentWhere
+import com.ismartcoding.plain.data.SortBy
+import com.ismartcoding.plain.data.SortDirection
+import com.ismartcoding.plain.lib.extensions.find
+import com.ismartcoding.plain.lib.extensions.getIntValue
+import com.ismartcoding.plain.lib.extensions.getPagingCursorWithSql
+import com.ismartcoding.plain.lib.extensions.getStringValue
+import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
+import com.ismartcoding.plain.lib.extensions.getTimeValue
+import com.ismartcoding.plain.lib.extensions.map
+import com.ismartcoding.plain.lib.extensions.queryCursor
+import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.db.DArchivedConversation
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.helpers.FilterField
+import com.ismartcoding.plain.helpers.QueryHelper
+import com.ismartcoding.plain.smsManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import java.util.Locale
+
+object SmsHelper {
+    private val smsUri = Telephony.Sms.CONTENT_URI
+    private val mmsUri = Telephony.Mms.CONTENT_URI
+    private val mmsPartUri = "content://mms/part".toUri()
+
+    private const val MMS_ADDR_TYPE_FROM = 137
+    private const val MMS_ADDR_TYPE_TO = 151
+    private const val MMS_INSERT_ADDRESS_TOKEN = "insert-address-token"
+
+    // Only include actual content PDUs; exclude notification/delivery-report frames.
+    // 128 = m-send-req (outgoing), 130 = m-retrieve-conf (incoming with content)
+    private const val MMS_CONTENT_FILTER = "m_type IN (128, 130)"
+
+    fun sendText(to: String, message: String, subscriptionId: Int? = null) {
+        val manager: SmsManager = if (subscriptionId != null && subscriptionId >= 0) {
+            @Suppress("DEPRECATION")
+            SmsManager.getSmsManagerForSubscriptionId(subscriptionId)
+        } else {
+            smsManager
+        }
+        val parts = manager.divideMessage(message)
+        if (parts.size > 1) {
+            manager.sendMultipartTextMessage(to, null, ArrayList(parts), null, null)
+        } else {
+            manager.sendTextMessage(to, null, message, null, null)
+        }
+    }
+
+    private fun getProjection(): Array<String> {
+        return arrayOf(
+            Telephony.Sms._ID,
+            Telephony.Sms.TYPE,
+            Telephony.Sms.BODY,
+            Telephony.Sms.ADDRESS,
+            Telephony.Sms.THREAD_ID,
+            Telephony.Sms.READ,
+            Telephony.Sms.DATE,
+            Telephony.Sms.SERVICE_CENTER,
+            Telephony.Sms.SUBSCRIPTION_ID,
+        )
+    }
+
+    private fun buildWhere(
+        conditions: List<FilterField>,
+        archivedRecords: List<DArchivedConversation>,
+    ): ContentWhere {
+        val where = ContentWhere()
+        conditions.forEach {
+            when (it.name) {
+                "text" -> where.add("${Telephony.Sms.BODY} LIKE ?", "%${it.value}%")
+                "ids" -> where.addIn(BaseColumns._ID, it.value.split(","))
+                "type" -> where.add("${Telephony.Sms.TYPE} = ?", it.value)
+                "thread_id" -> where.add("${Telephony.Sms.THREAD_ID} = ?", it.value)
+            }
+        }
+
+        val threadIdCondition = conditions.firstOrNull { it.name == "thread_id" }
+        val isArchived = conditions.any { it.name == "archived" && it.value == "1" }
+        if (threadIdCondition != null) {
+            val archivedConversation = archivedRecords.firstOrNull { it.conversationId == threadIdCondition.value }
+            if (archivedConversation != null) {
+                if (isArchived) {
+                    where.add("${Telephony.Sms.DATE} <= ?", archivedConversation.conversationDate.toString())
+                } else {
+                    where.add("${Telephony.Sms.DATE} > ?", archivedConversation.conversationDate.toString())
+                }
+            }
+        }
+
+        return where
+    }
+
+    private fun cursorToSmsMessage(cursor: Cursor, cache: MutableMap<String, Int>): DMessage {
+        return DMessage(
+            cursor.getStringValue(Telephony.Sms._ID, cache),
+            cursor.getStringValue(Telephony.Sms.BODY, cache),
+            cursor.getStringValue(Telephony.Sms.ADDRESS, cache),
+            cursor.getTimeValue(Telephony.Sms.DATE, cache),
+            cursor.getStringValue(Telephony.Sms.SERVICE_CENTER, cache),
+            cursor.getIntValue(Telephony.Sms.READ, cache) == 1,
+            cursor.getStringValue(Telephony.Sms.THREAD_ID, cache),
+            cursor.getIntValue(Telephony.Sms.TYPE, cache),
+            cursor.getIntValue(Telephony.Sms.SUBSCRIPTION_ID, cache, -1),
+        )
+    }
+
+    private fun queryCount(context: Context, uri: Uri, selection: String? = null, selectionArgs: Array<String>? = null): Int {
+        var count = 0
+        context.contentResolver.queryCursor(
+            uri, arrayOf("COUNT(*) as count"),
+            selection, selectionArgs, null
+        )?.use { cursor ->
+            if (cursor.moveToFirst()) count = cursor.getInt(0)
+        }
+        return count
+    }
+
+    suspend fun searchAsync(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+    ): List<DMessage> = withIO {
+        val conditions = QueryHelper.parseAsync(query)
+        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
+        if (threadId.isNotEmpty()) {
+            return@withIO searchByThreadAsync(context, threadId, conditions, archivedRecords, limit, offset)
+        }
+
+        val where = buildWhere(conditions, archivedRecords)
+        val hasTextOrIdsFilter = conditions.any { it.name == "text" || it.name == "ids" }
+
+        // When filtering by text/ids (SMS-specific columns), skip MMS, use normal paging
+        if (hasTextOrIdsFilter) {
+            return@withIO context.contentResolver.getPagingCursorWithSql(
+                smsUri, getProjection(), where,
+                limit, offset, SortBy(Telephony.Sms.DATE, SortDirection.DESC)
+            )?.map { cursor, cache ->
+                cursorToSmsMessage(cursor, cache)
+            } ?: emptyList()
+        }
+
+        // Cap each sub-query so we never load the entire table into memory
+        val fetchCap = offset + limit
+        val smsItems = context.contentResolver.queryCursor(
+            smsUri, getProjection(), where.toSelection(), where.args.toTypedArray(),
+            "${Telephony.Sms.DATE} DESC LIMIT $fetchCap"
+        )?.map { cursor, cache ->
+            cursorToSmsMessage(cursor, cache)
+        } ?: emptyList()
+
+        // Also query MMS and merge
+        val mmsWhere = ContentWhere()
+        val typeCondition = conditions.firstOrNull { it.name == "type" }
+        if (typeCondition != null) {
+            // SMS type 1=inbox, 2=sent; MMS MESSAGE_BOX 1=inbox, 2=sent
+            mmsWhere.add("${Telephony.Mms.MESSAGE_BOX} = ?", typeCondition.value)
+        }
+        mmsWhere.add(MMS_CONTENT_FILTER)
+
+        val mmsItems = context.contentResolver.queryCursor(
+            mmsUri,
+            arrayOf(
+                Telephony.Mms._ID, Telephony.Mms.DATE, Telephony.Mms.THREAD_ID,
+                Telephony.Mms.MESSAGE_BOX, Telephony.Mms.READ, Telephony.Mms.SUBSCRIPTION_ID,
+            ),
+            mmsWhere.toSelection(),
+            mmsWhere.args.toTypedArray(),
+            "${Telephony.Mms.DATE} DESC LIMIT $fetchCap"
+        )?.map { cursor, cache ->
+            val rawMmsId = cursor.getStringValue(Telephony.Mms._ID, cache)
+            val bodyAndAttachments = readMmsBodyAndAttachments(context, rawMmsId)
+            DMessage(
+                id = "mms_$rawMmsId",
+                body = bodyAndAttachments.first,
+                address = readMmsAddress(context, rawMmsId),
+                date = cursor.getTimeSecondsValue(Telephony.Mms.DATE, cache),
+                serviceCenter = "",
+                read = cursor.getIntValue(Telephony.Mms.READ, cache) == 1,
+                threadId = cursor.getStringValue(Telephony.Mms.THREAD_ID, cache),
+                type = cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache),
+                subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache, -1),
+                isMms = true,
+                attachments = bodyAndAttachments.second,
+            )
+        } ?: emptyList()
+
+        return@withIO smsItems.plus(mmsItems)
+            .sortedByDescending { it.date }
+            .drop(offset)
+            .take(limit)
+    }
+
+    private fun searchByThreadAsync(
+        context: Context,
+        threadId: String,
+        conditions: List<FilterField>,
+        archivedRecords: List<DArchivedConversation>,
+        limit: Int,
+        offset: Int,
+    ): List<DMessage> {
+        val fetchCap = offset + limit
+
+        val isArchived = conditions.any { it.name == "archived" && it.value == "1" }
+        val archivedConversation = archivedRecords.firstOrNull { it.conversationId == threadId }
+        val smsDateFilter = if (archivedConversation != null) {
+            if (isArchived) {
+                " AND ${Telephony.Sms.DATE} <= ?"
+            } else {
+                " AND ${Telephony.Sms.DATE} > ?"
+            }
+        } else ""
+        val mmsDateFilter = if (archivedConversation != null) {
+            val dateCol = Telephony.Mms.DATE
+            if (isArchived) {
+                " AND $dateCol <= ?"
+            } else {
+                " AND $dateCol > ?"
+            }
+        } else ""
+        val dateArgs = if (archivedConversation != null) {
+            arrayOf(threadId, archivedConversation.conversationDate.toString())
+        } else arrayOf(threadId)
+        // MMS DATE is in seconds, SMS DATE is in milliseconds
+        val mmsDateArgs = if (archivedConversation != null) {
+            arrayOf(threadId, (archivedConversation.conversationDate / 1000).toString())
+        } else arrayOf(threadId)
+
+        // Query SMS and MMS separately — this is reliable across all devices.
+        val smsItems = context.contentResolver.queryCursor(
+            smsUri,
+            getProjection(),
+            "${Telephony.Sms.THREAD_ID} = ?$smsDateFilter",
+            dateArgs,
+            "${Telephony.Sms.DATE} DESC LIMIT $fetchCap"
+        )?.map { cursor, cache ->
+            cursorToSmsMessage(cursor, cache)
+        } ?: emptyList()
+
+        val mmsItems = context.contentResolver.queryCursor(
+            mmsUri,
+            arrayOf(
+                Telephony.Mms._ID, Telephony.Mms.DATE, Telephony.Mms.THREAD_ID,
+                Telephony.Mms.MESSAGE_BOX, Telephony.Mms.READ, Telephony.Mms.SUBSCRIPTION_ID,
+            ),
+            "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER$mmsDateFilter",
+            mmsDateArgs,
+            "${Telephony.Mms.DATE} DESC LIMIT $fetchCap"
+        )?.map { cursor, cache ->
+            val rawMmsId = cursor.getStringValue(Telephony.Mms._ID, cache)
+            val bodyAndAttachments = readMmsBodyAndAttachments(context, rawMmsId)
+            DMessage(
+                id = "mms_$rawMmsId",
+                body = bodyAndAttachments.first,
+                address = readMmsAddress(context, rawMmsId),
+                date = cursor.getTimeSecondsValue(Telephony.Mms.DATE, cache),
+                serviceCenter = "",
+                read = cursor.getIntValue(Telephony.Mms.READ, cache) == 1,
+                threadId = cursor.getStringValue(Telephony.Mms.THREAD_ID, cache),
+                type = cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache),
+                subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache, -1),
+                isMms = true,
+                attachments = bodyAndAttachments.second,
+            )
+        } ?: emptyList()
+
+        val allItems = smsItems.plus(mmsItems).sortedByDescending { it.date }
+
+        // Fill empty addresses from canonical_addresses (e.g., for failed SMS type=5)
+        val canonicalAddress = if (allItems.any { it.address.isEmpty() }) {
+            getCanonicalAddressForThread(context, threadId)
+        } else ""
+
+        val result = if (canonicalAddress.isNotEmpty()) {
+            allItems.map { if (it.address.isEmpty()) it.copy(address = canonicalAddress) else it }
+        } else {
+            allItems
+        }
+
+        return result.drop(offset).take(limit)
+    }
+
+    private fun getCanonicalAddressForThread(context: Context, threadId: String): String {
+        val conversationsUri = "content://mms-sms/conversations?simple=true".toUri()
+        val recipientIds = context.contentResolver.queryCursor(
+            conversationsUri,
+            arrayOf(BaseColumns._ID, "recipient_ids"),
+            "${BaseColumns._ID} = ?",
+            arrayOf(threadId),
+            null
+        )?.find { cursor, cache ->
+            cursor.getStringValue("recipient_ids", cache)
+        } ?: ""
+
+        if (recipientIds.isEmpty()) return ""
+
+        val firstId = recipientIds.trim().split("\\s+".toRegex()).firstOrNull() ?: return ""
+        val canonicalUri = "content://mms-sms/canonical-address/$firstId".toUri()
+        return context.contentResolver.queryCursor(
+            canonicalUri, arrayOf("address")
+        )?.find { cursor, cache ->
+            cursor.getStringValue("address", cache)
+        } ?: ""
+    }
+
+    private fun readMmsAddress(context: Context, mmsId: String): String {
+        val addrUri = "content://mms/$mmsId/addr".toUri()
+        val colType = Telephony.Mms.Addr.TYPE
+        val colAddress = Telephony.Mms.Addr.ADDRESS
+        val candidates = context.contentResolver.queryCursor(
+            addrUri,
+            arrayOf(colAddress, colType),
+            "$colType = ? OR $colType = ?",
+            arrayOf(MMS_ADDR_TYPE_FROM.toString(), MMS_ADDR_TYPE_TO.toString()),
+            null
+        )?.map { cursor, cache ->
+            val address = cursor.getStringValue(colAddress, cache)
+            val type = cursor.getIntValue(colType, cache)
+            Pair(address, type)
+        } ?: emptyList()
+
+        val preferred = candidates.firstOrNull {
+            it.second == MMS_ADDR_TYPE_FROM &&
+                it.first.isNotEmpty() &&
+                !it.first.equals(MMS_INSERT_ADDRESS_TOKEN, true)
+        }?.first
+        if (!preferred.isNullOrEmpty()) {
+            return preferred
+        }
+
+        return candidates.firstOrNull {
+            it.first.isNotEmpty() &&
+                !it.first.equals(MMS_INSERT_ADDRESS_TOKEN, true)
+        }?.first ?: ""
+    }
+
+    private fun readMmsBodyAndAttachments(context: Context, mmsId: String): Pair<String, List<DMessageAttachment>> {
+        val bodyParts = mutableListOf<String>()
+        val attachments = mutableListOf<DMessageAttachment>()
+
+        context.contentResolver.queryCursor(
+            mmsPartUri,
+            arrayOf(
+                Telephony.Mms.Part._ID,
+                Telephony.Mms.Part.CONTENT_TYPE,
+                Telephony.Mms.Part.NAME,
+                Telephony.Mms.Part.FILENAME,
+                Telephony.Mms.Part._DATA,
+                Telephony.Mms.Part.TEXT,
+            ),
+            "mid = ?",
+            arrayOf(mmsId),
+            null
+        )?.use { cursor ->
+            val cache = mutableMapOf<String, Int>()
+            while (cursor.moveToNext()) {
+                val partId = cursor.getStringValue(Telephony.Mms.Part._ID, cache)
+                val contentType = cursor.getStringValue(Telephony.Mms.Part.CONTENT_TYPE, cache)
+                val contentTypeLower = contentType.lowercase(Locale.ROOT)
+                val dataColumn = cursor.getStringValue(Telephony.Mms.Part._DATA, cache)
+
+                if (contentTypeLower == "text/plain") {
+                    var text = cursor.getStringValue(Telephony.Mms.Part.TEXT, cache)
+                    if (text.isEmpty() && dataColumn.isNotEmpty()) {
+                        text = context.contentResolver.openInputStream(Uri.parse("content://mms/part/$partId"))
+                            ?.bufferedReader()
+                            ?.use { it.readText() }
+                            .orEmpty()
+                    }
+                    if (text.isNotEmpty()) {
+                        bodyParts.add(text)
+                    }
+                    continue
+                }
+
+                if (contentTypeLower.startsWith("image/") ||
+                    contentTypeLower.startsWith("video/") ||
+                    contentTypeLower.startsWith("audio/") ||
+                    dataColumn.isNotEmpty()
+                ) {
+                    val rawName = cursor.getStringValue(Telephony.Mms.Part.NAME, cache)
+                    val fileName = if (rawName.isNotEmpty()) rawName else cursor.getStringValue(Telephony.Mms.Part.FILENAME, cache)
+                    attachments.add(
+                        DMessageAttachment(
+                            path = "content://mms/part/$partId",
+                            contentType = contentType,
+                            name = fileName,
+                        )
+                    )
+                }
+            }
+        }
+
+        val body = bodyParts.joinToString("\n").trim().ifEmpty {
+            if (attachments.isNotEmpty()) "[MMS]" else ""
+        }
+        return Pair(body, attachments)
+    }
+
+    data class SmsCounts(val total: Int, val inbox: Int, val sent: Int, val drafts: Int)
+
+    suspend fun countAllAsync(context: Context): SmsCounts = coroutineScope {
+        val totalSms = async(Dispatchers.IO) { queryCount(context, smsUri, null, null) }
+        val totalMms = async(Dispatchers.IO) { queryCount(context, mmsUri, MMS_CONTENT_FILTER, null) }
+        val inboxSms = async(Dispatchers.IO) { queryCount(context, smsUri, "${Telephony.Sms.TYPE} = ?", arrayOf("1")) }
+        val inboxMms = async(Dispatchers.IO) { queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf("1")) }
+        val sentSms = async(Dispatchers.IO) { queryCount(context, smsUri, "${Telephony.Sms.TYPE} = ?", arrayOf("2")) }
+        val sentMms = async(Dispatchers.IO) { queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf("2")) }
+        val draftsSms = async(Dispatchers.IO) { queryCount(context, smsUri, "${Telephony.Sms.TYPE} = ?", arrayOf("3")) }
+        val draftsMms = async(Dispatchers.IO) { queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf("3")) }
+        SmsCounts(
+            total = totalSms.await() + totalMms.await(),
+            inbox = inboxSms.await() + inboxMms.await(),
+            sent = sentSms.await() + sentMms.await(),
+            drafts = draftsSms.await() + draftsMms.await(),
+        )
+    }
+
+    suspend fun countAsync(context: Context, query: String): Int = withIO {
+        val conditions = QueryHelper.parseAsync(query)
+        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
+
+        if (threadId.isNotEmpty()) {
+            return@withIO countByThread(context, threadId, conditions, archivedRecords)
+        }
+
+        val where = buildWhere(conditions, archivedRecords)
+
+        // Count SMS (date filter for archived conversations applied in buildWhereAsync)
+        val smsCount = queryCount(context, smsUri, where.toSelection(), where.args.toTypedArray())
+
+        // Count MMS (only when no text/ids filter which are SMS-specific)
+        val mmsCount = if (query.isEmpty() || (!query.contains("text") && !query.contains("ids"))) {
+            val typeCondition = conditions.firstOrNull { it.name == "type" }
+            if (typeCondition != null) {
+                // Map SMS type to MMS msg_box (1=inbox, 2=sent, 3=drafts, 4=outbox)
+                queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf(typeCondition.value))
+            } else {
+                queryCount(context, mmsUri, MMS_CONTENT_FILTER, null)
+            }
+        } else 0
+
+        return@withIO smsCount + mmsCount
+    }
+
+    private fun countByThread(
+        context: Context,
+        threadId: String,
+        conditions: List<FilterField>,
+        archivedRecords: List<DArchivedConversation>,
+    ): Int {
+        val isArchived = conditions.any { it.name == "archived" && it.value == "1" }
+        val archivedConversation = archivedRecords.firstOrNull { it.conversationId == threadId }
+        val smsDateFilter = if (archivedConversation != null) {
+            if (isArchived) " AND ${Telephony.Sms.DATE} <= ?" else " AND ${Telephony.Sms.DATE} > ?"
+        } else ""
+        val mmsDateFilter = if (archivedConversation != null) {
+            if (isArchived) " AND ${Telephony.Mms.DATE} <= ?" else " AND ${Telephony.Mms.DATE} > ?"
+        } else ""
+        val dateArgs = if (archivedConversation != null) arrayOf(threadId, archivedConversation.conversationDate.toString()) else arrayOf(threadId)
+        val mmsDateArgs = if (archivedConversation != null) arrayOf(threadId, (archivedConversation.conversationDate / 1000).toString()) else arrayOf(threadId)
+        val smsCount = queryCount(context, smsUri, "${Telephony.Sms.THREAD_ID} = ?$smsDateFilter", dateArgs)
+        val mmsCount = queryCount(context, mmsUri, "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER$mmsDateFilter", mmsDateArgs)
+        return smsCount + mmsCount
+    }
+
+    suspend fun getIdsAsync(context: Context, query: String): Set<String> = withIO {
+        val conditions = QueryHelper.parseAsync(query)
+        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val where = buildWhere(conditions, archivedRecords)
+        context.contentResolver.queryCursor(
+            smsUri,
+            arrayOf(BaseColumns._ID),
+            where.toSelection(),
+            where.args.toTypedArray(),
+            null
+        )?.map { cursor, cache ->
+            cursor.getStringValue(BaseColumns._ID, cache)
+        }?.toSet() ?: emptySet()
+    }
+}

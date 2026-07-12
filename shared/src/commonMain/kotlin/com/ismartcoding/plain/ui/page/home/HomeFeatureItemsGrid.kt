@@ -1,0 +1,154 @@
+package com.ismartcoding.plain.ui.page.home
+import com.ismartcoding.plain.preferences.*
+
+import org.jetbrains.compose.resources.DrawableResource
+import com.ismartcoding.plain.i18n.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.preferences.HomeFeaturesPreference
+import com.ismartcoding.plain.preferences.appDataStore
+import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
+import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyGridState
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+
+@Composable
+fun HomeFeatureItemsGrid(navController: NavHostController) {
+    val scope = rememberCoroutineScope()
+
+    val featuresStr = remember {
+        appDataStore.dataFlow.map { HomeFeaturesPreference.get(it) }
+    }.collectAsStateValue(initial = HomeFeaturesPreference.default)
+
+    var enabledIds by remember(featuresStr) {
+        mutableStateOf(HomeFeaturesPreference.parseList(featuresStr.ifEmpty { HomeFeaturesPreference.default }))
+    }
+
+    fun persist(newList: List<String>) {
+        enabledIds = newList
+        scope.launch(Dispatchers.Default) {
+            HomeFeaturesPreference.putAsync(HomeFeaturesPreference.formatList(newList))
+        }
+    }
+
+    val allFeatureItems = remember { FeatureItem.getList(navController) }
+    val items = remember(enabledIds) {
+        enabledIds
+            .filter { it != AppFeatureType.CHAT.name }
+            .mapNotNull { typeName -> allFeatureItems.find { it.type.name == typeName } }
+    }
+
+    val rowCount = (items.size + 2) / 2
+    val gridHeight = if (rowCount > 0) (rowCount * 72 + (rowCount - 1) * 12).dp else 0.dp
+
+    val gridState = rememberLazyGridState()
+    val reorderableState = rememberReorderableLazyGridState(gridState) { from, to ->
+        val fromKey = from.key as? String ?: return@rememberReorderableLazyGridState
+        val toKey = to.key as? String ?: return@rememberReorderableLazyGridState
+        val fromIdx = enabledIds.indexOf(fromKey)
+        val toIdx = enabledIds.indexOf(toKey)
+        if (fromIdx >= 0 && toIdx >= 0) {
+            persist(enabledIds.toMutableList().apply { add(toIdx, removeAt(fromIdx)) })
+        }
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        state = gridState,
+        modifier = Modifier.fillMaxWidth().height(gridHeight),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        userScrollEnabled = false,
+    ) {
+        items(items, key = { it.type.name }) { item ->
+            ReorderableItem(reorderableState, key = item.type.name, animateItemModifier = Modifier) { _ ->
+                HomeFeatureGridCell(
+                    iconRes = item.iconRes,
+                    titleRes = item.titleRes,
+                    modifier = Modifier.longPressDraggableHandle(),
+                    onClick = { item.click() },
+                )
+            }
+        }
+        item {
+            HomeFeatureGridCell(
+                iconRes = Res.drawable.plus,
+                titleRes = Res.string.more,
+                onClick = { navController.navigate(Routing.CustomFeatures) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeFeatureGridCell(
+    iconRes: DrawableResource,
+    titleRes: StringResource,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Surface(
+        modifier = modifier
+            .height(72.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onClick() },
+        color = MaterialTheme.colorScheme.cardBackgroundNormal,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = stringResource(titleRes),
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = stringResource(titleRes),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}

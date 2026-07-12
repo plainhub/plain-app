@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.discover
 
-import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.TimeHelper

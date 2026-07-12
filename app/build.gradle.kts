@@ -182,7 +182,7 @@ dependencies {
 
     implementation(libs.bcprov.jdk15on)
     implementation(libs.bcpkix.jdk15on)
-    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.okhttp)
 
     implementation(libs.okhttp)
 

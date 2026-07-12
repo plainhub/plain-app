@@ -2,8 +2,14 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.enums.DeviceType
 import platform.Foundation.NSBundle
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSUserDomainMask
 import platform.UIKit.UIDevice
 import platform.UIKit.UIUserInterfaceIdiom
+import platform.UIKit.UIUserInterfaceIdiomPad
+import platform.UIKit.UIUserInterfaceIdiomPhone
+import platform.UIKit.UIUserInterfaceIdiomTV
 
 actual fun getAppVersion(): String {
     val bundle = NSBundle.mainBundle
@@ -30,11 +36,14 @@ actual fun getPlatformName(): String = "ios"
 actual fun getDeviceType(): DeviceType {
     val idiom = UIDevice.currentDevice.userInterfaceIdiom
     return when (idiom) {
-        UIUserInterfaceIdiom.Pad -> DeviceType.TABLET
-        UIUserInterfaceIdiom.TV -> DeviceType.TV
-        UIUserInterfaceIdiom.Phone -> DeviceType.PHONE
+        UIUserInterfaceIdiomPad -> DeviceType.TABLET
+        UIUserInterfaceIdiomTV -> DeviceType.TV
+        UIUserInterfaceIdiomPhone -> DeviceType.PHONE
         else -> DeviceType.OTHER
     }
 }
 
 actual fun getDeviceIP4s(): List<String> = emptyList()
+
+actual fun appDir(): String =
+    NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)[0] as String

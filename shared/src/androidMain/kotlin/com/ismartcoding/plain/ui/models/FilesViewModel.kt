@@ -18,7 +18,7 @@ import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.preferences.LastFilePathPreference
 import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
@@ -31,8 +31,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
-
-data class BreadcrumbItem(var name: String, var path: String)
 
 class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>, ViewModel() {
     var rootPath = FileSystemHelper.getInternalStoragePath()

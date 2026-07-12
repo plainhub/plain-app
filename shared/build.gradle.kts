@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.devtools.ksp)
+    kotlin("plugin.parcelize")
     id("androidx.room")
 }
 
@@ -58,6 +59,9 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             api(libs.room.runtime)
             api(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
             implementation(libs.coil.compose)
 
             // Vendored multiplatform-markdown-renderer (lib/markdown/) depends on these.
@@ -71,16 +75,71 @@ kotlin {
             api(libs.latex.renderer)
         }
         androidMain.dependencies {
-            implementation(libs.ktor.client.cio)
-            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.okhttp)
             implementation(libs.okhttp)
             implementation(libs.tink.android)
             implementation(libs.androidx.exifinterface)
+            implementation(libs.androidx.appcompat)
+            implementation(libs.androidx.datastore.preferences)
             implementation(libs.coil)
             implementation(libs.coil.svg)
             implementation(libs.coil.gif)
             implementation(libs.coil.video)
             implementation(libs.coil.network.okhttp)
+
+            // Vendored libraries (lib/) dependencies
+            implementation(libs.jsoup)
+            implementation(libs.bcprov.jdk15on)
+            implementation(libs.bcpkix.jdk15on)
+            implementation(libs.pdfium.android)
+            implementation(libs.zxing.core)
+
+            // Ktor server (used by vendored kgraphql and web server code)
+            implementation(libs.ktor.server.core)
+            implementation(libs.ktor.server.netty)
+            implementation(libs.ktor.server.websockets)
+            implementation(libs.ktor.server.compression)
+            implementation(libs.ktor.server.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.server.caching.headers)
+            implementation(libs.ktor.server.cors)
+            implementation(libs.ktor.server.forwarded.header)
+            implementation(libs.ktor.server.partial.content)
+            implementation(libs.ktor.server.auto.head.response)
+            implementation(libs.ktor.server.conditional.headers)
+            implementation(libs.ktor.network.tls.certificates)
+
+            // Media3 (AudioPlayerService, audio playback, PlayerView UI)
+            implementation(libs.media3.exoplayer)
+            implementation(libs.media3.datasource)
+            implementation(libs.media3.session)
+            implementation(libs.media3.ui)
+            implementation(libs.media3.dash)
+            implementation(libs.media3.hls)
+
+            // LifecycleService (HttpServerService)
+            implementation(libs.androidx.lifecycle.service)
+
+            // WorkManager (FeedFetchWorker, ImageEmbedWorker)
+            implementation(libs.androidx.work.runtime.ktx)
+
+            // Splash screen (MainActivity)
+            implementation(libs.androidx.core.splashscreen)
+
+            // Activity Compose (LocalActivity)
+            implementation(libs.compose.activity)
+
+            // CameraX (ScanPage, ScanCameraView)
+            implementation(libs.camera.core)
+            implementation(libs.camera.camera2)
+            implementation(libs.camera.lifecycle)
+            implementation(libs.camera.view)
+
+            // Transitions (UI animations)
+            implementation(libs.androidx.transition)
+
+            // LiteRT (AI image search) — compileOnly; runtime provided by app flavors
+            compileOnly(libs.litert)
         }
         iosMain.dependencies {
             implementation(libs.sqlite.bundled)
@@ -102,6 +161,8 @@ dependencies {
     add("kspAndroid", libs.room.compiler)
     add("kspIosArm64", libs.room.compiler)
     add("kspIosSimulatorArm64", libs.room.compiler)
+    add("androidHostTestImplementation", kotlin("test"))
+    add("androidHostTestImplementation", libs.junit)
 }
 
 compose.resources {

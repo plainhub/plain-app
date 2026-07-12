@@ -37,7 +37,7 @@ fun <T : IData> SearchableTopBar(
             viewModel = viewModel,
             onSearch = {
                 viewModel.searchActive.value = false
-                scope.launch(com.ismartcoding.plain.helpers.IODispatcher) {
+                scope.launch(com.ismartcoding.plain.platform.IODispatcher) {
                     onSearchAction(it)
                 }
             }

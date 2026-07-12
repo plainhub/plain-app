@@ -1,7 +1,12 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package com.ismartcoding.plain.ble.server
 
 import com.ismartcoding.plain.ble.BleUuids
+import com.ismartcoding.plain.lib.toByteArray
+import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,12 +22,13 @@ import platform.CoreBluetooth.CBMutableCharacteristic
 import platform.CoreBluetooth.CBMutableDescriptor
 import platform.CoreBluetooth.CBMutableService
 import platform.CoreBluetooth.CBPeripheralManager
-import platform.CoreBluetooth.CBPeripheralManagerDelegate
+import platform.CoreBluetooth.CBPeripheralManagerDelegateProtocol
 import platform.CoreBluetooth.CBManagerStatePoweredOn
 import platform.CoreBluetooth.CBUUID
-import platform.Foundation.NSData
+import platform.CoreBluetooth.CBService
 import platform.Foundation.NSError
 import platform.Foundation.NSNumber
+import platform.darwin.NSObject
 
 private const val READY_SIGNAL = "1"
 private const val FLAG_AWARE_SUPPORTED: Byte = 0
@@ -30,7 +36,7 @@ private const val FLAG_AWARE_RUNNING: Byte = 0
 
 class IosBleGattServer : BleGattServer {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val protocol = BleServerProtocol()
 
     private var peripheralManager: CBPeripheralManager? = null
@@ -53,14 +59,7 @@ class IosBleGattServer : BleGattServer {
             advertising = false
         }
         if (serviceAdded) {
-            for (handler in handlers) {
-                characteristics[handler.charUuid]?.let { char ->
-                    manager.removeCharacteristic(char)
-                }
-            }
-            val serviceUuid = CBUUID.UUIDWithString(BleUuids.SERVICE_UUID)
-            val service = manager.services?.firstOrNull { it.UUID == serviceUuid }
-            service?.let { manager.removeService(it) }
+            manager.removeAllServices()
             serviceAdded = false
         }
         peripheralManager = null
@@ -91,23 +90,25 @@ class IosBleGattServer : BleGattServer {
     private fun setupService(manager: CBPeripheralManager) {
         val service = CBMutableService(CBUUID.UUIDWithString(BleUuids.SERVICE_UUID), true)
 
-        for (handler in handlers) {
+        val charList = mutableListOf<CBMutableCharacteristic>()
+        for (handler in protocol.handlers) {
             val charUuid = CBUUID.UUIDWithString(handler.charUuid)
+            val cccDescriptor = CBMutableDescriptor(
+                CBUUID.UUIDWithString(BleUuids.CCC_DESCRIPTOR_UUID),
+                null,
+            )
             val char = CBMutableCharacteristic(
                 charUuid,
                 CBCharacteristicPropertyRead or CBCharacteristicPropertyWrite or CBCharacteristicPropertyNotify,
                 null,
                 CBAttributePermissionsReadable or CBAttributePermissionsWriteable,
             )
-            val cccDescriptor = CBMutableDescriptor(
-                CBUUID.UUIDWithString(BleUuids.CCC_DESCRIPTOR_UUID),
-                null,
-            )
-            char.descriptors = listOf(cccDescriptor)
+            char.setDescriptors(listOf(cccDescriptor))
             characteristics[handler.charUuid] = char
+            charList.add(char)
         }
 
-        service.characteristics = characteristics.values.toList()
+        service.setCharacteristics(charList)
         manager.addService(service)
     }
 
@@ -178,7 +179,7 @@ class IosBleGattServer : BleGattServer {
 
 private class PeripheralManagerDelegate(
     private val server: IosBleGattServer,
-) : CBPeripheralManagerDelegate() {
+) : NSObject(), CBPeripheralManagerDelegateProtocol {
 
     override fun peripheralManagerDidUpdateState(peripheral: CBPeripheralManager) {
         LogCat.d("BLE peripheral manager state: ${peripheral.state}")
@@ -195,32 +196,26 @@ private class PeripheralManagerDelegate(
         }
     }
 
-    override fun peripheralManagerDidAddService(
+    override fun peripheralManager(
         peripheral: CBPeripheralManager,
-        service: CBMutableService,
+        didAddService: CBService,
         error: NSError?,
     ) {
         server.onServiceAdded(error)
     }
 
-    override fun peripheralManagerDidReceiveReadRequest(
+    override fun peripheralManager(
         peripheral: CBPeripheralManager,
-        request: CBATTRequest,
+        didReceiveReadRequest: CBATTRequest,
     ) {
-        server.onReadRequest(peripheral, request)
+        server.onReadRequest(peripheral, didReceiveReadRequest)
     }
 
-    override fun peripheralManagerDidReceiveWriteRequests(
+    override fun peripheralManager(
         peripheral: CBPeripheralManager,
-        requests: List<*>,
+        didReceiveWriteRequests: List<*>,
     ) {
         @Suppress("UNCHECKED_CAST")
-        server.onWriteRequests(peripheral, requests as List<CBATTRequest>)
+        server.onWriteRequests(peripheral, didReceiveWriteRequests as List<CBATTRequest>)
     }
-}
-
-private fun ByteArray.toNSData(): NSData = NSData.dataWithBytes(this, this.size.toULong())
-
-private fun NSData.toByteArray(): ByteArray = ByteArray(this.length.toInt()).also { buf ->
-    this.getBytes(buf)
 }

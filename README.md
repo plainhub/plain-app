@@ -181,9 +181,4 @@ keyAlias=release
 storeFile=release.jks
 ```
 
-## Star history
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ismartcoding/plain-app&type=Date)](https://star-history.com/#ismartcoding/plain-app&Date)
-
-
 

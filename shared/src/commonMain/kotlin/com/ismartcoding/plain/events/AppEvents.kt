@@ -7,6 +7,10 @@ import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.ExportFileType
+import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.lib.channel.ChannelEvent
 import com.ismartcoding.plain.ui.models.FolderOption
 
@@ -21,6 +25,8 @@ data class PairingCanceledEvent(val fromId: String) : ChannelEvent()
 class FolderKanbanSelectEvent(val data: FolderOption) : ChannelEvent()
 
 class StartHttpServerEvent : ChannelEvent()
+
+class HttpServerStateChangedEvent(val state: HttpServerState) : ChannelEvent()
 
 class RestartAppEvent : ChannelEvent()
 
@@ -49,6 +55,12 @@ data class ChannelInviteCanceledEvent(
 ) : ChannelEvent()
 
 class ExportFileEvent(val type: ExportFileType, val fileName: String) : ChannelEvent()
+
+class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: Boolean) : ChannelEvent()
+
+class PickFileResultEvent(val tag: PickFileTag, val type: PickFileType, val uris: Set<String>) : ChannelEvent()
+
+class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
 
 class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids: Set<String>, val extra: Any? = null) : ChannelEvent()
 

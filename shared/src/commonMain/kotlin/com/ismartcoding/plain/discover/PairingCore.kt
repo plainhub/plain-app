@@ -3,7 +3,7 @@ package com.ismartcoding.plain.discover
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.ble.server.BlePairingSessionStore
-import com.ismartcoding.plain.crypto.PairingCrypto
+import com.ismartcoding.plain.platform.PairingCrypto
 import com.ismartcoding.plain.data.DDiscoverReply
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
@@ -18,6 +18,7 @@ import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
@@ -191,7 +192,7 @@ object PairingCore {
         )
         response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
 
-        val requestEcdhPublicKey = Base64.decode(request.ecdhPublicKey)
+        val requestEcdhPublicKey = Base64Lenient.decode(request.ecdhPublicKey)
         val encryptKey = PairingCrypto.computeECDHSharedKey(keyPair.privateKeyEncoded, requestEcdhPublicKey)
         if (encryptKey == null) {
             PairingSessionStore.remove(request.fromId)
@@ -236,7 +237,7 @@ object PairingCore {
         LogCat.d("Pairing response signature verified successfully")
 
         if (response.accepted) {
-            val responseEcdhPublicKey = Base64.decode(response.ecdhPublicKey)
+            val responseEcdhPublicKey = Base64Lenient.decode(response.ecdhPublicKey)
             val encryptKey = PairingCrypto.computeECDHSharedKey(session.keyPair.privateKeyEncoded, responseEcdhPublicKey)
             if (encryptKey == null) {
                 notifyFailed(response.fromId, session.deviceName, "Failed to compute shared key")

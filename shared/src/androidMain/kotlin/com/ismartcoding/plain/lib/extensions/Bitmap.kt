@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.lib.extensions
 
 import android.graphics.Bitmap
-import com.ismartcoding.plain.lib.isRPlus
+import com.ismartcoding.plain.platform.isRPlus
 import java.io.ByteArrayOutputStream
 import androidx.core.graphics.scale
 

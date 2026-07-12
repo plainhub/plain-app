@@ -47,3 +47,37 @@ actual fun shareFile(path: String) {
     }
     ctx.startActivity(chooser)
 }
+
+actual fun shareFiles(paths: List<String>) {
+    val ctx = appContextValue ?: return
+    if (paths.isEmpty()) return
+    val authority = "${ctx.packageName}.fileprovider"
+    val uris = paths.map { FileProvider.getUriForFile(ctx, authority, File(it)) }
+    val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+        type = "*/*"
+        putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    val chooser = Intent.createChooser(intent, null).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    ctx.startActivity(chooser)
+}
+
+actual fun openFileExternal(path: String) {
+    val ctx = appContextValue ?: return
+    val file = File(path)
+    val authority = "${ctx.packageName}.fileprovider"
+    val uri = FileProvider.getUriForFile(ctx, authority, file)
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        data = uri
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    ctx.startActivity(intent)
+}
+
+actual fun relaunchApp() {
+    val ctx = appContextValue ?: return
+    com.ismartcoding.plain.helpers.AppHelper.relaunch(ctx)
+}

@@ -261,7 +261,7 @@ class AwarePeerLink(
         try {
             if (state == LinkState.CLOSED) return
             state = LinkState.IDLE
-            connection.getAndSet(null)?.httpClient?.let { runCatching { it.connectionPool.evictAll() } }
+            connection.getAndSet(null)?.httpClient?.let { runCatching { it.close() } }
             LogCat.w("Aware onLost peer=$peerId state=IDLE")
         } finally {
             buildMutex.unlock()
@@ -271,7 +271,7 @@ class AwarePeerLink(
     fun close(reason: String) {
         if (!closed.compareAndSet(false, true)) return
         state = LinkState.CLOSED
-        connection.getAndSet(null)?.httpClient?.let { runCatching { it.connectionPool.evictAll() } }
+        connection.getAndSet(null)?.httpClient?.let { runCatching { it.close() } }
         onClose(peerId, reason)
     }
 

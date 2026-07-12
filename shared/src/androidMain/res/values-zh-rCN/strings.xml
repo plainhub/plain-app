@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">PlainApp远程控制</string>
+    <string name="accessibility_service_description">PlainApp使用此无障碍服务以在屏幕镜像时启用远程控制。它会注入来自网页端的触摸事件（点击、滑动、滚动）以及导航操作（返回、主页、最近任务）。</string>
+</resources>

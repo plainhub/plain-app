@@ -3,6 +3,9 @@ package com.ismartcoding.plain.tests
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import com.ismartcoding.plain.thumbnail.decodeSampledBitmapFromFile
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule

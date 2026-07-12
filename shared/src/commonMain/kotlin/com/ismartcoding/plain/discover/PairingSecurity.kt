@@ -1,11 +1,11 @@
 package com.ismartcoding.plain.discover
 
-import com.ismartcoding.plain.crypto.PairingCrypto
+import com.ismartcoding.plain.platform.PairingCrypto
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
+import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.math.abs
 
@@ -16,9 +16,9 @@ object PairingSecurity {
     fun verify(request: DPairingRequest): Boolean {
         return try {
             val signatureData = request.toSignatureData()
-            val signatureBytes = Base64.decode(request.signature)
-            val rawPublicKey = Base64.decode(request.signaturePublicKey)
-            PairingCrypto.verifyEd25519(rawPublicKey, signatureData.toByteArray(), signatureBytes)
+            val signatureBytes = Base64Lenient.decode(request.signature)
+            val rawPublicKey = Base64Lenient.decode(request.signaturePublicKey)
+            PairingCrypto.verifyEd25519(rawPublicKey, signatureData.encodeToByteArray(), signatureBytes)
         } catch (e: Exception) {
             LogCat.e("Failed to verify pairing request signature: ${e.message}")
             false
@@ -28,9 +28,9 @@ object PairingSecurity {
     fun verify(response: DPairingResponse): Boolean {
         return try {
             val signatureData = response.toSignatureData()
-            val signatureBytes = Base64.decode(response.signature)
-            val rawPublicKey = Base64.decode(response.signaturePublicKey)
-            PairingCrypto.verifyEd25519(rawPublicKey, signatureData.toByteArray(), signatureBytes)
+            val signatureBytes = Base64Lenient.decode(response.signature)
+            val rawPublicKey = Base64Lenient.decode(response.signaturePublicKey)
+            PairingCrypto.verifyEd25519(rawPublicKey, signatureData.encodeToByteArray(), signatureBytes)
         } catch (e: Exception) {
             LogCat.e("Failed to verify pairing response signature: ${e.message}")
             false

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings referenced from AndroidManifest.xml — must remain as Android resources -->
+<resources>
+    <string name="app_name" translatable="false">PlainApp</string>
+    <string name="accessibility_service_label">PlainApp Remote Control</string>
+    <string name="accessibility_service_description">PlainApp uses this accessibility service to enable remote control during screen mirroring. It injects touch events (tap, swipe, scroll) and navigation actions (Back, Home, Recents) sent from the web interface.</string>
+</resources>

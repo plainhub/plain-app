@@ -11,9 +11,10 @@ import com.ismartcoding.plain.chat.peer.transport.aware.AwareSession
 import com.ismartcoding.plain.connectivityManager
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getAwareFileUrl
-import com.ismartcoding.plain.lib.isSPlus
-import com.ismartcoding.plain.lib.isTPlus
+import com.ismartcoding.plain.platform.isSPlus
+import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
+import io.ktor.http.isSuccess
 
 @RequiresApi(Build.VERSION_CODES.S)
 object WifiAwareTransport : PeerTransport {
@@ -57,12 +58,11 @@ object WifiAwareTransport : PeerTransport {
         val client = httpFactory.buildFileDownload(connection.network, connection.peerIpv6)
         val url = peer.getAwareFileUrl(fileId, connection.peerPort)
         val response = executeDownloadRequest(id, peer.id, client, url)
-        if (!response.isSuccessful) {
-            response.close()
-            LogCat.e("Aware transport file download failed: ${response.code}")
+        if (!response.status.isSuccess()) {
+            LogCat.e("Aware transport file download failed: ${response.status.value}")
             throw TransportUnavailable(id, peer.id, null)
         }
-        return DownloadedResponse(client, response)
+        return DownloadedResponse(response)
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_NETWORK_STATE])

@@ -7,7 +7,7 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.AppFileDao
 import java.io.File
@@ -141,25 +141,6 @@ object AppFileStore {
         }
         dao.insert(record)
         record
-    }
-
-    // ── Reference counting ──────────────────────────────────────────────────
-
-    /**
-     * Decrement the reference count for [fidSuffix] (the part after "fid:",
-     * e.g. "{hash}.{ext}" or legacy "{hash}").
-     * When refCount reaches 0 the physical file is deleted.
-     */
-    suspend fun release(fidSuffix: String) = withIO {
-        val hash = fidSuffix.substringBefore(".")
-        val dao = AppDatabase.instance.appFileDao()
-        dao.decrementRefCount(hash)
-        val updated = dao.getById(hash) ?: return@withIO
-        if (updated.refCount <= 0) {
-            dao.delete(hash)
-            File(updated.realPath).delete()
-            LogCat.d("ChatFileStore: deleted orphan file $hash")
-        }
     }
 
     // ── Internals ───────────────────────────────────────────────────────────

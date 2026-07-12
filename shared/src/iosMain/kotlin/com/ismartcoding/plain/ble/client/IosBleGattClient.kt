@@ -1,19 +1,24 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package com.ismartcoding.plain.ble.client
 
 import com.ismartcoding.plain.ble.BleService
 import com.ismartcoding.plain.ble.BleUuids
+import com.ismartcoding.plain.lib.toByteArray
+import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCSignatureOverride
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
 import platform.CoreBluetooth.CBCharacteristic
 import platform.CoreBluetooth.CBPeripheral
-import platform.CoreBluetooth.CBPeripheralDelegate
+import platform.CoreBluetooth.CBPeripheralDelegateProtocol
 import platform.CoreBluetooth.CBPeripheralStateConnected
 import platform.CoreBluetooth.CBService
 import platform.CoreBluetooth.CBUUID
-import platform.CoreBluetooth.CBCharacteristicWriteTypeWithResponse
-import platform.Foundation.NSData
 import platform.Foundation.NSError
+import platform.darwin.NSObject
 import kotlin.time.Duration.Companion.milliseconds
 
 class IosBleGattClient(
@@ -65,8 +70,8 @@ class IosBleGattClient(
         if (!serviceOk) return false
 
         val service = peripheral.services?.firstOrNull {
-            it.UUID.UUIDString.equals(BleUuids.SERVICE_UUID, ignoreCase = true)
-        } ?: return false
+            (it as CBService).UUID.UUIDString.equals(BleUuids.SERVICE_UUID, ignoreCase = true)
+        } as? CBService ?: return false
 
         val charDeferred = CompletableDeferred<Boolean>()
         charDiscoveryDeferred = charDeferred
@@ -74,7 +79,7 @@ class IosBleGattClient(
             BleUuids.NEARBY_CHAR_UUID,
             BleUuids.RPC_CHAR_UUID,
         ).map { CBUUID.UUIDWithString(it) }
-        peripheral.discoverCharacteristicsForService(allCharUuids, service)
+        peripheral.discoverCharacteristics(allCharUuids, forService = service)
         val charOk = withTimeoutOrNull(10_000L.milliseconds) { charDeferred.await() } == true
         charDiscoveryDeferred = null
         return charOk
@@ -83,11 +88,11 @@ class IosBleGattClient(
     private fun getCharacteristic(service: BleService): CBCharacteristic? {
         characteristics[service.charUuid]?.let { return it }
         val cbService = peripheral.services?.firstOrNull {
-            it.UUID.UUIDString.equals(service.serviceUuid, ignoreCase = true)
-        } ?: return null
+            (it as CBService).UUID.UUIDString.equals(service.serviceUuid, ignoreCase = true)
+        } as? CBService ?: return null
         val char = cbService.characteristics?.firstOrNull {
-            it.UUID.UUIDString.equals(service.charUuid, ignoreCase = true)
-        }
+            (it as CBCharacteristic).UUID.UUIDString.equals(service.charUuid, ignoreCase = true)
+        } as? CBCharacteristic
         if (char != null) {
             characteristics[service.charUuid] = char
         }
@@ -99,7 +104,7 @@ class IosBleGattClient(
         val data = value.encodeToByteArray().toNSData()
         val deferred = CompletableDeferred<Boolean>()
         writeDeferred = deferred
-        peripheral.writeValue(data, forCharacteristic = char, type = CBCharacteristicWriteTypeWithResponse)
+        peripheral.writeValue(data, forCharacteristic = char, type = 0L)
         val result = withTimeoutOrNull(5_000L.milliseconds) { deferred.await() }
         writeDeferred = null
         return result == true
@@ -142,8 +147,10 @@ class IosBleGattClient(
     }
 
     internal fun onCharacteristicsDiscovered(error: NSError?) {
-        peripheral.services?.forEach { service ->
-            service.characteristics?.forEach { char ->
+        peripheral.services?.forEach { svc ->
+            val service = svc as CBService
+            service.characteristics?.forEach { ch ->
+                val char = ch as CBCharacteristic
                 characteristics[char.UUID.UUIDString] = char
             }
         }
@@ -176,44 +183,44 @@ class IosBleGattClient(
     }
 }
 
-private class PeripheralDelegate(private val client: IosBleGattClient) : CBPeripheralDelegate() {
-    override fun peripheralDidDiscoverServices(peripheral: CBPeripheral, error: NSError?) {
-        client.onServicesDiscovered(error)
+private class PeripheralDelegate(private val client: IosBleGattClient) : NSObject(),
+    CBPeripheralDelegateProtocol {
+    override fun peripheral(peripheral: CBPeripheral, didDiscoverServices: NSError?) {
+        client.onServicesDiscovered(didDiscoverServices)
     }
 
-    override fun peripheralDidDiscoverCharacteristicsForService(
+    override fun peripheral(
         peripheral: CBPeripheral,
-        service: CBService,
+        didDiscoverCharacteristicsForService: CBService,
         error: NSError?,
     ) {
         client.onCharacteristicsDiscovered(error)
     }
 
-    override fun peripheralDidUpdateValueForCharacteristic(
+    @ObjCSignatureOverride
+    override fun peripheral(
         peripheral: CBPeripheral,
-        characteristic: CBCharacteristic,
+        didUpdateValueForCharacteristic: CBCharacteristic,
         error: NSError?,
     ) {
-        client.onCharacteristicUpdated(characteristic, error)
+        client.onCharacteristicUpdated(didUpdateValueForCharacteristic, error)
     }
 
-    override fun peripheralDidWriteValueForCharacteristic(
+    @ObjCSignatureOverride
+    override fun peripheral(
         peripheral: CBPeripheral,
-        characteristic: CBCharacteristic,
+        didWriteValueForCharacteristic: CBCharacteristic,
         error: NSError?,
     ) {
         client.onCharacteristicWrite(error)
     }
 
-    override fun peripheralDidUpdateNotificationStateForCharacteristic(
+    @ObjCSignatureOverride
+    override fun peripheral(
         peripheral: CBPeripheral,
-        characteristic: CBCharacteristic,
+        didUpdateNotificationStateForCharacteristic: CBCharacteristic,
         error: NSError?,
     ) {
         client.onNotificationStateChanged(error)
     }
-}
-
-private fun NSData.toByteArray(): ByteArray = ByteArray(this.length.toInt()).also { buf ->
-    this.getBytes(buf)
 }

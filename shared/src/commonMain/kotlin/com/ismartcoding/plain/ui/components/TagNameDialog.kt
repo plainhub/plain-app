@@ -7,7 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.helpers.IODispatcher
+import com.ismartcoding.plain.platform.IODispatcher
 import kotlinx.coroutines.launch
 
 @Composable

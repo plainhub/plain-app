@@ -13,7 +13,7 @@ import android.os.ParcelUuid
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.extensions.hasPermission
-import com.ismartcoding.plain.lib.isSPlus
+import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

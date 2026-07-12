@@ -1,0 +1,247 @@
+package com.ismartcoding.plain.audio
+import com.ismartcoding.plain.appContext
+
+import android.content.ComponentName
+import android.content.Context
+import androidx.media3.common.Player
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
+import com.google.common.util.concurrent.MoreExecutors
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.helpers.coMain
+import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.AudioAction
+import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.events.AudioActionEvent
+import com.ismartcoding.plain.preferences.AudioPlayingPreference
+import com.ismartcoding.plain.preferences.AudioPlaylistPreference
+import com.ismartcoding.plain.services.AudioPlayerService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+object AudioPlayer {
+    private val _isPlayingFlow = MutableStateFlow(false)
+    val isPlayingFlow: StateFlow<Boolean> = _isPlayingFlow.asStateFlow()
+
+    fun isPlaying(): Boolean {
+        return player?.isPlaying == true
+    }
+
+    private val playerListener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            LogCat.d("Player.isPlaying changed to: $isPlaying")
+            _isPlayingFlow.value = isPlaying
+            if (!isPlaying && player != null) {
+                TempData.audioPlayPosition = player?.currentPosition ?: 0
+            }
+        }
+    }
+
+    private var player: Player? = null
+    var playerProgress: Long = 0 // player progress in milliseconds
+        get() {
+            val currentPlayer = player
+            if (currentPlayer == null) {
+                return TempData.audioPlayPosition
+            }
+
+            val currentPosition = currentPlayer.currentPosition
+            // Keep UI stable right after seek when player may briefly report 0.
+            if (currentPosition == 0L && TempData.audioPlayPosition > 0L) {
+                return TempData.audioPlayPosition
+            }
+            return currentPosition
+        }
+
+    fun ensurePlayer(context: Context, callback: suspend () -> Unit = {}) {
+        if (player != null) {
+            coMain {
+                callback()
+            }
+            return
+        }
+        val sessionToken = SessionToken(context, ComponentName(context, AudioPlayerService::class.java))
+        val mediaControllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
+        mediaControllerFuture.addListener({
+            player = mediaControllerFuture.get().also {
+                it.addListener(playerListener)
+                _isPlayingFlow.value = it.isPlaying
+            }
+            coMain {
+                callback()
+            }
+        }, MoreExecutors.directExecutor())
+    }
+
+    fun play(
+        context: Context,
+        playlistAudio: DPlaylistAudio
+    ) {
+        coMain {
+            TempData.audioPlayPosition = 0
+            AudioPlaylistPreference.addAsync(listOf(playlistAudio))
+            ensurePlayer(context) {
+                doPlay(playlistAudio)
+            }
+        }
+    }
+
+    fun justPlay(
+        context: Context,
+        playlistAudio: DPlaylistAudio
+    ) {
+        coMain {
+            TempData.audioPlayPosition = 0
+            ensurePlayer(context) {
+                doPlay(playlistAudio)
+            }
+        }
+    }
+
+    fun play() {
+        coMain {
+            val current = player?.currentMediaItem
+            if (current != null) {
+                player?.seekTo(TempData.audioPlayPosition)
+                player?.play()
+                return@coMain
+            }
+
+            val context = appContext
+            val playlistAudio = ensureCurrentPlaylistAudio()
+            try {
+                if (playlistAudio != null) {
+                    ensurePlayer(context) {
+                        doPlay(playlistAudio)
+                    }
+                }
+            } catch (e: Exception) {
+                LogCat.e(e.toString())
+                if (playlistAudio != null) {
+                    AudioPlaylistPreference.deleteAsync(setOf(playlistAudio.path))
+                }
+                setChangedNotify(AudioAction.NOT_FOUND)
+            }
+        }
+    }
+
+    private suspend fun ensureCurrentPlaylistAudio(): DPlaylistAudio? {
+        val context = appContext
+        val path = AudioPlayingPreference.getValueAsync()
+        if (path.isEmpty()) {
+            return null
+        }
+        val playlistAudio = DPlaylistAudio.Companion.fromPath(context, path)
+        AudioPlaylistPreference.addAsync(listOf(playlistAudio))
+        return playlistAudio
+    }
+
+    fun seekTo(progress: Long) {
+        coMain {
+            val seekPosition = progress * 1000
+            TempData.audioPlayPosition = seekPosition
+            val currentPlayer = player
+            if (currentPlayer != null) {
+                currentPlayer.seekTo(seekPosition)
+                return@coMain
+            }
+            play()
+        }
+    }
+
+    fun skipToNext() {
+        skipTo(isNext = true)
+    }
+
+    fun skipToPrevious() {
+        skipTo(isNext = false)
+    }
+
+    private fun skipTo(isNext: Boolean) {
+        val context = appContext
+        coIO {
+            var audio: DPlaylistAudio
+            var playerAudioList = AudioPlaylistPreference.getValueAsync()
+            val playingPath = AudioPlayingPreference.getValueAsync()
+            if (playerAudioList.isEmpty()) {
+                if (playingPath.isNotEmpty()) {
+                    audio = DPlaylistAudio.Companion.fromPath(context, playingPath)
+                    AudioPlaylistPreference.addAsync(listOf(audio))
+                    playerAudioList = listOf(audio)
+                } else {
+                    return@coIO
+                }
+            }
+
+            if (TempData.audioPlayMode.value == MediaPlayMode.SHUFFLE) {
+                audio = playerAudioList.random()
+            } else {
+                if (playingPath.isNotEmpty()) {
+                    var index = playerAudioList.indexOfFirst { it.path == playingPath }
+                    if (isNext) {
+                        index++
+                        if (index > playerAudioList.size - 1) {
+                            index = 0
+                        }
+                    } else {
+                        index--
+                        if (index < 0) {
+                            index = playerAudioList.size - 1
+                        }
+                    }
+                    audio = playerAudioList[index]
+                } else {
+                    audio = playerAudioList[if (isNext) 0 else (playerAudioList.size - 1)]
+                }
+            }
+
+            LogCat.d("skipTo: ${audio.path}")
+            coMain {
+                ensurePlayer(context) {
+                    TempData.audioPlayPosition = 0
+                    doPlay(audio)
+                }
+            }
+        }
+    }
+
+    fun pause() {
+        coMain {
+            TempData.audioPlayPosition = player?.currentPosition ?: 0
+            player?.pause()
+        }
+    }
+
+    fun clear() {
+        coMain {
+            if (player?.isPlaying == true) {
+                player?.pause()
+            }
+            player?.clearMediaItems()
+            TempData.audioPlayPosition = 0
+        }
+    }
+
+    fun release() {
+        player?.removeListener(playerListener)
+        player = null
+        _isPlayingFlow.value = false
+        TempData.audioPlayPosition = 0
+    }
+
+    private fun doPlay(
+        audio: DPlaylistAudio,
+    ) {
+        player?.setMediaItem(audio.toMediaItem())
+        player?.prepare()
+        player?.seekTo(TempData.audioPlayPosition)
+        player?.play()
+    }
+
+    fun setChangedNotify(action: AudioAction) {
+        sendEvent(AudioActionEvent(action))
+    }
+}

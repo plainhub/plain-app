@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="accessibility_service_label">PlainApp Uzaktan Kontrol</string>
+    <string name="accessibility_service_description">PlainApp, ekran yansıtma sırasında uzaktan kontrolü etkinleştirmek için bu erişilebilirlik hizmetini kullanır. Web arayüzünden gönderilen dokunma olaylarını (dokunma, kaydırma, kaydırarak gezinme) ve gezinme eylemlerini (Geri, Ana ekran, Son kullanılanlar) enjekte eder.</string>
+</resources>

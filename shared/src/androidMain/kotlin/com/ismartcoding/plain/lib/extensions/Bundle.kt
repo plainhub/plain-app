@@ -6,7 +6,7 @@ import android.os.Parcelable
 import android.text.SpannableString
 import com.ismartcoding.plain.data.SortBy
 import com.ismartcoding.plain.data.SortDirection
-import com.ismartcoding.plain.lib.isTPlus
+import com.ismartcoding.plain.platform.isTPlus
 
 fun Bundle.sort(sortBy: SortBy) {
     val isExpression = sortBy.field.contains(' ') || sortBy.field.contains('(')

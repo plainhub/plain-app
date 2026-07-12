@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.platform.LocaleHelper
 
 import com.ismartcoding.plain.i18n.*
 

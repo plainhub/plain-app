@@ -20,7 +20,7 @@ import android.telephony.TelephonyManager
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.plain.lib.extensions.getSystemServiceCompat
-import com.ismartcoding.plain.lib.isSPlus
+import com.ismartcoding.plain.platform.isSPlus
 
 val contentResolver: ContentResolver by lazy { appContext.contentResolver }
 

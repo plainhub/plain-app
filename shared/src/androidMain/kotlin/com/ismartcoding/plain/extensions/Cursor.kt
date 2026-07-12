@@ -6,7 +6,7 @@ import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getLongValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
-import com.ismartcoding.plain.lib.isQPlus
+import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.features.file.DFile
 
 fun Cursor.toFile(cache: MutableMap<String, Int>): DFile {

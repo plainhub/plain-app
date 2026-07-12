@@ -4,13 +4,12 @@ import android.Manifest
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
-import android.util.Base64
 import com.ismartcoding.plain.lib.extensions.getFileName
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.hasPermission
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.helpers.CryptoHelper
-import com.ismartcoding.plain.lib.isRPlus
+import com.ismartcoding.plain.platform.isRPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.TempData
@@ -23,7 +22,10 @@ import java.io.FileWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
+@OptIn(ExperimentalEncodingApi::class)
 object FileHelper {
     fun fileFromAsset(
         context: Context,
@@ -59,9 +61,8 @@ object FileHelper {
         if (path.startsWith("https://", true) || path.startsWith("http://", true)) {
             return path
         }
-        return Base64.encodeToString(
+        return Base64.encode(
             CryptoHelper.chaCha20Encrypt(TempData.urlToken, path),
-            Base64.NO_WRAP
         )
     }
 

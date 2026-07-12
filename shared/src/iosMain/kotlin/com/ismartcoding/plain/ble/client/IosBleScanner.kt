@@ -9,12 +9,13 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withTimeoutOrNull
 import platform.CoreBluetooth.CBCentralManager
-import platform.CoreBluetooth.CBCentralManagerDelegate
+import platform.CoreBluetooth.CBCentralManagerDelegateProtocol
 import platform.CoreBluetooth.CBManagerStatePoweredOn
 import platform.CoreBluetooth.CBPeripheral
 import platform.CoreBluetooth.CBUUID
 import platform.Foundation.NSError
 import platform.Foundation.NSNumber
+import platform.darwin.NSObject
 import kotlin.time.Duration.Companion.milliseconds
 
 object IosBleScanner : BleScanner {
@@ -27,7 +28,7 @@ object IosBleScanner : BleScanner {
     private var scanCallback: ((CBPeripheral, NSNumber) -> Unit)? = null
     private var stateChangeCallback: (() -> Unit)? = null
 
-    @Volatile
+    @kotlin.concurrent.Volatile
     var isScanning = false
         private set
 
@@ -58,7 +59,7 @@ object IosBleScanner : BleScanner {
         return withTimeoutOrNull(10_000L.milliseconds) { deferred.await() } ?: false
     }
 
-    override fun scan(serviceUuid: String?): Flow<BleGattClient> = callbackFlow {
+    override fun scan(serviceUuid: String): Flow<BleGattClient> = callbackFlow {
         val manager = ensureCentralManager()
         if (manager.state != CBManagerStatePoweredOn) {
             LogCat.e("BLE scanner not ready, state=${manager.state}")
@@ -73,7 +74,7 @@ object IosBleScanner : BleScanner {
             trySend(client)
         }
 
-        val services = serviceUuid?.let { listOf(CBUUID.UUIDWithString(it)) }
+        val services = listOf(CBUUID.UUIDWithString(serviceUuid))
         manager.scanForPeripheralsWithServices(services, null)
         isScanning = true
         LogCat.d("BLE scan started for $serviceUuid")
@@ -136,35 +137,35 @@ object IosBleScanner : BleScanner {
     }
 }
 
-private class CentralDelegate : CBCentralManagerDelegate() {
+private class CentralDelegate : NSObject(), CBCentralManagerDelegateProtocol {
     override fun centralManagerDidUpdateState(central: CBCentralManager) {
         LogCat.d("BLE central manager state: ${central.state}")
         IosBleScanner.onStateChanged()
     }
 
-    override fun centralManagerDidDiscoverPeripheral(
+    override fun centralManager(
         central: CBCentralManager,
-        peripheral: CBPeripheral,
+        didDiscoverPeripheral: CBPeripheral,
         advertisementData: Map<Any?, *>,
         RSSI: NSNumber,
     ) {
-        IosBleScanner.onPeripheralDiscovered(peripheral, RSSI)
+        IosBleScanner.onPeripheralDiscovered(didDiscoverPeripheral, RSSI)
     }
 
-    override fun centralManagerDidConnectPeripheral(
+    override fun centralManager(
         central: CBCentralManager,
-        peripheral: CBPeripheral,
+        didConnectPeripheral: CBPeripheral,
     ) {
-        LogCat.d("BLE peripheral connected: ${peripheral.identifier.UUIDString}")
-        IosBleScanner.onPeripheralConnected(peripheral)
+        LogCat.d("BLE peripheral connected: ${didConnectPeripheral.identifier.UUIDString}")
+        IosBleScanner.onPeripheralConnected(didConnectPeripheral)
     }
 
-    override fun centralManagerDidDisconnectPeripheral(
+    override fun centralManager(
         central: CBCentralManager,
-        peripheral: CBPeripheral,
+        didDisconnectPeripheral: CBPeripheral,
         error: NSError?,
     ) {
-        LogCat.d("BLE peripheral disconnected: ${peripheral.identifier.UUIDString}")
-        IosBleScanner.onPeripheralDisconnected(peripheral)
+        LogCat.d("BLE peripheral disconnected: ${didDisconnectPeripheral.identifier.UUIDString}")
+        IosBleScanner.onPeripheralDisconnected(didDisconnectPeripheral)
     }
 }

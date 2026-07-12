@@ -62,6 +62,7 @@ object OkHttpClientFactory {
         socketFactory: SocketFactory? = null,
         dns: Dns? = null,
         connectTimeoutMs: Long = 1_000L,
+        addHeaders: Boolean = true,
     ): OkHttpClient {
         val builder =
             OkHttpClient.Builder()
@@ -70,10 +71,13 @@ object OkHttpClientFactory {
                     val requestBody = request.body!!
                     val requestBodyStr = bodyToString(requestBody)
                     LogCat.d("[Request] $requestBodyStr")
+                    val requestBuilder = request.newBuilder()
+                    if (addHeaders) {
+                        requestBuilder.addClientHeaders()
+                    }
                     val response =
                         chain.proceed(
-                            request.newBuilder()
-                                .addClientHeaders()
+                            requestBuilder
                                 .post(CryptoHelper.chaCha20Encrypt(keyBytes, requestBodyStr).toRequestBody(requestBody.contentType()))
                                 .build(),
                         )

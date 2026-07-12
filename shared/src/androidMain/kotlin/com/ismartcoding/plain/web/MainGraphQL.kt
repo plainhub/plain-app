@@ -1,0 +1,238 @@
+package com.ismartcoding.plain.web
+
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
+import com.ismartcoding.plain.lib.kgraphql.KGraphQL
+import com.ismartcoding.plain.lib.kgraphql.context
+import com.ismartcoding.plain.lib.kgraphql.schema.Schema
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.chat.peer.PeerCacher
+import com.ismartcoding.plain.db.DSession
+import com.ismartcoding.plain.events.WebRequestReceivedEvent
+import com.ismartcoding.plain.web.schemas.addAppFileSchema
+import com.ismartcoding.plain.web.schemas.addAppLogsSchema
+import com.ismartcoding.plain.web.schemas.addAppSchema
+import com.ismartcoding.plain.web.schemas.addAudioSchema
+import com.ismartcoding.plain.web.schemas.addBookmarkSchema
+import com.ismartcoding.plain.web.schemas.addCallSchema
+import com.ismartcoding.plain.web.schemas.addChatChannelSchema
+import com.ismartcoding.plain.web.schemas.addChatMessageSchema
+import com.ismartcoding.plain.web.schemas.addContactSchema
+import com.ismartcoding.plain.web.schemas.addDocSchema
+import com.ismartcoding.plain.web.schemas.addFeedSchema
+import com.ismartcoding.plain.web.schemas.addFileMutationSchema
+import com.ismartcoding.plain.web.schemas.addFileQuerySchema
+import com.ismartcoding.plain.web.schemas.addFileUploadSchema
+import com.ismartcoding.plain.web.schemas.addImageSchema
+import com.ismartcoding.plain.web.schemas.addMediaSchema
+import com.ismartcoding.plain.web.schemas.addNoteSchema
+import com.ismartcoding.plain.web.schemas.addNotificationSchema
+import com.ismartcoding.plain.web.schemas.addPackageSchema
+import com.ismartcoding.plain.web.schemas.addPairingSchema
+import com.ismartcoding.plain.web.schemas.addPeerSchema
+import com.ismartcoding.plain.web.schemas.addPomodoroSchema
+import com.ismartcoding.plain.web.schemas.addSchemaTypes
+import com.ismartcoding.plain.web.schemas.addScreenMirrorSchema
+import com.ismartcoding.plain.web.schemas.addSmsSchema
+import com.ismartcoding.plain.web.schemas.addTagSchema
+import com.ismartcoding.plain.web.schemas.addDataStoreSchema
+import com.ismartcoding.plain.web.schemas.addDbSchema
+import com.ismartcoding.plain.web.schemas.addDiscoverSchema
+import com.ismartcoding.plain.web.schemas.addVideoSchema
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.ApplicationCallPipeline
+import io.ktor.server.application.BaseApplicationPlugin
+import io.ktor.server.application.call
+import io.ktor.server.request.header
+import io.ktor.server.request.receive
+import io.ktor.server.request.receiveText
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
+import io.ktor.util.AttributeKey
+import kotlinx.coroutines.coroutineScope
+import kotlinx.serialization.json.Json
+
+class MainGraphQL(val schema: Schema) {
+    class Configuration : SchemaConfigurationDSL() {
+        fun init() {
+            schemaBlock = {
+                addChatMessageSchema()
+                addChatChannelSchema()
+                addSmsSchema()
+                addImageSchema()
+                addAudioSchema()
+                addVideoSchema()
+                addMediaSchema()
+                addDocSchema()
+                addContactSchema()
+                addCallSchema()
+                addPackageSchema()
+                addFileQuerySchema()
+                addFileUploadSchema()
+                addFileMutationSchema()
+                addFeedSchema()
+                addNoteSchema()
+                addTagSchema()
+                addScreenMirrorSchema()
+                addPomodoroSchema()
+                addNotificationSchema()
+                addAppSchema()
+                addAppFileSchema()
+                addAppLogsSchema()
+                addDataStoreSchema()
+                addDbSchema()
+                addDiscoverSchema()
+                addBookmarkSchema()
+                addPairingSchema()
+                addPeerSchema()
+                addSchemaTypes()
+            }
+        }
+
+        internal var schemaBlock: (SchemaBuilder.() -> Unit)? = null
+    }
+
+    companion object Feature : BaseApplicationPlugin<Application, Configuration, MainGraphQL> {
+        override val key = AttributeKey<MainGraphQL>("MainGraphQL")
+
+        private suspend fun executeGraphqlQL(
+            schema: Schema,
+            query: String,
+            call: ApplicationCall,
+        ): String = withIO {
+            val request = Json.decodeFromString(GraphqlRequest.serializer(), query)
+            schema.execute(
+                request.query,
+                request.variables?.toString(),
+                context { +call },
+            )
+        }
+
+        override fun install(
+            pipeline: Application,
+            configure: Configuration.() -> Unit,
+        ): MainGraphQL {
+            val config = Configuration().apply(configure)
+            val schema =
+                KGraphQL.schema {
+                    configuration = config
+                    config.schemaBlock?.invoke(this)
+                }
+
+            pipeline.routing {
+                route("/graphql") {
+                    post {
+                        if (!TempData.webEnabled.value) {
+                            call.respond(HttpStatusCode.Forbidden)
+                            return@post
+                        }
+                        val clientId = call.request.header("c-id") ?: ""
+                        if (clientId.isEmpty()) {
+                            call.respond(HttpStatusCode.Unauthorized)
+                            return@post
+                        }
+
+                        val authStr = call.request.header("authorization")?.split(" ")
+                        if (authStr.isNullOrEmpty()) {
+                            val token = HttpServerManager.tokenCache[clientId]
+                            if (token == null) {
+                                call.respond(HttpStatusCode.Unauthorized)
+                                return@post
+                            }
+
+                            val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, call.receive())
+                            val decryptedStr = decryptedBytes?.decodeToString() ?: ""
+                            if (decryptedStr.isEmpty()) {
+                                call.respond(HttpStatusCode.Unauthorized)
+                                return@post
+                            }
+
+                            val parsed = ReplayGuard.parse(decryptedStr)
+                            if (parsed == null) {
+                                call.respond(HttpStatusCode.BadRequest)
+                                return@post
+                            }
+                            val err = ReplayGuard.validate(clientId, parsed)
+                            if (err != null) {
+                                call.respond(HttpStatusCode.BadRequest)
+                                return@post
+                            }
+
+                            HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis()
+                            sendEvent(WebRequestReceivedEvent())
+                            val r = executeGraphqlQL(schema, parsed.body, call)
+                            call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
+                        } else {
+                            val bearerToken = authStr.getOrNull(1) ?: ""
+                            val session = SessionList.getByClientIdAsync(clientId)
+                            if (
+                                bearerToken.isEmpty() ||
+                                session == null ||
+                                session.type != DSession.TYPE_CUSTOM ||
+                                session.token != bearerToken
+                            ) {
+                                call.respond(HttpStatusCode.Unauthorized)
+                                return@post
+                            }
+
+                            val requestStr = call.receiveText()
+                            LogCat.d("[Request] $requestStr")
+                            HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis() // record the api request time
+                            sendEvent(WebRequestReceivedEvent())
+                            val r = executeGraphqlQL(schema, requestStr, call)
+                            call.respondText(r, contentType = ContentType.Application.Json)
+                        }
+                    }
+                }
+            }
+
+            pipeline.intercept(ApplicationCallPipeline.Monitoring) {
+                try {
+                    coroutineScope {
+                        proceed()
+                    }
+                } catch (e: Throwable) {
+                    if (e is GraphQLError) {
+                        val clientId = call.request.header("c-id") ?: ""
+                        val type = call.request.header("c-type") ?: "" // peer
+                        val channelId = call.request.header("c-cid") ?: "" // chat channel id
+                        val authStr = call.request.header("authorization")?.split(" ")
+                        if (authStr.isNullOrEmpty()) {
+                            val token = if (channelId.isNotEmpty()) {
+                                ChannelCacher.getKeyBytes(channelId)
+                            } else if (type == "peer") {
+                                PeerCacher.getKeyBytes(channelId)
+                            } else {
+                                HttpServerManager.tokenCache[clientId]
+                            }
+                            if (token != null) {
+                                call.respondBytes(CryptoHelper.chaCha20Encrypt(token, e.serialize()))
+                            } else {
+                                call.respond(HttpStatusCode.Unauthorized)
+                            }
+                        } else {
+                            context.respond(HttpStatusCode.OK, e.serialize())
+                        }
+                    } else {
+                        throw e
+                    }
+                }
+            }
+            return MainGraphQL(schema)
+        }
+    }
+}

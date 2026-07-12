@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ble
+import com.ismartcoding.plain.platform.bleTransport
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DDiscoverReply
@@ -28,7 +29,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
 object PairingTransport {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var server: BleGattServer? = null
     private var awareObserverJob: Job? = null
 

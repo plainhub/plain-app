@@ -1,7 +1,11 @@
 package com.ismartcoding.plain.events
 
+import com.ismartcoding.plain.chat.data.ChatTarget
+import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.lib.channel.ChannelEvent
+
+class HMessageCreatedEvent(val target: ChatTarget, val items: List<DChat>) : ChannelEvent()
 
 class HMessageUpdatedEvent(val id: String) : ChannelEvent()
 
@@ -40,4 +44,4 @@ class HCancelImageModelDownloadEvent : ChannelEvent()
 class HCancelNotificationsEvent(val ids: Set<String>) : ChannelEvent()
 class HChatItemsDeletedEvent(val ids: Set<String>) : ChannelEvent()
 
-// Download events moved to shared/androidMain/events/HttpApiEvents.kt (uses DownloadTask with OkHttpClient)
+data class HDownloadTaskDoneEvent(val downloadTask: DownloadTask) : ChannelEvent()

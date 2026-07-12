@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
-import com.ismartcoding.plain.helpers.IODispatcher
+import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.launch

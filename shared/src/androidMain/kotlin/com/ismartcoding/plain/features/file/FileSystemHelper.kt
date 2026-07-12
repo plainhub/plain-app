@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.file
 
-import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.platform.LocaleHelper
 
 import com.ismartcoding.plain.i18n.*
 
@@ -14,7 +14,7 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.extensions.getDirectChildrenCount
 import com.ismartcoding.plain.extensions.normalizeComparison
-import com.ismartcoding.plain.lib.isRPlus
+import com.ismartcoding.plain.platform.isRPlus
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.storageManager

@@ -1,0 +1,25 @@
+package com.ismartcoding.plain.audio
+
+import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.data.IItemMetadata
+import com.ismartcoding.plain.data.IMedia
+import kotlin.time.Instant
+
+data class DAudio(
+    override var id: String,
+    override val title: String,
+    val artist: String,
+    override val path: String,
+    override val duration: Long,
+    override val size: Long,
+    val bucketId: String,
+    val albumId: String,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    val isFavorite: Boolean = false,
+) : IItemMetadata, IMedia, IData {
+    fun getSubtitle(): String {
+        return listOf(artist, duration.formatDuration()).filter { it.isNotEmpty() }.joinToString(" · ")
+    }
+}

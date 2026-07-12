@@ -40,3 +40,9 @@ expect fun getDeviceType(): DeviceType
  * All IPv4 addresses of the device. Empty list on iOS (BLE-only).
  */
 expect fun getDeviceIP4s(): List<String>
+
+/**
+ * App's external files directory (Android) or Documents directory (iOS).
+ * Used to resolve `app://` and `fid:` paths.
+ */
+expect fun appDir(): String

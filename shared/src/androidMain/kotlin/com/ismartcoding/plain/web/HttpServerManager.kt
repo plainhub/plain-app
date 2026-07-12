@@ -1,0 +1,362 @@
+package com.ismartcoding.plain.web
+import com.ismartcoding.plain.appContext
+
+import android.content.Context
+import android.content.Intent
+import kotlin.io.encoding.ExperimentalEncodingApi
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.lib.helpers.JksHelper
+import com.ismartcoding.plain.helpers.PortHelper
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.Constants
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.platform.KtorClientFactory
+import com.ismartcoding.plain.api.OkHttpClientFactory
+import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.helpers.Base64Lenient
+import com.ismartcoding.plain.preferences.PasswordPreference
+import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.db.SessionClientTsUpdate
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.HttpServerStateChangedEvent
+import com.ismartcoding.plain.helpers.NotificationHelper
+import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
+import com.ismartcoding.plain.services.HttpServerService
+import com.ismartcoding.plain.services.PNotificationListenerService
+import com.ismartcoding.plain.web.websocket.WebSocketSession
+import io.ktor.client.request.get
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.engine.EmbeddedServer
+import io.ktor.server.engine.applicationEnvironment
+import io.ktor.server.engine.connector
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.sslConnector
+import io.ktor.server.netty.Netty
+import io.ktor.server.netty.NettyApplicationEngine
+import io.ktor.websocket.send
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.Instant
+import org.slf4j.LoggerFactory
+import java.io.File
+import java.io.FileOutputStream
+import java.security.KeyStore
+import java.security.cert.X509Certificate
+import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.set
+
+@OptIn(ExperimentalEncodingApi::class)
+object HttpServerManager {
+    private val SSL_KEY_ALIAS = Constants.SSL_NAME
+    val tokenCache = mutableMapOf<String, ByteArray>() // cache the session token, format: <client_id>:<token>
+    val clientIpCache = mutableMapOf<String, String>() // format: <client_id>:<client_ip>
+    val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
+    val clientRequestTs = mutableMapOf<String, Long>()
+    var httpServerError: String = ""
+    val portsInUse = mutableSetOf<Int>()
+    @Volatile
+    var server: EmbeddedServer<*, *>? = null
+
+    private const val LOGIN_RATE_LIMIT_WINDOW_MS = 60_000L
+    private const val LOGIN_RATE_LIMIT_MAX_ATTEMPTS = 5
+
+    private data class RateLimitWindow(var startMs: Long, var count: Int)
+
+    private val loginAttemptsByKey = ConcurrentHashMap<String, RateLimitWindow>()
+
+    private var clientTsJob: Job? = null
+
+    fun tryAcquireLoginAttempt(key: String, nowMs: Long = System.currentTimeMillis()): Boolean {
+        if (key.isBlank()) return true
+        val window = loginAttemptsByKey.compute(key) { _, existing ->
+            if (existing == null || nowMs - existing.startMs >= LOGIN_RATE_LIMIT_WINDOW_MS) {
+                RateLimitWindow(nowMs, 1)
+            } else {
+                existing.count += 1
+                existing
+            }
+        } ?: return true
+
+        // Opportunistic cleanup of stale entries
+        if (loginAttemptsByKey.size > 5_000) {
+            val threshold = nowMs - (LOGIN_RATE_LIMIT_WINDOW_MS * 2)
+            loginAttemptsByKey.entries.removeIf { it.value.startMs < threshold }
+        }
+
+        return window.count <= LOGIN_RATE_LIMIT_MAX_ATTEMPTS
+    }
+
+    fun getClientIpForLogin(clientId: String, remoteAddress: String): String {
+        val cached = clientIpCache[clientId]
+        if (!cached.isNullOrEmpty()) return cached
+        if (remoteAddress.isNotEmpty()) {
+            clientIpCache[clientId] = remoteAddress
+        }
+        return remoteAddress
+    }
+
+    val notificationId: Int by lazy {
+        NotificationHelper.generateId()
+    }
+
+    suspend fun resetPasswordAsync(): String {
+        val password = CryptoHelper.randomPassword(6)
+        PasswordPreference.putAsync(password)
+        return password
+    }
+
+    fun getNotificationContent(): String {
+        val ip = TempData.mdnsHostname
+        return "http://$ip:${TempData.httpPort.value}\nhttps://$ip:${TempData.httpsPort.value}"
+    }
+
+    suspend fun stopServiceAsync(context: Context) = withIO {
+        sendEvent(HttpServerStateChangedEvent(HttpServerState.STOPPING))
+        try {
+            val client = KtorClientFactory.httpClient()
+            client.get(UrlHelper.getShutdownUrl())
+        } catch (_: Exception) {}
+        try { server?.stop(0, 1000) } catch (_: Exception) {}
+        context.stopService(Intent(context, HttpServerService::class.java))
+        PNotificationListenerService.toggle(context, false)
+        httpServerError = ""
+        portsInUse.clear()
+        server = null
+        sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
+    }
+
+    fun stopPreviousServer() {
+        try {
+            server?.stop(0, 500)
+            LogCat.d("Previous server instance stopped")
+        } catch (e: Exception) {
+            LogCat.e("Error stopping previous server: ${e.message}")
+        } finally {
+            server = null
+        }
+    }
+
+    /**
+     * Wait for ports to become available after stopping a previous server.
+     * Returns true if both ports are free within the timeout.
+     */
+    suspend fun waitForPortsAvailable(httpPort: Int, httpsPort: Int, maxWaitMs: Long = 3000): Boolean = withIO {
+        val interval = 200L
+        var elapsed = 0L
+        while (elapsed < maxWaitMs) {
+            val httpFree = !PortHelper.isPortInUse(httpPort)
+            val httpsFree = !PortHelper.isPortInUse(httpsPort)
+            if (httpFree && httpsFree) {
+                LogCat.d("Ports $httpPort and $httpsPort are free after ${elapsed}ms")
+                return@withIO true
+            }
+            delay(interval)
+            elapsed += interval
+        }
+        LogCat.e("Ports still in use after ${maxWaitMs}ms - http:${PortHelper.isPortInUse(httpPort)}, https:${PortHelper.isPortInUse(httpsPort)}")
+        false
+    }
+
+    fun warmUp() {
+        coIO {
+            try {
+                val s = embeddedServer(Netty, port = 0) {}
+                s.start(wait = false)
+                s.stop(0, 0)
+                LogCat.d("Netty warm-up complete")
+            } catch (_: Exception) {}
+        }
+    }
+
+    suspend fun checkServerAsync(): Boolean = withIO {
+        withTimeoutOrNull(9000) {
+            val client = KtorClientFactory.httpClient()
+            val deadline = System.currentTimeMillis() + 8500L
+            var healthy = false
+            while (!healthy && System.currentTimeMillis() < deadline) {
+                try {
+                    val response = client.get(UrlHelper.getHealthCheckUrl())
+                    if (response.status == HttpStatusCode.OK) {
+                        healthy = true
+                    }
+                } catch (ex: Exception) {
+                    delay(300)
+                    LogCat.e("HTTP server check failed: ${ex.message}")
+                }
+            }
+            LogCat.d("HTTP server check healthy: $healthy")
+            healthy
+        } ?: false
+    }
+
+    private suspend fun passwordToToken(): ByteArray {
+        val password = PasswordPreference.getAsync()
+        return withIO { hashToToken(CryptoHelper.sha512(password.toByteArray())) }
+    }
+
+    fun hashToToken(hash: String): ByteArray {
+        return hash.substring(0, 32).toByteArray()
+    }
+
+    suspend fun loadTokenCache() = withIO {
+        tokenCache.clear()
+        SessionList.getItemsAsync().forEach {
+            if (it.token.isNotEmpty()) {
+                tokenCache[it.clientId] = Base64Lenient.decode(it.token)
+            }
+        }
+    }
+
+    fun generateSSLKeyStore(file: File, password: String) {
+        val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
+        // Write to a temp file first, then atomically rename to the target.
+        // This prevents a partially-written (corrupted) keystore if the process
+        // is killed mid-write (OOM, force-stop, reboot, etc.).
+        val tmp = File(file.parent, "${file.name}.tmp")
+        try {
+            FileOutputStream(tmp).use {
+                keyStore.store(it, password.toCharArray())
+            }
+            tmp.renameTo(file)
+        } catch (ex: Exception) {
+            tmp.delete()
+            throw ex
+        }
+    }
+
+    private fun getSSLKeyStore(context: Context, password: String): KeyStore {
+        val file = File(context.filesDir, Constants.KEY_STORE_FILE_NAME)
+        if (!file.exists()) {
+            generateSSLKeyStore(file, password)
+        }
+
+        return KeyStore.getInstance("BKS", "BC").apply {
+            try {
+                file.inputStream().use {
+                    load(it, password.toCharArray())
+                }
+            } catch (ex: Exception) {
+                LogCat.e("Failed to load keystore: ${ex.message}, regenerating...")
+                ex.printStackTrace()
+                // Delete corrupted file and regenerate
+                if (file.exists()) {
+                    file.delete()
+                }
+                try {
+                    generateSSLKeyStore(file, password)
+                    // Reload the newly generated keystore
+                    file.inputStream().use {
+                        load(it, password.toCharArray())
+                    }
+                } catch (ex2: Exception) {
+                    LogCat.e("Failed to regenerate keystore: ${ex2.message}")
+                    ex2.printStackTrace()
+                    throw ex2
+                }
+            }
+        }
+    }
+
+    suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
+        val password = KeyStorePasswordPreference.getAsync()
+        return withIO {
+            val passwordArray = password.toCharArray()
+            val httpPort = TempData.httpPort.value
+            val httpsPort = TempData.httpsPort.value
+            val environment = applicationEnvironment {
+                log = LoggerFactory.getLogger("ktor.application")
+            }
+
+            embeddedServer(Netty, environment, configure = {
+                runningLimit = 1000
+                tcpKeepAlive = true
+                enableHttp2 = false
+
+                connector {
+                    port = httpPort
+                }
+                sslConnector(
+                    keyStore = getSSLKeyStore(context, password),
+                    keyAlias = SSL_KEY_ALIAS,
+                    keyStorePassword = { passwordArray },
+                    privateKeyPassword = { passwordArray },
+                ) {
+                    port = httpsPort
+                }
+            }, HttpModule.module)
+        }
+    }
+
+    fun getSSLSignature(context: Context, password: String): ByteArray {
+        val keystore = getSSLKeyStore(context, password)
+        val cert = keystore.getCertificate(SSL_KEY_ALIAS) as X509Certificate
+        return cert.signature
+    }
+
+    fun clientTsInterval() {
+        if (clientTsJob?.isActive == true) return
+
+        // When there are active sessions/clients we update frequently, otherwise we back off.
+        val activeIntervalMs = 5_000L
+        val idleIntervalMs = 60_000L
+        var lastSyncTs = 0L
+        clientTsJob = coIO {
+            while (kotlinx.coroutines.currentCoroutineContext().isActive) {
+                val updates =
+                    clientRequestTs
+                        .filter { it.value > lastSyncTs }
+                        .map { SessionClientTsUpdate(it.key, Instant.fromEpochMilliseconds(it.value)) }
+                if (updates.isNotEmpty()) {
+                    val maxTsInThisBatch = updates.maxOf { it.lastActiveAt.toEpochMilliseconds() }
+                    runCatching {
+                        AppDatabase.instance.sessionDao().updateTs(updates)
+                        lastSyncTs = maxTsInThisBatch
+                    }.onFailure {
+                        LogCat.e("Failed to update client session timestamps: ${it.message}")
+                    }
+                    delay(activeIntervalMs)
+                } else {
+                    delay(idleIntervalMs)
+                }
+            }
+        }
+    }
+
+    suspend fun respondTokenAsync(
+        event: ConfirmToAcceptLoginEvent,
+        clientIp: String,
+    ) = withIO {
+        val token = CryptoHelper.generateChaCha20Key()
+        val r = event.request
+        SessionList.addOrUpdateAsync(event.clientId) {
+            it.clientIP = clientIp
+            it.osName = r.osName
+            it.osVersion = r.osVersion
+            it.browserName = r.browserName
+            it.browserVersion = r.browserVersion
+            it.token = token
+        }
+        HttpServerManager.loadTokenCache()
+        NotificationHelper.sendWebLoginNotification(appContext, r.browserName, r.browserVersion, r.osName, r.osVersion, clientIp)
+        event.session.send(
+            CryptoHelper.chaCha20Encrypt(
+                HttpServerManager.passwordToToken(),
+                JsonHelper.jsonEncode(
+                    AuthResponse(
+                        TempData.clientId,
+                        AuthStatus.COMPLETED,
+                        token,
+                    ),
+                ),
+            ),
+        )
+    }
+}

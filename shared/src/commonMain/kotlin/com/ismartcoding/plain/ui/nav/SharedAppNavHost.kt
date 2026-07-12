@@ -1,11 +1,17 @@
 package com.ismartcoding.plain.ui.nav
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ismartcoding.plain.shared.home.PlainHomeScreen
+import androidx.navigation.toRoute
+import com.ismartcoding.plain.platform.ChatListPageRoute
+import com.ismartcoding.plain.platform.ChatPageRoute
 
 @Composable
 fun SharedAppNavHost(
@@ -13,11 +19,20 @@ fun SharedAppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Routing.Home,
+        startDestination = Routing.ChatList,
     ) {
         composable<Routing.Home> {
-            PlainHomeScreen()
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background,
+            ) {}
         }
-        // Phase 6.1+ 完成后注册其它路由（Settings/Notes/Tags/Feeds/Chat/...）
+        composable<Routing.ChatList> {
+            ChatListPageRoute(navController)
+        }
+        composable<Routing.Chat> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.Chat>()
+            ChatPageRoute(navController, r.id)
+        }
     }
 }

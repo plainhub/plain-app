@@ -3,20 +3,17 @@ package com.ismartcoding.plain.platform
 import android.os.Build
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.PhoneHelper
+import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.appContextValue
 import com.ismartcoding.plain.buildTypeValue
+import com.ismartcoding.plain.lib.extensions.appDir as contextAppDir
 import com.ismartcoding.plain.lib.helpers.NetworkHelper
 
 actual fun getAppVersion(): String {
     val ctx = appContextValue ?: return ""
     val pi = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
     val versionName = pi.versionName ?: ""
-    val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        pi.longVersionCode
-    } else {
-        @Suppress("DEPRECATION")
-        pi.versionCode.toLong()
-    }
+    val versionCode = pi.longVersionCode
     return "$versionName ($versionCode)"
 }
 
@@ -31,3 +28,5 @@ actual fun getPlatformName(): String = "android"
 actual fun getDeviceType(): DeviceType = PhoneHelper.getDeviceType(appContextValue!!)
 
 actual fun getDeviceIP4s(): List<String> = NetworkHelper.getDeviceIP4s().toList()
+
+actual fun appDir(): String = appContext.contextAppDir()

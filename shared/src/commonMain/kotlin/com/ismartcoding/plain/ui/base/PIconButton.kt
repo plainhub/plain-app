@@ -1,21 +1,85 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
+import com.ismartcoding.plain.platform.rememberClickFeedback
+import com.ismartcoding.plain.ui.theme.badgeBorderColor
+import com.ismartcoding.plain.ui.theme.red
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-expect fun PIconButton(
+fun PIconButton(
     icon: DrawableResource,
-    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier,
+    modifier: Modifier = Modifier,
     iconSize: Dp = 24.dp,
-    tint: Color = androidx.compose.material3.LocalContentColor.current,
+    tint: Color = LocalContentColor.current,
     contentDescription: String? = null,
     showBadge: Boolean = false,
     isHaptic: Boolean? = false,
     isSound: Boolean? = false,
     enabled: Boolean = true,
     click: () -> Unit = {},
-)
+) {
+    val feedback = rememberClickFeedback()
+    IconButton(
+        modifier = modifier,
+        enabled = enabled,
+        colors = IconButtonDefaults.iconButtonColors().copy(
+            contentColor = tint,
+            disabledContentColor = tint.copy(alpha = 0.38f)
+        ),
+        onClick = {
+            feedback(isHaptic == true, isSound == true)
+            click()
+        },
+    ) {
+        if (showBadge) {
+            BadgedBox(
+                badge = {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .offset(x = 4.dp, y = (-6).dp)
+                            .background(MaterialTheme.colorScheme.badgeBorderColor, shape = CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(MaterialTheme.colorScheme.red, shape = CircleShape)
+                        )
+                    }
+                }
+            ) {
+                PIcon(
+                    modifier = Modifier.size(iconSize),
+                    icon = painterResource(icon),
+                    contentDescription = contentDescription,
+                )
+            }
+        } else {
+            PIcon(
+                modifier = Modifier.size(iconSize),
+                icon = painterResource(icon),
+                contentDescription = contentDescription,
+            )
+        }
+    }
+}

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features
 
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagCount
 import com.ismartcoding.plain.db.DTagRelation

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.lib.extensions
 
 import android.content.Intent
 import android.os.Parcelable
-import com.ismartcoding.plain.lib.isTPlus
+import com.ismartcoding.plain.platform.isTPlus
 
 inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? =
     when {

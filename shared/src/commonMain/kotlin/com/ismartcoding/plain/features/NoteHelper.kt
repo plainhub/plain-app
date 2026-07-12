@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features
 
 import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.NoteDao

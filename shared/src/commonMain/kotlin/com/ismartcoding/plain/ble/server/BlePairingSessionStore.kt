@@ -1,18 +1,20 @@
 package com.ismartcoding.plain.ble.server
 
+import com.ismartcoding.plain.platform.PlatformLock
+
 object BlePairingSessionStore {
     private val macs = mutableMapOf<String, String>()
-    private val lock = Any()
+    private val lock = PlatformLock()
 
     fun put(fromId: String, clientMac: String) {
-        synchronized(lock) { macs[fromId] = clientMac }
+        lock.withLock { macs[fromId] = clientMac }
     }
 
-    fun get(fromId: String): String? = synchronized(lock) { macs[fromId] }
+    fun get(fromId: String): String? = lock.withLock { macs[fromId] }
 
-    fun has(fromId: String): Boolean = synchronized(lock) { macs.containsKey(fromId) }
+    fun has(fromId: String): Boolean = lock.withLock { macs.containsKey(fromId) }
 
     fun remove(fromId: String) {
-        synchronized(lock) { macs.remove(fromId) }
+        lock.withLock { macs.remove(fromId) }
     }
 }

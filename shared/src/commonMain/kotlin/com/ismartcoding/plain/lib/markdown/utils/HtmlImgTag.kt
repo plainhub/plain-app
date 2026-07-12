@@ -36,8 +36,7 @@ val HTML_IMG_ALT_REGEX = Regex(
  * Returns `null` if the node is not an `<img>` element, has no `src` attribute,
  * or has an empty `src=""` value. The returned value preserves the original
  * casing/whitespace from the markup — callers that resolve `app://` or `fid:`
- * schemes should normalise via `String.getFinalPath(context)` (Android) or the
- * equivalent iOS helper.
+ * schemes should normalise via `String.getFinalPath()` (commonMain).
  */
 fun ASTNode.extractHtmlImgSrc(content: CharSequence): String? {
     val raw = getTextInNode(content).toString()

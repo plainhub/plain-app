@@ -1,0 +1,151 @@
+package com.ismartcoding.plain.mdns
+
+internal object MdnsPacketCodec {
+    private const val DNS_CLASS_IN = 0x0001
+    private const val DNS_TYPE_A = 0x0001
+    private const val DNS_TYPE_ANY = 0x00FF
+    private const val DNS_RESPONSE_FLAGS = 0x8400
+    private const val DNS_CACHE_FLUSH_CLASS_IN = 0x8001
+    private const val TTL_SECONDS = 120
+
+    fun buildResponseIfMatch(
+        query: ByteArray,
+        hostname: String,
+        ips: List<ByteArray>,
+    ): ByteArray? = buildResponseIfMatchDetails(query, hostname, ips)?.bytes
+
+    fun buildResponseIfMatchDetails(
+        query: ByteArray,
+        hostname: String,
+        ips: List<ByteArray>,
+    ): MdnsResponse? {
+        if (query.size < 12 || ips.isEmpty()) return null
+
+        val flags = readU16(query, 2)
+        // Bit 15 (QR) = 1 means this is a response, not a query. Ignore it.
+        if (flags and 0x8000 != 0) return null
+
+        val qdCount = readU16(query, 4)
+        if (qdCount <= 0) return null
+
+        var offset = 12
+        val questions = mutableListOf<MdnsQuestion>()
+        val matchedQuestions = mutableListOf<MdnsQuestion>()
+        repeat(qdCount) {
+            val parsed = readName(query, offset) ?: return null
+            val qname = parsed.first
+            offset = parsed.second
+            if (offset + 4 > query.size) return null
+
+            val qtype = readU16(query, offset)
+            val qclassRaw = readU16(query, offset + 2)
+            val qclass = qclassRaw and 0x7FFF
+            val question = MdnsQuestion(
+                name = qname,
+                qtype = qtype,
+                qclass = qclass,
+                unicastResponseRequested = qclassRaw and 0x8000 != 0,
+            )
+            questions.add(question)
+            offset += 4
+
+            if (
+                qname.equals(hostname, ignoreCase = true) &&
+                qclass == DNS_CLASS_IN &&
+                (qtype == DNS_TYPE_A || qtype == DNS_TYPE_ANY)
+            ) {
+                matchedQuestions.add(question)
+            }
+        }
+        if (matchedQuestions.isEmpty()) return null
+
+        val nameBytes = encodeName(hostname)
+        val out = mutableListOf<Byte>()
+        writeU16(out, 0)
+        writeU16(out, DNS_RESPONSE_FLAGS)
+        writeU16(out, 0)
+        writeU16(out, ips.size)
+        writeU16(out, 0)
+        writeU16(out, 0)
+
+        ips.forEach { ip ->
+            out.addAll(nameBytes.toList())
+            writeU16(out, DNS_TYPE_A)
+            writeU16(out, DNS_CACHE_FLUSH_CLASS_IN)
+            writeU32(out, TTL_SECONDS)
+            writeU16(out, 4)
+            out.addAll(ip.toList())
+        }
+        return MdnsResponse(out.toByteArray(), questions, matchedQuestions)
+    }
+
+    private fun encodeName(name: String): ByteArray {
+        val out = mutableListOf<Byte>()
+        name.split('.')
+            .filter { it.isNotEmpty() }
+            .forEach { label ->
+                val bytes = label.encodeToByteArray()
+                out.add(bytes.size.toByte())
+                out.addAll(bytes.toList())
+            }
+        out.add(0)
+        return out.toByteArray()
+    }
+
+    private fun readName(data: ByteArray, start: Int, depth: Int = 0): Pair<String, Int>? {
+        if (depth > 8 || start >= data.size) return null
+
+        val labels = mutableListOf<String>()
+        var offset = start
+        while (offset < data.size) {
+            val len = data[offset].toInt() and 0xFF
+            if (len == 0) return Pair(labels.joinToString("."), offset + 1)
+
+            if ((len and 0xC0) == 0xC0) {
+                if (offset + 1 >= data.size) return null
+                val ptr = ((len and 0x3F) shl 8) or (data[offset + 1].toInt() and 0xFF)
+                val pointed = readName(data, ptr, depth + 1) ?: return null
+                val pointedLabels = pointed.first.split('.').filter { it.isNotEmpty() }
+                return Pair((labels + pointedLabels).joinToString("."), offset + 2)
+            }
+
+            val next = offset + 1 + len
+            if (next > data.size) return null
+            labels.add(data.copyOfRange(offset + 1, offset + 1 + len).decodeToString())
+            offset = next
+        }
+        return null
+    }
+
+    private fun readU16(data: ByteArray, offset: Int): Int {
+        return ((data[offset].toInt() and 0xFF) shl 8) or (data[offset + 1].toInt() and 0xFF)
+    }
+
+    private fun writeU16(out: MutableList<Byte>, value: Int) {
+        out.add(((value ushr 8) and 0xFF).toByte())
+        out.add((value and 0xFF).toByte())
+    }
+
+    private fun writeU32(out: MutableList<Byte>, value: Int) {
+        out.add(((value ushr 24) and 0xFF).toByte())
+        out.add(((value ushr 16) and 0xFF).toByte())
+        out.add(((value ushr 8) and 0xFF).toByte())
+        out.add((value and 0xFF).toByte())
+    }
+}
+
+internal data class MdnsQuestion(
+    val name: String,
+    val qtype: Int,
+    val qclass: Int,
+    val unicastResponseRequested: Boolean,
+)
+
+internal data class MdnsResponse(
+    val bytes: ByteArray,
+    val questions: List<MdnsQuestion>,
+    val matchedQuestions: List<MdnsQuestion>,
+) {
+    val unicastResponseRequested: Boolean
+        get() = matchedQuestions.any { it.unicastResponseRequested }
+}
