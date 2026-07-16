@@ -19,8 +19,8 @@ fun StepNumber(num: Int) {
     val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
     Box(
         modifier = Modifier
-            .size(28.dp)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .size(28.dp),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.size(28.dp)) {

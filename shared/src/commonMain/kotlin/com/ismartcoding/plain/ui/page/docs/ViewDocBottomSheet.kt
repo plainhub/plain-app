@@ -1,0 +1,164 @@
+package com.ismartcoding.plain.ui.page.docs
+
+import com.ismartcoding.plain.i18n.*
+
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.getMimeType
+import com.ismartcoding.plain.platform.isRPlus
+import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.platform.formatDateTime
+import com.ismartcoding.plain.platform.openFileExternal
+import com.ismartcoding.plain.platform.shareFile
+import com.ismartcoding.plain.platform.shareFiles
+import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.ui.base.CopyIconButton
+import com.ismartcoding.plain.ui.base.IconTextDeleteButton
+import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
+import com.ismartcoding.plain.ui.base.IconTextRenameButton
+import com.ismartcoding.plain.ui.base.IconTextRestoreButton
+import com.ismartcoding.plain.ui.base.IconTextSelectButton
+import com.ismartcoding.plain.ui.base.IconTextShareButton
+import com.ismartcoding.plain.ui.base.IconTextTrashButton
+import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.components.FileRenameDialog
+import com.ismartcoding.plain.platform.renameAndScanFile
+import com.ismartcoding.plain.ui.components.TagSelector
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.models.DocsViewModel
+import com.ismartcoding.plain.ui.models.TagsViewModel
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun ViewDocBottomSheet(
+    docsVM: DocsViewModel,
+    tagsVM: TagsViewModel,
+    tagsMapState: Map<String, List<DTagRelation>>,
+    tagsState: List<DTag>,
+    dragSelectState: DragSelectState,
+) {
+    val m = docsVM.selectedItem.value ?: return
+    val onDismiss = {
+        docsVM.selectedItem.value = null
+    }
+
+    if (docsVM.showRenameDialog.value) {
+        FileRenameDialog(path = m.path, onDismiss = {
+            docsVM.showRenameDialog.value = false
+        }, onRename = { p, name -> renameAndScanFile(p, name) }, onRenamed = {
+            m.path = it
+            m.title = it.getFilenameFromPath()
+        })
+    }
+
+    PModalBottomSheet(
+        onDismissRequest = {
+            onDismiss()
+        },
+    ) {
+        LazyColumn {
+            item {
+                VerticalSpace(32.dp)
+            }
+            item {
+                ActionButtons {
+                    if (!docsVM.showSearchBar.value) {
+                        IconTextSelectButton {
+                            dragSelectState.enterSelectMode()
+                            dragSelectState.select(m.id)
+                            onDismiss()
+                        }
+                    }
+                    if (!docsVM.trash.value) {
+                        IconTextShareButton {
+                            shareFile(m.path)
+                            onDismiss()
+                        }
+                        IconTextOpenWithButton {
+                            openFileExternal(m.path)
+                        }
+                        IconTextRenameButton {
+                            docsVM.showRenameDialog.value = true
+                        }
+                    }
+                    if (AppFeatureType.MEDIA_TRASH.has()) {
+                        if (docsVM.trash.value) {
+                            IconTextRestoreButton {
+                                if (isRPlus()) {
+                                    docsVM.restore(tagsVM, setOf(m.id))
+                                    onDismiss()
+                                }
+                            }
+                            IconTextDeleteButton {
+                                DialogHelper.confirmToDelete {
+                                    docsVM.delete(tagsVM, setOf(m.id))
+                                    onDismiss()
+                                }
+                            }
+                        } else {
+                            IconTextTrashButton {
+                                if (isRPlus()) {
+                                    docsVM.trash(tagsVM, setOf(m.id))
+                                    onDismiss()
+                                }
+                            }
+                        }
+                    } else {
+                        IconTextDeleteButton {
+                            DialogHelper.confirmToDelete {
+                                docsVM.delete(tagsVM, setOf(m.id))
+                                onDismiss()
+                            }
+                        }
+                    }
+                }
+                VerticalSpace(dp = 24.dp)
+                if (!docsVM.trash.value) {
+                    Subtitle(text = stringResource(Res.string.tags))
+                    TagSelector(
+                        data = m,
+                        tagsVM = tagsVM,
+                        tagsMap = tagsMapState,
+                        tagsState = tagsState,
+                        onChangedAsync = { docsVM.loadAsync(tagsVM) }
+                    )
+                    VerticalSpace(dp = 16.dp)
+                }
+                PCard {
+                    PListItem(title = m.path, action = {
+                        CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
+                    })
+                }
+                VerticalSpace(dp = 16.dp)
+                PCard {
+                    PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
+                    PListItem(title = stringResource(Res.string.type), value = m.path.getMimeType())
+                    if (m.createdAt != null) {
+                        PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
+                    }
+                    PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
+                }
+            }
+            item {
+                BottomSpace()
+            }
+        }
+    }
+}

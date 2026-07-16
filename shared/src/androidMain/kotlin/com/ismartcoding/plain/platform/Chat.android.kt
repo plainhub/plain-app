@@ -7,10 +7,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.core.net.toUri
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.chat.peer.PeerCacher
+import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.extensions.getDuration
+import com.ismartcoding.plain.features.ChatMessageEditor
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.ImageHelper
@@ -93,4 +95,8 @@ actual object ChatPlatformOps {
             }
         }
     }
+}
+
+actual suspend fun updateChatMessageTextAsync(item: DChat, newText: String): Boolean {
+    return ChatMessageEditor.updateTextAsync(item, newText)
 }

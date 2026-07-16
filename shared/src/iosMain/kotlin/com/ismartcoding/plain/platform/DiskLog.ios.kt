@@ -15,3 +15,7 @@ actual fun currentDateTimeString(): String {
 actual fun currentThreadName(): String = NSThread.currentThread().name ?: "main"
 
 actual fun resolveCallerInfo(): String? = null
+
+actual fun readLogLinesNewestFirst(offset: Int, limit: Int): List<String> = emptyList()
+
+actual fun clearLatestLogFile() = Unit

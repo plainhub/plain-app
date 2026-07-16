@@ -39,6 +39,7 @@ fun TextFieldDialog(
     errorText: String = "",
     dismissText: String = stringResource(Res.string.cancel),
     confirmText: String = stringResource(Res.string.confirm),
+    allowEmpty: Boolean = false,
     validator: (String) -> Boolean = { true },
     validationErrorText: String = "",
     onValueChange: (String) -> Unit = {},
@@ -112,7 +113,7 @@ fun TextFieldDialog(
             PFilledButton(
                 text = confirmText,
                 buttonSize = ButtonSize.MEDIUM,
-                enabled = currentValue.isNotBlank(),
+                enabled = allowEmpty || currentValue.isNotBlank(),
                 onClick = {
                     if (validator(currentValue)) {
                         focusManager.clearFocus()

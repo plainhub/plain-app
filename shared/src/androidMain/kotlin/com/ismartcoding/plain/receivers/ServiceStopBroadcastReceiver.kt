@@ -12,7 +12,7 @@ import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.ScreenMirrorService
-import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.webserver.stopHttpServiceAsync
 
 class ServiceStopBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(
@@ -38,7 +38,7 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
                     if (intent.getStringExtra("token") != storedToken) return@coIO
                 }
                 WebPreference.putAsync(false)
-                HttpServerManager.stopServiceAsync(context)
+                stopHttpServiceAsync(context)
             }
 
             AppIntents.ACTION_STOP_SCREEN_MIRROR -> {

@@ -1,0 +1,162 @@
+package com.ismartcoding.plain.ui.page.web
+import com.ismartcoding.plain.preferences.*
+
+import com.ismartcoding.plain.i18n.*
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.platform.openAppSettings
+import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.features.PermissionItem
+import com.ismartcoding.plain.features.getWebList
+import com.ismartcoding.plain.platform.isGranted
+import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
+import com.ismartcoding.plain.platform.openBatteryOptimizationSettings
+import com.ismartcoding.plain.preferences.LocalApiPermissions
+import com.ismartcoding.plain.preferences.LocalKeepAwake
+import com.ismartcoding.plain.preferences.WebSettingsProvider
+import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.Tips
+import com.ismartcoding.plain.ui.base.TopSpace
+import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.helpers.WebHelper
+import com.ismartcoding.plain.ui.models.WebConsoleViewModel
+import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.theme.PlainTheme
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel = viewModel()) {
+    WebSettingsProvider {
+        val keepAwake = LocalKeepAwake.current
+        val scope = rememberCoroutineScope()
+        val enabledPermissions = LocalApiPermissions.current
+        val permissionList = remember { mutableStateOf(getWebList()) }
+        val shouldIgnoreOptimize = remember { mutableStateOf(!isIgnoringBatteryOptimizations()) }
+        val systemAlertWindow = remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.isGranted()) }
+        val notificationListenerGranted = remember { mutableStateOf(Permission.NOTIFICATION_LISTENER.isGranted()) }
+
+        WebSettingsEffects(permissionList, shouldIgnoreOptimize, systemAlertWindow, notificationListenerGranted)
+
+        PScaffold(topBar = {
+            PTopAppBar(navController = navController, title = stringResource(Res.string.web_settings))
+        }, content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+                item {
+                    TopSpace()
+                    PCard {
+                        PListItem(
+                            modifier = Modifier.clickable { navController.navigate(Routing.Connections) },
+                            icon = Res.drawable.devices, title = stringResource(Res.string.connections), showMore = true
+                        )
+                        PListItem(
+                            modifier = Modifier.clickable { navController.navigate(Routing.WebSecurity) },
+                            icon = Res.drawable.lock, title = stringResource(Res.string.security), showMore = true
+                        )
+                        PListItem(
+                            modifier = Modifier.clickable { navController.navigate(Routing.HowToUse) },
+                            icon = Res.drawable.info, title = stringResource(Res.string.how_to_use), showMore = true
+                        )
+                        PListItem(
+                            modifier = Modifier.clickable { WebHelper.open("https://plainapp.app/troubleshooting") },
+                            icon = Res.drawable.troubleshoot, title = stringResource(Res.string.troubleshoot), showMore = true
+                        )
+                    }
+                    VerticalSpace(dp = 16.dp)
+                }
+                item { Subtitle(text = stringResource(Res.string.permissions)) }
+                itemsIndexed(permissionList.value) { index, m ->
+                    val permission = m.permission
+                    PListItem(
+                        modifier = PlainTheme
+                            .getCardModifier(index = index, size = permissionList.value.size)
+                            .clickable { togglePermission(scope, m, !enabledPermissions.contains(permission.name)) },
+                        icon = m.icon, title = permission.getText(),
+                        subtitle = stringResource(if (m.granted) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
+                    ) {
+                        PSwitch(activated = enabledPermissions.contains(permission.name)) { enable -> togglePermission(scope, m, enable) }
+                    }
+                }
+                if (AppFeatureType.NOTIFICATIONS.has()) {
+                    item {
+                        VerticalSpace(dp = 16.dp)
+                        PCard {
+                            val m = PermissionItem.create(Res.drawable.bell, Permission.NOTIFICATION_LISTENER)
+                            val permission = m.permission
+                            val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
+                            PListItem(
+                                modifier = Modifier.clickable { togglePermission(scope, m, !enabled) },
+                                icon = m.icon, title = permission.getText(),
+                                subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
+                            ) {
+                                PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
+                            }
+                            if (enabled) {
+                                PListItem(
+                                    modifier = Modifier.clickable { navController.navigate(Routing.NotificationSettings) },
+                                    icon = Res.drawable.settings, title = stringResource(Res.string.notification_filter_settings),
+                                    subtitle = stringResource(Res.string.notification_filter_settings_desc), showMore = true
+                                )
+                            }
+                        }
+                    }
+                }
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    val m = PermissionItem(null, Permission.NONE, setOf(Permission.NONE))
+                    PCard {
+                        PListItem(modifier = Modifier.clickable { openAppSettings() }, icon = m.icon, title = m.permission.getText(), showMore = true)
+                    }
+                }
+                item {
+                    VerticalSpace(dp = 16.dp); Subtitle(text = stringResource(Res.string.performance))
+                    PCard {
+                        PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(!keepAwake) }, title = stringResource(Res.string.keep_awake)) {
+                            PSwitch(activated = keepAwake) { enable -> webVM.enableKeepAwake(enable) }
+                        }
+                    }
+                    Tips(stringResource(Res.string.keep_awake_tips))
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
+                        PListItem(modifier = Modifier.clickable {
+                            if (shouldIgnoreOptimize.value) webVM.requestIgnoreBatteryOptimization()
+                            else openBatteryOptimizationSettings()
+                        }, title = stringResource(if (shouldIgnoreOptimize.value) Res.string.disable_battery_optimization else Res.string.battery_optimization_disabled), showMore = true)
+                    }
+                    Tips(stringResource(Res.string.battery_optimization_tips))
+                }
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
+                        PListItem(
+                            modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
+                            icon = Res.drawable.code, title = stringResource(Res.string.developer_options), showMore = true
+                        )
+                    }
+                }
+                item { BottomSpace(paddingValues) }
+            }
+        })
+    }
+}

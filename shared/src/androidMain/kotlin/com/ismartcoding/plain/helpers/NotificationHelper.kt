@@ -26,7 +26,7 @@ import com.ismartcoding.plain.receivers.PeerChatReplyReceiver
 import com.ismartcoding.plain.receivers.ServiceStopBroadcastReceiver
 
 private val mainActivityClass: Class<*> by lazy {
-    Class.forName("com.ismartcoding.plain.ui.MainActivity")
+    Class.forName("com.ismartcoding.plain.MainActivity")
 }
 
 private fun notificationDrawableId(): Int {

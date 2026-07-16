@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.enums
 
 import com.ismartcoding.plain.buildChannel
+import com.ismartcoding.plain.features.allGranted
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.platform.isRPlus
 
@@ -24,4 +25,13 @@ fun AppFeatureType.has(): Boolean {
 
         else -> true
     }
+}
+
+fun AppFeatureType.hasPermission(): Boolean {
+    val p = getPermission()
+    if (p != null) {
+        return allGranted(p.permissions)
+    }
+
+    return true
 }

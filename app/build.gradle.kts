@@ -186,8 +186,6 @@ dependencies {
 
     implementation(libs.okhttp)
 
-    implementation(libs.jsoup)
-
     // Google Tink for cryptography (Ed25519 support on all Android versions)
     implementation(libs.tink.android)
 

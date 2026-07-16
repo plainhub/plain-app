@@ -147,7 +147,15 @@ object PairingTransport {
 
             if (responseJson != null) {
                 val response = JsonHelper.jsonDecode<DPairingResponse>(responseJson)
-                PairingCore.handlePairResponse(response, senderIp = "")
+                // The responder's BLE address (MAC on Android / UUID on iOS) is
+                // the id of the BleGattClient we used to send the pairing
+                // request. Persist it on the peer record so the BLE chat
+                // fallback can reconnect later without scanning.
+                PairingCore.handlePairResponse(
+                    response = response,
+                    senderIp = "",
+                    bleAddress = bleDevice.id,
+                )
             } else {
                 LogCat.e("BLE pairViaBle: response timeout after ${PAIR_RESPONSE_TIMEOUT_MS}ms")
                 PairingCore.notifyFailed(device.id, device.name, "Pairing timed out")

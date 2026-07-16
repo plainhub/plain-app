@@ -22,6 +22,10 @@ actual fun shareFile(path: String) {
     // Same as shareText: needs UIViewController present; implemented in Phase 25.
 }
 
+actual fun shareFileAs(path: String, displayName: String) {
+    // Same as shareFile: needs UIViewController present; implemented in Phase 25.
+}
+
 actual fun shareFiles(paths: List<String>) {
     // Needs UIViewController to present UIActivityViewController; implemented in Phase 25.
 }
@@ -29,6 +33,8 @@ actual fun shareFiles(paths: List<String>) {
 actual fun openFileExternal(path: String) {
     // Needs UIDocumentInteractionController; implemented in Phase 25.
 }
+
+actual fun isFileShareable(path: String): Boolean = false
 
 actual fun relaunchApp() {
     // iOS apps cannot programmatically restart; no-op.

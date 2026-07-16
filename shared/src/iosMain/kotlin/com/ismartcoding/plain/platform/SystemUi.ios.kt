@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import androidx.compose.runtime.Composable
+
 actual fun isGestureInteractionMode(): Boolean = true
 
 actual fun keepScreenOn(enabled: Boolean) {
@@ -20,4 +22,11 @@ actual fun setImmersiveFullscreen() {
 
 actual fun exitImmersiveFullscreen() {
     // No-op on iOS
+}
+
+@Composable
+actual fun rememberWindowInsetsController(): Any = Unit
+
+actual fun applySystemBarAppearanceForDarkTheme(useDarkTheme: Boolean) {
+    // iOS: status bar appearance is controlled via UIViewController.preferredStatusBarStyle
 }

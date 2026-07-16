@@ -136,6 +136,9 @@ class Routing {
     object Nearby
 
     @Serializable
+    object WifiAwareDebug
+
+    @Serializable
     object ComponentShowcase
 
     @Serializable

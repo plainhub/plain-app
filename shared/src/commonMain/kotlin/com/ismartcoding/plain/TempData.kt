@@ -2,6 +2,7 @@ package com.ismartcoding.plain
 
 import com.ismartcoding.plain.data.DNotification
 import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.features.sms.DPendingMms
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Instant
 
@@ -32,4 +33,11 @@ object TempData {
     // ChatPageEffects so the chat receiver can suppress notifications for the
     // active conversation. Format: "peer:<id>" / "channel:<id>" / "local".
     var activeToId = ""
+
+    /**
+     * MMS messages that have been launched in the default SMS app but not yet
+     * confirmed as sent.  Exposed through the sms query so the web can show a
+     * "sending…" state before and after a page refresh.
+     */
+    val pendingMmsMessages = mutableListOf<DPendingMms>()
 }

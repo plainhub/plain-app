@@ -30,3 +30,17 @@ actual fun getDeviceType(): DeviceType = PhoneHelper.getDeviceType(appContextVal
 actual fun getDeviceIP4s(): List<String> = NetworkHelper.getDeviceIP4s().toList()
 
 actual fun appDir(): String = appContext.contextAppDir()
+
+actual fun databaseFilePath(name: String): String =
+    appContext.getDatabasePath(name).absolutePath
+
+actual fun getOwnPackageName(): String = appContext.packageName
+
+actual fun dataStoreFilePath(): String =
+    appContext.filesDir.absolutePath + "/datastore/settings.preferences_pb"
+
+actual fun getAppVersionCode(): Long = com.ismartcoding.plain.getAppVersionCode()
+
+actual fun isDebugBuild(): Boolean = com.ismartcoding.plain.isDebugBuild()
+
+actual fun getSdkInt(): Int = android.os.Build.VERSION.SDK_INT

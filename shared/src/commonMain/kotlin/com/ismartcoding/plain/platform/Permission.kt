@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.platform
 
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.channel.sendEvent
@@ -75,6 +76,31 @@ enum class Permission {
 }
 
 expect fun Permission.isGranted(): Boolean
+
+/**
+ * Ensure the POST_NOTIFICATIONS runtime permission is granted, prompting the
+ * user if necessary. Returns true once the permission is granted (or already
+ * was), false if the user denied it. No-op (always returns true) on platforms
+ * without a notification permission concept (iOS).
+ *
+ * Equivalent to the Android-only `Permissions.ensureNotificationAsync(context)`
+ * but uses the platform's app context internally so it can be called from
+ * commonMain.
+ */
+expect suspend fun ensureNotificationPermissionAsync(): Boolean
+
+/**
+ * Check the POST_NOTIFICATIONS permission and run [onGranted] once it is granted
+ * (immediately if already granted, after the user grants it via the dialog
+ * otherwise). On iOS, [onGranted] is invoked immediately since iOS has no
+ * equivalent runtime permission concept for notifications.
+ *
+ * Equivalent to the Android-only `Permissions.checkNotification(context, ...)`.
+ *
+ * @param stringResource The resource id of the message shown in the
+ *     confirmation dialog when the permission is not yet granted.
+ */
+expect fun checkNotificationPermission(stringResource: StringResource, onGranted: () -> Unit)
 
 fun Permission.grant(): Boolean {
     if (isGranted()) return true

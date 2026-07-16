@@ -107,7 +107,7 @@
         android:theme="@style/Theme.Splash"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".MainActivity"
             android:configChanges="uiMode|orientation|screenSize|smallestScreenSize|screenLayout|locale|layoutDirection"
             android:exported="true"
             android:launchMode="singleInstance"

@@ -5,3 +5,7 @@ import com.ismartcoding.plain.chat.peer.transport.PeerTransport
 actual val isWifiAwareSupported: Boolean = false
 
 actual fun createWifiAwareTransport(): PeerTransport? = null
+
+actual fun getAwareDataInterfaces(): Int? = null
+
+actual fun getAwareDataPaths(): Int? = null

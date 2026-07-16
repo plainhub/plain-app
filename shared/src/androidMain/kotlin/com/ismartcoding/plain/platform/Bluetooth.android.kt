@@ -32,6 +32,10 @@ actual suspend fun ensureBlePermissionAsync(): Boolean = BluetoothUtil.ensurePer
 
 actual fun isBluetoothAdvertiseReady(): Boolean = BluetoothUtil.isAdvertiseReady()
 
+actual fun setBluetoothCanContinue(value: Boolean) {
+    BluetoothUtil.canContinue = value
+}
+
 actual fun bleTransport(): BleTransport = AndroidBleTransport
 
 object AndroidBleTransport : BleTransport {

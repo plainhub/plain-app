@@ -13,7 +13,7 @@ import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 private val mainActivityClass: Class<*> by lazy {
-    Class.forName("com.ismartcoding.plain.ui.MainActivity")
+    Class.forName("com.ismartcoding.plain.MainActivity")
 }
 
 object MediaShortcutHelper {

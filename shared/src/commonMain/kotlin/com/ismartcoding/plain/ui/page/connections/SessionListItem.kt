@@ -61,6 +61,7 @@ internal fun SessionListItem(
             value = m.name.ifEmpty { osDisplay },
             placeholder = stringResource(Res.string.name),
             confirmText = stringResource(Res.string.save),
+            allowEmpty = true,
             onDismissRequest = { showRenameDialog = false },
             onConfirm = { newName ->
                 onRename(m.clientId, newName.trim())

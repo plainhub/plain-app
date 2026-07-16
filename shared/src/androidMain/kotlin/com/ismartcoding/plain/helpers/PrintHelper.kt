@@ -8,7 +8,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.ui.text.TextMeasurer
 import androidx.core.text.htmlEncode
-import com.ismartcoding.plain.ui.ComposeTextPrintAdapter
+import com.ismartcoding.plain.platform.ComposeTextPrintAdapter
 
 object PrintHelper {
     fun printText(context: Context, textMeasurer: TextMeasurer, jobName: String, content: String) {

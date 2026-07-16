@@ -16,6 +16,8 @@ object PairingPeerStore {
         deviceType: DeviceType,
         key: String,
         signaturePublicKey: String,
+        bleAddress: String = "",
+        awareSupported: Boolean = false,
     ) = withIO {
         try {
             val now = TimeHelper.now()
@@ -31,8 +33,19 @@ object PairingPeerStore {
                 status = "paired"
                 updatedAt = now
             }
+            // Persist the peer's BLE address (MAC on Android, UUID on iOS) so
+            // the BLE chat fallback can reconnect without scanning. Preserve a
+            // previously learned address when the caller doesn't supply one —
+            // LAN-initiated pairing leaves bleAddress blank but shouldn't wipe
+            // an address captured during an earlier BLE pairing.
+            if (bleAddress.isNotEmpty()) {
+                peer.bleAddress = bleAddress
+            }
+            // Always update awareSupported — it reflects the peer's current
+            // device capability reported in the latest pairing handshake.
+            peer.awareSupported = awareSupported
             AppDatabase.instance.peerDao().upsert(peer)
-            LogCat.d("Upserted peer: $deviceId")
+            LogCat.d("Upserted peer: $deviceId ble=${peer.bleAddress} aware=${peer.awareSupported}")
         } catch (e: Exception) {
             LogCat.e("Error storing peer in database: ${e.message}")
             throw e

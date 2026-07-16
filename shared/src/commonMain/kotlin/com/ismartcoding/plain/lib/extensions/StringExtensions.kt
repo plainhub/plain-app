@@ -767,3 +767,21 @@ fun String.pathToAceMode(): String {
         else -> "text"
     }
 }
+
+
+fun String.htmlToPlainText(): String {
+    return this
+        .replace(Regex("(?i)<br\\s*/?>"), "\n")
+        .replace(Regex("(?i)</p>"), "\n")
+        .replace(Regex("(?i)</div>"), "\n")
+        .replace(Regex("(?i)</li>"), "\n")
+        .replace(Regex("<[^>]+>"), "")
+        .replace("&nbsp;", " ")
+        .replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", "\"")
+        .replace("&#39;", "'")
+        .replace(Regex("\\s+"), " ")
+        .trim()
+}

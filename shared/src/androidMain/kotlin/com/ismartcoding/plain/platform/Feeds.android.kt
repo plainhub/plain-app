@@ -18,8 +18,6 @@ import com.ismartcoding.plain.features.feed.exportAsync
 import com.ismartcoding.plain.features.feed.importAsync
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedsViewModel
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
 
 @Composable
 actual fun FeedsPageEffects(feedsVM: FeedsViewModel) {
@@ -29,26 +27,25 @@ actual fun FeedsPageEffects(feedsVM: FeedsViewModel) {
                 is PickFileResultEvent -> {
                     if (event.tag != PickFileTag.FEED) return@collect
                     val uri = Uri.parse(event.uris.first())
-                    InputStreamReader(contentResolver.openInputStream(uri)!!).use { reader ->
-                        DialogHelper.showLoading()
-                        withIO {
-                            try {
-                                FeedHelper.importAsync(reader)
-                                feedsVM.loadAsync(withCount = true)
-                                DialogHelper.hideLoading()
-                            } catch (ex: Exception) {
-                                DialogHelper.hideLoading()
-                                DialogHelper.showMessage(ex.toString())
-                            }
+                    val content = contentResolver.openInputStream(uri)!!.use { it.readBytes().decodeToString() }
+                    DialogHelper.showLoading()
+                    withIO {
+                        try {
+                            FeedHelper.importAsync(content)
+                            feedsVM.loadAsync(withCount = true)
+                            DialogHelper.hideLoading()
+                        } catch (ex: Exception) {
+                            DialogHelper.hideLoading()
+                            DialogHelper.showMessage(ex.toString())
                         }
                     }
                 }
                 is ExportFileResultEvent -> {
                     if (event.type == ExportFileType.OPML) {
-                        OutputStreamWriter(contentResolver.openOutputStream(event.uri)!!, Charsets.UTF_8).use { writer ->
-                            withIO { FeedHelper.exportAsync(writer) }
-                        }
-                        val fileName = contentResolver.queryOpenableFileName(event.uri)
+                        val uri = android.net.Uri.parse(event.uri)
+                        val opml = withIO { FeedHelper.exportAsync() }
+                        contentResolver.openOutputStream(uri)!!.use { it.write(opml.toByteArray()) }
+                        val fileName = contentResolver.queryOpenableFileName(uri)
                         DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, "name", fileName))
                     }
                 }

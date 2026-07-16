@@ -31,6 +31,12 @@ actual fun verifyEd25519Signature(publicKey: ByteArray, data: ByteArray, signatu
 actual fun generateChaCha20Key(): String =
     CryptoHelper.generateChaCha20Key()
 
+actual fun sha512(input: ByteArray): String =
+    CryptoHelper.sha512(input)
+
+actual fun randomPassword(n: Int): String =
+    CryptoHelper.randomPassword(n)
+
 @OptIn(ExperimentalEncodingApi::class)
 actual object PairingCrypto {
 

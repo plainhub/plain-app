@@ -6,6 +6,8 @@ import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.media.AudioFocusRequest
+import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Rational
@@ -40,20 +42,30 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
+import androidx.media3.common.ForwardingPlayer
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
+import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
+import com.ismartcoding.plain.lib.extensions.pathToUri
 import com.ismartcoding.plain.mainActivity
-import com.ismartcoding.plain.ui.components.mediaviewer.video.ExoPlayerVideoController
-import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoPlayerCacheManager
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoPlayerController
+import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoPlayerEvent
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
+import java.io.File
+import java.util.UUID
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -310,4 +322,165 @@ internal fun android.view.Window.setFullScreen(fullscreen: Boolean) {
     } else {
         decorView.systemUiVisibility = android.view.View.SYSTEM_UI_FLAG_VISIBLE
     }
+}
+
+// ---- ExoPlayer-backed VideoPlayerController (moved from ui/components/mediaviewer/video/) ----
+
+/**
+ * Android implementation of [VideoPlayerController] backed by ExoPlayer.
+ */
+@OptIn(UnstableApi::class)
+class ExoPlayerVideoController(
+    val exoPlayer: ExoPlayer,
+    context: Context,
+) : VideoPlayerController {
+
+    private val focusManager = VideoAudioFocusManager(
+        context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
+    )
+
+    private var eventListener: ((VideoPlayerEvent) -> Unit)? = null
+
+    private val playerListener = object : Player.Listener {
+        override fun onEvents(player: Player, events: Player.Events) {
+            val listener = eventListener ?: return
+            listener(
+                VideoPlayerEvent.StateChanged(
+                    isPlaying = player.isPlaying,
+                    duration = player.duration.coerceAtLeast(0L),
+                ),
+            )
+            if (events.contains(Player.EVENT_POSITION_DISCONTINUITY)) {
+                listener(VideoPlayerEvent.PositionDiscontinuity)
+            }
+            if (events.contains(Player.EVENT_RENDERED_FIRST_FRAME)) {
+                listener(VideoPlayerEvent.FirstFrameRendered)
+            }
+        }
+    }
+
+    private var mediaSession: MediaSession? = null
+
+    init {
+        exoPlayer.addListener(playerListener)
+        mediaSession = try {
+            MediaSession.Builder(
+                context.applicationContext,
+                ForwardingPlayer(exoPlayer),
+            ).setId("VideoPlayerMediaSession_" + UUID.randomUUID().toString().lowercase().split("-").first())
+                .build()
+        } catch (e: Throwable) {
+            null
+        }
+    }
+
+    override fun play() = exoPlayer.play()
+    override fun pause() = exoPlayer.pause()
+    override fun stop() = exoPlayer.stop()
+    override fun prepare() = exoPlayer.prepare()
+    override fun seekTo(positionMs: Long) = exoPlayer.seekTo(positionMs)
+    override fun setPlaybackSpeed(speed: Float) = exoPlayer.setPlaybackSpeed(speed)
+    override fun setMuted(muted: Boolean) {
+        exoPlayer.volume = if (muted) 0f else 1f
+    }
+
+    override fun release() {
+        mediaSession?.release()
+        mediaSession = null
+        focusManager.abandonFocus()
+        exoPlayer.removeListener(playerListener)
+        exoPlayer.release()
+    }
+
+    override fun setMediaItem(path: String) {
+        exoPlayer.setMediaItem(MediaItem.fromUri(path.pathToUri()))
+    }
+
+    override fun setEventListener(listener: (VideoPlayerEvent) -> Unit) {
+        eventListener = listener
+    }
+
+    override fun requestAudioFocus() = focusManager.requestFocus(exoPlayer)
+    override fun abandonAudioFocus() = focusManager.abandonFocus()
+
+    override val duration: Long get() = exoPlayer.duration.coerceAtLeast(0L)
+    override val currentPosition: Long get() = exoPlayer.currentPosition.coerceAtLeast(0L)
+    override val bufferedPercentage: Int get() = exoPlayer.bufferedPercentage
+    override val isPlaying: Boolean get() = exoPlayer.isPlaying
+}
+
+// ---- VideoAudioFocusManager (moved from ui/components/mediaviewer/video/) ----
+
+/**
+ * Manages audio focus for the video previewer using AUDIOFOCUS_GAIN_TRANSIENT.
+ * This ensures the background music player receives AUDIOFOCUS_LOSS_TRANSIENT
+ * (not the permanent AUDIOFOCUS_LOSS), so it auto-resumes when we release focus.
+ */
+class VideoAudioFocusManager(private val audioManager: AudioManager) {
+    private var focusRequest: AudioFocusRequest? = null
+
+    fun requestFocus(player: ExoPlayer) {
+        focusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
+        val req = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+            .setAudioAttributes(
+                android.media.AudioAttributes.Builder()
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MOVIE)
+                    .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+            .setOnAudioFocusChangeListener { change ->
+                when (change) {
+                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT,
+                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> player.pause()
+                    AudioManager.AUDIOFOCUS_GAIN -> player.play()
+                    AudioManager.AUDIOFOCUS_LOSS -> player.stop()
+                }
+            }
+            .build()
+        focusRequest = req
+        audioManager.requestAudioFocus(req)
+    }
+
+    fun abandonFocus() {
+        focusRequest?.let { audioManager.abandonAudioFocusRequest(it) }
+        focusRequest = null
+    }
+}
+
+// ---- VideoPlayerCacheManager (moved from ui/components/mediaviewer/video/) ----
+
+@OptIn(UnstableApi::class)
+object VideoPlayerCacheManager {
+
+    private lateinit var cacheInstance: Cache
+
+    /**
+     * Set the cache for video player.
+     * It can only be set once in the app, and it is shared and used by multiple video players.
+     *
+     * @param context Current activity context.
+     * @param maxCacheBytes Sets the maximum cache capacity in bytes. If the cache builds up as much as the set capacity, it is deleted from the oldest cache.
+     */
+    @SuppressLint("UnsafeOptInUsageError")
+    fun initialize(context: Context, maxCacheBytes: Long) {
+        if (VideoPlayerCacheManager::cacheInstance.isInitialized) {
+            return
+        }
+
+        cacheInstance = SimpleCache(
+            File(context.cacheDir, "video"),
+            LeastRecentlyUsedCacheEvictor(maxCacheBytes),
+            StandaloneDatabaseProvider(context),
+        )
+    }
+
+    /**
+     * Gets the ExoPlayer cache instance. If null, the cache to be disabled.
+     */
+    internal fun getCache(): Cache? =
+        if (VideoPlayerCacheManager::cacheInstance.isInitialized) {
+            cacheInstance
+        } else {
+            null
+        }
 }

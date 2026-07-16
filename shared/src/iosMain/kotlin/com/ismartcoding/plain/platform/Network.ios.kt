@@ -11,3 +11,5 @@ actual fun getDeviceIP4sWithPrefixLength(): Set<Pair<String, Short>> {
 }
 
 actual fun isVPNConnected(): Boolean = false
+
+actual fun isPortInUse(port: Int): Boolean = false

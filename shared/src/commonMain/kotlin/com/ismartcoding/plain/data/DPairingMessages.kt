@@ -17,7 +17,8 @@ data class DPairingRequest(
     var signature: String = "", // Ed25519 signature of request content (Base64 encoded)
     var fromIp: String = "",
     var bleMac: String = "",
-    var isQrInitiated: Boolean = false
+    var isQrInitiated: Boolean = false,
+    val awareSupported: Boolean = false, // Whether the requester's device supports Wi-Fi Aware
 ) {
     fun toSignatureData(): String {
         return "$fromId|$fromName|$port|${deviceType.value}|$ecdhPublicKey|$signaturePublicKey|$timestamp|${ips.joinToString(",")}"
@@ -56,7 +57,8 @@ data class DPairingResponse(
     val accepted: Boolean,
     val timestamp: Long, // Timestamp for replay attack prevention
     val ips: List<String> = emptyList(), // All IP addresses of the responding device
-    var signature: String = ""// Ed25519 signature of response content (Base64 encoded)
+    var signature: String = "",// Ed25519 signature of response content (Base64 encoded)
+    val awareSupported: Boolean = false, // Whether the responder's device supports Wi-Fi Aware
 ) {
     fun toSignatureData(): String {
         return "$fromId|$toId|$port|${deviceType.value}|$ecdhPublicKey|$signaturePublicKey|$accepted|$timestamp|${ips.joinToString(",")}"

@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.ismartcoding.plain.appContextValue
+import com.ismartcoding.plain.helpers.PortHelper
 import com.ismartcoding.plain.lib.helpers.NetworkHelper
 
 actual fun getNetworkType(): NetworkType {
@@ -31,3 +32,5 @@ actual fun isVPNConnected(): Boolean {
     val ctx = appContextValue ?: return false
     return NetworkHelper.isVPNConnected(ctx)
 }
+
+actual fun isPortInUse(port: Int): Boolean = PortHelper.isPortInUse(port)

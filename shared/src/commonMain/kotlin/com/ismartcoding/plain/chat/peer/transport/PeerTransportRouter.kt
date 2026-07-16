@@ -9,6 +9,11 @@ object PeerTransportRouter {
     private val transports: List<PeerTransport> = buildList {
         add(LanTransport)
         createWifiAwareTransport()?.let { add(it) }
+        // BLE is the last-resort fallback for chat: it works whenever the
+        // peer is paired with a stored bleAddress, even when LAN and Wi-Fi
+        // Aware are both unavailable. File download still goes through LAN
+        // since BLE throughput is too low for media.
+        add(BleTransport)
     }
 
     suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {

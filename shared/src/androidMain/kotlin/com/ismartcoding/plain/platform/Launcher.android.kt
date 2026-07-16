@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.ismartcoding.plain.appContextValue
+import com.ismartcoding.plain.helpers.ShareHelper
 import java.io.File
 
 actual fun launchUrl(url: String) {
@@ -34,18 +35,12 @@ actual fun shareText(text: String) {
 
 actual fun shareFile(path: String) {
     val ctx = appContextValue ?: return
-    val file = File(path)
-    val authority = "${ctx.packageName}.fileprovider"
-    val uri = FileProvider.getUriForFile(ctx, authority, file)
-    val intent = Intent(Intent.ACTION_SEND).apply {
-        type = ctx.contentResolver.getType(uri) ?: "*/*"
-        putExtra(Intent.EXTRA_STREAM, uri)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    val chooser = Intent.createChooser(intent, null).apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
-    ctx.startActivity(chooser)
+    ShareHelper.shareFile(ctx, File(path))
+}
+
+actual fun shareFileAs(path: String, displayName: String) {
+    val ctx = appContextValue ?: return
+    ShareHelper.shareFile(ctx, File(path), displayName = displayName)
 }
 
 actual fun shareFiles(paths: List<String>) {
@@ -75,6 +70,16 @@ actual fun openFileExternal(path: String) {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     ctx.startActivity(intent)
+}
+
+actual fun isFileShareable(path: String): Boolean {
+    val file = File(path)
+    if (!file.exists() || !file.canRead()) return false
+    if (path.startsWith("/apex/")) return false
+    if (path.startsWith("/system/") || path.startsWith("/vendor/") || path.startsWith("/product/")) {
+        return try { file.inputStream().use { it.read() }; true } catch (e: Exception) { false }
+    }
+    return true
 }
 
 actual fun relaunchApp() {

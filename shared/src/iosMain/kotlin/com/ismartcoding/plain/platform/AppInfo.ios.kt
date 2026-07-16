@@ -47,3 +47,20 @@ actual fun getDeviceIP4s(): List<String> = emptyList()
 
 actual fun appDir(): String =
     NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)[0] as String
+
+actual fun databaseFilePath(name: String): String = appDir() + "/" + name
+
+actual fun getOwnPackageName(): String =
+    NSBundle.mainBundle.bundleIdentifier ?: ""
+
+actual fun dataStoreFilePath(): String =
+    appDir() + "/datastore/settings.preferences_pb"
+
+actual fun getAppVersionCode(): Long {
+    val buildNumber = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleVersion") as? String ?: ""
+    return buildNumber.toLongOrNull() ?: 0L
+}
+
+actual fun isDebugBuild(): Boolean = false
+
+actual fun getSdkInt(): Int = 0

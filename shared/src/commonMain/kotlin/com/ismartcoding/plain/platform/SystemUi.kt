@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import androidx.compose.runtime.Composable
+
 /**
  * Whether the device uses gesture navigation (as opposed to 3-button nav).
  * On iOS this always returns true (no legacy nav bar mode).
@@ -32,3 +34,18 @@ expect fun setImmersiveFullscreen()
  * "show transient bars on swipe".
  */
 expect fun exitImmersiveFullscreen()
+
+/**
+ * Returns the platform's window insets controller for the current window.
+ * On Android this returns a `WindowInsetsControllerCompat`; on iOS it returns `Unit`.
+ */
+@Composable
+expect fun rememberWindowInsetsController(): Any
+
+/**
+ * Apply the platform's system bar appearance based on the dark theme state.
+ * On Android this sets the light/dark appearance of the status & navigation
+ * bar icons and disables navigation bar contrast in gesture nav mode.
+ * On iOS this is a no-op (status bar appearance is controlled per-UIViewController).
+ */
+expect fun applySystemBarAppearanceForDarkTheme(useDarkTheme: Boolean)

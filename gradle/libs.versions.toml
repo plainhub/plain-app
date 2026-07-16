@@ -15,7 +15,6 @@ coreVersion = "3.5.4"
 datastorePreferencesVersion = "1.2.1"
 
 jsonVersion="20260522"
-jsoupVersion="1.22.2"
 junitVersion="4.13.2"
 kotlin ="2.4.0"
 kotlinxDatetimeVersion="0.8.0"
@@ -110,10 +109,10 @@ compose-components-resources = { module = "org.jetbrains.compose.components:comp
 
 
 
-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
 
 # kotlin
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }

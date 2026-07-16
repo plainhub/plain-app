@@ -6,14 +6,18 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.audio.fromPath
 import com.ismartcoding.plain.data.DImageMeta
 import com.ismartcoding.plain.data.DVideoMeta
 import com.ismartcoding.plain.extensions.getDuration
 import com.ismartcoding.plain.helpers.ImageHelper
+import com.ismartcoding.plain.helpers.MediaShortcutHelper
 import com.ismartcoding.plain.helpers.QrCodeGenerateHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
+import com.ismartcoding.plain.helpers.SvgHelper
 import com.ismartcoding.plain.helpers.VideoHelper
-import com.ismartcoding.plain.ui.components.renameAndScan
+import com.ismartcoding.plain.platform.renameAndScanFile
+import com.ismartcoding.plain.platform.AppResources
 import java.io.File
 
 actual fun getImageRotation(path: String): Int = ImageHelper.getRotation(path)
@@ -39,7 +43,7 @@ actual fun fileLength(path: String): Long {
     return runCatching { File(path).takeIf { it.exists() }?.length() ?: 0L }.getOrDefault(0L)
 }
 
-actual suspend fun renameMediaFile(path: String, newName: String): String? = renameAndScan(path, newName)
+actual suspend fun renameMediaFile(path: String, newName: String): String? = renameAndScanFile(path, newName)
 
 actual fun getMediaDurationMs(path: String): Long = File(path).getDuration(appContext)
 
@@ -48,4 +52,10 @@ actual fun getAudioDurationMsFromPath(path: String): Long =
 
 actual fun generateQrCode(text: String, width: Int, height: Int): ImageBitmap {
     return QrCodeGenerateHelper.generate(text, width, height).asImageBitmap()
+}
+
+actual fun getSvgSize(path: String): IntSize = SvgHelper.getSize(path)
+
+actual fun addMediaShortcut(path: String, label: String) {
+    MediaShortcutHelper.addToDesktop(appContext, path, label, AppResources.mipmap("ic_launcher"))
 }

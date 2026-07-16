@@ -7,8 +7,10 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.appContextValue
+import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.lib.extensions.hasPermission
+import org.jetbrains.compose.resources.StringResource
 
 private val pNotificationListenerServiceClass: Class<*> by lazy {
     Class.forName("com.ismartcoding.plain.services.PNotificationListenerService")
@@ -33,4 +35,11 @@ actual fun Permission.isGranted(): Boolean = when {
         enabledListeners?.contains(componentName.flattenToString()) == true
     }
     else -> appContext.hasPermission(this.toSysPermission())
+}
+
+actual suspend fun ensureNotificationPermissionAsync(): Boolean =
+    Permissions.ensureNotificationAsync(appContext)
+
+actual fun checkNotificationPermission(stringResource: StringResource, onGranted: () -> Unit) {
+    Permissions.checkNotification(appContext, stringResource, onGranted)
 }

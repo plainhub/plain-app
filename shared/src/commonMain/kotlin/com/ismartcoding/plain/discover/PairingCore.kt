@@ -29,6 +29,7 @@ import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.platform.getDeviceName
 import com.ismartcoding.plain.platform.getDeviceType
 import com.ismartcoding.plain.platform.getPlatformName
+import com.ismartcoding.plain.platform.isWifiAwareSupported
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -84,14 +85,14 @@ object PairingCore {
         return request
     }
 
-    suspend fun handlePairResponse(response: DPairingResponse, senderIp: String) {
+    suspend fun handlePairResponse(response: DPairingResponse, senderIp: String, bleAddress: String = "") {
         val session = PairingSessionStore.get(response.fromId)
         if (session == null) {
             LogCat.e("No active pairing session for ${response.fromId}")
             return
         }
         try {
-            processPairingResponse(response, session, senderIp)
+            processPairingResponse(response, session, senderIp, bleAddress, response.awareSupported)
         } catch (e: Exception) {
             LogCat.e("Error processing pairing response: ${e.message}")
             notifyFailed(response.fromId, session.deviceName, "Failed to process pairing response")
@@ -125,6 +126,7 @@ object PairingCore {
             accepted = false,
             timestamp = TimeHelper.nowMillis(),
             ips = getDeviceIP4s(),
+            awareSupported = isWifiAwareSupported,
         )
         response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
         return response
@@ -161,6 +163,7 @@ object PairingCore {
             signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async(),
             timestamp = TimeHelper.nowMillis(),
             ips = getDeviceIP4s(),
+            awareSupported = isWifiAwareSupported,
         )
         request.signature = SignatureHelper.signTextAsync(request.toSignatureData())
         return request to keyPair
@@ -189,6 +192,7 @@ object PairingCore {
             accepted = true,
             timestamp = TimeHelper.nowMillis(),
             ips = getDeviceIP4s(),
+            awareSupported = isWifiAwareSupported,
         )
         response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
 
@@ -208,6 +212,8 @@ object PairingCore {
             deviceType = request.deviceType,
             key = encryptKey,
             signaturePublicKey = request.signaturePublicKey,
+            bleAddress = request.bleMac,
+            awareSupported = request.awareSupported,
         )
         sendEvent(PairingSuccessEvent(request.fromId, request.fromName, request.fromIp, encryptKey))
         sendEvent(
@@ -223,6 +229,8 @@ object PairingCore {
         response: DPairingResponse,
         session: DPairingSession,
         senderIp: String,
+        bleAddress: String = "",
+        awareSupported: Boolean = false,
     ): Boolean {
         if (!PairingSecurity.validateTimestamp(response.timestamp)) {
             LogCat.e("Pairing response timestamp is too old or in the future")
@@ -252,6 +260,8 @@ object PairingCore {
                 deviceType = response.deviceType,
                 key = encryptKey,
                 signaturePublicKey = response.signaturePublicKey,
+                bleAddress = bleAddress,
+                awareSupported = awareSupported,
             )
             sendEvent(PairingSuccessEvent(response.fromId, session.deviceName, senderIp, encryptKey))
             sendEvent(

@@ -41,3 +41,15 @@ expect fun getMediaDurationMs(path: String): Long
 expect fun getAudioDurationMsFromPath(path: String): Long
 
 expect fun generateQrCode(text: String, width: Int, height: Int): ImageBitmap
+
+/**
+ * Returns the intrinsic (width, height) of the SVG file at [path], or a default
+ * 150x150 size on failure / unsupported platforms.
+ */
+expect fun getSvgSize(path: String): IntSize
+
+/**
+ * Pin a media shortcut to the home screen (Android) / do nothing (iOS).
+ * [path] is the media file path, [label] is the shortcut display name.
+ */
+expect fun addMediaShortcut(path: String, label: String)

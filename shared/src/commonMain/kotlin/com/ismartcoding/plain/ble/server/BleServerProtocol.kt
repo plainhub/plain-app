@@ -8,6 +8,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 class BleServerProtocol {
     val handlers = listOf(
         NearbyServiceHandler(),
+        HTTPServiceHandler(),
     )
     private val handlerMap = handlers.associateBy { it.charUuid }
     private val pendingRequests = mutableMapOf<String, StringBuilder>()

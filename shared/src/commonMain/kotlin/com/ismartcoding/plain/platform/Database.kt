@@ -35,7 +35,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DArchivedConversation::class,
         DVideoPlayProgress::class,
     ],
-    version = 16,
+    version = 18,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -51,6 +51,8 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         AutoMigration(from = 13, to = 14),
         AutoMigration(from = 14, to = 15),
         AutoMigration(from = 15, to = 16),
+        AutoMigration(from = 16, to = 17),
+        AutoMigration(from = 17, to = 18),
     ],
     exportSchema = true,
 )
@@ -94,6 +96,14 @@ fun initDatabase(db: AppDatabase) {
 }
 
 @Suppress("NO_ACTUAL_FOR_EXPECT")
-expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
+expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
+    override fun initialize(): AppDatabase
+}
 
+/**
+ * Platform-specific database builder factory. The Android actual uses
+ * `Room.databaseBuilder(context, name)` (Android requires a `Context`);
+ * the iOS actual uses `Room.databaseBuilder(name, factory)` with
+ * `BundledSQLiteDriver`. Both register the manual 5→6 migration.
+ */
 expect fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase>

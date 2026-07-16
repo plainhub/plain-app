@@ -1,9 +1,5 @@
 package com.ismartcoding.plain.services
 
-import com.ismartcoding.plain.platform.LocaleHelper
-
-import com.ismartcoding.plain.i18n.*
-
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -12,20 +8,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.AppIntents
-import com.ismartcoding.plain.platform.KtorClientFactory
-import com.ismartcoding.plain.api.OkHttpClientFactory
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.api_service_is_running
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.MdnsRegister
 import com.ismartcoding.plain.mdns.NsdHelper
-import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.platform.KtorClientFactory
+import com.ismartcoding.plain.platform.LocaleHelper
+import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.webserver.httpServer
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Job
@@ -144,12 +143,12 @@ class HttpServerService : LifecycleService() {
         // User swiped away the app from recents; stop server immediately to release ports.
         NsdHelper.unregisterService()
         try {
-            HttpServerManager.server?.stop(500, 1000)
+            httpServer?.stop(500, 1000)
         } catch (e: Exception) {
             LogCat.e("Error stopping server on task removed: ${e.message}")
         } finally {
             PeerStatusManager.stop()
-            HttpServerManager.server = null
+            httpServer = null
         }
         stopSelf()
     }
@@ -167,10 +166,10 @@ class HttpServerService : LifecycleService() {
         NsdHelper.unregisterService()
         PeerStatusManager.stop()
         try {
-            HttpServerManager.server?.stop(0, 1000)
+            httpServer?.stop(0, 1000)
         } catch (_: Exception) {
         }
-        HttpServerManager.server = null
+        httpServer = null
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
@@ -189,13 +188,13 @@ class HttpServerService : LifecycleService() {
             LogCat.e("Graceful shutdown failed: ${ex.message}")
             // Fallback: force stop via stored server reference
             try {
-                HttpServerManager.server?.stop(500, 1000)
+                httpServer?.stop(500, 1000)
                 LogCat.d("Server force-stopped via stored reference")
             } catch (e: Exception) {
                 LogCat.e("Force stop also failed: ${e.message}")
             }
         }
-        HttpServerManager.server = null
+        httpServer = null
         PeerStatusManager.stop()
         val ctx = this@HttpServerService
         PNotificationListenerService.toggle(ctx, false)

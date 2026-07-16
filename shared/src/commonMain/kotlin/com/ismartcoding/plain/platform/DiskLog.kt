@@ -61,3 +61,20 @@ expect fun currentDateTimeString(): String
 expect fun currentThreadName(): String
 
 expect fun resolveCallerInfo(): String?
+
+/**
+ * Absolute path to the latest log file (e.g. `<logFolder>/latest.log`).
+ */
+fun getLatestLogFilePath(): String = "${DiskLogFormatStrategy.getLogFolder()}/latest.log"
+
+/**
+ * Read log lines in newest-first order without loading the whole file into memory.
+ * Returns at most [limit] lines starting from the [offset]-th newest line.
+ * Returns an empty list if the log file does not exist or is empty.
+ */
+expect fun readLogLinesNewestFirst(offset: Int, limit: Int): List<String>
+
+/**
+ * Truncate the latest log file to zero length. No-op if the file does not exist.
+ */
+expect fun clearLatestLogFile()

@@ -5,7 +5,7 @@ import android.media.AudioAttributes
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextClassifier
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.sqlite.SQLiteConnection
 import coil3.SingletonImageLoader
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.chat.ChatCacher
@@ -13,6 +13,7 @@ import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DataInitializer
+import com.ismartcoding.plain.platform.buildAppDatabase
 import com.ismartcoding.plain.platform.initDatabase
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
@@ -55,8 +56,9 @@ import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.preferences.initDataStore
 import com.ismartcoding.plain.preferences.setDarkMode
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
-import com.ismartcoding.plain.ui.base.coil.newImageLoader
+import com.ismartcoding.plain.platform.newImageLoader
 import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.webserver.warmUpNetty
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
 import kotlin.time.Duration.Companion.days
@@ -64,15 +66,14 @@ import kotlin.time.Duration.Companion.days
 object MainAppHelper {
 
     fun init(app: Application) {
-        com.ismartcoding.plain.platform.setDatabaseContext(app)
         com.ismartcoding.plain.platform.setLocaleContext(app)
         com.ismartcoding.plain.thumbnail.ThumbnailProvider.instance = com.ismartcoding.plain.thumbnail.ThumbnailGenerator
         initDataStore(app.dataStore)
         initDatabase(
-            com.ismartcoding.plain.platform.buildAppDatabase(Constants.DATABASE_NAME)
+            buildAppDatabase(Constants.DATABASE_NAME)
                 .addCallback(object : RoomDatabase.Callback() {
-                    override fun onCreate(db: SupportSQLiteDatabase) {
-                        DataInitializer(app, db).apply {
+                    override fun onCreate(connection: SQLiteConnection) {
+                        DataInitializer(connection).apply {
                             insertWelcome()
                             insertTags()
                             insertNotes()
@@ -97,7 +98,7 @@ object MainAppHelper {
         com.ismartcoding.plain.api.httpLogSink = com.ismartcoding.plain.api.HttpLogSink { LogCat.v(it) }
 
         AppEvents.register()
-        HttpServerManager.warmUp()
+        warmUpNetty()
         NetworkMonitor.init(app)
         if (isQPlus()) {
             try {

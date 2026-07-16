@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.helpers.AppLogHelper
+import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -34,4 +36,14 @@ private fun isInternalFrame(className: String): Boolean {
         className == "com.ismartcoding.plain.lib.logcat.LoggerPrinter" ||
         className == "com.ismartcoding.plain.lib.logcat.LogCat" ||
         className == "java.lang.Thread"
+}
+
+actual fun readLogLinesNewestFirst(offset: Int, limit: Int): List<String> {
+    val logFile = File(getLatestLogFilePath())
+    return AppLogHelper.getLogLines(logFile, offset, limit)
+}
+
+actual fun clearLatestLogFile() {
+    val logFile = File(getLatestLogFilePath())
+    if (logFile.exists()) logFile.writeText("")
 }

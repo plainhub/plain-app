@@ -15,7 +15,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.preferences.WebPreference
-import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.webserver.checkServerHealthAsync
+import com.ismartcoding.plain.webserver.stopHttpServiceAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -74,7 +75,7 @@ class QSTileService : TileService() {
             try {
                 // First check if webEnabled is true in TempData
                 if (TempData.webEnabled.value) {
-                    val serverUp = HttpServerManager.checkServerAsync()
+                    val serverUp = checkServerHealthAsync()
                     if (serverUp) {
                         withContext(Dispatchers.Main.immediate) {
                             serviceRef.get()?.setState(Tile.STATE_ACTIVE)
@@ -132,7 +133,7 @@ class QSTileService : TileService() {
 
                 // Launch the app with unlockAndRun
                 unlockAndRun {
-                    val intent = Intent(appContext, Class.forName("com.ismartcoding.plain.ui.MainActivity"))
+                    val intent = Intent(appContext, Class.forName("com.ismartcoding.plain.MainActivity"))
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     intent.putExtra("start_web_service", true)
                     startActivity(intent)
@@ -147,7 +148,7 @@ class QSTileService : TileService() {
                 serviceScope.launch(Dispatchers.IO) {
                     val appContext = applicationContext
                     WebPreference.putAsync(false)
-                    HttpServerManager.stopServiceAsync(appContext)
+                    stopHttpServiceAsync(appContext)
                     withContext(Dispatchers.Main.immediate) {
                         setState(Tile.STATE_INACTIVE)
                     }

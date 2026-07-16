@@ -1,26 +1,21 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.getAppVersionName
-import com.ismartcoding.plain.preferences.*
-
-import com.ismartcoding.plain.i18n.*
-
 import android.app.ActivityManager
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
-import android.os.Handler
-import android.os.Looper
-import android.os.Process
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.platform.KtorClientFactory
-import com.ismartcoding.plain.api.OkHttpClientFactory
+import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.data.Version
+import com.ismartcoding.plain.getAppVersionName
+import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.check_failure
+import com.ismartcoding.plain.i18n.rate_limit
+import com.ismartcoding.plain.platform.KtorClientFactory
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.request.get

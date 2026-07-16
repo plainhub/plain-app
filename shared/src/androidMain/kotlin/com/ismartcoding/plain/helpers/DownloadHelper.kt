@@ -1,15 +1,13 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.data.DownloadResult
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.isOk
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
-import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.platform.KtorClientFactory
-import com.ismartcoding.plain.api.OkHttpClientFactory
-import com.ismartcoding.plain.data.DownloadResult
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.util.cio.writeChannel

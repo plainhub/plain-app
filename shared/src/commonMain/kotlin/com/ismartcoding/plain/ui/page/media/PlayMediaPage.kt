@@ -1,0 +1,81 @@
+package com.ismartcoding.plain.ui.page.media
+
+import com.ismartcoding.plain.i18n.*
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavHostController
+import com.ismartcoding.plain.lib.extensions.isAudioFast
+import com.ismartcoding.plain.helpers.coMain
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
+import com.ismartcoding.plain.platform.playlistAudioFromPath
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
+import com.ismartcoding.plain.platform.MediaPreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
+import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.MediaPreviewData
+import com.ismartcoding.plain.ui.nav.Routing
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PlayMediaPage(
+    navController: NavHostController,
+    path: String,
+    audioPlaylistVM: AudioPlaylistViewModel,
+) {
+    val scope = rememberCoroutineScope()
+
+    if (path.isAudioFast()) {
+        LaunchedEffect(path) {
+            coMain {
+                val audio = withIO { playlistAudioFromPath(path) }
+                withIO {
+                    audioPlaylistVM.playlistItems.value = listOf(audio)
+                    audioPlaylistVM.selectedPath.value = path
+                }
+                audioJustPlayWithNotificationCheck(audio)
+                navController.navigate(Routing.Audio) {
+                    popUpTo(Routing.PlayMedia(path)) { inclusive = true }
+                }
+            }
+        }
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black))
+        return
+    }
+
+    MediaPreviewData.items = listOf(PreviewItem(id = path, path = path))
+
+    val previewerState = rememberPreviewerState(
+        scope = scope,
+        pageCount = { MediaPreviewData.items.size },
+    )
+
+    var hasOpened by remember { mutableStateOf(false) }
+
+    LaunchedEffect(previewerState.visible) {
+        if (previewerState.visible) {
+            hasOpened = true
+        } else if (hasOpened && !previewerState.animating) {
+            navController.navigateUp()
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        LaunchedEffect(Unit) {
+            previewerState.open(0)
+        }
+        MediaPreviewer(state = previewerState)
+    }
+}

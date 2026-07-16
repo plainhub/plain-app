@@ -34,6 +34,13 @@ expect suspend fun ensureBlePermissionAsync(): Boolean
  */
 expect fun isBluetoothAdvertiseReady(): Boolean
 
+/**
+ * Sets the `canContinue` flag used by the BLE permission flow. When the user
+ * grants BLE permission, this is set to true so pending BLE operations can
+ * resume. No-op on platforms without a Bluetooth permission flow (iOS).
+ */
+expect fun setBluetoothCanContinue(value: Boolean)
+
 interface BleTransport {
     fun createScanner(): BleScanner
 

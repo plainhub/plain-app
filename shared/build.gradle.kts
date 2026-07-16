@@ -55,9 +55,11 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlin.reflect)
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.kotlinx.serialization.json)
             api(libs.room.runtime)
+            implementation(libs.sqlite.bundled)
             api(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
@@ -88,7 +90,6 @@ kotlin {
             implementation(libs.coil.network.okhttp)
 
             // Vendored libraries (lib/) dependencies
-            implementation(libs.jsoup)
             implementation(libs.bcprov.jdk15on)
             implementation(libs.bcpkix.jdk15on)
             implementation(libs.pdfium.android)

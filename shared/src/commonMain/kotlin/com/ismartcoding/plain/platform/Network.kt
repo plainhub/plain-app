@@ -25,6 +25,12 @@ expect fun getDeviceIP4sWithPrefixLength(): Set<Pair<String, Short>>
  */
 expect fun isVPNConnected(): Boolean
 
+/**
+ * Returns true when a TCP server is already bound to [port].
+ * Used by the HTTP server startup to detect port conflicts.
+ */
+expect fun isPortInUse(port: Int): Boolean
+
 fun isSameSubnet(ip1: String, ip2: String, prefixLength: Short): Boolean {
     return try {
         val parts1 = ip1.split(".").map { it.toInt() }

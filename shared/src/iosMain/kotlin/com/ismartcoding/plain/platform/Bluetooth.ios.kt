@@ -17,6 +17,8 @@ actual suspend fun ensureBlePermissionAsync(): Boolean = false
 
 actual fun isBluetoothAdvertiseReady(): Boolean = false
 
+actual fun setBluetoothCanContinue(value: Boolean) {}
+
 actual fun bleTransport(): BleTransport = IosBleTransport
 
 object IosBleTransport : BleTransport {

@@ -10,6 +10,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.countMedia
+import com.ismartcoding.plain.platform.deleteMedia
 import com.ismartcoding.plain.platform.restoreMedia
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.platform.trashMedia
@@ -101,6 +102,16 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
 
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
         restoreItems(tagsVM, ids)
+    }
+
+    open fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
+        launchSafe {
+            DialogHelper.showLoading()
+            TagHelper.deleteTagRelationByKeys(ids, dataType)
+            deleteMedia(dataType, ids, trash.value)
+            loadAsync(tagsVM)
+            DialogHelper.hideLoading()
+        }
     }
 
     fun trashItems(

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
-import androidx.lifecycle.ViewModel
-
-expect class CastViewModel() : ViewModel
+/** UI-facing cast device info. */
+data class CastDevice(
+    val hostAddress: String,
+    val friendlyName: String,
+)

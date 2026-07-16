@@ -1,0 +1,129 @@
+package com.ismartcoding.plain.ui.base
+
+import com.ismartcoding.plain.i18n.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.ismartcoding.plain.platform.isQPlus
+import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.components.SortAndBrowseDialog
+import com.ismartcoding.plain.ui.models.CastViewModel
+import com.ismartcoding.plain.ui.models.BaseMediaViewModel
+import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.enterSearchMode
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+fun <T : IData> MediaTopBar(
+    navController: NavHostController,
+    mediaVM: BaseMediaViewModel<T>,
+    tagsVM: TagsViewModel,
+    castVM: CastViewModel,
+    dragSelectState: DragSelectState,
+    scrollBehavior: TopAppBarScrollBehavior,
+    bucketsMap: Map<String, DMediaBucket>,
+    itemsState: List<T>,
+    scrollToTop: () -> Unit,
+    defaultNavigationIcon: (@Composable () -> Unit)? = null,
+    onSortSelected: (sortBy: FileSortBy) -> Unit = {},
+    onSearchAction: (tagsViewModel: TagsViewModel) -> Unit
+) {
+    val isDocs = mediaVM.dataType == DataType.DOC
+
+    val title = getMediaPageTitle(
+        mediaType = mediaVM.dataType,
+        isCastMode = castVM.castMode.value,
+        castDeviceName = CastPlayer.currentDevice?.description?.device?.friendlyName,
+        bucket = bucketsMap[mediaVM.bucketId.value],
+        dragSelectState = dragSelectState,
+    )
+    val containerColor = if (castVM.castMode.value) MaterialTheme.colorScheme.secondaryContainer else null
+
+    SearchableTopBar(
+        navController = navController,
+        viewModel = mediaVM,
+        scrollBehavior = scrollBehavior,
+        title = title,
+        containerColor = containerColor,
+        scrollToTop = scrollToTop,
+        navigationIcon = {
+            if (dragSelectState.selectMode) {
+                NavigationCloseIcon {
+                    dragSelectState.exitSelectMode()
+                }
+            } else if (castVM.castMode.value) {
+                NavigationCloseIcon {
+                    castVM.exitCastMode()
+                }
+            } else {
+                defaultNavigationIcon?.invoke()
+            }
+        },
+        actions = {
+            if (!mediaVM.hasPermission.value) {
+                return@SearchableTopBar
+            }
+            if (castVM.castMode.value) {
+                return@SearchableTopBar
+            }
+            if (dragSelectState.selectMode) {
+                PTopRightButton(
+                    label = stringResource(if (dragSelectState.isAllSelected(itemsState)) Res.string.unselect_all else Res.string.select_all),
+                    click = {
+                        dragSelectState.toggleSelectAll(itemsState)
+                    },
+                )
+                HorizontalSpace(dp = 8.dp)
+            } else {
+                ActionButtonSearch {
+                    mediaVM.enterSearchMode()
+                }
+                if (isQPlus()) {
+                    ActionButtonFolders {
+                        mediaVM.showFoldersDialog.value = true
+                    }
+                }
+                if (!isDocs) {
+                    ActionButtonCast {
+                        castVM.showCastDialog.value = true
+                    }
+                }
+
+                ActionButtonTags {
+                    mediaVM.showTagsDialog.value = true
+                }
+
+                PIconButton(
+                    icon = Res.drawable.sort,
+                    contentDescription = stringResource(Res.string.sort),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    click = { mediaVM.showSortAndBrowseDialog.value = true },
+                )
+            }
+        },
+        onSearchAction = {
+            mediaVM.showLoading.value = true
+            onSearchAction(tagsVM)
+        }
+    )
+
+    if (mediaVM.showSortAndBrowseDialog.value) {
+        SortAndBrowseDialog(
+            mediaVM = mediaVM,
+            tagsVM = tagsVM,
+            sortByEntries = if (setOf(DataType.IMAGE, DataType.VIDEO).contains(mediaVM.dataType)) FileSortBy.entries else FileSortBy.entries.filter { it != FileSortBy.TAKEN_AT_DESC },
+            onSortSelected = { sortBy -> onSortSelected(sortBy) },
+            onDismiss = { mediaVM.showSortAndBrowseDialog.value = false },
+        )
+    }
+}

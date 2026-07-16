@@ -215,6 +215,9 @@ class AwareSession {
         }
     }
 
+    /** Number of peers currently known to subscribe-side discovery. */
+    val discoveredPeerCount: Int get() = discoveredPeers.size
+
     private fun clearPeerHandles() {
         discoveredPeers.clear()
         discoveredAt.clear()

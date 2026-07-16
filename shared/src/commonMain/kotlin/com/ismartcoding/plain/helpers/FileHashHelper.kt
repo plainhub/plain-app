@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.helpers
 
 import com.ismartcoding.plain.crypto.sha256
+import com.ismartcoding.plain.lib.extensions.toHexString
 
 object FileHashHelper {
 
@@ -20,7 +21,4 @@ object FileHashHelper {
     private fun sha256Hex(data: ByteArray): String {
         return sha256(data).toHexString()
     }
-
-    private fun ByteArray.toHexString(): String =
-        joinToString("") { (it.toInt() and 0xFF).toString(16).padStart(2, '0') }
 }

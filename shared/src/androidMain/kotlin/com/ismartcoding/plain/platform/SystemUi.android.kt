@@ -2,9 +2,11 @@ package com.ismartcoding.plain.platform
 
 import android.app.Activity
 import android.view.WindowManager
+import androidx.activity.compose.LocalActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.runtime.Composable
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -60,5 +62,24 @@ actual fun exitImmersiveFullscreen() {
     WindowInsetsControllerCompat(activity.window, view).apply {
         show(WindowInsetsCompat.Type.systemBars())
         systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+    }
+}
+
+@Composable
+actual fun rememberWindowInsetsController(): Any {
+    val window = with(LocalActivity.current as Activity) { return@with window }
+    return remember { WindowCompat.getInsetsController(window, window.decorView) }
+}
+
+actual fun applySystemBarAppearanceForDarkTheme(useDarkTheme: Boolean) {
+    val context = com.ismartcoding.plain.appContextValue ?: return
+    val activity = context as? Activity ?: return
+    val window = activity.window
+    WindowCompat.getInsetsController(window, window.decorView).apply {
+        isAppearanceLightStatusBars = !useDarkTheme
+        isAppearanceLightNavigationBars = !useDarkTheme
+    }
+    if (isQPlus() && isGestureInteractionMode()) {
+        window.isNavigationBarContrastEnforced = false
     }
 }

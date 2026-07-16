@@ -307,7 +307,7 @@ class HtmlElement(private var tag: String) : HtmlNode() {
 
 data class HtmlAttribute(val key: String, val value: String)
 
-internal object HtmlParser {
+object HtmlParser {
     private val VOID_ELEMENTS = setOf(
         "area", "base", "br", "col", "embed", "hr", "img", "input",
         "link", "meta", "param", "source", "track", "wbr",

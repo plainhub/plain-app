@@ -15,6 +15,10 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.webserver.checkServerHealthAsync
+import com.ismartcoding.plain.webserver.createHttpServerAsync
+import com.ismartcoding.plain.webserver.httpServer
+import com.ismartcoding.plain.webserver.stopPreviousHttpServer
 import com.ismartcoding.plain.mdns.NsdHelper
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.netty.NettyApplicationEngine
@@ -32,7 +36,7 @@ object HttpServerStartHelper {
         HttpServerManager.portsInUse.clear()
         HttpServerManager.httpServerError = ""
 
-        HttpServerManager.stopPreviousServer()
+        stopPreviousHttpServer()
         if (PortHelper.isPortInUse(TempData.httpPort.value) || PortHelper.isPortInUse(TempData.httpsPort.value)) {
             LogCat.d("Ports still in use after stopping previous server, waiting...")
             HttpServerManager.waitForPortsAvailable(TempData.httpPort.value, TempData.httpsPort.value)
@@ -41,10 +45,10 @@ object HttpServerStartHelper {
             attemptServerStart(2)
         }
 
-        if (HttpServerManager.server != null) {
+        if (httpServer != null) {
             PeerStatusManager.start()
         }
-        val serverUp = HttpServerManager.checkServerAsync()
+        val serverUp = checkServerHealthAsync()
         if (serverUp) {
             handleSuccess(service, onStateChanged)
         } else {
@@ -56,9 +60,9 @@ object HttpServerStartHelper {
         for (attempt in 1..maxRetries) {
             var newServer: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
             try {
-                newServer = HttpServerManager.createHttpServerAsync(appContext)
+                newServer = createHttpServerAsync(appContext)
                 newServer.start(wait = false)
-                HttpServerManager.server = newServer
+                httpServer = newServer
                 break
             } catch (ex: Exception) {
                 // The engine may have partially started (thread pools created) before
@@ -67,7 +71,7 @@ object HttpServerStartHelper {
                 LogCat.e("Server start attempt $attempt/$maxRetries failed: ${ex.message}")
                 if (ex is java.net.BindException || ex.cause is java.net.BindException) {
                     if (attempt < maxRetries) {
-                        HttpServerManager.stopPreviousServer()
+                        stopPreviousHttpServer()
                         HttpServerManager.waitForPortsAvailable(
                             TempData.httpPort.value, TempData.httpsPort.value, maxWaitMs = 3000,
                         )
@@ -93,12 +97,12 @@ object HttpServerStartHelper {
     private fun handleFailure(
         service: HttpServerService, onStateChanged: (HttpServerState) -> Unit,
     ) {
-        val serverWasRunning = HttpServerManager.server != null
+        val serverWasRunning = httpServer != null
 
         // Stop the server before checking ports — otherwise our own running
         // server is detected as the "occupier", causing a false positive on
         // every restart (common on rooted ROMs with firewall apps like AFWall+).
-        HttpServerManager.stopPreviousServer()
+        stopPreviousHttpServer()
 
         if (!serverWasRunning) {
             // Server never started — check if ports are occupied by another process.

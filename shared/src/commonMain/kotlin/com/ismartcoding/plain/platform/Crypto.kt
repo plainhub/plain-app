@@ -12,6 +12,12 @@ expect fun verifyEd25519Signature(publicKey: ByteArray, data: ByteArray, signatu
 
 expect fun generateChaCha20Key(): String
 
+/** SHA-512 hash of [input], returned as a lowercase hex string. */
+expect fun sha512(input: ByteArray): String
+
+/** Generate a random alphanumeric password of length [n] (human-readable charset). */
+expect fun randomPassword(n: Int): String
+
 expect object PairingCrypto {
     fun generateECDHKeyPair(): ECDHKeyPair
 
