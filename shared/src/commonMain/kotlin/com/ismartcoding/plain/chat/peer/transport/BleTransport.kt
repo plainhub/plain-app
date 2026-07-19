@@ -7,6 +7,7 @@ import com.ismartcoding.plain.ble.BleRpcResponse
 import com.ismartcoding.plain.ble.BleServices
 import com.ismartcoding.plain.ble.client.BleDeviceApi
 import com.ismartcoding.plain.ble.client.BleGattClient
+import com.ismartcoding.plain.api.clientHeadersMap
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.helpers.Base64Lenient
@@ -24,16 +25,23 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * characteristic ([com.ismartcoding.plain.ble.BleUuids.RPC_CHAR_UUID]) when
  * the LAN transport is unavailable.
  *
- * The peer's BLE address (MAC on Android, UUID on iOS) is persisted in
- * [DPeer.bleAddress] during BLE pairing — see
- * [com.ismartcoding.plain.discover.PairingCore]. When [send] is invoked the
- * transport:
+ * Peers are identified by their clientId (TempData.clientId, a 13-char short
+ * UUID), which is broadcast in the BLE scan response serviceData and parsed
+ * into [com.ismartcoding.plain.ble.client.BleGattClient.id]. The peer's
+ * `peer.id` is itself the clientId (it's the value stored on the DPeer
+ * record), so BLE discovery matches directly on `peer.id`. Android's BLE
+ * MAC randomization no longer matters because the BLE layer never exposes
+ * the MAC as the peer id.
  *
- * 1. Skips itself when the peer has no BLE address or BLE isn't ready
- *    (throws [TransportUnavailable] so the router can fall through).
- * 2. Connects to the peer's BLE device (directly via
- *    [com.ismartcoding.plain.ble.client.BleScanner.createClient] on Android,
- *    or by scanning for the stored UUID on iOS).
+ * When [send] is invoked the transport:
+ *
+ * 1. Skips itself when BLE isn't ready (throws [TransportUnavailable] so
+ *    the router can fall through).
+ * 2. Connects to the peer's BLE device: first checks for an already-discovered
+ *    client via [com.ismartcoding.plain.ble.client.BleScanner.createClient]
+ *    (matched by clientId), then falls back to a fresh BLE scan via
+ *    [com.ismartcoding.plain.ble.client.BleScanner.findOne] keyed on the
+ *    clientId parsed from scan response serviceData.
  * 3. Encrypts the signed request body with the peer's shared ChaCha20 key —
  *    mirroring what the OkHttp crypto interceptor does for [LanTransport].
  * 4. Wraps the encrypted bytes in a [BleRpcRequest] (base64 body) and sends
@@ -54,20 +62,18 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 object BleTransport : PeerTransport {
     override val id: String = "ble"
 
-    /** Scan timeout for iOS where createClient(mac) returns null. */
+    /** Scan timeout for the case where createClient(clientId) returns null. */
     private const val SCAN_TIMEOUT_MS = 10_000L
 
     override suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
-        if (peer.bleAddress.isEmpty()) {
-            throw TransportUnavailable(id, peer.id, IllegalStateException("peer has no bleAddress"))
-        }
         if (!isBleReady()) {
             throw TransportUnavailable(id, peer.id, IllegalStateException("BLE not ready"))
         }
 
+        val clientId = peer.id
         val scanner = bleTransport().createScanner()
-        val client = scanner.createClient(peer.bleAddress)
-            ?: withTimeoutOrNull(SCAN_TIMEOUT_MS) { scanner.findOne(peer.bleAddress) }
+        val client = scanner.createClient(clientId)
+            ?: withTimeoutOrNull(SCAN_TIMEOUT_MS) { scanner.findOne(clientId) }
         if (client == null) {
             throw TransportUnavailable(id, peer.id, IllegalStateException("BLE device not found"))
         }
@@ -83,7 +89,7 @@ object BleTransport : PeerTransport {
             // server's PeerGraphQLService decrypts with the same key.
             val encryptedBody = chaCha20Encrypt(keyBytes, request.body)
 
-            val rpcHeaders = buildMap {
+            val rpcHeaders = clientHeadersMap().toMutableMap().apply {
                 if (request.channelId.isNotEmpty()) {
                     put("c-cid", request.channelId)
                 }
@@ -101,7 +107,6 @@ object BleTransport : PeerTransport {
                 body = JsonHelper.jsonEncode(rpcRequest),
             )
 
-            LogCat.d("BleTransport: sending /peer_graphql to ${peer.id} via ${client.id}")
             val result = api.requestAsync(BleServices.rpc, requestData)
             if (!result.isSuccess()) {
                 throw TransportUnavailable(

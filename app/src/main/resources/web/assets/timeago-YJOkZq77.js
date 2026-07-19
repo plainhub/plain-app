@@ -1,0 +1,1 @@
+var e={now:`இப்போதுதான்`,short:{minutes:`{n} நிமி`,hours:`{n} மணி`,days:`{n} நாள்`,weeks:`{n} வாரம்`,months:`{n} மாதம்`,years:`{n} ஆண்டு`},long:{minutes:`{n} நிமிடங்கள் முன்பு`,hours:`{n} மணி நேரம் முன்பு`,days:`{n} நாட்கள் முன்பு`,weeks:`{n} வாரங்கள் முன்பு`,months:`{n} மாதங்கள் முன்பு`,years:`{n} ஆண்டுகள் முன்பு`}};export{e as default};

@@ -47,7 +47,6 @@ actual fun createHttpEngine(spec: HttpClientSpec): HttpClientEngine =
                         keyBytes = spec.keyBytes,
                         timeout = spec.timeoutSeconds,
                         connectTimeoutMs = spec.connectTimeoutMs,
-                        addHeaders = false,
                     )
             }
     }

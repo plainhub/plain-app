@@ -1,0 +1,1 @@
+import{Wt as e}from"./query-Llv-VI-G.js";import{in as t,n}from"./index-p2WLldbf.js";var r=r=>({viewAll:()=>{n(r,`/feeds`)},viewFeed:i=>{n(r,`/feeds?q=${e(t([{name:`feed_id`,op:``,value:i.id}]))}`)},viewToday:()=>{n(r,`/feeds?q=${e(t([{name:`today`,op:``,value:`true`}]))}`)}});export{r as t};

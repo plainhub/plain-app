@@ -1,0 +1,1 @@
+var e={now:`अभी`,short:{minutes:`{n} मि`,hours:`{n} घं`,days:`{n} दि`,weeks:`{n} सप्ता`,months:`{n} माह`,years:`{n} वर्ष`},long:{minutes:`{n} मिनट पहले`,hours:`{n} घंटे पहले`,days:`{n} दिन पहले`,weeks:`{n} सप्ताह पहले`,months:`{n} महीने पहले`,years:`{n} वर्ष पहले`}};export{e as default};

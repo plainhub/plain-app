@@ -14,6 +14,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -44,13 +45,20 @@ internal suspend fun executeGraphQLRequest(
     body: String,
     channelId: String,
 ): GraphQLResponse = withContext(Dispatchers.Default) {
-    val response = client.post(url) {
-        setBody(body)
-        contentType(ContentType.Application.Json)
-        addClientHeaders()
-        if (channelId.isNotEmpty()) {
-            header("c-cid", channelId)
+    val response = try {
+        client.post(url) {
+            setBody(body)
+            contentType(ContentType.Application.Json)
+            addClientHeaders()
+            if (channelId.isNotEmpty()) {
+                header("c-cid", channelId)
+            }
         }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        LogCat.d("$transportId request to peer $peerId threw ${e::class.simpleName}: ${e.message}")
+        throw TransportUnavailable(transportId, peerId, e)
     }
     val responseBody = response.bodyAsText()
     if (!response.status.isSuccess()) {
@@ -67,8 +75,15 @@ internal suspend fun executeDownloadRequest(
     client: HttpClient,
     url: String,
 ): HttpResponse = withContext(Dispatchers.Default) {
-    val response = client.get(url) {
-        addClientHeaders()
+    val response = try {
+        client.get(url) {
+            addClientHeaders()
+        }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        LogCat.d("$transportId download to peer $peerId threw ${e::class.simpleName}: ${e.message}")
+        throw TransportUnavailable(transportId, peerId, e)
     }
     if (!response.status.isSuccess()) {
         LogCat.e("$transportId downloadFile error: ${response.status.value}")

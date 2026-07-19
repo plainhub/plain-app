@@ -5,7 +5,7 @@ data class GraphQLResponse(
     val errors: List<GraphQLError>? = null,
     val exception: Throwable? = null,
 ) {
-    val isSuccess: Boolean = errors.isNullOrEmpty() || exception == null
+    val isSuccess: Boolean = errors.isNullOrEmpty() && exception == null
 
     fun getError(): String {
         if (errors?.isNotEmpty() == true) {

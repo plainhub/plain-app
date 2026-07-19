@@ -1,0 +1,1 @@
+var e={now:`Vừa xong`,short:{minutes:`{n} phút`,hours:`{n} giờ`,days:`{n} ngày`,weeks:`{n} tuần`,months:`{n} tháng`,years:`{n} năm`},long:{minutes:`{n} phút trước`,hours:`{n} giờ trước`,days:`{n} ngày trước`,weeks:`{n} tuần trước`,months:`{n} tháng trước`,years:`{n} năm trước`}};export{e as default};

@@ -1,0 +1,1 @@
+var e={now:`Ahora`,short:{minutes:`{n} min`,hours:`{n} h`,days:`{n} d`,weeks:`{n} sem`,months:`{n} mes`,years:`{n} año`},long:{minutes:`hace {n} minutos`,hours:`hace {n} horas`,days:`hace {n} días`,weeks:`hace {n} semanas`,months:`hace {n} meses`,years:`hace {n} años`}};export{e as default};

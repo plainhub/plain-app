@@ -119,9 +119,6 @@ fun PairingRequestPage(
                 if (displayIp.isNotEmpty()) {
                     PListItem(title = stringResource(Res.string.ip_address), value = displayIp)
                 }
-                if (request.bleMac.isNotEmpty()) {
-                    PListItem(title = stringResource(Res.string.mac_address), value = request.bleMac)
-                }
             }
         }
         item {

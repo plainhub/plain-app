@@ -1,0 +1,1 @@
+var e={now:`たった今`,short:{minutes:`{n}分前`,hours:`{n}時間前`,days:`{n}日前`,weeks:`{n}週前`,months:`{n}ヶ月前`,years:`{n}年前`},long:{minutes:`{n}分前`,hours:`{n}時間前`,days:`{n}日前`,weeks:`{n}週前`,months:`{n}ヶ月前`,years:`{n}年前`}};export{e as default};

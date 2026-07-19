@@ -1,0 +1,1 @@
+var e={now:`Только что`,short:{minutes:`{n} мин`,hours:`{n} ч`,days:`{n} д`,weeks:`{n} нед`,months:`{n} мес`,years:`{n} г`},long:{minutes:`{n} минут назад`,hours:`{n} часов назад`,days:`{n} дней назад`,weeks:`{n} недель назад`,months:`{n} месяцев назад`,years:`{n} лет назад`}};export{e as default};

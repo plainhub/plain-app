@@ -1,0 +1,1 @@
+var e={now:`刚刚`,short:{minutes:`{n}分钟前`,hours:`{n}小时前`,days:`{n}天前`,weeks:`{n}周前`,months:`{n}个月前`,years:`{n}年前`},long:{minutes:`{n}分钟前`,hours:`{n}小时前`,days:`{n}天前`,weeks:`{n}周前`,months:`{n}个月前`,years:`{n}年前`}};export{e as default};

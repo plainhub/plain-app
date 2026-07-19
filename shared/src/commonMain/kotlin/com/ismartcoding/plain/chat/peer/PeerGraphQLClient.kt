@@ -103,6 +103,32 @@ object PeerGraphQLClient {
         return PeerTransportRouter.send(peer, request, keyBytes)
     }
 
+    /**
+     * Sends a `startAware` mutation to [peer] via the transport fallback chain
+     * (typically BLE). Asks the peer to start its Wi-Fi Aware service and
+     * subscribe for us so both sides can establish an Aware data path for
+     * subsequent messages. Fire-and-forget — callers don't need to wait for
+     * the response, but we return it so PeerTransportPrewarmer can log the
+     * result.
+     */
+    suspend fun startAware(peer: DPeer): GraphQLResponse {
+        val mutation = $$"""
+            mutation StartAware {
+                startAware
+            }
+        """.trimIndent()
+
+        val keyBytes = requireNotNull(PeerCacher.getKeyBytes(peer.id)) {
+            "PeerCacher has no key bytes for peer ${peer.id}"
+        }
+        val request = buildSignedRequest(
+            query = mutation,
+            variables = emptyMap(),
+            channelId = "",
+        )
+        return PeerTransportRouter.send(peer, request, keyBytes)
+    }
+
     private suspend fun buildSignedRequest(
         query: String,
         variables: Map<String, String>,

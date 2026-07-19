@@ -16,13 +16,16 @@ import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.chaCha20Encrypt
+import com.ismartcoding.plain.platform.startAwareIfNeeded
+import com.ismartcoding.plain.platform.subscribeAwareForPeer
 import com.ismartcoding.plain.web.http.GraphqlRequestContext
 import com.ismartcoding.plain.web.http.HttpCall
 import com.ismartcoding.plain.web.http.HttpStatus
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.schemas.applyMainSchema
+import com.ismartcoding.plain.web.schemas.addSchemaTypes
 import kotlinx.serialization.json.Json
 
 /**
@@ -100,11 +103,13 @@ class PeerGraphQLService private constructor(
 
         /**
          * Build the [PeerGraphQLService] with a schema that combines the
-         * main schema (so peer mutations can return [ChatItem] results and
-         * reuse shared types) with the peer-specific mutations.
+         * shared scalar/enum types (so peer mutations can return [ChatItem]
+         * results with [com.ismartcoding.plain.web.models.ID] and
+         * [kotlin.time.Instant] fields) with the peer-specific mutations.
          */
         fun create(): PeerGraphQLService {
             val schema = KGraphQL.schema {
+                addSchemaTypes()
                 applyPeerSchema()
             }
             return PeerGraphQLService(schema)
@@ -150,6 +155,28 @@ class PeerGraphQLService private constructor(
                         return@resolver emptyList<ChatItem>()
                     }
                     listOf(item.toModel())
+                }
+            }
+            // Triggered by PeerTransportPrewarmer over BLE when the peer's
+            // Wi-Fi Aware service isn't running. Starts our own Aware service
+            // and subscribes for the requesting peer so both sides can establish
+            // a data path. This lets the next message go over the much faster
+            // Aware transport instead of BLE.
+            mutation("startAware") {
+                resolver("context") { context: Context ->
+                    val ctx = context.get<GraphqlRequestContext>()!!
+                    val fromPeerId = ctx.header("c-id") ?: ""
+                    LogCat.d("[PeerGraphQL] startAware from=$fromPeerId")
+                    val started = startAwareIfNeeded()
+                    if (started) {
+                        withIO {
+                            val peer = AppDatabase.instance.peerDao().getById(fromPeerId)
+                            if (peer != null) {
+                                subscribeAwareForPeer(peer)
+                            }
+                        }
+                    }
+                    started
                 }
             }
         }

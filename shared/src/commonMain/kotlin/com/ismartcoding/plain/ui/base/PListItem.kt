@@ -158,7 +158,7 @@ fun PListItem(
                         Modifier
                             .size(24.dp),
                     contentDescription = title,
-                    tint = MaterialTheme.colorScheme.outline,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

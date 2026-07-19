@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ble.client
 
 import com.ismartcoding.plain.ble.BleUuids
+import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
@@ -14,6 +15,7 @@ import platform.CoreBluetooth.CBManagerStatePoweredOn
 import platform.CoreBluetooth.CBPeripheral
 import platform.CoreBluetooth.CBUUID
 import platform.Foundation.NSError
+import platform.Foundation.NSData
 import platform.Foundation.NSNumber
 import platform.darwin.NSObject
 import kotlin.time.Duration.Companion.milliseconds
@@ -25,7 +27,7 @@ object IosBleScanner : BleScanner {
 
     private val allDevices = mutableMapOf<String, IosBleGattClient>()
     private val pendingConnections = mutableMapOf<String, CompletableDeferred<Boolean>>()
-    private var scanCallback: ((CBPeripheral, NSNumber) -> Unit)? = null
+    private var scanCallback: ((CBPeripheral, NSNumber, Map<Any?, *>) -> Unit)? = null
     private var stateChangeCallback: (() -> Unit)? = null
 
     @kotlin.concurrent.Volatile
@@ -67,10 +69,17 @@ object IosBleScanner : BleScanner {
             return@callbackFlow
         }
 
-        scanCallback = { peripheral, rssi ->
-            val id = peripheral.identifier.UUIDString
-            val client = allDevices.getOrPut(id) { IosBleGattClient(peripheral, 0) }
+        scanCallback = { peripheral, rssi, advertisementData ->
+            val (awareFlags, clientId) = parseServiceData(advertisementData, serviceUuid)
+            // Match by clientId when advertised; fall back to peripheral UUID so
+            // peers running older app versions (without clientId in serviceData)
+            // still get a stable id.
+            val key = clientId.ifEmpty { peripheral.identifier.UUIDString }
+            val client = allDevices.getOrPut(key) {
+                IosBleGattClient(peripheral, rssi.intValue, awareFlags, clientId)
+            }
             client.rssi = rssi.intValue
+            client.awareFlags = awareFlags
             trySend(client)
         }
 
@@ -87,23 +96,60 @@ object IosBleScanner : BleScanner {
         }
     }
 
+    /**
+     * Extracts (awareFlags, clientId) from the CBAdvertisementDataServiceDataKey
+     * entry for [serviceUuid]. Format mirrors AndroidBleGattServer: byte[0] =
+     * flags, bytes[1..N] = clientId UTF-8 bytes. Returns (0, "") when absent.
+     */
+    private fun parseServiceData(
+        advertisementData: Map<Any?, *>,
+        serviceUuid: String,
+    ): Pair<Int, String> {
+        val serviceDataKey = platform.CoreBluetooth.CBAdvertisementDataServiceDataKey
+            ?: return 0 to ""
+        @Suppress("UNCHECKED_CAST")
+        val serviceDataMap = advertisementData[serviceDataKey] as? Map<Any?, *>
+            ?: return 0 to ""
+        val targetUuid = CBUUID.UUIDWithString(serviceUuid)
+        val nsData = serviceDataMap.entries.firstOrNull { (k, _) ->
+            (k as? CBUUID)?.UUIDString.equals(targetUuid.UUIDString, ignoreCase = true)
+        }?.value as? NSData ?: return 0 to ""
+        val bytes = nsData.toByteArray()
+        if (bytes.isEmpty()) return 0 to ""
+        val flags = bytes[0].toInt() and 0xFF
+        val clientId = if (bytes.size > 1) {
+            try { bytes.decodeToString(1, bytes.size) } catch (_: Exception) { "" }
+        } else ""
+        return flags to clientId
+    }
+
     override suspend fun findOne(id: String): BleGattClient? {
         if (!isReadyToUse()) return null
+        // Fast path: a device with this clientId has already been discovered.
+        allDevices[id]?.let { return it }
         return scan(BleUuids.SERVICE_UUID).firstOrNull { device ->
             device.id.equals(id, ignoreCase = true)
         }
     }
 
-    override fun createClient(mac: String): BleGattClient? = null
+    /**
+     * On iOS we can't construct a client from a clientId alone — the underlying
+     * [CBPeripheral] must come from a scan result. Return an already-discovered
+     * client if we have one; otherwise the caller must scan via [findOne].
+     */
+    override fun createClient(clientId: String): BleGattClient? = allDevices[clientId]
 
     suspend fun connectPeripheral(client: IosBleGattClient): Boolean {
         if (client.isConnected()) return true
         val manager = ensureCentralManager()
         val deferred = CompletableDeferred<Boolean>()
-        pendingConnections[client.id] = deferred
+        // The peripheral UUID is the connection key on iOS — keep using it for
+        // pendingConnections (which the CentralDelegate keys off of).
+        val connectionKey = client.peripheral.identifier.UUIDString
+        pendingConnections[connectionKey] = deferred
         manager.connectPeripheral(client.peripheral, null)
         val result = withTimeoutOrNull(10_000L.milliseconds) { deferred.await() }
-        pendingConnections.remove(client.id)
+        pendingConnections.remove(connectionKey)
         return result == true
     }
 
@@ -122,8 +168,12 @@ object IosBleScanner : BleScanner {
         stateChangeCallback?.invoke()
     }
 
-    internal fun onPeripheralDiscovered(peripheral: CBPeripheral, rssi: NSNumber) {
-        scanCallback?.invoke(peripheral, rssi)
+    internal fun onPeripheralDiscovered(
+        peripheral: CBPeripheral,
+        rssi: NSNumber,
+        advertisementData: Map<Any?, *>,
+    ) {
+        scanCallback?.invoke(peripheral, rssi, advertisementData)
     }
 
     internal fun onPeripheralConnected(peripheral: CBPeripheral) {
@@ -149,7 +199,7 @@ private class CentralDelegate : NSObject(), CBCentralManagerDelegateProtocol {
         advertisementData: Map<Any?, *>,
         RSSI: NSNumber,
     ) {
-        IosBleScanner.onPeripheralDiscovered(didDiscoverPeripheral, RSSI)
+        IosBleScanner.onPeripheralDiscovered(didDiscoverPeripheral, RSSI, advertisementData)
     }
 
     override fun centralManager(

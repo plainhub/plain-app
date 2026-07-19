@@ -2,7 +2,6 @@ package com.ismartcoding.plain.api
 
 import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.lib.helpers.NetworkHelper
-import com.ismartcoding.plain.lib.logcat.LogCat
 import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
@@ -62,7 +61,6 @@ object OkHttpClientFactory {
         socketFactory: SocketFactory? = null,
         dns: Dns? = null,
         connectTimeoutMs: Long = 1_000L,
-        addHeaders: Boolean = true,
     ): OkHttpClient {
         val builder =
             OkHttpClient.Builder()
@@ -70,14 +68,9 @@ object OkHttpClientFactory {
                     val request = chain.request()
                     val requestBody = request.body!!
                     val requestBodyStr = bodyToString(requestBody)
-                    LogCat.d("[Request] $requestBodyStr")
-                    val requestBuilder = request.newBuilder()
-                    if (addHeaders) {
-                        requestBuilder.addClientHeaders()
-                    }
                     val response =
                         chain.proceed(
-                            requestBuilder
+                            request.newBuilder()
                                 .post(CryptoHelper.chaCha20Encrypt(keyBytes, requestBodyStr).toRequestBody(requestBody.contentType()))
                                 .build(),
                         )
@@ -85,8 +78,10 @@ object OkHttpClientFactory {
                     val decryptedBytes = CryptoHelper.chaCha20Decrypt(keyBytes, responseBody.bytes())
                     if (decryptedBytes != null) {
                         val json = decryptedBytes.decodeToString()
-                        LogCat.d("[Response] $json")
-                        return@addInterceptor response.newBuilder().body(json.toResponseBody(responseBody.contentType())).build()
+                        return@addInterceptor response.newBuilder()
+                            .body(json.toResponseBody(responseBody.contentType()))
+                            .removeHeader("Content-Length")
+                            .build()
                     }
                     response.newBuilder().build()
                 }
@@ -148,11 +143,3 @@ object OkHttpClientFactory {
     }
 }
 
-fun OkHttpClient.Builder.applyDownloadConfig(): OkHttpClient.Builder =
-    connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(120, TimeUnit.SECONDS)
-        .writeTimeout(120, TimeUnit.SECONDS)
-        .retryOnConnectionFailure(true)
-        .addInterceptor { chain ->
-            chain.proceed(chain.request().newBuilder().addClientHeaders().build())
-        }

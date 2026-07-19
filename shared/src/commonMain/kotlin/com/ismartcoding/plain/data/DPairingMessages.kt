@@ -16,7 +16,6 @@ data class DPairingRequest(
     val ips: List<String> = emptyList(), // All IP addresses of the requesting device
     var signature: String = "", // Ed25519 signature of request content (Base64 encoded)
     var fromIp: String = "",
-    var bleMac: String = "",
     var isQrInitiated: Boolean = false,
     val awareSupported: Boolean = false, // Whether the requester's device supports Wi-Fi Aware
 ) {

@@ -9,10 +9,11 @@ object PeerTransportRouter {
     private val transports: List<PeerTransport> = buildList {
         add(LanTransport)
         createWifiAwareTransport()?.let { add(it) }
-        // BLE is the last-resort fallback for chat: it works whenever the
-        // peer is paired with a stored bleAddress, even when LAN and Wi-Fi
-        // Aware are both unavailable. File download still goes through LAN
-        // since BLE throughput is too low for media.
+        // BLE is the last-resort fallback for chat: it works whenever the peer
+        // is paired (the peer's clientId is broadcast in the BLE scan response
+        // serviceData, so a clientId-based BLE scan finds the peer even when
+        // LAN and Wi-Fi Aware are both unavailable). File download still goes
+        // through LAN since BLE throughput is too low for media.
         add(BleTransport)
     }
 
@@ -31,7 +32,8 @@ object PeerTransportRouter {
                 return resp
             } catch (e: TransportUnavailable) {
                 PeerCircuitBreaker.recordFailure(peer.id, t.id)
-                LogCat.d("transport ${t.id} unavailable for peer ${peer.id}: ${e.message}")
+                val causeMsg = e.cause?.message ?: e.message
+                LogCat.d("transport ${t.id} unavailable for peer ${peer.id}: $causeMsg")
             }
         }
         throw Exception("all transports exhausted for peer ${peer.id}")
@@ -53,7 +55,8 @@ object PeerTransportRouter {
                 return resp
             } catch (e: TransportUnavailable) {
                 PeerCircuitBreaker.recordFailure(peer.id, t.id)
-                LogCat.d("transport ${t.id} unavailable for peer ${peer.id}: ${e.message}")
+                val causeMsg = e.cause?.message ?: e.message
+                LogCat.d("transport ${t.id} unavailable for peer ${peer.id}: $causeMsg")
                 lastError = e
             }
         }

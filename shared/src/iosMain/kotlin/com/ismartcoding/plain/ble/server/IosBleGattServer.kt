@@ -2,6 +2,7 @@
 
 package com.ismartcoding.plain.ble.server
 
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.lib.toNSData
@@ -31,8 +32,12 @@ import platform.Foundation.NSNumber
 import platform.darwin.NSObject
 
 private const val READY_SIGNAL = "1"
+// iOS Wi-Fi Aware is stubbed (not yet implemented) — always advertise flags = 0.
+// The clientId portion of serviceData is still populated so Android peers can
+// identify the iOS device when BLE MAC randomization rotates.
 private const val FLAG_AWARE_SUPPORTED: Byte = 0
 private const val FLAG_AWARE_RUNNING: Byte = 0
+private const val CLIENT_ID_MAX_LEN = 20
 
 class IosBleGattServer : BleGattServer {
 
@@ -113,13 +118,27 @@ class IosBleGattServer : BleGattServer {
     }
 
     private fun startAdvertising(manager: CBPeripheralManager) {
+        // Build the serviceData payload (flags byte + clientId UTF-8 bytes) and
+        // attach it to the advertisement so peers can identify this device by
+        // its stable clientId instead of the BLE MAC (which rotates).
+        val clientIdBytes = TempData.clientId.encodeToByteArray()
+        val clientIdLen = minOf(clientIdBytes.size, CLIENT_ID_MAX_LEN)
+        val payload = ByteArray(1 + clientIdLen)
+        payload[0] = (FLAG_AWARE_SUPPORTED.toInt() or FLAG_AWARE_RUNNING.toInt()).toByte()
+        if (clientIdLen > 0) {
+            clientIdBytes.copyInto(payload, 1, 0, clientIdLen)
+        }
+        val serviceDataMap: Map<Any?, Any?> = mapOf(
+            CBUUID.UUIDWithString(BleUuids.SERVICE_UUID) to payload.toNSData(),
+        )
         val advertisingData = mapOf<Any?, Any?>(
             platform.CoreBluetooth.CBAdvertisementDataServiceUUIDsKey to
                 listOf(CBUUID.UUIDWithString(BleUuids.SERVICE_UUID)),
+            platform.CoreBluetooth.CBAdvertisementDataServiceDataKey to serviceDataMap,
         )
         manager.startAdvertising(advertisingData)
         advertising = true
-        LogCat.d("BLE GATT server advertising started")
+        LogCat.d("BLE GATT server advertising started (clientId=${TempData.clientId})")
     }
 
     internal fun onManagerReady() {

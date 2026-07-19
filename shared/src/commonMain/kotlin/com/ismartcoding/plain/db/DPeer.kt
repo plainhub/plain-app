@@ -24,8 +24,6 @@ data class DPeer(
     @ColumnInfo(name = "status") var status: String = "", // paired, unpaired, channel
     @ColumnInfo(name = "port") var port: Int = 0,
     @ColumnInfo(name = "device_type") var deviceType: String = "", // phone, tablet, pc, etc.
-    @ColumnInfo(name = "ble_address", defaultValue = "") var bleAddress: String = "",
-    @ColumnInfo(name = "aware_supported", defaultValue = "0") var awareSupported: Boolean = false,
 ) : DEntityBase() {
     fun isPaired(): Boolean = status == "paired"
     fun isChannel(): Boolean = status == "channel"

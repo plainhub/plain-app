@@ -83,7 +83,11 @@ android {
             ndk {
                 debugSymbolLevel = "NONE"
             }
-            buildConfigField("String", "CHANNEL", "\"GITHUB\"")
+            // NOTE: Do NOT set CHANNEL here. Build-type buildConfigFields override
+            // product-flavor values in AGP, which would mask the real flavor
+            // (e.g. fdroidDebug would report CHANNEL="GITHUB" instead of "FDROID",
+            // hiding the fact that LiteRT stubs are in use). The flavor's own
+            // CHANNEL field is authoritative.
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
         release {

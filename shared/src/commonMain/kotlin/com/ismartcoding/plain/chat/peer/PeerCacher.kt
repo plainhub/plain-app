@@ -6,6 +6,7 @@ import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
+import androidx.compose.runtime.mutableStateMapOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,6 +24,17 @@ object PeerCacher {
 
     val peersMap = MutableStateFlow<Map<String, PeerRuntime>>(emptyMap())
     val onlineMap = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+
+    // In-memory Aware running flag per peer, refreshed from BLE scan response
+    // serviceData (FLAG_AWARE_RUNNING). When false, WifiAwareTransport skips
+    // itself immediately instead of waiting 10s+ for buildLink to time out.
+    private val awareRunningMap = mutableStateMapOf<String, Boolean>()
+    // In-memory Aware supported flag per peer, refreshed from BLE scan response
+    // serviceData (FLAG_AWARE_SUPPORTED). This is the source of truth for whether
+    // the peer CURRENTLY supports Aware — formerly mirrored on the DPeer row,
+    // now BLE-scan-only since peers are identified by clientId (not BLE MAC)
+    // and the aware_supported column has been removed.
+    private val awareSupportedMap = mutableStateMapOf<String, Boolean>()
 
     val pairedPeers: StateFlow<List<DPeer>> = combine(peersMap, ChatCacher.latestChatMap, onlineMap) { p, c, o ->
         sortPeers(p.values.filter { it.peer.isPaired() }.map { it.peer }, c, o)
@@ -58,6 +70,22 @@ object PeerCacher {
 
     fun getPublicKeyBytes(peerId: String): ByteArray? = peersMap.value[peerId]?.publicKeyBytes?.takeIf { it.isNotEmpty() }
 
+    /** Returns whether the peer's Wi-Fi Aware service is currently running (from BLE scan response). */
+    fun isAwareRunning(peerId: String): Boolean = awareRunningMap[peerId] == true
+
+    /** Stores the peer's Aware running flag in memory, refreshed from BLE scan response serviceData. */
+    fun setAwareRunning(peerId: String, running: Boolean) {
+        awareRunningMap[peerId] = running
+    }
+
+    /** Returns whether the peer currently supports Wi-Fi Aware (from BLE scan response serviceData). */
+    fun isAwareSupported(peerId: String): Boolean = awareSupportedMap[peerId] == true
+
+    /** Stores the peer's Aware supported flag in memory, refreshed from BLE scan response serviceData. */
+    fun setAwareSupported(peerId: String, supported: Boolean) {
+        awareSupportedMap[peerId] = supported
+    }
+
     fun removePeer(peerId: String) {
         val currentPeers = peersMap.value
         val currentOnline = onlineMap.value
@@ -65,6 +93,8 @@ object PeerCacher {
         val newOnline = if (currentOnline.containsKey(peerId)) currentOnline - peerId else currentOnline
         if (newPeers !== currentPeers) peersMap.value = newPeers
         if (newOnline !== currentOnline) onlineMap.value = newOnline
+        awareRunningMap.remove(peerId)
+        awareSupportedMap.remove(peerId)
     }
 
     fun updatePeer(peer: DPeer) {

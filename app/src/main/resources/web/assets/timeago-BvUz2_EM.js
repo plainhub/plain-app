@@ -1,0 +1,1 @@
+var e={now:`Gerade eben`,short:{minutes:`{n} Min.`,hours:`{n} Std.`,days:`{n} T.`,weeks:`{n} Wo.`,months:`{n} Mon.`,years:`{n} J.`},long:{minutes:`Vor {n} Minuten`,hours:`Vor {n} Stunden`,days:`Vor {n} Tagen`,weeks:`Vor {n} Wochen`,months:`Vor {n} Monaten`,years:`Vor {n} Jahren`}};export{e as default};

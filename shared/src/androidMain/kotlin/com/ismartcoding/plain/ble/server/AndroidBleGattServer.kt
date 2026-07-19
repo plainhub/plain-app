@@ -94,7 +94,7 @@ class AndroidBleGattServer : BleGattServer {
         val scanResponse = AdvertiseData.Builder()
             .addServiceData(
                 ParcelUuid(UUID.fromString(BleUuids.SERVICE_UUID)),
-                byteArrayOf(buildAwareFlags()),
+                buildServiceData(),
             )
             .build()
         try {
@@ -102,6 +102,22 @@ class AndroidBleGattServer : BleGattServer {
         } catch (e: Exception) {
             LogCat.e("GATT advertise error: ${e.message}")
         }
+    }
+
+    /**
+     * Builds the scan response serviceData payload:
+     *   byte[0]     = Aware flags (0x01=aware supported, 0x02=aware running)
+     *   byte[1..N]  = clientId UTF-8 bytes (TempData.clientId, 13-char short UUID)
+     *
+     * Total ~14 bytes, well within the 31-byte scan response limit.
+     */
+    private fun buildServiceData(): ByteArray {
+        val clientIdBytes = TempData.clientId.toByteArray(Charsets.UTF_8)
+        val clientIdLen = minOf(clientIdBytes.size, CLIENT_ID_MAX_LEN)
+        val payload = ByteArray(1 + clientIdLen)
+        payload[0] = buildAwareFlags()
+        System.arraycopy(clientIdBytes, 0, payload, 1, clientIdLen)
+        return payload
     }
 
     private fun buildAwareFlags(): Byte {
@@ -262,5 +278,9 @@ class AndroidBleGattServer : BleGattServer {
         private const val READY_SIGNAL = "1"
         private const val FLAG_AWARE_SUPPORTED = 0x01
         private const val FLAG_AWARE_RUNNING = 0x02
+        // Cap the clientId portion of the scan response serviceData. The full
+        // scan response payload is 31 bytes; minus 1 byte for flags and a few
+        // bytes for the service UUID header, 20 is a safe upper bound.
+        private const val CLIENT_ID_MAX_LEN = 20
     }
 }

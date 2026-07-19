@@ -28,7 +28,6 @@ class AwareHttpClientFactory {
             socketFactory = network.socketFactory,
             dns = awareDns(peerIpv6),
             connectTimeoutMs = 5_000L,
-            addHeaders = false,
         ).newBuilder()
             .retryOnConnectionFailure(true)
             .build()

@@ -17,11 +17,11 @@ object PeerChatSender {
                 content = content.toPeerMessageContent()
             )
 
-            if (response.errors.isNullOrEmpty()) {
+            if (response.isSuccess) {
                 LogCat.d("Message sent successfully to peer ${peer.id}: ${response.data}")
                 null
             } else {
-                val errorMessage = response.errors?.joinToString(", ") { it.message } ?: "Empty error list in response"
+                val errorMessage = response.getError()
                 LogCat.e("Failed to send message to peer ${peer.id}: $errorMessage")
                 errorMessage
             }

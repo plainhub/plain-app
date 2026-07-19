@@ -92,11 +92,11 @@ object ChannelChatSender {
                 channelId = channel.id,
                 content = modifiedContent,
             )
-            if (response.errors.isNullOrEmpty()) {
+            if (response.isSuccess) {
                 LogCat.d("Channel message sent to ${peer.id} via channel ${channel.id}")
                 DMessageDeliveryResult(peer.id, peer.name, null)
             } else {
-                val errors = response.errors.joinToString("; ") { it.message }
+                val errors = response.getError()
                 LogCat.e("Failed to send channel message to ${peer.id}: $errors")
                 DMessageDeliveryResult(peer.id, peer.name, errors)
             }

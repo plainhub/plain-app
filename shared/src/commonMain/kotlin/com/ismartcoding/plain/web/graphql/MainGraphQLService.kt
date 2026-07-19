@@ -144,16 +144,16 @@ class MainGraphQLService private constructor(
      */
     suspend fun handleError(error: GraphQLError, call: HttpCall): Boolean {
         val clientId = call.header("c-id") ?: ""
-        val type = call.header("c-type") ?: "" // peer
         val channelId = call.header("c-cid") ?: "" // chat channel id
         val authStr = call.header("authorization")?.split(" ")
         return if (authStr.isNullOrEmpty()) {
+            // Token mode — pick the decryption key the same way the route
+            // handlers do: channel key for channel chat, peer shared key for
+            // peer-to-peer chat, session token for regular web clients.
             val token = if (channelId.isNotEmpty()) {
                 ChannelCacher.getKeyBytes(channelId)
-            } else if (type == "peer") {
-                PeerCacher.getKeyBytes(channelId)
             } else {
-                HttpServerManager.tokenCache[clientId]
+                PeerCacher.getKeyBytes(clientId) ?: HttpServerManager.tokenCache[clientId]
             }
             if (token != null) {
                 call.respond(

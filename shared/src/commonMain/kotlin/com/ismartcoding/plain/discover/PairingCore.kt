@@ -85,14 +85,14 @@ object PairingCore {
         return request
     }
 
-    suspend fun handlePairResponse(response: DPairingResponse, senderIp: String, bleAddress: String = "") {
+    suspend fun handlePairResponse(response: DPairingResponse, senderIp: String) {
         val session = PairingSessionStore.get(response.fromId)
         if (session == null) {
             LogCat.e("No active pairing session for ${response.fromId}")
             return
         }
         try {
-            processPairingResponse(response, session, senderIp, bleAddress, response.awareSupported)
+            processPairingResponse(response, session, senderIp)
         } catch (e: Exception) {
             LogCat.e("Error processing pairing response: ${e.message}")
             notifyFailed(response.fromId, session.deviceName, "Failed to process pairing response")
@@ -105,7 +105,10 @@ object PairingCore {
 
     fun handlePairRequest(request: DPairingRequest, senderAddress: String, isBle: Boolean) {
         if (isBle) {
-            request.bleMac = senderAddress
+            // senderAddress on BLE is the MAC of the connected central. We
+            // don't store it on the request anymore (peers are identified by
+            // clientId, not MAC), but the GATT server still needs it for
+            // routing notifications back to the connected device.
             BlePairingSessionStore.put(request.fromId, senderAddress)
         } else {
             request.fromIp = senderAddress
@@ -212,8 +215,6 @@ object PairingCore {
             deviceType = request.deviceType,
             key = encryptKey,
             signaturePublicKey = request.signaturePublicKey,
-            bleAddress = request.bleMac,
-            awareSupported = request.awareSupported,
         )
         sendEvent(PairingSuccessEvent(request.fromId, request.fromName, request.fromIp, encryptKey))
         sendEvent(
@@ -229,8 +230,6 @@ object PairingCore {
         response: DPairingResponse,
         session: DPairingSession,
         senderIp: String,
-        bleAddress: String = "",
-        awareSupported: Boolean = false,
     ): Boolean {
         if (!PairingSecurity.validateTimestamp(response.timestamp)) {
             LogCat.e("Pairing response timestamp is too old or in the future")
@@ -260,8 +259,6 @@ object PairingCore {
                 deviceType = response.deviceType,
                 key = encryptKey,
                 signaturePublicKey = response.signaturePublicKey,
-                bleAddress = bleAddress,
-                awareSupported = awareSupported,
             )
             sendEvent(PairingSuccessEvent(response.fromId, session.deviceName, senderIp, encryptKey))
             sendEvent(

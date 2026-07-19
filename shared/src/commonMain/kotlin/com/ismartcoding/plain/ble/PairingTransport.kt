@@ -5,6 +5,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DDiscoverReply
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingResponse
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.discover.PairingSessionStore
 import com.ismartcoding.plain.enums.NearbyMessageType
@@ -69,20 +70,35 @@ object PairingTransport {
         val replyCache = mutableMapOf<String, DDiscoverReply>()
         val lastEmit = mutableMapOf<String, Long>()
         bleTransport().createScanner().scan(BleUuids.SERVICE_UUID).collect { device ->
-            val mac = device.id
-            val cached = replyCache[mac]
+            // device.id is the peer's clientId (parsed from scan response
+            // serviceData) — the stable peer identifier. The BLE MAC is no
+            // longer cached because Android randomizes it every ~15 min and
+            // we identify peers by clientId throughout.
+            val clientId = device.id
+            val cached = replyCache[clientId]
             if (cached == null) {
                 val reply = readDiscoverReply(device)
                 if (reply != null) {
-                    replyCache[mac] = reply
+                    replyCache[clientId] = reply
+                    // Cache the peer's Aware flags from the scan response serviceData:
+                    //  - awareSupported: whether the peer supports Wi-Fi Aware (FLAG_AWARE_SUPPORTED)
+                    //  - awareRunning: whether the peer's Aware service is currently running (FLAG_AWARE_RUNNING)
+                    // WifiAwareTransport uses awareRunning to skip itself when the peer's Aware isn't
+                    // running (avoids 10s+ buildLink timeout). PeerTransportPrewarmer uses awareSupported
+                    // to decide whether to send a startAware mutation via BLE.
+                    val flags = device.awareFlags
+                    val awareSupported = (flags and FLAG_AWARE_SUPPORTED) != 0
+                    val awareRunning = (flags and FLAG_AWARE_RUNNING) != 0
+                    PeerCacher.setAwareSupported(reply.id, awareSupported)
+                    PeerCacher.setAwareRunning(reply.id, awareRunning)
                     emit(PairingCore.replyToDevice(reply, device))
-                    lastEmit[mac] = TimeHelper.nowMillis()
+                    lastEmit[clientId] = TimeHelper.nowMillis()
                 }
             } else {
                 val now = TimeHelper.nowMillis()
-                if (now - (lastEmit[mac] ?: 0) > BLE_REFRESH_INTERVAL_MS) {
+                if (now - (lastEmit[clientId] ?: 0) > BLE_REFRESH_INTERVAL_MS) {
                     emit(PairingCore.replyToDevice(cached, device))
-                    lastEmit[mac] = now
+                    lastEmit[clientId] = now
                 }
             }
         }
@@ -147,14 +163,12 @@ object PairingTransport {
 
             if (responseJson != null) {
                 val response = JsonHelper.jsonDecode<DPairingResponse>(responseJson)
-                // The responder's BLE address (MAC on Android / UUID on iOS) is
-                // the id of the BleGattClient we used to send the pairing
-                // request. Persist it on the peer record so the BLE chat
-                // fallback can reconnect later without scanning.
+                // The responder is identified by its clientId (parsed from the
+                // BLE scan response serviceData), which is already on the
+                // DPairingResponse.fromId — no BLE MAC needs to be cached.
                 PairingCore.handlePairResponse(
                     response = response,
                     senderIp = "",
-                    bleAddress = bleDevice.id,
                 )
             } else {
                 LogCat.e("BLE pairViaBle: response timeout after ${PAIR_RESPONSE_TIMEOUT_MS}ms")
@@ -195,3 +209,8 @@ object PairingTransport {
 
 private const val BLE_REFRESH_INTERVAL_MS = 5_000L
 private const val PAIR_RESPONSE_TIMEOUT_MS = 90_000L
+// Bit flags matching AndroidBleGattServer.buildAwareFlags():
+//   0x01 = peer supports Wi-Fi Aware
+//   0x02 = peer's Wi-Fi Aware service is currently running
+private const val FLAG_AWARE_SUPPORTED = 0x01
+private const val FLAG_AWARE_RUNNING = 0x02

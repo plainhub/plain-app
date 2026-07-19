@@ -8,7 +8,7 @@ import com.ismartcoding.plain.db.Migrations
 /**
  * iOS actual: builds the [AppDatabase] using the Room KMP API with
  * [BundledSQLiteDriver] and registers the manual 5→6 migration.
- * All other database logic (entities, DAOs, migrations, data initializer)
+ * All other database logic (entities, DAOs, auto-migrations, data initializer)
  * lives in commonMain.
  */
 actual fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase> {

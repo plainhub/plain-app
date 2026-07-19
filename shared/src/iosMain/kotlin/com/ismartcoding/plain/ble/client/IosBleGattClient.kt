@@ -24,9 +24,17 @@ import kotlin.time.Duration.Companion.milliseconds
 class IosBleGattClient(
     val peripheral: CBPeripheral,
     override var rssi: Int = 0,
+    override var awareFlags: Int = 0,
+    clientId: String = "",
 ) : BleGattClient {
 
-    override val id: String = peripheral.identifier.UUIDString
+    /**
+     * Stable peer identifier — the peer's clientId (TempData.clientId, a 13-char
+     * short UUID) parsed from the BLE advertisement serviceData. Falls back to
+     * [peripheral.identifier] when no clientId was advertised (e.g. peer is
+     * running an older app version that doesn't broadcast clientId).
+     */
+    override val id: String = clientId.ifEmpty { peripheral.identifier.UUIDString }
     override val name: String? get() = peripheral.name
 
     private val delegate = PeripheralDelegate(this)
