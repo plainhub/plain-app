@@ -134,4 +134,7 @@
     <string name="delivery_status">डिलीवरी स्थिति</string>
     <string name="delivery_status_summary">%1$d / %2$d डिलीवर हुआ</string>
     <string name="resend_selected">चयनित फिर से भेजें</string>
+    <string name="bluetooth_permission_required_for_nearby">ब्लूटूथ के माध्यम से आसपास के डिवाइस खोजने के लिए ब्लूटूथ अनुमति आवश्यक है।</string>
+    <string name="nearby_wifi_devices_required_for_chat">आसपास के डिवाइस खोजने के लिए ब्लूटूथ और आसपास के डिवाइस अनुमतियां आवश्यक हैं।</string>
+    <string name="pairing_request_expired">पेयरिंग अनुरोध समाप्त</string>
 </resources>

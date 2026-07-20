@@ -50,4 +50,7 @@
     <string name="view_mode">Modo de visualización</string>
     <string name="browse_by_tags">Explorar por etiquetas</string>
     <string name="browse_by_file_type">Explorar por tipo de archivo</string>
+    <string name="app_files">Archivos de la app</string>
+    <string name="app_files_desc">Archivos compartidos en el chat</string>
+    <string name="no_app_files">Aún no hay archivos</string>
 </resources>

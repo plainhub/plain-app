@@ -134,4 +134,7 @@
     <string name="delivery_status">Status de entrega</string>
     <string name="delivery_status_summary">%1$d / %2$d entregue</string>
     <string name="resend_selected">Reenviar selecionados</string>
+    <string name="bluetooth_permission_required_for_nearby">A permissão de Bluetooth é necessária para descobrir dispositivos próximos via Bluetooth.</string>
+    <string name="nearby_wifi_devices_required_for_chat">As permissões de Bluetooth e de dispositivos próximos são necessárias para descobrir dispositivos próximos.</string>
+    <string name="pairing_request_expired">Solicitação de pareamento expirada</string>
 </resources>

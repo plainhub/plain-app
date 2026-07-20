@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">HTTP 서버 시작</string>
     <string name="adb_cmd_stop">HTTP 서버 중지</string>
     <string name="enable_adb_token">ADB 토큰 사용</string>
+    <string name="http_server_health_check_failed">서비스가 시작되었지만 접근할 수 없습니다. 방화벽 또는 VPN 앱이 localhost 연결을 차단하고 있을 수 있습니다. 네트워크 설정을 확인하고 앱을 다시 시작하세요.</string>
+    <string name="web_settings">웹 설정</string>
 </resources>

@@ -50,4 +50,7 @@
     <string name="view_mode">表示モード</string>
     <string name="browse_by_tags">タグで参照</string>
     <string name="browse_by_file_type">ファイルタイプで参照</string>
+    <string name="app_files">アプリファイル</string>
+    <string name="app_files_desc">チャットで共有されたファイル</string>
+    <string name="no_app_files">まだファイルがありません</string>
 </resources>

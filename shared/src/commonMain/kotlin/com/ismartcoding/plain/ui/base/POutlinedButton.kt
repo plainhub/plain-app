@@ -54,7 +54,7 @@ fun POutlinedButton(
         colors = ButtonDefaults.outlinedButtonColors(contentColor = resolvedColor),
         border = BorderStroke(1.dp, borderColor),
         contentPadding = padding,
-        enabled = enabled,
+        enabled = enabled && !isLoading,
     ) {
         Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             if (isLoading) {

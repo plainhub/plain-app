@@ -5,7 +5,6 @@ import android.os.Environment
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.isOk
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.lib.html2md.MDConverter
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.readability4j.Readability4J
@@ -50,7 +49,7 @@ actual suspend fun DFeedEntry.fetchContentAsync(): ApiResult = withIO {
                             if (r.isOk()) {
                                 val dir = appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!.path + "/feeds/${feedId}"
                                 File(dir).mkdirs()
-                                var path = "$dir/main-${CryptoHelper.sha1(image.toByteArray())}"
+                                var path = "$dir/main-${sha1(image.toByteArray())}"
                                 val extension = image.getFilenameExtension()
                                 if (extension.isNotEmpty()) {
                                     path += ".$extension"

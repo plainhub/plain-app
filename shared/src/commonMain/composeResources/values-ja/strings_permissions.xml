@@ -36,4 +36,5 @@
     <string name="call_phone_permission_required">アプリから電話をかけるためには、電話へのアクセスを許可してください。</string>
     <string name="accessibility_service_description">PlainApp は画面ミラーリング中のリモート操作を有効にするために、このユーザー補助サービスを使用します。Web インターフェースから送信されたタッチ操作（タップ、スワイプ、スクロール）およびナビゲーション操作（戻る、ホーム、最近のアプリ）を注入します。</string>
     <string name="accessibility_service_label">PlainApp リモート操作</string>
+    <string name="location_required_for_aware_chat">一部のAndroidデバイスでは、近くのデバイスとの通信に位置情報権限が必要です。PlainAppはあなたを追跡するために位置情報を使用しません。</string>
 </resources>

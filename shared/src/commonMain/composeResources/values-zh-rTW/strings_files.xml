@@ -50,4 +50,7 @@
     <string name="view_mode">瀏覽方式</string>
     <string name="browse_by_tags">按標籤</string>
     <string name="browse_by_file_type">按檔案類型</string>
+    <string name="app_files">應用檔案</string>
+    <string name="app_files_desc">聊天中共用的檔案</string>
+    <string name="no_app_files">尚無檔案</string>
 </resources>

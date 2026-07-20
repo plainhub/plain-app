@@ -22,10 +22,10 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * [com.ismartcoding.plain.ble.BleRpcResponse] and sent back to the BLE
  * client by [HTTPServiceHandler].
  *
- * The merged [headers] map combines the outer [com.ismartcoding.plain.ble.BleRequestData]
- * headers (client identity: `c-id`, `c-platform`, `c-name`, `c-version`)
- * with the inner [BleRpcRequest.headers] (request-specific: `authorization`,
- * `c-cid`, etc.); the inner entries win on conflict.
+ * The [headers] map comes entirely from the outer [com.ismartcoding.plain.ble.BleRequestData]
+ * headers, which carry both client identity (`c-id`, `c-platform`, `c-name`,
+ * `c-version`) and request-specific overrides (`c-cid`, `authorization`, etc.).
+ * [BleRpcRequest] no longer has its own headers field.
  *
  * `respondFile`, `respondStream`, and `respond` paths all buffer into
  * [responseBody] so binary content (encrypted GraphQL bytes, `/fs` file
@@ -49,10 +49,10 @@ class BleHttpCall(
     private val pathParams: MutableMap<String, String> = mutableMapOf()
 
     /**
-     * Effective HTTP headers seen by the route handler. The inner request
-     * headers override the outer client headers on conflict.
+     * Effective HTTP headers seen by the route handler. Sourced entirely from
+     * the outer [com.ismartcoding.plain.ble.BleRequestData.headers].
      */
-    val headers: Map<String, String> = clientHeaders + request.headers
+    val headers: Map<String, String> = clientHeaders
 
     private val requestBody: ByteArray =
         if (request.bodyBase64 && request.body.isNotEmpty()) {

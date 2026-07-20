@@ -134,4 +134,7 @@
     <string name="delivery_status">Stato di consegna</string>
     <string name="delivery_status_summary">%1$d / %2$d consegnati</string>
     <string name="resend_selected">Reinvia selezionati</string>
+    <string name="bluetooth_permission_required_for_nearby">È necessaria l'autorizzazione Bluetooth per scoprire i dispositivi nelle vicinanze tramite Bluetooth.</string>
+    <string name="nearby_wifi_devices_required_for_chat">Sono necessarie le autorizzazioni Bluetooth e dei dispositivi nelle vicinanze per scoprire i dispositivi nelle vicinanze.</string>
+    <string name="pairing_request_expired">Richiesta di associazione scaduta</string>
 </resources>

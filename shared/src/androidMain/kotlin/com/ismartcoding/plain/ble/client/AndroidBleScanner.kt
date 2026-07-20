@@ -11,6 +11,7 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.extensions.hasPermission
 import com.ismartcoding.plain.platform.isSPlus
@@ -72,9 +73,8 @@ object AndroidBleScanner : BleScanner {
 
             scanCallback = object : ScanCallback() {
                 override fun onScanResult(callbackType: Int, result: ScanResult) {
-                    val awareFlags = parseAwareFlags(result, serviceUuid)
-                    val clientId = parseClientId(result, serviceUuid)
-                    trySend(addDevice(result.device, result.rssi, clientId, awareFlags))
+                    val parts = parseServiceData(result, serviceUuid)
+                    trySend(addDevice(result.device, result.rssi, parts))
                 }
             }
             val filterUuid = ParcelUuid.fromString(serviceUuid)
@@ -89,38 +89,23 @@ object AndroidBleScanner : BleScanner {
     }
 
     /**
-     * Extracts the 1-byte Aware flags from the scan response serviceData.
-     * Returns 0 when the serviceData is absent (e.g. peer is not advertising yet).
+     * Parses the scan response serviceData via [BleServiceData.decode].
+     * Returns null when the serviceData is absent (peer is not advertising
+     * yet) — in that case the device falls back to being identified by MAC.
      */
-    private fun parseAwareFlags(result: ScanResult, serviceUuid: String): Int {
-        val data = result.scanRecord?.serviceData?.get(ParcelUuid.fromString(serviceUuid)) ?: return 0
-        if (data.isEmpty()) return 0
-        return data[0].toInt() and 0xFF
+    private fun parseServiceData(result: ScanResult, serviceUuid: String): BleServiceData.Parts? {
+        val data = result.scanRecord?.serviceData?.get(ParcelUuid.fromString(serviceUuid)) ?: return null
+        return BleServiceData.decode(data)
     }
 
-    /**
-     * Extracts the peer's clientId (TempData.clientId, a 13-char short UUID)
-     * from the scan response serviceData. Format: byte[0] = aware flags,
-     * byte[1..N] = clientId UTF-8 bytes. Returns "" when the serviceData is
-     * absent (peer is not advertising yet) — in that case the device falls
-     * back to being identified by MAC until a proper clientId is seen.
-     */
-    private fun parseClientId(result: ScanResult, serviceUuid: String): String {
-        val data = result.scanRecord?.serviceData?.get(ParcelUuid.fromString(serviceUuid)) ?: return ""
-        if (data.size <= 1) return ""
-        return try {
-            String(data, 1, data.size - 1, Charsets.UTF_8)
-        } catch (_: Exception) {
-            ""
-        }
-    }
-
-    override suspend fun findOne(id: String): BleGattClient? {
+    override suspend fun findOne(clientId: String): BleGattClient? {
         if (!isReadyToUse()) return null
-        // Fast path: a device with this clientId has already been discovered.
-        allDevices.find { it.id == id }?.let { return it }
+        // Match by shortId (SHA256(clientId)[0:8] hex) — the scan-exposed
+        // stable identifier. The full clientId is never broadcast.
+        val shortId = BleServiceData.shortIdOf(clientId)
+        allDevices.find { it.id.equals(shortId, ignoreCase = true) }?.let { return it }
         return scan(serviceUuid = BleUuids.SERVICE_UUID).firstOrNull { device ->
-            id.equals(device.id, ignoreCase = true)
+            shortId.equals(device.id, ignoreCase = true)
         }
     }
 
@@ -129,29 +114,34 @@ object AndroidBleScanner : BleScanner {
         // On Android we can't construct a BleGattClient from a clientId alone —
         // the underlying BluetoothDevice (with its current MAC) must come from
         // a scan result. Return an already-discovered client if we have one;
-        // otherwise the caller must scan via [findOne].
-        return allDevices.find { it.id == clientId }
+        // otherwise the caller must scan via [findOne]. Match by shortId.
+        val shortId = BleServiceData.shortIdOf(clientId)
+        return allDevices.find { it.id.equals(shortId, ignoreCase = true) }
     }
 
     @SuppressLint("MissingPermission")
     private fun addDevice(
         device: android.bluetooth.BluetoothDevice,
         rssi: Int,
-        clientId: String,
-        awareFlags: Int = 0,
+        parts: BleServiceData.Parts?,
     ): AndroidBleGattClient {
-        // Match by clientId (the stable peer id parsed from serviceData).
+        // Match by shortId (the stable peer match key parsed from serviceData).
         // Falls back to the BLE MAC only when the peer hasn't started
-        // advertising its clientId yet (clientId is empty).
-        val key = clientId.ifEmpty { device.address }
+        // advertising yet (parts is null).
+        val key = parts?.shortId ?: device.address
         var d = allDevices.find { it.id == key }
         if (d == null) {
-            LogCat.v("Found device: ${device.name}, clientId=$clientId, mac=${device.address}, $rssi, awareFlags=$awareFlags")
-            d = AndroidBleGattClient(device, rssi, awareFlags, clientId)
+            LogCat.v("Found device: ${device.name}, shortId=${parts?.shortId}, mac=${device.address}, $rssi")
+            d = AndroidBleGattClient(
+                device = device,
+                rssi = rssi,
+                shortId = parts?.shortId ?: "",
+                awareSupported = parts?.awareSupported ?: false,
+                awareRunning = parts?.awareRunning ?: false,
+            )
             allDevices.add(d)
         } else {
             d.rssi = rssi
-            d.awareFlags = awareFlags
         }
         return d
     }

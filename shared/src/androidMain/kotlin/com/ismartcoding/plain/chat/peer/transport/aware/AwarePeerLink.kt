@@ -236,7 +236,7 @@ class AwarePeerLink(
             val pub = session.publish ?: error("publish session not ready")
             WifiAwareNetworkSpecifier.Builder(pub)
         }
-        pmk?.let { builder.setPmk(it) }
+        //pmk?.let { builder.setPmk(it) }
         if (!isClient) {
             builder.setPort(TempData.httpsPort.value)
         }

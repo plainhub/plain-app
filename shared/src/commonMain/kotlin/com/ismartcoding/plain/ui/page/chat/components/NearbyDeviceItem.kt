@@ -65,14 +65,6 @@ fun NearbyDeviceItem(
             icon = item.deviceType.getIcon(),
             action = {
                 when (status) {
-                    NearbyItemStatus.COMPLETING -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                    }
-
                     NearbyItemStatus.PAIRING -> {
                         POutlinedButton(
                             text = stringResource(Res.string.cancel),

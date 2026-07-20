@@ -187,7 +187,6 @@ internal fun MainActivity.initEvents() {
                     }
                 }
                 is PairingSuccessEvent -> {
-                    withIO { PeerManager.load() }
                     PeerStatusManager.reconnectNow("post_pairing")
                 }
             }

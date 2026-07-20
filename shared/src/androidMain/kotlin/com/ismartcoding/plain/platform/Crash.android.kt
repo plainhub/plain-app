@@ -58,5 +58,10 @@ actual fun shareCrashReport(report: String, includeAppLogs: Boolean) {
             putExtra(Intent.EXTRA_TEXT, bodyText)
         }
     }
-    appContext.startActivity(Intent.createChooser(intent, null))
+    // appContext is the Application context, so FLAG_ACTIVITY_NEW_TASK is required
+    // when calling startActivity() outside of an Activity context.
+    val chooser = Intent.createChooser(intent, null).apply {
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    appContext.startActivity(chooser)
 }

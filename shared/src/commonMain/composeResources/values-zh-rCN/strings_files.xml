@@ -50,4 +50,7 @@
     <string name="browse_by_file_type">按文件类型</string>
     <string name="file_save_to">文件已保存到 {{path}}</string>
     <string name="group_by_taken_at">按拍摄时间分组</string>
+    <string name="app_files">应用文件</string>
+    <string name="app_files_desc">聊天中共享的文件</string>
+    <string name="no_app_files">暂无文件</string>
 </resources>

@@ -55,7 +55,7 @@ class PeerGraphQLService private constructor(
 
         val clientId = call.header("c-id") ?: ""
         val channelId = call.header("c-cid") ?: ""
-        LogCat.d("[PeerGraphQL] from=$clientId cid=$channelId")
+        LogCat.d("[PeerGraphQL] from=$clientId channelId=$channelId")
 
         // Determine the decryption key:
         // 1. If c-cid is present, always use the channel key (supports non-paired members).

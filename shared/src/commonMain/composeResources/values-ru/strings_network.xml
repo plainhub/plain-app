@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">Запустить HTTP-сервер</string>
     <string name="adb_cmd_stop">Остановить HTTP-сервер</string>
     <string name="enable_adb_token">Включить ADB-токен</string>
+    <string name="http_server_health_check_failed">Служба запущена, но недоступна. Возможно, брандмауэр или VPN-приложение блокирует подключения к localhost. Проверьте настройки сети и перезапустите приложение.</string>
+    <string name="web_settings">Веб-настройки</string>
 </resources>

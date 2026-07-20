@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.api
 
-import com.ismartcoding.plain.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.platform.chaCha20Decrypt
+import com.ismartcoding.plain.platform.chaCha20Encrypt
 import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
@@ -71,11 +72,11 @@ object OkHttpClientFactory {
                     val response =
                         chain.proceed(
                             request.newBuilder()
-                                .post(CryptoHelper.chaCha20Encrypt(keyBytes, requestBodyStr).toRequestBody(requestBody.contentType()))
+                                .post(chaCha20Encrypt(keyBytes, requestBodyStr).toRequestBody(requestBody.contentType()))
                                 .build(),
                         )
                     val responseBody = response.body
-                    val decryptedBytes = CryptoHelper.chaCha20Decrypt(keyBytes, responseBody.bytes())
+                    val decryptedBytes = chaCha20Decrypt(keyBytes, responseBody.bytes())
                     if (decryptedBytes != null) {
                         val json = decryptedBytes.decodeToString()
                         return@addInterceptor response.newBuilder()

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import androidx.compose.runtime.remember
+
 /**
  * Snapshot of Wi-Fi Aware capabilities, permissions, and runtime status.
  *

@@ -134,4 +134,7 @@
     <string name="delivery_status">Статус доставки</string>
     <string name="delivery_status_summary">%1$d / %2$d доставлено</string>
     <string name="resend_selected">Повторить выбранные</string>
+    <string name="bluetooth_permission_required_for_nearby">Для обнаружения ближайших устройств через Bluetooth требуется разрешение на использование Bluetooth.</string>
+    <string name="nearby_wifi_devices_required_for_chat">Для обнаружения ближайших устройств требуются разрешения на использование Bluetooth и доступ к ближайшим устройствам.</string>
+    <string name="pairing_request_expired">Срок действия запроса на сопряжение истек</string>
 </resources>

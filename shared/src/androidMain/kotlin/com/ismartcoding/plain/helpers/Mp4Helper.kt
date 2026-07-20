@@ -60,7 +60,7 @@ object Mp4Helper {
                 return null
             }
 
-            val videoMime = videoFormat!!.getString(MediaFormat.KEY_MIME)!!
+            val videoMime = videoFormat.getString(MediaFormat.KEY_MIME)!!
             val isH264 = videoMime == MediaFormat.MIMETYPE_VIDEO_AVC
             LogCat.d("Mp4Helper: video=$videoMime ${if (isH264) "(remux)" else "(transcode)"}, audio=${audioFormat?.getString(MediaFormat.KEY_MIME) ?: "none"}")
 
@@ -70,7 +70,7 @@ object Mp4Helper {
                 ext.setDataSource(context, uri, null)
                 ext.selectTrack(videoTrackIndex)
                 try {
-                    if (isH264) remuxTrack(ext, videoFormat!!) else transcodeH263ToH264(ext, videoFormat!!)
+                    if (isH264) remuxTrack(ext, videoFormat) else transcodeH263ToH264(ext, videoFormat!!)
                 } finally {
                     ext.release()
                 }

@@ -36,4 +36,5 @@
     <string name="call_phone_permission_required">为了通过应用程序进行电话通话，请允许访问电话。</string>
     <string name="accessibility_service_description">PlainApp使用此无障碍服务以在屏幕镜像时启用远程控制。它会注入来自网页端的触摸事件（点击、滑动、滚动）以及导航操作（返回、主页、最近任务）。</string>
     <string name="accessibility_service_label">PlainApp远程控制</string>
+    <string name="location_required_for_aware_chat">在某些 Android 设备上，附近设备通信需要位置权限。PlainApp 不会使用您的位置来跟踪您。</string>
 </resources>

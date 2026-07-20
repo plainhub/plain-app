@@ -79,7 +79,10 @@ fun ChannelInfoPage(
     navController: NavHostController, chatVM: ChatViewModel, peerVM: PeerViewModel, channelVM: ChannelViewModel,
 ) {
     val chatTarget = chatVM.target.collectAsState()
-    val liveChannel = ChannelCacher.getChannel(chatTarget.value.toId)
+    // Collect channels as state so the UI recomposes whenever ChannelCacher
+    // updates (invite/kick/accept all call ChannelCacher.mutateChannel).
+    val channels = ChannelCacher.channels.collectAsState()
+    val liveChannel = channels.value.find { it.id == chatTarget.value.toId }
     val ownedByMe = liveChannel?.isOwnedByMe() == true
     val showRenameDialog = remember { mutableStateOf(false) }
     val selectedMemberPeer = remember { mutableStateOf<PeerMember?>(null) }
@@ -175,7 +178,7 @@ fun ChannelInfoPage(
                                 onRemove = if (canManage) {
                                     { channelVM.kickMember(liveChannel.id, pm.peer.id) }
                                 } else null,
-                                isLoading = pm.peer.id in channelVM.kickingIds,
+                                isLoading = pm.peer.id in channelVM.pendingIds,
                             )
                         }
                     }
@@ -202,7 +205,7 @@ fun ChannelInfoPage(
                                             text = inviteLabel,
                                             onClick = { channelVM.inviteMember(liveChannel.id, peer.id) },
                                             buttonSize = ButtonSize.SMALL,
-                                            isLoading = peer.id in channelVM.invitingIds,
+                                            isLoading = peer.id in channelVM.pendingIds,
                                         )
                                     },
                                 )
@@ -355,7 +358,7 @@ private fun MemberInfoDialog(
                             onDismiss()
                         },
                         type = ButtonType.TERTIARY,
-                        isLoading = peer.id in channelVM.invitingIds,
+                        isLoading = peer.id in channelVM.pendingIds,
                     )
                 } else {
                     PFilledButton(
@@ -366,7 +369,7 @@ private fun MemberInfoDialog(
                             onDismiss()
                         },
                         type = ButtonType.DANGER,
-                        isLoading = peer.id in channelVM.kickingIds,
+                        isLoading = peer.id in channelVM.pendingIds,
                     )
                 }
             }

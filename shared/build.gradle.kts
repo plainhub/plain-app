@@ -171,3 +171,79 @@ compose.resources {
     generateResClass = always
     publicResClass = true
 }
+
+// ============================================================================
+// Compile-time validation: detect duplicate string resource keys.
+//
+// Compose Resources treats all strings*.xml files in the same values/ or
+// values-{lang}/ directory as a SINGLE namespace. A key appearing in more than
+// one file within the same locale causes a runtime crash:
+//   "Resource with ID='string:X' has more than one file"
+// This task fails the build at compile time so the issue is caught before any
+// device/emulator run. Also detects within-file duplicates.
+// ============================================================================
+val checkStringResourceDuplicates by tasks.registering {
+    group = "verification"
+    description = "Checks for duplicate string resource keys within each locale directory."
+
+    val resourcesDir = layout.projectDirectory.dir("src/commonMain/composeResources")
+    inputs.dir(resourcesDir).withPropertyName("composeResources")
+
+    doLast {
+        val keyPattern = Regex("""<string\s+name="([^"]+)"""")
+        val errors = mutableListOf<String>()
+
+        resourcesDir.asFile.listFiles()?.sortedBy { it.name }?.forEach { localeDir ->
+            if (!localeDir.isDirectory) return@forEach
+            val name = localeDir.name
+            if (name != "values" && !name.startsWith("values-")) return@forEach
+
+            // key -> set of files containing it
+            val keyToFiles = mutableMapOf<String, MutableMap<String, Int>>()
+            localeDir.listFiles { f -> f.isFile && f.name.startsWith("strings") && f.name.endsWith(".xml") }
+                ?.sortedBy { it.name }
+                ?.forEach { xmlFile ->
+                    val content = xmlFile.readText()
+                    keyPattern.findAll(content).forEach { match ->
+                        val fileMap = keyToFiles.getOrPut(match.groupValues[1]) { mutableMapOf() }
+                        fileMap[xmlFile.name] = (fileMap[xmlFile.name] ?: 0) + 1
+                    }
+                }
+
+            keyToFiles.forEach { (key, fileCounts) ->
+                val totalOccurrences = fileCounts.values.sum()
+                val distinctFiles = fileCounts.keys
+                // Cross-file duplicate (the crash scenario)
+                if (distinctFiles.size > 1) {
+                    errors.add("  $name/ key='$key' appears in multiple files: ${distinctFiles.sorted().joinToString(", ")}")
+                }
+                // Within-file duplicate (same key twice in one file)
+                fileCounts.forEach { (file, count) ->
+                    if (count > 1) {
+                        errors.add("  $name/$file key='$key' appears $count times within the same file")
+                    }
+                }
+            }
+        }
+
+        if (errors.isNotEmpty()) {
+            throw GradleException(
+                buildString {
+                    appendLine("Found ${errors.size} duplicate string resource key(s) in Compose Resources.")
+                    appendLine("Compose Resources does not allow the same key in multiple strings*.xml files")
+                    appendLine("within the same locale directory, nor the same key twice in one file.")
+                    appendLine("Fix by removing the duplicate key from all but one location.")
+                    appendLine()
+                    errors.forEach { appendLine(it) }
+                }
+            )
+        }
+    }
+}
+
+// Run the check before Compose Resources are processed and as part of `check`.
+// This ensures the build fails at compile time, not at runtime.
+tasks.matching { it.name.contains("ComposeResources", ignoreCase = true) }.configureEach {
+    dependsOn(checkStringResourceDuplicates)
+}
+tasks.named("check").configure { dependsOn(checkStringResourceDuplicates) }

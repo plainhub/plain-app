@@ -50,4 +50,7 @@
     <string name="view_mode">Ansichtsmodus</string>
     <string name="browse_by_tags">Nach Tags durchsuchen</string>
     <string name="browse_by_file_type">Nach Dateityp durchsuchen</string>
+    <string name="app_files">App-Dateien</string>
+    <string name="app_files_desc">Im Chat geteilte Dateien</string>
+    <string name="no_app_files">Noch keine Dateien</string>
 </resources>

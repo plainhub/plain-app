@@ -1,10 +1,7 @@
 package com.ismartcoding.plain.ble
 
-import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.api.clientHeadersMap
 import com.ismartcoding.plain.helpers.JsonHelper
-import com.ismartcoding.plain.platform.getAppVersion
-import com.ismartcoding.plain.platform.getDeviceName
-import com.ismartcoding.plain.platform.getPlatformName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -19,12 +16,7 @@ data class BleRequestData(
     companion object {
         fun create(): BleRequestData {
             return BleRequestData(
-                headers = mapOf(
-                    "c-id" to TempData.clientId,
-                    "c-platform" to getPlatformName(),
-                    "c-name" to getDeviceName(),
-                    "c-version" to getAppVersion(),
-                ),
+                headers = clientHeadersMap(),
             )
         }
 

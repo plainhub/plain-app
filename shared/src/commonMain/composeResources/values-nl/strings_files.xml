@@ -50,4 +50,7 @@
     <string name="view_mode">Weergavemodus</string>
     <string name="browse_by_tags">Bladeren op tags</string>
     <string name="browse_by_file_type">Bladeren op bestandstype</string>
+    <string name="app_files">App-bestanden</string>
+    <string name="app_files_desc">In chat gedeelde bestanden</string>
+    <string name="no_app_files">Nog geen bestanden</string>
 </resources>

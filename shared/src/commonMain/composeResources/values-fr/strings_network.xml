@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">Démarrer le serveur HTTP</string>
     <string name="adb_cmd_stop">Arrêter le serveur HTTP</string>
     <string name="enable_adb_token">Activer le jeton ADB</string>
+    <string name="http_server_health_check_failed">Le service a démarré mais est inaccessible. Un pare-feu ou une application VPN peut bloquer les connexions localhost. Veuillez vérifier vos paramètres réseau et redémarrer l'application.</string>
+    <string name="web_settings">Paramètres Web</string>
 </resources>

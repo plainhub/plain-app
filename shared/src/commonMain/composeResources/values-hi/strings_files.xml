@@ -50,4 +50,7 @@
     <string name="view_mode">देखने का मोड</string>
     <string name="browse_by_tags">टैग के अनुसार ब्राउज़ करें</string>
     <string name="browse_by_file_type">फ़ाइल प्रकार के अनुसार ब्राउज़ करें</string>
+    <string name="app_files">ऐप फ़ाइलें</string>
+    <string name="app_files_desc">चैट में साझा की गई फ़ाइलें</string>
+    <string name="no_app_files">अभी तक कोई फ़ाइल नहीं</string>
 </resources>

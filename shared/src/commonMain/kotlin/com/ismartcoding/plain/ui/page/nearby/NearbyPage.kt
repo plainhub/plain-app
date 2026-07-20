@@ -164,11 +164,6 @@ internal fun LazyListScope.nearbyDeviceListItems(
             item {
                 val isPaired = pairedPeers.any { it.id == item.id }
                 val status = nearbyVM.getStatus(item.id, isPaired)
-                LaunchedEffect(status) {
-                    if (status == NearbyItemStatus.COMPLETING && isPaired) {
-                        nearbyVM.clearStatus(item.id)
-                    }
-                }
                 NearbyDeviceItem(
                     item = item,
                     status = status,

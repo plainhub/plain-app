@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.discover
 
+import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
@@ -31,12 +32,14 @@ object PairingPeerStore {
                 status = "paired"
                 updatedAt = now
             }
-            // Peers are identified by their clientId (the deviceId), which is
-            // broadcast in the BLE scan response serviceData — no BLE MAC is
-            // stored. awareSupported is also not persisted; the in-memory
-            // PeerCacher.awareSupportedMap (refreshed from BLE scan flags) is
-            // the source of truth.
+            // Peers are identified by their clientId (the deviceId). Only an
+            // 8-byte shortId hash of the clientId is broadcast in the BLE scan
+            // response serviceData — no BLE MAC is stored. awareSupported is
+            // also not persisted; the in-memory PeerCacher.awareSupportedMap
+            // (refreshed from BLE scan flags + GATT DISCOVER reply) is the
+            // source of truth.
             AppDatabase.instance.peerDao().upsert(peer)
+            PeerManager.load()
             LogCat.d("Upserted peer: $deviceId")
         } catch (e: Exception) {
             LogCat.e("Error storing peer in database: ${e.message}")

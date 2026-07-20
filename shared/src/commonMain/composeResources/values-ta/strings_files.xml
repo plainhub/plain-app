@@ -50,4 +50,7 @@
     <string name="view_mode">காட்சி முறை</string>
     <string name="browse_by_tags">குறிச்சொற்கள் அடிப்படையில் உலாவுக</string>
     <string name="browse_by_file_type">கோப்பு வகை அடிப்படையில் உலாவுக</string>
+    <string name="app_files">ஆப் கோப்புகள்</string>
+    <string name="app_files_desc">அரட்டையில் பகிரப்பட்ட கோப்புகள்</string>
+    <string name="no_app_files">இன்னும் கோப்புகள் இல்லை</string>
 </resources>

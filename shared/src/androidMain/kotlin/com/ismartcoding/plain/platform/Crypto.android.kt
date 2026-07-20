@@ -1,13 +1,17 @@
 package com.ismartcoding.plain.platform
 
+import com.google.crypto.tink.aead.AeadConfig
+import com.google.crypto.tink.signature.SignatureConfig
+import com.google.crypto.tink.subtle.Ed25519Sign
+import com.google.crypto.tink.subtle.Ed25519Verify
+import com.google.crypto.tink.subtle.XChaCha20Poly1305
 import com.ismartcoding.plain.crypto.ECDHKeyPair
-import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.lib.helpers.CryptoHelper
-import org.json.JSONObject
-import kotlin.io.encoding.ExperimentalEncodingApi
+import com.ismartcoding.plain.lib.logcat.LogCat
 import java.math.BigInteger
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
+import java.security.MessageDigest
+import java.security.SecureRandom
 import java.security.interfaces.ECPrivateKey
 import java.security.interfaces.ECPublicKey
 import java.security.spec.ECGenParameterSpec
@@ -15,27 +19,71 @@ import java.security.spec.ECParameterSpec
 import java.security.spec.ECPoint
 import java.security.spec.ECPrivateKeySpec
 import java.security.spec.ECPublicKeySpec
+import java.util.concurrent.ConcurrentHashMap
+import javax.crypto.KeyAgreement
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+
+// Cache XChaCha20Poly1305 instances per key to avoid expensive re-construction on every encrypt/decrypt.
+// Key is the hex representation of the raw key bytes.
+private val aeadCache = ConcurrentHashMap<String, XChaCha20Poly1305>()
+
+private fun getAead(key: ByteArray): XChaCha20Poly1305 {
+    val keyHex = key.joinToString("") { (it.toInt() and 0xFF).toString(16).padStart(2, '0') }
+    return aeadCache.getOrPut(keyHex) { XChaCha20Poly1305(key) }
+}
+
+private val tinkInitLock = Any()
+
+@Volatile
+private var tinkInitialized = false
+
+private fun initializeTink() {
+    if (!tinkInitialized) {
+        synchronized(tinkInitLock) {
+            if (!tinkInitialized) {
+                try {
+                    AeadConfig.register()
+                    SignatureConfig.register()
+                    tinkInitialized = true
+                    LogCat.d("Google Tink initialized successfully (Ed25519 signatures + XChaCha20-Poly1305 AEAD)")
+                } catch (ex: Exception) {
+                    LogCat.e("Failed to initialize Google Tink: ${ex.message}")
+                    throw ex
+                }
+            }
+        }
+    }
+}
 
 actual fun chaCha20Decrypt(key: ByteArray, content: ByteArray): ByteArray? =
-    CryptoHelper.chaCha20Decrypt(key, content)
+    try {
+        getAead(key).decrypt(content, null)
+    } catch (ex: Exception) {
+        null
+    }
 
 actual fun chaCha20Encrypt(key: ByteArray, content: ByteArray): ByteArray =
-    CryptoHelper.chaCha20Encrypt(key, content)
+    getAead(key).encrypt(content, null)
 
 actual fun chaCha20Encrypt(key: ByteArray, content: String): ByteArray =
-    CryptoHelper.chaCha20Encrypt(key, content)
+    chaCha20Encrypt(key, content.toByteArray())
 
-actual fun verifyEd25519Signature(publicKey: ByteArray, data: ByteArray, signature: ByteArray): Boolean =
-    CryptoHelper.verifySignatureWithRawEd25519PublicKey(publicKey, data, signature)
+actual fun verifyEd25519Signature(publicKey: ByteArray, data: ByteArray, signature: ByteArray): Boolean {
+    initializeTink()
+    return try {
+        Ed25519Verify(publicKey).verify(signature, data)
+        true
+    } catch (ex: Exception) {
+        false
+    }
+}
 
-actual fun generateChaCha20Key(): String =
-    CryptoHelper.generateChaCha20Key()
-
-actual fun sha512(input: ByteArray): String =
-    CryptoHelper.sha512(input)
-
-actual fun randomPassword(n: Int): String =
-    CryptoHelper.randomPassword(n)
+actual fun generateChaCha20Key(): String {
+    val bytes = ByteArray(32) // XChaCha20 uses 32-byte keys
+    SecureRandom.getInstanceStrong().nextBytes(bytes)
+    return Base64.encode(bytes)
+}
 
 @OptIn(ExperimentalEncodingApi::class)
 actual object PairingCrypto {
@@ -65,22 +113,32 @@ actual object PairingCrypto {
             val pubSpec = ECPublicKeySpec(peerPoint, params)
             val peerPublicKey = KeyFactory.getInstance("EC").generatePublic(pubSpec)
 
-            CryptoHelper.computeECDHSharedKey(privateKey, peerPublicKey.encoded)
+            // Reconstruct the public key from bytes and perform ECDH key agreement
+            val keyAgreement = KeyAgreement.getInstance("ECDH")
+            keyAgreement.init(privateKey)
+            keyAgreement.doPhase(peerPublicKey, true)
+
+            val sharedSecret = keyAgreement.generateSecret()
+
+            // Derive XChaCha20 key from shared secret via SHA-256
+            val xChaCha20KeyBytes = MessageDigest.getInstance("SHA-256").digest(sharedSecret)
+            Base64.encode(xChaCha20KeyBytes)
         } catch (e: Exception) {
+            LogCat.e("ECDH key computation failed: ${e.message}")
             null
         }
     }
 
     actual fun generateEd25519KeyPair(): Pair<ByteArray, ByteArray> {
-        val tinkKeyPair = CryptoHelper.generateEd25519KeyPair()
-        val rawPublicKey = CryptoHelper.extractRawEd25519PublicKey(tinkKeyPair.publicKey)
-            ?: throw RuntimeException("Failed to extract raw Ed25519 public key")
-        val rawPrivateKey = extractRawEd25519PrivateKey(tinkKeyPair.privateKeyBytes)
-        return Pair(rawPrivateKey, rawPublicKey)
+        initializeTink()
+        val keyPair = Ed25519Sign.KeyPair.newKeyPair()
+        return Pair(keyPair.privateKey, keyPair.publicKey)
     }
 
     actual fun signEd25519(rawPrivateKey: ByteArray, data: ByteArray): ByteArray {
-        return CryptoHelper.signDataWithRawEd25519PrivateKey(rawPrivateKey, data)
+        require(rawPrivateKey.size == 32) { "Ed25519 private key must be 32 bytes, got ${rawPrivateKey.size}" }
+        initializeTink()
+        return Ed25519Sign(rawPrivateKey).sign(data)
     }
 
     actual fun verifyEd25519(
@@ -88,7 +146,13 @@ actual object PairingCrypto {
         data: ByteArray,
         signature: ByteArray,
     ): Boolean {
-        return CryptoHelper.verifySignatureWithRawEd25519PublicKey(rawPublicKey, data, signature)
+        initializeTink()
+        return try {
+            Ed25519Verify(rawPublicKey).verify(signature, data)
+            true
+        } catch (ex: Exception) {
+            false
+        }
     }
 
     private fun encodePublicKeyX963(pub: ECPublicKey): ByteArray {
@@ -134,22 +198,5 @@ actual object PairingCrypto {
         val params = (keyPair.public as ECPublicKey).params
         cachedParams = params
         return params
-    }
-
-    private fun extractRawEd25519PrivateKey(privateKeysetJsonBytes: ByteArray): ByteArray {
-        val jsonString = String(privateKeysetJsonBytes, Charsets.UTF_8)
-        val jsonObject = JSONObject(jsonString)
-        val keyArray = jsonObject.getJSONArray("key")
-        val firstKey = keyArray.getJSONObject(0)
-        val keyData = firstKey.getJSONObject("keyData")
-        val keyValueBase64 = keyData.getString("value")
-        val keyValueBytes = Base64Lenient.decode(keyValueBase64)
-
-        for (i in 0 until keyValueBytes.size - 33) {
-            if (keyValueBytes[i].toInt() == 0x1a && keyValueBytes[i + 1].toInt() == 0x20) {
-                return keyValueBytes.copyOfRange(i + 2, i + 34)
-            }
-        }
-        throw RuntimeException("Failed to extract raw Ed25519 private key from keyset")
     }
 }

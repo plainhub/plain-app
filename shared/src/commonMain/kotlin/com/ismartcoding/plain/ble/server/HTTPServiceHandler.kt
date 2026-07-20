@@ -16,7 +16,7 @@ import com.ismartcoding.plain.web.http.HttpStatus
  *
  * The client sends a [BleRequestData] whose [BleRequestData.body] carries a
  * JSON-encoded [BleRpcRequest] describing the HTTP request (method, path,
- * query, headers, body). The handler builds an in-memory [BleHttpCall] and
+ * query, body). The handler builds an in-memory [BleHttpCall] and
  * dispatches it through [HttpRouteRegistry] — the same router used by the
  * Ktor/SwiftNIO HTTP server — so `/graphql`, `/peer_graphql`, `/fs` and the
  * rest of the commonMain routes can be invoked over BLE with identical
@@ -27,11 +27,9 @@ import com.ismartcoding.plain.web.http.HttpStatus
  * bodies (encrypted GraphQL bytes, `/fs` file bytes) are base64-encoded so
  * they survive the string-only BLE transport.
  *
- * The outer [BleRequestData.headers] (populated by `BleRequestData.create()`)
- * carries the client identity (`c-id`, `c-platform`, `c-name`, `c-version`).
- * The inner [BleRpcRequest.headers] carries request-specific HTTP headers
- * (`authorization`, `c-cid`, `c-type`, etc.) and overrides the outer values
- * on conflict.
+ * All HTTP headers (both client identity and request-specific overrides)
+ * are carried by the outer [BleRequestData.headers], populated by
+ * `BleRequestData.create()` via [com.ismartcoding.plain.api.clientHeadersMap].
  */
 class HTTPServiceHandler : BleServiceHandler {
     override val charUuid: String = BleUuids.RPC_CHAR_UUID

@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.lib.channel.receiveEventHandler
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
@@ -131,12 +132,17 @@ class QSTileService : TileService() {
                 qsTile?.state = Tile.STATE_UNAVAILABLE
                 qsTile?.updateTile()
 
-                // Launch the app with unlockAndRun
-                unlockAndRun {
-                    val intent = Intent(appContext, Class.forName("com.ismartcoding.plain.MainActivity"))
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    intent.putExtra("start_web_service", true)
-                    startActivity(intent)
+                // Start HttpServerService directly without launching MainActivity.
+                // Going through MainActivity with an intent extra was unsafe because
+                // MainActivity is exported and the extra could be triggered by any
+                // external caller (e.g. `adb shell am start --ez start_web_service true`).
+                serviceScope.launch(Dispatchers.IO) {
+                    val appContext = applicationContext
+                    WebPreference.putAsync(true)
+                    ContextCompat.startForegroundService(
+                        appContext,
+                        Intent(appContext, HttpServerService::class.java),
+                    )
                 }
             }
 

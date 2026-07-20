@@ -50,4 +50,7 @@
     <string name="view_mode">Chế độ xem</string>
     <string name="browse_by_tags">Duyệt theo thẻ</string>
     <string name="browse_by_file_type">Duyệt theo loại tệp</string>
+    <string name="app_files">Tệp ứng dụng</string>
+    <string name="app_files_desc">Tệp được chia sẻ trong trò chuyện</string>
+    <string name="no_app_files">Chưa có tệp nào</string>
 </resources>

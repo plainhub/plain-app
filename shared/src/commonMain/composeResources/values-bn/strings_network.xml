@@ -89,4 +89,6 @@
     <string name="adb_cmd_start">HTTP সার্ভার শুরু করুন</string>
     <string name="adb_cmd_stop">HTTP সার্ভার বন্ধ করুন</string>
     <string name="enable_adb_token">ADB টোকেন সক্ষম করুন</string>
+    <string name="http_server_health_check_failed">পরিষেবা শুরু হয়েছে কিন্তু অ্যাক্সেস করা যাচ্ছে না। একটি ফায়ারওয়াল বা VPN অ্যাপ localhost সংযোগ ব্লক করতে পারে। অনুগ্রহ করে আপনার নেটওয়ার্ক সেটিংস পরীক্ষা করুন এবং অ্যাপটি পুনরায় চালু করুন।</string>
+    <string name="web_settings">ওয়েব সেটিংস</string>
 </resources>

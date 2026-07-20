@@ -134,4 +134,7 @@
     <string name="delivery_status">Trạng thái giao</string>
     <string name="delivery_status_summary">%1$d / %2$d đã giao</string>
     <string name="resend_selected">Gửi lại đã chọn</string>
+    <string name="bluetooth_permission_required_for_nearby">Cần có quyền Bluetooth để khám phá các thiết bị gần đó qua Bluetooth.</string>
+    <string name="nearby_wifi_devices_required_for_chat">Cần có quyền Bluetooth và thiết bị gần đó để khám phá các thiết bị gần đó.</string>
+    <string name="pairing_request_expired">Yêu cầu ghép nối đã hết hạn</string>
 </resources>

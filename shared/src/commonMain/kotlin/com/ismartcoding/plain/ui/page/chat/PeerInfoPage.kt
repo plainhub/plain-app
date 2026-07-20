@@ -23,7 +23,6 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PCard
@@ -46,8 +45,6 @@ fun PeerInfoPage(
 ) {
     val chatTarget = target.collectAsState()
     val peer = PeerCacher.getPeer(chatTarget.value.toId)
-    var developerMode by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { developerMode = DeveloperModePreference.getAsync() }
 
     PScaffold(
         topBar = {

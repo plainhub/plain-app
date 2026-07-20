@@ -18,6 +18,7 @@ object PeerTransportRouter {
     }
 
     suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
+        val errors = mutableListOf<String>()
         for (t in transports) {
             if (t is LanTransport && peer.ip.isEmpty()) {
                 continue
@@ -33,10 +34,11 @@ object PeerTransportRouter {
             } catch (e: TransportUnavailable) {
                 PeerCircuitBreaker.recordFailure(peer.id, t.id)
                 val causeMsg = e.cause?.message ?: e.message
-                LogCat.d("transport ${t.id} unavailable for peer ${peer.id}: $causeMsg")
+                errors.add("${t.id.uppercase()} error: $causeMsg")
+                LogCat.d("${t.id.uppercase()} error: ${peer.id} $causeMsg")
             }
         }
-        throw Exception("all transports exhausted for peer ${peer.id}")
+        throw Exception(errors.joinToString("\n"))
     }
 
     suspend fun downloadFile(

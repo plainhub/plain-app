@@ -134,4 +134,7 @@
     <string name="delivery_status">配信状況</string>
     <string name="delivery_status_summary">%1$d / %2$d 配信済み</string>
     <string name="resend_selected">選択項目を再送</string>
+    <string name="bluetooth_permission_required_for_nearby">Bluetooth経由で近くのデバイスを検出するには、Bluetooth権限が必要です。</string>
+    <string name="nearby_wifi_devices_required_for_chat">近くのデバイスを検出するには、Bluetoothと近くのデバイスの権限が必要です。</string>
+    <string name="pairing_request_expired">ペアリングリクエストの有効期限が切れました</string>
 </resources>

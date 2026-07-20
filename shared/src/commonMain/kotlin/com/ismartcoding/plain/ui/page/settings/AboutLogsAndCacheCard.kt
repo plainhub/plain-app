@@ -22,7 +22,6 @@ import com.ismartcoding.plain.platform.clearImageMemoryCache
 import com.ismartcoding.plain.platform.clearLogsAsync
 import com.ismartcoding.plain.platform.exportLogsAsync
 import com.ismartcoding.plain.platform.getCacheSize
-import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -42,8 +41,6 @@ fun AboutLogsAndCacheCard(
     onFileSizeCleared: () -> Unit,
     cacheSize: Long,
     onCacheCleared: (Long) -> Unit,
-    developerMode: Boolean,
-    onDeveloperModeChanged: (Boolean) -> Unit,
 ) {
     val logsTitle = stringResource(Res.string.logs)
     PCard {
@@ -93,15 +90,5 @@ fun AboutLogsAndCacheCard(
                 })
             },
         )
-        if (developerMode) {
-            PListItem(title = stringResource(Res.string.developer_mode)) {
-                PSwitch(activated = developerMode) {
-                    onDeveloperModeChanged(it)
-                    scope.launch(Dispatchers.Default) {
-                        DeveloperModePreference.putAsync(it)
-                    }
-                }
-            }
-        }
     }
 }

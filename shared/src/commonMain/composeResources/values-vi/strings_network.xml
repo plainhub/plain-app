@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">Khởi động máy chủ HTTP</string>
     <string name="adb_cmd_stop">Dừng máy chủ HTTP</string>
     <string name="enable_adb_token">Bật mã thông báo ADB</string>
+    <string name="http_server_health_check_failed">Dịch vụ đã khởi động nhưng không thể truy cập. Một ứng dụng tường lửa hoặc VPN có thể đang chặn các kết nối localhost. Vui lòng kiểm tra cài đặt mạng và khởi động lại ứng dụng.</string>
+    <string name="web_settings">Cài đặt Web</string>
 </resources>

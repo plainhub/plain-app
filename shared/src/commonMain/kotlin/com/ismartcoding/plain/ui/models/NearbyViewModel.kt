@@ -5,24 +5,22 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.ble.PairingTransport
-import com.ismartcoding.plain.lib.channel.Channel
-import com.ismartcoding.plain.lib.channel.sendEvent
-import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.discover.PairingInitiator
-import com.ismartcoding.plain.discover.PairingSessionStore
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
-import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.ensureBlePermissionAsync
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.platform.getDeviceType
@@ -142,10 +140,11 @@ class NearbyViewModel : ViewModel() {
 
         if (device.discoveredViaLan && device.ips.isNotEmpty()) {
             launchSafe {
+                // PairingInitiator.start now handles the 90s timeout internally
+                // with UDP retransmissions every 3s. If itemStatus is still
+                // PAIRING after it returns, the session timed out — clean up.
                 PairingInitiator.start(device)
-                delay(PAIRING_TIMEOUT_MS)
                 if (itemStatus[device.id] == NearbyItemStatus.PAIRING) {
-                    PairingSessionStore.remove(device.id)
                     itemStatus.remove(device.id)
                 }
             }
@@ -160,7 +159,12 @@ class NearbyViewModel : ViewModel() {
     }
 
     fun unpairDevice(deviceId: String) {
-        if (itemStatus[deviceId] != null) return
+        // Block only when an active pair/unpair operation is in progress.
+        // Previously this guarded on `!= null`, which also blocked unpairing
+        // from the PAIRED state (set by PairingSuccessEvent) — so the Unpair
+        // button appeared non-responsive after a successful pairing.
+        val current = itemStatus[deviceId]
+        if (current == NearbyItemStatus.UNPAIRING || current == NearbyItemStatus.PAIRING) return
         itemStatus[deviceId] = NearbyItemStatus.UNPAIRING
         launchSafe {
             try {
@@ -194,8 +198,7 @@ class NearbyViewModel : ViewModel() {
     fun getStatus(deviceId: String, isPaired: Boolean): NearbyItemStatus {
         return when (itemStatus[deviceId]) {
             NearbyItemStatus.UNPAIRING -> NearbyItemStatus.UNPAIRING
-            NearbyItemStatus.PAIRING -> if (isPaired) NearbyItemStatus.COMPLETING else NearbyItemStatus.PAIRING
-            NearbyItemStatus.COMPLETING -> NearbyItemStatus.COMPLETING
+            NearbyItemStatus.PAIRING -> if (isPaired) NearbyItemStatus.PAIRED else NearbyItemStatus.PAIRING
             else -> if (isPaired) NearbyItemStatus.PAIRED else NearbyItemStatus.UNPAIRED
         }
     }
@@ -231,12 +234,10 @@ class NearbyViewModel : ViewModel() {
                     }
 
                     is PairingSuccessEvent -> {
-                        itemStatus[event.deviceId] = NearbyItemStatus.COMPLETING
+                        itemStatus[event.deviceId] = NearbyItemStatus.PAIRED
                     }
                 }
             }
         }
     }
 }
-
-private const val PAIRING_TIMEOUT_MS = 90_000L

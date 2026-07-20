@@ -47,36 +47,24 @@ object PeerManager {
         port: Int,
         name: String,
         deviceType: DeviceType,
-    ): DPeer? = withIO {
-        val peerDao = AppDatabase.instance.peerDao()
-        val peer = peerDao.getById(deviceId) ?: return@withIO null
-        if (peer.status != "paired") return@withIO null
+    ): DPeer? {
+        val existing = PeerCacher.getPeer(deviceId) ?: return null
+        if (existing.status != "paired") return null
 
         val newIpString = ips.joinToString(",")
-        var changed = false
-        if (peer.ip != newIpString) {
-            peer.ip = newIpString
-            changed = true
+        val newDeviceType = deviceType.value
+        return PeerCacher.mutatePeer(deviceId) { p ->
+            if (p.ip != newIpString) p.ip = newIpString
+            if (p.port != port) p.port = port
+            if (p.name != name) p.name = name
+            if (p.deviceType != newDeviceType) p.deviceType = newDeviceType
+            // Always refresh updatedAt to signal we heard from this peer.
+            // PeerStatusManager.reconnectPeer compares updatedAt before and after
+            // a directed DISCOVER to detect whether the reply arrived within the
+            // wait window. Without this, a stale IP in the DB would be reused
+            // forever (observed: 370+ failed reconnect attempts to a dead IP).
+            p.updatedAt = TimeHelper.now()
         }
-        if (peer.port != port) {
-            peer.port = port
-            changed = true
-        }
-        if (peer.name != name) {
-            peer.name = name
-            changed = true
-        }
-        if (peer.deviceType != deviceType.value) {
-            peer.deviceType = deviceType.value
-            changed = true
-        }
-        if (!changed) return@withIO null
-
-        peer.updatedAt = TimeHelper.now()
-        peerDao.update(peer)
-
-        PeerCacher.updatePeer(peer)
-        peer
     }
 
     fun setOnlineStatus(peerId: String, online: Boolean) {

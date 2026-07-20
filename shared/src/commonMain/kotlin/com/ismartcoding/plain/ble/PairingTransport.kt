@@ -49,6 +49,9 @@ object PairingTransport {
         server = null
     }
 
+    /** Whether the GATT server (advertising) is currently running. */
+    fun isAdvertising(): Boolean = server != null
+
     fun refreshAdvertising() {
         server?.refreshAdvertising()
     }
@@ -70,35 +73,38 @@ object PairingTransport {
         val replyCache = mutableMapOf<String, DDiscoverReply>()
         val lastEmit = mutableMapOf<String, Long>()
         bleTransport().createScanner().scan(BleUuids.SERVICE_UUID).collect { device ->
-            // device.id is the peer's clientId (parsed from scan response
-            // serviceData) — the stable peer identifier. The BLE MAC is no
-            // longer cached because Android randomizes it every ~15 min and
-            // we identify peers by clientId throughout.
-            val clientId = device.id
-            val cached = replyCache[clientId]
+            // device.id is the peer's shortId (SHA256(clientId)[0:8] hex,
+            // parsed from scan response serviceData) — the stable per-scan
+            // match key. The full clientId is NOT available from the scan;
+            // it is recovered below via the GATT DISCOVER reply. The BLE MAC
+            // is not used because Android randomizes it every ~15 min.
+            val shortId = device.id
+            val cached = replyCache[shortId]
             if (cached == null) {
                 val reply = readDiscoverReply(device)
                 if (reply != null) {
-                    replyCache[clientId] = reply
-                    // Cache the peer's Aware flags from the scan response serviceData:
-                    //  - awareSupported: whether the peer supports Wi-Fi Aware (FLAG_AWARE_SUPPORTED)
-                    //  - awareRunning: whether the peer's Aware service is currently running (FLAG_AWARE_RUNNING)
+                    replyCache[shortId] = reply
+                    // Cache the peer's Aware flags from the DISCOVER reply
+                    // (authoritative). The scan-level flags (device.awareSupported
+                    // / device.awareRunning, parsed from serviceData byte[0])
+                    // are a pre-GATT hint already used by
+                    // PeerTransportPrewarmer.refreshAwareFlagFromScan; the
+                    // DISCOVER reply values here overwrite them.
+                    //  - awareSupported: whether the peer supports Wi-Fi Aware
+                    //  - awareRunning: whether the peer's Aware service is currently running
                     // WifiAwareTransport uses awareRunning to skip itself when the peer's Aware isn't
                     // running (avoids 10s+ buildLink timeout). PeerTransportPrewarmer uses awareSupported
                     // to decide whether to send a startAware mutation via BLE.
-                    val flags = device.awareFlags
-                    val awareSupported = (flags and FLAG_AWARE_SUPPORTED) != 0
-                    val awareRunning = (flags and FLAG_AWARE_RUNNING) != 0
-                    PeerCacher.setAwareSupported(reply.id, awareSupported)
-                    PeerCacher.setAwareRunning(reply.id, awareRunning)
+                    PeerCacher.setAwareSupported(reply.id, reply.awareSupported)
+                    PeerCacher.setAwareRunning(reply.id, reply.awareRunning)
                     emit(PairingCore.replyToDevice(reply, device))
-                    lastEmit[clientId] = TimeHelper.nowMillis()
+                    lastEmit[shortId] = TimeHelper.nowMillis()
                 }
             } else {
                 val now = TimeHelper.nowMillis()
-                if (now - (lastEmit[clientId] ?: 0) > BLE_REFRESH_INTERVAL_MS) {
+                if (now - (lastEmit[shortId] ?: 0) > BLE_REFRESH_INTERVAL_MS) {
                     emit(PairingCore.replyToDevice(cached, device))
-                    lastEmit[clientId] = now
+                    lastEmit[shortId] = now
                 }
             }
         }
@@ -114,6 +120,7 @@ object PairingTransport {
                 body = PairingCore.formatMessage(NearbyMessageType.DISCOVER, "")
             )
             val result = api.requestAsync(BleServices.nearby, requestData)
+            api.disconnect()
             if (!result.isSuccess()) {
                 LogCat.e("[BLE] readDiscoverReply failed: ${result.status}")
                 return null
@@ -163,9 +170,10 @@ object PairingTransport {
 
             if (responseJson != null) {
                 val response = JsonHelper.jsonDecode<DPairingResponse>(responseJson)
-                // The responder is identified by its clientId (parsed from the
-                // BLE scan response serviceData), which is already on the
-                // DPairingResponse.fromId — no BLE MAC needs to be cached.
+                // The responder is identified by its full clientId, which is
+                // on DPairingResponse.fromId (sent via the GATT notification,
+                // NOT parsed from the BLE scan response — only the shortId
+                // hash is broadcast). No BLE MAC needs to be cached.
                 PairingCore.handlePairResponse(
                     response = response,
                     senderIp = "",
@@ -209,8 +217,3 @@ object PairingTransport {
 
 private const val BLE_REFRESH_INTERVAL_MS = 5_000L
 private const val PAIR_RESPONSE_TIMEOUT_MS = 90_000L
-// Bit flags matching AndroidBleGattServer.buildAwareFlags():
-//   0x01 = peer supports Wi-Fi Aware
-//   0x02 = peer's Wi-Fi Aware service is currently running
-private const val FLAG_AWARE_SUPPORTED = 0x01
-private const val FLAG_AWARE_RUNNING = 0x02

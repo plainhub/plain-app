@@ -89,22 +89,31 @@ object LANDiscoverManager {
         val type = NearbyMessageType.entries.firstOrNull { message.startsWith(it.toPrefix()) } ?: return
         val payload = message.removePrefix(type.toPrefix())
 
-        when (type) {
-            NearbyMessageType.DISCOVER -> coIO { handleDiscoverRequest(payload, senderIP) }
-            NearbyMessageType.DISCOVER_REPLY -> handleDiscoverReply(payload)
-            NearbyMessageType.PAIR_REQUEST -> {
-                val request = JsonHelper.jsonDecode<DPairingRequest>(payload)
-                PairingCore.handlePairRequest(request, senderIP, isBle = false)
-            }
+        // Wrap all branches in a single try-catch: a malformed datagram from
+        // a peer (or an attacker) must not crash the receiver loop and take
+        // down all Nearby communication. DISCOVER and DISCOVER_REPLY already
+        // had inner try-catch, but PAIR_REQUEST/PAIR_RESPONSE/PAIR_CANCEL did
+        // not — a bad JSON payload would propagate up and kill the listener.
+        try {
+            when (type) {
+                NearbyMessageType.DISCOVER -> coIO { handleDiscoverRequest(payload, senderIP) }
+                NearbyMessageType.DISCOVER_REPLY -> handleDiscoverReply(payload)
+                NearbyMessageType.PAIR_REQUEST -> {
+                    val request = JsonHelper.jsonDecode<DPairingRequest>(payload)
+                    PairingCore.handlePairRequest(request, senderIP, isBle = false)
+                }
 
-            NearbyMessageType.PAIR_RESPONSE -> {
-                val response = JsonHelper.jsonDecode<DPairingResponse>(payload)
-                coIO { PairingCore.handlePairResponse(response, senderIP) }
-            }
+                NearbyMessageType.PAIR_RESPONSE -> {
+                    val response = JsonHelper.jsonDecode<DPairingResponse>(payload)
+                    coIO { PairingCore.handlePairResponse(response, senderIP) }
+                }
 
-            NearbyMessageType.PAIR_CANCEL -> {
-                PairingCore.handlePairCancel(JsonHelper.jsonDecode(payload))
+                NearbyMessageType.PAIR_CANCEL -> {
+                    PairingCore.handlePairCancel(JsonHelper.jsonDecode(payload))
+                }
             }
+        } catch (e: Exception) {
+            LogCat.e("Nearby onDatagram error type=$type sender=$senderIP: ${e.message}")
         }
     }
 

@@ -12,14 +12,18 @@ inline fun ViewModel.launchSafe(
     crossinline onError: (Throwable) -> Unit = {
         ToastManager.showErrorToast(it.message ?: it.toString())
     },
+    crossinline onDone: () -> Unit = {
+    },
     crossinline block: suspend CoroutineScope.() -> Unit
 ): Job {
     return viewModelScope.launch {
-        runCatching {
+        try {
             block()
-        }.onFailure {
-            if (it is CancellationException) throw it
-            onError(it)
+        } catch (ex: Throwable) {
+            if (ex is CancellationException) throw ex
+            onError(ex)
+        } finally {
+            onDone()
         }
     }
 }

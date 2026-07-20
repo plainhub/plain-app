@@ -139,6 +139,9 @@ class Routing {
     object WifiAwareDebug
 
     @Serializable
+    object BleDebug
+
+    @Serializable
     object ComponentShowcase
 
     @Serializable

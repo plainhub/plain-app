@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat.peer
 
 import androidx.compose.runtime.mutableStateMapOf
+import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.chat.peer.transport.TransportUnavailable
 import com.ismartcoding.plain.db.DPeer
@@ -20,12 +21,14 @@ import kotlinx.coroutines.withTimeoutOrNull
  * Pre-warms peer transports when the user enters a ChatPage so that the first
  * message send doesn't waste time on transport discovery:
  *
- * 1. Scans BLE to discover the peer by its clientId (TempData.clientId, a
- *    13-char short UUID broadcast in the BLE scan response serviceData).
- *    The clientId is the stable peer identifier — Android's BLE MAC randomizes
- *    every ~15 minutes, so we never store or match on MAC.
- * 2. Reads the peer's Aware running flag from the BLE scan response serviceData
- *    and caches it via [PeerCacher.setAwareRunning]. This lets [com.ismartcoding.plain.chat.peer.transport.WifiAwareTransport]
+ * 1. Scans BLE to discover the peer by its shortId (SHA256(clientId)[0:8],
+ *    broadcast in the BLE scan response serviceData). The full clientId is
+ *    NOT broadcast — only its 8-byte hash prefix is, and the scanner matches
+ *    it via [BleServiceData.shortIdOf]. Android's BLE MAC randomizes every
+ *    ~15 minutes, so we never store or match on MAC.
+ * 2. Reads the peer's Aware flags from the BLE scan response serviceData
+ *    (byte[0]) and caches them via [PeerCacher.setAwareSupported] /
+ *    [PeerCacher.setAwareRunning]. This lets [com.ismartcoding.plain.chat.peer.transport.WifiAwareTransport]
  *    skip itself immediately when the peer's Aware isn't running, instead of
  *    waiting 10s+ per buildLink attempt.
  * 3. If the peer supports Wi-Fi Aware but isn't running it, sends a `startAware`
@@ -90,30 +93,30 @@ object PeerTransportPrewarmer {
     }
 
     /**
-     * Scans for [peerId] (the clientId) and updates the cached awareSupported +
-     * awareRunning flags from the scan response serviceData. Doesn't connect —
-     * just reads the flags. Returns true if a matching device was found.
+     * Scans for [peerId] (the full clientId) by matching its shortId
+     * (SHA256(clientId)[0:8]) against the BLE scan response serviceData.
+     * Reads the peer's aware flags directly from the scan response — no GATT
+     * connection needed — and refreshes [PeerCacher]. Returns true if a
+     * matching device was found.
      */
     private suspend fun refreshAwareFlagFromScan(peerId: String): Boolean {
+        val shortId = BleServiceData.shortIdOf(peerId)
         val scanner = bleTransport().createScanner()
         val device = withTimeoutOrNull(BLE_SCAN_TIMEOUT_MS) {
-            scanner.scan(BleUuids.SERVICE_UUID).firstOrNull { it.id == peerId }
+            scanner.scan(BleUuids.SERVICE_UUID).firstOrNull { it.id == shortId }
         }
         if (device == null) {
-            LogCat.d("[Prewarm] refresh scan timeout peer=$peerId")
+            LogCat.d("[Prewarm] refresh scan timeout peer=$peerId shortId=$shortId")
             return false
         }
-        cacheAwareFlags(peerId, device.awareFlags)
-        LogCat.d("[Prewarm] refreshed peer=$peerId awareFlags=${device.awareFlags}")
+        // Refresh aware flags from the scan response (byte[0] of serviceData).
+        // These are a cheap hint without a GATT connection; the DISCOVER reply
+        // (read by PairingTransport.scanAndDiscover) will overwrite them with
+        // authoritative values when a full discovery happens.
+        PeerCacher.setAwareSupported(peerId, device.awareSupported)
+        PeerCacher.setAwareRunning(peerId, device.awareRunning)
+        LogCat.d("[Prewarm] found peer=$peerId shortId=$shortId awareSupported=${device.awareSupported} awareRunning=${device.awareRunning}")
         return true
-    }
-
-    /** Parses Aware flags from BLE scan response and caches awareSupported + awareRunning in PeerCacher. */
-    private fun cacheAwareFlags(peerId: String, awareFlags: Int) {
-        val awareSupported = (awareFlags and FLAG_AWARE_SUPPORTED) != 0
-        val awareRunning = (awareFlags and FLAG_AWARE_RUNNING) != 0
-        PeerCacher.setAwareSupported(peerId, awareSupported)
-        PeerCacher.setAwareRunning(peerId, awareRunning)
     }
 
     /**
@@ -156,7 +159,4 @@ object PeerTransportPrewarmer {
             LogCat.e("[Prewarm] startAware error peer=${peer.id}: ${e.message}")
         }
     }
-
-    private const val FLAG_AWARE_SUPPORTED = 0x01
-    private const val FLAG_AWARE_RUNNING = 0x02
 }

@@ -4,19 +4,23 @@ import com.ismartcoding.plain.ble.BleService
 import kotlinx.coroutines.flow.Flow
 
 interface BleGattClient {
-    // The peer's clientId (TempData.clientId, a 13-char short UUID like
-    // "t4a27f5gwnz8") parsed from the BLE scan response serviceData. This is
-    // the stable peer identifier — Android's BLE MAC randomizes every ~15
-    // minutes so it must NOT be used as the peer id. The underlying BLE MAC
-    // (on Android) is exposed separately via the platform-specific client.
+    // Stable peer match key parsed from the BLE scan response serviceData.
+    // This is the 8-byte truncated SHA256 of the peer's full clientId
+    // (TempData.clientId), rendered as a 16-char lowercase hex string — see
+    // [com.ismartcoding.plain.ble.BleServiceData.shortIdOf]. The full clientId
+    // is NOT broadcast; it is recovered later via the GATT DISCOVER reply.
+    // Android's BLE MAC randomizes every ~15 minutes so it must NOT be used
+    // as the peer id. The underlying BLE MAC (on Android) is exposed separately
+    // via the platform-specific client.
     val id: String
     val name: String?
     var rssi: Int
-    // Bit flags parsed from the BLE scan response serviceData:
-    //   bit 0 (0x01) = peer supports Wi-Fi Aware
-    //   bit 1 (0x02) = peer's Wi-Fi Aware service is currently running
-    // Refreshed by AndroidBleScanner from ScanResult.scanRecord.serviceData; defaults to 0 on iOS.
-    var awareFlags: Int
+
+    // Aware flags parsed from the BLE scan response serviceData (byte[0]).
+    // These are a cheap pre-GATT hint — the authoritative values come from the
+    // GATT DISCOVER reply ([com.ismartcoding.plain.data.DDiscoverReply]).
+    val awareSupported: Boolean get() = false
+    val awareRunning: Boolean get() = false
 
     fun isConnected(): Boolean
 
@@ -36,11 +40,19 @@ interface BleGattClient {
 interface BleScanner {
     fun scan(serviceUuid: String): Flow<BleGattClient>
 
-    suspend fun findOne(id: String): BleGattClient?
+    /**
+     * Finds a discovered BLE device whose shortId matches [clientId]. The
+     * shortId is computed via [com.ismartcoding.plain.ble.BleServiceData.shortIdOf]
+     * (8-byte truncated SHA256 of the full clientId), so callers pass the
+     * peer's full clientId (TempData.clientId / DPeer.id) and the scanner
+     * matches it against the shortId broadcast in the scan response.
+     */
+    suspend fun findOne(clientId: String): BleGattClient?
 
     /**
      * Returns an already-discovered [BleGattClient] for [clientId], or null if
-     * no device with that clientId has been seen in the current scan session.
+     * no matching device has been seen in the current scan session. Matching
+     * is done by shortId (see [findOne]).
      *
      * On Android, BLE MACs can't be constructed from a clientId alone — the
      * underlying [android.bluetooth.BluetoothDevice] must come from a scan

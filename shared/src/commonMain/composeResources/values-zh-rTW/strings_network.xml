@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">啟動 HTTP 伺服器</string>
     <string name="adb_cmd_stop">停止 HTTP 伺服器</string>
     <string name="enable_adb_token">啟用 ADB 令牌</string>
+    <string name="http_server_health_check_failed">服務已啟動但無法存取。防火牆或 VPN 應用程式可能封鎖了 localhost 連線。請檢查您的網路設定並重新啟動應用程式。</string>
+    <string name="web_settings">網頁設定</string>
 </resources>

@@ -13,12 +13,13 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.ParcelUuid
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.platform.isWifiAwareSupported
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -87,8 +88,15 @@ class AndroidBleGattServer : BleGattServer {
             .setConnectable(true)
             .setTimeout(0)
             .build()
+        // Do NOT include the device name in the advertising packet — on some
+        // devices (e.g. Pixel 9 / Android 17) the system adds extra bytes
+        // (TX power, flags) that push the total past the 31-byte limit,
+        // causing ADVERTISE_FAILED_DATA_TOO_LARGE (error code 1). The peer's
+        // display name is fetched later via the GATT DISCOVER reply, so it
+        // is not needed here. Keeping only the service UUID keeps the
+        // advertising packet minimal and compatible with the ScanFilter.
         val data = AdvertiseData.Builder()
-            .setIncludeDeviceName(true)
+            .setIncludeDeviceName(false)
             .addServiceUuid(ParcelUuid(UUID.fromString(BleUuids.SERVICE_UUID)))
             .build()
         val scanResponse = AdvertiseData.Builder()
@@ -105,31 +113,17 @@ class AndroidBleGattServer : BleGattServer {
     }
 
     /**
-     * Builds the scan response serviceData payload:
-     *   byte[0]     = Aware flags (0x01=aware supported, 0x02=aware running)
-     *   byte[1..N]  = clientId UTF-8 bytes (TempData.clientId, 13-char short UUID)
-     *
-     * Total ~14 bytes, well within the 31-byte scan response limit.
+     * Builds the scan response serviceData payload: byte[0] = aware flags,
+     * byte[1..8] = SHA256(clientId)[0:8]. Total 9 bytes — well within the
+     * 31-byte BLE limit (full entry = 1 len + 1 type + 16 UUID + 9 = 27 bytes).
+     * See [BleServiceData] for the wire format.
      */
-    private fun buildServiceData(): ByteArray {
-        val clientIdBytes = TempData.clientId.toByteArray(Charsets.UTF_8)
-        val clientIdLen = minOf(clientIdBytes.size, CLIENT_ID_MAX_LEN)
-        val payload = ByteArray(1 + clientIdLen)
-        payload[0] = buildAwareFlags()
-        System.arraycopy(clientIdBytes, 0, payload, 1, clientIdLen)
-        return payload
-    }
-
-    private fun buildAwareFlags(): Byte {
-        var flags = 0
-        if (isAwareSupported()) flags = flags or FLAG_AWARE_SUPPORTED
-        if (TempData.awareRunning.value) flags = flags or FLAG_AWARE_RUNNING
-        return flags.toByte()
-    }
-
-    private fun isAwareSupported(): Boolean {
-        return appContext.packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_AWARE)
-    }
+    private fun buildServiceData(): ByteArray =
+        BleServiceData.encode(
+            awareSupported = isWifiAwareSupported,
+            awareRunning = TempData.awareRunning.value,
+            clientId = TempData.clientId,
+        )
 
     private fun openGattServer() {
         val server = try {
@@ -276,11 +270,5 @@ class AndroidBleGattServer : BleGattServer {
 
     companion object {
         private const val READY_SIGNAL = "1"
-        private const val FLAG_AWARE_SUPPORTED = 0x01
-        private const val FLAG_AWARE_RUNNING = 0x02
-        // Cap the clientId portion of the scan response serviceData. The full
-        // scan response payload is 31 bytes; minus 1 byte for flags and a few
-        // bytes for the service UUID header, 20 is a safe upper bound.
-        private const val CLIENT_ID_MAX_LEN = 20
     }
 }

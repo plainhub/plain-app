@@ -23,16 +23,19 @@ import kotlin.time.Duration.Companion.milliseconds
 class AndroidBleGattClient(
     val device: BluetoothDevice,
     override var rssi: Int = 0,
-    override var awareFlags: Int = 0,
-    clientId: String = "",
+    shortId: String = "",
+    override val awareSupported: Boolean = false,
+    override val awareRunning: Boolean = false,
 ) : BleGattClient {
 
     /**
-     * Stable peer identifier — the peer's clientId (TempData.clientId, a 13-char
-     * short UUID) parsed from the BLE scan response serviceData. NOT the BLE MAC,
-     * because Android randomizes BLE MACs every ~15 minutes.
+     * Stable peer match key — the 8-byte truncated SHA256 of the peer's full
+     * clientId, rendered as a 16-char hex string. Parsed from the BLE scan
+     * response serviceData via [com.ismartcoding.plain.ble.BleServiceData].
+     * NOT the BLE MAC, because Android randomizes BLE MACs every ~15 minutes.
+     * Falls back to the MAC when no serviceData was advertised.
      */
-    override val id: String = clientId.ifEmpty { device.address }
+    override val id: String = shortId.ifEmpty { device.address }
 
     /**
      * The current BLE MAC of this device, used internally for Android GATT

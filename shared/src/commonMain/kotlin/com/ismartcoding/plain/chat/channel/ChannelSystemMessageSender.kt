@@ -114,7 +114,6 @@ object ChannelSystemMessageSender {
     private suspend fun sendToPeer(peer: DPeer, type: String, payload: String, channelId: String = ""): GraphQLResponse = withIO {
         PeerGraphQLClient.sendChannelSystemMessage(
             peer = peer,
-            clientId = TempData.clientId,
             type = type,
             payload = payload,
             channelId = channelId,

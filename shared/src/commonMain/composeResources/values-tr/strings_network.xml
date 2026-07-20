@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">HTTP Sunucusunu Başlat</string>
     <string name="adb_cmd_stop">HTTP Sunucusunu Durdur</string>
     <string name="enable_adb_token">ADB jetonunu etkinleştir</string>
+    <string name="http_server_health_check_failed">Hizmet başlatıldı ancak erişilemiyor. Bir güvenlik duvarı veya VPN uygulaması localhost bağlantılarını engelliyor olabilir. Lütfen ağ ayarlarınızı kontrol edin ve uygulamayı yeniden başlatın.</string>
+    <string name="web_settings">Web Ayarları</string>
 </resources>

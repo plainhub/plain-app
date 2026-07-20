@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ble.client
 
+import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -70,16 +71,21 @@ object IosBleScanner : BleScanner {
         }
 
         scanCallback = { peripheral, rssi, advertisementData ->
-            val (awareFlags, clientId) = parseServiceData(advertisementData, serviceUuid)
-            // Match by clientId when advertised; fall back to peripheral UUID so
-            // peers running older app versions (without clientId in serviceData)
-            // still get a stable id.
-            val key = clientId.ifEmpty { peripheral.identifier.UUIDString }
+            val parts = parseServiceData(advertisementData, serviceUuid)
+            // Match by shortId when advertised; fall back to peripheral UUID so
+            // peers running older app versions (without serviceData) still get
+            // a stable id.
+            val key = parts?.shortId ?: peripheral.identifier.UUIDString
             val client = allDevices.getOrPut(key) {
-                IosBleGattClient(peripheral, rssi.intValue, awareFlags, clientId)
+                IosBleGattClient(
+                    peripheral = peripheral,
+                    rssi = rssi.intValue,
+                    shortId = parts?.shortId ?: "",
+                    awareSupported = parts?.awareSupported ?: false,
+                    awareRunning = parts?.awareRunning ?: false,
+                )
             }
             client.rssi = rssi.intValue
-            client.awareFlags = awareFlags
             trySend(client)
         }
 
@@ -97,38 +103,33 @@ object IosBleScanner : BleScanner {
     }
 
     /**
-     * Extracts (awareFlags, clientId) from the CBAdvertisementDataServiceDataKey
-     * entry for [serviceUuid]. Format mirrors AndroidBleGattServer: byte[0] =
-     * flags, bytes[1..N] = clientId UTF-8 bytes. Returns (0, "") when absent.
+     * Parses the advertisement serviceData via [BleServiceData.decode].
+     * Returns null when the serviceData is absent or too short.
      */
     private fun parseServiceData(
         advertisementData: Map<Any?, *>,
         serviceUuid: String,
-    ): Pair<Int, String> {
+    ): BleServiceData.Parts? {
         val serviceDataKey = platform.CoreBluetooth.CBAdvertisementDataServiceDataKey
-            ?: return 0 to ""
+            ?: return null
         @Suppress("UNCHECKED_CAST")
         val serviceDataMap = advertisementData[serviceDataKey] as? Map<Any?, *>
-            ?: return 0 to ""
+            ?: return null
         val targetUuid = CBUUID.UUIDWithString(serviceUuid)
         val nsData = serviceDataMap.entries.firstOrNull { (k, _) ->
             (k as? CBUUID)?.UUIDString.equals(targetUuid.UUIDString, ignoreCase = true)
-        }?.value as? NSData ?: return 0 to ""
-        val bytes = nsData.toByteArray()
-        if (bytes.isEmpty()) return 0 to ""
-        val flags = bytes[0].toInt() and 0xFF
-        val clientId = if (bytes.size > 1) {
-            try { bytes.decodeToString(1, bytes.size) } catch (_: Exception) { "" }
-        } else ""
-        return flags to clientId
+        }?.value as? NSData ?: return null
+        return BleServiceData.decode(nsData.toByteArray())
     }
 
-    override suspend fun findOne(id: String): BleGattClient? {
+    override suspend fun findOne(clientId: String): BleGattClient? {
         if (!isReadyToUse()) return null
-        // Fast path: a device with this clientId has already been discovered.
-        allDevices[id]?.let { return it }
+        // Match by shortId (SHA256(clientId)[0:8] hex) — the scan-exposed
+        // stable identifier. The full clientId is never broadcast.
+        val shortId = BleServiceData.shortIdOf(clientId)
+        allDevices[shortId]?.let { return it }
         return scan(BleUuids.SERVICE_UUID).firstOrNull { device ->
-            device.id.equals(id, ignoreCase = true)
+            device.id.equals(shortId, ignoreCase = true)
         }
     }
 
@@ -136,8 +137,12 @@ object IosBleScanner : BleScanner {
      * On iOS we can't construct a client from a clientId alone — the underlying
      * [CBPeripheral] must come from a scan result. Return an already-discovered
      * client if we have one; otherwise the caller must scan via [findOne].
+     * Match by shortId.
      */
-    override fun createClient(clientId: String): BleGattClient? = allDevices[clientId]
+    override fun createClient(clientId: String): BleGattClient? {
+        val shortId = BleServiceData.shortIdOf(clientId)
+        return allDevices[shortId]
+    }
 
     suspend fun connectPeripheral(client: IosBleGattClient): Boolean {
         if (client.isConnected()) return true

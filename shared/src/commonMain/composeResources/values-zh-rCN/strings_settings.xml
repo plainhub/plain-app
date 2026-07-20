@@ -74,6 +74,22 @@
     <string name="wifi_aware_publish_session_status">Publish 会话状态</string>
     <string name="wifi_aware_subscribe_session_status">Subscribe 会话状态</string>
     <string name="wifi_aware_discovered_peer_count">已发现的对端数量</string>
+    <string name="ble_debug">BLE 调试</string>
+    <string name="ble_support">BLE 支持</string>
+    <string name="ble_permissions">权限</string>
+    <string name="ble_runtime_status">运行时状态</string>
+    <string name="ble_bluetooth_supported">支持蓝牙</string>
+    <string name="ble_bluetooth_enabled">蓝牙已开启</string>
+    <string name="ble_advertise_ready">广播就绪</string>
+    <string name="ble_advertise_ready_desc">蓝牙已开启且权限已授予</string>
+    <string name="ble_scan_permission">BLUETOOTH_SCAN 权限</string>
+    <string name="ble_connect_permission">BLUETOOTH_CONNECT 权限</string>
+    <string name="ble_advertise_permission">BLUETOOTH_ADVERTISE 权限</string>
+    <string name="ble_location_permission">位置权限</string>
+    <string name="ble_permission_granted">BLE 权限已授予</string>
+    <string name="ble_advertising_running">广播运行中</string>
+    <string name="ble_client_id">Client ID</string>
+    <string name="ble_service_uuid">Service UUID</string>
     <string name="clear_history">清空历史</string>
     <string name="clear_logs">清空日志</string>
     <string name="no_logs_error">无日志可分享</string>
@@ -106,4 +122,11 @@
     <string name="official">官方</string>
     <string name="official_website_title">探索 PlainApp 生态系统</string>
     <string name="official_website_desc">PlainApp 是一个开源项目。访问我们的官方网站，探索桌面客户端、功能特性和产品路线图。</string>
+    <string name="simulate_crash">模拟崩溃</string>
+    <string name="simulate_crash_desc">触发测试崩溃以验证崩溃报告是否正常工作</string>
+    <string name="ui_components">UI 组件</string>
+    <string name="update_downloaded">更新已下载！</string>
+    <string name="install_update">安装更新</string>
+    <string name="donation_title">支持 PlainApp 开发</string>
+    <string name="buy_me_a_coffee">请我喝杯咖啡</string>
 </resources>

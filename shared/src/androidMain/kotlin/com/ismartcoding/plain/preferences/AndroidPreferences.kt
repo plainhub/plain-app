@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.Preferences
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.platform.randomPassword
 
 fun DarkThemePreference.setDarkMode(theme: DarkTheme) {
     when (theme) {
@@ -22,7 +22,7 @@ suspend fun DarkThemePreference.putAsync(value: DarkTheme) {
 suspend fun AdbTokenPreference.ensureValueAsync(preferences: Preferences) {
     TempData.adbToken = get(preferences)
     if (TempData.adbToken.isEmpty()) {
-        TempData.adbToken = CryptoHelper.randomPassword(32)
+        TempData.adbToken = randomPassword(32)
         putAsync(TempData.adbToken)
     }
 }

@@ -36,4 +36,5 @@
     <string name="call_phone_permission_required">Uygulama üzerinden telefon aramaları yapabilmek için lütfen telefon erişimine izin verin.</string>
     <string name="accessibility_service_description">PlainApp, ekran yansıtma sırasında uzaktan kontrolü etkinleştirmek için bu erişilebilirlik hizmetini kullanır. Web arayüzünden gönderilen dokunma olaylarını (dokunma, kaydırma, kaydırarak gezinme) ve gezinme eylemlerini (Geri, Ana ekran, Son kullanılanlar) enjekte eder.</string>
     <string name="accessibility_service_label">PlainApp Uzaktan Kontrol</string>
+    <string name="location_required_for_aware_chat">Bazı Android cihazlarda, yakındaki cihaz iletişimi için konum izni gereklidir. PlainApp sizi izlemek için konumunuzu kullanmaz.</string>
 </resources>

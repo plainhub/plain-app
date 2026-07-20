@@ -9,8 +9,7 @@ import com.ismartcoding.plain.ui.base.ToastManager
 
 class ChannelViewModel : ViewModel() {
 
-    val invitingIds = mutableStateSetOf<String>()
-    val kickingIds = mutableStateSetOf<String>()
+    val pendingIds = mutableStateSetOf<String>()
 
     val showCreateChannelDialog = mutableStateOf(false)
     val renameChannelId = mutableStateOf("")
@@ -46,10 +45,11 @@ class ChannelViewModel : ViewModel() {
     }
 
     fun inviteMember(channelId: String, peerId: String) {
-        launchSafe {
-            invitingIds.add(peerId)
+        launchSafe(onDone = {
+            pendingIds.remove(peerId)
+        }) {
+            pendingIds.add(peerId)
             ChannelManager.inviteMember(channelId, peerId)
-            invitingIds.remove(peerId)
         }
     }
 
@@ -60,10 +60,11 @@ class ChannelViewModel : ViewModel() {
     }
 
     fun kickMember(channelId: String, peerId: String) {
-        launchSafe {
-            kickingIds.add(peerId)
+        launchSafe(onDone = {
+            pendingIds.remove(peerId)
+        }) {
+            pendingIds.add(peerId)
             ChannelManager.kickMember(channelId, peerId)
-            kickingIds.remove(peerId)
         }
     }
 

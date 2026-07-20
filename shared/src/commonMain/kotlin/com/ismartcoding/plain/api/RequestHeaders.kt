@@ -10,7 +10,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
- * Returns the common client identification headers (c-id, c-platform, c-name, c-version).
+ * Returns the common client identification headers (c-id, c-platform, c-version).
  *
  * Used by [addClientHeaders] for Ktor requests and by non-HTTP transports (e.g. BLE)
  * that need to forward the same metadata to the peer's HTTP router.
@@ -19,7 +19,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 fun clientHeadersMap(): Map<String, String> = mapOf(
     "c-id" to TempData.clientId,
     "c-platform" to getPlatformName(),
-    "c-name" to Base64.encode(getDeviceName().encodeToByteArray()),
     "c-version" to getAppVersion(),
 )
 

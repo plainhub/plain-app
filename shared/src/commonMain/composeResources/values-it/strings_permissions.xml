@@ -36,4 +36,5 @@
     <string name="call_phone_permission_required">Per effettuare chiamate telefoniche tramite l'app, permetti l'accesso al telefono.</string>
     <string name="accessibility_service_description">PlainApp usa questo servizio di accessibilità per abilitare il controllo remoto durante il mirroring dello schermo. Inietta eventi di tocco (tap, scorrimento, trascinamento) e azioni di navigazione (Indietro, Home, Recenti) inviate dall'interfaccia web.</string>
     <string name="accessibility_service_label">Controllo remoto PlainApp</string>
+    <string name="location_required_for_aware_chat">Su alcuni dispositivi Android, l'autorizzazione alla posizione è necessaria per la comunicazione con i dispositivi nelle vicinanze. PlainApp non utilizza la tua posizione per tracciarti.</string>
 </resources>

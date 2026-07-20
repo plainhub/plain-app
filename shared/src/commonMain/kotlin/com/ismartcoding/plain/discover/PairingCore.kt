@@ -47,6 +47,8 @@ object PairingCore {
             version = getAppVersion(),
             platform = getPlatformName(),
             ips = getDeviceIP4s(),
+            awareSupported = isWifiAwareSupported,
+            awareRunning = TempData.awareRunning.value,
         )
     }
 

@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">HTTP सर्वर शुरू करें</string>
     <string name="adb_cmd_stop">HTTP सर्वर बंद करें</string>
     <string name="enable_adb_token">ADB टोकन सक्षम करें</string>
+    <string name="http_server_health_check_failed">सेवा शुरू हो गई है लेकिन एक्सेस नहीं की जा सकती। फ़ायरवॉल या VPN ऐप localhost कनेक्शन को ब्लॉक कर सकता है। कृपया अपनी नेटवर्क सेटिंग जांचें और ऐप को पुनर्प्रारंभ करें।</string>
+    <string name="web_settings">वेब सेटिंग्स</string>
 </resources>

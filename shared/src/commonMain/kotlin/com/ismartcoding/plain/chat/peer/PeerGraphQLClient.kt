@@ -41,7 +41,6 @@ object PeerGraphQLClient {
 
     suspend fun sendChannelSystemMessage(
         peer: DPeer,
-        clientId: String,
         type: String,
         payload: String,
         channelId: String = "",
@@ -70,7 +69,7 @@ object PeerGraphQLClient {
         val request = buildSignedRequest(
             query = mutation,
             variables = variables,
-            channelId = channelId,
+            channelId = if (peer.key.isNotEmpty()) "" else channelId,
         )
         return PeerTransportRouter.send(peer, request, keyBytes)
     }

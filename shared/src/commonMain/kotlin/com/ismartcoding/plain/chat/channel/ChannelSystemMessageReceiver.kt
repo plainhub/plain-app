@@ -105,15 +105,14 @@ object ChannelSystemMessageReceiver {
         }
 
         if (isReinvite) {
-            val channel = existingChannel
-            channel.name = msg.channelName
-            channel.key = msg.key
-            channel.owner = fromId
-            channel.members = msg.members
-            channel.version = msg.version
-            channel.status = DChatChannel.STATUS_JOINED
-            AppDatabase.instance.chatChannelDao().update(channel)
-            ChannelCacher.updateChannel(channel)
+            ChannelCacher.mutateChannel(msg.channelId) { ch ->
+                ch.name = msg.channelName
+                ch.key = msg.key
+                ch.owner = fromId
+                ch.members = msg.members
+                ch.version = msg.version
+                ch.status = DChatChannel.STATUS_JOINED
+            }
             LogCat.d("Re-invite for channel ${msg.channelId} (was ${existingChannel.status}), restored to joined")
         } else {
             val channel = DChatChannel()
@@ -163,12 +162,12 @@ object ChannelSystemMessageReceiver {
                 logTag = "accepting member",
             )
         } else if (existingPeer.publicKey.isEmpty() && msg.publicKey.isNotEmpty()) {
-            existingPeer.publicKey = msg.publicKey
-            if (msg.name.isNotEmpty() && existingPeer.name.isEmpty()) {
-                existingPeer.name = msg.name
+            PeerCacher.mutatePeer(fromId) { p ->
+                p.publicKey = msg.publicKey
+                if (msg.name.isNotEmpty() && p.name.isEmpty()) {
+                    p.name = msg.name
+                }
             }
-            AppDatabase.instance.peerDao().update(existingPeer)
-            PeerCacher.updatePeer(existingPeer)
         }
 
         val member = channel.findMember(fromId)
@@ -181,16 +180,15 @@ object ChannelSystemMessageReceiver {
             return
         }
 
-        channel.members = channel.members.map {
-            if (it.id == fromId) it.copy(status = ChannelMember.STATUS_JOINED) else it
-        }
+        val updatedChannel = ChannelCacher.mutateChannel(msg.channelId) { ch ->
+            ch.members = ch.members.map {
+                if (it.id == fromId) it.copy(status = ChannelMember.STATUS_JOINED) else it
+            }
+            ch.version++
+            ch.updatedAt = TimeHelper.now()
+        } ?: return
 
-        channel.version++
-        channel.updatedAt = TimeHelper.now()
-        AppDatabase.instance.chatChannelDao().update(channel)
-        ChannelCacher.updateChannel(channel)
-
-        ChannelSystemMessageSender.broadcastUpdate(channel)
+        ChannelSystemMessageSender.broadcastUpdate(updatedChannel)
 
         LogCat.d("Peer $fromId accepted invite for channel ${msg.channelId}")
     }
@@ -201,11 +199,11 @@ object ChannelSystemMessageReceiver {
         if (!channel.isOwnedByMe()) return
 
         if (channel.hasMember(fromId)) {
-            channel.members = channel.members.filter { it.id != fromId }
-            channel.version++
-            channel.updatedAt = TimeHelper.now()
-            AppDatabase.instance.chatChannelDao().update(channel)
-            ChannelCacher.updateChannel(channel)
+            ChannelCacher.mutateChannel(msg.channelId) { ch ->
+                ch.members = ch.members.filter { it.id != fromId }
+                ch.version++
+                ch.updatedAt = TimeHelper.now()
+            }
         }
 
         LogCat.d("Peer $fromId declined invite for channel ${msg.channelId}")
@@ -257,12 +255,12 @@ object ChannelSystemMessageReceiver {
             )
         }
 
-        channel.name = msg.channelName
-        channel.members = msg.members
-        channel.version = msg.version
-        channel.updatedAt = TimeHelper.now()
-        AppDatabase.instance.chatChannelDao().update(channel)
-        ChannelCacher.updateChannel(channel)
+        ChannelCacher.mutateChannel(msg.channelId) { ch ->
+            ch.name = msg.channelName
+            ch.members = msg.members
+            ch.version = msg.version
+            ch.updatedAt = TimeHelper.now()
+        }
 
         PeerCacher.load()
 
@@ -270,7 +268,12 @@ object ChannelSystemMessageReceiver {
     }
 
     private suspend fun handleKick(fromId: String, msg: ChannelSystemMessages.ChannelKick) {
-        val channel = ChannelCacher.getChannel(msg.channelId) ?: return
+        val channel = ChannelCacher.getChannel(msg.channelId)
+        if (channel == null) {
+            // inviting, cancel the dialog
+            sendEvent(ChannelInviteCanceledEvent(channelId = msg.channelId, ownerPeerId = fromId))
+            return
+        }
 
         if (channel.owner != fromId) {
             LogCat.e("ChannelKick from non-owner $fromId (owner=${channel.owner}) — rejected")
@@ -294,10 +297,10 @@ object ChannelSystemMessageReceiver {
         }
 
         val wasPending = channel.findMember(TempData.clientId)?.isPending() == true
-        channel.status = DChatChannel.STATUS_KICKED
-        channel.members = channel.members.filter { it.id != TempData.clientId }
-        AppDatabase.instance.chatChannelDao().update(channel)
-        ChannelCacher.updateChannel(channel)
+        ChannelCacher.mutateChannel(msg.channelId) { ch ->
+            ch.status = DChatChannel.STATUS_KICKED
+            ch.members = ch.members.filter { it.id != TempData.clientId }
+        }
 
         if (wasPending) {
             sendEvent(ChannelInviteCanceledEvent(channelId = msg.channelId, ownerPeerId = fromId))
@@ -313,13 +316,13 @@ object ChannelSystemMessageReceiver {
             return
         }
 
-        channel.members = channel.members.filter { it.id != fromId }
-        channel.version++
-        channel.updatedAt = TimeHelper.now()
-        AppDatabase.instance.chatChannelDao().update(channel)
-        ChannelCacher.updateChannel(channel)
+        val updatedChannel = ChannelCacher.mutateChannel(msg.channelId) { ch ->
+            ch.members = ch.members.filter { it.id != fromId }
+            ch.version++
+            ch.updatedAt = TimeHelper.now()
+        } ?: return
 
-        ChannelSystemMessageSender.broadcastUpdate(channel)
+        ChannelSystemMessageSender.broadcastUpdate(updatedChannel)
 
         LogCat.d("Peer $fromId left channel ${msg.channelId}")
     }

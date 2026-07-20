@@ -136,4 +136,5 @@
     <string name="delivery_status">傳送狀態</string>
     <string name="delivery_status_summary">%1$d / %2$d 已送達</string>
     <string name="resend_selected">重新傳送選取</string>
+    <string name="pairing_request_expired">配對請求已過期</string>
 </resources>

@@ -7,7 +7,6 @@ import com.ismartcoding.plain.ble.BleRpcResponse
 import com.ismartcoding.plain.ble.BleServices
 import com.ismartcoding.plain.ble.client.BleDeviceApi
 import com.ismartcoding.plain.ble.client.BleGattClient
-import com.ismartcoding.plain.api.clientHeadersMap
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.helpers.Base64Lenient
@@ -26,12 +25,14 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * the LAN transport is unavailable.
  *
  * Peers are identified by their clientId (TempData.clientId, a 13-char short
- * UUID), which is broadcast in the BLE scan response serviceData and parsed
- * into [com.ismartcoding.plain.ble.client.BleGattClient.id]. The peer's
- * `peer.id` is itself the clientId (it's the value stored on the DPeer
- * record), so BLE discovery matches directly on `peer.id`. Android's BLE
- * MAC randomization no longer matters because the BLE layer never exposes
- * the MAC as the peer id.
+ * UUID). Only an 8-byte truncated SHA256 hash of the clientId (the "shortId")
+ * is broadcast in the BLE scan response serviceData; the scanner matches it
+ * via [com.ismartcoding.plain.ble.BleServiceData.shortIdOf]. The peer's
+ * `peer.id` is the full clientId (stored on the DPeer record), so callers
+ * pass it to [com.ismartcoding.plain.ble.client.BleScanner.findOne] /
+ * [com.ismartcoding.plain.ble.client.BleScanner.createClient], which
+ * internally compute the shortId for matching. Android's BLE MAC randomization
+ * no longer matters because the BLE layer never exposes the MAC as the peer id.
  *
  * When [send] is invoked the transport:
  *
@@ -39,9 +40,9 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  *    the router can fall through).
  * 2. Connects to the peer's BLE device: first checks for an already-discovered
  *    client via [com.ismartcoding.plain.ble.client.BleScanner.createClient]
- *    (matched by clientId), then falls back to a fresh BLE scan via
+ *    (matched by shortId), then falls back to a fresh BLE scan via
  *    [com.ismartcoding.plain.ble.client.BleScanner.findOne] keyed on the
- *    clientId parsed from scan response serviceData.
+ *    shortId computed from the peer's full clientId.
  * 3. Encrypts the signed request body with the peer's shared ChaCha20 key —
  *    mirroring what the OkHttp crypto interceptor does for [LanTransport].
  * 4. Wraps the encrypted bytes in a [BleRpcRequest] (base64 body) and sends
@@ -89,22 +90,24 @@ object BleTransport : PeerTransport {
             // server's PeerGraphQLService decrypts with the same key.
             val encryptedBody = chaCha20Encrypt(keyBytes, request.body)
 
-            val rpcHeaders = clientHeadersMap().toMutableMap().apply {
-                if (request.channelId.isNotEmpty()) {
-                    put("c-cid", request.channelId)
-                }
-            }
-
             val rpcRequest = BleRpcRequest(
                 method = "POST",
                 path = "/peer_graphql",
-                headers = rpcHeaders,
                 body = Base64Lenient.encode(encryptedBody),
                 bodyBase64 = true,
             )
 
-            val requestData = BleRequestData.create().copy(
+            // All headers (client identity + request-specific c-cid) live in
+            // the outer BleRequestData.headers — BleRpcRequest no longer has
+            // its own headers field.
+            val baseData = BleRequestData.create()
+            val requestData = baseData.copy(
                 body = JsonHelper.jsonEncode(rpcRequest),
+                headers = if (request.channelId.isNotEmpty()) {
+                    baseData.headers + ("c-cid" to request.channelId)
+                } else {
+                    baseData.headers
+                },
             )
 
             val result = api.requestAsync(BleServices.rpc, requestData)

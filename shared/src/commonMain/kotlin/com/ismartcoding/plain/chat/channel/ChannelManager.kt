@@ -59,12 +59,11 @@ object ChannelManager {
 
     suspend fun renameChannel(channelId: String, newName: String): DChatChannel {
         return withIO {
-            val channel = ensureChannel(channelId)
-            channel.name = newName.trim()
-            channel.version++
-            channel.updatedAt = TimeHelper.now()
-            AppDatabase.instance.chatChannelDao().update(channel)
-            ChannelCacher.updateChannel(channel)
+            val channel = ChannelCacher.mutateChannel(channelId) { ch ->
+                ch.name = newName.trim()
+                ch.version++
+                ch.updatedAt = TimeHelper.now()
+            } ?: throw Exception("Channel not found")
             if (channel.isOwnedByMe()) {
                 ChannelSystemMessageSender.broadcastUpdate(channel)
             }
@@ -86,35 +85,33 @@ object ChannelManager {
 
     suspend fun leaveChannel(channelId: String) {
         withIO {
-            val channel = ensureChannel(channelId)
-            if (!channel.isOwnedByMe()) throw Exception("Owner cannot leave; delete the channel instead")
+            val existing = ensureChannel(channelId)
+            if (existing.isOwnedByMe()) throw Exception("Owner cannot leave; delete the channel instead")
 
-            val ownerPeer = AppDatabase.instance.peerDao().getById(channel.owner)
+            val ownerPeer = AppDatabase.instance.peerDao().getById(existing.owner)
+            val channel = ChannelCacher.mutateChannel(channelId) { ch ->
+                ch.status = DChatChannel.STATUS_LEFT
+                ch.members = ch.members.filter { it.id != TempData.clientId }
+            } ?: throw Exception("Channel not found")
             if (ownerPeer != null) {
                 ChannelSystemMessageSender.sendLeave(channel.id, ownerPeer)
             }
-            channel.status = DChatChannel.STATUS_LEFT
-            channel.members = channel.members.filter { it.id != TempData.clientId }
-            AppDatabase.instance.chatChannelDao().update(channel)
-            ChannelCacher.updateChannel(channel)
         }
     }
 
     suspend fun inviteMember(channelId: String, peerId: String): DChatChannel {
         return withIO {
-            val channel = ensureChannel(channelId)
-            if (!channel.isOwnedByMe()) throw Exception("Only owner can add members")
-            if (channel.hasMember(peerId)) throw Exception("Already a member")
-
             val peer = AppDatabase.instance.peerDao().getById(peerId)
-            channel.members += ChannelMember(
-                id = peerId,
-                status = ChannelMember.STATUS_PENDING,
-            )
-            channel.version++
-            channel.updatedAt = TimeHelper.now()
-            AppDatabase.instance.chatChannelDao().update(channel)
-            ChannelCacher.updateChannel(channel)
+            val channel = ChannelCacher.mutateChannel(channelId) { ch ->
+                if (!ch.isOwnedByMe()) throw Exception("Only owner can add members")
+                if (ch.hasMember(peerId)) throw Exception("Already a member")
+                ch.members += ChannelMember(
+                    id = peerId,
+                    status = ChannelMember.STATUS_PENDING,
+                )
+                ch.version++
+                ch.updatedAt = TimeHelper.now()
+            } ?: throw Exception("Channel not found")
 
             if (peer != null) {
                 ChannelSystemMessageSender.sendInvite(channel, peer)
@@ -137,17 +134,15 @@ object ChannelManager {
 
     suspend fun kickMember(channelId: String, peerId: String): DChatChannel {
         return withIO {
-            val channel = ensureChannel(channelId)
-            if (!channel.isOwnedByMe()) throw Exception("Only owner can remove members")
-            if (!channel.hasMember(peerId)) throw Exception("Not a member")
-
-            channel.members = channel.members.filter { it.id != peerId }
-            channel.version++
-            channel.updatedAt = TimeHelper.now()
-            AppDatabase.instance.chatChannelDao().update(channel)
-            ChannelCacher.updateChannel(channel)
-
             val peer = AppDatabase.instance.peerDao().getById(peerId)
+            val channel = ChannelCacher.mutateChannel(channelId) { ch ->
+                if (!ch.isOwnedByMe()) throw Exception("Only owner can remove members")
+                if (!ch.hasMember(peerId)) throw Exception("Not a member")
+                ch.members = ch.members.filter { it.id != peerId }
+                ch.version++
+                ch.updatedAt = TimeHelper.now()
+            } ?: throw Exception("Channel not found")
+
             if (peer != null) {
                 ChannelSystemMessageSender.sendKick(channel, peer)
             }

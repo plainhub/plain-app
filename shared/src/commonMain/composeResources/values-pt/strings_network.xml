@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">Iniciar servidor HTTP</string>
     <string name="adb_cmd_stop">Parar servidor HTTP</string>
     <string name="enable_adb_token">Ativar token ADB</string>
+    <string name="http_server_health_check_failed">O serviço foi iniciado, mas não pode ser acessado. Um aplicativo de firewall ou VPN pode estar bloqueando conexões localhost. Verifique suas configurações de rede e reinicie o aplicativo.</string>
+    <string name="web_settings">Configurações da Web</string>
 </resources>

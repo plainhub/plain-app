@@ -3,30 +3,19 @@ package com.ismartcoding.plain
 import android.content.Intent
 import android.net.Uri
 import androidx.navigation.NavDestination.Companion.hasRoute
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.extensions.parcelable
 import com.ismartcoding.plain.lib.extensions.parcelableArrayList
-import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.AppIntents
-import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.not_supported_error
-import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 
 internal fun MainActivity.handleIntent(intent: Intent) {
-    if (intent.getBooleanExtra("start_web_service", false)) {
-        coIO {
-            WebPreference.putAsync(true)
-            sendEvent(StartHttpServerEvent())
-        }
-    }
-
     if (intent.getBooleanExtra("navigate_to_web_settings", false)) {
         val nav = navControllerState.value
         val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute(Routing.WebSettings::class) == true

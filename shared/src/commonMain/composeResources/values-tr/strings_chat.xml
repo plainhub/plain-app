@@ -134,4 +134,7 @@
     <string name="delivery_status">Gönderim durumu</string>
     <string name="delivery_status_summary">%1$d / %2$d teslim edildi</string>
     <string name="resend_selected">Seçilenleri yeniden gönder</string>
+    <string name="bluetooth_permission_required_for_nearby">Bluetooth üzerinden yakındaki cihazları keşfetmek için Bluetooth izni gereklidir.</string>
+    <string name="nearby_wifi_devices_required_for_chat">Yakındaki cihazları keşfetmek için Bluetooth ve yakındaki cihazlar izinleri gereklidir.</string>
+    <string name="pairing_request_expired">Eşleştirme isteğinin süresi doldu</string>
 </resources>

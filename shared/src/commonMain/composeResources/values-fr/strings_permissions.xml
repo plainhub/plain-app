@@ -36,4 +36,5 @@
     <string name="call_phone_permission_required">Pour passer des appels téléphoniques via l'application, veuillez autoriser l'accès au téléphone.</string>
     <string name="accessibility_service_description">PlainApp utilise ce service d'accessibilité pour permettre le contrôle à distance pendant la mise en miroir de l'écran. Il injecte des événements tactiles (tap, balayage, défilement) et des actions de navigation (Retour, Accueil, Récents) envoyés depuis l'interface Web.</string>
     <string name="accessibility_service_label">Contrôle à distance PlainApp</string>
+    <string name="location_required_for_aware_chat">Sur certains appareils Android, l'autorisation de localisation est requise pour la communication avec les appareils à proximité. PlainApp n'utilise pas votre localisation pour vous suivre.</string>
 </resources>

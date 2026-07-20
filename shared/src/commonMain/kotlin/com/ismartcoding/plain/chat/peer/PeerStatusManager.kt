@@ -12,13 +12,13 @@ import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getStatusWsUrl
+import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PeerStatusData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.platform.createPeerStatusHttpClient
-import com.ismartcoding.plain.platform.discoverPeerDevice
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.websocket.Frame
@@ -36,6 +36,7 @@ import kotlin.math.min
 object PeerStatusManager {
     private const val INITIAL_RECONNECT_DELAY_MS = 1000L
     private const val MAX_RECONNECT_DELAY_MS = 60000L
+    private const val DISCOVER_REPLY_WAIT_MS = 2000L
 
     private data class PeerState(
         val socketJob: Job? = null,
@@ -118,10 +119,21 @@ object PeerStatusManager {
         val key = PeerCacher.getKeyBytes(peer.id) ?: return@withIO
 
         LogCat.d("peer status: reconnect peer=$peerId reason=$reason")
-        discoverPeerDevice(peer.id, key)
-        delay(500)
+        // Record updatedAt before the directed DISCOVER so we can detect
+        // whether the reply actually arrived. Without this check, a stale IP
+        // in the DB would be reused forever — the socket would fail against
+        // the dead address and schedule another reconnect, never giving the
+        // discover reply a chance to refresh the IP.
+        val updatedAtBefore = peer.updatedAt
+        LANDiscoverManager.discoverSpecificDevice(peer.id, key)
+        delay(DISCOVER_REPLY_WAIT_MS)
 
         val refreshedPeer = AppDatabase.instance.peerDao().getById(peer.id) ?: peer
+        if (refreshedPeer.updatedAt == updatedAtBefore) {
+            LogCat.d("peer status: no discover reply peer=$peerId — rescheduling")
+            scheduleReconnect(peer.id)
+            return@withIO
+        }
         if (refreshedPeer.ip.isEmpty() || refreshedPeer.port <= 0) {
             scheduleReconnect(peer.id)
             return@withIO

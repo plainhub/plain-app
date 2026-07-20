@@ -143,14 +143,6 @@
     <string name="copied_to_clipboard_format">"%1$s" in die Zwischenablage kopiert.</string>
     <string name="unknown_error">Ein unbekannter Fehler ist aufgetreten.</string>
     <string name="delete_channel_warning">Das Löschen dieses Kanals löscht auch alle zugehörigen Nachrichten. Diese Aktion kann nicht rückgängig gemacht werden.</string>
-    <string name="app_files">App-Dateien</string>
-    <string name="app_files_desc">Im Chat geteilte Dateien</string>
-    <string name="no_app_files">Noch keine Dateien</string>
-    <string name="web_settings">Webeinstellungen</string>
-    <string name="ui_components">UI-Komponenten</string>
-    <string name="donation_title">Unterstützung der PlainApp-Entwicklung</string>
-    <string name="buy_me_a_coffee">Kauf mir einen Kaffee</string>
-
 
     <string name="crash_report_title">App abgestürzt</string>
     <string name="crash_report_message">Die App ist unerwartet abgestürzt. Möchten Sie uns den Absturzbericht mitteilen, damit wir es beheben können?</string>

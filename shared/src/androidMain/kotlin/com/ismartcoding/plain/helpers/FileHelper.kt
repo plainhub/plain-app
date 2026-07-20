@@ -8,7 +8,7 @@ import com.ismartcoding.plain.lib.extensions.getFileName
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.hasPermission
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
-import com.ismartcoding.plain.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.platform.isRPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.appContext
@@ -62,7 +62,7 @@ object FileHelper {
             return path
         }
         return Base64.encode(
-            CryptoHelper.chaCha20Encrypt(TempData.urlToken, path),
+            chaCha20Encrypt(TempData.urlToken, path),
         )
     }
 

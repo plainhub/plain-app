@@ -50,4 +50,7 @@
     <string name="view_mode">Режим просмотра</string>
     <string name="browse_by_tags">Обзор по тегам</string>
     <string name="browse_by_file_type">Обзор по типу файла</string>
+    <string name="app_files">Файлы приложения</string>
+    <string name="app_files_desc">Файлы, которыми поделились в чате</string>
+    <string name="no_app_files">Пока нет файлов</string>
 </resources>

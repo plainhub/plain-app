@@ -14,21 +14,23 @@ import kotlinx.serialization.Serializable
  *
  * - [method] + [path] select the route handler.
  * - [query] supplies query-string parameters (e.g. `id` for `/fs`).
- * - [headers] carries HTTP headers such as `c-id`, `c-cid`, `authorization`.
- *   The outer [BleRequestData.headers] (populated by `BleRequestData.create()`)
- *   is also forwarded to the handler, so [headers] here is for request-
- *   specific overrides only.
  * - [body] is the HTTP request body, base64-encoded when it carries binary
  *   data (e.g. encrypted GraphQL payloads). The flag [bodyBase64] tells the
  *   server whether to base64-decode [body] before passing it to the route
  *   handler.
+ *
+ * All HTTP headers (client identity AND request-specific overrides like
+ * `c-cid`, `authorization`) live in the outer [BleRequestData.headers],
+ * populated by `BleRequestData.create()` via
+ * [com.ismartcoding.plain.api.clientHeadersMap]. The server's
+ * [com.ismartcoding.plain.ble.server.BleHttpCall] reads them from there
+ * directly — no header merging needed.
  */
 @Serializable
 data class BleRpcRequest(
     @SerialName("m") val method: String = "POST",
     @SerialName("p") val path: String,
     @SerialName("q") val query: Map<String, List<String>> = emptyMap(),
-    @SerialName("h") val headers: Map<String, String> = emptyMap(),
     @SerialName("b") val body: String = "",
     @SerialName("bb") val bodyBase64: Boolean = false,
 )

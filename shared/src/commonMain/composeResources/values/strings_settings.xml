@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PlainApp</string>
+    <string name="app_name" translatable="false">PlainApp</string>
     <string name="app_data">App data</string>
     <string name="developer_mode">Developer mode</string>
     <string name="simulate_crash">Simulate crash</string>
@@ -85,6 +85,22 @@
     <string name="wifi_aware_publish_session_status">Publish Session Status</string>
     <string name="wifi_aware_subscribe_session_status">Subscribe Session Status</string>
     <string name="wifi_aware_discovered_peer_count">Discovered Peer Count</string>
+    <string name="ble_debug">BLE Debug</string>
+    <string name="ble_support">BLE Support</string>
+    <string name="ble_permissions">Permissions</string>
+    <string name="ble_runtime_status">Runtime Status</string>
+    <string name="ble_bluetooth_supported">Bluetooth Supported</string>
+    <string name="ble_bluetooth_enabled">Bluetooth Enabled</string>
+    <string name="ble_advertise_ready">Advertise Ready</string>
+    <string name="ble_advertise_ready_desc">Bluetooth enabled + permissions granted</string>
+    <string name="ble_scan_permission">BLUETOOTH_SCAN Permission</string>
+    <string name="ble_connect_permission">BLUETOOTH_CONNECT Permission</string>
+    <string name="ble_advertise_permission">BLUETOOTH_ADVERTISE Permission</string>
+    <string name="ble_location_permission">Location Permission</string>
+    <string name="ble_permission_granted">BLE Permission Granted</string>
+    <string name="ble_advertising_running">Advertising Running</string>
+    <string name="ble_client_id">Client ID</string>
+    <string name="ble_service_uuid">Service UUID</string>
     <string name="clear_history">Clear history</string>
     <string name="clear_logs">Clear logs</string>
     <string name="no_logs_error">No logs can be shared</string>

@@ -34,10 +34,10 @@ import com.ismartcoding.plain.platform.getAwareDataInterfaces
 import com.ismartcoding.plain.platform.getAwareDataPaths
 import com.ismartcoding.plain.platform.getLogFileSize
 import com.ismartcoding.plain.platform.getOSVersion
+import com.ismartcoding.plain.platform.isBluetoothSupported
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.platform.checkUpdateAsync
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
-import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.LocalAutoCheckUpdate
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.appDataStore
@@ -56,6 +56,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -70,20 +71,14 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     val autoCheckUpdate = LocalAutoCheckUpdate.current
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    var developerMode by remember { mutableStateOf(false) }
     var cacheSize by remember { mutableLongStateOf(0L) }
     var fileSize by remember { mutableLongStateOf(getLogFileSize()) }
-    val awareSupported = isWifiAwareSupported
-    val awareDataInterfaces = remember { getAwareDataInterfaces() }
-    val awareDataPaths = remember { getAwareDataPaths() }
     val isDiscoverable = remember {
         appDataStore.dataFlow.map { NearbyDiscoverablePreference.get(it) }
     }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
-
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.Default) {
             cacheSize = getCacheSize()
-            developerMode = DeveloperModePreference.getAsync()
         }
     }
 
@@ -129,21 +124,8 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                     VerticalSpace(dp = 16.dp)
                     PCard {
                         PListItem(
-                            modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
-                                developerMode = true
-                                scope.launch(Dispatchers.Default) { DeveloperModePreference.putAsync(true) }
-                            }),
                             title = stringResource(Res.string.android_version),
                             value = getOSVersion(),
-                        )
-                        PListItem(
-                            modifier = Modifier.clickable { navController.navigate(Routing.WifiAwareDebug) },
-                            title = stringResource(Res.string.nearby_share),
-                            value = stringResource(
-                                if (isWifiAwareSupported) Res.string.supported
-                                else Res.string.not_supported
-                            ),
-                            showMore = true,
                         )
                         PListItem(
                             title = stringResource(Res.string.make_discoverable),
@@ -181,7 +163,6 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                         navController = navController, scope = scope,
                         fileSize = fileSize, onFileSizeCleared = { fileSize = 0 },
                         cacheSize = cacheSize, onCacheCleared = { cacheSize = it },
-                        developerMode = developerMode, onDeveloperModeChanged = { developerMode = it },
                     )
                 }
                 item {
@@ -197,16 +178,11 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                         )
                     }
                 }
-                if (developerMode) {
-                    item {
-                        VerticalSpace(dp = 16.dp)
-                        DeveloperSettingsCard(
-                            navController = navController,
-                            awareSupported = awareSupported,
-                            awareDataInterfaces = awareDataInterfaces,
-                            awareDataPaths = awareDataPaths,
-                        )
-                    }
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    DeveloperSettingsCard(
+                        navController = navController,
+                    )
                 }
                 item { BottomSpace(paddingValues) }
             }

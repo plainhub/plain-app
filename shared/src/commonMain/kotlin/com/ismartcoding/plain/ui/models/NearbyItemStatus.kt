@@ -4,6 +4,5 @@ enum class NearbyItemStatus {
     UNPAIRED,
     PAIRED,
     PAIRING,
-    COMPLETING,
     UNPAIRING,
 }

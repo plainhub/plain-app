@@ -50,4 +50,7 @@
     <string name="view_mode">보기 모드</string>
     <string name="browse_by_tags">태그별로 탐색</string>
     <string name="browse_by_file_type">파일 형식별로 탐색</string>
+    <string name="app_files">앱 파일</string>
+    <string name="app_files_desc">채팅에서 공유된 파일</string>
+    <string name="no_app_files">아직 파일이 없습니다</string>
 </resources>

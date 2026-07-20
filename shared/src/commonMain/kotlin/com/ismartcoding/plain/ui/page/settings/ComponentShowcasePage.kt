@@ -31,6 +31,7 @@ import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -60,18 +61,8 @@ fun ComponentShowcasePage(navController: NavHostController) {
 }
 
 @Composable
-internal fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-    )
-}
-
-@Composable
 private fun ShowcaseAlerts() {
-    SectionTitle("PAlert")
+    Subtitle("PAlert")
     PAlert(description = "This is a warning alert.", type = AlertType.WARNING)
     VerticalSpace(8.dp)
     PAlert(description = "This is an error alert.", type = AlertType.ERROR)
@@ -84,14 +75,14 @@ private fun ShowcaseAlerts() {
 
 @Composable
 private fun ShowcaseBanners() {
-    SectionTitle("PBanner")
+    Subtitle("PBanner")
     PBanner(title = "Banner Title", desc = "Banner description.", icon = Res.drawable.lightbulb, onClick = {})
     VerticalSpace(16.dp)
 }
 
 @Composable
 private fun ShowcaseCards() {
-    SectionTitle("PCard + PListItem")
+    Subtitle("PCard + PListItem")
     PCard {
         PListItem(title = "List item with icon", subtitle = "Subtitle", icon = Res.drawable.settings, showMore = true)
         PListItem(title = "List item with value", value = "Value")
@@ -105,7 +96,7 @@ private fun ShowcaseCards() {
 
 @Composable
 private fun ShowcaseButtons() {
-    SectionTitle("Buttons")
+    Subtitle("Buttons")
     Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         PFilledButton(text = "Filled Button", onClick = {})
         PFilledButton(text = "Filled Danger", type = ButtonType.DANGER, onClick = {})
@@ -120,7 +111,7 @@ private fun ShowcaseButtons() {
 
 @Composable
 private fun ShowcaseChipsAndSwitches() {
-    SectionTitle("Chips & Switches")
+    Subtitle("Chips & Switches")
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             val selected = remember { mutableStateOf(false) }
@@ -140,7 +131,7 @@ private fun ShowcaseChipsAndSwitches() {
 
 @Composable
 private fun ShowcaseTips() {
-    SectionTitle("Tips")
+    Subtitle("Tips")
     Tips(text = "This is a tips component for supplementary information.")
     VerticalSpace(16.dp)
 }

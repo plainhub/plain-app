@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.chat
-import com.ismartcoding.plain.platform.discoverPeerDevice
 
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.chat.channel.ChannelChatSender
@@ -12,6 +11,8 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.discover.LANDiscoverManager
+import com.ismartcoding.plain.lib.logcat.LogCat
 
 object ChatSender {
     suspend fun send(
@@ -37,9 +38,10 @@ object ChatSender {
     }
 
     fun triggerPeerRediscovery(peerId: String) {
+        LogCat.d("triggerPeerRediscovery: $peerId")
         val key = PeerCacher.getKeyBytes(peerId)
         if (key != null) {
-            discoverPeerDevice(peerId, key)
+            LANDiscoverManager.discoverSpecificDevice(peerId, key)
         }
     }
 

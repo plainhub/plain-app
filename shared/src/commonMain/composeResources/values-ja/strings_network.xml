@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">HTTP サーバーを開始</string>
     <string name="adb_cmd_stop">HTTP サーバーを停止</string>
     <string name="enable_adb_token">ADB トークンを有効化</string>
+    <string name="http_server_health_check_failed">サービスは開始されましたが、アクセスできません。ファイアウォールまたはVPNアプリがlocalhost接続をブロックしている可能性があります。ネットワーク設定を確認してアプリを再起動してください。</string>
+    <string name="web_settings">Web設定</string>
 </resources>

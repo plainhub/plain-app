@@ -72,7 +72,7 @@ fun HttpRouter.addWebSocketRoutes() {
                 }
                 val decryptResult = PeerChatParser.decrypt(token, peerId, publicKey, frame)
                 if (decryptResult.content == null) {
-                    ws.close(WsCloseCode.POLICY_VIOLATION, "invalid_request")
+                    ws.close(WsCloseCode.POLICY_VIOLATION, "invalid_request: $peerId")
                     return@webSocket
                 }
                 authenticated = true
@@ -114,7 +114,7 @@ fun HttpRouter.addWebSocketRoutes() {
         } catch (ex: Exception) {
             LogCat.e("ws: $ex")
         } finally {
-            LogCat.d("ws: remove session ${sessionHandle.id}")
+            LogCat.d("ws: remove session $clientId, ${sessionHandle.id}")
             HttpServerManager.wsSessions.removeAll { it.id == sessionHandle.id }
             setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
         }
@@ -193,7 +193,7 @@ private suspend fun handleSessionFrame(
         HttpServerManager.wsSessions.add(sessionHandle)
         setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
     } else {
-        LogCat.d("ws: invalid_request")
+        LogCat.d("ws: invalid_request: $clientId")
         ws.close(WsCloseCode.TRY_AGAIN_LATER, "invalid_request")
     }
 }

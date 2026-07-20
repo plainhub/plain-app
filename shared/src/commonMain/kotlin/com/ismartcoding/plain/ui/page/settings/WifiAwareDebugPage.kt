@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
 
-import com.ismartcoding.plain.i18n.*
-
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,9 +10,34 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.no
+import com.ismartcoding.plain.i18n.not_available
+import com.ismartcoding.plain.i18n.wifi_aware_attach_status
+import com.ismartcoding.plain.i18n.wifi_aware_available
+import com.ismartcoding.plain.i18n.wifi_aware_characteristics
+import com.ismartcoding.plain.i18n.wifi_aware_data_cipher_suites
+import com.ismartcoding.plain.i18n.wifi_aware_debug
+import com.ismartcoding.plain.i18n.wifi_aware_discovered_peer_count
+import com.ismartcoding.plain.i18n.wifi_aware_location_permission
+import com.ismartcoding.plain.i18n.wifi_aware_max_extended_service_specific_info_length
+import com.ismartcoding.plain.i18n.wifi_aware_max_match_filter_length
+import com.ismartcoding.plain.i18n.wifi_aware_max_service_name_length
+import com.ismartcoding.plain.i18n.wifi_aware_max_service_specific_info_length
+import com.ismartcoding.plain.i18n.wifi_aware_nearby_devices_permission
+import com.ismartcoding.plain.i18n.wifi_aware_pairing_cipher_suites
+import com.ismartcoding.plain.i18n.wifi_aware_pairing_supported
+import com.ismartcoding.plain.i18n.wifi_aware_pairing_supported_desc
+import com.ismartcoding.plain.i18n.wifi_aware_permissions
+import com.ismartcoding.plain.i18n.wifi_aware_publish_session_status
+import com.ismartcoding.plain.i18n.wifi_aware_runtime_status
+import com.ismartcoding.plain.i18n.wifi_aware_subscribe_session_status
+import com.ismartcoding.plain.i18n.wifi_aware_support
+import com.ismartcoding.plain.i18n.wifi_aware_supported
+import com.ismartcoding.plain.i18n.wifi_aware_wifi_enabled
+import com.ismartcoding.plain.i18n.yes
 import com.ismartcoding.plain.platform.AwareDebugInfo
 import com.ismartcoding.plain.platform.getAwareDebugInfo
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -22,9 +45,11 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +91,7 @@ fun WifiAwareDebugPage(navController: NavHostController) {
 
 @Composable
 private fun AwareSupportCard(info: AwareDebugInfo) {
-    SectionTitle(stringResource(Res.string.wifi_aware_support))
+    Subtitle(stringResource(Res.string.wifi_aware_support))
     PCard {
         PListItem(
             title = stringResource(Res.string.wifi_aware_supported),
@@ -96,7 +121,7 @@ private fun AwareSupportCard(info: AwareDebugInfo) {
 
 @Composable
 private fun AwareCharacteristicsCard(info: AwareDebugInfo) {
-    SectionTitle(stringResource(Res.string.wifi_aware_characteristics))
+    Subtitle(stringResource(Res.string.wifi_aware_characteristics))
     PCard {
         PListItem(
             title = stringResource(Res.string.wifi_aware_max_service_name_length),
@@ -123,7 +148,7 @@ private fun AwareCharacteristicsCard(info: AwareDebugInfo) {
 
 @Composable
 private fun AwarePermissionsCard(info: AwareDebugInfo) {
-    SectionTitle(stringResource(Res.string.wifi_aware_permissions))
+    Subtitle(stringResource(Res.string.wifi_aware_permissions))
     PCard {
         PListItem(
             title = stringResource(Res.string.wifi_aware_nearby_devices_permission),
@@ -142,7 +167,7 @@ private fun AwarePermissionsCard(info: AwareDebugInfo) {
 
 @Composable
 private fun AwareRuntimeStatusCard(info: AwareDebugInfo) {
-    SectionTitle(stringResource(Res.string.wifi_aware_runtime_status))
+    Subtitle(stringResource(Res.string.wifi_aware_runtime_status))
     PCard {
         PListItem(
             title = stringResource(Res.string.wifi_aware_attach_status),

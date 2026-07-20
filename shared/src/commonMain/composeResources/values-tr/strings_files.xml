@@ -50,4 +50,7 @@
     <string name="view_mode">Görünüm modu</string>
     <string name="browse_by_tags">Etiketlere göre göz at</string>
     <string name="browse_by_file_type">Dosya türüne göre göz at</string>
+    <string name="app_files">Uygulama dosyaları</string>
+    <string name="app_files_desc">Sohbette paylaşılan dosyalar</string>
+    <string name="no_app_files">Henüz dosya yok</string>
 </resources>

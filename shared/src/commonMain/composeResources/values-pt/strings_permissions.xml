@@ -36,4 +36,5 @@
     <string name="call_phone_permission_required">Para fazer chamadas telefônicas pelo aplicativo, por favor, permita o acesso ao telefone.</string>
     <string name="accessibility_service_description">O PlainApp usa este serviço de acessibilidade para permitir o controle remoto durante o espelhamento de tela. Ele injeta eventos de toque (toque, deslizar, rolar) e ações de navegação (Voltar, Início, Recentes) enviados pela interface web.</string>
     <string name="accessibility_service_label">Controle remoto do PlainApp</string>
+    <string name="location_required_for_aware_chat">Em alguns dispositivos Android, a permissão de localização é necessária para a comunicação com dispositivos próximos. O PlainApp não usa sua localização para rastreá-lo.</string>
 </resources>

@@ -15,7 +15,7 @@ import kotlin.uuid.Uuid
  * Convert an [RssItem] into a [DFeedEntry] for storage.
  *
  * Pure-Kotlin port of the previous androidMain implementation: replaces
- * `java.util.UUID` with `kotlin.uuid.Uuid` and `CryptoHelper.sha1` with
+ * `java.util.UUID` with `kotlin.uuid.Uuid` and the legacy SHA-1 with
  * the commonMain `sha256` (the resulting `rawId` is a derived hash used
  * only for indexing, never compared against legacy SHA-1 values, so the
  * digest algorithm change is safe).

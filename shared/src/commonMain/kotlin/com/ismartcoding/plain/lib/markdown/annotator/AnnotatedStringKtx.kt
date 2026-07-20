@@ -17,9 +17,12 @@ import com.ismartcoding.plain.lib.markdown.model.ReferenceLinkHandler
 import com.ismartcoding.plain.lib.markdown.model.markdownAnnotator
 import com.ismartcoding.plain.lib.markdown.utils.MARKDOWN_TAG_IMAGE_URL
 import com.ismartcoding.plain.lib.markdown.utils.MARKDOWN_TAG_MATH
+import com.ismartcoding.plain.lib.markdown.utils.extractFontColor
 import com.ismartcoding.plain.lib.markdown.utils.extractHtmlImgAlt
 import com.ismartcoding.plain.lib.markdown.utils.extractHtmlImgSrc
 import com.ismartcoding.plain.lib.markdown.utils.findChildOfTypeRecursive
+import com.ismartcoding.plain.lib.markdown.utils.isFontCloseTag
+import com.ismartcoding.plain.lib.markdown.utils.parseHtmlColor
 import com.ismartcoding.plain.lib.markdown.utils.getUnescapedTextInNode
 import com.ismartcoding.plain.lib.markdown.utils.resolveImageLink
 import com.ismartcoding.plain.lib.markdown.utils.innerList
@@ -256,6 +259,10 @@ fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
     val annotate = annotatorSettings.annotator.annotate
     val eolAsNewLine = annotatorSettings.annotator.config.eolAsNewLine
     var skipIfNext: Any? = null
+    // Tracks unclosed `<font color="…">` pushes so we can balance the
+    // `AnnotatedString.Builder` style stack even when the closing `</font>`
+    // is missing (user-authored content). Each push must be matched by a pop.
+    var fontOpenCount = 0
     children.forEach { child ->
         if (skipIfNext == null || skipIfNext != child.type) {
             if (annotate == null || !annotate(content, child)) {
@@ -294,6 +301,12 @@ fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
                     // pipeline. Route them through the same inline-content placeholder
                     // used by `MarkdownElementTypes.IMAGE` so `MarkdownInlineImageWithSize`
                     // picks them up unchanged.
+                    //
+                    // `<font color="…">…</font>` tags (emitted by the editor colour
+                    // picker) are handled here too: the opening tag pushes a
+                    // `SpanStyle(color = …)` and the closing tag pops it, so the text
+                    // between inherits the colour. The KMP migration dropped the old
+                    // Markwon `FontTagHandler`; this restores that behaviour.
                     MarkdownTokenTypes.HTML_TAG -> {
                         val src = child.extractHtmlImgSrc(content)
                         if (!src.isNullOrEmpty()) {
@@ -302,6 +315,18 @@ fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
                             // second regex pass.
                             val alt = child.extractHtmlImgAlt(content) ?: src
                             appendInlineContent("${MARKDOWN_TAG_IMAGE_URL}_$src", alt)
+                        } else {
+                            val fontColor = child.extractFontColor(content)
+                            if (fontColor != null) {
+                                val color = parseHtmlColor(fontColor)
+                                if (color != null) {
+                                    pushStyle(SpanStyle(color = color))
+                                    fontOpenCount++
+                                }
+                            } else if (child.isFontCloseTag(content) && fontOpenCount > 0) {
+                                pop()
+                                fontOpenCount--
+                            }
                         }
                     }
 
@@ -384,4 +409,8 @@ fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
             skipIfNext = null
         }
     }
+    // Balance any unclosed `<font>` pushes so the builder's push/pop stack
+    // stays consistent and `buildAnnotatedString` doesn't throw on malformed
+    // user-authored content (e.g. a missing `</font>`).
+    repeat(fontOpenCount) { pop() }
 }

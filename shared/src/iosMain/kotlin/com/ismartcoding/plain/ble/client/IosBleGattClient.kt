@@ -24,17 +24,18 @@ import kotlin.time.Duration.Companion.milliseconds
 class IosBleGattClient(
     val peripheral: CBPeripheral,
     override var rssi: Int = 0,
-    override var awareFlags: Int = 0,
-    clientId: String = "",
+    shortId: String = "",
+    override val awareSupported: Boolean = false,
+    override val awareRunning: Boolean = false,
 ) : BleGattClient {
 
     /**
-     * Stable peer identifier — the peer's clientId (TempData.clientId, a 13-char
-     * short UUID) parsed from the BLE advertisement serviceData. Falls back to
-     * [peripheral.identifier] when no clientId was advertised (e.g. peer is
-     * running an older app version that doesn't broadcast clientId).
+     * Stable peer match key — the 8-byte truncated SHA256 of the peer's full
+     * clientId, rendered as a 16-char hex string. Parsed from the BLE
+     * advertisement serviceData via [com.ismartcoding.plain.ble.BleServiceData].
+     * Falls back to [peripheral.identifier] when no serviceData was advertised.
      */
-    override val id: String = clientId.ifEmpty { peripheral.identifier.UUIDString }
+    override val id: String = shortId.ifEmpty { peripheral.identifier.UUIDString }
     override val name: String? get() = peripheral.name
 
     private val delegate = PeripheralDelegate(this)

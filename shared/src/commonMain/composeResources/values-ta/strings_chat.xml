@@ -134,4 +134,7 @@
     <string name="delivery_status">டெலிவரி நிலை</string>
     <string name="delivery_status_summary">%1$d / %2$d டெலிவர் செய்யப்பட்டது</string>
     <string name="resend_selected">தேர்வுபடுத்தியவற்றை மீண்டும் அனுப்பு</string>
+    <string name="bluetooth_permission_required_for_nearby">புளூடூத் வழியாக அருகிலுள்ள சாதனங்களைக் கண்டறிய புளூடூத் அனுமதி தேவை.</string>
+    <string name="nearby_wifi_devices_required_for_chat">அருகிலுள்ள சாதனங்களைக் கண்டறிய புளூடூத் மற்றும் அருகிலுள்ள சாதன அனுமதிகள் தேவை.</string>
+    <string name="pairing_request_expired">இணைப்பு கோரிக்கை காலாவதியானது</string>
 </resources>

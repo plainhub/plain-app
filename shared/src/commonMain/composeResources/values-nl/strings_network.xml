@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">HTTP-server starten</string>
     <string name="adb_cmd_stop">HTTP-server stoppen</string>
     <string name="enable_adb_token">ADB-token inschakelen</string>
+    <string name="http_server_health_check_failed">Service gestart maar niet bereikbaar. Een firewall- of VPN-app blokkeert mogelijk localhost-verbindingen. Controleer uw netwerkinstellingen en start de app opnieuw.</string>
+    <string name="web_settings">Webinstellingen</string>
 </resources>

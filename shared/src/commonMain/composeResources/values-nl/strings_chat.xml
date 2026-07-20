@@ -134,4 +134,7 @@
     <string name="delivery_status">Leveringsstatus</string>
     <string name="delivery_status_summary">%1$d / %2$d geleverd</string>
     <string name="resend_selected">Geselecteerde opnieuw verzenden</string>
+    <string name="bluetooth_permission_required_for_nearby">Bluetooth-machtiging is vereist om apparaten in de buurt via Bluetooth te ontdekken.</string>
+    <string name="nearby_wifi_devices_required_for_chat">Bluetooth- en apparaten in de buurt-machtigingen zijn vereist om apparaten in de buurt te ontdekken.</string>
+    <string name="pairing_request_expired">Koppelingsverzoek verlopen</string>
 </resources>

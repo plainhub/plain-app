@@ -91,4 +91,6 @@
     <string name="adb_cmd_start">Avvia server HTTP</string>
     <string name="adb_cmd_stop">Ferma server HTTP</string>
     <string name="enable_adb_token">Abilita token ADB</string>
+    <string name="http_server_health_check_failed">Il servizio è stato avviato ma non è raggiungibile. Un'app firewall o VPN potrebbe bloccare le connessioni localhost. Controlla le impostazioni di rete e riavvia l'app.</string>
+    <string name="web_settings">Impostazioni Web</string>
 </resources>
