@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.preferences.EditorAccessoryLevelPreference
 import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
 import com.ismartcoding.plain.preferences.EditorSyntaxHighlightPreference
@@ -28,7 +29,7 @@ class MdEditorViewModel : ViewModel() {
     var level = mutableIntStateOf(0)
 
     fun load() {
-        launchSafe {
+        viewModelScope.launchSafe {
             level.intValue = EditorAccessoryLevelPreference.getAsync()
             wrapContent.value = EditorWrapContentPreference.getAsync()
             showLineNumbers.value = EditorShowLineNumbersPreference.getAsync()
@@ -38,21 +39,21 @@ class MdEditorViewModel : ViewModel() {
 
     fun toggleLevel() {
         level.intValue = if (level.intValue == 1) 0 else 1
-        launchSafe {
+        viewModelScope.launchSafe {
             EditorAccessoryLevelPreference.putAsync(level.intValue)
         }
     }
 
     fun toggleLineNumbers() {
         showLineNumbers.value = !showLineNumbers.value
-        launchSafe {
+        viewModelScope.launchSafe {
             EditorShowLineNumbersPreference.putAsync(showLineNumbers.value)
         }
     }
 
     fun toggleWrapContent() {
         wrapContent.value = !wrapContent.value
-        launchSafe {
+        viewModelScope.launchSafe {
             EditorWrapContentPreference.putAsync(wrapContent.value)
         }
     }

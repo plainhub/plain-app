@@ -42,7 +42,7 @@ class WebConsoleViewModel : ViewModel() {
     }
 
     fun enableKeepAwake(enable: Boolean) {
-        launchSafe {
+        viewModelScope.launchSafe {
             KeepAwakePreference.putAsync(enable)
             sendEvent(KeepAwakeChangedEvent(enable))
         }

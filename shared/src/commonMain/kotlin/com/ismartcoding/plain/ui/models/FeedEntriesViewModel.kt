@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
@@ -67,7 +68,7 @@ class FeedEntriesViewModel :
     }
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,

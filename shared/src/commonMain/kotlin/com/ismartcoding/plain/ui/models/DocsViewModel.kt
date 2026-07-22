@@ -6,6 +6,7 @@ import com.ismartcoding.plain.platform.LocaleHelper
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.docs.DDoc
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -53,7 +54,7 @@ class DocsViewModel : BaseMediaViewModel<DDoc>() {
     }
 
     override fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             deleteMedia(dataType, ids, trash.value)

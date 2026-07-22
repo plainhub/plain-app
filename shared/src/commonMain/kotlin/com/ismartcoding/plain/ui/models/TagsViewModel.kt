@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.launchSafe
 import com.ismartcoding.plain.helpers.withIO
@@ -51,7 +52,7 @@ class TagsViewModel : ViewModel() {
 
     fun loadMoreAsync(keys: Set<String>) {
         if (keys.isNotEmpty()) {
-            launchSafe {
+            viewModelScope.launchSafe {
                 _tagsMapFlow.value += TagHelper.getTagRelationsByKeysMap(keys, dataType.value)
             }
         }
@@ -80,7 +81,7 @@ class TagsViewModel : ViewModel() {
     }
 
     fun deleteTag(id: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             TagHelper.deleteTagRelationsByTagId(id)
             TagHelper.delete(id)
             _itemsFlow.update { it.filterNot { i -> i.id == id } }
@@ -103,7 +104,7 @@ class TagsViewModel : ViewModel() {
     }
 
     fun removeFromTags(ids: Set<String>, tagIds: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             for (tagId in tagIds) {
                 TagHelper.deleteTagRelationByKeysTagId(ids, tagId)
             }
@@ -118,7 +119,7 @@ class TagsViewModel : ViewModel() {
     }
 
     fun addToTags(items: List<IData>, tagIds: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             for (tagId in tagIds) {
                 val existingKeys = TagHelper.getKeysByTagId(tagId)
                 val newItems = items.filter { !existingKeys.contains(it.id) }

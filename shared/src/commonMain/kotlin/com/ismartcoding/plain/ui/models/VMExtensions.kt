@@ -8,7 +8,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 
-inline fun ViewModel.launchSafe(
+inline fun CoroutineScope.launchSafe(
     crossinline onError: (Throwable) -> Unit = {
         ToastManager.showErrorToast(it.message ?: it.toString())
     },
@@ -16,7 +16,7 @@ inline fun ViewModel.launchSafe(
     },
     crossinline block: suspend CoroutineScope.() -> Unit
 ): Job {
-    return viewModelScope.launch {
+    return launch {
         try {
             block()
         } catch (ex: Throwable) {

@@ -44,9 +44,7 @@ object PairingResponder {
             PairingCore.notifyFailed(request.fromId, request.fromName, "Failed to respond to pairing request")
             if (isBle) BlePairingSessionStore.remove(request.fromId)
         } finally {
-            if (!accepted) {
-                PairingSessionStore.remove(request.fromId)
-            }
+            PairingSessionStore.remove(request.fromId)
         }
     }
 

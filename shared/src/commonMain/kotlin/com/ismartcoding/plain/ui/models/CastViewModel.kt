@@ -65,7 +65,7 @@ class CastViewModel : ViewModel() {
     fun exitCastMode() {
         castMode.value = false
         val device = CastPlayer.currentDevice ?: return
-        launchSafe {
+        viewModelScope.launchSafe {
             DlnaTransportController.stopAVTransportAsync(device)
             CastPlayer.isPlaying.value = false
 
@@ -122,7 +122,7 @@ class CastViewModel : ViewModel() {
 
     fun playCast() {
         val device = CastPlayer.currentDevice ?: return
-        launchSafe {
+        viewModelScope.launchSafe {
             DlnaTransportController.playAVTransportAsync(device)
             CastPlayer.isPlaying.value = true
         }
@@ -130,7 +130,7 @@ class CastViewModel : ViewModel() {
 
     fun pauseCast() {
         val device = CastPlayer.currentDevice ?: return
-        launchSafe {
+        viewModelScope.launchSafe {
             DlnaTransportController.pauseAVTransportAsync(device)
             CastPlayer.isPlaying.value = false
         }
@@ -138,7 +138,7 @@ class CastViewModel : ViewModel() {
 
     fun castPath(path: String) {
         val device = CastPlayer.currentDevice ?: return
-        launchSafe {
+        viewModelScope.launchSafe {
             isLoading.value = true
             CastPlayer.setCurrentUri(path)
             try {
@@ -161,7 +161,7 @@ class CastViewModel : ViewModel() {
 
     fun castItem(item: IMedia) {
         val device = CastPlayer.currentDevice ?: return
-        launchSafe {
+        viewModelScope.launchSafe {
             CastPlayer.setCurrentUri(item.path)
             isLoading.value = true
             val castItems = CastPlayer.items.value
@@ -224,7 +224,7 @@ class CastViewModel : ViewModel() {
 
         positionUpdateJob?.cancel()
 
-        positionUpdateJob = launchSafe {
+        positionUpdateJob = viewModelScope.launchSafe {
             while (CastPlayer.currentUri.value.isNotEmpty() && CastPlayer.supportsCallback.value) {
                 try {
                     if (CastPlayer.isPlaying.value) {

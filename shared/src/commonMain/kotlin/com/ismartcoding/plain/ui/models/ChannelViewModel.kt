@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.channel.ChannelManager
 import com.ismartcoding.plain.ui.base.ToastManager
@@ -15,37 +16,37 @@ class ChannelViewModel : ViewModel() {
     val renameChannelId = mutableStateOf("")
 
     fun load() {
-        launchSafe { ChannelCacher.load() }
+        viewModelScope.launchSafe { ChannelCacher.load() }
     }
 
     fun createChannel(name: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             ChannelManager.createChannel(name)
             showCreateChannelDialog.value = false
         }
     }
 
     fun renameChannel(channelId: String, newName: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             ChannelManager.renameChannel(channelId, newName)
             renameChannelId.value = ""
         }
     }
 
     fun removeChannel(channelId: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             ChannelManager.deleteChannel(channelId)
         }
     }
 
     fun leaveChannel(channelId: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             ChannelManager.leaveChannel(channelId)
         }
     }
 
     fun inviteMember(channelId: String, peerId: String) {
-        launchSafe(onDone = {
+        viewModelScope.launchSafe(onDone = {
             pendingIds.remove(peerId)
         }) {
             pendingIds.add(peerId)
@@ -54,13 +55,13 @@ class ChannelViewModel : ViewModel() {
     }
 
     fun resendInvite(channelId: String, peerId: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             ChannelManager.resendInvite(channelId, peerId)
         }
     }
 
     fun kickMember(channelId: String, peerId: String) {
-        launchSafe(onDone = {
+        viewModelScope.launchSafe(onDone = {
             pendingIds.remove(peerId)
         }) {
             pendingIds.add(peerId)
@@ -68,8 +69,12 @@ class ChannelViewModel : ViewModel() {
         }
     }
 
-    fun acceptInvite(channelId: String, onSuccess: () -> Unit = {}) {
-        launchSafe {
+    fun acceptInvite(
+        channelId: String,
+        onSuccess: () -> Unit = {},
+        onDone: () -> Unit = {},
+    ) {
+        viewModelScope.launchSafe(onDone = onDone) {
             val r = ChannelManager.acceptInvite(channelId)
             if (r.isSuccess) {
                 onSuccess()
@@ -79,8 +84,11 @@ class ChannelViewModel : ViewModel() {
         }
     }
 
-    fun declineInvite(channelId: String) {
-        launchSafe {
+    fun declineInvite(
+        channelId: String,
+        onDone: () -> Unit = {},
+    ) {
+        viewModelScope.launchSafe(onDone = onDone) {
             ChannelManager.declineInvite(channelId)
         }
     }

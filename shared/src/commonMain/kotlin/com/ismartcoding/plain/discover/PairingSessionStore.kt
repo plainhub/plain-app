@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.discover
 
 import com.ismartcoding.plain.data.DPairingSession
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.PlatformLock
 
 object PairingSessionStore {

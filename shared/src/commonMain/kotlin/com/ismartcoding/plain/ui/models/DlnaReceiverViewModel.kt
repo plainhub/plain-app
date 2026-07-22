@@ -56,7 +56,7 @@ class DlnaReceiverViewModel : ViewModel() {
 
     private fun startRuleCheck() {
         ruleCheckJob?.cancel()
-        ruleCheckJob = launchSafe {
+        ruleCheckJob = viewModelScope.launchSafe {
             DlnaRendererState.rawPendingCastRequest.filterNotNull().collect { pending ->
                 val allowed = DlnaAllowedSendersPreference.getAsync()
                 val denied = DlnaDeniedSendersPreference.getAsync()
@@ -95,7 +95,7 @@ class DlnaReceiverViewModel : ViewModel() {
             DlnaRendererState.commandChannel.trySend(DlnaCommand.Play)
         }
         if (rememberChoice && pending.senderIp.isNotEmpty()) {
-            launchSafe {
+            viewModelScope.launchSafe {
                 DlnaDeniedSendersPreference.removeAsync(pending.senderIp)
                 DlnaAllowedSendersPreference.addAsync(pending.senderIp, pending.senderName)
             }
@@ -107,7 +107,7 @@ class DlnaReceiverViewModel : ViewModel() {
         DlnaRendererState.pendingCastRequest.value = null
         DlnaRendererState.pendingPlayQueued.value = false
         if (rememberChoice && pending.senderIp.isNotEmpty()) {
-            launchSafe {
+            viewModelScope.launchSafe {
                 DlnaAllowedSendersPreference.removeAsync(pending.senderIp)
                 DlnaDeniedSendersPreference.addAsync(pending.senderIp, pending.senderName)
             }

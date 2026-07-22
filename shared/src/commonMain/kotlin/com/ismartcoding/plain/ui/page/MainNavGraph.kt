@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -75,13 +74,10 @@ import com.ismartcoding.plain.platform.getOwnPackageName
 import com.ismartcoding.plain.platform.printText
 import com.ismartcoding.plain.platform.updateChatMessageTextAsync
 import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.discover.PairingResponder
 import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.resetAsync
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.i18n.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
@@ -110,7 +106,6 @@ fun MainNavGraph(
     pomodoroVM: PomodoroViewModel,
 ) {
     val updateVM: UpdateViewModel = viewModel()
-    val scope = rememberCoroutineScope()
     NavHost(
         modifier = Modifier.background(MaterialTheme.colorScheme.surface),
         navController = navController,
@@ -280,8 +275,6 @@ fun MainNavGraph(
                 PairingRequestPage(
                     request = request,
                     navController = navController,
-                    onAccept = { coIO { PairingResponder.respond(request, true) } },
-                    onDeny = { coIO { PairingResponder.respond(request, false) } },
                 )
             } else {
                 navController.popBackStack<Routing.PairingRequest>(inclusive = true)
@@ -292,19 +285,9 @@ fun MainNavGraph(
             if (event != null) {
                 val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
                 LoginRequestPage(
-                    request = event.request,
+                    event = event,
                     clientIp = clientIp,
                     navController = navController,
-                    onAccept = {
-                        scope.launch(Dispatchers.Default) {
-                            HttpServerManager.respondTokenAsync(event, clientIp)
-                        }
-                    },
-                    onDeny = {
-                        scope.launch(Dispatchers.Default) {
-                            event.session.close(1013, "rejected")
-                        }
-                    },
                 )
             } else {
                 navController.popBackStack<Routing.LoginRequest>(inclusive = true)
@@ -328,10 +311,11 @@ fun MainNavGraph(
             }
 
             ChannelInvitePage(
+                channelId = r.channelId,
                 channelName = r.channelName,
                 ownerPeerName = r.ownerPeerName,
-                onAccept = { channelVM.acceptInvite(r.channelId) { navController.popBackStack() } },
-                onDecline = { channelVM.declineInvite(r.channelId); navController.popBackStack() },
+                channelVM = channelVM,
+                navController = navController,
             )
         }
     }

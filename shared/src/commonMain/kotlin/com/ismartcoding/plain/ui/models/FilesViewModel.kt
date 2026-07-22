@@ -46,7 +46,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
             val isChanged = _selectedPath != value
             _selectedPath = value
             if (isChanged) {
-                launchSafe {
+                viewModelScope.launchSafe {
                     val breadcrumbsCopy = breadcrumbs.toList()
                     val fullPath = if (breadcrumbsCopy.isNotEmpty()) breadcrumbsCopy.last().path else value
                     LastFilePathPreference.putAsync(FilePathData(rootPath = rootPath, fullPath = fullPath, selectedPath = value))
@@ -91,7 +91,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
             navigationHistoryInternal.add(selectedPath)
             selectedPath = newPath
             rebuildBreadcrumbs(newPath)
-            launchSafe {
+            viewModelScope.launchSafe {
                 isLoading.value = true
                 updateItemsInternal(emptyList())
                 loadAsync()

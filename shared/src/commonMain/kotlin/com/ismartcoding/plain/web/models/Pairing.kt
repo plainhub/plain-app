@@ -3,6 +3,7 @@ package com.ismartcoding.plain.web.models
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.DiscoveryMethod
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
@@ -16,6 +17,7 @@ data class PairingDeviceInput(
     val version: String,
     val platform: String,
     val lastSeen: Instant,
+    val discoveryMethods: Set<DiscoveryMethod>,
 ) {
     fun toModel(): DNearbyDevice {
         return DNearbyDevice(
@@ -27,6 +29,7 @@ data class PairingDeviceInput(
             version = version,
             platform = platform,
             lastSeen = lastSeen,
+            discoveryMethods = discoveryMethods
         )
     }
 }
@@ -43,6 +46,8 @@ data class PairingRequestInput(
     val ips: List<String> = emptyList(),
     val signature: String = "",
     val fromIp: String = "",
+    val isQrInitiated: Boolean = false,
+    val awareSupported: Boolean = false,
 ) {
     fun toModel(): DPairingRequest {
         return DPairingRequest(
@@ -56,6 +61,8 @@ data class PairingRequestInput(
             ips = ips,
             signature = signature,
             fromIp = fromIp,
+            isQrInitiated = isQrInitiated,
+            awareSupported = awareSupported,
         )
     }
 }

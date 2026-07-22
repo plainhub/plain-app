@@ -3,34 +3,37 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.PairingTransport
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
+import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.discover.PairingInitiator
-import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
-import com.ismartcoding.plain.events.PairingFailedEvent
-import com.ismartcoding.plain.events.PairingSuccessEvent
-import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
-import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
+import com.ismartcoding.plain.enums.DiscoveryMethod
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.channel.Channel
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.ensureBlePermissionAsync
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.platform.getDeviceType
 import com.ismartcoding.plain.platform.isBluetoothReadyToUse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
-class NearbyViewModel : ViewModel() {
+object NearbyViewModel {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     val nearbyDevices = mutableStateListOf<DNearbyDevice>()
     var isDiscovering = mutableStateOf(false)
     val itemStatus = mutableStateMapOf<String, NearbyItemStatus>()
@@ -43,36 +46,22 @@ class NearbyViewModel : ViewModel() {
     private var bleJob: Job? = null
     private var blePermissionJob: Job? = null
     private val blePairingJobs = mutableMapOf<String, Job>()
-
-    init {
-        startEventListening()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        eventJob?.cancel()
-        cleanupJob?.cancel()
-        bleJob?.cancel()
-        blePermissionJob?.cancel()
-        blePairingJobs.values.forEach { it.cancel() }
-        blePairingJobs.clear()
-        sendEvent(StopNearbyDiscoveryEvent())
-    }
+    private val lastDeviceEventTimes = mutableMapOf<String, Long>()
 
     fun startDiscovering() {
         isDiscovering.value = true
-        sendEvent(StartNearbyDiscoveryEvent())
+        LANDiscoverManager.startPeriodicDiscovery()
         startDeviceCleanup()
     }
 
     fun stopDiscovering() {
         isDiscovering.value = false
-        sendEvent(StopNearbyDiscoveryEvent())
+        LANDiscoverManager.stopPeriodicDiscovery()
         stopDeviceCleanup()
     }
 
     private fun startDeviceCleanup() {
-        cleanupJob = viewModelScope.launch {
+        cleanupJob = scope.launch {
             while (isDiscovering.value || isBleScanning.value) {
                 delay(20000.milliseconds)
                 val currentTime = TimeHelper.now()
@@ -90,7 +79,7 @@ class NearbyViewModel : ViewModel() {
 
     fun requestBlePermission() {
         if (blePermissionJob?.isActive == true) return
-        blePermissionJob = launchSafe(
+        blePermissionJob = scope.launchSafe(
             onError = {
                 LogCat.e("BLE permission error: ${it.message}", it)
             },
@@ -107,7 +96,11 @@ class NearbyViewModel : ViewModel() {
     fun startBleScanning() {
         if (isBleScanning.value) return
         if (!isBluetoothReadyToUse()) return
-        bleJob = launchSafe(
+        bleJob = scope.launchSafe(
+            onDone = {
+                isBleScanning.value = false
+                stopDeviceCleanup()
+            },
             onError = {
                 LogCat.e("BLE scan error: ${it.message}", it)
                 isBleScanning.value = false
@@ -115,13 +108,8 @@ class NearbyViewModel : ViewModel() {
             block = {
                 isBleScanning.value = true
                 startDeviceCleanup()
-                try {
-                    PairingTransport.scanAndDiscover().collect { device ->
-                        sendEvent(NearbyDeviceFoundEvent(device))
-                    }
-                } finally {
-                    isBleScanning.value = false
-                    stopDeviceCleanup()
+                PairingTransport.scanAndDiscover().collect { device ->
+                    NearbyViewModel.handleNewDevice(device)
                 }
             }
         )
@@ -138,20 +126,15 @@ class NearbyViewModel : ViewModel() {
         if (itemStatus[device.id] != null) return
         itemStatus[device.id] = NearbyItemStatus.PAIRING
 
-        if (device.discoveredViaLan && device.ips.isNotEmpty()) {
-            launchSafe {
-                // PairingInitiator.start now handles the 90s timeout internally
-                // with UDP retransmissions every 3s. If itemStatus is still
-                // PAIRING after it returns, the session timed out — clean up.
+        if (DiscoveryMethod.LAN in device.discoveryMethods && device.ips.isNotEmpty()) {
+            scope.launchSafe {
                 PairingInitiator.start(device)
-                if (itemStatus[device.id] == NearbyItemStatus.PAIRING) {
-                    itemStatus.remove(device.id)
-                }
             }
-        } else if (device.discoveredViaBle && device.bleClient != null) {
-            blePairingJobs[device.id] = launchSafe {
-                PairingTransport.pairViaBle(device)
+        } else if (DiscoveryMethod.BLE in device.discoveryMethods && device.bleClient != null) {
+            blePairingJobs[device.id] = scope.launchSafe(onDone = {
                 blePairingJobs.remove(device.id)
+            }) {
+                PairingTransport.pairViaBle(device)
             }
         } else {
             itemStatus.remove(device.id)
@@ -159,19 +142,13 @@ class NearbyViewModel : ViewModel() {
     }
 
     fun unpairDevice(deviceId: String) {
-        // Block only when an active pair/unpair operation is in progress.
-        // Previously this guarded on `!= null`, which also blocked unpairing
-        // from the PAIRED state (set by PairingSuccessEvent) — so the Unpair
-        // button appeared non-responsive after a successful pairing.
         val current = itemStatus[deviceId]
         if (current == NearbyItemStatus.UNPAIRING || current == NearbyItemStatus.PAIRING) return
         itemStatus[deviceId] = NearbyItemStatus.UNPAIRING
-        launchSafe {
-            try {
-                PeerManager.markUnpaired(deviceId)
-            } finally {
-                itemStatus.remove(deviceId)
-            }
+        scope.launchSafe(onDone = {
+            itemStatus.remove(deviceId)
+        }) {
+            PeerManager.markUnpaired(deviceId)
         }
     }
 
@@ -203,41 +180,35 @@ class NearbyViewModel : ViewModel() {
         }
     }
 
-    fun clearStatus(deviceId: String) {
-        itemStatus.remove(deviceId)
+    fun handleNewDevice(incoming: DNearbyDevice) {
+        val existingIndex = nearbyDevices.indexOfFirst { it.id == incoming.id }
+        val paired = PeerCacher.pairedPeers.value.any { it.id == incoming.id }
+        val now = TimeHelper.nowMillis()
+        val shouldSendEvent = (now - (lastDeviceEventTimes[incoming.id] ?: 0L)) >= 1000L
+        if (shouldSendEvent) {
+            lastDeviceEventTimes[incoming.id] = now
+        }
+        if (existingIndex >= 0) {
+            val existing = nearbyDevices[existingIndex]
+            val merged = incoming.copy(
+                discoveryMethods = existing.discoveryMethods + incoming.discoveryMethods,
+                bleClient = incoming.bleClient ?: existing.bleClient,
+                ips = (existing.ips + incoming.ips).distinct(),
+                lastSeen = maxOf(existing.lastSeen, incoming.lastSeen),
+                status = getStatus(incoming.id, paired)
+            )
+            nearbyDevices[existingIndex] = merged
+            if (shouldSendEvent) {
+                sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(merged)))
+            }
+        } else {
+            val withStatus = incoming.copy(status = getStatus(incoming.id, paired))
+            sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(withStatus)))
+            nearbyDevices.add(withStatus)
+        }
     }
 
-    private fun startEventListening() {
-        eventJob = viewModelScope.launch {
-            Channel.sharedFlow.collect { event ->
-                when (event) {
-                    is NearbyDeviceFoundEvent -> {
-                        val incoming = event.device
-                        val existingIndex = nearbyDevices.indexOfFirst { it.id == incoming.id }
-                        if (existingIndex >= 0) {
-                            val existing = nearbyDevices[existingIndex]
-                            val merged = incoming.copy(
-                                discoveredViaLan = existing.discoveredViaLan || incoming.discoveredViaLan,
-                                discoveredViaBle = existing.discoveredViaBle || incoming.discoveredViaBle,
-                                bleClient = incoming.bleClient ?: existing.bleClient,
-                                ips = (existing.ips + incoming.ips).distinct(),
-                                lastSeen = maxOf(existing.lastSeen, incoming.lastSeen),
-                            )
-                            nearbyDevices[existingIndex] = merged
-                        } else {
-                            nearbyDevices.add(incoming)
-                        }
-                    }
-
-                    is PairingFailedEvent -> {
-                        itemStatus.remove(event.deviceId)
-                    }
-
-                    is PairingSuccessEvent -> {
-                        itemStatus[event.deviceId] = NearbyItemStatus.PAIRED
-                    }
-                }
-            }
-        }
+    fun handlePairingSuccess(deviceId: String) {
+        itemStatus[deviceId] = NearbyItemStatus.PAIRED
     }
 }

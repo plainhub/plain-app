@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.lib.rss.model.RssChannel
 import com.ismartcoding.plain.enums.DataType
@@ -38,7 +39,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
     override val selectedIds = mutableStateListOf<String>()
 
     fun loadAsync(withCount: Boolean = false) {
-        launchSafe {
+        viewModelScope.launchSafe {
             val countMap = if (withCount) {
                 FeedHelper.getFeedCounts().associate { it.id to it.count }
             } else {
@@ -53,7 +54,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
     }
 
     fun updateFetchContent(id: String, value: Boolean) {
-        launchSafe {
+        viewModelScope.launchSafe {
             FeedHelper.updateAsync(id) {
                 this.fetchContent = value
             }
@@ -61,7 +62,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
     }
 
     fun delete(ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             val entryIds = FeedEntryHelper.feedEntryDao.getIds(ids)
             if (entryIds.isNotEmpty()) {
                 TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
@@ -74,7 +75,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
 
     fun add() {
         editUrlError.value = ""
-        launchSafe {
+        viewModelScope.launchSafe {
             val id = FeedHelper.addAsync {
                 this.url = editUrl.value
                 this.name = editName.value
@@ -92,7 +93,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
             editUrlError.value = LocaleHelper.getString(Res.string.invalid_url)
             return
         }
-        launchSafe {
+        viewModelScope.launchSafe {
             if (FeedHelper.getByUrl(editUrl.value) != null) {
                 editUrlError.value = LocaleHelper.getStringAsync(Res.string.already_added)
                 return@launchSafe
@@ -114,7 +115,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
             editUrlError.value = LocaleHelper.getString(Res.string.invalid_url)
             return
         }
-        launchSafe {
+        viewModelScope.launchSafe {
             val a = FeedHelper.getByUrl(editUrl.value)
             if (a != null && a.id != editId.value) {
                 editUrlError.value = LocaleHelper.getStringAsync(Res.string.already_added)

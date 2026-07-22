@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.helpers.JsonHelper
@@ -92,7 +93,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     fun clearAllMessages() {
-        launchSafe {
+        viewModelScope.launchSafe {
             val target = target.value
             ChatManager.clearAllMessages(target)
             _itemsFlow.value = emptyList()
@@ -101,7 +102,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     fun resendMessage(messageId: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
             ChatManager.updateStatus(item, "pending")
             update(item)
@@ -110,7 +111,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     fun resendToMembers(messageId: String, peerIds: List<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             val target = target.value
             val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return@launchSafe
             val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
@@ -122,7 +123,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     fun forwardMessage(messageId: String, target: ChatTarget, onlinePeerIds: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
             val item2 = ChatManager.createChatItem(target, item.content)
             if (!target.isLocal()) {
@@ -139,7 +140,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     fun delete(ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             ChatManager.deleteByIds(ids)
             _itemsFlow.update { it.filterNot { m -> ids.contains(m.id) } }
             sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode("ids=${ids.joinToString(",")}")))
@@ -159,7 +160,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     fun sendTextMessage(text: String, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
-        launchSafe {
+        viewModelScope.launchSafe {
             val content = if (text.length > Constants.MAX_MESSAGE_LENGTH) {
                 createLongTextFile(text)
             } else {
@@ -172,11 +173,12 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     suspend fun sendFilesImmediate(files: List<DMessageFile>, isImageVideo: Boolean): String = withIO {
         val item = ChatManager.insertFilesImmediate(target.value, files, isImageVideo)
         addAllAndScroll(listOf(item))
+        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
         item.id
     }
 
     fun updateFilesMessage(messageId: String, files: List<DMessageFile>, isImageVideo: Boolean, onlinePeerIds: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             val target = target.value
             val item = ChatManager.updateFilesMessage(messageId, files, isImageVideo, target, onlinePeerIds) ?: return@launchSafe
             sendEvent(HMessageUpdatedEvent(item.id))

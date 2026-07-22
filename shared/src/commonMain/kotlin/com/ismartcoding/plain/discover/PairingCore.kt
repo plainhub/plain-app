@@ -12,9 +12,9 @@ import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.data.DPairingResult
 import com.ismartcoding.plain.data.DPairingSession
 import com.ismartcoding.plain.enums.NearbyMessageType
+import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PairingCanceledEvent
-import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.WebSocketEvent
@@ -30,6 +30,7 @@ import com.ismartcoding.plain.platform.getDeviceName
 import com.ismartcoding.plain.platform.getDeviceType
 import com.ismartcoding.plain.platform.getPlatformName
 import com.ismartcoding.plain.platform.isWifiAwareSupported
+import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -66,8 +67,7 @@ object PairingCore {
             version = reply.version,
             platform = reply.platform,
             lastSeen = TimeHelper.now(),
-            discoveredViaLan = bleClient == null,
-            discoveredViaBle = bleClient != null,
+            discoveryMethods = if (bleClient == null) setOf(DiscoveryMethod.LAN) else setOf(DiscoveryMethod.BLE),
             bleClient = bleClient,
         )
     }
@@ -218,6 +218,7 @@ object PairingCore {
             key = encryptKey,
             signaturePublicKey = request.signaturePublicKey,
         )
+        NearbyViewModel.handlePairingSuccess(request.fromId)
         sendEvent(PairingSuccessEvent(request.fromId, request.fromName, request.fromIp, encryptKey))
         sendEvent(
             WebSocketEvent(
@@ -262,6 +263,7 @@ object PairingCore {
                 key = encryptKey,
                 signaturePublicKey = response.signaturePublicKey,
             )
+            NearbyViewModel.handlePairingSuccess(response.fromId)
             sendEvent(PairingSuccessEvent(response.fromId, session.deviceName, senderIp, encryptKey))
             sendEvent(
                 WebSocketEvent(
@@ -279,12 +281,11 @@ object PairingCore {
     }
 
     fun notifyFailed(deviceId: String, deviceName: String, reason: String) {
-        val event = PairingFailedEvent(deviceId, reason)
-        sendEvent(event)
+        NearbyViewModel.itemStatus.remove(deviceId)
         sendEvent(
             WebSocketEvent(
                 EventType.PAIRING_FAILED,
-                JsonHelper.jsonEncode(DPairingResult(deviceId = event.deviceId, deviceName = deviceName, error = event.reason)),
+                JsonHelper.jsonEncode(DPairingResult(deviceId = deviceId, deviceName = deviceName, error = reason)),
             )
         )
     }

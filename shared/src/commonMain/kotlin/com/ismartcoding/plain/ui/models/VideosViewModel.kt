@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
@@ -13,7 +14,7 @@ class VideosViewModel : BaseMediaViewModel<DVideo>() {
     val scrollStateMap = mutableStateMapOf<Int, LazyGridState>()
 
     override fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             deleteMedia(dataType, ids, trash.value)

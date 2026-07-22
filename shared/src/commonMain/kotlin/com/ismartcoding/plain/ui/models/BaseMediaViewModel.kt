@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
@@ -105,7 +106,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     }
 
     open fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             deleteMedia(dataType, ids, trash.value)
@@ -117,7 +118,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     fun trashItems(
         tagsVM: TagsViewModel, ids: Set<String>,
     ) {
-        launchSafe {
+        viewModelScope.launchSafe {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             trashMedia(dataType, ids)
@@ -130,7 +131,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     fun restoreItems(
         tagsVM: TagsViewModel, ids: Set<String>,
     ) {
-        launchSafe {
+        viewModelScope.launchSafe {
             DialogHelper.showLoading()
             restoreMedia(dataType, ids)
             loadAsync(tagsVM)

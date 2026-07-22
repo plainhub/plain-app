@@ -18,6 +18,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
@@ -40,21 +41,21 @@ class DlnaCastRulesViewModel : ViewModel() {
     val deniedFlow = MutableStateFlow<List<Pair<String, String>>>(emptyList())
 
     fun load() {
-        launchSafe {
+        viewModelScope.launchSafe {
             allowedFlow.value = DlnaAllowedSendersPreference.getAsync().map { decodeSenderEntry(it) }
             deniedFlow.value = DlnaDeniedSendersPreference.getAsync().map { decodeSenderEntry(it) }
         }
     }
 
     fun removeAllowed(ip: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             DlnaAllowedSendersPreference.removeAsync(ip)
             allowedFlow.value = allowedFlow.value.filter { it.first != ip }
         }
     }
 
     fun removeDenied(ip: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             DlnaDeniedSendersPreference.removeAsync(ip)
             deniedFlow.value = deniedFlow.value.filter { it.first != ip }
         }

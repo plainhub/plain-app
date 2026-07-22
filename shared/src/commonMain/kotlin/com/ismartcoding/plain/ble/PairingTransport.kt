@@ -196,7 +196,6 @@ object PairingTransport {
                 }
             }
             bleTransport().createScanner().teardownConnection(bleDevice)
-            PairingSessionStore.remove(device.id)
         }
     }
 

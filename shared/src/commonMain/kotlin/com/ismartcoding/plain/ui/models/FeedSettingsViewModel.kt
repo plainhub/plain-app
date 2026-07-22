@@ -37,7 +37,7 @@ class FeedSettingsViewModel : ViewModel() {
 
     fun setAutoRefresh(value: Boolean) {
         autoRefresh.value = value
-        launchSafe {
+        viewModelScope.launchSafe {
             FeedAutoRefreshPreference.putAsync(value)
             if (value) {
                 feedWorkerStartRepeat()
@@ -49,14 +49,14 @@ class FeedSettingsViewModel : ViewModel() {
 
     fun setAutoRefreshInterval(value: Int) {
         autoRefreshInterval.value = value
-        launchSafe {
+        viewModelScope.launchSafe {
             FeedAutoRefreshIntervalPreference.putAsync(value)
         }
     }
 
     fun setAutoRefreshOnlyWifi(value: Boolean) {
         autoRefreshOnlyWifi.value = value
-        launchSafe {
+        viewModelScope.launchSafe {
             FeedAutoRefreshOnlyWifiPreference.putAsync(value)
         }
     }
@@ -68,7 +68,7 @@ class FeedSettingsViewModel : ViewModel() {
     }
 
     fun clearAllAsync() {
-        launchSafe {
+        viewModelScope.launchSafe {
             TagHelper.deleteByTypeAsync(DataType.FEED_ENTRY)
             FeedEntryHelper.deleteAllAsync()
         }

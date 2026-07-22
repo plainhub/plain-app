@@ -48,8 +48,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
-data class NearbyDeviceFoundEvent(val device: DNearbyDevice) : ChannelEvent()
-
 /**
  * A web login request that needs user confirmation. The [session] handle is
  * platform-agnostic so the event can flow through commonMain business logic.
@@ -63,7 +61,6 @@ class ConfirmToAcceptLoginEvent(
 // Pairing events
 data class PairingRequestReceivedEvent(val request: DPairingRequest) : ChannelEvent()
 data class PairingSuccessEvent(val deviceId: String, val deviceName: String, val deviceIp: String, val key: String) : ChannelEvent()
-data class PairingFailedEvent(val deviceId: String, val reason: String) : ChannelEvent()
 data class PairingCanceledEvent(val fromId: String) : ChannelEvent()
 
 class FolderKanbanSelectEvent(val data: FolderOption) : ChannelEvent()
@@ -133,8 +130,6 @@ class SleepTimerEvent(val durationMs: Long) : ChannelEvent()
 class CancelSleepTimerEvent : ChannelEvent()
 
 class StartNearbyServiceEvent : ChannelEvent()
-class StartNearbyDiscoveryEvent : ChannelEvent()
-class StopNearbyDiscoveryEvent : ChannelEvent()
 
 data class ChatMessageNotificationEvent(
     val targetId: String,
@@ -214,14 +209,6 @@ object AppEvents {
                         if (isBluetoothAdvertiseReady()) {
                             PairingTransport.startAdvertising()
                         }
-                    }
-
-                    is StartNearbyDiscoveryEvent -> {
-                        LANDiscoverManager.startPeriodicDiscovery()
-                    }
-
-                    is StopNearbyDiscoveryEvent -> {
-                        LANDiscoverManager.stopPeriodicDiscovery()
                     }
 
                     is ImageSearchStatusChangedEvent -> {

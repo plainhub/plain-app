@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.data.DNearbyDevice
@@ -54,12 +53,11 @@ import com.ismartcoding.plain.ui.page.chat.components.NearbyDeviceItem
 fun NearbyPage(
     navController: NavHostController,
     peerVM: PeerViewModel,
-    nearbyVM: NearbyViewModel = viewModel(),
 ) {
-    val nearbyDevices = nearbyVM.nearbyDevices
-    val isDiscovering by nearbyVM.isDiscovering
-    val isBleScanning by nearbyVM.isBleScanning
-    val blePermissionReady by nearbyVM.blePermissionReady
+    val nearbyDevices = NearbyViewModel.nearbyDevices
+    val isDiscovering by NearbyViewModel.isDiscovering
+    val isBleScanning by NearbyViewModel.isBleScanning
+    val blePermissionReady by NearbyViewModel.blePermissionReady
     val isSearching = isDiscovering || isBleScanning
     val pairedPeers by PeerCacher.pairedPeers.collectAsState()
 
@@ -68,23 +66,23 @@ fun NearbyPage(
 
     LaunchedEffect(Unit) {
         if (!isDiscovering) {
-            nearbyVM.startDiscovering()
+            NearbyViewModel.startDiscovering()
         }
         if (blePermissionReady && !isBleScanning) {
-            nearbyVM.startBleScanning()
+            NearbyViewModel.startBleScanning()
         }
     }
 
     LaunchedEffect(showQrSheet) {
         if (showQrSheet && qrData == null) {
-            qrData = nearbyVM.getQrDataAsync()
+            qrData = NearbyViewModel.getQrDataAsync()
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            if (isDiscovering) nearbyVM.stopDiscovering()
-            if (isBleScanning) nearbyVM.stopBleScanning()
+            if (isDiscovering) NearbyViewModel.stopDiscovering()
+            if (isBleScanning) NearbyViewModel.stopBleScanning()
         }
     }
 
@@ -114,13 +112,13 @@ fun NearbyPage(
                         PFilledButton(
                             text = stringResource(Res.string.grant_permission),
                             buttonSize = ButtonSize.SMALL,
-                            onClick = { nearbyVM.requestBlePermission() },
+                            onClick = { NearbyViewModel.requestBlePermission() },
                         )
                     }
                 }
             }
             nearbySearchingItem(isSearching)
-            nearbyDeviceListItems(nearbyDevices, nearbyVM, peerVM, pairedPeers)
+            nearbyDeviceListItems(nearbyDevices, peerVM, pairedPeers)
             if (nearbyDevices.isEmpty() && !isSearching) {
                 item {
                     Box(
@@ -155,7 +153,6 @@ fun NearbyPage(
 
 internal fun LazyListScope.nearbyDeviceListItems(
     nearbyDevices: List<DNearbyDevice>,
-    nearbyVM: NearbyViewModel,
     peerVM: PeerViewModel,
     pairedPeers: List<com.ismartcoding.plain.db.DPeer>,
 ) {
@@ -163,14 +160,11 @@ internal fun LazyListScope.nearbyDeviceListItems(
         nearbyDevices.forEach { item ->
             item {
                 val isPaired = pairedPeers.any { it.id == item.id }
-                val status = nearbyVM.getStatus(item.id, isPaired)
+                val status = NearbyViewModel.getStatus(item.id, isPaired)
                 NearbyDeviceItem(
                     item = item,
                     status = status,
                     bestIp = getBestIp(item.ips),
-                    onPairClick = { nearbyVM.startPairing(item) },
-                    onUnpairClick = { nearbyVM.unpairDevice(item.id) },
-                    onCancelClick = { nearbyVM.cancelPairing(item.id) },
                 )
                 VerticalSpace(8.dp)
             }

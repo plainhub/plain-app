@@ -16,8 +16,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -28,14 +33,19 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.models.ChannelViewModel
 
 @Composable
 fun ChannelInvitePage(
+    channelId: String,
     channelName: String,
     ownerPeerName: String,
-    onAccept: () -> Unit,
-    onDecline: () -> Unit,
+    channelVM: ChannelViewModel,
+    navController: NavHostController,
 ) {
+    var accepting by remember { mutableStateOf(false) }
+    var declining by remember { mutableStateOf(false) }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -98,8 +108,15 @@ fun ChannelInvitePage(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.accept),
                     buttonSize = ButtonSize.EXTRA_LARGE,
+                    isLoading = accepting,
+                    enabled = !accepting && !declining,
                     onClick = {
-                        onAccept()
+                        accepting = true
+                        channelVM.acceptInvite(
+                            channelId = channelId,
+                            onSuccess = { navController.popBackStack() },
+                            onDone = { accepting = false },
+                        )
                     },
                 )
                 VerticalSpace(24.dp)
@@ -108,8 +125,17 @@ fun ChannelInvitePage(
                     text = stringResource(Res.string.decline),
                     buttonSize = ButtonSize.EXTRA_LARGE,
                     type = ButtonType.DANGER,
+                    isLoading = declining,
+                    enabled = !accepting && !declining,
                     onClick = {
-                        onDecline()
+                        declining = true
+                        channelVM.declineInvite(
+                            channelId = channelId,
+                            onDone = {
+                                declining = false
+                                navController.popBackStack()
+                            },
+                        )
                     },
                 )
             }

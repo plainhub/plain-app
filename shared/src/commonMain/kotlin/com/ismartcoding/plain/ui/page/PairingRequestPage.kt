@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.data.DPairingRequest
+import com.ismartcoding.plain.discover.PairingResponder
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.base.PCard
@@ -38,6 +40,7 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val PAIRING_REQUEST_TIMEOUT_SECONDS = 90
 
@@ -45,11 +48,12 @@ private const val PAIRING_REQUEST_TIMEOUT_SECONDS = 90
 fun PairingRequestPage(
     request: DPairingRequest,
     navController: NavHostController,
-    onAccept: () -> Unit,
-    onDeny: () -> Unit,
 ) {
     var remainingSeconds by remember { mutableIntStateOf(PAIRING_REQUEST_TIMEOUT_SECONDS) }
     var expired by remember { mutableStateOf(false) }
+    var accepting by remember { mutableStateOf(false) }
+    var denying by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         while (remainingSeconds > 0) {
@@ -150,9 +154,14 @@ fun PairingRequestPage(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(Res.string.allow),
                         buttonSize = ButtonSize.EXTRA_LARGE,
+                        isLoading = accepting,
+                        enabled = !accepting && !denying,
                         onClick = {
-                            onAccept()
-                            navController.popBackStack()
+                            accepting = true
+                            scope.launch {
+                                PairingResponder.respond(request, true)
+                                navController.popBackStack()
+                            }
                         },
                     )
                     VerticalSpace(24.dp)
@@ -161,9 +170,14 @@ fun PairingRequestPage(
                         text = stringResource(Res.string.deny),
                         buttonSize = ButtonSize.EXTRA_LARGE,
                         type = ButtonType.DANGER,
+                        isLoading = denying,
+                        enabled = !accepting && !denying,
                         onClick = {
-                            onDeny()
-                            navController.popBackStack()
+                            denying = true
+                            scope.launch {
+                                PairingResponder.respond(request, false)
+                                navController.popBackStack()
+                            }
                         },
                     )
                 }

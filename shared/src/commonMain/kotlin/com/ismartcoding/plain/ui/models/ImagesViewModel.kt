@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.enums.DataType
@@ -42,7 +43,7 @@ class ImagesViewModel : BaseMediaViewModel<DImage>() {
     }
 
     override fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             deleteMedia(dataType, ids, trash.value)

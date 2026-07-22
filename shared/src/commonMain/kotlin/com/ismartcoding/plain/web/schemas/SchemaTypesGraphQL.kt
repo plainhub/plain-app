@@ -4,6 +4,7 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.data.DevicePlatform
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.enums.ScreenMirrorMode
@@ -30,6 +31,7 @@ fun SchemaBuilder.addSchemaTypes() {
     enum<BatteryHealth>()
     enum<BatteryStatus>()
     enum<BatteryPlugged>()
+    enum<DiscoveryMethod>()
     stringScalar<Instant> {
         deserialize = { value: String -> Instant.parse(value) }
         serialize = Instant::toString

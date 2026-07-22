@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.helpers.launchSafe
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.db.DNote
@@ -58,7 +59,7 @@ class NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>,
     }
 
     fun trash(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.trashAsync(ids)
             loadAsync(tagsVM)
@@ -77,7 +78,7 @@ class NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>,
     }
 
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.restoreAsync(ids)
             loadAsync(tagsVM)
@@ -85,7 +86,7 @@ class NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>,
     }
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        launchSafe {
+        viewModelScope.launchSafe {
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.deleteAsync(ids)
             loadAsync(tagsVM)

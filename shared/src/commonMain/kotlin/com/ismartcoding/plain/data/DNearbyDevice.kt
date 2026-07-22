@@ -2,6 +2,8 @@ package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.DiscoveryMethod
+import com.ismartcoding.plain.ui.models.NearbyItemStatus
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlin.time.Instant
@@ -16,8 +18,8 @@ data class DNearbyDevice(
     val version: String,
     val platform: String,
     val lastSeen: Instant,
-    val discoveredViaLan: Boolean = true,
-    val discoveredViaBle: Boolean = false,
+    val status: NearbyItemStatus = NearbyItemStatus.UNPAIRED,
+    val discoveryMethods: Set<DiscoveryMethod> = setOf(),
     @Transient
     val bleClient: BleGattClient? = null,
 )

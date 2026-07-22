@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.extensions.toJsValue
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.launchSafe
@@ -51,7 +52,7 @@ class TextFileViewModel : ViewModel() {
 
     fun toggleWrapContent() {
         wrapContent.value = !wrapContent.value
-        launchSafe {
+        viewModelScope.launchSafe {
             EditorWrapContentPreference.putAsync(wrapContent.value)
         }
         webView.value?.evaluateJavascript("editor.session.setUseWrapMode(${wrapContent.value.toJsValue()})")

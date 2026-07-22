@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.helpers.launchSafe
 import com.ismartcoding.plain.preferences.ScanHistoryPreference
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,7 @@ class ScanHistoryViewModel : ViewModel() {
     val itemsFlow = _itemsFlow.asStateFlow()
 
     fun fetch() {
-        launchSafe {
+        viewModelScope.launchSafe {
             _itemsFlow.update {
                 ScanHistoryPreference.getValueAsync()
             }
@@ -20,7 +21,7 @@ class ScanHistoryViewModel : ViewModel() {
     }
 
     fun delete(value: String) {
-        launchSafe {
+        viewModelScope.launchSafe {
             _itemsFlow.update {
                 val mutableList = it.toMutableList()
                 mutableList.remove(value)

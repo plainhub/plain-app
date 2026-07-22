@@ -16,6 +16,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
@@ -23,27 +28,33 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.lib.extensions.capitalize
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.lib.extensions.capitalize
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.web.AuthRequest
+import com.ismartcoding.plain.web.HttpServerManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginRequestPage(
-    request: AuthRequest,
+    event: ConfirmToAcceptLoginEvent,
     clientIp: String,
     navController: NavHostController,
-    onAccept: () -> Unit,
-    onDeny: () -> Unit,
 ) {
+    val request = event.request
     val isWeb = request.browserName != "PlainApp"
     val titleRes = if (isWeb) Res.string.allow_web_access else Res.string.allow_desktop_access
     val descRes = if (isWeb) Res.string.allow_web_access_desc else Res.string.allow_desktop_access_desc
     val iconRes = if (isWeb) Res.drawable.chrome else Res.drawable.laptop
+
+    var allowing by remember { mutableStateOf(false) }
+    var denying by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     LazyColumn(
         modifier = Modifier
@@ -117,9 +128,14 @@ fun LoginRequestPage(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.allow),
                     buttonSize = ButtonSize.EXTRA_LARGE,
+                    isLoading = allowing,
+                    enabled = !allowing && !denying,
                     onClick = {
-                        navController.popBackStack()
-                        onAccept()
+                        allowing = true
+                        scope.launch {
+                            HttpServerManager.respondTokenAsync(event, clientIp)
+                            navController.popBackStack()
+                        }
                     },
                 )
                 VerticalSpace(24.dp)
@@ -128,9 +144,14 @@ fun LoginRequestPage(
                     text = stringResource(Res.string.deny),
                     buttonSize = ButtonSize.EXTRA_LARGE,
                     type = ButtonType.DANGER,
+                    isLoading = denying,
+                    enabled = !allowing && !denying,
                     onClick = {
-                        navController.popBackStack()
-                        onDeny()
+                        denying = true
+                        scope.launch {
+                            event.session.close(1013, "rejected")
+                            navController.popBackStack()
+                        }
                     },
                 )
             }

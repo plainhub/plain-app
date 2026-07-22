@@ -16,11 +16,13 @@ import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.enums.BadgeType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PStatusBadge
 import com.ismartcoding.plain.ui.models.NearbyItemStatus
+import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 @Composable
@@ -28,9 +30,6 @@ fun NearbyDeviceItem(
     item: DNearbyDevice,
     status: NearbyItemStatus,
     bestIp: String,
-    onPairClick: () -> Unit,
-    onUnpairClick: () -> Unit,
-    onCancelClick: () -> Unit,
 ) {
     Surface(
         modifier = PlainTheme.getCardModifier(selected = status == NearbyItemStatus.PAIRED),
@@ -39,7 +38,7 @@ fun NearbyDeviceItem(
         PListItem(
             title = item.name,
             titleSuffix = {
-                if (item.discoveredViaBle) {
+                if (DiscoveryMethod.BLE in item.discoveryMethods) {
                     Icon(
                         painter = painterResource(Res.drawable.bluetooth),
                         contentDescription = "Bluetooth",
@@ -47,8 +46,8 @@ fun NearbyDeviceItem(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                if (item.discoveredViaLan) {
-                    if (item.discoveredViaBle) HorizontalSpace(2.dp)
+                if (DiscoveryMethod.LAN in item.discoveryMethods) {
+                    if (DiscoveryMethod.BLE in item.discoveryMethods) HorizontalSpace(2.dp)
                     Icon(
                         painter = painterResource(Res.drawable.wifi),
                         contentDescription = "Wi-Fi",
@@ -68,7 +67,9 @@ fun NearbyDeviceItem(
                     NearbyItemStatus.PAIRING -> {
                         POutlinedButton(
                             text = stringResource(Res.string.cancel),
-                            onClick = onCancelClick,
+                            onClick = {
+                                NearbyViewModel.cancelPairing(item.id)
+                            },
                             type = ButtonType.DANGER,
                             buttonSize = ButtonSize.SMALL,
                         )
@@ -88,7 +89,9 @@ fun NearbyDeviceItem(
                     NearbyItemStatus.PAIRED -> {
                         POutlinedButton(
                             text = stringResource(Res.string.unpair),
-                            onClick = onUnpairClick,
+                            onClick = {
+                                NearbyViewModel.unpairDevice(item.id)
+                            },
                             type = ButtonType.DANGER,
                             buttonSize = ButtonSize.SMALL,
                         )
@@ -97,7 +100,9 @@ fun NearbyDeviceItem(
                     NearbyItemStatus.UNPAIRED -> {
                         POutlinedButton(
                             text = stringResource(Res.string.pair),
-                            onClick = onPairClick,
+                            onClick = {
+                                NearbyViewModel.startPairing(item)
+                            },
                             buttonSize = ButtonSize.SMALL,
                         )
                     }

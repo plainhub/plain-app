@@ -34,7 +34,6 @@ fun DPairingRequest.toDNearbyDevice(): DNearbyDevice {
         version = "",
         platform = "android",
         lastSeen = TimeHelper.now(),
-        discoveredViaLan = true,
     )
 }
 

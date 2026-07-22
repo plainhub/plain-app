@@ -16,7 +16,6 @@ import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
@@ -24,6 +23,7 @@ import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
+import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -150,8 +150,7 @@ object LANDiscoverManager {
         try {
             val reply = JsonHelper.jsonDecode<DDiscoverReply>(payload)
             val device = PairingCore.replyToDevice(reply)
-            sendEvent(NearbyDeviceFoundEvent(device))
-            sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(device)))
+            NearbyViewModel.handleNewDevice(device)
             PeerStatusManager.setOnline(device.id, true)
             coIO {
                 PeerManager.applyDeviceDiscovered(
