@@ -86,6 +86,8 @@ actual fun saveUploadChunk(fileId: String, chunkIndex: Int, data: ByteArray): St
 
 actual suspend fun streamFileTo(path: String, sink: StreamSink): Boolean = false
 
+actual suspend fun readFileRange(path: String, offset: Long, length: Int): ByteArray? = null
+
 actual suspend fun createFileSink(path: String): StreamSink = NullStreamSink
 
 actual suspend fun renameFileAtomic(from: String, to: String): Boolean = false

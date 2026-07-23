@@ -67,7 +67,6 @@ fun MediaVideo(
     var vSize by remember { mutableStateOf(IntSize(0, 0)) }
     val sizing = MediaVideoSizing(bSize, vSize)
     var videoSpecified by remember { mutableStateOf(false) }
-    LogCat.d("MediaVideo test")
     LaunchedEffect(vSize, bSize) {
         if (vSize != IntSize.Zero && bSize != IntSize.Zero) {
             onSizeChange(SizeChangeContent(defaultSize = sizing.displaySize, containerSize = bSize, maxScale = sizing.maxScale))
@@ -145,7 +144,6 @@ fun MediaVideo(
         if (savedPos != null && savedPos > 0L) {
             videoState.currentTime = savedPos
         }
-        LogCat.d("MediaVideo LaunchedEffect starting playback path=${model.path} savedPos=$savedPos")
         controller.setMediaItem(model.path)
         if (savedPos != null && savedPos > 0) {
             controller.seekTo(savedPos)

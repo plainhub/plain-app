@@ -5,8 +5,6 @@ import com.ismartcoding.plain.helpers.JsonHelper
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class BleAuthData(val password: String)
 
 @Serializable
 data class BleRequestData(

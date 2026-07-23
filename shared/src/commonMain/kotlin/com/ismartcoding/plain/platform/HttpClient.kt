@@ -66,8 +66,8 @@ fun createPlatformHttpClient(spec: HttpClientSpec): HttpClient {
 
             HttpClientSpec.Download -> {
                 install(HttpTimeout) {
-                    requestTimeoutMillis = 120_000L
-                    connectTimeoutMillis = 30_000L
+                    connectTimeoutMillis = 5_000L
+                    socketTimeoutMillis = 120_000L
                 }
             }
 

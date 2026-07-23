@@ -239,6 +239,25 @@ actual suspend fun streamFileTo(path: String, sink: StreamSink): Boolean = withI
     }
 }
 
+actual suspend fun readFileRange(path: String, offset: Long, length: Int): ByteArray? = withIO {
+    try {
+        val file = File(path)
+        if (!file.exists() || !file.isFile) return@withIO null
+        val fileLen = file.length()
+        if (offset >= fileLen) return@withIO ByteArray(0)
+        val readLen = minOf(length.toLong(), fileLen - offset).toInt()
+        if (readLen <= 0) return@withIO ByteArray(0)
+        val bytes = ByteArray(readLen)
+        java.io.RandomAccessFile(file, "r").use { raf ->
+            raf.seek(offset)
+            raf.readFully(bytes)
+        }
+        bytes
+    } catch (e: Exception) {
+        null
+    }
+}
+
 actual suspend fun createFileSink(path: String): StreamSink = withIO {
     val file = File(path)
     file.parentFile?.mkdirs()

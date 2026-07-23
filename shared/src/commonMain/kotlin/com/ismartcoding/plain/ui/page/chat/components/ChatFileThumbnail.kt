@@ -13,7 +13,6 @@ import coil3.compose.AsyncImage
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
-import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
@@ -58,12 +57,10 @@ fun ChatFileThumbnail(
 
         if (isActive && downloadTask != null) {
             DownloadProgressOverlay(
+                taskId = item.id,
+                status = downloadTask.status,
                 modifier = Modifier.size(48.dp),
                 downloadProgress = downloadProgress,
-                status = downloadTask.status,
-                onPause = { DownloadQueue.pauseDownload(item.id) },
-                onResume = { DownloadQueue.resumeDownload(item.id) },
-                onCancel = { DownloadQueue.removeDownload(item.id) },
                 size = 32.dp,
             )
         }

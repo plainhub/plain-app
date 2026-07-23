@@ -63,6 +63,14 @@ class PeerGraphQLService private constructor(
         val token = if (channelId.isNotEmpty()) {
             ChannelCacher.getKeyBytes(channelId)
         } else {
+            // Direct peer-to-peer message: require the peer to be paired.
+            // An unpaired peer must not be able to deliver messages to us.
+            val peer = PeerCacher.getPeer(clientId)
+            if (peer == null || !peer.isPaired()) {
+                LogCat.w("[PeerGraphQL] reject non-paired direct message from=$clientId status=${peer?.status}")
+                call.respondNoBody(HttpStatus.FORBIDDEN)
+                return
+            }
             PeerCacher.getKeyBytes(clientId)
         }
         val publicKey = PeerCacher.getPublicKeyBytes(clientId)

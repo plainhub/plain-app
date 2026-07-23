@@ -24,6 +24,7 @@ import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.helpers.coMain
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.chat.download.DownloadQueue
+import com.ismartcoding.plain.chat.download.DownloadStatus
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer
@@ -49,6 +50,8 @@ internal fun ChatImageItem(
     val itemState = rememberTransformItemState()
     val isRemoteFile = item.isRemoteFile()
     val taskActive = downloadTask?.isActive() == true
+    val isFailed = downloadTask?.status == DownloadStatus.FAILED
+    val isDownloading = downloadTask?.isDownloading() == true
     val downloadProgress = downloadTask?.let {
         if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
     } ?: 0f
@@ -62,7 +65,13 @@ internal fun ChatImageItem(
 
     Box(
         modifier = Modifier.clickable {
-            if (taskActive) return@clickable
+            // Allow retry when the download has failed; block navigation only
+            // while a download is actively in flight (pending/downloading).
+            if (isDownloading) return@clickable
+            if (isFailed) {
+                DownloadQueue.retryDownload(item.id)
+                return@clickable
+            }
             scope.launch {
                 withIO { MediaPreviewData.setDataAsync(itemState, items.reversed(), item) }
                 previewerState.openTransform(
@@ -85,12 +94,10 @@ internal fun ChatImageItem(
 
         if (taskActive) {
             DownloadProgressOverlay(
+                taskId = item.id,
+                status = downloadTask.status,
                 modifier = Modifier.size(imageWidthDp),
                 downloadProgress = downloadProgress,
-                status = downloadTask.status,
-                onPause = { DownloadQueue.pauseDownload(item.id) },
-                onResume = { DownloadQueue.resumeDownload(item.id) },
-                onCancel = { DownloadQueue.removeDownload(item.id) },
             )
         }
 

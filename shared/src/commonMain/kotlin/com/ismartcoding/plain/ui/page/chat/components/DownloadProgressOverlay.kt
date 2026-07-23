@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadStatus
 import com.ismartcoding.plain.ui.base.PIconButton
 
@@ -20,7 +21,6 @@ private fun DualProgressIndicator(
     size: Dp
 ) {
     val modifier = Modifier.size(size)
-    // Progress circle background (track)
     CircularProgressIndicator(
         progress = { 1f },
         modifier = modifier,
@@ -28,7 +28,6 @@ private fun DualProgressIndicator(
         strokeWidth = 4.dp,
         trackColor = Color.Transparent
     )
-    // Actual progress
     CircularProgressIndicator(
         progress = { progress.coerceIn(0f, 1f) },
         modifier = modifier,
@@ -40,15 +39,13 @@ private fun DualProgressIndicator(
 
 @Composable
 private fun DownloadActionButton(
+    taskId: String,
     status: DownloadStatus,
-    onPause: () -> Unit,
-    onResume: () -> Unit,
-    onCancel: () -> Unit
 ) {
     when (status) {
         DownloadStatus.DOWNLOADING -> PIconButton(
             icon = Res.drawable.pause,
-            click = onPause,
+            click = { DownloadQueue.pauseDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.pause),
             modifier = Modifier.size(24.dp)
@@ -56,7 +53,7 @@ private fun DownloadActionButton(
 
         DownloadStatus.PAUSED -> PIconButton(
             icon = Res.drawable.download,
-            click = onResume,
+            click = { DownloadQueue.resumeDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.resume),
             modifier = Modifier.size(24.dp)
@@ -64,7 +61,7 @@ private fun DownloadActionButton(
 
         DownloadStatus.PENDING -> PIconButton(
             icon = Res.drawable.x,
-            click = onCancel,
+            click = { DownloadQueue.removeDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.cancel),
             modifier = Modifier.size(24.dp)
@@ -72,7 +69,7 @@ private fun DownloadActionButton(
 
         DownloadStatus.FAILED -> PIconButton(
             icon = Res.drawable.circle_alert,
-            click = onResume,
+            click = { DownloadQueue.retryDownload(taskId) },
             tint = Color.White,
             contentDescription = stringResource(Res.string.try_again),
             modifier = Modifier.size(24.dp)
@@ -84,19 +81,16 @@ private fun DownloadActionButton(
 
 @Composable
 fun DownloadProgressOverlay(
+    taskId: String,
+    status: DownloadStatus,
     modifier: Modifier,
     downloadProgress: Float,
-    status: DownloadStatus,
-    onPause: () -> Unit,
-    onResume: () -> Unit,
-    onCancel: () -> Unit,
     size: Dp = 48.dp
 ) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        // Show progress indicators for downloading and paused states
         if (status in setOf(DownloadStatus.DOWNLOADING, DownloadStatus.PAUSED)) {
             DualProgressIndicator(
                 progress = downloadProgress,
@@ -111,12 +105,9 @@ fun DownloadProgressOverlay(
             )
         }
 
-        // Action button for all states
         DownloadActionButton(
+            taskId = taskId,
             status = status,
-            onPause = onPause,
-            onResume = onResume,
-            onCancel = onCancel
         )
     }
 }

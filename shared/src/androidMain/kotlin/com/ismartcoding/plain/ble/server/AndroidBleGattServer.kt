@@ -16,14 +16,18 @@ import android.content.Context
 import android.os.ParcelUuid
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.ble.BleSegmentData
 import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.isWifiAwareSupported
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
@@ -38,6 +42,20 @@ class AndroidBleGattServer : BleGattServer {
     private var advertiser: BluetoothLeAdvertiser? = null
     private var gattServer: BluetoothGattServer? = null
     private val connectedDevices = ConcurrentHashMap<String, android.bluetooth.BluetoothDevice>()
+
+    /**
+     * Per-MAC deferred for `onNotificationSent` flow control. Only one
+     * notification per device is in flight at a time —
+     * [sendNotificationBlocking] awaits this before sending the next chunk.
+     */
+    private val pendingNotificationAcks = ConcurrentHashMap<String, CompletableDeferred<Boolean>>()
+
+    /**
+     * Notification chunk size for response delivery. Matches the request
+     * segment size used by [com.ismartcoding.plain.ble.client.BleDeviceApi]
+     * so both directions share the same BLE MTU headroom.
+     */
+    private val notifyChunkSize = 380
 
     override fun start() {
         val adapter = bluetoothManager.adapter ?: return
@@ -195,11 +213,11 @@ class AndroidBleGattServer : BleGattServer {
             offset: Int,
             characteristic: BluetoothGattCharacteristic,
         ) {
-            val mac = device.address
-            val charUuid = characteristic.uuid.toString()
-            val payload = protocol.handleRead(mac, charUuid, offset)
-            LogCat.d("[GATT] onReadRequest mac=$mac charUuid=$charUuid offset=$offset payloadSize=${payload.size}")
-            gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, payload)
+            // Responses are now delivered via chunked notifications — see
+            // [sendChunkedResponse]. Keep a no-op read response so legacy
+            // clients that still issue a Read Request get GATT_SUCCESS with
+            // an empty payload instead of an error.
+            gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, ByteArray(0))
         }
 
         override fun onCharacteristicWriteRequest(
@@ -219,10 +237,9 @@ class AndroidBleGattServer : BleGattServer {
             }
 
             scope.launch {
-                val processed = protocol.handleWrite(mac, charUuid, value)
-                LogCat.d("[GATT] handleWrite mac=$mac charUuid=$charUuid processed=$processed")
-                if (processed) {
-                    notifyReady(device, characteristic.uuid)
+                val response = protocol.handleWrite(mac, charUuid, value)
+                if (response != null) {
+                    sendChunkedResponse(device, characteristic.uuid, response)
                 }
             }
         }
@@ -256,19 +273,72 @@ class AndroidBleGattServer : BleGattServer {
             status: Int,
         ) {
             LogCat.d("GATT notification sent to ${device.address} status=$status")
+            pendingNotificationAcks.remove(device.address)?.complete(status == BluetoothGatt.GATT_SUCCESS)
+        }
+    }
+
+    /**
+     * Chunk [response] into [BleSegmentData] notifications and send each one
+     * to the peer with flow control. The client reassembles the segments into
+     * the original response string. This bypasses the 512-byte ATT attribute
+     * value limit that truncates large `readCharacteristic` responses.
+     */
+    @Suppress("DEPRECATION")
+    private suspend fun sendChunkedResponse(
+        device: android.bluetooth.BluetoothDevice,
+        charUuid: UUID,
+        response: String,
+    ) {
+        val mac = device.address
+        val server = gattServer
+        val char = server?.getService(UUID.fromString(BleUuids.SERVICE_UUID))?.getCharacteristic(charUuid)
+        if (server == null || char == null) {
+            LogCat.e("[GATT] sendChunkedResponse mac=$mac charUuid=$charUuid: server/char unavailable")
+            return
+        }
+
+        val chunks = if (response.isEmpty()) listOf("") else response.chunked(notifyChunkSize)
+        LogCat.d("[GATT] sendChunkedResponse mac=$mac charUuid=$charUuid responseLen=${response.length} chunks=${chunks.size}")
+
+        for ((index, chunk) in chunks.withIndex()) {
+            val segment = BleSegmentData.build(
+                data = chunk,
+                start = index == 0,
+                end = index == chunks.lastIndex,
+            )
+            val payload = JsonHelper.jsonEncode(segment)
+            val ok = sendNotificationBlocking(mac, charUuid.toString(), payload)
+            if (!ok) {
+                LogCat.e("[GATT] sendChunkedResponse mac=$mac chunk $index/${chunks.size} failed, aborting")
+                return
+            }
         }
     }
 
     @Suppress("DEPRECATION")
-    private fun notifyReady(device: android.bluetooth.BluetoothDevice, charUuid: UUID) {
-        val server = gattServer ?: return
+    override suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: String): Boolean {
+        val server = gattServer ?: return false
+        val device = connectedDevices[mac] ?: return false
         val char = server.getService(UUID.fromString(BleUuids.SERVICE_UUID))
-            ?.getCharacteristic(charUuid) ?: return
-        char.value = READY_SIGNAL.toByteArray(Charsets.UTF_8)
-        server.notifyCharacteristicChanged(device, char, false)
+            ?.getCharacteristic(UUID.fromString(charUuid)) ?: return false
+
+        val ack = CompletableDeferred<Boolean>()
+        pendingNotificationAcks[mac] = ack
+
+        char.value = value.toByteArray(Charsets.UTF_8)
+        val queued = server.notifyCharacteristicChanged(device, char, false)
+        if (!queued) {
+            pendingNotificationAcks.remove(mac)
+            return false
+        }
+
+        val ok = withTimeoutOrNull(NOTIFY_ACK_TIMEOUT_MS) { ack.await() } ?: false
+        // Only the ack owner should remove the entry; the timeout path clears it here.
+        pendingNotificationAcks.remove(mac)
+        return ok
     }
 
     companion object {
-        private const val READY_SIGNAL = "1"
+        private const val NOTIFY_ACK_TIMEOUT_MS = 10_000L
     }
 }

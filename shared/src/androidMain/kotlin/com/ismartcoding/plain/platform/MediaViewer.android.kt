@@ -76,7 +76,6 @@ fun MediaViewer(
 
         when (model) {
             is PreviewItem -> {
-                LogCat.d("MediaVideo test ${model.isVideo()}, ${model.path} ${model.path.isUrl()}")
                 if (model.isVideo()) {
                     MediaVideo(
                         pagerState = pagerState, videoState = videoState, page = page, model = model,

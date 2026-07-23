@@ -13,6 +13,7 @@ import com.ismartcoding.plain.platform.getPackageIconBytes
 import com.ismartcoding.plain.platform.getThumbnailBytes
 import com.ismartcoding.plain.platform.isAnimatedImageOrSvg
 import com.ismartcoding.plain.platform.isContentUri
+import com.ismartcoding.plain.platform.readFileRange
 import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.platform.streamContentUri
 import com.ismartcoding.plain.web.FileIdParams
@@ -61,6 +62,24 @@ fun HttpRouter.addFilesRoutes() {
             val heightParam = call.queryParam("h")?.toIntOrNull()
             // `cc` defaults to true (matches the original `!= false` behavior).
             val centerCrop = call.queryParam("cc")?.toBooleanStrictOrNull() != false
+
+            // Byte-range request: used by low-throughput transports (BLE) to
+            // download a file in small chunks. Only applies to regular files
+            // (not content:// URIs or package icons) and skips all
+            // conversion/thumbnail logic — raw bytes are served directly.
+            val rangeOffset = call.queryParam("offset")?.toLongOrNull()
+            val rangeLength = call.queryParam("length")?.toIntOrNull()
+            if (rangeOffset != null && rangeLength != null && rangeLength > 0 &&
+                !isContentUri(path) && !path.startsWith("pkgicon://")
+            ) {
+                val bytes = readFileRange(path, rangeOffset, rangeLength)
+                if (bytes == null) {
+                    call.respondNoBody(HttpStatus.NOT_FOUND)
+                } else {
+                    call.respond(bytes, contentType = "application/octet-stream")
+                }
+                return@get
+            }
 
             when {
                 isContentUri(path) -> serveContentUri(

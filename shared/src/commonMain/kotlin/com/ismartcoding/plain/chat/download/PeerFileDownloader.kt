@@ -13,8 +13,6 @@ import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.helpers.TimeHelper
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.http.isSuccess
 import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.yield
 
@@ -36,16 +34,15 @@ object PeerFileDownloader {
             val downloaded = PeerTransportRouter.downloadFile(task.peer, fileId)
 
             downloaded.use { d ->
-                val response = d.response
-                if (!response.status.isSuccess()) {
-                    val error = "HTTP ${response.status.value}"
-                    LogCat.e("HTTP request failed: $error")
+                if (d.status !in 200..299) {
+                    val error = "HTTP ${d.status}"
+                    LogCat.e("Download failed: $error")
                     task.status = DownloadStatus.FAILED
                     task.error = error
                     return null
                 }
 
-                val channel = response.bodyAsChannel()
+                val channel = d.channel
                 val buffer = ByteArray(8192)
                 var lastProgressUpdate = TimeHelper.nowMillis()
                 var lastDownloadedSize = 0L

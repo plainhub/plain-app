@@ -13,27 +13,33 @@ object LogCat {
     private val printer = LoggerPrinter()
 
     fun d(message: Any?, vararg args: Any?) {
-        platformLog(DEBUG, TAG, format(message, args))
+        dispatch(DEBUG, message, args)
     }
 
     fun e(message: Any?, vararg args: Any?) {
-        platformLog(ERROR, TAG, format(message, args))
+        dispatch(ERROR, message, args)
     }
 
     fun i(message: Any?, vararg args: Any?) {
-        platformLog(INFO, TAG, format(message, args))
+        dispatch(INFO, message, args)
     }
 
     fun w(message: Any?, vararg args: Any?) {
-        platformLog(WARN, TAG, format(message, args))
+        dispatch(WARN, message, args)
     }
 
     fun v(message: Any?, vararg args: Any?) {
-        platformLog(VERBOSE, TAG, format(message, args))
+        dispatch(VERBOSE, message, args)
     }
 
     fun wtf(message: Any?, vararg args: Any?) {
-        platformLog(ASSERT, TAG, format(message, args))
+        dispatch(ASSERT, message, args)
+    }
+
+    private fun dispatch(priority: Int, message: Any?, args: Array<out Any?>) {
+        val formatted = format(message, args)
+        platformLog(priority, TAG, formatted)
+        printer.log(priority, TAG, formatted, null)
     }
 
     fun addLogAdapter(adapter: LogAdapter) {
@@ -42,10 +48,6 @@ object LogCat {
 
     fun clearLogAdapters() {
         printer.clearLogAdapters()
-    }
-
-    fun init(context: Any?) {
-        initLogCat(context)
     }
 
     fun logFolder(): String = logFolderImpl()
@@ -63,7 +65,5 @@ object LogCat {
 }
 
 internal expect fun platformLog(priority: Int, tag: String, message: String)
-
-internal expect fun initLogCat(context: Any?)
 
 internal expect fun logFolderImpl(): String

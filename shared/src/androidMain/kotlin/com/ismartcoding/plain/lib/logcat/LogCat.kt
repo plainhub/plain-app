@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.lib.logcat
 
-import android.content.Context
 import android.util.Log
-
-private var appContext: Context? = null
+import com.ismartcoding.plain.appContext
 
 internal actual fun platformLog(priority: Int, tag: String, message: String) {
     try {
@@ -15,14 +13,9 @@ internal actual fun platformLog(priority: Int, tag: String, message: String) {
             LogCat.ERROR -> Log.e(tag, message)
             LogCat.ASSERT -> Log.wtf(tag, message)
         }
-    } catch (e: RuntimeException) {
+    } catch (_: RuntimeException) {
         // Ignore logging failures (e.g. android.util.Log not mocked in unit tests)
     }
 }
 
-internal actual fun initLogCat(context: Any?) {
-    appContext = context as? Context
-}
-
-internal actual fun logFolderImpl(): String =
-    appContext?.let { it.filesDir.absolutePath + "/logs" } ?: ""
+internal actual fun logFolderImpl(): String = appContext.filesDir.absolutePath + "/logs"

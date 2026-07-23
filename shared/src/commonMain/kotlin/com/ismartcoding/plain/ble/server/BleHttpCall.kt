@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ble.server
 
-import com.ismartcoding.plain.ble.BleRpcRequest
+import com.ismartcoding.plain.ble.BleHttpRequest
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -13,19 +13,19 @@ import com.ismartcoding.plain.web.http.StreamSink
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
- * In-memory [HttpCall] that wraps a [BleRpcRequest] received over the BLE
- * RPC characteristic ([com.ismartcoding.plain.ble.BleUuids.RPC_CHAR_UUID])
+ * In-memory [HttpCall] that wraps a [BleHttpRequest] received over the BLE
+ * RPC characteristic ([com.ismartcoding.plain.ble.BleUuids.HTTP_CHAR_UUID])
  * and captures the response produced by the matched route handler.
  *
  * The captured [responseBody] (along with [responseStatus] and
  * [responseHeaders]) is then JSON-encoded as a
- * [com.ismartcoding.plain.ble.BleRpcResponse] and sent back to the BLE
- * client by [HTTPServiceHandler].
+ * [com.ismartcoding.plain.ble.BleHttpResponse] and sent back to the BLE
+ * client by [HttpServiceHandler].
  *
  * The [headers] map comes entirely from the outer [com.ismartcoding.plain.ble.BleRequestData]
  * headers, which carry both client identity (`c-id`, `c-platform`, `c-name`,
  * `c-version`) and request-specific overrides (`c-cid`, `authorization`, etc.).
- * [BleRpcRequest] no longer has its own headers field.
+ * [BleHttpRequest] no longer has its own headers field.
  *
  * `respondFile`, `respondStream`, and `respond` paths all buffer into
  * [responseBody] so binary content (encrypted GraphQL bytes, `/fs` file
@@ -35,7 +35,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * through the HTTP server instead.
  */
 class BleHttpCall(
-    request: BleRpcRequest,
+    request: BleHttpRequest,
     clientHeaders: Map<String, String>,
     /** MAC/UUID of the BLE peer, exposed as [remoteHost] for handlers that read it. */
     private val remoteHostValue: String,
@@ -209,14 +209,14 @@ class BleHttpCall(
 
 /**
  * Encodes the [BleHttpCall]'s captured response into a JSON
- * [com.ismartcoding.plain.ble.BleRpcResponse] string suitable for returning
+ * [com.ismartcoding.plain.ble.BleHttpResponse] string suitable for returning
  * from [BleServiceHandler.handleRequest]. The response body is base64-encoded
  * so binary payloads (encrypted GraphQL bytes, `/fs` file bytes) survive the
  * string-only BLE transport.
  */
 @OptIn(ExperimentalEncodingApi::class)
 internal fun BleHttpCall.encodeResponse(): String {
-    val response = com.ismartcoding.plain.ble.BleRpcResponse(
+    val response = com.ismartcoding.plain.ble.BleHttpResponse(
         status = responseStatus,
         headers = snapshotHeaders(),
         body = if (responseBody.isNotEmpty()) {

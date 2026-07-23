@@ -114,6 +114,15 @@ expect fun saveUploadChunk(fileId: String, chunkIndex: Int, data: ByteArray): St
 expect suspend fun streamFileTo(path: String, sink: StreamSink): Boolean
 
 /**
+ * Read a byte range `[offset, offset + length)` from the regular file at [path].
+ * Returns the bytes read (possibly shorter than [length] when the range extends
+ * past EOF), an empty array when [offset] is at or past EOF, or null when the
+ * file cannot be opened. Used by the `/fs` route to serve chunked ranges over
+ * low-throughput transports (e.g. BLE).
+ */
+expect suspend fun readFileRange(path: String, offset: Long, length: Int): ByteArray?
+
+/**
  * Create a [StreamSink] backed by a new file at [path] (truncating if it exists).
  * The caller is responsible for calling [StreamSink.close].
  */

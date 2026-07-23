@@ -87,7 +87,6 @@ object MainAppHelper {
 
         SingletonImageLoader.setSafe { context -> newImageLoader(context) }
 
-        LogCat.init(app)
         LogCat.addLogAdapter(
             DiskLogAdapter(
                 DiskLogFormatStrategy.getInstance(),

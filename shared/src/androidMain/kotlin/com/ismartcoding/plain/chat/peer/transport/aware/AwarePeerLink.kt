@@ -236,7 +236,7 @@ class AwarePeerLink(
             val pub = session.publish ?: error("publish session not ready")
             WifiAwareNetworkSpecifier.Builder(pub)
         }
-        //pmk?.let { builder.setPmk(it) }
+        pmk?.let { builder.setPmk(it) }
         if (!isClient) {
             builder.setPort(TempData.httpsPort.value)
         }
@@ -280,7 +280,7 @@ class AwarePeerLink(
         // Previously 3 × 10s + 2 × 2s = 34s, which blocked the LAN → Aware → BLE fallback
         // chain for too long. The PeerTransportPrewarmer pre-warms Aware on ChatPage entry,
         // so by the time the user sends a message, both sides should already be in sync.
-        private const val MAX_BUILD_ATTEMPTS = 2
+        private const val MAX_BUILD_ATTEMPTS = 1
         private const val ATTEMPT_TIMEOUT_MS = 5_000L
         private const val RETRY_DELAY_MS = 500L
         private const val REQUEST_TIMEOUT_MS = 30_000

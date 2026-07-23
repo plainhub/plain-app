@@ -46,6 +46,11 @@ object ChatSender {
     }
 
     suspend fun sendToPeer(item: DChat, peer: DPeer) = withIO {
+        if (!peer.isPaired()) {
+            LogCat.w("Skip send to unpaired peer ${peer.id}")
+            ChatDbHelper.updateChatItemStatus(item, peer, "peer unpaired")
+            return@withIO
+        }
         val error = PeerChatSender.send(peer, item.content)
         if (error != null) {
             triggerPeerRediscovery(peer.id)

@@ -3,17 +3,21 @@
 package com.ismartcoding.plain.ble.server
 
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.ble.BleSegmentData
 import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import platform.CoreBluetooth.CBATTErrorSuccess
 import platform.CoreBluetooth.CBATTRequest
 import platform.CoreBluetooth.CBAttributePermissionsReadable
@@ -32,12 +36,7 @@ import platform.CoreBluetooth.CBService
 import platform.Foundation.NSError
 import platform.Foundation.NSNumber
 import platform.darwin.NSObject
-
-private const val READY_SIGNAL = "1"
-// serviceData payload is 9 bytes: byte[0] = aware flags, byte[1..8] =
-// SHA256(clientId)[0:8] (shortId). See BleServiceData for the wire format.
-// The full clientId is NOT broadcast — it is recovered via the GATT DISCOVER
-// reply. Total scan-response entry = 1 len + 1 type + 16 UUID + 9 = 27 bytes.
+import kotlin.time.Duration.Companion.milliseconds
 
 class IosBleGattServer : BleGattServer {
 
@@ -49,6 +48,14 @@ class IosBleGattServer : BleGattServer {
     private val characteristics = mutableMapOf<String, CBMutableCharacteristic>()
     private var serviceAdded = false
     private var advertising = false
+
+    /**
+     * Notification chunk size for response delivery. Matches the request
+     * segment size used by [com.ismartcoding.plain.ble.client.BleDeviceApi].
+     */
+    private val notifyChunkSize = 380
+
+    private val notifyAckTimeoutMs = 10_000L
 
     override fun start() {
         if (peripheralManager != null) return
@@ -92,6 +99,43 @@ class IosBleGattServer : BleGattServer {
         return sent
     }
 
+    override suspend fun sendNotificationBlocking(mac: String, charUuid: String, value: String): Boolean {
+        val manager = peripheralManager ?: return false
+        val char = characteristics[charUuid] ?: return false
+        val data = value.encodeToByteArray().toNSData()
+
+        // iOS `updateValue` returns false when the internal queue is full.
+        // Wait for `peripheralManagerIsReadyToUpdateSubscribers` and retry.
+        var attempts = 0
+        while (attempts < 10) {
+            val deferred = CompletableDeferred<Unit>()
+            // Stash the deferred so the delegate can complete it.
+            pendingReadyDeferred = deferred
+            val sent = manager.updateValue(data, forCharacteristic = char, onSubscribedCentrals = null)
+            if (sent) {
+                pendingReadyDeferred = null
+                return true
+            }
+            // Wait for ready signal or timeout.
+            val ready = withTimeoutOrNull(notifyAckTimeoutMs.milliseconds) { deferred.await() }
+            pendingReadyDeferred = null
+            if (ready == null) {
+                LogCat.e("[BLE] sendNotificationBlocking: timed out waiting for readyToUpdate")
+                return false
+            }
+            attempts++
+        }
+        LogCat.e("[BLE] sendNotificationBlocking: exhausted retries")
+        return false
+    }
+
+    @Volatile
+    private var pendingReadyDeferred: CompletableDeferred<Unit>? = null
+
+    internal fun onReadyToUpdateSubscribers() {
+        pendingReadyDeferred?.complete(Unit)
+    }
+
     private fun setupService(manager: CBPeripheralManager) {
         val service = CBMutableService(CBUUID.UUIDWithString(BleUuids.SERVICE_UUID), true)
 
@@ -118,11 +162,6 @@ class IosBleGattServer : BleGattServer {
     }
 
     private fun startAdvertising(manager: CBPeripheralManager) {
-        // Build the serviceData payload: byte[0] = aware flags, byte[1..8] =
-        // SHA256(clientId)[0:8]. Peers match the shortId against
-        // BleServiceData.shortIdOf(theirKnownClientId) and read aware flags
-        // without a GATT connection. The full clientId is recovered later via
-        // the GATT DISCOVER reply.
         val payload = BleServiceData.encode(
             awareSupported = isWifiAwareSupported,
             awareRunning = TempData.awareRunning.value,
@@ -161,12 +200,9 @@ class IosBleGattServer : BleGattServer {
     }
 
     internal fun onReadRequest(manager: CBPeripheralManager, request: CBATTRequest) {
-        val charUuid = request.characteristic.UUID.UUIDString
-        val centralId = request.central.identifier.UUIDString
-        val offset = request.offset.toInt()
-
-        val payload = protocol.handleRead(centralId, charUuid, offset)
-        request.value = payload.toNSData()
+        // Responses are now delivered via chunked notifications. Reply with
+        // an empty value so legacy Read Requests still get a success status.
+        request.value = ByteArray(0).toNSData()
         manager.respondToRequest(request, CBATTErrorSuccess)
     }
 
@@ -181,18 +217,34 @@ class IosBleGattServer : BleGattServer {
         val value = firstRequest.value?.toByteArray() ?: return
 
         scope.launch {
-            val processed = protocol.handleWrite(centralId, charUuid, value)
-            if (processed) {
-                notifyReady(manager, centralId, charUuid)
+            val response = protocol.handleWrite(centralId, charUuid, value)
+            if (response != null) {
+                sendChunkedResponse(centralId, charUuid, response)
             }
         }
     }
 
-    private fun notifyReady(manager: CBPeripheralManager, centralId: String, charUuid: String) {
-        val char = characteristics[charUuid] ?: return
-        val readyData = READY_SIGNAL.encodeToByteArray().toNSData()
-        manager.updateValue(readyData, forCharacteristic = char, onSubscribedCentrals = null)
-        LogCat.d("BLE GATT server sent ready notification to $centralId")
+    /**
+     * Chunk [response] into [BleSegmentData] notifications and send each one
+     * with flow control. Mirrors [AndroidBleGattServer.sendChunkedResponse].
+     */
+    private suspend fun sendChunkedResponse(centralId: String, charUuid: String, response: String) {
+        val chunks = if (response.isEmpty()) listOf("") else response.chunked(notifyChunkSize)
+        LogCat.d("[BLE] sendChunkedResponse central=$centralId charUuid=$charUuid responseLen=${response.length} chunks=${chunks.size}")
+
+        for ((index, chunk) in chunks.withIndex()) {
+            val segment = BleSegmentData.build(
+                data = chunk,
+                start = index == 0,
+                end = index == chunks.lastIndex,
+            )
+            val payload = JsonHelper.jsonEncode(segment)
+            val ok = sendNotificationBlocking(centralId, charUuid, payload)
+            if (!ok) {
+                LogCat.e("[BLE] sendChunkedResponse central=$centralId chunk $index/${chunks.size} failed, aborting")
+                return
+            }
+        }
     }
 }
 
@@ -236,5 +288,9 @@ private class PeripheralManagerDelegate(
     ) {
         @Suppress("UNCHECKED_CAST")
         server.onWriteRequests(peripheral, didReceiveWriteRequests as List<CBATTRequest>)
+    }
+
+    override fun peripheralManagerIsReadyToUpdateSubscribers(peripheral: CBPeripheralManager) {
+        server.onReadyToUpdateSubscribers()
     }
 }

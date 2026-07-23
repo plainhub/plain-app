@@ -84,17 +84,6 @@ object PairingTransport {
                 val reply = readDiscoverReply(device)
                 if (reply != null) {
                     replyCache[shortId] = reply
-                    // Cache the peer's Aware flags from the DISCOVER reply
-                    // (authoritative). The scan-level flags (device.awareSupported
-                    // / device.awareRunning, parsed from serviceData byte[0])
-                    // are a pre-GATT hint already used by
-                    // PeerTransportPrewarmer.refreshAwareFlagFromScan; the
-                    // DISCOVER reply values here overwrite them.
-                    //  - awareSupported: whether the peer supports Wi-Fi Aware
-                    //  - awareRunning: whether the peer's Aware service is currently running
-                    // WifiAwareTransport uses awareRunning to skip itself when the peer's Aware isn't
-                    // running (avoids 10s+ buildLink timeout). PeerTransportPrewarmer uses awareSupported
-                    // to decide whether to send a startAware mutation via BLE.
                     PeerCacher.setAwareSupported(reply.id, reply.awareSupported)
                     PeerCacher.setAwareRunning(reply.id, reply.awareRunning)
                     emit(PairingCore.replyToDevice(reply, device))
@@ -204,8 +193,7 @@ object PairingTransport {
         while (true) {
             val remaining = PAIR_RESPONSE_TIMEOUT_MS - (TimeHelper.nowMillis() - startTime)
             if (remaining <= 0) return null
-            val notification = bleDevice.waitForNotification(BleServices.nearby, remaining)
-            if (notification == null) return null
+            val notification = bleDevice.waitForNotification(BleServices.nearby, remaining) ?: return null
             if (notification.startsWith(NearbyMessageType.PAIR_RESPONSE.toPrefix())) {
                 return notification.removePrefix(NearbyMessageType.PAIR_RESPONSE.toPrefix())
             }

@@ -76,12 +76,6 @@ internal class LoggerPrinter : Printer {
         throwable: Throwable?,
     ) {
         var newMessage = message
-        if (throwable != null && newMessage != null) {
-            newMessage = "$newMessage : ${throwable.stackTraceToString()}"
-        }
-        if (throwable != null && newMessage == null) {
-            newMessage = throwable.stackTraceToString()
-        }
         if (newMessage.isNullOrEmpty()) {
             newMessage = "Empty/NULL log message"
         }

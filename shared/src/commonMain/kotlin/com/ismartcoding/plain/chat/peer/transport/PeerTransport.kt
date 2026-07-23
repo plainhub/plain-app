@@ -9,11 +9,12 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,10 +31,23 @@ class TransportUnavailable(
     cause: Throwable? = null,
 ) : Exception("transport=$transportId peer=$peerId unavailable", cause)
 
+/**
+ * Transport-agnostic download result. [status] is the HTTP status code of the
+ * underlying request; [channel] is a [ByteReadChannel] that streams the file
+ * bytes regardless of which transport produced them (LAN/Aware stream the live
+ * HTTP body, BLE streams chunked RPC responses through a pipelined channel).
+ *
+ * [onClose] is invoked when the caller releases the response, so transports
+ * that run a background download coroutine (BLE) can cancel it and tear down
+ * their connection.
+ */
 class DownloadedResponse(
-    val response: HttpResponse,
+    val status: Int,
+    val channel: ByteReadChannel,
+    private val onClose: (() -> Unit)? = null,
 ) : AutoCloseable {
     override fun close() {
+        onClose?.invoke()
     }
 }
 
@@ -74,7 +88,7 @@ internal suspend fun executeDownloadRequest(
     peerId: String,
     client: HttpClient,
     url: String,
-): HttpResponse = withContext(Dispatchers.Default) {
+): DownloadedResponse = withContext(Dispatchers.Default) {
     val response = try {
         client.get(url) {
             addClientHeaders()
@@ -89,5 +103,5 @@ internal suspend fun executeDownloadRequest(
         LogCat.e("$transportId downloadFile error: ${response.status.value}")
         throw TransportUnavailable(transportId, peerId, null)
     }
-    response
+    DownloadedResponse(response.status.value, response.bodyAsChannel())
 }

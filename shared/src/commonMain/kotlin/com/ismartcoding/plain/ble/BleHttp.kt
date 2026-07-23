@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 /**
  * Request envelope carried inside [BleRequestData.body] when an RPC client
  * wants to invoke an HTTP API (e.g. `/graphql`, `/peer_graphql`, `/fs`) over
- * the BLE RPC characteristic ([BleUuids.RPC_CHAR_UUID]).
+ * the BLE RPC characteristic ([BleUuids.HTTP_CHAR_UUID]).
  *
  * The format mirrors a normal HTTP request so the server can route it
  * through the same [com.ismartcoding.plain.web.http.HttpRouter] used by the
@@ -27,7 +27,7 @@ import kotlinx.serialization.Serializable
  * directly — no header merging needed.
  */
 @Serializable
-data class BleRpcRequest(
+data class BleHttpRequest(
     @SerialName("m") val method: String = "POST",
     @SerialName("p") val path: String,
     @SerialName("q") val query: Map<String, List<String>> = emptyMap(),
@@ -36,7 +36,7 @@ data class BleRpcRequest(
 )
 
 /**
- * Response returned by [com.ismartcoding.plain.ble.server.HTTPServiceHandler]
+ * Response returned by [com.ismartcoding.plain.ble.server.HttpServiceHandler]
  * and JSON-encoded as the BLE write response.
  *
  * - [status] is the HTTP status code produced by the route handler.
@@ -46,7 +46,7 @@ data class BleRpcRequest(
  *   string-only BLE transport.
  */
 @Serializable
-data class BleRpcResponse(
+data class BleHttpResponse(
     @SerialName("s") val status: Int = 200,
     @SerialName("h") val headers: Map<String, String> = emptyMap(),
     @SerialName("b") val body: String = "",

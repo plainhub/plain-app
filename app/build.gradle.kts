@@ -33,9 +33,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 598
+        val vCode = 601
         versionCode = vCode - singleAbiNum
-        versionName = "3.1.16"
+        versionName = "3.2.0"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -153,7 +153,6 @@ play {
 }
 
 dependencies {
-    testImplementation(libs.junit)
     testImplementation(libs.json)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.runner)
@@ -167,8 +166,6 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
-//    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-
     implementation(libs.pdfium.android)
 
     implementation(libs.kotlinx.coroutines.core)
@@ -178,11 +175,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.service)
 
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.transition)
-
-//    implementation(libs.exoplayer)
 
     implementation(libs.bcprov.jdk15on)
     implementation(libs.bcpkix.jdk15on)
@@ -258,7 +251,6 @@ dependencies {
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
 
     // For cryptography (Ed25519 support on all Android versions)
-    implementation(libs.tink.android)
 
     // AI Image Search: MediaPipe is open source (included for all flavors).
     // LiteRT is excluded from fdroid to pass F-Droid FOSS checks.

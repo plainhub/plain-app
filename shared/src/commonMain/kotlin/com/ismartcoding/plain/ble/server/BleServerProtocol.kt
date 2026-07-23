@@ -8,35 +8,45 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 class BleServerProtocol {
     val handlers = listOf(
         NearbyServiceHandler(),
-        HTTPServiceHandler(),
+        HttpServiceHandler(),
     )
     private val handlerMap = handlers.associateBy { it.charUuid }
     private val pendingRequests = mutableMapOf<String, StringBuilder>()
-    private val responses = mutableMapOf<String, MutableMap<String, ByteArray>>()
-    private val responseLock = PlatformLock()
+    private val pendingLock = PlatformLock()
 
-    suspend fun handleWrite(mac: String, charUuid: String, value: ByteArray): Boolean {
+    /**
+     * Process a write segment from the client. Returns the full response
+     * string when the last segment of a request has been received and the
+     * handler has produced a reply, or null when more segments are expected.
+     *
+     * The response is delivered back to the [BleGattServer] implementation,
+     * which chunks it into [BleSegmentData] notifications. This avoids the
+     * 512-byte ATT attribute value limit that truncates large
+     * `readCharacteristic` responses (e.g. base64-encoded file chunks from
+     * `/fs`).
+     */
+    suspend fun handleWrite(mac: String, charUuid: String, value: ByteArray): String? {
         val handler = handlerMap[charUuid] ?: run {
             LogCat.e("[GATT] handleWrite mac=$mac charUuid=$charUuid: no handler registered, known=${handlerMap.keys}")
-            return false
+            return null
         }
 
         val segment = try {
             BleSegmentData.fromJSON(value.decodeToString())
         } catch (e: Exception) {
             LogCat.e("[GATT] handleWrite mac=$mac charUuid=$charUuid: segment parse error: ${e.message}")
-            pendingRequests.remove(mac)
-            return false
+            pendingLock.withLock { pendingRequests.remove(mac) }
+            return null
         }
 
-        val buffer = pendingRequests.getOrPut(mac) { StringBuilder() }
+        val buffer = pendingLock.withLock { pendingRequests.getOrPut(mac) { StringBuilder() } }
         buffer.append(segment.data)
         LogCat.d("[GATT] handleWrite mac=$mac charUuid=$charUuid: segment dataLen=${segment.data.length} isEnd=${segment.isEnd()} bufferLen=${buffer.length}")
 
-        if (!segment.isEnd()) return false
+        if (!segment.isEnd()) return null
 
         val requestJson = buffer.toString()
-        pendingRequests.remove(mac)
+        pendingLock.withLock { pendingRequests.remove(mac) }
         LogCat.d("[GATT] handleWrite mac=$mac charUuid=$charUuid: full request received, jsonLen=${requestJson.length}")
 
         val responseData = try {
@@ -47,26 +57,12 @@ class BleServerProtocol {
             null
         }
 
-        val responseBytes = (responseData ?: "").encodeToByteArray()
-        LogCat.d("[GATT] handleWrite mac=$mac charUuid=$charUuid: response size=${responseBytes.size}")
-        responseLock.withLock {
-            responses.getOrPut(mac) { mutableMapOf() }[charUuid] = responseBytes
-        }
-
-        return true
-    }
-
-    fun handleRead(mac: String, charUuid: String, offset: Int): ByteArray {
-        val payload = responseLock.withLock {
-            responses[mac]?.get(charUuid)
-        } ?: return ByteArray(0)
-        return if (offset < payload.size) payload.copyOfRange(offset, payload.size) else ByteArray(0)
+        val response = responseData ?: ""
+        LogCat.d("[GATT] handleWrite mac=$mac charUuid=$charUuid: response size=${response.length}")
+        return response
     }
 
     fun clearClient(mac: String) {
-        pendingRequests.remove(mac)
-        responseLock.withLock {
-            responses.remove(mac)
-        }
+        pendingLock.withLock { pendingRequests.remove(mac) }
     }
 }

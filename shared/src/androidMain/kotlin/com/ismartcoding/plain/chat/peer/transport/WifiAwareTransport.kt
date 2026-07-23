@@ -18,7 +18,6 @@ import com.ismartcoding.plain.db.getAwareFileUrl
 import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 
@@ -89,12 +88,7 @@ object WifiAwareTransport : PeerTransport {
         }
         val client = httpFactory.buildFileDownload(connection.network, connection.peerIpv6)
         val url = peer.getAwareFileUrl(fileId, connection.peerPort)
-        val response = executeDownloadRequest(id, peer.id, client, url)
-        if (!response.status.isSuccess()) {
-            LogCat.e("Aware transport file download failed: ${response.status.value}")
-            throw TransportUnavailable(id, peer.id, null)
-        }
-        return DownloadedResponse(response)
+        return executeDownloadRequest(id, peer.id, client, url)
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_NETWORK_STATE])

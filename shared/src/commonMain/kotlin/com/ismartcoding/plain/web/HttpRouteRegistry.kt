@@ -19,7 +19,7 @@ import com.ismartcoding.plain.web.routes.addZipRoutes
 /**
  * Shared HTTP route registry built once per process and dispatch from both
  * the platform HTTP server (Ktor on Android, SwiftNIO on iOS future) and
- * the BLE [com.ismartcoding.plain.ble.server.HTTPServiceHandler].
+ * the BLE [com.ismartcoding.plain.ble.server.HttpServiceHandler].
  *
  * All business-logic routes live in commonMain and are collected into
  * [router]. The GraphQL services ([mainGraphQL], [peerGraphQL]) are also
@@ -94,7 +94,4 @@ object HttpRouteRegistry {
         }
         return params
     }
-
-    /** HTTP status used by [dispatch] callers when no route matches. */
-    const val NOT_FOUND_STATUS = HttpStatus.NOT_FOUND
 }

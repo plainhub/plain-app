@@ -86,7 +86,7 @@ class IosBleGattClient(
         charDiscoveryDeferred = charDeferred
         val allCharUuids = listOf(
             BleUuids.NEARBY_CHAR_UUID,
-            BleUuids.RPC_CHAR_UUID,
+            BleUuids.HTTP_CHAR_UUID,
         ).map { CBUUID.UUIDWithString(it) }
         peripheral.discoverCharacteristics(allCharUuids, forService = service)
         val charOk = withTimeoutOrNull(10_000L.milliseconds) { charDeferred.await() } == true

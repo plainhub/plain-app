@@ -123,7 +123,7 @@ class AndroidBleGattClient(
         ) {
             val uuid = characteristic.uuid
             val strValue = String(value)
-            LogCat.v("[BLE] onCharacteristicChanged value $strValue for uuid $uuid")
+//            LogCat.v("[BLE] onCharacteristicChanged value $strValue for uuid $uuid")
             publish(ActionType.NOTIFY_VALUE, ActionResult(uuid, strValue, true))
         }
 

@@ -24,7 +24,6 @@ object LanTransport : PeerTransport {
 
     override suspend fun downloadFile(peer: DPeer, fileId: String): DownloadedResponse {
         val client = createDownloadClient()
-        val response = executeDownloadRequest(id, peer.id, client, peer.getFileUrl(fileId))
-        return DownloadedResponse(response)
+        return executeDownloadRequest(id, peer.id, client, peer.getFileUrl(fileId))
     }
 }
