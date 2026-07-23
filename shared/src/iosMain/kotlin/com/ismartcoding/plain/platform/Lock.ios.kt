@@ -2,14 +2,14 @@ package com.ismartcoding.plain.platform
 
 import platform.Foundation.NSLock
 
-actual class PlatformLock {
-    private val lock = NSLock()
-    actual fun <T> withLock(block: () -> T): T {
-        lock.lock()
-        try {
-            return block()
-        } finally {
-            lock.unlock()
-        }
+actual fun newPlatformLock(): Any = NSLock()
+
+actual fun <T> runPlatformLocked(lock: Any, block: () -> T): T {
+    val nsLock = lock as NSLock
+    nsLock.lock()
+    try {
+        return block()
+    } finally {
+        nsLock.unlock()
     }
 }

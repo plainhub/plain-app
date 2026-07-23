@@ -8,13 +8,12 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.platform.PlatformLock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -31,25 +30,23 @@ data class DownloadProgressItem(
 object DownloadQueue {
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val downloadChannel = Channel<DownloadTask>(Channel.BUFFERED)
-    private val tasksFlow = MutableStateFlow<Map<String, DownloadTask>>(emptyMap())
-    private const val MAX_CONCURRENT = 3
+    private val tasks = mutableMapOf<String, DownloadTask>()
+    private val tasksLock = PlatformLock()
 
-    val downloadProgress: StateFlow<Map<String, DownloadTask>> = tasksFlow.asStateFlow()
+    val downloadProgress = MutableStateFlow<Map<String, DownloadTask>>(emptyMap())
+
+    private const val MAX_CONCURRENT = 3
 
     init {
         repeat(MAX_CONCURRENT) {
-            scope.launch {
-                processDownloads()
-            }
+            scope.launch { processDownloads() }
         }
     }
 
     private suspend fun processDownloads() {
         for (task in downloadChannel) {
             try {
-                if (!task.aborted) {
-                    executeTaskAsync(task)
-                }
+                if (!task.aborted) executeTaskAsync(task)
             } catch (e: Exception) {
                 LogCat.e("Download task ${task.id} failed: ${e.message}")
                 task.status = DownloadStatus.FAILED
@@ -58,31 +55,22 @@ object DownloadQueue {
         }
     }
 
-    fun addDownloadTask(
-        messageFile: DMessageFile,
-        peer: DPeer,
-        messageId: String
-    ): String {
-        if (tasksFlow.value.containsKey(messageFile.id)) {
-            return messageFile.id
+    fun addDownloadTask(messageFile: DMessageFile, peer: DPeer, messageId: String): String {
+        tasksLock.withLock {
+            if (tasks.containsKey(messageFile.id)) return@withLock
+            val task = DownloadTask(id = messageFile.id, messageFile = messageFile, peer = peer, messageId = messageId)
+            tasks[task.id] = task
+            scope.launch {
+                downloadChannel.send(task)
+                updateProgressFlow()
+            }
         }
-        val downloadTask = DownloadTask(
-            id = messageFile.id,
-            messageFile = messageFile,
-            peer = peer,
-            messageId = messageId
-        )
-        tasksFlow.value = tasksFlow.value.toMutableMap().also { it[downloadTask.id] = downloadTask }
-        scope.launch {
-            downloadChannel.send(downloadTask)
-            updateProgressFlow()
-        }
-        return downloadTask.id
+        return messageFile.id
     }
 
-    fun pauseDownload(taskId: String): Boolean {
-        val task = tasksFlow.value[taskId] ?: return false
-        return when (task.status) {
+    fun pauseDownload(taskId: String): Boolean = tasksLock.withLock {
+        val task = tasks[taskId] ?: return@withLock false
+        when (task.status) {
             DownloadStatus.DOWNLOADING -> {
                 task.aborted = true
                 task.job?.cancel()
@@ -90,62 +78,56 @@ object DownloadQueue {
                 scope.launch { updateProgressFlow() }
                 true
             }
-
             DownloadStatus.PENDING -> {
                 task.status = DownloadStatus.PAUSED
                 scope.launch { updateProgressFlow() }
                 true
             }
-
             else -> false
         }
     }
 
-    fun resumeDownload(taskId: String): Boolean {
-        val task = tasksFlow.value[taskId] ?: return false
-        if (task.status == DownloadStatus.PAUSED) {
-            task.aborted = false
-            task.status = DownloadStatus.PENDING
-            scope.launch {
-                downloadChannel.send(task)
-                updateProgressFlow()
-            }
-            return true
+    fun resumeDownload(taskId: String): Boolean = tasksLock.withLock {
+        val task = tasks[taskId] ?: return@withLock false
+        if (task.status != DownloadStatus.PAUSED) return@withLock false
+        task.aborted = false
+        task.status = DownloadStatus.PENDING
+        scope.launch {
+            downloadChannel.send(task)
+            updateProgressFlow()
         }
-        return false
+        true
     }
 
-    fun retryDownload(taskId: String): Boolean {
-        val task = tasksFlow.value[taskId] ?: return false
-        if (task.status == DownloadStatus.FAILED) {
-            task.apply {
-                error = ""
-                downloadedSize = 0
-                downloadSpeed = 0
-                lastDownloadedSize = 0
-                lastUpdateTime = null
-            }
-            task.aborted = false
-            task.status = DownloadStatus.PENDING
-            scope.launch {
-                downloadChannel.send(task)
-                updateProgressFlow()
-            }
-            return true
+    fun retryDownload(taskId: String): Boolean = tasksLock.withLock {
+        val task = tasks[taskId] ?: return@withLock false
+        if (task.status != DownloadStatus.FAILED) return@withLock false
+        task.apply {
+            error = ""
+            downloadedSize = 0
+            downloadSpeed = 0
+            lastDownloadedSize = 0
+            lastUpdateTime = null
         }
-        return false
+        task.aborted = false
+        task.status = DownloadStatus.PENDING
+        scope.launch {
+            downloadChannel.send(task)
+            updateProgressFlow()
+        }
+        true
     }
 
-    fun removeDownload(taskId: String): Boolean {
-        val task = tasksFlow.value[taskId] ?: return false
+    fun removeDownload(taskId: String): Boolean = tasksLock.withLock {
+        val task = tasks[taskId] ?: return@withLock false
         if (task.status == DownloadStatus.DOWNLOADING) {
             task.aborted = true
             task.job?.cancel()
         }
-        tasksFlow.value = tasksFlow.value.filterKeys { it != taskId }
+        tasks.remove(taskId)
         task.status = DownloadStatus.CANCELED
         scope.launch { updateProgressFlow() }
-        return true
+        true
     }
 
     private suspend fun executeTaskAsync(task: DownloadTask) {
@@ -155,33 +137,26 @@ object DownloadQueue {
 
         val result = PeerFileDownloader.downloadAsync(task)
 
-        if (task.aborted) {
-            return
-        }
+        if (task.aborted) return
 
         if (result != null) {
             sendEvent(HDownloadTaskDoneEvent(task))
-            tasksFlow.value = tasksFlow.value.filterKeys { it != task.id }
+            tasksLock.withLock { tasks.remove(task.id) }
             updateProgressFlow()
         } else {
             task.status = DownloadStatus.FAILED
+            updateProgressFlow()
         }
     }
 
     private suspend fun updateProgressFlow() {
-        val progressMap = tasksFlow.value.mapValues { (_, task) -> task.copy() }
-        tasksFlow.value = progressMap
-        val items = progressMap.values.map { task ->
-            DownloadProgressItem(
-                id = task.id,
-                messageId = task.messageId,
-                downloaded = task.downloadedSize,
-                total = task.messageFile.size,
-                speed = task.downloadSpeed,
-                status = task.status.name.lowercase(),
-            )
-        }
-        sendEvent(WebSocketEvent(EventType.DOWNLOAD_PROGRESS, JsonHelper.jsonEncode(items)))
+        val snapshot = tasksLock.withLock { tasks.mapValues { it.value.copy() }.toMap() }
+        downloadProgress.value = snapshot
+        sendEvent(WebSocketEvent(EventType.DOWNLOAD_PROGRESS, JsonHelper.jsonEncode(
+            snapshot.values.map {
+                DownloadProgressItem(it.id, it.messageId, it.downloadedSize, it.messageFile.size, it.downloadSpeed, it.status.name.lowercase())
+            }
+        )))
     }
 
     fun notifyProgressUpdate() {

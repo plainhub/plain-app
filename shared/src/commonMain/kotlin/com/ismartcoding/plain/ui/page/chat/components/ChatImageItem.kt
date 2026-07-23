@@ -107,9 +107,15 @@ internal fun ChatImageItem(
                 .clip(RoundedCornerShape(bottomEnd = 6.dp))
                 .background(Color.Black.copy(alpha = 0.4f)),
         ) {
+            val sizeText = if (item.duration > 0) item.duration.formatDuration() else item.size.formatBytes()
+            val labelText = if (taskActive) {
+                "${(downloadProgress * 100).toInt()}%  $sizeText"
+            } else {
+                sizeText
+            }
             Text(
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                text = if (item.duration > 0) item.duration.formatDuration() else item.size.formatBytes(),
+                text = labelText,
                 color = Color.White,
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
             )

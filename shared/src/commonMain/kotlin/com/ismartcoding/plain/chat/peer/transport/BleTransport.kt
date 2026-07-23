@@ -10,6 +10,7 @@ import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.platform.PlatformLock
 import com.ismartcoding.plain.platform.bleTransport
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.chaCha20Encrypt
@@ -21,6 +22,8 @@ import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -67,6 +70,19 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * [DownloadedResponse]. Throughput is low (tens of KB/s), so this path only
  * triggers when both LAN and Wi-Fi Aware are unavailable (e.g. cross-subnet
  * peers without a shared Aware data path).
+ *
+ * ## Concurrency: message send vs. file download
+ *
+ * BLE GATT is inherently serial — only one `requestAsync` can be in flight
+ * per device at a time.  A per-peer [Mutex] serializes all GATT operations.
+ * The download loop acquires the mutex **per chunk** (releasing it between
+ * chunks), so a [send] call naturally "cuts in" between two chunk fetches:
+ * the current chunk finishes, the download releases the mutex, [send]
+ * acquires it, sends the message, releases, and the download continues with
+ * the next chunk.  [send] never tears down the connection — the download owns
+ * the connection lifecycle and cleans up in its `finally` block.  When no
+ * download is in progress the connection stays cached for reuse or is
+ * cleaned up by `disconnectAll` when scanning stops.
  */
 @OptIn(ExperimentalEncodingApi::class)
 object BleTransport : PeerTransport {
@@ -77,14 +93,27 @@ object BleTransport : PeerTransport {
 
     /**
      * Byte-range size for chunked file downloads over BLE. Each chunk is
-     * base64-encoded inside a [BleHttpResponse], then split into ~58
+     * base64-encoded inside a [BleHttpResponse], then split into ~29
      * notification segments by the server. Chunks are streamed through a
      * [ByteChannel] so the caller ([PeerFileDownloader]) can update download
      * progress incrementally — without this, the entire file would be
      * buffered in memory before the reader saw the first byte, making the
      * progress UI appear stuck at 0% until the download finished.
+     *
+     * 8 KB keeps each BLE RPC round-trip under ~1 s so the progress UI
+     * updates at least once per second; 16 KB chunks took ~1.5 s each,
+     * making the overlay jump in large steps that looked frozen.
      */
-    private const val CHUNK_SIZE = 16 * 1024
+    private const val CHUNK_SIZE = 8 * 1024
+
+    // Per-peer mutex serializing all BLE GATT operations (send + download).
+    // See class doc for the concurrency model.
+    private val peerMutexes = mutableMapOf<String, Mutex>()
+    private val peerMutexLock = PlatformLock()
+
+    private fun mutexFor(peerId: String): Mutex = peerMutexLock.withLock {
+        peerMutexes.getOrPut(peerId) { Mutex() }
+    }
 
     override suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
         if (!isBleReady()) {
@@ -100,35 +129,40 @@ object BleTransport : PeerTransport {
         }
 
         val api = BleDeviceApi(client)
-        try {
+        val mutex = mutexFor(peer.id)
+
+        // Encrypt the signed request body with the peer's shared key, the
+        // same way the OkHttp crypto client would for LanTransport. The
+        // server's PeerGraphQLService decrypts with the same key.
+        val encryptedBody = chaCha20Encrypt(keyBytes, request.body)
+
+        val rpcRequest = BleHttpRequest(
+            method = "POST",
+            path = "/peer_graphql",
+            body = Base64Lenient.encode(encryptedBody),
+            bodyBase64 = true,
+        )
+
+        // All headers (client identity + request-specific c-cid) live in
+        // the outer BleRequestData.headers — BleRpcRequest no longer has
+        // its own headers field.
+        val baseData = BleRequestData.create()
+        val requestData = baseData.copy(
+            body = JsonHelper.jsonEncode(rpcRequest),
+            headers = if (request.channelId.isNotEmpty()) {
+                baseData.headers + ("c-cid" to request.channelId)
+            } else {
+                baseData.headers
+            },
+        )
+
+        // Hold the per-peer mutex for the entire GATT round-trip so a
+        // concurrent download chunk can't interleave notifications.
+        // No teardown — the download (if any) owns the connection lifecycle.
+        return mutex.withLock {
             if (!api.ensureConnected()) {
                 throw TransportUnavailable(id, peer.id, IllegalStateException("BLE connect failed"))
             }
-
-            // Encrypt the signed request body with the peer's shared key, the
-            // same way the OkHttp crypto client would for LanTransport. The
-            // server's PeerGraphQLService decrypts with the same key.
-            val encryptedBody = chaCha20Encrypt(keyBytes, request.body)
-
-            val rpcRequest = BleHttpRequest(
-                method = "POST",
-                path = "/peer_graphql",
-                body = Base64Lenient.encode(encryptedBody),
-                bodyBase64 = true,
-            )
-
-            // All headers (client identity + request-specific c-cid) live in
-            // the outer BleRequestData.headers — BleRpcRequest no longer has
-            // its own headers field.
-            val baseData = BleRequestData.create()
-            val requestData = baseData.copy(
-                body = JsonHelper.jsonEncode(rpcRequest),
-                headers = if (request.channelId.isNotEmpty()) {
-                    baseData.headers + ("c-cid" to request.channelId)
-                } else {
-                    baseData.headers
-                },
-            )
 
             val result = api.requestAsync(BleServices.http, requestData)
             if (!result.isSuccess()) {
@@ -160,7 +194,7 @@ object BleTransport : PeerTransport {
 
             if (rpcResponse.body.isEmpty()) {
                 LogCat.e("BleTransport: empty response body from ${peer.id}")
-                return GraphQLResponse(
+                return@withLock GraphQLResponse(
                     null,
                     null,
                     IllegalStateException("empty response body from peer"),
@@ -169,15 +203,13 @@ object BleTransport : PeerTransport {
 
             val encryptedResponse = Base64Lenient.decode(rpcResponse.body)
             val decrypted = chaCha20Decrypt(keyBytes, encryptedResponse)
-                ?: return GraphQLResponse(
+                ?: return@withLock GraphQLResponse(
                     null,
                     null,
                     IllegalStateException("failed to decrypt response from peer"),
                 )
 
-            return GraphQLResponseParser.parse(decrypted.decodeToString())
-        } finally {
-            scanner.teardownConnection(client)
+            GraphQLResponseParser.parse(decrypted.decodeToString())
         }
     }
 
@@ -195,9 +227,15 @@ object BleTransport : PeerTransport {
         }
 
         val api = BleDeviceApi(client)
-        if (!api.ensureConnected()) {
-            scanner.teardownConnection(client)
-            throw TransportUnavailable(id, peer.id, IllegalStateException("BLE connect failed"))
+        val mutex = mutexFor(peer.id)
+
+        // Ensure connected under the mutex so a concurrent send() can't
+        // race with GATT discovery.
+        mutex.withLock {
+            if (!api.ensureConnected()) {
+                scanner.teardownConnection(client)
+                throw TransportUnavailable(id, peer.id, IllegalStateException("BLE connect failed"))
+            }
         }
 
         // Stream chunks through a ByteChannel so PeerFileDownloader reads
@@ -213,60 +251,58 @@ object BleTransport : PeerTransport {
                 var offset = 0L
                 var chunkIndex = 0
                 while (true) {
-                    val rpcRequest = BleHttpRequest(
-                        method = "GET",
-                        path = "/fs",
-                        query = mapOf(
-                            "id" to listOf(fileId),
-                            "offset" to listOf(offset.toString()),
-                            "length" to listOf(CHUNK_SIZE.toString()),
-                        ),
-                    )
-                    val requestData = BleRequestData.create().copy(
-                        body = JsonHelper.jsonEncode(rpcRequest),
-                    )
+                    // Acquire the per-peer mutex per chunk.  Between chunks
+                    // the mutex is free, so a message send() can cut in,
+                    // do its GATT round-trip, and release — then the next
+                    // chunk continues.  This is the "pause after 8 KB, send
+                    // message, resume" pattern without explicit pausing.
+                    val chunkBytes = mutex.withLock {
+                        val rpcRequest = BleHttpRequest(
+                            method = "GET",
+                            path = "/fs",
+                            query = mapOf(
+                                "id" to listOf(fileId),
+                                "offset" to listOf(offset.toString()),
+                                "length" to listOf(CHUNK_SIZE.toString()),
+                            ),
+                        )
+                        val requestData = BleRequestData.create().copy(
+                            body = JsonHelper.jsonEncode(rpcRequest),
+                        )
 
-                    val result = api.requestAsync(BleServices.http, requestData)
-                    if (!result.isSuccess()) {
-                        channel.close(
-                            TransportUnavailable(
+                        val result = api.requestAsync(BleServices.http, requestData)
+                        if (!result.isSuccess()) {
+                            throw TransportUnavailable(
                                 id,
                                 peer.id,
                                 IllegalStateException("BLE rpc chunk $chunkIndex failed: ${result.status}"),
-                            ),
-                        )
-                        return@launch
-                    }
+                            )
+                        }
 
-                    val responseJson = result.value as? String
-                    if (responseJson.isNullOrEmpty()) {
-                        channel.close(
-                            TransportUnavailable(
+                        val responseJson = result.value as? String
+                        if (responseJson.isNullOrEmpty()) {
+                            throw TransportUnavailable(
                                 id,
                                 peer.id,
                                 IllegalStateException("BLE rpc chunk $chunkIndex empty response"),
-                            ),
-                        )
-                        return@launch
-                    }
+                            )
+                        }
 
-                    val rpcResponse = JsonHelper.jsonDecode<BleHttpResponse>(responseJson)
-                    if (rpcResponse.status != 200) {
-                        channel.close(
-                            TransportUnavailable(
+                        val rpcResponse = JsonHelper.jsonDecode<BleHttpResponse>(responseJson)
+                        if (rpcResponse.status != 200) {
+                            throw TransportUnavailable(
                                 id,
                                 peer.id,
                                 IllegalStateException("BLE /fs chunk $chunkIndex status ${rpcResponse.status}"),
-                            ),
-                        )
-                        return@launch
+                            )
+                        }
+
+                        if (rpcResponse.body.isEmpty()) return@withLock null
+                        Base64Lenient.decode(rpcResponse.body)
                     }
 
-                    if (rpcResponse.body.isEmpty()) break
-
-                    val chunkBytes = Base64Lenient.decode(rpcResponse.body)
-                    if (chunkBytes.isEmpty()) break
-
+                    // Write outside the mutex — no BLE operation needed.
+                    if (chunkBytes == null || chunkBytes.isEmpty()) break
                     channel.writeFully(chunkBytes)
                     offset += chunkBytes.size
                     chunkIndex++

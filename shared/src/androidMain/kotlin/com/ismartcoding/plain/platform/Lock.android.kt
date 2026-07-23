@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.platform
 
-actual class PlatformLock {
-    private val lock = Any()
-    actual fun <T> withLock(block: () -> T): T = synchronized(lock, block)
-}
+actual fun newPlatformLock(): Any = Any()
+
+actual fun <T> runPlatformLocked(lock: Any, block: () -> T): T = synchronized(lock, block)

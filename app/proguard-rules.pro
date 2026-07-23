@@ -27,6 +27,12 @@
 -dontwarn org.apache.log4j.**
 -dontwarn org.apache.logging.log4j.**
 
+# Netty 4.2 uses java.lang.invoke.VarHandle for byte[]/ByteBuffer short/int/long
+# access. R8 horizontal class merging corrupts the invoke-polymorphic call sites,
+# producing java.lang.VerifyError ("expected Reference: java.lang.Object[]") on
+# launch. Keeping the package intact disables that optimization for these classes.
+-keep class io.netty.** { *; }
+
 # ===== kotlinx.serialization =====
 # Keep @Serializable companions and serializer accessors.
 -keepattributes *Annotation*, InnerClasses
@@ -44,6 +50,13 @@
 -keep class io.ktor.** { *; }
 -keep class kotlinx.coroutines.** { *; }
 -dontwarn io.ktor.**
+
+# ===== App code (vendored kgraphql + GraphQL model classes) =====
+# kgraphql discovers type fields via Kotlin reflection (KClass.memberProperties,
+# primaryConstructor). R8 obfuscation strips/renames properties and corrupts
+# @kotlin.Metadata, producing "An Object type must define one or more fields"
+# at schema build time. Keep the app's own classes intact.
+-keep class com.ismartcoding.plain.** { *; }
 
 # ===== BouncyCastle (reflection-heavy crypto) =====
 -keep class org.bouncycastle.** { *; }
