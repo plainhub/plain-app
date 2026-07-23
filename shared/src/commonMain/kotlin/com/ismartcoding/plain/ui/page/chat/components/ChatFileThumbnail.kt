@@ -62,6 +62,7 @@ fun ChatFileThumbnail(
                 modifier = Modifier.size(48.dp),
                 downloadProgress = downloadProgress,
                 size = 32.dp,
+                cornerRadius = 4.dp,
             )
         }
     }

@@ -51,7 +51,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * 3. Encrypts the signed request body with the peer's shared ChaCha20 key —
  *    mirroring what the OkHttp crypto interceptor does for [LanTransport].
  * 4. Wraps the encrypted bytes in a [BleHttpRequest] (base64 body) and sends
- *    it via [BleServices.rpc]. The server-side
+ *    it via [BleServices.http]. The server-side
  *    [com.ismartcoding.plain.ble.server.HttpServiceHandler] dispatches the
  *    request through the shared [com.ismartcoding.plain.web.HttpRouteRegistry]
  *    to [com.ismartcoding.plain.web.graphql.PeerGraphQLService], which
@@ -130,7 +130,7 @@ object BleTransport : PeerTransport {
                 },
             )
 
-            val result = api.requestAsync(BleServices.rpc, requestData)
+            val result = api.requestAsync(BleServices.http, requestData)
             if (!result.isSuccess()) {
                 throw TransportUnavailable(
                     id,
@@ -226,7 +226,7 @@ object BleTransport : PeerTransport {
                         body = JsonHelper.jsonEncode(rpcRequest),
                     )
 
-                    val result = api.requestAsync(BleServices.rpc, requestData)
+                    val result = api.requestAsync(BleServices.http, requestData)
                     if (!result.isSuccess()) {
                         channel.close(
                             TransportUnavailable(

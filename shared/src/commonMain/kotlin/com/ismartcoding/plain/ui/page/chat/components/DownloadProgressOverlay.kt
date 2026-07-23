@@ -1,12 +1,15 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
 import com.ismartcoding.plain.i18n.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.Dp
@@ -25,14 +28,14 @@ private fun DualProgressIndicator(
         progress = { 1f },
         modifier = modifier,
         color = Color.White.copy(alpha = 0.3f),
-        strokeWidth = 4.dp,
+        strokeWidth = 3.dp,
         trackColor = Color.Transparent
     )
     CircularProgressIndicator(
         progress = { progress.coerceIn(0f, 1f) },
         modifier = modifier,
         color = Color.White,
-        strokeWidth = 4.dp,
+        strokeWidth = 3.dp,
         trackColor = Color.Transparent
     )
 }
@@ -85,10 +88,13 @@ fun DownloadProgressOverlay(
     status: DownloadStatus,
     modifier: Modifier,
     downloadProgress: Float,
-    size: Dp = 48.dp
+    size: Dp = 48.dp,
+    cornerRadius: Dp = 6.dp,
 ) {
     Box(
-        modifier = modifier,
+        modifier = modifier
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(Color.Black.copy(alpha = 0.4f)),
         contentAlignment = Alignment.Center
     ) {
         if (status in setOf(DownloadStatus.DOWNLOADING, DownloadStatus.PAUSED)) {
@@ -100,7 +106,7 @@ fun DownloadProgressOverlay(
             CircularProgressIndicator(
                 modifier = Modifier.size(size),
                 color = Color.White,
-                strokeWidth = 4.dp,
+                strokeWidth = 3.dp,
                 trackColor = Color.Transparent
             )
         }
