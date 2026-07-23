@@ -27,8 +27,15 @@ keyAlias=release
 storeFile=release.jks
 EOF
 
+if [ -n "$ANDROID_HOME" ]; then
+  SDK_DIR="$ANDROID_HOME"
+elif [ -d "$HOME/Library/Android/sdk" ]; then
+  SDK_DIR="$HOME/Library/Android/sdk"
+else
+  SDK_DIR="/usr/local/lib/android/sdk"
+fi
 cat > ./local.properties <<EOF
-sdk.dir=/Users/$USER/Library/Android/sdk
+sdk.dir=$SDK_DIR
 EOF
 
 cat > ./app/play-config.json <<EOF
