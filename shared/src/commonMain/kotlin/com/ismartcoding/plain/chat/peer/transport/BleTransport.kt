@@ -86,7 +86,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  */
 @OptIn(ExperimentalEncodingApi::class)
 object BleTransport : PeerTransport {
-    override val id: String = "ble"
+    override val type = PeerTransportType.BLE
 
     /** Scan timeout for the case where createClient(clientId) returns null. */
     private const val SCAN_TIMEOUT_MS = 10_000L
@@ -117,7 +117,7 @@ object BleTransport : PeerTransport {
 
     override suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
         if (!isBleReady()) {
-            throw TransportUnavailable(id, peer.id, IllegalStateException("BLE not ready"))
+            throw TransportUnavailable(type, peer.id, IllegalStateException("BLE not ready"))
         }
 
         val clientId = peer.id
@@ -125,7 +125,7 @@ object BleTransport : PeerTransport {
         val client = scanner.createClient(clientId)
             ?: withTimeoutOrNull(SCAN_TIMEOUT_MS) { scanner.findOne(clientId) }
         if (client == null) {
-            throw TransportUnavailable(id, peer.id, IllegalStateException("BLE device not found"))
+            throw TransportUnavailable(type, peer.id, IllegalStateException("BLE device not found"))
         }
 
         val api = BleDeviceApi(client)
@@ -161,13 +161,13 @@ object BleTransport : PeerTransport {
         // No teardown — the download (if any) owns the connection lifecycle.
         return mutex.withLock {
             if (!api.ensureConnected()) {
-                throw TransportUnavailable(id, peer.id, IllegalStateException("BLE connect failed"))
+                throw TransportUnavailable(type, peer.id, IllegalStateException("BLE connect failed"))
             }
 
             val result = api.requestAsync(BleServices.http, requestData)
             if (!result.isSuccess()) {
                 throw TransportUnavailable(
-                    id,
+                    type,
                     peer.id,
                     IllegalStateException("BLE rpc failed: ${result.status}"),
                 )
@@ -176,7 +176,7 @@ object BleTransport : PeerTransport {
             val responseJson = result.value as? String
             if (responseJson.isNullOrEmpty()) {
                 throw TransportUnavailable(
-                    id,
+                    type,
                     peer.id,
                     IllegalStateException("BLE rpc empty response"),
                 )
@@ -186,7 +186,7 @@ object BleTransport : PeerTransport {
             if (rpcResponse.status != 200) {
                 LogCat.e("BleTransport: /peer_graphql status=${rpcResponse.status} body=${rpcResponse.body.take(200)}")
                 throw TransportUnavailable(
-                    id,
+                    type,
                     peer.id,
                     IllegalStateException("peer_graphql status ${rpcResponse.status}"),
                 )
@@ -215,7 +215,7 @@ object BleTransport : PeerTransport {
 
     override suspend fun downloadFile(peer: DPeer, fileId: String): DownloadedResponse {
         if (!isBleReady()) {
-            throw TransportUnavailable(id, peer.id, IllegalStateException("BLE not ready"))
+            throw TransportUnavailable(type, peer.id, IllegalStateException("BLE not ready"))
         }
 
         val clientId = peer.id
@@ -223,7 +223,7 @@ object BleTransport : PeerTransport {
         val client = scanner.createClient(clientId)
             ?: withTimeoutOrNull(SCAN_TIMEOUT_MS) { scanner.findOne(clientId) }
         if (client == null) {
-            throw TransportUnavailable(id, peer.id, IllegalStateException("BLE device not found"))
+            throw TransportUnavailable(type, peer.id, IllegalStateException("BLE device not found"))
         }
 
         val api = BleDeviceApi(client)
@@ -234,7 +234,7 @@ object BleTransport : PeerTransport {
         mutex.withLock {
             if (!api.ensureConnected()) {
                 scanner.teardownConnection(client)
-                throw TransportUnavailable(id, peer.id, IllegalStateException("BLE connect failed"))
+                throw TransportUnavailable(type, peer.id, IllegalStateException("BLE connect failed"))
             }
         }
 
@@ -273,7 +273,7 @@ object BleTransport : PeerTransport {
                         val result = api.requestAsync(BleServices.http, requestData)
                         if (!result.isSuccess()) {
                             throw TransportUnavailable(
-                                id,
+                                type,
                                 peer.id,
                                 IllegalStateException("BLE rpc chunk $chunkIndex failed: ${result.status}"),
                             )
@@ -282,7 +282,7 @@ object BleTransport : PeerTransport {
                         val responseJson = result.value as? String
                         if (responseJson.isNullOrEmpty()) {
                             throw TransportUnavailable(
-                                id,
+                                type,
                                 peer.id,
                                 IllegalStateException("BLE rpc chunk $chunkIndex empty response"),
                             )
@@ -291,7 +291,7 @@ object BleTransport : PeerTransport {
                         val rpcResponse = JsonHelper.jsonDecode<BleHttpResponse>(responseJson)
                         if (rpcResponse.status != 200) {
                             throw TransportUnavailable(
-                                id,
+                                type,
                                 peer.id,
                                 IllegalStateException("BLE /fs chunk $chunkIndex status ${rpcResponse.status}"),
                             )

@@ -12,27 +12,27 @@ object PeerCircuitBreaker {
     private val states = mutableMapOf<String, State>()
     private val mutex = Mutex()
 
-    private fun key(peerId: String, transportId: String) = "$peerId|$transportId"
+    private fun key(peerId: String, transportType: PeerTransportType) = "$peerId|${transportType.name}"
 
-    suspend fun isOpen(peerId: String, transportId: String): Boolean = mutex.withLock {
-        val state = states[key(peerId, transportId)] ?: return@withLock false
+    suspend fun isOpen(peerId: String, transportType: PeerTransportType): Boolean = mutex.withLock {
+        val state = states[key(peerId, transportType)] ?: return@withLock false
         if (state.failures < MAX_FAILURES) return@withLock false
         if (TimeHelper.nowMillis() - state.openedAt > WINDOW_MS) {
-            states.remove(key(peerId, transportId))
+            states.remove(key(peerId, transportType))
             return@withLock false
         }
         return@withLock true
     }
 
-    suspend fun recordSuccess(peerId: String, transportId: String) {
+    suspend fun recordSuccess(peerId: String, transportType: PeerTransportType) {
         mutex.withLock {
-            states.remove(key(peerId, transportId))
+            states.remove(key(peerId, transportType))
         }
     }
 
-    suspend fun recordFailure(peerId: String, transportId: String) {
+    suspend fun recordFailure(peerId: String, transportType: PeerTransportType) {
         mutex.withLock {
-            val k = key(peerId, transportId)
+            val k = key(peerId, transportType)
             val current = states[k]
             val nextFailures = (current?.failures ?: 0) + 1
             states[k] = State(

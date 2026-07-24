@@ -35,7 +35,6 @@ object PeerManager {
         peer.status = "unpaired"
         peer.updatedAt = TimeHelper.now()
         peerDao.update(peer)
-        PeerCacher.removePeer(peerId)
         PeerCacher.load()
         LogCat.d("Device unpaired: $peerId")
         true

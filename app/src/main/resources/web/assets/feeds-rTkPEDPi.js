@@ -1,1 +1,0 @@
-import{Wt as e}from"./query-yg6gMeKv.js";import{in as t,n}from"./index-S2MjgRMs.js";var r=r=>({viewAll:()=>{n(r,`/feeds`)},viewFeed:i=>{n(r,`/feeds?q=${e(t([{name:`feed_id`,op:``,value:i.id}]))}`)},viewToday:()=>{n(r,`/feeds?q=${e(t([{name:`today`,op:``,value:`true`}]))}`)}});export{r as t};

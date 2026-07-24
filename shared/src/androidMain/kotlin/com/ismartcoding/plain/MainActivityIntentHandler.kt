@@ -22,6 +22,12 @@ internal fun MainActivity.handleIntent(intent: Intent) {
         if (!alreadyThere) nav?.navigate(Routing.WebSettings)
     }
 
+    intent.getStringExtra(IntentExtras.CHAT_TARGET_ID)?.let { targetId ->
+        val nav = navControllerState.value
+        val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute(Routing.Chat::class) == true
+        if (!alreadyThere) nav?.navigate(Routing.Chat(targetId))
+    }
+
     if (intent.action == Intent.ACTION_VIEW) {
         val uri = intent.data ?: return
         val mimeType = contentResolver.getType(uri)

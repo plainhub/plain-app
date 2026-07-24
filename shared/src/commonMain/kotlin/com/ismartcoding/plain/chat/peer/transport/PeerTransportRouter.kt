@@ -2,6 +2,7 @@ package com.ismartcoding.plain.chat.peer.transport
 import com.ismartcoding.plain.platform.createWifiAwareTransport
 
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.lib.logcat.LogCat
 
@@ -21,26 +22,31 @@ object PeerTransportRouter {
 
     suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
         val errors = mutableListOf<String>()
-        for (t in transports) {
-            if (t is LanTransport && peer.ip.isEmpty()) {
-                continue
+        try {
+            for (t in transports) {
+                if (t is LanTransport && peer.ip.isEmpty()) {
+                    continue
+                }
+                if (PeerCircuitBreaker.isOpen(peer.id, t.type)) {
+                    LogCat.d("transport ${t.type} skipped for peer ${peer.id} (breaker open)")
+                    continue
+                }
+                PeerCacher.setCurrentTransport(peer.id, t.type)
+                try {
+                    val resp = t.send(peer, request, keyBytes)
+                    PeerCircuitBreaker.recordSuccess(peer.id, t.type)
+                    return resp
+                } catch (e: TransportUnavailable) {
+                    PeerCircuitBreaker.recordFailure(peer.id, t.type)
+                    val causeMsg = e.cause?.message ?: e.message
+                    errors.add("${t.type.name} error: $causeMsg")
+                    LogCat.d("${t.type.name} error: ${peer.id} $causeMsg")
+                }
             }
-            if (PeerCircuitBreaker.isOpen(peer.id, t.id)) {
-                LogCat.d("transport ${t.id} skipped for peer ${peer.id} (breaker open)")
-                continue
-            }
-            try {
-                val resp = t.send(peer, request, keyBytes)
-                PeerCircuitBreaker.recordSuccess(peer.id, t.id)
-                return resp
-            } catch (e: TransportUnavailable) {
-                PeerCircuitBreaker.recordFailure(peer.id, t.id)
-                val causeMsg = e.cause?.message ?: e.message
-                errors.add("${t.id.uppercase()} error: $causeMsg")
-                LogCat.d("${t.id.uppercase()} error: ${peer.id} $causeMsg")
-            }
+            throw Exception(errors.joinToString("\n"))
+        } finally {
+            PeerCacher.setCurrentTransport(peer.id, null)
         }
-        throw Exception(errors.joinToString("\n"))
     }
 
     suspend fun downloadFile(
@@ -49,18 +55,18 @@ object PeerTransportRouter {
     ): DownloadedResponse {
         var lastError: Throwable? = null
         for (t in transports) {
-            if (PeerCircuitBreaker.isOpen(peer.id, t.id)) {
-                LogCat.d("transport ${t.id} skipped for peer ${peer.id} (breaker open)")
+            if (PeerCircuitBreaker.isOpen(peer.id, t.type)) {
+                LogCat.d("transport ${t.type} skipped for peer ${peer.id} (breaker open)")
                 continue
             }
             try {
                 val resp = t.downloadFile(peer, fileId)
-                PeerCircuitBreaker.recordSuccess(peer.id, t.id)
+                PeerCircuitBreaker.recordSuccess(peer.id, t.type)
                 return resp
             } catch (e: TransportUnavailable) {
-                PeerCircuitBreaker.recordFailure(peer.id, t.id)
+                PeerCircuitBreaker.recordFailure(peer.id, t.type)
                 val causeMsg = e.cause?.message ?: e.message
-                LogCat.d("transport ${t.id} unavailable for peer ${peer.id}: $causeMsg")
+                LogCat.d("transport ${t.type} unavailable for peer ${peer.id}: $causeMsg")
                 lastError = e
             }
         }

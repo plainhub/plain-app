@@ -23,7 +23,7 @@ import kotlinx.coroutines.TimeoutCancellationException
 
 @RequiresApi(Build.VERSION_CODES.S)
 object WifiAwareTransport : PeerTransport {
-    override val id: String = "aware"
+    override val type = PeerTransportType.AWARE
 
     private val session = AwareSession()
     private val httpFactory = AwareHttpClientFactory()
@@ -73,22 +73,22 @@ object WifiAwareTransport : PeerTransport {
         // the peer's BLE scan response by PeerTransportPrewarmer on ChatPage entry.
         if (!PeerCacher.isAwareRunning(peer.id)) {
             LogCat.d("[AWARE] skip download peer=${peer.id} (peer Aware not running)")
-            throw TransportUnavailable(id, peer.id, IllegalStateException("peer Aware not running"))
+            throw TransportUnavailable(type, peer.id, IllegalStateException("peer Aware not running"))
         }
         val connection = try {
             pool.buildLink(peer)
         } catch (e: TimeoutCancellationException) {
             LogCat.d("[AWARE] buildLink timed out (download) peer=${peer.id}")
-            throw TransportUnavailable(id, peer.id, e)
+            throw TransportUnavailable(type, peer.id, e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             LogCat.d("[AWARE] buildLink failed (download) peer=${peer.id} type=${e::class.simpleName} msg=${e.message}")
-            throw TransportUnavailable(id, peer.id, e)
+            throw TransportUnavailable(type, peer.id, e)
         }
         val client = httpFactory.buildFileDownload(connection.network, connection.peerIpv6)
         val url = peer.getAwareFileUrl(fileId, connection.peerPort)
-        return executeDownloadRequest(id, peer.id, client, url)
+        return executeDownloadRequest(type, peer.id, client, url)
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_NETWORK_STATE])
@@ -99,24 +99,24 @@ object WifiAwareTransport : PeerTransport {
         // scan response by PeerTransportPrewarmer on ChatPage entry.
         if (!PeerCacher.isAwareRunning(peer.id)) {
             LogCat.d("[AWARE] skip send peer=${peer.id} (peer Aware not running)")
-            throw TransportUnavailable(id, peer.id, IllegalStateException("peer Aware not running"))
+            throw TransportUnavailable(type, peer.id, IllegalStateException("peer Aware not running"))
         }
         LogCat.d("[AWARE] send start peer=${peer.id} cid=${request.channelId}")
         val connection = try {
             pool.buildLink(peer)
         } catch (e: TimeoutCancellationException) {
             LogCat.d("[AWARE] buildLink timed out peer=${peer.id}")
-            throw TransportUnavailable(id, peer.id, e)
+            throw TransportUnavailable(type, peer.id, e)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             LogCat.d("[AWARE] buildLink failed peer=${peer.id} type=${e::class.simpleName} msg=${e.message}")
-            throw TransportUnavailable(id, peer.id, e)
+            throw TransportUnavailable(type, peer.id, e)
         }
         val url = "https://${AwareHttpClientFactory.AWARE_HOST}:${connection.peerPort}/peer_graphql"
         LogCat.d("[AWARE] send http peer=${peer.id} url=$url")
         val resp = executeGraphQLRequest(
-            transportId = id,
+            transportType = type,
             peerId = peer.id,
             client = connection.httpClient,
             url = url,

@@ -69,6 +69,7 @@
     <string name="discovered_devices">Discovered Devices</string>
     <string name="pairing_request">Pairing Request</string>
     <string name="pairing_request_message">Do you want to pair with device "%1$s"?</string>
+    <string name="pairing_request_hint">After pairing, you can exchange messages between both devices.</string>
     <string name="pairing_request_expired">Pairing request expired</string>
     <string name="allow">Allow</string>
     <string name="deny">Deny</string>

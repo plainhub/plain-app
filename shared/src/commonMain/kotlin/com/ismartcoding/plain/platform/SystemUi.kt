@@ -25,8 +25,10 @@ expect fun showNavigationBar()
 
 /**
  * Enter immersive fullscreen mode (hides system bars, edge-to-edge layout).
- * Should be called from a SideEffect/DisposableEffect scoped to a Dialog/Window.
+ * Composable so the Android actual can resolve the host window via LocalView
+ * (a Dialog has its own window, separate from the activity).
  */
+@Composable
 expect fun setImmersiveFullscreen()
 
 /**

@@ -16,6 +16,7 @@ actual fun showNavigationBar() {
     // No legacy navigation bar on iOS
 }
 
+@Composable
 actual fun setImmersiveFullscreen() {
     // iOS immersive mode handled via UIViewController prefersStatusBarHidden
 }

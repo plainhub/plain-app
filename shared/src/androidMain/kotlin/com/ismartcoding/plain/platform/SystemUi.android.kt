@@ -4,9 +4,11 @@ import android.app.Activity
 import android.view.WindowManager
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -43,14 +45,18 @@ actual fun showNavigationBar() {
         .show(WindowInsetsCompat.Type.navigationBars())
 }
 
+@Composable
 actual fun setImmersiveFullscreen() {
-    val context = com.ismartcoding.plain.appContextValue ?: return
-    val activity = context as? Activity ?: return
-    val view = activity.window.decorView
-    WindowCompat.setDecorFitsSystemWindows(activity.window, false)
-    WindowInsetsControllerCompat(activity.window, view).apply {
-        hide(WindowInsetsCompat.Type.systemBars())
-        systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    val view = LocalView.current
+    SideEffect {
+        val window = (view.parent as? DialogWindowProvider)?.window
+            ?: (com.ismartcoding.plain.appContextValue as? Activity)?.window
+            ?: return@SideEffect
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, view).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 }
 

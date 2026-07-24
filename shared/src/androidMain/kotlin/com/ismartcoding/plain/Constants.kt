@@ -9,3 +9,7 @@ object AppIntents {
     val ACTION_REPOST_HTTP_NOTIFICATION: String get() = "${appContext.packageName}.action.REPOST_HTTP_NOTIFICATION"
     val ACTION_PLAY_MEDIA: String get() = "${appContext.packageName}.action.PLAY_MEDIA"
 }
+
+object IntentExtras {
+    const val CHAT_TARGET_ID = "chat_target_id"
+}

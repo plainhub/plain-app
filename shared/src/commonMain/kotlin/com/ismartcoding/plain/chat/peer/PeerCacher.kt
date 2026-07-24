@@ -3,6 +3,7 @@ package com.ismartcoding.plain.chat.peer
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.chat.ChatCacher
+import com.ismartcoding.plain.chat.peer.transport.PeerTransportType
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
@@ -24,6 +25,12 @@ object PeerCacher {
 
     val peersMap = MutableStateFlow<Map<String, PeerRuntime>>(emptyMap())
     val onlineMap = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+
+    // Transport currently being attempted for a peer, or absent when idle. Set
+    // by PeerTransportRouter.send() right before each transport attempt and
+    // cleared in finally. Observed by ChatPage to show the transport badge
+    // only while a send is in flight.
+    val currentTransportMap = MutableStateFlow<Map<String, PeerTransportType>>(emptyMap())
 
     // In-memory Aware running flag per peer. Set from two sources:
     //  1. BLE scan response serviceData (byte[0]) — cheap hint, no GATT needed
@@ -66,6 +73,17 @@ object PeerCacher {
     fun getPeerOnlineStatus(peerId: String): Boolean? = onlineMap.value[peerId]
 
     fun getOnlinePeerIds(): Set<String> = onlineMap.value.filterValues { it }.keys.toSet()
+
+    fun setCurrentTransport(peerId: String, transportType: PeerTransportType?) {
+        val current = currentTransportMap.value
+        if (transportType == null) {
+            if (current.containsKey(peerId)) {
+                currentTransportMap.value = current - peerId
+            }
+        } else if (current[peerId] != transportType) {
+            currentTransportMap.value = current + (peerId to transportType)
+        }
+    }
 
     fun getPeer(peerId: String): DPeer? = peersMap.value[peerId]?.peer
 
@@ -119,6 +137,9 @@ object PeerCacher {
         val newOnline = if (currentOnline.containsKey(peerId)) currentOnline - peerId else currentOnline
         if (newPeers !== currentPeers) peersMap.value = newPeers
         if (newOnline !== currentOnline) onlineMap.value = newOnline
+        if (currentTransportMap.value.containsKey(peerId)) {
+            currentTransportMap.value = currentTransportMap.value - peerId
+        }
         awareRunningMap.remove(peerId)
         awareSupportedMap.remove(peerId)
     }

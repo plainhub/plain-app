@@ -66,6 +66,7 @@
     <string name="discovered_devices">கண்டுபிடிக்கப்பட்ட சாதனங்கள்</string>
     <string name="pairing_request">இணைப்பு கோரிக்கை</string>
     <string name="pairing_request_message">"%1$s" சாதனத்துடன் இணைக்க விரும்புகிறீர்களா?</string>
+    <string name="pairing_request_hint">இணைத்த பிறகு, இரு சாதனங்களுக்கும் இடையே செய்திகளைப் பரிமாறிக்கொள்ளலாம்.</string>
     <string name="allow">அனுமதி</string>
     <string name="deny">மறுக்க</string>
     <string name="chat">அரட்டை</string>

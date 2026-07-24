@@ -10,9 +10,9 @@ import com.ismartcoding.plain.ui.models.VSession
 
 @Composable
 fun SessionBadge(m: VSession, isOnline: Boolean) {
-    val label = if (m.isCustom) stringResource(Res.string.custom_token) else if (isOnline) stringResource(Res.string.online) else stringResource(Res.string.offline)
+    val label = if (isOnline) stringResource(Res.string.online) else stringResource(Res.string.offline)
     PStatusBadge(
         text = label,
-        type = if (!m.isCustom && isOnline) BadgeType.SUCCESS else BadgeType.NEUTRAL,
+        type = if (isOnline) BadgeType.SUCCESS else BadgeType.NEUTRAL,
     )
 }

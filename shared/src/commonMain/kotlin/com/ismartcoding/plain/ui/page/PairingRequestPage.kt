@@ -115,6 +115,17 @@ fun PairingRequestPage(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
             )
+            VerticalSpace(dp = 8.dp)
+            Text(
+                text = stringResource(Res.string.pairing_request_hint),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            )
             VerticalSpace(dp = 40.dp)
         }
         item {

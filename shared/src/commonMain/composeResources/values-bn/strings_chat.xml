@@ -66,6 +66,7 @@
     <string name="discovered_devices">আবিষ্কৃত ডিভাইস</string>
     <string name="pairing_request">জোড়া লাগানোর অনুরোধ</string>
     <string name="pairing_request_message">আপনি কি ডিভাইস "%1$s" এর সাথে জোড়া লাগাতে চান?</string>
+    <string name="pairing_request_hint">পেয়ারিং করার পর, আপনি উভয় ডিভাইসের মধ্যে বার্তা বিনিময় করতে পারবেন।</string>
     <string name="allow">অনুমতি দিন</string>
     <string name="deny">প্রত্যাখ্যান করুন</string>
     <string name="chat">চ্যাট</string>

@@ -32,6 +32,7 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.platform.getBestIp
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -157,7 +158,7 @@ internal fun LazyListScope.nearbyDeviceListItems(
     pairedPeers: List<com.ismartcoding.plain.db.DPeer>,
 ) {
     if (nearbyDevices.isNotEmpty()) {
-        nearbyDevices.forEach { item ->
+        nearbyDevices.sortedBy { it.name.toSortName() }.forEach { item ->
             item {
                 val isPaired = pairedPeers.any { it.id == item.id }
                 val status = NearbyViewModel.getStatus(item.id, isPaired)

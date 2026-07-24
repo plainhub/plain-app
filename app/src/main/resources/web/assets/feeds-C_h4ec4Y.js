@@ -1,0 +1,1 @@
+import{Jt as e}from"./temp-DoICORwT.js";import{in as t,n}from"./index-BXDGPIe0.js";var r=r=>({viewAll:()=>{n(r,`/feeds`)},viewFeed:i=>{n(r,`/feeds?q=${e(t([{name:`feed_id`,op:``,value:i.id}]))}`)},viewToday:()=>{n(r,`/feeds?q=${e(t([{name:`today`,op:``,value:`true`}]))}`)}});export{r as t};

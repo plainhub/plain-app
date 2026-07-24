@@ -66,6 +66,7 @@
     <string name="discovered_devices">Ontdekte apparaten</string>
     <string name="pairing_request">Koppelingsverzoek</string>
     <string name="pairing_request_message">Wilt u koppelen met apparaat "%1$s"?</string>
+    <string name="pairing_request_hint">Na het koppelen kunt u berichten uitwisselen tussen beide apparaten.</string>
     <string name="allow">Toestaan</string>
     <string name="deny">Weigeren</string>
     <string name="chat">Chat</string>

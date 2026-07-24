@@ -32,7 +32,7 @@ fun NearbyDeviceItem(
     bestIp: String,
 ) {
     Surface(
-        modifier = PlainTheme.getCardModifier(selected = status == NearbyItemStatus.PAIRED),
+        modifier = PlainTheme.getCardModifier(),
         color = Color.Unspecified,
     ) {
         PListItem(

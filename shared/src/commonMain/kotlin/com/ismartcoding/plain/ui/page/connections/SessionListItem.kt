@@ -31,6 +31,7 @@ import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -79,18 +80,34 @@ internal fun SessionListItem(
                 onEditTitle = {
                     showRenameDialog = true
                 },
-                action = { SessionBadge(m = m, isOnline = isOnline) },
+                action = {
+                    if (m.isCustom) {
+                        POutlinedButton(
+                            text = stringResource(Res.string.how_to_use),
+                            buttonSize = ButtonSize.SMALL, onClick = onHowToUse
+                        )
+                    } else {
+                        SessionBadge(m = m, isOnline = isOnline)
+                    }
+                },
             )
             PListItem(
-                title = stringResource(Res.string.client_id) + " - " + stringResource(Res.string.token),
-                subtitle = m.clientId + "-" + m.token, action = {
+                title = stringResource(Res.string.client_id),
+                subtitle = m.clientId, action = {
                     Column(horizontalAlignment = Alignment.End) {
-                        if (m.isCustom) {
-                            PFilledButton(stringResource(Res.string.how_to_use), buttonSize = ButtonSize.SMALL, onClick = onHowToUse)
-                        }
-                        CopyIconButton(text = m.clientId + "-" + m.token, clipLabel = stringResource(Res.string.token))
+                        CopyIconButton(text = m.clientId, clipLabel = stringResource(Res.string.client_id))
                     }
-                })
+                }
+            )
+            PListItem(
+                title = stringResource(Res.string.token),
+                subtitle = m.token, action = {
+                    Column(horizontalAlignment = Alignment.End) {
+                        CopyIconButton(text = m.token, clipLabel = stringResource(Res.string.token))
+                    }
+                }
+            )
+
             if (m.clientIP.isNotEmpty()) {
                 PListItem(title = stringResource(Res.string.ip_address), value = m.clientIP)
             }

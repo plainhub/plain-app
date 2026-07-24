@@ -11,9 +11,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import java.net.DatagramPacket
 import java.net.DatagramSocket
+import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.MulticastSocket
+import java.net.NetworkInterface
 import java.net.SocketAddress
 import java.net.SocketTimeoutException
 
@@ -113,6 +115,11 @@ actual object NearbyNetwork {
     private suspend fun receiveLoop(
         onMessage: (message: String, senderIP: String) -> Unit,
     ) = withIO {
+        // Skip when no LAN interface is up (Wi-Fi off, airplane mode, hotspot-only).
+        // joinGroup() would otherwise throw ENODEV and the outer retry loop would
+        // spam the log every RESTART_DELAY_MS until an interface appears.
+        if (!hasLanInterface()) return@withIO
+
         var socket: MulticastSocket? = null
         try {
             socket = MulticastSocket(null as SocketAddress?).apply {
@@ -143,4 +150,30 @@ actual object NearbyNetwork {
             }
         }
     }
+
+    /**
+     * Returns true when at least one up, non-loopback, non-mobile IPv4 interface
+     * is available — i.e. a real LAN interface joinGroup() can bind to. Mirrors
+     * the candidateInterfaces() check in MdnsHostResponder so the receiver does
+     * not attempt IP_ADD_MEMBERSHIP on a kernel with no usable interface, which
+     * throws ENODEV ("No such device").
+     */
+    private fun hasLanInterface(): Boolean {
+        return runCatching {
+            NetworkInterface.getNetworkInterfaces()
+                ?.asSequence()
+                ?.filter { it.isUp }
+                ?.filterNot { it.isLoopback }
+                ?.filterNot { isMobileDataInterface(it.name) }
+                ?.any { iface ->
+                    iface.inetAddresses.asSequence().any { it is Inet4Address && !it.isLoopbackAddress }
+                }
+                ?: false
+        }.getOrDefault(false)
+    }
+
+    private fun isMobileDataInterface(name: String): Boolean =
+        name.startsWith("rmnet") || name.startsWith("ccmni") ||
+            name.startsWith("v4-rmnet") || name.startsWith("v6-rmnet") ||
+            name.startsWith("clat") || name.startsWith("v4-ccmni")
 }

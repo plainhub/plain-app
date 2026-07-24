@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -10,6 +12,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -26,6 +29,7 @@ fun PTopAppBar(
     navigationIcon: (@Composable () -> Unit)? = null,
     title: String,
     subtitle: String = "",
+    titleTrailing: (@Composable () -> Unit)? = null,
     containerColor: Color? = null,
     subtitleColor: Color? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
@@ -36,30 +40,34 @@ fun PTopAppBar(
     val nav = navController as? NavHostController
     TopAppBar(
         title = {
-            if (subtitle.isEmpty()) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            } else {
-                Column {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                if (subtitle.isEmpty()) {
                     Text(
-                        text = title,
+                        title,
                         style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
-                        color = topBarSubtitleColor,
-                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 4.dp)
+                        modifier = Modifier.weight(1f, fill = false),
                     )
+                } else {
+                    Column(modifier = Modifier.weight(1f, fill = false)) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                            color = topBarSubtitleColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
+                titleTrailing?.invoke()
             }
         },
         navigationIcon = {

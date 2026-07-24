@@ -66,6 +66,7 @@
     <string name="discovered_devices">Thiết bị đã phát hiện</string>
     <string name="pairing_request">Yêu cầu ghép nối</string>
     <string name="pairing_request_message">Bạn có muốn ghép nối với thiết bị "%1$s"?</string>
+    <string name="pairing_request_hint">Sau khi ghép đôi, bạn có thể trao đổi tin nhắn giữa hai thiết bị.</string>
     <string name="allow">Cho phép</string>
     <string name="deny">Từ chối</string>
     <string name="chat">Trò chuyện</string>

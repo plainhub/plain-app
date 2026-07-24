@@ -1,0 +1,39 @@
+{
+  "ecdh": {
+    "privateKeyA": "zr22f5ALFxADUT21GVNTEyUI+72Y88nUqZaIefZf7RU=",
+    "publicKeyA": "BO/Ta0uUEQEdL+GxYuBPo329/jyTN2BYlm+NnTwqcoxyg81Uuem+JSJfVjlcH6TjSI6aTzDvGej706BNvWKRfMo=",
+    "privateKeyB": "/r7KgsZkR5QylpmyhXw4K6aLlmNBtnaCMtdb2zEstUU=",
+    "publicKeyB": "BIIPPvtbNbfsURszIF2AQpaH5B08/QMnlUE/qR4Rh1ARJ73qTRpwEBFmnCxNfWI+O2bmRP3Ljt4acLoBmgoi9sk=",
+    "sharedKey": "ityOlIJd1jbbPBAjdIw0qvemzg5RSXr26IEu5oX1Uhc="
+  },
+  "ed25519": {
+    "privateKey": "PJM5aOgkkiGandLbM/1cdd1GhOiggLLu60yWnLRbZms=",
+    "publicKey": "MpeBRm+A7eYuIqR4Q3Z8kfJmMsX5gcnPwMxt0SVYZiw=",
+    "message": "web-generated ed25519 cross-platform test message",
+    "signature": "IKfPHSsoTYt7DLlb+xz7XXz2gBcm4QUin0QoAeWX3dvh6Pf4SPf6SMgYSL2oBxwXef/zs/iR+yI8p+1NXWzzDA=="
+  },
+  "xchacha20": {
+    "key": "BRAbJjE8R1JdaHN+iZSfqrXAy9bh7PcCDRgjLjlET1o=",
+    "nonce": "AQQHCg0QExYZHB8iJSgrLjE0Nzo9QENG",
+    "plaintext": "web-generated xchacha20-poly1305 cross-platform test",
+    "ciphertext": "vXgQAlot62V1AY1OGT296HnRg24YgbKkz8y8acse+CIztDSb3hZnzs3gT40rQwJHsgMjiRcY2xQ+fqV2zmWU7AlAkaU="
+  },
+  "base64": {
+    "input": [
+      104,
+      101,
+      108,
+      108,
+      111
+    ],
+    "output": "aGVsbG8="
+  },
+  "hex": {
+    "input": [
+      255,
+      0,
+      128
+    ],
+    "output": "ff0080"
+  }
+}

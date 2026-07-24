@@ -19,6 +19,7 @@ import com.ismartcoding.plain.lib.extensions.notificationManager
 import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.AppIntents
+import com.ismartcoding.plain.IntentExtras
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
@@ -34,16 +35,23 @@ private fun notificationDrawableId(): Int {
 }
 
 object NotificationHelper {
-    private fun createContentIntent(context: Context): PendingIntent {
+    private fun createContentIntent(
+        context: Context,
+        chatTargetId: String? = null,
+        requestCode: Int = 0,
+    ): PendingIntent {
         val intent = Intent(context, mainActivityClass).apply {
             `package` = context.packageName
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            if (!chatTargetId.isNullOrEmpty()) {
+                putExtra(IntentExtras.CHAT_TARGET_ID, chatTargetId)
+            }
         }
         return PendingIntent.getActivity(
             context,
-            0,
+            requestCode,
             intent,
-            PendingIntent.FLAG_IMMUTABLE,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
     }
 
@@ -115,7 +123,7 @@ object NotificationHelper {
             .setContentText(messageText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
-            .setContentIntent(createContentIntent(context))
+            .setContentIntent(createContentIntent(context, targetId, notificationId))
             .addAction(replyAction)
             .build()
 

@@ -66,6 +66,7 @@
     <string name="discovered_devices">Обнаруженные устройства</string>
     <string name="pairing_request">Запрос на сопряжение</string>
     <string name="pairing_request_message">Хотите сопрячь с устройством "%1$s"?</string>
+    <string name="pairing_request_hint">После сопряжения вы сможете обмениваться сообщениями между обоими устройствами.</string>
     <string name="allow">Разрешить</string>
     <string name="deny">Запретить</string>
     <string name="chat">Чат</string>

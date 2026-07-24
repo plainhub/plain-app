@@ -85,6 +85,7 @@ import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ChatInput
 import com.ismartcoding.plain.ui.page.chat.components.ChatListItem
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import com.ismartcoding.plain.ui.page.chat.components.TransportIcon
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -209,6 +210,14 @@ fun ChatPage(
 
     val channel = if (chatTarget.value.type == ChatTargetType.CHANNEL) channelsState.value.find { it.id == chatTarget.value.toId } else null
 
+    // Transport badge: only visible while a send is in flight. Reflects the
+    // transport the router is currently attempting (LAN/AWARE/BLE) in real
+    // time; disappears once the send succeeds or all transports are exhausted.
+    val currentTransportMap = PeerCacher.currentTransportMap.collectAsState()
+    val transportType = if (chatTarget.value.type == ChatTargetType.PEER && !chatTarget.value.isLocal()) {
+        currentTransportMap.value[chatTarget.value.toId]
+    } else null
+
     PScaffold(
         modifier = Modifier.imePadding(),
         topBar = {
@@ -220,6 +229,9 @@ fun ChatPage(
                     else NavigationBackIcon { navController.navigateUp() }
                 },
                 title = pageTitle,
+                titleTrailing = if (!chatVM.selectMode.value && transportType != null) {
+                    { TransportIcon(transportType) }
+                } else null,
                 actions = {
                     if (chatVM.selectMode.value) {
                         PTopRightButton(label = stringResource(if (chatVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { chatVM.toggleSelectAll() })

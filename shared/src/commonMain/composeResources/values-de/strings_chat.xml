@@ -66,6 +66,7 @@
     <string name="discovered_devices">Entdeckte Geräte</string>
     <string name="pairing_request">Kopplungsanfrage</string>
     <string name="pairing_request_message">Möchten Sie mit dem Gerät "%1$s" koppeln?</string>
+    <string name="pairing_request_hint">Nach dem Koppeln können Sie Nachrichten zwischen beiden Geräten austauschen.</string>
     <string name="allow">Erlauben</string>
     <string name="deny">Verweigern</string>
     <string name="chat">Chat</string>

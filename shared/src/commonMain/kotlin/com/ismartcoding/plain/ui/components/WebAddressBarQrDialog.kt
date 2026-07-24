@@ -45,6 +45,11 @@ fun WebAddressBarQrDialog(
                     contentDescription = stringResource(Res.string.qrcode),
                     modifier = Modifier.size(300.dp),
                 )
+                Text(
+                    text = url,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         },
     )

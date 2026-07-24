@@ -66,6 +66,7 @@
     <string name="discovered_devices">Bulunan cihazlar</string>
     <string name="pairing_request">Eşleştirme isteği</string>
     <string name="pairing_request_message">"%1$s" cihazı ile eşleştirmek istiyor musunuz?</string>
+    <string name="pairing_request_hint">Eşleştirmeden sonra, her iki cihaz arasında mesaj alışverişi yapabilirsiniz.</string>
     <string name="allow">İzin ver</string>
     <string name="deny">Reddet</string>
     <string name="chat">Sohbet</string>

@@ -8,12 +8,12 @@ import com.ismartcoding.plain.db.getApiUrl
 import com.ismartcoding.plain.db.getFileUrl
 
 object LanTransport : PeerTransport {
-    override val id: String = "lan"
+    override val type = PeerTransportType.LAN
 
     override suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse {
         val client = createCryptoClient(keyBytes, 10)
         return executeGraphQLRequest(
-            transportId = id,
+            transportType = type,
             peerId = peer.id,
             client = client,
             url = peer.getApiUrl(),
@@ -24,6 +24,6 @@ object LanTransport : PeerTransport {
 
     override suspend fun downloadFile(peer: DPeer, fileId: String): DownloadedResponse {
         val client = createDownloadClient()
-        return executeDownloadRequest(id, peer.id, client, peer.getFileUrl(fileId))
+        return executeDownloadRequest(type, peer.id, client, peer.getFileUrl(fileId))
     }
 }

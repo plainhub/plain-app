@@ -66,6 +66,7 @@
     <string name="discovered_devices">खोजे गए उपकरण</string>
     <string name="pairing_request">जोड़ने का अनुरोध</string>
     <string name="pairing_request_message">क्या आप डिवाइस "%1$s" के साथ जोड़ना चाहते हैं?</string>
+    <string name="pairing_request_hint">पेयरिंग के बाद, आप दोनों डिवाइस के बीच संदेश भेज सकते हैं।</string>
     <string name="allow">अनुमति दें</string>
     <string name="deny">मना करें</string>
     <string name="chat">चैट</string>

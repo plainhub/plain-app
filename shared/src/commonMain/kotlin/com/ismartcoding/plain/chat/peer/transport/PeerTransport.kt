@@ -19,17 +19,20 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/** The three transports a peer message/file can be routed over. */
+enum class PeerTransportType { LAN, AWARE, BLE }
+
 interface PeerTransport {
-    val id: String
+    val type: PeerTransportType
     suspend fun send(peer: DPeer, request: SignedRequest, keyBytes: ByteArray): GraphQLResponse
     suspend fun downloadFile(peer: DPeer, fileId: String): DownloadedResponse
 }
 
 class TransportUnavailable(
-    transportId: String,
+    transportType: PeerTransportType,
     peerId: String,
     cause: Throwable? = null,
-) : Exception("transport=$transportId peer=$peerId unavailable", cause)
+) : Exception("transport=${transportType.name.lowercase()} peer=$peerId unavailable", cause)
 
 /**
  * Transport-agnostic download result. [status] is the HTTP status code of the
@@ -52,13 +55,14 @@ class DownloadedResponse(
 }
 
 internal suspend fun executeGraphQLRequest(
-    transportId: String,
+    transportType: PeerTransportType,
     peerId: String,
     client: HttpClient,
     url: String,
     body: String,
     channelId: String,
 ): GraphQLResponse = withContext(Dispatchers.Default) {
+    val tid = transportType.name.lowercase()
     val response = try {
         client.post(url) {
             setBody(body)
@@ -71,12 +75,12 @@ internal suspend fun executeGraphQLRequest(
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        LogCat.d("$transportId request to peer $peerId threw ${e::class.simpleName}: ${e.message}")
-        throw TransportUnavailable(transportId, peerId, e)
+        LogCat.d("$tid request to peer $peerId threw ${e::class.simpleName}: ${e.message}")
+        throw TransportUnavailable(transportType, peerId, e)
     }
     val responseBody = response.bodyAsText()
     if (!response.status.isSuccess()) {
-        LogCat.e("$transportId GraphQL request failed: ${response.status.value} body=${responseBody.take(200)}")
+        LogCat.e("$tid GraphQL request failed: ${response.status.value} body=${responseBody.take(200)}")
         GraphQLResponse(null, null, Exception("${response.status.value} - ${response.status.description}"))
     } else {
         GraphQLResponseParser.parse(responseBody)
@@ -84,11 +88,12 @@ internal suspend fun executeGraphQLRequest(
 }
 
 internal suspend fun executeDownloadRequest(
-    transportId: String,
+    transportType: PeerTransportType,
     peerId: String,
     client: HttpClient,
     url: String,
 ): DownloadedResponse = withContext(Dispatchers.Default) {
+    val tid = transportType.name.lowercase()
     val response = try {
         client.get(url) {
             addClientHeaders()
@@ -96,12 +101,12 @@ internal suspend fun executeDownloadRequest(
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        LogCat.d("$transportId download to peer $peerId threw ${e::class.simpleName}: ${e.message}")
-        throw TransportUnavailable(transportId, peerId, e)
+        LogCat.d("$tid download to peer $peerId threw ${e::class.simpleName}: ${e.message}")
+        throw TransportUnavailable(transportType, peerId, e)
     }
     if (!response.status.isSuccess()) {
-        LogCat.e("$transportId downloadFile error: ${response.status.value}")
-        throw TransportUnavailable(transportId, peerId, null)
+        LogCat.e("$tid downloadFile error: ${response.status.value}")
+        throw TransportUnavailable(transportType, peerId, null)
     }
     DownloadedResponse(response.status.value, response.bodyAsChannel())
 }

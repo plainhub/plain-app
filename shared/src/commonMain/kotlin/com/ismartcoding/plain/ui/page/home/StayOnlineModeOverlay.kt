@@ -18,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,7 +77,7 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
             dismissOnClickOutside = false,
         ),
     ) {
-        SideEffect { setImmersiveFullscreen() }
+        setImmersiveFullscreen()
 
         Box(
             modifier = Modifier

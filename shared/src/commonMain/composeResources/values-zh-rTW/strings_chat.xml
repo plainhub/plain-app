@@ -68,6 +68,7 @@
     <string name="discovered_devices">發現的設備</string>
     <string name="pairing_request">配對請求</string>
     <string name="pairing_request_message">是否要與設備"%1$s"配對？</string>
+    <string name="pairing_request_hint">配對後，你們可以互發訊息。</string>
     <string name="allow">允許</string>
     <string name="deny">拒絕</string>
     <string name="chat">聊天</string>

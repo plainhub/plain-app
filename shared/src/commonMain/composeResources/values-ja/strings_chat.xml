@@ -66,6 +66,7 @@
     <string name="discovered_devices">発見されたデバイス</string>
     <string name="pairing_request">ペアリング要求</string>
     <string name="pairing_request_message">デバイス "%1$s" とペアリングしますか？</string>
+    <string name="pairing_request_hint">ペア設定後、両デバイス間でメッセージを送受信できます。</string>
     <string name="allow">許可</string>
     <string name="deny">拒否</string>
     <string name="chat">チャット</string>
