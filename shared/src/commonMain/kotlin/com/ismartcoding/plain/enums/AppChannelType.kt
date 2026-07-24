@@ -2,5 +2,6 @@ package com.ismartcoding.plain.enums
 
 enum class AppChannelType {
     GITHUB,
-    GOOGLE
+    GOOGLE,
+    FDROID,
 }

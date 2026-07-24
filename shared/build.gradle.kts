@@ -139,8 +139,11 @@ kotlin {
             // Transitions (UI animations)
             implementation(libs.androidx.transition)
 
-            // LiteRT (AI image search) — compileOnly; runtime provided by app flavors
-            compileOnly(libs.litert)
+            // LiteRT (AI image search) — compileOnly stubs; real runtime provided by
+            // app flavors (github/google). Declaring a local FLOSS stubs module here
+            // instead of `libs.litert` keeps the non-FLOSS artifact out of the shared
+            // module's dependency tree so F-Droid's scanner doesn't flag it.
+            compileOnly(project(":litert-stubs"))
         }
         iosMain.dependencies {
             implementation(libs.sqlite.bundled)

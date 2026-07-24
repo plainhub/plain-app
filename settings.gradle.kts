@@ -4,3 +4,4 @@ plugins {
 rootProject.name = "PlainApp"
 include(":app")
 include(":shared")
+include(":litert-stubs")

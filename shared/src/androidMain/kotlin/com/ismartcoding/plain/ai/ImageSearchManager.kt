@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ai
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.buildChannel
+import com.ismartcoding.plain.enums.AppChannelType
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.lib.channel.sendEvent
@@ -41,6 +43,8 @@ object ImageSearchManager {
 
     fun isModelReady(): Boolean = _status.value == ImageSearchStatus.READY
 
+    private fun isFdroid(): Boolean = buildChannel == AppChannelType.FDROID.name
+
     fun isModelAvailable(): Boolean {
         val dir = modelsDir
         return File(dir, IMAGE_MODEL).exists() &&
@@ -51,6 +55,7 @@ object ImageSearchManager {
     fun totalModelSize(): Long = MODEL_FILES.sumOf { it.size }
 
     suspend fun restoreIfEnabled() = withIO {
+        if (isFdroid()) return@withIO
         val enabled = AiImageSearchEnabledPreference.getAsync()
         if (enabled && isModelAvailable()) {
             loadModels()
@@ -59,6 +64,7 @@ object ImageSearchManager {
     }
 
     suspend fun enableAsync() = withIO {
+        if (isFdroid()) return@withIO
         if (_status.value == ImageSearchStatus.DOWNLOADING ||
             _status.value == ImageSearchStatus.LOADING
         ) {

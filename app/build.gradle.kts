@@ -33,9 +33,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 604
+        val vCode = 607
         versionCode = vCode - singleAbiNum
-        versionName = "3.2.1"
+        versionName = "3.2.2"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -252,9 +252,13 @@ dependencies {
 
     // For cryptography (Ed25519 support on all Android versions)
 
-    // AI Image Search: MediaPipe is open source (included for all flavors).
-    // LiteRT is excluded from fdroid to pass F-Droid FOSS checks.
-    implementation(libs.mediapipe.tasks.vision)
+    // AI Image Search: both MediaPipe and LiteRT are excluded from fdroid
+    // to pass F-Droid FOSS checks (com.google.ai.edge.litert is non-FLOSS
+    // after 1.2.0 — see issue #333). The shared module compiles against
+    // local stubs (project(":litert-stubs")); github/google flavors provide
+    // the real runtime here.
+    "githubImplementation"(libs.mediapipe.tasks.vision)
+    "googleImplementation"(libs.mediapipe.tasks.vision)
     "githubImplementation"(libs.litert)
     "googleImplementation"(libs.litert)
 }
