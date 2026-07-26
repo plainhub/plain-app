@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioPause
@@ -38,7 +39,7 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
     var progress by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableFloatStateOf(1f) }
     val isPlaying by audioIsPlayingFlow().collectAsState()
-    var showPlayer by remember { mutableStateOf(false) }
+    val showPlayer by TempData.audioPlayerVisible.collectAsState()
     var showSleepTimer by remember { mutableStateOf(false) }
     var showPlaylist by remember { mutableStateOf(false) }
     val currentPlayingPath = audioPlaylistVM.selectedPath
@@ -51,7 +52,7 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
                 title = audio.title; artist = audio.artist
                 duration = audio.duration.toFloat(); progress = audioPlayerProgress() / 1000f
             }
-            if (showPlayer) showPlayer = path.isNotEmpty()
+            if (TempData.audioPlayerVisible.value) TempData.audioPlayerVisible.value = path.isNotEmpty()
         }
     }
 
@@ -72,12 +73,12 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
         AudioPlayerBarCard(
             title = title, artist = artist, progress = progress, duration = duration,
             isPlaying = isPlaying,
-            onClickContent = { showPlayer = true }, onClickPlaylist = { showPlaylist = true },
+            onClickContent = { TempData.audioPlayerVisible.value = true }, onClickPlaylist = { showPlaylist = true },
             onPlayPause = { if (isPlaying) audioPause() else audioPlay() },
         )
     }
 
-    if (showPlayer) AudioPlayerPage(audioPlaylistVM, onDismissRequest = { showPlayer = false })
+    if (showPlayer) AudioPlayerPage(audioPlaylistVM, onDismissRequest = { TempData.audioPlayerVisible.value = false })
     if (showSleepTimer) SleepTimerPage(onDismissRequest = { showSleepTimer = false })
     if (showPlaylist) AudioPlaylistPage(audioPlaylistVM, onDismissRequest = { showPlaylist = false })
 }

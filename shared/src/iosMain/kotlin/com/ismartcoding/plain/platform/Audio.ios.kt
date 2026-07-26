@@ -41,6 +41,8 @@ actual fun audioSkipToPrevious() {}
 
 actual fun audioSkipToNext() {}
 
+actual fun audioSetPlaybackSpeed(speed: Float) {}
+
 actual fun loadAudioCoverBitmap(path: String): ImageBitmap? = null
 
 actual fun getAudioAlbumArtFileId(audio: DAudio): String = ""

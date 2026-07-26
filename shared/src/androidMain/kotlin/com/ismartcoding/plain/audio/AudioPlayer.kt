@@ -69,6 +69,7 @@ object AudioPlayer {
             player = mediaControllerFuture.get().also {
                 it.addListener(playerListener)
                 _isPlayingFlow.value = it.isPlaying
+                it.setPlaybackSpeed(TempData.audioPlaybackSpeed.value)
             }
             coMain {
                 callback()
@@ -225,6 +226,13 @@ object AudioPlayer {
         }
     }
 
+    fun setPlaybackSpeed(speed: Float) {
+        coMain {
+            TempData.audioPlaybackSpeed.value = speed
+            player?.setPlaybackSpeed(speed)
+        }
+    }
+
     fun release() {
         player?.removeListener(playerListener)
         player = null
@@ -238,6 +246,7 @@ object AudioPlayer {
         player?.setMediaItem(audio.toMediaItem())
         player?.prepare()
         player?.seekTo(TempData.audioPlayPosition)
+        player?.setPlaybackSpeed(TempData.audioPlaybackSpeed.value)
         player?.play()
     }
 

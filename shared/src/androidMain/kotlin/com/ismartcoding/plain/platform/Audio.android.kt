@@ -68,6 +68,8 @@ actual fun audioSkipToPrevious() = AudioPlayer.skipToPrevious()
 
 actual fun audioSkipToNext() = AudioPlayer.skipToNext()
 
+actual fun audioSetPlaybackSpeed(speed: Float) = AudioPlayer.setPlaybackSpeed(speed)
+
 actual fun loadAudioCoverBitmap(path: String): ImageBitmap? {
     return try {
         val retriever = android.media.MediaMetadataRetriever()

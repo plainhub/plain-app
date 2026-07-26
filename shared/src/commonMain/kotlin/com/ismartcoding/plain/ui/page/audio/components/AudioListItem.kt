@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.audio.DAudio
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.db.DTag
@@ -71,6 +72,7 @@ fun AudioListItem(
                 onClick = {
                     if (dragSelectState.selectMode) { dragSelectState.select(item.id) }
                     else if (castVM.castMode.value) { castVM.cast(item) }
+                    else if (isCurrentlyPlaying) { TempData.audioPlayerVisible.value = true }
                     else {
                         checkNotificationPermission(Res.string.audio_notification_prompt) {
                             scope.launch(Dispatchers.Default) { audioPlaylistVM.playAsync(item) }

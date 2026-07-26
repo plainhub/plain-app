@@ -55,6 +55,7 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
     var artist by remember { mutableStateOf("") }
     val isPlaying by audioIsPlayingFlow().collectAsState()
     val playMode by TempData.audioPlayMode.collectAsState()
+    val playbackSpeed by TempData.audioPlaybackSpeed.collectAsState()
     var showPlaylist by remember { mutableStateOf(false) }
     var showSleepTimer by remember { mutableStateOf(false) }
     var isDragging by remember { mutableStateOf(false) }
@@ -107,6 +108,7 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
                 onPlayPrevious = { audioSkipToPrevious() },
                 onPlayPause = { if (isPlaying) audioPause() else audioPlay() },
                 onPlayNext = { audioSkipToNext() },
+                speed = playbackSpeed,
             )
         }
     }

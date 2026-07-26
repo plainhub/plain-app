@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page.audio
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
@@ -18,13 +17,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.platform.audioSetPlaybackSpeed
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
+import com.ismartcoding.plain.preferences.AudioPlaybackSpeedPreference
+import com.ismartcoding.plain.ui.components.mediaviewer.PlaybackSpeedButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun AudioPlayerControls(
@@ -37,12 +39,14 @@ fun AudioPlayerControls(
     onPlayPrevious: () -> Unit,
     onPlayPause: () -> Unit,
     onPlayNext: () -> Unit,
+    speed: Float,
     scope: CoroutineScope,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
+        SpeedButton(speed = speed, scope = scope)
         IconButton(
             onClick = {
                 scope.launch {
@@ -117,4 +121,18 @@ fun AudioPlayerControls(
             Icon(painter = painterResource(Res.drawable.skip_next), contentDescription = "Next", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(36.dp))
         }
     }
+}
+
+@Composable
+private fun SpeedButton(speed: Float, scope: CoroutineScope) {
+    fun applySpeed(s: Float) {
+        audioSetPlaybackSpeed(s)
+        scope.launch { AudioPlaybackSpeedPreference.putAsync(s) }
+    }
+    PlaybackSpeedButton(
+        speed = speed,
+        onSpeedChange = { applySpeed(it) },
+        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+    )
 }

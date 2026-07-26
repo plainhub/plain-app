@@ -18,12 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +60,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
+import com.ismartcoding.plain.ui.components.mediaviewer.PlaybackSpeedButton
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -225,28 +222,13 @@ fun ActionIconButton(icon: DrawableResource, contentDescription: String, click: 
 
 // ---- VideoPreviewButtons (moved from ui/components/mediaviewer/previewer/) ----
 
-data class PlaybackSpeed(val speed: Float, val label: String)
-
 @Composable
 fun VideoButtons1(context: Context, videoState: VideoState) {
-    var showSpeedMenu by rememberSaveable { mutableStateOf(false) }
-    val playbackSpeeds = remember {
-        listOf(PlaybackSpeed(0.25f, "0.25x"), PlaybackSpeed(0.5f, "0.5x"), PlaybackSpeed(1f, "1x"), PlaybackSpeed(2f, "2x"), PlaybackSpeed(3f, "3x"))
-    }
-    fun setSpeed(speed: Float) { videoState.changeSpeed(speed); showSpeedMenu = false }
-
-    Box(contentAlignment = Alignment.TopEnd) {
-        DropdownMenu(expanded = showSpeedMenu, onDismissRequest = { showSpeedMenu = false }) {
-            playbackSpeeds.forEach { speed ->
-                DropdownMenuItem(modifier = Modifier.padding(end = 16.dp), onClick = { setSpeed(speed.speed) },
-                    leadingIcon = { RadioButton(selected = videoState.speed == speed.speed, onClick = { setSpeed(speed.speed) }) },
-                    text = { Text(text = speed.label) })
-            }
-        }
-        IconButton(onClick = { showSpeedMenu = !showSpeedMenu }) {
-            Icon(painter = painterResource(Res.drawable.gauge), tint = Color.White, contentDescription = stringResource(Res.string.change_playback_speed))
-        }
-    }
+    PlaybackSpeedButton(
+        speed = videoState.speed,
+        onSpeedChange = { videoState.changeSpeed(it) },
+        tint = Color.White,
+    )
     IconButton(onClick = { videoState.toggleMute() }) {
         Icon(painter = painterResource(if (videoState.isMuted) Res.drawable.volume_x else Res.drawable.volume_2), tint = Color.White, contentDescription = stringResource(Res.string.toggle_audio))
     }

@@ -17,6 +17,8 @@ object TempData {
     var mdnsHostname = "plainapp.local" // mDNS hostname for local network discovery
 
     val audioPlayMode = MutableStateFlow(MediaPlayMode.REPEAT)
+    val audioPlaybackSpeed = MutableStateFlow(1f)
+    val audioPlayerVisible = MutableStateFlow(false)
 
     var adbToken = "" // in-memory cache of the ADB automation token
 

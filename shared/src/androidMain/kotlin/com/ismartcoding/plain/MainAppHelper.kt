@@ -33,6 +33,7 @@ import com.ismartcoding.plain.platform.DiskLogFormatStrategy
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
+import com.ismartcoding.plain.preferences.AudioPlaybackSpeedPreference
 import com.ismartcoding.plain.preferences.ClientIdPreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
 import com.ismartcoding.plain.preferences.DeviceNamePreference
@@ -123,6 +124,7 @@ object MainAppHelper {
             TempData.httpPort.value = HttpPortPreference.get(preferences)
             TempData.httpsPort.value = HttpsPortPreference.get(preferences)
             TempData.audioPlayMode.value = AudioPlayModePreference.getValue(preferences)
+            TempData.audioPlaybackSpeed.value = AudioPlaybackSpeedPreference.getValue(preferences)
             AdbTokenPreference.ensureValueAsync(preferences)
             TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync()
             val updateInfo = UpdateInfoPreference.getValueAsync()

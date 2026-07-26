@@ -2,6 +2,7 @@ package com.ismartcoding.plain.preferences
 
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -232,6 +233,18 @@ object AudioPlayModePreference : BasePreference<Int>() {
     suspend fun putAsync(value: MediaPlayMode) {
         super.putAsync(value.ordinal)
         TempData.audioPlayMode.value = value
+    }
+}
+
+object AudioPlaybackSpeedPreference : BasePreference<Float>() {
+    override val default = 1f
+    override val key = floatPreferencesKey("audio_playback_speed")
+
+    fun getValue(preferences: Preferences): Float = preferences[key] ?: default
+
+    override suspend fun putAsync(value: Float) {
+        super.putAsync(value)
+        TempData.audioPlaybackSpeed.value = value
     }
 }
 

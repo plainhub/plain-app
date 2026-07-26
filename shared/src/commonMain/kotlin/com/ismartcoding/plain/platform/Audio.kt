@@ -73,6 +73,12 @@ expect fun audioSkipToPrevious()
 expect fun audioSkipToNext()
 
 /**
+ * Set the audio playback speed. [speed] is a multiplier (e.g. 1f = normal, 2f = double speed).
+ * Persists across tracks until changed.
+ */
+expect fun audioSetPlaybackSpeed(speed: Float)
+
+/**
  * Loads the embedded cover art for the audio file at [path] as an [ImageBitmap],
  * or null if the file has no embedded picture or loading fails.
  */

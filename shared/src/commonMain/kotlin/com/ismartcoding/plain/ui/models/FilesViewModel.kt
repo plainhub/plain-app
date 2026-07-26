@@ -89,8 +89,8 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     fun navigateToDirectory(newPath: String) {
         if (selectedPath != newPath) {
             navigationHistoryInternal.add(selectedPath)
-            selectedPath = newPath
             rebuildBreadcrumbs(newPath)
+            selectedPath = newPath
             viewModelScope.launchSafe {
                 isLoading.value = true
                 updateItemsInternal(emptyList())
@@ -101,8 +101,9 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     fun navigateBack(): Boolean {
         return if (navigationHistoryInternal.isNotEmpty()) {
-            selectedPath = navigationHistoryInternal.removeLastOrNull() ?: selectedPath
-            rebuildBreadcrumbs(selectedPath)
+            val prevPath = navigationHistoryInternal.removeLastOrNull() ?: selectedPath
+            rebuildBreadcrumbs(prevPath)
+            selectedPath = prevPath
             true
         } else false
     }
@@ -111,7 +112,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
         val data = LastFilePathPreference.getValueAsync()
         if (data.selectedPath.isNotEmpty() && fileExists(data.selectedPath)) {
             type = inferFileTypeFromRoot(data.rootPath)
-            initSelectedPath(data.rootPath, type, data.fullPath, data.selectedPath)
+            initSelectedPath(data.rootPath, type, data.selectedPath, data.selectedPath)
         } else {
             type = inferFileTypeFromRoot(rootPath)
             updateRootBreadcrumb()
@@ -169,16 +170,9 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
                 breadcrumbs.add(BreadcrumbItem(segment, currentInternalPath))
             }
         } else {
-            val relativePath = targetPath.removePrefix(rootPath).trimStart('/')
-            if (relativePath.isNotEmpty()) {
-                var currentPath = rootPath
-                relativePath.split("/").forEach { segment ->
-                    if (segment.isNotEmpty()) {
-                        currentPath += "/$segment"
-                        breadcrumbs.add(BreadcrumbItem(segment, currentPath))
-                    }
-                }
-            }
+            val (items, _) = buildRegularBreadcrumbs(rootPath, getRootDisplayName(), targetPath)
+            breadcrumbs.clear()
+            breadcrumbs.addAll(items)
         }
         selectedBreadcrumbIndex.value = breadcrumbs.size - 1
     }
@@ -232,6 +226,28 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
             }
             DialogHelper.hideLoading()
             _itemsFlow.update { it.filterNot { i -> paths.contains(i.path) } }
+        }
+    }
+
+    internal companion object {
+        /**
+         * Builds breadcrumb items for a regular (non-zip) directory [targetPath] under [rootPath].
+         * Returns the breadcrumb list (root first) and the index of the deepest segment.
+         */
+        fun buildRegularBreadcrumbs(rootPath: String, rootName: String, targetPath: String): Pair<List<BreadcrumbItem>, Int> {
+            val items = mutableListOf(BreadcrumbItem(rootName, rootPath))
+            if (targetPath == rootPath) return items to 0
+            val relativePath = targetPath.removePrefix(rootPath).trimStart('/')
+            if (relativePath.isNotEmpty()) {
+                var currentPath = rootPath
+                relativePath.split("/").forEach { segment ->
+                    if (segment.isNotEmpty()) {
+                        currentPath += "/$segment"
+                        items.add(BreadcrumbItem(segment, currentPath))
+                    }
+                }
+            }
+            return items to (items.size - 1)
         }
     }
 }
