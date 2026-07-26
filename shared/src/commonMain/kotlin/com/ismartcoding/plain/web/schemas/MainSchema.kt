@@ -36,5 +36,6 @@ fun SchemaBuilder.applyMainSchema() {
     addBookmarkSchema()
     addPairingSchema()
     addPeerSchema()
+    addImageEditorProjectSchema()
     addSchemaTypes()
 }

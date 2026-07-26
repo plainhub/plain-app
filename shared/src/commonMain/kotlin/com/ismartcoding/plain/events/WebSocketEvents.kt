@@ -63,6 +63,7 @@ enum class EventType(val value: Int) {
     NEARBY_DEVICE_FOUND(27),
     NEARBY_DISCOVERY_STARTED(29),
     NEARBY_DISCOVERY_STOPPED(30),
+    IMAGE_EDITOR_UPDATE(34),
 }
 
 

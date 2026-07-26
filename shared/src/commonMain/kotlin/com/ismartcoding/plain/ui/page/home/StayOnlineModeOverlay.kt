@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,8 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.ismartcoding.plain.enums.DarkTheme
+import com.ismartcoding.plain.platform.applySystemBarAppearanceForDarkTheme
 import com.ismartcoding.plain.platform.keepScreenOn
 import com.ismartcoding.plain.platform.setImmersiveFullscreen
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -55,9 +59,14 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
         }
     }
 
+    val currentUseDarkTheme by rememberUpdatedState(DarkTheme.isDarkTheme(LocalDarkTheme.current))
+
     DisposableEffect(Unit) {
         keepScreenOn(true)
-        onDispose { keepScreenOn(false) }
+        onDispose {
+            keepScreenOn(false)
+            applySystemBarAppearanceForDarkTheme(currentUseDarkTheme)
+        }
     }
 
     // Initial display: show text for 3s then sleep
