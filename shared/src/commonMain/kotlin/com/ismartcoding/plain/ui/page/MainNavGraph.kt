@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
@@ -135,11 +136,17 @@ fun MainNavGraph(
             ) + fadeOut(animationSpec = tween(150, easing = FastOutLinearInEasing))
         },
     ) {
-        composable<Routing.Home> { HomePage(navController, mainVM, updateVM, peerVM, channelVM) }
+        composable<Routing.Home> {
+            val selectedTab by mainVM.currentRootTab
+            val onTabSelected: (Int) -> Unit = { mainVM.currentRootTab.value = it }
+            when (selectedTab) {
+                0 -> HomePage(navController, mainVM, updateVM, peerVM, channelVM, onTabSelected = onTabSelected)
+                1 -> ChatListPage(navController, mainVM, peerVM = peerVM, channelVM = channelVM, onTabSelected = onTabSelected)
+            }
+        }
         composable<Routing.Images> { ImagesPage(navController) }
         composable<Routing.Videos> { VideosPage(navController) }
         composable<Routing.Audio> { AudioPage(navController, audioPlaylistVM) }
-        composable<Routing.ChatList> { ChatListPage(navController, mainVM, peerVM = peerVM, channelVM = channelVM) }
         composable<Routing.Apps> { AppsPage(navController) }
         composable<Routing.Docs> { DocsPage(navController) }
         composable<Routing.Notes> { NotesPage(navController, notesVM = notesVM, tagsVM = noteTagsVM) }

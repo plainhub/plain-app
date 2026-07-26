@@ -48,6 +48,7 @@ import com.ismartcoding.plain.ui.models.MainViewModelBase
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
+import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,9 +59,9 @@ fun HomePage(
     updateVM: UpdateViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
+    onTabSelected: (Int) -> Unit,
 ) {
     val webEnabled = LocalWeb.current
-    val showOnlineStatus = webEnabled && mainVM.httpServerState.value == HttpServerState.ON
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.isGranted()) }
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("home_pull_refresh")
@@ -96,6 +97,7 @@ fun HomePage(
 
     PScaffold(
         topBar = { TopBarHome(navController) },
+        bottomBar = { MainBottomBar(selectedIndex = 0, onTabSelected = onTabSelected) },
     ) { paddingValues ->
         PullToRefresh(
             modifier = Modifier
@@ -139,7 +141,7 @@ fun HomePage(
                     VerticalSpace(dp = 16.dp)
                 }
                 item {
-                    HomeShortcutGrid(navController = navController, peerVM = peerVM, showOnlineStatus = showOnlineStatus)
+                    HomeShortcutGrid(navController = navController)
                     VerticalSpace(dp = 16.dp)
                 }
                 item {

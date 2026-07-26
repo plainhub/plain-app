@@ -5,13 +5,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.base.ActionButtonAddWithMenu
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.ActionButtonFolders
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -23,15 +20,8 @@ import com.ismartcoding.plain.ui.nav.navigateAppFiles
 fun TopBarChat(
     navController: NavHostController,
     onCreateChannel: () -> Unit,
-    onNavigateBack: () -> Unit,
 ) {
-    val showMenu = remember { mutableStateOf(false) }
-
     PTopAppBar(
-        navController = navController,
-        navigationIcon = {
-            NavigationBackIcon(onClick = onNavigateBack)
-        },
         title = stringResource(Res.string.chat),
         actions = {
             ActionButtonFolders {

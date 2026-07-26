@@ -60,6 +60,7 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.MainViewModelBase
 import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
@@ -72,6 +73,7 @@ fun ChatListPage(
     mainVM: MainViewModelBase,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
+    onTabSelected: ((Int) -> Unit)? = null,
 ) {
     val pairedPeers = PeerCacher.pairedPeers.collectAsStateValue()
     val unpairedPeers = PeerCacher.unpairedPeers.collectAsStateValue()
@@ -121,7 +123,8 @@ fun ChatListPage(
     }
 
     PScaffold(
-        topBar = { TopBarChat(navController, onCreateChannel = { channelVM.showCreateChannelDialog.value = true }, onNavigateBack = { navController.popBackStack() }) },
+        topBar = { TopBarChat(navController, onCreateChannel = { channelVM.showCreateChannelDialog.value = true }) },
+        bottomBar = if (onTabSelected != null) { { MainBottomBar(selectedIndex = 1, onTabSelected = onTabSelected!!) } } else null,
     ) { paddingValues ->
         PullToRefresh(
             modifier = Modifier

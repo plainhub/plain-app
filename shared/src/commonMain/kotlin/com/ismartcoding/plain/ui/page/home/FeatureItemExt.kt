@@ -33,9 +33,6 @@ fun FeatureItem.Companion.getList(navController: NavHostController): List<Featur
             FeatureItem(AppFeatureType.FEEDS, Res.string.feeds, Res.drawable.rss) {
                 navController.navigate(Routing.Feeds)
             },
-            FeatureItem(AppFeatureType.CHAT, Res.string.chat, Res.drawable.message_circle) {
-                navController.navigate(Routing.ChatList)
-            },
             FeatureItem(AppFeatureType.AUDIO, Res.string.audios, Res.drawable.music) {
                 navController.navigate(Routing.Audio)
             },
