@@ -103,6 +103,12 @@ class Routing {
     data class NoteDetail(val id: String)
 
     @Serializable
+    object ImageEditor
+
+    @Serializable
+    data class ImageEditorDetail(val id: String = "")
+
+    @Serializable
     data class PdfViewer(val uri: String, val fileName: String = "")
 
     @Serializable

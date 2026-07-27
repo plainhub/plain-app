@@ -37,6 +37,7 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class, FlowPreview::class)
 @Composable
@@ -53,7 +54,7 @@ fun MdEditor(
 
     LaunchedEffect(Unit) {
         snapshotFlow { scrollState.value }
-            .debounce(10)
+            .debounce(10.milliseconds)
             .collectLatest { value ->
                 lineNumberState.scrollTo(value)
             }

@@ -97,9 +97,7 @@ object HttpModule {
         // are re-thrown so Ktor returns a 500.
         intercept(ApplicationCallPipeline.Monitoring) {
             try {
-                coroutineScope {
-                    proceed()
-                }
+                proceed()
             } catch (e: Throwable) {
                 if (e is GraphQLError) {
                     val httpCall = KtorHttpCall(call, emptyMap())

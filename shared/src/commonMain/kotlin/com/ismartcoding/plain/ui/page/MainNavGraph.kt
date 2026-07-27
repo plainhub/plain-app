@@ -64,6 +64,8 @@ import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.files.FilesPage
 import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.home.HomePage
+import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorListPage
+import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorPage
 import com.ismartcoding.plain.ui.page.images.ImagesPage
 import com.ismartcoding.plain.ui.page.media.PlayMediaPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
@@ -220,6 +222,13 @@ fun MainNavGraph(
         composable<Routing.NoteDetail> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.NoteDetail>()
             NotePage(navController, r.id, "", notesVM = notesVM, tagsVM = noteTagsVM)
+        }
+        composable<Routing.ImageEditor> {
+            ImageEditorListPage(navController)
+        }
+        composable<Routing.ImageEditorDetail> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.ImageEditorDetail>()
+            ImageEditorPage(navController, r.id)
         }
         composable<Routing.Text> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Text>()

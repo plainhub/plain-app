@@ -104,9 +104,7 @@ class GraphQL(val schema: Schema) {
 
             pipeline.intercept(ApplicationCallPipeline.Monitoring) {
                 try {
-                    coroutineScope {
-                        proceed()
-                    }
+                    proceed()
                 } catch (e: Throwable) {
                     if (e is GraphQLError) {
                         context.respond(HttpStatusCode.OK, e.serialize())

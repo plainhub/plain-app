@@ -24,7 +24,8 @@ enum class AppFeatureType {
     MIRROR_AUDIO,
     MEDIA_TRASH,
     DONATION,
-    DLNA_RECEIVER;
+    DLNA_RECEIVER,
+    IMAGE_EDITOR;
 
     fun getPermission(): DFeaturePermission? {
         return when (this) {
