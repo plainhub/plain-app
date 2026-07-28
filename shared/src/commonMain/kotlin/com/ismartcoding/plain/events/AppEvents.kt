@@ -129,6 +129,20 @@ class SleepTimerEvent(val durationMs: Long) : ChannelEvent()
 
 class CancelSleepTimerEvent : ChannelEvent()
 
+/**
+ * Fired when media items with zero duration are found during list queries.
+ * AppEvents handles this asynchronously to compute actual duration and update MediaStore.
+ */
+data class MediaDurationZeroEvent(
+    val mediaType: String, // "video" or "audio"
+    val items: List<MediaDurationZeroItem>,
+) : ChannelEvent()
+
+data class MediaDurationZeroItem(
+    val id: String,
+    val path: String,
+)
+
 class StartNearbyServiceEvent : ChannelEvent()
 
 data class ChatMessageNotificationEvent(
@@ -151,6 +165,7 @@ object AppEvents {
     private var sleepTimerJob: Job? = null
 
     fun register() {
+        com.ismartcoding.plain.platform.MediaDurationFixQueue.start()
         val sharedFlow = Channel.sharedFlow
         coMain {
             sharedFlow.collect { event ->
@@ -265,6 +280,10 @@ object AppEvents {
                             targetName = event.targetName,
                             messageText = event.messageText,
                         )
+                    }
+
+                    is MediaDurationZeroEvent -> {
+                        com.ismartcoding.plain.platform.MediaDurationFixQueue.enqueue(event)
                     }
                 }
             }

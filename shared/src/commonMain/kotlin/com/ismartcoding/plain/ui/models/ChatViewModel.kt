@@ -48,6 +48,24 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     private val _scrollToLatest = Channel<String?>(Channel.BUFFERED)
     val scrollToLatest: Flow<String?> = _scrollToLatest.receiveAsFlow()
 
+    // Pending forward payload from an external share (file/text). Set by the
+    // forward-target dialog before navigating to ChatPage, consumed by ChatPage
+    // after its target is initialized. Using a holder instead of emitting
+    // PickFileResultEvent avoids a race where the event was emitted before
+    // ChatPage subscribed to the shared flow (dropping the shared file).
+    private val _pendingForwardFiles = MutableStateFlow<Set<String>?>(null)
+    val pendingForwardFiles: StateFlow<Set<String>?> = _pendingForwardFiles.asStateFlow()
+    private val _pendingForwardText = MutableStateFlow<String?>(null)
+    val pendingForwardText: StateFlow<String?> = _pendingForwardText.asStateFlow()
+
+    fun setPendingForwardFiles(uris: Set<String>?) {
+        _pendingForwardFiles.value = uris
+    }
+
+    fun setPendingForwardText(text: String?) {
+        _pendingForwardText.value = text
+    }
+
     suspend fun initializeTargetAsync(chatId: String) = withIO {
         _target.value = ChatTarget.parseId(chatId)
     }

@@ -15,8 +15,11 @@ import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
+import com.ismartcoding.plain.events.MediaDurationZeroEvent
+import com.ismartcoding.plain.events.MediaDurationZeroItem
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.toSortBy
+import com.ismartcoding.plain.lib.channel.sendEvent
 import kotlin.time.Instant
 
 object VideoMediaStoreHelper : BaseMediaContentHelper() {
@@ -70,6 +73,9 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         offset: Int,
         sortBy: FileSortBy,
     ): List<DVideo> = withIO {
+        val videos = mutableListOf<DVideo>()
+        val zeroDurationItems = mutableListOf<MediaDurationZeroItem>()
+        
         getPagingCursorAsync(context, query, limit, offset, sortBy.toSortBy())?.map { cursor, cache ->
             val id = cursor.getStringValue(MediaStore.Video.Media._ID, cache)
             val title = cursor.getStringValue(MediaStore.Video.Media.TITLE, cache)
@@ -85,8 +91,20 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             val dateTakenMs = cursor.getLongValue(MediaStore.Video.Media.DATE_TAKEN, cache)
             val takenAt = if (dateTakenMs > 0) Instant.fromEpochMilliseconds(dateTakenMs) else null
             val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Video.Media.IS_FAVORITE, cache) == 1 else false
-            DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt, isFavorite)
-        } ?: emptyList()
+            
+            val video = DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt, isFavorite)
+            videos.add(video)
+            
+            if (duration <= 0L && path.isNotEmpty()) {
+                zeroDurationItems.add(MediaDurationZeroItem(id, path))
+            }
+        }
+        
+        if (zeroDurationItems.isNotEmpty()) {
+            sendEvent(MediaDurationZeroEvent("video", zeroDurationItems))
+        }
+        
+        videos
     }
 
     suspend fun getTagRelationStubsAsync(

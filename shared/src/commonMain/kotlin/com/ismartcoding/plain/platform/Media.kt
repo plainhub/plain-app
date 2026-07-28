@@ -53,3 +53,13 @@ expect fun getSvgSize(path: String): IntSize
  * [path] is the media file path, [label] is the shortcut display name.
  */
 expect fun addMediaShortcut(path: String, label: String)
+
+/**
+ * Process a single media item with zero duration: calculate actual duration
+ * and update MediaStore. Called by [MediaDurationFixQueue] worker, never on
+ * the list-API path.
+ */
+expect suspend fun processSingleDurationZero(
+    mediaType: String,
+    item: com.ismartcoding.plain.events.MediaDurationZeroItem,
+)

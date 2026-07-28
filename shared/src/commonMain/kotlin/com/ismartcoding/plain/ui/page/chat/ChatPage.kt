@@ -45,6 +45,7 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.HChatItemsDeletedEvent
 import com.ismartcoding.plain.events.HMessageCreatedEvent
@@ -160,6 +161,20 @@ fun ChatPage(
             val target = chatVM.target.value
             if (target.type == ChatTargetType.PEER && target.toId != "local") {
                 PeerTransportPrewarmer.prewarm(target.toId)
+            }
+            // Consume any pending forward payload from an external share.
+            // Must run after initializeTargetAsync so the message is sent to
+            // the selected peer/channel instead of the stale "local" default.
+            chatVM.pendingForwardFiles.value?.let { uris ->
+                chatVM.setPendingForwardFiles(null)
+                ChatPlatformOps.handleFileSelection(
+                    PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris),
+                    chatVM, peerVM, focusManager,
+                )
+            }
+            chatVM.pendingForwardText.value?.let { text ->
+                chatVM.setPendingForwardText(null)
+                chatVM.sendTextMessage(text, PeerCacher.getOnlinePeerIds())
             }
         }
     }

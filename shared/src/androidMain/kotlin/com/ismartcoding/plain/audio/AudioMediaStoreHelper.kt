@@ -14,9 +14,12 @@ import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
+import com.ismartcoding.plain.events.MediaDurationZeroEvent
+import com.ismartcoding.plain.events.MediaDurationZeroItem
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.toSortBy
 import com.ismartcoding.plain.features.media.BaseMediaContentHelper
+import com.ismartcoding.plain.lib.channel.sendEvent
 
 object AudioMediaStoreHelper : BaseMediaContentHelper() {
     override val uriExternal: Uri = if (isQPlus()) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -45,7 +48,8 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
 
     override fun buildBaseWhere(filterFields: List<FilterField>): ContentWhere {
         val where = ContentWhere()
-        where.addGt(MediaStore.Audio.Media.DURATION, "0")
+        // NOTE: do NOT filter DURATION>0 here — zero-duration items are collected
+        // and fixed asynchronously via MediaDurationZeroEvent.
         filterFields.forEach {
             when (it.name) {
                 "text" -> {
@@ -86,6 +90,9 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
         offset: Int,
         sortBy: FileSortBy,
     ): List<DAudio> = withIO {
+        val audios = mutableListOf<DAudio>()
+        val zeroDurationItems = mutableListOf<MediaDurationZeroItem>()
+        
         getPagingCursorAsync(context, query, limit, offset, sortBy.toSortBy())?.map { cursor, cache ->
             val id = cursor.getStringValue(MediaStore.Audio.Media._ID, cache)
             val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE, cache)
@@ -100,8 +107,19 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             } else ""
             val albumId = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID, cache)
             val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Audio.Media.IS_FAVORITE, cache) == 1 else false
-            DAudio(id, title, artist, path, duration, size, bucketId, albumId, createdAt, updatedAt, isFavorite)
-        } ?: emptyList()
+            val audio = DAudio(id, title, artist, path, duration, size, bucketId, albumId, createdAt, updatedAt, isFavorite)
+            audios.add(audio)
+            
+            if (duration <= 0L && path.isNotEmpty()) {
+                zeroDurationItems.add(MediaDurationZeroItem(id, path))
+            }
+        }
+        
+        if (zeroDurationItems.isNotEmpty()) {
+            sendEvent(MediaDurationZeroEvent("audio", zeroDurationItems))
+        }
+        
+        audios
     }
 
     suspend fun getTagRelationStubsAsync(

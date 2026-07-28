@@ -31,7 +31,6 @@ import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -192,12 +191,12 @@ class MainActivity : AppCompatActivity() {
                             },
                             onTargetSelected = { target ->
                                 navControllerState.value?.navigate(Routing.Chat(target.encodedToId))
-                                pendingFileUris?.let { uris ->
-                                    sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris.map { it.toString() }.toSet()))
-                                }
-                                pendingForwardText?.let { text ->
-                                    chatVM.sendTextMessage(text, PeerCacher.getOnlinePeerIds())
-                                }
+                                // Stash the payload on chatVM; ChatPage consumes it after
+                                // initializing its target. Emitting PickFileResultEvent here
+                                // would race with ChatPage's shared-flow subscription and drop
+                                // the event, so the shared file never reached the chat.
+                                chatVM.setPendingForwardFiles(pendingFileUris?.map { it.toString() }?.toSet())
+                                chatVM.setPendingForwardText(pendingForwardText)
                             })
                     }
                     pendingCrashReport?.let { report ->
