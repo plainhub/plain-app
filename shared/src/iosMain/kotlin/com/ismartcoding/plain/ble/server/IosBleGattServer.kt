@@ -16,6 +16,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import platform.CoreBluetooth.CBATTErrorSuccess
@@ -110,15 +111,15 @@ class IosBleGattServer : BleGattServer {
         while (attempts < 10) {
             val deferred = CompletableDeferred<Unit>()
             // Stash the deferred so the delegate can complete it.
-            pendingReadyDeferred = deferred
+            pendingReadyDeferred.value = deferred
             val sent = manager.updateValue(data, forCharacteristic = char, onSubscribedCentrals = null)
             if (sent) {
-                pendingReadyDeferred = null
+                pendingReadyDeferred.value = null
                 return true
             }
             // Wait for ready signal or timeout.
             val ready = withTimeoutOrNull(notifyAckTimeoutMs.milliseconds) { deferred.await() }
-            pendingReadyDeferred = null
+            pendingReadyDeferred.value = null
             if (ready == null) {
                 LogCat.e("[BLE] sendNotificationBlocking: timed out waiting for readyToUpdate")
                 return false
@@ -129,11 +130,13 @@ class IosBleGattServer : BleGattServer {
         return false
     }
 
-    @Volatile
-    private var pendingReadyDeferred: CompletableDeferred<Unit>? = null
+    // @Volatile is JVM-only; use MutableStateFlow for thread-safe single-slot
+    // state on Kotlin/Native (kotlin.native.concurrent.AtomicReference is
+    // hard-deprecated in Kotlin 2.4).
+    private val pendingReadyDeferred = MutableStateFlow<CompletableDeferred<Unit>?>(null)
 
     internal fun onReadyToUpdateSubscribers() {
-        pendingReadyDeferred?.complete(Unit)
+        pendingReadyDeferred.value?.complete(Unit)
     }
 
     private fun setupService(manager: CBPeripheralManager) {

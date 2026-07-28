@@ -4,6 +4,8 @@
 <dict>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>CFBundleDisplayName</key>
+    <string>PlainApp</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -13,34 +15,42 @@
     <key>CFBundleName</key>
     <string>$(PRODUCT_NAME)</string>
     <key>CFBundlePackageType</key>
-    <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+    <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>$(MARKETING_VERSION)</string>
+    <string>1.0.0</string>
     <key>CFBundleVersion</key>
-    <string>$(CURRENT_PROJECT_VERSION)</string>
-    <key>UILaunchScreen</key>
-    <dict/>
-    <key>CADisableMinimumFrameDurationOnPhone</key>
+    <string>1</string>
+    <key>LSRequiresIPhoneOS</key>
     <true/>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Plain needs access to your photo library to import and back up images and videos.</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Plain needs access to save images and videos to your photo library.</string>
-    <key>NSCameraUsageDescription</key>
-    <string>Plain needs camera access to scan QR codes and capture media.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Plain needs microphone access for screen mirroring audio.</string>
-    <key>NSContactsUsageDescription</key>
-    <string>Plain needs contacts access to back up your address book.</string>
+    <key>UILaunchScreen</key>
+    <dict>
+        <key>UIColorName</key>
+        <string>AccentColor</string>
+    </dict>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
     <key>NSLocalNetworkUsageDescription</key>
-    <string>Plain uses your local network to discover and connect to nearby Plain-enabled devices.</string>
-    <key>NSBonjourServices</key>
-    <array>
-        <string>_plain._tcp</string>
-    </array>
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-    </array>
+    <string>PlainApp needs local network access to discover and communicate with peer devices.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>PlainApp needs photo library access to browse and manage your photos.</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>PlainApp needs Bluetooth to connect with nearby devices for peer-to-peer features.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>PlainApp needs camera access for QR code scanning and document scanning.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>PlainApp needs microphone access for sound meter and audio recording features.</string>
+    <key>NSContactsUsageDescription</key>
+    <string>PlainApp needs contacts access to display and manage your contacts.</string>
 </dict>
 </plist>

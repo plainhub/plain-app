@@ -18,8 +18,6 @@ internal actual fun platformLog(priority: Int, tag: String, message: String) {
     NSLog("$prefix $message")
 }
 
-internal actual fun initLogCat(context: Any?) {}
-
 internal actual fun logFolderImpl(): String {
     val paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)
     val docs = (paths.firstOrNull() as? String) ?: ""
