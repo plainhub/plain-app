@@ -1,1 +1,0 @@
-import{H as e,T as t,mt as n,v as r}from"./vue.runtime.esm-bundler-DB7W0Wog.js";import{ut as i}from"./query-BarMv5uk.js";import{wn as a}from"./index-vw3Gvyz7.js";import{t as o}from"./MediaSidebar-CScEHe8k.js";var s=t({__name:`VideosSidebar`,setup(t){return(t,s)=>{let c=o;return e(),r(c,{type:n(a).VIDEO,gql:n(i)},null,8,[`type`,`gql`])}}});export{s as default};

@@ -22,6 +22,7 @@ import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isPdfFile
 import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.lib.extensions.isVideoFast
+import com.ismartcoding.plain.lib.extensions.isZipFile
 import com.ismartcoding.plain.helpers.coMain
 import com.ismartcoding.plain.platform.fileToUriString
 import com.ismartcoding.plain.platform.playAudioWithNotificationCheck
@@ -41,6 +42,7 @@ import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.nav.navigateOtherFile
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
+import com.ismartcoding.plain.ui.nav.navigateZipFile
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -83,6 +85,8 @@ internal fun ChatFileItemContent(
                         navController.navigateTextFile(path, fileName, mediaId = "", type = TextFileType.CHAT)
                     } else if (fileName.isPdfFile()) {
                         navController.navigatePdf(fileToUriString(path), fileName)
+                    } else if (fileName.isZipFile()) {
+                        navController.navigateZipFile(path, fileName)
                     } else {
                         navController.navigateOtherFile(path, fileName)
                     }

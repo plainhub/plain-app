@@ -7,6 +7,7 @@ import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.urlEncode
 import com.ismartcoding.plain.platform.convert3gpToMp4
 import com.ismartcoding.plain.platform.decodeImageFileToPng
+import com.ismartcoding.plain.platform.extractZipEntryToCache
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.getContentTypeForPath
 import com.ismartcoding.plain.platform.getPackageIconBytes
@@ -16,6 +17,7 @@ import com.ismartcoding.plain.platform.isContentUri
 import com.ismartcoding.plain.platform.readFileRange
 import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.platform.streamContentUri
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.web.FileIdParams
 import com.ismartcoding.plain.web.http.HttpCall
 import com.ismartcoding.plain.web.http.HttpRouter
@@ -62,6 +64,26 @@ fun HttpRouter.addFilesRoutes() {
             val heightParam = call.queryParam("h")?.toIntOrNull()
             // `cc` defaults to true (matches the original `!= false` behavior).
             val centerCrop = call.queryParam("cc")?.toBooleanStrictOrNull() != false
+
+            // Zip virtual path: extract the entry to cache and serve it.
+            if (ZipBrowserHelper.isZipPath(path)) {
+                val cachePath = extractZipEntryToCache(path)
+                if (cachePath == null) {
+                    call.respondNoBody(HttpStatus.NOT_FOUND)
+                    return@get
+                }
+                val zipEntryName = ZipBrowserHelper.getInternalPath(path).trimEnd('/').substringAfterLast('/')
+                val displayName = jsonName.ifEmpty { zipEntryName }.urlEncode()
+                val contentDisposition = if (isDownload) {
+                    "attachment; filename=\"${displayName}\"; filename*=utf-8''${displayName}"
+                } else {
+                    "inline; filename=\"${displayName}\"; filename*=utf-8''${displayName}"
+                }
+                val contentType = getContentTypeForPath(cachePath)
+                call.responseHeader("Access-Control-Expose-Headers", "Content-Disposition")
+                call.respondFile(cachePath, contentType = contentType, contentDisposition = contentDisposition)
+                return@get
+            }
 
             // Byte-range request: used by low-throughput transports (BLE) to
             // download a file in small chunks. Only applies to regular files

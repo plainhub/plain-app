@@ -145,9 +145,7 @@
     <string name="delete_channel_warning">Das Löschen dieses Kanals löscht auch alle zugehörigen Nachrichten. Diese Aktion kann nicht rückgängig gemacht werden.</string>
 
     <string name="crash_report_title">App abgestürzt</string>
-    <string name="crash_report_message">Die App ist unerwartet abgestürzt. Möchten Sie uns den Absturzbericht mitteilen, damit wir es beheben können?</string>
-    <string name="crash_include_app_logs">App-Protokolle einschließen</string>
-    <string name="crash_share">Teilen</string>
+    <string name="crash_report_message">Die App ist unerwartet abgestürzt. Sehen Sie sich den Absturzbericht mit App-Protokollen an und teilen Sie ihn, um uns bei der Behebung zu helfen.</string>
     <string name="stay_online_mode">Online-Bleib-Modus</string>
     <string name="stay_online_mode_oled_saving">OLED Energiesparen</string>
     <string name="stay_online_mode_tap_to_exit">Zum Beenden tippen</string>

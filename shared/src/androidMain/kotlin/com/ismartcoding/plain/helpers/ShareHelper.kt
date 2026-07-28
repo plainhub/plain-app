@@ -53,6 +53,8 @@ object ShareHelper {
         val shareIntent = createFileIntent(context, uri)
         val chooserIntent = Intent.createChooser(shareIntent, LocaleHelper.getString(Res.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
+        // context may be the Application context, so FLAG_ACTIVITY_NEW_TASK is required
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(chooserIntent)
     }
 
@@ -80,6 +82,8 @@ object ShareHelper {
         }
         val chooserIntent = Intent.createChooser(shareIntent, LocaleHelper.getString(Res.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
+        // context may be the Application context, so FLAG_ACTIVITY_NEW_TASK is required
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(chooserIntent)
     }
 
@@ -101,6 +105,8 @@ object ShareHelper {
         val shareIntent = createFilesIntent(uris)
         val chooserIntent = Intent.createChooser(shareIntent, LocaleHelper.getString(Res.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
+        // context may be the Application context, so FLAG_ACTIVITY_NEW_TASK is required
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(chooserIntent)
     }
 
@@ -164,6 +170,8 @@ object ShareHelper {
         file: File,
         mimeType: String = "",
         displayName: String = "",
+        email: String = "",
+        subject: String = "",
     ) {
         val fileToShare = if (displayName.isNotEmpty() && displayName != file.name) {
             val tempDir = File(context.cacheDir, "share_temp").apply { mkdirs() }
@@ -187,8 +195,16 @@ object ShareHelper {
             intent.type = resolveShareMimeType(context, fileToShare, mimeType)
             intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, AppIntents.AUTHORITY, fileToShare))
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            if (email.isNotEmpty()) {
+                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+            }
+            if (subject.isNotEmpty()) {
+                intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+            }
             val chooserIntent = Intent.createChooser(intent, LocaleHelper.getString(Res.string.share))
             chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
+            // context may be the Application context, so FLAG_ACTIVITY_NEW_TASK is required
+            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(chooserIntent)
         } catch (e: IllegalArgumentException) {
             DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.cannot_share_file_not_accessible))
@@ -232,6 +248,8 @@ object ShareHelper {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         val chooserIntent = Intent.createChooser(intent, LocaleHelper.getString(Res.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
+        // context may be the Application context, so FLAG_ACTIVITY_NEW_TASK is required
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(chooserIntent)
     }
 
@@ -261,6 +279,8 @@ object ShareHelper {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             val chooserIntent = Intent.createChooser(intent, LocaleHelper.getString(Res.string.open_with))
             chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
+            // context may be the Application context, so FLAG_ACTIVITY_NEW_TASK is required
+            chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(chooserIntent)
         } catch (e: IllegalArgumentException) {
             DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.cannot_open_file_not_accessible))

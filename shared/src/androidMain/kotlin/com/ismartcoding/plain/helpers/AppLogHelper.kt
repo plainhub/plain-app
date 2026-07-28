@@ -127,6 +127,8 @@ object AppLogHelper {
         intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, AppIntents.AUTHORITY, file))
         val chooserIntent = Intent.createChooser(intent, LocaleHelper.getString(Res.string.share_logs))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, ShareHelper.getExcludeComponentNames(context).toTypedArray())
+        // appContext is the Application context, so FLAG_ACTIVITY_NEW_TASK is required
+        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(chooserIntent)
     }
 

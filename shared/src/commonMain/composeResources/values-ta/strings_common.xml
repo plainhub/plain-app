@@ -145,9 +145,7 @@
     <string name="delete_channel_warning">இந்த சேனலை நீக்குவது தொடர்புடைய அனைத்து செய்திகளையும் நீக்கும். இந்த செயலை மாற்ற முடியாது.</string>
 
     <string name="crash_report_title">ஆப் செயலிழந்தது</string>
-    <string name="crash_report_message">ஆப் எதிர்பாராத விதமாக செயலிழந்தது. நாங்கள் சரிசெய்ய உதவ கிராஷ் அறிக்கையை பகிர விரும்புகிறீர்களா?</string>
-    <string name="crash_include_app_logs">ஆப் பதிவுகளை சேர்க்கவும்</string>
-    <string name="crash_share">பகிரவும்</string>
+    <string name="crash_report_message">ஆப் எதிர்பாராத விதமாக செயலிழந்தது. ஆப் பதிவுகளுடன் கிராஷ் அறிக்கையை பார்த்து, சிக்கலை சரிசெய்ய உதவ பகிரவும்.</string>
     <string name="stay_online_mode">ஆன்லைன் நிலை பயன்முறை</string>
     <string name="stay_online_mode_oled_saving">OLED மின் சேமிப்பு</string>
     <string name="stay_online_mode_tap_to_exit">வெளியேற எங்கும் தட்டவும்</string>

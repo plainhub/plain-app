@@ -19,8 +19,10 @@ expect fun shareText(text: String)
 
 /**
  * Share a single file via the system share sheet (uses FileProvider on Android).
+ * When [email] is non-empty, the share intent pre-fills the recipient; when
+ * [subject] is non-empty, it pre-fills the subject line.
  */
-expect fun shareFile(path: String)
+expect fun shareFile(path: String, email: String = "", subject: String = "")
 
 /**
  * Share a single file via the system share sheet, overriding the displayed file

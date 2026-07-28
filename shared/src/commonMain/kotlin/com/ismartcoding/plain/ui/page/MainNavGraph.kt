@@ -62,6 +62,7 @@ import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.files.FilesPage
+import com.ismartcoding.plain.ui.page.files.ZipFilePage
 import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.home.HomePage
 import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorListPage
@@ -257,6 +258,10 @@ fun MainNavGraph(
         composable<Routing.OtherFile> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.OtherFile>()
             OtherFilePage(navController, r.path, r.title)
+        }
+        composable<Routing.ZipFile> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.ZipFile>()
+            ZipFilePage(navController, audioPlaylistVM, r.path, r.title)
         }
         composable<Routing.PdfViewer> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PdfViewer>()

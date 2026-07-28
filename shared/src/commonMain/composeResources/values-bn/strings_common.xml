@@ -145,9 +145,7 @@
     <string name="delete_channel_warning">এই চ্যানেল মুছে ফেললে সমস্ত সম্পর্কিত বার্তাও মুছে যাবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
 
     <string name="crash_report_title">অ্যাপ ক্র্যাশ হয়েছে</string>
-    <string name="crash_report_message">অ্যাপটি অপ্রত্যাশিতভাবে ক্র্যাশ হয়েছে। আমরা এটি ঠিক করতে পারি সে জন্য কি আপনি আমাদের সাথে ক্র্যাশ রিপোর্ট শেয়ার করতে চান?</string>
-    <string name="crash_include_app_logs">অ্যাপ লগ অন্তর্ভুক্ত করুন</string>
-    <string name="crash_share">শেয়ার করুন</string>
+    <string name="crash_report_message">অ্যাপটি অপ্রত্যাশিতভাবে ক্র্যাশ হয়েছে। অ্যাপ লগ সহ ক্র্যাশ রিপোর্ট দেখুন এবং সমস্যা সমাধানে সাহায্য করতে শেয়ার করুন।</string>
     <string name="stay_online_mode">স্টে অনলাইন মোড</string>
     <string name="stay_online_mode_oled_saving">OLED বিদ্যুৎ সাশ্রয়</string>
     <string name="stay_online_mode_tap_to_exit">প্রস্থান করতে যেকোনো জায়গায় ট্যাপ করুন</string>

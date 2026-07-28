@@ -15,6 +15,7 @@ import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.extensions.getDirectChildrenCount
 import com.ismartcoding.plain.extensions.normalizeComparison
 import com.ismartcoding.plain.platform.isRPlus
+import com.ismartcoding.plain.platform.listZipEntries
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.storageManager
@@ -238,9 +239,9 @@ object FileSystemHelper {
         val parent = filterFields.find { it.name == "parent" }?.value ?: ""
         val fileSizeFields = filterFields.filter { it.name == "file_size" }
         val dir = parent.ifEmpty { root }
-        val items = if (text.isNotEmpty() || fileSizeFields.isNotEmpty()) {
-            // When filtering by file size, users expect a search over the directory tree,
-            // not only the current folder's direct children.
+        val items = if (ZipBrowserHelper.isZipPath(dir)) {
+            listZipEntries(dir, sortBy)
+        } else if (text.isNotEmpty() || fileSizeFields.isNotEmpty()) {
             search(text, dir, showHidden).sorted(sortBy)
         } else {
             getFilesList(dir, showHidden, sortBy)

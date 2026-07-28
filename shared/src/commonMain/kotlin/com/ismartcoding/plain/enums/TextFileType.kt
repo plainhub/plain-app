@@ -4,4 +4,5 @@ enum class TextFileType {
     DEFAULT,
     APP_LOG,
     CHAT,
+    CRASH_REPORT,
 }

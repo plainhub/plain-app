@@ -2,6 +2,7 @@ package com.ismartcoding.plain.enums
 
 import com.ismartcoding.plain.buildChannel
 import com.ismartcoding.plain.features.allGranted
+import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.platform.isRPlus
 
@@ -21,6 +22,10 @@ fun AppFeatureType.has(): Boolean {
 
         AppFeatureType.CHECK_UPDATES -> {
             buildChannel == AppChannelType.GITHUB.name
+        }
+
+        AppFeatureType.IMAGE_EDITOR -> {
+            isDebugBuild()
         }
 
         else -> true

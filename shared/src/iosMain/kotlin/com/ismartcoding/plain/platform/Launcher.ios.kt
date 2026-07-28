@@ -18,7 +18,7 @@ actual fun shareText(text: String) {
     // Phase 25 wires this via Compose LocalContext -> UIViewControllerRepresentable.
 }
 
-actual fun shareFile(path: String) {
+actual fun shareFile(path: String, email: String, subject: String) {
     // Same as shareText: needs UIViewController present; implemented in Phase 25.
 }
 

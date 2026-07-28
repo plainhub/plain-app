@@ -48,11 +48,16 @@ fun FeatureItem.Companion.getList(navController: NavHostController): List<Featur
             FeatureItem(AppFeatureType.DLNA_RECEIVER, Res.string.dlna_receiver, Res.drawable.cast) {
                 navController.navigate(Routing.DlnaReceiver)
             },
+        )
+    )
+
+    if (AppFeatureType.IMAGE_EDITOR.has()) {
+        list.add(
             FeatureItem(AppFeatureType.IMAGE_EDITOR, Res.string.image_editor, Res.drawable.square_pen) {
                 navController.navigate(Routing.ImageEditor)
             },
         )
-    )
+    }
 
     return list
 }

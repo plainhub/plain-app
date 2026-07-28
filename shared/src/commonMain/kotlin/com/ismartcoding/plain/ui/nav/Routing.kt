@@ -91,6 +91,9 @@ class Routing {
     data class OtherFile(val path: String, val title: String)
 
     @Serializable
+    data class ZipFile(val path: String, val title: String = "")
+
+    @Serializable
     object Docs
 
     @Serializable

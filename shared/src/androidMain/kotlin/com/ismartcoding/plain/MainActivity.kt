@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity() {
                             })
                     }
                     pendingCrashReport?.let { report ->
-                        CrashReportDialog(crashReport = report, onDismiss = { pendingCrashReport = null })
+                        CrashReportDialog(crashReport = report, navController = navControllerState.value, onDismiss = { pendingCrashReport = null })
                     }
                 }
             }

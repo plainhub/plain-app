@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.ismartcoding.plain.appContextValue
+import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.helpers.ShareHelper
 import java.io.File
 
@@ -33,9 +34,9 @@ actual fun shareText(text: String) {
     appContextValue?.startActivity(chooser)
 }
 
-actual fun shareFile(path: String) {
+actual fun shareFile(path: String, email: String, subject: String) {
     val ctx = appContextValue ?: return
-    ShareHelper.shareFile(ctx, File(path))
+    ShareHelper.shareFile(ctx, File(path), email = email, subject = subject)
 }
 
 actual fun shareFileAs(path: String, displayName: String) {
@@ -46,8 +47,7 @@ actual fun shareFileAs(path: String, displayName: String) {
 actual fun shareFiles(paths: List<String>) {
     val ctx = appContextValue ?: return
     if (paths.isEmpty()) return
-    val authority = "${ctx.packageName}.fileprovider"
-    val uris = paths.map { FileProvider.getUriForFile(ctx, authority, File(it)) }
+    val uris = paths.map { FileProvider.getUriForFile(ctx, AppIntents.AUTHORITY, File(it)) }
     val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
         type = "*/*"
         putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
@@ -62,8 +62,7 @@ actual fun shareFiles(paths: List<String>) {
 actual fun openFileExternal(path: String) {
     val ctx = appContextValue ?: return
     val file = File(path)
-    val authority = "${ctx.packageName}.fileprovider"
-    val uri = FileProvider.getUriForFile(ctx, authority, file)
+    val uri = FileProvider.getUriForFile(ctx, AppIntents.AUTHORITY, file)
     val intent = Intent(Intent.ACTION_VIEW).apply {
         data = uri
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

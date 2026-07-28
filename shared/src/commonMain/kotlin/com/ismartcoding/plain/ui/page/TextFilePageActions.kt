@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page
 
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.MaterialTheme
@@ -38,7 +39,7 @@ internal fun RowScope.TextFilePageActions(
     val focusManager = LocalFocusManager.current
 
     if (textFileVM.readOnly.value) {
-        if (type != TextFileType.APP_LOG.name && !textFileVM.isExternalFile.value) {
+        if (type != TextFileType.APP_LOG.name && type != TextFileType.CRASH_REPORT.name && !textFileVM.isExternalFile.value) {
             PIconButton(
                 icon = Res.drawable.square_pen,
                 contentDescription = stringResource(Res.string.edit),
@@ -71,7 +72,7 @@ internal fun RowScope.TextFilePageActions(
             }
         }
     }
-    if (setOf(TextFileType.APP_LOG.name, TextFileType.CHAT.name).contains(type)) {
+    if (setOf(TextFileType.APP_LOG.name, TextFileType.CHAT.name, TextFileType.CRASH_REPORT.name).contains(type)) {
         PIconButton(
             icon = Res.drawable.wrap_text,
             contentDescription = stringResource(Res.string.wrap_content),
@@ -84,10 +85,10 @@ internal fun RowScope.TextFilePageActions(
             contentDescription = stringResource(Res.string.share),
             tint = MaterialTheme.colorScheme.onSurface,
         ) {
-            if (type == TextFileType.APP_LOG.name) {
-                exportLogsAsync()
-            } else if (type == TextFileType.CHAT.name) {
-                shareFile(path)
+            when (type) {
+                TextFileType.APP_LOG.name -> exportLogsAsync()
+                TextFileType.CHAT.name -> shareFile(path)
+                TextFileType.CRASH_REPORT.name -> shareFile(path, email = Constants.SUPPORT_EMAIL, subject = "Crash Report - PlainApp")
             }
         }
     } else {
