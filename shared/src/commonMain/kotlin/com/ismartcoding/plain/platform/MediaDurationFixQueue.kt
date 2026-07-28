@@ -4,6 +4,7 @@ import com.ismartcoding.plain.events.MediaDurationZeroEvent
 import com.ismartcoding.plain.events.MediaDurationZeroItem
 import com.ismartcoding.plain.helpers.coIO
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.Semaphore
@@ -33,8 +34,9 @@ object MediaDurationFixQueue {
     private val mutex = Mutex()
     private val processing = mutableSetOf<String>()
 
-    @Volatile
-    private var started = false
+    // MutableStateFlow.compareAndSet provides the same atomic check-and-set
+    // semantics as @Volatile + synchronized, but works on both JVM and Native.
+    private val started = MutableStateFlow(false)
 
     /**
      * Start the background worker. Safe to call multiple times — only the first
@@ -42,8 +44,7 @@ object MediaDurationFixQueue {
      * empty it simply suspends.
      */
     fun start() {
-        if (started) return
-        started = true
+        if (!started.compareAndSet(false, true)) return
         coIO {
             val semaphore = Semaphore(MAX_CONCURRENCY)
             while (true) {
