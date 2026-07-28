@@ -2,12 +2,11 @@ package com.ismartcoding.plain.services.screenmirror
 
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
+import android.media.MediaCodecList
 import android.media.MediaFormat
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Surface
-import com.ismartcoding.plain.helpers.coIO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,26 +26,37 @@ import java.nio.ByteBuffer
 class MediaCodecVideoEncoder(
     private val width: Int,
     private val height: Int,
-    private val frameRate: Int = 30,
-    private val bitrateBps: Int = 4_000_000,
-    private val iFrameIntervalSec: Int = 1,
-    private val profile: Int = MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline,
+    private val frameRate: Int = 60,
+    private val bitrateBps: Int = 8_000_000,
+    private val iFrameIntervalSec: Int = 10,
 ) {
     companion object {
         private const val TAG = "MirrorCodec"
         const val MIME = "video/avc"
+
+        fun queryEncoderCaps(): EncoderVideoCaps? {
+            return try {
+                val info = MediaCodecList(MediaCodecList.REGULAR_CODECS).codecInfos
+                    .firstOrNull { it.isEncoder && MIME in it.supportedTypes }
+                val caps = info?.getCapabilitiesForType(MIME) ?: return null
+                val vc = caps.videoCapabilities ?: return null
+                EncoderVideoCaps(
+                    maxWidth = vc.supportedWidths.upper,
+                    maxHeight = vc.supportedHeights.upper,
+                    widthAlignment = vc.widthAlignment,
+                    heightAlignment = vc.heightAlignment,
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "queryEncoderCaps failed: ${e.message}")
+                null
+            }
+        }
     }
 
     private var codec: MediaCodec? = null
     private var inputSurface: Surface? = null
     private var outputThread: Job? = null
-    private val lock = Any()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    @Volatile
-    private var currentBitrateBps: Int = bitrateBps
-    @Volatile
-    private var currentFps: Int = frameRate
 
     var onEncoded: ((nalu: ByteArray, isKeyFrame: Boolean, pts: Long) -> Unit)? = null
     var onCodecConfig: ((configBytes: ByteArray) -> Unit)? = null
@@ -57,39 +67,22 @@ class MediaCodecVideoEncoder(
             setInteger(MediaFormat.KEY_BIT_RATE, bitrateBps)
             setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
             setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, iFrameIntervalSec)
-            setInteger(MediaFormat.KEY_PROFILE, profile)
+            setLong(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER, 100_000L)
+            setInteger(MediaFormat.KEY_COLOR_RANGE, MediaFormat.COLOR_RANGE_LIMITED)
+            setInteger(MediaFormat.KEY_PRIORITY, 0)
+            setInteger(MediaFormat.KEY_LATENCY, 1)
         }
         val c = MediaCodec.createEncoderByType(MIME)
         c.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         inputSurface = c.createInputSurface()
         c.start()
         codec = c
-        Log.d(TAG, "started ${width}x${height}@${frameRate}fps ${bitrateBps / 1_000_000}Mbps")
+        Log.d(TAG, "started ${width}x${height}@${frameRate}fps ${bitrateBps / 1_000_000}Mbps iFrame=${iFrameIntervalSec}s")
         outputThread = scope.launch { drainLoop() }
     }
 
     fun getInputSurface(): Surface = inputSurface
         ?: error("encoder not started")
-
-    fun setBitrate(bps: Int) {
-        synchronized(lock) {
-            if (bps == currentBitrateBps) return
-            currentBitrateBps = bps
-            val b = Bundle().apply { putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, bps) }
-            codec?.setParameters(b)
-        }
-    }
-
-    fun setFps(fps: Int) {
-        synchronized(lock) {
-            if (fps == currentFps) return
-            currentFps = fps
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val b = Bundle().apply { putInt(MediaFormat.KEY_FRAME_RATE, fps) }
-                codec?.setParameters(b)
-            }
-        }
-    }
 
     fun requestKeyFrame() {
         val b = Bundle().apply { putInt(MediaCodec.PARAMETER_KEY_REQUEST_SYNC_FRAME, 1) }
@@ -99,10 +92,16 @@ class MediaCodecVideoEncoder(
     fun stop() {
         outputThread?.cancel()
         outputThread = null
-        try { codec?.stop() } catch (_: Exception) {}
+        try {
+            codec?.stop()
+        } catch (_: Exception) {
+        }
         codec?.release()
         codec = null
-        try { inputSurface?.release() } catch (_: Exception) {}
+        try {
+            inputSurface?.release()
+        } catch (_: Exception) {
+        }
         inputSurface = null
         Log.d(TAG, "stopped")
     }
@@ -134,14 +133,24 @@ class MediaCodecVideoEncoder(
                             Log.d(TAG, "codec-spec unavailable (rawSps=${rawSps?.remaining()} rawPps=${rawPps?.remaining()})")
                         }
                     }
+
                     idx >= 0 -> {
                         val buf = c.getOutputBuffer(idx) ?: continue
-                        if (info.size > 0 && info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0) {
-                            val data = ByteArray(info.size)
-                            buf.position(info.offset)
-                            buf.get(data, 0, info.size)
+                        if (info.size > 0) {
+                            val isConfig = info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0
                             val isKey = info.flags and MediaCodec.BUFFER_FLAG_SYNC_FRAME != 0
-                            onEncoded?.invoke(H264AnnexB.avccToAnnexB(data), isKey, info.presentationTimeUs)
+                            // Some encoders (Qualcomm/Xiaomi) bundle SPS+PPS+IDR in one
+                            // buffer with CODEC_CONFIG|SYNC_FRAME flags. Skipping these
+                            // drops the IDR — the decoder then only gets P-frames and
+                            // produces mosaic/garbage output. Only skip pure config
+                            // buffers (already handled via FORMAT_CHANGED); keep any
+                            // buffer that carries a sync frame.
+                            if (!isConfig || isKey) {
+                                val data = ByteArray(info.size)
+                                buf.position(info.offset)
+                                buf.get(data, 0, info.size)
+                                onEncoded?.invoke(H264AnnexB.avccToAnnexB(data), isKey, info.presentationTimeUs)
+                            }
                         }
                         c.releaseOutputBuffer(idx, false)
                         if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return
@@ -156,3 +165,10 @@ class MediaCodecVideoEncoder(
 
     private fun hex(b: ByteArray): String = b.joinToString("") { "%02x".format(it) }
 }
+
+data class EncoderVideoCaps(
+    val maxWidth: Int,
+    val maxHeight: Int,
+    val widthAlignment: Int,
+    val heightAlignment: Int,
+)

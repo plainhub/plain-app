@@ -18,4 +18,6 @@ actual fun applyScreenMirrorQualityPreference() = Unit
 
 actual fun dispatchScreenMirrorControl(input: ScreenMirrorControlInput): Boolean = false
 
+actual fun requestScreenMirrorKeyFrame() = Unit
+
 actual fun getAccessibilityScreenSize(): Pair<Int, Int> = Pair(0, 0)

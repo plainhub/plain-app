@@ -14,6 +14,7 @@ import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.platform.isUPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.web.models.ScreenMirrorVideoCodec
 
 /**
@@ -43,6 +44,12 @@ class ScreenMirrorPipeline(
 
     @Volatile
     private var pendingConfigBroadcast: ByteArray? = null
+
+    @Volatile
+    private var videoFrameId: Int = 0
+
+    @Volatile
+    private var audioFrameId: Int = 0
 
     @OptIn(ExperimentalEncodingApi::class)
     fun getScreenMirrorVideoCodec(): ScreenMirrorVideoCodec? {
@@ -100,13 +107,18 @@ class ScreenMirrorPipeline(
         }
     }
 
-    private fun broadcastConfig(keyFrame: ByteArray? = null) {
+    private fun broadcastConfig() {
         sendEvent(
             WebSocketEvent(
                 EventType.SCREEN_MIRROR_VIDEO_CODEC,
                 jsonEncode(getScreenMirrorVideoCodec()),
             )
         )
+    }
+
+    fun requestKeyFrame() {
+        videoEncoder?.requestKeyFrame()
+        LogCat.d("$TAG: key frame requested by client")
     }
 
     private fun startEncoders(w: Int, h: Int, dpi: Int) {
@@ -116,7 +128,7 @@ class ScreenMirrorPipeline(
         projection.registerCallback(object : MediaProjection.Callback() {
             override fun onStop() {
                 LogCat.d("$TAG: MediaProjection onStop (system revoked)")
-                stop()
+                ScreenMirrorService.instance?.stop()
             }
         }, null)
 
@@ -133,11 +145,12 @@ class ScreenMirrorPipeline(
 
         if (audioEncoder == null) {
             val audio = MediaCodecAudioEncoder(context, projection).also {
-                it.onEncoded = { opus, _ ->
+                it.onEncoded = { opus, pts ->
+                    val packet = VideoPacket.encode(audioFrameId++, pts, VideoPacket.FLAG_AUDIO, opus)
                     sendEvent(
                         WebSocketEvent(
                             EventType.SCREEN_MIRROR_AUDIO,
-                            opus
+                            packet
                         )
                     )
                 }
@@ -150,7 +163,7 @@ class ScreenMirrorPipeline(
     private fun createVideoEncoder(w: Int, h: Int): MediaCodecVideoEncoder {
         val video = MediaCodecVideoEncoder(
             width = w, height = h,
-            frameRate = 30,
+            frameRate = 60,
             bitrateBps = computeStartBitrate(effectiveResolution),
         ).also {
             it.onCodecConfig = { configBytes ->
@@ -159,28 +172,27 @@ class ScreenMirrorPipeline(
                 LogCat.d("$TAG: cached annex-B config ${configBytes.size}B")
                 pendingConfigBroadcast = configBytes
             }
-            it.onEncoded = { nalu, isKey, _ ->
-                val bundled = if (isKey) {
+            it.onEncoded = onEncoded@{ nalu, isKey, pts ->
+                if (isKey) {
                     cachedKeyFrame = nalu
-                    val pending = pendingConfigBroadcast
-                    if (pending != null) {
-                        broadcastConfig(keyFrame = nalu)
+                    // When the config just changed, bundle it with this keyframe
+                    // in a single codec event instead of sending the keyframe as
+                    // a separate video packet — the web client reconfigures its
+                    // decoder from the event and decodes the bundled keyframe.
+                    if (pendingConfigBroadcast != null) {
+                        broadcastConfig()
                         pendingConfigBroadcast = null
-                        true
-                    } else {
-                        false
+                        return@onEncoded
                     }
-                } else {
-                    false
                 }
-                if (!bundled) {
-                    sendEvent(
-                        WebSocketEvent(
-                            EventType.SCREEN_MIRROR_VIDEO,
-                            nalu
-                        )
+                val flags: Byte = if (isKey) VideoPacket.FLAG_KEY_FRAME else 0
+                val packet = VideoPacket.encode(videoFrameId++, pts, flags, nalu)
+                sendEvent(
+                    WebSocketEvent(
+                        EventType.SCREEN_MIRROR_VIDEO,
+                        packet
                     )
-                }
+                )
             }
             it.start()
         }
@@ -215,17 +227,26 @@ class ScreenMirrorPipeline(
         val realSize = getRealScreenSize(context)
         val physW = realSize.x
         val physH = realSize.y
-        val scale = minOf(1f, shortTarget.toFloat() / minOf(physW, physH).toFloat())
-        val w = makeEven((physW * scale).toInt().coerceAtLeast(2))
-        val h = makeEven((physH * scale).toInt().coerceAtLeast(2))
+        val caps = MediaCodecVideoEncoder.queryEncoderCaps()
+        val maxW = caps?.maxWidth ?: 4096
+        val maxH = caps?.maxHeight ?: 4096
+        val wAlign = caps?.widthAlignment ?: 2
+        val hAlign = caps?.heightAlignment ?: 2
+        val (w, h) = ScreenMirrorCaptureSize.compute(
+            physW, physH, shortTarget, maxW, maxH, wAlign, hAlign,
+        )
+        LogCat.d("$TAG: captureSize phys=${physW}x${physH} target=$shortTarget encMax=${maxW}x${maxH} align=${wAlign}x${hAlign} → ${w}x${h}")
         return Triple(w, h, context.resources.displayMetrics.densityDpi)
     }
 
+    // Bitrate values from scrcpy defaults (SurfaceEncoder.java createFormat()).
+    // scrcpy default is 8 Mbps for 1080p, proven across Pixel/Xiaomi/Samsung.
+    // Higher bitrates (e.g. 24 Mbps) cause encoder/decoder frame drops and
+    // increased end-to-end latency without visible quality gain for screen
+    // content.
     private fun computeStartBitrate(shortTarget: Int): Int = when {
-        shortTarget >= 1080 -> 4_000_000
-        shortTarget >= 720 -> 2_000_000
-        else -> 1_000_000
+        shortTarget >= 1080 -> 8_000_000
+        shortTarget >= 720 -> 4_000_000
+        else -> 2_000_000
     }
-
-    private fun makeEven(v: Int): Int = if (v % 2 == 0) v else v - 1
 }

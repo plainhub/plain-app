@@ -45,6 +45,13 @@ expect fun applyScreenMirrorQualityPreference()
 expect fun dispatchScreenMirrorControl(input: ScreenMirrorControlInput): Boolean
 
 /**
+ * Request an immediate IDR keyframe from the running screen mirror encoder.
+ * Used by the web client to recover from packet loss or decoder errors.
+ * No-op if the pipeline is not running.
+ */
+expect fun requestScreenMirrorKeyFrame()
+
+/**
  * Returns the screen size used by the accessibility service for coordinate
  * scaling. Returns (0, 0) on unsupported platforms.
  */

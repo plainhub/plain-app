@@ -34,21 +34,35 @@ object H264AnnexB {
      */
     fun avccToAnnexB(avcc: ByteArray): ByteArray {
         if (avcc.size < 4) return ByteArray(0)
-        // Already Annex-B? Pass through.
+        // Already Annex-B? Pass through (0-copy).
         if (avcc[0] == 0.toByte() && avcc[1] == 0.toByte() &&
             ((avcc[2] == 0.toByte() && avcc[3] == 1.toByte()) ||
              avcc[2] == 1.toByte())
         ) return avcc
-        val out = ArrayList<Byte>(avcc.size + 16)
+        // First pass: compute total output size so we allocate once.
+        var outSize = 0
         var off = 0
         while (off + 4 <= avcc.size) {
             val len = readUInt32BE(avcc, off)
             if (len <= 0 || off + 4 + len > avcc.size) break
-            out.add(0x00); out.add(0x00); out.add(0x00); out.add(0x01)
-            for (i in 0 until len) out.add(avcc[off + 4 + i])
+            outSize += 4 + len
             off += 4 + len
         }
-        return out.toByteArray()
+        if (outSize == 0) return ByteArray(0)
+        // Second pass: write start codes + bulk-copy NAL data.
+        val out = ByteArray(outSize)
+        var writeOff = 0
+        off = 0
+        while (off + 4 <= avcc.size) {
+            val len = readUInt32BE(avcc, off)
+            if (len <= 0 || off + 4 + len > avcc.size) break
+            out[writeOff] = 0; out[writeOff + 1] = 0
+            out[writeOff + 2] = 0; out[writeOff + 3] = 1
+            avcc.copyInto(out, writeOff + 4, off + 4, off + 4 + len)
+            writeOff += 4 + len
+            off += 4 + len
+        }
+        return out
     }
 
     /**
@@ -66,12 +80,12 @@ object H264AnnexB {
         ) {
             val out = ByteArray(buf.size + 1)
             out[0] = 0; out[1] = 0; out[2] = 0; out[3] = 1
-            for (i in 0 until buf.size - 3) out[4 + i] = buf[3 + i]
+            buf.copyInto(out, 4, 3)
             return out
         }
         val out = ByteArray(buf.size + 4)
         out[0] = 0; out[1] = 0; out[2] = 0; out[3] = 1
-        for (i in 0 until buf.size) out[4 + i] = buf[i]
+        buf.copyInto(out, 4)
         return out
     }
 
@@ -85,8 +99,8 @@ object H264AnnexB {
         val a = ensureStartCode(sps)
         val b = ensureStartCode(pps)
         val out = ByteArray(a.size + b.size)
-        for (i in 0 until a.size) out[i] = a[i]
-        for (i in 0 until b.size) out[a.size + i] = b[i]
+        a.copyInto(out, 0)
+        b.copyInto(out, a.size)
         return out
     }
 

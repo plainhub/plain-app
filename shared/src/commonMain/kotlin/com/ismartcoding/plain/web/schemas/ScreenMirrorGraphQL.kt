@@ -16,6 +16,7 @@ import com.ismartcoding.plain.platform.isScreenMirrorControlEnabled
 import com.ismartcoding.plain.platform.isScreenMirrorRunning
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.onScreenMirrorQualityChanged
+import com.ismartcoding.plain.platform.requestScreenMirrorKeyFrame
 import com.ismartcoding.plain.platform.stopScreenMirror
 import com.ismartcoding.plain.preferences.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.web.models.ScreenMirrorVideoCodec
@@ -83,6 +84,12 @@ fun SchemaBuilder.addScreenMirrorSchema() {
             if (!ok) {
                 throw GraphQLError("Accessibility service is not enabled")
             }
+            true
+        }
+    }
+    mutation("requestScreenMirrorKeyFrame") {
+        resolver { ->
+            requestScreenMirrorKeyFrame()
             true
         }
     }

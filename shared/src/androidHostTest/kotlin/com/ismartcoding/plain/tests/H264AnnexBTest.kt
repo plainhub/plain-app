@@ -76,6 +76,31 @@ class H264AnnexBTest {
         assertEquals(0, out.size)
     }
 
+    @Test
+    fun `avccToAnnexB passes Annex-B input through unchanged (same reference)`() {
+        val annexB = b(0, 0, 0, 1, 0x65, 0x88, 0x80, 0x40)
+        val out = H264AnnexB.avccToAnnexB(annexB)
+        assertTrue("expected same reference (0-copy passthrough)", annexB === out)
+    }
+
+    @Test
+    fun `avccToAnnexB bulk-copies a large NAL correctly`() {
+        // Simulate a realistic ~50KB IDR NAL
+        val payload = ByteArray(50_000) { (it and 0xFF).toByte() }
+        val avcc = avccOf(payload)
+        val out = H264AnnexB.avccToAnnexB(avcc)
+        // Expected: 4-byte start code + payload
+        assertEquals(4 + payload.size, out.size)
+        assertEquals(0, out[0].toInt())
+        assertEquals(0, out[1].toInt())
+        assertEquals(0, out[2].toInt())
+        assertEquals(1, out[3].toInt())
+        // Verify payload integrity at start, middle, and end
+        assertEquals(payload[0], out[4])
+        assertEquals(payload[25_000], out[25_004])
+        assertEquals(payload[49_999], out[49_999 + 4])
+    }
+
     // ── ensureStartCode ──────────────────────────────────────────────────────
 
     @Test

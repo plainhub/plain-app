@@ -40,6 +40,10 @@ actual fun dispatchScreenMirrorControl(input: ScreenMirrorControlInput): Boolean
     return true
 }
 
+actual fun requestScreenMirrorKeyFrame() {
+    ScreenMirrorService.instance?.getPipeline()?.requestKeyFrame()
+}
+
 actual fun getAccessibilityScreenSize(): Pair<Int, Int> {
     val size = PlainAccessibilityService.getScreenSize(appContext)
     return Pair(size.x, size.y)

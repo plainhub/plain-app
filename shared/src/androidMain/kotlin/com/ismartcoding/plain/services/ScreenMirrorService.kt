@@ -140,7 +140,7 @@ class ScreenMirrorService : LifecycleService() {
         sendEvent(
             WebSocketEvent(
                 EventType.SCREEN_MIRRORING,
-                ""
+                """{"running":true}""",
             ),
         )
 
@@ -165,7 +165,14 @@ class ScreenMirrorService : LifecycleService() {
     }
 
     fun stop() {
+        if (!running) return
         running = false
+        sendEvent(
+            WebSocketEvent(
+                EventType.SCREEN_MIRRORING,
+                """{"running":false}""",
+            ),
+        )
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }
