@@ -35,3 +35,10 @@ actual fun getSvgSize(path: String): IntSize = IntSize(150, 150)
 actual fun addMediaShortcut(path: String, label: String) {
     // iOS stub — home screen shortcuts not supported
 }
+
+actual suspend fun processSingleDurationZero(
+    mediaType: String,
+    item: com.ismartcoding.plain.events.MediaDurationZeroItem,
+) {
+    // iOS stub — MediaStore not applicable on iOS
+}

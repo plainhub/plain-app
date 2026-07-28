@@ -9,6 +9,7 @@ import android.media.MediaMuxer
 import android.net.Uri
 import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.File
+import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 
 /**
@@ -31,6 +32,317 @@ object Mp4Helper {
         val format: MediaFormat,
         val samples: List<EncodedSample>,
     )
+
+    /**
+     * Media duration in milliseconds for fMP4 files whose moov reports
+     * duration=0 (real duration lives in moof fragments), where
+     * MediaMetadataRetriever fails. Two-tier strategy: MediaExtractor
+     * (primary) + MP4 box parsing (fallback). The box parser matches the
+     * video track, so audio-only fMP4 returns 0.
+     */
+    fun getMp4DurationMs(path: String): Long {
+        val file = File(path)
+        if (!file.exists() || file.length() < 8) return 0L
+
+        val durationFromExtractor = getDurationViaExtractor(path)
+        if (durationFromExtractor > 0) return durationFromExtractor
+
+        val durationFromBoxes = getDurationFromMp4Boxes(path)
+        if (durationFromBoxes > 0) return durationFromBoxes
+
+        return 0L
+    }
+
+    private fun getDurationViaExtractor(path: String): Long {
+        val extractor = MediaExtractor()
+        return try {
+            extractor.setDataSource(path)
+            if (extractor.trackCount == 0) return 0L
+            val format = extractor.getTrackFormat(0)
+            if (!format.containsKey(MediaFormat.KEY_DURATION)) return 0L
+            format.getLong(MediaFormat.KEY_DURATION) / 1000L // microseconds → ms
+        } catch (e: Exception) {
+            LogCat.e("getDurationViaExtractor failed: ${e.message}")
+            0L
+        } finally {
+            try { extractor.release() } catch (_: Exception) {}
+        }
+    }
+
+    private fun getDurationFromMp4Boxes(path: String): Long {
+        return try {
+            RandomAccessFile(path, "r").use { raf ->
+                val fileLength = raf.length()
+                var timescale = 0L
+                var videoTrackId = -1
+
+                // Phase 1: parse moov to get the video track ID and its mdhd timescale.
+                // The video track is identified by an hdlr box whose handler_type == 'vide'.
+                var offset = 0L
+                while (offset < fileLength && offset >= 0) {
+                    raf.seek(offset)
+                    val boxSize = readBoxSize(raf)
+                    if (boxSize <= 0) break
+                    val boxType = readBoxType(raf)
+
+                    if (boxType == "moov") {
+                        val moovEnd = offset + boxSize
+                        var moovOffset = offset + 8
+                        while (moovOffset < moovEnd) {
+                            raf.seek(moovOffset)
+                            val trakSize = readBoxSize(raf)
+                            if (trakSize <= 0) break
+                            val trakType = readBoxType(raf)
+
+                            if (trakType == "trak") {
+                                val trackInfo = parseTrakForVideoInfo(raf, moovOffset, trakSize)
+                                if (trackInfo.isVideo && trackInfo.timescale > 0) {
+                                    videoTrackId = trackInfo.trackId
+                                    timescale = trackInfo.timescale
+                                    break
+                                }
+                            }
+                            moovOffset += trakSize
+                        }
+                        break
+                    }
+                    offset += boxSize
+                }
+
+                if (timescale <= 0) return@use 0L
+
+                // Phase 2: sum trun sample durations across all moof fragments that
+                // belong to the video track (matched via tfhd.track_ID).
+                var totalDuration = 0L
+                offset = 0L
+                while (offset < fileLength && offset >= 0) {
+                    raf.seek(offset)
+                    val boxSize = readBoxSize(raf)
+                    if (boxSize <= 0) break
+                    val boxType = readBoxType(raf)
+
+                    if (boxType == "moof") {
+                        totalDuration += parseMoofForVideoDuration(raf, offset, boxSize, videoTrackId)
+                    }
+                    offset += boxSize
+                }
+
+                if (totalDuration > 0) totalDuration * 1000L / timescale else 0L
+            }
+        } catch (e: Exception) {
+            LogCat.e("getDurationFromMp4Boxes failed: ${e.message}")
+            0L
+        }
+    }
+
+    private data class TrackInfo(
+        val isVideo: Boolean,
+        val trackId: Int,
+        val timescale: Long,
+    )
+
+    /** Parse a trak box to determine if it's a video track, and extract its ID + timescale. */
+    private fun parseTrakForVideoInfo(raf: RandomAccessFile, trakOffset: Long, trakSize: Long): TrackInfo {
+        val trakEnd = trakOffset + trakSize
+        var offset = trakOffset + 8
+        var trackId = -1
+        var isVideo = false
+        var timescale = 0L
+
+        while (offset < trakEnd) {
+            raf.seek(offset)
+            val subSize = readBoxSize(raf)
+            if (subSize <= 0) break
+            val subType = readBoxType(raf)
+
+            when (subType) {
+                "tkhd" -> {
+                    raf.seek(offset + 8)
+                    val version = raf.readByte().toInt()
+                    raf.skipBytes(3) // flags
+                    if (version == 0) {
+                        raf.skipBytes(8) // creation + modification time
+                    } else {
+                        raf.skipBytes(16)
+                    }
+                    trackId = raf.readInt()
+                }
+                "mdia" -> {
+                    val mdiaInfo = parseMdiaForVideoInfo(raf, offset, subSize)
+                    if (mdiaInfo.isVideo) isVideo = true
+                    if (mdiaInfo.timescale > 0) timescale = mdiaInfo.timescale
+                }
+            }
+            offset += subSize
+        }
+        return TrackInfo(isVideo, trackId, timescale)
+    }
+
+    private data class MdiaInfo(val isVideo: Boolean, val timescale: Long)
+
+    private fun parseMdiaForVideoInfo(raf: RandomAccessFile, mdiaOffset: Long, mdiaSize: Long): MdiaInfo {
+        val mdiaEnd = mdiaOffset + mdiaSize
+        var offset = mdiaOffset + 8
+        var isVideo = false
+        var timescale = 0L
+
+        while (offset < mdiaEnd) {
+            raf.seek(offset)
+            val subSize = readBoxSize(raf)
+            if (subSize <= 0) break
+            val subType = readBoxType(raf)
+
+            when (subType) {
+                "mdhd" -> {
+                    raf.seek(offset + 8)
+                    val version = raf.readByte().toInt()
+                    raf.skipBytes(3) // flags
+                    if (version == 0) {
+                        raf.skipBytes(8) // creation + modification time
+                    } else {
+                        raf.skipBytes(16)
+                    }
+                    timescale = raf.readInt().toLong() and 0xFFFFFFFFL
+                }
+                "hdlr" -> {
+                    raf.seek(offset + 8)
+                    raf.skipBytes(4) // version + flags
+                    raf.skipBytes(4) // pre_defined
+                    val handlerType = readBoxType(raf)
+                    isVideo = handlerType == "vide"
+                }
+            }
+            offset += subSize
+        }
+        return MdiaInfo(isVideo, timescale)
+    }
+
+    /** Parse a moof box: sum trun durations for the traf whose tfhd matches [videoTrackId]. */
+    private fun parseMoofForVideoDuration(
+        raf: RandomAccessFile,
+        moofOffset: Long,
+        moofSize: Long,
+        videoTrackId: Int,
+    ): Long {
+        val moofEnd = moofOffset + moofSize
+        var offset = moofOffset + 8
+        var totalDuration = 0L
+
+        while (offset < moofEnd) {
+            raf.seek(offset)
+            val subSize = readBoxSize(raf)
+            if (subSize <= 0) break
+            val subType = readBoxType(raf)
+
+            if (subType == "traf") {
+                val trafInfo = parseTrafForVideoTrun(raf, offset, subSize, videoTrackId)
+                totalDuration += trafInfo
+            }
+            offset += subSize
+        }
+        return totalDuration
+    }
+
+    /** Parse traf: read tfhd to get track_ID, and if it matches, sum trun sample durations. */
+    private fun parseTrafForVideoTrun(
+        raf: RandomAccessFile,
+        trafOffset: Long,
+        trafSize: Long,
+        videoTrackId: Int,
+    ): Long {
+        val trafEnd = trafOffset + trafSize
+        var offset = trafOffset + 8
+        var trafTrackId = -1
+        var trunDuration = 0L
+        var foundTrun = false
+
+        // First pass: find tfhd to get track_ID
+        while (offset < trafEnd) {
+            raf.seek(offset)
+            val subSize = readBoxSize(raf)
+            if (subSize <= 0) break
+            val subType = readBoxType(raf)
+
+            if (subType == "tfhd") {
+                raf.seek(offset + 8)
+                raf.skipBytes(4) // version + flags
+                trafTrackId = raf.readInt()
+                break
+            }
+            offset += subSize
+        }
+
+        // If this traf is not for the video track, skip it
+        if (videoTrackId >= 0 && trafTrackId != videoTrackId) return 0L
+
+        // Second pass: sum trun durations
+        offset = trafOffset + 8
+        while (offset < trafEnd) {
+            raf.seek(offset)
+            val subSize = readBoxSize(raf)
+            if (subSize <= 0) break
+            val subType = readBoxType(raf)
+
+            if (subType == "trun") {
+                trunDuration += parseTrunDuration(raf, offset, subSize)
+                foundTrun = true
+            }
+            offset += subSize
+        }
+        return if (foundTrun) trunDuration else 0L
+    }
+
+    /** Parse a trun box and return the sum of per-sample durations (in timescale units). */
+    private fun parseTrunDuration(raf: RandomAccessFile, trunOffset: Long, trunSize: Long): Long {
+        raf.seek(trunOffset + 8)
+        val version = raf.readByte().toInt()
+        val flags = (raf.readByte().toInt() and 0xFF) shl 16 or
+            (raf.readByte().toInt() and 0xFF) shl 8 or
+            (raf.readByte().toInt() and 0xFF)
+
+        val dataOffsetPresent = (flags and 0x000001) != 0
+        val firstSampleFlagsPresent = (flags and 0x000004) != 0
+        val sampleDurationPresent = (flags and 0x000100) != 0
+        val sampleSizePresent = (flags and 0x000200) != 0
+        val sampleFlagsPresent = (flags and 0x000400) != 0
+        val sampleCompositionOffsetsPresent = (flags and 0x000800) != 0
+
+        val sampleCount = raf.readInt().toLong() and 0xFFFFFFFFL
+        if (sampleCount == 0L) return 0L
+
+        // data_offset (optional)
+        if (dataOffsetPresent) raf.skipBytes(4)
+        // first_sample_flags (optional) — read BEFORE the samples array
+        if (firstSampleFlagsPresent) raf.skipBytes(4)
+
+        var totalDuration = 0L
+        var remaining = sampleCount
+        while (remaining > 0) {
+            if (sampleDurationPresent) {
+                totalDuration += raf.readInt().toLong() and 0xFFFFFFFFL
+            }
+            if (sampleSizePresent) raf.skipBytes(4)
+            if (sampleFlagsPresent) raf.skipBytes(4)
+            if (sampleCompositionOffsetsPresent) raf.skipBytes(4)
+            remaining--
+        }
+        return totalDuration
+    }
+
+    private fun readBoxSize(raf: RandomAccessFile): Long {
+        val size = raf.readInt().toLong() and 0xFFFFFFFFL
+        return when {
+            size == 0L -> -1L  // box extends to end of file; signal to stop
+            size == 1L -> raf.readLong()
+            else -> size
+        }
+    }
+
+    private fun readBoxType(raf: RandomAccessFile): String {
+        val bytes = ByteArray(4)
+        raf.readFully(bytes)
+        return String(bytes, Charsets.US_ASCII)
+    }
 
     fun convert3gpToMp4(context: Context, uri: Uri): ByteArray? {
         val tmpFile = File.createTempFile("mms_", ".mp4", context.cacheDir)
