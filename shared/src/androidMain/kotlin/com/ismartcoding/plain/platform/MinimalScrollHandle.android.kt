@@ -39,7 +39,7 @@ class MinimalScrollHandle(context: Context) : View(context), ScrollHandle {
 
     init {
         visibility = INVISIBLE
-        thumbPaint.color = ContextCompat.getColor(context, AppResources.color("scrollbar_primary"))
+        thumbPaint.color = ContextCompat.getColor(context, appResourceColor("scrollbar_primary"))
         bubblePaint.color = 0xCC2C2C2E.toInt()
         textPaint.apply {
             color = 0xFFFFFFFF.toInt()

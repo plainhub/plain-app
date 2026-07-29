@@ -17,7 +17,6 @@ import com.ismartcoding.plain.helpers.QrCodeScanHelper
 import com.ismartcoding.plain.helpers.SvgHelper
 import com.ismartcoding.plain.helpers.VideoHelper
 import com.ismartcoding.plain.platform.renameAndScanFile
-import com.ismartcoding.plain.platform.AppResources
 import java.io.File
 
 actual fun getImageRotation(path: String): Int = ImageHelper.getRotation(path)
@@ -57,5 +56,5 @@ actual fun generateQrCode(text: String, width: Int, height: Int): ImageBitmap {
 actual fun getSvgSize(path: String): IntSize = SvgHelper.getSize(path)
 
 actual fun addMediaShortcut(path: String, label: String) {
-    MediaShortcutHelper.addToDesktop(appContext, path, label, AppResources.mipmap("ic_launcher"))
+    MediaShortcutHelper.addToDesktop(appContext, path, label, appResourceMipmap("ic_launcher"))
 }

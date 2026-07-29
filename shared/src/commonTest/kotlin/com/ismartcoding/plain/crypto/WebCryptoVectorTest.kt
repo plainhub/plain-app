@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.crypto
 
-import com.ismartcoding.plain.platform.PairingCrypto
 import com.ismartcoding.plain.platform.chaCha20Decrypt
+import com.ismartcoding.plain.platform.computeECDHSharedKey
+import com.ismartcoding.plain.platform.verifyEd25519
 import com.ismartcoding.plain.platform.verifyEd25519Signature
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -28,7 +29,7 @@ class WebCryptoVectorTest {
         assertEquals(65, pubB.size, "public key B must be 65 bytes (X9.63)")
         assertEquals(0x04, pubB[0], "public key B must start with 0x04")
 
-        val shared = PairingCrypto.computeECDHSharedKey(privA, pubB)
+        val shared = computeECDHSharedKey(privA, pubB)
         assertNotNull(shared, "ECDH shared key computation must not return null")
         assertEquals(v.sharedKey, shared, "plain-app ECDH shared key must match web's")
     }
@@ -39,7 +40,7 @@ class WebCryptoVectorTest {
         val privB = b64Decode(v.privateKeyB)
         val pubA = b64Decode(v.publicKeyA)
 
-        val shared = PairingCrypto.computeECDHSharedKey(privB, pubA)
+        val shared = computeECDHSharedKey(privB, pubA)
         assertNotNull(shared, "ECDH shared key computation must not return null")
         assertEquals(v.sharedKey, shared, "ECDH(B_priv, A_pub) must equal ECDH(A_priv, B_pub)")
     }
@@ -53,7 +54,7 @@ class WebCryptoVectorTest {
         assertEquals(32, pub.size, "public key must be 32 bytes")
         assertEquals(64, sig.size, "signature must be 64 bytes")
 
-        val ok = PairingCrypto.verifyEd25519(pub, v.message.toByteArray(), sig)
+        val ok = verifyEd25519(pub, v.message.toByteArray(), sig)
         assertTrue(ok, "plain-app must verify web's Ed25519 signature")
     }
 
@@ -74,7 +75,7 @@ class WebCryptoVectorTest {
         val tampered = b64Decode(v.signature).copyOf()
         tampered[0] = (tampered[0].toInt() xor 0x01).toByte()
 
-        val ok = PairingCrypto.verifyEd25519(b64Decode(v.publicKey), v.message.toByteArray(), tampered)
+        val ok = verifyEd25519(b64Decode(v.publicKey), v.message.toByteArray(), tampered)
         assertTrue(!ok, "tampered signature must fail verification")
     }
 

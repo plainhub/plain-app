@@ -10,10 +10,13 @@ import com.ismartcoding.plain.data.DDiscoverRequest
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.platform.NearbyNetwork
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.platform.getDeviceIP4s
+import com.ismartcoding.plain.platform.nearbySendMulticast
+import com.ismartcoding.plain.platform.nearbySendUnicast
+import com.ismartcoding.plain.platform.nearbyStartReceiver
+import com.ismartcoding.plain.platform.nearbyStopReceiver
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
@@ -37,7 +40,7 @@ object LANDiscoverManager {
     private var restartJob: Job? = null
 
     fun startReceiver() {
-        NearbyNetwork.startReceiver(::onDatagram)
+        nearbyStartReceiver(::onDatagram)
     }
 
     fun startPeriodicDiscovery() {
@@ -76,8 +79,8 @@ object LANDiscoverManager {
         restartJob = coIO {
             delay(1_500.milliseconds) // debounce rapid network churn
             LogCat.d("Network change ($reason) — restarting multicast listener")
-            NearbyNetwork.stopReceiver()
-            NearbyNetwork.startReceiver(::onDatagram)
+            nearbyStopReceiver()
+            nearbyStartReceiver(::onDatagram)
         }
     }
 
@@ -120,7 +123,7 @@ object LANDiscoverManager {
     // ---- Discovery logic -------------------------------------------------------
 
     private fun broadcastDiscover(request: DDiscoverRequest) {
-        NearbyNetwork.sendMulticast(PairingCore.formatMessage(NearbyMessageType.DISCOVER, JsonHelper.jsonEncode(request)))
+        nearbySendMulticast(PairingCore.formatMessage(NearbyMessageType.DISCOVER, JsonHelper.jsonEncode(request)))
     }
 
     private suspend fun handleDiscoverRequest(payload: String, senderIP: String) {
@@ -143,7 +146,7 @@ object LANDiscoverManager {
 
     private fun sendDiscoverReply(targetIP: String) {
         val message = PairingCore.formatMessage(NearbyMessageType.DISCOVER_REPLY, JsonHelper.jsonEncode(PairingCore.buildDiscoverReply()))
-        NearbyNetwork.sendUnicast(message, targetIP)
+        nearbySendUnicast(message, targetIP)
     }
 
     private fun handleDiscoverReply(payload: String) {

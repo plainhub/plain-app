@@ -5,8 +5,12 @@ package com.ismartcoding.plain.platform
  * (e.g. "ic_launcher") to integer resource ids via `Resources.getIdentifier`.
  * On iOS all functions return `0` since there is no equivalent resource id system.
  */
-expect object AppResources {
-    fun color(name: String): Int
-    fun drawable(name: String): Int
-    fun mipmap(name: String): Int
-}
+
+/** Resolve a color resource name to its integer resource id (0 if not found). */
+expect fun appResourceColor(name: String): Int
+
+/** Resolve a drawable resource name to its integer resource id (0 if not found). */
+expect fun appResourceDrawable(name: String): Int
+
+/** Resolve a mipmap resource name to its integer resource id (0 if not found). */
+expect fun appResourceMipmap(name: String): Int

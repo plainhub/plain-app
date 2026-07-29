@@ -5,7 +5,7 @@ import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.helpers.JsonHelper
-import com.ismartcoding.plain.platform.NearbyNetwork
+import com.ismartcoding.plain.platform.nearbySendUnicast
 
 object PairingMessenger {
     fun sendRequest(request: DPairingRequest, targetIp: String) {
@@ -21,6 +21,6 @@ object PairingMessenger {
     }
 
     private fun send(type: NearbyMessageType, message: String, targetIp: String) {
-        NearbyNetwork.sendUnicast(PairingCore.formatMessage(type, message), targetIp)
+        nearbySendUnicast(PairingCore.formatMessage(type, message), targetIp)
     }
 }

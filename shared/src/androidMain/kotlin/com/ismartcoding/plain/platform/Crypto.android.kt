@@ -85,118 +85,115 @@ actual fun generateChaCha20Key(): String {
     return Base64.encode(bytes)
 }
 
+actual fun generateECDHKeyPair(): ECDHKeyPair {
+    val keyPairGen = KeyPairGenerator.getInstance("EC")
+    keyPairGen.initialize(ECGenParameterSpec("secp256r1"))
+    val keyPair = keyPairGen.generateKeyPair()
+    val pub = keyPair.public as ECPublicKey
+    val priv = keyPair.private as ECPrivateKey
+    return ECDHKeyPair(
+        privateKeyEncoded = encodePrivateKeyBytes(priv),
+        publicKeyEncoded = encodePublicKeyX963(pub),
+    )
+}
+
 @OptIn(ExperimentalEncodingApi::class)
-actual object PairingCrypto {
+actual fun computeECDHSharedKey(
+    privateKeyEncoded: ByteArray,
+    peerPublicKeyEncoded: ByteArray,
+): String? {
+    return try {
+        val params = getSecp256r1Params()
+        val privSpec = ECPrivateKeySpec(BigInteger(1, privateKeyEncoded), params)
+        val privateKey = KeyFactory.getInstance("EC").generatePrivate(privSpec)
 
-    actual fun generateECDHKeyPair(): ECDHKeyPair {
-        val keyPairGen = KeyPairGenerator.getInstance("EC")
-        keyPairGen.initialize(ECGenParameterSpec("secp256r1"))
-        val keyPair = keyPairGen.generateKeyPair()
-        val pub = keyPair.public as ECPublicKey
-        val priv = keyPair.private as ECPrivateKey
-        return ECDHKeyPair(
-            privateKeyEncoded = encodePrivateKeyBytes(priv),
-            publicKeyEncoded = encodePublicKeyX963(pub),
-        )
+        val peerPoint = decodeX963(peerPublicKeyEncoded)
+        val pubSpec = ECPublicKeySpec(peerPoint, params)
+        val peerPublicKey = KeyFactory.getInstance("EC").generatePublic(pubSpec)
+
+        // Reconstruct the public key from bytes and perform ECDH key agreement
+        val keyAgreement = KeyAgreement.getInstance("ECDH")
+        keyAgreement.init(privateKey)
+        keyAgreement.doPhase(peerPublicKey, true)
+
+        val sharedSecret = keyAgreement.generateSecret()
+
+        // Derive XChaCha20 key from shared secret via SHA-256
+        val xChaCha20KeyBytes = MessageDigest.getInstance("SHA-256").digest(sharedSecret)
+        Base64.encode(xChaCha20KeyBytes)
+    } catch (e: Exception) {
+        LogCat.e("ECDH key computation failed: ${e.message}")
+        null
     }
+}
 
-    actual fun computeECDHSharedKey(
-        privateKeyEncoded: ByteArray,
-        peerPublicKeyEncoded: ByteArray,
-    ): String? {
-        return try {
-            val params = getSecp256r1Params()
-            val privSpec = ECPrivateKeySpec(BigInteger(1, privateKeyEncoded), params)
-            val privateKey = KeyFactory.getInstance("EC").generatePrivate(privSpec)
+actual fun generateEd25519KeyPair(): Pair<ByteArray, ByteArray> {
+    initializeTink()
+    val keyPair = Ed25519Sign.KeyPair.newKeyPair()
+    return Pair(keyPair.privateKey, keyPair.publicKey)
+}
 
-            val peerPoint = decodeX963(peerPublicKeyEncoded)
-            val pubSpec = ECPublicKeySpec(peerPoint, params)
-            val peerPublicKey = KeyFactory.getInstance("EC").generatePublic(pubSpec)
+actual fun signEd25519(rawPrivateKey: ByteArray, data: ByteArray): ByteArray {
+    require(rawPrivateKey.size == 32) { "Ed25519 private key must be 32 bytes, got ${rawPrivateKey.size}" }
+    initializeTink()
+    return Ed25519Sign(rawPrivateKey).sign(data)
+}
 
-            // Reconstruct the public key from bytes and perform ECDH key agreement
-            val keyAgreement = KeyAgreement.getInstance("ECDH")
-            keyAgreement.init(privateKey)
-            keyAgreement.doPhase(peerPublicKey, true)
-
-            val sharedSecret = keyAgreement.generateSecret()
-
-            // Derive XChaCha20 key from shared secret via SHA-256
-            val xChaCha20KeyBytes = MessageDigest.getInstance("SHA-256").digest(sharedSecret)
-            Base64.encode(xChaCha20KeyBytes)
-        } catch (e: Exception) {
-            LogCat.e("ECDH key computation failed: ${e.message}")
-            null
-        }
+actual fun verifyEd25519(
+    rawPublicKey: ByteArray,
+    data: ByteArray,
+    signature: ByteArray,
+): Boolean {
+    initializeTink()
+    return try {
+        Ed25519Verify(rawPublicKey).verify(signature, data)
+        true
+    } catch (ex: Exception) {
+        false
     }
+}
 
-    actual fun generateEd25519KeyPair(): Pair<ByteArray, ByteArray> {
-        initializeTink()
-        val keyPair = Ed25519Sign.KeyPair.newKeyPair()
-        return Pair(keyPair.privateKey, keyPair.publicKey)
+private fun encodePublicKeyX963(pub: ECPublicKey): ByteArray {
+    val x = bigIntegerToFixedBytes(pub.w.affineX, 32)
+    val y = bigIntegerToFixedBytes(pub.w.affineY, 32)
+    return ByteArray(65).also { out ->
+        out[0] = 0x04
+        System.arraycopy(x, 0, out, 1, 32)
+        System.arraycopy(y, 0, out, 33, 32)
     }
+}
 
-    actual fun signEd25519(rawPrivateKey: ByteArray, data: ByteArray): ByteArray {
-        require(rawPrivateKey.size == 32) { "Ed25519 private key must be 32 bytes, got ${rawPrivateKey.size}" }
-        initializeTink()
-        return Ed25519Sign(rawPrivateKey).sign(data)
+private fun encodePrivateKeyBytes(priv: ECPrivateKey): ByteArray {
+    return bigIntegerToFixedBytes(priv.s, 32)
+}
+
+private fun decodeX963(bytes: ByteArray): ECPoint {
+    require(bytes.size == 65 && bytes[0].toInt() == 0x04) {
+        "Invalid X9.63 public key format: expected 65 bytes with 0x04 prefix"
     }
+    val x = BigInteger(1, bytes.copyOfRange(1, 33))
+    val y = BigInteger(1, bytes.copyOfRange(33, 65))
+    return ECPoint(x, y)
+}
 
-    actual fun verifyEd25519(
-        rawPublicKey: ByteArray,
-        data: ByteArray,
-        signature: ByteArray,
-    ): Boolean {
-        initializeTink()
-        return try {
-            Ed25519Verify(rawPublicKey).verify(signature, data)
-            true
-        } catch (ex: Exception) {
-            false
-        }
+private fun bigIntegerToFixedBytes(value: BigInteger, length: Int): ByteArray {
+    val raw = value.toByteArray()
+    return when {
+        raw.size == length -> raw
+        raw.size == length + 1 && raw[0].toInt() == 0 -> raw.copyOfRange(1, raw.size)
+        raw.size < length -> ByteArray(length).also { System.arraycopy(raw, 0, it, length - raw.size, raw.size) }
+        else -> raw.copyOfRange(raw.size - length, raw.size)
     }
+}
 
-    private fun encodePublicKeyX963(pub: ECPublicKey): ByteArray {
-        val x = bigIntegerToFixedBytes(pub.w.affineX, 32)
-        val y = bigIntegerToFixedBytes(pub.w.affineY, 32)
-        return ByteArray(65).also { out ->
-            out[0] = 0x04
-            System.arraycopy(x, 0, out, 1, 32)
-            System.arraycopy(y, 0, out, 33, 32)
-        }
-    }
+private var cachedParams: ECParameterSpec? = null
 
-    private fun encodePrivateKeyBytes(priv: ECPrivateKey): ByteArray {
-        return bigIntegerToFixedBytes(priv.s, 32)
-    }
-
-    private fun decodeX963(bytes: ByteArray): ECPoint {
-        require(bytes.size == 65 && bytes[0].toInt() == 0x04) {
-            "Invalid X9.63 public key format: expected 65 bytes with 0x04 prefix"
-        }
-        val x = BigInteger(1, bytes.copyOfRange(1, 33))
-        val y = BigInteger(1, bytes.copyOfRange(33, 65))
-        return ECPoint(x, y)
-    }
-
-    private fun bigIntegerToFixedBytes(value: BigInteger, length: Int): ByteArray {
-        val raw = value.toByteArray()
-        return when {
-            raw.size == length -> raw
-            raw.size == length + 1 && raw[0].toInt() == 0 -> raw.copyOfRange(1, raw.size)
-            raw.size < length -> ByteArray(length).also { System.arraycopy(raw, 0, it, length - raw.size, raw.size) }
-            else -> raw.copyOfRange(raw.size - length, raw.size)
-        }
-    }
-
-    private var cachedParams: ECParameterSpec? = null
-
-    private fun getSecp256r1Params(): ECParameterSpec {
-        cachedParams?.let { return it }
-        val keyPairGen = KeyPairGenerator.getInstance("EC")
-        keyPairGen.initialize(ECGenParameterSpec("secp256r1"))
-        val keyPair = keyPairGen.generateKeyPair()
-        val params = (keyPair.public as ECPublicKey).params
-        cachedParams = params
-        return params
-    }
+private fun getSecp256r1Params(): ECParameterSpec {
+    cachedParams?.let { return it }
+    val keyPairGen = KeyPairGenerator.getInstance("EC")
+    keyPairGen.initialize(ECGenParameterSpec("secp256r1"))
+    val keyPair = keyPairGen.generateKeyPair()
+    val params = (keyPair.public as ECPublicKey).params
+    cachedParams = params
+    return params
 }

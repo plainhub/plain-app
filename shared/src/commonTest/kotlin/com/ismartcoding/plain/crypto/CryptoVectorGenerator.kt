@@ -1,7 +1,11 @@
 package com.ismartcoding.plain.crypto
 
-import com.ismartcoding.plain.platform.PairingCrypto
 import com.ismartcoding.plain.platform.chaCha20Encrypt
+import com.ismartcoding.plain.platform.computeECDHSharedKey
+import com.ismartcoding.plain.platform.generateECDHKeyPair
+import com.ismartcoding.plain.platform.generateEd25519KeyPair
+import com.ismartcoding.plain.platform.signEd25519
+import com.ismartcoding.plain.platform.verifyEd25519
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -68,12 +72,12 @@ class CryptoVectorGenerator {
     )
 
     private fun generateEcdhVectors(): EcdhVectors {
-        val pairA = PairingCrypto.generateECDHKeyPair()
-        val pairB = PairingCrypto.generateECDHKeyPair()
+        val pairA = generateECDHKeyPair()
+        val pairB = generateECDHKeyPair()
 
         // ECDH(A_priv, B_pub) must equal ECDH(B_priv, A_pub).
-        val sharedAB = PairingCrypto.computeECDHSharedKey(pairA.privateKeyEncoded, pairB.publicKeyEncoded)
-        val sharedBA = PairingCrypto.computeECDHSharedKey(pairB.privateKeyEncoded, pairA.publicKeyEncoded)
+        val sharedAB = computeECDHSharedKey(pairA.privateKeyEncoded, pairB.publicKeyEncoded)
+        val sharedBA = computeECDHSharedKey(pairB.privateKeyEncoded, pairA.publicKeyEncoded)
         assertNotNull(sharedAB, "ECDH shared key A→B must not be null")
         assertNotNull(sharedBA, "ECDH shared key B→A must not be null")
         assertEquals(sharedAB, sharedBA, "ECDH shared key must be symmetric")
@@ -88,7 +92,7 @@ class CryptoVectorGenerator {
     }
 
     private fun verifyEcdhSymmetry(v: EcdhVectors) {
-        val recomputed = PairingCrypto.computeECDHSharedKey(
+        val recomputed = computeECDHSharedKey(
             base64Decode(v.privateKeyA),
             base64Decode(v.publicKeyB),
         )
@@ -105,9 +109,9 @@ class CryptoVectorGenerator {
     )
 
     private fun generateEd25519Vectors(): Ed25519Vectors {
-        val (priv, pub) = PairingCrypto.generateEd25519KeyPair()
+        val (priv, pub) = generateEd25519KeyPair()
         val message = "the quick brown fox jumps over the lazy dog"
-        val signature = PairingCrypto.signEd25519(priv, message.toByteArray())
+        val signature = signEd25519(priv, message.toByteArray())
 
         assertEquals(32, priv.size, "Ed25519 private key must be 32 bytes")
         assertEquals(32, pub.size, "Ed25519 public key must be 32 bytes")
@@ -122,7 +126,7 @@ class CryptoVectorGenerator {
     }
 
     private fun verifyEd25519RoundTrip(v: Ed25519Vectors) {
-        val ok = PairingCrypto.verifyEd25519(
+        val ok = verifyEd25519(
             base64Decode(v.publicKey),
             v.message.toByteArray(),
             base64Decode(v.signature),

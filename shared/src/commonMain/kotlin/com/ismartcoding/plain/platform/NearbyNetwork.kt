@@ -6,20 +6,19 @@ package com.ismartcoding.plain.platform
  * Platform-specific implementation: Android uses WiFi multicast lock + java.net sockets;
  * iOS is currently a no-op (LAN multicast discovery is Android-only for now).
  */
-expect object NearbyNetwork {
-    /** Send [message] to the local-subnet multicast group (fire-and-forget). */
-    fun sendMulticast(message: String)
 
-    /** Send [message] to a specific [targetIP] via unicast (fire-and-forget). */
-    fun sendUnicast(message: String, targetIP: String)
+/** Send [message] to the local-subnet multicast group (fire-and-forget). */
+expect fun nearbySendMulticast(message: String)
 
-    /**
-     * Start the multicast receiver loop.
-     *
-     * @param onMessage called for every incoming datagram with (message, senderIP).
-     */
-    fun startReceiver(onMessage: (message: String, senderIP: String) -> Unit)
+/** Send [message] to a specific [targetIP] via unicast (fire-and-forget). */
+expect fun nearbySendUnicast(message: String, targetIP: String)
 
-    /** Stop the multicast receiver loop. */
-    fun stopReceiver()
-}
+/**
+ * Start the multicast receiver loop.
+ *
+ * @param onMessage called for every incoming datagram with (message, senderIP).
+ */
+expect fun nearbyStartReceiver(onMessage: (message: String, senderIP: String) -> Unit)
+
+/** Stop the multicast receiver loop. */
+expect fun nearbyStopReceiver()

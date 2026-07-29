@@ -57,7 +57,7 @@ actual fun chaCha20Encrypt(key: ByteArray, content: ByteArray): ByteArray = Byte
 actual fun chaCha20Encrypt(key: ByteArray, content: String): ByteArray = ByteArray(0)
 
 actual fun verifyEd25519Signature(publicKey: ByteArray, data: ByteArray, signature: ByteArray): Boolean =
-    PairingCrypto.verifyEd25519(publicKey, data, signature)
+    verifyEd25519(publicKey, data, signature)
 
 actual fun generateChaCha20Key(): String {
     val bytes = ByteArray(32)
@@ -67,172 +67,169 @@ actual fun generateChaCha20Key(): String {
     return Base64.encode(bytes)
 }
 
+actual fun generateECDHKeyPair(): ECDHKeyPair {
+    val attrs = createKeyAttributes(kSecAttrKeyTypeECSECPrimeRandom, 256)
+    val privateKey = SecKeyCreateRandomKey(attrs, null)
+        ?: throw RuntimeException("Failed to generate ECDH key pair")
+    val publicKey = SecKeyCopyPublicKey(privateKey)
+
+    val privData = SecKeyCopyExternalRepresentation(privateKey, null)
+        ?: throw RuntimeException("Failed to export private key")
+    val pubData = SecKeyCopyExternalRepresentation(publicKey, null)
+        ?: throw RuntimeException("Failed to export public key")
+
+    return ECDHKeyPair(
+        privateKeyEncoded = privData.toByteArray(),
+        publicKeyEncoded = pubData.toByteArray(),
+    )
+}
+
 @OptIn(ExperimentalEncodingApi::class)
-actual object PairingCrypto {
-
-    actual fun generateECDHKeyPair(): ECDHKeyPair {
-        val attrs = createKeyAttributes(kSecAttrKeyTypeECSECPrimeRandom, 256)
-        val privateKey = SecKeyCreateRandomKey(attrs, null)
-            ?: throw RuntimeException("Failed to generate ECDH key pair")
-        val publicKey = SecKeyCopyPublicKey(privateKey)
-
-        val privData = SecKeyCopyExternalRepresentation(privateKey, null)
-            ?: throw RuntimeException("Failed to export private key")
-        val pubData = SecKeyCopyExternalRepresentation(publicKey, null)
-            ?: throw RuntimeException("Failed to export public key")
-
-        return ECDHKeyPair(
-            privateKeyEncoded = privData.toByteArray(),
-            publicKeyEncoded = pubData.toByteArray(),
-        )
-    }
-
-    actual fun computeECDHSharedKey(
-        privateKeyEncoded: ByteArray,
-        peerPublicKeyEncoded: ByteArray,
-    ): String? {
-        return try {
-            val privAttrs = createKeyAttributes(
-                kSecAttrKeyTypeECSECPrimeRandom, 256, kSecAttrKeyClassPrivate
-            )
-            val privateKey = SecKeyCreateWithData(
-                privateKeyEncoded.toCFData(),
-                privAttrs,
-                null,
-            ) ?: run {
-                LogCat.e("Failed to reconstruct ECDH private key")
-                return null
-            }
-
-            val pubAttrs = createKeyAttributes(
-                kSecAttrKeyTypeECSECPrimeRandom, 256, kSecAttrKeyClassPublic
-            )
-            val peerPublicKey = SecKeyCreateWithData(
-                peerPublicKeyEncoded.toCFData(),
-                pubAttrs,
-                null,
-            ) ?: run {
-                LogCat.e("Failed to reconstruct peer ECDH public key")
-                return null
-            }
-
-            val sharedSecret = SecKeyCopyKeyExchangeResult(
-                privateKey,
-                kSecKeyAlgorithmECDHKeyExchangeStandard,
-                peerPublicKey,
-                null,
-                null,
-            ) ?: run {
-                LogCat.e("ECDH key exchange failed")
-                return null
-            }
-
-            val sharedBytes = sharedSecret.toByteArray()
-            Base64.encode(sha256(sharedBytes))
-        } catch (e: Exception) {
-            LogCat.e("ECDH key computation failed: ${e.message}")
-            null
-        }
-    }
-
-    /**
-     * Generate a raw Ed25519 key pair using Apple Security framework.
-     * Returns 32-byte private key and 32-byte public key (RFC 8032 raw format),
-     * matching Android's Tink-based output for cross-platform compatibility.
-     */
-    actual fun generateEd25519KeyPair(): Pair<ByteArray, ByteArray> {
-        val attrs = createKeyAttributes(kSecAttrKeyTypeEd25519Compat, 256)
-        val privateKey = SecKeyCreateRandomKey(attrs, null)
-            ?: throw RuntimeException("Failed to generate Ed25519 key pair")
-        val publicKey = SecKeyCopyPublicKey(privateKey)
-
-        val privData = SecKeyCopyExternalRepresentation(privateKey, null)
-            ?: throw RuntimeException("Failed to export Ed25519 private key")
-        val pubData = SecKeyCopyExternalRepresentation(publicKey, null)
-            ?: throw RuntimeException("Failed to export Ed25519 public key")
-
-        return Pair(privData.toByteArray(), pubData.toByteArray())
-    }
-
-    /**
-     * Sign [data] with raw 32-byte Ed25519 [rawPrivateKey] using Apple Security framework.
-     * Returns a 64-byte Ed25519 signature (RFC 8032).
-     */
-    actual fun signEd25519(rawPrivateKey: ByteArray, data: ByteArray): ByteArray {
-        require(rawPrivateKey.size == 32) {
-            "Ed25519 private key must be 32 bytes, got ${rawPrivateKey.size}"
-        }
+actual fun computeECDHSharedKey(
+    privateKeyEncoded: ByteArray,
+    peerPublicKeyEncoded: ByteArray,
+): String? {
+    return try {
         val privAttrs = createKeyAttributes(
-            kSecAttrKeyTypeEd25519Compat, 256, kSecAttrKeyClassPrivate
+            kSecAttrKeyTypeECSECPrimeRandom, 256, kSecAttrKeyClassPrivate
         )
-        val privateKey = SecKeyCreateWithData(rawPrivateKey.toCFData(), privAttrs, null)
-            ?: throw RuntimeException("Failed to reconstruct Ed25519 private key")
+        val privateKey = SecKeyCreateWithData(
+            privateKeyEncoded.toCFData(),
+            privAttrs,
+            null,
+        ) ?: run {
+            LogCat.e("Failed to reconstruct ECDH private key")
+            return null
+        }
 
-        val signature = memScoped {
+        val pubAttrs = createKeyAttributes(
+            kSecAttrKeyTypeECSECPrimeRandom, 256, kSecAttrKeyClassPublic
+        )
+        val peerPublicKey = SecKeyCreateWithData(
+            peerPublicKeyEncoded.toCFData(),
+            pubAttrs,
+            null,
+        ) ?: run {
+            LogCat.e("Failed to reconstruct peer ECDH public key")
+            return null
+        }
+
+        val sharedSecret = SecKeyCopyKeyExchangeResult(
+            privateKey,
+            kSecKeyAlgorithmECDHKeyExchangeStandard,
+            peerPublicKey,
+            null,
+            null,
+        ) ?: run {
+            LogCat.e("ECDH key exchange failed")
+            return null
+        }
+
+        val sharedBytes = sharedSecret.toByteArray()
+        Base64.encode(sha256(sharedBytes))
+    } catch (e: Exception) {
+        LogCat.e("ECDH key computation failed: ${e.message}")
+        null
+    }
+}
+
+/**
+ * Generate a raw Ed25519 key pair using Apple Security framework.
+ * Returns 32-byte private key and 32-byte public key (RFC 8032 raw format),
+ * matching Android's Tink-based output for cross-platform compatibility.
+ */
+actual fun generateEd25519KeyPair(): Pair<ByteArray, ByteArray> {
+    val attrs = createKeyAttributes(kSecAttrKeyTypeEd25519Compat, 256)
+    val privateKey = SecKeyCreateRandomKey(attrs, null)
+        ?: throw RuntimeException("Failed to generate Ed25519 key pair")
+    val publicKey = SecKeyCopyPublicKey(privateKey)
+
+    val privData = SecKeyCopyExternalRepresentation(privateKey, null)
+        ?: throw RuntimeException("Failed to export Ed25519 private key")
+    val pubData = SecKeyCopyExternalRepresentation(publicKey, null)
+        ?: throw RuntimeException("Failed to export Ed25519 public key")
+
+    return Pair(privData.toByteArray(), pubData.toByteArray())
+}
+
+/**
+ * Sign [data] with raw 32-byte Ed25519 [rawPrivateKey] using Apple Security framework.
+ * Returns a 64-byte Ed25519 signature (RFC 8032).
+ */
+actual fun signEd25519(rawPrivateKey: ByteArray, data: ByteArray): ByteArray {
+    require(rawPrivateKey.size == 32) {
+        "Ed25519 private key must be 32 bytes, got ${rawPrivateKey.size}"
+    }
+    val privAttrs = createKeyAttributes(
+        kSecAttrKeyTypeEd25519Compat, 256, kSecAttrKeyClassPrivate
+    )
+    val privateKey = SecKeyCreateWithData(rawPrivateKey.toCFData(), privAttrs, null)
+        ?: throw RuntimeException("Failed to reconstruct Ed25519 private key")
+
+    val signature = memScoped {
+        val errorPtr = alloc<CFErrorRefVar>().ptr
+        SecKeyCreateSignature(
+            privateKey,
+            kSecKeyAlgorithmEdDSASignatureMessageEd25519Compat,
+            data.toNSData() as CFDataRef,
+            errorPtr,
+        )
+    } ?: throw RuntimeException("SecKeyCreateSignature returned null")
+
+    return signature.toByteArray()
+}
+
+/**
+ * Verify an Ed25519 [signature] over [data] with raw 32-byte [rawPublicKey]
+ * using Apple Security framework.
+ */
+actual fun verifyEd25519(
+    rawPublicKey: ByteArray,
+    data: ByteArray,
+    signature: ByteArray,
+): Boolean {
+    require(rawPublicKey.size == 32) {
+        "Ed25519 public key must be 32 bytes, got ${rawPublicKey.size}"
+    }
+    return try {
+        val pubAttrs = createKeyAttributes(
+            kSecAttrKeyTypeEd25519Compat, 256, kSecAttrKeyClassPublic
+        )
+        val publicKey = SecKeyCreateWithData(rawPublicKey.toCFData(), pubAttrs, null)
+            ?: run {
+                LogCat.e("Failed to reconstruct Ed25519 public key")
+                return false
+            }
+
+        memScoped {
             val errorPtr = alloc<CFErrorRefVar>().ptr
-            SecKeyCreateSignature(
-                privateKey,
+            SecKeyVerifySignature(
+                publicKey,
                 kSecKeyAlgorithmEdDSASignatureMessageEd25519Compat,
                 data.toNSData() as CFDataRef,
+                signature.toNSData() as CFDataRef,
                 errorPtr,
             )
-        } ?: throw RuntimeException("SecKeyCreateSignature returned null")
-
-        return signature.toByteArray()
-    }
-
-    /**
-     * Verify an Ed25519 [signature] over [data] with raw 32-byte [rawPublicKey]
-     * using Apple Security framework.
-     */
-    actual fun verifyEd25519(
-        rawPublicKey: ByteArray,
-        data: ByteArray,
-        signature: ByteArray,
-    ): Boolean {
-        require(rawPublicKey.size == 32) {
-            "Ed25519 public key must be 32 bytes, got ${rawPublicKey.size}"
         }
-        return try {
-            val pubAttrs = createKeyAttributes(
-                kSecAttrKeyTypeEd25519Compat, 256, kSecAttrKeyClassPublic
-            )
-            val publicKey = SecKeyCreateWithData(rawPublicKey.toCFData(), pubAttrs, null)
-                ?: run {
-                    LogCat.e("Failed to reconstruct Ed25519 public key")
-                    return false
-                }
-
-            memScoped {
-                val errorPtr = alloc<CFErrorRefVar>().ptr
-                SecKeyVerifySignature(
-                    publicKey,
-                    kSecKeyAlgorithmEdDSASignatureMessageEd25519Compat,
-                    data.toNSData() as CFDataRef,
-                    signature.toNSData() as CFDataRef,
-                    errorPtr,
-                )
-            }
-        } catch (e: Exception) {
-            LogCat.e("Ed25519 verify failed: ${e.message}")
-            false
-        }
+    } catch (e: Exception) {
+        LogCat.e("Ed25519 verify failed: ${e.message}")
+        false
     }
+}
 
-    @Suppress("CAST_NEVER_SUCCEEDS")
-    private fun createKeyAttributes(
-        keyType: CFStringRef?,
-        keySize: Int,
-        keyClass: CFStringRef? = null,
-    ): CFDictionaryRef? {
-        val attrs = NSMutableDictionary()
-        attrs.setObject(keyType as NSString, forKey = kSecAttrKeyType as NSString)
-        attrs.setObject(NSNumber.numberWithInt(keySize), forKey = kSecAttrKeySizeInBits as NSString)
-        if (keyClass != null) {
-            attrs.setObject(keyClass as NSString, forKey = kSecAttrKeyClass as NSString)
-        }
-        return attrs as CFDictionaryRef
+@Suppress("CAST_NEVER_SUCCEEDS")
+private fun createKeyAttributes(
+    keyType: CFStringRef?,
+    keySize: Int,
+    keyClass: CFStringRef? = null,
+): CFDictionaryRef? {
+    val attrs = NSMutableDictionary()
+    attrs.setObject(keyType as NSString, forKey = kSecAttrKeyType as NSString)
+    attrs.setObject(NSNumber.numberWithInt(keySize), forKey = kSecAttrKeySizeInBits as NSString)
+    if (keyClass != null) {
+        attrs.setObject(keyClass as NSString, forKey = kSecAttrKeyClass as NSString)
     }
+    return attrs as CFDictionaryRef
 }
 
 private fun CFDataRef?.toByteArray(): ByteArray {

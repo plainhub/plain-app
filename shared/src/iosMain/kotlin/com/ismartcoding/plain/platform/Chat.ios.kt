@@ -10,15 +10,13 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
  * iOS stub implementation. The chat file-selection flow depends on Android's
  * ContentResolver and is a no-op on iOS.
  */
-actual object ChatPlatformOps {
-    actual fun handleFileSelection(
-        event: PickFileResultEvent,
-        chatVM: ChatViewModel,
-        peerVM: PeerViewModel,
-        focusManager: FocusManager,
-    ) {
-        // No-op on iOS: file picking flow is Android-only.
-    }
+actual fun handleChatFileSelection(
+    event: PickFileResultEvent,
+    chatVM: ChatViewModel,
+    peerVM: PeerViewModel,
+    focusManager: FocusManager,
+) {
+    // No-op on iOS: file picking flow is Android-only.
 }
 
 actual suspend fun updateChatMessageTextAsync(item: DChat, newText: String): Boolean {

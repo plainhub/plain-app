@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat
 
-import com.ismartcoding.plain.platform.ChatPlatformOps
+import com.ismartcoding.plain.platform.handleChatFileSelection
 import com.ismartcoding.plain.chat.peer.PeerTransportPrewarmer
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.combinedClickable
@@ -167,7 +167,7 @@ fun ChatPage(
             // the selected peer/channel instead of the stale "local" default.
             chatVM.pendingForwardFiles.value?.let { uris ->
                 chatVM.setPendingForwardFiles(null)
-                ChatPlatformOps.handleFileSelection(
+                handleChatFileSelection(
                     PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris),
                     chatVM, peerVM, focusManager,
                 )
@@ -192,7 +192,7 @@ fun ChatPage(
 
                 is PickFileResultEvent -> {
                     if (event.tag != PickFileTag.SEND_MESSAGE) return@collect
-                    ChatPlatformOps.handleFileSelection(event, chatVM, peerVM, focusManager)
+                    handleChatFileSelection(event, chatVM, peerVM, focusManager)
                 }
             }
         }

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.preferences
 
-import com.ismartcoding.plain.platform.PairingCrypto
+import com.ismartcoding.plain.platform.generateEd25519KeyPair
 import com.ismartcoding.plain.data.DSignatureKeyPair
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
@@ -11,7 +11,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 suspend fun SignatureKeyPreference.ensureKeyPairAsync() {
     val keyPairJson = getAsync()
     if (keyPairJson.isEmpty()) {
-        val (privateKey, publicKey) = PairingCrypto.generateEd25519KeyPair()
+        val (privateKey, publicKey) = generateEd25519KeyPair()
         val signatureKeyPair = DSignatureKeyPair(
             privateKey = Base64.encode(privateKey),
             publicKey = Base64.encode(publicKey),

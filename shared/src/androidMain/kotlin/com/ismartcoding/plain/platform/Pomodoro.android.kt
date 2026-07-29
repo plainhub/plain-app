@@ -2,7 +2,6 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.platform.AppResources
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
@@ -85,7 +84,7 @@ actual suspend fun showPomodoroNotification(state: PomodoroState) {
 
     val notificationId = NotificationHelper.generateId()
     val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(AppResources.drawable("notification"))
+        .setSmallIcon(appResourceDrawable("notification"))
         .setContentTitle(title)
         .setContentText(message)
         .setPriority(NotificationCompat.PRIORITY_HIGH)

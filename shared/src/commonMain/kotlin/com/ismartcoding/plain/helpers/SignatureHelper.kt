@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.helpers
 
-import com.ismartcoding.plain.platform.PairingCrypto
+import com.ismartcoding.plain.platform.signEd25519
 import com.ismartcoding.plain.preferences.SignatureKeyPreference
 import com.ismartcoding.plain.preferences.getKeyPairAsync
 import kotlin.io.encoding.Base64
@@ -12,7 +12,7 @@ object SignatureHelper {
     suspend fun signDataAsync(data: ByteArray): ByteArray {
         val keyPair = SignatureKeyPreference.getKeyPairAsync()
         val rawPrivateKey = Base64Lenient.decode(keyPair.privateKey)
-        return PairingCrypto.signEd25519(rawPrivateKey, data)
+        return signEd25519(rawPrivateKey, data)
     }
 
     suspend fun signTextAsync(text: String): String {

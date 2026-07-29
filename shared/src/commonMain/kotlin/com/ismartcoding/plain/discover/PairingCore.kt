@@ -3,7 +3,8 @@ package com.ismartcoding.plain.discover
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.ble.server.BlePairingSessionStore
-import com.ismartcoding.plain.platform.PairingCrypto
+import com.ismartcoding.plain.platform.computeECDHSharedKey
+import com.ismartcoding.plain.platform.generateECDHKeyPair
 import com.ismartcoding.plain.data.DDiscoverReply
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
@@ -157,7 +158,7 @@ object PairingCore {
     // ---- Core pairing logic (existing) -------------------------------------
 
     suspend fun buildPairingRequest(): Pair<DPairingRequest, com.ismartcoding.plain.crypto.ECDHKeyPair> {
-        val keyPair = PairingCrypto.generateECDHKeyPair()
+        val keyPair = generateECDHKeyPair()
         val ecdhPublicKey = Base64.encode(keyPair.publicKeyEncoded)
         val request = DPairingRequest(
             fromId = TempData.clientId,
@@ -177,7 +178,7 @@ object PairingCore {
     suspend fun acceptPairingRequest(request: DPairingRequest): DPairingResponse? {
         if (!validatePairingRequest(request)) return null
 
-        val keyPair = PairingCrypto.generateECDHKeyPair()
+        val keyPair = generateECDHKeyPair()
         PairingSessionStore.put(
             DPairingSession(
                 deviceId = request.fromId,
@@ -202,7 +203,7 @@ object PairingCore {
         response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
 
         val requestEcdhPublicKey = Base64Lenient.decode(request.ecdhPublicKey)
-        val encryptKey = PairingCrypto.computeECDHSharedKey(keyPair.privateKeyEncoded, requestEcdhPublicKey)
+        val encryptKey = computeECDHSharedKey(keyPair.privateKeyEncoded, requestEcdhPublicKey)
         if (encryptKey == null) {
             PairingSessionStore.remove(request.fromId)
             return null
@@ -248,7 +249,7 @@ object PairingCore {
 
         if (response.accepted) {
             val responseEcdhPublicKey = Base64Lenient.decode(response.ecdhPublicKey)
-            val encryptKey = PairingCrypto.computeECDHSharedKey(session.keyPair.privateKeyEncoded, responseEcdhPublicKey)
+            val encryptKey = computeECDHSharedKey(session.keyPair.privateKeyEncoded, responseEcdhPublicKey)
             if (encryptKey == null) {
                 notifyFailed(response.fromId, session.deviceName, "Failed to compute shared key")
                 return false

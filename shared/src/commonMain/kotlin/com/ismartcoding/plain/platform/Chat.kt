@@ -14,18 +14,17 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
  * expect/actual functions (e.g. [com.ismartcoding.plain.platform.isBleReady],
  * [com.ismartcoding.plain.platform.saveFileToDownloads]).
  */
-expect object ChatPlatformOps {
-    /**
-     * Handle a file-pick result: create placeholder chat messages, import the
-     * selected files, and update the messages with final metadata.
-     */
-    fun handleFileSelection(
-        event: PickFileResultEvent,
-        chatVM: ChatViewModel,
-        peerVM: PeerViewModel,
-        focusManager: FocusManager,
-    )
-}
+
+/**
+ * Handle a file-pick result: create placeholder chat messages, import the
+ * selected files, and update the messages with final metadata.
+ */
+expect fun handleChatFileSelection(
+    event: PickFileResultEvent,
+    chatVM: ChatViewModel,
+    peerVM: PeerViewModel,
+    focusManager: FocusManager,
+)
 
 /**
  * Edit a text chat message in-place: persist the new text, reconcile link

@@ -32,18 +32,23 @@ expect fun verifyEd25519Signature(publicKey: ByteArray, data: ByteArray, signatu
  */
 expect fun generateChaCha20Key(): String
 
-/** Pairing crypto primitives shared across platforms (Ed25519 + ECDH). */
-expect object PairingCrypto {
-    fun generateECDHKeyPair(): ECDHKeyPair
+/** Generate a fresh ECDH (secp256r1) key pair for pairing key exchange. */
+expect fun generateECDHKeyPair(): ECDHKeyPair
 
-    fun computeECDHSharedKey(privateKeyEncoded: ByteArray, peerPublicKeyEncoded: ByteArray): String?
+/**
+ * Compute the ECDH shared key from [privateKeyEncoded] and [peerPublicKeyEncoded].
+ * Returns a Base64-encoded derived key, or null if computation fails.
+ */
+expect fun computeECDHSharedKey(privateKeyEncoded: ByteArray, peerPublicKeyEncoded: ByteArray): String?
 
-    fun generateEd25519KeyPair(): Pair<ByteArray, ByteArray>
+/** Generate a raw Ed25519 key pair: (32-byte private key, 32-byte public key). */
+expect fun generateEd25519KeyPair(): Pair<ByteArray, ByteArray>
 
-    fun signEd25519(rawPrivateKey: ByteArray, data: ByteArray): ByteArray
+/** Sign [data] with a raw 32-byte Ed25519 [rawPrivateKey]. Returns a 64-byte signature. */
+expect fun signEd25519(rawPrivateKey: ByteArray, data: ByteArray): ByteArray
 
-    fun verifyEd25519(rawPublicKey: ByteArray, data: ByteArray, signature: ByteArray): Boolean
-}
+/** Verify an Ed25519 [signature] over [data] with a raw 32-byte [rawPublicKey]. */
+expect fun verifyEd25519(rawPublicKey: ByteArray, data: ByteArray, signature: ByteArray): Boolean
 
 /** SHA-1 of [input] as a lowercase hex string. Use only for non-security-critical hashing. */
 fun sha1(input: ByteArray): String = sha1Bytes(input).toHexString()
