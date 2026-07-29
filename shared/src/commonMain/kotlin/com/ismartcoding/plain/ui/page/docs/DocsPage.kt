@@ -47,10 +47,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun DocsPage(
     navController: NavHostController,
-    docsVM: DocsViewModel = viewModel(),
-    tagsVM: TagsViewModel = viewModel(key = "docTagsVM"),
-    castVM: CastViewModel = viewModel(key = "docsCastVM"),
-    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "docFoldersVM"),
+    docsVM: DocsViewModel = viewModel { DocsViewModel() },
+    tagsVM: TagsViewModel = viewModel(key = "docTagsVM") { TagsViewModel() },
+    castVM: CastViewModel = viewModel(key = "docsCastVM") { CastViewModel() },
+    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "docFoldersVM") { MediaFoldersViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val docsState = DocsPageState.create(docsVM, tagsVM, mediaFoldersVM)

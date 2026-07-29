@@ -91,10 +91,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun VideosPage(
     navController: NavHostController,
-    videosVM: VideosViewModel = viewModel(key = "videosVM"),
-    tagsVM: TagsViewModel = viewModel(key = "videoTagsVM"),
-    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "videoFoldersVM"),
-    castVM: CastViewModel = viewModel(key = "videoCastVM"),
+    videosVM: VideosViewModel = viewModel(key = "videosVM") { VideosViewModel() },
+    tagsVM: TagsViewModel = viewModel(key = "videoTagsVM") { TagsViewModel() },
+    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "videoFoldersVM") { MediaFoldersViewModel() },
+    castVM: CastViewModel = viewModel(key = "videoCastVM") { CastViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current

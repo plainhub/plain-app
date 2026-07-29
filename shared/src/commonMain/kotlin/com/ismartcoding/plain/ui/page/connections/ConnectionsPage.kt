@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ConnectionsPage(
     navController: NavHostController,
-    sessionsVM: SessionsViewModel = viewModel(),
+    sessionsVM: SessionsViewModel = viewModel { SessionsViewModel() },
 ) {
     val itemsState by sessionsVM.itemsFlow.collectAsState()
     var showCreateDialog by remember { mutableStateOf(false) }

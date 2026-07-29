@@ -73,7 +73,7 @@ import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun FeedEntryPage(navController: NavHostController, id: String, tagsVM: TagsViewModel, feedEntryVM: FeedEntryViewModel = viewModel()) {
+fun FeedEntryPage(navController: NavHostController, id: String, tagsVM: TagsViewModel, feedEntryVM: FeedEntryViewModel = viewModel { FeedEntryViewModel() }) {
     val scope = rememberCoroutineScope()
     val tagsState by tagsVM.itemsFlow.collectAsState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()

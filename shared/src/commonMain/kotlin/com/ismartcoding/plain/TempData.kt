@@ -1,6 +1,5 @@
 package com.ismartcoding.plain
 
-import com.ismartcoding.plain.data.DNotification
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.sms.DPendingMms
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +29,11 @@ object TempData {
     var audioPlayPosition = 0L // audio play position in milliseconds
     // mediaId -> playback position in milliseconds; pre-loaded from DB on startup as cache
     val videoPlayProgressMap = mutableMapOf<String, Long>()
+
+    // "<mediaType>:<mediaId>" -> duration in seconds; pre-loaded from DB on
+    // startup. Used to patch zero-duration MediaStore rows (fMP4 files whose
+    // DURATION column is read-only and reports 0). Unit matches DVideo/DAudio.duration.
+    val mediaDurationMap = mutableMapOf<String, Long>()
 
     // Encoded target id of the chat page currently in the foreground. Set by
     // ChatPageEffects so the chat receiver can suppress notifications for the

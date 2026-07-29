@@ -2,7 +2,7 @@ import SwiftUI
 import PlainShared
 
 @main
-struct PlainApp: App {
+struct PlainApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
             ComposeView()
@@ -13,9 +13,9 @@ struct PlainApp: App {
 
 /// Wraps the Compose Multiplatform `MainViewController` in a SwiftUI view.
 struct ComposeView: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController {
-        MainViewController()
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ComposeView>) -> UIViewController {
+        MainViewControllerKt.MainViewController()
     }
 
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<ComposeView>) {}
 }

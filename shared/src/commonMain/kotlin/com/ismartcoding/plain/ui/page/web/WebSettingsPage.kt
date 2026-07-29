@@ -47,7 +47,7 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel = viewModel()) {
+fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel = viewModel { WebConsoleViewModel() }) {
     WebSettingsProvider {
         val keepAwake = LocalKeepAwake.current
         val scope = rememberCoroutineScope()

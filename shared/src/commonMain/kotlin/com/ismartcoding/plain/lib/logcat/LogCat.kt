@@ -1,12 +1,16 @@
 package com.ismartcoding.plain.lib.logcat
 
+import kotlin.experimental.ExperimentalObjCRefinement
+import kotlin.native.HiddenFromObjC
+
+@OptIn(ExperimentalObjCRefinement::class)
 object LogCat {
-    const val VERBOSE = 2
-    const val DEBUG = 3
-    const val INFO = 4
-    const val WARN = 5
-    const val ERROR = 6
-    const val ASSERT = 7
+    @HiddenFromObjC const val VERBOSE = 2
+    @HiddenFromObjC const val DEBUG = 3
+    @HiddenFromObjC const val INFO = 4
+    @HiddenFromObjC const val WARN = 5
+    @HiddenFromObjC const val ERROR = 6
+    @HiddenFromObjC const val ASSERT = 7
 
     private const val TAG = "PlainApp"
 

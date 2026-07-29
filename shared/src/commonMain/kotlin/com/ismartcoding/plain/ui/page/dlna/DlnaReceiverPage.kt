@@ -49,7 +49,7 @@ import com.ismartcoding.plain.ui.nav.Routing
 @Composable
 fun DlnaReceiverPage(
     navController: NavHostController,
-    vm: DlnaReceiverViewModel = viewModel(),
+    vm: DlnaReceiverViewModel = viewModel { DlnaReceiverViewModel() },
 ) {
     DisposableEffect(Unit) {
         vm.startReceiver()

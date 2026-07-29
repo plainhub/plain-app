@@ -35,7 +35,7 @@ import com.ismartcoding.plain.ui.page.scan.components.ScanHistoryItem
 @Composable
 fun ScanHistoryPage(
     navController: NavHostController,
-    scanHistoryVM: ScanHistoryViewModel = viewModel(),
+    scanHistoryVM: ScanHistoryViewModel = viewModel { ScanHistoryViewModel() },
 ) {
     val itemsState by scanHistoryVM.itemsFlow.collectAsState()
     val refreshState =

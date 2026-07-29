@@ -29,7 +29,7 @@ fun TextPage(
     title: String,
     content: String,
     language: String,
-    textFileVM: TextFileViewModel = viewModel(),
+    textFileVM: TextFileViewModel = viewModel { TextFileViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val darkTheme = LocalDarkTheme.current

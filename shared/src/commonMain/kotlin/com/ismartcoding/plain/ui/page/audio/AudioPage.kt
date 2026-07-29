@@ -60,10 +60,10 @@ import kotlinx.coroutines.launch
 fun AudioPage(
     navController: NavHostController,
     audioPlaylistVM: AudioPlaylistViewModel,
-    audioVM: AudioViewModel = viewModel(key = "audioVM"),
-    tagsVM: TagsViewModel = viewModel(key = "audioTagsVM"),
-    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "audioFoldersVM"),
-    castVM: CastViewModel = viewModel(key = "audioCastVM"),
+    audioVM: AudioViewModel = viewModel(key = "audioVM") { AudioViewModel() },
+    tagsVM: TagsViewModel = viewModel(key = "audioTagsVM") { TagsViewModel() },
+    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "audioFoldersVM") { MediaFoldersViewModel() },
+    castVM: CastViewModel = viewModel(key = "audioCastVM") { CastViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val audioState = AudioPageState.create(audioVM, tagsVM, mediaFoldersVM)

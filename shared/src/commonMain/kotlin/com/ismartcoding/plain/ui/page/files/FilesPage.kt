@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FilesPage(
     navController: NavHostController, audioPlaylistVM: AudioPlaylistViewModel,
-    folderPath: String = "", filesVM: FilesViewModel = viewModel(),
+    folderPath: String = "", filesVM: FilesViewModel = viewModel { FilesViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()

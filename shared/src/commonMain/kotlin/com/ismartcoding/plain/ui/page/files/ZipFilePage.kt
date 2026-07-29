@@ -61,7 +61,7 @@ fun ZipFilePage(
     audioPlaylistVM: AudioPlaylistViewModel,
     path: String,
     title: String = "",
-    filesVM: FilesViewModel = viewModel(),
+    filesVM: FilesViewModel = viewModel { FilesViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()

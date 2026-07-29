@@ -94,7 +94,7 @@ private val PRESET_WIDTHS = listOf(2.0, 4.0, 8.0, 16.0)
 fun ImageEditorPage(
     navController: NavHostController,
     projectId: String,
-    vm: ImageEditorEditViewModel = viewModel(),
+    vm: ImageEditorEditViewModel = viewModel { ImageEditorEditViewModel() },
 ) {
     val layers by vm.layersFlow.collectAsState()
 

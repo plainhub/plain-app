@@ -103,7 +103,9 @@ fun MediaVideo(
         if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@setEventListener
         when (event) {
             is VideoPlayerEvent.StateChanged -> {
-                videoState.totalTime = event.duration
+                if (event.duration > 0L) {
+                    videoState.totalTime = event.duration
+                }
                 videoState.isPlaying = event.isPlaying
                 videoState.updateTime()
             }

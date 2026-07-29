@@ -47,9 +47,9 @@ fun Main(
     chatVM: ChatViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
-    notesVM: NotesViewModel = viewModel(key = "notesVM"),
-    feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM"),
-    noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM"),
+    notesVM: NotesViewModel = viewModel(key = "notesVM") { NotesViewModel() },
+    feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM") { TagsViewModel() },
+    noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM") { TagsViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val navController = rememberNavController()

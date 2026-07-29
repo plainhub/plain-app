@@ -12,6 +12,7 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.platform.isQPlus
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.events.MediaDurationZeroEvent
@@ -107,10 +108,20 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             } else ""
             val albumId = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID, cache)
             val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Audio.Media.IS_FAVORITE, cache) == 1 else false
-            val audio = DAudio(id, title, artist, path, duration, size, bucketId, albumId, createdAt, updatedAt, isFavorite)
+
+            // MediaStore.DURATION is read-only on Android 10+; for fMP4 files
+            // it stays 0. Fall back to the app-local cache (computed by
+            // MediaDurationFixQueue, stored in seconds — same unit as
+            // DAudio.duration) before reporting zero to the UI.
+            val effectiveDuration = if (duration <= 0L) {
+                TempData.mediaDurationMap["audio:$id"] ?: 0L
+            } else {
+                duration
+            }
+            val audio = DAudio(id, title, artist, path, effectiveDuration, size, bucketId, albumId, createdAt, updatedAt, isFavorite)
             audios.add(audio)
-            
-            if (duration <= 0L && path.isNotEmpty()) {
+
+            if (effectiveDuration <= 0L && path.isNotEmpty()) {
                 zeroDurationItems.add(MediaDurationZeroItem(id, path))
             }
         }

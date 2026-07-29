@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel()) {
+fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel { AppsViewModel() }) {
     val itemsState by appsVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val scrollStateMap = remember { mutableStateMapOf<Int, LazyListState>() }

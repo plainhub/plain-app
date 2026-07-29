@@ -35,8 +35,9 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DArchivedConversation::class,
         DVideoPlayProgress::class,
         DImageEditorProject::class,
+        DMediaItem::class,
     ],
-    version = 17,
+    version = 18,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -53,6 +54,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         AutoMigration(from = 14, to = 15),
         AutoMigration(from = 15, to = 16),
         AutoMigration(from = 16, to = 17),
+        AutoMigration(from = 17, to = 18),
     ],
     exportSchema = true,
 )
@@ -78,6 +80,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun archivedConversationDao(): ArchivedConversationDao
     abstract fun videoPlayProgressDao(): VideoPlayProgressDao
     abstract fun imageEditorProjectDao(): ImageEditorProjectDao
+    abstract fun mediaItemDao(): MediaItemDao
 
     companion object {
         @kotlin.concurrent.Volatile

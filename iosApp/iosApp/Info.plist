@@ -27,6 +27,13 @@
         <key>UIColorName</key>
         <string>AccentColor</string>
     </dict>
+    <key>UIApplicationSceneManifest</key>
+    <dict>
+        <key>UIApplicationSupportsMultipleScenes</key>
+        <false/>
+    </dict>
+    <key>CADisableMinimumFrameDurationOnPhone</key>
+    <true/>
     <key>UISupportedInterfaceOrientations</key>
     <array>
         <string>UIInterfaceOrientationPortrait</string>

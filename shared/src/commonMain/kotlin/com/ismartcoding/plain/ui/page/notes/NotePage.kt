@@ -58,7 +58,7 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 fun NotePage(
     navController: NavHostController, initId: String, tagId: String,
     notesVM: NotesViewModel, tagsVM: TagsViewModel,
-    noteVM: NoteViewModel = viewModel(), mdEditorVM: MdEditorViewModel = viewModel(),
+    noteVM: NoteViewModel = viewModel { NoteViewModel() }, mdEditorVM: MdEditorViewModel = viewModel { MdEditorViewModel() },
 ) {
     val id = remember { mutableStateOf(initId) }
     val previewerState = rememberPreviewerState()

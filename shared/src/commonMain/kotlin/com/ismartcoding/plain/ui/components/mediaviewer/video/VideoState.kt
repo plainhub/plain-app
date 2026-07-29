@@ -88,7 +88,14 @@ class VideoState {
         val ctrl = controller ?: return
         isPlaying = ctrl.isPlaying
         currentTime = ctrl.currentPosition.coerceAtLeast(0L)
-        totalTime = ctrl.duration.coerceAtLeast(0L)
+        // ExoPlayer returns C.TIME_UNSET (< 0) for fragmented MP4 files whose
+        // duration can't be extracted from the moov box. Don't overwrite the
+        // expectedTotalMs (set from DVideo.duration / cache) with 0 — that
+        // would break the progress bar for fMP4 videos.
+        val ctrlDuration = ctrl.duration
+        if (ctrlDuration > 0L) {
+            totalTime = ctrlDuration
+        }
         bufferedPercentage = ctrl.bufferedPercentage
     }
 }

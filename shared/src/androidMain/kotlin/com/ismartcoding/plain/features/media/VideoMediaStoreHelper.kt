@@ -12,6 +12,7 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.platform.isQPlus
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
@@ -91,11 +92,20 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             val dateTakenMs = cursor.getLongValue(MediaStore.Video.Media.DATE_TAKEN, cache)
             val takenAt = if (dateTakenMs > 0) Instant.fromEpochMilliseconds(dateTakenMs) else null
             val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Video.Media.IS_FAVORITE, cache) == 1 else false
-            
-            val video = DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt, isFavorite)
+
+            // MediaStore.DURATION is read-only on Android 10+; for fMP4 files
+            // it stays 0. Fall back to the app-local cache (computed by
+            // MediaDurationFixQueue, stored in seconds — same unit as
+            // DVideo.duration) before reporting zero to the UI.
+            val effectiveDuration = if (duration <= 0L) {
+                TempData.mediaDurationMap["video:$id"] ?: 0L
+            } else {
+                duration
+            }
+            val video = DVideo(id, title, path, effectiveDuration, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt, isFavorite)
             videos.add(video)
-            
-            if (duration <= 0L && path.isNotEmpty()) {
+
+            if (effectiveDuration <= 0L && path.isNotEmpty()) {
                 zeroDurationItems.add(MediaDurationZeroItem(id, path))
             }
         }

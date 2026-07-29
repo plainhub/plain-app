@@ -109,7 +109,7 @@ fun MainNavGraph(
     noteTagsVM: TagsViewModel,
     pomodoroVM: PomodoroViewModel,
 ) {
-    val updateVM: UpdateViewModel = viewModel()
+    val updateVM: UpdateViewModel = viewModel { UpdateViewModel() }
     NavHost(
         modifier = Modifier.background(MaterialTheme.colorScheme.surface),
         navController = navController,
@@ -201,7 +201,7 @@ fun MainNavGraph(
         composable<Routing.Feeds> { FeedsPage(navController) }
         composable<Routing.FeedSettings> { FeedSettingsPage(navController) }
         composable<Routing.HowToUse> {
-            val webVM: WebConsoleViewModel = viewModel()
+            val webVM: WebConsoleViewModel = viewModel { WebConsoleViewModel() }
             HowToUsePage(navController, onRunDiagnostics = { webVM.dig() })
         }
         composable<Routing.AppDetails> { backStackEntry ->

@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotificationSettingsPage(
     navController: NavHostController,
-    vm: NotificationSettingsViewModel = viewModel()
+    vm: NotificationSettingsViewModel = viewModel { NotificationSettingsViewModel() }
 ) {
     val scope = rememberCoroutineScope()
     val selectedAppsState by vm.selectedAppsFlow.collectAsState()

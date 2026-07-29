@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FeedEntriesPage(
     navController: NavHostController, feedId: String, tagsVM: TagsViewModel,
-    feedEntriesVM: FeedEntriesViewModel = viewModel(), feedsVM: FeedsViewModel = viewModel(),
+    feedEntriesVM: FeedEntriesViewModel = viewModel { FeedEntriesViewModel() }, feedsVM: FeedsViewModel = viewModel { FeedsViewModel() },
 ) {
     val feedsState by feedsVM.itemsFlow.collectAsState()
     val feedsMap = remember(feedsState) { derivedStateOf { feedsState.associateBy { it.id } } }

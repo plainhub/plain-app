@@ -66,7 +66,7 @@ class DlnaCastRulesViewModel : ViewModel() {
 @Composable
 fun DlnaCastHistoryPage(
     navController: NavHostController,
-    vm: DlnaCastRulesViewModel = viewModel(),
+    vm: DlnaCastRulesViewModel = viewModel { DlnaCastRulesViewModel() },
 ) {
     val allowed by vm.allowedFlow.collectAsState()
     val denied by vm.deniedFlow.collectAsState()

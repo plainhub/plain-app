@@ -16,7 +16,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 @Composable
 expect fun MediaPreviewer(
     state: MediaPreviewerState,
-    castVM: CastViewModel = viewModel(),
+    castVM: CastViewModel = viewModel { CastViewModel() },
     tagsVM: TagsViewModel? = null,
     tagsMap: Map<String, List<DTagRelation>>? = null,
     tagsState: List<DTag> = emptyList(),

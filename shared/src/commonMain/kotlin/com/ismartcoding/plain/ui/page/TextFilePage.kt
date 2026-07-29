@@ -43,7 +43,7 @@ fun TextFilePage(
     title: String,
     mediaId: String = "",
     type: String = TextFileType.DEFAULT.name,
-    textFileVM: TextFileViewModel = viewModel()
+    textFileVM: TextFileViewModel = viewModel { TextFileViewModel() }
 ) {
     val scope = rememberCoroutineScope()
     val darkTheme = LocalDarkTheme.current

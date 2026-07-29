@@ -91,10 +91,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImagesPage(
     navController: NavHostController,
-    imagesVM: ImagesViewModel = viewModel(key = "imagesVM"),
-    tagsVM: TagsViewModel = viewModel(key = "imageTagsVM"),
-    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "imageFoldersVM"),
-    castVM: CastViewModel = viewModel(key = "imageCastVM"),
+    imagesVM: ImagesViewModel = viewModel(key = "imagesVM") { ImagesViewModel() },
+    tagsVM: TagsViewModel = viewModel(key = "imageTagsVM") { TagsViewModel() },
+    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "imageFoldersVM") { MediaFoldersViewModel() },
+    castVM: CastViewModel = viewModel(key = "imageCastVM") { CastViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     tagsVM.dataType.value = imagesVM.dataType

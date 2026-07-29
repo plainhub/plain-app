@@ -37,7 +37,7 @@ import com.ismartcoding.plain.ui.models.FeedSettingsViewModel
 @Composable
 fun FeedSettingsPage(
     navController: NavHostController,
-    feedSettingsVM: FeedSettingsViewModel = viewModel()
+    feedSettingsVM: FeedSettingsViewModel = viewModel { FeedSettingsViewModel() }
 ) {
     LaunchedEffect(Unit) {
         feedSettingsVM.loadSettings()

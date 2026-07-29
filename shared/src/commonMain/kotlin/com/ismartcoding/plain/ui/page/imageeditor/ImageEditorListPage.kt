@@ -62,7 +62,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImageEditorListPage(
     navController: NavHostController,
-    vm: ImageEditorViewModel = viewModel(),
+    vm: ImageEditorViewModel = viewModel { ImageEditorViewModel() },
 ) {
     val itemsState by vm.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()

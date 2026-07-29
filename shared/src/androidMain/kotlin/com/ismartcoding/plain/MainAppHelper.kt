@@ -118,6 +118,14 @@ object MainAppHelper {
         }
 
         coIO {
+            // Load media duration cache first — needed by VideoMediaStoreHelper
+            // before the first list query. fMP4 videos have MediaStore.DURATION=0
+            // and rely on this cache; loading it last caused a race where the
+            // Videos page showed duration=0 on quick app open.
+            AppDatabase.instance.mediaItemDao().getAll().forEach {
+                TempData.mediaDurationMap["${it.mediaType}:${it.mediaId}"] = it.duration
+            }
+
             val preferences = getPreferencesAsync()
             TempData.webEnabled.value = WebPreference.get(preferences)
             TempData.webHttps.value = HttpsPreference.get(preferences)

@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewModel()) {
+fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewModel { FeedsViewModel() }) {
     val itemsState by feedsVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val topRefreshLayoutState = rememberRefreshLayoutState {

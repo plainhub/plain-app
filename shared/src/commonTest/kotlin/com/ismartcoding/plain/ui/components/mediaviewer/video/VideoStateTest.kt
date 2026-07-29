@@ -311,6 +311,24 @@ class VideoStateTest {
     }
 
     @Test
+    fun `updateTime preserves totalTime when controller duration is unknown`() {
+        // fMP4 scenario: ExoPlayer returns C.TIME_UNSET (< 0) because it can't
+        // extract duration from the moov box. The expectedTotalMs (set from
+        // DVideo.duration / cache) must be preserved, not overwritten with 0.
+        val state = VideoState()
+        val fake = FakeVideoPlayerController()
+        state.initData(fake)
+        state.totalTime = 84000L // expectedTotalMs from DVideo.duration * 1000
+        fake.fakeCurrentPosition = 3000L
+        fake.fakeDuration = 0L // ExoPlayer can't determine fMP4 duration
+
+        state.updateTime()
+
+        assertEquals(3000L, state.currentTime)
+        assertEquals(84000L, state.totalTime) // preserved, not overwritten with 0
+    }
+
+    @Test
     fun `togglePlay does nothing when controller is null`() {
         val state = VideoState()
         state.isPlaying = true

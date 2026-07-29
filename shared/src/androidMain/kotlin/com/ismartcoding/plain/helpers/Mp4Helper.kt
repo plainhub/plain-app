@@ -243,7 +243,11 @@ object Mp4Helper {
         return totalDuration
     }
 
-    /** Parse traf: read tfhd to get track_ID, and if it matches, sum trun sample durations. */
+    /** Parse traf: read tfhd to get track_ID and defaultSampleDuration, and if
+     *  track_ID matches, sum trun sample durations. Per-sample durations come
+     *  from the trun when sampleDurationPresent is set; otherwise each sample
+     *  uses tfhd.defaultSampleDuration (common for fMP4 produced by libavformat
+     *  / Pixel camera where the trun omits per-sample durations). */
     private fun parseTrafForVideoTrun(
         raf: RandomAccessFile,
         trafOffset: Long,
@@ -253,10 +257,11 @@ object Mp4Helper {
         val trafEnd = trafOffset + trafSize
         var offset = trafOffset + 8
         var trafTrackId = -1
+        var defaultSampleDuration = 0L
         var trunDuration = 0L
         var foundTrun = false
 
-        // First pass: find tfhd to get track_ID
+        // First pass: find tfhd to get track_ID and defaultSampleDuration
         while (offset < trafEnd) {
             raf.seek(offset)
             val subSize = readBoxSize(raf)
@@ -265,8 +270,15 @@ object Mp4Helper {
 
             if (subType == "tfhd") {
                 raf.seek(offset + 8)
-                raf.skipBytes(4) // version + flags
+                val flags = (raf.readByte().toInt() and 0xFF) shl 24 or
+                    (raf.readByte().toInt() and 0xFF) shl 16 or
+                    (raf.readByte().toInt() and 0xFF) shl 8 or
+                    (raf.readByte().toInt() and 0xFF)
                 trafTrackId = raf.readInt()
+                // defaultSampleDurationPresent (flag 0x08) → 4 bytes
+                if ((flags and 0x08) != 0) {
+                    defaultSampleDuration = raf.readInt().toLong() and 0xFFFFFFFFL
+                }
                 break
             }
             offset += subSize
@@ -284,7 +296,7 @@ object Mp4Helper {
             val subType = readBoxType(raf)
 
             if (subType == "trun") {
-                trunDuration += parseTrunDuration(raf, offset, subSize)
+                trunDuration += parseTrunDuration(raf, offset, subSize, defaultSampleDuration)
                 foundTrun = true
             }
             offset += subSize
@@ -292,8 +304,15 @@ object Mp4Helper {
         return if (foundTrun) trunDuration else 0L
     }
 
-    /** Parse a trun box and return the sum of per-sample durations (in timescale units). */
-    private fun parseTrunDuration(raf: RandomAccessFile, trunOffset: Long, trunSize: Long): Long {
+    /** Parse a trun box and return the sum of per-sample durations (in timescale
+     *  units). When sampleDurationPresent is false, each sample uses
+     *  [defaultSampleDuration] from tfhd. */
+    private fun parseTrunDuration(
+        raf: RandomAccessFile,
+        trunOffset: Long,
+        trunSize: Long,
+        defaultSampleDuration: Long,
+    ): Long {
         raf.seek(trunOffset + 8)
         val version = raf.readByte().toInt()
         val flags = (raf.readByte().toInt() and 0xFF) shl 16 or
@@ -320,6 +339,8 @@ object Mp4Helper {
         while (remaining > 0) {
             if (sampleDurationPresent) {
                 totalDuration += raf.readInt().toLong() and 0xFFFFFFFFL
+            } else {
+                totalDuration += defaultSampleDuration
             }
             if (sampleSizePresent) raf.skipBytes(4)
             if (sampleFlagsPresent) raf.skipBytes(4)
