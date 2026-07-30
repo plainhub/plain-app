@@ -216,6 +216,13 @@ expect suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink
 expect suspend fun streamZipFolderToSink(folderPath: String, sink: StreamSink): Boolean
 
 /**
+ * Stream a directory inside a zip archive as a new zip to [sink].
+ * [zipVirtualPath] is a virtual path like `/path/to/file.zip!zip!/internal/dir/`.
+ * Returns true on success.
+ */
+expect suspend fun streamZipInternalDirToSink(zipVirtualPath: String, sink: StreamSink): Boolean
+
+/**
  * Single entry for [streamZipToSink]. [entryName] is the name used inside the
  * archive (may include subdirectory components). When [entryName] is blank the
  * source file's name is used.

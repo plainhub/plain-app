@@ -13,7 +13,7 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.File
-import java.util.zip.ZipInputStream
+import java.util.zip.ZipFile
 import kotlin.io.path.moveTo
 import kotlin.time.Instant
 
@@ -79,83 +79,90 @@ actual fun getUSBStorageStats(): List<DStorageStatsItem> = FileSystemHelper.getU
 
 actual fun listZipEntries(zipVirtualPath: String, sortBy: FileSortBy): List<DFile> {
     val zipFilePath = ZipBrowserHelper.getZipFilePath(zipVirtualPath)
-    val internalDir = ZipBrowserHelper.getInternalPath(zipVirtualPath)
+    val rawInternalDir = ZipBrowserHelper.getInternalPath(zipVirtualPath)
+    val internalDir = rawInternalDir.trimStart('/')
     val prefix = when {
         internalDir.isEmpty() -> ""
         internalDir.endsWith("/") -> internalDir
         else -> "$internalDir/"
     }
     val entries = linkedMapOf<String, DFile>()
+    val directChildren = hashMapOf<String, HashSet<String>>()
     try {
-        ZipInputStream(File(zipFilePath).inputStream().buffered()).use { zis ->
-            var entry = zis.nextEntry
-            while (entry != null) {
-                val entryName = entry.name
-                if (entryName.startsWith(prefix)) {
-                    val relative = entryName.removePrefix(prefix)
-                    if (relative.isNotEmpty()) {
-                        val slashIndex = relative.indexOf('/')
-                        when {
-                            slashIndex == -1 -> {
-                                if (!entries.containsKey(relative)) {
-                                    entries[relative] = DFile(
-                                        name = relative,
-                                        path = ZipBrowserHelper.joinPath(zipFilePath, "$prefix$relative"),
-                                        permission = "",
-                                        createdAt = null,
-                                        updatedAt = if (entry.time > 0) Instant.fromEpochMilliseconds(entry.time) else Instant.fromEpochMilliseconds(0),
-                                        size = entry.size.coerceAtLeast(0),
-                                        isDir = false,
-                                        children = 0,
-                                    )
-                                }
-                            }
-                            slashIndex == relative.length - 1 -> {
-                                val dirName = relative.dropLast(1)
-                                if (dirName.isNotEmpty() && !entries.containsKey(dirName)) {
-                                    entries[dirName] = DFile(
-                                        name = dirName,
-                                        path = ZipBrowserHelper.joinPath(zipFilePath, "$prefix$dirName/"),
-                                        permission = "",
-                                        createdAt = null,
-                                        updatedAt = if (entry.time > 0) Instant.fromEpochMilliseconds(entry.time) else Instant.fromEpochMilliseconds(0),
-                                        size = 0,
-                                        isDir = true,
-                                        children = 0,
-                                    )
-                                }
-                            }
-                            else -> {
-                                val dirName = relative.substring(0, slashIndex)
-                                if (!entries.containsKey(dirName)) {
-                                    entries[dirName] = DFile(
-                                        name = dirName,
-                                        path = ZipBrowserHelper.joinPath(zipFilePath, "$prefix$dirName/"),
-                                        permission = "",
-                                        createdAt = null,
-                                        updatedAt = Instant.fromEpochMilliseconds(0),
-                                        size = 0,
-                                        isDir = true,
-                                        children = 0,
-                                    )
-                                }
-                            }
+        ZipFile(zipFilePath).use { zf ->
+            val it = zf.entries()
+            while (it.hasMoreElements()) {
+                val entry = it.nextElement()
+                val entryName = entry.name.trimStart('/')
+                if (!entryName.startsWith(prefix)) continue
+                val relative = entryName.removePrefix(prefix)
+                if (relative.isEmpty()) continue
+                val slashIndex = relative.indexOf('/')
+                when {
+                    slashIndex == -1 -> {
+                        if (!entries.containsKey(relative)) {
+                            entries[relative] = DFile(
+                                name = relative,
+                                path = ZipBrowserHelper.joinPath(zipFilePath, "$prefix$relative"),
+                                permission = "",
+                                createdAt = null,
+                                updatedAt = if (entry.time > 0) Instant.fromEpochMilliseconds(entry.time) else Instant.fromEpochMilliseconds(0),
+                                size = entry.size.coerceAtLeast(0),
+                                isDir = false,
+                                children = 0,
+                            )
+                        }
+                    }
+                    slashIndex == relative.length - 1 -> {
+                        val dirName = relative.dropLast(1)
+                        if (dirName.isNotEmpty() && !entries.containsKey(dirName)) {
+                            entries[dirName] = DFile(
+                                name = dirName,
+                                path = ZipBrowserHelper.joinPath(zipFilePath, "$prefix$dirName/"),
+                                permission = "",
+                                createdAt = null,
+                                updatedAt = if (entry.time > 0) Instant.fromEpochMilliseconds(entry.time) else Instant.fromEpochMilliseconds(0),
+                                size = 0,
+                                isDir = true,
+                                children = 0,
+                            )
+                        }
+                    }
+                    else -> {
+                        val dirName = relative.substring(0, slashIndex)
+                        val rest = relative.substring(slashIndex + 1)
+                        val childEnd = rest.indexOf('/')
+                        val childName = if (childEnd == -1) rest else rest.substring(0, childEnd)
+                        if (childName.isNotEmpty()) {
+                            directChildren.getOrPut(dirName) { hashSetOf() }.add(childName)
+                        }
+                        if (!entries.containsKey(dirName)) {
+                            entries[dirName] = DFile(
+                                name = dirName,
+                                path = ZipBrowserHelper.joinPath(zipFilePath, "$prefix$dirName/"),
+                                permission = "",
+                                createdAt = null,
+                                updatedAt = Instant.fromEpochMilliseconds(0),
+                                size = 0,
+                                isDir = true,
+                                children = 0,
+                            )
                         }
                     }
                 }
-                zis.closeEntry()
-                entry = zis.nextEntry
             }
         }
     } catch (e: Exception) {
         LogCat.e(e.toString())
     }
-    return entries.values.toList().sorted(sortBy)
+    return entries.values.map { dfile ->
+        if (dfile.isDir) dfile.copy(children = directChildren[dfile.name]?.size ?: 0) else dfile
+    }.sorted(sortBy)
 }
 
 actual fun extractZipEntryToCache(zipVirtualPath: String): String? {
     val zipFilePath = ZipBrowserHelper.getZipFilePath(zipVirtualPath)
-    val internalPath = ZipBrowserHelper.getInternalPath(zipVirtualPath).trimEnd('/')
+    val internalPath = ZipBrowserHelper.getInternalPath(zipVirtualPath).trimEnd('/').trimStart('/')
     if (internalPath.isEmpty()) return null
     val rawName = internalPath.substringAfterLast('/')
     val safeName = rawName.replace("[/\\\\:*?\"<>|]".toRegex(), "_").take(80)
@@ -163,16 +170,12 @@ actual fun extractZipEntryToCache(zipVirtualPath: String): String? {
     val tempFile = File(appContext.cacheDir, "zip_preview_$cacheKey")
     if (tempFile.exists()) return tempFile.absolutePath
     try {
-        ZipInputStream(File(zipFilePath).inputStream().buffered()).use { zis ->
-            var entry = zis.nextEntry
-            while (entry != null) {
-                if (entry.name.trimEnd('/') == internalPath) {
-                    tempFile.outputStream().use { out -> zis.copyTo(out) }
-                    return tempFile.absolutePath
-                }
-                zis.closeEntry()
-                entry = zis.nextEntry
+        ZipFile(zipFilePath).use { zf ->
+            val entry = zf.getEntry(internalPath) ?: zf.getEntry("/$internalPath") ?: return null
+            zf.getInputStream(entry).use { input ->
+                tempFile.outputStream().use { out -> input.copyTo(out) }
             }
+            return tempFile.absolutePath
         }
     } catch (e: Exception) {
         LogCat.e(e.toString())

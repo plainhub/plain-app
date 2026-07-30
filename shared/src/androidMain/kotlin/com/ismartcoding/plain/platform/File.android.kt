@@ -42,7 +42,9 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
 actual fun getFileId(path: String): String = FileHelper.getFileId(path)
@@ -414,6 +416,36 @@ actual suspend fun streamZipFolderToSink(folderPath: String, sink: StreamSink): 
     try {
         ZipOutputStream(os).use { zip ->
             ZipHelper.zipFolderToStreamAsync(folder, zip)
+        }
+        runBlocking { sink.flush() }
+        true
+    } catch (e: Exception) {
+        false
+    }
+}
+
+actual suspend fun streamZipInternalDirToSink(zipVirtualPath: String, sink: StreamSink): Boolean = withIO {
+    val zipFilePath = ZipBrowserHelper.getZipFilePath(zipVirtualPath)
+    val prefix = ZipBrowserHelper.getInternalPath(zipVirtualPath).trimStart('/')
+    val os = object : OutputStream() {
+        override fun write(b: Int) { runBlocking { sink.write(byteArrayOf(b.toByte())) } }
+        override fun write(b: ByteArray, off: Int, len: Int) { runBlocking { sink.write(b, off, len) } }
+    }
+    try {
+        ZipFile(zipFilePath).use { zf ->
+            ZipOutputStream(os).use { zip ->
+                val it = zf.entries()
+                while (it.hasMoreElements()) {
+                    val entry = it.nextElement()
+                    val entryName = entry.name.trimStart('/')
+                    if (!entryName.startsWith(prefix)) continue
+                    val newName = entryName.removePrefix(prefix).trimStart('/')
+                    if (newName.isEmpty()) continue
+                    zip.putNextEntry(ZipEntry(newName))
+                    zf.getInputStream(entry).copyTo(zip)
+                    zip.closeEntry()
+                }
+            }
         }
         runBlocking { sink.flush() }
         true
