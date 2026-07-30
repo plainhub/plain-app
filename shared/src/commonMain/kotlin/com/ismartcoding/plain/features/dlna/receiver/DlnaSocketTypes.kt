@@ -44,9 +44,9 @@ data class DlnaHttpRequest(
 interface DlnaSsdpSocket {
     /**
      * Block until a datagram is received or [timeoutMs] elapses.
-     * @return the raw SSDP message text, or null on timeout.
+     * @return the received SSDP packet (message + sender address:port), or null on timeout.
      */
-    suspend fun receive(timeoutMs: Int): String?
+    suspend fun receive(timeoutMs: Int): DlnaSsdpPacket?
 
     /** Send [message] to the multicast group. */
     fun sendMulticast(message: String)
@@ -56,6 +56,19 @@ interface DlnaSsdpSocket {
 
     fun close()
 }
+
+/**
+ * A received SSDP datagram: the raw message text plus the sender's unicast
+ * address and port, so the receiver can reply via unicast (per UPnP spec,
+ * M-SEARCH responses must be unicasted to the source of the query, not
+ * re-multicast to the group — control points listen on a random port and
+ * cannot receive multicast sent to port 1900).
+ */
+data class DlnaSsdpPacket(
+    val message: String,
+    val sourceAddress: String,
+    val sourcePort: Int,
+)
 
 /**
  * Open a [DlnaServerSocket] bound to [port] with SO_REUSEADDR enabled.

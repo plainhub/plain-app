@@ -125,22 +125,15 @@ object DlnaReceiverEngine {
     private suspend fun runSsdpLoop(socket: DlnaSsdpSocket) = withIO {
         try {
             DlnaSsdpMessages.aliveMessages(deviceUuid).forEach { socket.sendMulticast(it) }
+            LogCat.d("DLNA SSDP advertiser started, sent initial alive")
             while (isActive) {
-                val msg = try {
+                val packet = try {
                     socket.receive(30_000)
                 } catch (_: Exception) {
                     null
                 }
-                if (msg != null) {
-                    if (msg.contains("M-SEARCH")) {
-                        // Respond to the unicast source (parsed from the message)
-                        val srcAddress = extractHeaderValue(msg, "HOST")?.substringBefore(':') ?: DlnaSsdpMessages.SSDP_ADDR
-                        val srcPort = extractHeaderValue(msg, "HOST")?.substringAfter(':')?.toIntOrNull()
-                            ?: DlnaSsdpMessages.SSDP_PORT
-                        DlnaSsdpMessages.searchResponses(deviceUuid).forEach {
-                            socket.sendUnicast(it, srcAddress, srcPort)
-                        }
-                    }
+                if (packet != null) {
+                    handleSsdpPacket(packet, socket, deviceUuid)
                 } else {
                     // Timeout — resend alive notifications
                     DlnaSsdpMessages.aliveMessages(deviceUuid).forEach { socket.sendMulticast(it) }
@@ -157,6 +150,20 @@ object DlnaReceiverEngine {
     }
 
     /**
+     * Processes a single inbound SSDP datagram. M-SEARCH queries are answered
+     * via **unicast** to the sender's source address:port (per UPnP spec) —
+     * never re-multicasted to the group, because control points listen on a
+     * random ephemeral port and cannot receive multicast sent to port 1900.
+     */
+    internal fun handleSsdpPacket(packet: DlnaSsdpPacket, socket: DlnaSsdpSocket, uuid: String) {
+        if (!packet.message.contains("M-SEARCH")) return
+        LogCat.d("DLNA M-SEARCH from ${packet.sourceAddress}:${packet.sourcePort}")
+        val responses = DlnaSsdpMessages.searchResponses(uuid)
+        responses.forEach { socket.sendUnicast(it, packet.sourceAddress, packet.sourcePort) }
+        LogCat.d("DLNA sent ${responses.size} search responses to ${packet.sourceAddress}:${packet.sourcePort}")
+    }
+
+    /**
      * Opens a [DlnaServerSocket] with SO_REUSEADDR enabled, trying the last
      * successfully used port first, then the other candidates.
      */
@@ -168,18 +175,6 @@ object DlnaReceiverEngine {
             val ss = createDlnaServerSocket(port)
             if (ss != null) return ss
             LogCat.d("DlnaReceiverEngine: port $port unavailable, trying next")
-        }
-        return null
-    }
-
-    /** Extracts a header value from an HTTP/SSDP message (case-insensitive). */
-    private fun extractHeaderValue(message: String, headerName: String): String? {
-        val lines = message.split("\r\n", "\n")
-        val prefix = headerName.uppercase() + ":"
-        for (line in lines.drop(1)) {
-            if (line.uppercase().startsWith(prefix)) {
-                return line.substringAfter(':').trim()
-            }
         }
         return null
     }

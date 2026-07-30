@@ -151,7 +151,7 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
-                            icon = Res.drawable.code, title = stringResource(Res.string.developer_options), showMore = true
+                            icon = Res.drawable.code, title = stringResource(Res.string.adb_automation), showMore = true
                         )
                     }
                 }

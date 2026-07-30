@@ -8,6 +8,11 @@
 /* Begin PBXBuildFile section */
 		AA0000010000000000000001 /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000020000000000000001 /* iosApp.swift */; };
 		AA0000030000000000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA0000040000000000000001 /* Assets.xcassets */; };
+		BB0000020000000000000001 /* PlainHttpServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB0000010000000000000001 /* PlainHttpServer.swift */; };
+		BB0000080000000000000001 /* NIOCore in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000040000000000000001 /* NIOCore */; };
+		BB0000090000000000000001 /* NIOPosix in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000050000000000000001 /* NIOPosix */; };
+		BB00000A0000000000000001 /* NIOHTTP1 in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000060000000000000001 /* NIOHTTP1 */; };
+		BB00000B0000000000000001 /* NIOWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000070000000000000001 /* NIOWebSocket */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,6 +21,7 @@
 		AA0000050000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA0000100000000000000001 /* PlainShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PlainShared.framework; path = ../shared/build/xcode-frameworks/PlainShared.framework; sourceTree = "<group>"; };
 		AA0000200000000000000001 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB0000010000000000000001 /* PlainHttpServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainHttpServer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -39,6 +45,7 @@
 			isa = PBXGroup;
 			children = (
 				AA0000020000000000000001 /* iosApp.swift */,
+				BB0000010000000000000001 /* PlainHttpServer.swift */,
 				AA0000040000000000000001 /* Assets.xcassets */,
 				AA0000050000000000000001 /* Info.plist */,
 				AA0000100000000000000001 /* PlainShared.framework */,
@@ -57,6 +64,7 @@
 				AA0000900000000000000001 /* Sources */,
 				AA0000A0000000000000001 /* Frameworks */,
 				AA0000B0000000000000001 /* Resources */,
+				BB0000C0000000000000001 /* Copy Web Resources */,
 			);
 			buildRules = (
 			);
@@ -87,6 +95,9 @@
 			hasScannedForEncodings = 0;
 			knownRegions = ("en", "Base");
 			mainGroup = AA0000300000000000000001;
+			packageReferences = (
+				BB0000D0000000000000001 /* XCRemoteSwiftPackageReference "swift-nio" */,
+			);
 			productRefGroup = AA0000500000000000000001 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -116,6 +127,24 @@
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\n\n# Use Android Studio JBR if JAVA_HOME is not set or points to invalid path\nif [ -z \"$JAVA_HOME\" ] || [ ! -d \"$JAVA_HOME\" ]; then\n    export JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\"\nfi\n\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
 		};
+		BB0000C0000000000000001 /* Copy Web Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Web Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copy pre-built web assets (Vue SPA) into the app bundle so the\n# SwiftNIO HTTP server can serve them as static files.\nWEB_SRC=\"$SRCROOT/../app/src/main/resources/web\"\nWEB_DST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/web\"\n\nif [ ! -d \"$WEB_SRC\" ]; then\n    echo \"warning: web assets not found at $WEB_SRC — web UI will not be available\"\n    exit 0\nfi\n\nrm -rf \"$WEB_DST\"\nmkdir -p \"$WEB_DST\"\ncp -R \"$WEB_SRC/\" \"$WEB_DST/\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -124,6 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA0000010000000000000001 /* iosApp.swift in Sources */,
+				BB0000020000000000000001 /* PlainHttpServer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +164,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB0000080000000000000001 /* NIOCore in Frameworks */,
+				BB0000090000000000000001 /* NIOPosix in Frameworks */,
+				BB00000A0000000000000001 /* NIOHTTP1 in Frameworks */,
+				BB00000B0000000000000001 /* NIOWebSocket in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,6 +289,7 @@
 		AA0000F00000000000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -289,6 +324,7 @@
 		AA0000F10000000000000001 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -342,6 +378,40 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BB0000D0000000000000001 /* XCRemoteSwiftPackageReference "swift-nio" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-nio.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.65.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BB0000040000000000000001 /* NIOCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB0000D0000000000000001 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOCore;
+		};
+		BB0000050000000000000001 /* NIOPosix */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB0000D0000000000000001 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOPosix;
+		};
+		BB0000060000000000000001 /* NIOHTTP1 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB0000D0000000000000001 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOHTTP1;
+		};
+		BB0000070000000000000001 /* NIOWebSocket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB0000D0000000000000001 /* XCRemoteSwiftPackageReference "swift-nio" */;
+			productName = NIOWebSocket;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AA0000C00000000000000001 /* Project object */;
 }

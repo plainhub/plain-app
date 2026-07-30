@@ -166,7 +166,7 @@ object DlnaSoapHandler {
     fun extractMediaTypeFromDidlMeta(meta: String, fallbackUri: String = ""): DlnaMediaType {
         val classStart = meta.indexOf("<upnp:class>")
         val classEnd = meta.indexOf("</upnp:class>")
-        if (classStart >= 0 && classEnd > classStart) {
+        if (classStart in 0..<classEnd) {
             val cls = meta.substring(classStart + 12, classEnd).lowercase()
             return when {
                 "audioitem" in cls || "musictrack" in cls -> DlnaMediaType.AUDIO
@@ -192,12 +192,12 @@ object DlnaSoapHandler {
         var i = 0
         while (i < input.length) {
             val c = input[i]
-            when {
-                c == '+' -> {
+            when (c) {
+                '+' -> {
                     out.append(' ')
                     i++
                 }
-                c == '%' && i + 2 < input.length -> {
+                '%' if i + 2 < input.length -> {
                     val hex = input.substring(i + 1, i + 3)
                     val code = hex.toIntOrNull(16)
                     if (code != null) {

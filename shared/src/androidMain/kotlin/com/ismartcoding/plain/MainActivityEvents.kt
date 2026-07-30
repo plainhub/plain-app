@@ -45,7 +45,6 @@ import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.launch
 
 @SuppressLint("CheckResult")
@@ -56,8 +55,8 @@ internal fun MainActivity.initEvents() {
 
             when (event) {
                 is HttpServerStateChangedEvent -> {
-                    mainVM.httpServerError.value = HttpServerManager.httpServerError
-                    mainVM.httpServerState.value = event.state
+                    // State + error are updated in commonMain's MainEventCollector.
+                    // Here we only handle the Android-specific storage permission prompt.
                     if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.isGranted()) {
                         DialogHelper.showConfirmDialog(LocaleHelper.getStringAsync(Res.string.confirm), LocaleHelper.getStringAsync(Res.string.storage_permission_confirm)) {
                             coIO { ApiPermissionsPreference.putAsync(Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }

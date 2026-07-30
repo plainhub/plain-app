@@ -37,7 +37,7 @@ object HttpRouteRegistry {
             addFilesRoutes()
             addZipRoutes()
             addDlnaRoutes()
-            addGraphQLRoutes(mainGraphQL, peerGraphQL)
+            addGraphQLRoutes()
             addWebSocketRoutes()
         }
     }
