@@ -147,7 +147,8 @@
     <string name="crash_report_title">App gecrasht</string>
     <string name="crash_report_message">De app is onverwacht gecrasht. Bekijk het crashrapport met app-logboeken en deel het om ons te helpen het probleem op te lossen.</string>
     <string name="stay_online_mode">Online-blijfmodus</string>
-    <string name="stay_online_mode_oled_saving">OLED energiebesparing</string>
+    <string name="stay_online_mode_screen_black_countdown">Het scherm wordt zwart na %1$d seconden.</string>
+    <string name="stay_online_mode_keep_running">Houd PlainApp actief wanneer sommige telefoons achtergrondactiviteit beperken.</string>
     <string name="stay_online_mode_tap_to_exit">Tik om af te sluiten</string>
     <string name="add_to_home">Toevoegen aan startscherm</string>
     <string name="shortcut_added_to_home">Snelkoppeling toegevoegd aan startscherm</string>

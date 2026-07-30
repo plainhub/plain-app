@@ -147,7 +147,8 @@
     <string name="crash_report_title">App in crash</string>
     <string name="crash_report_message">L'app si è arrestata in modo imprevisto. Visualizza il report del crash con i log dell'app e condividilo per aiutarci a risolvere il problema.</string>
     <string name="stay_online_mode">Modalità sempre online</string>
-    <string name="stay_online_mode_oled_saving">Risparmio OLED</string>
+    <string name="stay_online_mode_screen_black_countdown">Lo schermo diventerà nero tra %1$d secondi.</string>
+    <string name="stay_online_mode_keep_running">Mantieni PlainApp in esecuzione quando alcuni telefoni limitano l\'attività in background.</string>
     <string name="stay_online_mode_tap_to_exit">Tocca per uscire</string>
     <string name="add_to_home">Aggiungi alla schermata principale</string>
     <string name="shortcut_added_to_home">Collegamento aggiunto alla schermata principale</string>

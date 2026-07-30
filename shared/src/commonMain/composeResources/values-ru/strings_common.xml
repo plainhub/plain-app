@@ -147,7 +147,8 @@
     <string name="crash_report_title">Приложение завершилось с ошибкой</string>
     <string name="crash_report_message">Приложение неожиданно завершилось. Просмотрите отчёт об ошибке с журналами приложения и поделитесь им, чтобы помочь нам исправить проблему.</string>
     <string name="stay_online_mode">Режим онлайн</string>
-    <string name="stay_online_mode_oled_saving">Экономия OLED</string>
+    <string name="stay_online_mode_screen_black_countdown">Экран станет чёрным через %1$d секунд.</string>
+    <string name="stay_online_mode_keep_running">Поддерживайте PlainApp работающим, когда некоторые телефоны ограничивают фоновую активность.</string>
     <string name="stay_online_mode_tap_to_exit">Нажмите для выхода</string>
     <string name="add_to_home">Добавить на главный экран</string>
     <string name="shortcut_added_to_home">Ярлык добавлен на главный экран</string>

@@ -57,10 +57,12 @@ object HttpModule {
 
         install(CORS) {
             if (isDebugBuild()) {
-                allowHost("*")
+                anyHost()
             } else {
                 allowHost("localhost:3000")
                 allowHost("127.0.0.1:3000")
+                allowHost("localhost:4000")
+                allowHost("127.0.0.1:4000")
             }
             allowHeadersPrefixed("c-")
         }
