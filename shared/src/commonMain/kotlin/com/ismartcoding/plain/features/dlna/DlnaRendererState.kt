@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.features.dlna
 
+import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
+import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -7,6 +10,7 @@ enum class DlnaPlaybackState { NO_MEDIA_PRESENT, STOPPED, PLAYING, PAUSED, TRANS
 
 object DlnaRendererState {
     val isRunning = MutableStateFlow(false)
+    val isRetrying = MutableStateFlow(false)
     val mediaUri = MutableStateFlow("")
     val mediaTitle = MutableStateFlow("")
     val mediaAlbumArtUri = MutableStateFlow("")
@@ -22,8 +26,9 @@ object DlnaRendererState {
     val commandChannel = Channel<DlnaCommand>(Channel.UNLIMITED)
 
     /**
-     * Set by the HTTP server when a cast request arrives. The ViewModel checks rules against
-     * this and either silently handles it or promotes to [pendingCastRequest] for the UI.
+     * Set by the HTTP server when a cast request arrives. [DlnaReceiverEngine] checks
+     * rules against this and either silently handles it or promotes to
+     * [pendingCastRequest] for the UI.
      */
     val rawPendingCastRequest = MutableStateFlow<PendingCastRequest?>(null)
 
@@ -49,6 +54,42 @@ object DlnaRendererState {
         pendingCastRequest.value = null
         pendingPlayQueued.value = false
         startError.value = ""
+    }
+
+    /**
+     * Accepts the current [pendingCastRequest]: dispatches the SetUri (and queued
+     * Play) commands and optionally persists the sender as allowed so future
+     * requests from the same sender are auto-accepted.
+     */
+    fun acceptCastRequest(rememberChoice: Boolean) {
+        val pending = pendingCastRequest.value ?: return
+        val playQueued = pendingPlayQueued.value
+        pendingCastRequest.value = null
+        pendingPlayQueued.value = false
+        commandChannel.trySend(DlnaCommand.SetUri(pending.mediaUri, pending.mediaTitle, pending.mediaType, pending.albumArtUri))
+        if (playQueued) commandChannel.trySend(DlnaCommand.Play)
+        if (rememberChoice && pending.senderIp.isNotEmpty()) {
+            coIO {
+                DlnaDeniedSendersPreference.removeAsync(pending.senderIp)
+                DlnaAllowedSendersPreference.addAsync(pending.senderIp, pending.senderName)
+            }
+        }
+    }
+
+    /**
+     * Rejects the current [pendingCastRequest] and optionally persists the sender
+     * as denied so future requests from the same sender are silently discarded.
+     */
+    fun rejectCastRequest(rememberChoice: Boolean) {
+        val pending = pendingCastRequest.value ?: return
+        pendingCastRequest.value = null
+        pendingPlayQueued.value = false
+        if (rememberChoice && pending.senderIp.isNotEmpty()) {
+            coIO {
+                DlnaAllowedSendersPreference.removeAsync(pending.senderIp)
+                DlnaDeniedSendersPreference.addAsync(pending.senderIp, pending.senderName)
+            }
+        }
     }
 
     fun formatPositionInfo(): Pair<String, String> {

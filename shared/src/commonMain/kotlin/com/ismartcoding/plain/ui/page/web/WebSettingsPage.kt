@@ -28,6 +28,7 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.openBatteryOptimizationSettings
 import com.ismartcoding.plain.preferences.LocalApiPermissions
+import com.ismartcoding.plain.preferences.LocalDlnaReceiverEnabled
 import com.ismartcoding.plain.preferences.LocalKeepAwake
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -50,6 +51,7 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel = viewModel { WebConsoleViewModel() }) {
     WebSettingsProvider {
         val keepAwake = LocalKeepAwake.current
+        val dlnaReceiverEnabled = LocalDlnaReceiverEnabled.current
         val scope = rememberCoroutineScope()
         val enabledPermissions = LocalApiPermissions.current
         val permissionList = remember { mutableStateOf(getWebList()) }
@@ -85,7 +87,7 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     }
                     VerticalSpace(dp = 16.dp)
                 }
-                item { Subtitle(text = stringResource(Res.string.permissions)) }
+                item { Subtitle(text = stringResource(Res.string.features)) }
                 itemsIndexed(permissionList.value) { index, m ->
                     val permission = m.permission
                     PListItem(
@@ -127,6 +129,19 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     val m = PermissionItem(null, Permission.NONE, setOf(Permission.NONE))
                     PCard {
                         PListItem(modifier = Modifier.clickable { openAppSettings() }, icon = m.icon, title = m.permission.getText(), showMore = true)
+                    }
+                }
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
+                        PListItem(
+                            modifier = Modifier.clickable { navController.navigate(Routing.DlnaReceiver) },
+                            icon = Res.drawable.cast,
+                            title = stringResource(Res.string.dlna_receiver),
+                            showMore = true,
+                        ) {
+                            PSwitch(activated = dlnaReceiverEnabled) { enable -> webVM.enableDlnaReceiver(enable) }
+                        }
                     }
                 }
                 item {

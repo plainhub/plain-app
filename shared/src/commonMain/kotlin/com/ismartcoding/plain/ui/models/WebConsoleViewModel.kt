@@ -11,6 +11,9 @@ import com.ismartcoding.plain.events.KeepAwakeChangedEvent
 import com.ismartcoding.plain.platform.checkHttpServerAsync
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.relaunchApp
+import com.ismartcoding.plain.platform.startDlnaRenderer
+import com.ismartcoding.plain.platform.stopDlnaRenderer
+import com.ismartcoding.plain.preferences.DlnaReceiverEnabledPreference
 import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
@@ -45,6 +48,13 @@ class WebConsoleViewModel : ViewModel() {
         viewModelScope.launchSafe {
             KeepAwakePreference.putAsync(enable)
             sendEvent(KeepAwakeChangedEvent(enable))
+        }
+    }
+
+    fun enableDlnaReceiver(enable: Boolean) {
+        viewModelScope.launchSafe {
+            DlnaReceiverEnabledPreference.putAsync(enable)
+            if (enable) startDlnaRenderer() else stopDlnaRenderer()
         }
     }
 }

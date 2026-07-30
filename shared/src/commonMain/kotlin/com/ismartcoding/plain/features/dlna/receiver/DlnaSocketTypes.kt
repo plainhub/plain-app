@@ -1,34 +1,12 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 /**
- * Platform-agnostic server socket abstraction for the DLNA HTTP server.
- *
- * Android wraps `java.net.ServerSocket`; iOS returns null (DLNA receiver
- * is not supported on iOS). The commonMain [DlnaReceiverEngine] drives the
- * accept loop via this interface so all HTTP routing / SOAP handling can
- * live in commonMain.
- */
-interface DlnaServerSocket {
-    val localPort: Int
-    suspend fun accept(): DlnaClientConnection?
-    fun close()
-}
-
-/**
- * A single accepted TCP connection from a DLNA control point.
- * [readHttpRequest] parses the raw HTTP request; [writeResponse] sends the
- * pre-built response string. [senderIp] is the remote IP for logging.
- */
-interface DlnaClientConnection {
-    val senderIp: String
-    fun readHttpRequest(): DlnaHttpRequest?
-    fun writeResponse(response: String)
-    fun close()
-}
-
-/**
  * Parsed HTTP request from a DLNA control point.
- * [headers] keys are lowercased.
+ *
+ * The HTTP control endpoints are served by the shared web server (see
+ * `web/routes/DlnaRoutes.kt`); this type is the adapter the web server's
+ * [HttpCall][com.ismartcoding.plain.web.http.HttpCall] is converted into
+ * before being handed to [DlnaHttpRouter]. [headers] keys are lowercased.
  */
 data class DlnaHttpRequest(
     val method: String,
@@ -69,12 +47,6 @@ data class DlnaSsdpPacket(
     val sourceAddress: String,
     val sourcePort: Int,
 )
-
-/**
- * Open a [DlnaServerSocket] bound to [port] with SO_REUSEADDR enabled.
- * @return the socket, or null if the port is unavailable.
- */
-expect fun createDlnaServerSocket(port: Int): DlnaServerSocket?
 
 /**
  * Create a [DlnaSsdpSocket] joined to the standard SSDP multicast group

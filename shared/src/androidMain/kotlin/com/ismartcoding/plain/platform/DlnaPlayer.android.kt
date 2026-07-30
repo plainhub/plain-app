@@ -59,7 +59,6 @@ import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.formatMinSec
 import com.ismartcoding.plain.ui.base.PlayerSlider
-import com.ismartcoding.plain.ui.models.DlnaReceiverViewModel
 import com.ismartcoding.plain.ui.page.dlna.AudioPlayerControls
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
@@ -68,7 +67,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @OptIn(UnstableApi::class)
 @Composable
-actual fun DlnaReceiverAudioPlayerContent(vm: DlnaReceiverViewModel, onExit: () -> Unit) {
+actual fun DlnaReceiverAudioPlayerContent(onExit: () -> Unit) {
     val context = LocalContext.current
     val mediaUri by DlnaRendererState.mediaUri.collectAsState()
     val mediaTitle by DlnaRendererState.mediaTitle.collectAsState()
@@ -97,7 +96,13 @@ actual fun DlnaReceiverAudioPlayerContent(vm: DlnaReceiverViewModel, onExit: () 
         }
     }
     LaunchedEffect(seekTargetMs) { seekTargetMs?.let { player.seekTo(it) } }
-    LaunchedEffect(player) { vm.startPositionSync(player) }
+    LaunchedEffect(player) {
+        while (true) {
+            DlnaRendererState.currentPositionMs.value = getPlayerPositionMs(player)
+            DlnaRendererState.durationMs.value = getPlayerDurationMs(player)
+            delay(1_000)
+        }
+    }
     DisposableEffect(Unit) {
         context.findActivity().setFullScreen(true)
         onDispose { context.findActivity().setFullScreen(false); player.stop(); player.release() }
@@ -183,7 +188,7 @@ actual fun DlnaReceiverAudioPlayerContent(vm: DlnaReceiverViewModel, onExit: () 
 
 @OptIn(UnstableApi::class)
 @Composable
-actual fun DlnaReceiverVideoPlayerContent(vm: DlnaReceiverViewModel, onExit: () -> Unit) {
+actual fun DlnaReceiverVideoPlayerContent(onExit: () -> Unit) {
     val context = LocalContext.current
     val mediaUri by DlnaRendererState.mediaUri.collectAsState()
     val mediaTitle by DlnaRendererState.mediaTitle.collectAsState()
@@ -213,7 +218,13 @@ actual fun DlnaReceiverVideoPlayerContent(vm: DlnaReceiverViewModel, onExit: () 
         }
     }
     LaunchedEffect(seekTargetMs) { seekTargetMs?.let { player.seekTo(it) } }
-    LaunchedEffect(player) { vm.startPositionSync(player) }
+    LaunchedEffect(player) {
+        while (true) {
+            DlnaRendererState.currentPositionMs.value = getPlayerPositionMs(player)
+            DlnaRendererState.durationMs.value = getPlayerDurationMs(player)
+            delay(1_000)
+        }
+    }
     LaunchedEffect(showControls, controlsSeed) {
         if (showControls) { delay(4.seconds); showControls = false }
     }

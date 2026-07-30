@@ -1,12 +1,19 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 /**
- * Pure-Kotlin helpers for the DLNA HTTP server: HTTP response builders,
- * DLNA time parsing, and sender-name resolution.
+ * Pure-Kotlin helpers for the DLNA receiver HTTP routes: structured response
+ * type, response builders, DLNA time parsing, and sender-name resolution.
  *
- * Migrated from androidMain so all business logic lives in commonMain;
- * the platform layer only handles raw socket I/O.
+ * The receiver HTTP endpoints are served by the shared web server (see
+ * `web/routes/DlnaRoutes.kt`); these helpers produce [DlnaHttpResponse]
+ * values that the route handler applies to the platform-agnostic [HttpCall].
  */
+data class DlnaHttpResponse(
+    val status: Int,
+    val contentType: String? = null,
+    val headers: Map<String, String> = emptyMap(),
+    val body: String = "",
+)
 
 internal fun resolveSenderName(headers: Map<String, String>, senderIp: String): String {
     return headers["c-name"]?.takeIf { it.isNotBlank() } ?: senderIp
@@ -26,19 +33,15 @@ internal fun parseDlnaTimeToMs(time: String): Long {
     } else -1L
 }
 
-internal fun httpOk(body: String, contentType: String = "text/plain"): String {
-    val bytes = body.encodeToByteArray()
-    return "HTTP/1.1 200 OK\r\nContent-Type: $contentType\r\nContent-Length: ${bytes.size}\r\nConnection: close\r\n\r\n$body"
-}
+internal fun httpOk(body: String, contentType: String = "text/plain"): DlnaHttpResponse =
+    DlnaHttpResponse(status = 200, contentType = contentType, body = body)
 
-internal fun httpOkSubscribe(): String {
-    return "HTTP/1.1 200 OK\r\nSID: uuid:dlna-plain-sub\r\nTIMEOUT: Second-3600\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-}
+internal fun httpOkSubscribe(): DlnaHttpResponse =
+    DlnaHttpResponse(
+        status = 200,
+        headers = mapOf("SID" to "uuid:dlna-plain-sub", "TIMEOUT" to "Second-3600"),
+    )
 
-internal fun httpNotFound(): String {
-    return "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-}
+internal fun httpNotFound(): DlnaHttpResponse = DlnaHttpResponse(status = 404)
 
-internal fun httpInternalError(): String {
-    return "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-}
+internal fun httpInternalError(): DlnaHttpResponse = DlnaHttpResponse(status = 500)

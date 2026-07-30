@@ -146,7 +146,10 @@ fun ImagePreviewActions(
 ) {
     val scope = rememberCoroutineScope()
 
-    CastDialog(castViewModel)
+    CastDialog(castViewModel, onDeviceSelected = {
+        castViewModel.enterCastMode()
+        castViewModel.cast(m.path)
+    })
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -162,8 +165,6 @@ fun ImagePreviewActions(
                     .background(MaterialTheme.colorScheme.darkMask())
                     .padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
-                POutlinedButton(text = stringResource(Res.string.cast), buttonSize = ButtonSize.SMALL, onClick = { castViewModel.cast(m.path) })
-                HorizontalSpace(dp = 20.dp)
                 POutlinedButton(text = stringResource(Res.string.exit_cast_mode), buttonSize = ButtonSize.SMALL, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
             }
             return
@@ -246,7 +247,10 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
     val videoState = state.videoState
     if (!state.showActions || videoState.enablePip || videoState.isFullscreenMode) return
     val scope = rememberCoroutineScope()
-    CastDialog(castViewModel)
+    CastDialog(castViewModel, onDeviceSelected = {
+        castViewModel.enterCastMode()
+        castViewModel.cast(m.path)
+    })
     LaunchedEffect(Unit) { while (true) { scope.launch { state.videoState.updateTime() }; delay(1.seconds) } }
 
     Box(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 32.dp).navigationBarsPadding().alpha(state.uiAlpha.value)) {
@@ -256,8 +260,6 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
             if (castViewModel.castMode.value) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Row(modifier = Modifier.align(Alignment.BottomCenter).clip(RoundedCornerShape(50)).background(MaterialTheme.colorScheme.darkMask()).padding(horizontal = 20.dp, vertical = 8.dp)) {
-                        POutlinedButton(text = stringResource(Res.string.cast), buttonSize = ButtonSize.SMALL, onClick = { castViewModel.cast(m.path) })
-                        HorizontalSpace(dp = 20.dp)
                         POutlinedButton(text = stringResource(Res.string.exit_cast_mode), buttonSize = ButtonSize.SMALL, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
                     }
                 }

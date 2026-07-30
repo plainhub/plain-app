@@ -45,9 +45,6 @@ fun FeatureItem.Companion.getList(navController: NavHostController): List<Featur
             FeatureItem(AppFeatureType.POMODORO_TIMER, Res.string.pomodoro_timer, Res.drawable.timer) {
                 navController.navigate(Routing.PomodoroTimer)
             },
-            FeatureItem(AppFeatureType.DLNA_RECEIVER, Res.string.dlna_receiver, Res.drawable.cast) {
-                navController.navigate(Routing.DlnaReceiver)
-            },
         )
     )
 

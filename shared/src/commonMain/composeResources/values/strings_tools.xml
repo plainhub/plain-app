@@ -3,8 +3,6 @@
     <string name="sound_meter">Sound meter</string>
     <string name="pomodoro_timer">Pomodoro timer</string>
     <string name="dlna_receiver">Wireless Cast</string>
-    <string name="dlna_receiver_description">When enabled, PlainApp on the same Wi-Fi network can cast video and music to this device</string>
-    <string name="dlna_receiver_active">Active, waiting for cast…</string>
     <string name="dlna_receiver_waiting_title">Waiting for Cast</string>
     <string name="dlna_receiver_waiting_desc">Device visible on network: %1$s</string>
     <string name="dlna_receiver_step1_title">Connect to the Same Wi-Fi</string>
@@ -14,9 +12,9 @@
     <string name="dlna_receiver_step3_title">Tap to Cast</string>
     <string name="dlna_receiver_step3_desc">Tap the cast icon, select "%1$s" from the list, and playback will begin</string>
     <string name="dlna_receiver_protocol_note">Supports DLNA / UPnP protocols, compatible with VLC, Kodi, and other popular casting apps</string>
-    <string name="dlna_receiver_enable">Enable Cast Receiver</string>
-    <string name="dlna_receiver_disable">Disable Cast Receiver</string>
     <string name="dlna_receiver_exit_player">Exit Player</string>
+    <string name="dlna_receiver_disabled_title">Cast Receiver is Off</string>
+    <string name="dlna_receiver_disabled_desc">Turn on the toggle in Web Settings to receive casts on this device</string>
     <string name="dlna_cast_request_title">Cast Request</string>
     <string name="dlna_cast_request_desc">Device %1$s wants to cast to this device</string>
     <string name="dlna_cast_accept">Accept</string>

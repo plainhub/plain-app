@@ -5,8 +5,6 @@
     <string name="sound_meter">Ses ölçer</string>
     <string name="pomodoro_timer">Pomodoro Zamanlayıcısı</string>
     <string name="dlna_receiver">Kablosuz Yayın</string>
-    <string name="dlna_receiver_description">Etkinleştirildiğinde, aynı Wi-Fi ağındaki PlainApp bu cihaza video ve müzik yayınlayabilir</string>
-    <string name="dlna_receiver_active">Aktif, yayın bekleniyor…</string>
     <string name="dlna_receiver_waiting_title">Yayın Bekleniyor</string>
     <string name="dlna_receiver_waiting_desc">Ağda görünen cihaz: %1$s</string>
     <string name="dlna_receiver_step1_title">Aynı Wi-Fi'ya Bağlanın</string>
@@ -16,9 +14,9 @@
     <string name="dlna_receiver_step3_title">Yayınla</string>
     <string name="dlna_receiver_step3_desc">Yayın simgesine dokunun, listeden "%1$s"ı seçin ve oynatma başlayacak</string>
     <string name="dlna_receiver_protocol_note">DLNA / UPnP protokollerini destekler, VLC, Kodi ve diğer popüler yayın uygulamalarıyla uyumludur</string>
-    <string name="dlna_receiver_enable">Alıcıyı Etkinleştir</string>
-    <string name="dlna_receiver_disable">Alıcıyı Devre Dışı Bırak</string>
     <string name="dlna_receiver_exit_player">Oynatıcıdan Çık</string>
+    <string name="dlna_receiver_disabled_title">Alıcı Devre Dışı</string>
+    <string name="dlna_receiver_disabled_desc">Bu cihaza yayın almak için Web Ayarları'nda anahtarı açın</string>
     <string name="short_break">Kısa mola</string>
     <string name="long_break">Uzun mola</string>
     <string name="tomatoes_today">Bugünkü domatesler</string>

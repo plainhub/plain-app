@@ -1,5 +1,11 @@
 package com.ismartcoding.plain.web.routes
 
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.features.dlna.receiver.DlnaHttpRequest
+import com.ismartcoding.plain.features.dlna.receiver.DlnaHttpRouter
+import com.ismartcoding.plain.features.dlna.receiver.DlnaHttpResponse
+import com.ismartcoding.plain.features.dlna.receiver.DlnaReceiverEngine
+import com.ismartcoding.plain.features.dlna.receiver.resolveSenderName
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -10,13 +16,27 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.isContentUri
 import com.ismartcoding.plain.platform.streamContentUri
+import com.ismartcoding.plain.web.http.HttpCall
 import com.ismartcoding.plain.web.http.HttpMethod
 import com.ismartcoding.plain.web.http.HttpRouter
 import com.ismartcoding.plain.web.http.HttpStatus
 
 /**
- * `/media/{id}` and `NOTIFY /callback/cast` — DLNA endpoints shared between
- * Android (Ktor) and iOS (SwiftNIO future).
+ * DLNA endpoints served by the shared web server.
+ *
+ * Sender routes (`/media/{id}`, `NOTIFY /callback/cast`) and receiver routes
+ * (`/description.xml`, `/AVTransport/...`, `/RenderingControl/...`) are registered
+ * here so they share the web server port. The receiver routes are gated by
+ * `TempData.dlnaReceiverEnabled` — when the DLNA receiver toggle is off they
+ * return 404.
+ */
+fun HttpRouter.addDlnaRoutes() {
+    addDlnaSenderRoutes()
+    addDlnaReceiverRoutes()
+}
+
+/**
+ * `/media/{id}` and `NOTIFY /callback/cast` — DLNA sender endpoints.
  *
  * `/media/{id}` looks up a previously-registered media path by short id
  * (see `UrlHelper.getMediaHttpUrl`) and serves it. URL sources are proxied,
@@ -29,7 +49,7 @@ import com.ismartcoding.plain.web.http.HttpStatus
  * callback has no AVTransportURIMetaData — which would indicate a duplicate
  * callback) the player auto-advances to the next playlist item.
  */
-fun HttpRouter.addDlnaRoutes() {
+private fun HttpRouter.addDlnaSenderRoutes() {
     get("/media/{id}") { call ->
         val rawId = call.pathParam("id") ?: ""
         val id = rawId.split(".").firstOrNull() ?: ""
@@ -144,5 +164,67 @@ fun HttpRouter.addDlnaRoutes() {
         }
 
         call.respondNoBody(HttpStatus.OK)
+    }
+}
+
+/**
+ * DLNA MediaRenderer receiver routes, served by the shared web server so the
+ * receiver shares the web server port. All routing / SOAP dispatch lives in
+ * [DlnaHttpRouter]; these handlers adapt the platform-agnostic [HttpCall] to
+ * the [DlnaHttpRequest]/[DlnaHttpResponse] types the router expects.
+ *
+ * Gated by `TempData.dlnaReceiverEnabled` — when the DLNA receiver toggle is
+ * off every receiver route returns 404.
+ */
+private fun HttpRouter.addDlnaReceiverRoutes() {
+    listOf(
+        "/description.xml",
+        "/AVTransport/scpd.xml",
+        "/RenderingControl/scpd.xml",
+    ).forEach { get(it) { call -> handleDlnaReceiver(call) } }
+
+    listOf(
+        "/AVTransport/control",
+        "/RenderingControl/control",
+    ).forEach { post(it) { call -> handleDlnaReceiver(call) } }
+
+    val eventPaths = listOf("/AVTransport/event", "/RenderingControl/event")
+    listOf(HttpMethod("SUBSCRIBE"), HttpMethod("UNSUBSCRIBE")).forEach { m ->
+        eventPaths.forEach { path -> method(m, path) { call -> handleDlnaReceiver(call) } }
+    }
+}
+
+private suspend fun handleDlnaReceiver(call: HttpCall) {
+    if (!TempData.dlnaReceiverEnabled.value) {
+        call.respondNoBody(HttpStatus.NOT_FOUND)
+        return
+    }
+    val senderIp = call.remoteHost
+    val headers = buildMap<String, String> {
+        call.header("soapaction")?.let { put("soapaction", it) }
+        call.header("c-name")?.let { put("c-name", it) }
+    }
+    val body = if (call.method.name == "POST") call.receiveText() else ""
+    val request = DlnaHttpRequest(
+        method = call.method.name,
+        path = call.path,
+        headers = headers,
+        body = body,
+    )
+    val senderName = resolveSenderName(headers, senderIp)
+    val response = DlnaHttpRouter.route(request, DlnaReceiverEngine.deviceUuid, senderIp, senderName)
+    applyDlnaResponse(call, response)
+}
+
+private suspend fun applyDlnaResponse(call: HttpCall, response: DlnaHttpResponse) {
+    response.headers.forEach { (name, value) -> call.responseHeader(name, value) }
+    if (response.body.isNotEmpty()) {
+        call.respondText(
+            body = response.body,
+            contentType = response.contentType,
+            status = response.status,
+        )
+    } else {
+        call.respondNoBody(response.status)
     }
 }

@@ -3,119 +3,42 @@ package com.ismartcoding.plain.ui.page.dlna
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
-import com.ismartcoding.plain.features.dlna.DlnaMediaType
-import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.platform.DlnaReceiverAudioPlayerContent
-import com.ismartcoding.plain.platform.DlnaReceiverImageViewerContent
-import com.ismartcoding.plain.platform.DlnaReceiverVideoPlayerContent
-import com.ismartcoding.plain.platform.PBackHandler
+import com.ismartcoding.plain.features.dlna.receiver.DlnaReceiverEngine
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.models.DlnaReceiverViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DlnaReceiverPage(
-    navController: NavHostController,
-    vm: DlnaReceiverViewModel = viewModel { DlnaReceiverViewModel() },
-) {
-    DisposableEffect(Unit) {
-        vm.startReceiver()
-        onDispose { vm.stopReceiver() }
-    }
-
-    val mediaUri by DlnaRendererState.mediaUri.collectAsState()
-    val mediaType by DlnaRendererState.mediaType.collectAsState()
-    val playbackState by DlnaRendererState.playbackState.collectAsState()
-    val pendingCastRequest by DlnaRendererState.pendingCastRequest.collectAsState()
+fun DlnaReceiverPage(navController: NavHostController) {
+    val enabled by TempData.dlnaReceiverEnabled.collectAsState()
     val startError by DlnaRendererState.startError.collectAsState()
-    val isRetrying by vm.isRetrying.collectAsState()
-    val hasMedia = mediaUri.isNotEmpty() && playbackState != DlnaPlaybackState.NO_MEDIA_PRESENT
-
-    pendingCastRequest?.let { pending ->
-        var rememberChoice by remember { mutableStateOf(false) }
-        val displayName = pending.senderName.ifEmpty { pending.senderIp.ifEmpty { stringResource(Res.string.unknown) } }
-        AlertDialog(
-            onDismissRequest = {},
-            title = { Text(stringResource(Res.string.dlna_cast_request_title)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(stringResource(Res.string.dlna_cast_request_desc, displayName))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Checkbox(
-                            checked = rememberChoice,
-                            onCheckedChange = { rememberChoice = it },
-                        )
-                        Text(
-                            text = stringResource(Res.string.dlna_cast_remember_choice),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                PFilledButton(
-                    text = stringResource(Res.string.dlna_cast_accept),
-                    buttonSize = ButtonSize.MEDIUM,
-                    onClick = { vm.acceptCastRequest(rememberChoice) },
-                )
-            },
-            dismissButton = {
-                OutlinedButton(onClick = { vm.rejectCastRequest(rememberChoice) }) {
-                    Text(stringResource(Res.string.dlna_cast_reject))
-                }
-            },
-        )
-    }
-
-    if (hasMedia) {
-        val exitAction = {
-            DlnaRendererState.mediaUri.value = ""
-            DlnaRendererState.playbackState.value = DlnaPlaybackState.NO_MEDIA_PRESENT
-        }
-        PBackHandler { exitAction() }
-        when (mediaType) {
-            DlnaMediaType.AUDIO -> DlnaReceiverAudioPlayerContent(vm = vm, onExit = exitAction)
-            DlnaMediaType.IMAGE -> DlnaReceiverImageViewerContent(onExit = exitAction)
-            else -> DlnaReceiverVideoPlayerContent(vm = vm, onExit = exitAction)
-        }
-        return
-    }
+    val isRetrying by DlnaRendererState.isRetrying.collectAsState()
 
     PScaffold(
         topBar = {
@@ -148,14 +71,42 @@ fun DlnaReceiverPage(
                                 stringResource(Res.string.retry),
                                 buttonSize = ButtonSize.SMALL,
                                 isLoading = isRetrying,
-                                onClick = { vm.retryReceiver() }
+                                onClick = { DlnaReceiverEngine.retry() }
                             )
                         },
                     )
                 }
             }
-            item { DlnaReceiverWaitingScreen() }
+            item {
+                if (enabled) {
+                    DlnaReceiverWaitingScreen()
+                } else {
+                    DlnaReceiverDisabledScreen()
+                }
+            }
             item { BottomSpace() }
+        }
+    }
+}
+
+@Composable
+private fun DlnaReceiverDisabledScreen() {
+    PCard {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.dlna_receiver_disabled_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = stringResource(Res.string.dlna_receiver_disabled_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

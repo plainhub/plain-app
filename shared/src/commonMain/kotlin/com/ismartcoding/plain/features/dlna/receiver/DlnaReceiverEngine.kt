@@ -1,58 +1,68 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.features.dlna.DlnaCommand
+import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
+import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.IODispatcher
+import com.ismartcoding.plain.platform.startDlnaRenderer
+import com.ismartcoding.plain.platform.stopDlnaRenderer
+import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
+import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /**
- * Orchestrates the DLNA MediaRenderer receiver: opens the HTTP server socket,
- * accepts control-point connections, drives the SSDP advertiser, and dispatches
- * SOAP requests through [DlnaHttpRouter].
+ * Drives the DLNA MediaRenderer receiver.
  *
- * Replaces androidMain's `DlnaRenderer` + `DlnaHttpServer` + `DlnaSsdpAdvertiser`
- * trio. The platform layer only needs to provide [createDlnaServerSocket] and
- * [createDlnaSsdpSocket]; everything else — port selection, accept loop,
- * M-SEARCH handling, alive/byebye cadence — lives here in commonMain.
+ * Responsibilities:
+ * 1. SSDP advertiser — M-SEARCH responses + ssdp:alive/byebye notifications so
+ *    control points on the network can find the renderer.
+ * 2. Command processing — consumes [DlnaRendererState.commandChannel] and
+ *    updates playback state.
+ * 3. Rule checking — inspects [DlnaRendererState.rawPendingCastRequest] and
+ *    auto-accepts (known-allowed senders), auto-rejects (known-denied senders),
+ *    or promotes to [DlnaRendererState.pendingCastRequest] for user confirmation.
+ *
+ * The HTTP control endpoints (description.xml, SOAP control, SUBSCRIBE) are
+ * served by the shared web server — see `web/routes/DlnaRoutes.kt`.
+ *
+ * The engine runs independently of any page — once started (via the
+ * WebSettings toggle or app startup) the receiver accepts casts from any
+ * screen. The cast-request dialog and media player are rendered globally by
+ * `DlnaReceiverOverlay`.
  */
 object DlnaReceiverEngine {
 
     /** Stable UUID for this device's UPnP identity (regenerated per process). */
     val deviceUuid: String by lazy { randomUuid() }
 
-    private val CANDIDATE_PORTS = listOf(7878, 7879, 7880)
-    private var lastPort: Int? = null
     private var scope: CoroutineScope? = null
-    /** Held so stop() can close it immediately, unblocking accept() on the IO thread. */
-    private var activeServerSocket: DlnaServerSocket? = null
     private var activeSsdpSocket: DlnaSsdpSocket? = null
+    private var commandJob: Job? = null
+    private var ruleCheckJob: Job? = null
 
     /**
-     * Starts the renderer. Binds one of [CANDIDATE_PORTS] (preferring the last
-     * successful port), launches the HTTP accept loop and the SSDP advertiser,
-     * and marks [DlnaRendererState.isRunning] true. No-op if already running.
+     * Starts the receiver: sets [DlnaRendererState.port] to the current web
+     * server HTTP port (so SSDP LOCATION URLs point at the web server), launches
+     * the SSDP loop, command processing, and rule checking. No-op if already
+     * running.
      */
     fun start() {
         if (DlnaRendererState.isRunning.value) return
         DlnaRendererState.startError.value = ""
 
-        val serverSocket = openServerSocket()
-        if (serverSocket == null) {
-            val msg = "Failed to bind on ports ${CANDIDATE_PORTS.joinToString()}"
-            LogCat.e("DlnaReceiverEngine: $msg")
-            DlnaRendererState.startError.value = msg
-            return
-        }
-        val port = serverSocket.localPort
-        lastPort = port
-        activeServerSocket = serverSocket
-        DlnaRendererState.port.value = port
+        DlnaRendererState.port.value = TempData.httpPort.value
 
         val ssdpSocket = createDlnaSsdpSocket()
         activeSsdpSocket = ssdpSocket
@@ -60,7 +70,6 @@ object DlnaReceiverEngine {
         scope = CoroutineScope(SupervisorJob() + IODispatcher)
         scope!!.launch {
             try {
-                launch { runHttpLoop(serverSocket) }
                 if (ssdpSocket != null) {
                     launch { runSsdpLoop(ssdpSocket) }
                 } else {
@@ -71,53 +80,105 @@ object DlnaReceiverEngine {
                 DlnaRendererState.isRunning.value = false
             }
         }
+        startCommandProcessing()
+        startRuleCheck()
         DlnaRendererState.isRunning.value = true
-        LogCat.d("DlnaReceiverEngine started on port $port uuid=$deviceUuid")
+        LogCat.d("DlnaReceiverEngine started, web port=${TempData.httpPort.value} uuid=$deviceUuid")
     }
 
     /**
-     * Stops the renderer: closes the sockets (unblocking the accept/receive
-     * loops immediately), cancels the coroutine scope, and resets state.
+     * Stops the receiver: closes the SSDP socket (unblocking the receive loop
+     * immediately), cancels the coroutine scope, and resets state.
      */
     fun stop() {
-        // Close sockets first — this immediately unblocks the IO loops and
-        // causes the OS to release the port for the next start() call.
-        activeServerSocket?.close()
-        activeServerSocket = null
         activeSsdpSocket?.close()
         activeSsdpSocket = null
         scope?.cancel()
         scope = null
+        commandJob = null
+        ruleCheckJob = null
         DlnaRendererState.isRunning.value = false
         DlnaRendererState.reset()
         LogCat.d("DlnaReceiverEngine stopped")
     }
 
-    /** HTTP accept loop: each connection is handled on its own coroutine. */
-    private suspend fun runHttpLoop(serverSocket: DlnaServerSocket) = withIO {
-        LogCat.d("DLNA HTTP server started on port ${serverSocket.localPort}")
-        while (isActive) {
-            val client = try {
-                serverSocket.accept()
-            } catch (_: Exception) {
-                break
-            }
-            if (client == null) break
-            launch { handleClient(client) }
+    /**
+     * Restarts the receiver engine. Used when the engine failed to start
+     * (e.g. multicast lock failure) and the user taps retry.
+     *
+     * Runs on an independent [coIO] scope because [stop] cancels the engine's
+     * own scope — launching retry inside it would self-cancel before
+     * [startDlnaRenderer] runs.
+     */
+    fun retry() {
+        coIO {
+            DlnaRendererState.isRetrying.value = true
+            stopDlnaRenderer()
+            startDlnaRenderer()
+            delay(300)
+            DlnaRendererState.isRetrying.value = false
         }
     }
 
-    /** Reads one HTTP request, routes it, writes the response, closes. */
-    private suspend fun handleClient(client: DlnaClientConnection) = withIO {
-        try {
-            val request = client.readHttpRequest() ?: return@withIO
-            val senderName = resolveSenderName(request.headers, client.senderIp)
-            val response = DlnaHttpRouter.route(request, deviceUuid, client.senderIp, senderName)
-            client.writeResponse(response)
-        } catch (e: Exception) {
-            LogCat.e("DLNA client error: ${e.message}")
-        } finally {
-            client.close()
+    /**
+     * Consumes [DlnaRendererState.commandChannel] and updates playback state.
+     * Runs for the lifetime of the engine so casts are handled on any screen.
+     */
+    private fun startCommandProcessing() {
+        commandJob = scope?.launch {
+            for (command in DlnaRendererState.commandChannel) {
+                when (command) {
+                    is DlnaCommand.SetUri -> {
+                        DlnaRendererState.mediaUri.value = command.uri
+                        DlnaRendererState.mediaTitle.value = command.title
+                        DlnaRendererState.mediaAlbumArtUri.value = command.albumArtUri
+                        DlnaRendererState.mediaType.value = command.mediaType
+                        DlnaRendererState.playbackState.value = DlnaPlaybackState.TRANSITIONING
+                    }
+                    is DlnaCommand.Play -> DlnaRendererState.playbackState.value = DlnaPlaybackState.PLAYING
+                    is DlnaCommand.Pause -> DlnaRendererState.playbackState.value = DlnaPlaybackState.PAUSED
+                    is DlnaCommand.Stop -> {
+                        DlnaRendererState.seekTargetMs.value = 0L
+                        DlnaRendererState.playbackState.value = DlnaPlaybackState.STOPPED
+                    }
+                    is DlnaCommand.Seek -> DlnaRendererState.seekTargetMs.value = command.positionMs
+                }
+            }
+        }
+    }
+
+    /**
+     * Inspects [DlnaRendererState.rawPendingCastRequest]: auto-accepts known
+     * senders, auto-rejects denied senders, and promotes unknown senders to
+     * [DlnaRendererState.pendingCastRequest] for user confirmation (rendered
+     * globally by `DlnaReceiverOverlay`).
+     */
+    private fun startRuleCheck() {
+        ruleCheckJob = scope?.launch {
+            DlnaRendererState.rawPendingCastRequest.filterNotNull().collect { pending ->
+                val allowed = DlnaAllowedSendersPreference.getAsync()
+                val denied = DlnaDeniedSendersPreference.getAsync()
+                when {
+                    DlnaAllowedSendersPreference.containsIp(allowed, pending.senderIp) -> {
+                        DlnaRendererState.pendingCastRequest.value = null
+                        DlnaRendererState.rawPendingCastRequest.value = null
+                        val playQueued = DlnaRendererState.pendingPlayQueued.value
+                        DlnaRendererState.pendingPlayQueued.value = false
+                        DlnaRendererState.commandChannel.trySend(
+                            DlnaCommand.SetUri(pending.mediaUri, pending.mediaTitle, pending.mediaType, pending.albumArtUri)
+                        )
+                        if (playQueued) DlnaRendererState.commandChannel.trySend(DlnaCommand.Play)
+                    }
+                    DlnaDeniedSendersPreference.containsIp(denied, pending.senderIp) -> {
+                        DlnaRendererState.rawPendingCastRequest.value = null
+                        DlnaRendererState.pendingPlayQueued.value = false
+                    }
+                    else -> {
+                        DlnaRendererState.pendingCastRequest.value = pending
+                        DlnaRendererState.rawPendingCastRequest.value = null
+                    }
+                }
+            }
         }
     }
 
@@ -161,22 +222,6 @@ object DlnaReceiverEngine {
         val responses = DlnaSsdpMessages.searchResponses(uuid)
         responses.forEach { socket.sendUnicast(it, packet.sourceAddress, packet.sourcePort) }
         LogCat.d("DLNA sent ${responses.size} search responses to ${packet.sourceAddress}:${packet.sourcePort}")
-    }
-
-    /**
-     * Opens a [DlnaServerSocket] with SO_REUSEADDR enabled, trying the last
-     * successfully used port first, then the other candidates.
-     */
-    private fun openServerSocket(): DlnaServerSocket? {
-        val candidates = lastPort
-            ?.let { listOf(it) + CANDIDATE_PORTS.filter { p -> p != it } }
-            ?: CANDIDATE_PORTS
-        for (port in candidates) {
-            val ss = createDlnaServerSocket(port)
-            if (ss != null) return ss
-            LogCat.d("DlnaReceiverEngine: port $port unavailable, trying next")
-        }
-        return null
     }
 
     /**

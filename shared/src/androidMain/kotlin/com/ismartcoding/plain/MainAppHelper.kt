@@ -28,6 +28,7 @@ import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.platform.isUPlus
+import com.ismartcoding.plain.platform.startDlnaRenderer
 import com.ismartcoding.plain.lib.logcat.DiskLogAdapter
 import com.ismartcoding.plain.platform.DiskLogFormatStrategy
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -35,6 +36,7 @@ import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
 import com.ismartcoding.plain.preferences.AudioPlaybackSpeedPreference
 import com.ismartcoding.plain.preferences.ClientIdPreference
+import com.ismartcoding.plain.preferences.DlnaReceiverEnabledPreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
@@ -131,6 +133,7 @@ object MainAppHelper {
             TempData.webHttps.value = HttpsPreference.get(preferences)
             TempData.httpPort.value = HttpPortPreference.get(preferences)
             TempData.httpsPort.value = HttpsPortPreference.get(preferences)
+            TempData.dlnaReceiverEnabled.value = DlnaReceiverEnabledPreference.get(preferences)
             TempData.audioPlayMode.value = AudioPlayModePreference.getValue(preferences)
             TempData.audioPlaybackSpeed.value = AudioPlaybackSpeedPreference.getValue(preferences)
             AdbTokenPreference.ensureValueAsync(preferences)
@@ -172,6 +175,9 @@ object MainAppHelper {
             }
             if (AppFeatureType.CHECK_UPDATES.has() && autoCheckUpdate && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
                 AppHelper.checkUpdateAsync(app, false)
+            }
+            if (TempData.dlnaReceiverEnabled.value) {
+                startDlnaRenderer()
             }
         }
     }

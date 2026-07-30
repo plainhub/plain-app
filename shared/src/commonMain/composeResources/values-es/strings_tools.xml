@@ -3,8 +3,6 @@
     <string name="sound_meter">Medidor de sonido</string>
     <string name="pomodoro_timer">Temporizador Pomodoro</string>
     <string name="dlna_receiver">Emisión inalámbrica</string>
-    <string name="dlna_receiver_description">Cuando está activado, PlainApp en la misma red Wi-Fi puede transmitir vídeo y música a este dispositivo</string>
-    <string name="dlna_receiver_active">Activo, esperando transmisión…</string>
     <string name="dlna_receiver_waiting_title">Esperando transmisión</string>
     <string name="dlna_receiver_waiting_desc">Dispositivo visible en la red: %1$s</string>
     <string name="dlna_receiver_step1_title">Conectarse al mismo Wi-Fi</string>
@@ -14,9 +12,9 @@
     <string name="dlna_receiver_step3_title">Transmitir</string>
     <string name="dlna_receiver_step3_desc">Toque el ícono de transmisión, seleccione "%1$s" de la lista y comenzará la reproducción</string>
     <string name="dlna_receiver_protocol_note">Compatible con protocolos DLNA / UPnP, compatible con VLC, Kodi y otras aplicaciones de transmisión populares</string>
-    <string name="dlna_receiver_enable">Activar receptor</string>
-    <string name="dlna_receiver_disable">Desactivar receptor</string>
     <string name="dlna_receiver_exit_player">Salir del reproductor</string>
+    <string name="dlna_receiver_disabled_title">Receptor desactivado</string>
+    <string name="dlna_receiver_disabled_desc">Activa el interruptor en Ajustes Web para recibir transmisiones en este dispositivo</string>
     <string name="short_break">Pausa corta</string>
     <string name="long_break">Pausa larga</string>
     <string name="tomatoes_today">Tomates de hoy</string>

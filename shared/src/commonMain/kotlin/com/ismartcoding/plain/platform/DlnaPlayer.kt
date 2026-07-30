@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.platform
 
 import androidx.compose.runtime.Composable
-import com.ismartcoding.plain.ui.models.DlnaReceiverViewModel
 
 /**
  * DLNA receiver audio player surface.
@@ -9,7 +8,7 @@ import com.ismartcoding.plain.ui.models.DlnaReceiverViewModel
  * iOS: stub (DLNA receiver not supported on iOS).
  */
 @Composable
-expect fun DlnaReceiverAudioPlayerContent(vm: DlnaReceiverViewModel, onExit: () -> Unit)
+expect fun DlnaReceiverAudioPlayerContent(onExit: () -> Unit)
 
 /**
  * DLNA receiver video player surface.
@@ -17,7 +16,7 @@ expect fun DlnaReceiverAudioPlayerContent(vm: DlnaReceiverViewModel, onExit: () 
  * iOS: stub (DLNA receiver not supported on iOS).
  */
 @Composable
-expect fun DlnaReceiverVideoPlayerContent(vm: DlnaReceiverViewModel, onExit: () -> Unit)
+expect fun DlnaReceiverVideoPlayerContent(onExit: () -> Unit)
 
 /**
  * DLNA receiver image viewer surface.
