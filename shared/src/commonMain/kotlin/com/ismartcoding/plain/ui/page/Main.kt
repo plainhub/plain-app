@@ -70,7 +70,7 @@ fun Main(
     }
 
     MainEventCollector(
-        scope, chatVM, audioPlaylistVM, pomodoroVM, peerVM,
+        scope, mainVM, chatVM, audioPlaylistVM, pomodoroVM, peerVM,
         onConfirmDialog = { confirmDialogEvent = it },
         onLoadingDialog = { loadingDialogEvent = if (it.show) it else null },
         onToast = { toastState = it },

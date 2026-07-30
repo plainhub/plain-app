@@ -17,7 +17,9 @@ import com.ismartcoding.plain.preferences.LocalAdbToken
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardCard
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
@@ -39,21 +41,23 @@ fun WebDevPage(
             topBar = {
                 PTopAppBar(
                     navController = navController,
-                    title = stringResource(Res.string.developer_options),
+                    title = stringResource(Res.string.adb_automation),
                 )
             },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item {
                         TopSpace()
-                        Subtitle(text = stringResource(Res.string.adb_automation))
+                        Subtitle(text = stringResource(Res.string.token))
                         ClipboardCard(label = stringResource(Res.string.token), text = adbToken)
                         VerticalSpace(dp = 16.dp)
+                        Subtitle(text = stringResource(Res.string.start_service))
                         ClipboardCard(
                             label = stringResource(Res.string.adb_cmd_start),
                             text = "adb shell am broadcast -a $packageId.action.START_HTTP_SERVER -p $packageId --es token $adbToken",
                         )
                         VerticalSpace(dp = 16.dp)
+                        Subtitle(text = stringResource(Res.string.stop_service))
                         ClipboardCard(
                             label = stringResource(Res.string.adb_cmd_stop),
                             text = "adb shell am broadcast -a $packageId.action.STOP_HTTP_SERVER -p $packageId --es token $adbToken",

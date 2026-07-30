@@ -53,6 +53,7 @@ actual fun searchDlnaDevicesRaw(): Flow<DlnaSsdpResponse> = callbackFlow {
         socket.joinGroup(group)
         socket.setReceiveBufferSize(32768)
         socket.broadcast = true
+        LogCat.d("DLNA scanner: sending M-SEARCH to $SSDP_ADDR:$SSDP_PORT from local port ${socket.localPort}")
         socket.send(DatagramPacket(searchQuery.toByteArray(), searchQuery.length, group, SSDP_PORT))
         socket.soTimeout = 5_000
         while (isActive) {
@@ -62,6 +63,7 @@ actual fun searchDlnaDevicesRaw(): Flow<DlnaSsdpResponse> = callbackFlow {
                 val response = String(packet.data, 0, packet.length)
                 val prefix = response.take(20).uppercase(Locale.getDefault())
                 if (prefix.startsWith("HTTP/1.1 200") || prefix.startsWith("NOTIFY * HTTP")) {
+                    LogCat.d("DLNA scanner: received response from ${packet.address.hostAddress}:${packet.port}")
                     trySend(DlnaSsdpResponse(packet.address.hostAddress ?: "", response))
                 }
             } catch (_: SocketTimeoutException) {
