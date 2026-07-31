@@ -14,6 +14,7 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.PropertyDSL
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.UnionPropertyDSL
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
+import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
 
@@ -23,6 +24,23 @@ open class TypeDSL<T : Any>(
 ) : ItemDSL() {
 
     var name = kClass.defaultKQLTypeName()
+
+    // KSP bridge: set to true for @GraphQLInterface types, bypasses isKotlinFinal()
+    var isInterface: Boolean = false
+        internal set
+
+    // KSP bridge: explicit possible types for interfaces, bypasses isKotlinSubclassOf()
+    var possibleTypes: List<KClass<*>> = emptyList()
+        internal set
+
+    /**
+     * Marks this type as a GraphQL Interface with the given implementing types.
+     * Used by registerGeneratedSchema() — replaces runtime isKotlinSubclassOf.
+     */
+    fun interfaceType(possible: List<KClass<*>> = emptyList()) {
+        isInterface = true
+        possibleTypes = possible
+    }
 
     @PublishedApi
     internal val transformationProperties = mutableSetOf<Transformation<T, *>>()
@@ -83,7 +101,17 @@ open class TypeDSL<T : Any>(
     }
 
     fun <R> property(kProperty: KProperty1<T, R>, block : KotlinPropertyDSL<T, R>.() -> Unit){
-        val dsl = KotlinPropertyDSL(kProperty, block)
+        val dsl = KotlinPropertyDSL(kProperty, returnType = null, block)
+        describedKotlinProperties[kProperty] = dsl.toKQLProperty()
+    }
+
+    /**
+     * KSP bridge: register a property with a pre-computed return type.
+     * The [returnType] is generated at compile time via `typeOf<R>()`,
+     * avoiding runtime `kProperty.returnType` reflection (kotlin.reflect.full).
+     */
+    fun <R> property(kProperty: KProperty1<T, R>, returnType: KType, block : KotlinPropertyDSL<T, R>.() -> Unit = {}){
+        val dsl = KotlinPropertyDSL(kProperty, returnType, block)
         describedKotlinProperties[kProperty] = dsl.toKQLProperty()
     }
 
@@ -118,7 +146,9 @@ open class TypeDSL<T : Any>(
             dataloadExtensionProperties = dataloadedExtensionProperties.toList(),
             unionProperties = unionProperties.toList(),
             transformations = transformationProperties.associateBy { it.kProperty },
-            description = description
+            description = description,
+            isInterface = isInterface,
+            possibleTypes = possibleTypes
         )
     }
 }

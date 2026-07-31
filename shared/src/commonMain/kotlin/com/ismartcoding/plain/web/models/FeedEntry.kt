@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.web.models
 
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
+@GraphQLType
 data class FeedEntry(
     val id: ID,
     val title: String,

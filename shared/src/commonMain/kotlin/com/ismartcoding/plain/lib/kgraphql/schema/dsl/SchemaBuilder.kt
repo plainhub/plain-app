@@ -3,6 +3,7 @@ package com.ismartcoding.plain.lib.kgraphql.schema.dsl
 import com.ismartcoding.plain.lib.kgraphql.schema.Publisher
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.SchemaException
+import com.ismartcoding.plain.lib.kgraphql.generated.GeneratedSchemaRegistry
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.operations.MutationDSL
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.operations.QueryDSL
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.operations.SubscriptionDSL
@@ -22,8 +23,6 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.ShortScalarDSL
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.StringScalarDSL
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.TypeDSL
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.UnionTypeDSL
-import com.ismartcoding.plain.lib.kgraphql.isKotlinSealed
-import com.ismartcoding.plain.lib.kgraphql.sealedSubclassesList
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
@@ -151,6 +150,25 @@ class SchemaBuilder internal constructor() {
 
     fun <T : Any> type(kClass: KClass<T>, block: TypeDSL<T>.() -> Unit) {
         val type = TypeDSL(model.unionsMonitor, kClass).apply(block)
+        // KSP merge: if a descriptor exists for this kClass, auto-declare any
+        // properties the user did NOT explicitly add in [block]. This keeps
+        // `type<User> {}` working without forcing users to re-list every field
+        // already captured by @GraphQLType. Custom properties (transformations,
+        // extensions, ignored) declared in [block] take precedence.
+        GeneratedSchemaRegistry.types[kClass]?.let { desc ->
+            @Suppress("UNCHECKED_CAST")
+            val typedDesc = desc as com.ismartcoding.plain.lib.kgraphql.generated.TypeDescriptor<T>
+            typedDesc.fields.forEach { f ->
+                if (f.kProperty !in type.describedKotlinProperties) {
+                    type.property(f.kProperty, f.returnType) {}
+                }
+            }
+            // If the descriptor marks this as an interface, propagate the flag
+            // and possibleTypes (no-op for regular @GraphQLType objects).
+            if (typedDesc.isInterface) {
+                type.interfaceType(typedDesc.possibleTypes)
+            }
+        }
         model.addObject(type.toKQLObject())
     }
 
@@ -185,6 +203,17 @@ class SchemaBuilder internal constructor() {
         }
 
         model.addEnum(TypeDef.Enumeration(type.name, kClass, kqlEnumValues, type.description))
+
+        // KMP-safe enum deserializer: register a JsonElement -> enum value mapper
+        // so VariablesJson can convert JSON string variables to enum constants
+        // WITHOUT using isKotlinEnum()/enumValueOfSafe() reflection (iOS-safe).
+        val nameToValue = enumValues.associateBy { it.name }
+        configuration.scalarDeserializers[kClass] = { element ->
+            val name = (element as? JsonPrimitive)?.content
+                ?: throw IllegalStateException("Expected JSON string for enum $kClass")
+            nameToValue[name]
+                ?: throw IllegalArgumentException("No enum constant ${kClass.qualifiedName}.$name")
+        }
     }
 
     inline fun <reified T : Enum<T>> enum(noinline block: (EnumDSL<T>.() -> Unit)? = null) {
@@ -206,25 +235,28 @@ class SchemaBuilder internal constructor() {
         return TypeID(name)
     }
 
-    inline fun <reified T: Any> unionType(noinline block: UnionTypeDSL.() -> Unit = {}): TypeID {
-        if (!T::class.isKotlinSealed()) throw SchemaException("Can't generate a union type out of a non sealed class. '${T::class.simpleName}'")
-
-        return unionType(T::class.simpleName!!) {
-            block()
-            T::class.sealedSubclassesList().forEach {
-                type(it, subTypeBlock) // <-- Adds to schema definition
-                type(it) // <-- Adds to possible union type
-            }
-        }
-    }
-
     //================================================================================
     // INPUT
     //================================================================================
 
     fun <T : Any> inputType(kClass: KClass<T>, block: InputTypeDSL<T>.() -> Unit) {
         val input = InputTypeDSL(kClass).apply(block)
-        model.addInputObject(TypeDef.Input(input.name, kClass, input.description))
+        // KSP merge: if an InputDescriptor exists for this kClass, auto-declare
+        // any properties the user did NOT explicitly add in [block]. This keeps
+        // `inputType<CreateItemInput>()` working without re-listing every field
+        // already captured by @GraphQLInput.
+        GeneratedSchemaRegistry.inputs[kClass]?.let { desc ->
+            @Suppress("UNCHECKED_CAST")
+            val typedDesc = desc as com.ismartcoding.plain.lib.kgraphql.generated.InputDescriptor<T>
+            val declaredNames = input.declaredKotlinProperties.map { it.name }.toMutableSet()
+            typedDesc.fields.forEach { f ->
+                if (f.name !in declaredNames) {
+                    input.property(f.kProperty, f.returnType)
+                    declaredNames.add(f.name)
+                }
+            }
+        }
+        model.addInputObject(input.toKQLInput())
     }
 
     inline fun <reified T : Any> inputType(noinline block : InputTypeDSL<T>.() -> Unit = {}) {

@@ -55,7 +55,6 @@ kotlin {
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlin.reflect)
             implementation(libs.androidx.datastore.preferences.core)
             implementation(libs.kotlinx.serialization.json)
             api(libs.room.runtime)
@@ -80,6 +79,11 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.okhttp)
             implementation(libs.tink.android)
+            // kotlin-reflect provides kotlin.reflect.full (memberProperties,
+            // isSubclassOf, etc.) used by the Android ReflectionBridge actual.
+            // Not needed in commonMain — the stdlib provides the base
+            // KClass/KProperty1/KType interfaces including KCallable.returnType.
+            implementation(libs.kotlin.reflect)
             implementation(libs.androidx.exifinterface)
             implementation(libs.androidx.appcompat)
             implementation(libs.androidx.datastore.preferences)
@@ -165,6 +169,13 @@ dependencies {
     add("kspAndroid", libs.room.compiler)
     add("kspIosArm64", libs.room.compiler)
     add("kspIosSimulatorArm64", libs.room.compiler)
+    // KGraphQL KSP2 processor — generates reflection-free schema descriptors.
+    // Uses expect/actual pattern: commonMain declares expect, each platform's
+    // KSP generates the actual + descriptor objects. No kspCommonMainMetadata
+    // needed (platform KSP is sufficient).
+    add("kspAndroid", project(":kgraphql-ksp"))
+    add("kspIosArm64", project(":kgraphql-ksp"))
+    add("kspIosSimulatorArm64", project(":kgraphql-ksp"))
     add("androidHostTestImplementation", kotlin("test"))
     add("androidHostTestImplementation", libs.junit)
 }

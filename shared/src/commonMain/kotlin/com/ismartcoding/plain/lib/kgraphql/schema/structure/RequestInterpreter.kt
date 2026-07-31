@@ -27,7 +27,7 @@ import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.SelectionNode
 import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.SelectionSetNode
 import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.VariableDefinitionNode
 import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.toArguments
-import com.ismartcoding.plain.lib.kgraphql.starProjectedKType
+import kotlin.reflect.typeOf
 
 
 class RequestInterpreter(val schemaModel: SchemaModel) {
@@ -74,7 +74,7 @@ class RequestInterpreter(val schemaModel: SchemaModel) {
                     }.joinToString(prefix = "[", postfix = "]")
 
                     val operationName = requestedOperationName ?: (
-                        variables.get(String::class, String::class.starProjectedKType(), DefaultSchema.Companion.OPERATION_NAME_PARAM)
+                        variables.get(String::class, typeOf<String>(), DefaultSchema.Companion.OPERATION_NAME_PARAM)
                             ?: throw GraphQLError("Must provide an operation name from: $operationNamesFound")
                         )
 

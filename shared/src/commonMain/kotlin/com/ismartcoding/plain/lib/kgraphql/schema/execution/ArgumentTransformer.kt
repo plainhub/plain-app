@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.lib.kgraphql.schema.execution
 
 import com.ismartcoding.plain.lib.kgraphql.ExecutionException
-import com.ismartcoding.plain.lib.kgraphql.callConstructorBy
-import com.ismartcoding.plain.lib.kgraphql.getConstructorParamNames
-import com.ismartcoding.plain.lib.kgraphql.isConstructorParamOptional
+import com.ismartcoding.plain.lib.kgraphql.generated.GeneratedSchemaRegistry
 import com.ismartcoding.plain.lib.kgraphql.request.Variables
 import com.ismartcoding.plain.lib.kgraphql.schema.DefaultSchema
 import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.ValueNode
@@ -30,7 +28,7 @@ open class ArgumentTransformer(val schema : DefaultSchema) {
             }
             value is ValueNode.ObjectValueNode -> {
                 val kClass = type.unwrapped().kClass ?: throw GraphQLError("Cannot get KClass from type", value)
-                val paramNames = kClass.getConstructorParamNames()
+
                 val valueMap = value.fields.map { valueField ->
                     val inputField = type
                             .unwrapped()
@@ -45,15 +43,23 @@ open class ArgumentTransformer(val schema : DefaultSchema) {
                     valueField.name.value to transformValue(paramType, valueField.value, variables)
                 }.toMap()
 
-                val missingNonOptionalInputs = paramNames
-                        .filter { !kClass.isConstructorParamOptional(it) && !valueMap.containsKey(it) }
+                // KSP-only: use the generated InputDescriptor's fromMap factory
+                // (direct constructor call) instead of callConstructorBy reflection.
+                val inputDescriptor = GeneratedSchemaRegistry.inputs[kClass]
+                    ?: throw GraphQLError("No InputDescriptor found for type ${kClass.simpleName}. " +
+                        "Annotate the class with @GraphQLInput to enable KSP code generation.", value)
+
+                val missingNonOptionalInputs = inputDescriptor.fields
+                    .map { it.name }
+                    .filter { it !in inputDescriptor.optionalParams && it !in valueMap }
 
                 if (missingNonOptionalInputs.isNotEmpty()) {
                     val inputs = missingNonOptionalInputs.joinToString(",")
                     throw GraphQLError("You are missing non optional input fields: $inputs", value)
                 }
 
-                kClass.callConstructorBy(valueMap)
+                @Suppress("UNCHECKED_CAST")
+                return (inputDescriptor.fromMap as (Map<String, Any?>) -> Any)(valueMap)
             }
             value is ValueNode.NullValueNode -> {
                 if (type.isNotNullable()) {
@@ -84,8 +90,9 @@ open class ArgumentTransformer(val schema : DefaultSchema) {
         val kClass = kType.kClass()
 
         fun throwInvalidEnumValue(enumType : Type.Enum<*>){
+            val validValues = enumType.values.joinToString(prefix = "[", postfix = "]") { it.name }
             throw GraphQLError(
-                "Invalid enum ${schema.model.enums[kClass]?.name} value. Expected one of ${enumType.values}", value
+                "Invalid enum ${schema.model.enums[kClass]?.name} value. Expected one of $validValues", value
             )
         }
 

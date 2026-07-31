@@ -1,12 +1,14 @@
 package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLInput
 import kotlinx.serialization.Serializable
 
 /**
  * Input data from the web client for screen mirror remote control.
  * Coordinates (x, y, endX, endY) are normalized to [0, 1].
  */
+@GraphQLInput
 @Serializable
 data class ScreenMirrorControlInput(
     val action: ScreenMirrorControlAction,

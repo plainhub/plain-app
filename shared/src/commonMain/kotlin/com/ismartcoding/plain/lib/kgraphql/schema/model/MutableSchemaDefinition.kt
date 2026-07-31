@@ -11,10 +11,11 @@ import com.ismartcoding.plain.lib.kgraphql.schema.introspection.TypeKind
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Directive
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__EnumValue
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Field
+import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__InputValue
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Type
-import com.ismartcoding.plain.lib.kgraphql.isKotlinSubclassOf
 import kotlin.reflect.KClass
+import kotlin.reflect.typeOf
 
 /**
  * Intermediate, mutable data structure used to prepare [SchemaDefinition]
@@ -22,9 +23,12 @@ import kotlin.reflect.KClass
  */
 data class MutableSchemaDefinition (
     private val objects: ArrayList<TypeDef.Object<*>> = arrayListOf(
-        TypeDef.Object(__Schema::class.defaultKQLTypeName(), __Schema::class),
+        create__SchemaDefinition(),
         create__TypeDefinition(),
-        create__DirectiveDefinition()
+        create__DirectiveDefinition(),
+        create__FieldDefinition(),
+        create__InputValueDefinition(),
+        create__EnumValueDefinition()
     ),
     private val queries: ArrayList<QueryDef<*>> = arrayListOf(),
     private val scalars: ArrayList<TypeDef.Scalar<*>> = arrayListOf(
@@ -87,12 +91,11 @@ data class MutableSchemaDefinition (
             )
         }
 
-        if (member.isKotlinSubclassOf(Collection::class)) {
-            throw SchemaException("Collection may not be member type of a Union '${union.name}'")
-        }
-
-        if (member.isKotlinSubclassOf(Map::class)) {
-            throw SchemaException("Map may not be member type of a Union '${union.name}'")
+        // KMP-safe check: verify member is not a Collection or Map type.
+        // Uses qualifiedName instead of isKotlinSubclassOf reflection.
+        val memberQn = member.qualifiedName
+        if (memberQn != null && (memberQn.startsWith("kotlin.collections.") || memberQn.startsWith("java.util."))) {
+            throw SchemaException("Collection/Map may not be member type of a Union '${union.name}'")
         }
 
         if (compiledObjects.none { it.kClass == member }) {
@@ -150,7 +153,29 @@ data class MutableSchemaDefinition (
     }
 }
 
+private fun create__SchemaDefinition() = TypeDSL(emptyList(), __Schema::class).apply {
+    // KSP-only: explicitly declare all __Schema properties with typeOf<>() return
+    // types. No memberPropertiesList() reflection (iOS-safe).
+    property(__Schema::types, typeOf<List<__Type>>())
+    property(__Schema::queryType, typeOf<__Type>())
+    property(__Schema::mutationType, typeOf<__Type?>())
+    property(__Schema::subscriptionType, typeOf<__Type?>())
+    property(__Schema::directives, typeOf<List<__Directive>>())
+}.toKQLObject()
+
 private fun create__TypeDefinition() = TypeDSL(emptyList(), __Type::class).apply {
+    // KSP-only: explicitly declare all __Type properties with typeOf<>() return
+    // types. No memberPropertiesList() reflection (iOS-safe).
+    property(__Type::kind, typeOf<TypeKind>())
+    property(__Type::name, typeOf<String?>())
+    property(__Type::description, typeOf<String>())
+    property(__Type::fields, typeOf<List<__Field>?>())
+    property(__Type::interfaces, typeOf<List<__Type>?>())
+    property(__Type::possibleTypes, typeOf<List<__Type>?>())
+    property(__Type::enumValues, typeOf<List<__EnumValue>?>())
+    property(__Type::inputFields, typeOf<List<__InputValue>?>())
+    property(__Type::ofType, typeOf<__Type?>())
+    // Transformations apply to the declared properties above (matched by name).
     transformation(__Type::fields, "includeDeprecated") { fields: List<__Field>?, includeDeprecated: Boolean? ->
         if (includeDeprecated == true) fields else fields?.filterNot { it.isDeprecated }
     }
@@ -163,6 +188,13 @@ private fun create__DirectiveDefinition() = TypeDSL(
     emptyList(),
     __Directive::class
 ).apply {
+    // KSP-only: explicitly declare all __Directive properties (inherited from
+    // __Described + declared in __Directive) with typeOf<>() return types.
+    property(__Directive::name, typeOf<String>())
+    property(__Directive::description, typeOf<String?>())
+    property(__Directive::locations, typeOf<List<DirectiveLocation>>())
+    property(__Directive::args, typeOf<List<__InputValue>>())
+    // Deprecated extension properties (computed from locations).
     property<Boolean>("onField") {
         resolver { dir: __Directive ->
             dir.locations.contains(DirectiveLocation.FIELD)
@@ -189,6 +221,35 @@ private fun create__DirectiveDefinition() = TypeDSL(
         }
         deprecate("Use `locations`.")
     }
+}.toKQLObject()
+
+private fun create__FieldDefinition() = TypeDSL(emptyList(), __Field::class).apply {
+    // KSP-only: explicitly declare all __Field properties (inherited from
+    // __Described + Depreciable + declared in __Field) with typeOf<>() return types.
+    property(__Field::name, typeOf<String>())
+    property(__Field::description, typeOf<String?>())
+    property(__Field::type, typeOf<__Type>())
+    property(__Field::args, typeOf<List<__InputValue>>())
+    property(__Field::isDeprecated, typeOf<Boolean>())
+    property(__Field::deprecationReason, typeOf<String?>())
+}.toKQLObject()
+
+private fun create__InputValueDefinition() = TypeDSL(emptyList(), __InputValue::class).apply {
+    // KSP-only: explicitly declare all __InputValue properties (inherited from
+    // __Described + declared in __InputValue) with typeOf<>() return types.
+    property(__InputValue::name, typeOf<String>())
+    property(__InputValue::description, typeOf<String?>())
+    property(__InputValue::type, typeOf<__Type>())
+    property(__InputValue::defaultValue, typeOf<String?>())
+}.toKQLObject()
+
+private fun create__EnumValueDefinition() = TypeDSL(emptyList(), __EnumValue::class).apply {
+    // KSP-only: explicitly declare all __EnumValue properties (inherited from
+    // __Described + Depreciable) with typeOf<>() return types.
+    property(__EnumValue::name, typeOf<String>())
+    property(__EnumValue::description, typeOf<String?>())
+    property(__EnumValue::isDeprecated, typeOf<Boolean>())
+    property(__EnumValue::deprecationReason, typeOf<String?>())
 }.toKQLObject()
 
 private fun <T> List<T>.containsAny(vararg elements: T) = elements.filter { this.contains(it) }.any()

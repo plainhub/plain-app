@@ -132,11 +132,6 @@ internal fun MainActivity.initEvents() {
                 is PickFileEvent -> handlePickFileEvent(event)
                 is ExportFileEvent -> handleExportFileEvent(event)
                 is ConfirmToAcceptLoginEvent -> {
-                    mainVM.pendingLoginEvent.value = event
-                    val nav = navControllerState.value
-                    if (nav?.currentBackStackEntry?.destination?.hasRoute<Routing.LoginRequest>() != true) {
-                        nav?.navigate(Routing.LoginRequest)
-                    }
                     openNew()
                 }
 

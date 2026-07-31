@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
+@GraphQLType
 data class Image(
     var id: ID,
     var title: String,

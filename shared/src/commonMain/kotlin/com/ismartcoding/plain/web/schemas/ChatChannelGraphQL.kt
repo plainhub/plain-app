@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.chat.channel.ChannelManager
 import com.ismartcoding.plain.platform.AppDatabase
@@ -8,58 +10,58 @@ import com.ismartcoding.plain.web.models.ChatChannelMember
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
 
+@GraphQLQuery
+suspend fun chatChannels(): List<ChatChannel> {
+    return AppDatabase.instance.chatChannelDao().getAll()
+        .sortedBy { it.name.lowercase() }
+        .map { it.toModel() }
+}
+
+@GraphQLMutation
+suspend fun createChatChannel(name: String): ChatChannel {
+    return ChannelManager.createChannel(name).toModel()
+}
+
+@GraphQLMutation
+suspend fun updateChatChannel(id: ID, name: String): ChatChannel {
+    return ChannelManager.renameChannel(id.value, name).toModel()
+}
+
+@GraphQLMutation
+suspend fun deleteChatChannel(id: ID): Boolean {
+    ChannelManager.deleteChannel(id.value)
+    return true
+}
+
+@GraphQLMutation
+suspend fun leaveChatChannel(id: ID): Boolean {
+    ChannelManager.leaveChannel(id.value)
+    return true
+}
+
+@GraphQLMutation
+suspend fun addChatChannelMember(id: ID, peerId: String): ChatChannel {
+    return ChannelManager.inviteMember(id.value, peerId).toModel()
+}
+
+@GraphQLMutation
+suspend fun removeChatChannelMember(id: ID, peerId: String): ChatChannel {
+    return ChannelManager.kickMember(id.value, peerId).toModel()
+}
+
+@GraphQLMutation
+suspend fun acceptChatChannelInvite(id: ID): Boolean {
+    ChannelManager.acceptInvite(id.value)
+    return true
+}
+
+@GraphQLMutation
+suspend fun declineChatChannelInvite(id: ID): Boolean {
+    ChannelManager.declineInvite(id.value)
+    return true
+}
+
 fun SchemaBuilder.addChatChannelSchema() {
-    query("chatChannels") {
-        resolver { ->
-            AppDatabase.instance.chatChannelDao().getAll()
-                .sortedBy { it.name.lowercase() }
-                .map { it.toModel() }
-        }
-    }
-    mutation("createChatChannel") {
-        resolver("name") { name: String ->
-            ChannelManager.createChannel(name).toModel()
-        }
-    }
-    mutation("updateChatChannel") {
-        resolver("id", "name") { id: ID, name: String ->
-            ChannelManager.renameChannel(id.value, name).toModel()
-        }
-    }
-    mutation("deleteChatChannel") {
-        resolver("id") { id: ID ->
-            ChannelManager.deleteChannel(id.value)
-            true
-        }
-    }
-    mutation("leaveChatChannel") {
-        resolver("id") { id: ID ->
-            ChannelManager.leaveChannel(id.value)
-            true
-        }
-    }
-    mutation("addChatChannelMember") {
-        resolver("id", "peerId") { id: ID, peerId: String ->
-            ChannelManager.inviteMember(id.value, peerId).toModel()
-        }
-    }
-    mutation("removeChatChannelMember") {
-        resolver("id", "peerId") { id: ID, peerId: String ->
-            ChannelManager.kickMember(id.value, peerId).toModel()
-        }
-    }
-    mutation("acceptChatChannelInvite") {
-        resolver("id") { id: ID ->
-            ChannelManager.acceptInvite(id.value)
-            true
-        }
-    }
-    mutation("declineChatChannelInvite") {
-        resolver("id") { id: ID ->
-            ChannelManager.declineInvite(id.value)
-            true
-        }
-    }
     type<ChatChannel> {}
     type<ChatChannelMember> {}
 }

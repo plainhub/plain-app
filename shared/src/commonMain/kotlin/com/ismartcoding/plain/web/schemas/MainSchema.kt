@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
+import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedResolvers
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 
 /**
@@ -7,6 +9,10 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
  * (SwiftNIO, future) HTTP server entry points to assemble the full API schema.
  */
 fun SchemaBuilder.applyMainSchema() {
+    configure {
+        executor = Executor.DataLoaderPrepared
+    }
+    registerGeneratedResolvers()
     addChatMessageSchema()
     addChatChannelSchema()
     addSmsSchema()

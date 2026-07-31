@@ -11,7 +11,10 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.plain.lib.kgraphql.KGraphQL
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLSchemaTarget
 import com.ismartcoding.plain.lib.kgraphql.context
+import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedPeerResolvers
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -27,6 +30,54 @@ import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.schemas.addSchemaTypes
 import kotlinx.serialization.json.Json
+
+@GraphQLMutation(target = GraphQLSchemaTarget.PEER)
+suspend fun channelSystemMessage(type: String, payload: String, context: Context): Boolean {
+    val ctx = context.get<GraphqlRequestContext>()!!
+    val fromId = ctx.header("c-id") ?: ""
+    ChannelSystemMessageReceiver.handle(fromId, type, payload)
+    return true
+}
+
+@GraphQLMutation(target = GraphQLSchemaTarget.PEER)
+suspend fun createChatItem(content: String, context: Context): List<ChatItem> {
+    val ctx = context.get<GraphqlRequestContext>()!!
+    val fromPeerId = ctx.header("c-id") ?: ""
+    val fromChannelId = ctx.header("c-cid") ?: ""
+    val signature: String = ctx.attribute(PeerGraphQLService.ATTR_SIGNATURE) ?: ""
+    val timestamp: Long = ctx.attribute(PeerGraphQLService.ATTR_TIMESTAMP) ?: 0L
+
+    val item = try {
+        ChatMessageReceiver.receive(
+            fromPeerId = fromPeerId,
+            content = DChat.parseContent(content),
+            fromChannelId = fromChannelId,
+            signature = signature,
+            timestamp = timestamp,
+        )
+    } catch (e: ReplayedMessageException) {
+        LogCat.d("Dropped replayed message from $fromPeerId")
+        return emptyList()
+    }
+    return listOf(item.toModel())
+}
+
+@GraphQLMutation(target = GraphQLSchemaTarget.PEER)
+suspend fun startAware(context: Context): Boolean {
+    val ctx = context.get<GraphqlRequestContext>()!!
+    val fromPeerId = ctx.header("c-id") ?: ""
+    LogCat.d("[PeerGraphQL] startAware from=$fromPeerId")
+    val started = startAwareIfNeeded()
+    if (started) {
+        withIO {
+            val peer = AppDatabase.instance.peerDao().getById(fromPeerId)
+            if (peer != null) {
+                subscribeAwareForPeer(peer)
+            }
+        }
+    }
+    return started
+}
 
 /**
  * Holds the peer-chat GraphQL [Schema] and dispatches `/peer_graphql`
@@ -129,62 +180,10 @@ class PeerGraphQLService private constructor(
          * [GraphqlRequestContext] injected into the KGraphQL Context.
          */
         fun SchemaBuilder.applyPeerSchema() {
+            registerGeneratedPeerResolvers()
             type<ChatItem> {
                 property("data") {
                     resolver { c: ChatItem -> c.getContentData() }
-                }
-            }
-            mutation("channelSystemMessage") {
-                resolver("type", "payload", "context") { type: String, payload: String, context: Context ->
-                    val ctx = context.get<GraphqlRequestContext>()!!
-                    val fromId = ctx.header("c-id") ?: ""
-                    ChannelSystemMessageReceiver.handle(fromId, type, payload)
-                    true
-                }
-            }
-            mutation("createChatItem") {
-                resolver("content", "context") { content: String, context: Context ->
-                    val ctx = context.get<GraphqlRequestContext>()!!
-                    val fromPeerId = ctx.header("c-id") ?: ""
-                    val fromChannelId = ctx.header("c-cid") ?: ""
-                    val signature: String = ctx.attribute(ATTR_SIGNATURE) ?: ""
-                    val timestamp: Long = ctx.attribute(ATTR_TIMESTAMP) ?: 0L
-
-                    val item = try {
-                        ChatMessageReceiver.receive(
-                            fromPeerId = fromPeerId,
-                            content = DChat.parseContent(content),
-                            fromChannelId = fromChannelId,
-                            signature = signature,
-                            timestamp = timestamp,
-                        )
-                    } catch (e: ReplayedMessageException) {
-                        LogCat.d("Dropped replayed message from $fromPeerId")
-                        return@resolver emptyList<ChatItem>()
-                    }
-                    listOf(item.toModel())
-                }
-            }
-            // Triggered by PeerTransportPrewarmer over BLE when the peer's
-            // Wi-Fi Aware service isn't running. Starts our own Aware service
-            // and subscribes for the requesting peer so both sides can establish
-            // a data path. This lets the next message go over the much faster
-            // Aware transport instead of BLE.
-            mutation("startAware") {
-                resolver("context") { context: Context ->
-                    val ctx = context.get<GraphqlRequestContext>()!!
-                    val fromPeerId = ctx.header("c-id") ?: ""
-                    LogCat.d("[PeerGraphQL] startAware from=$fromPeerId")
-                    val started = startAwareIfNeeded()
-                    if (started) {
-                        withIO {
-                            val peer = AppDatabase.instance.peerDao().getById(fromPeerId)
-                            if (peer != null) {
-                                subscribeAwareForPeer(peer)
-                            }
-                        }
-                    }
-                    started
                 }
             }
         }

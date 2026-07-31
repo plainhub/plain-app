@@ -1,12 +1,16 @@
 package com.ismartcoding.plain.web.models
 
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLInput
 import kotlinx.serialization.Serializable
 
+@GraphQLInput
 @Serializable
 data class ContentItemInput(var value: String, var type: Int, var label: String)
+@GraphQLInput
 @Serializable
 data class OrganizationInput(var company: String, var title: String)
 
+@GraphQLInput
 @Serializable
 data class ContactInput(
     var prefix: String,

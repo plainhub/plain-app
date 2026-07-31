@@ -37,7 +37,7 @@ class DlnaSsdpMessagesTest {
     }
 
     @Test
-    fun `aliveMessages includes root device, device type, and service entries`() {
+    fun `aliveMessages includes root device and device type and service entries`() {
         val messages = DlnaSsdpMessages.aliveMessages(testUuid)
 
         assertTrue(messages.any { it.contains("NT: upnp:rootdevice") }, "should include root device")

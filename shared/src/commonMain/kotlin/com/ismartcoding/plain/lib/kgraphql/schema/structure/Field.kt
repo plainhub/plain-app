@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.lib.kgraphql.schema.structure
 
 import com.ismartcoding.plain.lib.kgraphql.Context
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Execution
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.*
 import com.ismartcoding.plain.lib.kgraphql.schema.model.*
 import com.ismartcoding.plain.lib.kdataloader.factories.DataLoaderFactory
-import com.ismartcoding.plain.lib.kgraphql.schema.introspection.NotIntrospected
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Field
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__InputValue
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Type
@@ -12,7 +12,6 @@ import com.ismartcoding.plain.lib.kgraphql.schema.model.BaseOperationDef
 import com.ismartcoding.plain.lib.kgraphql.schema.model.FunctionWrapper
 import com.ismartcoding.plain.lib.kgraphql.schema.model.PropertyDef
 import com.ismartcoding.plain.lib.kgraphql.schema.model.Transformation
-import com.ismartcoding.plain.lib.kgraphql.hasNotIntrospectedAnnotation
 
 
 sealed class Field : __Field {
@@ -20,7 +19,7 @@ sealed class Field : __Field {
     abstract val arguments : List<InputValue<*>>
 
     override val args: List<__InputValue>
-        get() = arguments.filterNot { it.type.kClass?.hasNotIntrospectedAnnotation() == true }
+        get() = arguments.filterNot { it.type.kClass == Context::class || it.type.kClass == Execution.Node::class }
 
     abstract val returnType : Type
 

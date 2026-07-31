@@ -5,3 +5,4 @@ rootProject.name = "PlainApp"
 include(":app")
 include(":shared")
 include(":litert-stubs")
+include(":kgraphql-ksp")

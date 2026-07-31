@@ -1,7 +1,8 @@
 package com.ismartcoding.plain.web.schemas
 
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.enums.DataType
@@ -24,80 +25,79 @@ import com.ismartcoding.plain.web.models.Image
 import com.ismartcoding.plain.web.models.ImageSearchStatus
 import com.ismartcoding.plain.web.models.toModel
 
+@GraphQLQuery
+suspend fun imageCount(query: String): Int {
+    return if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndIsGrantedAsync()) {
+        val fields = SearchHelper.parse(query)
+        val textField = fields.find { it.name == "text" }
+        val queryText = textField?.value ?: ""
+        countImagesCombined(
+            queryText = queryText,
+            extraQuery = query,
+        )
+    } else {
+        0
+    }
+}
+
+@GraphQLQuery
+suspend fun imageSearchStatus(): ImageSearchStatus {
+    return buildImageSearchStatus()
+}
+
+@GraphQLMutation
+suspend fun enableImageSearch(): Boolean {
+    sendEvent(HEnableImageSearchEvent())
+    return true
+}
+
+@GraphQLMutation
+suspend fun disableImageSearch(): Boolean {
+    sendEvent(HDisableImageSearchEvent())
+    return true
+}
+
+@GraphQLMutation
+suspend fun cancelImageModelDownload(): Boolean {
+    sendEvent(HCancelImageModelDownloadEvent())
+    return true
+}
+
+@GraphQLMutation
+suspend fun startImageIndex(force: Boolean?): Boolean {
+    startImageIndexFullScan(force == true)
+    return true
+}
+
+@GraphQLMutation
+suspend fun cancelImageIndex(): Boolean {
+    cancelImageIndex()
+    return true
+}
+
+@GraphQLQuery
+suspend fun images(offset: Int, limit: Int, query: String, sortBy: FileSortBy): List<Image> {
+    Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
+    val fields = SearchHelper.parse(query)
+    val textField = fields.find { it.name == "text" }
+    val queryText = textField?.value ?: ""
+    return searchImagesCombined(
+        queryText = queryText,
+        extraQuery = query,
+        limit = limit,
+        offset = offset,
+        sortBy = sortBy,
+    ).map { it.toModel() }
+}
+
 fun SchemaBuilder.addImageSchema() {
-    query("images") {
-        configure {
-            executor = Executor.DataLoaderPrepared
-        }
-        resolver("offset", "limit", "query", "sortBy") { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
-            Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
-            val fields = SearchHelper.parse(query)
-            val textField = fields.find { it.name == "text" }
-            val queryText = textField?.value ?: ""
-            searchImagesCombined(
-                queryText = queryText,
-                extraQuery = query,
-                limit = limit,
-                offset = offset,
-                sortBy = sortBy,
-            ).map { it.toModel() }
-        }
-        type<Image> {
-            dataProperty("tags") {
-                prepare { item -> item.id.value }
-                loader { ids ->
-                    TagsLoader.load(ids, DataType.IMAGE)
-                }
+    type<Image> {
+        dataProperty("tags") {
+            prepare { item -> item.id.value }
+            loader { ids ->
+                TagsLoader.load(ids, DataType.IMAGE)
             }
         }
-    }
-    query("imageCount") {
-        resolver("query") { query: String ->
-            if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndIsGrantedAsync()) {
-                val fields = SearchHelper.parse(query)
-                val textField = fields.find { it.name == "text" }
-                val queryText = textField?.value ?: ""
-                countImagesCombined(
-                    queryText = queryText,
-                    extraQuery = query,
-                )
-            } else {
-                0
-            }
-        }
-    }
-    query("imageSearchStatus") {
-        resolver { -> buildImageSearchStatus() }
     }
     type<ImageSearchStatus> {}
-    mutation("enableImageSearch") {
-        resolver { ->
-            sendEvent(HEnableImageSearchEvent())
-            true
-        }
-    }
-    mutation("disableImageSearch") {
-        resolver { ->
-            sendEvent(HDisableImageSearchEvent())
-            true
-        }
-    }
-    mutation("cancelImageModelDownload") {
-        resolver { ->
-            sendEvent(HCancelImageModelDownloadEvent())
-            true
-        }
-    }
-    mutation("startImageIndex") {
-        resolver("force") { force: Boolean? ->
-            startImageIndexFullScan(force == true)
-            true
-        }
-    }
-    mutation("cancelImageIndex") {
-        resolver { ->
-            cancelImageIndex()
-            true
-        }
-    }
 }

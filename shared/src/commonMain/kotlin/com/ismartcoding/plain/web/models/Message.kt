@@ -2,8 +2,10 @@ package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.features.sms.DMessageAttachment
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
+@GraphQLType
 data class Message(
     val id: ID,
     val body: String,

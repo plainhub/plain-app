@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.docs.DDoc
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
+@GraphQLType
 data class Doc(
     val id: ID,
     val title: String,

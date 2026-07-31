@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.lib.kgraphql.schema.structure
 
+import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.schema.directive.Directive
-import com.ismartcoding.plain.lib.kgraphql.schema.introspection.NotIntrospected
+import com.ismartcoding.plain.lib.kgraphql.schema.execution.Execution
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Type
-import com.ismartcoding.plain.lib.kgraphql.hasNotIntrospectedAnnotation
 import kotlin.reflect.KClass
 
 
@@ -33,7 +33,7 @@ data class SchemaModel (
         var list = allTypes.toList()
                 //workaround on the fact that Double and Float are treated as GraphQL Float
                 .filterNot { it is Type.Scalar<*> && it.kClass == Float::class }
-                .filterNot { it.kClass?.hasNotIntrospectedAnnotation() == true }
+                .filterNot { it.kClass == Context::class || it.kClass == Execution.Node::class }
                 //query and mutation must be present in introspection 'types' field for introspection tools
                 .plus(query)
         if (mutation != null) list = list.plus(mutation)

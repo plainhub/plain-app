@@ -93,7 +93,7 @@ class IosRequestContext(
     internal var responseFileContentDisposition: String? = null
 
     fun setRequestHeader(name: String, value: String) {
-        requestHeaders[name] = value
+        requestHeaders[name.lowercase()] = value
     }
 
     fun addQueryParam(name: String, value: String) {
@@ -118,7 +118,7 @@ class IosRequestContext(
 
     // --- internal accessors used by NioHttpCall ---
 
-    internal fun getRequestHeader(name: String): String? = requestHeaders[name]
+    internal fun getRequestHeader(name: String): String? = requestHeaders[name.lowercase()]
 
     internal fun getRequestHeaders(): Map<String, String> = requestHeaders.toMap()
 

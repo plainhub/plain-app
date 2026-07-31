@@ -4,9 +4,11 @@ import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.DiscoveryMethod
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLInput
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
+@GraphQLInput
 @Serializable
 data class PairingDeviceInput(
     val id: String,
@@ -34,6 +36,7 @@ data class PairingDeviceInput(
     }
 }
 
+@GraphQLInput
 @Serializable
 data class PairingRequestInput(
     val fromId: String,

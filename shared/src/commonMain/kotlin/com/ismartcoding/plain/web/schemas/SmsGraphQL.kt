@@ -6,8 +6,9 @@ import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.features.sms.DPendingMms
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.events.HStartMmsPollingEvent
@@ -33,124 +34,122 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.Message
+import com.ismartcoding.plain.web.models.MessageConversation
 import com.ismartcoding.plain.web.models.toModel
 
-fun SchemaBuilder.addSmsSchema() {
-    query("sms") {
-        configure {
-            executor = Executor.DataLoaderPrepared
-        }
-        resolver("offset", "limit", "query") { offset: Int, limit: Int, query: String ->
-            Permission.READ_SMS.checkEnabledAsync()
-            searchMedia(DataType.SMS, query, limit, offset, FileSortBy.DATE_DESC)
-                .filterIsInstance<DMessage>()
-                .map { it.toModel() }
-        }
-        type<Message> {
-            dataProperty("tags") {
-                prepare { item -> item.id.value }
-                loader { ids ->
-                    TagsLoader.load(ids, DataType.SMS)
-                }
-            }
-        }
+@GraphQLQuery
+suspend fun smsAllCounts(): SmsCounts {
+    return if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
+        getSmsAllCounts()
+    } else {
+        SmsCounts(0, 0, 0, 0)
     }
-    query("smsConversations") {
-        resolver("offset", "limit", "query") { offset: Int, limit: Int, query: String ->
-            Permission.READ_SMS.checkEnabledAsync()
-            searchSmsConversations(query, limit, offset).map { it.toModel() }
-        }
-    }
-    query("smsCount") {
-        resolver("query") { query: String ->
-            if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
-                countMedia(DataType.SMS, query)
-            } else {
-                0
-            }
-        }
-    }
-    query("smsConversationCount") {
-        resolver("query") { query: String ->
-            if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
-                countSmsConversations(query)
-            } else {
-                0
-            }
-        }
-    }
-    query("archivedConversations") {
-        resolver { ->
-            Permission.READ_SMS.checkEnabledAsync()
-            getArchivedSmsConversations().map { it.toModel() }
-        }
-    }
-    query("smsAllCounts") {
-        resolver { ->
-            if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
-                getSmsAllCounts()
-            } else {
-                SmsCounts(0, 0, 0, 0)
-            }
-        }
-    }
-    mutation("archiveConversation") {
-        resolver("id", "date") { id: String, date: Long ->
-            AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id, conversationDate = date))
-            true
-        }
-    }
-    mutation("unarchiveConversation") {
-        resolver("id") { id: String ->
-            AppDatabase.instance.archivedConversationDao().delete(id)
-            true
-        }
-    }
-    mutation("sendSms") {
-        resolver("number", "body", "subscriptionId") { number: String, body: String, subscriptionId: Int ->
-            Permission.SEND_SMS.checkEnabledAsync()
-            val simId = if (subscriptionId >= 0) subscriptionId else null
-            try {
-                sendSmsText(number, body, simId)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                throw GraphQLError(e.message ?: "Invalid SMS input")
-            }
-            true
-        }
-    }
-    mutation("sendMms") {
-        resolver("number", "body", "attachmentPaths", "threadId") { number: String, body: String, attachmentPaths: List<String>, threadId: String ->
-            try {
-                val resolvedAttachments = attachmentPaths.map { path ->
-                    val resolvedPath = resolveAppFileUri(path)
-                    if (!fileExists(resolvedPath)) {
-                        throw IllegalArgumentException("Attachment file not found: $resolvedPath")
-                    }
-                    val mimeType = mimeTypeFromExtension(resolvedPath.getFilenameExtension())
-                    Pair(resolvedPath, mimeType)
-                }
-                val launchTimeSec = launchDefaultSmsApp(number, body, resolvedAttachments)
-                val nowMs = TimeHelper.nowMillis()
+}
 
-                val pendingId = "pending_mms_$nowMs"
-                val pendingEntry = DPendingMms(
-                    id = pendingId,
-                    number = number,
-                    body = body,
-                    attachments = resolvedAttachments.map { (path, mimeType) ->
-                        DMessageAttachment(path, mimeType, path.getFilenameFromPath())
-                    },
-                    threadId = threadId,
-                    launchTimeSec = launchTimeSec,
-                    createdAt = TimeHelper.now(),
-                )
-                TempData.pendingMmsMessages.add(pendingEntry)
-                sendEvent(HStartMmsPollingEvent(pendingId, launchTimeSec, resolvedAttachments.map { it.first }))
-                pendingId
-            } catch (e: Exception) {
-                e.printStackTrace()
-                throw GraphQLError(e.message ?: "Failed to launch SMS app for MMS")
+@GraphQLMutation
+suspend fun unarchiveConversation(id: String): Boolean {
+    AppDatabase.instance.archivedConversationDao().delete(id)
+    return true
+}
+
+@GraphQLMutation
+suspend fun sendSms(number: String, body: String, subscriptionId: Int): Boolean {
+    Permission.SEND_SMS.checkEnabledAsync()
+    val simId = if (subscriptionId >= 0) subscriptionId else null
+    try {
+        sendSmsText(number, body, simId)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        throw GraphQLError(e.message ?: "Invalid SMS input")
+    }
+    return true
+}
+
+@GraphQLQuery
+suspend fun sms(offset: Int, limit: Int, query: String): List<Message> {
+    Permission.READ_SMS.checkEnabledAsync()
+    return searchMedia(DataType.SMS, query, limit, offset, FileSortBy.DATE_DESC)
+        .filterIsInstance<DMessage>()
+        .map { it.toModel() }
+}
+
+@GraphQLQuery
+suspend fun smsConversations(offset: Int, limit: Int, query: String): List<MessageConversation> {
+    Permission.READ_SMS.checkEnabledAsync()
+    return searchSmsConversations(query, limit, offset).map { it.toModel() }
+}
+
+@GraphQLQuery
+suspend fun smsCount(query: String): Int {
+    return if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
+        countMedia(DataType.SMS, query)
+    } else {
+        0
+    }
+}
+
+@GraphQLQuery
+suspend fun smsConversationCount(query: String): Int {
+    return if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
+        countSmsConversations(query)
+    } else {
+        0
+    }
+}
+
+@GraphQLQuery
+suspend fun archivedConversations(): List<MessageConversation> {
+    Permission.READ_SMS.checkEnabledAsync()
+    return getArchivedSmsConversations().map { it.toModel() }
+}
+
+@GraphQLMutation
+suspend fun archiveConversation(id: String, date: Long): Boolean {
+    AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id, conversationDate = date))
+    return true
+}
+
+@GraphQLMutation
+suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>, threadId: String): String {
+    try {
+        val resolvedAttachments = attachmentPaths.map { path ->
+            val resolvedPath = resolveAppFileUri(path)
+            if (!fileExists(resolvedPath)) {
+                throw IllegalArgumentException("Attachment file not found: $resolvedPath")
+            }
+            val mimeType = mimeTypeFromExtension(resolvedPath.getFilenameExtension())
+            Pair(resolvedPath, mimeType)
+        }
+        val launchTimeSec = launchDefaultSmsApp(number, body, resolvedAttachments)
+        val nowMs = TimeHelper.nowMillis()
+
+        val pendingId = "pending_mms_$nowMs"
+        val pendingEntry = DPendingMms(
+            id = pendingId,
+            number = number,
+            body = body,
+            attachments = resolvedAttachments.map { (path, mimeType) ->
+                DMessageAttachment(path, mimeType, path.getFilenameFromPath())
+            },
+            threadId = threadId,
+            launchTimeSec = launchTimeSec,
+            createdAt = TimeHelper.now(),
+        )
+        TempData.pendingMmsMessages.add(pendingEntry)
+        sendEvent(HStartMmsPollingEvent(pendingId, launchTimeSec, resolvedAttachments.map { it.first }))
+        return pendingId
+    } catch (e: Exception) {
+        e.printStackTrace()
+        throw GraphQLError(e.message ?: "Failed to launch SMS app for MMS")
+    }
+}
+
+fun SchemaBuilder.addSmsSchema() {
+    type<Message> {
+        dataProperty("tags") {
+            prepare { item -> item.id.value }
+            loader { ids ->
+                TagsLoader.load(ids, DataType.SMS)
             }
         }
     }

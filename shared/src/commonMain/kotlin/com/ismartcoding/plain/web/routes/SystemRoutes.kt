@@ -23,6 +23,10 @@ fun HttpRouter.addSystemRoutes() {
         call.respondText(getOwnPackageName())
     }
 
+    get("/health_check") { call ->
+        call.respondText(getOwnPackageName())
+    }
+
     get("/shutdown") { call ->
         if (call.remoteHost != "localhost") {
             call.respondNoBody(HttpStatus.FORBIDDEN)

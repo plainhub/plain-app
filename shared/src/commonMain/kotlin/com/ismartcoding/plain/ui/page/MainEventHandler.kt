@@ -11,8 +11,11 @@ import com.ismartcoding.plain.platform.updateChatMessageTextAsync
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.chat.ChatManager
+import androidx.navigation.NavHostController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
@@ -30,6 +33,7 @@ import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
+import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +50,7 @@ fun MainEventCollector(
     audioPlaylistVM: AudioPlaylistViewModel,
     pomodoroVM: PomodoroViewModel,
     peerVM: PeerViewModel,
+    navController: NavHostController,
     onConfirmDialog: (ConfirmDialogEvent) -> Unit,
     onLoadingDialog: (LoadingDialogEvent) -> Unit,
     onToast: (ToastEvent) -> Unit,
@@ -113,6 +118,13 @@ fun MainEventCollector(
                             m.data = m.getContentData()
                             sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(m))))
                         }
+                    }
+                }
+
+                is ConfirmToAcceptLoginEvent -> {
+                    mainVM.pendingLoginEvent.value = event
+                    if (navController.currentBackStackEntry?.destination?.hasRoute<Routing.LoginRequest>() != true) {
+                        navController.navigate(Routing.LoginRequest)
                     }
                 }
 

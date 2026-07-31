@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.db.*
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLIgnore
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLUnion
 import com.ismartcoding.plain.platform.getFileId
 import kotlin.time.Instant
 import kotlinx.serialization.Contextual
@@ -10,6 +13,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
+@GraphQLType
 @Serializable
 data class ChatItem(
     val id: ID,
@@ -20,7 +24,7 @@ data class ChatItem(
     val createdAt: Instant,
     val updatedAt: Instant,
     @Transient private val _content: DMessageContent? = null,
-    @Contextual var data: ChatItemContent? = null,
+    @GraphQLIgnore @Contextual var data: ChatItemContent? = null,
     val status: String = "",
     val statusData: String = "",
 ) {
@@ -60,15 +64,19 @@ data class ChatItem(
     }
 }
 
+@GraphQLUnion
 @Serializable
 @Polymorphic
 sealed class ChatItemContent {
+    @GraphQLType
     @Serializable
     data class MessageImages(val ids: List<String>) : ChatItemContent()
 
+    @GraphQLType
     @Serializable
     data class MessageFiles(val ids: List<String>) : ChatItemContent()
 
+    @GraphQLType
     @Serializable
     data class MessageText(val ids: List<String>) : ChatItemContent()
 }

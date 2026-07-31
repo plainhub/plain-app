@@ -6,7 +6,6 @@ import com.ismartcoding.plain.lib.kgraphql.schema.introspection.TypeKind
 import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.ArgumentNode
 import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.SelectionNode.FieldNode
 import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.SelectionNode
-import com.ismartcoding.plain.lib.kgraphql.isKotlinSubclassOf
 import kotlin.reflect.KClass
 
 
@@ -89,8 +88,9 @@ fun validateName(name : String) {
 }
 
 //function before generic, because it is its subset
-fun assertValidObjectType(kClass: KClass<*>) = when {
-    kClass.isKotlinSubclassOf(Function::class) -> throw SchemaException("Cannot handle function $kClass as Object type")
-    kClass.isKotlinSubclassOf(Enum::class) -> throw SchemaException("Cannot handle enum class $kClass as Object type")
-    else -> Unit
+fun assertValidObjectType(kClass: KClass<*>) {
+    // Enums and Functions cannot be Object types — they are handled via dedicated
+    // enum() / scalar() DSL registration. Exact-match check is sufficient since
+    // KGraphQL does not support subclassing for schema object types.
+    if (kClass == Function::class) throw SchemaException("Cannot handle function $kClass as Object type")
 }

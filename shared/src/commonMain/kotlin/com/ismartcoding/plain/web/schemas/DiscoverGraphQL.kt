@@ -1,26 +1,28 @@
 package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 
+@GraphQLMutation
+suspend fun startDiscovery(): Boolean {
+    NearbyViewModel.startDiscovering()
+    return true
+}
+
+@GraphQLMutation
+suspend fun stopDiscovery(): Boolean {
+    NearbyViewModel.stopDiscovering()
+    return true
+}
+
+@GraphQLQuery
+suspend fun isDiscovering(): Boolean {
+    return LANDiscoverManager.isDiscovering()
+}
+
 fun SchemaBuilder.addDiscoverSchema() {
-    mutation("startDiscovery") {
-        resolver { ->
-            NearbyViewModel.startDiscovering()
-            true
-        }
-    }
-    mutation("stopDiscovery") {
-        resolver { ->
-            NearbyViewModel.stopDiscovering()
-            true
-        }
-    }
-    query("isDiscovering") {
-        resolver { ->
-            LANDiscoverManager.isDiscovering()
-        }
-    }
 }

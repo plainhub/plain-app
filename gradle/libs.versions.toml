@@ -3,7 +3,7 @@ appcompatVersion="1.7.1"
 bcprovJdk15onVersion="1.70"
 coil="3.5.0"
 coreKtxVersion="1.19.0"
-gradle= "9.2.1"
+gradle= "9.3.1"
 cameraCoreVersion = "1.6.1"
 compose = "1.11.4"
 composeMultiplatform = "1.11.1"
@@ -152,6 +152,8 @@ latex-renderer = { module = "io.github.huarangmeng:latex-renderer", version.ref 
 room-gradle = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+# KSP2 API for the :kgraphql-ksp annotation processor
+ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "devtoolsKspVersion" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }

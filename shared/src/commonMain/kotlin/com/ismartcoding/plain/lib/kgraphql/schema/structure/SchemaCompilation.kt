@@ -5,13 +5,13 @@ package com.ismartcoding.plain.lib.kgraphql.schema.structure
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.configuration.SchemaConfiguration
 import com.ismartcoding.plain.lib.kgraphql.defaultKQLTypeName
+import com.ismartcoding.plain.lib.kgraphql.generated.GeneratedSchemaRegistry
 import com.ismartcoding.plain.lib.kgraphql.getIterableElementType
 import com.ismartcoding.plain.lib.kgraphql.isIterable
 import com.ismartcoding.plain.lib.kgraphql.schema.DefaultSchema
 import com.ismartcoding.plain.lib.kgraphql.schema.SchemaException
 import com.ismartcoding.plain.lib.kgraphql.schema.directive.Directive
 import com.ismartcoding.plain.lib.kgraphql.schema.execution.Execution
-import com.ismartcoding.plain.lib.kgraphql.schema.introspection.NotIntrospected
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.SchemaProxy
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.TypeKind
 import com.ismartcoding.plain.lib.kgraphql.schema.introspection.__Schema
@@ -23,15 +23,7 @@ import com.ismartcoding.plain.lib.kgraphql.schema.model.QueryDef
 import com.ismartcoding.plain.lib.kgraphql.schema.model.SchemaDefinition
 import com.ismartcoding.plain.lib.kgraphql.schema.model.Transformation
 import com.ismartcoding.plain.lib.kgraphql.schema.model.TypeDef
-import com.ismartcoding.plain.lib.kgraphql.hasNotIntrospectedAnnotation
-import com.ismartcoding.plain.lib.kgraphql.isKotlinFinal
-import com.ismartcoding.plain.lib.kgraphql.isKotlinSealed
-import com.ismartcoding.plain.lib.kgraphql.isKotlinSubclassOf
-import com.ismartcoding.plain.lib.kgraphql.isKotlinSuperclassOf
-import com.ismartcoding.plain.lib.kgraphql.isPublicVisibility
 import com.ismartcoding.plain.lib.kgraphql.kClass
-import com.ismartcoding.plain.lib.kgraphql.memberPropertiesList
-import com.ismartcoding.plain.lib.kgraphql.sealedSubclassesList
 import kotlin.collections.get
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
@@ -102,9 +94,16 @@ class SchemaCompilation(
     private fun introspectPossibleTypes(kClass: KClass<*>, typeProxy: TypeProxy) {
         val proxied = typeProxy.proxied
         if (proxied is Type.Interface<*>) {
-            val possibleTypes = queryTypeProxies.filter { (otherKClass, otherTypeProxy) ->
-                otherTypeProxy.kind == TypeKind.OBJECT && otherKClass != kClass && otherKClass.isKotlinSubclassOf(kClass)
-            }.values.toList()
+            // KSP-only: possibleTypes are explicitly provided via @GraphQLInterface descriptor.
+            // No runtime isKotlinSubclassOf reflection needed.
+            val objectDef = definition.objects.find { it.kClass == kClass }
+            val possibleTypes = if (objectDef != null && objectDef.possibleTypes.isNotEmpty()) {
+                queryTypeProxies.filter { (otherKClass, _) ->
+                    otherKClass != kClass && otherKClass in objectDef.possibleTypes
+                }.values.toList()
+            } else {
+                emptyList()
+            }
 
             typeProxy.proxied = proxied.withPossibleTypes(possibleTypes)
         }
@@ -113,8 +112,13 @@ class SchemaCompilation(
     private fun introspectInterfaces(kClass: KClass<*>, typeProxy: TypeProxy) {
         val proxied = typeProxy.proxied
         if(proxied is Type.Object<*>){
+            // KSP-only: interfaces are discovered via @GraphQLInterface possibleTypes.
+            // No runtime isKotlinSubclassOf reflection needed.
             val interfaces = queryTypeProxies.filter { (otherKClass, otherTypeProxy) ->
-                otherTypeProxy.kind == TypeKind.INTERFACE && otherKClass != kClass && kClass.isKotlinSubclassOf(otherKClass)
+                otherTypeProxy.kind == TypeKind.INTERFACE && otherKClass != kClass && run {
+                    val interfaceDef = definition.objects.find { it.kClass == otherKClass }
+                    interfaceDef != null && kClass in interfaceDef.possibleTypes
+                }
             }.values.toList()
 
             typeProxy.proxied = proxied.withInterfaces(interfaces)
@@ -167,18 +171,23 @@ class SchemaCompilation(
     }
 
     private suspend fun handlePossiblyWrappedType(kType : KType, typeCategory: TypeCategory) : Type = try {
+        val kClass = kType.kClass()
         when {
             kType.isIterable() -> handleCollectionType(kType, typeCategory)
-            kType.kClass() == Context::class && typeCategory == TypeCategory.INPUT -> contextType
-            kType.kClass() == Execution.Node::class && typeCategory == TypeCategory.INPUT -> executionType
-            kType.kClass() == Context::class && typeCategory == TypeCategory.QUERY -> throw SchemaException("Context type cannot be part of schema")
+            kClass == Context::class && typeCategory == TypeCategory.INPUT -> contextType
+            kClass == Execution.Node::class && typeCategory == TypeCategory.INPUT -> executionType
+            kClass == Context::class && typeCategory == TypeCategory.QUERY -> throw SchemaException("Context type cannot be part of schema")
             kType.arguments.isNotEmpty() -> configuration.genericTypeResolver.resolveMonad(kType)
                 .let { handlePossiblyWrappedType(it, typeCategory) }
-            kType.kClass().isKotlinSealed() -> TypeDef.Union(
-                name = kType.kClass().simpleName!!,
-                members = kType.kClass().sealedSubclassesList().toSet(),
-                description = null
-            ).let { handleUnionType(it) }
+            // KSP-only: sealed class unions are discovered via @GraphQLUnion descriptor.
+            GeneratedSchemaRegistry.unions[kClass] != null -> {
+                val unionDesc = GeneratedSchemaRegistry.unions[kClass]!!
+                TypeDef.Union(
+                    name = unionDesc.name,
+                    members = unionDesc.members.toSet(),
+                    description = null
+                ).let { handleUnionType(it) }
+            }
             else -> handleSimpleType(kType, typeCategory)
         }
     } catch (e: Throwable) {
@@ -252,41 +261,52 @@ class SchemaCompilation(
 
     private suspend fun handleObjectType(kClass: KClass<*>) : Type {
         assertValidObjectType(kClass)
-        val objectDefs = definition.objects.filter { it.kClass.isKotlinSuperclassOf(kClass) }
-        val objectDef = objectDefs.find { it.kClass == kClass } ?: TypeDef.Object(kClass.defaultKQLTypeName(), kClass)
+        // KSP-only: exact match (no isKotlinSuperclassOf reflection).
+        // Type hierarchies are handled via @GraphQLInterface possibleTypes.
+        val objectDefs = definition.objects.filter { it.kClass == kClass }
+        val objectDef = objectDefs.firstOrNull() ?: synthesizeObjectFromKsp(kClass)
+        // When [objectDef] is synthesized from KSP, [objectDefs] is empty — include
+        // the synthesized def so property folding below actually sees its fields.
+        val effectiveDefs = if (objectDefs.isEmpty()) listOf(objectDef) else objectDefs
 
-        //treat introspection types as objects -> adhere to reference implementation behaviour
-        val kind = if(kClass.isKotlinFinal() || objectDef.name.startsWith("__")) TypeKind.OBJECT else TypeKind.INTERFACE
+        // KSP-only: kind is determined by isInterface flag from @GraphQLInterface descriptor.
+        // No isKotlinFinal() reflection needed.
+        val kind = if (objectDef.isInterface) {
+            TypeKind.INTERFACE
+        } else {
+            TypeKind.OBJECT
+        }
 
         val objectType = if(kind == TypeKind.OBJECT) Type.Object(objectDef) else Type.Interface(objectDef)
         val typeProxy = TypeProxy(objectType)
         queryTypeProxies[kClass] = typeProxy
 
-        val allKotlinProperties = objectDefs.fold(emptyMap<String, PropertyDef.Kotlin<*, *>>()) { acc, def ->
+        val allKotlinProperties = effectiveDefs.fold(emptyMap<String, PropertyDef.Kotlin<*, *>>()) { acc, def ->
             acc + def.kotlinProperties.mapKeys { (property) -> property.name }
         }
-        val allTransformations= objectDefs.fold(emptyMap<String, Transformation<*, *>>()) { acc, def ->
+        val allTransformations= effectiveDefs.fold(emptyMap<String, Transformation<*, *>>()) { acc, def ->
             acc + def.transformations.mapKeys { (property) -> property.name }
         }
 
-        val kotlinFields = kClass.memberPropertiesList()
-                .filter { field -> field.isPublicVisibility() }
-                .filterNot { field ->  objectDefs.any { it.isIgnored(field.name) } }
-                .map { property -> handleKotlinProperty (
-                        kProperty = property,
-                        kqlProperty = allKotlinProperties[property.name],
-                        transformation = allTransformations[property.name]
-                ) }
+        // KSP-only: properties must be explicitly declared via @GraphQLType descriptor or DSL.
+        // No memberPropertiesList()/isPublicVisibility() reflection.
+        val kotlinFields = allKotlinProperties.map { (name, kqlProperty) ->
+            handleKotlinProperty(
+                kProperty = kqlProperty.kProperty,
+                kqlProperty = kqlProperty,
+                transformation = allTransformations[name]
+            )
+        }
 
-        val extensionFields = objectDefs
+        val extensionFields = effectiveDefs
             .flatMap(TypeDef.Object<*>::extensionProperties)
             .map { property -> handleOperation(property) }
 
-        val dataloadExtensionFields = objectDefs
+        val dataloadExtensionFields = effectiveDefs
             .flatMap(TypeDef.Object<*>::dataloadExtensionProperties)
             .map { property -> handleDataloadOperation(property) }
 
-        val unionFields = objectDefs
+        val unionFields = effectiveDefs
             .flatMap(TypeDef.Object<*>::unionProperties)
             .map { property -> handleUnionProperty(property) }
 
@@ -317,17 +337,75 @@ class SchemaCompilation(
     private suspend fun handleInputType(kClass: KClass<*>) : Type {
         assertValidObjectType(kClass)
 
-        val inputObjectDef = definition.inputObjects.find { it.kClass == kClass } ?: TypeDef.Input(kClass.defaultKQLTypeName(), kClass)
+        val inputObjectDef = definition.inputObjects.find { it.kClass == kClass } ?: synthesizeInputFromKsp(kClass)
         val objectType = Type.Input(inputObjectDef)
         val typeProxy = TypeProxy(objectType)
         inputTypeProxies[kClass] = typeProxy
 
-        val fields = if (!kClass.hasNotIntrospectedAnnotation()) {
-            kClass.memberPropertiesList().map { property -> handleKotlinInputProperty(property) }
-        } else listOf()
+        // KSP-only: properties must be explicitly declared via @GraphQLInput descriptor or DSL.
+        // No memberPropertiesList() reflection.
+        val fields = inputObjectDef.kotlinProperties.map { property ->
+            handleKotlinInputProperty(property, inputObjectDef.returnTypes[property.name]
+                ?: throw SchemaException("Missing return type for input property '${property.name}' on ${kClass.simpleName}. " +
+                    "Ensure @GraphQLInput descriptor is generated."))
+        }
 
         typeProxy.proxied = Type.Input(inputObjectDef, fields)
         return typeProxy
+    }
+
+    /**
+     * KSP fallback: when no explicit `type<T> {}` was declared for [kClass],
+     * synthesize a [TypeDef.Object] from the KSP-generated descriptor in
+     * [GeneratedSchemaRegistry]. This covers types referenced only via
+     * resolvers or as union members — they still need their @GraphQLType
+     * properties without forcing users to write `type<T> {}` for every type.
+     *
+     * Returns a bare [TypeDef.Object] (no properties) if no descriptor exists;
+     * [handleObjectType] will then throw "must define one or more fields".
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun synthesizeObjectFromKsp(kClass: KClass<*>): TypeDef.Object<*> {
+        val desc = GeneratedSchemaRegistry.types[kClass]
+            ?: GeneratedSchemaRegistry.interfaces[kClass]
+            ?: return TypeDef.Object(kClass.defaultKQLTypeName(), kClass)
+
+        val kClassAny = desc.kClass as KClass<Any>
+        val properties: Map<KProperty1<Any, *>, PropertyDef.Kotlin<Any, *>> = desc.fields.map { f ->
+            val prop = f.kProperty as KProperty1<Any, *>
+            prop to PropertyDef.Kotlin(prop, f.returnType, f.description)
+        }.toMap()
+
+        return TypeDef.Object(
+            name = desc.name,
+            kClass = kClassAny,
+            kotlinProperties = properties,
+            isInterface = desc.isInterface,
+            possibleTypes = desc.possibleTypes
+        )
+    }
+
+    /**
+     * KSP fallback: when no explicit `inputType<T>()` was declared for [kClass],
+     * synthesize a [TypeDef.Input] from the KSP-generated descriptor in
+     * [GeneratedSchemaRegistry]. This covers input types referenced only via
+     * resolver parameters — they still need their @GraphQLInput properties.
+     */
+    @Suppress("UNCHECKED_CAST")
+    private fun synthesizeInputFromKsp(kClass: KClass<*>): TypeDef.Input<*> {
+        val desc = GeneratedSchemaRegistry.inputs[kClass]
+            ?: return TypeDef.Input(kClass.defaultKQLTypeName(), kClass)
+
+        val kClassAny = desc.kClass as KClass<Any>
+        val properties: List<KProperty1<Any, *>> = desc.fields.map { it.kProperty as KProperty1<Any, *> }
+        val returnTypes: Map<String, KType> = desc.fields.associate { it.name to it.returnType }
+
+        return TypeDef.Input(
+            name = desc.name,
+            kClass = kClassAny,
+            kotlinProperties = properties,
+            returnTypes = returnTypes
+        )
     }
 
     private suspend fun handleInputValues(operationName : String, operation: FunctionWrapper<*>, inputValues: List<InputValueDef<*>>) : List<InputValue<*>> {
@@ -368,9 +446,9 @@ class SchemaCompilation(
         return unionType
     }
 
-    private suspend fun handleKotlinInputProperty(kProperty: KProperty1<*, *>) : InputValue<*> {
-        val type = handlePossiblyWrappedType(kProperty.returnType, TypeCategory.INPUT)
-        return InputValue(InputValueDef(kProperty.returnType.kClass(), kProperty.name), type)
+    private suspend fun handleKotlinInputProperty(kProperty: KProperty1<*, *>, returnType: KType) : InputValue<*> {
+        val type = handlePossiblyWrappedType(returnType, TypeCategory.INPUT)
+        return InputValue(InputValueDef(returnType.kClass(), kProperty.name), type)
     }
 
     private suspend fun <T : Any, R> handleKotlinProperty (
@@ -378,7 +456,10 @@ class SchemaCompilation(
         kqlProperty: PropertyDef.Kotlin<*, *>?,
         transformation: Transformation<*, *>?
     ) : Field.Kotlin<*, *> {
-        val returnType = handlePossiblyWrappedType(kProperty.returnType, TypeCategory.QUERY)
+        // KSP-only: returnType is always provided by KSP descriptor or DSL.
+        // No returnTypeBridge() reflection needed.
+        val kType = kqlProperty!!.returnType!!
+        val returnType = handlePossiblyWrappedType(kType, TypeCategory.QUERY)
         val inputValues = if(transformation != null){
             handleInputValues("$kProperty transformation", transformation.transformation, emptyList())
         } else {

@@ -343,12 +343,12 @@ private final class WebSocketFrameReader: ChannelInboundHandler {
         let frame = unwrapInboundIn(data)
         switch frame.opcode {
         case .binary:
-            var buf = frame.data
+            var buf = frame.unmaskedData
             let bytes = buf.readBytes(length: buf.readableBytes) ?? []
             session?.onBinaryFrame(data: bytes.toKotlinByteArray())
 
         case .text:
-            var buf = frame.data
+            var buf = frame.unmaskedData
             let text = buf.readString(length: buf.readableBytes) ?? ""
             session?.onTextFrame(text: text)
 
@@ -399,7 +399,7 @@ private final class WsChannelTransport: NSObject, IosWsTransport {
 
     @objc func close(code: Int32, reason: String) {
         var buffer = channel.allocator.buffer(capacity: 2 + reason.utf8.count)
-        buffer.writeInteger(UInt16(truncatingIfNeeded: code).bigEndian)
+        buffer.writeInteger(UInt16(truncatingIfNeeded: code))
         buffer.writeString(reason)
         _ = channel.writeAndFlush(WebSocketFrame(fin: true, opcode: .connectionClose, data: buffer))
         _ = channel.close()

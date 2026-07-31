@@ -4,6 +4,7 @@ import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.features.contact.DContactPhoneNumber
 import com.ismartcoding.plain.features.contact.DContentItem
 import com.ismartcoding.plain.features.contact.DOrganization
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
 data class ContentItem(var value: String, var type: Int, var label: String)
@@ -24,6 +25,7 @@ fun DContactPhoneNumber.toModel(): ContactPhoneNumber {
     return ContactPhoneNumber(value, type, label, normalizedNumber)
 }
 
+@GraphQLType
 data class Contact(
     var id: ID,
     var prefix: String,

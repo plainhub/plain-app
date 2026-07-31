@@ -2,10 +2,9 @@ package com.ismartcoding.plain.lib.kgraphql.request
 
 import com.ismartcoding.plain.lib.kgraphql.ExecutionException
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
-import com.ismartcoding.plain.lib.kgraphql.enumValueOfSafe
+import com.ismartcoding.plain.lib.kgraphql.generated.GeneratedSchemaRegistry
 import com.ismartcoding.plain.lib.kgraphql.getIterableElementType
 import com.ismartcoding.plain.lib.kgraphql.isIterable
-import com.ismartcoding.plain.lib.kgraphql.isKotlinEnum
 import com.ismartcoding.plain.lib.kgraphql.kClass
 import com.ismartcoding.plain.lib.kgraphql.schema.model.ast.NameNode
 import kotlinx.serialization.json.Json
@@ -74,19 +73,24 @@ interface VariablesJson {
                     val elementKClass = elementKType.kClass()
                     (element as JsonArray).map { convertElement(it, elementKClass, elementKType) } as T
                 }
-                kClass.isKotlinEnum() -> {
-                    val content = (element as JsonPrimitive).content
-                    @Suppress("UNCHECKED_CAST")
-                    enumValueOfSafe(kClass, content) as T
-                }
                 else -> {
                     val deserializer = scalarDeserializers[kClass]
-                    if (deserializer != null) {
-                        deserializer(element) as T
-                    } else if (element is JsonObject) {
-                        Json.decodeFromJsonElement(serializer(kType), element) as T
-                    } else {
-                        throw ExecutionException("No deserializer registered for type $kClass")
+                    when {
+                        deserializer != null -> deserializer(element) as T
+                        element is JsonObject -> {
+                            val inputDesc = GeneratedSchemaRegistry.inputs[kClass]
+                            if (inputDesc != null) {
+                                val valueMap = inputDesc.fields.associate { f ->
+                                    f.name to element[f.name]?.let { v ->
+                                        convertElement(v, f.returnType.kClass(), f.returnType)
+                                    }
+                                }
+                                (inputDesc.fromMap as (Map<String, Any?>) -> Any)(valueMap) as T
+                            } else {
+                                Json.decodeFromJsonElement(serializer(kType), element) as T
+                            }
+                        }
+                        else -> throw ExecutionException("No deserializer registered for type $kClass")
                     }
                 }
             }

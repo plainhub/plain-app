@@ -1,7 +1,10 @@
 package com.ismartcoding.plain.lib.kgraphql
 
 import com.ismartcoding.plain.lib.kgraphql.context
+import com.ismartcoding.plain.lib.kgraphql.generated.GeneratedSchemaRegistry
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.plain.lib.kgraphql.schema.dsl.types.TypeDSL
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -16,6 +19,8 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.longOrNull
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.memberProperties
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -27,6 +32,11 @@ import kotlin.test.assertFailsWith
  * Unit tests covering KGraphQL core behavior.
  * These tests exercise the PUBLIC API (KGraphQL.schema + schema.execute)
  * to ensure behavior is preserved during the reflection → pure Kotlin migration.
+ *
+ * NOTE: Tests run on androidHostTest (JVM) where kotlin.reflect.full is available.
+ * The helpers below use JVM reflection to auto-discover properties — this is
+ * test-only convenience; production code uses KSP-generated descriptors that
+ * work on both Android and iOS without reflection.
  */
 class KGraphQLTest {
 
@@ -37,6 +47,39 @@ class KGraphQLTest {
     @Serializable
     data class CreateItemInput(val title: String, val price: Double)
     enum class Status { ACTIVE, INACTIVE, PENDING }
+
+    // ========== Test helpers (JVM reflection — test-only) ==========
+
+    /**
+     * Registers [T] as a GraphQL Object type with all its public properties
+     * auto-discovered via JVM reflection. Tests run on androidHostTest (JVM)
+     * where kotlin.reflect.full is available, so we can use reflection here
+     * without affecting iOS. Production code uses @GraphQLType + KSP instead.
+     */
+    private inline fun <reified T : Any> SchemaBuilder.typeWithProperties(
+        noinline block: TypeDSL<T>.() -> Unit = {}
+    ) {
+        type<T> {
+            @Suppress("UNCHECKED_CAST")
+            T::class.memberProperties.forEach { prop ->
+                property(prop as KProperty1<T, *>, prop.returnType)
+            }
+            block()
+        }
+    }
+
+    /**
+     * Registers [T] as a GraphQL Input type with all its public properties
+     * auto-discovered via JVM reflection. Test-only convenience.
+     */
+    private inline fun <reified T : Any> SchemaBuilder.inputTypeWithProperties() {
+        inputType<T> {
+            @Suppress("UNCHECKED_CAST")
+            T::class.memberProperties.forEach { prop ->
+                property(prop as KProperty1<T, *>, prop.returnType)
+            }
+        }
+    }
 
     private fun executeQuery(schema: Schema, query: String, variables: String? = null): String {
         return runBlocking {
@@ -97,7 +140,7 @@ class KGraphQLTest {
             query("user") {
                 resolver { -> User("u1", "Alice", 30) }
             }
-            type<User> {}
+            typeWithProperties<User>()
         }
 
         val result = executeQuery(schema, "{ user { id name age } }")
@@ -120,7 +163,7 @@ class KGraphQLTest {
                     )
                 }
             }
-            type<User> {}
+            typeWithProperties<User>()
         }
 
         val result = executeQuery(schema, "{ users { id name } }")
@@ -144,7 +187,7 @@ class KGraphQLTest {
                     )
                 }
             }
-            type<User> {}
+            typeWithProperties<User>()
         }
 
         val result = executeQuery(schema, "{ users { id name } }")
@@ -161,7 +204,7 @@ class KGraphQLTest {
             query("user") {
                 resolver { -> User("u1", "Alice Smith", 30) }
             }
-            type<User> {
+            typeWithProperties<User> {
                 property("displayName") {
                     resolver { user: User ->
                         "${user.name} (${user.age})"
@@ -229,7 +272,7 @@ class KGraphQLTest {
                     Item("i1", title, price)
                 }
             }
-            type<Item> {}
+            typeWithProperties<Item>()
         }
 
         val result = executeQuery(schema, "mutation { createItem(title: \"Widget\", price: 19.99) { id title price } }")
@@ -263,8 +306,8 @@ class KGraphQLTest {
                     Item("i1", input.title, input.price)
                 }
             }
-            inputType<CreateItemInput>()
-            type<Item> {}
+            inputTypeWithProperties<CreateItemInput>()
+            typeWithProperties<Item>()
         }
 
         val query = """
@@ -306,7 +349,7 @@ class KGraphQLTest {
             query("task") {
                 resolver { -> Task("t1", Status.PENDING) }
             }
-            type<Task> {}
+            typeWithProperties<Task>()
             enum<Status>()
         }
 
@@ -435,7 +478,7 @@ class KGraphQLTest {
             query("product") {
                 resolver { -> Product("p1", 9999) }
             }
-            type<Product> {
+            typeWithProperties<Product> {
                 transformation(Product::priceCents, "divisor") { cents: Int, divisor: Int ->
                     cents / divisor
                 }
@@ -448,5 +491,51 @@ class KGraphQLTest {
         assertNotNull(product)
         assertEquals("p1", product!!["id"]?.jsonPrimitive?.contentOrNull)
         assertEquals(99, product["priceCents"]?.jsonPrimitive?.intOrNull)
+    }
+
+    // ========== KSP synthesis path tests ==========
+
+    @Test
+    fun `type synthesized from KSP descriptor without explicit type declaration`() {
+        // Simulates the production scenario where a type is referenced via a
+        // resolver return type but NOT explicitly declared with `type<T> {}`.
+        // The schema compiler must synthesize the TypeDef.Object from the KSP
+        // descriptor in GeneratedSchemaRegistry and still expose its fields.
+        data class SynthType(val id: String, val label: String)
+
+        // Manually register a KSP descriptor (production code gets this from KSP).
+        GeneratedSchemaRegistry.registerType(
+            com.ismartcoding.plain.lib.kgraphql.generated.TypeDescriptor(
+                kClass = SynthType::class,
+                name = "SynthType",
+                isInterface = false,
+                fields = listOf(
+                    com.ismartcoding.plain.lib.kgraphql.generated.FieldDescriptor(
+                        name = "id",
+                        kProperty = SynthType::id,
+                        returnType = kotlin.reflect.typeOf<String>()
+                    ),
+                    com.ismartcoding.plain.lib.kgraphql.generated.FieldDescriptor(
+                        name = "label",
+                        kProperty = SynthType::label,
+                        returnType = kotlin.reflect.typeOf<String>()
+                    )
+                )
+            )
+        )
+
+        val schema = KGraphQL.schema {
+            // NOTE: no `type<SynthType> {}` — must be synthesized from the registry.
+            query("synth") {
+                resolver { -> SynthType("s1", "hello") }
+            }
+        }
+
+        val result = executeQuery(schema, "{ synth { id label } }")
+        val data = parseData(result)
+        val synth = data["synth"]?.jsonObject
+        assertNotNull(synth)
+        assertEquals("s1", synth!!["id"]?.jsonPrimitive?.contentOrNull)
+        assertEquals("hello", synth["label"]?.jsonPrimitive?.contentOrNull)
     }
 }

@@ -2,6 +2,8 @@ package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.data.ChatTarget
@@ -18,68 +20,67 @@ import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
 
-fun SchemaBuilder.addChatMessageSchema() {
-    query("chatItems") {
-        resolver("id") { id: String ->
-            val dao = AppDatabase.instance.chatDao()
-            val target = ChatTarget.parseId(id)
-            val items = if (target.type == ChatTargetType.CHANNEL) {
-                dao.getByChannelId(target.toId)
-            } else {
-                dao.getByPeerId(target.toId)
-            }
-            items.map { it.toModel() }
-        }
+@GraphQLQuery
+suspend fun chatItems(id: String): List<ChatItem> {
+    val dao = AppDatabase.instance.chatDao()
+    val target = ChatTarget.parseId(id)
+    val items = if (target.type == ChatTargetType.CHANNEL) {
+        dao.getByChannelId(target.toId)
+    } else {
+        dao.getByPeerId(target.toId)
     }
+    return items.map { it.toModel() }
+}
 
-    query("latestChatItems") {
-        resolver { ->
-            AppDatabase.instance.chatDao().getAllLatestChats().map { it.toModel() }
-        }
+@GraphQLQuery
+suspend fun latestChatItems(): List<ChatItem> {
+    return AppDatabase.instance.chatDao().getAllLatestChats().map { it.toModel() }
+}
+
+@GraphQLMutation
+suspend fun sendChatItem(toId: String, content: String): List<ChatItem> {
+    val target = ChatTarget.parseId(toId)
+    val item = ChatManager.createChatItem(target, DChat.parseContent(content))
+    ChatManager.sendMessage(item, target, emptySet())
+    val model = item.toModel()
+    sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
+    sendEvent(HMessageCreatedEvent(target, arrayListOf(item)))
+    return listOf(model)
+}
+
+@GraphQLMutation
+suspend fun deleteChatItem(id: ID): Boolean {
+    val item = ChatManager.getChatItem(id.value)
+    if (item != null) {
+        ChatManager.deleteOne(item.id)
+        sendEvent(DeleteChatItemViewEvent(item.id))
     }
+    return true
+}
+
+@GraphQLMutation
+suspend fun deleteChatItems(query: String): Boolean {
+    val ids = ChatManager.getIdsAsync(query)
+    ChatManager.deleteByIds(ids)
+    sendEvent(HChatItemsDeletedEvent(ids))
+    sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode(query)))
+    return true
+}
+
+@GraphQLMutation
+suspend fun retryChatItem(id: ID): ChatItem? {
+    val item = ChatManager.getChatItem(id.value) ?: return null
+    ChatManager.updateStatus(item, "pending")
+    sendEvent(HRetryChatItemEvent(item))
+    return item.toModel()
+}
+
+fun SchemaBuilder.addChatMessageSchema() {
     type<ChatItem> {
         property("data") {
             resolver { c: ChatItem ->
                 c.getContentData()
             }
-        }
-    }
-    mutation("sendChatItem") {
-        resolver("toId", "content") { toId: String, content: String ->
-            val target = ChatTarget.parseId(toId)
-            val item = ChatManager.createChatItem(target, DChat.parseContent(content))
-            ChatManager.sendMessage(item, target, emptySet())
-            val model = item.toModel()
-            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-            sendEvent(HMessageCreatedEvent(target, arrayListOf(item)))
-            listOf(model)
-        }
-    }
-    mutation("deleteChatItem") {
-        resolver("id") { id: ID ->
-            val item = ChatManager.getChatItem(id.value)
-            if (item != null) {
-                ChatManager.deleteOne(item.id)
-                sendEvent(DeleteChatItemViewEvent(item.id))
-            }
-            true
-        }
-    }
-    mutation("deleteChatItems") {
-        resolver("query") { query: String ->
-            val ids = ChatManager.getIdsAsync(query)
-            ChatManager.deleteByIds(ids)
-            sendEvent(HChatItemsDeletedEvent(ids))
-            sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode(query)))
-            true
-        }
-    }
-    mutation("retryChatItem") {
-        resolver("id") { id: ID ->
-            val item = ChatManager.getChatItem(id.value) ?: return@resolver null
-            ChatManager.updateStatus(item, "pending")
-            sendEvent(HRetryChatItemEvent(item))
-            item.toModel()
         }
     }
 }

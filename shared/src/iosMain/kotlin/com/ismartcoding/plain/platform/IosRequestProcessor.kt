@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.web.HttpRouteRegistry
 import com.ismartcoding.plain.web.http.HttpMethod
@@ -44,8 +45,8 @@ object IosRequestProcessor {
      */
     suspend fun processHttpRequest(ctx: IosRequestContext) {
         try {
-            // Short-circuit /health so the health check works even when web is disabled.
-            if (ctx.path == "/health") {
+            // Short-circuit /health and /health_check so they work even when web is disabled.
+            if (ctx.path == "/health" || ctx.path == "/health_check") {
                 ctx.responseStatus = HttpStatus.OK
                 ctx.setResponseBody(getOwnPackageName().encodeToByteArray())
                 ctx.setResponseHeader("Content-Type", "text/plain")
@@ -66,6 +67,11 @@ object IosRequestProcessor {
                 call.setPathParams(params)
                 try {
                     matched.handler(call)
+                } catch (e: GraphQLError) {
+                    val sent = HttpRouteRegistry.mainGraphQL.handleError(e, call)
+                    if (!sent) {
+                        ctx.responseStatus = HttpStatus.UNAUTHORIZED
+                    }
                 } catch (e: Throwable) {
                     LogCat.e("IosRequestProcessor: route handler threw: ${e.message}")
                     ctx.responseStatus = HttpStatus.INTERNAL_SERVER_ERROR
@@ -101,8 +107,9 @@ object IosRequestProcessor {
     ) {
         scope.launch {
             try {
+                val cleanPath = path.substringBefore("?")
                 val wsEntries = HttpRouteRegistry.router.webSocketEntries()
-                val entry = wsEntries.firstOrNull { it.path == path }
+                val entry = wsEntries.firstOrNull { it.path == cleanPath }
                 if (entry == null) {
                     session.close(1008, "no route")
                     return@launch

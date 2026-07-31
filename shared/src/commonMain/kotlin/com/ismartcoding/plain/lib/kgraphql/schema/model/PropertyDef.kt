@@ -41,6 +41,7 @@ interface PropertyDef<T> : Depreciable, DescribedDef {
 
     open class Kotlin<T : Any, R> (
         val kProperty: KProperty1<T, R>,
+        val returnType: KType? = null,
         override val description: String? = null,
         override val isDeprecated: Boolean = false,
         override val deprecationReason: String? = null,

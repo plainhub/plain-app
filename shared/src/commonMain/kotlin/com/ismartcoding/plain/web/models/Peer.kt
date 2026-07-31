@@ -1,8 +1,12 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
+import kotlinx.serialization.Serializable
 
+@GraphQLType
+@Serializable
 data class Peer(
     val id: String,
     val name: String,

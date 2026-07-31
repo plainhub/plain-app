@@ -10,6 +10,7 @@ import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.plain.lib.kgraphql.KGraphQL
 import com.ismartcoding.plain.lib.kgraphql.context
+import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedSchema
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.helpers.TimeHelper
@@ -178,6 +179,7 @@ class MainGraphQLService private constructor(
          */
         fun create(): MainGraphQLService {
             val schema = KGraphQL.schema {
+                registerGeneratedSchema()
                 applyMainSchema()
             }
             return MainGraphQLService(schema)
