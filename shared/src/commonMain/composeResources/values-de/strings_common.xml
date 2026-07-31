@@ -147,7 +147,8 @@
     <string name="crash_report_title">App abgestürzt</string>
     <string name="crash_report_message">Die App ist unerwartet abgestürzt. Sehen Sie sich den Absturzbericht mit App-Protokollen an und teilen Sie ihn, um uns bei der Behebung zu helfen.</string>
     <string name="stay_online_mode">Online-Bleib-Modus</string>
-    <string name="stay_online_mode_oled_saving">OLED Energiesparen</string>
+    <string name="stay_online_mode_screen_black_countdown">Der Bildschirm wird nach %1$d Sekunden schwarz.</string>
+    <string name="stay_online_mode_keep_running">Halten Sie PlainApp am Laufen, wenn einige Telefone Hintergrundaktivitäten einschränken.</string>
     <string name="stay_online_mode_tap_to_exit">Zum Beenden tippen</string>
     <string name="add_to_home">Zum Startbildschirm hinzufügen</string>
     <string name="shortcut_added_to_home">Verknüpfung zum Startbildschirm hinzugefügt</string>

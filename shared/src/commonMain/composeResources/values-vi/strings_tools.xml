@@ -5,8 +5,6 @@
     <string name="sound_meter">Dụng cụ đo âm thanh</string>
     <string name="pomodoro_timer">Bộ hẹn giờ Pomodoro</string>
     <string name="dlna_receiver">Phát không dây</string>
-    <string name="dlna_receiver_description">Khi được bật, PlainApp trên cùng mạng Wi-Fi có thể phát video và nhạc đến thiết bị này</string>
-    <string name="dlna_receiver_active">Đang hoạt động, chờ chiếu…</string>
     <string name="dlna_receiver_waiting_title">Chờ chiếu</string>
     <string name="dlna_receiver_waiting_desc">Thiết bị hiển thị trên mạng: %1$s</string>
     <string name="dlna_receiver_step1_title">Kết nối cùng Wi-Fi</string>
@@ -16,9 +14,9 @@
     <string name="dlna_receiver_step3_title">Chiếu</string>
     <string name="dlna_receiver_step3_desc">Nhấn biểu tượng chiếu, chọn "%1$s" từ danh sách và phát sẽ bắt đầu</string>
     <string name="dlna_receiver_protocol_note">Hỗ trợ giao thức DLNA / UPnP, tương thích với VLC, Kodi và các ứng dụng chiếu phổ biến khác</string>
-    <string name="dlna_receiver_enable">Bật bộ nhận</string>
-    <string name="dlna_receiver_disable">Tắt bộ nhận</string>
     <string name="dlna_receiver_exit_player">Thoát trình phát</string>
+    <string name="dlna_receiver_disabled_title">Bộ nhận đã tắt</string>
+    <string name="dlna_receiver_disabled_desc">Bật công tắc trong Cài đặt Web để nhận chiếu trên thiết bị này</string>
     <string name="short_break">Nghỉ ngắn</string>
     <string name="long_break">Nghỉ dài</string>
     <string name="tomatoes_today">Số Pomodoro hôm nay</string>

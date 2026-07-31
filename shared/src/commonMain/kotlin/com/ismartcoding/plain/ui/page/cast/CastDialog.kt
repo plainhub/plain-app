@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CastDialog(castVM: CastViewModel) {
+fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
     if (!castVM.showCastDialog.value) return
     val itemsState by castVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
@@ -103,13 +103,17 @@ fun CastDialog(castVM: CastViewModel) {
                             subtitle = device.hostAddress,
                             onClick = {
                                 castVM.selectDevice(device.hostAddress)
-                                castVM.enterCastMode()
                                 audioPause()
                                 scope.launch(Dispatchers.Default) {
                                     if (!WebPreference.getAsync()) {
                                         WebPreference.putAsync(true)
                                         sendEvent(StartHttpServerEvent())
                                     }
+                                }
+                                if (onDeviceSelected != null) {
+                                    onDeviceSelected()
+                                } else {
+                                    castVM.enterCastMode()
                                 }
                                 onDismiss()
                             },

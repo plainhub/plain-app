@@ -49,12 +49,17 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
 
     // true = pure black screen; false = text visible
     var sleeping by remember { mutableStateOf(false) }
+    var remainingSeconds by remember { mutableStateOf(20) }
     var sleepJob by remember { mutableStateOf<Job?>(null) }
 
-    fun scheduleSleep(delayMs: Long) {
+    fun scheduleSleep(seconds: Int) {
         sleepJob?.cancel()
+        remainingSeconds = seconds
         sleepJob = scope.launch {
-            delay(delayMs)
+            while (remainingSeconds > 0) {
+                delay(1_000)
+                remainingSeconds -= 1
+            }
             sleeping = true
         }
     }
@@ -69,8 +74,8 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
         }
     }
 
-    // Initial display: show text for 3s then sleep
-    LaunchedEffect(Unit) { scheduleSleep(3_000) }
+    // Initial display: countdown 20s then sleep
+    LaunchedEffect(Unit) { scheduleSleep(20) }
 
     val textAlpha by animateFloatAsState(
         targetValue = if (sleeping) 0f else 1f,
@@ -98,7 +103,7 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
                 ) {
                     if (sleeping) {
                         sleeping = false
-                        scheduleSleep(5_000)
+                        scheduleSleep(20)
                     } else {
                         onExit()
                     }
@@ -122,7 +127,13 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = stringResource(Res.string.stay_online_mode_oled_saving),
+                        text = stringResource(Res.string.stay_online_mode_screen_black_countdown, remainingSeconds),
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 20.sp,
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = stringResource(Res.string.stay_online_mode_keep_running),
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 20.sp,
                     )

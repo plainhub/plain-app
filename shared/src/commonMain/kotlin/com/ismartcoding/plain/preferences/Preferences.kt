@@ -167,6 +167,16 @@ object WebPreference : BasePreference<Boolean>() {
     }
 }
 
+object DlnaReceiverEnabledPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("dlna_receiver_enabled")
+
+    override suspend fun putAsync(value: Boolean) {
+        super.putAsync(value)
+        TempData.dlnaReceiverEnabled.value = value
+    }
+}
+
 object DeveloperModePreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("developer_mode")

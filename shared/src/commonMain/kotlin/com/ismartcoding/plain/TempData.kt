@@ -10,6 +10,7 @@ object TempData {
     val webHttps = MutableStateFlow(false)
     val httpPort = MutableStateFlow(8080)
     val httpsPort = MutableStateFlow(8443)
+    val dlnaReceiverEnabled = MutableStateFlow(false)
     var clientId = ""
     val deviceName = MutableStateFlow("")
     var urlToken = ByteArray(0) // use to encrypt or decrypt params in url (kept as raw bytes to avoid base64 decode on every encrypt/decrypt)

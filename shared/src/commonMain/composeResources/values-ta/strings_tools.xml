@@ -5,8 +5,6 @@
     <string name="sound_meter">ஒலிக்குக் கோளி</string>
     <string name="pomodoro_timer">பொமடோரோ நேரமிடி</string>
     <string name="dlna_receiver">வயர்லெஸ் கேஸ்ட்</string>
-    <string name="dlna_receiver_description">இயக்கப்படும்போது, அதே Wi-Fi நெட்வொர்க்கில் உள்ள PlainApp இந்த சாதனத்தில் வீடியோ மற்றும் இசையை ஸ்ட்ரீம் செய்யலாம்</string>
-    <string name="dlna_receiver_active">செயலில், ஸ்ட்ரீமிங் காத்திருக்கிறது…</string>
     <string name="dlna_receiver_waiting_title">ஸ்ட்ரீமிங் காத்திருக்கிறது</string>
     <string name="dlna_receiver_waiting_desc">நெட்வொர்க்கில் காட்சியளிக்கும் சாதனம்: %1$s</string>
     <string name="dlna_receiver_step1_title">அதே Wi-Fi-ல் இணைக்கவும்</string>
@@ -16,9 +14,9 @@
     <string name="dlna_receiver_step3_title">ஸ்ட்ரீம் செய்யவும்</string>
     <string name="dlna_receiver_step3_desc">ஸ்ட்ரீம் ஐகானை தட்டி, பட்டியலில் இருந்து "%1$s" தேர்வு செய்யவும், இயக்கம் தொடங்கும்</string>
     <string name="dlna_receiver_protocol_note">DLNA / UPnP நெறிமுறைகளை ஆதரிக்கிறது, VLC, Kodi மற்றும் பிற பிரபலமான ஸ்ட்ரீமிங் பயன்பாடுகளுடன் இணக்கமானது</string>
-    <string name="dlna_receiver_enable">பெறுநரை இயக்கவும்</string>
-    <string name="dlna_receiver_disable">பெறுநரை முடக்கவும்</string>
     <string name="dlna_receiver_exit_player">பிளேயரில் இருந்து வெளியேறவும்</string>
+    <string name="dlna_receiver_disabled_title">ஸ்ட்ரீமிங் பெறுநர் அணைக்கப்பட்டது</string>
+    <string name="dlna_receiver_disabled_desc">இந்த சாதனத்தில் ஸ்ட்ரீமிங் பெற வெப் அமைப்புகளில் ஸ்விட்சை இயக்கவும்</string>
     <string name="short_break">குறுகிய இடைவேளை</string>
     <string name="long_break">நீண்ட இடைவேளை</string>
     <string name="tomatoes_today">இன்றைய டொமேட்டோக்கள்</string>

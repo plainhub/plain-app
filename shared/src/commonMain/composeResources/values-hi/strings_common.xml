@@ -147,7 +147,8 @@
     <string name="crash_report_title">ऐप क्रैश हो गया</string>
     <string name="crash_report_message">ऐप अप्रत्याशित रूप से क्रैश हो गया। क्रैश रिपोर्ट और ऐप लॉग देखें और समस्या हल करने में मदद के लिए साझा करें।</string>
     <string name="stay_online_mode">ऑनलाइन रहने का मोड</string>
-    <string name="stay_online_mode_oled_saving">OLED ऊर्जा बचत</string>
+    <string name="stay_online_mode_screen_black_countdown">स्क्रीन %1$d सेकंड में काली हो जाएगी।</string>
+    <string name="stay_online_mode_keep_running">जब कुछ फ़ोन बैकग्राउंड गतिविधि को सीमित करते हैं तब PlainApp चालू रखें।</string>
     <string name="stay_online_mode_tap_to_exit">बाहर निकलने के लिए कहीं भी टैप करें</string>
     <string name="add_to_home">होम स्क्रीन पर जोड़ें</string>
     <string name="shortcut_added_to_home">होम स्क्रीन पर शॉर्टकट जोड़ा गया</string>

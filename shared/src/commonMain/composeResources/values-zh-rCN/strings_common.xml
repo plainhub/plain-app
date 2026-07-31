@@ -147,7 +147,8 @@
     <string name="crash_report_title">应用崩溃</string>
     <string name="crash_report_message">应用意外崩溃了。您可以查看包含应用日志的崩溃报告，并分享给我们以便修复。</string>
     <string name="stay_online_mode">防断连模式</string>
-    <string name="stay_online_mode_oled_saving">OLED 省电中</string>
+    <string name="stay_online_mode_screen_black_countdown">屏幕将在 %1$d 秒后变黑。</string>
+    <string name="stay_online_mode_keep_running">当部分手机限制后台活动时,保持 PlainApp 运行。</string>
     <string name="stay_online_mode_tap_to_exit">点击任意位置退出</string>
     <string name="add_to_home">添加到主屏幕</string>
     <string name="shortcut_added_to_home">快捷方式已添加到主屏幕</string>

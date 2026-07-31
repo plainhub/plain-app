@@ -9,20 +9,20 @@ import com.ismartcoding.plain.platform.getDeviceIP4
 /**
  * Pure-Kotlin HTTP request router for the DLNA receiver.
  *
- * Extracted from androidMain's `DlnaHttpServer.route()/handleSoap()` so all
- * routing / SOAP dispatch logic lives in commonMain. The platform layer is
- * only responsible for raw socket I/O (see [DlnaServerSocket] /
- * [DlnaClientConnection]).
+ * All routing / SOAP dispatch logic lives in commonMain. The receiver HTTP
+ * endpoints are served by the shared web server (see
+ * `web/routes/DlnaRoutes.kt`); this router produces [DlnaHttpResponse]
+ * values that the route handler applies to the platform-agnostic [HttpCall].
  */
 object DlnaHttpRouter {
 
     /**
-     * Routes a parsed HTTP request and returns the full HTTP response string
-     * (status line + headers + body) ready to be written to the socket.
+     * Routes a parsed HTTP request and returns a structured [DlnaHttpResponse]
+     * ready to be applied to an [HttpCall] by the web server route handler.
      *
      * @param deviceUuid the renderer's UPnP UUID (used in device description)
      */
-    suspend fun route(request: DlnaHttpRequest, deviceUuid: String, senderIp: String, senderName: String): String {
+    suspend fun route(request: DlnaHttpRequest, deviceUuid: String, senderIp: String, senderName: String): DlnaHttpResponse {
         val method = request.method
         val path = request.path
         val headers = request.headers
@@ -48,7 +48,7 @@ object DlnaHttpRouter {
         }
     }
 
-    private suspend fun handleSoap(headers: Map<String, String>, body: String, senderIp: String, senderName: String): String {
+    private suspend fun handleSoap(headers: Map<String, String>, body: String, senderIp: String, senderName: String): DlnaHttpResponse {
         val soapAction = headers["soapaction"] ?: return httpInternalError()
         val (action, params) = DlnaSoapHandler.parseSoapAction(soapAction, body)
         LogCat.d("DLNA SOAP action: $action")
