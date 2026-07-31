@@ -6,11 +6,13 @@ import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.lib.extensions.urlEncode
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.platform.ZipStreamEntry
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.searchZipItems
 import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.platform.streamZipFolderToSink
+import com.ismartcoding.plain.platform.streamZipInternalDirToSink
 import com.ismartcoding.plain.platform.streamZipToSink
 import com.ismartcoding.plain.web.FileIdParams
 import com.ismartcoding.plain.web.http.HttpCall
@@ -58,6 +60,23 @@ fun HttpRouter.addZipRoutes() {
             } else {
                 dirPath = decryptedId
                 jsonName = ""
+            }
+
+            if (ZipBrowserHelper.isZipPath(dirPath)) {
+                val internalPath = ZipBrowserHelper.getInternalPath(dirPath).trimEnd('/')
+                val zipFileName = ZipBrowserHelper.getZipFilePath(dirPath).substringAfterLast('/')
+                val folderName = if (internalPath.isEmpty()) zipFileName else internalPath.substringAfterLast('/')
+                val fileName = (jsonName.ifEmpty { "$folderName.zip" }).urlEncode()
+                call.respondStream(
+                    contentType = "application/zip",
+                    headers = mapOf(
+                        "Content-Disposition" to
+                            "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\""
+                    ),
+                ) { sink ->
+                    streamZipInternalDirToSink(dirPath, sink)
+                }
+                return@get
             }
 
             val stat = statFile(dirPath)

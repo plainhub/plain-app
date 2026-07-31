@@ -79,7 +79,7 @@ object Mp4Helper {
                 // Phase 1: parse moov to get the video track ID and its mdhd timescale.
                 // The video track is identified by an hdlr box whose handler_type == 'vide'.
                 var offset = 0L
-                while (offset < fileLength && offset >= 0) {
+                while (offset in 0..<fileLength) {
                     raf.seek(offset)
                     val boxSize = readBoxSize(raf)
                     if (boxSize <= 0) break

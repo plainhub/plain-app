@@ -123,6 +123,8 @@ actual suspend fun streamZipToSink(items: List<ZipStreamEntry>, sink: StreamSink
 
 actual suspend fun streamZipFolderToSink(folderPath: String, sink: StreamSink): Boolean = false
 
+actual suspend fun streamZipInternalDirToSink(zipVirtualPath: String, sink: StreamSink): Boolean = false
+
 actual suspend fun fetchUrlToStream(url: String, sink: StreamSink): Pair<Int, String?> = 0 to null
 
 actual fun isContentUri(path: String): Boolean = false
