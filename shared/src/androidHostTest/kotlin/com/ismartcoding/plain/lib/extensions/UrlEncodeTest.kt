@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Unit tests for [String.urlEncode] — pure-Kotlin RFC 3986 percent-encoding
+ * Unit tests for [urlEncode] — pure-Kotlin RFC 3986 percent-encoding
  * (unreserved characters kept as-is, everything else UTF-8 + uppercase hex).
  *
  * Replaces the previous java.net.URLEncoder-based implementation so feed

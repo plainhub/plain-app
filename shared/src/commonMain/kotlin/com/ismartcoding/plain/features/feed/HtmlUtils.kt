@@ -4,7 +4,6 @@ import com.ismartcoding.plain.lib.html2md.HtmlElement
 import com.ismartcoding.plain.lib.html2md.HtmlNode
 import com.ismartcoding.plain.lib.html2md.HtmlParser
 import com.ismartcoding.plain.lib.html2md.HtmlTextNode
-
 /**
  * Pure-Kotlin HTML utilities for feed content sanitization and image extraction.
  *
@@ -78,8 +77,8 @@ object HtmlUtils {
 
     private val IMG_REGEX = Regex("""<img\s+[^>]*src=\s*['"]([^'"]+)['"][^>]*>""", RegexOption.IGNORE_CASE)
     private val ADS_REGEX = Regex(
-        """<div class=('|")mf-viral('|")><table border=('|")0('|")>.*""",
-        setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL),
+        """<div\s+class=['"]mf-viral['"]><table\s+border=['"]0['"]>[\s\S]*""",
+        RegexOption.IGNORE_CASE,
     )
     private val SRCSET_REGEX = Regex("""\s+srcset=\s*['"]([^'"\s]+)[^'"]*['"]""", RegexOption.IGNORE_CASE)
     private val LAZY_LOADING_REGEX = Regex("""\s+src=[^>]+\s+original[-]*src=("|')""", RegexOption.IGNORE_CASE)

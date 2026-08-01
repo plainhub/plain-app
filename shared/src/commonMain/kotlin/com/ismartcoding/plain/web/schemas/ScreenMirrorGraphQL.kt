@@ -4,12 +4,12 @@ import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.events.HRequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.events.HStartScreenMirrorEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.applyScreenMirrorQualityPreference
 import com.ismartcoding.plain.platform.dispatchScreenMirrorControl
@@ -18,8 +18,6 @@ import com.ismartcoding.plain.platform.isScreenMirrorControlEnabled
 import com.ismartcoding.plain.platform.isScreenMirrorRunning
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.onScreenMirrorQualityChanged
-import com.ismartcoding.plain.platform.requestScreenMirrorKeyFrame
-import com.ismartcoding.plain.platform.stopScreenMirror
 import com.ismartcoding.plain.preferences.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.web.models.ScreenMirrorQuality
 import com.ismartcoding.plain.web.models.ScreenMirrorVideoCodec

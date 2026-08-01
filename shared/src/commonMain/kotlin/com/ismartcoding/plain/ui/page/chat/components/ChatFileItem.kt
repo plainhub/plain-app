@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioPause

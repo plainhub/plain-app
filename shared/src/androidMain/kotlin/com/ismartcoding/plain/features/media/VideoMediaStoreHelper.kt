@@ -20,7 +20,7 @@ import com.ismartcoding.plain.events.MediaDurationZeroEvent
 import com.ismartcoding.plain.events.MediaDurationZeroItem
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.toSortBy
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.sendEvent
 import kotlin.time.Instant
 
 object VideoMediaStoreHelper : BaseMediaContentHelper() {

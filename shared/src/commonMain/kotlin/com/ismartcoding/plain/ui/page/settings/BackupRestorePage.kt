@@ -18,11 +18,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.lib.channel.Channel
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.platform.isP
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileTag
@@ -31,6 +29,7 @@ import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.backup
 import com.ismartcoding.plain.platform.backupToFile
 import com.ismartcoding.plain.platform.formatName

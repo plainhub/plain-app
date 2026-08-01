@@ -2,14 +2,13 @@ package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync
-import com.ismartcoding.plain.features.checkEnabledAsync
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.searchFilesInDir
 import com.ismartcoding.plain.platform.getRecentFiles

@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
-import com.ismartcoding.plain.i18n.*
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

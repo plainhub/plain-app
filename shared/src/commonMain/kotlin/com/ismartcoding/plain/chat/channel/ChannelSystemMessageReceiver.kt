@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.chat.channel
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerCacher
@@ -13,6 +12,7 @@ import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.sendEvent
 
 object ChannelSystemMessageReceiver {
 

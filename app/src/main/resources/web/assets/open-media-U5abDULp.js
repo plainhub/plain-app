@@ -1,0 +1,1 @@
+import{t as e}from"./temp-Im8LEY0y.js";import"./index-ChUNXVG7.js";function t(t){let n=e();function r(e,r){let i=r??t?.value;i&&i[e]&&(n.lightbox={sources:i,index:e,visible:!0})}return{open:r}}export{t};

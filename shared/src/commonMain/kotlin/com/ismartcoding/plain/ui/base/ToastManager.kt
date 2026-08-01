@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
-import com.ismartcoding.plain.lib.channel.ChannelEvent
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.ChannelEvent
+import com.ismartcoding.plain.lib.sendEvent
 
 data class ToastEvent(
     val message: String,

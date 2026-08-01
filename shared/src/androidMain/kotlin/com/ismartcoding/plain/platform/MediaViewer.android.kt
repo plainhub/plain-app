@@ -20,12 +20,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -36,7 +34,6 @@ import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import coil3.imageLoader
 import com.ismartcoding.plain.lib.extensions.isUrl
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_OFFSET_X
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_OFFSET_Y

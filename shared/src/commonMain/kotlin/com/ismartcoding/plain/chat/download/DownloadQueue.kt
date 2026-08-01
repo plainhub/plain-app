@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.chat.download
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer
@@ -8,6 +7,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.PlatformLock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

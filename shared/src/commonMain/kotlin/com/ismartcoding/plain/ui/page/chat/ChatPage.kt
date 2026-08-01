@@ -51,7 +51,7 @@ import com.ismartcoding.plain.events.HChatItemsDeletedEvent
 import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction

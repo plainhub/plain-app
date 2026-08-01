@@ -8,6 +8,8 @@ import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.docs.DocMediaStoreHelper
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.call.PhoneGeoCache
 import com.ismartcoding.plain.features.media.CallMediaStoreHelper
 import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
@@ -15,6 +17,8 @@ import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.sendEvent
 
 actual suspend fun getMediaBuckets(dataType: DataType): List<DMediaBucket> {
     return when (dataType) {
@@ -266,10 +270,10 @@ actual fun startMmsPolling(pendingId: String, launchTimeSec: Long, attachmentPat
                     } catch (_: Exception) {
                     }
                 }
-                com.ismartcoding.plain.lib.channel.sendEvent(
-                    com.ismartcoding.plain.events.WebSocketEvent(
-                        com.ismartcoding.plain.events.EventType.MMS_SENT,
-                        com.ismartcoding.plain.helpers.JsonHelper.jsonEncode(pendingId),
+                sendEvent(
+                    WebSocketEvent(
+                        EventType.MMS_SENT,
+                        JsonHelper.jsonEncode(pendingId),
                     ),
                 )
                 return@coIO

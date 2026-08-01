@@ -4,7 +4,6 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -21,7 +19,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
@@ -30,12 +28,8 @@ import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.platform.getAppVersion
 import com.ismartcoding.plain.platform.getCacheSize
-import com.ismartcoding.plain.platform.getAwareDataInterfaces
-import com.ismartcoding.plain.platform.getAwareDataPaths
 import com.ismartcoding.plain.platform.getLogFileSize
 import com.ismartcoding.plain.platform.getOSVersion
-import com.ismartcoding.plain.platform.isBluetoothSupported
-import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.platform.checkUpdateAsync
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.preferences.LocalAutoCheckUpdate
@@ -56,11 +50,9 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.home.UpdateBanner

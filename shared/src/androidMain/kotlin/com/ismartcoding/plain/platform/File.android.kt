@@ -36,7 +36,6 @@ import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.lib.extensions.compress
 import com.ismartcoding.plain.lib.extensions.getContentType
-import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.thumbnail.ThumbnailProvider
 import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import kotlinx.coroutines.runBlocking
@@ -595,4 +594,24 @@ actual suspend fun importChatFile(uriStr: String, mimeType: String): String? = w
 actual suspend fun getFileByMediaId(mediaId: String): DFile? = withIO {
     if (mediaId.isEmpty()) null
     else FileMediaStoreHelper.getByIdAsync(appContext, mediaId)
+}
+
+internal actual fun ensureDir(path: String) {
+    val dir = File(path)
+    if (!dir.exists()) dir.mkdirs()
+}
+
+internal actual fun appendLine(path: String, line: String): Long {
+    val file = File(path)
+    file.appendText(line)
+    return file.length()
+}
+
+internal actual fun deleteFileIfExists(path: String) {
+    val file = File(path)
+    if (file.exists()) file.delete()
+}
+
+internal actual fun renameFile(from: String, to: String) {
+    File(from).renameTo(File(to))
 }

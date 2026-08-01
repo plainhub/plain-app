@@ -1,12 +1,17 @@
 package com.ismartcoding.plain.lib.logcat
 
+import com.ismartcoding.plain.platform.appendLine
+import com.ismartcoding.plain.platform.deleteFileIfExists
+import com.ismartcoding.plain.platform.ensureDir
+import com.ismartcoding.plain.platform.renameFile
+
 class DiskLogStrategy : LogStrategy {
     override fun log(priority: Int, tag: String?, message: String) {
         val folder = LogCat.logFolder()
         if (folder.isEmpty()) return
-        ensureLogDir(folder)
+        ensureDir(folder)
         val filePath = "$folder/latest.log"
-        val size = appendLogLine(filePath, message + "\n")
+        val size = appendLine(filePath, message + "\n")
         if (size > MAX_BYTES) {
             val backupPath = "$folder/latest.log.bak"
             deleteFileIfExists(backupPath)
@@ -18,11 +23,3 @@ class DiskLogStrategy : LogStrategy {
         private const val MAX_BYTES = 25L * 1024 * 1024
     }
 }
-
-internal expect fun ensureLogDir(path: String)
-
-internal expect fun appendLogLine(path: String, line: String): Long
-
-internal expect fun deleteFileIfExists(path: String)
-
-internal expect fun renameFile(from: String, to: String)

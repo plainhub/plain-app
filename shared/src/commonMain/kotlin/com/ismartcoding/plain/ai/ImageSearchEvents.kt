@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ai
 
-import com.ismartcoding.plain.lib.channel.ChannelEvent
+import com.ismartcoding.plain.lib.ChannelEvent
 
 data class ImageSearchStatusChangedEvent(
     val status: ImageSearchStatus,

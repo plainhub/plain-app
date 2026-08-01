@@ -31,7 +31,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.platform.Permission
@@ -39,6 +38,7 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.SoundMeterRecorder
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.helpers.FormatHelper
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.base.*
 import kotlin.math.abs
 

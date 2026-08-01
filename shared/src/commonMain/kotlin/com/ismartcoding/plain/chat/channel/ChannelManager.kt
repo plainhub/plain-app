@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.chat.channel
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.chat.ChatManager
@@ -18,6 +17,7 @@ import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.platform.generateChaCha20Key
 import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.web.models.dchatChannelToModel
 
 object ChannelManager {

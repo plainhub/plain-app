@@ -5,9 +5,9 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.KeepAwakeChangedEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.checkHttpServerAsync
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.relaunchApp

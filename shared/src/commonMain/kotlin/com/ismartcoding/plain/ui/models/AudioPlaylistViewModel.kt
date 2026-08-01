@@ -6,7 +6,7 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.toPlaylistAudio
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.audioClear
 import com.ismartcoding.plain.platform.audioJustPlay
 import com.ismartcoding.plain.preferences.AudioPlayingPreference

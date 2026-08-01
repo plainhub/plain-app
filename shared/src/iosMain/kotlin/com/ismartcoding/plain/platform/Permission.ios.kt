@@ -2,7 +2,7 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance

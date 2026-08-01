@@ -42,8 +42,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.lib.channel.Channel
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.enums.PickFileTag
@@ -58,6 +57,7 @@ import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.preferences.ScanHistoryPreference
 import com.ismartcoding.plain.ui.base.PIconButton

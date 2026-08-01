@@ -3,6 +3,7 @@ appcompatVersion="1.7.1"
 bcprovJdk15onVersion="1.70"
 coil="3.5.0"
 coreKtxVersion="1.19.0"
+foundationVersion="1.11.1"
 gradle= "9.3.1"
 cameraCoreVersion = "1.6.1"
 compose = "1.11.4"
@@ -14,7 +15,7 @@ exifinterfaceVersion = "1.4.2"
 coreVersion = "3.5.4"
 datastorePreferencesVersion = "1.2.1"
 
-jsonVersion="20260522"
+jsonVersion="20260719"
 junitVersion="4.13.2"
 kotlin ="2.4.10"
 kotlinxDatetimeVersion="0.8.0"
@@ -24,16 +25,20 @@ ktor = "3.5.1"
 leakcanaryAndroidVersion = "2.14"
 lifecycleViewmodelKtxVersion="2.11.0"
 jetbrainsLifecycleViewmodel = "2.11.0"
-jetbrainsMarkdown = "0.7.7"
+jetbrainsMarkdown = "0.7.8"
 kotlinxCollectionsImmutable = "0.5.1"
-latex = "1.4.7"
+latex = "1.5.1"
+material3="1.9.0"
 media3 = "1.10.1"
+navigationCompose="2.9.2"
 navigationComposeVersion = "2.9.8"
 material3Version = "1.4.0"
 okhttpVersion="5.4.0"
 room = "2.8.4"
+runtimeVersion="1.11.1"
 sqlite = "2.7.0"
 transitionVersion="1.7.0"
+uiVersion="1.11.1"
 workRuntimeKtxVersion = "2.11.2"
 devtoolsKspVersion = "2.3.7"
 tinkAndroidVersion = "1.23.0"
@@ -50,6 +55,7 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
+foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundationVersion" }
 jetbrains-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrainsLifecycleViewmodel" }
 androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycleViewmodelKtxVersion" }
 bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bcprovJdk15onVersion" }
@@ -83,6 +89,7 @@ junit = { module = "junit:junit", version.ref = "junitVersion" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExtJunit" }
+material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "material3" }
 media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3" }
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
@@ -90,6 +97,9 @@ media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 media3-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3" }
 media3-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
 
+navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "runtimeVersion" }
+ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "uiVersion" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 
 

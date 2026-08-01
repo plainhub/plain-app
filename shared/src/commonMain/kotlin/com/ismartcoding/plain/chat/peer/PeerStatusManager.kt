@@ -2,7 +2,6 @@ package com.ismartcoding.plain.chat.peer
 import com.ismartcoding.plain.platform.subscribeAwareForPeer
 import com.ismartcoding.plain.platform.startAwareIfNeeded
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.helpers.JsonHelper
@@ -18,6 +17,7 @@ import com.ismartcoding.plain.events.PeerStatusData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.createPeerStatusHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocket

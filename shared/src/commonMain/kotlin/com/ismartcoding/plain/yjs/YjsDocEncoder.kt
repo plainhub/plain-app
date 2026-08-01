@@ -287,7 +287,7 @@ object YjsDocEncoder {
 
         // parentSub string
         if (hasParentSub) {
-            encoder.writeVarString(item.parentSub!!)
+            encoder.writeVarString(item.parentSub)
         }
 
         // Content

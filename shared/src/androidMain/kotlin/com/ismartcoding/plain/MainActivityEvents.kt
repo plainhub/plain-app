@@ -1,4 +1,5 @@
 package com.ismartcoding.plain
+import android.Manifest
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -9,12 +10,9 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hasRoute
-import com.ismartcoding.plain.lib.channel.Channel
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
@@ -38,8 +36,8 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.services.PNotificationListenerService
@@ -70,7 +68,7 @@ internal fun MainActivity.initEvents() {
 
                 is HStartScreenMirrorEvent -> {
                     try {
-                        if (event.audio && !Permission.RECORD_AUDIO.isGranted()) recordAudioForMirror.launch(android.Manifest.permission.RECORD_AUDIO)
+                        if (event.audio && !Permission.RECORD_AUDIO.isGranted()) recordAudioForMirror.launch(Manifest.permission.RECORD_AUDIO)
                         else screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
                     } catch (e: IllegalStateException) {
                         LogCat.e("Error launching screen capture: ${e.message}")
@@ -80,7 +78,7 @@ internal fun MainActivity.initEvents() {
                 is HRequestScreenMirrorAudioEvent -> {
                     try {
                         if (Permission.RECORD_AUDIO.isGranted()) sendScreenMirrorAudioStatus(true)
-                        else recordAudioForMirrorLate.launch(android.Manifest.permission.RECORD_AUDIO)
+                        else recordAudioForMirrorLate.launch(Manifest.permission.RECORD_AUDIO)
                     } catch (e: IllegalStateException) {
                         LogCat.e("Error requesting RECORD_AUDIO: ${e.message}")
                     }

@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
 
-import com.ismartcoding.plain.preferences.*
-
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.clickable
@@ -25,12 +23,9 @@ import com.ismartcoding.plain.platform.getCacheSize
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PSwitch
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import androidx.compose.ui.unit.toSize
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.data.DImage

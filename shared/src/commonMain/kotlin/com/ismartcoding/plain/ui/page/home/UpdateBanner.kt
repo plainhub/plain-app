@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
 import com.ismartcoding.plain.platform.getAppVersionName
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
@@ -23,12 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.CancelUpdateDownloadEvent
 import com.ismartcoding.plain.events.DownloadUpdateEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.exitApp
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.installApk

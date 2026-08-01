@@ -23,8 +23,8 @@ import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getAppVersion
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.platform.getDeviceName

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.events
 
-import com.ismartcoding.plain.lib.channel.ChannelEvent
+import com.ismartcoding.plain.lib.ChannelEvent
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import kotlinx.serialization.Serializable
 

@@ -1,11 +1,8 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.plain.preferences.*
-
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.coMain
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
@@ -16,9 +13,9 @@ import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.audioClear
 import com.ismartcoding.plain.platform.checkEnabledAsync
-import com.ismartcoding.plain.features.checkEnabledAsync
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.platform.searchMedia

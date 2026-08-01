@@ -4,7 +4,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 /**
- * Unit tests for [String.capitalize] — a pure-Kotlin replacement for the
+ * Unit tests for [capitalize] — a pure-Kotlin replacement for the
  * deprecated `kotlin.text.capitalize` extension. Used by contact sort-key
  * generation and feed title formatting.
  */

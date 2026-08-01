@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.page.files
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.appDir
 import com.ismartcoding.plain.platform.fileExists

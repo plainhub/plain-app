@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.db
 
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.platform.getFileId
 
 fun DMessageFile.getPreviewPath(peer: DPeer?): String {

@@ -4,9 +4,7 @@ import com.ismartcoding.plain.preferences.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.rememberCoroutineScope
-import com.ismartcoding.plain.lib.channel.Channel
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
@@ -15,7 +13,7 @@ import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.PermissionItem
 import com.ismartcoding.plain.features.getWebList
-import com.ismartcoding.plain.platform.getOwnPackageName
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.toggleNotificationListener

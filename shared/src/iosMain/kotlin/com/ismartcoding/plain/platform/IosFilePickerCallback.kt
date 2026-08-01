@@ -5,8 +5,8 @@ import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.sendEvent
 
 /**
  * Singleton entry point that Swift calls after an iOS file pick / export

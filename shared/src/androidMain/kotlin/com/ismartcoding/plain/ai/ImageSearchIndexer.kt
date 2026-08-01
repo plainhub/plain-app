@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ai
 import com.ismartcoding.plain.appContext
 
 import android.graphics.Bitmap
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
@@ -11,6 +10,7 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
+import com.ismartcoding.plain.lib.sendEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope

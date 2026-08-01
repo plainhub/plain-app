@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.chat
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
@@ -14,6 +13,7 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
+import com.ismartcoding.plain.lib.sendEvent
 
 object ChatManager {
 

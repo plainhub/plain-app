@@ -1,13 +1,11 @@
 package com.ismartcoding.plain.web.schemas
 
 import com.ismartcoding.plain.buildChannel
-import com.ismartcoding.plain.preferences.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.events.HOpenAccessibilitySettingsEvent
@@ -27,6 +25,7 @@ import com.ismartcoding.plain.platform.getAppVersionCode
 import com.ismartcoding.plain.platform.getSdkInt
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.helpers.TempHelper
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference

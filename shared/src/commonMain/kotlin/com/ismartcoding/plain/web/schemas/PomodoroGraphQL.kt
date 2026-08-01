@@ -3,15 +3,14 @@ package com.ismartcoding.plain.web.schemas
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.events.HPomodoroPauseEvent
 import com.ismartcoding.plain.events.HPomodoroStartEvent
 import com.ismartcoding.plain.events.HPomodoroStopEvent
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
-import com.ismartcoding.plain.web.models.PomodoroRuntimeInfo
 import com.ismartcoding.plain.web.models.PomodoroSettings
 import com.ismartcoding.plain.web.models.PomodoroToday
 import com.ismartcoding.plain.web.models.pomodoroRuntimeInfoProvider

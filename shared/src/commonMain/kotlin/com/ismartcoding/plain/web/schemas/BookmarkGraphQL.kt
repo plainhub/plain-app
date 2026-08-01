@@ -3,9 +3,9 @@ package com.ismartcoding.plain.web.schemas
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.events.FetchBookmarkMetadataEvent
 import com.ismartcoding.plain.features.BookmarkHelper
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.web.models.Bookmark
 import com.ismartcoding.plain.web.models.BookmarkGroup
 import com.ismartcoding.plain.web.models.BookmarkInput

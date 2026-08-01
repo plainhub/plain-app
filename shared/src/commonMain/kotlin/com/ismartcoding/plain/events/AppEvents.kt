@@ -4,7 +4,6 @@ import com.ismartcoding.plain.ai.ImageIndexProgressEvent
 import com.ismartcoding.plain.ai.ImageSearchStatusChangedEvent
 import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.chat.ChatManager
-import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.discover.LANDiscoverManager
@@ -21,12 +20,11 @@ import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.coMain
-import com.ismartcoding.plain.lib.channel.Channel
-import com.ismartcoding.plain.lib.channel.ChannelEvent
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.Channel
+import com.ismartcoding.plain.lib.ChannelEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.audioPause
-import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.platform.buildImageSearchStatus
 import com.ismartcoding.plain.platform.cancelImageModelDownload
 import com.ismartcoding.plain.platform.cancelUpdateDownloadAsync

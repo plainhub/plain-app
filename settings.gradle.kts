@@ -4,5 +4,6 @@ plugins {
 rootProject.name = "PlainApp"
 include(":app")
 include(":shared")
+include(":shared-lib")
 include(":litert-stubs")
 include(":kgraphql-ksp")

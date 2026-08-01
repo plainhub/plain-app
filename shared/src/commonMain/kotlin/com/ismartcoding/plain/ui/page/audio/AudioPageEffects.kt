@@ -1,10 +1,9 @@
 package com.ismartcoding.plain.ui.page.audio
-import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.platform.isGestureInteractionMode
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.hasPermission
@@ -16,7 +15,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.page.audio.AudioPageState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

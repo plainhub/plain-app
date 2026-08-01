@@ -10,7 +10,7 @@ import android.media.AudioFormat
 import android.media.AudioTrack
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.helpers.coIO
@@ -20,8 +20,6 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.audio.fromPath
-import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference

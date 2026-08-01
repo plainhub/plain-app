@@ -34,7 +34,7 @@ private fun computeScale(viewBox: SvgRect?, w: Int, h: Int): Pair<Float, Float> 
 private fun renderGroup(group: SvgGroup, canvas: Canvas, scaleX: Float, scaleY: Float) {
     val saveCount = if (group.transform != null) canvas.save() else -1
     if (group.transform != null) {
-        canvas.concat(group.transform.toMatrix())
+        canvas.concat(group.transform!!.toMatrix())
     }
     group.children.forEach { child ->
         when (child) {

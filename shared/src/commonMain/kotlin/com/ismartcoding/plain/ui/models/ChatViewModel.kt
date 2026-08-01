@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.platform.createLongTextFile
@@ -16,15 +15,14 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.sent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.channels.Channel

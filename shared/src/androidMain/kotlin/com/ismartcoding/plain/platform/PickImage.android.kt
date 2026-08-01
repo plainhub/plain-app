@@ -3,7 +3,7 @@ package com.ismartcoding.plain.platform
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.lib.extensions.getFileName
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath

@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.EventType
@@ -12,6 +11,7 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.device_name
 import com.ismartcoding.plain.i18n.save
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import kotlinx.coroutines.launch

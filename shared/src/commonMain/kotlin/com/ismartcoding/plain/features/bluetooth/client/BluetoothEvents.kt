@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.bluetooth.client
 
-import com.ismartcoding.plain.lib.channel.ChannelEvent
+import com.ismartcoding.plain.lib.ChannelEvent
 
 class RequestEnableBluetoothEvent: ChannelEvent()
 

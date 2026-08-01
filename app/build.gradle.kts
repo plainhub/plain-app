@@ -165,48 +165,22 @@ dependencies {
 
     implementation(kotlin("reflect"))
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
 
     implementation(libs.pdfium.android)
 
-    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.datetime)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.service)
-
-    implementation(libs.androidx.transition)
-
-    implementation(libs.bcprov.jdk15on)
-    implementation(libs.bcpkix.jdk15on)
-    implementation(libs.ktor.client.okhttp)
 
     implementation(libs.okhttp)
 
     // Google Tink for cryptography (Ed25519 support on all Android versions)
     implementation(libs.tink.android)
 
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.server.websockets)
-    implementation(libs.ktor.server.compression)
-    implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.ktor.network.tls.certificates)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.server.caching.headers)
-    implementation(libs.ktor.server.cors)
-    implementation(libs.ktor.server.forwarded.header)
-    implementation(libs.ktor.server.partial.content)
-    implementation(libs.ktor.server.auto.head.response)
-    implementation(libs.ktor.server.conditional.headers)
-
-
     implementation(platform(libs.compose.bom))
 
     // https://github.com/google/accompanist/releases
     implementation(libs.compose.lifecycle.runtime)
     implementation(libs.compose.activity)
-    implementation(libs.compose.runtime)
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
     implementation(libs.compose.foundation.layout)
@@ -222,9 +196,6 @@ dependencies {
     implementation(libs.media3.session)
     implementation(libs.media3.dash)
     implementation(libs.media3.hls)
-
-    implementation(libs.androidx.core.splashscreen)
-    implementation(libs.androidx.exifinterface)
 
     // CameraX
     implementation(libs.camera.core)
@@ -242,15 +213,8 @@ dependencies {
 
     implementation(libs.zxing.core)
 
-    implementation(libs.androidx.work.runtime.ktx)
-
-    // https://developer.android.com/jetpack/androidx/releases/datastore
-    implementation(libs.androidx.datastore.preferences)
-
     debugImplementation(libs.leakcanary.android)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
-
-    // For cryptography (Ed25519 support on all Android versions)
 
     // AI Image Search: both MediaPipe and LiteRT are excluded from fdroid
     // to pass F-Droid FOSS checks (com.google.ai.edge.litert is non-FLOSS

@@ -17,8 +17,8 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.ensureBlePermissionAsync
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.platform.getDeviceType

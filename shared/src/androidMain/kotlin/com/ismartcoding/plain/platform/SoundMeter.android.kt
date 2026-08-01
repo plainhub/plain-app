@@ -11,7 +11,7 @@ import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.helpers.SoundMeterHelper
 import kotlinx.coroutines.Dispatchers

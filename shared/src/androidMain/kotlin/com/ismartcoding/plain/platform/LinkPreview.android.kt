@@ -5,7 +5,7 @@ import android.os.Environment
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.db.DLinkPreview
 import com.ismartcoding.plain.features.LinkPreviewHelper
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.async

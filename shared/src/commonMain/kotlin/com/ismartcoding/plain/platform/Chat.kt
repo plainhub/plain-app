@@ -12,7 +12,7 @@ import com.ismartcoding.plain.helpers.StringHelper
 import com.ismartcoding.plain.helpers.coMain
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtension
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.ui.helpers.DialogHelper

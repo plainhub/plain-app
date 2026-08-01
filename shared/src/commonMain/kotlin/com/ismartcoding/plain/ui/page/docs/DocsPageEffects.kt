@@ -1,11 +1,10 @@
 package com.ismartcoding.plain.ui.page.docs
-import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.platform.isGestureInteractionMode
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.hasPermission

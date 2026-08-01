@@ -1,13 +1,11 @@
 package com.ismartcoding.plain.chat
 import com.ismartcoding.plain.platform.canShowNotifications
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.download.DownloadQueue
-import com.ismartcoding.plain.chat.peer.PeerChatParser
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
@@ -26,6 +24,7 @@ import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.peer_chat
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.dchatToModel
 import kotlinx.coroutines.sync.Mutex

@@ -457,7 +457,7 @@ class YjsDoc(data: ByteArray) {
         val points = mutableListOf<Point>()
         for (item in pointItems) {
             val values = when (item.content) {
-                is YjsContent.AnyContent -> (item.content as YjsContent.AnyContent).values
+                is YjsContent.AnyContent -> item.content.values
                 else -> listOf(extractValue(item))
             }
             for (value in values) {
@@ -491,10 +491,10 @@ class YjsDoc(data: ByteArray) {
 
     private fun extractValue(item: YjsItem): Any? {
         return when (item.content) {
-            is YjsContent.StringContent -> (item.content as YjsContent.StringContent).value
-            is YjsContent.AnyContent -> (item.content as YjsContent.AnyContent).values.firstOrNull()
+            is YjsContent.StringContent -> item.content.value
+            is YjsContent.AnyContent -> item.content.values.firstOrNull()
             is YjsContent.JsonContent -> {
-                val json = (item.content as YjsContent.JsonContent).values.firstOrNull() ?: return null
+                val json = item.content.values.firstOrNull() ?: return null
                 Json.parseToJsonElement(json).let { jsonElementToJsonValue(it) }
             }
             is YjsContent.TypeContent -> {

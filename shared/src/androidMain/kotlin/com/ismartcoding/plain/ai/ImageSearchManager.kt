@@ -2,11 +2,10 @@ package com.ismartcoding.plain.ai
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.buildChannel
 import com.ismartcoding.plain.enums.AppChannelType
-import com.ismartcoding.plain.preferences.*
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.preferences.AiImageSearchEnabledPreference
 import kotlinx.coroutines.flow.MutableStateFlow

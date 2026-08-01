@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
@@ -16,6 +15,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.HRetryChatItemEvent
 import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel

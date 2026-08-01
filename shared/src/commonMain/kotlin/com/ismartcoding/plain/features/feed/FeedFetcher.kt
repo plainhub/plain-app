@@ -7,8 +7,8 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.pmap
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.NetworkType
 import com.ismartcoding.plain.platform.fetchContentAsync
 import com.ismartcoding.plain.platform.fetchRssChannel

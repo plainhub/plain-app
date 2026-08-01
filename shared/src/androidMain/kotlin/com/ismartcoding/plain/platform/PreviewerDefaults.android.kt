@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
 import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.rememberAsyncImagePainter
-import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.size.Size
 import com.ismartcoding.plain.enums.ImageType

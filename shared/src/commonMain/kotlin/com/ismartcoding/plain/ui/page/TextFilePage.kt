@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.ui.page
-import com.ismartcoding.plain.preferences.*
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

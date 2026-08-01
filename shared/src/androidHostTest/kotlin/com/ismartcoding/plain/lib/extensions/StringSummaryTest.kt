@@ -6,7 +6,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Unit tests for [String.getSummary] — strips Markdown image syntax and
+ * Unit tests for [getSummary] — strips Markdown image syntax and
  * `<img>` HTML, replaces them with the 🖼 emoji, then collapses newlines
  * and leading whitespace. Used by feed entry previews / notification bodies.
  */

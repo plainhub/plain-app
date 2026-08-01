@@ -45,7 +45,7 @@ import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.isGestureInteractionMode
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.preferences.VideoGridCellsPerRowPreference
 import com.ismartcoding.plain.preferences.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction

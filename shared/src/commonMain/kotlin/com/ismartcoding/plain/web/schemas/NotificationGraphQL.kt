@@ -4,12 +4,11 @@ import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.events.HCancelNotificationsEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.platform.filterNotificationsAsync
-import com.ismartcoding.plain.platform.replyNotification
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.Notification
 import com.ismartcoding.plain.web.models.toModel

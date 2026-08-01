@@ -18,7 +18,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.extensions.cut
 import com.ismartcoding.plain.features.NoteHelper
-import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.platform.shareText
 import com.ismartcoding.plain.platform.launchUrl

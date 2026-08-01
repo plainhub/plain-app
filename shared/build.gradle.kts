@@ -53,20 +53,19 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            api(compose.components.resources)
-            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.0")
+            api(project(":shared-lib"))
+            implementation(libs.runtime)
+            implementation(libs.foundation)
+            implementation(libs.material3)
+            implementation(libs.ui)
+            api("org.jetbrains.compose.components:components-resources:1.11.1")
+            implementation(libs.navigation.compose)
             implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.compose.lifecycle.runtime)
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.datastore.preferences.core)
-            implementation(libs.kotlinx.serialization.json)
             api(libs.room.runtime)
             implementation(libs.sqlite.bundled)
-            api(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
@@ -83,6 +82,7 @@ kotlin {
             api(libs.latex.renderer)
         }
         androidMain.dependencies {
+            api(project(":shared-lib"))
             implementation(libs.ktor.client.okhttp)
             implementation(libs.okhttp)
             implementation(libs.tink.android)

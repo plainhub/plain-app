@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.chat.ChatManager
@@ -15,6 +14,7 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.web.models.toModel
 
 class PeerChatReplyReceiver : BroadcastReceiver() {

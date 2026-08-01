@@ -38,8 +38,8 @@ import com.ismartcoding.plain.i18n.local_chat
 import com.ismartcoding.plain.i18n.local_chat_desc
 import com.ismartcoding.plain.i18n.nearby_wifi_devices_required_for_chat
 import com.ismartcoding.plain.i18n.web_service_required_for_chat
-import com.ismartcoding.plain.lib.channel.Channel
-import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.Channel
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.preferences.LocalWeb

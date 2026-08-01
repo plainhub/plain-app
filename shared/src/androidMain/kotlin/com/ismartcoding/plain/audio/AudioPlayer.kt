@@ -7,7 +7,6 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.MoreExecutors
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.coMain
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -15,6 +14,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.events.AudioActionEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.services.AudioPlayerService

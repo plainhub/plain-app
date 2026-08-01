@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.events
 
-import com.ismartcoding.plain.lib.channel.ChannelEvent
+import com.ismartcoding.plain.lib.ChannelEvent
 
 class ConfirmDialogEvent(
     val title: String,

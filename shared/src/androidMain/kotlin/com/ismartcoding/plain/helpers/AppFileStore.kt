@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.helpers
 
-import android.content.Context
 import android.webkit.MimeTypeMap
 import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
-import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.platform.AppDatabase

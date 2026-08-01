@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.lib.ahocorasick.trie
 
+import com.ismartcoding.plain.lib.Trie
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import kotlin.test.assertFalse
 
 /**
  * Unit tests for [Trie] — the pure-Kotlin multi-pattern matcher backing the

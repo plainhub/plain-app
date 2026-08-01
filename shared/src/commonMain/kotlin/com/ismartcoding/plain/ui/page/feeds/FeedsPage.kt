@@ -23,7 +23,6 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.helpers.TimeHelper
@@ -32,6 +31,7 @@ import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.PickFileEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.formatName
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.FeedsPageEffects
@@ -79,11 +79,17 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
                         PDropdownMenuItem(
                             text = { Text(stringResource(Res.string.import_opml_file)) },
                             leadingIcon = { Icon(painter = painterResource(Res.drawable.upload), contentDescription = stringResource(Res.string.import_opml_file)) },
-                            onClick = { dismiss(); sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false)) })
+                            onClick = {
+                                dismiss()
+                                sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false))
+                            })
                         PDropdownMenuItem(
                             text = { Text(stringResource(Res.string.export_opml_file)) },
                             leadingIcon = { Icon(painter = painterResource(Res.drawable.download), contentDescription = stringResource(Res.string.export_opml_file)) },
-                            onClick = { dismiss(); sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + TimeHelper.now().formatName() + ".opml")) })
+                            onClick = {
+                                dismiss()
+                                sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + TimeHelper.now().formatName() + ".opml"))
+                            })
                     }
                 }
             })

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.web.routes
 
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.urlEncode
 import com.ismartcoding.plain.platform.convert3gpToMp4

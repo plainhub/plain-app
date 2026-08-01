@@ -8,8 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,13 +22,13 @@ import androidx.navigation.NavHostController
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import androidx.compose.foundation.layout.fillMaxWidth
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.events.RestartAppEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.generateSSLKeyStore
 import com.ismartcoding.plain.platform.getSSLSignature
@@ -139,10 +137,13 @@ fun WebSecurityPage(navController: NavHostController) {
                                     keyStorePassword = KeyStorePasswordPreference.getAsync()
                                     generateSSLKeyStore(keyStorePassword)
                                     DialogHelper.hideLoading()
-                                    DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset)) { sendEvent(RestartAppEvent()) }
+                                    DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset)) {
+                                        sendEvent(RestartAppEvent())
+                                    }
                                 }
                             })
-                        VerticalSpace(dp = 24.dp); Subtitle(text = stringResource(Res.string.url_token))
+                        VerticalSpace(dp = 24.dp)
+                        Subtitle(text = stringResource(Res.string.url_token))
                         ClipboardCard(label = stringResource(Res.string.url_token), text = urlToken)
                         Tips(text = stringResource(Res.string.url_token_tips)); VerticalSpace(dp = 16.dp)
                         PCard {

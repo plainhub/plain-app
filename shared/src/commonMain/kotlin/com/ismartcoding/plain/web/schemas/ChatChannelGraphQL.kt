@@ -6,7 +6,6 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.chat.channel.ChannelManager
 import com.ismartcoding.plain.lib.extensions.toSortName
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.web.models.ChatChannel
 import com.ismartcoding.plain.web.models.ChatChannelMember
 import com.ismartcoding.plain.web.models.ID

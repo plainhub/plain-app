@@ -32,7 +32,7 @@ fun RssItem.toDFeedEntry(
         ).toHexString()
 
     item.feedId = feedId
-    item.title = if (title != null) title.htmlToPlainText() else ""
+    item.title = title?.htmlToPlainText() ?: ""
 
     val feedBaseUrl = HtmlUtils.getBaseUrl(feedUrl)
     item.description = HtmlUtils.improveHtmlContent(content ?: description ?: "", feedBaseUrl)

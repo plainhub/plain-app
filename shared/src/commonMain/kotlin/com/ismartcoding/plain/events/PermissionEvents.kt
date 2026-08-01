@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.events
 
 import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.lib.channel.ChannelEvent
+import com.ismartcoding.plain.lib.ChannelEvent
 
 class RequestPermissionsEvent(vararg val permissions: Permission) : ChannelEvent()
 

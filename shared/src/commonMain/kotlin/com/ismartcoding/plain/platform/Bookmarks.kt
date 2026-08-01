@@ -2,7 +2,7 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.db.DBookmark
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.logcat.LogCat
 import io.ktor.client.call.body
 import io.ktor.client.request.get

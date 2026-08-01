@@ -36,7 +36,6 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.launch
 

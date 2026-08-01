@@ -12,11 +12,8 @@ import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.data.DVideo
-import com.ismartcoding.plain.db.DTag
-import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
-import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.addMediaShortcut
 import com.ismartcoding.plain.platform.getMediaItemUriString
 import com.ismartcoding.plain.platform.openFileExternal

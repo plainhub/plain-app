@@ -11,7 +11,7 @@ import com.ismartcoding.plain.features.feed.exportAsync
 import com.ismartcoding.plain.features.feed.importAsync
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.channel.Channel
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 

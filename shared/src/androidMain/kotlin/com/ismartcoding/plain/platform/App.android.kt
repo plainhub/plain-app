@@ -12,10 +12,10 @@ import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.ZipHelper
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import java.io.File
 import java.io.FileOutputStream

@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.ui.page.pomodoro
 
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PomodoroActionData
 import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 
 internal fun sendPomodoroAction(action: String, vm: PomodoroViewModel) {

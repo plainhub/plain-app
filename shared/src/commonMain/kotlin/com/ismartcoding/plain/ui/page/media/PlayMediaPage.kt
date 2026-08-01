@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.media
 
-import com.ismartcoding.plain.i18n.*
-
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

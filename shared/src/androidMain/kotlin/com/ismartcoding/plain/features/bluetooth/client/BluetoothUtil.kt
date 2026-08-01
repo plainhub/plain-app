@@ -7,10 +7,10 @@ import android.location.LocationManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.ismartcoding.plain.ble.client.AndroidBleScanner
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.extensions.hasPermission
 import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.sendEvent
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 

@@ -17,10 +17,10 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
+import com.ismartcoding.plain.lib.sendEvent
 
 @Composable
 fun PomodoroSoundSection(
@@ -30,20 +30,20 @@ fun PomodoroSoundSection(
 ) {
     Column {
         Text(
-            text = stringResource(Res.string.custom_sound),
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(bottom = 8.dp)
+            text = stringResource(Res.string.custom_sound), style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(bottom = 8.dp)
         )
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
         ) {
             if (soundPath.isNotEmpty()) {
                 Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Text(
-                        text = originalFileName, style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface, maxLines = 2,
-                        overflow = TextOverflow.Ellipsis, modifier = Modifier.fillMaxWidth()
+                        text = originalFileName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.End) {
                         TextButton(onClick = { sendEvent(PickFileEvent(PickFileTag.POMODORO, PickFileType.FILE, multiple = false)) }) {
