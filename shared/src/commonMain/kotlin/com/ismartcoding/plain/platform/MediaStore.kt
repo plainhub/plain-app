@@ -158,7 +158,7 @@ expect suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.fe
  * Aggregate SMS counts (total, unread, sent, drafts) on supported platforms.
  * Returns zeroes on unsupported platforms.
  */
-expect suspend fun getSmsAllCounts(): SmsCounts
+expect suspend fun getSmsAllCounts(): DSmsCounts
 
 /**
  * Send an SMS text message to [number] with body [body].
@@ -204,7 +204,7 @@ expect fun getDownloadsDirPath(): String
 /**
  * Aggregate SMS counts returned by [getSmsAllCounts].
  */
-data class SmsCounts(
+data class DSmsCounts(
     val total: Int,
     val inbox: Int,
     val sent: Int,

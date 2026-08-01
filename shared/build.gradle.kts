@@ -9,6 +9,12 @@ plugins {
     id("androidx.room")
 }
 
+// Dev-only single-target mode: pass -PenableDeviceTarget=false to skip
+// configuring iosArm64 (dependency resolution, KSP, task graph) when only
+// building for the simulator. Saves ~3-5s of configuration overhead per
+// build. Restore by omitting the flag (default: both targets enabled).
+val enableDeviceTarget = (findProperty("enableDeviceTarget") as? String)?.toBoolean() ?: true
+
 kotlin {
     jvmToolchain(17)
 
@@ -34,10 +40,11 @@ kotlin {
         withHostTest {}
     }
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64(),
-    ).forEach { iosTarget ->
+    // Dev-only single-target mode: see enableDeviceTarget above.
+    val iosTargets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
+    if (enableDeviceTarget) iosTargets.add(iosArm64())
+    iosTargets.add(iosSimulatorArm64())
+    iosTargets.forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "PlainShared"
             isStatic = true
@@ -167,14 +174,14 @@ room {
 
 dependencies {
     add("kspAndroid", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
+    if (enableDeviceTarget) add("kspIosArm64", libs.room.compiler)
     add("kspIosSimulatorArm64", libs.room.compiler)
     // KGraphQL KSP2 processor — generates reflection-free schema descriptors.
     // Uses expect/actual pattern: commonMain declares expect, each platform's
     // KSP generates the actual + descriptor objects. No kspCommonMainMetadata
     // needed (platform KSP is sufficient).
     add("kspAndroid", project(":kgraphql-ksp"))
-    add("kspIosArm64", project(":kgraphql-ksp"))
+    if (enableDeviceTarget) add("kspIosArm64", project(":kgraphql-ksp"))
     add("kspIosSimulatorArm64", project(":kgraphql-ksp"))
     add("androidHostTestImplementation", kotlin("test"))
     add("androidHostTestImplementation", libs.junit)

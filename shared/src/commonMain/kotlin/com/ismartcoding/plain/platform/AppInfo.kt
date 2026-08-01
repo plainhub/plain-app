@@ -48,6 +48,12 @@ expect fun getDeviceIP4s(): List<String>
 expect fun appDir(): String
 
 /**
+ * Platform cache/temp directory. Android: `Context.cacheDir`; iOS:
+ * `NSTemporaryDirectory()`. Used for short-lived files such as crash reports.
+ */
+expect fun cacheDirPath(): String
+
+/**
  * Absolute path of the database file with the given [name].
  * On Android this is `<filesDir>/databases/<name>` (matching Room's default
  * location so existing databases are preserved across the KMP migration).

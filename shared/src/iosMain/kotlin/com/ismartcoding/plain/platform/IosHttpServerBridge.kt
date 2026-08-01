@@ -46,6 +46,49 @@ interface IosWsTransport {
 }
 
 /**
+ * Swift-implemented network info provider. Returns device IPv4 addresses
+ * via the Darwin `getifaddrs` API (not directly accessible from Kotlin/Native
+ * without a custom .def file).
+ */
+interface IosNetworkInfoProvider {
+    fun getDeviceIP4s(): List<String>
+}
+
+/**
+ * Swift-implemented permission checker. iOS permission APIs (Photos, Bluetooth,
+ * Location, Camera, etc.) are only accessible from Swift/ObjC, so the real
+ * checks live in Swift and are bridged through this interface.
+ *
+ * The [permission] string is the `Permission` enum name from commonMain
+ * (e.g. `"READ_MEDIA_IMAGES"`, `"ACCESS_FINE_LOCATION"`).
+ */
+interface IosPermissionChecker {
+    fun isGranted(permission: String): Boolean
+    fun requestPermission(permission: String)
+    fun openAppSettings()
+}
+
+/**
+ * Swift-implemented file picker. iOS document/photo pickers
+ * (`UIDocumentPickerViewController`, `PHPickerViewController`) must be presented
+ * from a `UIViewController` and use ObjC delegate protocols, so the real UI
+ * lives in Swift and is bridged through this interface.
+ *
+ * Kotlin calls [pickFile] when commonMain emits `PickFileEvent`; Swift presents
+ * the appropriate picker and, on completion, calls
+ * [IosFilePickerCallback.onPickResult]. Likewise [exportFile] is called for
+ * `ExportFileEvent` and Swift calls [IosFilePickerCallback.onExportResult].
+ *
+ * @param tag      `PickFileTag` name (e.g. `"SEND_MESSAGE"`, `"FEED"`)
+ * @param type     `PickFileType` name (e.g. `"IMAGE_VIDEO"`, `"FILE"`, `"FOLDER"`)
+ * @param multiple whether multiple selection is allowed
+ */
+interface IosFilePicker {
+    fun pickFile(tag: String, type: String, multiple: Boolean)
+    fun exportFile(type: String, fileName: String)
+}
+
+/**
  * Singleton registry that lets Swift register platform implementations at app
  * startup. Kotlin code in iosMain reads [httpServerBridge] when commonMain
  * calls `startHttpServerService()` etc.
@@ -54,12 +97,71 @@ object IosPlatformRegistry {
     @Volatile
     private var _httpServerBridge: IosHttpServerBridge? = null
 
+    @Volatile
+    private var _networkInfoProvider: IosNetworkInfoProvider? = null
+
+    @Volatile
+    private var _permissionChecker: IosPermissionChecker? = null
+
+    @Volatile
+    private var _filePicker: IosFilePicker? = null
+
+    @Volatile
+    private var _shareController: IosShareController? = null
+
+    @Volatile
+    private var _sslCertProvider: IosSslCertProvider? = null
+
     fun setHttpServerBridge(bridge: IosHttpServerBridge) {
         _httpServerBridge = bridge
         LogCat.d("IosPlatformRegistry: HTTP server bridge registered")
     }
 
     fun httpServerBridge(): IosHttpServerBridge? = _httpServerBridge
+
+    fun setNetworkInfoProvider(provider: IosNetworkInfoProvider) {
+        _networkInfoProvider = provider
+        LogCat.d("IosPlatformRegistry: network info provider registered")
+    }
+
+    fun getDeviceIP4s(): List<String> = _networkInfoProvider?.getDeviceIP4s() ?: emptyList()
+
+    fun setPermissionChecker(checker: IosPermissionChecker) {
+        _permissionChecker = checker
+        LogCat.d("IosPlatformRegistry: permission checker registered")
+    }
+
+    fun isPermissionGranted(permission: String): Boolean =
+        _permissionChecker?.isGranted(permission) ?: true
+
+    fun requestPermission(permission: String) {
+        _permissionChecker?.requestPermission(permission)
+    }
+
+    fun openAppSettings() {
+        _permissionChecker?.openAppSettings()
+    }
+
+    fun setFilePicker(picker: IosFilePicker) {
+        _filePicker = picker
+        LogCat.d("IosPlatformRegistry: file picker registered")
+    }
+
+    fun filePicker(): IosFilePicker? = _filePicker
+
+    fun setShareController(controller: IosShareController) {
+        _shareController = controller
+        LogCat.d("IosPlatformRegistry: share controller registered")
+    }
+
+    fun shareController(): IosShareController? = _shareController
+
+    fun setSslCertProvider(provider: IosSslCertProvider) {
+        _sslCertProvider = provider
+        LogCat.d("IosPlatformRegistry: SSL cert provider registered")
+    }
+
+    fun sslCertProvider(): IosSslCertProvider? = _sslCertProvider
 }
 
 /**

@@ -17,7 +17,6 @@ class AwareHttpClientFactory {
         peerId: String,
         network: Network,
         peerIpv6: Inet6Address,
-        peerPort: Int,
     ): HttpClient {
         val keyBytes = requireNotNull(PeerCacher.getKeyBytes(peerId)) {
             "PeerCacher has no key bytes for peer $peerId"

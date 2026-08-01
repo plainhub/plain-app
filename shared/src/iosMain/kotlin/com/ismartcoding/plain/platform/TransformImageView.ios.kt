@@ -1,16 +1,11 @@
 package com.ismartcoding.plain.platform
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageViewWithUri
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 
-/**
- * iOS stub. The transform image view relies on Coil + Android-specific image
- * decoding; on iOS it renders an empty container so chat UI compiles.
- */
 @Composable
 actual fun TransformImageView(
     modifier: Modifier,
@@ -22,5 +17,15 @@ actual fun TransformImageView(
     widthPx: Int,
     forceVideoDecoder: Boolean,
 ) {
-    Box(modifier = modifier.fillMaxSize())
+    TransformImageViewWithUri(
+        modifier = modifier,
+        path = path,
+        fileName = fileName,
+        key = key,
+        uri = null,
+        itemState = itemState,
+        previewerState = previewerState,
+        widthPx = widthPx,
+        forceVideoDecoder = forceVideoDecoder,
+    )
 }

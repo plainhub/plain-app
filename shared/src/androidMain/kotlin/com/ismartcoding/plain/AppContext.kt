@@ -2,7 +2,6 @@ package com.ismartcoding.plain
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 
 @PublishedApi
@@ -31,12 +30,7 @@ fun getAppVersion(): String {
     val ctx = appContextValue ?: return ""
     val pi = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
     val versionName = pi.versionName ?: ""
-    val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        pi.longVersionCode
-    } else {
-        @Suppress("DEPRECATION")
-        pi.versionCode.toLong()
-    }
+    val versionCode = pi.longVersionCode
     return "$versionName ($versionCode)"
 }
 
@@ -49,14 +43,5 @@ fun getAppVersionName(): String {
 fun getAppVersionCode(): Long {
     val ctx = appContextValue ?: return 0L
     val pi = ctx.packageManager.getPackageInfo(ctx.packageName, 0)
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        pi.longVersionCode
-    } else {
-        @Suppress("DEPRECATION")
-        pi.versionCode.toLong()
-    }
-}
-
-fun getAndroidVersion(): String {
-    return "Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT})"
+    return pi.longVersionCode
 }

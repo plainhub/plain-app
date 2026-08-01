@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.lib.extensions.getMimeType
+import com.ismartcoding.plain.lib.logcat.LogCat
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
@@ -14,28 +16,57 @@ actual fun openAppSettings() {
 }
 
 actual fun shareText(text: String) {
-    // Requires UIViewController to present UIActivityViewController.
-    // Phase 25 wires this via Compose LocalContext -> UIViewControllerRepresentable.
+    val controller = IosPlatformRegistry.shareController()
+    if (controller == null) {
+        LogCat.w("Launcher.ios: no share controller registered, shareText ignored")
+        return
+    }
+    controller.shareText(text)
 }
 
 actual fun shareFile(path: String, email: String, subject: String) {
-    // Same as shareText: needs UIViewController present; implemented in Phase 25.
+    val controller = IosPlatformRegistry.shareController()
+    if (controller == null) {
+        LogCat.w("Launcher.ios: no share controller registered, shareFile ignored")
+        return
+    }
+    controller.shareFile(path, path.getMimeType().ifEmpty { "application/octet-stream" })
 }
 
 actual fun shareFileAs(path: String, displayName: String) {
-    // Same as shareFile: needs UIViewController present; implemented in Phase 25.
+    val controller = IosPlatformRegistry.shareController()
+    if (controller == null) {
+        LogCat.w("Launcher.ios: no share controller registered, shareFileAs ignored")
+        return
+    }
+    controller.shareFile(path, path.getMimeType().ifEmpty { "application/octet-stream" })
 }
 
 actual fun shareFiles(paths: List<String>) {
-    // Needs UIViewController to present UIActivityViewController; implemented in Phase 25.
+    val controller = IosPlatformRegistry.shareController()
+    if (controller == null) {
+        LogCat.w("Launcher.ios: no share controller registered, shareFiles ignored")
+        return
+    }
+    controller.shareFiles(paths, paths.map { it.getMimeType().ifEmpty { "application/octet-stream" } })
 }
 
 actual fun openFileExternal(path: String) {
-    // Needs UIDocumentInteractionController; implemented in Phase 25.
+    val controller = IosPlatformRegistry.shareController()
+    if (controller == null) {
+        LogCat.w("Launcher.ios: no share controller registered, openFileExternal ignored")
+        return
+    }
+    controller.openFileExternal(path)
 }
 
-actual fun isFileShareable(path: String): Boolean = false
+actual fun isFileShareable(path: String): Boolean {
+    if (path.startsWith("http://", true) || path.startsWith("https://", true)) return true
+    if (path.startsWith("file://", true)) return true
+    if (path.startsWith("/")) return true
+    return false
+}
 
 actual fun relaunchApp() {
-    // iOS apps cannot programmatically restart; no-op.
+    // iOS apps cannot programmatically restart; no-op by design.
 }

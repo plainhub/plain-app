@@ -4,6 +4,9 @@ import com.ismartcoding.plain.api.addClientHeaders
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.platform.CryptoKeyAttribute
+import com.ismartcoding.plain.platform.chaCha20Decrypt
+import com.ismartcoding.plain.platform.chaCha20Encrypt
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -11,6 +14,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.readBytes
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
@@ -63,10 +67,19 @@ internal suspend fun executeGraphQLRequest(
     channelId: String,
 ): GraphQLResponse = withContext(Dispatchers.Default) {
     val tid = transportType.name.lowercase()
+    val cryptoKey = runCatching {
+        client.attributes.getOrNull(CryptoKeyAttribute)
+    }.getOrNull()
     val response = try {
         client.post(url) {
-            setBody(body)
-            contentType(ContentType.Application.Json)
+            if (cryptoKey != null) {
+                val encrypted = chaCha20Encrypt(cryptoKey, body)
+                setBody(encrypted)
+                contentType(ContentType.Application.OctetStream)
+            } else {
+                setBody(body)
+                contentType(ContentType.Application.Json)
+            }
             addClientHeaders()
             if (channelId.isNotEmpty()) {
                 header("c-cid", channelId)
@@ -78,7 +91,13 @@ internal suspend fun executeGraphQLRequest(
         LogCat.d("$tid request to peer $peerId threw ${e::class.simpleName}: ${e.message}")
         throw TransportUnavailable(transportType, peerId, e)
     }
-    val responseBody = response.bodyAsText()
+    val responseBody = if (cryptoKey != null) {
+        val encryptedBytes = response.readBytes()
+        val decrypted = chaCha20Decrypt(cryptoKey, encryptedBytes)
+        decrypted?.decodeToString() ?: encryptedBytes.decodeToString()
+    } else {
+        response.bodyAsText()
+    }
     if (!response.status.isSuccess()) {
         LogCat.e("$tid GraphQL request failed: ${response.status.value} body=${responseBody.take(200)}")
         GraphQLResponse(null, null, Exception("${response.status.value} - ${response.status.description}"))

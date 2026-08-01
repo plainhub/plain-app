@@ -3,8 +3,10 @@ package com.ismartcoding.plain.web.models
 import com.ismartcoding.plain.data.DDeviceInfo
 import com.ismartcoding.plain.data.DevicePlatform
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
+@GraphQLType
 class AndroidDeviceInfo {
     var sdkVersion: Int = 0
     var versionCodeName: String = ""
@@ -26,6 +28,7 @@ class AndroidDeviceInfo {
     var buildTime: Instant = TimeHelper.now()
 }
 
+@GraphQLType
 class DesktopDeviceInfo {
     var hostname: String = ""
     var cpuModel: String = ""
@@ -34,12 +37,14 @@ class DesktopDeviceInfo {
     var windowManager: String = ""
 }
 
+@GraphQLType
 class DisplayInfo {
     var width: Int = 0
     var height: Int = 0
     var density: String = ""
 }
 
+@GraphQLType
 class DeviceInfo {
     var name: String = ""
     var platform: DevicePlatform = DevicePlatform.ANDROID

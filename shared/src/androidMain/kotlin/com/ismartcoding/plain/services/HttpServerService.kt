@@ -13,7 +13,6 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
-import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.i18n.Res
@@ -21,12 +20,11 @@ import com.ismartcoding.plain.i18n.api_service_is_running
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.MdnsRegister
 import com.ismartcoding.plain.mdns.NsdHelper
-import com.ismartcoding.plain.platform.KtorClientFactory
 import com.ismartcoding.plain.platform.LocaleHelper
+import com.ismartcoding.plain.platform.startHttpServerAsync
+import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.webserver.httpServer
-import io.ktor.client.request.get
-import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -70,7 +68,7 @@ class HttpServerService : LifecycleService() {
                                 delay(5_000)
                                 isStickyRestart = false
                             }
-                            startHttpServerAsync()
+                            startServer()
                         }
                     }
 
@@ -134,8 +132,8 @@ class HttpServerService : LifecycleService() {
         return START_STICKY
     }
 
-    private suspend fun startHttpServerAsync() {
-        HttpServerStartHelper.startServer(this) { serverState = it }
+    private suspend fun startServer() {
+        startHttpServerAsync { serverState = it }
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -175,30 +173,9 @@ class HttpServerService : LifecycleService() {
 
     private suspend fun stopHttpServerAsync() = withIO {
         LogCat.d("stopHttpServer")
-        try {
-            // Stop mDNS responder
-            NsdHelper.unregisterService()
-
-            val client = KtorClientFactory.httpClient()
-            val r = client.get(UrlHelper.getShutdownUrl())
-            if (r.status == HttpStatusCode.Gone) {
-                LogCat.d("http server is stopped")
-            }
-        } catch (ex: Exception) {
-            LogCat.e("Graceful shutdown failed: ${ex.message}")
-            // Fallback: force stop via stored server reference
-            try {
-                httpServer?.stop(500, 1000)
-                LogCat.d("Server force-stopped via stored reference")
-            } catch (e: Exception) {
-                LogCat.e("Force stop also failed: ${e.message}")
-            }
-        }
-        httpServer = null
-        PeerStatusManager.stop()
-        val ctx = this@HttpServerService
-        PNotificationListenerService.toggle(ctx, false)
-
+        // Shared stop body handles /shutdown, engine stop, mDNS/peer-status/
+        // notification-listener side effects, state clear and OFF event.
+        stopHttpServerCoreAsync()
         serverState = HttpServerState.OFF
     }
 

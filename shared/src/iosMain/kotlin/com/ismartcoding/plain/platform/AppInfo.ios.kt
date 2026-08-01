@@ -4,6 +4,7 @@ import com.ismartcoding.plain.enums.DeviceType
 import platform.Foundation.NSBundle
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSUserDomainMask
 import platform.UIKit.UIDevice
 import platform.UIKit.UIUserInterfaceIdiom
@@ -43,10 +44,12 @@ actual fun getDeviceType(): DeviceType {
     }
 }
 
-actual fun getDeviceIP4s(): List<String> = emptyList()
+actual fun getDeviceIP4s(): List<String> = IosPlatformRegistry.getDeviceIP4s()
 
 actual fun appDir(): String =
     NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)[0] as String
+
+actual fun cacheDirPath(): String = NSTemporaryDirectory()
 
 actual fun databaseFilePath(name: String): String = appDir() + "/" + name
 

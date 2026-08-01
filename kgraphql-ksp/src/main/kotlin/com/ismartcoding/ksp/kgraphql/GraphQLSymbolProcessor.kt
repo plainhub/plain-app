@@ -110,42 +110,17 @@ class GraphQLSymbolProcessor(
     private val generatedTypeFqns = mutableSetOf<String>()
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        // 1. Scan @GraphQLType
+        // 1. Scan @GraphQLType — annotation-driven only.
+        // KMP-safe: only explicitly annotated classes get descriptors.
+        // Platform-specific classes (NSObject subclasses, Swift interop) are
+        // never accidentally picked up because they live in iosMain/androidMain
+        // and are not annotated.
         resolver.getSymbolsWithAnnotation(TYPE_ANN)
             .filterIsInstance<KSClassDeclaration>()
             .forEach { cls ->
                 allTypeClasses.add(cls)
                 generateTypeDescriptor(cls, isInterface = false)
             }
-
-        // 1b. Auto-discover ALL data classes without @GraphQLType in model
-        // packages. The old reflection-based code auto-discovered properties
-        // for any data class used as a resolver return type. KSP can't know
-        // which types resolvers will return at runtime, so we generate
-        // descriptors for every data class in model packages — only the ones
-        // actually referenced by resolvers get compiled into the schema.
-        // Excludes ui/lib/helpers subpackages which contain UI state and
-        // internal library classes that are not GraphQL types.
-        resolver.getAllFiles()
-            .filter { file ->
-                val pkg = file.packageName.asString()
-                pkg.startsWith("com.ismartcoding.plain.web.models") ||
-                    pkg.startsWith("com.ismartcoding.plain.platform") ||
-                    pkg.startsWith("com.ismartcoding.plain.data") ||
-                    pkg.startsWith("com.ismartcoding.plain.enums") ||
-                    pkg.startsWith("com.ismartcoding.plain.db") ||
-                    pkg.startsWith("com.ismartcoding.plain.features.sms") ||
-                    pkg.startsWith("com.ismartcoding.plain.features.contact") ||
-                    pkg.startsWith("com.ismartcoding.plain.features.feed")
-            }
-            .flatMap { file -> file.declarations }
-            .filterIsInstance<KSClassDeclaration>()
-            .filter { cls ->
-                // Only scan project types — skip Android SDK / Kotlin stdlib
-                cls.qualifiedName?.asString()?.startsWith("com.ismartcoding.plain.") == true &&
-                    isDiscoverableType(cls)
-            }
-            .forEach { cls -> generateTypeDescriptor(cls, isInterface = false) }
 
         // 2. Scan @GraphQLInput
         resolver.getSymbolsWithAnnotation(INPUT_ANN)

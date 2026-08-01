@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DPomodoroSettings
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
+@GraphQLType
 data class PomodoroSettings(
     val workDuration: Int,
     val shortBreakDuration: Int,

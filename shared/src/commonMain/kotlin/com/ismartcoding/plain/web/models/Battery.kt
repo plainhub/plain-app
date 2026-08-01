@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DBattery
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
 enum class BatteryHealth {
     UNKNOWN, GOOD, OVERHEAT, DEAD, OVER_VOLTAGE, UNSPECIFIED_FAILURE, COLD
@@ -14,6 +15,7 @@ enum class BatteryPlugged {
     UNPLUGGED, AC, USB, WIRELESS
 }
 
+@GraphQLType
 class Battery {
     var level: Int = -1
     var voltage: Int = 0

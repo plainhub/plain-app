@@ -1,13 +1,24 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.db.DSession
+import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.web.SessionList
 
-expect suspend fun fetchSessionsListItemsAsync(): List<DSession>
+suspend fun fetchSessionsListItemsAsync(): List<DSession> = SessionList.getItemsAsync()
 
-expect suspend fun deleteSessionListItemAsync(clientId: String)
+suspend fun deleteSessionListItemAsync(clientId: String) {
+    SessionList.deleteAsync(clientId)
+    HttpServerManager.loadTokenCache()
+}
 
-expect suspend fun createCustomSessionTokenAsync(name: String)
+suspend fun createCustomSessionTokenAsync(name: String) {
+    SessionList.createCustomTokenAsync(name)
+    HttpServerManager.loadTokenCache()
+}
 
-expect suspend fun renameSessionListItemAsync(clientId: String, name: String): Boolean
+suspend fun renameSessionListItemAsync(clientId: String, name: String): Boolean =
+    SessionList.renameAsync(clientId, name)
 
-expect suspend fun reloadSessionTokenCache()
+suspend fun reloadSessionTokenCache() {
+    HttpServerManager.loadTokenCache()
+}

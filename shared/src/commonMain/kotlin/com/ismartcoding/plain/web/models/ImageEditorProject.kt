@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.db.DImageEditorProject
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
+@GraphQLType
 data class ImageEditorProject(
     val id: ID,
     val stateB64: String,
@@ -14,6 +16,7 @@ data class ImageEditorProject(
     val updatedAt: Instant,
 )
 
+@GraphQLType
 data class ImageEditorProjectSummary(
     val id: ID,
     val thumbnail: String?,

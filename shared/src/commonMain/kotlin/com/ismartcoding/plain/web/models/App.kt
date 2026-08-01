@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.web.models
 
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.enums.MediaPlayMode
 
+@GraphQLType
 data class App(
     val clientId: String,
     val usbConnected: Boolean,

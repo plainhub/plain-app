@@ -1,9 +1,11 @@
 package com.ismartcoding.plain.web.schemas
 
+import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.chat.channel.ChannelManager
+import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.web.models.ChatChannel
 import com.ismartcoding.plain.web.models.ChatChannelMember
@@ -12,8 +14,8 @@ import com.ismartcoding.plain.web.models.toModel
 
 @GraphQLQuery
 suspend fun chatChannels(): List<ChatChannel> {
-    return AppDatabase.instance.chatChannelDao().getAll()
-        .sortedBy { it.name.lowercase() }
+    return ChannelCacher.channels.value
+        .sortedBy { it.name.toSortName() }
         .map { it.toModel() }
 }
 

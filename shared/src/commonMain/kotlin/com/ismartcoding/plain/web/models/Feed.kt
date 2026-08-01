@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.db.DFeed
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
+@GraphQLType
 data class Feed(
     val id: ID,
     val name: String,

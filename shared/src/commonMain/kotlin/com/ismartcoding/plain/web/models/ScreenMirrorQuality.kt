@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DScreenMirrorQuality
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
+@GraphQLType
 data class ScreenMirrorQuality(
     val mode: String,
     val resolution: Int,

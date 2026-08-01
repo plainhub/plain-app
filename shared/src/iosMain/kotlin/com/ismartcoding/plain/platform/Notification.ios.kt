@@ -1,6 +1,10 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.data.DNotification
+import kotlin.concurrent.Volatile
+
+@Volatile
+private var notificationIdCounter = 1000
 
 actual fun toggleNotificationListener(enabled: Boolean) {}
 
@@ -20,6 +24,6 @@ actual fun sendWebLoginNotification(
     clientIp: String,
 ) {}
 
-actual fun generateNotificationId(): Int = 1
+actual fun generateNotificationId(): Int = ++notificationIdCounter
 
 actual fun sendChatMessageNotification(targetId: String, targetName: String, messageText: String) {}

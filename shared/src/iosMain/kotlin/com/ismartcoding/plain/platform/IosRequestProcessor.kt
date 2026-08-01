@@ -3,6 +3,7 @@ package com.ismartcoding.plain.platform
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.web.CorsPolicy
 import com.ismartcoding.plain.web.HttpRouteRegistry
 import com.ismartcoding.plain.web.http.HttpMethod
 import com.ismartcoding.plain.web.http.HttpStatus
@@ -45,8 +46,37 @@ object IosRequestProcessor {
      */
     suspend fun processHttpRequest(ctx: IosRequestContext) {
         try {
-            // Short-circuit /health and /health_check so they work even when web is disabled.
-            if (ctx.path == "/health" || ctx.path == "/health_check") {
+            // Apply the shared CORS policy before anything else so preflight
+            // requests succeed even when web is disabled, mirroring the
+            // Ktor CORS plugin on Android. Without this the browser blocks
+            // every cross-origin request to the iOS SwiftNIO server.
+            val origin = ctx.getRequestHeader("origin")
+            if (origin != null && CorsPolicy.isOriginAllowed(origin)) {
+                // Credentials are not enabled, so the wildcard is safe in
+                // debug builds; otherwise echo the specific origin and vary
+                // on Origin so caches don't leak across origins.
+                val allowOrigin = if (CorsPolicy.anyHostAllowed) "*" else origin
+                ctx.setResponseHeader("Access-Control-Allow-Origin", allowOrigin)
+                if (allowOrigin != "*") {
+                    ctx.setResponseHeader("Vary", "Origin")
+                }
+
+                // CORS preflight: short-circuit OPTIONS requests carrying an
+                // Origin header before route matching or static-file serving.
+                if (ctx.method.equals("OPTIONS", ignoreCase = true)) {
+                    ctx.setResponseHeader("Access-Control-Allow-Methods", CorsPolicy.allowedMethods)
+                    CorsPolicy.filterAllowedRequestHeaders(
+                        ctx.getRequestHeader("access-control-request-headers"),
+                    )?.let { ctx.setResponseHeader("Access-Control-Allow-Headers", it) }
+                    ctx.setResponseHeader("Access-Control-Max-Age", CorsPolicy.maxAgeSeconds)
+                    ctx.responseStatus = HttpStatus.NO_CONTENT
+                    ctx.setResponseBody(ByteArray(0))
+                    return
+                }
+            }
+
+            // Short-circuit /health so they work even when web is disabled.
+            if (ctx.path == "/health") {
                 ctx.responseStatus = HttpStatus.OK
                 ctx.setResponseBody(getOwnPackageName().encodeToByteArray())
                 ctx.setResponseHeader("Content-Type", "text/plain")

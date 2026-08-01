@@ -20,6 +20,7 @@ fun DNote.toModel(): Note {
 }
 
 
+@GraphQLType
 @Serializable
 data class ExportNote(
     val id: ID,

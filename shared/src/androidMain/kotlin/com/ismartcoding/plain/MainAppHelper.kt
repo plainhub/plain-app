@@ -23,7 +23,6 @@ import com.ismartcoding.plain.events.PowerConnectedEvent
 import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ChatFidUriMigration
-import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.platform.isQPlus
@@ -33,25 +32,13 @@ import com.ismartcoding.plain.lib.logcat.DiskLogAdapter
 import com.ismartcoding.plain.platform.DiskLogFormatStrategy
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.preferences.AdbTokenPreference
-import com.ismartcoding.plain.preferences.AudioPlayModePreference
-import com.ismartcoding.plain.preferences.AudioPlaybackSpeedPreference
-import com.ismartcoding.plain.preferences.ClientIdPreference
 import com.ismartcoding.plain.preferences.DlnaReceiverEnabledPreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
-import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
 import com.ismartcoding.plain.preferences.FidUriExtMigratedPreference
-import com.ismartcoding.plain.preferences.HttpPortPreference
-import com.ismartcoding.plain.preferences.HttpsPortPreference
-import com.ismartcoding.plain.preferences.HttpsPreference
-import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
-import com.ismartcoding.plain.preferences.MdnsHostnamePreference
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
-import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.preferences.SignatureKeyPreference
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
-import com.ismartcoding.plain.preferences.UrlTokenPreference
-import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.preferences.ensureKeyPairAsync
 import com.ismartcoding.plain.preferences.ensureValueAsync
@@ -128,37 +115,13 @@ object MainAppHelper {
                 TempData.mediaDurationMap["${it.mediaType}:${it.mediaId}"] = it.duration
             }
 
-            val preferences = getPreferencesAsync()
-            TempData.webEnabled.value = WebPreference.get(preferences)
-            TempData.webHttps.value = HttpsPreference.get(preferences)
-            TempData.httpPort.value = HttpPortPreference.get(preferences)
-            TempData.httpsPort.value = HttpsPortPreference.get(preferences)
-            TempData.dlnaReceiverEnabled.value = DlnaReceiverEnabledPreference.get(preferences)
-            TempData.audioPlayMode.value = AudioPlayModePreference.getValue(preferences)
-            TempData.audioPlaybackSpeed.value = AudioPlaybackSpeedPreference.getValue(preferences)
-            AdbTokenPreference.ensureValueAsync(preferences)
-            TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync()
-            val updateInfo = UpdateInfoPreference.getValueAsync()
-            val checkUpdateTime = updateInfo.checkUpdateTime
-            val autoCheckUpdate = updateInfo.autoCheckUpdate
-            ClientIdPreference.ensureValueAsync(preferences)
-            TempData.deviceName.value = DeviceNamePreference.get(preferences).ifEmpty { PhoneHelper.getDeviceName(app) }
-            KeyStorePasswordPreference.ensureValueAsync(preferences)
-            UrlTokenPreference.ensureValueAsync(preferences)
-            SignatureKeyPreference.ensureKeyPairAsync()
-            MdnsHostnamePreference.ensureValueAsync(preferences)
-
+            val preferences = initCommonPreferences()
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
+            AdbTokenPreference.ensureValueAsync(preferences)
             if (TempData.webEnabled.value && PlugInControlReceiver.isUSBConnected(app)) {
                 sendEvent(PowerConnectedEvent())
             }
-            if (PasswordPreference.get(preferences).isEmpty()) {
-                HttpServerManager.resetPasswordAsync()
-            }
-            HttpServerManager.loadTokenCache()
-            PeerCacher.load()
-            ChannelCacher.load()
-            ChatCacher.load()
+
             if (!FidUriExtMigratedPreference.get(preferences)) {
                 ChatFidUriMigration.run(app)
                 FidUriExtMigratedPreference.putAsync(true)
@@ -166,18 +129,17 @@ object MainAppHelper {
             if (FeedAutoRefreshPreference.get(preferences)) {
                 FeedFetchWorker.startRepeatWorkerAsync(app)
             }
-            sendEvent(StartNearbyServiceEvent())
-            HttpServerManager.clientTsInterval()
             ImageSearchManager.restoreIfEnabled()
             val thirtyDaysAgo = (kotlin.time.Clock.System.now() - 30.days).toString()
             AppDatabase.instance.videoPlayProgressDao().getRecentProgress(thirtyDaysAgo).forEach {
                 TempData.videoPlayProgressMap[it.mediaId] = it.duration
             }
+
+            val updateInfo = UpdateInfoPreference.getValueAsync()
+            val checkUpdateTime = updateInfo.checkUpdateTime
+            val autoCheckUpdate = updateInfo.autoCheckUpdate
             if (AppFeatureType.CHECK_UPDATES.has() && autoCheckUpdate && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
                 AppHelper.checkUpdateAsync(app, false)
-            }
-            if (TempData.dlnaReceiverEnabled.value) {
-                startDlnaRenderer()
             }
         }
     }

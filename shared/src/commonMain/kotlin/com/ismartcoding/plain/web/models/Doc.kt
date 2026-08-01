@@ -16,6 +16,7 @@ data class Doc(
     val updatedAt: Instant,
 )
 
+@GraphQLType
 data class DocExtGroup(
     val ext: String,
     val count: Int,

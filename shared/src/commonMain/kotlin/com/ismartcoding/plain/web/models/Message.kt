@@ -20,6 +20,7 @@ data class Message(
     val attachments: List<MessageAttachment>,
 )
 
+@GraphQLType
 data class MessageAttachment(
     val path: String,
     val contentType: String,

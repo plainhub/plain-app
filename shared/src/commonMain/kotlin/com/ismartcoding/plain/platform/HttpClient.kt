@@ -12,6 +12,7 @@ import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.headers
+import io.ktor.util.AttributeKey
 
 sealed class HttpClientSpec {
     data object Default : HttpClientSpec()
@@ -28,9 +29,21 @@ sealed class HttpClientSpec {
 
 expect fun createHttpEngine(spec: HttpClientSpec): HttpClientEngine
 
+/**
+ * Attribute carrying the ChaCha20 key bytes when the [HttpClient] was built
+ * from [HttpClientSpec.Crypto]. Transport-layer callers (e.g.
+ * `executeGraphQLRequest`) read this attribute to encrypt the request body and
+ * decrypt the response body, replacing the previous platform-specific
+ * interceptor approach (OkHttp on Android, unimplemented on iOS).
+ *
+ * Using a ktor [AttributeKey] keeps the crypto contract platform-agnostic:
+ * both Android and iOS share a single encryption code path in commonMain.
+ */
+val CryptoKeyAttribute: AttributeKey<ByteArray> = AttributeKey("CryptoKey")
+
 fun createPlatformHttpClient(spec: HttpClientSpec): HttpClient {
     val engine = createHttpEngine(spec)
-    return HttpClient(engine) {
+    val client = HttpClient(engine) {
         when (spec) {
             HttpClientSpec.Default -> {
                 install(HttpTimeout) {
@@ -76,10 +89,18 @@ fun createPlatformHttpClient(spec: HttpClientSpec): HttpClient {
             }
 
             is HttpClientSpec.Crypto -> {
-                install(WebSockets)
+                install(HttpTimeout) {
+                    connectTimeoutMillis = spec.connectTimeoutMs
+                    requestTimeoutMillis = spec.timeoutSeconds * 1000L
+                    socketTimeoutMillis = spec.timeoutSeconds * 1000L
+                }
             }
         }
     }
+    if (spec is HttpClientSpec.Crypto) {
+        client.attributes.put(CryptoKeyAttribute, spec.keyBytes)
+    }
+    return client
 }
 
 fun createHttpClient(): HttpClient = createPlatformHttpClient(HttpClientSpec.Default)

@@ -13,6 +13,9 @@
 		BB0000090000000000000001 /* NIOPosix in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000050000000000000001 /* NIOPosix */; };
 		BB00000A0000000000000001 /* NIOHTTP1 in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000060000000000000001 /* NIOHTTP1 */; };
 		BB00000B0000000000000001 /* NIOWebSocket in Frameworks */ = {isa = PBXBuildFile; productRef = BB0000070000000000000001 /* NIOWebSocket */; };
+		CC0000020000000000000001 /* FilePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000010000000000000001 /* FilePickerController.swift */; };
+		DD0000020000000000000001 /* ShareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000010000000000000001 /* ShareController.swift */; };
+		EE0000020000000000000001 /* SslCertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000010000000000000001 /* SslCertManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +25,9 @@
 		AA0000100000000000000001 /* PlainShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PlainShared.framework; path = ../shared/build/xcode-frameworks/PlainShared.framework; sourceTree = "<group>"; };
 		AA0000200000000000000001 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000010000000000000001 /* PlainHttpServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainHttpServer.swift; sourceTree = "<group>"; };
+		CC0000010000000000000001 /* FilePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePickerController.swift; sourceTree = "<group>"; };
+		DD0000010000000000000001 /* ShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareController.swift; sourceTree = "<group>"; };
+		EE0000010000000000000001 /* SslCertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SslCertManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -46,6 +52,9 @@
 			children = (
 				AA0000020000000000000001 /* iosApp.swift */,
 				BB0000010000000000000001 /* PlainHttpServer.swift */,
+				CC0000010000000000000001 /* FilePickerController.swift */,
+				DD0000010000000000000001 /* ShareController.swift */,
+				EE0000010000000000000001 /* SslCertManager.swift */,
 				AA0000040000000000000001 /* Assets.xcassets */,
 				AA0000050000000000000001 /* Info.plist */,
 				AA0000100000000000000001 /* PlainShared.framework */,
@@ -60,12 +69,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = AA0000700000000000000001 /* Build configuration list for PBXNativeTarget "iosApp" */;
 			buildPhases = (
-				AA0000800000000000000001 /* Run Script: Gradle */,
-				AA0000900000000000000001 /* Sources */,
-				AA0000A0000000000000001 /* Frameworks */,
-				AA0000B0000000000000001 /* Resources */,
-				BB0000C0000000000000001 /* Copy Web Resources */,
-			);
+			AA0000800000000000000001 /* Run Script: Gradle */,
+			AA0000900000000000000001 /* Sources */,
+			AA0000A0000000000000001 /* Frameworks */,
+			AA0000B0000000000000001 /* Resources */,
+			BB0000C0000000000000001 /* Copy Web Resources */,
+			EE0000C0000000000000001 /* Copy Editor Resources */,
+		);
 			buildRules = (
 			);
 			dependencies = (
@@ -125,7 +135,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\n\n# Use Android Studio JBR if JAVA_HOME is not set or points to invalid path\nif [ -z \"$JAVA_HOME\" ] || [ ! -d \"$JAVA_HOME\" ]; then\n    export JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\"\nfi\n\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "cd \"$SRCROOT/..\"\n\n# Use Android Studio JBR if JAVA_HOME is not set or points to invalid path\nif [ -z \"$JAVA_HOME\" ] || [ ! -d \"$JAVA_HOME\" ]; then\n    export JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\"\nfi\n\n# Skip the Gradle call entirely when no Kotlin/source file is newer than the\n# embedded framework. This avoids the ~10s Gradle daemon + configuration-cache\n# warm-up cost on every Xcode build that only touched Swift code.\nFRAMEWORK=\"$SRCROOT/../shared/build/xcode-frameworks/PlainShared.framework\"\nif [ -d \"$FRAMEWORK\" ]; then\n    NEWEST_FW=$(find \"$FRAMEWORK\" -type f -exec stat -f '%m' {} + | sort -rn | head -1)\n    # Check commonMain, iosMain, androidMain (affects metadata) and build.gradle.kts\n    NEWEST_SRC=$(find \"$SRCROOT/../shared/src\" \"$SRCROOT/../shared/build.gradle.kts\" \\\n        -name '*.kt' -o -name '*.kts' 2>/dev/null | xargs stat -f '%m' 2>/dev/null | sort -rn | head -1)\n    if [ -n \"$NEWEST_SRC\" ] && [ -n \"$NEWEST_FW\" ] && [ \"$NEWEST_SRC\" -le \"$NEWEST_FW\" ]; then\n        echo \"Kotlin sources unchanged — skipping Gradle framework build.\"\n        exit 0\n    fi\nfi\n\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
 		};
 		BB0000C0000000000000001 /* Copy Web Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -145,6 +155,24 @@
 			shellPath = /bin/sh;
 			shellScript = "# Copy pre-built web assets (Vue SPA) into the app bundle so the\n# SwiftNIO HTTP server can serve them as static files.\nWEB_SRC=\"$SRCROOT/../app/src/main/resources/web\"\nWEB_DST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/web\"\n\nif [ ! -d \"$WEB_SRC\" ]; then\n    echo \"warning: web assets not found at $WEB_SRC — web UI will not be available\"\n    exit 0\nfi\n\nrm -rf \"$WEB_DST\"\nmkdir -p \"$WEB_DST\"\ncp -R \"$WEB_SRC/\" \"$WEB_DST/\"\n";
 		};
+		EE0000C0000000000000001 /* Copy Editor Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Editor Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copy the Ace editor assets (shared with Android's assets/editor/) into\n# the app bundle so WKWebView can load editor/index.html via loadFileURL.\nEDITOR_SRC=\"$SRCROOT/../app/src/main/assets/editor\"\nEDITOR_DST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/editor\"\n\nif [ ! -d \"$EDITOR_SRC\" ]; then\n    echo \"warning: editor assets not found at $EDITOR_SRC — text editor will not be available\"\n    exit 0\nfi\n\nrm -rf \"$EDITOR_DST\"\nmkdir -p \"$EDITOR_DST\"\ncp -R \"$EDITOR_SRC/\" \"$EDITOR_DST/\"\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -154,6 +182,9 @@
 			files = (
 				AA0000010000000000000001 /* iosApp.swift in Sources */,
 				BB0000020000000000000001 /* PlainHttpServer.swift in Sources */,
+				CC0000020000000000000001 /* FilePickerController.swift in Sources */,
+				DD0000020000000000000001 /* ShareController.swift in Sources */,
+				EE0000020000000000000001 /* SslCertManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

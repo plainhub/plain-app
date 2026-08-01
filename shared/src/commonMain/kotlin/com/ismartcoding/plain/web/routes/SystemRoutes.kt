@@ -4,14 +4,15 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.platform.chaCha20Decrypt
-import com.ismartcoding.plain.platform.disposeHttpServer
 import com.ismartcoding.plain.platform.getOwnPackageName
+import com.ismartcoding.plain.platform.stopHttpEngineAsync
 import com.ismartcoding.plain.preferences.PasswordTypePreference
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.http.HttpCall
 import com.ismartcoding.plain.web.http.HttpRouter
 import com.ismartcoding.plain.web.http.HttpStatus
 import com.ismartcoding.plain.web.setOnlineClientIds
+import kotlinx.coroutines.delay
 
 /**
  * `/health`, `/shutdown`, `/init` — simple system endpoints shared between
@@ -20,10 +21,6 @@ import com.ismartcoding.plain.web.setOnlineClientIds
  */
 fun HttpRouter.addSystemRoutes() {
     get("/health") { call ->
-        call.respondText(getOwnPackageName())
-    }
-
-    get("/health_check") { call ->
         call.respondText(getOwnPackageName())
     }
 
@@ -36,7 +33,10 @@ fun HttpRouter.addSystemRoutes() {
         HttpServerManager.wsSessions.clear()
         setOnlineClientIds(emptySet())
         call.respondNoBody(HttpStatus.GONE)
-        disposeHttpServer()
+        // Give the response a moment to flush before the engine tears down the
+        // connection that is still writing it.
+        delay(100)
+        stopHttpEngineAsync()
     }
 
     post("/init") { call ->

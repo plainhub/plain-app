@@ -1,10 +1,43 @@
 package com.ismartcoding.plain.platform
 
 /**
- * Write the crash report (with device info and app logs) to a cache file and
- * return its absolute path so the caller can navigate to a text viewer.
+ * Recent application log lines captured by the platform crash handler.
+ * Empty string when no logs are available (e.g. on iOS).
+ */
+expect fun getAppLogs(): String
+
+/**
+ * Write the crash report — device info, report body, and app logs — to a
+ * cache file named `crash_report.txt` and return its absolute path so the
+ * caller can navigate to a text viewer.
+ *
+ * Device info is assembled from the common [AppInfo] expects; the file write
+ * goes through [cacheDirPath] + [writeBytesToPath]. Returns an empty string
+ * on failure.
  *
  * @param report  Crash report body text (already formatted).
- * @return Absolute path of the written file, or empty string on failure.
  */
-expect fun writeCrashReport(report: String): String
+fun writeCrashReport(report: String): String {
+    val deviceInfo = buildString {
+        appendLine("App version: ${getAppVersion()}")
+        appendLine("OS: ${getOSVersion()}")
+        appendLine("Device: ${getDeviceName()}")
+        appendLine("Platform: ${getPlatformName()}")
+        appendLine("Build type: ${getBuildType()}")
+    }
+    val bodyText = buildString {
+        append(deviceInfo)
+        appendLine()
+        appendLine("--- Crash Report ---")
+        append(report)
+        val logs = getAppLogs()
+        if (logs.isNotEmpty()) {
+            appendLine()
+            appendLine()
+            appendLine("--- App Logs ---")
+            append(logs)
+        }
+    }
+    val path = cacheDirPath() + "/crash_report.txt"
+    return if (writeBytesToPath(path, bodyText.encodeToByteArray())) path else ""
+}

@@ -1,26 +1,13 @@
 package com.ismartcoding.plain.webserver
 
 import android.content.Context
-import android.content.Intent
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.lib.helpers.JksHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.platform.KtorClientFactory
-import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
-import com.ismartcoding.plain.services.HttpServerService
-import com.ismartcoding.plain.services.PNotificationListenerService
-import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.setOnlineClientIds
-import io.ktor.client.request.get
-import io.ktor.http.HttpStatusCode
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.applicationEnvironment
 import io.ktor.server.engine.connector
@@ -28,8 +15,6 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withTimeoutOrNull
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
@@ -47,38 +32,6 @@ var httpServer: EmbeddedServer<*, *>? = null
 private val SSL_KEY_ALIAS = Constants.SSL_NAME
 
 /**
- * Stop the embedded HTTP server and the foreground service, then notify listeners.
- */
-suspend fun stopHttpServiceAsync(context: Context) = withIO {
-    sendEvent(HttpServerStateChangedEvent(HttpServerState.STOPPING))
-    try {
-        val client = KtorClientFactory.httpClient()
-        client.get(UrlHelper.getShutdownUrl())
-    } catch (_: Exception) {}
-    try { httpServer?.stop(0, 1000) } catch (_: Exception) {}
-    context.stopService(Intent(context, HttpServerService::class.java))
-    PNotificationListenerService.toggle(context, false)
-    HttpServerManager.httpServerError = ""
-    HttpServerManager.portsInUse.clear()
-    httpServer = null
-    sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
-}
-
-/**
- * Stop a previously-started server instance so a new one can bind the same ports.
- */
-fun stopPreviousHttpServer() {
-    try {
-        httpServer?.stop(0, 500)
-        LogCat.d("Previous server instance stopped")
-    } catch (e: Exception) {
-        LogCat.e("Error stopping previous server: ${e.message}")
-    } finally {
-        httpServer = null
-    }
-}
-
-/**
  * Start a throwaway Netty engine to preload classes/JIT on app launch so the
  * first real server start is fast.
  */
@@ -91,31 +44,6 @@ fun warmUpNetty() {
             LogCat.d("Netty warm-up complete")
         } catch (_: Exception) {}
     }
-}
-
-/**
- * Probe the running server's `/health` endpoint with a short timeout and retry
- * loop. Returns true once the server responds with HTTP 200.
- */
-suspend fun checkServerHealthAsync(): Boolean = withIO {
-    withTimeoutOrNull(9000) {
-        val client = KtorClientFactory.httpClient()
-        val deadline = System.currentTimeMillis() + 8500L
-        var healthy = false
-        while (!healthy && System.currentTimeMillis() < deadline) {
-            try {
-                val response = client.get(UrlHelper.getHealthCheckUrl())
-                if (response.status == HttpStatusCode.OK) {
-                    healthy = true
-                }
-            } catch (ex: Exception) {
-                delay(300)
-                LogCat.e("HTTP server check failed: ${ex.message}")
-            }
-        }
-        LogCat.d("HTTP server check healthy: $healthy")
-        healthy
-    } ?: false
 }
 
 /**

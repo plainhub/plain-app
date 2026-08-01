@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DGroup
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
+@GraphQLType
 data class ContactGroup(
     var id: ID,
     var name: String,

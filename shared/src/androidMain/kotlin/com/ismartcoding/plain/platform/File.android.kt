@@ -10,10 +10,12 @@ import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppFileStore
+import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.extensions.queryOpenableFile
+import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.web.http.StreamSink
 import android.net.Uri
@@ -51,6 +53,15 @@ actual fun getFileId(path: String): String = FileHelper.getFileId(path)
 
 actual fun deleteFileAt(path: String) {
     File(path).delete()
+}
+
+actual fun writeBytesToPath(path: String, bytes: ByteArray): Boolean {
+    return try {
+        File(path).writeBytes(bytes)
+        true
+    } catch (_: Exception) {
+        false
+    }
 }
 
 actual fun createLongTextFile(text: String): DMessageContent {
@@ -533,6 +544,51 @@ actual suspend fun readTextFile(path: String): String = withIO {
         }
     } catch (e: Exception) {
         ""
+    }
+}
+
+actual suspend fun writeBytesToUri(uriStr: String, bytes: ByteArray): Boolean = withIO {
+    try {
+        if (uriStr.startsWith("content://")) {
+            val uri = Uri.parse(uriStr)
+            appContext.contentResolver.openOutputStream(uri)?.use { it.write(bytes) } != null
+        } else {
+            File(uriStr).writeBytes(bytes)
+            true
+        }
+    } catch (_: Exception) {
+        false
+    }
+}
+
+actual fun getFileNameFromUri(uriStr: String): String? {
+    if (!uriStr.startsWith("content://")) {
+        return File(uriStr).name
+    }
+    return try {
+        appContext.contentResolver.queryOpenableFileName(Uri.parse(uriStr)).takeIf { it.isNotEmpty() }
+    } catch (_: Exception) {
+        null
+    }
+}
+
+actual fun queryPickedFileInfo(uriStr: String): PickedFileInfo? {
+    return try {
+        val uri = Uri.parse(uriStr)
+        val cr = appContext.contentResolver
+        val file = cr.queryOpenableFile(uri) ?: return null
+        val mime = cr.getType(uri) ?: ""
+        PickedFileInfo(file.displayName, file.size, mime)
+    } catch (_: Exception) {
+        null
+    }
+}
+
+actual suspend fun importChatFile(uriStr: String, mimeType: String): String? = withIO {
+    try {
+        ChatFileSaveHelper.importFromUri(appContext, Uri.parse(uriStr), mimeType)
+    } catch (_: Exception) {
+        null
     }
 }
 

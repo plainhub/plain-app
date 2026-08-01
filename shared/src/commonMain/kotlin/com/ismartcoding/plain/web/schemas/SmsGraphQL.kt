@@ -14,7 +14,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.events.HStartMmsPollingEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.platform.SmsCounts
+import com.ismartcoding.plain.platform.DSmsCounts
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.countSmsConversations
@@ -35,12 +35,13 @@ import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.Message
 import com.ismartcoding.plain.web.models.MessageConversation
+import com.ismartcoding.plain.web.models.SmsCounts
 import com.ismartcoding.plain.web.models.toModel
 
 @GraphQLQuery
 suspend fun smsAllCounts(): SmsCounts {
     return if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
-        getSmsAllCounts()
+        getSmsAllCounts().toModel()
     } else {
         SmsCounts(0, 0, 0, 0)
     }

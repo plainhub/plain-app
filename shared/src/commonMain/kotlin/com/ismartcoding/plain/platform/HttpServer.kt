@@ -1,10 +1,25 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.events.HttpServerStateChangedEvent
+import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.channel.sendEvent
+import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.web.HttpServerManager
+import io.ktor.client.request.get
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
+
 /**
  * Set of HTTP/HTTPS ports that failed to bind on the current platform.
  * Empty when no port conflicts exist.
  */
-expect fun httpServerPortsInUse(): Set<Int>
+fun httpServerPortsInUse(): Set<Int> = HttpServerManager.portsInUse.toSet()
 
 /**
  * SSL certificate signature bytes for the current HTTPS keystore.
@@ -22,32 +37,189 @@ expect fun generateSSLKeyStore(password: String)
  * Reset the web console password to a new random value and persist it.
  * @return the new password
  */
-expect suspend fun resetPasswordAsync(): String
+suspend fun resetPasswordAsync(): String = HttpServerManager.resetPasswordAsync()
+
+// ----------------------------------------------------------------------------------
+// Platform-lowest-level engine lifecycle hooks.
+//
+// Business logic (state transitions, retries, health probing, error formatting,
+// event emission) lives in the commonMain functions below; each `actual` only
+// drives the native server engine (Ktor/Netty on Android, SwiftNIO on iOS) and
+// the Android-only side effects (mDNS, notification-listener, foreground
+// service). iOS actuals for the side-effect hooks are no-ops.
+// ----------------------------------------------------------------------------------
 
 /**
- * Probe the embedded HTTP server health endpoint.
- * @return true if the server responds with HTTP 200
+ * Start the native HTTP/HTTPS server engine and bind the configured ports.
+ * @return `true` when the engine is accepting connections, `false` on failure
+ *         (the actual records the failure reason in [HttpServerManager.httpServerError])
  */
-expect suspend fun checkHttpServerAsync(): Boolean
+expect suspend fun startHttpEngineAsync(): Boolean
 
 /**
- * Dispose the embedded HTTP server immediately. Called by the `/shutdown` route
- * after the response is flushed. Safe to call when no server is running.
+ * Stop/dispose the native HTTP server engine immediately. Safe to call when no
+ * engine is running. Used by the stop orchestrator and the `/shutdown` route.
  */
-expect suspend fun disposeHttpServer()
+expect suspend fun stopHttpEngineAsync()
 
 /**
- * Stop the embedded HTTP server and the foreground service (on Android), then
- * notify listeners. No-op on platforms without an HTTP server. Equivalent to
- * the Android-only `webserver.stopHttpServiceAsync(context)` but uses the
- * platform's app context internally so it can be called from commonMain.
+ * Side effects to run once the server is healthy and reachable: register mDNS,
+ * start the peer-status manager, and enable the notification listener
+ * (Android). No-op on iOS.
+ */
+expect suspend fun onHttpServerStarted()
+
+/**
+ * Side effects to run when the server stops or fails to start: unregister mDNS,
+ * stop the peer-status manager, and disable the notification listener
+ * (Android). No-op on iOS. Does NOT stop the Android foreground service — that
+ * is handled by [stopHttpServiceAsync] so start-failure does not tear down the
+ * still-running service.
+ */
+expect suspend fun onHttpServerStopped()
+
+/**
+ * Start the embedded HTTP server. Android starts a foreground service which
+ * then runs the shared [startHttpServerAsync] orchestrator; iOS launches a
+ * coroutine directly. Retained as `expect` because the Android entry MUST go
+ * through `startForegroundService` for platform lifecycle compliance.
+ */
+expect fun startHttpServerService()
+
+/**
+ * Stop the embedded HTTP server from commonMain. Runs the shared
+ * [stopHttpServerCoreAsync] body, then on Android additionally stops the
+ * foreground service.
  */
 expect suspend fun stopHttpServiceAsync()
 
+// ----------------------------------------------------------------------------------
+// Shared commonMain business logic.
+// ----------------------------------------------------------------------------------
+
 /**
- * Start the embedded HTTP server foreground service (on Android). Retries up
- * to 3 times on failure. No-op on platforms without an HTTP server service.
- * Equivalent to the Android-only `Intent(context, HttpServerService::class.java)`
- * startForegroundService call but uses the platform's app context internally.
+ * Probe the embedded HTTP server's `/health` endpoint with a bounded retry
+ * loop. Shared by Android and iOS — previously each platform duplicated this
+ * loop (Android `checkServerHealthAsync`, iOS `checkHttpServerAsync`).
+ *
+ * @return `true` if the server responds with HTTP 200 within the deadline.
  */
-expect fun startHttpServerService()
+suspend fun checkHttpServerAsync(): Boolean = withIO {
+    withTimeoutOrNull(9_000) {
+        val client = createHttpClient()
+        val deadline = TimeHelper.nowMillis() + 8_500L
+        var healthy = false
+        while (!healthy && TimeHelper.nowMillis() < deadline) {
+            try {
+                val response = client.get(UrlHelper.getHealthCheckUrl())
+                if (response.status == HttpStatusCode.OK) {
+                    healthy = true
+                }
+            } catch (ex: Exception) {
+                delay(300)
+                LogCat.e("HTTP server check failed: ${ex.message}")
+            }
+        }
+        LogCat.d("HTTP server check healthy: $healthy")
+        healthy
+    } ?: false
+}
+
+/**
+ * Shared start orchestration: emits state transitions, clears stale state,
+ * stops any previous engine, handles port-conflict retries, starts the engine,
+ * probes health, and invokes platform side-effect hooks.
+ *
+ * On Android this is invoked from the foreground service's coroutine; on iOS
+ * it is invoked directly by [startHttpServerService]. The optional
+ * [onStateChanged] callback mirrors the emitted [HttpServerStateChangedEvent]
+ * for callers (the Android service) that need synchronous local state.
+ */
+suspend fun startHttpServerAsync(onStateChanged: (HttpServerState) -> Unit = {}) = withIO {
+    LogCat.d("startHttpServer")
+    onStateChanged(HttpServerState.STARTING)
+    sendEvent(HttpServerStateChangedEvent(HttpServerState.STARTING))
+    HttpServerManager.portsInUse.clear()
+    HttpServerManager.httpServerError = ""
+
+    val httpPort = TempData.httpPort.value
+    val httpsPort = TempData.httpsPort.value
+
+    // Stop any previous instance so the ports are free.
+    stopHttpEngineAsync()
+    val portsWereInUse = isPortInUse(httpPort) || isPortInUse(httpsPort)
+    if (portsWereInUse) {
+        LogCat.d("Ports still in use after stopping previous server, waiting...")
+        HttpServerManager.waitForPortsAvailable(httpPort, httpsPort)
+    }
+    // If ports were occupied we only get one fresh attempt; otherwise allow a
+    // second try to tolerate a transient bind failure.
+    val maxRetries = if (portsWereInUse) 1 else 2
+
+    var started = false
+    for (attempt in 1..maxRetries) {
+        if (startHttpEngineAsync()) {
+            started = true
+            break
+        }
+        LogCat.e("Server start attempt $attempt/$maxRetries failed")
+        if (attempt < maxRetries) {
+            stopHttpEngineAsync()
+            HttpServerManager.waitForPortsAvailable(httpPort, httpsPort, maxWaitMs = 3_000)
+        }
+    }
+
+    val healthy = started && checkHttpServerAsync()
+    if (healthy) {
+        HttpServerManager.httpServerError = ""
+        HttpServerManager.portsInUse.clear()
+        onHttpServerStarted()
+        onStateChanged(HttpServerState.ON)
+        sendEvent(HttpServerStateChangedEvent(HttpServerState.ON))
+        LogCat.d("HTTP server started on port $httpPort")
+        return@withIO
+    }
+
+    // Failure: stop whatever engine may have started, then re-check ports so we
+    // can distinguish a port conflict from a health-check failure.
+    if (started) {
+        stopHttpEngineAsync()
+    } else {
+        if (isPortInUse(httpPort)) HttpServerManager.portsInUse.add(httpPort)
+        if (isPortInUse(httpsPort)) HttpServerManager.portsInUse.add(httpsPort)
+    }
+    HttpServerManager.httpServerError = when {
+        HttpServerManager.portsInUse.isNotEmpty() -> LocaleHelper.getStringFAsync(
+            if (HttpServerManager.portsInUse.size > 1) Res.string.http_port_conflict_errors
+            else Res.string.http_port_conflict_error,
+            "port", HttpServerManager.portsInUse.joinToString(", "),
+        )
+        started -> LocaleHelper.getStringAsync(Res.string.http_server_health_check_failed)
+        HttpServerManager.httpServerError.isNotEmpty() ->
+            LocaleHelper.getStringAsync(Res.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
+        else -> LocaleHelper.getStringAsync(Res.string.http_server_failed)
+    }
+    onHttpServerStopped()
+    onStateChanged(HttpServerState.ERROR)
+    sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))
+}
+
+/**
+ * Shared stop body: emits STOPPING, attempts graceful `/shutdown`, stops the
+ * engine, runs side-effect hooks, clears state, and emits OFF. Called by the
+ * platform [stopHttpServiceAsync] actuals and by the Android service's own
+ * lifecycle stop. Does NOT stop the Android foreground service.
+ */
+suspend fun stopHttpServerCoreAsync() = withIO {
+    sendEvent(HttpServerStateChangedEvent(HttpServerState.STOPPING))
+    try {
+        // Best-effort graceful shutdown via /shutdown endpoint.
+        val client = createHttpClient()
+        client.get(UrlHelper.getShutdownUrl())
+    } catch (_: Exception) {}
+    stopHttpEngineAsync()
+    onHttpServerStopped()
+    HttpServerManager.httpServerError = ""
+    HttpServerManager.portsInUse.clear()
+    sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
+}

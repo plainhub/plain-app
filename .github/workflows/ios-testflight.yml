@@ -1,0 +1,182 @@
+name: iOS TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump_build:
+        description: 'Auto-increment build number'
+        required: false
+        type: boolean
+        default: true
+  push:
+    tags:
+      - 'ios/v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-upload:
+    name: Build & Upload to TestFlight
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    env:
+      XCODE_PROJECT: iosApp/iosApp.xcodeproj
+      SCHEME: iosApp
+      ARCHIVE_PATH: build/ios/PlainApp.xcarchive
+      EXPORT_DIR: build/ios/export
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Cache Swift Package Manager
+        uses: actions/cache@v4
+        with:
+          path: |
+            iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata
+            ~/Library/Caches/org.swift.swiftpm
+            .build
+          key: spm-${{ runner.os }}-${{ hashFiles('iosApp/iosApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-
+
+      - name: Bump build number
+        if: ${{ github.event.inputs.bump_build != 'false' }}
+        run: |
+          PBXPROJ="iosApp/iosApp.xcodeproj/project.pbxproj"
+          CURRENT=$(grep -m1 'CURRENT_PROJECT_VERSION' "$PBXPROJ" | awk -F '= ' '{print $2}' | tr -d ';')
+          NEXT=$((CURRENT + 1))
+          sed -i '' "s/CURRENT_PROJECT_VERSION = $CURRENT;/CURRENT_PROJECT_VERSION = $NEXT;/g" "$PBXPROJ"
+          echo "Build number: $CURRENT -> $NEXT"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$PBXPROJ"
+          git commit -m "ios: bump build number to $NEXT" || true
+          git push || true
+
+      - name: Configure signing
+        env:
+          IOS_DEVELOPMENT_TEAM: ${{ secrets.IOS_DEVELOPMENT_TEAM }}
+        run: |
+          if [ -z "$IOS_DEVELOPMENT_TEAM" ]; then
+            echo "ERROR: Secret IOS_DEVELOPMENT_TEAM is not set"
+            exit 1
+          fi
+          PBXPROJ="iosApp/iosApp.xcodeproj/project.pbxproj"
+          sed -i '' "s/DEVELOPMENT_TEAM = \"\";/DEVELOPMENT_TEAM = \"$IOS_DEVELOPMENT_TEAM\";/g" "$PBXPROJ"
+          echo "Signing configured for team: $IOS_DEVELOPMENT_TEAM"
+
+      - name: Build Kotlin Framework (Release)
+        run: |
+          ./gradlew :shared:linkReleaseFrameworkIosSimulatorArm64 --no-daemon
+
+      - name: Resolve Swift Package Dependencies
+        run: |
+          xcodebuild \
+            -project "$XCODE_PROJECT" \
+            -scheme "$SCHEME" \
+            -resolvePackageDependencies
+
+      - name: Build Archive
+        run: |
+          mkdir -p "$(dirname "$ARCHIVE_PATH")"
+          xcodebuild \
+            -project "$XCODE_PROJECT" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -archivePath "$ARCHIVE_PATH" \
+            -destination 'generic/platform=iOS' \
+            -allowProvisioningUpdates \
+            archive \
+            CODE_SIGN_STYLE=Automatic
+
+      - name: Set up API Key
+        env:
+          APP_STORE_CONNECT_KEY: ${{ secrets.APP_STORE_CONNECT_KEY }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          if [ -z "$APP_STORE_CONNECT_KEY" ] || [ -z "$APP_STORE_CONNECT_KEY_ID" ] || [ -z "$APP_STORE_CONNECT_ISSUER_ID" ]; then
+            echo "ERROR: App Store Connect API Key secrets are not set"
+            echo "Required: APP_STORE_CONNECT_KEY, APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID"
+            exit 1
+          fi
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$APP_STORE_CONNECT_KEY" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8
+          echo "API Key stored"
+
+      - name: Export IPA
+        env:
+          IOS_DEVELOPMENT_TEAM: ${{ secrets.IOS_DEVELOPMENT_TEAM }}
+        run: |
+          mkdir -p "$EXPORT_DIR"
+          cat > build/ios/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store</string>
+              <key>teamID</key>
+              <string>$IOS_DEVELOPMENT_TEAM</string>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>stripSwiftSymbols</key>
+              <true/>
+              <key>compileBitcode</key>
+              <false/>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild \
+            -exportArchive \
+            -archivePath "$ARCHIVE_PATH" \
+            -exportOptionsPlist build/ios/ExportOptions.plist \
+            -exportPath "$EXPORT_DIR"
+
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          IPA=$(find "$EXPORT_DIR" -name "*.ipa" -type f | head -1)
+          if [ -z "$IPA" ]; then
+            echo "ERROR: No IPA found"
+            exit 1
+          fi
+          echo "Uploading: $IPA"
+          xcrun altool \
+            --upload-app \
+            --type ios \
+            --file "$IPA" \
+            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+            --verbose
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-logs
+          path: |
+            build/ios/
+          retention-days: 7

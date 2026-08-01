@@ -66,7 +66,7 @@ suspend fun updateFeed(id: ID, name: String, fetchContent: Boolean): Feed? {
 }
 
 @GraphQLMutation
-suspend fun createFeed(url: String, fetchContent: Boolean): DFeed? {
+suspend fun createFeed(url: String, fetchContent: Boolean): Feed? {
     val syndFeed = fetchRssChannel(url)
     val id =
         FeedHelper.addAsync {
@@ -75,7 +75,7 @@ suspend fun createFeed(url: String, fetchContent: Boolean): DFeed? {
             this.fetchContent = fetchContent
         }
     feedWorkerOneTimeRequest(id)
-    return FeedHelper.getById(id)
+    return FeedHelper.getById(id)?.toModel()
 }
 
 @GraphQLMutation

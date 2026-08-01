@@ -6,6 +6,7 @@ import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.FileSortBy
+import kotlinx.cinterop.useContents
 
 actual suspend fun getMediaBuckets(dataType: DataType): List<DMediaBucket> = emptyList()
 
@@ -79,7 +80,7 @@ actual suspend fun countSmsConversations(query: String): Int = 0
 
 actual suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.features.sms.DMessageConversation> = emptyList()
 
-actual suspend fun getSmsAllCounts(): SmsCounts = SmsCounts(0, 0, 0, 0)
+actual suspend fun getSmsAllCounts(): DSmsCounts = DSmsCounts(0, 0, 0, 0)
 
 actual fun sendSmsText(number: String, body: String, subscriptionId: Int?) {}
 
@@ -93,7 +94,13 @@ actual fun launchDefaultSmsApp(
     attachments: List<Pair<String, String>>,
 ): Long = 0L
 
-actual fun getScreenSize(): Pair<Int, Int> = Pair(0, 0)
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
+actual fun getScreenSize(): Pair<Int, Int> {
+    val bounds = platform.UIKit.UIScreen.mainScreen.bounds.useContents {
+        Pair(size.width.toInt(), size.height.toInt())
+    }
+    return bounds
+}
 
 actual fun getDownloadsDirPath(): String = ""
 

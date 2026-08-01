@@ -18,6 +18,7 @@ data class Audio(
     val isFavorite: Boolean,
 )
 
+@GraphQLType
 data class PlaylistAudio(
     val title: String,
     val artist: String,

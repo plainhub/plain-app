@@ -202,9 +202,9 @@ actual suspend fun countSmsConversations(query: String): Int =
 actual suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.features.sms.DMessageConversation> =
     com.ismartcoding.plain.features.sms.SmsConversationHelper.getArchivedConversations(appContext)
 
-actual suspend fun getSmsAllCounts(): SmsCounts =
+actual suspend fun getSmsAllCounts(): DSmsCounts =
     com.ismartcoding.plain.features.sms.SmsHelper.countAllAsync(appContext).let {
-        SmsCounts(it.total, it.inbox, it.sent, it.drafts)
+        DSmsCounts(it.total, it.inbox, it.sent, it.drafts)
     }
 
 actual fun sendSmsText(number: String, body: String, subscriptionId: Int?) =

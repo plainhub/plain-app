@@ -1,9 +1,11 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DNotification
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 
+@GraphQLType
 @Serializable
 data class Notification(
     val id: ID,

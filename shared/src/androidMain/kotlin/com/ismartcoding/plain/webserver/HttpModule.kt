@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.webserver
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.isDebugBuild
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.web.CorsPolicy
 import com.ismartcoding.plain.web.HttpRouteRegistry
 import com.ismartcoding.plain.web.http.HttpRouter
 import io.ktor.http.CacheControl
@@ -56,15 +56,12 @@ object HttpModule {
         }
 
         install(CORS) {
-            if (isDebugBuild()) {
+            if (CorsPolicy.anyHostAllowed) {
                 anyHost()
             } else {
-                allowHost("localhost:3000")
-                allowHost("127.0.0.1:3000")
-                allowHost("localhost:4000")
-                allowHost("127.0.0.1:4000")
+                CorsPolicy.releaseHosts.forEach { allowHost(it) }
             }
-            allowHeadersPrefixed("c-")
+            CorsPolicy.allowedHeaderPrefixes.forEach { allowHeadersPrefixed(it) }
         }
 
         install(ConditionalHeaders)

@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.db.DAppFile
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
+@GraphQLType
 data class AppFile(
     val id: ID,
     val size: Long,

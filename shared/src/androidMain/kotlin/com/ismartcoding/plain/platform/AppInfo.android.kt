@@ -31,6 +31,8 @@ actual fun getDeviceIP4s(): List<String> = NetworkHelper.getDeviceIP4s().toList(
 
 actual fun appDir(): String = appContext.contextAppDir()
 
+actual fun cacheDirPath(): String = appContext.cacheDir.absolutePath
+
 actual fun databaseFilePath(name: String): String =
     appContext.getDatabasePath(name).absolutePath
 

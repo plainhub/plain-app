@@ -7,6 +7,8 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.channel.sendEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
+import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 /**
  * Check whether a runtime permission is granted without prompting the user.
@@ -119,5 +121,51 @@ suspend fun Permission.enabledAndIsGrantedAsync(): Boolean {
 suspend fun Permission.checkEnabledAsync() {
     if (!isEnabledAsync()) {
         throw Exception("no_permission")
+    }
+}
+
+/**
+ * Show a "permission denied" dialog with a "Go to Settings" button.
+ * Called from iosMain (which cannot access `Res.string` directly) to
+ * delegate the dialog UI to commonMain where Compose Resources are
+ * accessible.
+ *
+ * @param onOpenSettings Called when the user taps "Go to Settings".
+ */
+fun showPermissionDeniedDialog(onOpenSettings: () -> Unit) {
+    coIO {
+        val message = LocaleHelper.getStringAsync(Res.string.permission_denied_message)
+        val title = LocaleHelper.getStringAsync(Res.string.settings)
+        val goText = LocaleHelper.getStringAsync(Res.string.go_to_settings)
+        val okText = LocaleHelper.getStringAsync(Res.string.ok)
+        DialogHelper.showConfirmDialog(
+            title = title,
+            message = message,
+            confirmButton = Pair(goText) { onOpenSettings() },
+            dismissButton = Pair(okText) {},
+        )
+    }
+}
+
+/**
+ * Show a notification permission confirmation dialog. Called from
+ * iosMain's [checkNotificationPermission] to delegate the dialog UI
+ * to commonMain where Compose Resources are accessible.
+ *
+ * @param messageResource The resource id of the dialog message.
+ * @param onConfirmed Called when the user taps "OK" to proceed with
+ *     requesting the notification permission.
+ */
+fun showNotificationConfirmDialog(
+    messageResource: StringResource,
+    onConfirmed: () -> Unit,
+) {
+    coIO {
+        val message = LocaleHelper.getStringAsync(messageResource)
+        val confirmText = LocaleHelper.getStringAsync(Res.string.confirm)
+        val okText = LocaleHelper.getStringAsync(Res.string.ok)
+        DialogHelper.showConfirmDialog(confirmText, message, confirmButton = Pair(okText) {
+            onConfirmed()
+        })
     }
 }

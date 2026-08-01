@@ -15,6 +15,7 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLSchemaTarget
 import com.ismartcoding.plain.lib.kgraphql.context
 import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedPeerResolvers
+import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedSchema
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -168,6 +169,7 @@ class PeerGraphQLService private constructor(
          */
         fun create(): PeerGraphQLService {
             val schema = KGraphQL.schema {
+                registerGeneratedSchema()
                 addSchemaTypes()
                 applyPeerSchema()
             }

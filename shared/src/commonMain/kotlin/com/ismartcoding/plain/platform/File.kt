@@ -23,6 +23,12 @@ suspend fun releaseAppFile(fidSuffix: String) = withIO {
 
 expect fun deleteFileAt(path: String)
 
+/**
+ * Write [bytes] to a regular file at [path], replacing any existing content.
+ * Returns true on success, false on failure. The parent directory must exist.
+ */
+expect fun writeBytesToPath(path: String, bytes: ByteArray): Boolean
+
 expect fun createLongTextFile(text: String): DMessageContent
 
 /**
@@ -262,6 +268,44 @@ expect suspend fun searchZipItems(type: String, query: String, tempId: String): 
  * filesystem directly. Returns an empty string if the file cannot be opened.
  */
 expect suspend fun readTextFile(path: String): String
+
+/**
+ * Write [bytes] to the file at [uriStr]. On Android [uriStr] may be a
+ * `content://` URI (resolved via `ContentResolver.openOutputStream`) or a
+ * filesystem path; on iOS it must be a filesystem path. Returns true on
+ * success, false on failure.
+ */
+expect suspend fun writeBytesToUri(uriStr: String, bytes: ByteArray): Boolean
+
+/**
+ * Returns the display name of the file at [uriStr] (e.g. via
+ * `OpenableColumns.DISPLAY_NAME` on Android), or null if it cannot be
+ * determined. Used to surface a friendly file name after export.
+ */
+expect fun getFileNameFromUri(uriStr: String): String?
+
+/**
+ * Metadata for a picked file (URI-based). [displayName] is the user-visible
+ * name, [size] is the byte length, [mimeType] is the content type (may be
+ * empty). Returned by [queryPickedFileInfo].
+ */
+data class PickedFileInfo(val displayName: String, val size: Long, val mimeType: String)
+
+/**
+ * Query display name, size, and MIME type for a picked file URI. On Android
+ * [uriStr] is typically a `content://` URI resolved via `ContentResolver`;
+ * on iOS this returns null (no document picker yet). Returns null when the
+ * URI cannot be queried.
+ */
+expect fun queryPickedFileInfo(uriStr: String): PickedFileInfo?
+
+/**
+ * Import a picked file (identified by [uriStr]) into the content-addressable
+ * chat file store and return its `fid:` URI, or null on failure. On Android
+ * this streams the content URI to a temp file then dedups-imports it; on iOS
+ * it returns null (no document picker yet).
+ */
+expect suspend fun importChatFile(uriStr: String, mimeType: String): String?
 
 /**
  * Look up a media-scanned file (e.g. from MediaStore.Files) by its [mediaId]

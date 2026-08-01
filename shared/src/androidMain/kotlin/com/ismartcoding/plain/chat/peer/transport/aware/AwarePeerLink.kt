@@ -186,7 +186,7 @@ class AwarePeerLink(
                         network = n,
                         peerIpv6 = ip,
                         peerPort = port,
-                        httpClient = httpFactory.build(peerId, n, ip, port),
+                        httpClient = httpFactory.build(peerId, n, ip),
                     ),
                 )
             }

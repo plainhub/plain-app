@@ -43,10 +43,11 @@ actual fun createHttpEngine(spec: HttpClientSpec): HttpClientEngine =
         is HttpClientSpec.Crypto ->
             OkHttp.create {
                 preconfigured =
-                    OkHttpClientFactory.createCryptoHttpClient(
-                        keyBytes = spec.keyBytes,
-                        timeout = spec.timeoutSeconds,
-                        connectTimeoutMs = spec.connectTimeoutMs,
-                    )
+                    OkHttpClientFactory.createUnsafeOkHttpClient()
+                        .newBuilder()
+                        .connectTimeout(spec.connectTimeoutMs, TimeUnit.MILLISECONDS)
+                        .writeTimeout(spec.timeoutSeconds.toLong(), TimeUnit.SECONDS)
+                        .readTimeout(spec.timeoutSeconds.toLong(), TimeUnit.SECONDS)
+                        .build()
             }
     }

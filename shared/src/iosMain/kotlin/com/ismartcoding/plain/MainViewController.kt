@@ -20,23 +20,9 @@ import com.ismartcoding.plain.platform.DiskLogFormatStrategy
 import com.ismartcoding.plain.platform.buildAppDatabase
 import com.ismartcoding.plain.platform.dataStoreFilePath
 import com.ismartcoding.plain.platform.initDatabase
-import com.ismartcoding.plain.preferences.AudioPlaybackSpeedPreference
-import com.ismartcoding.plain.preferences.AudioPlayModePreference
-import com.ismartcoding.plain.preferences.ClientIdPreference
-import com.ismartcoding.plain.preferences.HttpPortPreference
-import com.ismartcoding.plain.preferences.HttpsPortPreference
-import com.ismartcoding.plain.preferences.HttpsPreference
-import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.preferences.MdnsHostnamePreference
-import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.preferences.SettingsProvider
-import com.ismartcoding.plain.preferences.UrlTokenPreference
-import com.ismartcoding.plain.preferences.WebPreference
-import com.ismartcoding.plain.preferences.ensureValueAsync
-import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.preferences.initDataStore
-import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
@@ -104,24 +90,15 @@ fun initIosApp() {
     // Global event collectors (MediaDurationFixQueue, sleep timer, etc.)
     AppEvents.register()
 
-    // Initialize preferences and TempData (mirrors Android's MainAppHelper)
+    // iOS permission request handler (bridges RequestPermissionsEvent → Swift)
+    com.ismartcoding.plain.platform.IosPermissionEvents.register()
+
+    // iOS file picker (bridges PickFileEvent/ExportFileEvent → Swift UIDocumentPicker/PHPicker)
+    com.ismartcoding.plain.platform.IosFilePickerEvents.register()
+
+    // Initialize preferences and TempData (shared with Android via initCommonPreferences)
     coIO {
-        val preferences = getPreferencesAsync()
-        TempData.webEnabled.value = WebPreference.get(preferences)
-        TempData.webHttps.value = HttpsPreference.get(preferences)
-        TempData.httpPort.value = HttpPortPreference.get(preferences)
-        TempData.httpsPort.value = HttpsPortPreference.get(preferences)
-        TempData.audioPlayMode.value = AudioPlayModePreference.getValue(preferences)
-        TempData.audioPlaybackSpeed.value = AudioPlaybackSpeedPreference.getValue(preferences)
-        ClientIdPreference.ensureValueAsync(preferences)
-        KeyStorePasswordPreference.ensureValueAsync(preferences)
-        UrlTokenPreference.ensureValueAsync(preferences)
-        MdnsHostnamePreference.ensureValueAsync(preferences)
-        if (PasswordPreference.get(preferences).isEmpty()) {
-            HttpServerManager.resetPasswordAsync()
-        }
-        HttpServerManager.loadTokenCache()
-        LogCat.d("initIosApp: preferences initialized, clientId=${TempData.clientId}")
+        initCommonPreferences()
     }
 }
 
