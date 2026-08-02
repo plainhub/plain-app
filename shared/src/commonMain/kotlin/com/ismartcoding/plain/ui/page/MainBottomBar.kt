@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.chat
+import com.ismartcoding.plain.i18n.grid_3x3
 import com.ismartcoding.plain.i18n.home
 import com.ismartcoding.plain.i18n.house
 import com.ismartcoding.plain.i18n.message_circle
+import com.ismartcoding.plain.i18n.tools
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -50,6 +52,20 @@ fun MainBottomBar(
                 )
             },
             label = { Text(stringResource(Res.string.chat)) },
+            colors = NavigationBarItemDefaults.colors(
+                indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+        )
+        NavigationBarItem(
+            selected = selectedIndex == 2,
+            onClick = { onTabSelected(2) },
+            icon = {
+                Icon(
+                    painter = painterResource(Res.drawable.grid_3x3),
+                    contentDescription = null,
+                )
+            },
+            label = { Text(stringResource(Res.string.tools)) },
             colors = NavigationBarItemDefaults.colors(
                 indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
             ),

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -137,8 +138,8 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.DlnaReceiver) },
                             icon = Res.drawable.cast,
+                            separatedActions = true,
                             title = stringResource(Res.string.dlna_receiver),
-                            showMore = true,
                         ) {
                             PSwitch(activated = dlnaReceiverEnabled) { enable -> webVM.enableDlnaReceiver(enable) }
                         }

@@ -140,10 +140,6 @@ fun HomePage(
                     VerticalSpace(dp = 16.dp)
                 }
                 item {
-                    HomeShortcutGrid(navController = navController)
-                    VerticalSpace(dp = 16.dp)
-                }
-                item {
                     BottomSpace(paddingValues)
                 }
             }

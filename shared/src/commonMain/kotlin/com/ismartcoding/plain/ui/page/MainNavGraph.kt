@@ -56,6 +56,7 @@ import com.ismartcoding.plain.ui.page.connections.ConnectionsPage
 import com.ismartcoding.plain.ui.page.devoptions.WebDevPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaCastHistoryPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
+import com.ismartcoding.plain.ui.page.tools.DiscoverPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
@@ -145,6 +146,7 @@ fun MainNavGraph(
             when (selectedTab) {
                 0 -> HomePage(navController, mainVM, updateVM, peerVM, channelVM, onTabSelected = onTabSelected)
                 1 -> ChatListPage(navController, mainVM, peerVM = peerVM, channelVM = channelVM, onTabSelected = onTabSelected)
+                2 -> DiscoverPage(navController, onTabSelected = onTabSelected)
             }
         }
         composable<Routing.Images> { ImagesPage(navController) }
