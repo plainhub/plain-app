@@ -51,7 +51,7 @@
     <string name="os">Sistema Operacional</string>
     <string name="browser">Navegador</string>
     <string name="reject">Rejeitar</string>
-    <string name="allow_web_access">Permitir acesso web</string>
+    <string name="open_web_address">Abra o endereço abaixo no seu navegador web.</string>
     <string name="allow_web_access_desc">Permitir acesso aos dados do seu telefone a partir de um navegador web</string>
     <string name="allow_desktop_access">Permitir acesso desktop</string>
     <string name="allow_desktop_access_desc">Permitir acesso aos dados do seu telefone a partir do aplicativo desktop</string>

@@ -4,7 +4,10 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.web.CorsPolicy
 import com.ismartcoding.plain.web.HttpRouteRegistry
+import com.ismartcoding.plain.web.http.HttpMethod
 import com.ismartcoding.plain.web.http.HttpRouter
+import com.ismartcoding.plain.web.isPeerAccessiblePath
+import com.ismartcoding.plain.web.isDlnaPath
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -27,7 +30,6 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
-import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 
 object HttpModule {
@@ -80,10 +82,16 @@ object HttpModule {
         }
 
         intercept(ApplicationCallPipeline.Plugins) {
-            if (call.request.path() == "/health") {
-                return@intercept
-            }
-            if (!TempData.webEnabled.value) {
+            val method = HttpMethod(call.request.local.method.value.uppercase())
+            val path = call.request.path()
+            // Peer-accessible routes (PeerGraphQL, /fs, /health, WS /status)
+            // and DLNA routes (sender /media/{id}, NOTIFY /callback/cast;
+            // receiver /description.xml, /AVTransport/*, /RenderingControl/*)
+            // remain available when desktopAccessEnabled=false but
+            // serviceEnabled=true. Main-UI routes are rejected here; the
+            // authoritative check still lives in each route handler so BLE
+            // RPC (which bypasses this intercept) is also covered.
+            if (!isPeerAccessiblePath(method, path) && !isDlnaPath(method, path) && !TempData.canDesktopAccess()) {
                 call.respond(HttpStatusCode.NotFound)
                 return@intercept finish()
             }

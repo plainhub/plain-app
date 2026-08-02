@@ -101,8 +101,9 @@ fun String.linkify(
     var raw = this@linkify
     var m = parse(raw)
     while (m != null) {
-        val start = m.start
-        val end = m.end
+        val result = m
+        val start = result.start
+        val end = result.end
 
         if (start > 0) {
             append(raw.subSequence(0, start))
@@ -110,12 +111,12 @@ fun String.linkify(
 
         withStyle(linkStyle) {
             addStringAnnotation(
-                tag = m!!.tag,
-                annotation = m!!.text,
+                tag = result.tag,
+                annotation = result.text,
                 start = length,
-                end = length + m!!.text.length,
+                end = length + result.text.length,
             )
-            append(m!!.text)
+            append(result.text)
         }
 
         raw = raw.substring(end)

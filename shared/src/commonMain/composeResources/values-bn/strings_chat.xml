@@ -51,7 +51,7 @@
     <string name="os">অপারেটিং সিস্টেম</string>
     <string name="browser">ব্রাউজার</string>
     <string name="reject">প্রত্যাখ্যান করুন</string>
-    <string name="allow_web_access">ওয়েব অ্যাক্সেস অনুমতি দিন</string>
+    <string name="open_web_address">নিচের ঠিকানাটি আপনার ওয়েব ব্রাউজারে খুলুন।</string>
     <string name="allow_web_access_desc">একটি ওয়েব ব্রাউজার থেকে আপনার ফোনের ডেটা অ্যাক্সেস করার অনুমতি দিন</string>
     <string name="allow_desktop_access">ডেস্কটপ অ্যাক্সেস অনুমতি দিন</string>
     <string name="allow_desktop_access_desc">ডেস্কটপ অ্যাপ থেকে আপনার ফোনের ডেটা অ্যাক্সেস করার অনুমতি দিন</string>

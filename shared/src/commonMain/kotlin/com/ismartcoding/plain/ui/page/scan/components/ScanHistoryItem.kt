@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -27,6 +26,8 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PClickableText
+import com.ismartcoding.plain.ui.base.PDivider
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
@@ -80,7 +81,7 @@ fun ScanHistoryItem(
                     .fillMaxWidth()
                     .padding(16.dp),
             ) {
-                ClickableText(
+                PClickableText(
                     text = newText,
                     style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                     onClick = { position -> newText.urlAt(position) },
@@ -89,11 +90,7 @@ fun ScanHistoryItem(
 
             VerticalSpace(dp = 8.dp)
 
-            HorizontalDivider(
-                thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+            PDivider()
 
             Row(
                 modifier = Modifier.fillMaxWidth()

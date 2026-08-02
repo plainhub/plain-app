@@ -47,7 +47,7 @@ fun LoginRequestPage(
 ) {
     val request = event.request
     val isWeb = request.browserName != "PlainApp"
-    val titleRes = if (isWeb) Res.string.allow_web_access else Res.string.allow_desktop_access
+    val titleRes = Res.string.allow_desktop_access
     val descRes = if (isWeb) Res.string.allow_web_access_desc else Res.string.allow_desktop_access_desc
     val iconRes = if (isWeb) Res.drawable.chrome else Res.drawable.laptop
 
@@ -137,7 +137,7 @@ fun LoginRequestPage(
                         }
                     },
                 )
-                VerticalSpace(24.dp)
+                VerticalSpace(32.dp)
                 PFilledButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.deny),

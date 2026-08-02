@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.page.scan.components
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -11,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
 
@@ -28,7 +28,7 @@ fun ScanResult(
         ) {
             val newText = text.linkify()
             SelectionContainer {
-                ClickableText(
+                PClickableText(
                     text = newText,
                     style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                     onClick = { position -> newText.urlAt(position) },

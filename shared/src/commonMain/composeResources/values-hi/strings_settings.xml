@@ -45,7 +45,7 @@
     <string name="ip_address_asc">आईपी पता (0 से 9 तक)</string>
     <string name="last_active_desc">अंतिम सक्रिय</string>
     <string name="app_version">एप्लिकेशन संस्करण</string>
-    <string name="android_version">एंड्रॉयड संस्करण</string>
+    <string name="system_version">सिस्टम संस्करण</string>
     <string name="clear_history">इतिहास साफ़ करें</string>
     <string name="clear_logs">लॉग साफ़ करें</string>
     <string name="no_logs_error">कोई लॉग साझा नहीं किए जा सकते</string>

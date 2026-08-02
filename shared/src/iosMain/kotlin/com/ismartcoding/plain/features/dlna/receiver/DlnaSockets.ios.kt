@@ -101,8 +101,8 @@ private class IosDlnaSsdpSocket(private val fd: Int) : DlnaSsdpSocket {
     }
 }
 
-/** Actual factory: creates a POSIX UDP socket bound to 0.0.0.0:1900 joined to the SSDP group. */
-actual fun createDlnaSsdpSocket(): DlnaSsdpSocket? {
+/** Actual factory: creates a POSIX UDP socket bound to 0.0.0.0:[bindPort] joined to the SSDP group. */
+actual fun createDlnaSsdpSocket(bindPort: Int): DlnaSsdpSocket? {
     val fd = socket(AF_INET, SOCK_DGRAM, 0)
     if (fd < 0) {
         LogCat.e("createDlnaSsdpSocket: socket() failed: ${errnoString()}")
@@ -118,10 +118,10 @@ actual fun createDlnaSsdpSocket(): DlnaSsdpSocket? {
     memScoped {
         val addr = alloc<sockaddr_in>()
         addr.sin_family = AF_INET.convert()
-        addr.sin_port = htons(DlnaSsdpMessages.SSDP_PORT.convert())
+        addr.sin_port = htons(bindPort.convert())
         addr.sin_addr.s_addr = 0u
         if (bind(fd, addr.ptr.reinterpret(), sizeOf<sockaddr_in>().toUInt()) < 0) {
-            LogCat.e("createDlnaSsdpSocket: bind(0.0.0.0:${DlnaSsdpMessages.SSDP_PORT}) failed: ${errnoString()}")
+            LogCat.e("createDlnaSsdpSocket: bind(0.0.0.0:$bindPort) failed: ${errnoString()}")
             close(fd)
             return null
         }
@@ -136,7 +136,7 @@ actual fun createDlnaSsdpSocket(): DlnaSsdpSocket? {
             return null
         }
     }
-    LogCat.d("DLNA SSDP socket bound to 0.0.0.0:${DlnaSsdpMessages.SSDP_PORT} joined ${DlnaSsdpMessages.SSDP_ADDR}")
+    LogCat.d("DLNA SSDP socket bound to 0.0.0.0:$bindPort joined ${DlnaSsdpMessages.SSDP_ADDR}")
     return IosDlnaSsdpSocket(fd)
 }
 

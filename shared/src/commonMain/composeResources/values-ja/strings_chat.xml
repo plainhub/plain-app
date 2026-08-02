@@ -51,7 +51,7 @@
     <string name="os">OS</string>
     <string name="browser">ブラウザ</string>
     <string name="reject">拒否</string>
-    <string name="allow_web_access">Webアクセスを許可</string>
+    <string name="open_web_address">下記のアドレスをWebブラウザで開いてください。</string>
     <string name="allow_web_access_desc">Webブラウザからスマホのデータへのアクセスを許可する</string>
     <string name="allow_desktop_access">デスクトップアクセスを許可</string>
     <string name="allow_desktop_access_desc">デスクトップアプリからスマホのデータへのアクセスを許可する</string>

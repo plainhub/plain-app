@@ -7,7 +7,8 @@ import com.ismartcoding.plain.web.CorsPolicy
 import com.ismartcoding.plain.web.HttpRouteRegistry
 import com.ismartcoding.plain.web.http.HttpMethod
 import com.ismartcoding.plain.web.http.HttpStatus
-import com.ismartcoding.plain.web.http.WsSession
+import com.ismartcoding.plain.web.isPeerAccessiblePath
+import com.ismartcoding.plain.web.isDlnaPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -75,21 +76,20 @@ object IosRequestProcessor {
                 }
             }
 
-            // Short-circuit /health so they work even when web is disabled.
-            if (ctx.path == "/health") {
-                ctx.responseStatus = HttpStatus.OK
-                ctx.setResponseBody(getOwnPackageName().encodeToByteArray())
-                ctx.setResponseHeader("Content-Type", "text/plain")
-                return
-            }
+            val method = HttpMethod(ctx.method.uppercase())
 
-            // Match the web-enabled gate used by Ktor's intercept pipeline.
-            if (!TempData.webEnabled.value) {
+            // Peer-accessible routes (PeerGraphQL, /fs, /health, WS /status)
+            // and DLNA routes (sender /media/{id}, NOTIFY /callback/cast;
+            // receiver /description.xml, /AVTransport/*, /RenderingControl/*)
+            // remain available when desktopAccessEnabled=false but
+            // serviceEnabled=true. Main-UI routes are rejected here; the
+            // authoritative check still lives in each route handler so BLE
+            // RPC (which bypasses this processor) is also covered.
+            if (!isPeerAccessiblePath(method, ctx.path) && !isDlnaPath(method, ctx.path) && !TempData.desktopAccessEnabled.value) {
                 ctx.responseStatus = HttpStatus.NOT_FOUND
                 return
             }
 
-            val method = HttpMethod(ctx.method.uppercase())
             val matched = HttpRouteRegistry.matchRoute(method, ctx.path)
             if (matched != null) {
                 val params = HttpRouteRegistry.matchPath(matched.path, ctx.path) ?: emptyMap()

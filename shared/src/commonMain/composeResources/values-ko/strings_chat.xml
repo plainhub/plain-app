@@ -51,7 +51,7 @@
     <string name="os">운영체제</string>
     <string name="browser">브라우저</string>
     <string name="reject">거부</string>
-    <string name="allow_web_access">웹 접근 허용</string>
+    <string name="open_web_address">아래 주소를 웹 브라우저에서 여세요.</string>
     <string name="allow_web_access_desc">웹 브라우저에서 휴대폰 데이터에 접근하도록 허용</string>
     <string name="allow_desktop_access">데스크톱 접근 허용</string>
     <string name="allow_desktop_access_desc">데스크톱 앱에서 휴대폰 데이터에 접근하도록 허용</string>

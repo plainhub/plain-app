@@ -36,7 +36,7 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
-import com.ismartcoding.plain.ui.models.WebConsoleViewModel
+import com.ismartcoding.plain.ui.models.DesktopAccessSettingsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
@@ -95,7 +95,7 @@ import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.web.HowToUsePage
 import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
-import com.ismartcoding.plain.ui.page.web.WebSettingsPage
+import com.ismartcoding.plain.ui.page.web.DesktopAccessSettingsPage
 
 @Composable
 fun MainNavGraph(
@@ -172,7 +172,7 @@ fun MainNavGraph(
         composable<Routing.DarkTheme> { DarkThemePage(navController) }
         composable<Routing.Language> { LanguagePage(navController) }
         composable<Routing.BackupRestore> { BackupRestorePage(navController) }
-        composable<Routing.WebSettings> { WebSettingsPage(navController) }
+        composable<Routing.DesktopAccessSettings> { DesktopAccessSettingsPage(navController) }
         composable<Routing.CustomFeatures> { HomeFeaturesSelectionPage(navController) }
         composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }
         composable<Routing.Connections> { ConnectionsPage(navController) }
@@ -203,7 +203,7 @@ fun MainNavGraph(
         composable<Routing.Feeds> { FeedsPage(navController) }
         composable<Routing.FeedSettings> { FeedSettingsPage(navController) }
         composable<Routing.HowToUse> {
-            val webVM: WebConsoleViewModel = viewModel { WebConsoleViewModel() }
+            val webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }
             HowToUsePage(navController, onRunDiagnostics = { webVM.dig() })
         }
         composable<Routing.AppDetails> { backStackEntry ->

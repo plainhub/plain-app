@@ -51,7 +51,7 @@
     <string name="os">Besturingssysteem</string>
     <string name="browser">Browser</string>
     <string name="reject">Afwijzen</string>
-    <string name="allow_web_access">Webtoegang toestaan</string>
+    <string name="open_web_address">Open het onderstaande adres in uw webbrowser.</string>
     <string name="allow_web_access_desc">Toegang tot uw telefoongegevens via een webbrowser toestaan</string>
     <string name="allow_desktop_access">Desktoptoegang toestaan</string>
     <string name="allow_desktop_access_desc">Toegang tot uw telefoongegevens via de desktop-app toestaan</string>

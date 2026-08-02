@@ -39,7 +39,7 @@ import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
-import com.ismartcoding.plain.preferences.WebPreference
+import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
@@ -112,9 +112,9 @@ internal fun MainActivity.initEvents() {
                 is HOpenWebSettingsEvent -> {
                     try {
                         val nav = navControllerState.value
-                        val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute<Routing.WebSettings>() == true
+                        val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute<Routing.DesktopAccessSettings>() == true
                         if (AppHelper.foregrounded()) {
-                            if (!alreadyThere) nav?.navigate(Routing.WebSettings)
+                            if (!alreadyThere) nav?.navigate(Routing.DesktopAccessSettings)
                         } else {
                             val intent = Intent(this@initEvents, MainActivity::class.java).apply {
                                 addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
@@ -186,8 +186,3 @@ internal fun MainActivity.initEvents() {
     }
 }
 
-internal suspend fun MainActivity.doWhenReadyAsync() {
-    val webEnabled = WebPreference.getAsync()
-    val permEnabled = Permission.NOTIFICATION_LISTENER.isEnabledAsync()
-    PNotificationListenerService.toggle(this, webEnabled && permEnabled)
-}

@@ -136,7 +136,7 @@ fun PListItem(
             }
 
             if (value != null || action != null) {
-                Box(Modifier.padding(start = 16.dp)) {
+                Row (Modifier.padding(start = 16.dp)) {
                     action?.invoke()
                     value?.let {
                         Box(Modifier.padding(end = if (showMore) 0.dp else 8.dp, top = 8.dp, bottom = 8.dp)) {

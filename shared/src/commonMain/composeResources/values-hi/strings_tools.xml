@@ -4,19 +4,20 @@
     <string name="select_sound">ध्वनि चुनें</string>
     <string name="sound_meter">ध्वनि मीटर</string>
     <string name="pomodoro_timer">पोमोडोरो टाइमर</string>
-    <string name="dlna_receiver">वायरलेस कास्ट</string>
-    <string name="dlna_receiver_waiting_title">स्ट्रीमिंग की प्रतीक्षा</string>
+    <string name="dlna_receiver">कास्ट रिसीवर</string>
+    <string name="dlna_receiver_desc">किसी अन्य डिवाइस से वीडियो, संगीत और फ़ोटो चलाएं।</string>
+    <string name="dlna_receiver_waiting_title">कास्ट की प्रतीक्षा की जा रही है</string>
     <string name="dlna_receiver_waiting_desc">नेटवर्क पर दृश्यमान डिवाइस: %1$s</string>
     <string name="dlna_receiver_step1_title">एक ही Wi-Fi से कनेक्ट करें</string>
     <string name="dlna_receiver_step1_desc">सुनिश्चित करें कि दोनों डिवाइस एक ही Wi-Fi नेटवर्क से जुड़े हैं</string>
     <string name="dlna_receiver_step2_title">PlainApp खोलें</string>
-    <string name="dlna_receiver_step2_desc">दूसरे डिवाइस पर PlainApp खोलें और जो वीडियो या संगीत चलाना चाहते हैं उसे ढूंढें</string>
-    <string name="dlna_receiver_step3_title">स्ट्रीम करें</string>
-    <string name="dlna_receiver_step3_desc">स्ट्रीम आइकन पर टैप करें, सूची से "%1$s" चुनें और चलाना शुरू हो जाएगा</string>
-    <string name="dlna_receiver_protocol_note">DLNA / UPnP प्रोटोकॉल का समर्थन करता है, VLC, Kodi और अन्य लोकप्रिय स्ट्रीमिंग ऐप्स के साथ संगत</string>
+    <string name="dlna_receiver_step2_desc">दूसरे डिवाइस पर PlainApp खोलें और चलाने चाहिए वीडियो या संगीत को खोजें</string>
+    <string name="dlna_receiver_step3_title">कास्ट करने के लिए टैप करें</string>
+    <string name="dlna_receiver_step3_desc">कास्ट आइकन पर टैप करें, सूची से "%1$s" चुनें और चलाना शुरू हो जाएगा</string>
+    <string name="dlna_receiver_protocol_note">DLNA / UPnP प्रोटोकॉल का समर्थन करता है, VLC, Kodi और अन्य लोकप्रिय कास्टिंग ऐप्स के साथ संगत</string>
     <string name="dlna_receiver_exit_player">प्लेयर से बाहर निकलें</string>
-    <string name="dlna_receiver_disabled_title">रिसीवर बंद है</string>
-    <string name="dlna_receiver_disabled_desc">इस डिवाइस पर स्ट्रीम प्राप्त करने के लिए वेब सेटिंग्स में टॉगल चालू करें</string>
+    <string name="dlna_receiver_turn_on">चालू करें</string>
+    <string name="feature_disabled_title">%1$s बंद है</string>
     <string name="short_break">छोटा ब्रेक</string>
     <string name="long_break">लंबा ब्रेक</string>
     <string name="tomatoes_today">आज के टमाटर</string>
@@ -74,6 +75,5 @@
     <string name="dlna_cast_history">Cast नियम</string>
     <string name="dlna_cast_accepted">स्वीकृत</string>
     <string name="dlna_cast_rejected">अस्वीकृत</string>
-    <string name="dlna_receiver_start_error">रिसीवर शुरू नहीं हो सका।</string>
     <string name="retry">पुनः प्रयास करें</string>
 </resources>

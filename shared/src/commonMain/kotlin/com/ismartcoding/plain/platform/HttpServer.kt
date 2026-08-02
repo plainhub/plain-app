@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.api.isOk
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.helpers.TimeHelper
@@ -11,6 +12,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.web.HttpServerManager
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
@@ -112,7 +114,7 @@ suspend fun checkHttpServerAsync(): Boolean = withIO {
         while (!healthy && TimeHelper.nowMillis() < deadline) {
             try {
                 val response = client.get(UrlHelper.getHealthCheckUrl())
-                if (response.status == HttpStatusCode.OK) {
+                if (response.isOk() && response.bodyAsText() == getOwnPackageName()) {
                     healthy = true
                 }
             } catch (ex: Exception) {

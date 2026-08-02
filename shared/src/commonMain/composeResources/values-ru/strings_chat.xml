@@ -51,7 +51,7 @@
     <string name="os">ОС</string>
     <string name="browser">Браузер</string>
     <string name="reject">Отклонить</string>
-    <string name="allow_web_access">Разрешить веб-доступ</string>
+    <string name="open_web_address">Откройте указанный ниже адрес в веб-браузере.</string>
     <string name="allow_web_access_desc">Разрешить доступ к данным телефона из веб-браузера</string>
     <string name="allow_desktop_access">Разрешить доступ с ПК</string>
     <string name="allow_desktop_access_desc">Разрешить доступ к данным телефона из настольного приложения</string>

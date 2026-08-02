@@ -14,6 +14,7 @@ import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.platform.DiskLogFormatStrategy
 import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.platform.clearCacheAsync
 import com.ismartcoding.plain.platform.clearImageMemoryCache
@@ -23,6 +24,7 @@ import com.ismartcoding.plain.platform.getCacheSize
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 import kotlinx.coroutines.CoroutineScope
@@ -56,12 +58,16 @@ fun AboutLogsAndCacheCard(
                             exportLogsAsync()
                         })
                     if (fileSize > 0L) {
-                        PFilledButton(text = stringResource(Res.string.clear_logs), buttonSize = ButtonSize.SMALL, onClick = {
-                            DialogHelper.confirmToAction(Res.string.confirm_to_clear_logs) {
-                                clearLogsAsync()
-                                onFileSizeCleared()
-                            }
-                        })
+                        POutlinedButton(
+                            text = stringResource(Res.string.clear_logs),
+                            buttonSize = ButtonSize.SMALL,
+                            type = ButtonType.DANGER,
+                            onClick = {
+                                DialogHelper.confirmToAction(Res.string.confirm_to_clear_logs) {
+                                    clearLogsAsync()
+                                    onFileSizeCleared()
+                                }
+                            })
                     }
                 }
             },
@@ -70,19 +76,22 @@ fun AboutLogsAndCacheCard(
             title = stringResource(Res.string.local_cache),
             subtitle = cacheSize.formatBytes(),
             action = {
-                PFilledButton(text = stringResource(Res.string.clear_cache), buttonSize = ButtonSize.SMALL, onClick = {
-                    scope.launch {
-                        DialogHelper.showLoading()
-                        withIO {
-                            clearCacheAsync()
+                POutlinedButton(
+                    text = stringResource(Res.string.clear_cache),
+                    type = ButtonType.DANGER,
+                    buttonSize = ButtonSize.SMALL, onClick = {
+                        scope.launch {
+                            DialogHelper.showLoading()
+                            withIO {
+                                clearCacheAsync()
+                            }
+                            clearImageMemoryCache()
+                            val newSize = getCacheSize()
+                            DialogHelper.hideLoading()
+                            DialogHelper.showMessage(Res.string.local_cache_cleared)
+                            onCacheCleared(newSize)
                         }
-                        clearImageMemoryCache()
-                        val newSize = getCacheSize()
-                        DialogHelper.hideLoading()
-                        DialogHelper.showMessage(Res.string.local_cache_cleared)
-                        onCacheCleared(newSize)
-                    }
-                })
+                    })
             },
         )
     }

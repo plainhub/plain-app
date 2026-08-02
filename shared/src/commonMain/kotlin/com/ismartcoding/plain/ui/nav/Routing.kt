@@ -19,7 +19,7 @@ class Routing {
     object BackupRestore
 
     @Serializable
-    object WebSettings
+    object DesktopAccessSettings
 
     @Serializable
     object CustomFeatures

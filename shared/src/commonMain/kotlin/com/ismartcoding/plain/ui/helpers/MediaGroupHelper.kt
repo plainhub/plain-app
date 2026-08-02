@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.ui.helpers
 
 import com.ismartcoding.plain.platform.formatDate
-import kotlinx.datetime.Instant as KxInstant
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.number
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
@@ -18,9 +18,9 @@ fun <T> groupMediaByDate(
 ): List<MediaDateGroup<T>> {
     return items.groupBy { item ->
         val instant = getDate(item)
-        val localDateTime = KxInstant.fromEpochSeconds(instant.epochSeconds)
+        val localDateTime = Instant.fromEpochSeconds(instant.epochSeconds)
             .toLocalDateTime(TimeZone.currentSystemDefault())
-        "${localDateTime.year.toString().padStart(4, '0')}-${localDateTime.monthNumber.toString().padStart(2, '0')}-${localDateTime.dayOfMonth.toString().padStart(2, '0')}"
+        "${localDateTime.year.toString().padStart(4, '0')}-${localDateTime.month.number.toString().padStart(2, '0')}-${localDateTime.day.toString().padStart(2, '0')}"
     }.map { (dateKey, groupItems) ->
         MediaDateGroup(
             dateKey = dateKey,

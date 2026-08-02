@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.shareText
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.IconTextToTopButton
 import com.ismartcoding.plain.ui.base.PCard
@@ -65,6 +66,7 @@ fun ViewTextContentBottomSheet(
                         ) {
                             textFileVM.toggleWrapContent()
                         }
+                        HorizontalSpace(8.dp)
                     })
                 }
             }

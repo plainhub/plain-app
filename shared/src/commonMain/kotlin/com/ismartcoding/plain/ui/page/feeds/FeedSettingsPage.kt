@@ -21,6 +21,7 @@ import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.feed.FeedAutoRefreshInterval
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
@@ -89,6 +90,7 @@ fun FeedSettingsPage(
                         ) {
                             feedSettingsVM.setAutoRefresh(it)
                         }
+                        HorizontalSpace(8.dp)
                     }
 
                     if (feedSettingsVM.autoRefresh.value) {
@@ -111,6 +113,7 @@ fun FeedSettingsPage(
                             ) {
                                 feedSettingsVM.setAutoRefreshOnlyWifi(it)
                             }
+                            HorizontalSpace(8.dp)
                         }
                     }
                 }

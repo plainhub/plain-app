@@ -19,7 +19,7 @@
     <string name="stop_service">Arresta servizio</string>
     <string name="run">Esegui</string>
     <string name="troubleshoot">Risoluzione dei problemi</string>
-    <string name="allow_remote_access_from_pc">Consenti l'accesso remoto dal PC</string>
+    <string name="allow_desktop_access_from_pc">Consenti l'accesso remoto dal PC</string>
     <string name="http_port_conflict_error">La porta {{ port }} è occupata. Tocca "Riavvia app" per risolvere automaticamente.</string>
     <string name="http_port_conflict_errors">Le porte {{ port }} sono occupate. Tocca "Riavvia app" per risolvere automaticamente.</string>
     <string name="fix">Correggi</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">Il server HTTP non è stato avviato. Riavvia PlainApp e riprova. Assicurati che non ci siano altre applicazioni che occupano le porte HTTP o HTTPS. Se il problema persiste, fornisci ulteriori dettagli sul problema contattando support@plainapp.app.</string>
     <string name="relaunch_app">Rilancia l'app</string>
     <string name="require_confirmation">Richiedi conferma</string>
-    <string name="web_service_required_for_chat">Per ricevere messaggi da altri, abilita il Portale Web del telefono.</string>
-    <string name="enable_web_service">Abilita servizio Web</string>
+    <string name="plainapp_service_required_for_chat">Avvia PlainApp Service per usare Chat.</string>
+    <string name="desktop_access">Accesso desktop</string>
     <string name="http_port">Porta HTTP</string>
     <string name="https_port">Porta HTTPS</string>
     <string name="allow_new_login">Consenti nuovo accesso</string>
@@ -54,7 +54,7 @@
     <string name="web_url">URL web</string>
     <string name="auth_dev_token_tips">I client devono includere sia c-id: &lt;client_id&gt; che Authorization: Bearer &lt;token&gt; nelle intestazioni della richiesta, oppure utilizzare la stessa coppia per crittografare il payload dell'API. Se il token viene fornito nelle intestazioni della richiesta, la risposta verrà restituita in testo normale.</string>
     <string name="browser_https_error_tips">Se visualizzi l'errore "La tua connessione non è privata", clicca semplicemente il pulsante "Avanzate" e poi il pulsante "Procedi a …", così Chrome confiderà questo URL per il resto della sessione del browser.</string>
-    <string name="api_service_is_running">Il servizio API è in esecuzione</string>
+    <string name="plainapp_service_is_running">PlainApp Service in esecuzione</string>
     <string name="screen_mirror_service_is_running">Il servizio di duplicazione dello schermo è in esecuzione</string>
     <string name="screen_mirror_audio_permission_settings_message">L'autorizzazione del microfono è disattivata. Abilitala nelle Impostazioni per specchiare l'audio di sistema.</string>
     <string name="enter_this_address_tips">Inserisci l'indirizzo sopra nel browser del tuo computer, assicurandoti che il telefono e il computer siano sulla stessa rete locale.</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">Quasi fatto! Tocca semplicemente "Rilancia APP" per rendere effettive le modifiche.</string>
     <string name="access_phone_web">Accedi al tuo telefono da un browser del computer.</string>
     <string name="scan_qrcode_to_access_web">Scansiona il codice QR per accedere all'indirizzo web</string>
-    <string name="phone_web_portal">Accesso web</string>
-    <string name="phone_web_portal_desc">Accedi al tuo telefono dal browser di un computer</string>
-    <string name="web_portal_off">Accesso web: DISATTIVATO</string>
-    <string name="web_portal_running">Accesso web: ATTIVATO</string>
-    <string name="web_portal_desc_off">Avvia il servizio per gestire i file del telefono dal desktop.</string>
-    <string name="web_portal_desc_running">Gestisci i file del telefono dal desktop sulla stessa rete locale.</string>
+    <string name="plainapp_service_off">PlainApp Service DISATTIVATO</string>
+    <string name="plainapp_service_on">PlainApp Service ATTIVATO</string>
+    <string name="plainapp_service_off_desc">Avvia PlainApp Service per usare Accesso desktop, Chat e Streaming wireless.</string>
     <string name="collapse_section">Comprimi</string>
     <string name="expand_section">Espandi</string>
     <string name="more_settings">Altre impostazioni</string>
     <string name="same_network_hint">Assicurati che il computer e il telefono siano sulla stessa rete</string>
     <string name="ready">Pronto</string>
     <string name="permission_settings">Impostazioni autorizzazioni</string>
-    <string name="web_address_hint">Collega computer e telefono alla stessa rete, quindi apri l'indirizzo corrispondente nel tuo browser.</string>
+    <string name="desktop_access_desc">Gestisci il tuo telefono dal tuo computer sulla stessa rete.</string>
     <string name="home_web_easy_hint">Tocca per avviare</string>
     <string name="home_web_easy_loading">Attendi…</string>
-    <string name="home_web_easy_failed_title">Impossibile avviare</string>
+    <string name="plainapp_service_failed">Impossibile avviare</string>
     <string name="last_active">Ultimo attivo: %1$s</string>
     <string name="revoke_session">Revoca questa sessione</string>
     <string name="how_to_use">Come si usa</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">Ferma server HTTP</string>
     <string name="enable_adb_token">Abilita token ADB</string>
     <string name="http_server_health_check_failed">Il servizio è stato avviato ma non è raggiungibile. Un'app firewall o VPN potrebbe bloccare le connessioni localhost. Controlla le impostazioni di rete e riavvia l'app.</string>
-    <string name="web_settings">Impostazioni Web</string>
+    <string name="access_settings">Impostazioni di accesso</string>
 </resources>

@@ -53,7 +53,6 @@
     <string name="empty_playlist">Ваш плейлист пуст</string>
     <string name="remove_from_playlist">Удалить из плейлиста</string>
     <string name="image">Изображение</string>
-    <string name="cast_searching_for_screen">Поиск экрана</string>
     <string name="cast_select_screen">Выбрать экран</string>
     <string name="cast_looking_for_devices">Поиск ближайших устройств...</string>
 </resources>

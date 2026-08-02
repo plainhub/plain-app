@@ -51,7 +51,7 @@
     <string name="os">Betriebssystem</string>
     <string name="browser">Browser</string>
     <string name="reject">Ablehnen</string>
-    <string name="allow_web_access">Web-Zugriff erlauben</string>
+    <string name="open_web_address">Öffnen Sie die untenstehende Adresse in Ihrem Webbrowser.</string>
     <string name="allow_web_access_desc">Erlaube den Zugriff auf deine Telefondaten über einen Webbrowser</string>
     <string name="allow_desktop_access">Desktop-Zugriff erlauben</string>
     <string name="allow_desktop_access_desc">Erlaube den Zugriff auf deine Telefondaten über die Desktop-App</string>

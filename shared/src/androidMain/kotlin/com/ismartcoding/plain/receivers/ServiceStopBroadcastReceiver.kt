@@ -1,5 +1,4 @@
 package com.ismartcoding.plain.receivers
-import com.ismartcoding.plain.preferences.*
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -9,8 +8,9 @@ import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.preferences.AdbTokenPreference
-import com.ismartcoding.plain.preferences.WebPreference
+import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.platform.stopHttpServiceAsync
+import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.ScreenMirrorService
 
@@ -24,7 +24,7 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
                 coIO {
                     val storedToken = AdbTokenPreference.getAsync()
                     if (intent.getStringExtra("token") != storedToken) return@coIO
-                    WebPreference.putAsync(true)
+                    ServicePreference.putAsync(true)
                     ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
                 }
             }
@@ -37,7 +37,7 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
                     val storedToken = AdbTokenPreference.getAsync()
                     if (intent.getStringExtra("token") != storedToken) return@coIO
                 }
-                WebPreference.putAsync(false)
+                ServicePreference.putAsync(false)
                 stopHttpServiceAsync()
             }
 

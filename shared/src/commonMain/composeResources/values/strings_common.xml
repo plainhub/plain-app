@@ -149,8 +149,8 @@
     <string name="copied_to_clipboard_format">"%1$s" copied to clipboard.</string>
     <string name="unknown_error">Unknown error occurred.</string>
     <string name="delete_channel_warning">Deleting this channel will also delete all related messages. This action cannot be undone.</string>
-    <string name="stay_online_mode">Stay Online Mode</string>
-    <string name="stay_online_mode_screen_black_countdown">The screen will turn black after %1$d seconds.</string>
-    <string name="stay_online_mode_keep_running">Keep PlainApp running when some phones limit background activity.</string>
-    <string name="stay_online_mode_tap_to_exit">Tap anywhere to exit</string>
+    <string name="stay_online">Stay Online</string>
+    <string name="stay_online_screen_black_countdown">The screen will turn black after %1$d seconds.</string>
+    <string name="stay_online_keep_running">Keep PlainApp running when some phones limit background activity.</string>
+    <string name="stay_online_tap_to_exit">Tap anywhere to exit</string>
 </resources>

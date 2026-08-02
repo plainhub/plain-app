@@ -19,7 +19,7 @@
     <string name="stop_service">停止服务</string>
     <string name="run">启动</string>
     <string name="troubleshoot">排查问题</string>
-    <string name="allow_remote_access_from_pc">允许电脑远程访问网页</string>
+    <string name="allow_desktop_access_from_pc">允许电脑远程访问网页</string>
     <string name="http_port_conflict_error">端口 {{ port }} 已被占用。轻触“重启应用”可自动修复。</string>
     <string name="http_port_conflict_errors">端口 {{ port }} 已被占用。轻触“重启应用”可自动修复。</string>
     <string name="fix">修复</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">HTTP服务器未启动。重新启动应用并重试。</string>
     <string name="relaunch_app">重启应用</string>
     <string name="require_confirmation">需要二次确认</string>
-    <string name="web_service_required_for_chat">要接收其他人发送的消息，请启用手机网页。</string>
-    <string name="enable_web_service">启用网页服务</string>
+    <string name="plainapp_service_required_for_chat">要使用聊天，请启动 PlainApp Service。</string>
+    <string name="desktop_access">桌面访问</string>
     <string name="http_port">HTTP端口</string>
     <string name="https_port">HTTPS端口</string>
     <string name="allow_new_login">允许新的登录</string>
@@ -54,7 +54,7 @@
     <string name="web_url">网站地址</string>
     <string name="auth_dev_token_tips">客户端必须在请求头中同时包含 c-id: &lt;client_id&gt; 和 Authorization: Bearer &lt;token&gt;，或使用同一对参数加密 API 数据。如果在请求头中提供了令牌，响应将以明文返回。</string>
     <string name="browser_https_error_tips">如果使用 HTTPS 地址，Chrome浏览器将会显示"您的连接不是私密连接"，请点击页面"高级"按钮继续。</string>
-    <string name="api_service_is_running">网页服务运行中</string>
+    <string name="plainapp_service_is_running">PlainApp Service 运行中</string>
     <string name="screen_mirror_service_is_running">屏幕镜像服务运行中</string>
     <string name="screen_mirror_audio_permission_settings_message">麦克风权限被禁用，请到设置里开启后才能镜像系统音频。</string>
     <string name="enter_this_address_tips">在电脑浏览器中输入以上地址，需确保手机和电脑在同一局域网中。</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">差一点了！只需点击“重启应用”即可生效。</string>
     <string name="access_phone_web">从电脑浏览器访问您的手机。</string>
     <string name="scan_qrcode_to_access_web">扫描二维码访问网页</string>
-    <string name="phone_web_portal">网页访问</string>
-    <string name="phone_web_portal_desc">在电脑浏览器中访问你的手机</string>
-    <string name="web_portal_off">网页访问已关闭</string>
-    <string name="web_portal_running">网页访问已激活</string>
-    <string name="web_portal_desc_off">启动从桌面管理手机文件的服务。</string>
-    <string name="web_portal_desc_running">在同一本地网络上从桌面管理手机文件。</string>
+    <string name="plainapp_service_off">PlainApp Service 已关闭</string>
+    <string name="plainapp_service_on">PlainApp Service 已开启</string>
+    <string name="plainapp_service_off_desc">启动 PlainApp Service 以使用桌面访问、聊天和无线投屏。</string>
     <string name="collapse_section">折叠</string>
     <string name="expand_section">展开</string>
     <string name="more_settings">更多设置</string>
     <string name="same_network_hint">请确保你的电脑和手机在同一网络下</string>
     <string name="ready">就绪</string>
     <string name="permission_settings">权限设置</string>
-    <string name="web_address_hint">将电脑和手机连接到同一网络，然后在浏览器中打开对应的地址。</string>
+    <string name="desktop_access_desc">在同一网络下通过电脑管理您的手机。</string>
     <string name="home_web_easy_hint">点击开始</string>
     <string name="home_web_easy_loading">请稍候…</string>
-    <string name="home_web_easy_failed_title">无法启动</string>
+    <string name="plainapp_service_failed">无法启动</string>
     <string name="last_active">最后活跃：%1$s</string>
     <string name="revoke_session">撤销此会话</string>
     <string name="how_to_use">使用方法</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">停止 HTTP 服务器</string>
     <string name="enable_adb_token">启用 ADB 令牌</string>
     <string name="http_server_health_check_failed">服务已启动但无法访问。防火墙或 VPN 应用可能阻止了 localhost 连接。请检查您的网络设置并重启应用。</string>
-    <string name="web_settings">网页设置</string>
+    <string name="access_settings">访问设置</string>
 </resources>

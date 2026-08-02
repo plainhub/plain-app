@@ -175,7 +175,7 @@ fun PairingRequestPage(
                             }
                         },
                     )
-                    VerticalSpace(24.dp)
+                    VerticalSpace(32.dp)
                     PFilledButton(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(Res.string.deny),

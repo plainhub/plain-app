@@ -45,7 +45,7 @@
     <string name="ip_address_asc">আইপি ঠিকানা (0 থেকে 9)</string>
     <string name="last_active_desc">শেষ সক্রিয়</string>
     <string name="app_version">অ্যাপ সংস্করণ</string>
-    <string name="android_version">অ্যান্ড্রয়েড সংস্করণ</string>
+    <string name="system_version">সিস্টেম সংস্করণ</string>
     <string name="clear_history">ইতিহাস মুছুন</string>
     <string name="clear_logs">লগ মুছুন</string>
     <string name="no_logs_error">কোন লগ শেয়ার করা যাবে না</string>

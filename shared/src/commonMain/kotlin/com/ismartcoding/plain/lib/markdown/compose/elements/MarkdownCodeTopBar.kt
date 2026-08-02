@@ -12,18 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.lib.markdown.compose.LocalMarkdownA11yLabels
 import com.ismartcoding.plain.lib.markdown.compose.LocalMarkdownColors
 import com.ismartcoding.plain.lib.markdown.compose.elements.material.MarkdownBasicText
+import com.ismartcoding.plain.platform.setClipboardText
 
 @Composable
 internal fun MarkdownCodeTopBar(
@@ -31,7 +30,6 @@ internal fun MarkdownCodeTopBar(
     code: String,
     modifier: Modifier = Modifier,
 ) {
-    @Suppress("DEPRECATION") val clipboardManager = LocalClipboardManager.current
     val textColor = LocalMarkdownColors.current.text
     val a11yLabels = LocalMarkdownA11yLabels.current
 
@@ -65,7 +63,7 @@ internal fun MarkdownCodeTopBar(
                     role = Role.Button
                 }
                 .clickable(onClickLabel = a11yLabels.copyCode) {
-                    clipboardManager.setText(AnnotatedString(code))
+                    setClipboardText("code", code)
                 },
             contentAlignment = Alignment.Center
         ) {

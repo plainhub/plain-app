@@ -21,6 +21,7 @@ import com.ismartcoding.plain.preferences.DarkThemePreference
 import com.ismartcoding.plain.preferences.LocalAmoledDarkTheme
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -89,6 +90,7 @@ fun DarkThemePage(navController: NavHostController) {
                                     AmoledDarkThemePreference.putAsync(!amoledDarkTheme)
                                 }
                             }
+                            HorizontalSpace(8.dp)
                         }
                     }
                     BottomSpace(paddingValues)

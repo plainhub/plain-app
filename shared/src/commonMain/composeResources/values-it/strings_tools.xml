@@ -4,19 +4,20 @@
     <string name="select_sound">Seleziona suono</string>
     <string name="sound_meter">Misuratore di suono</string>
     <string name="pomodoro_timer">Timer Pomodoro</string>
-    <string name="dlna_receiver">Streaming wireless</string>
+    <string name="dlna_receiver">Ricevitore di trasmissione</string>
+    <string name="dlna_receiver_desc">Riproduci video, musica e foto da un altro dispositivo.</string>
     <string name="dlna_receiver_waiting_title">In attesa di trasmissione</string>
     <string name="dlna_receiver_waiting_desc">Dispositivo visibile sulla rete: %1$s</string>
     <string name="dlna_receiver_step1_title">Connettiti allo stesso Wi-Fi</string>
     <string name="dlna_receiver_step1_desc">Assicurati che entrambi i dispositivi siano connessi alla stessa rete Wi-Fi</string>
     <string name="dlna_receiver_step2_title">Apri PlainApp</string>
     <string name="dlna_receiver_step2_desc">Apri PlainApp sull'altro dispositivo e trova il video o la musica che vuoi riprodurre</string>
-    <string name="dlna_receiver_step3_title">Trasmetti</string>
+    <string name="dlna_receiver_step3_title">Tocca per trasmettere</string>
     <string name="dlna_receiver_step3_desc">Tocca l'icona di trasmissione, seleziona "%1$s" dall'elenco e la riproduzione inizierà</string>
     <string name="dlna_receiver_protocol_note">Supporta i protocolli DLNA / UPnP, compatibile con VLC, Kodi e altre popolari app di trasmissione</string>
     <string name="dlna_receiver_exit_player">Esci dal lettore</string>
-    <string name="dlna_receiver_disabled_title">Ricevitore disattivato</string>
-    <string name="dlna_receiver_disabled_desc">Attiva l'interruttore nelle Impostazioni Web per ricevere trasmissioni su questo dispositivo</string>
+    <string name="dlna_receiver_turn_on">Attiva</string>
+    <string name="feature_disabled_title">%1$s è disattivato</string>
     <string name="short_break">Pausa Breve</string>
     <string name="long_break">Pausa Lunga</string>
     <string name="tomatoes_today">Pomodori Oggi</string>
@@ -74,6 +75,5 @@
     <string name="dlna_cast_history">Regole di cast</string>
     <string name="dlna_cast_accepted">Accettato</string>
     <string name="dlna_cast_rejected">Rifiutato</string>
-    <string name="dlna_receiver_start_error">Impossibile avviare il ricevitore.</string>
     <string name="retry">Riprova</string>
 </resources>

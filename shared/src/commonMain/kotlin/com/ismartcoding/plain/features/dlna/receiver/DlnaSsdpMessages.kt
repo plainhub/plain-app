@@ -16,6 +16,10 @@ object DlnaSsdpMessages {
     const val DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1"
     const val AVT_TYPE = "urn:schemas-upnp-org:service:AVTransport:1"
 
+    /** M-SEARCH query used by the DLNA device scanner to discover renderers. */
+    const val M_SEARCH_QUERY =
+        "M-SEARCH * HTTP/1.1\r\nST: ssdp:all\r\nHOST: $SSDP_ADDR:$SSDP_PORT\r\nMX: 3\r\nMAN: \"ssdp:discover\"\r\n\r\n"
+
     /** NOTIFY ssdp:alive messages for root device, device type, and service. */
     fun aliveMessages(uuid: String): List<String> {
         return listOf(

@@ -17,15 +17,15 @@ enum class ButtonSize(val height: Dp, val cornerRadius: Dp) {
     fun textStyle() = when (this) {
         SMALL -> MaterialTheme.typography.labelLarge
         MEDIUM -> MaterialTheme.typography.labelLarge
-        LARGE -> MaterialTheme.typography.titleSmall
-        EXTRA_LARGE -> MaterialTheme.typography.titleMedium
+        LARGE -> MaterialTheme.typography.titleMedium
+        EXTRA_LARGE -> MaterialTheme.typography.titleLarge
     }
 
     fun fontWeight() = when (this) {
         SMALL -> FontWeight.Medium
-        MEDIUM -> FontWeight.SemiBold
+        MEDIUM -> FontWeight.Medium
         LARGE -> FontWeight.SemiBold
-        EXTRA_LARGE -> FontWeight.Bold
+        EXTRA_LARGE -> FontWeight.SemiBold
     }
 
     @Composable

@@ -45,7 +45,7 @@
     <string name="ip_address_asc">IP 주소 (0에서 9로)</string>
     <string name="last_active_desc">마지막 활동</string>
     <string name="app_version">앱 버전</string>
-    <string name="android_version">Android 버전</string>
+    <string name="system_version">시스템 버전</string>
     <string name="clear_history">기록 지우기</string>
     <string name="clear_logs">로그 지우기</string>
     <string name="no_logs_error">공유할 로그가 없습니다</string>

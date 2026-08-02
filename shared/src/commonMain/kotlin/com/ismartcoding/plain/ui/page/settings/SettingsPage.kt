@@ -42,6 +42,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDonationBanner
 import com.ismartcoding.plain.ui.base.PExploreBanner
@@ -116,7 +117,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                     VerticalSpace(dp = 16.dp)
                     PCard {
                         PListItem(
-                            title = stringResource(Res.string.android_version),
+                            title = stringResource(Res.string.system_version),
                             value = getOSVersion(),
                         )
                         PListItem(
@@ -126,6 +127,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                             PSwitch(activated = isDiscoverable) { newValue ->
                                 peerVM.updateDiscoverable(newValue)
                             }
+                            HorizontalSpace(8.dp)
                         }
                         if (AppFeatureType.CHECK_UPDATES.has()) {
                             PListItem(title = stringResource(Res.string.app_version), subtitle = getAppVersion(), action = {
@@ -142,7 +144,10 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 })
                             })
                             PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
-                                PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.Default) { UpdateInfoPreference.updateAsync { it.copy(autoCheckUpdate = newValue) } } }
+                                PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.Default) {
+                                    UpdateInfoPreference.updateAsync { it.copy(autoCheckUpdate = newValue) } }
+                                }
+                                HorizontalSpace(8.dp)
                             }
                         } else {
                             PListItem(title = stringResource(Res.string.app_version), value = getAppVersion())

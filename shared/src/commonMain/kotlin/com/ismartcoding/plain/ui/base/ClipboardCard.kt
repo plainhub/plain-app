@@ -9,12 +9,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.platform.setClipboardText
 
 @Composable
 fun ClipboardCard(
@@ -22,13 +21,12 @@ fun ClipboardCard(
     label: String,
     text: String,
 ) {
-    val clipboard = LocalClipboardManager.current
     PCard(horizontal) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    clipboard.setText(AnnotatedString(text))
+                    setClipboardText(label, text)
                     DialogHelper.showTextCopiedMessage(text)
                 }
                 .padding(16.dp),

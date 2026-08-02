@@ -53,7 +53,6 @@
     <string name="empty_playlist">आपकी प्लेलिस्ट खाली है</string>
     <string name="remove_from_playlist">प्लेलिस्ट से हटाएं</string>
     <string name="image">छवि</string>
-    <string name="cast_searching_for_screen">स्क्रीन खोज रहा है</string>
     <string name="cast_select_screen">स्क्रीन चुनें</string>
     <string name="cast_looking_for_devices">पास के डिवाइस खोज रहा है...</string>
 </resources>

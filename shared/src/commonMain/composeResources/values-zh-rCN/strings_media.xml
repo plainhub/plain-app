@@ -53,7 +53,6 @@
     <string name="in_playlist">在播放列表中</string>
     <string name="empty_playlist">您的播放列表为空</string>
     <string name="remove_from_playlist">从播放列表中移除</string>
-    <string name="cast_searching_for_screen">正在搜索屏幕</string>
     <string name="cast_select_screen">选择屏幕</string>
     <string name="cast_looking_for_devices">正在搜索附近设备...</string>
 </resources>

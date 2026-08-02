@@ -51,7 +51,7 @@
     <string name="os">ऑपरेटिंग सिस्टम</string>
     <string name="browser">ब्राउज़र</string>
     <string name="reject">अस्वीकार करें</string>
-    <string name="allow_web_access">वेब एक्सेस की अनुमति दें</string>
+    <string name="open_web_address">नीचे दिया गया पता अपने वेब ब्राउज़र में खोलें।</string>
     <string name="allow_web_access_desc">वेब ब्राउज़र से अपने फ़ोन डेटा तक पहुँच की अनुमति दें</string>
     <string name="allow_desktop_access">डेस्कटॉप एक्सेस की अनुमति दें</string>
     <string name="allow_desktop_access_desc">डेस्कटॉप ऐप से अपने फ़ोन डेटा तक पहुँच की अनुमति दें</string>

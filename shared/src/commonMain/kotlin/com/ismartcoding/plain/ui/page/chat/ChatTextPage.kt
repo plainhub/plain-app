@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,6 +19,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.share
 import com.ismartcoding.plain.i18n.share_2
+import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -69,7 +69,7 @@ fun ChatTextPage(
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    ClickableText(
+                    PClickableText(
                         text = text,
                         style =
                             MaterialTheme.typography.bodyLarge.copy(

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,11 +12,9 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -118,15 +117,16 @@ fun DocItem(
                         VerticalSpace(dp = 8.dp)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             tags.forEach { tag ->
-                                ClickableText(
-                                    text = AnnotatedString("#" + tag.name),
-                                    modifier = Modifier.padding(end = 8.dp),
+                                Text(
+                                    text = "#" + tag.name,
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .clickable {
+                                            if (!dragSelectState.selectMode) {
+                                                onTagClick(tag)
+                                            }
+                                        },
                                     style = MaterialTheme.typography.listItemTag(),
-                                    onClick = {
-                                        if (!dragSelectState.selectMode) {
-                                            onTagClick(tag)
-                                        }
-                                    }
                                 )
                             }
                         }

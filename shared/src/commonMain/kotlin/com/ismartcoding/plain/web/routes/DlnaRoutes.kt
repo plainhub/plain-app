@@ -48,6 +48,13 @@ fun HttpRouter.addDlnaRoutes() {
  * `CastPlayer` state accordingly. When the renderer reports STOPPED (and the
  * callback has no AVTransportURIMetaData — which would indicate a duplicate
  * callback) the player auto-advances to the next playlist item.
+ *
+ * These are sender (casting) routes and have no separate feature toggle —
+ * they are available whenever the service is running, independently of the
+ * desktop-access gate and the DLNA receiver toggle. The platform HTTP
+ * intercepts bypass `desktopAccessEnabled` for them via
+ * [com.ismartcoding.plain.web.isDlnaSenderPath]; the HTTP server itself only
+ * runs while `serviceEnabled=true`.
  */
 private fun HttpRouter.addDlnaSenderRoutes() {
     get("/media/{id}") { call ->
@@ -195,7 +202,7 @@ private fun HttpRouter.addDlnaReceiverRoutes() {
 }
 
 private suspend fun handleDlnaReceiver(call: HttpCall) {
-    if (!TempData.dlnaReceiverEnabled.value) {
+    if (!TempData.canDLNAAccess()) {
         call.respondNoBody(HttpStatus.NOT_FOUND)
         return
     }

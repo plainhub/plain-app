@@ -22,28 +22,28 @@ import com.ismartcoding.plain.platform.stopHttpServiceAsync
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.preferences.WebPreference
+import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel(), MainViewModelBase {
-    override var httpServerError = mutableStateOf("")
-    override var httpServerState = mutableStateOf(HttpServerState.OFF)
-    override var isVPNConnected = mutableStateOf(false)
-    override var ip4s = mutableStateOf(emptyList<String>())
-    override var ip4 = mutableStateOf("")
-    override var currentRootTab = mutableIntStateOf(0)
-    override var pendingLoginEvent = mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
-    override var pendingPairingRequest = mutableStateOf<DPairingRequest?>(null)
+class MainViewModel : ViewModel() {
+    var httpServerError = mutableStateOf("")
+    var httpServerState = mutableStateOf(HttpServerState.OFF)
+    var isVPNConnected = mutableStateOf(false)
+    var ip4s = mutableStateOf(emptyList<String>())
+    var ip4 = mutableStateOf("")
+    var currentRootTab = mutableIntStateOf(0)
+    var pendingLoginEvent = mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
+    var pendingPairingRequest = mutableStateOf<DPairingRequest?>(null)
     // The channel invite currently on top of the back stack (if any). Used by
     // ChannelInviteCanceledEvent handling to pop the right page. Not saved across
     // process death — a fresh invite will re-fire ChannelInviteReceivedEvent.
-    override var pendingChannelInvite = mutableStateOf<ChannelInviteReceivedEvent?>(null)
+    var pendingChannelInvite = mutableStateOf<ChannelInviteReceivedEvent?>(null)
 
-    override fun enableHttpServer(enable: Boolean) {
+    fun enableHttpServer(enable: Boolean) {
         viewModelScope.launch {
-            WebPreference.putAsync(enable)
+            ServicePreference.putAsync(enable)
             if (enable) {
                 httpServerError.value = ""
                 if (!httpServerState.value.isProcessing() && httpServerState.value != HttpServerState.ON) {
@@ -73,10 +73,10 @@ class MainViewModel : ViewModel(), MainViewModelBase {
         }
     }
 
-    override fun syncHttpServerState() {
+    fun syncHttpServerState() {
         viewModelScope.launch {
-            val webEnabled = WebPreference.getAsync()
-            if (!webEnabled) {
+            val serviceEnabled = ServicePreference.getAsync()
+            if (!serviceEnabled) {
                 if (!httpServerState.value.isProcessing()) {
                     httpServerState.value = HttpServerState.OFF
                 }

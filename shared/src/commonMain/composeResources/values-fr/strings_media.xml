@@ -53,7 +53,6 @@
     <string name="empty_playlist">Votre liste de lecture est vide</string>
     <string name="remove_from_playlist">Supprimer de la liste</string>
     <string name="image">Image</string>
-    <string name="cast_searching_for_screen">Recherche d'écran</string>
     <string name="cast_select_screen">Sélectionner un écran</string>
     <string name="cast_looking_for_devices">Recherche d'appareils à proximité...</string>
 </resources>

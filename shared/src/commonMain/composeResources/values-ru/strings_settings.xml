@@ -45,7 +45,7 @@
     <string name="ip_address_asc">IP-адрес (от 0 до 9)</string>
     <string name="last_active_desc">Последняя активность</string>
     <string name="app_version">Версия приложения</string>
-    <string name="android_version">Версия Android</string>
+    <string name="system_version">Версия системы</string>
     <string name="clear_history">Очистить историю</string>
     <string name="clear_logs">Очистить логи</string>
     <string name="no_logs_error">Нет доступных логов</string>

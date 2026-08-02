@@ -45,7 +45,7 @@
     <string name="ip_address_asc">IP-adres (0 tot 9)</string>
     <string name="last_active_desc">Laatst actief</string>
     <string name="app_version">APP-versie</string>
-    <string name="android_version">Android-versie</string>
+    <string name="system_version">Systeemversie</string>
     <string name="clear_history">Geschiedenis wissen</string>
     <string name="clear_logs">Logs wissen</string>
     <string name="no_logs_error">Er zijn geen logs om te delen</string>

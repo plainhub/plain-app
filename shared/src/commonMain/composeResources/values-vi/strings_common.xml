@@ -146,10 +146,10 @@
 
     <string name="crash_report_title">Ứng dụng bị lỗi</string>
     <string name="crash_report_message">Ứng dụng bị lỗi bất ngờ. Xem báo cáo lỗi kèm nhật ký ứng dụng và chia sẻ để giúp chúng tôi khắc phục sự cố.</string>
-    <string name="stay_online_mode">Chế độ luôn trực tuyến</string>
-    <string name="stay_online_mode_screen_black_countdown">Màn hình sẽ chuyển sang đen sau %1$d giây.</string>
-    <string name="stay_online_mode_keep_running">Giữ PlainApp chạy khi một số điện thoại hạn chế hoạt động nền.</string>
-    <string name="stay_online_mode_tap_to_exit">Nhấn bất cứ đâu để thoát</string>
+    <string name="stay_online">Giữ trực tuyến</string>
+    <string name="stay_online_screen_black_countdown">Màn hình sẽ chuyển sang đen sau %1$d giây.</string>
+    <string name="stay_online_keep_running">Giữ PlainApp chạy khi một số điện thoại hạn chế hoạt động nền.</string>
+    <string name="stay_online_tap_to_exit">Nhấn bất cứ đâu để thoát</string>
     <string name="add_to_home">Thêm vào màn hình chính</string>
     <string name="shortcut_added_to_home">Đã thêm lối tắt vào màn hình chính</string>
     <string name="shortcut_not_supported">Trình khởi chạy của bạn không hỗ trợ thêm lối tắt</string>

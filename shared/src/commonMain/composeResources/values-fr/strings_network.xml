@@ -19,7 +19,7 @@
     <string name="stop_service">Arrêter le service</string>
     <string name="run">Exécuter</string>
     <string name="troubleshoot">Dépanner</string>
-    <string name="allow_remote_access_from_pc">Autoriser l'accès à distance depuis un PC</string>
+    <string name="allow_desktop_access_from_pc">Autoriser l'accès à distance depuis un PC</string>
     <string name="http_port_conflict_error">Le port {{ port }} est occupé. Appuyez sur "Redémarrer l’application" pour corriger automatiquement.</string>
     <string name="http_port_conflict_errors">Les ports {{ port }} sont occupés. Appuyez sur "Redémarrer l’application" pour corriger automatiquement.</string>
     <string name="fix">Réparer</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">Le serveur HTTP n'est pas démarré. Relancez PlainApp et réessayez. Assurez-vous qu'aucune autre application n'occupe les ports HTTP ou HTTPS. Si le problème persiste, veuillez fournir plus de détails sur le problème en contactant support@plainapp.app.</string>
     <string name="relaunch_app">Relancer l'application</string>
     <string name="require_confirmation">Nécessite une confirmation</string>
-    <string name="web_service_required_for_chat">Pour recevoir des messages d'autres personnes, veuillez activer le portail Web du téléphone.</string>
-    <string name="enable_web_service">Activer le service Web</string>
+    <string name="plainapp_service_required_for_chat">Veuillez démarrer PlainApp Service pour utiliser Chat.</string>
+    <string name="desktop_access">Accès Bureau</string>
     <string name="http_port">Port HTTP</string>
     <string name="https_port">Port HTTPS</string>
     <string name="allow_new_login">Autoriser nouvelle connexion</string>
@@ -54,7 +54,7 @@
     <string name="web_url">URL Web</string>
     <string name="auth_dev_token_tips">Les clients doivent inclure à la fois c-id: &lt;client_id&gt; et Authorization: Bearer &lt;token&gt; dans les en-têtes de la requête, ou utiliser la même paire pour chiffrer le payload de l'API. Si le token est fourni dans les en-têtes de la requête, la réponse sera renvoyée en texte clair.</string>
     <string name="browser_https_error_tips">Si vous voyez l'erreur "Votre connexion n'est pas privée", cliquez simplement sur le bouton "Avancé" et sur le bouton "Continuer vers…", puis Chrome fera confiance à cette URL pour le reste de la session du navigateur.</string>
-    <string name="api_service_is_running">Le service API est en cours d'exécution</string>
+    <string name="plainapp_service_is_running">PlainApp Service est en cours d'exécution</string>
     <string name="screen_mirror_service_is_running">Le service de mise en miroir de l'écran est en cours d'exécution</string>
     <string name="screen_mirror_audio_permission_settings_message">L'autorisation du microphone est désactivée. Veuillez l'activer dans les paramètres pour refléter l'audio système.</string>
     <string name="enter_this_address_tips">Entrez l'adresse ci-dessus dans le navigateur de votre ordinateur, en vous assurant que votre téléphone et votre ordinateur sont sur le même réseau local.</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">Presque terminé ! Appuyez simplement sur "Relancer l'application" pour que les changements prennent effet.</string>
     <string name="access_phone_web">Accédez à votre téléphone depuis un navigateur sur un ordinateur.</string>
     <string name="scan_qrcode_to_access_web">Scannez le code QR ci-dessus pour accéder à votre téléphone depuis un navigateur sur un ordinateur.</string>
-    <string name="phone_web_portal">Accès web</string>
-    <string name="phone_web_portal_desc">Accédez à votre téléphone depuis le navigateur d'un ordinateur</string>
-    <string name="web_portal_off">Accès web : DÉSACTIVÉ</string>
-    <string name="web_portal_running">Accès web : ACTIVÉ</string>
-    <string name="web_portal_desc_off">Démarrez le service pour gérer les fichiers du téléphone à partir du bureau.</string>
-    <string name="web_portal_desc_running">Gérez les fichiers du téléphone depuis le bureau sur le même réseau local.</string>
+    <string name="plainapp_service_off">PlainApp Service DÉSACTIVÉ</string>
+    <string name="plainapp_service_on">PlainApp Service ACTIVÉ</string>
+    <string name="plainapp_service_off_desc">Démarrez PlainApp Service pour utiliser Accès Bureau, Chat et Diffusion sans fil.</string>
     <string name="collapse_section">Réduire</string>
     <string name="expand_section">Développer</string>
     <string name="more_settings">Plus de paramètres</string>
     <string name="same_network_hint">Assurez-vous que votre ordinateur et votre téléphone sont sur le même réseau</string>
     <string name="ready">Prêt</string>
     <string name="permission_settings">Paramètres des autorisations</string>
-    <string name="web_address_hint">Connectez l'ordinateur et le téléphone au même réseau, puis ouvrez l'adresse correspondante dans votre navigateur.</string>
+    <string name="desktop_access_desc">Gérez votre téléphone depuis votre ordinateur sur le même réseau.</string>
     <string name="home_web_easy_hint">Appuyez pour démarrer</string>
     <string name="home_web_easy_loading">Veuillez patienter…</string>
-    <string name="home_web_easy_failed_title">Impossible de démarrer</string>
+    <string name="plainapp_service_failed">Impossible de démarrer</string>
     <string name="last_active">Dernier actif : %1$s</string>
     <string name="revoke_session">Révoquer cette session</string>
     <string name="how_to_use">Comment utiliser</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">Arrêter le serveur HTTP</string>
     <string name="enable_adb_token">Activer le jeton ADB</string>
     <string name="http_server_health_check_failed">Le service a démarré mais est inaccessible. Un pare-feu ou une application VPN peut bloquer les connexions localhost. Veuillez vérifier vos paramètres réseau et redémarrer l'application.</string>
-    <string name="web_settings">Paramètres Web</string>
+    <string name="access_settings">Paramètres d'accès</string>
 </resources>

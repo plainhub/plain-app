@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.ui.base.ClipboardTextField
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PDialogTips
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -82,6 +83,7 @@ fun AddFeedDialog(feedsVM: FeedsViewModel) {
                             ) {
                                 feedsVM.editFetchContent.value = it
                             }
+                            HorizontalSpace(8.dp)
                         }
                         PDialogTips(text = stringResource(Res.string.auto_fetch_full_content_tips))
                     }

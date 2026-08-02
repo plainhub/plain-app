@@ -146,10 +146,10 @@
 
     <string name="crash_report_title">Uygulama çöktü</string>
     <string name="crash_report_message">Uygulama beklenmedik şekilde çöktü. Uygulama günlükleriyle birlikte kilitlenme raporunu görüntüleyin ve sorunu çözmeye yardımcı olmak için paylaşın.</string>
-    <string name="stay_online_mode">Çevrimiçi Kal Modu</string>
-    <string name="stay_online_mode_screen_black_countdown">Ekran %1$d saniye sonra siyah olacak.</string>
-    <string name="stay_online_mode_keep_running">Bazı telefonlar arka plan etkinliğini kısıtladığında PlainApp\'i çalışır halde tutun.</string>
-    <string name="stay_online_mode_tap_to_exit">Çıkmak için dokunun</string>
+    <string name="stay_online">Çevrimiçi kal</string>
+    <string name="stay_online_screen_black_countdown">Ekran %1$d saniye sonra siyah olacak.</string>
+    <string name="stay_online_keep_running">Bazı telefonlar arka plan etkinliğini kısıtladığında PlainApp'i çalışır halde tutun.</string>
+    <string name="stay_online_tap_to_exit">Çıkmak için dokunun</string>
     <string name="add_to_home">Ana ekrana ekle</string>
     <string name="shortcut_added_to_home">Kısayol ana ekrana eklendi</string>
     <string name="shortcut_not_supported">Başlatıcınız kısayol eklemeyi desteklemiyor</string>

@@ -1,13 +1,11 @@
 package com.ismartcoding.plain.platform
 
 import androidx.room.AutoMigration
-import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.DeleteTable
 import androidx.room.RenameColumn
 import androidx.room.RenameTable
 import androidx.room.RoomDatabase
-import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import com.ismartcoding.plain.db.*
@@ -59,7 +57,6 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
     exportSchema = true,
 )
 @TypeConverters(DateConverter::class, ChannelMemberListConverter::class, ChatItemContentConverter::class)
-@ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
     abstract fun sessionDao(): SessionDao
@@ -99,10 +96,12 @@ fun initDatabase(db: AppDatabase) {
     AppDatabase.init(db)
 }
 
-@Suppress("NO_ACTUAL_FOR_EXPECT")
-expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
-    override fun initialize(): AppDatabase
-}
+/**
+ * Platform-specific factory that instantiates the KSP-generated [AppDatabase]
+ * implementation (`AppDatabase_Impl`). Each platform's actual references the
+ * generated class directly.
+ */
+expect fun createAppDatabaseInstance(): AppDatabase
 
 /**
  * Platform-specific database builder factory. The Android actual uses

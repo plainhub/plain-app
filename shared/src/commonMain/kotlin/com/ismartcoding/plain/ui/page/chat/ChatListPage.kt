@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
@@ -31,18 +32,18 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.bot
 import com.ismartcoding.plain.i18n.channels
 import com.ismartcoding.plain.i18n.devices
-import com.ismartcoding.plain.i18n.enable_web_service
+import com.ismartcoding.plain.i18n.desktop_access
 import com.ismartcoding.plain.i18n.grant_permission
 import com.ismartcoding.plain.i18n.hash
 import com.ismartcoding.plain.i18n.local_chat
 import com.ismartcoding.plain.i18n.local_chat_desc
 import com.ismartcoding.plain.i18n.nearby_wifi_devices_required_for_chat
-import com.ismartcoding.plain.i18n.web_service_required_for_chat
+import com.ismartcoding.plain.i18n.plainapp_service_required_for_chat
+import com.ismartcoding.plain.i18n.start_service
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.platform.isTPlus
-import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
@@ -58,7 +59,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.platform.isBleReady
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.MainViewModelBase
+import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.nav.Routing
@@ -70,14 +71,14 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ChatListPage(
     navController: NavHostController,
-    mainVM: MainViewModelBase,
+    mainVM: MainViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
     onTabSelected: ((Int) -> Unit)? = null,
 ) {
     val pairedPeers = PeerCacher.pairedPeers.collectAsStateValue()
     val unpairedPeers = PeerCacher.unpairedPeers.collectAsStateValue()
-    val webEnabled = LocalWeb.current
+    val serviceEnabled = TempData.serviceEnabled.collectAsStateValue()
     val refreshState = rememberRefreshLayoutState {
         PeerStatusManager.reconnectNow("chat_list_pull_refresh")
         peerVM.load()
@@ -124,7 +125,7 @@ fun ChatListPage(
 
     PScaffold(
         topBar = { TopBarChat(navController, onCreateChannel = { channelVM.showCreateChannelDialog.value = true }) },
-        bottomBar = if (onTabSelected != null) { { MainBottomBar(selectedIndex = 1, onTabSelected = onTabSelected!!) } } else null,
+        bottomBar = if (onTabSelected != null) { { MainBottomBar(selectedIndex = 1, onTabSelected = onTabSelected) } } else null,
     ) { paddingValues ->
         PullToRefresh(
             modifier = Modifier
@@ -135,16 +136,18 @@ fun ChatListPage(
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item { TopSpace() }
                 item {
-                    if (!webEnabled) PAlert(
-                        description = stringResource(Res.string.web_service_required_for_chat),
-                        AlertType.WARNING
-                    ) {
-                        PFilledButton(
-                            text = stringResource(Res.string.enable_web_service),
-                            buttonSize = ButtonSize.SMALL,
-                            onClick = {
-                                mainVM.enableHttpServer(true)
-                            })
+                    if (!serviceEnabled){
+                        PAlert(
+                            description = stringResource(Res.string.plainapp_service_required_for_chat),
+                            AlertType.WARNING
+                        ) {
+                            PFilledButton(
+                                text = stringResource(Res.string.start_service),
+                                buttonSize = ButtonSize.SMALL,
+                                onClick = {
+                                    mainVM.enableHttpServer(true)
+                                })
+                        }
                     }
                 }
                 item {

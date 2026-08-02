@@ -107,7 +107,7 @@ object MainAppHelper {
             val preferences = initCommonPreferences()
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
             AdbTokenPreference.ensureValueAsync(preferences)
-            if (TempData.webEnabled.value && PlugInControlReceiver.isUSBConnected(app)) {
+            if (TempData.serviceEnabled.value && PlugInControlReceiver.isUSBConnected(app)) {
                 sendEvent(PowerConnectedEvent())
             }
 

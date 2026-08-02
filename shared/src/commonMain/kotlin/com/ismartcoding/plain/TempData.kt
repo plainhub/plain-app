@@ -3,14 +3,14 @@ package com.ismartcoding.plain
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.sms.DPendingMms
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlin.time.Instant
 
 object TempData {
-    val webEnabled = MutableStateFlow(false)
+    val serviceEnabled = MutableStateFlow(false)
+    val desktopAccessEnabled = MutableStateFlow(false)
     val webHttps = MutableStateFlow(false)
     val httpPort = MutableStateFlow(8080)
     val httpsPort = MutableStateFlow(8443)
-    val dlnaReceiverEnabled = MutableStateFlow(false)
+    val dlnaEnabled = MutableStateFlow(false)
     var clientId = ""
     val deviceName = MutableStateFlow("")
     var urlToken = ByteArray(0) // use to encrypt or decrypt params in url (kept as raw bytes to avoid base64 decode on every encrypt/decrypt)
@@ -28,6 +28,7 @@ object TempData {
 
     var audioSleepTimerFutureTime = 0L
     var audioPlayPosition = 0L // audio play position in milliseconds
+
     // mediaId -> playback position in milliseconds; pre-loaded from DB on startup as cache
     val videoPlayProgressMap = mutableMapOf<String, Long>()
 
@@ -47,4 +48,16 @@ object TempData {
      * "sending…" state before and after a page refresh.
      */
     val pendingMmsMessages = mutableListOf<DPendingMms>()
+
+    fun canDesktopAccess(): Boolean {
+        return desktopAccessEnabled.value && serviceEnabled.value
+    }
+
+    fun canChatAccess(): Boolean {
+        return serviceEnabled.value
+    }
+
+    fun canDLNAAccess(): Boolean {
+        return dlnaEnabled.value && serviceEnabled.value
+    }
 }

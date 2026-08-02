@@ -19,7 +19,7 @@
     <string name="stop_service">Dừng dịch vụ</string>
     <string name="run">Chạy</string>
     <string name="troubleshoot">Khắc phục sự cố</string>
-    <string name="allow_remote_access_from_pc">Cho phép truy cập từ xa từ PC</string>
+    <string name="allow_desktop_access_from_pc">Cho phép truy cập từ xa từ PC</string>
     <string name="http_port_conflict_error">Cổng {{ port }} đang bị chiếm. Nhấn "Khởi động lại ứng dụng" để tự động khắc phục.</string>
     <string name="http_port_conflict_errors">Các cổng {{ port }} đang bị chiếm. Nhấn "Khởi động lại ứng dụng" để tự động khắc phục.</string>
     <string name="fix">Sửa</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">Máy chủ HTTP không được khởi động. Vui lòng khởi động lại PlainApp và thử lại.</string>
     <string name="relaunch_app">Khởi chạy lại ứng dụng</string>
     <string name="require_confirmation">Yêu cầu xác nhận</string>
-    <string name="web_service_required_for_chat">Để nhận tin nhắn từ người khác, vui lòng bật Cổng web điện thoại.</string>
-    <string name="enable_web_service">Bật dịch vụ Web</string>
+    <string name="plainapp_service_required_for_chat">Vui lòng khởi động PlainApp Service để sử dụng Trò chuyện.</string>
+    <string name="desktop_access">Truy cập máy tính</string>
     <string name="http_port">Cổng HTTP</string>
     <string name="https_port">Cổng HTTPS</string>
     <string name="allow_new_login">Cho phép đăng nhập mới</string>
@@ -54,7 +54,7 @@
     <string name="web_url">URL Web</string>
     <string name="auth_dev_token_tips">Clients phải bao gồm cả c-id: &lt;client_id&gt; và Authorization: Bearer &lt;token&gt; trong tiêu đề yêu cầu, hoặc sử dụng cùng một cặp để mã hóa payload API. Nếu token được cung cấp trong tiêu đề yêu cầu, phản hồi sẽ được trả về ở dạng văn bản thuần túy.</string>
     <string name="browser_https_error_tips">Nếu bạn thấy lỗi "Kết nối của bạn không riêng tư", đơn giản là nhấn vào nút "Nâng cao" và nhấn vào nút "Tiếp tục tới …", sau đó Chrome sẽ tin tưởng vào URL này cho phần còn lại của phiên duyệt.</string>
-    <string name="api_service_is_running">Dịch vụ API đang chạy</string>
+    <string name="plainapp_service_is_running">PlainApp Service đang chạy</string>
     <string name="screen_mirror_service_is_running">Dịch vụ phản chiếu màn hình đang chạy</string>
     <string name="screen_mirror_audio_permission_settings_message">Quyền micro đang bị tắt. Hãy bật trong Cài đặt để phản chiếu âm thanh hệ thống.</string>
     <string name="enter_this_address_tips">Nhập địa chỉ trên vào trình duyệt của máy tính của bạn, đảm bảo rằng điện thoại và máy tính của bạn đang kết nối với cùng một mạng cục bộ.</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">Gần xong! Chỉ cần nhấn "Khởi động lại ứng dụng" để thực hiện.</string>
     <string name="access_phone_web">Truy cập điện thoại của bạn từ trình duyệt máy tính.</string>
     <string name="scan_qrcode_to_access_web">Quét mã QR để truy cập địa chỉ web</string>
-    <string name="phone_web_portal">Truy cập Web</string>
-    <string name="phone_web_portal_desc">Truy cập điện thoại của bạn từ trình duyệt trên máy tính</string>
-    <string name="web_portal_off">Truy cập Web: TẮT</string>
-    <string name="web_portal_running">Truy cập Web: BẬT</string>
-    <string name="web_portal_desc_off">Bắt đầu dịch vụ để quản lý các tệp điện thoại từ máy tính để bàn.</string>
-    <string name="web_portal_desc_running">Quản lý các tập tin điện thoại từ máy tính để bàn trên cùng một mạng cục bộ.</string>
+    <string name="plainapp_service_off">PlainApp Service TẮT</string>
+    <string name="plainapp_service_on">PlainApp Service BẬT</string>
+    <string name="plainapp_service_off_desc">Khởi động PlainApp Service để sử dụng Truy cập máy tính, Trò chuyện và Phát không dây.</string>
     <string name="collapse_section">Thu gọn</string>
     <string name="expand_section">Mở rộng</string>
     <string name="more_settings">Cài đặt khác</string>
     <string name="same_network_hint">Đảm bảo máy tính và điện thoại của bạn cùng một mạng</string>
     <string name="ready">Sẵn sàng</string>
     <string name="permission_settings">Cài đặt quyền</string>
-    <string name="web_address_hint">Kết nối máy tính và điện thoại vào cùng một mạng, sau đó mở địa chỉ tương ứng trong trình duyệt của bạn.</string>
+    <string name="desktop_access_desc">Quản lý điện thoại của bạn từ máy tính trên cùng một mạng.</string>
     <string name="home_web_easy_hint">Nhấn để bắt đầu</string>
     <string name="home_web_easy_loading">Vui lòng chờ…</string>
-    <string name="home_web_easy_failed_title">Không thể khởi động</string>
+    <string name="plainapp_service_failed">Không thể khởi động</string>
     <string name="last_active">Lần cuối hoạt động: %1$s</string>
     <string name="revoke_session">Thu hồi phiên này</string>
     <string name="how_to_use">Cách sử dụng</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">Dừng máy chủ HTTP</string>
     <string name="enable_adb_token">Bật mã thông báo ADB</string>
     <string name="http_server_health_check_failed">Dịch vụ đã khởi động nhưng không thể truy cập. Một ứng dụng tường lửa hoặc VPN có thể đang chặn các kết nối localhost. Vui lòng kiểm tra cài đặt mạng và khởi động lại ứng dụng.</string>
-    <string name="web_settings">Cài đặt Web</string>
+    <string name="access_settings">Cài đặt truy cập</string>
 </resources>

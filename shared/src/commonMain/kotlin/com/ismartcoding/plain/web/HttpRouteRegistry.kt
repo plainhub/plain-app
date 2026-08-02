@@ -1,12 +1,9 @@
 package com.ismartcoding.plain.web
 
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.web.graphql.MainGraphQLService
-import com.ismartcoding.plain.web.graphql.PeerGraphQLService
 import com.ismartcoding.plain.web.http.HttpCall
 import com.ismartcoding.plain.web.http.HttpMethod
 import com.ismartcoding.plain.web.http.HttpRouter
-import com.ismartcoding.plain.web.http.HttpStatus
 import com.ismartcoding.plain.web.http.RouteEntry
 import com.ismartcoding.plain.web.routes.addDlnaRoutes
 import com.ismartcoding.plain.web.routes.addFilesRoutes
@@ -15,6 +12,88 @@ import com.ismartcoding.plain.web.routes.addSystemRoutes
 import com.ismartcoding.plain.web.routes.addUploadRoutes
 import com.ismartcoding.plain.web.routes.addWebSocketRoutes
 import com.ismartcoding.plain.web.routes.addZipRoutes
+
+/**
+ * Peer-to-peer communication channels that remain accessible when
+ * `desktopAccessEnabled=false` but `serviceEnabled=true`.
+ *
+ * These routes serve paired-peer traffic (PeerGraphQL, peer file download,
+ * peer status heartbeat) plus the health probe. Main-UI routes
+ * (MainGraphQL `/graphql`, `/init`, WS `/`, `/upload`, `/zip/dir`, `/zip/files`, `/proxyfs`)
+ * are NOT listed here — they require `canDesktopAccess()`.
+ *
+ * Used by the Android/iOS platform intercepts as an early-reject whitelist
+ * so Main-UI requests are turned away before route dispatch, while peer
+ * traffic flows through to the commonMain handlers. The authoritative
+ * access-control checks live inside each route handler (covers BLE RPC,
+ * which has no platform intercept).
+ */
+private val PEER_ACCESSIBLE_PATHS: Set<Pair<HttpMethod, String>> = setOf(
+    HttpMethod.POST to "/peer_graphql",
+    HttpMethod.GET to "/fs",
+    HttpMethod.GET to "/health",
+    HttpMethod.GET to "/status", // WebSocket upgrade for peer status heartbeat
+)
+
+/**
+ * Returns `true` when [method] + [path] is a peer-accessible route that must
+ * remain available even when `desktopAccessEnabled=false` (as long as
+ * `serviceEnabled=true`). See [PEER_ACCESSIBLE_PATHS].
+ */
+fun isPeerAccessiblePath(method: HttpMethod, path: String): Boolean {
+    val cleanPath = path.substringBefore("?")
+    return PEER_ACCESSIBLE_PATHS.contains(method to cleanPath)
+}
+
+/**
+ * DLNA sender paths that must remain accessible when
+ * `desktopAccessEnabled=false` (as long as `serviceEnabled=true`).
+ *
+ * `/media/{id}` serves media files to remote DLNA renderers (the TV pulls the
+ * stream from here); `NOTIFY /callback/cast` receives renderer event callbacks.
+ * Both are required for casting (sender mode) and have no separate feature
+ * toggle — they are available whenever the service is running, independently
+ * of the desktop-access gate (web UI) and the DLNA receiver toggle.
+ *
+ * `/media/{id}` uses a path parameter so it is matched by prefix. Used by the
+ * platform HTTP intercepts to bypass the `desktopAccessEnabled` check; the
+ * HTTP server itself only runs while `serviceEnabled=true`.
+ */
+fun isDlnaSenderPath(method: HttpMethod, path: String): Boolean {
+    val cleanPath = path.substringBefore("?")
+    if (method == HttpMethod.GET && cleanPath.startsWith("/media/")) return true
+    if (method.name == "NOTIFY" && cleanPath == "/callback/cast") return true
+    return false
+}
+
+/**
+ * DLNA receiver paths that must remain accessible when
+ * `desktopAccessEnabled=false` (as long as `serviceEnabled=true`).
+ *
+ * `/description.xml` is the device description document fetched by remote
+ * senders (control points) during SSDP discovery; the `/AVTransport/...` and
+ * `/RenderingControl/...` paths carry the SOAP control + GENA event traffic
+ * that drives playback on this device acting as a MediaRenderer.
+ *
+ * The authoritative access check (`TempData.canDLNAAccess()`, which requires
+ * the DLNA receiver toggle + service) lives in the receiver route handler;
+ * this function only decides whether to bypass the `desktopAccessEnabled`
+ * gate at the platform HTTP intercept so the request can reach that handler.
+ */
+fun isDlnaReceiverPath(method: HttpMethod, path: String): Boolean {
+    val cleanPath = path.substringBefore("?")
+    if (method == HttpMethod.GET && cleanPath == "/description.xml") return true
+    if (cleanPath.startsWith("/AVTransport/") || cleanPath.startsWith("/RenderingControl/")) return true
+    return false
+}
+
+/**
+ * Convenience aggregate of [isDlnaSenderPath] and [isDlnaReceiverPath] for
+ * the platform HTTP intercepts: any DLNA route bypasses the
+ * `desktopAccessEnabled` gate (its own handler enforces the real toggle).
+ */
+fun isDlnaPath(method: HttpMethod, path: String): Boolean =
+    isDlnaSenderPath(method, path) || isDlnaReceiverPath(method, path)
 
 /**
  * Shared HTTP route registry built once per process and dispatch from both

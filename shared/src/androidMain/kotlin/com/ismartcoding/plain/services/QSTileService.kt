@@ -15,9 +15,9 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.lib.receiveEventHandler
-import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.platform.checkHttpServerAsync
 import com.ismartcoding.plain.platform.stopHttpServiceAsync
+import com.ismartcoding.plain.preferences.ServicePreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -75,7 +75,7 @@ class QSTileService : TileService() {
         stateCheckJob = serviceScope.launch(Dispatchers.IO) {
             try {
                 // First check if webEnabled is true in TempData
-                if (TempData.webEnabled.value) {
+                if (TempData.serviceEnabled.value) {
                     val serverUp = checkHttpServerAsync()
                     if (serverUp) {
                         withContext(Dispatchers.Main.immediate) {
@@ -138,7 +138,7 @@ class QSTileService : TileService() {
                 // external caller (e.g. `adb shell am start --ez start_web_service true`).
                 serviceScope.launch(Dispatchers.IO) {
                     val appContext = applicationContext
-                    WebPreference.putAsync(true)
+                    ServicePreference.putAsync(true)
                     ContextCompat.startForegroundService(
                         appContext,
                         Intent(appContext, HttpServerService::class.java),
@@ -152,7 +152,7 @@ class QSTileService : TileService() {
                 qsTile?.updateTile()
 
                 serviceScope.launch(Dispatchers.IO) {
-                    WebPreference.putAsync(false)
+                    ServicePreference.putAsync(false)
                     stopHttpServiceAsync()
                     withContext(Dispatchers.Main.immediate) {
                         setState(Tile.STATE_INACTIVE)

@@ -5,8 +5,6 @@ import android.net.Uri
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.plain.lib.extensions.parcelable
 import com.ismartcoding.plain.lib.extensions.parcelableArrayList
-import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.not_supported_error
@@ -18,8 +16,8 @@ import com.ismartcoding.plain.ui.nav.navigateTextFile
 internal fun MainActivity.handleIntent(intent: Intent) {
     if (intent.getBooleanExtra("navigate_to_web_settings", false)) {
         val nav = navControllerState.value
-        val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute(Routing.WebSettings::class) == true
-        if (!alreadyThere) nav?.navigate(Routing.WebSettings)
+        val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute(Routing.DesktopAccessSettings::class) == true
+        if (!alreadyThere) nav?.navigate(Routing.DesktopAccessSettings)
     }
 
     intent.getStringExtra(IntentExtras.CHAT_TARGET_ID)?.let { targetId ->

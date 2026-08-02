@@ -520,7 +520,6 @@ class YjsDoc(data: ByteArray) {
             is JsonArray -> {
                 element.map { jsonElementToJsonValue(it) }
             }
-            else -> null
         }
     }
 

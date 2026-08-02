@@ -146,10 +146,10 @@
 
     <string name="crash_report_title">অ্যাপ ক্র্যাশ হয়েছে</string>
     <string name="crash_report_message">অ্যাপটি অপ্রত্যাশিতভাবে ক্র্যাশ হয়েছে। অ্যাপ লগ সহ ক্র্যাশ রিপোর্ট দেখুন এবং সমস্যা সমাধানে সাহায্য করতে শেয়ার করুন।</string>
-    <string name="stay_online_mode">স্টে অনলাইন মোড</string>
-    <string name="stay_online_mode_screen_black_countdown">%1$d সেকেন্ডে স্ক্রিন কালো হয়ে যাবে।</string>
-    <string name="stay_online_mode_keep_running">কিছু ফোন ব্যাকগ্রাউন্ড অ্যাক্টিভিটি সীমিত করলে PlainApp চালু রাখুন।</string>
-    <string name="stay_online_mode_tap_to_exit">প্রস্থান করতে যেকোনো জায়গায় ট্যাপ করুন</string>
+    <string name="stay_online">অনলাইনে থাকুন</string>
+    <string name="stay_online_screen_black_countdown">স্ক্রিন %1$d সেকেন্ডে কালো হয়ে যাবে।</string>
+    <string name="stay_online_keep_running">কিছু ফোন ব্যাকগ্রাউন্ড অ্যাক্টিভিটি সীমিত করলে PlainApp চালু রাখুন।</string>
+    <string name="stay_online_tap_to_exit">প্রস্থান করতে যেকোনো জায়গায় ট্যাপ করুন</string>
     <string name="add_to_home">হোম স্ক্রিনে যোগ করুন</string>
     <string name="shortcut_added_to_home">হোম স্ক্রিনে শর্টকাট যোগ করা হয়েছে</string>
     <string name="shortcut_not_supported">আপনার লঞ্চার শর্টকাট যোগ করা সমর্থন করে না</string>

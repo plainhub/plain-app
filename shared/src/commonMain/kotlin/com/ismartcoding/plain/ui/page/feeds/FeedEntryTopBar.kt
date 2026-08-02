@@ -11,8 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.navigation.NavHostController
@@ -27,6 +25,7 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedEntryViewModel
+import com.ismartcoding.plain.platform.setClipboardText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -37,7 +36,6 @@ internal fun FeedEntryTopBar(
     scrollBehavior: TopAppBarScrollBehavior, scope: CoroutineScope,
     onScrollToTop: () -> Unit,
 ) {
-    val clipboard = LocalClipboardManager.current
     PTopAppBar(
         modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { onScrollToTop() }),
         navController = navController, title = "", scrollBehavior = scrollBehavior,
@@ -68,7 +66,7 @@ internal fun FeedEntryTopBar(
                     leadingIcon = { Icon(painter = painterResource(Res.drawable.link), contentDescription = stringResource(Res.string.copy_link)) },
                     onClick = {
                         dismiss(); val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
-                        clipboard.setText(AnnotatedString(m.url))
+                        setClipboardText("link", m.url)
                         DialogHelper.showTextCopiedMessage(m.url)
                     })
             }

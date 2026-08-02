@@ -2,7 +2,8 @@
 <resources>
     <string name="sound_meter">Sound meter</string>
     <string name="pomodoro_timer">Pomodoro timer</string>
-    <string name="dlna_receiver">Wireless Cast</string>
+    <string name="dlna_receiver">Cast Receiver</string>
+    <string name="dlna_receiver_desc">Play videos, music, and photos from another device.</string>
     <string name="dlna_receiver_waiting_title">Waiting for Cast</string>
     <string name="dlna_receiver_waiting_desc">Device visible on network: %1$s</string>
     <string name="dlna_receiver_step1_title">Connect to the Same Wi-Fi</string>
@@ -13,8 +14,8 @@
     <string name="dlna_receiver_step3_desc">Tap the cast icon, select "%1$s" from the list, and playback will begin</string>
     <string name="dlna_receiver_protocol_note">Supports DLNA / UPnP protocols, compatible with VLC, Kodi, and other popular casting apps</string>
     <string name="dlna_receiver_exit_player">Exit Player</string>
-    <string name="dlna_receiver_disabled_title">Cast Receiver is Off</string>
-    <string name="dlna_receiver_disabled_desc">Turn on the toggle in Web Settings to receive casts on this device</string>
+    <string name="dlna_receiver_turn_on">Turn On</string>
+    <string name="feature_disabled_title">%1$s is Off</string>
     <string name="dlna_cast_request_title">Cast Request</string>
     <string name="dlna_cast_request_desc">Device %1$s wants to cast to this device</string>
     <string name="dlna_cast_accept">Accept</string>
@@ -23,7 +24,6 @@
     <string name="dlna_cast_history">Cast Rules</string>
     <string name="dlna_cast_accepted">Accepted</string>
     <string name="dlna_cast_rejected">Rejected</string>
-    <string name="dlna_receiver_start_error">Failed to start receiver.</string>
     <string name="retry">Retry</string>
     <string name="short_break">Short break</string>
     <string name="long_break">Long break</string>

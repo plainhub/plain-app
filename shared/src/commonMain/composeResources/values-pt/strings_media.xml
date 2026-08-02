@@ -53,7 +53,6 @@
     <string name="empty_playlist">Sua lista de reprodução está vazia</string>
     <string name="remove_from_playlist">Remover da lista</string>
     <string name="image">Imagem</string>
-    <string name="cast_searching_for_screen">Procurando tela</string>
     <string name="cast_select_screen">Selecionar uma tela</string>
     <string name="cast_looking_for_devices">Procurando dispositivos próximos...</string>
 </resources>

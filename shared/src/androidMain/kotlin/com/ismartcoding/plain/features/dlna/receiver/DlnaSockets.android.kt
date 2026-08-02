@@ -78,7 +78,7 @@ private class AndroidDlnaSsdpSocket(
 }
 
 /** Actual factory: creates a [MulticastSocket] joined to the SSDP group, with multicast lock. */
-actual fun createDlnaSsdpSocket(): DlnaSsdpSocket? {
+actual fun createDlnaSsdpSocket(bindPort: Int): DlnaSsdpSocket? {
     return try {
         val wifiMgr = appContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val lock = wifiMgr.createMulticastLock("DlnaRendererSsdp").apply { acquire() }
@@ -89,9 +89,9 @@ actual fun createDlnaSsdpSocket(): DlnaSsdpSocket? {
         // family — a bare InetSocketAddress(port) may bind to IPv6 (::) on some
         // Android builds, which complicates IPv4 multicast (239.255.255.250)
         // join/receive and breaks unicast replies to IPv4 control points.
-        socket.bind(InetSocketAddress(InetAddress.getByName("0.0.0.0"), DlnaSsdpMessages.SSDP_PORT))
+        socket.bind(InetSocketAddress(InetAddress.getByName("0.0.0.0"), bindPort))
         socket.joinGroup(group)
-        LogCat.d("DLNA SSDP socket bound to 0.0.0.0:${DlnaSsdpMessages.SSDP_PORT} joined $group")
+        LogCat.d("DLNA SSDP socket bound to 0.0.0.0:$bindPort joined $group")
         AndroidDlnaSsdpSocket(socket, group, lock)
     } catch (e: Exception) {
         LogCat.e("createDlnaSsdpSocket failed: ${e.message}")

@@ -146,10 +146,10 @@
 
     <string name="crash_report_title">アプリがクラッシュしました</string>
     <string name="crash_report_message">アプリが予期せずクラッシュしました。クラッシュレポートとアプリログを確認し、問題解決のために共有してください。</string>
-    <string name="stay_online_mode">オンライン維持モード</string>
-    <string name="stay_online_mode_screen_black_countdown">%1$d 秒後に画面が黒くなります。</string>
-    <string name="stay_online_mode_keep_running">一部の電話機がバックグラウンドアクティビティを制限する場合、PlainApp を実行し続けてください。</string>
-    <string name="stay_online_mode_tap_to_exit">タップして終了</string>
+    <string name="stay_online">オンライン状態を維持</string>
+    <string name="stay_online_screen_black_countdown">%1$d 秒後に画面が黒くなります。</string>
+    <string name="stay_online_keep_running">一部の電話機がバックグラウンドアクティビティを制限する場合、PlainAppを実行し続けてください。</string>
+    <string name="stay_online_tap_to_exit">タップして終了</string>
     <string name="add_to_home">ホーム画面に追加</string>
     <string name="shortcut_added_to_home">ショートカットをホーム画面に追加しました</string>
     <string name="shortcut_not_supported">ランチャーがショートカットの追加をサポートしていません</string>

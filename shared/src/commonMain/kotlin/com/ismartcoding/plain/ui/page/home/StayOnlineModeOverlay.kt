@@ -119,27 +119,19 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = stringResource(Res.string.stay_online_mode),
-                        color = Color.White.copy(alpha = 0.8f),
-                        lineHeight = 56.sp,
-                        fontSize = 36.sp,
-                        fontWeight = FontWeight.Bold,
+                        text = stringResource(Res.string.stay_online_keep_running),
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 20.sp,
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                     Text(
-                        text = stringResource(Res.string.stay_online_mode_screen_black_countdown, remainingSeconds),
+                        text = stringResource(Res.string.stay_online_screen_black_countdown, remainingSeconds),
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 20.sp,
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = stringResource(Res.string.stay_online_mode_keep_running),
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 20.sp,
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(
-                        text = stringResource(Res.string.stay_online_mode_tap_to_exit),
+                        text = stringResource(Res.string.stay_online_tap_to_exit),
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 20.sp,
                     )

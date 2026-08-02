@@ -2,19 +2,20 @@
 <resources>
     <string name="sound_meter">音量メーター</string>
     <string name="pomodoro_timer">ポモドーロタイマー</string>
-    <string name="dlna_receiver">ワイヤレスキャスト</string>
+    <string name="dlna_receiver">キャストレシーバー</string>
+    <string name="dlna_receiver_desc">別のデバイスから動画、音楽、写真を再生します。</string>
     <string name="dlna_receiver_waiting_title">キャスト待機中</string>
-    <string name="dlna_receiver_waiting_desc">ネットワークで表示されるデバイス名：%1$s</string>
+    <string name="dlna_receiver_waiting_desc">ネットワークで表示されるデバイス: %1$s</string>
     <string name="dlna_receiver_step1_title">同じWi-Fiに接続</string>
     <string name="dlna_receiver_step1_desc">両方のデバイスが同じWi-Fiネットワークに接続されていることを確認してください</string>
     <string name="dlna_receiver_step2_title">PlainAppを開く</string>
     <string name="dlna_receiver_step2_desc">もう一方のデバイスでPlainAppを開き、再生したいビデオや音楽を見つけてください</string>
-    <string name="dlna_receiver_step3_title">キャスト</string>
+    <string name="dlna_receiver_step3_title">キャストするにはタップ</string>
     <string name="dlna_receiver_step3_desc">キャストアイコンをタップし、リストから「%1$s」を選択すると再生が始まります</string>
     <string name="dlna_receiver_protocol_note">DLNA / UPnPプロトコルに対応、VLC、Kodiなどの主要なキャストアプリと互換性があります</string>
     <string name="dlna_receiver_exit_player">プレーヤーを終了</string>
-    <string name="dlna_receiver_disabled_title">レシーバーがオフです</string>
-    <string name="dlna_receiver_disabled_desc">このデバイスでキャストを受信するには、Web設定でトグルをオンにしてください</string>
+    <string name="dlna_receiver_turn_on">オンにする</string>
+    <string name="feature_disabled_title">%1$s が無効です</string>
     <string name="short_break">短い休憩</string>
     <string name="long_break">長い休憩</string>
     <string name="tomatoes_today">今日のトマト</string>
@@ -74,6 +75,5 @@
     <string name="dlna_cast_history">キャストルール</string>
     <string name="dlna_cast_accepted">許可済み</string>
     <string name="dlna_cast_rejected">拒否済み</string>
-    <string name="dlna_receiver_start_error">レシーバーの起動に失敗しました。</string>
     <string name="retry">再試行</string>
 </resources>

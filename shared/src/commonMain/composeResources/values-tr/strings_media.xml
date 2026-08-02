@@ -53,7 +53,6 @@
     <string name="empty_playlist">Çalma listeniz boş</string>
     <string name="remove_from_playlist">Çalma listesinden kaldır</string>
     <string name="image">Görüntü</string>
-    <string name="cast_searching_for_screen">Ekran aranıyor</string>
     <string name="cast_select_screen">Bir ekran seçin</string>
     <string name="cast_looking_for_devices">Yakın cihazlar aranıyor...</string>
 </resources>

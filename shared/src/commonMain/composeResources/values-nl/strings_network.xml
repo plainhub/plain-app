@@ -19,7 +19,7 @@
     <string name="stop_service">Service stoppen</string>
     <string name="run">Uitvoeren</string>
     <string name="troubleshoot">Problemen oplossen</string>
-    <string name="allow_remote_access_from_pc">Toegang op afstand vanaf de pc toestaan</string>
+    <string name="allow_desktop_access_from_pc">Toegang op afstand vanaf de pc toestaan</string>
     <string name="http_port_conflict_error">Poort {{ port }} is in gebruik. Tik op "App opnieuw starten", om dit automatisch te herstellen.</string>
     <string name="http_port_conflict_errors">Poorten {{ port }} zijn in gebruik. Tik op "App opnieuw starten", om dit automatisch te herstellen.</string>
     <string name="fix">Herstellen</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">De HTTP-server is niet gestart. Start PlainApp opnieuw en probeer het opnieuw. Zorg ervoor dat er geen andere apps zijn die de HTTP- of HTTPS-poorten bezetten. Als het probleem aanhoudt, geef dan meer details over het probleem door contact op te nemen met support@plainapp.app.</string>
     <string name="relaunch_app">App opnieuw starten</string>
     <string name="require_confirmation">Bevestiging vereisen</string>
-    <string name="web_service_required_for_chat">Om berichten van anderen te ontvangen, schakel het telefoonwebportaal in.</string>
-    <string name="enable_web_service">Web-service inschakelen</string>
+    <string name="plainapp_service_required_for_chat">Start PlainApp Service om Chat te gebruiken.</string>
+    <string name="desktop_access">Desktoptoegang</string>
     <string name="http_port">HTTP-poort</string>
     <string name="https_port">HTTPS-poort</string>
     <string name="allow_new_login">Nieuwe aanmelding toestaan</string>
@@ -54,7 +54,7 @@
     <string name="web_url">Web-URL</string>
     <string name="auth_dev_token_tips">Clients moeten zowel c-id: &lt;client_id&gt; als Authorization: Bearer &lt;token&gt; in de verzoekkopteksten opnemen, of hetzelfde paar gebruiken om de API-payload te versleutelen. Als het token in de verzoekkopteksten wordt opgegeven, wordt het antwoord als platte tekst geretourneerd.</string>
     <string name="browser_https_error_tips">Als u de fout "Uw verbinding is niet privé" ziet, klikt u eenvoudig op de knop "Geavanceerd" en vervolgens op de knop "Doorgaan naar …", dan zal Chrome deze URL vertrouwen voor de rest van de browsersessie.</string>
-    <string name="api_service_is_running">API-service wordt uitgevoerd</string>
+    <string name="plainapp_service_is_running">PlainApp Service wordt uitgevoerd</string>
     <string name="screen_mirror_service_is_running">Schermspiegelservice is actief</string>
     <string name="screen_mirror_audio_permission_settings_message">Microfoontoestemming is uitgeschakeld. Schakel deze in bij Instellingen om systeemaudio te spiegelen.</string>
     <string name="enter_this_address_tips">Voer het bovenstaande adres in uw computerbrowser in en zorg ervoor dat uw telefoon en computer zich in hetzelfde lokale netwerk bevinden.</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">Bijna klaar! Tik gewoon op "APP opnieuw starten" om het effect te zien.</string>
     <string name="access_phone_web">Toegang tot je telefoon via een computerbrowser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR-code om toegang te krijgen tot het webadres</string>
-    <string name="phone_web_portal">Webtoegang</string>
-    <string name="phone_web_portal_desc">Open je telefoon via de browser op je computer</string>
-    <string name="web_portal_off">Webtoegang: UIT</string>
-    <string name="web_portal_running">Webtoegang: AAN</string>
-    <string name="web_portal_desc_off">Start service om telefoonbestanden vanaf het bureaublad te beheren.</string>
-    <string name="web_portal_desc_running">Beheer telefoonbestanden vanaf het bureaublad op hetzelfde lokale netwerk.</string>
+    <string name="plainapp_service_off">PlainApp Service UIT</string>
+    <string name="plainapp_service_on">PlainApp Service AAN</string>
+    <string name="plainapp_service_off_desc">Start PlainApp Service om Desktoptoegang, Chat en Draadloos streamen te gebruiken.</string>
     <string name="collapse_section">Inklappen</string>
     <string name="expand_section">Uitklappen</string>
     <string name="more_settings">Meer instellingen</string>
     <string name="same_network_hint">Zorg dat je computer en telefoon met hetzelfde netwerk zijn verbonden</string>
     <string name="ready">Gereed</string>
     <string name="permission_settings">Machtigingsinstellingen</string>
-    <string name="web_address_hint">Verbind de computer en telefoon met hetzelfde netwerk en open vervolgens het bijbehorende adres in je browser.</string>
+    <string name="desktop_access_desc">Beheer uw telefoon vanaf uw computer in hetzelfde netwerk.</string>
     <string name="home_web_easy_hint">Tik om te starten</string>
     <string name="home_web_easy_loading">Even geduld…</string>
-    <string name="home_web_easy_failed_title">Kon niet starten</string>
+    <string name="plainapp_service_failed">Kon niet starten</string>
     <string name="last_active">Laatste actief: %1$s</string>
     <string name="revoke_session">Deze sessie intrekken</string>
     <string name="how_to_use">Hoe te gebruiken</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">HTTP-server stoppen</string>
     <string name="enable_adb_token">ADB-token inschakelen</string>
     <string name="http_server_health_check_failed">Service gestart maar niet bereikbaar. Een firewall- of VPN-app blokkeert mogelijk localhost-verbindingen. Controleer uw netwerkinstellingen en start de app opnieuw.</string>
-    <string name="web_settings">Webinstellingen</string>
+    <string name="access_settings">Toegangsinstellingen</string>
 </resources>

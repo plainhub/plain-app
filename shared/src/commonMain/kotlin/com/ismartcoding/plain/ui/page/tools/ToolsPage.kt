@@ -14,11 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.tools
+import com.ismartcoding.plain.ui.base.ActionButtonAdd
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.page.home.HomeFeatureItemsGrid
 import org.jetbrains.compose.resources.stringResource
@@ -30,7 +32,16 @@ fun DiscoverPage(
     onTabSelected: (Int) -> Unit,
 ) {
     PScaffold(
-        topBar = { PTopAppBar(title = stringResource(Res.string.tools)) },
+        topBar = {
+            PTopAppBar(
+                title = stringResource(Res.string.tools),
+                actions = {
+                    ActionButtonAdd {
+                        navController.navigate(Routing.CustomFeatures)
+                    }
+                },
+            )
+        },
         bottomBar = { MainBottomBar(selectedIndex = 2, onTabSelected = onTabSelected) },
     ) { paddingValues ->
         Column(

@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -15,7 +14,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.preferences.LocalWeb
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -25,6 +24,7 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,9 +32,8 @@ fun HowToUsePage(
     navController: NavHostController,
     onRunDiagnostics: () -> Unit,
 ) {
-
     WebSettingsProvider {
-        val webEnabled = LocalWeb.current
+        val serviceEnabled = TempData.serviceEnabled.collectAsStateValue()
         PScaffold(
             topBar = {
                 PTopAppBar(navController = navController, title = stringResource(Res.string.how_to_use))
@@ -65,7 +64,7 @@ fun HowToUsePage(
                         VerticalSpace(dp = 16.dp)
                     }
                     item {
-                        if (webEnabled) {
+                        if (serviceEnabled) {
                             VerticalSpace(dp = 16.dp)
                             PFilledButton(
                                 modifier = Modifier

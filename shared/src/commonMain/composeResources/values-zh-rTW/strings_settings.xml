@@ -45,7 +45,7 @@
     <string name="system">系統默認</string>
     <string name="light">淺色</string>
     <string name="app_version">應用版本</string>
-    <string name="android_version">安卓版本</string>
+    <string name="system_version">系統版本</string>
     <string name="clear_history">清空歷史</string>
     <string name="clear_logs">清空日誌</string>
     <string name="no_logs_error">無日誌可分享</string>

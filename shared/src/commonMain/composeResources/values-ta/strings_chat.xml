@@ -51,7 +51,7 @@
     <string name="os">ஓ.எஸ்</string>
     <string name="browser">உலாவர</string>
     <string name="reject">நிராகரி</string>
-    <string name="allow_web_access">இணைய அணுகலை அனுமதி</string>
+    <string name="open_web_address">கீழே உள்ள முகவரியை உங்கள் வலை உலாவியில் திறக்கவும்.</string>
     <string name="allow_web_access_desc">வலை உலாவியிலிருந்து உங்கள் தொலைபேசி தரவை அணுக அனுமதிக்கவும்</string>
     <string name="allow_desktop_access">டெஸ்க்டாப் அணுகலை அனுமதி</string>
     <string name="allow_desktop_access_desc">டெஸ்க்டாப் ஆப்பிலிருந்து உங்கள் தொலைபேசி தரவை அணுக அனுமதிக்கவும்</string>

@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.i18n.Res
@@ -29,6 +30,7 @@ import com.ismartcoding.plain.i18n.wifi_aware_debug
 import com.ismartcoding.plain.platform.isBluetoothSupported
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.preferences.DeveloperModePreference
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PSwitch
@@ -59,6 +61,7 @@ internal fun DeveloperSettingsCard(
                     DeveloperModePreference.putAsync(it)
                 }
             }
+            HorizontalSpace(8.dp)
         }
         if (developerMode) {
             PListItem(

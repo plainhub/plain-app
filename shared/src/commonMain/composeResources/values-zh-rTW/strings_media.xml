@@ -53,7 +53,6 @@
     <string name="empty_playlist">您的播放清單為空</string>
     <string name="remove_from_playlist">從播放清單中移除</string>
     <string name="image">圖片</string>
-    <string name="cast_searching_for_screen">正在搜尋螢幕</string>
     <string name="cast_select_screen">選擇螢幕</string>
     <string name="cast_looking_for_devices">正在搜尋附近裝置...</string>
 </resources>

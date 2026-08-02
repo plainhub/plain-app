@@ -39,7 +39,7 @@
     <string name="browser">浏览器</string>
     <string name="accept">允许</string>
     <string name="reject">拒绝</string>
-    <string name="allow_web_access">允许网页访问</string>
+    <string name="open_web_address">在网页浏览器中打开下面的地址。</string>
     <string name="allow_web_access_desc">允许从网页浏览器访问您的手机数据</string>
     <string name="allow_desktop_access">允许桌面应用访问</string>
     <string name="allow_desktop_access_desc">允许从桌面应用访问您的手机数据</string>

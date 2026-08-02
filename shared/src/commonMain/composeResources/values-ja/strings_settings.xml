@@ -45,7 +45,7 @@
     <string name="ip_address_asc">IPアドレス（0から9）</string>
     <string name="last_active_desc">最終アクティブ</string>
     <string name="app_version">アプリバージョン</string>
-    <string name="android_version">Androidバージョン</string>
+    <string name="system_version">システムバージョン</string>
     <string name="clear_history">履歴をクリア</string>
     <string name="clear_logs">ログをクリア</string>
     <string name="no_logs_error">共有できるログがありません</string>

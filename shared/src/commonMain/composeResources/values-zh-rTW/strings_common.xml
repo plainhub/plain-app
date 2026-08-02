@@ -146,10 +146,10 @@
 
     <string name="crash_report_title">應用程式崩潰</string>
     <string name="crash_report_message">應用程式意外崩潰了。您可以查看包含應用程式日誌的崩潰報告，並分享給我們以便修復。</string>
-    <string name="stay_online_mode">防斷線模式</string>
-    <string name="stay_online_mode_screen_black_countdown">螢幕將在 %1$d 秒後變黑。</string>
-    <string name="stay_online_mode_keep_running">當部分手機限制背景活動時,保持 PlainApp 運行。</string>
-    <string name="stay_online_mode_tap_to_exit">點擊任意位置退出</string>
+    <string name="stay_online">保持在線</string>
+    <string name="stay_online_screen_black_countdown">螢幕將在 %1$d 秒後變黑。</string>
+    <string name="stay_online_keep_running">當部分手機限制背景活動時，保持 PlainApp 運行。</string>
+    <string name="stay_online_tap_to_exit">點擊任意位置退出</string>
     <string name="add_to_home">添加到主螢幕</string>
     <string name="shortcut_added_to_home">捷徑已添加到主螢幕</string>
     <string name="shortcut_not_supported">您的桌面不支援添加捷徑</string>

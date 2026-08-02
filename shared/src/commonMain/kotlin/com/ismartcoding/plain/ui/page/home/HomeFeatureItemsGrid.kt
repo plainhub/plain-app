@@ -42,7 +42,6 @@ import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyGridState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -74,7 +73,7 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
             .mapNotNull { typeName -> allFeatureItems.find { it.type.name == typeName } }
     }
 
-    val rowCount = (items.size + 2) / 2
+    val rowCount = (items.size + 1) / 2
     val gridHeight = if (rowCount > 0) (rowCount * 72 + (rowCount - 1) * 12).dp else 0.dp
 
     val gridState = rememberLazyGridState()
@@ -105,13 +104,6 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
                     onClick = { item.click() },
                 )
             }
-        }
-        item {
-            HomeFeatureGridCell(
-                iconRes = Res.drawable.plus,
-                titleRes = Res.string.more,
-                onClick = { navController.navigate(Routing.CustomFeatures) },
-            )
         }
     }
 }

@@ -19,7 +19,7 @@
     <string name="stop_service">サービスを停止</string>
     <string name="run">実行</string>
     <string name="troubleshoot">トラブルシューティング</string>
-    <string name="allow_remote_access_from_pc">PCからのリモートアクセスを許可する</string>
+    <string name="allow_desktop_access_from_pc">PCからのリモートアクセスを許可する</string>
     <string name="http_port_conflict_error">ポート {{ port }} は使用中です。「アプリを再起動」して自動的に修正します。</string>
     <string name="http_port_conflict_errors">ポート {{ port }} は使用中です。「アプリを再起動」して自動的に修正します。</string>
     <string name="fix">修正</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">HTTPサーバーが起動していません。PlainAppを再起動して、もう一度試してみてください。HTTPまたはHTTPSポートを占有している他のアプリケーションがないことを確認してください。問題が解決しない場合は、support@plainapp.app に連絡して問題の詳細を提供してください。</string>
     <string name="relaunch_app">アプリを再起動</string>
     <string name="require_confirmation">確認が必要</string>
-    <string name="web_service_required_for_chat">他の人からメッセージを受信するには、スマホWebポータルを有効にしてください。</string>
-    <string name="enable_web_service">Webサービスを有効にする</string>
+    <string name="plainapp_service_required_for_chat">チャットを使用するには、PlainApp Serviceを開始してください。</string>
+    <string name="desktop_access">デスクトップアクセス</string>
     <string name="http_port">HTTPポート</string>
     <string name="https_port">HTTPSポート</string>
     <string name="allow_new_login">新しいログインを許可する</string>
@@ -54,7 +54,7 @@
     <string name="web_url">Web URL</string>
     <string name="auth_dev_token_tips">クライアントはリクエストヘッダーに c-id: &lt;client_id&gt; と Authorization: Bearer &lt;token&gt; の両方を含めるか、同じペアを使用して API ペイロードを暗号化する必要があります。トークンがリクエストヘッダーで提供された場合、レスポンスはプレーンテキストで返されます。</string>
     <string name="browser_https_error_tips">"Your connection is not private"エラーが表示された場合は、「詳細」ボタンをクリックし、「...に進む」ボタンをクリックするだけで、ChromeがこのURLをブラウザセッションの残りの期間信頼します。</string>
-    <string name="api_service_is_running">APIサービスが実行されています</string>
+    <string name="plainapp_service_is_running">PlainApp Serviceを実行中</string>
     <string name="screen_mirror_service_is_running">スクリーンミラーサービスが実行されています</string>
     <string name="screen_mirror_audio_permission_settings_message">マイクの権限が無効です。システムオーディオをミラーリングするには、設定で有効にしてください。</string>
     <string name="enter_this_address_tips">上記のアドレスをコンピューターのブラウザに入力して、電話とコンピューターが同じローカルネットワークにあることを確認してください。</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">ほとんど完了！効果を確認するには、「アプリを再起動」をタップしてください。</string>
     <string name="access_phone_web">コンピュータのブラウザから携帯電話にアクセスします。</string>
     <string name="scan_qrcode_to_access_web">WebアドレスにアクセスするためにQRコードをスキャンします</string>
-    <string name="phone_web_portal">ウェブアクセス</string>
-    <string name="phone_web_portal_desc">パソコンのブラウザーからスマホにアクセスします</string>
-    <string name="web_portal_off">ウェブアクセス: オフ</string>
-    <string name="web_portal_running">ウェブアクセス: オン</string>
-    <string name="web_portal_desc_off">デスクトップから電話ファイルを管理するサービスを開始します。</string>
-    <string name="web_portal_desc_running">同じローカルネットワーク上のデスクトップから電話ファイルを管理します。</string>
+    <string name="plainapp_service_off">PlainApp Service オフ</string>
+    <string name="plainapp_service_on">PlainApp Service オン</string>
+    <string name="plainapp_service_off_desc">デスクトップアクセス、チャット、ワイヤレスキャストを使用するには、PlainApp Serviceを開始してください。</string>
     <string name="collapse_section">折りたたむ</string>
     <string name="expand_section">展開する</string>
     <string name="more_settings">その他の設定</string>
     <string name="same_network_hint">パソコンとスマホが同じネットワークに接続されていることを確認してください</string>
     <string name="ready">準備完了</string>
     <string name="permission_settings">権限設定</string>
-    <string name="web_address_hint">コンピューターとスマートフォンを同じネットワークに接続し、ブラウザで対応するアドレスを開いてください。</string>
+    <string name="desktop_access_desc">同じネットワーク上でコンピューターからスマートフォンを管理します。</string>
     <string name="home_web_easy_hint">タップして開始</string>
     <string name="home_web_easy_loading">しばらくお待ちください…</string>
-    <string name="home_web_easy_failed_title">開始できませんでした</string>
+    <string name="plainapp_service_failed">開始できませんでした</string>
     <string name="last_active">最終アクティブ：%1$s</string>
     <string name="revoke_session">このセッションを取り消す</string>
     <string name="how_to_use">使い方</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">HTTP サーバーを停止</string>
     <string name="enable_adb_token">ADB トークンを有効化</string>
     <string name="http_server_health_check_failed">サービスは開始されましたが、アクセスできません。ファイアウォールまたはVPNアプリがlocalhost接続をブロックしている可能性があります。ネットワーク設定を確認してアプリを再起動してください。</string>
-    <string name="web_settings">Web設定</string>
+    <string name="access_settings">アクセス設定</string>
 </resources>

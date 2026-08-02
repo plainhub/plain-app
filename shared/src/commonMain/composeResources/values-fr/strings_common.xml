@@ -146,10 +146,10 @@
 
     <string name="crash_report_title">Application plantée</string>
     <string name="crash_report_message">L'application a planté de façon inattendue. Consultez le rapport de plantage avec les journaux de l'application et partagez-le pour nous aider à corriger le problème.</string>
-    <string name="stay_online_mode">Mode toujours en ligne</string>
-    <string name="stay_online_mode_screen_black_countdown">L\'écran deviendra noir dans %1$d secondes.</string>
-    <string name="stay_online_mode_keep_running">Maintenez PlainApp en cours d\'exécution lorsque certains téléphones limitent l\'activité en arrière-plan.</string>
-    <string name="stay_online_mode_tap_to_exit">Appuyez pour quitter</string>
+    <string name="stay_online">Rester en ligne</string>
+    <string name="stay_online_screen_black_countdown">L'écran deviendra noir dans %1$d secondes.</string>
+    <string name="stay_online_keep_running">Maintenez PlainApp en cours d'exécution lorsque certains téléphones limitent l'activité en arrière-plan.</string>
+    <string name="stay_online_tap_to_exit">Touchez n'importe où pour quitter</string>
     <string name="add_to_home">Ajouter à l'écran d'accueil</string>
     <string name="shortcut_added_to_home">Raccourci ajouté à l'écran d'accueil</string>
     <string name="shortcut_not_supported">Votre lanceur ne prend pas en charge les raccourcis</string>

@@ -129,7 +129,7 @@ class RequestInterpreter(val schemaModel: SchemaModel) {
         val children = mutableListOf<Execution>()
 
         if (!selectionSet?.selections.isNullOrEmpty()) {
-            selectionSet!!.selections.mapTo(children) {
+            selectionSet.selections.mapTo(children) {
                 handleReturnTypeChildOrFragment(it, type, ctx)
             }
         } else if (type.unwrapped().fields?.isNotEmpty() == true) {

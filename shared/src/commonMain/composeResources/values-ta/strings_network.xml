@@ -19,7 +19,7 @@
     <string name="stop_service">சேவை நிறுத்து</string>
     <string name="run">இயக்கு</string>
     <string name="troubleshoot">சிக்கல்களை தீர்க்க</string>
-    <string name="allow_remote_access_from_pc">கணினியிலிருந்து தொலைநோக்கி அணுகல் அனுமதி</string>
+    <string name="allow_desktop_access_from_pc">கணினியிலிருந்து தொலைநோக்கி அணுகல் அனுமதி</string>
     <string name="http_port_conflict_error">போர்ட் {{ port }} பயன்படுத்தப்படுகிறது. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
     <string name="http_port_conflict_errors">போர்டுகள் {{ port }} பயன்படுத்தப்படுகின்றன. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
     <string name="fix">பிக்ஸ்</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">Http சேவையகம் ஆரம்பிக்கப்படவில்லை. PlainApp ஐ மீண்டும் தொடங்கி முயற்சிக்கவும். HTTP அல்லது HTTPS போர்ட்களை பயன்படுகின்ற பிற பயன்பாடுகள் இல்லையெனில் உள்ளிட்ட பிரச்சினைக்கு மேலும் விவரங்களை support@plainapp.app உடைகளுக்கு அனுப்புக.</string>
     <string name="relaunch_app">புதுப்பிக்க APP</string>
     <string name="require_confirmation">உறுதிப்பார்வை தேவை</string>
-    <string name="web_service_required_for_chat">மற்றவர்களிடமிருந்து செய்திகளைப் பெற, தொலைபேசி வலை வாயிலை இயக்கவும்.</string>
-    <string name="enable_web_service">வலைத்தள சேவையை இயக்கு</string>
+    <string name="plainapp_service_required_for_chat">அரட்டையைப் பயன்படுத்த PlainApp Service-ஐ தொடங்கவும்.</string>
+    <string name="desktop_access">டெஸ்க்டாப் அணுகல்</string>
     <string name="http_port">HTTP போர்ட்</string>
     <string name="https_port">HTTPS போர்ட்</string>
     <string name="allow_new_login">புதிய உள்நுழைவை அனுமதிக்கவும்</string>
@@ -54,7 +54,7 @@
     <string name="web_url">வலைத்தளம் விலகல்</string>
     <string name="auth_dev_token_tips">கிளையன்கள் கோரிக்கை தலைப்புகளில் c-id: &lt;client_id&gt; மற்றும் Authorization: Bearer &lt;token&gt; இரண்டையும் சேர்க்க வேண்டும், அல்லது API பேலோடை குறியாக்கம் செய்ய அதே ஜோடியை பயன்படுத்த வேண்டும். கோரிக்கை தலைப்புகளில் டோக்கன் வழங்கப்பட்டால், பதில் எளிய உரையில் திரும்பியனுப்பப்படும்.</string>
     <string name="browser_https_error_tips">நீங்களில் "உங்கள் இணைப்பு தனிநபராகுகிறது" பிழையைக் காண்க, எளிதாக "மேம்படுத்தவும்" பொத்தானை அழுத்தி "தொலைநிலை அவாற்கு ..." எனும் பொத்தானை அழுத்திக் கொள்ளவும், அப்போது குரோம் இந்த URL ஐ உங்களுக்கு மீதமுள்ள அந்தரங்கம் விரிவு கொள்ளும்.</string>
-    <string name="api_service_is_running">API சேவை செயல்பாடு நடக்கின்றது</string>
+    <string name="plainapp_service_is_running">PlainApp Service இயங்குகிறது</string>
     <string name="screen_mirror_service_is_running">திரை மிரர் சேவை செயல்படுகின்றது</string>
     <string name="screen_mirror_audio_permission_settings_message">மைக்ரோஃபோன் அனுமதி முடக்கப்பட்டுள்ளது. அமைப்புகளில் இயக்கி, சிஸ்டம் ஆடியோவை பிரதிமைப்படுத்தவும்.</string>
     <string name="enter_this_address_tips">உங்கள் கணினியின் உலாவியில் மேலே குறிப்பிட்ட முகவரியை உள்ளிடுக, உங்கள் போன் மற்றும் கணினியை ஒரே உள்ளாக்க வலிமையானதாக உறுதிப்படுத்துங்கள்.</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">விரைவில் முடிந்தது! பிராப்தியை அடைய விட்டு "பராமரிக்க APP" ஐ தட்டவும்.</string>
     <string name="access_phone_web">கணினி உலாவியில் இருந்து உங்கள் கைபேசியை அணுகவும்.</string>
     <string name="scan_qrcode_to_access_web">இணைய முகவரிக்கு அணுக கீரோ குறியை சீக்கிரம் செய்யவும்</string>
-    <string name="phone_web_portal">இணைய அணுகல்</string>
-    <string name="phone_web_portal_desc">கணினி உலாவியில் இருந்து உங்கள் தொலைபேசியை அணுகுங்கள்</string>
-    <string name="web_portal_off">இணைய அணுகல்: முடக்கம்</string>
-    <string name="web_portal_running">இணைய அணுகல்: இயக்கம்</string>
-    <string name="web_portal_desc_off">டெஸ்க்டாப்பில் இருந்து ஃபோன் கோப்புகளை நிர்வகிக்க சேவையைத் தொடங்கவும்.</string>
-    <string name="web_portal_desc_running">அதே உள்ளூர் நெட்வொர்க்கில் டெஸ்க்டாப்பில் இருந்து ஃபோன் கோப்புகளை நிர்வகிக்கவும்.</string>
+    <string name="plainapp_service_off">PlainApp Service அணைக்கப்பட்டது</string>
+    <string name="plainapp_service_on">PlainApp Service இயக்கப்பட்டது</string>
+    <string name="plainapp_service_off_desc">டெஸ்க்டாப் அணுகல், அரட்டை மற்றும் வயர்லெஸ் கேஸ்ட் ஆகியவற்றைப் பயன்படுத்த PlainApp Service-ஐ தொடங்கவும்.</string>
     <string name="collapse_section">சுருக்கு</string>
     <string name="expand_section">விரிவாக்கு</string>
     <string name="more_settings">மேலும் அமைப்புகள்</string>
     <string name="same_network_hint">உங்கள் கணினியும் தொலைபேசியும் ஒரே நெட்வொர்க்கில் உள்ளதா என்பதை உறுதிப்படுத்துங்கள்</string>
     <string name="ready">தயார்</string>
     <string name="permission_settings">அனுமதி அமைப்புகள்</string>
-    <string name="web_address_hint">கணினி மற்றும் தொலைபேசியை ஒரே நெட்வொர்க்கில் இணைத்து, உங்கள் உலாவியில் பொருத்தமான முகவரியைத் திறக்கவும்.</string>
+    <string name="desktop_access_desc">ஒரே நெட்வொர்க்கில் உங்கள் கணினியிலிருந்து உங்கள் தொலைபேசியை நிர்வகிக்கவும்.</string>
     <string name="home_web_easy_hint">தொடங்கத் தட்டவும்</string>
     <string name="home_web_easy_loading">தயவு செய்து காத்திருக்கவும்…</string>
-    <string name="home_web_easy_failed_title">தொடங்க முடியவில்லை</string>
+    <string name="plainapp_service_failed">தொடங்க முடியவில்லை</string>
     <string name="last_active">கடைசியாக செயலில்: %1$s</string>
     <string name="revoke_session">இந்த அமர்வை திரும்பப் பெறு</string>
     <string name="how_to_use">எப்படி பயன்படுத்துவது</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">HTTP சேவையகத்தை நிறுத்து</string>
     <string name="enable_adb_token">ADB டோக்கன் இயக்கு</string>
     <string name="http_server_health_check_failed">சேவை தொடங்கப்பட்டது ஆனால் அணுக முடியவில்லை. ஃபயர்வால் அல்லது VPN பயன்பாடு localhost இணைப்புகளைத் தடுக்கலாம். உங்கள் நெட்வொர்க் அமைப்புகளைச் சரிபார்த்து, பயன்பாட்டை மறுதொடக்கம் செய்யவும்.</string>
-    <string name="web_settings">வலை அமைப்புகள்</string>
+    <string name="access_settings">அணுகல் அமைப்புகள்</string>
 </resources>

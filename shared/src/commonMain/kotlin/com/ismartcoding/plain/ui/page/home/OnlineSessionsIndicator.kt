@@ -50,6 +50,7 @@ fun OnlineSessionsIndicator(count: Int, onClick: () -> Unit) {
 
     Surface(
         modifier = Modifier
+            .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick),
         color = MaterialTheme.colorScheme.greenPill,

@@ -53,7 +53,6 @@
     <string name="empty_playlist">Danh sách phát của bạn trống</string>
     <string name="remove_from_playlist">Xóa khỏi danh sách phát</string>
     <string name="image">Hình ảnh</string>
-    <string name="cast_searching_for_screen">Đang tìm kiếm màn hình</string>
     <string name="cast_select_screen">Chọn màn hình</string>
     <string name="cast_looking_for_devices">Đang tìm kiếm thiết bị lân cận...</string>
 </resources>

@@ -6,7 +6,6 @@ import com.ismartcoding.plain.enums.DarkTheme
 
 val LocalDarkTheme = compositionLocalOf { DarkTheme.UseDeviceTheme.value }
 val LocalAmoledDarkTheme = compositionLocalOf { false }
-val LocalWeb = compositionLocalOf { WebPreference.default }
 val LocalUpdateInfo = compositionLocalOf { DUpdateInfo() }
 
 val LocalNewVersion = compositionLocalOf { "" }

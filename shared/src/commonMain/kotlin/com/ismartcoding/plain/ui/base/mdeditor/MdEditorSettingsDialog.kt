@@ -11,10 +11,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PSwitch
@@ -60,6 +62,7 @@ fun MdEditorSettingsDialog(
                             EditorShowLineNumbersPreference.putAsync(it)
                         }
                     }
+                    HorizontalSpace(8.dp)
                 }
                 PDialogListItem(
                     title = stringResource(Res.string.wrap_content),
@@ -72,6 +75,7 @@ fun MdEditorSettingsDialog(
                             EditorWrapContentPreference.putAsync(it)
                         }
                     }
+                    HorizontalSpace(8.dp)
                 }
             }
         })

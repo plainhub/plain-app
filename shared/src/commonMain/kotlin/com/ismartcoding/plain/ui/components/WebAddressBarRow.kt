@@ -2,24 +2,24 @@ package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.plain.i18n.*
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.platform.setClipboardText
 
 @Composable
 fun WebAddressBarRow(
@@ -28,23 +28,23 @@ fun WebAddressBarRow(
     onEditClick: () -> Unit,
     onQrClick: () -> Unit,
 ) {
-    val clipboard = LocalClipboardManager.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         SelectionContainer {
-            ClickableText(
-                text = AnnotatedString(url),
-                modifier = Modifier.padding(start = 16.dp),
+            Text(
+                text = url,
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .clickable {
+                        setClipboardText("url", url)
+                        DialogHelper.showTextCopiedMessage(url)
+                    },
                 style =
                     TextStyle(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 18.sp,
                     ),
-                onClick = {
-                    clipboard.setText(AnnotatedString(url))
-                    DialogHelper.showTextCopiedMessage(url)
-                },
             )
         }
         Spacer(modifier = Modifier.weight(1f))

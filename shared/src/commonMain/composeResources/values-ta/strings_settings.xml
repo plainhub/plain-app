@@ -45,7 +45,7 @@
     <string name="ip_address_asc">IP முகவரி (0 முதல் 9 வரை)</string>
     <string name="last_active_desc">கடைசி செயலில்</string>
     <string name="app_version">பயன்பாடு பதிப்பு</string>
-    <string name="android_version">ஆண்ட்ராய்டு பதிப்பு</string>
+    <string name="system_version">கணினி பதிப்பு</string>
     <string name="clear_history">வரலாற்றை அழி</string>
     <string name="clear_logs">பதிவுகளை அழி</string>
     <string name="no_logs_error">பதிவுகள் பகிராது</string>

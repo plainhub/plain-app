@@ -146,10 +146,10 @@
 
     <string name="crash_report_title">App encerrado inesperadamente</string>
     <string name="crash_report_message">O app encerrou de forma inesperada. Veja o relatório de falha com os registros do app e compartilhe para nos ajudar a corrigir o problema.</string>
-    <string name="stay_online_mode">Modo sempre online</string>
-    <string name="stay_online_mode_screen_black_countdown">A tela ficará preta em %1$d segundos.</string>
-    <string name="stay_online_mode_keep_running">Mantenha o PlainApp rodando quando alguns telefones limitam a atividade em segundo plano.</string>
-    <string name="stay_online_mode_tap_to_exit">Toque para sair</string>
+    <string name="stay_online">Manter online</string>
+    <string name="stay_online_screen_black_countdown">A tela ficará preta em %1$d segundos.</string>
+    <string name="stay_online_keep_running">Mantenha o PlainApp rodando quando alguns telefones limitam a atividade em segundo plano.</string>
+    <string name="stay_online_tap_to_exit">Toque em qualquer lugar para sair</string>
     <string name="add_to_home">Adicionar à tela inicial</string>
     <string name="shortcut_added_to_home">Atalho adicionado à tela inicial</string>
     <string name="shortcut_not_supported">Seu launcher não suporta adicionar atalhos</string>

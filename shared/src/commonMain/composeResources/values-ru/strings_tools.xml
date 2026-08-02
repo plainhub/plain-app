@@ -2,19 +2,20 @@
 <resources>
     <string name="sound_meter">Звуковой метр</string>
     <string name="pomodoro_timer">Таймер Помодоро</string>
-    <string name="dlna_receiver">Беспроводная трансляция</string>
+    <string name="dlna_receiver">Приёмник трансляции</string>
+    <string name="dlna_receiver_desc">Воспроизводите видео, музыку и фотографии с другого устройства.</string>
     <string name="dlna_receiver_waiting_title">Ожидание трансляции</string>
     <string name="dlna_receiver_waiting_desc">Устройство видно в сети: %1$s</string>
     <string name="dlna_receiver_step1_title">Подключитесь к той же сети Wi-Fi</string>
     <string name="dlna_receiver_step1_desc">Убедитесь, что оба устройства подключены к одной сети Wi-Fi</string>
     <string name="dlna_receiver_step2_title">Откройте PlainApp</string>
     <string name="dlna_receiver_step2_desc">Откройте PlainApp на другом устройстве и найдите видео или музыку для воспроизведения</string>
-    <string name="dlna_receiver_step3_title">Трансляция</string>
+    <string name="dlna_receiver_step3_title">Нажмите для трансляции</string>
     <string name="dlna_receiver_step3_desc">Нажмите на значок трансляции, выберите «%1$s» из списка, и воспроизведение начнётся</string>
     <string name="dlna_receiver_protocol_note">Поддерживает протоколы DLNA / UPnP, совместим с VLC, Kodi и другими популярными приложениями для трансляции</string>
     <string name="dlna_receiver_exit_player">Выйти из плеера</string>
-    <string name="dlna_receiver_disabled_title">Приёмник выключен</string>
-    <string name="dlna_receiver_disabled_desc">Включите переключатель в веб-настройках, чтобы принимать трансляции на этом устройстве</string>
+    <string name="dlna_receiver_turn_on">Включить</string>
+    <string name="feature_disabled_title">%1$s отключено</string>
     <string name="short_break">Короткий перерыв</string>
     <string name="long_break">Длинный перерыв</string>
     <string name="tomatoes_today">Сегодняшние помидоры</string>
@@ -74,6 +75,5 @@
     <string name="dlna_cast_history">Правила трансляции</string>
     <string name="dlna_cast_accepted">Принято</string>
     <string name="dlna_cast_rejected">Отклонено</string>
-    <string name="dlna_receiver_start_error">Не удалось запустить приёмник.</string>
     <string name="retry">Повторить</string>
 </resources>

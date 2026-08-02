@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.routes
 
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -131,6 +132,14 @@ fun HttpRouter.addFilesRoutes() {
     }
 
     get("/proxyfs") { call ->
+        // `/proxyfs` proxies peer HTTP URLs for the Main Web UI (used when
+        // the browser displays files hosted on a peer device). It is a
+        // Main-UI route — peer file downloads over BLE/Aware use `/fs`
+        // directly, not `/proxyfs`.
+        if (!TempData.canDesktopAccess()) {
+            call.respondNoBody(HttpStatus.FORBIDDEN)
+            return@get
+        }
         val id = call.queryParam("id") ?: ""
         if (id.isEmpty()) {
             call.respondNoBody(HttpStatus.BAD_REQUEST)

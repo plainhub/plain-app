@@ -2,19 +2,20 @@
 <resources>
     <string name="sound_meter">Détecteur de son</string>
     <string name="pomodoro_timer">Minuteur Pomodoro</string>
-    <string name="dlna_receiver">Diffusion sans fil</string>
+    <string name="dlna_receiver">Récepteur de diffusion</string>
+    <string name="dlna_receiver_desc">Lisez des vidéos, de la musique et des photos depuis un autre appareil.</string>
     <string name="dlna_receiver_waiting_title">En attente de diffusion</string>
     <string name="dlna_receiver_waiting_desc">Appareil visible sur le réseau : %1$s</string>
     <string name="dlna_receiver_step1_title">Se connecter au même Wi-Fi</string>
     <string name="dlna_receiver_step1_desc">Assurez-vous que les deux appareils sont connectés au même réseau Wi-Fi</string>
     <string name="dlna_receiver_step2_title">Ouvrir PlainApp</string>
     <string name="dlna_receiver_step2_desc">Ouvrez PlainApp sur l'autre appareil et trouvez la vidéo ou la musique que vous souhaitez lire</string>
-    <string name="dlna_receiver_step3_title">Diffuser</string>
-    <string name="dlna_receiver_step3_desc">Appuyez sur l'icône de diffusion, sélectionnez "%1$s" dans la liste et la lecture commencera</string>
+    <string name="dlna_receiver_step3_title">Toucher pour diffuser</string>
+    <string name="dlna_receiver_step3_desc">Touchez l'icône de diffusion, sélectionnez "%1$s" dans la liste et la lecture commencera</string>
     <string name="dlna_receiver_protocol_note">Prend en charge les protocoles DLNA / UPnP, compatible avec VLC, Kodi et d'autres applications de diffusion populaires</string>
     <string name="dlna_receiver_exit_player">Quitter le lecteur</string>
-    <string name="dlna_receiver_disabled_title">Récepteur de diffusion désactivé</string>
-    <string name="dlna_receiver_disabled_desc">Activez l'option dans les paramètres Web pour recevoir les diffusions sur cet appareil</string>
+    <string name="dlna_receiver_turn_on">Allumer</string>
+    <string name="feature_disabled_title">%1$s est désactivé</string>
     <string name="short_break">Courte Pause</string>
     <string name="long_break">Longue Pause</string>
     <string name="tomatoes_today">Tomates Aujourd'hui</string>
@@ -74,6 +75,5 @@
     <string name="dlna_cast_history">Règles de diffusion</string>
     <string name="dlna_cast_accepted">Accepté</string>
     <string name="dlna_cast_rejected">Refusé</string>
-    <string name="dlna_receiver_start_error">Impossible de démarrer le récepteur.</string>
     <string name="retry">Réessayer</string>
 </resources>

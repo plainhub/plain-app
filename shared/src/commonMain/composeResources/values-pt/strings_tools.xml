@@ -4,19 +4,20 @@
     <string name="select_sound">Selecionar som</string>
     <string name="sound_meter">Medidor de som</string>
     <string name="pomodoro_timer">Temporizador Pomodoro</string>
-    <string name="dlna_receiver">Transmissão sem fio</string>
+    <string name="dlna_receiver">Receptor de transmissão</string>
+    <string name="dlna_receiver_desc">Reproduza vídeos, músicas e fotos de outro dispositivo.</string>
     <string name="dlna_receiver_waiting_title">Aguardando transmissão</string>
     <string name="dlna_receiver_waiting_desc">Dispositivo visível na rede: %1$s</string>
     <string name="dlna_receiver_step1_title">Conectar-se ao mesmo Wi-Fi</string>
     <string name="dlna_receiver_step1_desc">Certifique-se de que ambos os dispositivos estão conectados à mesma rede Wi-Fi</string>
     <string name="dlna_receiver_step2_title">Abrir PlainApp</string>
     <string name="dlna_receiver_step2_desc">Abra o PlainApp no outro dispositivo e encontre o vídeo ou música que deseja reproduzir</string>
-    <string name="dlna_receiver_step3_title">Transmitir</string>
+    <string name="dlna_receiver_step3_title">Toque para transmitir</string>
     <string name="dlna_receiver_step3_desc">Toque no ícone de transmissão, selecione "%1$s" na lista e a reprodução começará</string>
     <string name="dlna_receiver_protocol_note">Suporta protocolos DLNA / UPnP, compatível com VLC, Kodi e outros aplicativos de transmissão populares</string>
-    <string name="dlna_receiver_exit_player">Sair do player</string>
-    <string name="dlna_receiver_disabled_title">Receptor de transmissão desligado</string>
-    <string name="dlna_receiver_disabled_desc">Ative a opção nas Configurações da Web para receber transmissões neste dispositivo</string>
+    <string name="dlna_receiver_exit_player">Sair do leitor</string>
+    <string name="dlna_receiver_turn_on">Ligar</string>
+    <string name="feature_disabled_title">%1$s está desativado</string>
     <string name="short_break">Pausa curta</string>
     <string name="long_break">Pausa longa</string>
     <string name="tomatoes_today">Pomodoros de hoje</string>
@@ -74,6 +75,5 @@
     <string name="dlna_cast_history">Regras de cast</string>
     <string name="dlna_cast_accepted">Aceito</string>
     <string name="dlna_cast_rejected">Rejeitado</string>
-    <string name="dlna_receiver_start_error">Falha ao iniciar o receptor.</string>
     <string name="retry">Tentar novamente</string>
 </resources>

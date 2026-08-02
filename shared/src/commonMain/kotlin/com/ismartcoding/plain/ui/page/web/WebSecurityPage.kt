@@ -96,6 +96,7 @@ fun WebSecurityPage(navController: NavHostController) {
                                         )
                                     }
                                 }
+                                HorizontalSpace(8.dp)
                             }
                             if (passwordType != PasswordType.NONE.value) {
                                 PasswordTextField(
@@ -116,7 +117,10 @@ fun WebSecurityPage(navController: NavHostController) {
                                 modifier = Modifier.clickable { scope.launch(Dispatchers.Default) { AuthTwoFactorPreference.putAsync(!authTwoFactor) } },
                                 title = stringResource(Res.string.require_confirmation)
                             ) {
-                                PSwitch(activated = authTwoFactor) { scope.launch(Dispatchers.Default) { AuthTwoFactorPreference.putAsync(it) } }
+                                PSwitch(activated = authTwoFactor) {
+                                    scope.launch(Dispatchers.Default) { AuthTwoFactorPreference.putAsync(it) }
+                                }
+                                HorizontalSpace(8.dp)
                             }
                         }
                         Tips(text = stringResource(Res.string.two_factor_auth_tips)); VerticalSpace(dp = 24.dp)
@@ -153,6 +157,7 @@ fun WebSecurityPage(navController: NavHostController) {
                                 PSwitch(activated = rotateUrlTokenOnRestart) {
                                     scope.launch(Dispatchers.Default) { RotateUrlTokenOnRestartPreference.putAsync(it) }
                                 }
+                                HorizontalSpace(8.dp)
                             }
                         }
                         Tips(text = stringResource(Res.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)

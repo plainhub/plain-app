@@ -18,6 +18,7 @@ import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CopyIconButton
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.IconTextToBottomButton
@@ -102,6 +103,7 @@ fun ViewTextFileBottomSheet(
                     ) {
                         textFileVM.toggleWrapContent()
                     }
+                    HorizontalSpace(8.dp)
                 })
             }
         }

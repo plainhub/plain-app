@@ -78,8 +78,7 @@ actual fun rememberWindowInsetsController(): Any {
 }
 
 actual fun applySystemBarAppearanceForDarkTheme(useDarkTheme: Boolean) {
-    val context = com.ismartcoding.plain.appContextValue ?: return
-    val activity = context as? Activity ?: return
+    val activity = com.ismartcoding.plain.mainActivity ?: return
     val window = activity.window
     WindowCompat.getInsetsController(window, window.decorView).apply {
         isAppearanceLightStatusBars = !useDarkTheme

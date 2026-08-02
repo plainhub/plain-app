@@ -51,7 +51,7 @@
     <string name="os">Système d'exploitation</string>
     <string name="browser">Navigateur</string>
     <string name="reject">Rejeter</string>
-    <string name="allow_web_access">Autoriser l'accès Web</string>
+    <string name="open_web_address">Ouvrez l'adresse ci-dessous dans votre navigateur Web.</string>
     <string name="allow_web_access_desc">Autoriser l'accès à vos données téléphoniques depuis un navigateur Web</string>
     <string name="allow_desktop_access">Autoriser l'accès Bureau</string>
     <string name="allow_desktop_access_desc">Autoriser l'accès à vos données téléphoniques depuis l'application de bureau</string>

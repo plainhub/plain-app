@@ -2,6 +2,7 @@ package com.ismartcoding.plain.web.routes
 
 import com.ismartcoding.plain.data.UploadChunkInfo
 import com.ismartcoding.plain.data.UploadInfo
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -24,9 +25,10 @@ import kotlin.random.Random
 
 /**
  * `/upload` and `/upload_chunk` — multipart file upload endpoints shared
- * between Android (Ktor) and iOS (SwiftNIO future). Both endpoints verify the
- * `c-id` header against the in-memory token cache and decrypt the `info` part
- * with ChaCha20 before any file content is written.
+ * between Android (Ktor) and iOS (SwiftNIO future). Both endpoints require
+ * `canDesktopAccess()` (Main-UI route) and verify the `c-id` header against
+ * the in-memory token cache, decrypting the `info` part with ChaCha20 before
+ * any file content is written.
  *
  * The chunk endpoint streams each chunk directly to disk to avoid large heap
  * allocations when multiple workers upload in parallel (the previous
@@ -34,6 +36,10 @@ import kotlin.random.Random
  */
 fun HttpRouter.addUploadRoutes() {
     post("/upload") { call ->
+        if (!TempData.canDesktopAccess()) {
+            call.respondNoBody(HttpStatus.FORBIDDEN)
+            return@post
+        }
         val clientId = call.header("c-id") ?: ""
         if (clientId.isEmpty()) {
             call.respondText("c-id header is missing", status = HttpStatus.BAD_REQUEST)
@@ -88,6 +94,10 @@ fun HttpRouter.addUploadRoutes() {
     }
 
     post("/upload_chunk") { call ->
+        if (!TempData.canDesktopAccess()) {
+            call.respondNoBody(HttpStatus.FORBIDDEN)
+            return@post
+        }
         val clientId = call.header("c-id") ?: ""
         if (clientId.isEmpty()) {
             call.respondText("c-id header is missing", status = HttpStatus.BAD_REQUEST)

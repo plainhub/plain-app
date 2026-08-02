@@ -45,7 +45,7 @@
     <string name="ip_address_asc">Địa chỉ IP (0 đến 9)</string>
     <string name="last_active_desc">Hoạt động gần đây</string>
     <string name="app_version">Phiên bản ứng dụng</string>
-    <string name="android_version">Phiên bản Android</string>
+    <string name="system_version">Phiên bản hệ thống</string>
     <string name="clear_history">Xóa lịch sử</string>
     <string name="clear_logs">Xóa log</string>
     <string name="no_logs_error">Không có log nào có thể được chia sẻ</string>

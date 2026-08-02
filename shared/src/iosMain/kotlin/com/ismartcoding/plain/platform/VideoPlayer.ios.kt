@@ -173,7 +173,7 @@ actual fun VideoPlayerSurface(
     )
 }
 
-private class PlayerContainerView : UIView {
+internal class PlayerContainerView : UIView {
     @OverrideInit
     constructor(frame: CValue<CGRect>) : super(frame)
 

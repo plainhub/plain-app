@@ -53,7 +53,6 @@
     <string name="empty_playlist">Ihre Playlist ist leer</string>
     <string name="remove_from_playlist">Aus Playlist entfernen</string>
     <string name="image">Bild</string>
-    <string name="cast_searching_for_screen">Suche nach Bildschirm</string>
     <string name="cast_select_screen">Bildschirm auswählen</string>
     <string name="cast_looking_for_devices">Suche nach Geräten in der Nähe...</string>
 </resources>

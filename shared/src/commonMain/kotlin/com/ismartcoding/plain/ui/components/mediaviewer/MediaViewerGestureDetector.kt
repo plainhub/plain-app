@@ -90,7 +90,7 @@ suspend fun PointerInputScope.detectTransformGestures(
                 t1 = 0L; scope?.cancel(); onDoubleTap(offset)
             } else if (dt < 200) {
                 scope = MainScope()
-                scope?.launch(Dispatchers.Main) { delay(272); onTap(offset) }
+                scope.launch(Dispatchers.Main) { delay(272); onTap(offset) }
             }
             lastReleaseTime = t1
         }

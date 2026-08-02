@@ -286,7 +286,7 @@ fun ImageEditorPage(
                                     strokePoints.add(toCanvas(firstPos))
                                     previewId = StringHelper.shortUUID()
                                     drawingLayer = FreehandLayer(
-                                        id = previewId!!,
+                                        id = previewId,
                                         points = strokePoints.toList(),
                                         color = vm.color.value,
                                         lineWidth = vm.lineWidth.value,
@@ -300,7 +300,7 @@ fun ImageEditorPage(
                                     previewId = StringHelper.shortUUID()
                                     drawingLayer = createShape(
                                         tool = tool,
-                                        id = previewId!!,
+                                        id = previewId,
                                         start = startPoint,
                                         end = startPoint,
                                         color = vm.color.value,
@@ -349,7 +349,7 @@ fun ImageEditorPage(
                                                 DragMode.RESIZE -> {
                                                     val selId = vm.selectedLayerId.value
                                                     if (selId != null && activeHandleLocal != null) {
-                                                        vm.resizeLayer(selId, activeHandleLocal!!, dx, dy)
+                                                        vm.resizeLayer(selId, activeHandleLocal, dx, dy)
                                                     }
                                                 }
                                                 DragMode.MOVE -> {

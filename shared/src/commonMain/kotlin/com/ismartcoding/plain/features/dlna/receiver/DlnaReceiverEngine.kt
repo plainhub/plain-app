@@ -8,8 +8,8 @@ import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.IODispatcher
-import com.ismartcoding.plain.platform.startDlnaRenderer
-import com.ismartcoding.plain.platform.stopDlnaRenderer
+import com.ismartcoding.plain.features.dlna.startDlnaRenderer
+import com.ismartcoding.plain.features.dlna.stopDlnaRenderer
 import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
 import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
 import kotlinx.coroutines.CoroutineScope

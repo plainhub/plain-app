@@ -13,7 +13,6 @@ data class Settings(
     val darkTheme: Int,
     val amoledDarkTheme: Boolean,
     val locale: Locale?,
-    val web: Boolean,
     val updateInfo: DUpdateInfo,
 )
 
@@ -25,7 +24,6 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         darkTheme = DarkThemePreference.default,
         amoledDarkTheme = AmoledDarkThemePreference.default,
         locale = null,
-        web = WebPreference.default,
         updateInfo = DUpdateInfo(),
     )
     val settings = remember {
@@ -34,7 +32,6 @@ fun SettingsProvider(content: @Composable () -> Unit) {
                 darkTheme = DarkThemePreference.get(it),
                 amoledDarkTheme = AmoledDarkThemePreference.get(it),
                 locale = LanguagePreference.getLocale(it),
-                web = WebPreference.get(it),
                 updateInfo = UpdateInfoPreference.getValue(it),
             )
         }
@@ -44,7 +41,6 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         LocalDarkTheme provides settings.darkTheme,
         LocalAmoledDarkTheme provides settings.amoledDarkTheme,
         LocalLocale provides settings.locale,
-        LocalWeb provides settings.web,
         LocalUpdateInfo provides settings.updateInfo,
         LocalNewVersion provides settings.updateInfo.newVersion,
         LocalSkipVersion provides settings.updateInfo.skipVersion,

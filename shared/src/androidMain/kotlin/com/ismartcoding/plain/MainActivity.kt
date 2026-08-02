@@ -40,7 +40,7 @@ import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.preferences.SettingsProvider
-import com.ismartcoding.plain.preferences.WebPreference
+import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.PlainAccessibilityService
@@ -55,6 +55,7 @@ import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.LocalDarkTheme
+import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.ui.page.CrashReportDialog
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.Main
@@ -208,9 +209,8 @@ class MainActivity : AppCompatActivity() {
         AudioPlayer.ensurePlayer(this)
         coIO {
             try {
-                if (WebPreference.getAsync()) {
+                if (ServicePreference.getAsync()) {
                     mainVM.enableHttpServer(true)
-                    doWhenReadyAsync()
                 }
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())

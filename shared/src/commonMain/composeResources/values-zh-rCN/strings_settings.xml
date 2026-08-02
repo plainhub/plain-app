@@ -45,7 +45,7 @@
     <string name="system">系统默认</string>
     <string name="light">浅色</string>
     <string name="app_version">应用版本</string>
-    <string name="android_version">安卓版本</string>
+    <string name="system_version">系统版本</string>
     <string name="nearby_share">附近共享</string>
     <string name="supported">支持</string>
     <string name="not_supported">不支持</string>

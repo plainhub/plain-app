@@ -146,10 +146,10 @@
 
     <string name="crash_report_title">앱이 충돌했습니다</string>
     <string name="crash_report_message">앱이 예기치 않게 충돌했습니다. 앱 로그가 포함된 충돌 보고서를 확인하고 공유하여 문제 해결에 도움을 주세요.</string>
-    <string name="stay_online_mode">온라인 유지 모드</string>
-    <string name="stay_online_mode_screen_black_countdown">%1$d초 후 화면이 검게 됩니다.</string>
-    <string name="stay_online_mode_keep_running">일부 폰이 백그라운드 활동을 제한할 때 PlainApp를 계속 실행하세요.</string>
-    <string name="stay_online_mode_tap_to_exit">탭하여 종료</string>
+    <string name="stay_online">온라인 유지</string>
+    <string name="stay_online_screen_black_countdown">%1$d초 후 화면이 검게 됩니다.</string>
+    <string name="stay_online_keep_running">일부 폰이 백그라운드 활동을 제한할 때 PlainApp을 계속 실행하세요.</string>
+    <string name="stay_online_tap_to_exit">탭하여 종료</string>
     <string name="add_to_home">홈 화면에 추가</string>
     <string name="shortcut_added_to_home">바로가기가 홈 화면에 추가되었습니다</string>
     <string name="shortcut_not_supported">런처가 바로가기 추가를 지원하지 않습니다</string>

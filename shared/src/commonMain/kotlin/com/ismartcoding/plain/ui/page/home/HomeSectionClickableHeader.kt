@@ -37,8 +37,8 @@ fun HomeSectionClickableHeader(
         Text(
             text = title,
             style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.SemiBold,
-                lineHeight = 36.sp,
+                fontWeight = FontWeight.Medium,
+                lineHeight = 32.sp,
             ),
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),

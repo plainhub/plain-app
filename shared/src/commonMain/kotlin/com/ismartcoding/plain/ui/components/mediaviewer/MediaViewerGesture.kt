@@ -85,7 +85,7 @@ internal fun rememberMediaViewerGesture(
                             state.offsetX.updateBounds(-boundX, boundX); state.offsetX.animateDecay(sameDirection(lastPan.x, velocity.x), decay)
                         } else {
                             val tx = if (scale != maxDisplayScale) limitToBound(state.offsetX.value, boundX)
-                            else panTransformAndScale(state.offsetX.value, centroid.x, state.containerSize.width.toFloat(), state.defaultSize.width.toFloat(), state.scale.value, scale!!)
+                            else panTransformAndScale(state.offsetX.value, centroid.x, state.containerSize.width.toFloat(), state.defaultSize.width.toFloat(), state.scale.value, scale)
                             state.offsetX.animateTo(tx)
                         }
                     }
@@ -94,7 +94,7 @@ internal fun rememberMediaViewerGesture(
                             state.offsetY.updateBounds(-boundY, boundY); state.offsetY.animateDecay(sameDirection(lastPan.y, velocity.y), decay)
                         } else {
                             val ty = if (scale != maxDisplayScale) limitToBound(state.offsetY.value, boundY)
-                            else panTransformAndScale(state.offsetY.value, centroid.y, state.containerSize.height.toFloat(), state.defaultSize.height.toFloat(), state.scale.value, scale!!)
+                            else panTransformAndScale(state.offsetY.value, centroid.y, state.containerSize.height.toFloat(), state.defaultSize.height.toFloat(), state.scale.value, scale)
                             state.offsetY.animateTo(ty)
                         }
                     }

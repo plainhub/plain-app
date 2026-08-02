@@ -15,6 +15,7 @@ import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CopyIconButton
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextEditButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
@@ -88,6 +89,7 @@ fun ViewFeedBottomSheet(
                     m.fetchContent = it
                     feedsVM.updateFetchContent(m.id, it)
                 }
+                HorizontalSpace(8.dp)
             })
         }
         Tips(text = stringResource(Res.string.auto_fetch_full_content_tips))

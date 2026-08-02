@@ -27,6 +27,9 @@ class DlnaDevice(
     fun getAVTransportService(): DeviceService? =
         description?.device?.serviceList?.find { it.serviceId == "urn:upnp-org:serviceId:AVTransport" }
 
+    /** 设备显示名：优先 friendlyName，缺失时回退到 hostAddress。 */
+    fun getDeviceName(): String = description?.device?.friendlyName?.ifEmpty { hostAddress } ?: hostAddress
+
     /**
      * 从 location URL (如 "http://192.168.1.10:5000/desc.xml") 提取 base URL
      * ("http://192.168.1.10:5000")，不依赖 java.net.URL 以保持 KMP 兼容。

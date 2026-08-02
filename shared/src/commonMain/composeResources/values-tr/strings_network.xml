@@ -19,7 +19,7 @@
     <string name="stop_service">Hizmeti durdur</string>
     <string name="run">Çalıştır</string>
     <string name="troubleshoot">Sorun gider</string>
-    <string name="allow_remote_access_from_pc">PC'den uzaktan erişime izin ver</string>
+    <string name="allow_desktop_access_from_pc">PC'den uzaktan erişime izin ver</string>
     <string name="http_port_conflict_error">{{ port }} portu meşgul. Otomatik düzeltmek için "Uygulamayı Yeniden Başlat"a dokunun.</string>
     <string name="http_port_conflict_errors">{{ port }} portları meşgul. Otomatik düzeltmek için "Uygulamayı Yeniden Başlat"a dokunun.</string>
     <string name="fix">Düzelt</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">HTTP sunucusu başlatılmadı. PlainApp'i yeniden başlatın ve tekrar deneyin.</string>
     <string name="relaunch_app">UYGULAMAYI Yeniden Başlat</string>
     <string name="require_confirmation">Onay gerektir</string>
-    <string name="web_service_required_for_chat">Başkalarından mesaj almak için lütfen Telefon Web Portalı'nı etkinleştirin.</string>
-    <string name="enable_web_service">Web hizmetini etkinleştir</string>
+    <string name="plainapp_service_required_for_chat">Sohbet'i kullanmak için lütfen PlainApp Service'i başlatın.</string>
+    <string name="desktop_access">Masaüstü erişimi</string>
     <string name="http_port">HTTP bağlantı noktası</string>
     <string name="https_port">HTTPS bağlantı noktası</string>
     <string name="allow_new_login">Yeni girişe izin ver</string>
@@ -54,7 +54,7 @@
     <string name="web_url">Web URL'si</string>
     <string name="auth_dev_token_tips">İstemciler, istek başlıklarına hem c-id: &lt;client_id&gt; hem de Authorization: Bearer &lt;token&gt; dahil etmeli ya da API yükünü şifrelemek için aynı çifti kullanmalıdır. Token istek başlıklarında sağlanırsa, yanıt düz metin olarak döndürülür.</string>
     <string name="browser_https_error_tips">Eğer "Bağlantınız gizli değil" hatası görürseniz, sadece "Gelişmiş" düğmesine tıklayın ve "… devam et" düğmesine tıklayın, sonra Chrome bu URL'ye tarayıcı oturumu boyunca güvenecektir.</string>
-    <string name="api_service_is_running">Web hizmeti çalışıyor</string>
+    <string name="plainapp_service_is_running">PlainApp Service çalışıyor</string>
     <string name="screen_mirror_service_is_running">Ekran yansıtma hizmeti çalışıyor</string>
     <string name="screen_mirror_audio_permission_settings_message">Mikrofon izni devre dışı. Sistem sesini yansıtmak için Ayarlar bölümünden etkinleştirin.</string>
     <string name="enter_this_address_tips">Yukarıdaki adresi bilgisayarınızın tarayıcısına girin, telefonunuzun ve bilgisayarınızın aynı yerel ağda olduğundan emin olun.</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">Neredeyse bitti! Etkili olması için "Uygulamayı Yeniden Başlat" düğmesine dokunun.</string>
     <string name="access_phone_web">Telefonunuza bir bilgisayar tarayıcısından erişin.</string>
     <string name="scan_qrcode_to_access_web">Web adresine erişmek için QR kodunu tarayın</string>
-    <string name="phone_web_portal">Web Erişimi</string>
-    <string name="phone_web_portal_desc">Telefonunuza bilgisayar tarayıcısından erişin</string>
-    <string name="web_portal_off">Web Erişimi: KAPALI</string>
-    <string name="web_portal_running">Web Erişimi: AÇIK</string>
-    <string name="web_portal_desc_off">Telefon dosyalarını masaüstünden yönetmek için hizmeti başlatın.</string>
-    <string name="web_portal_desc_running">Telefon dosyalarını aynı yerel ağdaki masaüstünden yönetin.</string>
+    <string name="plainapp_service_off">PlainApp Service KAPALI</string>
+    <string name="plainapp_service_on">PlainApp Service AÇIK</string>
+    <string name="plainapp_service_off_desc">Masaüstü erişimi, Sohbet ve Kablosuz Yayın'ı kullanmak için PlainApp Service'i başlatın.</string>
     <string name="collapse_section">Daralt</string>
     <string name="expand_section">Genişlet</string>
     <string name="more_settings">Diğer ayarlar</string>
     <string name="same_network_hint">Bilgisayarınızın ve telefonunuzun aynı ağda olduğundan emin olun</string>
     <string name="ready">Hazır</string>
     <string name="permission_settings">İzin ayarları</string>
-    <string name="web_address_hint">Bilgisayarı ve telefonu aynı ağa bağlayın, ardından eşleşen adresi tarayıcınızda açın.</string>
+    <string name="desktop_access_desc">Aynı ağdaki bilgisayarınızdan telefonunuzu yönetin.</string>
     <string name="home_web_easy_hint">Başlamak için dokunun</string>
     <string name="home_web_easy_loading">Lütfen bekleyin…</string>
-    <string name="home_web_easy_failed_title">Başlatılamadı</string>
+    <string name="plainapp_service_failed">Başlatılamadı</string>
     <string name="last_active">Son aktif: %1$s</string>
     <string name="revoke_session">Bu oturumu iptal et</string>
     <string name="how_to_use">Nasıl kullanılır</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">HTTP Sunucusunu Durdur</string>
     <string name="enable_adb_token">ADB jetonunu etkinleştir</string>
     <string name="http_server_health_check_failed">Hizmet başlatıldı ancak erişilemiyor. Bir güvenlik duvarı veya VPN uygulaması localhost bağlantılarını engelliyor olabilir. Lütfen ağ ayarlarınızı kontrol edin ve uygulamayı yeniden başlatın.</string>
-    <string name="web_settings">Web Ayarları</string>
+    <string name="access_settings">Erişim ayarları</string>
 </resources>

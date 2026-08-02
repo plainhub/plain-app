@@ -19,7 +19,7 @@
     <string name="stop_service">停止服務</string>
     <string name="run">運行</string>
     <string name="troubleshoot">排除問題</string>
-    <string name="allow_remote_access_from_pc">允許電腦遠端存取網頁</string>
+    <string name="allow_desktop_access_from_pc">允許電腦遠端存取網頁</string>
     <string name="http_port_conflict_error">埠 {{ port }} 目前被佔用。點按「重新啟動應用程式」可自動修復。</string>
     <string name="http_port_conflict_errors">埠 {{ port }} 目前被佔用。點按「重新啟動應用程式」可自動修復。</string>
     <string name="fix">修復</string>
@@ -32,8 +32,8 @@
     <string name="http_server_error">HTTP伺服器未啟動。重新啟動PlainApp並重試。</string>
     <string name="relaunch_app">重啟應用</string>
     <string name="require_confirmation">需要二次確認</string>
-    <string name="web_service_required_for_chat">要接收其他人傳送的訊息，請啟用手機網頁入口。</string>
-    <string name="enable_web_service">啟用網頁服務</string>
+    <string name="plainapp_service_required_for_chat">要使用聊天，請啟動 PlainApp Service。</string>
+    <string name="desktop_access">桌面存取</string>
     <string name="http_port">HTTP端口</string>
     <string name="https_port">HTTPS端口</string>
     <string name="allow_new_login">允許新的登錄</string>
@@ -54,7 +54,7 @@
     <string name="web_url">網站地址</string>
     <string name="auth_dev_token_tips">客戶端必須在請求標頭中同時包含 c-id: &lt;client_id&gt; 和 Authorization: Bearer &lt;token&gt;，或使用同一組參數加密 API 資料。若在請求標頭中提供了權杖，回應將以明文返回。</string>
     <string name="browser_https_error_tips">如果Chrome瀏覽器顯示"您的連接不是私密連接"，請點擊頁面"高級"按鈕繼續。</string>
-    <string name="api_service_is_running">API服務運行中</string>
+    <string name="plainapp_service_is_running">PlainApp Service 運行中</string>
     <string name="screen_mirror_service_is_running">螢幕鏡像服務運行中</string>
     <string name="screen_mirror_audio_permission_settings_message">麥克風權限已被停用，請到設定中開啟後才能鏡像系統音訊。</string>
     <string name="enter_this_address_tips">在電腦瀏覽器中輸入上述地址，請確保您的手機和電腦位於同一局域網中。</string>
@@ -66,22 +66,19 @@
     <string name="restart_app_message">差一點了！只需點擊「重新啟動應用程式」即可生效。</string>
     <string name="access_phone_web">從電腦瀏覽器訪問您的手機。</string>
     <string name="scan_qrcode_to_access_web">掃描二維碼訪問網頁</string>
-    <string name="phone_web_portal">網頁存取</string>
-    <string name="phone_web_portal_desc">在電腦瀏覽器中存取你的手機</string>
-    <string name="web_portal_off">網頁存取：關閉</string>
-    <string name="web_portal_running">網頁存取：開啟</string>
-    <string name="web_portal_desc_off">啟動從桌面管理手機檔案的服務。</string>
-    <string name="web_portal_desc_running">在同一本地網路上從桌面管理手機檔案。</string>
+    <string name="plainapp_service_off">PlainApp Service 已關閉</string>
+    <string name="plainapp_service_on">PlainApp Service 已開啟</string>
+    <string name="plainapp_service_off_desc">啟動 PlainApp Service 以使用桌面存取、聊天和無線投影。</string>
     <string name="collapse_section">折疊</string>
     <string name="expand_section">展開</string>
     <string name="more_settings">更多设置</string>
     <string name="same_network_hint">請確認你的電腦與手機位於同一網路</string>
     <string name="ready">就緒</string>
     <string name="permission_settings">權限設定</string>
-    <string name="web_address_hint">將電腦和手機連線到同一個網路，然後在瀏覽器中開啟對應的網址。</string>
+    <string name="desktop_access_desc">在同一網路下透過電腦管理您的手機。</string>
     <string name="home_web_easy_hint">點一下開始</string>
     <string name="home_web_easy_loading">請稍候…</string>
-    <string name="home_web_easy_failed_title">無法啟動</string>
+    <string name="plainapp_service_failed">無法啟動</string>
     <string name="last_active">最後活躍：%1$s</string>
     <string name="revoke_session">撤銷此工作階段</string>
     <string name="how_to_use">使用方式</string>
@@ -92,5 +89,5 @@
     <string name="adb_cmd_stop">停止 HTTP 伺服器</string>
     <string name="enable_adb_token">啟用 ADB 令牌</string>
     <string name="http_server_health_check_failed">服務已啟動但無法存取。防火牆或 VPN 應用程式可能封鎖了 localhost 連線。請檢查您的網路設定並重新啟動應用程式。</string>
-    <string name="web_settings">網頁設定</string>
+    <string name="access_settings">存取設定</string>
 </resources>

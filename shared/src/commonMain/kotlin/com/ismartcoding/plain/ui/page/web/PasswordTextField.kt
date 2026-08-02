@@ -18,12 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.platform.getClipboardText
 
 @Composable
 fun PasswordTextField(
@@ -31,7 +31,6 @@ fun PasswordTextField(
     onValueChange: (String) -> Unit = {}, onConfirm: (String) -> Unit = {},
 ) {
     Box(modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 0.dp)) {
-        val clipboardManager = LocalClipboardManager.current
         val focusRequester = remember { FocusRequester() }
         TextField(modifier = Modifier.focusRequester(focusRequester).fillMaxWidth(),
             colors = TextFieldDefaults.colors(focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent, disabledContainerColor = Color.Transparent),
@@ -43,7 +42,7 @@ fun PasswordTextField(
                 if (value.isNotEmpty()) {
                     if (isChanged()) { Button(onClick = { onConfirm(value) }) { Text(stringResource(Res.string.save)) } }
                 } else {
-                    IconButton(onClick = { onValueChange(clipboardManager.getText()?.text ?: "") }) {
+                    IconButton(onClick = { onValueChange(getClipboardText() ?: "") }) {
                         Icon(painter = painterResource(Res.drawable.content_paste), contentDescription = stringResource(Res.string.paste), tint = MaterialTheme.colorScheme.primary)
                     }
                 }

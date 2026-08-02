@@ -2,13 +2,11 @@ package com.ismartcoding.plain.web.routes
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.PasswordType
-import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.getOwnPackageName
 import com.ismartcoding.plain.platform.stopHttpEngineAsync
 import com.ismartcoding.plain.preferences.PasswordTypePreference
 import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.http.HttpCall
 import com.ismartcoding.plain.web.http.HttpRouter
 import com.ismartcoding.plain.web.http.HttpStatus
 import com.ismartcoding.plain.web.setOnlineClientIds
@@ -45,8 +43,8 @@ fun HttpRouter.addSystemRoutes() {
             call.respondText("`c-id` is missing in the headers", status = HttpStatus.BAD_REQUEST)
             return@post
         }
-        if (!TempData.webEnabled.value) {
-            call.respondText("web_access_disabled", status = HttpStatus.FORBIDDEN)
+        if (!TempData.canDesktopAccess()) {
+            call.respondText("desktop_access_disabled", status = HttpStatus.FORBIDDEN)
             return@post
         }
         HttpServerManager.clientIpCache[clientId] = call.remoteHost

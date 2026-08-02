@@ -2,6 +2,7 @@ package com.ismartcoding.plain.web.routes
 
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -39,6 +40,10 @@ private val zipSemaphore = Semaphore(1)
  */
 fun HttpRouter.addZipRoutes() {
     get("/zip/dir") { call ->
+        if (!TempData.canDesktopAccess()) {
+            call.respondNoBody(HttpStatus.FORBIDDEN)
+            return@get
+        }
         val id = call.queryParam("id") ?: ""
         if (id.isEmpty()) {
             call.respondNoBody(HttpStatus.BAD_REQUEST)
@@ -101,6 +106,10 @@ fun HttpRouter.addZipRoutes() {
     }
 
     get("/zip/files") { call ->
+        if (!TempData.canDesktopAccess()) {
+            call.respondNoBody(HttpStatus.FORBIDDEN)
+            return@get
+        }
         val id = call.queryParam("id") ?: ""
         if (id.isEmpty()) {
             call.respondNoBody(HttpStatus.BAD_REQUEST)

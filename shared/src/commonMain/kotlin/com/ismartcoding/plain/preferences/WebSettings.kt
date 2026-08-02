@@ -16,7 +16,6 @@ data class WebSettings(
     val keepAwake: Boolean,
     val apiPermissions: Set<String>,
     val rotateUrlTokenOnRestart: Boolean,
-    val dlnaReceiverEnabled: Boolean,
 )
 
 val LocalPasswordType = compositionLocalOf { PasswordTypePreference.default }
@@ -27,7 +26,6 @@ val LocalAuthDevToken = compositionLocalOf { AuthDevTokenPreference.default }
 val LocalAdbToken = compositionLocalOf { AdbTokenPreference.default }
 val LocalKeepAwake = compositionLocalOf { KeepAwakePreference.default }
 val LocalRotateUrlTokenOnRestart = compositionLocalOf { RotateUrlTokenOnRestartPreference.default }
-val LocalDlnaReceiverEnabled = compositionLocalOf { DlnaReceiverEnabledPreference.default }
 
 @Composable
 fun WebSettingsProvider(content: @Composable () -> Unit) {
@@ -41,7 +39,6 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
             keepAwake = KeepAwakePreference.default,
             apiPermissions = ApiPermissionsPreference.default,
             rotateUrlTokenOnRestart = RotateUrlTokenOnRestartPreference.default,
-            dlnaReceiverEnabled = DlnaReceiverEnabledPreference.default,
         )
     val settings =
         remember {
@@ -55,7 +52,6 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
                     keepAwake = KeepAwakePreference.get(it),
                     apiPermissions = ApiPermissionsPreference.get(it),
                     rotateUrlTokenOnRestart = RotateUrlTokenOnRestartPreference.get(it),
-                    dlnaReceiverEnabled = DlnaReceiverEnabledPreference.get(it),
                 )
             }
         }.collectAsStateValue(
@@ -71,7 +67,6 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
         LocalKeepAwake provides settings.keepAwake,
         LocalApiPermissions provides settings.apiPermissions,
         LocalRotateUrlTokenOnRestart provides settings.rotateUrlTokenOnRestart,
-        LocalDlnaReceiverEnabled provides settings.dlnaReceiverEnabled,
     ) {
         content()
     }

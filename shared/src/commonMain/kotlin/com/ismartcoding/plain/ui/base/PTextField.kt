@@ -22,12 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import com.ismartcoding.plain.platform.getClipboardText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +45,6 @@ fun PTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
 ) {
-    val clipboardManager = LocalClipboardManager.current
     val focusRequester = remember { FocusRequester() }
     var showPassword by remember { mutableStateOf(false) }
 
@@ -119,7 +118,7 @@ fun PTextField(
                 }
             } else {
                 IconButton(onClick = {
-                    onValueChange(clipboardManager.getText()?.text ?: "")
+                    onValueChange(getClipboardText() ?: "")
                 }) {
                     Icon(
                         painter = painterResource(Res.drawable.content_paste),

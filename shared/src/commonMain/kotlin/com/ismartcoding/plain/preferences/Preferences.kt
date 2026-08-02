@@ -22,7 +22,6 @@ import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.platform.randomPassword
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 internal val preferencesJson = Json { ignoreUnknownKeys = true }
@@ -157,23 +156,33 @@ object LanguagePreference : BasePreference<String>() {
     override val key = stringPreferencesKey("locale")
 }
 
-object WebPreference : BasePreference<Boolean>() {
+object ServicePreference : BasePreference<Boolean>() {
     override val default = false
-    override val key = booleanPreferencesKey("web")
+    override val key = booleanPreferencesKey("service")
 
     override suspend fun putAsync(value: Boolean) {
         super.putAsync(value)
-        TempData.webEnabled.value = value
+        TempData.serviceEnabled.value = value
     }
 }
 
-object DlnaReceiverEnabledPreference : BasePreference<Boolean>() {
-    override val default = false
-    override val key = booleanPreferencesKey("dlna_receiver_enabled")
+object DesktopAccessPreference : BasePreference<Boolean>() {
+    override val default = true
+    override val key = booleanPreferencesKey("desktop_access")
 
     override suspend fun putAsync(value: Boolean) {
         super.putAsync(value)
-        TempData.dlnaReceiverEnabled.value = value
+        TempData.desktopAccessEnabled.value = value
+    }
+}
+
+object DlnaPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("dlna")
+
+    override suspend fun putAsync(value: Boolean) {
+        super.putAsync(value)
+        TempData.dlnaEnabled.value = value
     }
 }
 

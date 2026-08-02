@@ -45,7 +45,7 @@
     <string name="ip_address_asc">Dirección IP (0 a 9)</string>
     <string name="last_active_desc">Última actividad</string>
     <string name="app_version">Versión de la APP</string>
-    <string name="android_version">Versión de Android</string>
+    <string name="system_version">Versión del sistema</string>
     <string name="clear_history">Borrar historial</string>
     <string name="clear_logs">Borrar registros</string>
     <string name="no_logs_error">No se pueden compartir registros</string>

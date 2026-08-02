@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
@@ -23,6 +24,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.features.dlna.receiver.DlnaReceiverEngine
+import com.ismartcoding.plain.features.dlna.startDlnaRenderer
+import com.ismartcoding.plain.preferences.DlnaPreference
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
@@ -31,12 +34,14 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.nav.Routing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DlnaReceiverPage(navController: NavHostController) {
-    val enabled by TempData.dlnaReceiverEnabled.collectAsState()
+    val enabled by TempData.dlnaEnabled.collectAsState()
     val startError by DlnaRendererState.startError.collectAsState()
     val isRetrying by DlnaRendererState.isRetrying.collectAsState()
 
@@ -91,21 +96,32 @@ fun DlnaReceiverPage(navController: NavHostController) {
 
 @Composable
 private fun DlnaReceiverDisabledScreen() {
+    val scope = rememberCoroutineScope()
     PCard {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
-                text = stringResource(Res.string.dlna_receiver_disabled_title),
+                text = stringResource(Res.string.feature_disabled_title, stringResource(Res.string.dlna_receiver)),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = stringResource(Res.string.dlna_receiver_disabled_desc),
+                text = stringResource(Res.string.dlna_receiver_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            PFilledButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(Res.string.dlna_receiver_turn_on),
+                onClick = {
+                    scope.launchSafe {
+                        DlnaPreference.putAsync(true)
+                        startDlnaRenderer()
+                    }
+                },
+                buttonSize = ButtonSize.EXTRA_LARGE,
             )
         }
     }

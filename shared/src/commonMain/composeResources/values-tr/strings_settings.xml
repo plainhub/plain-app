@@ -45,7 +45,7 @@
     <string name="ip_address_asc">IP adresi (0'dan 9'a)</string>
     <string name="last_active_desc">Son etkin</string>
     <string name="app_version">UYGULAMA sürümü</string>
-    <string name="android_version">Android sürümü</string>
+    <string name="system_version">Sistem sürümü</string>
     <string name="clear_history">Geçmişi temizle</string>
     <string name="clear_logs">Günlükleri temizle</string>
     <string name="no_logs_error">Paylaşılacak günlük yok</string>

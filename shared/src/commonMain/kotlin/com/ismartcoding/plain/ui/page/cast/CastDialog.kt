@@ -20,53 +20,41 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.features.dlna.sender.DlnaDeviceScanner
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.audioPause
-import com.ismartcoding.plain.preferences.WebPreference
+import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.models.CastViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
     if (!castVM.showCastDialog.value) return
-    val itemsState by castVM.itemsFlow.collectAsState()
+    val devices by castVM.devices.collectAsState()
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    val hasDevices = itemsState.isNotEmpty()
+    val hasDevices = devices.isNotEmpty()
     val heroHeight by animateDpAsState(if (hasDevices) 104.dp else 156.dp, label = "castHeroHeight")
-    var job by remember { mutableStateOf<Job?>(null) }
     val onDismiss = { castVM.showCastDialog.value = false }
 
-    LaunchedEffect(Unit) {
-        if (job?.isActive != true) {
-            job = coIO { castVM.searchAsync() }
-        }
-    }
+    LaunchedEffect(Unit) { DlnaDeviceScanner.start() }
     LaunchedEffect(hasDevices) {
         if (hasDevices) sheetState.expand()
     }
     DisposableEffect(Unit) {
-        onDispose {
-            job?.cancel()
-            job = null
-        }
+        onDispose { DlnaDeviceScanner.stop() }
     }
 
     PModalBottomSheet(
@@ -80,7 +68,7 @@ fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             PBottomSheetTopAppBar(
-                title = stringResource(if (hasDevices) Res.string.cast_select_screen else Res.string.cast_searching_for_screen),
+                title = stringResource(Res.string.cast_select_screen),
                 subtitle = stringResource(if (hasDevices)  Res.string.cast_dialog_hint else Res.string.cast_looking_for_devices),
             )
             Column(
@@ -95,16 +83,16 @@ fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
                     modifier = Modifier.fillMaxWidth().heightIn(max = 300.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    items(itemsState, key = { it.hostAddress }) { device ->
+                    items(devices, key = { it.hostAddress }) { device ->
                         CastDeviceCard(
-                            title = device.friendlyName,
+                            title = device.getDeviceName(),
                             subtitle = device.hostAddress,
                             onClick = {
                                 castVM.selectDevice(device.hostAddress)
                                 audioPause()
                                 scope.launch(Dispatchers.Default) {
-                                    if (!WebPreference.getAsync()) {
-                                        WebPreference.putAsync(true)
+                                    if (!ServicePreference.getAsync()) {
+                                        ServicePreference.putAsync(true)
                                         sendEvent(StartHttpServerEvent())
                                     }
                                 }

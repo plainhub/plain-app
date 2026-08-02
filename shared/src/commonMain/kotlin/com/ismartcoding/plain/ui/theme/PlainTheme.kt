@@ -48,7 +48,7 @@ fun Typography.tipsText() = bodyMedium.copy(color = MaterialTheme.colorScheme.on
 
 @Composable
 fun Typography.listItemTitle() = titleMedium.copy(
-    fontWeight = FontWeight.SemiBold,
+    fontWeight = FontWeight.Medium,
     color = MaterialTheme.colorScheme.onSurface
 )
 

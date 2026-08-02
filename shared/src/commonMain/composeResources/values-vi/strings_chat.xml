@@ -51,7 +51,7 @@
     <string name="os">Hệ điều hành</string>
     <string name="browser">Trình duyệt</string>
     <string name="reject">Từ chối</string>
-    <string name="allow_web_access">Cho phép truy cập web</string>
+    <string name="open_web_address">Mở địa chỉ bên dưới trong trình duyệt web của bạn.</string>
     <string name="allow_web_access_desc">Cho phép truy cập dữ liệu điện thoại từ trình duyệt web</string>
     <string name="allow_desktop_access">Cho phép truy cập máy tính</string>
     <string name="allow_desktop_access_desc">Cho phép truy cập dữ liệu điện thoại từ ứng dụng máy tính</string>

@@ -53,7 +53,6 @@
     <string name="empty_playlist">Je afspeellijst is leeg</string>
     <string name="remove_from_playlist">Verwijderen uit afspeellijst</string>
     <string name="image">Afbeelding</string>
-    <string name="cast_searching_for_screen">Scherm zoeken</string>
     <string name="cast_select_screen">Selecteer een scherm</string>
     <string name="cast_looking_for_devices">Apparaten in de buurt zoeken...</string>
 </resources>

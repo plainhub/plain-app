@@ -4,19 +4,20 @@
     <string name="select_sound">사운드 선택</string>
     <string name="sound_meter">음향 미터</string>
     <string name="pomodoro_timer">포모도로 타이머</string>
-    <string name="dlna_receiver">무선 캐스트</string>
-    <string name="dlna_receiver_waiting_title">전송 대기 중</string>
+    <string name="dlna_receiver">캐스트 수신기</string>
+    <string name="dlna_receiver_desc">다른 기기에서 동영상, 음악, 사진을 재생하세요.</string>
+    <string name="dlna_receiver_waiting_title">캐스트 대기 중</string>
     <string name="dlna_receiver_waiting_desc">네트워크에서 보이는 기기: %1$s</string>
     <string name="dlna_receiver_step1_title">같은 Wi-Fi에 연결</string>
     <string name="dlna_receiver_step1_desc">두 기기가 같은 Wi-Fi 네트워크에 연결되어 있는지 확인하세요</string>
     <string name="dlna_receiver_step2_title">PlainApp 열기</string>
     <string name="dlna_receiver_step2_desc">다른 기기에서 PlainApp을 열고 재생할 동영상이나 음악을 찾으세요</string>
-    <string name="dlna_receiver_step3_title">전송</string>
-    <string name="dlna_receiver_step3_desc">전송 아이콘을 탭하고 목록에서 "%1$s"를 선택하면 재생이 시작됩니다</string>
-    <string name="dlna_receiver_protocol_note">DLNA / UPnP 프로토콜 지원, VLC, Kodi 등 주요 전송 앱과 호환됩니다</string>
+    <string name="dlna_receiver_step3_title">캐스트하려면 탭</string>
+    <string name="dlna_receiver_step3_desc">캐스트 아이콘을 탭하고 목록에서 "%1$s"를 선택하면 재생이 시작됩니다</string>
+    <string name="dlna_receiver_protocol_note">DLNA / UPnP 프로토콜 지원, VLC, Kodi 등 주요 캐스트 앱과 호환됩니다</string>
     <string name="dlna_receiver_exit_player">플레이어 종료</string>
-    <string name="dlna_receiver_disabled_title">수신기 꺼짐</string>
-    <string name="dlna_receiver_disabled_desc">이 기기에서 전송을 수신하려면 웹 설정에서 토글을 켜세요</string>
+    <string name="dlna_receiver_turn_on">켜기</string>
+    <string name="feature_disabled_title">%1$s이(가) 비활성화되었습니다</string>
     <string name="short_break">짧은 휴식</string>
     <string name="long_break">긴 휴식</string>
     <string name="tomatoes_today">오늘의 토마토</string>
@@ -74,6 +75,5 @@
     <string name="dlna_cast_history">캐스트 규칙</string>
     <string name="dlna_cast_accepted">허용됨</string>
     <string name="dlna_cast_rejected">거부됨</string>
-    <string name="dlna_receiver_start_error">수신기를 시작하지 못했습니다.</string>
     <string name="retry">다시 시도</string>
 </resources>

@@ -89,6 +89,15 @@ fun HttpRouter.addWebSocketRoutes() {
     }
 
     webSocket("/") { ws, call ->
+        // WS `/` is the Main-UI login + event-push channel — it requires
+        // `canDesktopAccess()`. WS `/status` (peer heartbeat) is separate and
+        // only needs `serviceEnabled`. This check is authoritative: iOS
+        // `processWebSocket` has no platform-level gate, so without this the
+        // login WS would be reachable with desktop access disabled.
+        if (!TempData.canDesktopAccess()) {
+            ws.close(WsCloseCode.POLICY_VIOLATION, "desktop_access_disabled")
+            return@webSocket
+        }
         val q = call.queryParamStrings()
         val clientId = q["cid"]?.firstOrNull() ?: ""
         if (clientId.isEmpty()) {

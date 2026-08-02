@@ -4,19 +4,20 @@
     <string name="select_sound">Chọn âm thanh</string>
     <string name="sound_meter">Dụng cụ đo âm thanh</string>
     <string name="pomodoro_timer">Bộ hẹn giờ Pomodoro</string>
-    <string name="dlna_receiver">Phát không dây</string>
+    <string name="dlna_receiver">Bộ thu chiếu</string>
+    <string name="dlna_receiver_desc">Phát video, nhạc và ảnh từ thiết bị khác.</string>
     <string name="dlna_receiver_waiting_title">Chờ chiếu</string>
     <string name="dlna_receiver_waiting_desc">Thiết bị hiển thị trên mạng: %1$s</string>
     <string name="dlna_receiver_step1_title">Kết nối cùng Wi-Fi</string>
     <string name="dlna_receiver_step1_desc">Đảm bảo cả hai thiết bị đều kết nối cùng mạng Wi-Fi</string>
     <string name="dlna_receiver_step2_title">Mở PlainApp</string>
     <string name="dlna_receiver_step2_desc">Mở PlainApp trên thiết bị kia và tìm video hoặc nhạc muốn phát</string>
-    <string name="dlna_receiver_step3_title">Chiếu</string>
+    <string name="dlna_receiver_step3_title">Nhấn để chiếu</string>
     <string name="dlna_receiver_step3_desc">Nhấn biểu tượng chiếu, chọn "%1$s" từ danh sách và phát sẽ bắt đầu</string>
     <string name="dlna_receiver_protocol_note">Hỗ trợ giao thức DLNA / UPnP, tương thích với VLC, Kodi và các ứng dụng chiếu phổ biến khác</string>
     <string name="dlna_receiver_exit_player">Thoát trình phát</string>
-    <string name="dlna_receiver_disabled_title">Bộ nhận đã tắt</string>
-    <string name="dlna_receiver_disabled_desc">Bật công tắc trong Cài đặt Web để nhận chiếu trên thiết bị này</string>
+    <string name="dlna_receiver_turn_on">Bật</string>
+    <string name="feature_disabled_title">%1$s đã tắt</string>
     <string name="short_break">Nghỉ ngắn</string>
     <string name="long_break">Nghỉ dài</string>
     <string name="tomatoes_today">Số Pomodoro hôm nay</string>
@@ -74,6 +75,5 @@
     <string name="dlna_cast_history">Quy tắc Cast</string>
     <string name="dlna_cast_accepted">Đã chấp nhận</string>
     <string name="dlna_cast_rejected">Đã từ chối</string>
-    <string name="dlna_receiver_start_error">Không thể khởi động bộ thu.</string>
     <string name="retry">Thử lại</string>
 </resources>

@@ -4,10 +4,10 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -15,7 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.TempData
@@ -102,15 +101,17 @@ fun AudioListItem(
                     VerticalSpace(dp = 8.dp)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         tags.forEach { tag ->
-                            ClickableText(
-                                text = AnnotatedString("#" + tag.name),
-                                modifier = Modifier.wrapContentHeight().padding(end = 8.dp),
+                            Text(
+                                text = "#" + tag.name,
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .padding(end = 8.dp)
+                                    .clickable {
+                                        if (dragSelectState.selectMode) return@clickable
+                                        val idx = tagsVM.itemsFlow.value.indexOfFirst { it.id == tag.id }
+                                        if (idx != -1) scope.launch { pagerState.scrollToPage(idx + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1) }
+                                    },
                                 style = MaterialTheme.typography.listItemTag(),
-                                onClick = {
-                                    if (dragSelectState.selectMode) return@ClickableText
-                                    val idx = tagsVM.itemsFlow.value.indexOfFirst { it.id == tag.id }
-                                    if (idx != -1) scope.launch { pagerState.scrollToPage(idx + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1) }
-                                }
                             )
                         }
                     }

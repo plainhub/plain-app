@@ -18,7 +18,7 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.toggleNotificationListener
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
-import com.ismartcoding.plain.preferences.WebPreference
+import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -41,7 +41,7 @@ internal fun WebSettingsEffects(
                     systemAlertWindow.value = Permission.SYSTEM_ALERT_WINDOW.isGranted()
                     notificationListenerGranted.value = Permission.NOTIFICATION_LISTENER.isGranted()
                     if (event.map[Permission.NOTIFICATION_LISTENER.toSysPermission()] == true) {
-                        toggleNotificationListener(WebPreference.getAsync())
+                        toggleNotificationListener(DesktopAccessPreference.getAsync())
                     }
                 }
                 is WindowFocusChangedEvent -> {
@@ -65,7 +65,7 @@ internal fun togglePermission(scope: CoroutineScope, m: PermissionItem, enable: 
     scope.launch {
         ApiPermissionsPreference.putAsync(m.permission, enable)
         if (m.permission == Permission.NOTIFICATION_LISTENER) {
-            val webEnabled = WebPreference.getAsync()
+            val webEnabled = DesktopAccessPreference.getAsync()
             toggleNotificationListener(enable && webEnabled)
         }
         if (enable) {

@@ -16,7 +16,7 @@ import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.api_service_is_running
+import com.ismartcoding.plain.i18n.plainapp_service_is_running
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.MdnsRegister
 import com.ismartcoding.plain.mdns.NsdHelper
@@ -97,7 +97,7 @@ class HttpServerService : LifecycleService() {
             val notification = NotificationHelper.createServiceNotification(
                 this,
                 AppIntents.ACTION_STOP_HTTP_SERVER,
-                LocaleHelper.getString(Res.string.api_service_is_running),
+                LocaleHelper.getString(Res.string.plainapp_service_is_running),
                 HttpServerManager.getNotificationContent()
             )
 
