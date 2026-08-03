@@ -32,7 +32,7 @@
     <string name="http_server_error">El servidor HTTP no está iniciado. Vuelve a abrir PlainApp e inténtalo de nuevo. Asegúrate de que no haya otras aplicaciones ocupando los puertos HTTP o HTTPS. Si el problema persiste, proporciona más detalles sobre el problema contactando a support@plainapp.app.</string>
     <string name="relaunch_app">Vuelve a abrir PlainApp</string>
     <string name="require_confirmation">Requiere confirmación</string>
-    <string name="plainapp_service_required_for_chat">Inicia el PlainApp Service para usar Chat.</string>
+    <string name="plainapp_service_required_for_chat">Inicia el PlainApp Servicio para usar Chat.</string>
     <string name="desktop_access">Acceso de escritorio</string>
     <string name="http_port">Puerto HTTP</string>
     <string name="https_port">Puerto HTTPS</string>
@@ -54,7 +54,7 @@
     <string name="web_url">URL web</string>
     <string name="auth_dev_token_tips">Los clientes deben incluir tanto c-id: &lt;client_id&gt; como Authorization: Bearer &lt;token&gt; en los encabezados de la solicitud, o usar el mismo par para cifrar el payload de la API. Si el token se proporciona en los encabezados de la solicitud, la respuesta se devolverá en texto sin formato.</string>
     <string name="browser_https_error_tips">Si ves el error "Tu conexión no es privada", simplemente haz clic en el botón "Avanzado" y luego en el botón "Continuar a ...", así Chrome confiará en esta URL durante el resto de la sesión del navegador.</string>
-    <string name="plainapp_service_is_running">PlainApp Service en ejecución</string>
+    <string name="plainapp_service_is_running">PlainApp Servicio en ejecución</string>
     <string name="screen_mirror_service_is_running">El servicio de espejo de pantalla está en ejecución</string>
     <string name="screen_mirror_audio_permission_settings_message">El permiso del micrófono está desactivado. Actívelo en Ajustes para reflejar el audio del sistema.</string>
     <string name="enter_this_address_tips">Ingrese la dirección anterior en el navegador de su computadora, asegurándose de que su teléfono y su computadora estén en la misma red local.</string>
@@ -66,9 +66,9 @@
     <string name="restart_app_message">¡Casi listo! Solo toque "Volver a lanzar APP" para que surtan efecto los cambios.</string>
     <string name="access_phone_web">Accede a tu teléfono desde el navegador de una computadora.</string>
     <string name="scan_qrcode_to_access_web">Escanea el código QR para acceder a la dirección web</string>
-    <string name="plainapp_service_off">PlainApp Service APAGADO</string>
-    <string name="plainapp_service_on">PlainApp Service ACTIVADO</string>
-    <string name="plainapp_service_off_desc">Inicia el PlainApp Service para usar Acceso de escritorio, Chat y Emisión inalámbrica.</string>
+    <string name="plainapp_service_off">PlainApp Servicio APAGADO</string>
+    <string name="plainapp_service_on">PlainApp Servicio ACTIVADO</string>
+    <string name="plainapp_service_off_desc">Inicia el PlainApp Servicio para usar Acceso de escritorio, Chat y Emisión inalámbrica.</string>
     <string name="collapse_section">Contraer</string>
     <string name="expand_section">Expandir</string>
     <string name="more_settings">Más configuraciones</string>

@@ -32,7 +32,7 @@
     <string name="http_server_error">Máy chủ HTTP không được khởi động. Vui lòng khởi động lại PlainApp và thử lại.</string>
     <string name="relaunch_app">Khởi chạy lại ứng dụng</string>
     <string name="require_confirmation">Yêu cầu xác nhận</string>
-    <string name="plainapp_service_required_for_chat">Vui lòng khởi động PlainApp Service để sử dụng Trò chuyện.</string>
+    <string name="plainapp_service_required_for_chat">Vui lòng khởi động PlainApp Dịch vụ để sử dụng Trò chuyện.</string>
     <string name="desktop_access">Truy cập máy tính</string>
     <string name="http_port">Cổng HTTP</string>
     <string name="https_port">Cổng HTTPS</string>
@@ -54,7 +54,7 @@
     <string name="web_url">URL Web</string>
     <string name="auth_dev_token_tips">Clients phải bao gồm cả c-id: &lt;client_id&gt; và Authorization: Bearer &lt;token&gt; trong tiêu đề yêu cầu, hoặc sử dụng cùng một cặp để mã hóa payload API. Nếu token được cung cấp trong tiêu đề yêu cầu, phản hồi sẽ được trả về ở dạng văn bản thuần túy.</string>
     <string name="browser_https_error_tips">Nếu bạn thấy lỗi "Kết nối của bạn không riêng tư", đơn giản là nhấn vào nút "Nâng cao" và nhấn vào nút "Tiếp tục tới …", sau đó Chrome sẽ tin tưởng vào URL này cho phần còn lại của phiên duyệt.</string>
-    <string name="plainapp_service_is_running">PlainApp Service đang chạy</string>
+    <string name="plainapp_service_is_running">PlainApp Dịch vụ đang chạy</string>
     <string name="screen_mirror_service_is_running">Dịch vụ phản chiếu màn hình đang chạy</string>
     <string name="screen_mirror_audio_permission_settings_message">Quyền micro đang bị tắt. Hãy bật trong Cài đặt để phản chiếu âm thanh hệ thống.</string>
     <string name="enter_this_address_tips">Nhập địa chỉ trên vào trình duyệt của máy tính của bạn, đảm bảo rằng điện thoại và máy tính của bạn đang kết nối với cùng một mạng cục bộ.</string>
@@ -66,9 +66,9 @@
     <string name="restart_app_message">Gần xong! Chỉ cần nhấn "Khởi động lại ứng dụng" để thực hiện.</string>
     <string name="access_phone_web">Truy cập điện thoại của bạn từ trình duyệt máy tính.</string>
     <string name="scan_qrcode_to_access_web">Quét mã QR để truy cập địa chỉ web</string>
-    <string name="plainapp_service_off">PlainApp Service TẮT</string>
-    <string name="plainapp_service_on">PlainApp Service BẬT</string>
-    <string name="plainapp_service_off_desc">Khởi động PlainApp Service để sử dụng Truy cập máy tính, Trò chuyện và Phát không dây.</string>
+    <string name="plainapp_service_off">PlainApp Dịch vụ TẮT</string>
+    <string name="plainapp_service_on">PlainApp Dịch vụ BẬT</string>
+    <string name="plainapp_service_off_desc">Khởi động PlainApp Dịch vụ để sử dụng Truy cập máy tính, Trò chuyện và Phát không dây.</string>
     <string name="collapse_section">Thu gọn</string>
     <string name="expand_section">Mở rộng</string>
     <string name="more_settings">Cài đặt khác</string>

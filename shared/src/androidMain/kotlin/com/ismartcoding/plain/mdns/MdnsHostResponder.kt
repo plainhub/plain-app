@@ -40,6 +40,9 @@ object MdnsHostResponder {
     private var worker: Thread? = null
     private var multicastLock: WifiManager.MulticastLock? = null
 
+    val isRunning: Boolean
+        get() = worker?.isAlive == true && socket != null
+
     fun start(context: Context, mdnsHostname: String): Boolean {
         val normalized = normalizeHostname(mdnsHostname)
         if (normalized.isEmpty()) {

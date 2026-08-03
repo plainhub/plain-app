@@ -32,7 +32,7 @@
     <string name="http_server_error">HTTP伺服器未啟動。重新啟動PlainApp並重試。</string>
     <string name="relaunch_app">重啟應用</string>
     <string name="require_confirmation">需要二次確認</string>
-    <string name="plainapp_service_required_for_chat">要使用聊天，請啟動 PlainApp Service。</string>
+    <string name="plainapp_service_required_for_chat">要使用聊天，請啟動 PlainApp 服務。</string>
     <string name="desktop_access">桌面存取</string>
     <string name="http_port">HTTP端口</string>
     <string name="https_port">HTTPS端口</string>
@@ -54,7 +54,7 @@
     <string name="web_url">網站地址</string>
     <string name="auth_dev_token_tips">客戶端必須在請求標頭中同時包含 c-id: &lt;client_id&gt; 和 Authorization: Bearer &lt;token&gt;，或使用同一組參數加密 API 資料。若在請求標頭中提供了權杖，回應將以明文返回。</string>
     <string name="browser_https_error_tips">如果Chrome瀏覽器顯示"您的連接不是私密連接"，請點擊頁面"高級"按鈕繼續。</string>
-    <string name="plainapp_service_is_running">PlainApp Service 運行中</string>
+    <string name="plainapp_service_is_running">PlainApp 服務運行中</string>
     <string name="screen_mirror_service_is_running">螢幕鏡像服務運行中</string>
     <string name="screen_mirror_audio_permission_settings_message">麥克風權限已被停用，請到設定中開啟後才能鏡像系統音訊。</string>
     <string name="enter_this_address_tips">在電腦瀏覽器中輸入上述地址，請確保您的手機和電腦位於同一局域網中。</string>
@@ -66,9 +66,9 @@
     <string name="restart_app_message">差一點了！只需點擊「重新啟動應用程式」即可生效。</string>
     <string name="access_phone_web">從電腦瀏覽器訪問您的手機。</string>
     <string name="scan_qrcode_to_access_web">掃描二維碼訪問網頁</string>
-    <string name="plainapp_service_off">PlainApp Service 已關閉</string>
-    <string name="plainapp_service_on">PlainApp Service 已開啟</string>
-    <string name="plainapp_service_off_desc">啟動 PlainApp Service 以使用桌面存取、聊天和無線投影。</string>
+    <string name="plainapp_service_off">PlainApp 服務已關閉</string>
+    <string name="plainapp_service_on">PlainApp 服務已開啟</string>
+    <string name="plainapp_service_off_desc">啟動 PlainApp 服務 以使用桌面存取、聊天和無線投影。</string>
     <string name="collapse_section">折疊</string>
     <string name="expand_section">展開</string>
     <string name="more_settings">更多设置</string>

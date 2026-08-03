@@ -130,4 +130,17 @@
     <string name="drag_number_to_reorder_list">Drag the number to reorder the list</string>
     <string name="web_client_connected">Web client connected</string>
     <string name="clients_online">%1$d client(s) online</string>
+    <string name="service_debug">Service Debug</string>
+    <string name="http_server">HTTP Server</string>
+    <string name="service_running">Running</string>
+    <string name="http_server_state">State</string>
+    <string name="ws_session_count">WebSocket Sessions</string>
+    <string name="mdns_server">mDNS Server</string>
+    <string name="dlna_service">DLNA Service</string>
+    <string name="dlna_playback_state">Playback State</string>
+    <string name="dlna_start_error">Start Error</string>
+    <string name="ble_service">BLE Service</string>
+    <string name="aware_service">Aware Service</string>
+    <string name="aware_attach_status">Attach Status</string>
+    <string name="aware_discovered_peer_count">Discovered Peers</string>
 </resources>

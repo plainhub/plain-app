@@ -151,6 +151,9 @@ class Routing {
     object BleDebug
 
     @Serializable
+    object ServiceDebug
+
+    @Serializable
     object ComponentShowcase
 
     @Serializable

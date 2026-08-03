@@ -32,7 +32,7 @@
     <string name="http_server_error">HTTP sunucusu başlatılmadı. PlainApp'i yeniden başlatın ve tekrar deneyin.</string>
     <string name="relaunch_app">UYGULAMAYI Yeniden Başlat</string>
     <string name="require_confirmation">Onay gerektir</string>
-    <string name="plainapp_service_required_for_chat">Sohbet'i kullanmak için lütfen PlainApp Service'i başlatın.</string>
+    <string name="plainapp_service_required_for_chat">Sohbet'i kullanmak için lütfen PlainApp Servis'i başlatın.</string>
     <string name="desktop_access">Masaüstü erişimi</string>
     <string name="http_port">HTTP bağlantı noktası</string>
     <string name="https_port">HTTPS bağlantı noktası</string>
@@ -54,7 +54,7 @@
     <string name="web_url">Web URL'si</string>
     <string name="auth_dev_token_tips">İstemciler, istek başlıklarına hem c-id: &lt;client_id&gt; hem de Authorization: Bearer &lt;token&gt; dahil etmeli ya da API yükünü şifrelemek için aynı çifti kullanmalıdır. Token istek başlıklarında sağlanırsa, yanıt düz metin olarak döndürülür.</string>
     <string name="browser_https_error_tips">Eğer "Bağlantınız gizli değil" hatası görürseniz, sadece "Gelişmiş" düğmesine tıklayın ve "… devam et" düğmesine tıklayın, sonra Chrome bu URL'ye tarayıcı oturumu boyunca güvenecektir.</string>
-    <string name="plainapp_service_is_running">PlainApp Service çalışıyor</string>
+    <string name="plainapp_service_is_running">PlainApp Servis çalışıyor</string>
     <string name="screen_mirror_service_is_running">Ekran yansıtma hizmeti çalışıyor</string>
     <string name="screen_mirror_audio_permission_settings_message">Mikrofon izni devre dışı. Sistem sesini yansıtmak için Ayarlar bölümünden etkinleştirin.</string>
     <string name="enter_this_address_tips">Yukarıdaki adresi bilgisayarınızın tarayıcısına girin, telefonunuzun ve bilgisayarınızın aynı yerel ağda olduğundan emin olun.</string>
@@ -66,9 +66,9 @@
     <string name="restart_app_message">Neredeyse bitti! Etkili olması için "Uygulamayı Yeniden Başlat" düğmesine dokunun.</string>
     <string name="access_phone_web">Telefonunuza bir bilgisayar tarayıcısından erişin.</string>
     <string name="scan_qrcode_to_access_web">Web adresine erişmek için QR kodunu tarayın</string>
-    <string name="plainapp_service_off">PlainApp Service KAPALI</string>
-    <string name="plainapp_service_on">PlainApp Service AÇIK</string>
-    <string name="plainapp_service_off_desc">Masaüstü erişimi, Sohbet ve Kablosuz Yayın'ı kullanmak için PlainApp Service'i başlatın.</string>
+    <string name="plainapp_service_off">PlainApp Servis KAPALI</string>
+    <string name="plainapp_service_on">PlainApp Servis AÇIK</string>
+    <string name="plainapp_service_off_desc">Masaüstü erişimi, Sohbet ve Kablosuz Yayın'ı kullanmak için PlainApp Servis'i başlatın.</string>
     <string name="collapse_section">Daralt</string>
     <string name="expand_section">Genişlet</string>
     <string name="more_settings">Diğer ayarlar</string>

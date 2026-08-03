@@ -32,7 +32,7 @@
     <string name="http_server_error">De HTTP-server is niet gestart. Start PlainApp opnieuw en probeer het opnieuw. Zorg ervoor dat er geen andere apps zijn die de HTTP- of HTTPS-poorten bezetten. Als het probleem aanhoudt, geef dan meer details over het probleem door contact op te nemen met support@plainapp.app.</string>
     <string name="relaunch_app">App opnieuw starten</string>
     <string name="require_confirmation">Bevestiging vereisen</string>
-    <string name="plainapp_service_required_for_chat">Start PlainApp Service om Chat te gebruiken.</string>
+    <string name="plainapp_service_required_for_chat">Start PlainApp Dienst om Chat te gebruiken.</string>
     <string name="desktop_access">Desktoptoegang</string>
     <string name="http_port">HTTP-poort</string>
     <string name="https_port">HTTPS-poort</string>
@@ -54,7 +54,7 @@
     <string name="web_url">Web-URL</string>
     <string name="auth_dev_token_tips">Clients moeten zowel c-id: &lt;client_id&gt; als Authorization: Bearer &lt;token&gt; in de verzoekkopteksten opnemen, of hetzelfde paar gebruiken om de API-payload te versleutelen. Als het token in de verzoekkopteksten wordt opgegeven, wordt het antwoord als platte tekst geretourneerd.</string>
     <string name="browser_https_error_tips">Als u de fout "Uw verbinding is niet privé" ziet, klikt u eenvoudig op de knop "Geavanceerd" en vervolgens op de knop "Doorgaan naar …", dan zal Chrome deze URL vertrouwen voor de rest van de browsersessie.</string>
-    <string name="plainapp_service_is_running">PlainApp Service wordt uitgevoerd</string>
+    <string name="plainapp_service_is_running">PlainApp Dienst wordt uitgevoerd</string>
     <string name="screen_mirror_service_is_running">Schermspiegelservice is actief</string>
     <string name="screen_mirror_audio_permission_settings_message">Microfoontoestemming is uitgeschakeld. Schakel deze in bij Instellingen om systeemaudio te spiegelen.</string>
     <string name="enter_this_address_tips">Voer het bovenstaande adres in uw computerbrowser in en zorg ervoor dat uw telefoon en computer zich in hetzelfde lokale netwerk bevinden.</string>
@@ -66,9 +66,9 @@
     <string name="restart_app_message">Bijna klaar! Tik gewoon op "APP opnieuw starten" om het effect te zien.</string>
     <string name="access_phone_web">Toegang tot je telefoon via een computerbrowser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR-code om toegang te krijgen tot het webadres</string>
-    <string name="plainapp_service_off">PlainApp Service UIT</string>
-    <string name="plainapp_service_on">PlainApp Service AAN</string>
-    <string name="plainapp_service_off_desc">Start PlainApp Service om Desktoptoegang, Chat en Draadloos streamen te gebruiken.</string>
+    <string name="plainapp_service_off">PlainApp Dienst UIT</string>
+    <string name="plainapp_service_on">PlainApp Dienst AAN</string>
+    <string name="plainapp_service_off_desc">Start PlainApp Dienst om Desktoptoegang, Chat en Draadloos streamen te gebruiken.</string>
     <string name="collapse_section">Inklappen</string>
     <string name="expand_section">Uitklappen</string>
     <string name="more_settings">Meer instellingen</string>

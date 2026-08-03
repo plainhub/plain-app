@@ -32,7 +32,7 @@
     <string name="http_server_error">HTTP सर्वर शुरू नहीं हुआ है। PlainApp को फिर से चालने का प्रयास करें और पुन: प्रयास करें। सुनिश्चित करें कि HTTP या HTTPS पोर्ट पर कोई अन्य एप्लिकेशन नहीं है। यदि समस्या बरकरार रहती है, तो कृपया support@plainapp.app पर समस्या के बारे में अधिक विवरण प्रदान करें।</string>
     <string name="relaunch_app">ऐप फिर से चालू करें</string>
     <string name="require_confirmation">पुष्टिकरण की आवश्यकता है</string>
-    <string name="plainapp_service_required_for_chat">चैट का उपयोग करने के लिए कृपया PlainApp Service शुरू करें।</string>
+    <string name="plainapp_service_required_for_chat">चैट का उपयोग करने के लिए कृपया PlainApp सेवा शुरू करें।</string>
     <string name="desktop_access">डेस्कटॉप एक्सेस</string>
     <string name="http_port">HTTP पोर्ट</string>
     <string name="https_port">HTTPS पोर्ट</string>
@@ -54,7 +54,7 @@
     <string name="web_url">वेब URL</string>
     <string name="auth_dev_token_tips">क्लाइंट को अनुरोध हेडर में c-id: &lt;client_id&gt; और Authorization: Bearer &lt;token&gt; दोनों शामिल करने होंगे, या API पेलोड को एन्क्रिप्ट करने के लिए उसी जोड़े का उपयोग करना होगा। यदि टोकन अनुरोध हेडर में प्रदान किया जाता है, तो प्रतिक्रिया प्लेन टेक्स्ट में लौटाई जाएगी।</string>
     <string name="browser_https_error_tips">अगर आपको "आपका कनेक्शन निजी नहीं है" त्रुटि दिखाई देती है, तो सीधे "उन्नत" बटन पर क्लिक करें और "पर जाएं ..." बटन पर क्लिक करें, तब क्रोम इस URL को ब्राउज़र सत्र के लिए विश्वसनीय बना देगा।</string>
-    <string name="plainapp_service_is_running">PlainApp Service चल रहा है</string>
+    <string name="plainapp_service_is_running">PlainApp सेवा चल रहा है</string>
     <string name="screen_mirror_service_is_running">स्क्रीन मिरर सेवा चल रही है</string>
     <string name="screen_mirror_audio_permission_settings_message">माइक्रोफोन अनुमति बंद है। सिस्टम ऑडियो मिरर करने के लिए इसे सेटिंग्स में चालू करें।</string>
     <string name="enter_this_address_tips">अपने कंप्यूटर के ब्राउज़र में ऊपर दिए गए पते को डालें, यह सुनिश्चित करें कि आपका फोन और कंप्यूटर एक ही स्थानीय नेटवर्क में हैं।</string>
@@ -66,9 +66,9 @@
     <string name="restart_app_message">लगभग हो गया! केवल प्रभावी बनाने के लिए "ऐप फिर से चालना" टैप करें।</string>
     <string name="access_phone_web">कंप्यूटर ब्राउज़र से अपने फ़ोन तक पहुँचें।</string>
     <string name="scan_qrcode_to_access_web">वेब पता तक पहुँचने के लिए QR कोड स्कैन करें</string>
-    <string name="plainapp_service_off">PlainApp Service बंद</string>
-    <string name="plainapp_service_on">PlainApp Service चालू</string>
-    <string name="plainapp_service_off_desc">डेस्कटॉप एक्सेस, चैट और वायरलेस कास्ट का उपयोग करने के लिए PlainApp Service शुरू करें।</string>
+    <string name="plainapp_service_off">PlainApp सेवा बंद</string>
+    <string name="plainapp_service_on">PlainApp सेवा चालू</string>
+    <string name="plainapp_service_off_desc">डेस्कटॉप एक्सेस, चैट और वायरलेस कास्ट का उपयोग करने के लिए PlainApp सेवा शुरू करें।</string>
     <string name="collapse_section">संकुचित करें</string>
     <string name="expand_section">विस्तार करें</string>
     <string name="more_settings">अधिक सेटिंग्स</string>

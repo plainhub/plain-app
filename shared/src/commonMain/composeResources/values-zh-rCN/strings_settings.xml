@@ -129,4 +129,17 @@
     <string name="install_update">安装更新</string>
     <string name="donation_title">支持 PlainApp 开发</string>
     <string name="buy_me_a_coffee">请我喝杯咖啡</string>
+    <string name="service_debug">服务调试</string>
+    <string name="http_server">HTTP 服务器</string>
+    <string name="service_running">运行中</string>
+    <string name="http_server_state">状态</string>
+    <string name="ws_session_count">WebSocket 会话数</string>
+    <string name="mdns_server">mDNS 服务</string>
+    <string name="dlna_service">DLNA 服务</string>
+    <string name="dlna_playback_state">播放状态</string>
+    <string name="dlna_start_error">启动错误</string>
+    <string name="ble_service">BLE 服务</string>
+    <string name="aware_service">Aware 服务</string>
+    <string name="aware_attach_status">Attach 状态</string>
+    <string name="aware_discovered_peer_count">已发现对端数</string>
 </resources>

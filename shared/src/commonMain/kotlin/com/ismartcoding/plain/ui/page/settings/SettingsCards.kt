@@ -22,6 +22,7 @@ import com.ismartcoding.plain.i18n.developer_mode
 import com.ismartcoding.plain.i18n.layout_grid
 import com.ismartcoding.plain.i18n.nearby_share
 import com.ismartcoding.plain.i18n.not_supported
+import com.ismartcoding.plain.i18n.service_debug
 import com.ismartcoding.plain.i18n.simulate_crash
 import com.ismartcoding.plain.i18n.simulate_crash_desc
 import com.ismartcoding.plain.i18n.supported
@@ -80,6 +81,11 @@ internal fun DeveloperSettingsCard(
                     if (isBluetoothSupported()) Res.string.supported
                     else Res.string.not_supported
                 ),
+                showMore = true,
+            )
+            PListItem(
+                modifier = Modifier.clickable { navController.navigate(Routing.ServiceDebug) },
+                title = stringResource(Res.string.service_debug),
                 showMore = true,
             )
             PListItem(
