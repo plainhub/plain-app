@@ -59,7 +59,7 @@ actual suspend fun stopHttpEngineAsync() = withIO {
 
 actual suspend fun onHttpServerStarted() {
     val service = HttpServerService.instance ?: return
-    NsdHelper.registerServices(service, TempData.httpPort.value, TempData.httpsPort.value)
+    NsdHelper.registerServices(TempData.httpPort.value, TempData.httpsPort.value)
     PNotificationListenerService.toggle(service, Permission.NOTIFICATION_LISTENER.isEnabledAsync())
     PeerStatusManager.start()
 }

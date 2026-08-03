@@ -5,13 +5,14 @@ import com.ismartcoding.plain.features.dlna.receiver.DlnaSsdpMessages
 import com.ismartcoding.plain.features.dlna.receiver.DlnaSsdpSocket
 import com.ismartcoding.plain.features.dlna.receiver.createDlnaSsdpSocket
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.platform.createHttpClient
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +38,7 @@ object DlnaDeviceScanner {
      */
     val devices: StateFlow<List<DlnaDevice>> = _devices.asStateFlow()
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = CoroutineScope(SupervisorJob() + IODispatcher)
     private var scanJob: Job? = null
     private var socket: DlnaSsdpSocket? = null
 

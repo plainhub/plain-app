@@ -46,7 +46,8 @@ import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.tipsText
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.setOnlineClientIds
-import com.ismartcoding.plain.web.wsSessionCount
+import com.ismartcoding.plain.web.onlineClientIds
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import kotlin.compareTo
@@ -60,7 +61,7 @@ fun DesktopAccessSection(navController: NavHostController) {
         initialPage = if (isHttps.value) 1 else 0,
         pageCount = { 2 },
     )
-    val onlineCount by wsSessionCount.collectAsState()
+    val onlineCount by onlineClientIds.map { it.size }.collectAsState(0)
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.collect { page ->

@@ -142,7 +142,7 @@ fun MarkdownText(
             color = style.color.takeOrElse { defaultColor },
             fontSize = style.fontSize,
             lineHeight = style.lineHeight,
-            textAlign = style.textAlign ?: TextAlign.Unspecified,
+            textAlign = style.textAlign,
             fontStyle = style.fontStyle ?: FontStyle.Normal,
             fontWeight = style.fontWeight ?: FontWeight.Normal,
             textDecoration = style.textDecoration ?: TextDecoration.None,

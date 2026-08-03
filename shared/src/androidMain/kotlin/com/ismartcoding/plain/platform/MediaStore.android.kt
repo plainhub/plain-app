@@ -214,6 +214,9 @@ actual suspend fun getSmsAllCounts(): DSmsCounts =
 actual fun sendSmsText(number: String, body: String, subscriptionId: Int?) =
     com.ismartcoding.plain.features.sms.SmsHelper.sendText(number, body, subscriptionId)
 
+actual fun call(number: String, showDialer: Boolean) =
+    com.ismartcoding.plain.features.media.CallMediaStoreHelper.call(appContext, number, showDialer)
+
 actual fun resolveAppFileUri(uri: String): String =
     com.ismartcoding.plain.helpers.AppFileStore.resolveUri(uri)
 

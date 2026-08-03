@@ -117,8 +117,10 @@ object CallMediaStoreHelper : BaseContentHelper() {
         showDialer: Boolean,
     ) {
         val action = if (showDialer) Intent.ACTION_DIAL else Intent.ACTION_CALL
-        val intent = Intent(action)
-        intent.data = Uri.parse("tel:$number")
+        val intent = Intent(action).apply {
+            data = Uri.parse("tel:$number")
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
         context.startActivity(intent)
     }
 }

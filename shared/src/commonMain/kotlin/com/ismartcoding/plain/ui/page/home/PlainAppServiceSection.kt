@@ -64,7 +64,6 @@ fun PlainAppServiceSection(
                     HttpServiceState.ERROR -> stringResource(Res.string.plainapp_service_failed)
                     else -> stringResource(Res.string.plainapp_service_on)
                 },
-                onClick = { navController.navigate(Routing.DesktopAccessSettings) },
                 trailingContent = {
                     if (httpServiceState != HttpServiceState.ON) {
                         PIconButton(
@@ -76,69 +75,74 @@ fun PlainAppServiceSection(
                 },
             )
             Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp)) {
-                if (httpServiceState != HttpServiceState.ON) {
-                    Text(
-                        text = when (httpServiceState) {
-                            HttpServiceState.OFF -> stringResource(Res.string.plainapp_service_off_desc)
-                            HttpServiceState.ERROR -> errorMessage
-                        },
-                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)),
-                    )
-                    VerticalSpace(24.dp)
-                }
                 when (httpServiceState) {
-                    HttpServiceState.OFF -> PFilledButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(Res.string.start_service),
-                        onClick = onRun ?: {},
-                        buttonSize = ButtonSize.LARGE,
-                        isLoading = isLoading,
-                    )
-
-                    HttpServiceState.ERROR -> Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        POutlinedButton(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(Res.string.troubleshoot),
-                            onClick = {
-                                WebHelper.open(
-                                    "https://plainapp.app/docs/troubleshooting"
-                                )
-                            },
-                            buttonSize = ButtonSize.MEDIUM,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    HttpServiceState.OFF -> {
+                        Text(
+                            text = stringResource(Res.string.plainapp_service_off_desc),
+                            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)),
                         )
+                        VerticalSpace(24.dp)
                         PFilledButton(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(Res.string.relaunch_app),
-                            onClick = onRestartFix,
-                            type = ButtonType.TERTIARY,
-                            buttonSize = ButtonSize.MEDIUM,
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(Res.string.start_service),
+                            onClick = onRun ?: {},
+                            buttonSize = ButtonSize.LARGE,
+                            isLoading = isLoading,
                         )
                     }
 
-                    else -> Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        POutlinedButton(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(Res.string.stay_online),
-                            onClick = { onStayOnline?.invoke() },
-                            buttonSize = ButtonSize.MEDIUM,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    HttpServiceState.ERROR -> {
+                        Text(
+                            text = errorMessage,
+                            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)),
                         )
-                        PFilledButton(
-                            modifier = Modifier.weight(1f),
-                            text = stringResource(Res.string.stop_service),
-                            onClick = {
-                                mainVM.enableHttpServer(false)
-                            },
-                            type = ButtonType.DANGER,
-                            buttonSize = ButtonSize.MEDIUM,
-                        )
+                        VerticalSpace(24.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            POutlinedButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.troubleshoot),
+                                onClick = {
+                                    WebHelper.open(
+                                        "https://plainapp.app/docs/troubleshooting"
+                                    )
+                                },
+                                buttonSize = ButtonSize.MEDIUM,
+                            )
+                            PFilledButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.relaunch_app),
+                                onClick = onRestartFix,
+                                type = ButtonType.TERTIARY,
+                                buttonSize = ButtonSize.MEDIUM,
+                            )
+                        }
+                    }
+
+                    HttpServiceState.ON -> {
+                        VerticalSpace(8.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            POutlinedButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.stay_online),
+                                onClick = { onStayOnline?.invoke() },
+                                buttonSize = ButtonSize.MEDIUM,
+                            )
+                            PFilledButton(
+                                modifier = Modifier.weight(1f),
+                                text = stringResource(Res.string.stop_service),
+                                onClick = {
+                                    mainVM.enableHttpServer(false)
+                                },
+                                type = ButtonType.DANGER,
+                                buttonSize = ButtonSize.MEDIUM,
+                            )
+                        }
                     }
                 }
             }

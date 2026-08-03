@@ -1,1 +1,0 @@
-import{H as e,T as t,mt as n,v as r}from"./vue.runtime.esm-bundler-DB7W0Wog.js";import{T as i}from"./query-DEq_bhae.js";import{cn as a}from"./index-ChUNXVG7.js";import{t as o}from"./MediaSidebar-CchgLgE4.js";var s=t({__name:`DocsSidebar`,setup(t){return(t,s)=>{let c=o;return e(),r(c,{type:n(a).DOC,gql:n(i)},null,8,[`type`,`gql`])}}});export{s as default};

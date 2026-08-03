@@ -11,13 +11,13 @@ internal object MdnsPacketCodec {
     fun buildResponseIfMatch(
         query: ByteArray,
         hostname: String,
-        ips: List<ByteArray>,
+        ips: List<String>,
     ): ByteArray? = buildResponseIfMatchDetails(query, hostname, ips)?.bytes
 
     fun buildResponseIfMatchDetails(
         query: ByteArray,
         hostname: String,
-        ips: List<ByteArray>,
+        ips: List<String>,
     ): MdnsResponse? {
         if (query.size < 12 || ips.isEmpty()) return null
 
@@ -74,7 +74,7 @@ internal object MdnsPacketCodec {
             writeU16(out, DNS_CACHE_FLUSH_CLASS_IN)
             writeU32(out, TTL_SECONDS)
             writeU16(out, 4)
-            out.addAll(ip.toList())
+            out.addAll(ipToBytes(ip).toList())
         }
         return MdnsResponse(out.toByteArray(), questions, matchedQuestions)
     }

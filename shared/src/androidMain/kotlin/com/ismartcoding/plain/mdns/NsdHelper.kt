@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.mdns
 
-import android.content.Context
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import java.util.concurrent.atomic.AtomicBoolean
@@ -12,19 +11,19 @@ object NsdHelper {
     /**
      * Start mDNS hostname responder for the active web service.
      */
-    fun registerServices(context: Context, httpPort: Int?, httpsPort: Int?): Boolean {
+    fun registerServices(httpPort: Int?, httpsPort: Int?): Boolean {
         if (!registering.compareAndSet(false, true)) {
             LogCat.d("registerServices already in progress, skipping")
             return false
         }
         try {
-            return registerServicesInternal(context, httpPort, httpsPort)
+            return registerServicesInternal(httpPort, httpsPort)
         } finally {
             registering.set(false)
         }
     }
 
-    private fun registerServicesInternal(context: Context, httpPort: Int?, httpsPort: Int?): Boolean {
+    private fun registerServicesInternal(httpPort: Int?, httpsPort: Int?): Boolean {
         unregisterService()
 
         val hasAnyPort = (httpPort != null && httpPort > 0) || (httpsPort != null && httpsPort > 0)
@@ -34,7 +33,7 @@ object NsdHelper {
         }
 
         val hostname = TempData.mdnsHostname
-        return MdnsHostResponder.start(context, hostname)
+        return MdnsHostResponder.start(hostname)
     }
 
     /**

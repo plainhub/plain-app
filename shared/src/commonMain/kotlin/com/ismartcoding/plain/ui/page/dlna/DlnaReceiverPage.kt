@@ -121,7 +121,7 @@ private fun DlnaReceiverDisabledScreen() {
                         startDlnaRenderer()
                     }
                 },
-                buttonSize = ButtonSize.EXTRA_LARGE,
+                buttonSize = ButtonSize.LARGE,
             )
         }
     }

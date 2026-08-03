@@ -11,6 +11,7 @@ import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.features.checkEnabledAsync
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.getSims
+import com.ismartcoding.plain.platform.call as platformCall
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.deleteMedia
@@ -23,7 +24,7 @@ import com.ismartcoding.plain.web.models.toModel
 
 @GraphQLQuery
 suspend fun callCount(query: String): Int {
-    return if (Permission.READ_CALL_LOG.enabledAndIsGrantedAsync()) {
+    return if (Permission.WRITE_CALL_LOG.enabledAndIsGrantedAsync()) {
         countMedia(DataType.CALL, query)
     } else {
         0
@@ -38,7 +39,7 @@ suspend fun sims(): List<Sim> {
 @GraphQLMutation
 suspend fun call(number: String, showDialer: Boolean): Boolean {
     Permission.CALL_PHONE.checkEnabledAsync()
-    // Note: actual dialing handled via platform sendSmsText-like bridge on Android
+    platformCall(number, showDialer)
     return true
 }
 

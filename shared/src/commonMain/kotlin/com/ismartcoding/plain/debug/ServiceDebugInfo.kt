@@ -5,6 +5,7 @@ import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.web.onlineClientIds
 
 /**
  * Snapshot of all persistent service runtime statuses.
@@ -45,7 +46,7 @@ fun getServiceDebugInfo(): ServiceDebugInfo {
         httpServerState = if (httpRunning) "ON" else "OFF",
         httpPort = TempData.httpPort.value,
         httpsPort = TempData.httpsPort.value,
-        wsSessionCount = HttpServerManager.wsSessions.size,
+        wsSessionCount = onlineClientIds.value.size,
         httpServerError = HttpServerManager.httpServerError,
 
         mdnsRunning = isMdnsRunning(),

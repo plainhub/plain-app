@@ -47,7 +47,7 @@ class MdnsRegister(
         // onLinkPropertiesChanged storms (DNS updates, CLAT/NAT64 changes) from
         // continuously resetting the debounce timer and blocking re-registration.
         val currentIfaces = candidateInterfaces()
-            .map { (iface, ip) -> "${iface.name}:${ip.hostAddress}" }
+            .map { (iface, ip) -> "${iface.name}:$ip" }
             .toSet()
         if (currentIfaces.isNotEmpty() && currentIfaces == lastRegisteredIfaces && reregisterJob?.isActive == true) {
             return
@@ -60,7 +60,7 @@ class MdnsRegister(
 
             // Re-fetch — interfaces may have changed since fast-path check above.
             val freshIfaces = candidateInterfaces()
-                .map { (iface, ip) -> "${iface.name}:${ip.hostAddress}" }
+                .map { (iface, ip) -> "${iface.name}:$ip" }
                 .toSet()
 
             // Network gone — tear down responder and reset so the next
@@ -86,7 +86,6 @@ class MdnsRegister(
             LogCat.d("mDNS re-register ($reason): $freshIfaces")
             runCatching {
                 NsdHelper.registerServices(
-                    context = appContext,
                     httpPort = if (httpOk) httpPort else null,
                     httpsPort = if (httpsOk) httpsPort else null,
                 )

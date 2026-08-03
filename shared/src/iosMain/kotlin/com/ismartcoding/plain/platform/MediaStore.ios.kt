@@ -84,6 +84,8 @@ actual suspend fun getSmsAllCounts(): DSmsCounts = DSmsCounts(0, 0, 0, 0)
 
 actual fun sendSmsText(number: String, body: String, subscriptionId: Int?) {}
 
+actual fun call(number: String, showDialer: Boolean) {}
+
 actual fun resolveAppFileUri(uri: String): String = uri
 
 actual fun mimeTypeFromExtension(extension: String): String = "application/octet-stream"

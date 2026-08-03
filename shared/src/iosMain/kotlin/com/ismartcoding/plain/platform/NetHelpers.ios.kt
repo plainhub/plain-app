@@ -47,4 +47,6 @@ internal fun htonl(value: UInt): UInt {
         ((value and 0xFF000000u) shr 24)
 }
 
+internal fun ntohs(value: UShort): UShort = htons(value)
+
 internal fun ntohl(value: UInt): UInt = htonl(value)

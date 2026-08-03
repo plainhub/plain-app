@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.lib.extensions.dp2px
 import com.ismartcoding.plain.lib.pdfviewer.PDFView
 import com.ismartcoding.plain.lib.pdfviewer.scroll.ScrollHandle
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 class MinimalScrollHandle(context: Context) : View(context), ScrollHandle {
     private val thumbPaint = Paint(Paint.ANTI_ALIAS_FLAG)

@@ -4,6 +4,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.mdns.MdnsHostResponder
 import com.ismartcoding.plain.web.HttpServerManager
 
 /**
@@ -59,10 +60,19 @@ actual suspend fun stopHttpEngineAsync(): Unit = withIO {
 }
 
 /** No platform side effects on iOS once the server is healthy. */
-actual suspend fun onHttpServerStarted() {}
+actual suspend fun onHttpServerStarted() {
+    // Start mDNS hostname responder so peers can discover this device via its .local name.
+    val httpPort = TempData.httpPort.value
+    val httpsPort = TempData.httpsPort.value
+    if (httpPort > 0 || httpsPort > 0) {
+        MdnsHostResponder.start(TempData.mdnsHostname)
+    }
+}
 
 /** No platform side effects on iOS when the server stops. */
-actual suspend fun onHttpServerStopped() {}
+actual suspend fun onHttpServerStopped() {
+    MdnsHostResponder.stop()
+}
 
 /**
  * iOS entry: launch a coroutine running the shared [startHttpServerAsync]

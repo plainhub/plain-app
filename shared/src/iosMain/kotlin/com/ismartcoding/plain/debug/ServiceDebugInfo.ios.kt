@@ -1,6 +1,12 @@
 package com.ismartcoding.plain.debug
 
-actual fun isHttpServerRunning(): Boolean = false
-actual fun isMdnsRunning(): Boolean = false
+import com.ismartcoding.plain.mdns.MdnsHostResponder
+import com.ismartcoding.plain.platform.IosPlatformRegistry
+
+actual fun isHttpServerRunning(): Boolean =
+    IosPlatformRegistry.httpServerBridge()?.isRunning() == true
+
+actual fun isMdnsRunning(): Boolean = MdnsHostResponder.isRunning
+
 actual fun getAwareAttachStatus(): String = "not available"
 actual fun getAwareDiscoveredPeerCount(): Int = 0

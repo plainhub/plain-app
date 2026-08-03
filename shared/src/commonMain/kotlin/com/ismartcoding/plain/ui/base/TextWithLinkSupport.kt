@@ -89,7 +89,7 @@ fun String.linkify(
                 val endIndex = startIndex + v.text.length
                 if (r == null) {
                     r = LinkifyParseResult(v.text, startIndex, endIndex)
-                } else if (r!!.start > startIndex) {
+                } else if (r.start > startIndex) {
                     r = LinkifyParseResult(v.text, startIndex, endIndex)
                 }
             }

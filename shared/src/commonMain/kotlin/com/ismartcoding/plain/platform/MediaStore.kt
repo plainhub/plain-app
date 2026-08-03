@@ -167,6 +167,13 @@ expect suspend fun getSmsAllCounts(): DSmsCounts
 expect fun sendSmsText(number: String, body: String, subscriptionId: Int?)
 
 /**
+ * Initiate a phone call to [number].
+ * If [showDialer] is true, opens the dialer with the number pre-filled.
+ * Otherwise, directly places the call.
+ */
+expect fun call(number: String, showDialer: Boolean)
+
+/**
  * Resolve a content URI (e.g. from app file store) to a real filesystem path.
  * Returns the input unchanged on platforms without content URIs.
  */

@@ -29,7 +29,7 @@ private fun plainDarkColorScheme(): ColorScheme {
     val surfaceVariant = if (amoled) Color(0xFF1C1C1E) else Color(0xFF2C2C2E)
     return darkColorScheme(
         primary = Color(0xFF0A84FF), onPrimary = Color(0xFFFFFFFF),
-        primaryContainer = Color(0xFF003D99), onPrimaryContainer = Color(0xFFCCE4FF),
+        primaryContainer = Color(0xFF163B66), onPrimaryContainer = Color(0xFFF5F9FF),
         inversePrimary = Color(0xFF007AFF),
         secondary = Color(0xFF0A84FF), onSecondary = Color(0xFFFFFFFF),
         secondaryContainer = Color(0xFF003380), onSecondaryContainer = Color(0xFFCCDFFF),
@@ -56,7 +56,7 @@ private fun plainDarkColorScheme(): ColorScheme {
 
 private fun plainLightColorScheme(): ColorScheme = lightColorScheme(
     primary = Color(0xFF007AFF), onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFD1E9FF), onPrimaryContainer = Color(0xFF001E3C),
+    primaryContainer = Color(0xFFE8F2FF), onPrimaryContainer = Color(0xFF001E3C),
     inversePrimary = Color(0xFF4DA3FF),
     secondary = Color(0xFF007AFF), onSecondary = Color(0xFFFFFFFF),
     secondaryContainer = Color(0xFFE5F0FF), onSecondaryContainer = Color(0xFF001B47),

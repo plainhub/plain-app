@@ -1,11 +1,13 @@
 package com.ismartcoding.plain.platform
 
 import androidx.room.AutoMigration
+import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.DeleteTable
 import androidx.room.RenameColumn
 import androidx.room.RenameTable
 import androidx.room.RoomDatabase
+import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import com.ismartcoding.plain.db.*
@@ -56,6 +58,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
     ],
     exportSchema = true,
 )
+@ConstructedBy(AppDatabaseConstructor::class)
 @TypeConverters(DateConverter::class, ChannelMemberListConverter::class, ChatItemContentConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
@@ -97,16 +100,17 @@ fun initDatabase(db: AppDatabase) {
 }
 
 /**
- * Platform-specific factory that instantiates the KSP-generated [AppDatabase]
- * implementation (`AppDatabase_Impl`). Each platform's actual references the
- * generated class directly.
+ * KSP-generated constructor for [AppDatabase]. Required by Room KMP on
+ * non-Android platforms to instantiate the generated `AppDatabase_Impl`.
+ * KSP generates the `actual object` for each platform.
  */
-expect fun createAppDatabaseInstance(): AppDatabase
+@Suppress("NO_ACTUAL_FOR_EXPECT")
+expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
 
 /**
  * Platform-specific database builder factory. The Android actual uses
  * `Room.databaseBuilder(context, name)` (Android requires a `Context`);
- * the iOS actual uses `Room.databaseBuilder(name, factory)` with
+ * the iOS actual uses `Room.databaseBuilder(name)` with
  * `BundledSQLiteDriver`. Both register the manual 5→6 migration.
  */
 expect fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase>

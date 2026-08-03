@@ -20,7 +20,6 @@ actual fun PdfView(
     modifier: Modifier,
 ) {
     val parsedUri = Uri.parse(uri)
-    val context = LocalContext.current
     val darkTheme = LocalDarkTheme.current
     val isDarkTheme = DarkTheme.isDarkTheme(darkTheme)
     AndroidView(
