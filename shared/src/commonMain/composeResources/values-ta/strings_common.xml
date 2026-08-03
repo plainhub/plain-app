@@ -148,7 +148,7 @@
     <string name="crash_report_message">ஆப் எதிர்பாராத விதமாக செயலிழந்தது. ஆப் பதிவுகளுடன் கிராஷ் அறிக்கையை பார்த்து, சிக்கலை சரிசெய்ய உதவ பகிரவும்.</string>
     <string name="stay_online">ஆன்லைனில் இருக்க</string>
     <string name="stay_online_screen_black_countdown">%1$d விநாடிகளில் திரை கருப்பாகும்.</string>
-    <string name="stay_online_keep_running">சில ஃபோன்கள் பின்னணி செயல்பாட்டை கட்டுப்படுத்தும்போது PlainApp-ஐ இயங்க விடவும்.</string>
+    <string name="stay_online_keep_running">சில சாதனங்கள் திரை அணைந்திருக்கும்போது அல்லது செயலி பின்னணியில் இருக்கும்போது துண்டிக்கப்படலாம். PlainApp ஐ இயக்க வைத்திருக்கவும் மற்றும் டெஸ்க்டாப் அணுகலை பராமரிக்கவும் இந்த பக்கத்தை திறந்து வைத்திருக்கவும்.</string>
     <string name="stay_online_tap_to_exit">வெளியேற எங்கும் தட்டவும்</string>
     <string name="add_to_home">முகப்புத் திரையில் சேர்க்கவும்</string>
     <string name="shortcut_added_to_home">முகப்புத் திரையில் குறுக்குவழி சேர்க்கப்பட்டது</string>

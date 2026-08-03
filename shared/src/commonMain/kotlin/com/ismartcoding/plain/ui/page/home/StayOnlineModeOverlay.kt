@@ -48,8 +48,9 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     // true = pure black screen; false = text visible
+    val totalSeconds = 30
     var sleeping by remember { mutableStateOf(false) }
-    var remainingSeconds by remember { mutableStateOf(20) }
+    var remainingSeconds by remember { mutableStateOf(totalSeconds) }
     var sleepJob by remember { mutableStateOf<Job?>(null) }
 
     fun scheduleSleep(seconds: Int) {
@@ -74,8 +75,8 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
         }
     }
 
-    // Initial display: countdown 20s then sleep
-    LaunchedEffect(Unit) { scheduleSleep(20) }
+    // Initial display: countdown 30s then sleep
+    LaunchedEffect(Unit) { scheduleSleep(totalSeconds) }
 
     val textAlpha by animateFloatAsState(
         targetValue = if (sleeping) 0f else 1f,
@@ -103,7 +104,7 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
                 ) {
                     if (sleeping) {
                         sleeping = false
-                        scheduleSleep(20)
+                        scheduleSleep(totalSeconds)
                     } else {
                         onExit()
                     }

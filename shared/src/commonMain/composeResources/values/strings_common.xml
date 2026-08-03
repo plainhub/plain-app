@@ -151,6 +151,6 @@
     <string name="delete_channel_warning">Deleting this channel will also delete all related messages. This action cannot be undone.</string>
     <string name="stay_online">Stay Online</string>
     <string name="stay_online_screen_black_countdown">The screen will turn black after %1$d seconds.</string>
-    <string name="stay_online_keep_running">Keep PlainApp running when some phones limit background activity.</string>
+    <string name="stay_online_keep_running">Some devices may disconnect when the screen is off or when the app is in the background. Keep this page open to keep PlainApp running and maintain desktop access.</string>
     <string name="stay_online_tap_to_exit">Tap anywhere to exit</string>
 </resources>

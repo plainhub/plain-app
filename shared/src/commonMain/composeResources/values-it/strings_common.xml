@@ -148,7 +148,7 @@
     <string name="crash_report_message">L'app si è arrestata in modo imprevisto. Visualizza il report del crash con i log dell'app e condividilo per aiutarci a risolvere il problema.</string>
     <string name="stay_online">Resta online</string>
     <string name="stay_online_screen_black_countdown">Lo schermo diventerà nero tra %1$d secondi.</string>
-    <string name="stay_online_keep_running">Mantieni PlainApp in esecuzione quando alcuni telefoni limitano l'attività in background.</string>
+    <string name="stay_online_keep_running">Alcuni dispositivi potrebbero disconnettersi quando lo schermo è spento o quando l'app è in background. Mantieni aperta questa pagina per mantenere PlainApp in esecuzione e mantenere l'accesso al desktop.</string>
     <string name="stay_online_tap_to_exit">Tocca per uscire</string>
     <string name="add_to_home">Aggiungi alla schermata principale</string>
     <string name="shortcut_added_to_home">Collegamento aggiunto alla schermata principale</string>

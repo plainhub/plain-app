@@ -148,7 +148,7 @@
     <string name="crash_report_message">ऐप अप्रत्याशित रूप से क्रैश हो गया। क्रैश रिपोर्ट और ऐप लॉग देखें और समस्या हल करने में मदद के लिए साझा करें।</string>
     <string name="stay_online">ऑनलाइन रहें</string>
     <string name="stay_online_screen_black_countdown">स्क्रीन %1$d सेकंड में काली हो जाएगी।</string>
-    <string name="stay_online_keep_running">जब कुछ फ़ोन बैकग्राउंड गतिविधि को सीमित करते हैं तब PlainApp को चालू रखें।</string>
+    <string name="stay_online_keep_running">कुछ डिवाइस स्क्रीन ऑफ होने या ऐप के बैकग्राउंड में होने पर डिस्कनेक्ट हो सकते हैं। PlainApp को चालू रखने और डेस्कटॉप पहुंच बनाए रखने के लिए इस पेज को खुला रखें।</string>
     <string name="stay_online_tap_to_exit">बाहर निकलने के लिए कहीं भी टैप करें</string>
     <string name="add_to_home">होम स्क्रीन पर जोड़ें</string>
     <string name="shortcut_added_to_home">होम स्क्रीन पर शॉर्टकट जोड़ा गया</string>

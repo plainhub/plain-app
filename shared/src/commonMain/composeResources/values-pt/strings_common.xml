@@ -148,7 +148,7 @@
     <string name="crash_report_message">O app encerrou de forma inesperada. Veja o relatório de falha com os registros do app e compartilhe para nos ajudar a corrigir o problema.</string>
     <string name="stay_online">Manter online</string>
     <string name="stay_online_screen_black_countdown">A tela ficará preta em %1$d segundos.</string>
-    <string name="stay_online_keep_running">Mantenha o PlainApp rodando quando alguns telefones limitam a atividade em segundo plano.</string>
+    <string name="stay_online_keep_running">Alguns dispositivos podem desconectar quando a tela está desligada ou quando o app está em segundo plano. Mantenha esta página aberta para manter o PlainApp rodando e manter o acesso à área de trabalho.</string>
     <string name="stay_online_tap_to_exit">Toque em qualquer lugar para sair</string>
     <string name="add_to_home">Adicionar à tela inicial</string>
     <string name="shortcut_added_to_home">Atalho adicionado à tela inicial</string>
