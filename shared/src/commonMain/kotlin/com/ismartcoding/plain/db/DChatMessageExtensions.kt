@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.db
 
 import com.ismartcoding.plain.extensions.getFinalPath
-import com.ismartcoding.plain.platform.getFileId
+import com.ismartcoding.plain.helpers.getFileId
 
 fun DMessageFile.getPreviewPath(peer: DPeer?): String {
     return if (isRemoteFile()) {

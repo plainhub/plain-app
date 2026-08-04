@@ -55,4 +55,8 @@
     <string name="image">छवि</string>
     <string name="cast_select_screen">स्क्रीन चुनें</string>
     <string name="cast_looking_for_devices">पास के डिवाइस खोज रहा है...</string>
+    <string name="enter_fullscreen">फुल स्क्रीन में जाएं</string>
+    <string name="exit_fullscreen">फुल स्क्रीन से बाहर निकलें</string>
+    <string name="mute">म्यूट</string>
+    <string name="unmute">अनम्यूट</string>
 </resources>

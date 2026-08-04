@@ -55,4 +55,8 @@
     <string name="image">Hình ảnh</string>
     <string name="cast_select_screen">Chọn màn hình</string>
     <string name="cast_looking_for_devices">Đang tìm kiếm thiết bị lân cận...</string>
+    <string name="enter_fullscreen">Vào chế độ toàn màn hình</string>
+    <string name="exit_fullscreen">Thoát chế độ toàn màn hình</string>
+    <string name="mute">Tắt tiếng</string>
+    <string name="unmute">Bật tiếng</string>
 </resources>

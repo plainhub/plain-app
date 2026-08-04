@@ -104,13 +104,39 @@ internal fun avPlayerTimeMs(target: NSObject, selName: String): Long {
 }
 
 internal fun avPlayerPerform(target: NSObject, selectorName: String) {
-    target.performSelector(sel_registerName(selectorName))
+    try {
+        val sel = sel_registerName(selectorName)
+        if (!target.respondsToSelector(sel)) {
+            LogCat.w("avPlayerPerform: target does not respond to $selectorName")
+            return
+        }
+        target.performSelector(sel)
+    } catch (e: Exception) {
+        LogCat.e("avPlayerPerform($selectorName): ${e.message}")
+    }
 }
 
 internal fun avPlayerPerformWithArg(target: NSObject, selectorName: String, arg: Any?) {
-    if (arg == null) {
-        target.performSelector(sel_registerName(selectorName))
-    } else {
-        target.performSelector(sel_registerName(selectorName), arg)
+    try {
+        val sel = sel_registerName(selectorName)
+        if (!target.respondsToSelector(sel)) {
+            LogCat.w("avPlayerPerformWithArg: target does not respond to $selectorName")
+            return
+        }
+        if (arg == null) {
+            target.performSelector(sel)
+        } else {
+            target.performSelector(sel, arg)
+        }
+    } catch (e: Exception) {
+        LogCat.e("avPlayerPerformWithArg($selectorName): ${e.message}")
     }
+}
+
+internal fun avPlayerCurrentItem(player: NSObject): NSObject? =
+    player.valueForKey("currentItem") as? NSObject
+
+internal fun avPlayerItemIsBuffering(item: NSObject): Boolean {
+    val likelyToKeepUp = (item.valueForKey("playbackLikelyToKeepUp") as? NSNumber)?.boolValue()
+    return likelyToKeepUp == false
 }

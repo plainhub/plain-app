@@ -17,6 +17,9 @@
     <string name="dlna_receiver_protocol_note">Ondersteunt DLNA / UPnP-protocollen, compatibel met VLC, Kodi en andere populaire cast-apps</string>
     <string name="dlna_receiver_exit_player">Speler afsluiten</string>
     <string name="dlna_receiver_turn_on">Inschakelen</string>
+    <string name="download">Downloaden</string>
+    <string name="dlna_download_success">Opgeslagen in Downloads: %1$s</string>
+    <string name="dlna_download_failed">Download mislukt</string>
     <string name="feature_disabled_title">%1$s is uitgeschakeld</string>
     <string name="short_break">Korte Pauze</string>
     <string name="long_break">Lange Pauze</string>

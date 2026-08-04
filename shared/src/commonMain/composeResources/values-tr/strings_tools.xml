@@ -17,6 +17,9 @@
     <string name="dlna_receiver_protocol_note">DLNA / UPnP protokollerini destekler, VLC, Kodi ve diğer popüler yayın uygulamalarıyla uyumludur</string>
     <string name="dlna_receiver_exit_player">Oynatıcıdan çık</string>
     <string name="dlna_receiver_turn_on">Aç</string>
+    <string name="download">İndir</string>
+    <string name="dlna_download_success">İndirilenler'e kaydedildi: %1$s</string>
+    <string name="dlna_download_failed">İndirme başarısız</string>
     <string name="feature_disabled_title">%1$s devre dışı</string>
     <string name="short_break">Kısa mola</string>
     <string name="long_break">Uzun mola</string>

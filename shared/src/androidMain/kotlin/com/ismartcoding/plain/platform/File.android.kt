@@ -48,8 +48,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
-actual fun getFileId(path: String): String = FileHelper.getFileId(path)
-
 actual fun deleteFileAt(path: String) {
     File(path).delete()
 }

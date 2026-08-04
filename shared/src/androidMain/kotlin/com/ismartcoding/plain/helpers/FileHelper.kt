@@ -4,16 +4,14 @@ import android.Manifest
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.extensions.newFile
 import com.ismartcoding.plain.lib.extensions.getFileName
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.hasPermission
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
-import com.ismartcoding.plain.platform.chaCha20Encrypt
-import com.ismartcoding.plain.platform.isRPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.extensions.newFile
+import com.ismartcoding.plain.platform.isRPlus
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
@@ -22,7 +20,6 @@ import java.io.FileWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -54,17 +51,7 @@ object FileHelper {
         }
     }
 
-    fun getFileId(path: String): String {
-        if (path.isEmpty()) {
-            return ""
-        }
-        if (path.startsWith("https://", true) || path.startsWith("http://", true)) {
-            return path
-        }
-        return Base64.encode(
-            chaCha20Encrypt(TempData.urlToken, path),
-        )
-    }
+
 
     fun rename(
         filePath: String,

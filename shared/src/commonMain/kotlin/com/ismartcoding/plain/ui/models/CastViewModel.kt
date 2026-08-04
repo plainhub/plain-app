@@ -37,6 +37,16 @@ class CastViewModel : ViewModel() {
 
     internal var positionUpdateJob: Job? = null
 
+    private fun getCastUrl(path: String): String {
+        val device = CastPlayer.currentDevice
+        return UrlHelper.getMediaHttpUrl(path)
+    }
+
+    private fun getCastAlbumArtUrl(albumUri: String): String {
+        val device = CastPlayer.currentDevice
+        return UrlHelper.getAlbumArtHttpUrl(albumUri)
+    }
+
     fun enterCastMode() {
         castMode.value = true
         showCastDialog.value = false
@@ -96,7 +106,7 @@ class CastViewModel : ViewModel() {
             CastPlayer.setCurrentUri(path)
             try {
                 val title = path.getFilenameWithoutExtensionFromPath()
-                DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(path), title)
+                DlnaTransportController.setAVTransportURIAsync(device, getCastUrl(path), title)
                 DlnaTransportController.playAVTransportAsync(device)
                 CastPlayer.isPlaying.value = true
                 if (CastPlayer.sid.isNotEmpty()) {
@@ -123,9 +133,9 @@ class CastViewModel : ViewModel() {
                 CastPlayer.addItem(item)
             }
             try {
-                val mediaUrl = UrlHelper.getMediaHttpUrl(item.path)
+                val mediaUrl = getCastUrl(item.path)
                 val albumArtUri = if (item is DAudio) {
-                    UrlHelper.getAlbumArtHttpUrl("content://media/external/audio/albumart/${item.albumId}")
+                    getCastAlbumArtUrl("content://media/external/audio/albumart/${item.albumId}")
                 } else ""
                 DlnaTransportController.setAVTransportURIAsync(device, mediaUrl, item.title, albumArtUri)
                 DlnaTransportController.playAVTransportAsync(device)

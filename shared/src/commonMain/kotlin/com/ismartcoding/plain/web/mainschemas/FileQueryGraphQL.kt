@@ -13,7 +13,7 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.searchFilesInDir
 import com.ismartcoding.plain.platform.getRecentFiles
 import com.ismartcoding.plain.platform.statFile
-import com.ismartcoding.plain.platform.getFileId
+import com.ismartcoding.plain.helpers.getFileId
 import com.ismartcoding.plain.web.loaders.MountsLoader
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.File

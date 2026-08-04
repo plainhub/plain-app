@@ -17,6 +17,9 @@
     <string name="dlna_receiver_protocol_note">支援 DLNA / UPnP 協議，相容 VLC、Kodi 等主流投影應用</string>
     <string name="dlna_receiver_exit_player">退出播放器</string>
     <string name="dlna_receiver_turn_on">開啟</string>
+    <string name="download">下載</string>
+    <string name="dlna_download_success">已儲存到下載：%1$s</string>
+    <string name="dlna_download_failed">下載失敗</string>
     <string name="feature_disabled_title">%1$s 已關閉</string>
     <string name="short_break">短暫休息</string>
     <string name="long_break">長時間休息</string>

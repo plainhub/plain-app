@@ -3,15 +3,19 @@ package com.ismartcoding.plain.yjs
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
+import org.junit.Assume.assumeTrue
 
 class YjsDocDebugTest {
 
-    private val webPayloadB64 = java.io.File("/tmp/web-payload.b64").readText().trim()
+    private val payloadFile = java.io.File("/tmp/web-payload.b64")
 
     @OptIn(ExperimentalEncodingApi::class)
     @Test
     fun debug_parse_structure() {
-        val bytes = Base64.Default.decode(webPayloadB64)
+        // This is a scratch debug test that only runs when a captured payload
+        // is present on disk; skip silently otherwise so CI stays green.
+        assumeTrue("Missing scratch payload $payloadFile — skipping", payloadFile.exists())
+        val bytes = Base64.Default.decode(payloadFile.readText().trim())
         println("Payload size: ${bytes.size} bytes")
 
         val doc = YjsDoc(bytes)

@@ -55,4 +55,8 @@
     <string name="image">Immagine</string>
     <string name="cast_select_screen">Seleziona uno schermo</string>
     <string name="cast_looking_for_devices">Ricerca dispositivi nelle vicinanze...</string>
+    <string name="enter_fullscreen">Entra in schermo intero</string>
+    <string name="exit_fullscreen">Esci da schermo intero</string>
+    <string name="mute">Muto</string>
+    <string name="unmute">Attiva audio</string>
 </resources>

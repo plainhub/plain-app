@@ -55,4 +55,8 @@
     <string name="image">圖片</string>
     <string name="cast_select_screen">選擇螢幕</string>
     <string name="cast_looking_for_devices">正在搜尋附近裝置...</string>
+    <string name="enter_fullscreen">進入全螢幕</string>
+    <string name="exit_fullscreen">退出全螢幕</string>
+    <string name="mute">靜音</string>
+    <string name="unmute">取消靜音</string>
 </resources>

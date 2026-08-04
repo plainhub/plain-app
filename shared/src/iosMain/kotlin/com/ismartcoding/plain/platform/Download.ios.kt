@@ -83,6 +83,29 @@ actual suspend fun importDownloadedFile(handle: DownloadTempFileHandle, mimeType
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
+actual suspend fun saveTempFileToDownloads(handle: DownloadTempFileHandle, filename: String): String = withIO {
+    val iosHandle = handle as? IosDownloadTempFileHandle ?: return@withIO ""
+    iosHandle.close()
+    val destDir = appDir() + "/downloads"
+    NSFileManager.defaultManager.createDirectoryAtPath(
+        destDir, withIntermediateDirectories = true, attributes = null, error = null,
+    )
+    val destPath = "$destDir/$filename"
+    NSFileManager.defaultManager.removeItemAtPath(destPath, null)
+    try {
+        if (NSFileManager.defaultManager.moveItemAtPath(iosHandle.filePath, destPath, error = null)) {
+            destPath
+        } else {
+            LogCat.e("saveTempFileToDownloads: moveItemAtPath failed")
+            ""
+        }
+    } catch (e: Exception) {
+        LogCat.e("saveTempFileToDownloads: ${e.message}")
+        ""
+    }
+}
+
 actual fun resolveAppFilePath(fidUri: String): String {
     if (fidUri.startsWith("fid:", ignoreCase = true)) {
         val fidSuffix = fidUri.removePrefix("fid:").removePrefix("FID:")

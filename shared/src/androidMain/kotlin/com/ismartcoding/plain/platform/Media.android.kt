@@ -44,9 +44,9 @@ actual fun fileLength(path: String): Long {
 
 actual suspend fun renameMediaFile(path: String, newName: String): String? = renameAndScanFile(path, newName)
 
-actual fun getMediaDurationMs(path: String): Long = File(path).getDuration(appContext)
+actual fun getMediaDuration(path: String): Long = File(path).getDuration(appContext)
 
-actual fun getAudioDurationMsFromPath(path: String): Long =
+actual fun getAudioDurationFromPath(path: String): Long =
     DPlaylistAudio.fromPath(appContext, path).duration
 
 actual fun generateQrCode(text: String, width: Int, height: Int): ImageBitmap {

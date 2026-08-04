@@ -117,6 +117,12 @@ private class AVPlayerVideoController : VideoPlayerController {
     override val bufferedPercentage: Int get() = 0
     override val isPlaying: Boolean
         get() = player?.let { avPlayerRate(it) > 0f } ?: false
+    override val isBuffering: Boolean
+        get() {
+            val p = player ?: return false
+            val item = avPlayerCurrentItem(p) ?: return false
+            return avPlayerItemIsBuffering(item)
+        }
 
     private fun startPolling() {
         stopPolling()
@@ -148,7 +154,7 @@ private class AVPlayerVideoController : VideoPlayerController {
 }
 
 @Composable
-actual fun rememberVideoPlayerController(): VideoPlayerController {
+actual fun rememberVideoPlayerController(claimAudioSession: Boolean): VideoPlayerController {
     return remember { AVPlayerVideoController() }
 }
 
@@ -156,8 +162,7 @@ actual fun rememberVideoPlayerController(): VideoPlayerController {
 actual fun VideoPlayerSurface(
     modifier: Modifier,
     controller: VideoPlayerController,
-    videoState: VideoState,
-    useController: Boolean,
+    videoState: VideoState?,
 ) {
     val avController = controller as? AVPlayerVideoController ?: return
     UIKitView(

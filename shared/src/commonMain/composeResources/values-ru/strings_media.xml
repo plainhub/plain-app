@@ -55,4 +55,8 @@
     <string name="image">Изображение</string>
     <string name="cast_select_screen">Выбрать экран</string>
     <string name="cast_looking_for_devices">Поиск ближайших устройств...</string>
+    <string name="enter_fullscreen">Полноэкранный режим</string>
+    <string name="exit_fullscreen">Выйти из полноэкранного режима</string>
+    <string name="mute">Без звука</string>
+    <string name="unmute">Включить звук</string>
 </resources>

@@ -74,12 +74,12 @@ object ChannelManager {
     suspend fun deleteChannel(channelId: String) {
         withIO {
             val channel = ensureChannel(channelId)
-            if (channel.isOwnedByMe()) {
-                ChannelSystemMessageSender.broadcastKick(channel)
-            }
             ChatDbHelper.deleteAllChannelChatsAsync(channelId)
             AppDatabase.instance.chatChannelDao().delete(channelId)
             ChannelCacher.removeChannel(channelId)
+            if (channel.isOwnedByMe()) {
+                ChannelSystemMessageSender.broadcastKick(channel)
+            }
         }
     }
 

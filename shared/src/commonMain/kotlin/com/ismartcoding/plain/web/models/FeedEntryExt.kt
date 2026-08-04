@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.db.DFeedEntry
-import com.ismartcoding.plain.platform.getFileId
+import com.ismartcoding.plain.helpers.getFileId
 
 fun DFeedEntry.toModel(): FeedEntry {
     return FeedEntry(

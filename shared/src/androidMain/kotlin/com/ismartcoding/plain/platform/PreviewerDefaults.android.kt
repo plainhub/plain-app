@@ -1,16 +1,6 @@
 package com.ismartcoding.plain.platform
 
 import android.graphics.BitmapRegionDecoder
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -18,16 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntSize
-import coil3.annotation.ExperimentalCoilApi
-import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
-import coil3.size.Size
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.withIO
@@ -37,20 +18,6 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.InputStream
 import java.util.concurrent.ConcurrentHashMap
-
-// ---- MediaLoader (moved from ui/components/mediaviewer/MediaLoader.kt) ----
-
-@OptIn(ExperimentalCoilApi::class)
-@Composable
-fun rememberCoilImagePainter(path: String): Painter {
-    val imageRequest = ImageRequest
-        .Builder(LocalContext.current)
-        .data(path)
-        .size(Size.ORIGINAL)
-        .build()
-    return rememberAsyncImagePainter(imageRequest)
-}
-
 
 @Composable
 fun rememberDecoderImagePainter(
@@ -87,29 +54,10 @@ fun rememberDecoderImagePainter(
     return imageDecoder
 }
 
-// ---- PreviewerDefaults (moved from ui/components/mediaviewer/previewer/PreviewerDefaults.kt) ----
-
-val DEFAULT_PREVIEWER_ENTER_TRANSITION = scaleIn(tween(180)) + fadeIn(tween(240))
-val DEFAULT_PREVIEWER_EXIT_TRANSITION = scaleOut(tween(320)) + fadeOut(tween(240))
-val DEFAULT_PLACEHOLDER_ENTER_TRANSITION = fadeIn(tween(200))
-val DEFAULT_PLACEHOLDER_EXIT_TRANSITION = fadeOut(tween(200))
-
-val DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT = @Composable {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator(color = Color.White.copy(0.2F))
-    }
-}
-
 private val fileExistsCache = ConcurrentHashMap<String, Boolean>()
 
-class PreviewerPlaceholder(
-    var enterTransition: EnterTransition = DEFAULT_PLACEHOLDER_ENTER_TRANSITION,
-    var exitTransition: ExitTransition = DEFAULT_PLACEHOLDER_EXIT_TRANSITION,
-    var content: @Composable () -> Unit = DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT,
-)
-
 @Composable
-fun getModel(item: PreviewItem): Any {
+actual fun getModel(item: PreviewItem): Any {
     if (item.isVideo() || item.path.isUrl()) return item
     if (item.size <= 2000 * 1000) return item
 

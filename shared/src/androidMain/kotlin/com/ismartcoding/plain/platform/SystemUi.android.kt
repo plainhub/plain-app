@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.platform
 
 import android.app.Activity
+import android.app.PictureInPictureParams
+import android.content.pm.PackageManager
+import android.util.Rational
 import android.view.WindowManager
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
@@ -13,6 +16,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
+import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 
 actual fun isGestureInteractionMode(): Boolean {
     val context = com.ismartcoding.plain.appContextValue ?: return false
@@ -87,4 +91,26 @@ actual fun applySystemBarAppearanceForDarkTheme(useDarkTheme: Boolean) {
     if (isQPlus() && isGestureInteractionMode()) {
         window.isNavigationBarContrastEnforced = false
     }
+}
+
+actual fun hasPipMode(): Boolean {
+    val context = com.ismartcoding.plain.appContextValue ?: return false
+    return context.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
+}
+
+actual fun enterPipMode(videoState: VideoState): Boolean {
+    val context = com.ismartcoding.plain.mainActivity ?: return false
+    if (!hasPipMode()) return false
+    videoState.enablePip = true
+    val params = PictureInPictureParams.Builder()
+    if (isTPlus()) {
+        params
+            .setTitle("Video Player")
+            .setAspectRatio(Rational(16, 9))
+            .setSeamlessResizeEnabled(true)
+    }
+    return runCatching {
+        context.findActivity().enterPictureInPictureMode(params.build())
+        true
+    }.getOrDefault(false)
 }

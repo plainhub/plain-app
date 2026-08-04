@@ -136,9 +136,10 @@ private fun HttpRouter.addDlnaSenderRoutes() {
                         val current = castItems[index]
                         if (current.path != currentUri) {
                             LogCat.d(current.path)
+                            val url = UrlHelper.getMediaHttpUrl(current.path)
                             DlnaTransportController.setAVTransportURIAsync(
                                 device,
-                                UrlHelper.getMediaHttpUrl(current.path),
+                                url,
                                 current.title,
                             )
                             CastPlayer.setCurrentUri(current.path)

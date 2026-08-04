@@ -55,4 +55,8 @@
     <string name="image">Afbeelding</string>
     <string name="cast_select_screen">Selecteer een scherm</string>
     <string name="cast_looking_for_devices">Apparaten in de buurt zoeken...</string>
+    <string name="enter_fullscreen">Volledig scherm</string>
+    <string name="exit_fullscreen">Afsluiten volledig scherm</string>
+    <string name="mute">Dempen</string>
+    <string name="unmute">Ontdempen</string>
 </resources>

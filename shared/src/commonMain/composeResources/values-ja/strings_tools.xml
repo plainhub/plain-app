@@ -15,6 +15,9 @@
     <string name="dlna_receiver_protocol_note">DLNA / UPnPプロトコルに対応、VLC、Kodiなどの主要なキャストアプリと互換性があります</string>
     <string name="dlna_receiver_exit_player">プレーヤーを終了</string>
     <string name="dlna_receiver_turn_on">オンにする</string>
+    <string name="download">ダウンロード</string>
+    <string name="dlna_download_success">ダウンロードに保存しました：%1$s</string>
+    <string name="dlna_download_failed">ダウンロードに失敗しました</string>
     <string name="feature_disabled_title">%1$s が無効です</string>
     <string name="short_break">短い休憩</string>
     <string name="long_break">長い休憩</string>

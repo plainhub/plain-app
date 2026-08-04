@@ -55,4 +55,8 @@
     <string name="image">Imagem</string>
     <string name="cast_select_screen">Selecionar uma tela</string>
     <string name="cast_looking_for_devices">Procurando dispositivos próximos...</string>
+    <string name="enter_fullscreen">Entrar em tela cheia</string>
+    <string name="exit_fullscreen">Sair de tela cheia</string>
+    <string name="mute">Mudo</string>
+    <string name="unmute">Ativar som</string>
 </resources>

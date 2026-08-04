@@ -124,7 +124,20 @@ object IosPlatformRegistry {
         LogCat.d("IosPlatformRegistry: network info provider registered")
     }
 
-    fun getDeviceIP4s(): List<String> = _networkInfoProvider?.getDeviceIP4s() ?: emptyList()
+    fun getDeviceIP4s(): List<String> {
+        val provider = _networkInfoProvider
+        if (provider == null) {
+            LogCat.w("IosPlatformRegistry: getDeviceIP4s() called before NetworkInfoProvider registered")
+            return emptyList()
+        }
+        val result = provider.getDeviceIP4s()
+        if (result.isEmpty()) {
+            LogCat.w("IosPlatformRegistry: NetworkInfoProvider.getDeviceIP4s() returned empty list")
+        } else {
+            LogCat.d("IosPlatformRegistry: getDeviceIP4s() -> ${result.joinToString()}")
+        }
+        return result
+    }
 
     fun setPermissionChecker(checker: IosPermissionChecker) {
         _permissionChecker = checker

@@ -47,6 +47,7 @@ private class FakeVideoPlayerController : VideoPlayerController {
     override val currentPosition: Long get() = fakeCurrentPosition
     override val bufferedPercentage: Int get() = fakeBufferedPercentage
     override val isPlaying: Boolean get() = fakeIsPlaying
+    override val isBuffering: Boolean = false
 }
 
 class VideoStateTest {

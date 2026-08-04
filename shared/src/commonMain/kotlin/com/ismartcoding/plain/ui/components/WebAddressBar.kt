@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.web.deviceIP4s
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
@@ -32,7 +31,7 @@ fun WebAddressBar(
     var mdnsEditDialogVisible by remember { mutableStateOf(false) }
     var hostname by remember { mutableStateOf(TempData.mdnsHostname) }
     var qrCodeUrl by remember { mutableStateOf("") }
-    val ip4s = listOf(hostname) + deviceIP4s.value.ifEmpty { listOf("127.0.0.1") }
+    val ip4s = listOf(hostname) + TempData.ip4s.value.ifEmpty { listOf("127.0.0.1") }
     val scope = rememberCoroutineScope()
 
     Column(

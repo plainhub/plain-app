@@ -18,7 +18,7 @@ import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.platform.audioPlayerProgress
 import com.ismartcoding.plain.platform.audioSeekTo
-import com.ismartcoding.plain.platform.getAudioDurationMsFromPath
+import com.ismartcoding.plain.platform.getAudioDurationFromPath
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadTask
@@ -76,7 +76,7 @@ fun ChatFileItem(
         if (isAudio && isCurrentlyPlaying && duration <= 0f) {
             val loadedDuration = withIO {
                 runCatching {
-                    getAudioDurationMsFromPath(path).toFloat()
+                    getAudioDurationFromPath(path).toFloat()
                 }.getOrDefault(0f)
             }
             if (loadedDuration > 0f) {
@@ -125,9 +125,9 @@ fun ChatFileItem(
                         progress = newProgress * duration
                     }
                 },
-                onValueChangeFinished = {
+                onValueChangeFinished = { normalizedProgress ->
                     if (duration > 0f) {
-                        audioSeekTo(progress.toLong())
+                        audioSeekTo((normalizedProgress * duration).toLong())
                     }
                     isDraggingProgress = false
                 },

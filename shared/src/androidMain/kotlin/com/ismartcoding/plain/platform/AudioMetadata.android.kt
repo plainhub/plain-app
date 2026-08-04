@@ -7,7 +7,7 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.fromPath
 import com.ismartcoding.plain.audio.getAlbumUri
-import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.helpers.getFileId
 import com.ismartcoding.plain.helpers.withIO
 
 actual suspend fun getAudioMetadata(path: String): Pair<String, String> {
@@ -36,5 +36,5 @@ actual fun loadAudioCoverBitmap(path: String): ImageBitmap? {
 }
 
 actual fun getAudioAlbumArtFileId(audio: DAudio): String {
-    return FileHelper.getFileId(audio.getAlbumUri().toString())
+    return getFileId(audio.getAlbumUri().toString())
 }

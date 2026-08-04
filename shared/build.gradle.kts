@@ -126,6 +126,7 @@ kotlin {
             implementation(libs.media3.datasource)
             implementation(libs.media3.session)
             implementation(libs.media3.ui)
+            implementation(libs.media3.ui.compose)
             implementation(libs.media3.dash)
             implementation(libs.media3.hls)
 
@@ -146,6 +147,7 @@ kotlin {
             implementation(libs.camera.camera2)
             implementation(libs.camera.lifecycle)
             implementation(libs.camera.view)
+            implementation(libs.camera.compose)
 
             // Transitions (UI animations)
             implementation(libs.androidx.transition)

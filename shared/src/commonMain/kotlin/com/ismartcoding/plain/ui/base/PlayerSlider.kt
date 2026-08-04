@@ -37,7 +37,7 @@ fun PlayerSlider(
     bufferColor: Color = Color.Gray,
     progressColor: Color = Color.White,
     thumbColor: Color = Color.White,
-    onValueChangeFinished: (() -> Unit)? = null
+    onValueChangeFinished: ((Float) -> Unit)? = null
 ) {
     val sliderHeight = 4.dp
     val thumbSize = 12.dp
@@ -62,7 +62,7 @@ fun PlayerSlider(
                         val newProgress = (offset.x / size.width.toFloat()).coerceIn(0f, 1f)
                         dragPosition = newProgress
                         onProgressChange(newProgress)
-                        onValueChangeFinished?.invoke()
+                        onValueChangeFinished?.invoke(newProgress)
                     }
                 )
             }
@@ -75,7 +75,7 @@ fun PlayerSlider(
                     onDragEnd = {
                         isDragging = false
                         onProgressChange(dragPosition)
-                        onValueChangeFinished?.invoke()
+                        onValueChangeFinished?.invoke(dragPosition)
                     },
                     onDragCancel = {
                         isDragging = false

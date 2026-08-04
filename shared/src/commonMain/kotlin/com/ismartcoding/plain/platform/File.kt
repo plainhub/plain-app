@@ -7,8 +7,6 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.web.http.StreamSink
 
-expect fun getFileId(path: String): String
-
 suspend fun releaseAppFile(fidSuffix: String) = withIO {
     val hash = fidSuffix.substringBefore(".")
     val dao = AppDatabase.instance.appFileDao()

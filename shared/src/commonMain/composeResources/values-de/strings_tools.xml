@@ -15,6 +15,9 @@
     <string name="dlna_receiver_protocol_note">Unterstützt DLNA / UPnP-Protokolle, kompatibel mit VLC, Kodi und anderen beliebten Casting-Apps</string>
     <string name="dlna_receiver_exit_player">Player verlassen</string>
     <string name="dlna_receiver_turn_on">Einschalten</string>
+    <string name="download">Herunterladen</string>
+    <string name="dlna_download_success">In Downloads gespeichert: %1$s</string>
+    <string name="dlna_download_failed">Herunterladen fehlgeschlagen</string>
     <string name="feature_disabled_title">%1$s ist deaktiviert</string>
     <string name="short_break">Kurze Pause</string>
     <string name="long_break">Lange Pause</string>

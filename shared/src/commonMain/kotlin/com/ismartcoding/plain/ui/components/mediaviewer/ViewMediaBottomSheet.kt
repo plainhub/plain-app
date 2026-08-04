@@ -54,6 +54,7 @@ fun ViewMediaBottomSheet(
     onRenamedAsync: suspend () -> Unit = {},
     deleteAction: () -> Unit = {},
     onTagsChangedAsync: suspend () -> Unit = {},
+    castViewModel: com.ismartcoding.plain.ui.models.CastViewModel? = null,
 ) {
     var showRenameDialog by remember { mutableStateOf(false) }
     var showQrScanResult by remember { mutableStateOf(false) }
@@ -64,6 +65,16 @@ fun ViewMediaBottomSheet(
     // `var`, so writing back to it from a coroutine wouldn't trigger a
     // recomposition — this local `MutableLongState` does.
     var displaySize by remember(m) { mutableLongStateOf(m.size) }
+
+    // Host the DLNA cast dialog when a CastViewModel is provided. Selecting a
+    // device enters cast mode and dismisses this info sheet.
+    if (castViewModel != null) {
+        com.ismartcoding.plain.ui.page.cast.CastDialog(castViewModel, onDeviceSelected = {
+            castViewModel.enterCastMode()
+            castViewModel.cast(m.path)
+            onDismiss()
+        })
+    }
 
     if (showRenameDialog) {
         FileRenameDialog(path = m.path, onDismiss = { showRenameDialog = false }, onRename = { p, name -> renameMediaFile(p, name) }, onRenamed = {
@@ -103,7 +114,8 @@ fun ViewMediaBottomSheet(
                     ViewMediaActionButtons(m = m, qrScanResult = qrScanResult,
                         onShowQrScanResult = { showQrScanResult = true },
                         onShowRenameDialog = { showRenameDialog = true },
-                        deleteAction = deleteAction, onDismiss = onDismiss)
+                        deleteAction = deleteAction, onDismiss = onDismiss,
+                        onCast = castViewModel?.let { vm -> { vm.showCastDialog.value = true } })
                 }
                 item {
                     VerticalSpace(dp = 16.dp)

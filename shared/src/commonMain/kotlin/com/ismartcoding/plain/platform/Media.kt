@@ -34,11 +34,11 @@ expect fun fileLength(path: String): Long
  */
 expect suspend fun renameMediaFile(path: String, newName: String): String?
 
-/** Returns the media duration in milliseconds for the file at [path], or 0L on failure. */
-expect fun getMediaDurationMs(path: String): Long
+/** Returns the media duration in seconds for the file at [path], or 0L on failure. */
+expect fun getMediaDuration(path: String): Long
 
-/** Returns the audio duration in milliseconds for the file at [path], or 0L on failure. */
-expect fun getAudioDurationMsFromPath(path: String): Long
+/** Returns the audio duration in seconds for the file at [path], or 0L on failure. */
+expect fun getAudioDurationFromPath(path: String): Long
 
 expect fun generateQrCode(text: String, width: Int, height: Int): ImageBitmap
 

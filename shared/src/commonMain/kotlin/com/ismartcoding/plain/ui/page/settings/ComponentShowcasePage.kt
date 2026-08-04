@@ -33,6 +33,7 @@ import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
+import com.ismartcoding.plain.ui.base.ToastManager
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 
@@ -54,6 +55,7 @@ fun ComponentShowcasePage(navController: NavHostController) {
             item { ShowcaseButtons() }
             item { ShowcaseChipsAndSwitches() }
             item { ShowcaseTips() }
+            item { ShowcaseToasts() }
             item { ShowcaseColors() }
             item { BottomSpace(paddingValues) }
         }
@@ -133,5 +135,25 @@ private fun ShowcaseChipsAndSwitches() {
 private fun ShowcaseTips() {
     Subtitle("Tips")
     Tips(text = "This is a tips component for supplementary information.")
+    VerticalSpace(16.dp)
+}
+
+@Composable
+private fun ShowcaseToasts() {
+    Subtitle("Toast")
+    Column(modifier = Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        PFilledButton(text = "Info Toast", onClick = {
+            ToastManager.showInfoToast("This is an info toast")
+        })
+        PFilledButton(text = "Success Toast", type = ButtonType.PRIMARY, onClick = {
+            ToastManager.showSuccessToast("Operation completed successfully")
+        })
+        POutlinedButton(text = "Warning Toast", type = ButtonType.TERTIARY, onClick = {
+            ToastManager.showWarningToast("Please review your input")
+        })
+        PFilledButton(text = "Error Toast", type = ButtonType.DANGER, onClick = {
+            ToastManager.showErrorToast("Something went wrong")
+        })
+    }
     VerticalSpace(16.dp)
 }

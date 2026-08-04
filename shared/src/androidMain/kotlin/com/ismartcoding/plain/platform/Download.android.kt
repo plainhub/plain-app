@@ -4,6 +4,8 @@ import android.webkit.MimeTypeMap
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
+import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.helpers.withIO
 import java.io.File
 import java.io.FileOutputStream
 
@@ -39,6 +41,14 @@ actual suspend fun importDownloadedFile(handle: DownloadTempFileHandle, mimeType
     val androidHandle = handle as AndroidDownloadTempFileHandle
     androidHandle.close()
     return ChatFileSaveHelper.importDownloadedFile(androidHandle.file, mimeType)
+}
+
+actual suspend fun saveTempFileToDownloads(handle: DownloadTempFileHandle, filename: String): String = withIO {
+    val androidHandle = handle as AndroidDownloadTempFileHandle
+    androidHandle.close()
+    val savedPath = FileHelper.copyFileToDownloads(androidHandle.file.absolutePath, filename)
+    androidHandle.file.delete()
+    savedPath
 }
 
 actual fun resolveAppFilePath(fidUri: String): String {

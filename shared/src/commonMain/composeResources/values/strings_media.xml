@@ -55,4 +55,8 @@
     <string name="in_playlist">In playlist</string>
     <string name="empty_playlist">Your playlist is empty</string>
     <string name="remove_from_playlist">Remove from playlist</string>
+    <string name="enter_fullscreen">Enter fullscreen</string>
+    <string name="exit_fullscreen">Exit fullscreen</string>
+    <string name="mute">Mute</string>
+    <string name="unmute">Unmute</string>
 </resources>

@@ -2,6 +2,7 @@ package com.ismartcoding.plain.lib.extensions
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Unit tests for [urlEncode] — pure-Kotlin RFC 3986 percent-encoding

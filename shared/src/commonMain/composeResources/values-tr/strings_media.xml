@@ -55,4 +55,8 @@
     <string name="image">Görüntü</string>
     <string name="cast_select_screen">Bir ekran seçin</string>
     <string name="cast_looking_for_devices">Yakın cihazlar aranıyor...</string>
+    <string name="enter_fullscreen">Tam ekrana gir</string>
+    <string name="exit_fullscreen">Tam ekrandan çık</string>
+    <string name="mute">Sessiz</string>
+    <string name="unmute">Sesi aç</string>
 </resources>

@@ -2,8 +2,8 @@
 
 package com.ismartcoding.plain.mdns
 
-import com.ismartcoding.plain.platform.IosPlatformRegistry
 import com.ismartcoding.plain.platform.formatIpv4
+import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.platform.htonl
 import com.ismartcoding.plain.platform.htons
 import com.ismartcoding.plain.platform.ntohs
@@ -48,6 +48,13 @@ import platform.posix.timeval
 
 private const val MDNS_GROUP = "224.0.0.251"
 
+/**
+ * Darwin's `SO_REUSEPORT` (0x0200). Not exposed via `platform.posix` in
+ * Kotlin/Native, but required by RFC 6762 §6.1 alongside `SO_REUSEADDR`
+ * so an app socket can share port 5353 with the system `mDNSResponder`.
+ */
+private const val SO_REUSEPORT = 0x0200
+
 internal actual fun createMdnsSocket(): MdnsSocket = PosixMdnsSocket()
 
 /**
@@ -64,7 +71,7 @@ internal actual fun createMdnsSocket(): MdnsSocket = PosixMdnsSocket()
  * and to avoid an extra C-interop .def for a single Darwin header.
  */
 internal actual fun candidateInterfaces(): List<Pair<MdnsIface, String>> {
-    val ips = IosPlatformRegistry.getDeviceIP4s()
+    val ips = getDeviceIP4s()
     val out = ArrayList<Pair<MdnsIface, String>>(ips.size)
     for ((i, ip) in ips.withIndex()) {
         val parts = ip.split(".")
@@ -113,6 +120,7 @@ private class PosixMdnsSocket : MdnsSocket {
             check(it >= 0) { "mDNS: socket() failed" }
         }
         setSockOptInt(fd, SOL_SOCKET, SO_REUSEADDR, 1)
+        setSockOptInt(fd, SOL_SOCKET, SO_REUSEPORT, 1)
         setSockOptInt(fd, SOL_SOCKET, SO_RCVBUF, 1 shl 17)
     }
 

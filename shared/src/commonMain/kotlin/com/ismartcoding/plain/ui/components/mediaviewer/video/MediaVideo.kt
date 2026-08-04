@@ -206,16 +206,22 @@ fun MediaVideo(
                 rotationZ = rotation
             }
         }
-        VideoPlayerSurface(
-            modifier = videoModifier
+        val surfaceModifier = if (videoState.isFullscreenMode) {
+            videoModifier
+                .align(Alignment.Center)
+                .fillMaxSize()
+        } else {
+            videoModifier
                 .align(Alignment.Center)
                 .size(
                     LocalDensity.current.run { sizing.displaySize.width.toDp() },
                     LocalDensity.current.run { sizing.displaySize.height.toDp() },
-                ),
+                )
+        }
+        VideoPlayerSurface(
+            modifier = surfaceModifier,
             controller = controller,
             videoState = videoState,
-            useController = false,
         )
     }
 }

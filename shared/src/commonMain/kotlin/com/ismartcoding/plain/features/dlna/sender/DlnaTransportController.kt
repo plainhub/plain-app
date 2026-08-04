@@ -1,9 +1,10 @@
 package com.ismartcoding.plain.features.dlna.sender
 
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.features.dlna.DlnaMediaUtils
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.lib.xml.parseData
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.xml.parseData
 import com.ismartcoding.plain.features.dlna.common.DlnaDevice
 import com.ismartcoding.plain.features.dlna.common.DlnaPositionInfoResponse
 import com.ismartcoding.plain.features.dlna.common.DlnaSoap
@@ -28,15 +29,7 @@ object DlnaTransportController {
     }
 
     private fun buildDidlLiteMetadata(mediaUrl: String, title: String, albumArtUri: String): String {
-        val ext = mediaUrl.substringAfterLast('.').substringBefore('?').lowercase()
-        val upnpClass = when {
-            ext in setOf("mp3", "m4a", "flac", "ogg", "aac", "wav", "opus", "wma") -> "object.item.audioItem.musicTrack"
-            ext in setOf("jpg", "jpeg", "png", "gif", "webp", "bmp") -> "object.item.imageItem"
-            else -> "object.item.videoItem"
-        }
-        val escapedTitle = title.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-        val albumArtTag = if (albumArtUri.isNotEmpty()) "<upnp:albumArtURI>$albumArtUri</upnp:albumArtURI>" else ""
-        val didl = """<DIDL-Lite xmlns="urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/"><item id="0" parentID="-1" restricted="0"><dc:title>$escapedTitle</dc:title><upnp:class>$upnpClass</upnp:class>$albumArtTag</item></DIDL-Lite>"""
+        val didl = DlnaMediaUtils.buildDidlLite(mediaUrl, title, albumArtUri)
         return didl.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     }
 

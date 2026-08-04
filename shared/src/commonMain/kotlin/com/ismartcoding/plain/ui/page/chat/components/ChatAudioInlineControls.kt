@@ -32,7 +32,7 @@ fun ChatAudioInlineControls(
     duration: Float,
     isPlaying: Boolean,
     onProgressChange: (Float) -> Unit,
-    onValueChangeFinished: () -> Unit,
+    onValueChangeFinished: (Float) -> Unit,
     onShowFullPlayer: () -> Unit,
     onPause: () -> Unit,
     onPlay: () -> Unit,

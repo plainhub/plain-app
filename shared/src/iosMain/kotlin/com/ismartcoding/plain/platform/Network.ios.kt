@@ -21,18 +21,18 @@ import platform.posix.sockaddr_in
 import platform.posix.socket
 
 actual fun getNetworkType(): NetworkType {
-    val ips = IosPlatformRegistry.getDeviceIP4s()
+    val ips = getDeviceIP4s()
     return if (ips.any { !it.startsWith("127.") }) NetworkType.WIFI else NetworkType.NONE
 }
 
 actual fun getDeviceIP4(): String {
-    val ips = IosPlatformRegistry.getDeviceIP4s()
+    val ips = getDeviceIP4s()
     return ips.firstOrNull { !it.startsWith("127.") } ?: ""
 }
 
 actual fun getBestIp(ips: List<String>): String {
     if (ips.isEmpty()) return ""
-    val local = IosPlatformRegistry.getDeviceIP4s().filter { !it.startsWith("127.") }
+    val local = getDeviceIP4s().filter { !it.startsWith("127.") }
     for (ip in ips) {
         val match = local.firstOrNull { isSameSubnet(it, ip, 24) }
         if (match != null) return match
@@ -41,12 +41,12 @@ actual fun getBestIp(ips: List<String>): String {
 }
 
 actual fun getDeviceIP4sWithPrefixLength(): Set<Pair<String, Short>> {
-    val ips = IosPlatformRegistry.getDeviceIP4s().filter { !it.startsWith("127.") }
+    val ips = getDeviceIP4s().filter { !it.startsWith("127.") }
     return ips.map { it to 24.toShort() }.toSet()
 }
 
 actual fun isVPNConnected(): Boolean {
-    val ips = IosPlatformRegistry.getDeviceIP4s()
+    val ips = getDeviceIP4s()
     val has10 = ips.any { it.startsWith("10.") }
     val hasNon10 = ips.any { !it.startsWith("127.") && !it.startsWith("10.") }
     return has10 && hasNon10

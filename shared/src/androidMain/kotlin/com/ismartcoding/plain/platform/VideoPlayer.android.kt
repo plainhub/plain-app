@@ -2,20 +2,19 @@ package com.ismartcoding.plain.platform
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.pm.ActivityInfo
-import android.content.pm.PackageManager
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.os.Handler
 import android.os.Looper
-import android.util.Rational
-import android.widget.ImageButton
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -25,17 +24,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.window.DialogWindowProvider
-import androidx.compose.ui.window.SecureFlagPolicy
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -45,6 +42,7 @@ import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.VideoSize
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
@@ -56,8 +54,8 @@ import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
+import androidx.media3.ui.compose.PlayerSurface
+import androidx.media3.ui.compose.SURFACE_TYPE_SURFACE_VIEW
 import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.plain.lib.extensions.pathToUri
 import com.ismartcoding.plain.mainActivity
@@ -69,22 +67,11 @@ import java.util.UUID
 
 @OptIn(UnstableApi::class)
 @Composable
-actual fun rememberVideoPlayerController(): VideoPlayerController {
+actual fun rememberVideoPlayerController(claimAudioSession: Boolean): VideoPlayerController {
     val context = LocalContext.current
     return remember {
-        ExoPlayerVideoController(buildExoPlayer(context), context)
+        ExoPlayerVideoController(buildExoPlayer(context), context, claimAudioSession)
     }
-}
-
-/**
- * Android-only raw ExoPlayer factory for callers (e.g. DLNA receivers) that
- * use the ExoPlayer API directly and don't need the [VideoPlayerController]
- * abstraction (MediaSession / audio focus / event mapping).
- */
-@OptIn(UnstableApi::class)
-@Composable
-internal fun rememberExoPlayer(context: Context): ExoPlayer {
-    return remember { buildExoPlayer(context) }
 }
 
 @OptIn(UnstableApi::class)
@@ -118,183 +105,153 @@ private fun buildExoPlayer(context: Context): ExoPlayer {
 actual fun VideoPlayerSurface(
     modifier: Modifier,
     controller: VideoPlayerController,
-    videoState: VideoState,
-    useController: Boolean,
+    videoState: VideoState?,
 ) {
     val exoController = controller as ExoPlayerVideoController
     val exoPlayer = exoController.exoPlayer
     val context = LocalContext.current
+    val view = LocalView.current
     val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
-
-    val playerView = remember { PlayerView(context) }
     var isPendingPipMode by remember { mutableStateOf(false) }
 
-    val isPlayingState by remember { derivedStateOf { videoState.isPlaying } }
-    LaunchedEffect(isPlayingState) {
-        playerView.keepScreenOn = isPlayingState
+    // Track video size for aspect-ratio-aware "fit" rendering.
+    // PlayerSurface (media3-ui-compose 1.10.x) has no resizeMode parameter,
+    // so we apply Modifier.aspectRatio based on the reported VideoSize.
+    var videoSize by remember { mutableStateOf<VideoSize?>(null) }
+    var isBuffering by remember { mutableStateOf(false) }
+
+    DisposableEffect(exoPlayer) {
+        val listener = object : Player.Listener {
+            override fun onVideoSizeChanged(size: VideoSize) {
+                videoSize = size
+            }
+
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                isBuffering = playbackState == Player.STATE_BUFFERING
+            }
+        }
+        exoPlayer.addListener(listener)
+        onDispose { exoPlayer.removeListener(listener) }
     }
 
-    AndroidView(
-        modifier = modifier,
-        factory = {
-            playerView.apply {
-                this.player = exoPlayer
-                this.useController = useController
-                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-            }
-        },
-    )
+    // Fullscreen + lifecycle management — only when a VideoState is provided
+    // (local media previewer). The DLNA receiver passes null and manages these
+    // itself via setImmersiveFullscreen / DisposableEffect.
+    if (videoState != null) {
+        val isPlayingState by remember { derivedStateOf { videoState.isPlaying } }
+        LaunchedEffect(isPlayingState) {
+            view.keepScreenOn = isPlayingState
+        }
 
-    DisposableEffect(Unit) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_PAUSE -> {
-                    if (!videoState.enablePip) {
-                        exoPlayer.pause()
-                    }
-                    if (videoState.enablePip && exoPlayer.playWhenReady) {
-                        isPendingPipMode = true
-                        Handler(Looper.getMainLooper()).post {
-                            if (enterPipMode(videoState)) {
-                                Handler(Looper.getMainLooper()).postDelayed({
-                                    isPendingPipMode = false
-                                }, 500)
+        // Fullscreen: switch orientation + immersive system bars.
+        val activity = context.findActivity()
+        LaunchedEffect(videoState.isFullscreenMode) {
+            if (videoState.isFullscreenMode) {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                val insetsController = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+                if (context.isGestureInteractionMode()) {
+                    insetsController.hide(WindowInsetsCompat.Type.systemBars())
+                } else {
+                    insetsController.hide(WindowInsetsCompat.Type.statusBars())
+                }
+                insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                WindowCompat.setDecorFitsSystemWindows(activity.window, false)
+            } else {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                val insetsController = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+                insetsController.show(WindowInsetsCompat.Type.systemBars())
+                insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                WindowCompat.setDecorFitsSystemWindows(activity.window, true)
+            }
+        }
+        DisposableEffect(Unit) {
+            onDispose {
+                if (videoState.isFullscreenMode) {
+                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    val insetsController = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+                    insetsController.show(WindowInsetsCompat.Type.systemBars())
+                    insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                    WindowCompat.setDecorFitsSystemWindows(activity.window, true)
+                }
+            }
+        }
+
+        DisposableEffect(Unit) {
+            val observer = LifecycleEventObserver { _, event ->
+                when (event) {
+                    Lifecycle.Event.ON_PAUSE -> {
+                        if (!videoState.enablePip) {
+                            exoPlayer.pause()
+                        }
+                        if (videoState.enablePip && exoPlayer.playWhenReady) {
+                            isPendingPipMode = true
+                            Handler(Looper.getMainLooper()).post {
+                                if (enterPipMode(videoState)) {
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        isPendingPipMode = false
+                                    }, 500)
+                                }
                             }
                         }
                     }
-                }
 
-                Lifecycle.Event.ON_RESUME -> {
-                    videoState.enablePip = context.isActivityStatePipMode()
-                    if (!videoState.enablePip) {
-                        exoPlayer.play()
+                    Lifecycle.Event.ON_RESUME -> {
+                        videoState.enablePip = context.isActivityStatePipMode()
+                        if (!videoState.enablePip) {
+                            exoPlayer.play()
+                        }
                     }
-                    if (videoState.enablePip && exoPlayer.playWhenReady) {
-                        playerView.useController = useController
-                    }
-                }
 
-                else -> {}
+                    else -> {}
+                }
             }
-        }
-        val lifecycle = lifecycleOwner.value.lifecycle
-        lifecycle.addObserver(observer)
-        onDispose {
-            lifecycle.removeObserver(observer)
+            val lifecycle = lifecycleOwner.value.lifecycle
+            lifecycle.addObserver(observer)
+            onDispose {
+                lifecycle.removeObserver(observer)
+            }
         }
     }
 
-    if (videoState.isFullscreenMode) {
-        VideoPlayerFullScreenDialog(
-            exoPlayer = exoPlayer,
-            currentPlayerView = playerView,
-            videoState = videoState,
+    // Shared PlayerSurface — rendering + buffering indicator always active.
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        PlayerSurface(
+            player = exoPlayer,
+            modifier = Modifier.then(fitModifier(videoSize)),
+            surfaceType = SURFACE_TYPE_SURFACE_VIEW,
         )
-    }
-}
-
-// ---- PiP (androidMain-only, called from surface actual and VideoPreviewButtons) ----
-
-internal fun hasPipMode(context: Context): Boolean {
-    return context.packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
-}
-
-internal fun enterPipMode(videoState: VideoState): Boolean {
-    val context = mainActivity ?: return false
-    if (!hasPipMode(context)) return false
-    videoState.enablePip = true
-    val params = PictureInPictureParams.Builder()
-    if (isTPlus()) {
-        params
-            .setTitle("Video Player")
-            .setAspectRatio(Rational(16, 9))
-            .setSeamlessResizeEnabled(true)
-    }
-    return runCatching {
-        context.findActivity().enterPictureInPictureMode(params.build())
-        true
-    }.getOrDefault(false)
-}
-
-// ---- Fullscreen dialog (androidMain-only) ----
-
-@SuppressLint("UnsafeOptInUsageError")
-@Composable
-internal fun VideoPlayerFullScreenDialog(
-    exoPlayer: ExoPlayer,
-    currentPlayerView: PlayerView,
-    videoState: VideoState,
-) {
-    val context = LocalContext.current
-    val fullScreenPlayerView = remember {
-        PlayerView(context).apply {
-            setShowBuffering(PlayerView.SHOW_BUFFERING_ALWAYS)
+        // Before the video size is reported, fitModifier falls back to
+        // fillMaxSize which stretches the first frame to fill the entire
+        // container. Hide the surface behind a black overlay until the
+        // correct aspect ratio is applied.
+        val vs = videoSize
+        val sizeKnown = vs != null && vs.width > 0 && vs.height > 0
+        if (!sizeKnown) {
+            Box(modifier = Modifier.fillMaxSize().background(Color.Black))
         }
-    }
-
-    val view = LocalView.current
-    val window = (view.context as Activity).window
-    val insetsController = WindowCompat.getInsetsController(window, view)
-
-    val onDismissRequest = {
-        PlayerView.switchTargetView(exoPlayer, fullScreenPlayerView, currentPlayerView)
-        currentPlayerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
-            .performClick()
-        val currentActivity = context.findActivity()
-        currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        currentActivity.setFullScreen(false)
-        if (context.isGestureInteractionMode()) {
-            insetsController.show(WindowInsetsCompat.Type.systemBars())
-        } else {
-            insetsController.show(WindowInsetsCompat.Type.statusBars())
-        }
-        videoState.isFullscreenMode = false
-    }
-
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            dismissOnClickOutside = false,
-            usePlatformDefaultWidth = false,
-            securePolicy = SecureFlagPolicy.Inherit,
-            decorFitsSystemWindows = false,
-        ),
-    ) {
-        LaunchedEffect(Unit) {
-            PlayerView.switchTargetView(exoPlayer, currentPlayerView, fullScreenPlayerView)
-
-            val currentActivity = context.findActivity()
-            currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            (view.parent as DialogWindowProvider).window.setFullScreen(true)
-            fullScreenPlayerView.setFullscreenButtonClickListener {
-                if (!it) {
-                    onDismissRequest()
-                }
-            }
-            fullScreenPlayerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
-                .performClick()
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black),
-        ) {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = {
-                    fullScreenPlayerView.apply {
-                        this.player = exoPlayer
-                        useController = true
-                        resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-                    }
-                },
+        if (isBuffering && sizeKnown) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp),
+                color = Color.White,
             )
         }
     }
 }
 
-// ---- Activity/Window helpers (moved from Helpers.kt) ----
+/**
+ * Builds a Modifier that preserves the video's aspect ratio (RESIZE_MODE_FIT behavior).
+ * When [videoSize] is unknown or invalid, falls back to fillMaxSize to avoid distortion.
+ */
+@OptIn(UnstableApi::class)
+private fun fitModifier(videoSize: VideoSize?): Modifier {
+    if (videoSize == null || videoSize.width <= 0 || videoSize.height <= 0) {
+        return Modifier.fillMaxSize()
+    }
+    val ratio = videoSize.width.toFloat() / videoSize.height.toFloat()
+    return Modifier.aspectRatio(ratio)
+}
+
+// ---- Activity helpers ----
 
 internal fun Context.findActivity(): Activity {
     return mainActivity!!
@@ -304,40 +261,29 @@ internal fun Context.isActivityStatePipMode(): Boolean {
     return findActivity().isInPictureInPictureMode
 }
 
-internal fun Activity.setFullScreen(fullscreen: Boolean) {
-    window.setFullScreen(fullscreen)
-}
-
-@Suppress("Deprecation")
-internal fun android.view.Window.setFullScreen(fullscreen: Boolean) {
-    if (fullscreen) {
-        decorView.systemUiVisibility = (
-            android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                or android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                or android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or android.view.View.SYSTEM_UI_FLAG_FULLSCREEN
-            )
-    } else {
-        decorView.systemUiVisibility = android.view.View.SYSTEM_UI_FLAG_VISIBLE
-    }
-}
-
 // ---- ExoPlayer-backed VideoPlayerController (moved from ui/components/mediaviewer/video/) ----
 
 /**
  * Android implementation of [VideoPlayerController] backed by ExoPlayer.
+ *
+ * @param claimAudioSession when true, creates a [MediaSession] and wires audio
+ *   focus management (for the local media previewer). When false, the controller
+ *   is a raw ExoPlayer wrapper with no session/focus — used by the DLNA receiver.
  */
 @OptIn(UnstableApi::class)
 class ExoPlayerVideoController(
     val exoPlayer: ExoPlayer,
     context: Context,
+    private val claimAudioSession: Boolean,
 ) : VideoPlayerController {
 
-    private val focusManager = VideoAudioFocusManager(
-        context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
-    )
+    private val focusManager = if (claimAudioSession) {
+        VideoAudioFocusManager(
+            context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
+        )
+    } else {
+        null
+    }
 
     private var eventListener: ((VideoPlayerEvent) -> Unit)? = null
 
@@ -363,14 +309,16 @@ class ExoPlayerVideoController(
 
     init {
         exoPlayer.addListener(playerListener)
-        mediaSession = try {
-            MediaSession.Builder(
-                context.applicationContext,
-                ForwardingPlayer(exoPlayer),
-            ).setId("VideoPlayerMediaSession_" + UUID.randomUUID().toString().lowercase().split("-").first())
-                .build()
-        } catch (e: Throwable) {
-            null
+        if (claimAudioSession) {
+            mediaSession = try {
+                MediaSession.Builder(
+                    context.applicationContext,
+                    ForwardingPlayer(exoPlayer),
+                ).setId("VideoPlayerMediaSession_" + UUID.randomUUID().toString().lowercase().split("-").first())
+                    .build()
+            } catch (e: Throwable) {
+                null
+            }
         }
     }
 
@@ -387,7 +335,7 @@ class ExoPlayerVideoController(
     override fun release() {
         mediaSession?.release()
         mediaSession = null
-        focusManager.abandonFocus()
+        focusManager?.abandonFocus()
         exoPlayer.removeListener(playerListener)
         exoPlayer.release()
     }
@@ -400,13 +348,18 @@ class ExoPlayerVideoController(
         eventListener = listener
     }
 
-    override fun requestAudioFocus() = focusManager.requestFocus(exoPlayer)
-    override fun abandonAudioFocus() = focusManager.abandonFocus()
+    override fun requestAudioFocus() {
+        focusManager?.requestFocus(exoPlayer)
+    }
+    override fun abandonAudioFocus() {
+        focusManager?.abandonFocus()
+    }
 
     override val duration: Long get() = exoPlayer.duration.coerceAtLeast(0L)
     override val currentPosition: Long get() = exoPlayer.currentPosition.coerceAtLeast(0L)
     override val bufferedPercentage: Int get() = exoPlayer.bufferedPercentage
     override val isPlaying: Boolean get() = exoPlayer.isPlaying
+    override val isBuffering: Boolean get() = exoPlayer.playbackState == ExoPlayer.STATE_BUFFERING
 }
 
 // ---- VideoAudioFocusManager (moved from ui/components/mediaviewer/video/) ----

@@ -45,13 +45,13 @@ actual fun getVideoIntrinsicSize(path: String): IntSize {
 
 actual fun getVideoMeta(path: String): DVideoMeta? {
     val (w, h, rotation) = readVideoTrackInfo(path) ?: return null
-    val durationMs = readAssetDurationMs(path)
+    val durationSec = readAssetDuration(path)
     val (displayW, displayH) = if (rotation == 90 || rotation == 270) h to w else w to h
     return DVideoMeta(
         width = displayW,
         height = displayH,
         rotation = rotation,
-        duration = if (durationMs > 0) durationMs / 1000 else 0L,
+        duration = durationSec,
         bitrate = 0L,
         frameRate = 0f,
         title = "",
@@ -130,9 +130,9 @@ actual suspend fun renameMediaFile(path: String, newName: String): String? = try
     null
 }
 
-actual fun getMediaDurationMs(path: String): Long = readAssetDurationMs(path)
+actual fun getMediaDuration(path: String): Long = readAssetDuration(path)
 
-actual fun getAudioDurationMsFromPath(path: String): Long = readAssetDurationMs(path)
+actual fun getAudioDurationFromPath(path: String): Long = readAssetDuration(path)
 
 actual fun generateQrCode(text: String, width: Int, height: Int): ImageBitmap {
     return ImageBitmap(width, height, ImageBitmapConfig.Argb8888)
@@ -235,12 +235,12 @@ private fun callStructReturningSelectorRaw(target: NSObject, selName: String): B
     }
 }
 
-private fun readAssetDurationMs(path: String): Long = try {
+private fun readAssetDuration(path: String): Long = try {
     val asset = AVURLAsset(NSURL.fileURLWithPath(path), null)
     val seconds = CMTimeGetSeconds(asset.duration)
-    if (seconds.isNaN() || seconds.isInfinite() || seconds <= 0.0) 0L else (seconds * 1000).toLong()
+    if (seconds.isNaN() || seconds.isInfinite() || seconds <= 0.0) 0L else seconds.toLong()
 } catch (e: Exception) {
-    LogCat.e("readAssetDurationMs: ${e.message}")
+    LogCat.e("readAssetDuration: ${e.message}")
     0L
 }
 

@@ -7,14 +7,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
-import com.ismartcoding.plain.i18n.*
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,11 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
@@ -37,14 +31,21 @@ import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.grant_permission
+import com.ismartcoding.plain.i18n.http_port_conflict_error
+import com.ismartcoding.plain.i18n.http_port_conflict_errors
+import com.ismartcoding.plain.i18n.http_server_failed
+import com.ismartcoding.plain.i18n.system_alert_window_warning
+import com.ismartcoding.plain.i18n.vpn_web_conflict_warning
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.platform.getDeviceIP4s
+import com.ismartcoding.plain.platform.httpServerPortsInUse
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isVPNConnected
-import com.ismartcoding.plain.platform.getDeviceIP4s
-import com.ismartcoding.plain.platform.getDeviceIP4
-import com.ismartcoding.plain.platform.httpServerPortsInUse
 import com.ismartcoding.plain.platform.relaunchApp
 import com.ismartcoding.plain.preferences.HttpPortPreference
 import com.ismartcoding.plain.preferences.HttpsPortPreference
@@ -55,14 +56,13 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.web.setDeviceIP4s
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
-import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
+import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.MainBottomBar
@@ -70,6 +70,7 @@ import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 import com.ismartcoding.plain.web.httpPorts
 import com.ismartcoding.plain.web.httpsPorts
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 enum class HttpServiceState { OFF, ERROR, ON }
 
@@ -146,9 +147,7 @@ fun HomePage(
                 is WindowFocusChangedEvent -> {
                     mainVM.isVPNConnected.value = isVPNConnected()
                     val ips = getDeviceIP4s().filter { it.isNotEmpty() }
-                    mainVM.ip4s.value = ips
-                    setDeviceIP4s(ips)
-                    mainVM.ip4.value = getDeviceIP4().ifEmpty { "127.0.0.1" }
+                    TempData.ip4s.value = ips
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.isGranted()
                 }
             }

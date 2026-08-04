@@ -202,6 +202,7 @@ dependencies {
     implementation(libs.camera.camera2)
     implementation(libs.camera.lifecycle)
     implementation(libs.camera.view)
+    implementation(libs.camera.compose)
 
     // coil: https://coil-kt.github.io/coil/changelog/
     implementation(libs.coil)

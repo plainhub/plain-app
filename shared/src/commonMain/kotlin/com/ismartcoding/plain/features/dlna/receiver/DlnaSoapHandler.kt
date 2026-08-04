@@ -3,6 +3,7 @@ package com.ismartcoding.plain.features.dlna.receiver
 import com.ismartcoding.plain.features.dlna.DlnaMediaType
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
+import com.ismartcoding.plain.features.dlna.DlnaMediaUtils
 import com.ismartcoding.plain.features.dlna.common.DlnaSoap
 
 /**
@@ -164,6 +165,14 @@ object DlnaSoapHandler {
     }
 
     fun extractMediaTypeFromDidlMeta(meta: String, fallbackUri: String = ""): DlnaMediaType {
+        // Tier 1: <res protocolInfo="http-get:*:{mime}:*"> — most authoritative,
+        // especially important for /fs?id= URLs that carry no file extension.
+        val piMime = DlnaMediaUtils.extractProtocolInfoMime(meta)
+        if (!piMime.isNullOrEmpty()) {
+            val cls = DlnaMediaUtils.classifyByMime(piMime)
+            if (cls != DlnaMediaType.UNKNOWN) return cls
+        }
+        // Tier 2: upnp:class text (object.item.videoItem / audioItem.musicTrack / ...)
         val classStart = meta.indexOf("<upnp:class>")
         val classEnd = meta.indexOf("</upnp:class>")
         if (classStart in 0..<classEnd) {
@@ -175,6 +184,7 @@ object DlnaSoapHandler {
                 else -> DlnaMediaType.UNKNOWN
             }
         }
+        // Tier 3: URL extension fallback (for /media/{id}.mp4 style URLs).
         val ext = fallbackUri.substringAfterLast('.').substringBefore('?').lowercase()
         return when (ext) {
             "mp3", "flac", "aac", "ogg", "m4a", "wav", "opus", "wma" -> DlnaMediaType.AUDIO

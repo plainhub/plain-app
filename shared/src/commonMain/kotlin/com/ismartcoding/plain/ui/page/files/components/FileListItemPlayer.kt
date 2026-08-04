@@ -43,7 +43,7 @@ internal fun FileListItemPlayer(
                     PlayerSlider(progress = if (duration == 0f) 0f else progress / duration, bufferedProgress = 0f,
                         modifier = Modifier.fillMaxWidth().height(20.dp),
                         onProgressChange = onProgressChange,
-                        onValueChangeFinished = { onSeekTo(progress.toLong()) },
+                        onValueChangeFinished = { normalizedProgress -> onSeekTo((normalizedProgress * duration).toLong()) },
                         trackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f),
                         progressColor = MaterialTheme.colorScheme.primary, thumbColor = MaterialTheme.colorScheme.primary)
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

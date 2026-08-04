@@ -55,4 +55,8 @@
     <string name="image">படம்</string>
     <string name="cast_select_screen">ஒரு திரையை தேர்ந்தெடுக்கவும்</string>
     <string name="cast_looking_for_devices">அருகில் உள்ள சாதனங்களை தேடுகிறது...</string>
+    <string name="enter_fullscreen">முழுத்திரையில் நுழையவும்</string>
+    <string name="exit_fullscreen">முழுத்திரையிலிருந்து வெளியேறவும்</string>
+    <string name="mute">ஒலியடக்கு</string>
+    <string name="unmute">ஒலியை இயக்கு</string>
 </resources>

@@ -31,8 +31,6 @@ class MainViewModel : ViewModel() {
     var httpServerError = mutableStateOf("")
     var httpServerState = mutableStateOf(HttpServerState.OFF)
     var isVPNConnected = mutableStateOf(false)
-    var ip4s = mutableStateOf(emptyList<String>())
-    var ip4 = mutableStateOf("")
     var currentRootTab = mutableIntStateOf(0)
     var pendingLoginEvent = mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
     var pendingPairingRequest = mutableStateOf<DPairingRequest?>(null)

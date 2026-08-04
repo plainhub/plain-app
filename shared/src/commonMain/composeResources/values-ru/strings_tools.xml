@@ -15,6 +15,9 @@
     <string name="dlna_receiver_protocol_note">Поддерживает протоколы DLNA / UPnP, совместим с VLC, Kodi и другими популярными приложениями для трансляции</string>
     <string name="dlna_receiver_exit_player">Выйти из плеера</string>
     <string name="dlna_receiver_turn_on">Включить</string>
+    <string name="download">Скачать</string>
+    <string name="dlna_download_success">Сохранено в Загрузки: %1$s</string>
+    <string name="dlna_download_failed">Скачивание не удалось</string>
     <string name="feature_disabled_title">%1$s отключено</string>
     <string name="short_break">Короткий перерыв</string>
     <string name="long_break">Длинный перерыв</string>

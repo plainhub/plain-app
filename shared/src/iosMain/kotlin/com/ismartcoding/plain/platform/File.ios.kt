@@ -50,15 +50,6 @@ import platform.posix.fclose
 import platform.posix.fopen
 import platform.posix.fwrite
 
-@OptIn(ExperimentalEncodingApi::class)
-actual fun getFileId(path: String): String {
-    if (path.isEmpty()) return ""
-    if (path.startsWith("https://", true) || path.startsWith("http://", true)) return path
-    val token = TempData.urlToken
-    if (token.isEmpty()) return ""
-    return Base64.encode(chaCha20Encrypt(token, path))
-}
-
 @OptIn(ExperimentalForeignApi::class)
 actual fun deleteFileAt(path: String) {
     NSFileManager.defaultManager.removeItemAtPath(path, null)

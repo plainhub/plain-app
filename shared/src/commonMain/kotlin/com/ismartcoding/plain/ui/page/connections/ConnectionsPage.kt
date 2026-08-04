@@ -45,6 +45,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.models.SessionsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.web.onlineClientIds
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -54,10 +55,13 @@ fun ConnectionsPage(
     sessionsVM: SessionsViewModel = viewModel { SessionsViewModel() },
 ) {
     val itemsState by sessionsVM.itemsFlow.collectAsState()
+    val onlineIds by onlineClientIds.collectAsState()
     var showCreateDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { 2 })
-    val sessions = remember(itemsState) { itemsState.filter { !it.isCustom } }
+    val sessions = remember(itemsState, onlineIds) {
+        itemsState.filter { !it.isCustom }.sortedByDescending { onlineIds.contains(it.clientId) }
+    }
     val apiTokens = remember(itemsState) { itemsState.filter { it.isCustom } }
     val tabTitles = listOf(stringResource(Res.string.sessions), stringResource(Res.string.api_tokens))
 

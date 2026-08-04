@@ -4,7 +4,7 @@ import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLIgnore
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLUnion
-import com.ismartcoding.plain.platform.getFileId
+import com.ismartcoding.plain.helpers.getFileId
 import kotlin.time.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Polymorphic

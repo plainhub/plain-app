@@ -17,6 +17,9 @@
     <string name="dlna_receiver_protocol_note">DLNA / UPnP நெறிமுறைகளை ஆதரிக்கிறது, VLC, Kodi மற்றும் பிற பிரபலமான காஸ்டிங் பயன்பாடுகளுடன் இணக்கமானது</string>
     <string name="dlna_receiver_exit_player">பிளேயரில் இருந்து வெளியேறவும்</string>
     <string name="dlna_receiver_turn_on">இயக்கு</string>
+    <string name="download">பதிவிறக்கு</string>
+    <string name="dlna_download_success">பதிவிறக்கங்களில் சேமிக்கப்பட்டது: %1$s</string>
+    <string name="dlna_download_failed">பதிவிறக்கம் தோல்வியுற்றது</string>
     <string name="feature_disabled_title">%1$s அணைக்கப்பட்டது</string>
     <string name="short_break">குறுகிய இடைவேளை</string>
     <string name="long_break">நீண்ட இடைவேளை</string>

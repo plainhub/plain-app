@@ -17,6 +17,9 @@
     <string name="dlna_receiver_protocol_note">DLNA / UPnP প্রোটোকল সমর্থন করে, VLC, Kodi এবং অন্যান্য জনপ্রিয় কাস্টিং অ্যাপের সাথে সামঞ্জস্যপূর্ণ</string>
     <string name="dlna_receiver_exit_player">প্লেয়ার থেকে প্রস্থান করুন</string>
     <string name="dlna_receiver_turn_on">চালু করুন</string>
+    <string name="download">ডাউনলোড</string>
+    <string name="dlna_download_success">ডাউনলোডে সংরক্ষিত: %1$s</string>
+    <string name="dlna_download_failed">ডাউনলোড ব্যর্থ হয়েছে</string>
     <string name="feature_disabled_title">%1$s বন্ধ আছে</string>
     <string name="short_break">সংক্ষেপ ব্রেক</string>
     <string name="long_break">দীর্ঘ ব্রেক</string>

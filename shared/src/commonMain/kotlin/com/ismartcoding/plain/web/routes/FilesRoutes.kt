@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.web.routes
 
+import com.ismartcoding.plain.features.dlna.DlnaMediaUtils
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -80,7 +81,7 @@ fun HttpRouter.addFilesRoutes() {
                 } else {
                     "inline; filename=\"${displayName}\"; filename*=utf-8''${displayName}"
                 }
-                val contentType = getContentTypeForPath(cachePath)
+                val contentType = getContentTypeForPath(cachePath) ?: "application/octet-stream"
                 call.responseHeader("Access-Control-Expose-Headers", "Content-Disposition")
                 call.respondFile(cachePath, contentType = contentType, contentDisposition = contentDisposition)
                 return@get
@@ -239,7 +240,7 @@ private suspend fun serveRegularFile(
     if (isDownload) {
         val contentDisposition =
             "attachment; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
-        val contentType = getContentTypeForPath(path)
+        val contentType = getContentTypeForPath(path) ?: "application/octet-stream"
         call.respondFile(path, contentType = contentType, contentDisposition = contentDisposition)
         return
     }
@@ -248,7 +249,7 @@ private suspend fun serveRegularFile(
     // Animated images (GIF, animated WebP, animated HEIF) and SVG: serve as-is
     // so the browser can render them with native range support.
     if (fileName.isImageFast() && isAnimatedImageOrSvg(path, fileName)) {
-        val contentType = getContentTypeForPath(path)
+        val contentType = getContentTypeForPath(path) ?: "application/octet-stream"
         call.respondFile(path, contentType = contentType)
         return
     }
@@ -277,6 +278,6 @@ private suspend fun serveRegularFile(
     }
 
     // Default: serve the file as-is with content type sniffed from extension.
-    val contentType = getContentTypeForPath(path)
+    val contentType = getContentTypeForPath(path) ?: "application/octet-stream"
     call.respondFile(path, contentType = contentType)
 }

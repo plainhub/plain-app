@@ -1,5 +1,6 @@
 package com.ismartcoding.plain
 
+import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.sms.DPendingMms
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ object TempData {
     val httpPort = MutableStateFlow(8080)
     val httpsPort = MutableStateFlow(8443)
     val dlnaEnabled = MutableStateFlow(false)
+    var ip4s = mutableStateOf(emptyList<String>())
     var clientId = ""
     val deviceName = MutableStateFlow("")
     var urlToken = ByteArray(0) // use to encrypt or decrypt params in url (kept as raw bytes to avoid base64 decode on every encrypt/decrypt)

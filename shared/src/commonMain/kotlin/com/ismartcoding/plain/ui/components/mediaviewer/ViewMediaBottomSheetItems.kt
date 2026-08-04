@@ -10,6 +10,7 @@ import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.platform.shareFile
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.CopyIconButton
+import com.ismartcoding.plain.ui.base.IconTextCastButton
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
 import com.ismartcoding.plain.ui.base.IconTextScanQrCodeButton
@@ -27,6 +28,7 @@ internal fun ViewMediaActionButtons(
     onShowRenameDialog: () -> Unit,
     deleteAction: () -> Unit,
     onDismiss: () -> Unit,
+    onCast: (() -> Unit)? = null,
 ) {
     ActionButtons {
         if (qrScanResult.isNotEmpty()) {
@@ -37,6 +39,9 @@ internal fun ViewMediaActionButtons(
                 shareFile(m.path)
                 onDismiss()
             }
+        }
+        if (onCast != null) {
+            IconTextCastButton { onCast() }
         }
         IconTextRenameButton { onShowRenameDialog() }
         IconTextDeleteButton {

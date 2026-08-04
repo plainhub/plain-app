@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.platform
 
 import androidx.compose.runtime.Composable
+import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 
 /**
  * Whether the device uses gesture navigation (as opposed to 3-button nav).
@@ -51,3 +52,18 @@ expect fun rememberWindowInsetsController(): Any
  * On iOS this is a no-op (status bar appearance is controlled per-UIViewController).
  */
 expect fun applySystemBarAppearanceForDarkTheme(useDarkTheme: Boolean)
+
+/**
+ * Whether the current platform supports Picture-in-Picture mode.
+ * Android: checks PackageManager.FEATURE_PICTURE_IN_PICTURE.
+ * iOS: always false (PiP not wired up for video preview).
+ */
+expect fun hasPipMode(): Boolean
+
+/**
+ * Attempt to enter Picture-in-Picture mode for the given [videoState].
+ * Android: builds PictureInPictureParams and calls enterPictureInPictureMode.
+ * iOS: no-op, returns false.
+ * @return true if PiP was entered successfully
+ */
+expect fun enterPipMode(videoState: VideoState): Boolean

@@ -2,18 +2,14 @@ package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_SOFT_ANIMATION_SPEC
 import com.ismartcoding.plain.ui.components.mediaviewer.MediaViewerState
-import com.ismartcoding.plain.ui.components.mediaviewer.rememberViewerState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers

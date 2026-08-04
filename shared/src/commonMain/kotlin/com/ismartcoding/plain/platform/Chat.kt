@@ -28,7 +28,7 @@ import kotlinx.coroutines.delay
  * Platform-specific steps (URI query, file import, media metadata) go through
  * the low-level expects [queryPickedFileInfo], [importChatFile],
  * [getImageIntrinsicSize], [getImageRotation], [getVideoIntrinsicSize],
- * [getMediaDurationMs]. On iOS these return null/zero (no document picker),
+ * [getMediaDuration]. On iOS these return null/zero (no document picker),
  * so the flow is effectively a no-op until the picker ships.
  */
 fun handleChatFileSelection(
@@ -84,7 +84,7 @@ fun handleChatFileSelection(
                             id = placeholder.id,
                             uri = fidUri,
                             size = placeholder.size,
-                            duration = getMediaDurationMs(realPath),
+                            duration = getMediaDuration(realPath),
                             width = intrinsicSize.width,
                             height = intrinsicSize.height,
                             summary = placeholder.summary,

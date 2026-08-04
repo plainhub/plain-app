@@ -43,9 +43,9 @@ class MdnsIfaceSelectorTest {
 
 
     @Test fun `subnet arithmetic selects correct slash-24 match`() {
-        val wlanIp = ip4("192.168.1.10")
-        val senderOnWlan = ip4("192.168.1.200")
-        val senderOnAp = ip4("192.168.43.50")
+        val wlanIp = "192.168.1.10"
+        val senderOnWlan = "192.168.1.200"
+        val senderOnAp = "192.168.43.50"
         val mask24 = 0xFFFFFF00.toInt()
 
         assertEquals(

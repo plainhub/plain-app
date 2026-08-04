@@ -55,4 +55,8 @@
     <string name="image">이미지</string>
     <string name="cast_select_screen">화면 선택</string>
     <string name="cast_looking_for_devices">주변 기기 검색 중...</string>
+    <string name="enter_fullscreen">전체 화면 들어가기</string>
+    <string name="exit_fullscreen">전체 화면 나가기</string>
+    <string name="mute">음소거</string>
+    <string name="unmute">음소거 해제</string>
 </resources>

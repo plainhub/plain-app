@@ -218,6 +218,6 @@ private fun recvOne(fd: Int, buffer: ByteArray): Pair<String, String>? = memScop
 }
 
 private fun hasLanInterface(): Boolean {
-    val ips = IosPlatformRegistry.getDeviceIP4s()
+    val ips = getDeviceIP4s()
     return ips.any { !it.startsWith("127.") }
 }

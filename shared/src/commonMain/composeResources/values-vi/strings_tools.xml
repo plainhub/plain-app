@@ -17,6 +17,9 @@
     <string name="dlna_receiver_protocol_note">Hỗ trợ giao thức DLNA / UPnP, tương thích với VLC, Kodi và các ứng dụng chiếu phổ biến khác</string>
     <string name="dlna_receiver_exit_player">Thoát trình phát</string>
     <string name="dlna_receiver_turn_on">Bật</string>
+    <string name="download">Tải xuống</string>
+    <string name="dlna_download_success">Đã lưu vào Tải xuống: %1$s</string>
+    <string name="dlna_download_failed">Tải xuống thất bại</string>
     <string name="feature_disabled_title">%1$s đã tắt</string>
     <string name="short_break">Nghỉ ngắn</string>
     <string name="long_break">Nghỉ dài</string>

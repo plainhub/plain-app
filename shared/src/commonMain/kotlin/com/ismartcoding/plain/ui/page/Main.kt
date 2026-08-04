@@ -86,7 +86,7 @@ fun Main(
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
         MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, noteTagsVM, pomodoroVM)
 
-        MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })
         DlnaReceiverOverlay()
+        MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })
     }
 }

@@ -17,6 +17,9 @@
     <string name="dlna_receiver_protocol_note">DLNA / UPnP 프로토콜 지원, VLC, Kodi 등 주요 캐스트 앱과 호환됩니다</string>
     <string name="dlna_receiver_exit_player">플레이어 종료</string>
     <string name="dlna_receiver_turn_on">켜기</string>
+    <string name="download">다운로드</string>
+    <string name="dlna_download_success">다운로드에 저장됨: %1$s</string>
+    <string name="dlna_download_failed">다운로드 실패</string>
     <string name="feature_disabled_title">%1$s이(가) 비활성화되었습니다</string>
     <string name="short_break">짧은 휴식</string>
     <string name="long_break">긴 휴식</string>

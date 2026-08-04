@@ -55,4 +55,8 @@
     <string name="image">ছবি</string>
     <string name="cast_select_screen">একটি স্ক্রিন বেছে নিন</string>
     <string name="cast_looking_for_devices">কাছাকাছি ডিভাইস খোঁজা হচ্ছে...</string>
+    <string name="enter_fullscreen">পূর্ণ স্ক্রিনে প্রবেশ করুন</string>
+    <string name="exit_fullscreen">পূর্ণ স্ক্রিন থেকে প্রস্থান করুন</string>
+    <string name="mute">নিঃশব্দ</string>
+    <string name="unmute">শব্দ চালু করুন</string>
 </resources>

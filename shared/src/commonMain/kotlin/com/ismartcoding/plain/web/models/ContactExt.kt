@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DContact
-import com.ismartcoding.plain.platform.getFileId
+import com.ismartcoding.plain.helpers.getFileId
 
 fun DContact.toModel(): Contact {
     return Contact(
