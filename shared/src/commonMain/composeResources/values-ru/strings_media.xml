@@ -36,8 +36,11 @@
     <string name="stop">Остановить</string>
     <string name="cast_mode">Режим передачи</string>
     <string name="casting">Передача</string>
+    <string name="casting_to">Передача на %1$s</string>
     <string name="cast_playlist">Плейлист передачи</string>
     <string name="cast_playlist_empty">Плейлист передачи пуст</string>
+    <string name="stop_casting">Остановить передачу</string>
+    <string name="no_active_cast">Нет активной сессии передачи</string>
     <string name="add_to_cast_queue">Добавить в очередь передачи</string>
     <string name="remove_from_cast_queue">Удалить из очереди передачи</string>
     <string name="my_phone">Мой телефон</string>

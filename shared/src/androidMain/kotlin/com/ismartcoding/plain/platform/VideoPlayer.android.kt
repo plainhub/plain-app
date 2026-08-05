@@ -157,11 +157,13 @@ actual fun VideoPlayerSurface(
                 insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 WindowCompat.setDecorFitsSystemWindows(activity.window, false)
             } else {
+                // Non-fullscreen: only reset orientation. System bar visibility
+                // is owned by the MediaPreviewer (status bar follows showActions
+                // for video, immersive for image) — do NOT touch bars here.
+                // This LaunchedEffect also runs on the initial composition of
+                // every video page (swipe); manipulating bars here would fight
+                // the previewer's state and surface the gesture/3-button bar.
                 activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                val insetsController = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
-                insetsController.show(WindowInsetsCompat.Type.systemBars())
-                insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
-                WindowCompat.setDecorFitsSystemWindows(activity.window, true)
             }
         }
         DisposableEffect(Unit) {

@@ -36,6 +36,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.platform.applySystemBarAppearanceForDarkTheme
+import com.ismartcoding.plain.platform.exitImmersiveFullscreen
 import com.ismartcoding.plain.platform.keepScreenOn
 import com.ismartcoding.plain.platform.setImmersiveFullscreen
 import com.ismartcoding.plain.preferences.LocalDarkTheme
@@ -71,6 +72,7 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
         keepScreenOn(true)
         onDispose {
             keepScreenOn(false)
+            exitImmersiveFullscreen()
             applySystemBarAppearanceForDarkTheme(currentUseDarkTheme)
         }
     }

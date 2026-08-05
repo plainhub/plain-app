@@ -24,35 +24,24 @@ struct PlainApp: SwiftUI.App {
         IosPlatformRegistry.shared.setFilePicker(picker: filePicker)
         IosPlatformRegistry.shared.setShareController(controller: shareController)
         IosPlatformRegistry.shared.setSslCertProvider(provider: sslCertManager)
-#if DEBUG
-        let provider = networkInfo
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            provider.debugDumpDeviceIP4s(label: "startup+1s")
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            provider.debugDumpDeviceIP4s(label: "startup+5s")
-        }
-#endif
     }
 
     var body: some Scene {
         WindowGroup {
             ComposeView()
                 .ignoresSafeArea()
+                // System background fills the gap between the system
+                // LaunchScreen disappearing and the first Compose frame
+                // rendering. Matches the LaunchScreenBackground asset so
+                // the transition is visually seamless (no more white flash).
+                .background(Color(uiColor: .systemBackground))
         }
     }
 }
-
 final class NetworkInfoProvider: NSObject, IosNetworkInfoProvider {
     func getDeviceIP4s() -> [String] {
         collectDeviceIP4s(debugLabel: nil)
     }
-
-#if DEBUG
-    func debugDumpDeviceIP4s(label: String) {
-        _ = collectDeviceIP4s(debugLabel: label)
-    }
-#endif
 
     private func collectDeviceIP4s(debugLabel: String?) -> [String] {
         debugLog(debugLabel, "begin")
@@ -207,10 +196,6 @@ final class NetworkInfoProvider: NSObject, IosNetworkInfoProvider {
     }
 
     private func debugLog(_ label: String?, _ message: String) {
-#if DEBUG
-        guard let label else { return }
-        print("[PlainApp][NetworkInfoProvider][\(label)] \(message)")
-#endif
     }
 }
 
@@ -322,14 +307,122 @@ final class LocationPermissionDelegate: NSObject, CLLocationManagerDelegate {
     }
 }
 
+/// A `UIWindow` that passes all touches through to windows below it.
+/// Used for the immersive overlay so the Compose `Dialog` underneath still
+/// receives tap events while the overlay window controls Status Bar visibility.
+final class PassThroughWindow: UIWindow {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        nil
+    }
+}
+
+/// Root VC for the immersive overlay window. Returns `true` for
+/// `prefersStatusBarHidden` / `prefersHomeIndicatorAutoHidden` and defers
+/// all edge system gestures, giving a clean pseudo-sleep black screen.
+final class ImmersiveBarHidingVC: UIViewController {
+    override var prefersStatusBarHidden: Bool { true }
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation { .fade }
+    override var prefersHomeIndicatorAutoHidden: Bool { true }
+    override var preferredScreenEdgesDeferringSystemGestures: UIRectEdge { .all }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .clear
+    }
+}
+
+/// Wraps the Compose Multiplatform `MainViewController` in a container
+/// `UIViewController`. When Kotlin requests immersive fullscreen (via
+/// `IosSystemUiController`), the host creates a `PassThroughWindow` floating
+/// above every other window (including the Compose `Dialog` window). That
+/// window's root VC hides the Status Bar and Home Indicator, while its
+/// `hitTest` returns `nil` so touches fall through to the Compose UI below.
+final class ComposeHostingController: UIViewController, IosSystemUiController {
+    private let composeVC: UIViewController
+    private var immersiveWindow: UIWindow?
+    private var previousKeyWindow: UIWindow?
+
+    init(composeVC: UIViewController) {
+        self.composeVC = composeVC
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        addChild(composeVC)
+        view.addSubview(composeVC.view)
+        composeVC.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            composeVC.view.topAnchor.constraint(equalTo: view.topAnchor),
+            composeVC.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            composeVC.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            composeVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        ])
+        composeVC.didMove(toParent: self)
+    }
+
+    // MARK: - IosSystemUiController
+
+    func setImmersive(enabled: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            if enabled {
+                self?.presentImmersiveOverlay()
+            } else {
+                self?.dismissImmersiveOverlay()
+            }
+        }
+    }
+
+    // MARK: - Immersive overlay window
+
+    private func presentImmersiveOverlay() {
+        guard immersiveWindow == nil else { return }
+
+        guard let scene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive })
+        else { return }
+
+        // Remember the current key window so we can restore it when immersive
+        // mode ends (it may be the Compose Dialog's window).
+        previousKeyWindow = scene.windows.first(where: { $0.isKeyWindow })
+
+        let window = PassThroughWindow(windowScene: scene)
+        // Level above .alert so it also covers Compose Dialog windows.
+        window.windowLevel = .alert + 1
+        window.backgroundColor = .clear
+        window.rootViewController = ImmersiveBarHidingVC()
+        // Making this window key means its root VC controls the Status Bar.
+        window.makeKeyAndVisible()
+        immersiveWindow = window
+    }
+
+    private func dismissImmersiveOverlay() {
+        immersiveWindow?.isHidden = true
+        immersiveWindow = nil
+        if let prev = previousKeyWindow, !prev.isHidden {
+            prev.makeKey()
+        }
+        previousKeyWindow = nil
+    }
+}
+
 /// Wraps the Compose Multiplatform `MainViewController` in a SwiftUI view.
 struct ComposeView: UIViewControllerRepresentable {
     func makeUIViewController(context: UIViewControllerRepresentableContext<ComposeView>) -> UIViewController {
-        let vc = MainViewControllerKt.MainViewController()
-        // Prevent the green flash from the Metal surface before the first
-        // Compose frame is rendered. Use white to match the app's background.
-        vc.view.backgroundColor = .white
-        return vc
+        let inner = MainViewControllerKt.MainViewController()
+        // Use the system background color (adapts to light/dark mode) so it
+        // matches the LaunchScreen's LaunchScreenBackground asset and avoids
+        // a visible color flash between the system splash screen and the
+        // first Compose frame. Also suppresses the green Metal-clear flash.
+        inner.view.backgroundColor = .systemBackground
+        let host = ComposeHostingController(composeVC: inner)
+        IosPlatformRegistry.shared.setSystemUiController(controller: host)
+        return host
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<ComposeView>) {}

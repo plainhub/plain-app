@@ -36,8 +36,11 @@
     <string name="stop">Durdur</string>
     <string name="cast_mode">Yayın modu</string>
     <string name="casting">Yayınla</string>
+    <string name="casting_to">%1$s'e yayınlanıyor</string>
     <string name="cast_playlist">Yayın listesi</string>
     <string name="cast_playlist_empty">Yayın listesi boş</string>
+    <string name="stop_casting">Yayını durdur</string>
+    <string name="no_active_cast">Aktif yayın oturumu yok</string>
     <string name="add_to_cast_queue">Yayın kuyruğuna ekle</string>
     <string name="remove_from_cast_queue">Yayın kuyruğundan kaldır</string>
     <string name="my_phone">Telefonum</string>

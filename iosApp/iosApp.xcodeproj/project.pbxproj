@@ -17,18 +17,21 @@
 		CC0000020000000000000001 /* FilePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000010000000000000001 /* FilePickerController.swift */; };
 		DD0000020000000000000001 /* ShareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000010000000000000001 /* ShareController.swift */; };
 		EE0000020000000000000001 /* SslCertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000010000000000000001 /* SslCertManager.swift */; };
+		FF0000010000000000000001 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF0000050000000000000001 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		AA0000020000000000000001 /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
 		AA0000040000000000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA0000050000000000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000060000000000000001 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		AA0000100000000000000001 /* PlainShared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PlainShared.framework; path = "../shared/build/xcode-frameworks/PlainShared.framework"; sourceTree = "<group>"; };
 		AA0000200000000000000001 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0000010000000000000001 /* PlainHttpServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainHttpServer.swift; sourceTree = "<group>"; };
 		CC0000010000000000000001 /* FilePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePickerController.swift; sourceTree = "<group>"; };
 		DD0000010000000000000001 /* ShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareController.swift; sourceTree = "<group>"; };
 		EE0000010000000000000001 /* SslCertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SslCertManager.swift; sourceTree = "<group>"; };
+		FF0000050000000000000001 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,7 +66,9 @@
 				DD0000010000000000000001 /* ShareController.swift */,
 				EE0000010000000000000001 /* SslCertManager.swift */,
 				AA0000040000000000000001 /* Assets.xcassets */,
+				FF0000050000000000000001 /* LaunchScreen.storyboard */,
 				AA0000050000000000000001 /* Info.plist */,
+				AA0000060000000000000001 /* iosApp.entitlements */,
 				AA0000100000000000000001 /* PlainShared.framework */,
 			);
 			path = iosApp;
@@ -141,6 +146,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA0000030000000000000001 /* Assets.xcassets in Resources */,
+				FF0000010000000000000001 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +256,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_MODE = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -306,7 +313,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsim";
+				DEBUG_MODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -333,6 +341,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K8C45N3Y4L;
@@ -345,7 +354,6 @@
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "Portrait PortraitUpsideDown LandscapeLeft LandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "Portrait LandscapeLeft LandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -371,6 +379,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = K8C45N3Y4L;
@@ -383,7 +392,6 @@
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "Portrait PortraitUpsideDown LandscapeLeft LandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "Portrait LandscapeLeft LandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (

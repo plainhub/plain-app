@@ -36,8 +36,11 @@
     <string name="stop">정지</string>
     <string name="cast_mode">캐스트 모드</string>
     <string name="casting">캐스트</string>
+    <string name="casting_to">%1$s에 캐스팅 중</string>
     <string name="cast_playlist">캐스트 재생 목록</string>
     <string name="cast_playlist_empty">캐스트 재생 목록이 비어 있습니다</string>
+    <string name="stop_casting">캐스팅 중지</string>
+    <string name="no_active_cast">활성 캐스트 세션 없음</string>
     <string name="add_to_cast_queue">캐스트 큐에 추가</string>
     <string name="remove_from_cast_queue">캐스트 큐에서 제거</string>
     <string name="my_phone">내 폰</string>

@@ -22,10 +22,8 @@ import com.ismartcoding.plain.helpers.ChatFidUriMigration
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.platform.isUPlus
-import com.ismartcoding.plain.lib.logcat.DiskLogAdapter
-import com.ismartcoding.plain.platform.DiskLogFormatStrategy
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.platform.initDiskLogging
 import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
 import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
@@ -66,14 +64,8 @@ object MainAppHelper {
 
         SingletonImageLoader.setSafe { context -> newImageLoader(context) }
 
-        LogCat.addLogAdapter(
-            DiskLogAdapter(
-                DiskLogFormatStrategy.getInstance(),
-                minPriority = if (isDebugBuild()) LogCat.VERBOSE else LogCat.WARN,
-            ),
-        )
-
-        com.ismartcoding.plain.api.httpLogSink = com.ismartcoding.plain.api.HttpLogSink { LogCat.v(it) }
+        // Disk logging + HTTP request logging (debug=VERBOSE, release=WARN)
+        initDiskLogging()
 
         AppEvents.register()
         warmUpNetty()

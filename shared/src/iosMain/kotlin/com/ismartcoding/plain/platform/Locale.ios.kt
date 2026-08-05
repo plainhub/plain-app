@@ -1,19 +1,16 @@
 package com.ismartcoding.plain.platform
 
 import kotlinx.cinterop.ExperimentalForeignApi
-import platform.Foundation.NSLocale
-import platform.Foundation.NSLocaleIdentifier
-import platform.Foundation.currentLocale
-import platform.Foundation.localeIdentifier
+import platform.Foundation.*
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun currentLocale(): Locale {
-    val ns = NSLocale.currentLocale
-    val identifier = ns.localeIdentifier
-    val parts = identifier.split("_")
+    val preferred = NSLocale.preferredLanguages.firstOrNull() as? String
+    val identifier = preferred ?: NSLocale.currentLocale.localeIdentifier
+    val nsLocale = NSLocale(localeIdentifier = identifier)
     return Locale(
-        language = parts.getOrNull(0) ?: "en",
-        country = parts.getOrNull(1) ?: "US",
+        language = nsLocale.languageCode,
+        country = nsLocale.countryCode.orEmpty(),
     )
 }
 
@@ -23,4 +20,18 @@ actual fun getLocaleDisplayName(locale: Locale): String {
     return NSLocale.currentLocale.displayNameForKey(NSLocaleIdentifier, identifier) ?: identifier
 }
 
-actual fun setSystemLocale(locale: Locale?) {}
+@OptIn(ExperimentalForeignApi::class)
+actual fun setSystemLocale(locale: Locale?) {
+    val defaults = NSUserDefaults.standardUserDefaults
+    if (locale != null) {
+        val identifier = if (locale.country.isNotEmpty()) {
+            "${locale.language}-${locale.country}"
+        } else {
+            locale.language
+        }
+        defaults.setObject(listOf(identifier), forKey = "AppleLanguages")
+    } else {
+        defaults.removeObjectForKey("AppleLanguages")
+    }
+    defaults.synchronize()
+}

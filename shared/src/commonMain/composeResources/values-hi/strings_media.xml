@@ -36,8 +36,11 @@
     <string name="stop">रोकें</string>
     <string name="cast_mode">कास्ट मोड</string>
     <string name="casting">कास्टिंग</string>
+    <string name="casting_to">%1$s पर कास्टिंग हो रही है</string>
     <string name="cast_playlist">कास्ट प्लेलिस्ट</string>
     <string name="cast_playlist_empty">कास्ट प्लेलिस्ट खाली है</string>
+    <string name="stop_casting">कास्टिंग रोकें</string>
+    <string name="no_active_cast">कोई सक्रिय कास्ट सत्र नहीं है</string>
     <string name="add_to_cast_queue">कास्ट किउ में जोड़ें</string>
     <string name="remove_from_cast_queue">कास्ट किउ से हटाएं</string>
     <string name="my_phone">मेरा फोन</string>

@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
+import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
 
 @Composable
 fun ChatAudioInlineControls(
@@ -52,9 +53,7 @@ fun ChatAudioInlineControls(
                     .height(20.dp),
                 onProgressChange = onProgressChange,
                 onValueChangeFinished = onValueChangeFinished,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                progressColor = MaterialTheme.colorScheme.primary,
-                thumbColor = MaterialTheme.colorScheme.primary,
+                colors = PlayerSliderDefaults.lightColors(),
             )
 
             Row(

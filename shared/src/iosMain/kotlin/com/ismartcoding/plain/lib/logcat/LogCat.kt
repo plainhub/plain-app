@@ -19,7 +19,6 @@ internal actual fun platformLog(priority: Int, tag: String, message: String) {
 }
 
 internal actual fun logFolderImpl(): String {
-    val paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)
-    val docs = (paths.firstOrNull() as? String) ?: ""
+    val docs = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)[0] as String
     return "$docs/logs"
 }

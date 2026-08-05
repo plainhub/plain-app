@@ -37,8 +37,11 @@
     <string name="stop">停止</string>
     <string name="cast_mode">投屏模式</string>
     <string name="casting">投屏中</string>
+    <string name="casting_to">投屏到 %1$s</string>
     <string name="cast_playlist">投屏播放列表</string>
     <string name="cast_playlist_empty">投屏播放列表为空</string>
+    <string name="stop_casting">停止投屏</string>
+    <string name="no_active_cast">无活跃的投屏会话</string>
     <string name="add_to_cast_queue">添加到投屏队列</string>
     <string name="remove_from_cast_queue">从投屏队列移除</string>
     <string name="my_phone">我的手机</string>

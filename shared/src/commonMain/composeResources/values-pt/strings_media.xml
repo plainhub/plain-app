@@ -36,8 +36,11 @@
     <string name="stop">Parar</string>
     <string name="cast_mode">Modo de transmissão</string>
     <string name="casting">Transmitindo</string>
+    <string name="casting_to">Transmitindo para %1$s</string>
     <string name="cast_playlist">Lista de reprodução de transmissão</string>
     <string name="cast_playlist_empty">A lista de reprodução de transmissão está vazia</string>
+    <string name="stop_casting">Parar transmissão</string>
+    <string name="no_active_cast">Nenhuma sessão de transmissão ativa</string>
     <string name="add_to_cast_queue">Adicionar à fila de transmissão</string>
     <string name="remove_from_cast_queue">Remover da fila de transmissão</string>
     <string name="my_phone">Meu telefone</string>

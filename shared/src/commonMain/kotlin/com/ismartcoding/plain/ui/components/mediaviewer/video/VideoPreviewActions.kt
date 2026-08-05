@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -80,7 +79,6 @@ fun VideoPreviewActions(
     Box(
         modifier = Modifier.fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 32.dp)
-            .navigationBarsPadding()
             .alpha(state.uiAlpha.value),
     ) {
         Column(

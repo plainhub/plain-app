@@ -39,6 +39,20 @@ expect fun setImmersiveFullscreen()
 expect fun exitImmersiveFullscreen()
 
 /**
+ * Toggle system bar visibility while keeping the edge-to-edge layout intact.
+ *
+ * Unlike [setImmersiveFullscreen] (which is composable and always hides bars)
+ * and [exitImmersiveFullscreen] (which also flips DecorFitsSystemWindows and
+ * causes media content to resize), this only flips bar visibility so the
+ * media surface never relayouts. Used by media viewers that show/hide bars
+ * alongside their control overlays — the top bar's `statusBarsPadding()`
+ * stays stable because bars are visible exactly when the top bar is visible.
+ *
+ * @param visible true to show system bars, false to hide them (immersive).
+ */
+expect fun setSystemBarsVisible(visible: Boolean)
+
+/**
  * Returns the platform's window insets controller for the current window.
  * On Android this returns a `WindowInsetsControllerCompat`; on iOS it returns `Unit`.
  */

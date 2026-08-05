@@ -44,7 +44,7 @@ import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.exitImmersiveFullscreen
 import com.ismartcoding.plain.platform.rememberVideoPlayerController
-import com.ismartcoding.plain.platform.setImmersiveFullscreen
+import com.ismartcoding.plain.platform.setSystemBarsVisible
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoPlayerEvent
 import kotlinx.coroutines.delay
@@ -109,7 +109,10 @@ fun DlnaReceiverAudioPlayerContent(onExit: () -> Unit) {
             delay(1.seconds)
         }
     }
-    setImmersiveFullscreen()
+    // Audio player has a persistent top bar (exit/download) using
+    // statusBarsPadding(): keep the status bar visible so the top bar is not
+    // pushed up against the screen edge. Bottom system bar stays hidden.
+    setSystemBarsVisible(true)
     DisposableEffect(Unit) {
         onDispose {
             exitImmersiveFullscreen()
@@ -130,7 +133,7 @@ fun DlnaReceiverAudioPlayerContent(onExit: () -> Unit) {
         contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(horizontal = 32.dp),
+            modifier = Modifier.fillMaxSize().statusBarsPadding().padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(

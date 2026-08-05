@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.components.mediaviewer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,7 +38,6 @@ fun ImagePreviewActions(
     Box(
         modifier = Modifier.fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 32.dp)
-            .navigationBarsPadding()
             .alpha(state.uiAlpha.value),
     ) {
         if (!state.showActions) return

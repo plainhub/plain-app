@@ -163,6 +163,9 @@ class Routing {
     object DlnaCastHistory
 
     @Serializable
+    object CastSession
+
+    @Serializable
     data class PlayMedia(val path: String)
 
     @Serializable

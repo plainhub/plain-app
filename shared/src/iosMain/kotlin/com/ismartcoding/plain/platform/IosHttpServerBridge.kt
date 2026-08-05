@@ -89,6 +89,28 @@ interface IosFilePicker {
 }
 
 /**
+ * Swift-implemented system UI controller. iOS Status Bar / Home Indicator
+ * visibility is controlled by the key window's root `UIViewController`
+ * (`prefersStatusBarHidden`, `prefersHomeIndicatorAutoHidden`,
+ * `preferredScreenEdgesDeferringSystemGestures`). Because the Compose `Dialog`
+ * creates its own window on top, the Swift implementation creates a
+ * `PassThroughWindow` above all other windows whose root VC hides the system
+ * bars, while its `hitTest` returns nil so touches reach the Compose UI below.
+ * Kotlin calls [setImmersive] from [setImmersiveFullscreen] /
+ * [exitImmersiveFullscreen] when the Stay-Online overlay opens/closes.
+ */
+interface IosSystemUiController {
+    /**
+     * Toggle immersive fullscreen. When enabled, Swift creates a
+     * `PassThroughWindow` (above `.alert` level) whose root VC hides the
+     * Status Bar and Home Indicator and defers all edge system gestures.
+     * When disabled, the window is dismissed and the previous key window
+     * is restored.
+     */
+    fun setImmersive(enabled: Boolean)
+}
+
+/**
  * Singleton registry that lets Swift register platform implementations at app
  * startup. Kotlin code in iosMain reads [httpServerBridge] when commonMain
  * calls `startHttpServerService()` etc.
@@ -112,6 +134,9 @@ object IosPlatformRegistry {
     @Volatile
     private var _sslCertProvider: IosSslCertProvider? = null
 
+    @Volatile
+    private var _systemUiController: IosSystemUiController? = null
+
     fun setHttpServerBridge(bridge: IosHttpServerBridge) {
         _httpServerBridge = bridge
         LogCat.d("IosPlatformRegistry: HTTP server bridge registered")
@@ -130,7 +155,7 @@ object IosPlatformRegistry {
             LogCat.w("IosPlatformRegistry: getDeviceIP4s() called before NetworkInfoProvider registered")
             return emptyList()
         }
-        val result = provider.getDeviceIP4s()
+        val result = provider.getDeviceIP4s().filter { !it.startsWith("169.254.") }
         if (result.isEmpty()) {
             LogCat.w("IosPlatformRegistry: NetworkInfoProvider.getDeviceIP4s() returned empty list")
         } else {
@@ -175,6 +200,17 @@ object IosPlatformRegistry {
     }
 
     fun sslCertProvider(): IosSslCertProvider? = _sslCertProvider
+
+    fun setSystemUiController(controller: IosSystemUiController) {
+        _systemUiController = controller
+        LogCat.d("IosPlatformRegistry: system UI controller registered")
+    }
+
+    /** Request immersive fullscreen (hide status bar + home indicator). */
+    fun setImmersive(enabled: Boolean) {
+        _systemUiController?.setImmersive(enabled)
+            ?: LogCat.w("IosPlatformRegistry: setImmersive($enabled) called before SystemUiController registered")
+    }
 }
 
 /**

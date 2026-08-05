@@ -36,8 +36,11 @@
     <string name="stop">Detener</string>
     <string name="cast_mode">Modo de transmisión</string>
     <string name="casting">Transmitiendo</string>
+    <string name="casting_to">Difundiendo a %1$s</string>
     <string name="cast_playlist">Lista de reproducción de transmisión</string>
     <string name="cast_playlist_empty">La lista de reproducción de transmisión está vacía</string>
+    <string name="stop_casting">Detener difusión</string>
+    <string name="no_active_cast">No hay una sesión de difusión activa</string>
     <string name="add_to_cast_queue">Agregar a la lista de reproducción de transmisión</string>
     <string name="remove_from_cast_queue">Eliminar de la lista de reproducción de transmisión</string>
     <string name="my_phone">Mi teléfono</string>

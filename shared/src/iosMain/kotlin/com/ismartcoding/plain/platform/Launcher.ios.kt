@@ -5,14 +5,21 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 
 actual fun launchUrl(url: String) {
     val nsUrl = NSURL.URLWithString(url) ?: return
-    UIApplication.sharedApplication.openURL(nsUrl)
+    dispatch_async(dispatch_get_main_queue()) {
+        UIApplication.sharedApplication.openURL(nsUrl, mapOf<Any?, Any?>(), null)
+    }
 }
 
 actual fun openAppSettings() {
-    UIApplication.sharedApplication.openURL(NSURL.URLWithString(UIApplicationOpenSettingsURLString)!!)
+    val url = NSURL.URLWithString(UIApplicationOpenSettingsURLString) ?: return
+    dispatch_async(dispatch_get_main_queue()) {
+        UIApplication.sharedApplication.openURL(url, mapOf<Any?, Any?>(), null)
+    }
 }
 
 actual fun shareText(text: String) {

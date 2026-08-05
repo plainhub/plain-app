@@ -52,9 +52,10 @@ actual fun showNavigationBar() {
 @Composable
 actual fun setImmersiveFullscreen() {
     val view = LocalView.current
+    val activity = LocalActivity.current
     SideEffect {
         val window = (view.parent as? DialogWindowProvider)?.window
-            ?: (com.ismartcoding.plain.appContextValue as? Activity)?.window
+            ?: (activity as? Activity)?.window
             ?: return@SideEffect
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, view).apply {
@@ -65,13 +66,28 @@ actual fun setImmersiveFullscreen() {
 }
 
 actual fun exitImmersiveFullscreen() {
-    val context = com.ismartcoding.plain.appContextValue ?: return
-    val activity = context as? Activity ?: return
-    val view = activity.window.decorView
+    val activity = com.ismartcoding.plain.mainActivity ?: return
     WindowCompat.setDecorFitsSystemWindows(activity.window, true)
-    WindowInsetsControllerCompat(activity.window, view).apply {
+    WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
         show(WindowInsetsCompat.Type.systemBars())
         systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+    }
+}
+
+actual fun setSystemBarsVisible(visible: Boolean) {
+    val activity = com.ismartcoding.plain.mainActivity ?: return
+    // Keep edge-to-edge so the media surface never relayouts when bars toggle.
+    // Only toggle the status bar — the navigation bar (gesture bar / 3-button
+    // bar) stays hidden so the bottom of the player never shows a system bar
+    // when the control overlay appears.
+    WindowCompat.setDecorFitsSystemWindows(activity.window, false)
+    val controller = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
+    controller.hide(WindowInsetsCompat.Type.navigationBars())
+    if (visible) {
+        controller.show(WindowInsetsCompat.Type.statusBars())
+    } else {
+        controller.hide(WindowInsetsCompat.Type.statusBars())
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 }
 

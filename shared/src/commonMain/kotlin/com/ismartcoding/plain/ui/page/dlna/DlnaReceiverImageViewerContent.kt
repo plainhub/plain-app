@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,7 +39,7 @@ import coil3.request.ImageRequest
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.exitImmersiveFullscreen
-import com.ismartcoding.plain.platform.setImmersiveFullscreen
+import com.ismartcoding.plain.platform.setSystemBarsVisible
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -52,7 +53,13 @@ fun DlnaReceiverImageViewerContent(onExit: () -> Unit) {
     var isLoading by remember(mediaUri) { mutableStateOf(true) }
     val interactionSource = remember { MutableInteractionSource() }
 
-    setImmersiveFullscreen()
+    // Tie system bar visibility to the control overlay so the top bar's
+    // statusBarsPadding() stays stable (bars visible exactly when the top
+    // bar is visible) — the top bar never gets pushed up against the screen
+    // edge when the status bar disappears.
+    LaunchedEffect(showControls) {
+        setSystemBarsVisible(showControls)
+    }
     DisposableEffect(Unit) {
         onDispose { exitImmersiveFullscreen() }
     }

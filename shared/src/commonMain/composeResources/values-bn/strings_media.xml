@@ -36,8 +36,11 @@
     <string name="stop">বন্ধ</string>
     <string name="cast_mode">কাস্ট মোড</string>
     <string name="casting">কাস্টিং</string>
+    <string name="casting_to">%1$s এ কাস্টিং হচ্ছে</string>
     <string name="cast_playlist">কাস্ট প্লেলিস্ট</string>
     <string name="cast_playlist_empty">কাস্ট প্লেলিস্ট খালি</string>
+    <string name="stop_casting">কাস্টিং বন্ধ করুন</string>
+    <string name="no_active_cast">কোনো সক্রিয় কাস্ট সেশন নেই</string>
     <string name="add_to_cast_queue">কাস্ট কিউ এ যোগ করুন</string>
     <string name="remove_from_cast_queue">কাস্ট কিউ থেকে সরান</string>
     <string name="my_phone">আমার ফোন</string>

@@ -92,9 +92,29 @@
         </intent>
     </queries>
 
+    <attribution
+        android:tag="mediaPlayback"
+        android:label="@string/app_name" />
+    <attribution
+        android:tag="mediaProjection"
+        android:label="@string/app_name" />
+    <attribution
+        android:tag="cameraAccess"
+        android:label="@string/app_name" />
+    <attribution
+        android:tag="audioRecording"
+        android:label="@string/app_name" />
+    <attribution
+        android:tag="phoneAccess"
+        android:label="@string/app_name" />
+    <attribution
+        android:tag="locationAccess"
+        android:label="@string/app_name" />
+
     <application
         android:name=".MainApp"
         android:allowBackup="true"
+        android:attributionTags='["mediaPlayback","mediaProjection","cameraAccess","audioRecording","phoneAccess","locationAccess"]'
         android:banner="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"

@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.getAudioMetadata
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -55,8 +56,8 @@ import kotlinx.coroutines.launch
 fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val castItems by castVM.castItems.collectAsState()
-    val currentUri by castVM.currentUri.collectAsState()
+    val castItems by CastPlayer.items.collectAsState()
+    val currentUri by CastPlayer.currentUri.collectAsState()
     var showClearConfirmDialog by remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->

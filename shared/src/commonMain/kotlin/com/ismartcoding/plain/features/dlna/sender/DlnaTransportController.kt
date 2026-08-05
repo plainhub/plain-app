@@ -42,6 +42,12 @@ object DlnaTransportController {
     suspend fun pauseAVTransportAsync(device: DlnaDevice): String =
         executeAVTransportCommand(device, "Pause")
 
+    suspend fun seekAVTransportAsync(device: DlnaDevice, target: String): String =
+        executeAVTransportCommand(
+            device, "Seek",
+            "<InstanceID>0</InstanceID><Unit>REL_TIME</Unit><Target>$target</Target>",
+        )
+
     suspend fun getTransportInfoAsync(device: DlnaDevice): DlnaTransportInfoResponse {
         val st = device.getAVTransportService()?.serviceType ?: return DlnaTransportInfoResponse()
         val xml = executeSOAPRequest(

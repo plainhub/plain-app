@@ -131,6 +131,14 @@ val ColorScheme.greenPill: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0x4D1B5E20) else Color(0xFFE8F5E9)
 
+val ColorScheme.primaryPill: Color
+    @Composable @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0x4D1A73E8) else Color(0xFFE3F2FD)
+
+val ColorScheme.primaryText: Color
+    @Composable @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF90CAF9) else Color(0xFF1565C0)
+
 val ColorScheme.secondaryTextColor: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF8D8D93) else Color(0xFF8E8E93)

@@ -5,6 +5,8 @@ import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
+import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
@@ -21,29 +23,18 @@ class CastViewModel : ViewModel() {
     val castMode: MutableState<Boolean> = mutableStateOf(false)
     val showCastDialog: MutableState<Boolean> = mutableStateOf(false)
     val isLoading: MutableState<Boolean> = mutableStateOf(false)
-
-    val devices = DlnaDeviceScanner.devices
-
-    val castItems: StateFlow<List<IMedia>> = CastPlayer.items
-    val currentUri: StateFlow<String> = CastPlayer.currentUri
-    val isPlaying: StateFlow<Boolean> = CastPlayer.isPlaying
-    val progress: StateFlow<Float> = CastPlayer.progress
-    val duration: StateFlow<Float> = CastPlayer.duration
-    val supportsCallback: StateFlow<Boolean> = CastPlayer.supportsCallback
     val currentDeviceName: String
-        get() = CastPlayer.currentDevice?.description?.device?.friendlyName ?: ""
+        get() = CastPlayer.currentDevice?.getDeviceName() ?: ""
     val hasCurrentDevice: Boolean
         get() = CastPlayer.currentDevice != null
 
     internal var positionUpdateJob: Job? = null
 
     private fun getCastUrl(path: String): String {
-        val device = CastPlayer.currentDevice
         return UrlHelper.getMediaHttpUrl(path)
     }
 
     private fun getCastAlbumArtUrl(albumUri: String): String {
-        val device = CastPlayer.currentDevice
         return UrlHelper.getAlbumArtHttpUrl(albumUri)
     }
 
@@ -61,10 +52,8 @@ class CastViewModel : ViewModel() {
         castMode.value = false
         val device = CastPlayer.currentDevice ?: return
         viewModelScope.launchSafe {
-            DlnaTransportController.stopAVTransportAsync(device)
             CastPlayer.isPlaying.value = false
 
-            // 清理投屏状态
             if (CastPlayer.sid.isNotEmpty()) {
                 DlnaTransportController.unsubscribeEvent(device, CastPlayer.sid)
                 CastPlayer.sid = ""
@@ -73,7 +62,6 @@ class CastViewModel : ViewModel() {
             CastPlayer.progress.value = 0f
             CastPlayer.duration.value = 0f
 
-            // 取消位置更新作业
             positionUpdateJob?.cancel()
             positionUpdateJob = null
         }
@@ -96,6 +84,34 @@ class CastViewModel : ViewModel() {
         viewModelScope.launchSafe {
             DlnaTransportController.pauseAVTransportAsync(device)
             CastPlayer.isPlaying.value = false
+        }
+    }
+
+    fun seekCast(positionSeconds: Float) {
+        val device = CastPlayer.currentDevice ?: return
+        val target = positionSeconds.toLong().formatDuration(alwaysShowHour = true)
+        viewModelScope.launchSafe {
+            DlnaTransportController.seekAVTransportAsync(device, target)
+            CastPlayer.progress.value = positionSeconds
+        }
+    }
+
+    fun stopCast() {
+        val device = CastPlayer.currentDevice
+        val sid = CastPlayer.sid
+        castMode.value = false
+        positionUpdateJob?.cancel()
+        positionUpdateJob = null
+        CastPlayer.clearItems()
+        CastPlayer.currentDevice = null
+        CastPlayer.sid = ""
+        coIO {
+            if (device != null) {
+                DlnaTransportController.stopAVTransportAsync(device)
+                if (sid.isNotEmpty()) {
+                    DlnaTransportController.unsubscribeEvent(device, sid)
+                }
+            }
         }
     }
 
@@ -183,16 +199,18 @@ class CastViewModel : ViewModel() {
 
     fun startPositionUpdater() {
         val device = CastPlayer.currentDevice ?: return
-        if (!CastPlayer.supportsCallback.value) return
 
         positionUpdateJob?.cancel()
 
         positionUpdateJob = viewModelScope.launchSafe {
-            while (CastPlayer.currentUri.value.isNotEmpty() && CastPlayer.supportsCallback.value) {
+            while (CastPlayer.currentUri.value.isNotEmpty()) {
                 try {
                     if (CastPlayer.isPlaying.value) {
                         val positionInfo = DlnaTransportController.getPositionInfoAsync(device)
                         CastPlayer.updatePositionInfo(positionInfo.relTime, positionInfo.trackDuration)
+                        if (!CastPlayer.supportsCallback.value) {
+                            CastPlayer.supportsCallback.value = true
+                        }
                     }
                 } catch (e: Exception) {
                     break

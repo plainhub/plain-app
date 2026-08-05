@@ -17,6 +17,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -73,6 +74,29 @@ fun MediaPreviewer(
     }
     LaunchedEffect(state.visible) {
         state.videoState.isPreviewerOpen = state.visible
+    }
+    if (state.visible) {
+        // System bar policy (see docs/media-viewer-system-bars.md):
+        //  - Bottom system bar (gesture / 3-button) is ALWAYS hidden.
+        //  - Status bar follows the control overlay, but only for video.
+        //    Image preview has no top bar (floating chips only), so it stays
+        //    fully immersive regardless of showActions.
+        //  - Fullscreen video forces immersive (handled by VideoPlayerSurface).
+        val currentIsVideo = remember(state.pagerState.currentPage, MediaPreviewData.items.size) {
+            MediaPreviewData.items.getOrNull(state.pagerState.currentPage)?.isVideo() == true
+        }
+        LaunchedEffect(currentIsVideo, state.showActions, state.videoState.isFullscreenMode) {
+            when {
+                state.videoState.isFullscreenMode -> setSystemBarsVisible(false)
+                currentIsVideo -> setSystemBarsVisible(state.showActions)
+                else -> setSystemBarsVisible(false)
+            }
+        }
+        DisposableEffect(Unit) {
+            onDispose {
+                exitImmersiveFullscreen()
+            }
+        }
     }
     val scope = rememberCoroutineScope()
 

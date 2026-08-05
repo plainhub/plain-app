@@ -36,8 +36,11 @@
     <string name="stop">Interrompi</string>
     <string name="cast_mode">Modalità Cast</string>
     <string name="casting">Trasmissione</string>
+    <string name="casting_to">Trasmissione a %1$s</string>
     <string name="cast_playlist">Playlist Cast</string>
     <string name="cast_playlist_empty">La playlist Cast è vuota</string>
+    <string name="stop_casting">Interrompi trasmissione</string>
+    <string name="no_active_cast">Nessuna sessione di trasmissione attiva</string>
     <string name="add_to_cast_queue">Aggiungi alla coda Cast</string>
     <string name="remove_from_cast_queue">Rimuovi dalla coda Cast</string>
     <string name="my_phone">Il mio telefono</string>

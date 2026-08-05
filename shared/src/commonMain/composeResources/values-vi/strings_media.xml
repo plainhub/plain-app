@@ -36,8 +36,11 @@
     <string name="stop">Dừng</string>
     <string name="cast_mode">Chế độ đút</string>
     <string name="casting">Đút</string>
+    <string name="casting_to">Đang đút tới %1$s</string>
     <string name="cast_playlist">Danh sách phát đút</string>
     <string name="cast_playlist_empty">Danh sách phát đút trống</string>
+    <string name="stop_casting">Dừng đút</string>
+    <string name="no_active_cast">Không có phiên đút hoạt động</string>
     <string name="add_to_cast_queue">Thêm vào hàng đợi đút</string>
     <string name="remove_from_cast_queue">Xóa khỏi hàng đợi đút</string>
     <string name="my_phone">Điện thoại của tôi</string>

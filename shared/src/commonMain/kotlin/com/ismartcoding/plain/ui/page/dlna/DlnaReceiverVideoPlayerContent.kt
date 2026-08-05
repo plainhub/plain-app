@@ -8,8 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -19,7 +17,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
@@ -30,7 +27,7 @@ import com.ismartcoding.plain.platform.exitImmersiveFullscreen
 import com.ismartcoding.plain.platform.hasPipMode
 import com.ismartcoding.plain.platform.keepScreenOn
 import com.ismartcoding.plain.platform.rememberVideoPlayerController
-import com.ismartcoding.plain.platform.setImmersiveFullscreen
+import com.ismartcoding.plain.platform.setSystemBarsVisible
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoControlsBar
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoOverlayScaffold
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoPlayerEvent
@@ -97,10 +94,13 @@ fun DlnaReceiverVideoPlayerContent(onExit: () -> Unit) {
     LaunchedEffect(showControls, controlsSeed) {
         if (showControls) { delay(4.seconds); showControls = false }
     }
-    if (state.isFullscreenMode) {
-        setImmersiveFullscreen()
-    } else {
-        exitImmersiveFullscreen()
+    // Tie system bar visibility to the control overlay: bars are visible
+    // exactly when the top bar is visible, so statusBarsPadding() stays stable
+    // and the top bar is never pushed up against the screen edge when the
+    // status bar disappears. Edge-to-edge is preserved (setSystemBarsVisible
+    // never flips DecorFitsSystemWindows), so the video surface never relayouts.
+    LaunchedEffect(showControls, state.isFullscreenMode) {
+        setSystemBarsVisible(showControls || !state.isFullscreenMode)
     }
     keepScreenOn(enabled = true)
     DisposableEffect(Unit) {

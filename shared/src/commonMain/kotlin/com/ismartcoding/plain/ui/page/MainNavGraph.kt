@@ -42,6 +42,7 @@ import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.audio.AudioPage
+import com.ismartcoding.plain.ui.page.cast.CastSessionPage
 import com.ismartcoding.plain.ui.page.chat.ChannelInfoPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
 import com.ismartcoding.plain.ui.page.chat.ChatListPage
@@ -57,7 +58,7 @@ import com.ismartcoding.plain.ui.page.connections.ConnectionsPage
 import com.ismartcoding.plain.ui.page.devoptions.WebDevPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaCastHistoryPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
-import com.ismartcoding.plain.ui.page.tools.DiscoverPage
+import com.ismartcoding.plain.ui.page.tools.ToolsPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
@@ -147,7 +148,7 @@ fun MainNavGraph(
             when (selectedTab) {
                 0 -> HomePage(navController, mainVM, updateVM, peerVM, channelVM, onTabSelected = onTabSelected)
                 1 -> ChatListPage(navController, mainVM, peerVM = peerVM, channelVM = channelVM, onTabSelected = onTabSelected)
-                2 -> DiscoverPage(navController, onTabSelected = onTabSelected)
+                2 -> ToolsPage(navController, onTabSelected = onTabSelected)
             }
         }
         composable<Routing.Images> { ImagesPage(navController) }
@@ -292,6 +293,7 @@ fun MainNavGraph(
         composable<Routing.ComponentShowcase> { ComponentShowcasePage(navController) }
         composable<Routing.DlnaReceiver> { DlnaReceiverPage(navController) }
         composable<Routing.DlnaCastHistory> { DlnaCastHistoryPage(navController) }
+        composable<Routing.CastSession> { CastSessionPage(navController) }
         composable<Routing.PlayMedia> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlayMedia>()
             PlayMediaPage(navController, r.path, audioPlaylistVM)

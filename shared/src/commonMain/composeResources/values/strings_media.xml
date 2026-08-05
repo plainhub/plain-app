@@ -39,8 +39,11 @@
     <string name="stop">Stop</string>
     <string name="cast_mode">Cast mode</string>
     <string name="casting">Casting</string>
+    <string name="casting_to">Casting to %1$s</string>
     <string name="cast_playlist">Cast Playlist</string>
     <string name="cast_playlist_empty">Cast playlist is empty</string>
+    <string name="stop_casting">Stop Casting</string>
+    <string name="no_active_cast">No active cast session</string>
     <string name="add_to_cast_queue">Add to cast queue</string>
     <string name="remove_from_cast_queue">Remove from cast queue</string>
     <string name="my_phone">My phone</string>

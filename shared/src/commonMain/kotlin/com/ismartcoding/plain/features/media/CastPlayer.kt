@@ -21,14 +21,13 @@ object CastPlayer {
     val duration = MutableStateFlow(0f) // 总时长（秒）
     val supportsCallback = MutableStateFlow(false) // 是否支持回调
 
+    // 是否有正在进行的投屏任务（设备已选且有内容在投）
+    val active = MutableStateFlow(false)
+
     var sid: String = ""
 
-    fun setItems(newItems: List<IMedia>) {
-        _items.value = newItems
-    }
-
     fun addItem(item: IMedia) {
-        _items.value = _items.value + item
+        _items.value += item
     }
 
     fun removeItem(item: IMedia) {
@@ -37,7 +36,7 @@ object CastPlayer {
 
     fun removeItemAt(index: Int) {
         val currentList = _items.value.toMutableList()
-        if (index in 0 until currentList.size) {
+        if (index in currentList.indices) {
             currentList.removeAt(index)
             _items.value = currentList
         }
@@ -86,9 +85,6 @@ object CastPlayer {
         }
     }
 
-    /**
-     * 更新播放位置信息
-     */
     fun updatePositionInfo(relTime: String, trackDuration: String) {
         progress.value = parseTimeToSeconds(relTime)
         duration.value = parseTimeToSeconds(trackDuration)

@@ -63,6 +63,10 @@ actual fun getAppVersionCode(): Long {
     return buildNumber.toLongOrNull() ?: 0L
 }
 
-actual fun isDebugBuild(): Boolean = false
+actual fun isDebugBuild(): Boolean {
+    val bundle = NSBundle.mainBundle
+    val debugMode = bundle.objectForInfoDictionaryKey("DEBUG") as? String
+    return debugMode == "YES"
+}
 
 actual fun getSdkInt(): Int = 0

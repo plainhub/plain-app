@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
     if (!castVM.showCastDialog.value) return
-    val devices by castVM.devices.collectAsState()
+    val devices by DlnaDeviceScanner.devices.collectAsState()
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val hasDevices = devices.isNotEmpty()
