@@ -27,6 +27,7 @@ object TempData {
     var adbToken = "" // in-memory cache of the ADB automation token
 
     var nearbyDiscoverable = false
+    var developerMode = false
 
     val awareRunning = MutableStateFlow(false)
 

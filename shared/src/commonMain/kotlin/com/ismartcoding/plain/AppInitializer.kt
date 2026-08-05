@@ -25,6 +25,7 @@ import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.preferences.SignatureKeyPreference
 import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.DesktopAccessPreference
+import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.preferences.ensureKeyPairAsync
 import com.ismartcoding.plain.preferences.ensureValueAsync
@@ -43,7 +44,7 @@ suspend fun initCommonPreferences(): Preferences {
     val preferences = getPreferencesAsync()
     TempData.dlnaEnabled.value = DlnaPreference.get(preferences)
     TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync()
-
+    TempData.developerMode = DeveloperModePreference.get(preferences)
     SignatureKeyPreference.ensureKeyPairAsync()
     TempData.desktopAccessEnabled.value = DesktopAccessPreference.get(preferences)
     TempData.serviceEnabled.value = ServicePreference.get(preferences)

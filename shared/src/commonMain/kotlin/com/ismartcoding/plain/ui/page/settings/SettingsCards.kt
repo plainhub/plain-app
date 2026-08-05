@@ -46,12 +46,7 @@ internal fun DeveloperSettingsCard(
     navController: NavHostController,
 ) {
     val scope = rememberCoroutineScope()
-    var developerMode by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.Default) {
-            developerMode = DeveloperModePreference.getAsync()
-        }
-    }
+    var developerMode by remember { mutableStateOf(TempData.developerMode) }
 
     PCard {
         PListItem(title = stringResource(Res.string.client_id), value = TempData.clientId)
@@ -60,6 +55,7 @@ internal fun DeveloperSettingsCard(
                 scope.launch(Dispatchers.Default) {
                     developerMode = it
                     DeveloperModePreference.putAsync(it)
+                    TempData.developerMode = it
                 }
             }
             HorizontalSpace(8.dp)

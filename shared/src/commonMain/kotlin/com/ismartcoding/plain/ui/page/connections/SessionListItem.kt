@@ -23,6 +23,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.extensions.capitalize
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.platform.formatDateTime
@@ -53,7 +54,6 @@ internal fun SessionListItem(
     var showRenameDialog by remember { mutableStateOf(false) }
     val lastActiveText = if (showFullTime) m.lastActiveAt?.formatDateTime() else m.lastActiveAt?.timeAgo()
     val displayName = m.name.ifEmpty { stringResource(Res.string.unknown) }
-    val title = if (m.isCustom) displayName else osDisplay
 
     if (showRenameDialog) {
         TextFieldDialog(
@@ -90,23 +90,25 @@ internal fun SessionListItem(
                     }
                 },
             )
-            PListItem(
-                title = stringResource(Res.string.client_id),
-                subtitle = m.clientId, action = {
-                    Column(horizontalAlignment = Alignment.End) {
-                        CopyIconButton(text = m.clientId, clipLabel = stringResource(Res.string.client_id))
-                    }
-                }
-            )
-            PListItem(
-                title = stringResource(Res.string.token),
-                subtitle = m.token, action = {
-                    Column(horizontalAlignment = Alignment.End) {
-                        CopyIconButton(text = m.token, clipLabel = stringResource(Res.string.token))
-                    }
-                }
-            )
 
+            if (m.isCustom || TempData.developerMode) {
+                PListItem(
+                    title = stringResource(Res.string.client_id),
+                    subtitle = m.clientId, action = {
+                        Column(horizontalAlignment = Alignment.End) {
+                            CopyIconButton(text = m.clientId, clipLabel = stringResource(Res.string.client_id))
+                        }
+                    }
+                )
+                PListItem(
+                    title = stringResource(Res.string.token),
+                    subtitle = m.token, action = {
+                        Column(horizontalAlignment = Alignment.End) {
+                            CopyIconButton(text = m.token, clipLabel = stringResource(Res.string.token))
+                        }
+                    }
+                )
+            }
             if (m.clientIP.isNotEmpty()) {
                 PListItem(title = stringResource(Res.string.ip_address), value = m.clientIP)
             }
@@ -127,7 +129,7 @@ internal fun SessionListItem(
         }
     }
 
-    if (lastActiveText != null) {
+    if (!isOnline && lastActiveText != null) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
