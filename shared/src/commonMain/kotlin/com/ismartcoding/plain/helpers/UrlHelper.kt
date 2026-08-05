@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.helpers
 
+import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.platform.chaCha20Decrypt
@@ -10,7 +11,9 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalEncodingApi::class)
 object UrlHelper {
-    private val mediaPathMap = mutableMapOf<String, String>() // format: <short_path>:<raw_path>
+    // Written from every /media HTTP URL generation call (concurrent GraphQL/HTTP
+    // requests), so a plain mutableMapOf (LinkedHashMap) is not safe here.
+    private val mediaPathMap = mutableStateMapOf<String, String>() // format: <short_path>:<raw_path>
 
     fun getMediaHttpUrl(path: String): String {
         val id = TimeHelper.nowMillis().toString()

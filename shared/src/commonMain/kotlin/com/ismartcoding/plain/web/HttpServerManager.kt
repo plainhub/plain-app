@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.web
 
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateSetOf
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
@@ -34,23 +36,30 @@ import kotlin.time.Instant
  * `webserver` package and calls into this object for shared state.
  */
 object HttpServerManager {
+    // These caches are mutated concurrently from every in-flight HTTP/WebSocket
+    // request (each handled on its own Netty/IO thread), so a plain
+    // mutableMapOf/mutableSetOf (LinkedHashMap/LinkedHashSet) is not safe here —
+    // concurrent puts can corrupt the internal structure and crash the app
+    // (observed as repeated-request crashes). Use Compose's SnapshotStateMap/Set
+    // for KMP-safe concurrent access (same convention as PeerTransportPrewarmer).
+
     /** Cached session token keyed by client id. */
-    val tokenCache = mutableMapOf<String, ByteArray>()
+    val tokenCache = mutableStateMapOf<String, ByteArray>()
 
     /** Cached client IP keyed by client id. */
-    val clientIpCache = mutableMapOf<String, String>()
+    val clientIpCache = mutableStateMapOf<String, String>()
 
     /** Active WebSocket sessions. Platform implementations register here on connect. */
-    val wsSessions = mutableSetOf<WsSessionHandle>()
+    val wsSessions = mutableStateSetOf<WsSessionHandle>()
 
     /** Last API request timestamp per client id, used to drive session activity updates. */
-    val clientRequestTs = mutableMapOf<String, Long>()
+    val clientRequestTs = mutableStateMapOf<String, Long>()
 
     /** Last server start error message, empty when the server is healthy. */
     var httpServerError: String = ""
 
     /** Ports that failed to bind on the last start attempt. */
-    val portsInUse = mutableSetOf<Int>()
+    val portsInUse = mutableStateSetOf<Int>()
 
     /** Stable notification id used for the foreground service and server-status notifications. */
     val notificationId: Int by lazy { generateNotificationId() }

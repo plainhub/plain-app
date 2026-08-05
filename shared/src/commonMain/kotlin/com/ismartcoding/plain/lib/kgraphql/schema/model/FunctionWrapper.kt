@@ -2,13 +2,17 @@
 
 package com.ismartcoding.plain.lib.kgraphql.schema.model
 
+import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.lib.kgraphql.schema.Publisher
 import com.ismartcoding.plain.lib.kgraphql.schema.Subscriber
 import com.ismartcoding.plain.lib.kgraphql.schema.structure.validateName
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
-private val subscribers = mutableMapOf<String, Subscriber?>()
+// Read/written on every GraphQL invoke() across all concurrent HTTP/WebSocket
+// requests (subscribe/unsubscribe/onNext/onError), so a plain mutableMapOf
+// (LinkedHashMap) is not safe here.
+private val subscribers = mutableStateMapOf<String, Subscriber?>()
 
 /**
  * FunctionWrapper stores functions registered in schema by server code.

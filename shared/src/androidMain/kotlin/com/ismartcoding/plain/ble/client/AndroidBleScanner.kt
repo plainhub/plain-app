@@ -10,6 +10,8 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
@@ -24,14 +26,17 @@ import java.util.UUID
 
 object AndroidBleScanner : BleScanner {
 
-    private val allDevices = mutableListOf<AndroidBleGattClient>()
+    // Mutated from BLE scan callbacks, which the system can invoke on different
+    // background threads concurrently, so a plain mutableListOf (ArrayList) is
+    // not safe here.
+    private val allDevices = mutableStateListOf<AndroidBleGattClient>()
     private var scanCallback: ScanCallback? = null
 
     @Volatile
     var isScanning = false
         private set
 
-    private val cachedNames = mutableMapOf<String, String>()
+    private val cachedNames = mutableStateMapOf<String, String>()
 
     fun getBluetoothAdapter(): BluetoothAdapter {
         val manager = appContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager

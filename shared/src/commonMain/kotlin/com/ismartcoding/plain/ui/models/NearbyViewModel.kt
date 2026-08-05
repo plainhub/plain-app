@@ -45,8 +45,8 @@ object NearbyViewModel {
     private var cleanupJob: Job? = null
     private var bleJob: Job? = null
     private var blePermissionJob: Job? = null
-    private val blePairingJobs = mutableMapOf<String, Job>()
-    private val lastDeviceEventTimes = mutableMapOf<String, Long>()
+    private val blePairingJobs = mutableStateMapOf<String, Job>()
+    private val lastDeviceEventTimes = mutableStateMapOf<String, Long>()
 
     fun startDiscovering() {
         isDiscovering.value = true

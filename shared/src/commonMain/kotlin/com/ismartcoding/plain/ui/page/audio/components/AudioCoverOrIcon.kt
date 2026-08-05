@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,8 +26,10 @@ import com.ismartcoding.plain.platform.loadAudioCoverBitmap
  * In-memory cache of audio cover art keyed by file path.
  * A null value indicates the audio file was inspected and has no embedded cover.
  * A missing key indicates the path has not yet been inspected.
+ * Loaded concurrently from multiple LaunchedEffect(withIO) blocks, so a plain
+ * mutableMapOf (LinkedHashMap) is not safe here.
  */
-val audioCoverCache = mutableMapOf<String, ImageBitmap?>()
+val audioCoverCache = mutableStateMapOf<String, ImageBitmap?>()
 
 @Composable
 fun AudioCoverOrIcon(

@@ -1,8 +1,12 @@
 package com.ismartcoding.plain.features.feed
 
+import androidx.compose.runtime.mutableStateMapOf
+
 object FeedWorkerState {
-    val statusMap = mutableMapOf<String, FeedWorkerStatus>()
-    val errorMap = mutableMapOf<String, String>()
+    // Mutated concurrently by parallel feed sync tasks (FeedFetcher.pmap()), so
+    // a plain mutableMapOf (LinkedHashMap) is not safe here.
+    val statusMap = mutableStateMapOf<String, FeedWorkerStatus>()
+    val errorMap = mutableStateMapOf<String, String>()
 
     fun clear(feedId: String) {
         statusMap.remove(feedId)
