@@ -4,13 +4,12 @@ import android.graphics.RectF
 import com.ismartcoding.plain.lib.pdfviewer.model.PagePart
 import com.ismartcoding.plain.lib.pdfviewer.util.Constants.CACHE_SIZE
 import com.ismartcoding.plain.lib.pdfviewer.util.Constants.THUMBNAILS_CACHE_SIZE
-import com.ismartcoding.plain.lib.pdfviewer.util.Constants
 import java.util.*
 
 class CacheManager {
     private val orderComparator = PagePartComparator()
-    private val passiveCache = PriorityQueue(Constants.CACHE_SIZE, orderComparator)
-    private val activeCache = PriorityQueue(Constants.CACHE_SIZE, orderComparator)
+    private val passiveCache = PriorityQueue(CACHE_SIZE, orderComparator)
+    private val activeCache = PriorityQueue(CACHE_SIZE, orderComparator)
     private val thumbnails = mutableListOf<PagePart>()
     private val passiveActiveLock = Any()
 
@@ -33,12 +32,12 @@ class CacheManager {
 
     private fun makeAFreeSpace() {
         synchronized(passiveActiveLock) {
-            while ((activeCache.size + passiveCache.size) >= Constants.CACHE_SIZE &&
+            while ((activeCache.size + passiveCache.size) >= CACHE_SIZE &&
                 !passiveCache.isEmpty()
             ) {
                 passiveCache.poll()?.renderedBitmap?.recycle()
             }
-            while ((activeCache.size + passiveCache.size) >= Constants.CACHE_SIZE &&
+            while ((activeCache.size + passiveCache.size) >= CACHE_SIZE &&
                 !activeCache.isEmpty()
             ) {
                 activeCache.poll()?.renderedBitmap?.recycle()
@@ -49,7 +48,7 @@ class CacheManager {
     fun cacheThumbnail(part: PagePart) {
         synchronized(thumbnails) {
             // If cache too big, remove and recycle
-            while (thumbnails.size >= Constants.THUMBNAILS_CACHE_SIZE) {
+            while (thumbnails.size >= THUMBNAILS_CACHE_SIZE) {
                 thumbnails.removeAt(0).renderedBitmap?.recycle()
             }
 

@@ -1,11 +1,11 @@
-package com.ismartcoding.plain.crypto
+package com.ismartcoding.plain.lib.crypto
 
 /**
  * Pure-Kotlin SHA-256 implementation returning raw 32-byte digest.
  * Used by pairing crypto on platforms without a native SHA-256 entry point
  * (e.g. iOS Security framework exposes ECDH but not a raw SHA-256 on raw bytes).
  */
-internal fun sha256(input: ByteArray): ByteArray {
+fun sha256(input: ByteArray): ByteArray {
     val h = intArrayOf(
         0x6a09e667, 0xbb67ae85.toInt(), 0x3c6ef372, 0xa54ff53a.toInt(),
         0x510e527f, 0x9b05688c.toInt(), 0x1f83d9ab, 0x5be0cd19,
@@ -40,17 +40,23 @@ internal fun sha256(input: ByteArray): ByteArray {
     for (block in padded.indices step 64) {
         for (i in 0 until 16) {
             w[i] = ((padded[block + i * 4].toInt() and 0xFF) shl 24) or
-                ((padded[block + i * 4 + 1].toInt() and 0xFF) shl 16) or
-                ((padded[block + i * 4 + 2].toInt() and 0xFF) shl 8) or
-                (padded[block + i * 4 + 3].toInt() and 0xFF)
+                    ((padded[block + i * 4 + 1].toInt() and 0xFF) shl 16) or
+                    ((padded[block + i * 4 + 2].toInt() and 0xFF) shl 8) or
+                    (padded[block + i * 4 + 3].toInt() and 0xFF)
         }
         for (i in 16 until 64) {
             val s0 = rotateRight(w[i - 15], 7) xor rotateRight(w[i - 15], 18) xor (w[i - 15] ushr 3)
             val s1 = rotateRight(w[i - 2], 17) xor rotateRight(w[i - 2], 19) xor (w[i - 2] ushr 10)
             w[i] = w[i - 16] + s0 + w[i - 7] + s1
         }
-        var a = h[0]; var b = h[1]; var c = h[2]; var d = h[3]
-        var e = h[4]; var f = h[5]; var g = h[6]; var hh = h[7]
+        var a = h[0];
+        var b = h[1];
+        var c = h[2];
+        var d = h[3]
+        var e = h[4];
+        var f = h[5];
+        var g = h[6];
+        var hh = h[7]
         for (i in 0 until 64) {
             val s1 = rotateRight(e, 6) xor rotateRight(e, 11) xor rotateRight(e, 25)
             val ch = (e and f) xor (e.inv() and g)

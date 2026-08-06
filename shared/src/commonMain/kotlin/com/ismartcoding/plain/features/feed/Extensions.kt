@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.feed
 
-import com.ismartcoding.plain.crypto.sha256
+import com.ismartcoding.plain.lib.crypto.sha256
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.lib.extensions.htmlToPlainText
 import com.ismartcoding.plain.lib.extensions.toHexString

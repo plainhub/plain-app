@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.crypto
+package com.ismartcoding.plain.lib.crypto
 
 /**
  * Pure-Kotlin SHA-1 implementation returning raw 20-byte digest.
@@ -8,7 +8,7 @@ package com.ismartcoding.plain.crypto
  * non-security uses (e.g. deriving a stable file path from a URL) where the
  * digest is treated as an opaque key, not as a security guarantee.
  */
-internal fun sha1(input: ByteArray): ByteArray {
+fun sha1(input: ByteArray): ByteArray {
     val h = intArrayOf(
         0x67452301, 0xEFCDAB89.toInt(), 0x98BADCFE.toInt(), 0x10325476, 0xC3D2E1F0.toInt(),
     )
@@ -26,15 +26,19 @@ internal fun sha1(input: ByteArray): ByteArray {
     for (block in padded.indices step 64) {
         for (i in 0 until 16) {
             w[i] = ((padded[block + i * 4].toInt() and 0xFF) shl 24) or
-                ((padded[block + i * 4 + 1].toInt() and 0xFF) shl 16) or
-                ((padded[block + i * 4 + 2].toInt() and 0xFF) shl 8) or
-                (padded[block + i * 4 + 3].toInt() and 0xFF)
+                    ((padded[block + i * 4 + 1].toInt() and 0xFF) shl 16) or
+                    ((padded[block + i * 4 + 2].toInt() and 0xFF) shl 8) or
+                    (padded[block + i * 4 + 3].toInt() and 0xFF)
         }
         for (i in 16 until 80) {
             w[i] = rotateLeft(w[i - 3] xor w[i - 8] xor w[i - 14] xor w[i - 16], 1)
         }
 
-        var a = h[0]; var b = h[1]; var c = h[2]; var d = h[3]; var e = h[4]
+        var a = h[0];
+        var b = h[1];
+        var c = h[2];
+        var d = h[3];
+        var e = h[4]
         for (i in 0 until 80) {
             val (f, k) = when (i) {
                 in 0..19 -> ((b and c) or (b.inv() and d)) to 0x5A827999

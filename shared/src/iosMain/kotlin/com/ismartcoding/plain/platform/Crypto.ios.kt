@@ -2,10 +2,9 @@
 
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.crypto.ECDHKeyPair
-import com.ismartcoding.plain.crypto.sha256
+import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
+import com.ismartcoding.plain.lib.crypto.sha256
 import com.ismartcoding.plain.lib.logcat.LogCat
-import kotlinx.cinterop.ByteVar
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.IntVar
 import kotlinx.cinterop.UByteVar

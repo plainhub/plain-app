@@ -23,6 +23,7 @@ import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getAppVersion
@@ -157,7 +158,7 @@ object PairingCore {
 
     // ---- Core pairing logic (existing) -------------------------------------
 
-    suspend fun buildPairingRequest(): Pair<DPairingRequest, com.ismartcoding.plain.crypto.ECDHKeyPair> {
+    suspend fun buildPairingRequest(): Pair<DPairingRequest, ECDHKeyPair> {
         val keyPair = generateECDHKeyPair()
         val ecdhPublicKey = Base64.encode(keyPair.publicKeyEncoded)
         val request = DPairingRequest(

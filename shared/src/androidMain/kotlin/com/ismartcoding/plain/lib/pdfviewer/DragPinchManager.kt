@@ -8,7 +8,6 @@ import com.ismartcoding.plain.lib.pdfviewer.model.LinkTapEvent
 import com.ismartcoding.plain.lib.pdfviewer.scroll.ScrollHandle
 import com.ismartcoding.plain.lib.pdfviewer.util.Constants.PINCH_MAXIMUM_ZOOM
 import com.ismartcoding.plain.lib.pdfviewer.util.Constants.PINCH_MINIMUM_ZOOM
-import com.ismartcoding.plain.lib.pdfviewer.util.Constants
 import java.lang.Integer.max
 import kotlin.math.abs
 import kotlin.math.min
@@ -239,8 +238,8 @@ internal class DragPinchManager(
     override fun onScale(detector: ScaleGestureDetector): Boolean {
         var dr = detector.scaleFactor
         val wantedZoom = pdfView.zoom * dr
-        val minZoom = min(Constants.PINCH_MINIMUM_ZOOM, pdfView.minZoom)
-        val maxZoom = min(Constants.PINCH_MAXIMUM_ZOOM, pdfView.maxZoom)
+        val minZoom = min(PINCH_MINIMUM_ZOOM, pdfView.minZoom)
+        val maxZoom = min(PINCH_MAXIMUM_ZOOM, pdfView.maxZoom)
         if (wantedZoom < minZoom) {
             dr = minZoom / pdfView.zoom
         } else if (wantedZoom > maxZoom) {

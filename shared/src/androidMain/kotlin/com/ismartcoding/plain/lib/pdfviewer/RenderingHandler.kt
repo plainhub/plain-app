@@ -3,7 +3,6 @@ package com.ismartcoding.plain.lib.pdfviewer
 import android.graphics.*
 import android.os.*
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.pdfviewer.RenderingHandler.RenderingTask
 import com.ismartcoding.plain.lib.pdfviewer.exception.PageRenderingException
 import com.ismartcoding.plain.lib.pdfviewer.model.PagePart
 import kotlin.math.roundToInt

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ble
 
-import com.ismartcoding.plain.crypto.sha256
+import com.ismartcoding.plain.lib.crypto.sha256
 import com.ismartcoding.plain.lib.extensions.toHexString
 
 /**

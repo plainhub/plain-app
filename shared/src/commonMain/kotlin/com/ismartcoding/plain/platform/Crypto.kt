@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.crypto.ECDHKeyPair
-import com.ismartcoding.plain.crypto.sha1 as sha1Bytes
-import com.ismartcoding.plain.crypto.sha512 as sha512Bytes
+import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
+import com.ismartcoding.plain.lib.crypto.sha1 as sha1Bytes
+import com.ismartcoding.plain.lib.crypto.sha512 as sha512Bytes
 import com.ismartcoding.plain.lib.extensions.toHexString
 import kotlin.random.Random
 

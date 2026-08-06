@@ -12,10 +12,8 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.pdfviewer.exception.PageRenderingException
 import com.ismartcoding.plain.lib.pdfviewer.link.DefaultLinkHandler
 import com.ismartcoding.plain.lib.pdfviewer.link.LinkHandler
-import com.ismartcoding.plain.lib.pdfviewer.listener.*
 import com.ismartcoding.plain.lib.pdfviewer.model.PagePart
 import com.ismartcoding.plain.lib.pdfviewer.scroll.ScrollHandle
-import com.ismartcoding.plain.lib.pdfviewer.source.*
 import com.ismartcoding.plain.lib.pdfviewer.util.Constants
 import com.ismartcoding.plain.lib.pdfviewer.util.FitPolicy
 import com.ismartcoding.plain.lib.pdfviewer.util.MathUtils

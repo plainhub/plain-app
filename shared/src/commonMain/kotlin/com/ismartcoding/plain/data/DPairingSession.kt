@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.data
 
-import com.ismartcoding.plain.crypto.ECDHKeyPair
+import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlin.time.Instant
 

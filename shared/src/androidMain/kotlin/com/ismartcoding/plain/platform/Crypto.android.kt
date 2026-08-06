@@ -5,7 +5,7 @@ import com.google.crypto.tink.signature.SignatureConfig
 import com.google.crypto.tink.subtle.Ed25519Sign
 import com.google.crypto.tink.subtle.Ed25519Verify
 import com.google.crypto.tink.subtle.XChaCha20Poly1305
-import com.ismartcoding.plain.crypto.ECDHKeyPair
+import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
 import com.ismartcoding.plain.lib.logcat.LogCat
 import java.math.BigInteger
 import java.security.KeyFactory

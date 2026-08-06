@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.crypto
+package com.ismartcoding.plain.lib.crypto
 
 /**
  * Pure-Kotlin SHA-512 implementation returning raw 64-byte digest.
@@ -8,7 +8,7 @@ package com.ismartcoding.plain.crypto
  * cinterop bindings). Mirrors the algorithm of `sha256` but operates on
  * 64-bit words with a 1024-bit block size per FIPS 180-4.
  */
-internal fun sha512(input: ByteArray): ByteArray {
+fun sha512(input: ByteArray): ByteArray {
     val h = longArrayOf(
         0x6a09e667f3bcc908uL.toLong(), 0xbb67ae8584caa73buL.toLong(),
         0x3c6ef372fe94f82buL.toLong(), 0xa54ff53a5f1d36f1uL.toLong(),
@@ -75,13 +75,13 @@ internal fun sha512(input: ByteArray): ByteArray {
         for (i in 0 until 16) {
             val base = block + i * 8
             w[i] = ((padded[base].toLong() and 0xFF) shl 56) or
-                ((padded[base + 1].toLong() and 0xFF) shl 48) or
-                ((padded[base + 2].toLong() and 0xFF) shl 40) or
-                ((padded[base + 3].toLong() and 0xFF) shl 32) or
-                ((padded[base + 4].toLong() and 0xFF) shl 24) or
-                ((padded[base + 5].toLong() and 0xFF) shl 16) or
-                ((padded[base + 6].toLong() and 0xFF) shl 8) or
-                (padded[base + 7].toLong() and 0xFF)
+                    ((padded[base + 1].toLong() and 0xFF) shl 48) or
+                    ((padded[base + 2].toLong() and 0xFF) shl 40) or
+                    ((padded[base + 3].toLong() and 0xFF) shl 32) or
+                    ((padded[base + 4].toLong() and 0xFF) shl 24) or
+                    ((padded[base + 5].toLong() and 0xFF) shl 16) or
+                    ((padded[base + 6].toLong() and 0xFF) shl 8) or
+                    (padded[base + 7].toLong() and 0xFF)
         }
         for (i in 16 until 80) {
             val s0 = rotateRight64(w[i - 15], 1) xor rotateRight64(w[i - 15], 8) xor (w[i - 15] ushr 7)
@@ -89,8 +89,14 @@ internal fun sha512(input: ByteArray): ByteArray {
             w[i] = w[i - 16] + s0 + w[i - 7] + s1
         }
 
-        var a = h[0]; var b = h[1]; var c = h[2]; var d = h[3]
-        var e = h[4]; var f = h[5]; var g = h[6]; var hh = h[7]
+        var a = h[0];
+        var b = h[1];
+        var c = h[2];
+        var d = h[3]
+        var e = h[4];
+        var f = h[5];
+        var g = h[6];
+        var hh = h[7]
         for (i in 0 until 80) {
             val s1 = rotateRight64(e, 14) xor rotateRight64(e, 18) xor rotateRight64(e, 41)
             val ch = (e and f) xor (e.inv() and g)

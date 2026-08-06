@@ -70,7 +70,7 @@ class PageSizeCalculator(
         var h = pageSize.height.toFloat()
         val ratio = w / h
         w = maxWidth
-        h = MathUtils.floor(maxWidth / ratio).toFloat()
+        h = floor(maxWidth / ratio).toFloat()
         return SizeF(w, h)
     }
 
@@ -82,7 +82,7 @@ class PageSizeCalculator(
         var h = pageSize.height.toFloat()
         val ratio = h / w
         h = maxHeight
-        w = MathUtils.floor(maxHeight / ratio).toFloat()
+        w = floor(maxHeight / ratio).toFloat()
         return SizeF(w, h)
     }
 
@@ -95,10 +95,10 @@ class PageSizeCalculator(
         var h = pageSize.height.toFloat()
         val ratio = w / h
         w = maxWidth
-        h = MathUtils.floor(maxWidth / ratio).toFloat()
+        h = floor(maxWidth / ratio).toFloat()
         if (h > maxHeight) {
             h = maxHeight
-            w = MathUtils.floor(maxHeight * ratio).toFloat()
+            w = floor(maxHeight * ratio).toFloat()
         }
         return SizeF(w, h)
     }

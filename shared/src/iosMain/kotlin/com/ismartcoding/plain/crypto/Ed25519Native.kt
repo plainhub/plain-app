@@ -2,7 +2,7 @@
 
 package com.ismartcoding.plain.crypto
 
-import com.ismartcoding.plain.crypto.sha512
+import com.ismartcoding.plain.lib.crypto.sha512
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Security.SecRandomCopyBytes

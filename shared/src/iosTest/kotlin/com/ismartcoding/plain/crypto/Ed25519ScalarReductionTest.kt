@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.crypto
 
+import com.ismartcoding.plain.lib.crypto.sha512
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

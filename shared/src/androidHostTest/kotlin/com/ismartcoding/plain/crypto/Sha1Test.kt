@@ -1,12 +1,13 @@
 package com.ismartcoding.plain.crypto
 
+import com.ismartcoding.plain.lib.crypto.sha1
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertContentEquals
 import kotlin.test.assertTrue
 
 /**
- * Unit tests for the pure-Kotlin [sha1] implementation.
+ * Unit tests for the pure-Kotlin [com.ismartcoding.plain.lib.crypto.sha1] implementation.
  *
  * Test vectors are the official NIST FIPS 180-4 SHA-1 examples plus a few
  * edge cases that matter for the code paths in this repo:

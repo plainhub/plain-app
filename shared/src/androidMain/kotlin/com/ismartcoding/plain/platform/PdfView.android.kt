@@ -1,11 +1,8 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.preferences.*
-
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.pdfviewer.PDFView

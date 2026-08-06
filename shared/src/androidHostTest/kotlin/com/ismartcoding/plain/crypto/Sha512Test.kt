@@ -1,12 +1,13 @@
 package com.ismartcoding.plain.crypto
 
+import com.ismartcoding.plain.lib.crypto.sha512
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertContentEquals
 import kotlin.test.assertTrue
 
 /**
- * Unit tests for the pure-Kotlin [sha512] implementation.
+ * Unit tests for the pure-Kotlin [com.ismartcoding.plain.lib.crypto.sha512] implementation.
  *
  * Test vectors are the official NIST FIPS 180-4 SHA-512 examples plus a few
  * edge cases. The pure-Kotlin implementation exists because iOS does not

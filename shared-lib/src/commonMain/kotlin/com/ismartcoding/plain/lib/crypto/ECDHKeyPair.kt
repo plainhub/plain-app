@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.crypto
+package com.ismartcoding.plain.lib.crypto
 
 data class ECDHKeyPair(
     val privateKeyEncoded: ByteArray,
