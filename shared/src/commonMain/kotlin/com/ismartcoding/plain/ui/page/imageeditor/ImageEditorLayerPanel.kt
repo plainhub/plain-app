@@ -32,16 +32,16 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.models.ImageEditorEditViewModel
-import com.ismartcoding.plain.yjs.ArrowLayer
-import com.ismartcoding.plain.yjs.EditorLayer
-import com.ismartcoding.plain.yjs.EllipseLayer
-import com.ismartcoding.plain.yjs.FreehandLayer
-import com.ismartcoding.plain.yjs.HighlightLayer
-import com.ismartcoding.plain.yjs.ImageLayer
-import com.ismartcoding.plain.yjs.MosaicLayer
-import com.ismartcoding.plain.yjs.RectLayer
-import com.ismartcoding.plain.yjs.StickerLayer
-import com.ismartcoding.plain.yjs.TextLayer
+import com.ismartcoding.plain.lib.yjs.ArrowLayer
+import com.ismartcoding.plain.lib.yjs.EditorLayer
+import com.ismartcoding.plain.lib.yjs.EllipseLayer
+import com.ismartcoding.plain.lib.yjs.FreehandLayer
+import com.ismartcoding.plain.lib.yjs.HighlightLayer
+import com.ismartcoding.plain.lib.yjs.ImageLayer
+import com.ismartcoding.plain.lib.yjs.MosaicLayer
+import com.ismartcoding.plain.lib.yjs.RectLayer
+import com.ismartcoding.plain.lib.yjs.StickerLayer
+import com.ismartcoding.plain.lib.yjs.TextLayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

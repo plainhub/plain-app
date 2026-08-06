@@ -43,7 +43,6 @@ import kotlin.time.Duration.Companion.days
 object MainAppHelper {
 
     fun init(app: Application) {
-        com.ismartcoding.plain.platform.setLocaleContext(app)
         com.ismartcoding.plain.thumbnail.ThumbnailProvider.instance = com.ismartcoding.plain.thumbnail.ThumbnailGenerator
         initDataStore(app.dataStore)
         initDatabase(

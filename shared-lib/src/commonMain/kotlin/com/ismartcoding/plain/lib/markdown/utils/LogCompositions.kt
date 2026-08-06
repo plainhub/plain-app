@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.ismartcoding.plain.lib.logcat.LogCat
 
 /**
  * Helper to use when debugging recompositions.
@@ -19,7 +18,7 @@ inline fun LogCompositions(
     if (logCompositionsEnabled) {
         var ref by remember { mutableStateOf(0) }
         SideEffect { ref++ }
-        LogCat.d("${message()} $ref")
+        println("${message()} $ref")
     }
 }
 

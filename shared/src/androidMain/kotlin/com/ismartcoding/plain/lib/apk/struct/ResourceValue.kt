@@ -5,7 +5,6 @@ import com.ismartcoding.plain.lib.apk.struct.resource.ResourceEntry
 import com.ismartcoding.plain.lib.apk.struct.resource.ResourceTable
 import com.ismartcoding.plain.lib.apk.struct.resource.TypeSpec
 import com.ismartcoding.plain.lib.apk.utils.Locales
-import java.lang.Float
 import java.util.Locale
 
 abstract class ResourceValue protected constructor(protected val value: Int) {
@@ -150,7 +149,7 @@ abstract class ResourceValue protected constructor(protected val value: Int) {
                 ResValue.ResDataCOMPLEX.UNIT_FRACTION_PARENT -> "%p"
                 else -> "unknown type:0x" + Integer.toHexString(type.toInt())
             }
-            val f = Float.intBitsToFloat(value shr 4)
+            val f = Float.fromBits(value shr 4)
             return f.toString() + pstr
         }
     }

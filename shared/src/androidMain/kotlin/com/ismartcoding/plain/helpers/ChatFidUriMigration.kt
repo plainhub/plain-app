@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.helpers
 
 import android.content.Context
-import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
@@ -9,6 +8,7 @@ import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.platform.appDir
 import java.io.File
 
 /**
@@ -99,7 +99,7 @@ object ChatFidUriMigration {
         fileDao: com.ismartcoding.plain.db.AppFileDao,
         dFile: com.ismartcoding.plain.db.DAppFile,
     ) {
-        val base = context.appDir()
+        val base = appDir()
         val legacyPath = "$base/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$hash"
         val newPath = "$legacyPath.$ext"
         val legacyFile = File(legacyPath)

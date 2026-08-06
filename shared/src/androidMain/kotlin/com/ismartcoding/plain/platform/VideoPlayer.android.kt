@@ -172,8 +172,11 @@ actual fun VideoPlayerSurface(
                     activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
                     val insetsController = WindowCompat.getInsetsController(activity.window, activity.window.decorView)
                     insetsController.show(WindowInsetsCompat.Type.systemBars())
-                    insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
-                    WindowCompat.setDecorFitsSystemWindows(activity.window, true)
+                    // Keep DecorFitsSystemWindows = false to match MainActivity's default
+                    // (setDecorFitsSystemWindows(window, false) in MainActivity.onCreate).
+                    // Flipping it to true would trigger a full Activity relayout, causing a
+                    // visible flash on Huawei devices.
+                    insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 }
             }
         }

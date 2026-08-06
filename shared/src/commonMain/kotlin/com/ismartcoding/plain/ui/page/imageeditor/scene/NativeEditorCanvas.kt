@@ -2,8 +2,8 @@ package com.ismartcoding.plain.ui.page.imageeditor.scene
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.ismartcoding.plain.yjs.CanvasSize
-import com.ismartcoding.plain.yjs.EditorLayer
+import com.ismartcoding.plain.lib.yjs.CanvasSize
+import com.ismartcoding.plain.lib.yjs.EditorLayer
 
 data class SceneViewport(
     val scale: Float,

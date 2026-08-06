@@ -25,7 +25,7 @@ interface AnnotatorSettings {
     val codeSpanStyle: SpanStyle
 
     /** Provides custom interception logic for building this annotated string */
-    val annotator: MarkdownAnnotator
+    val annotator: com.ismartcoding.plain.lib.markdown.model.MarkdownAnnotator
 
     /** Represents the [ReferenceLinkHandler] used to store and find links when clicks on links occur. */
     val referenceLinkHandler: ReferenceLinkHandler?

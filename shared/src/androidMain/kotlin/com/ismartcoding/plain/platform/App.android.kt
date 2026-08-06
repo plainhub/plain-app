@@ -12,7 +12,6 @@ import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.ZipHelper
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
@@ -97,7 +96,7 @@ actual fun restore(uriStr: String) {
                     if (it.exists()) it.copyRecursively(appContext.filesDir, true)
                 }
                 File(destFile.path + "/external/files").let {
-                    if (it.exists()) it.copyRecursively(File(appContext.appDir()), true)
+                    if (it.exists()) it.copyRecursively(File(appDir()), true)
                 }
                 destFile.deleteRecursively()
             }
@@ -138,7 +137,7 @@ private fun writeBackupContent(out: ZipOutputStream) {
     val items = listOf(
         BackupExportItem("/", File(appContext.dataDir.path + "/databases")),
         BackupExportItem("/", appContext.filesDir),
-        BackupExportItem("/external/", File(appContext.appDir())),
+        BackupExportItem("/external/", File(appDir())),
     )
     for (item in items) {
         appendBackupFile(out, item.dir, item.file)

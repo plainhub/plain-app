@@ -5,8 +5,7 @@ import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.appContextValue
-import com.ismartcoding.plain.buildTypeValue
-import com.ismartcoding.plain.lib.extensions.appDir as contextAppDir
+import com.ismartcoding.plain.buildType
 import com.ismartcoding.plain.lib.helpers.NetworkHelper
 
 actual fun getAppVersion(): String {
@@ -21,7 +20,7 @@ actual fun getOSVersion(): String = "Android ${Build.VERSION.RELEASE} (API ${Bui
 
 actual fun getDeviceName(): String = PhoneHelper.getDeviceName(appContextValue!!)
 
-actual fun getBuildType(): String = buildTypeValue.ifEmpty { "android" }
+actual fun getBuildType(): String = buildType.ifEmpty { "android" }
 
 actual fun getPlatformName(): String = "android"
 
@@ -29,7 +28,7 @@ actual fun getDeviceType(): DeviceType = PhoneHelper.getDeviceType(appContextVal
 
 actual fun getDeviceIP4s(): List<String> = NetworkHelper.getDeviceIP4s().toList()
 
-actual fun appDir(): String = appContext.contextAppDir()
+actual fun appDir(): String = appContext.getExternalFilesDir(null)?.absolutePath ?: appContext.filesDir.absolutePath
 
 actual fun cacheDirPath(): String = appContext.cacheDir.absolutePath
 

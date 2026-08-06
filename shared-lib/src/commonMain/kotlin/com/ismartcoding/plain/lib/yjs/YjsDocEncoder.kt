@@ -1,4 +1,6 @@
-package com.ismartcoding.plain.yjs
+package com.ismartcoding.plain.lib.yjs
+
+import kotlin.collections.iterator
 
 /**
  * Low-level binary encoder for lib0 encoding format used by Yjs V1 updates.

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.yjs
 
+import com.ismartcoding.plain.lib.yjs.YjsDoc
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test

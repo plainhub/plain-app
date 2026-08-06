@@ -12,18 +12,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.yjs.ArrowLayer
-import com.ismartcoding.plain.yjs.EditorLayer
-import com.ismartcoding.plain.yjs.FreehandLayer
-import com.ismartcoding.plain.yjs.HighlightLayer
-import com.ismartcoding.plain.yjs.ImageLayer
-import com.ismartcoding.plain.yjs.MosaicLayer
-import com.ismartcoding.plain.yjs.RectLayer
-import com.ismartcoding.plain.yjs.StickerLayer
-import com.ismartcoding.plain.yjs.TextLayer
+import com.ismartcoding.plain.lib.yjs.ArrowLayer
+import com.ismartcoding.plain.lib.yjs.EditorLayer
+import com.ismartcoding.plain.lib.yjs.EllipseLayer
+import com.ismartcoding.plain.lib.yjs.FreehandLayer
+import com.ismartcoding.plain.lib.yjs.HighlightLayer
+import com.ismartcoding.plain.lib.yjs.ImageLayer
+import com.ismartcoding.plain.lib.yjs.MosaicLayer
+import com.ismartcoding.plain.lib.yjs.RectLayer
+import com.ismartcoding.plain.lib.yjs.StickerLayer
+import com.ismartcoding.plain.lib.yjs.TextLayer
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
@@ -72,7 +72,7 @@ internal fun DrawScope.drawSceneLayer(
             size = Size(layer.w.toFloat(), layer.h.toFloat()),
             style = Stroke(width = layer.lineWidth.toFloat()),
         )
-        is com.ismartcoding.plain.yjs.EllipseLayer -> drawOval(
+        is EllipseLayer -> drawOval(
             color = parseScopeBgColor(layer.color),
             topLeft = Offset((layer.cx - layer.rx).toFloat(), (layer.cy - layer.ry).toFloat()),
             size = Size((layer.rx * 2).toFloat(), (layer.ry * 2).toFloat()),

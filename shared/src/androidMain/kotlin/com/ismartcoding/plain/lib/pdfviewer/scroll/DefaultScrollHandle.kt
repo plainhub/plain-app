@@ -90,7 +90,7 @@ class DefaultScrollHandle
 
         private fun setPosition(pos: Float) {
             var newPosition = pos
-            if (java.lang.Float.isInfinite(newPosition) || java.lang.Float.isNaN(newPosition)) {
+            if (newPosition.isInfinite() || newPosition.isNaN()) {
                 return
             }
             val pdfViewSize =

@@ -19,8 +19,7 @@ abstract class AbstractOperationDSL(
 
     var explicitReturnType: KType? = null
 
-    @PublishedApi
-    internal fun resolver(function: FunctionWrapper<*>): ResolverDSL {
+    fun resolver(function: FunctionWrapper<*>): ResolverDSL {
         require(function.hasReturnType()) {
             "Resolver for '$name' has no return value"
         }

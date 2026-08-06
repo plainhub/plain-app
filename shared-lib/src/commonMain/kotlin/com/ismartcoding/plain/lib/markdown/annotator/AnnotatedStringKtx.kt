@@ -12,6 +12,10 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
+import com.ismartcoding.plain.lib.markdown.annotator.appendAutoLink
+import com.ismartcoding.plain.lib.markdown.annotator.appendMarkdownLink
+import com.ismartcoding.plain.lib.markdown.annotator.appendMarkdownReference
+import com.ismartcoding.plain.lib.markdown.annotator.buildMarkdownAnnotatedString
 import com.ismartcoding.plain.lib.markdown.model.MarkdownAnnotator
 import com.ismartcoding.plain.lib.markdown.model.ReferenceLinkHandler
 import com.ismartcoding.plain.lib.markdown.model.markdownAnnotator
@@ -28,6 +32,14 @@ import com.ismartcoding.plain.lib.markdown.utils.resolveImageLink
 import com.ismartcoding.plain.lib.markdown.utils.innerList
 import com.ismartcoding.plain.lib.markdown.utils.mapAutoLinkToType
 import com.ismartcoding.plain.lib.markdown.compose.elements.mathBody
+import com.ismartcoding.plain.lib.markdown.utils.extractFontColor
+import com.ismartcoding.plain.lib.markdown.utils.extractHtmlImgAlt
+import com.ismartcoding.plain.lib.markdown.utils.extractHtmlImgSrc
+import com.ismartcoding.plain.lib.markdown.utils.getUnescapedTextInNode
+import com.ismartcoding.plain.lib.markdown.utils.innerList
+import com.ismartcoding.plain.lib.markdown.utils.isFontCloseTag
+import com.ismartcoding.plain.lib.markdown.utils.mapAutoLinkToType
+import com.ismartcoding.plain.lib.markdown.utils.resolveImageLink
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
@@ -61,8 +73,8 @@ fun String.buildMarkdownAnnotatedString(
     linkTextSpanStyle: SpanStyle = style.toSpanStyle(),
     codeSpanStyle: SpanStyle = style.toSpanStyle(),
     flavour: MarkdownFlavourDescriptor = GFMFlavourDescriptor(),
-    annotator: MarkdownAnnotator = markdownAnnotator(),
-    referenceLinkHandler: ReferenceLinkHandler? = null,
+    annotator: com.ismartcoding.plain.lib.markdown.model.MarkdownAnnotator = markdownAnnotator(),
+    referenceLinkHandler: com.ismartcoding.plain.lib.markdown.model.ReferenceLinkHandler? = null,
     linkInteractionListener: LinkInteractionListener? = null,
 ) = buildMarkdownAnnotatedString(
     style = style,
@@ -89,7 +101,7 @@ fun String.buildMarkdownAnnotatedString(
  */
 fun String.buildMarkdownAnnotatedString(
     style: TextStyle,
-    annotatorSettings: AnnotatorSettings,
+    annotatorSettings: com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings,
     flavour: MarkdownFlavourDescriptor = GFMFlavourDescriptor(),
 ): AnnotatedString {
     val content = this
@@ -119,7 +131,7 @@ fun String.buildMarkdownAnnotatedString(
 fun String.buildMarkdownAnnotatedString(
     textNode: ASTNode,
     style: TextStyle,
-    annotatorSettings: AnnotatorSettings,
+    annotatorSettings: com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings,
 ): AnnotatedString = buildAnnotatedString {
     pushStyle(style.toSpanStyle())
     buildMarkdownAnnotatedString(this@buildMarkdownAnnotatedString, textNode, annotatorSettings)
@@ -136,7 +148,7 @@ fun String.buildMarkdownAnnotatedString(
 fun AnnotatedString.Builder.appendMarkdownLink(
     content: String,
     node: ASTNode,
-    annotatorSettings: AnnotatorSettings,
+    annotatorSettings: com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings,
 ) {
     val linkText = node.findChildOfType(MarkdownElementTypes.LINK_TEXT)?.children?.innerList()
     if (linkText == null) {
@@ -168,7 +180,7 @@ fun AnnotatedString.Builder.appendMarkdownLink(
 fun AnnotatedString.Builder.appendMarkdownReference(
     content: String,
     node: ASTNode,
-    annotatorSettings: AnnotatorSettings,
+    annotatorSettings: com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings,
 ) {
     val full = node.type == MarkdownElementTypes.FULL_REFERENCE_LINK
     val labelNode = node.findChildOfType(MarkdownElementTypes.LINK_LABEL)
@@ -210,7 +222,7 @@ fun AnnotatedString.Builder.appendMarkdownReference(
 fun AnnotatedString.Builder.appendAutoLink(
     content: String,
     node: ASTNode,
-    annotatorSettings: AnnotatorSettings,
+    annotatorSettings: com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings,
 ) {
     val targetNode = node.children.firstOrNull {
         it.type.name == MarkdownElementTypes.AUTOLINK.name
@@ -235,7 +247,7 @@ fun AnnotatedString.Builder.appendAutoLink(
 fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
     content: String,
     node: ASTNode,
-    annotatorSettings: AnnotatorSettings,
+    annotatorSettings: com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings,
 ) = buildMarkdownAnnotatedString(
     content = content,
     children = node.children,
@@ -254,7 +266,7 @@ fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
 fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
     content: String,
     children: List<ASTNode>,
-    annotatorSettings: AnnotatorSettings,
+    annotatorSettings: com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings,
 ) {
     val annotate = annotatorSettings.annotator.annotate
     val eolAsNewLine = annotatorSettings.annotator.config.eolAsNewLine

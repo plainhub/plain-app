@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.yjs
+package com.ismartcoding.plain.lib.yjs
 
 import kotlinx.serialization.Serializable
 

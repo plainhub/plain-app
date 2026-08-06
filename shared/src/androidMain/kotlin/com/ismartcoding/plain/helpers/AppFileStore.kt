@@ -1,13 +1,13 @@
 package com.ismartcoding.plain.helpers
 
 import android.webkit.MimeTypeMap
-import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.AppFileDao
+import com.ismartcoding.plain.platform.appDir
 import java.io.File
 
 /**
@@ -40,7 +40,7 @@ object AppFileStore {
      */
     fun realPathFromId(fidSuffix: String): String {
         val hash = fidSuffix.substringBefore(".")
-        val base = appContext.appDir()
+        val base = appDir()
         return "$base/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$fidSuffix"
     }
 
@@ -144,7 +144,7 @@ object AppFileStore {
     // ── Internals ───────────────────────────────────────────────────────────
 
     private fun destFile(hash: String, ext: String = ""): File {
-        val base = appContext.appDir()
+        val base = appDir()
         val name = if (ext.isNotEmpty()) "$hash.$ext" else hash
         return File("$base/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$name")
     }

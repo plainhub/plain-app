@@ -16,24 +16,13 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import java.io.File
 
-fun Context.px(
-    @DimenRes dimen: Int,
-): Int = resources.getDimension(dimen).toInt()
-
-fun Context.dp(
-    @DimenRes dimen: Int,
-): Float = resources.getDimensionPixelSize(dimen) / resources.displayMetrics.density
-
 fun Context.dp2px(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 
 fun Context.hasPermission(vararg permission: String): Boolean {
     return permission.toSet().all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
 }
 
-val Context.telecomManager: TelecomManager get() = getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-val Context.windowManager: WindowManager get() = getSystemService(Context.WINDOW_SERVICE) as WindowManager
 val Context.notificationManager: NotificationManager get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-val Context.shortcutManager: ShortcutManager get() = getSystemService(ShortcutManager::class.java) as ShortcutManager
 
 fun Context.scanFileByConnection(
     file: File,
@@ -60,12 +49,6 @@ fun Context.scanFileByConnection(
     MediaScannerConnection.scanFile(this, paths, mimeTypes, callback)
 }
 
-fun <T> Context.getSystemServiceCompat(serviceClass: Class<T>): T = ContextCompat.getSystemService(this, serviceClass)!!
-
-fun Context.getCompatDrawable(
-    @DrawableRes drawableId: Int,
-) = ContextCompat.getDrawable(this, drawableId)
-
 fun Context.getMimeTypeFromUri(uri: Uri): String {
     var mimetype = uri.path?.getMimeType() ?: ""
     if (mimetype.isEmpty()) {
@@ -77,12 +60,6 @@ fun Context.getMimeTypeFromUri(uri: Uri): String {
     return mimetype
 }
 
-fun Context.isWifiConnected(): Boolean {
-    val cm = getSystemServiceCompat(ConnectivityManager::class.java)
-    val capabilities = cm.getNetworkCapabilities(cm.activeNetwork)
-    return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
-}
-
 fun Context.isGestureInteractionMode(): Boolean {
     val resourceId = resources.getIdentifier("config_navBarInteractionMode", "integer", "android")
     if (resourceId == 0) {
@@ -91,14 +68,3 @@ fun Context.isGestureInteractionMode(): Boolean {
     return resources.getInteger(resourceId) == 2
 }
 
-fun Context.isPortrait(): Boolean {
-    return resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-}
-
-fun Context.isTV(): Boolean {
-    return packageManager.hasSystemFeature("android.hardware.type.television")
-}
-
-fun Context.appDir(): String {
-    return getExternalFilesDir(null)?.absolutePath ?: filesDir.absolutePath
-}

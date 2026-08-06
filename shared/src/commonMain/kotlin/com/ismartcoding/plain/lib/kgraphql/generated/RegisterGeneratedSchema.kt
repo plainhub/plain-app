@@ -28,6 +28,10 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
  * a type is referenced via a resolver. In both cases, the KSP descriptor is
  * merged automatically, so users do not need to redeclare properties that are
  * already captured by `@GraphQLType` / `@GraphQLInput` annotations.
+ *
+ * This file lives in `:shared` (not `:shared-lib`) because it calls
+ * [registerAllGeneratedSchema], an expect function whose KSP-generated actual
+ * is also in `:shared`. Expect/actual pairs must reside in the same Gradle module.
  */
 fun SchemaBuilder.registerGeneratedSchema() {
     // Populate the registry from KSP-generated code.

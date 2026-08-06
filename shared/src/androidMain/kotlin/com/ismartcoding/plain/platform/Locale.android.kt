@@ -3,12 +3,7 @@ package com.ismartcoding.plain.platform
 import android.content.Context
 import android.os.LocaleList as AndroidLocaleList
 import com.ismartcoding.plain.appContext
-
-private var appContextValue: Context? = null
-
-fun setLocaleContext(context: Context) {
-    appContextValue = context
-}
+import com.ismartcoding.plain.appContextValue
 
 actual fun currentLocale(): Locale {
     val ctx = appContextValue ?: return Locale("en", "US")

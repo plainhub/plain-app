@@ -1,5 +1,11 @@
 package com.ismartcoding.plain.yjs
 
+import com.ismartcoding.plain.lib.yjs.ArrowLayer
+import com.ismartcoding.plain.lib.yjs.FreehandLayer
+import com.ismartcoding.plain.lib.yjs.StickerLayer
+import com.ismartcoding.plain.lib.yjs.TextLayer
+import com.ismartcoding.plain.lib.yjs.YjsDoc
+import com.ismartcoding.plain.lib.yjs.YjsDocEncoder
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test

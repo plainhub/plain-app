@@ -67,10 +67,13 @@ actual fun setImmersiveFullscreen() {
 
 actual fun exitImmersiveFullscreen() {
     val activity = com.ismartcoding.plain.mainActivity ?: return
-    WindowCompat.setDecorFitsSystemWindows(activity.window, true)
+    // Keep DecorFitsSystemWindows = false to match MainActivity's default
+    // (setDecorFitsSystemWindows(window, false) in MainActivity.onCreate).
+    // Flipping it to true would trigger a full Activity relayout, causing a
+    // visible flash on Huawei devices. We only need to restore bar visibility.
     WindowInsetsControllerCompat(activity.window, activity.window.decorView).apply {
         show(WindowInsetsCompat.Type.systemBars())
-        systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+        systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 }
 

@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.lib.extensions.appDir
 import com.ismartcoding.plain.lib.extensions.getFileName
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import android.net.Uri
@@ -35,7 +34,7 @@ actual fun PickImageEffect(
                             "image_${System.currentTimeMillis()}.jpg"
                         }.replace("/", "_")
                         if (fileName.isNotEmpty()) {
-                            val noteImagesDir = File(context.appDir(), "note-images")
+                            val noteImagesDir = File(appDir(), "note-images")
                             if (!noteImagesDir.exists()) {
                                 noteImagesDir.mkdirs()
                             }
