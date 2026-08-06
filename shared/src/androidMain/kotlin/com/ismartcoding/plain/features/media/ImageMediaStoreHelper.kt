@@ -14,7 +14,9 @@ import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.TagRelationStub
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.MediaType
+import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.toSortBy
 import kotlin.time.Instant
@@ -37,7 +39,7 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             MediaStore.Images.Media.ORIENTATION,
             MediaStore.Images.Media.BUCKET_ID,
         )
-        if (isQPlus()) {
+        if (AppFeatureType.MEDIA_FAVORITE.has()) {
             projection.add(MediaStore.Images.Media.IS_FAVORITE)
         }
         return projection.toTypedArray()
@@ -84,7 +86,7 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             val rotation = cursor.getIntValue(MediaStore.Images.Media.ORIENTATION, cache)
             val path = cursor.getStringValue(MediaStore.Images.Media.DATA, cache)
             val bucketId = cursor.getStringValue(MediaStore.Images.Media.BUCKET_ID, cache)
-            val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Images.Media.IS_FAVORITE, cache) == 1 else false
+            val isFavorite = if (AppFeatureType.MEDIA_FAVORITE.has()) cursor.getIntValue(MediaStore.Images.Media.IS_FAVORITE, cache) == 1 else false
             DImage(id, title, path, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt, isFavorite)
         } ?: emptyList()
     }

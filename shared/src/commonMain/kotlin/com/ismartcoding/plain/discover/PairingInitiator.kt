@@ -42,7 +42,7 @@ object PairingInitiator {
                 sendEvent(
                     WebSocketEvent(
                         EventType.PAIRING_CANCELED,
-                        JsonHelper.jsonEncode(DPairingResult(deviceId = deviceId, deviceName = session.deviceName ?: "")),
+                        JsonHelper.jsonEncode(DPairingResult(deviceId = deviceId, deviceName = session.deviceName)),
                     )
                 )
                 LogCat.d("Pairing cancel message sent to ${session.deviceName}")

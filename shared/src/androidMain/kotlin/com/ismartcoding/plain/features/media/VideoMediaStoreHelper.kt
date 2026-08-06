@@ -15,7 +15,9 @@ import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.TagRelationStub
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.MediaType
+import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.events.MediaDurationZeroEvent
 import com.ismartcoding.plain.events.MediaDurationZeroItem
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -44,7 +46,9 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         )
         if (isQPlus()) {
             projection.add(MediaStore.Video.Media.ORIENTATION)
-            projection.add(MediaStore.Video.Media.IS_FAVORITE)
+            if (AppFeatureType.MEDIA_FAVORITE.has()) {
+                projection.add(MediaStore.Video.Media.IS_FAVORITE)
+            }
         }
 
         return projection.toTypedArray()
@@ -91,7 +95,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
             val dateTakenMs = cursor.getLongValue(MediaStore.Video.Media.DATE_TAKEN, cache)
             val takenAt = if (dateTakenMs > 0) Instant.fromEpochMilliseconds(dateTakenMs) else null
-            val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Video.Media.IS_FAVORITE, cache) == 1 else false
+            val isFavorite = if (AppFeatureType.MEDIA_FAVORITE.has()) cursor.getIntValue(MediaStore.Video.Media.IS_FAVORITE, cache) == 1 else false
 
             // MediaStore.DURATION is read-only on Android 10+; for fMP4 files
             // it stays 0. Fall back to the app-local cache (computed by

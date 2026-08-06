@@ -14,7 +14,9 @@ import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.TagRelationStub
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.MediaType
+import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.events.MediaDurationZeroEvent
 import com.ismartcoding.plain.events.MediaDurationZeroItem
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -41,7 +43,9 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
 
         if (isQPlus()) {
             projection.add(MediaStore.Audio.Media.BUCKET_ID)
-            projection.add(MediaStore.Audio.Media.IS_FAVORITE)
+            if (AppFeatureType.MEDIA_FAVORITE.has()) {
+                projection.add(MediaStore.Audio.Media.IS_FAVORITE)
+            }
         }
 
         return projection.toTypedArray()

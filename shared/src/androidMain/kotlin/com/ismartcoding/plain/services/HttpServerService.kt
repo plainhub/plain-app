@@ -24,7 +24,7 @@ import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.startHttpServerAsync
 import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserverserver.httpServer
+import com.ismartcoding.plain.httpserver.httpServer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 

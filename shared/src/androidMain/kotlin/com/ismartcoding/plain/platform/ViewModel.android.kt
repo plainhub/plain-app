@@ -15,5 +15,5 @@ actual fun <T : ViewModel> rememberViewModel(type: KClass<T>, factory: () -> T):
         override fun <M : ViewModel> create(modelClass: Class<M>): M = factory() as M
     })
     @Suppress("UNCHECKED_CAST")
-    return provider.get(type.java) as T
+    return provider[type.java]
 }

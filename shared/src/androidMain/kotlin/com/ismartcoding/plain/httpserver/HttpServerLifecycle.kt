@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.httpserverserver
+package com.ismartcoding.plain.httpserver
 
 import android.content.Context
 import com.ismartcoding.plain.Constants
@@ -117,7 +117,10 @@ suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplica
         }
 
         embeddedServer(Netty, environment, configure = {
-            runningLimit = 1000
+            // Ktor's default is 32 requests per HTTP pipeline. Allowing 1,000
+            // lets a single browser connection overwhelm a memory-constrained
+            // Android compatibility container during repeated API calls.
+            runningLimit = 32
             tcpKeepAlive = true
             enableHttp2 = false
 

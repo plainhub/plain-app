@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
-import com.ismartcoding.plain.audio.toPlaylistAudio
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.audioClear

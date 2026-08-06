@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.httpserverserver
+package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError

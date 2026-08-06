@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.httpserverserver
+package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.helpers.withIO
@@ -145,10 +145,6 @@ class KtorHttpCall(
                 }
             }
             val body = response.body
-            if (body == null) {
-                applicationCall.respond(HttpStatusCode.NotFound)
-                return@proxyUrl false
-            }
             applicationCall.respondOutputStream {
                 body.byteStream().use { input ->
                     input.copyTo(this)

@@ -2,6 +2,7 @@ package com.ismartcoding.plain.enums
 
 import com.ismartcoding.plain.data.DFeaturePermission
 import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.platform.isQPlus
 
 enum class AppFeatureType {
     WEB_PORTAL,
@@ -25,6 +26,7 @@ enum class AppFeatureType {
     MEDIA_TRASH,
     DONATION,
     DLNA_RECEIVER,
+    MEDIA_FAVORITE,
     IMAGE_EDITOR;
 
     fun getPermission(): DFeaturePermission? {

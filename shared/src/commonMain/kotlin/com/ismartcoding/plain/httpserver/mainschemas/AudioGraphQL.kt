@@ -6,7 +6,6 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.helpers.coMain
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
-import com.ismartcoding.plain.audio.toPlaylistAudio
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent

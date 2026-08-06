@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.httpserverserver
+package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.httpserver.http.HttpMethod
 import com.ismartcoding.plain.httpserver.http.HttpRouter

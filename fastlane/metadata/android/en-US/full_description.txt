@@ -1,46 +1,46 @@
-**PlainApp** is a free, open-source Android app that turns your phone into a self-hosted management hub you can access from any web browser on the same network — no accounts, no cloud, no subscriptions. Whether you need to transfer files, read SMS, browse photos, or mirror your screen, PlainApp puts full control back in your hands.
+**PlainApp** is a free, open-source Android app that turns your phone into a self-hosted management hub accessible from any web browser on the same network - no accounts, no cloud, no subscriptions.
 
-## Why PlainApp?
+**Why PlainApp?**
 
-Most phone-management tools either route your data through their own servers, lock features behind subscriptions, or plague you with ads. PlainApp is different:
+Most phone-management tools route your data through their own servers, lock features behind subscriptions, or show ads. PlainApp is different:
 
-- **100% local** — your data never leaves your network
-- **End-to-end encrypted** — every connection is secured with TLS + XChaCha20-Poly1305
-- **Completely free and ad-free** — no purchases, no upsells, ever
-- **Fully open-source** — audit the code, build your own binary, or contribute
+- **100% local** - your data never leaves your network
+- **End-to-end encrypted** - every connection is secured with TLS + XChaCha20-Poly1305
+- **Free and ad-free** - no purchases, no upsells, ever
+- **Fully open-source** - audit the code, build your own binary, or contribute
 
-## Features
+**Features**
 
-### 🌐 Web-Based Phone Management
-Open a browser on any desktop or laptop connected to the same Wi-Fi network and get a full dashboard to manage your Android device — no app installation required on the computer side. Supports PWA so you can pin it to your desktop like a native app.
+**Web-Based Phone Management**
+Open a browser on any device connected to the same Wi-Fi network to manage your Android phone - no app installation required on the computer side.
 
-| Category | What you can do |
-|---|---|
-| **Files** | Browse internal storage, SD card, and USB drives; upload, download, rename, delete |
-| **Media** | View and manage photos, videos, and audio; stream them directly in the browser |
-| **Contacts** | View, search, and manage your contacts |
-| **SMS & Calls** | Read messages and call logs; send SMS from your desktop |
-| **Apps** | List installed apps and export APKs |
-| **Notifications** | Mirror phone notifications to the browser in real time |
-| **Screen Mirror** | Live-stream the phone screen to the browser with audio and remote control support |
-| **Device Info** | Check battery, storage, network, and system details |
+- **Files** - Browse internal storage, SD card, and USB drives; upload, download, rename, delete
+- **Media** - View and manage photos, videos, and audio; stream them in the browser
+- **Contacts** - View, search, and manage contacts
+- **SMS & Calls** - Read messages and call logs; send SMS from your desktop
+- **Apps** - List installed apps and export APKs
+- **Notifications** - Mirror phone notifications to the browser in real time
+- **Screen Mirror** - Live-stream the phone screen to the browser with audio and remote control support
+- **Device Info** - Check battery, storage, network, and system details
 
-### 📱 Built-in Android Tools
-PlainApp is also a capable standalone app — not just a server:
+**Built-in Android Tools**
+PlainApp is also a capable standalone app:
 
-- **Markdown Notes** — write and organize notes with a clean editor
-- **RSS Reader** — follow your favorite websites with a distraction-free reader
-- **Video & Audio Player** — full-featured media player with playlist support
-- **TV Cast** — cast media to any DLNA/Chromecast-compatible TV
-- **Peer-to-Peer Chat & File Sharing** — share files and messages directly between devices without a server
-- **Pomodoro Timer** — stay focused with a built-in work timer
-- **Sound Meter** — measure ambient noise levels in real time
+- **Markdown Notes** - Write and organize notes with a clean editor
+- **RSS Reader** - Follow your favorite websites with a distraction-free reader
+- **Video & Audio Player** - Full-featured media player with playlist support
+- **TV Cast** - Cast media to any DLNA/Chromecast-compatible TV
+- **Peer-to-Peer Chat & File Sharing** - Share files and messages directly between devices without a server
+- **Pomodoro Timer** - Stay focused with a built-in work timer
+- **Sound Meter** - Measure ambient noise levels in real time
 
-### 🔒 Privacy & Security
-- No Firebase Analytics or Messaging — crash reporting (via Firebase Crashlytics) is optional and opt-in
+**Privacy & Security**
+
+- No Firebase Analytics or Messaging - crash reporting is optional and opt-in
 - Zero data sent to any third-party server
-- All traffic between phone and browser is encrypted (TLS + XChaCha20-Poly1305)
+- All traffic between phone and browser is encrypted
 - No account registration required
 
-Github: https://github.com/plainhub/plain-app
-Reddit: https://www.reddit.com/r/plainapp
+**Links**
+- Github: https://github.com/plainhub/plain-app
+- Reddit: https://www.reddit.com/r/plainapp
