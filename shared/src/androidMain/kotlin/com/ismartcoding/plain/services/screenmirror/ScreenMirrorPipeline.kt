@@ -15,7 +15,7 @@ import com.ismartcoding.plain.platform.isUPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.services.ScreenMirrorService
-import com.ismartcoding.plain.web.models.ScreenMirrorVideoCodec
+import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
 
 /**
  * Owns MediaProjection + VirtualDisplay + the two encoders. Pushes H.264 NAL

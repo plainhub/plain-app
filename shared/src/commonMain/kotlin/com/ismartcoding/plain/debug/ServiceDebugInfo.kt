@@ -4,8 +4,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.onlineClientIds
+import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.onlineClientIds
 
 /**
  * Snapshot of all persistent service runtime statuses.

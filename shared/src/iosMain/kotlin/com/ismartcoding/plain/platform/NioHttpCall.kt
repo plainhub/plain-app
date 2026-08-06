@@ -3,10 +3,10 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.web.http.HttpCall
-import com.ismartcoding.plain.web.http.HttpMethod
-import com.ismartcoding.plain.web.http.HttpMultipartPart
-import com.ismartcoding.plain.web.http.StreamSink
+import com.ismartcoding.plain.httpserver.http.HttpCall
+import com.ismartcoding.plain.httpserver.http.HttpMethod
+import com.ismartcoding.plain.httpserver.http.HttpMultipartPart
+import com.ismartcoding.plain.httpserver.http.StreamSink
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.readBytes
@@ -15,7 +15,7 @@ import platform.Foundation.NSFileManager
 
 /**
  * Bridges an [IosRequestContext] (populated by Swift) to the commonMain
- * [HttpCall] interface so [com.ismartcoding.plain.web.HttpRouteRegistry] route
+ * [HttpCall] interface so [com.ismartcoding.plain.httpserver.HttpRouteRegistry] route
  * handlers can run on iOS without touching SwiftNIO types.
  *
  * The call buffers the full response body in memory before returning. For

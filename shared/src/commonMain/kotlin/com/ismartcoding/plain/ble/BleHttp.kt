@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * the BLE RPC characteristic ([BleUuids.HTTP_CHAR_UUID]).
  *
  * The format mirrors a normal HTTP request so the server can route it
- * through the same [com.ismartcoding.plain.web.http.HttpRouter] used by the
+ * through the same [com.ismartcoding.plain.httpserver.http.HttpRouter] used by the
  * embedded HTTP server:
  *
  * - [method] + [path] select the route handler.

@@ -1,13 +1,13 @@
-package com.ismartcoding.plain.webserver
+package com.ismartcoding.plain.httpserverserver
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
-import com.ismartcoding.plain.web.CorsPolicy
-import com.ismartcoding.plain.web.HttpRouteRegistry
-import com.ismartcoding.plain.web.http.HttpMethod
-import com.ismartcoding.plain.web.http.HttpRouter
-import com.ismartcoding.plain.web.isPeerAccessiblePath
-import com.ismartcoding.plain.web.isDlnaPath
+import com.ismartcoding.plain.httpserver.CorsPolicy
+import com.ismartcoding.plain.httpserver.HttpRouteRegistry
+import com.ismartcoding.plain.httpserver.http.HttpMethod
+import com.ismartcoding.plain.httpserver.http.HttpRouter
+import com.ismartcoding.plain.httpserver.isPeerAccessiblePath
+import com.ismartcoding.plain.httpserver.isDlnaPath
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode

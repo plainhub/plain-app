@@ -2,7 +2,6 @@ package com.ismartcoding.plain.helpers
 
 import com.ismartcoding.plain.platform.signEd25519
 import com.ismartcoding.plain.preferences.SignatureKeyPreference
-import com.ismartcoding.plain.preferences.getKeyPairAsync
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 

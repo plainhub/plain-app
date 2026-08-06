@@ -3,7 +3,7 @@ package com.ismartcoding.plain.features.call
 import androidx.collection.LruCache
 import com.ismartcoding.plain.lib.phonegeo.PhoneNumberLookup
 import com.ismartcoding.plain.lib.phonegeo.algo.LookupAlgorithm
-import com.ismartcoding.plain.web.models.PhoneGeo
+import com.ismartcoding.plain.httpserver.models.PhoneGeo
 
 /**
  * LRU cache for phone-number -> PhoneGeo lookups.

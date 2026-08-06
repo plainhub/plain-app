@@ -11,6 +11,7 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.data.DScreenMirrorQuality
+import com.ismartcoding.plain.data.DSignatureKeyPair
 import com.ismartcoding.plain.data.DUpdateInfo
 import com.ismartcoding.plain.data.FilePathData
 import com.ismartcoding.plain.data.NotificationFilterData
@@ -19,10 +20,17 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PasswordType
+import com.ismartcoding.plain.helpers.Base64Lenient
+import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.helpers.StringHelper
+import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.platform.generateEd25519KeyPair
 import com.ismartcoding.plain.platform.randomPassword
 import kotlinx.serialization.json.Json
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 internal val preferencesJson = Json { ignoreUnknownKeys = true }
 
@@ -109,11 +117,42 @@ object UpdateInfoPreference : BasePreference<String>() {
 object UrlTokenPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("url_token")
+
+    suspend fun ensureValueAsync(preferences: Preferences) {
+        val rotateOnRestart = RotateUrlTokenOnRestartPreference.get(preferences)
+        if (rotateOnRestart) {
+            val keyStr = com.ismartcoding.plain.platform.generateChaCha20Key()
+            TempData.urlToken = com.ismartcoding.plain.helpers.Base64Lenient.decode(keyStr)
+            putAsync(keyStr)
+            return
+        }
+        val keyStr = get(preferences)
+        if (keyStr.isEmpty()) {
+            val newKeyStr = com.ismartcoding.plain.platform.generateChaCha20Key()
+            TempData.urlToken = com.ismartcoding.plain.helpers.Base64Lenient.decode(newKeyStr)
+            putAsync(newKeyStr)
+        } else {
+            TempData.urlToken = com.ismartcoding.plain.helpers.Base64Lenient.decode(keyStr)
+        }
+    }
+
+    suspend fun resetAsync() {
+        val keyStr = com.ismartcoding.plain.platform.generateChaCha20Key()
+        TempData.urlToken = com.ismartcoding.plain.helpers.Base64Lenient.decode(keyStr)
+        putAsync(keyStr)
+    }
+
 }
 
 object ApiPermissionsPreference : BasePreference<Set<String>>() {
     override val default = setOf<String>()
     override val key = stringSetPreferencesKey("api_permissions")
+
+    suspend fun putAsync(permission: Permission, enable: Boolean) {
+        val permissions = getAsync().toMutableSet()
+        if (enable) permissions.add(permission.name) else permissions.remove(permission.name)
+        putAsync(permissions)
+    }
 }
 
 object HttpPortPreference : BasePreference<Int>() {
@@ -228,11 +267,31 @@ object ScreenMirrorQualityPreference : BasePreference<String>() {
 object ClientIdPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("client_id")
+
+    suspend fun ensureValueAsync(preferences: Preferences) {
+        TempData.clientId = get(preferences)
+        if (TempData.clientId.isEmpty()) {
+            TempData.clientId = StringHelper.shortUUID()
+            putAsync(TempData.clientId)
+        }
+    }
 }
 
 object KeyStorePasswordPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("key_store_password")
+
+    suspend fun ensureValueAsync(preferences: Preferences) {
+        var password = get(preferences)
+        if (password.isEmpty()) {
+            password = StringHelper.shortUUID()
+            putAsync(password)
+        }
+    }
+
+    suspend fun resetAsync() {
+        putAsync(StringHelper.shortUUID())
+    }
 }
 
 object AudioPlayModePreference : BasePreference<Int>() {
@@ -426,7 +485,11 @@ object AudioPlaylistPreference : BasePreference<String>() {
     suspend fun getValueAsync(): List<DPlaylistAudio> {
         val str = getAsync()
         if (str.isEmpty()) return listOf()
-        return try { jsonDecode(str) } catch (_: Exception) { listOf() }
+        return try {
+            jsonDecode(str)
+        } catch (_: Exception) {
+            listOf()
+        }
     }
 
     suspend fun putAsync(value: List<DPlaylistAudio>) {
@@ -462,6 +525,20 @@ object NearbyDiscoverablePreference : BasePreference<Boolean>() {
 object MdnsHostnamePreference : BasePreference<String>() {
     override val default = "plainapp.local"
     override val key = stringPreferencesKey("mdns_hostname")
+
+    suspend fun ensureValueAsync(preferences: Preferences) {
+        val stored = preferences[key]
+        if (stored.isNullOrEmpty()) {
+            val allowedChars = ('a'..'z').filter { it !in listOf('i', 'l', 'o', 'v') }
+            val randomString = (1..2).map { allowedChars.random() }.joinToString("")
+            val hostname = "$randomString.local"
+            TempData.mdnsHostname = hostname
+            putAsync(hostname)
+        } else {
+            TempData.mdnsHostname = stored
+        }
+    }
+
 }
 
 object AiImageSearchEnabledPreference : BasePreference<Boolean>() {
@@ -541,6 +618,28 @@ object PomodoroSettingsPreference : BasePreference<String>() {
 object SignatureKeyPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("signature_key_pair")
+
+    @OptIn(ExperimentalEncodingApi::class)
+    suspend fun ensureKeyPairAsync() {
+        val keyPairJson = getAsync()
+        if (keyPairJson.isEmpty()) {
+            val (privateKey, publicKey) = generateEd25519KeyPair()
+            val signatureKeyPair = DSignatureKeyPair(
+                privateKey = Base64.encode(privateKey),
+                publicKey = Base64.encode(publicKey),
+            )
+            putAsync(JsonHelper.jsonEncode(signatureKeyPair))
+        }
+    }
+
+    suspend fun getKeyPairAsync(): DSignatureKeyPair {
+        return JsonHelper.jsonDecode<DSignatureKeyPair>(getAsync())
+    }
+
+    suspend fun getPublicKeyBytesAsync(): ByteArray {
+        val keyPair = getKeyPairAsync()
+        return Base64Lenient.decode(keyPair.publicKey)
+    }
 }
 
 object VideoPlaylistPreference : BasePreference<String>() {

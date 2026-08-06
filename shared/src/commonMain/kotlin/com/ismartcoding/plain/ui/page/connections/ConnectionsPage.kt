@@ -45,7 +45,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.models.SessionsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.web.onlineClientIds
+import com.ismartcoding.plain.httpserver.onlineClientIds
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)

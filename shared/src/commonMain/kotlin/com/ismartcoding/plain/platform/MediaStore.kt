@@ -126,13 +126,13 @@ expect fun cancelImageIndex()
  * Build a snapshot of the current image-search status (model state, indexing progress).
  * Returns a default "unavailable" status on platforms without AI image search.
  */
-expect fun buildImageSearchStatus(): com.ismartcoding.plain.web.models.ImageSearchStatus
+expect fun buildImageSearchStatus(): com.ismartcoding.plain.httpserver.models.ImageSearchStatus
 
 /**
  * Look up geographic information (province, city, ISP) for a phone [number].
  * Returns null if no match is found or the platform has no lookup capability.
  */
-expect fun lookupPhoneGeo(number: String): com.ismartcoding.plain.web.models.PhoneGeo?
+expect fun lookupPhoneGeo(number: String): com.ismartcoding.plain.httpserver.models.PhoneGeo?
 
 /**
  * Search SMS conversations matching [query], paginated by [limit]/[offset].
@@ -227,13 +227,13 @@ expect suspend fun getContactById(id: String): com.ismartcoding.plain.data.DCont
  * Update the contact identified by [id] with the values in [input].
  * No-op on platforms without a contacts provider.
  */
-expect fun updateContact(id: String, input: com.ismartcoding.plain.web.models.ContactInput)
+expect fun updateContact(id: String, input: com.ismartcoding.plain.httpserver.models.ContactInput)
 
 /**
  * Create a new contact with the values in [input]. Returns the new contact's id,
  * or empty string on failure / unsupported platforms.
  */
-expect fun createContact(input: com.ismartcoding.plain.web.models.ContactInput): String
+expect fun createContact(input: com.ismartcoding.plain.httpserver.models.ContactInput): String
 
 /**
  * Delete the contacts identified by [ids]. Used by tag-cleanup flow.

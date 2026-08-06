@@ -25,8 +25,8 @@ import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.peer_chat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.web.models.ChatItem
-import com.ismartcoding.plain.web.models.dchatToModel
+import com.ismartcoding.plain.httpserver.models.ChatItem
+import com.ismartcoding.plain.httpserver.models.dchatToModel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 

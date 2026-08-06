@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.web.models.DbTableInfo
+import com.ismartcoding.plain.httpserver.models.DbTableInfo
 import org.json.JSONObject
 
 private val ALLOWED_NAME_REGEX = Regex("^[a-zA-Z_][a-zA-Z0-9_]*$")

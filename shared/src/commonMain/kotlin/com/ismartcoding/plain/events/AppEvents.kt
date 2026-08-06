@@ -38,10 +38,10 @@ import com.ismartcoding.plain.platform.setBluetoothCanContinue
 import com.ismartcoding.plain.platform.startHttpServerService
 import com.ismartcoding.plain.platform.startMmsPolling
 import com.ismartcoding.plain.ui.models.FolderOption
-import com.ismartcoding.plain.web.AuthRequest
-import com.ismartcoding.plain.web.WsSessionHandle
-import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.websocket.WebSocketHelper
+import com.ismartcoding.plain.httpserver.AuthRequest
+import com.ismartcoding.plain.httpserver.WsSessionHandle
+import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.httpserver.websocket.WebSocketHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds

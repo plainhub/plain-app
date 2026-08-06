@@ -15,7 +15,7 @@ import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.httpserver.models.toModel
 
 class PeerChatReplyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

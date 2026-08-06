@@ -8,8 +8,8 @@ import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.normalizePhoneNumber
 import com.ismartcoding.plain.lib.extensions.queryCursor
-import com.ismartcoding.plain.web.models.ContentItemInput
-import com.ismartcoding.plain.web.models.OrganizationInput
+import com.ismartcoding.plain.httpserver.models.ContentItemInput
+import com.ismartcoding.plain.httpserver.models.OrganizationInput
 import java.util.ArrayList
 
 data class Content(

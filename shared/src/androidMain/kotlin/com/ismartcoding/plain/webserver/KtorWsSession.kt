@@ -1,6 +1,6 @@
-package com.ismartcoding.plain.webserver
+package com.ismartcoding.plain.httpserverserver
 
-import com.ismartcoding.plain.web.http.WsSession
+import com.ismartcoding.plain.httpserver.http.WsSession
 import io.ktor.server.plugins.origin
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import io.ktor.websocket.Frame

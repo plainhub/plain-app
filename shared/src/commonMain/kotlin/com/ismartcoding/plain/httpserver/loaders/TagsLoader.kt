@@ -1,0 +1,53 @@
+package com.ismartcoding.plain.httpserver.loaders
+
+import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.TagHelper
+import com.ismartcoding.plain.httpserver.models.Tag
+import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.lib.kdataloader.ExecutionResult
+
+object TagsLoader {
+    suspend fun load(
+        ids: List<String>,
+        type: DataType,
+    ): List<ExecutionResult<List<Tag>>> {
+        val tagRelations = TagHelper.getTagRelationsByKeys(ids.toSet(), type).groupBy { it.key }
+        val tags = TagHelper.getAll(type).associateBy { it.id }
+        return ids.map { id ->
+            val tagIds = tagRelations[id]?.map { it.tagId } ?: setOf()
+            ExecutionResult.Success(
+                if (tagIds.isEmpty()) {
+                    listOf()
+                } else {
+                    val list = mutableListOf<Tag>()
+                    tagIds.forEach { tagId ->
+                        tags[tagId]?.toModel()?.let {
+                            list.add(it)
+                        }
+                    }
+                    list
+                },
+            )
+        }
+    }
+
+    suspend fun load(
+        id: String,
+        type: DataType,
+    ): List<Tag> {
+        val tagRelations = TagHelper.getTagRelationsByKey(id, type)
+        val tags = TagHelper.getAll(type).associateBy { it.id }
+        val tagIds = tagRelations.map { it.tagId }
+        return if (tagIds.isEmpty()) {
+            listOf()
+        } else {
+            val list = mutableListOf<Tag>()
+            tagIds.forEach { tagId ->
+                tags[tagId]?.toModel()?.let {
+                    list.add(it)
+                }
+            }
+            list
+        }
+    }
+}

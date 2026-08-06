@@ -37,7 +37,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.VSession
 import com.ismartcoding.plain.ui.theme.red
-import com.ismartcoding.plain.web.onlineClientIds
+import com.ismartcoding.plain.httpserver.onlineClientIds
 
 @Composable
 internal fun SessionListItem(

@@ -56,8 +56,8 @@ actual fun startImageIndexFullScan(force: Boolean) {}
 
 actual fun cancelImageIndex() {}
 
-actual fun buildImageSearchStatus(): com.ismartcoding.plain.web.models.ImageSearchStatus =
-    com.ismartcoding.plain.web.models.ImageSearchStatus(
+actual fun buildImageSearchStatus(): com.ismartcoding.plain.httpserver.models.ImageSearchStatus =
+    com.ismartcoding.plain.httpserver.models.ImageSearchStatus(
         status = "UNAVAILABLE",
         downloadProgress = 0,
         errorMessage = "",
@@ -68,7 +68,7 @@ actual fun buildImageSearchStatus(): com.ismartcoding.plain.web.models.ImageSear
         indexedImages = 0,
     )
 
-actual fun lookupPhoneGeo(number: String): com.ismartcoding.plain.web.models.PhoneGeo? = null
+actual fun lookupPhoneGeo(number: String): com.ismartcoding.plain.httpserver.models.PhoneGeo? = null
 
 actual suspend fun searchSmsConversations(
     query: String,
@@ -108,9 +108,9 @@ actual fun getDownloadsDirPath(): String = ""
 
 actual suspend fun getContactById(id: String): com.ismartcoding.plain.data.DContact? = null
 
-actual fun updateContact(id: String, input: com.ismartcoding.plain.web.models.ContactInput) {}
+actual fun updateContact(id: String, input: com.ismartcoding.plain.httpserver.models.ContactInput) {}
 
-actual fun createContact(input: com.ismartcoding.plain.web.models.ContactInput): String = ""
+actual fun createContact(input: com.ismartcoding.plain.httpserver.models.ContactInput): String = ""
 
 actual suspend fun deleteContacts(ids: Set<String>) {}
 

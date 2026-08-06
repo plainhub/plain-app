@@ -5,11 +5,11 @@ import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.streamFileTo
-import com.ismartcoding.plain.web.http.HttpCall
-import com.ismartcoding.plain.web.http.HttpMethod
-import com.ismartcoding.plain.web.http.HttpMultipartPart
-import com.ismartcoding.plain.web.http.HttpStatus
-import com.ismartcoding.plain.web.http.StreamSink
+import com.ismartcoding.plain.httpserver.http.HttpCall
+import com.ismartcoding.plain.httpserver.http.HttpMethod
+import com.ismartcoding.plain.httpserver.http.HttpMultipartPart
+import com.ismartcoding.plain.httpserver.http.HttpStatus
+import com.ismartcoding.plain.httpserver.http.StreamSink
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**

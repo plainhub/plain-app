@@ -150,9 +150,9 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.getInsetsController(window, window.decorView).systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         instance = WeakReference(this)
         com.ismartcoding.plain.mainActivity = this
-        com.ismartcoding.plain.web.models.pomodoroRuntimeInfoProvider = {
+        com.ismartcoding.plain.httpserver.models.pomodoroRuntimeInfoProvider = {
             val vm = pomodoroVM
-            com.ismartcoding.plain.web.models.PomodoroRuntimeInfo(
+            com.ismartcoding.plain.httpserver.models.PomodoroRuntimeInfo(
                 completedCount = vm.completedCount.intValue,
                 currentRound = vm.currentRound.intValue,
                 timeLeft = vm.timeLeft.intValue,

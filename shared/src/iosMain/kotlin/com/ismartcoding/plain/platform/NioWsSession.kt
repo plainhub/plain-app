@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.web.http.WsSession
+import com.ismartcoding.plain.httpserver.http.WsSession
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ChannelResult
 import kotlin.concurrent.Volatile
@@ -14,7 +14,7 @@ import kotlin.concurrent.Volatile
  * [onClose] as frames arrive from the network.
  *
  * The commonMain WebSocket route handler (see
- * [com.ismartcoding.plain.web.routes.addWebSocketRoutes]) calls
+ * [com.ismartcoding.plain.httpserver.routes.addWebSocketRoutes]) calls
  * [receiveBinary] in a loop — that call suspends on [frameChannel] until
  * Swift delivers the next frame or closes the connection.
  *

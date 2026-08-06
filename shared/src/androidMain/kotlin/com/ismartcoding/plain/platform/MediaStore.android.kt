@@ -175,10 +175,10 @@ actual fun startImageIndexFullScan(force: Boolean) =
 actual fun cancelImageIndex() =
     com.ismartcoding.plain.ai.ImageSearchIndexer.cancel()
 
-actual fun buildImageSearchStatus(): com.ismartcoding.plain.web.models.ImageSearchStatus {
+actual fun buildImageSearchStatus(): com.ismartcoding.plain.httpserver.models.ImageSearchStatus {
     val mgr = com.ismartcoding.plain.ai.ImageSearchManager
     val indexer = com.ismartcoding.plain.ai.ImageSearchIndexer
-    return com.ismartcoding.plain.web.models.ImageSearchStatus(
+    return com.ismartcoding.plain.httpserver.models.ImageSearchStatus(
         status = mgr.status.value.name,
         downloadProgress = mgr.downloadProgress.value,
         errorMessage = mgr.errorMessage.value,
@@ -190,7 +190,7 @@ actual fun buildImageSearchStatus(): com.ismartcoding.plain.web.models.ImageSear
     )
 }
 
-actual fun lookupPhoneGeo(number: String): com.ismartcoding.plain.web.models.PhoneGeo? =
+actual fun lookupPhoneGeo(number: String): com.ismartcoding.plain.httpserver.models.PhoneGeo? =
     PhoneGeoCache.lookup(number)
 
 actual suspend fun searchSmsConversations(
@@ -243,10 +243,10 @@ actual fun getDownloadsDirPath(): String =
 actual suspend fun getContactById(id: String): com.ismartcoding.plain.data.DContact? =
     com.ismartcoding.plain.features.media.ContactMediaStoreHelper.getByIdAsync(appContext, id)
 
-actual fun updateContact(id: String, input: com.ismartcoding.plain.web.models.ContactInput) =
+actual fun updateContact(id: String, input: com.ismartcoding.plain.httpserver.models.ContactInput) =
     com.ismartcoding.plain.features.media.ContactMediaStoreHelper.updateAsync(id, input)
 
-actual fun createContact(input: com.ismartcoding.plain.web.models.ContactInput): String =
+actual fun createContact(input: com.ismartcoding.plain.httpserver.models.ContactInput): String =
     com.ismartcoding.plain.features.media.ContactMediaStoreHelper.createAsync(input)
 
 actual suspend fun deleteContacts(ids: Set<String>) {

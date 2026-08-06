@@ -67,8 +67,8 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
-import com.ismartcoding.plain.web.httpPorts
-import com.ismartcoding.plain.web.httpsPorts
+import com.ismartcoding.plain.httpserver.httpPorts
+import com.ismartcoding.plain.httpserver.httpsPorts
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 

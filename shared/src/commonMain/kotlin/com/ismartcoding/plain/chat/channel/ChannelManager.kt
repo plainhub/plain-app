@@ -18,7 +18,7 @@ import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.platform.generateChaCha20Key
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.web.models.dchatChannelToModel
+import com.ismartcoding.plain.httpserver.models.dchatChannelToModel
 
 object ChannelManager {
 

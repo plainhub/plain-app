@@ -5,7 +5,7 @@ package com.ismartcoding.plain.features.dlna.receiver
  *
  * The HTTP control endpoints are served by the shared web server (see
  * `web/routes/DlnaRoutes.kt`); this type is the adapter the web server's
- * [HttpCall][com.ismartcoding.plain.web.http.HttpCall] is converted into
+ * [HttpCall][com.ismartcoding.plain.httpserver.http.HttpCall] is converted into
  * before being handed to [DlnaHttpRouter]. [headers] keys are lowercased.
  */
 data class DlnaHttpRequest(

@@ -10,7 +10,7 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode

@@ -15,7 +15,7 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.notificationManager
-import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.httpserver.HttpServerManager
 
 class NetworkStateReceiver : BroadcastReceiver() {
     @SuppressLint("MissingPermission")

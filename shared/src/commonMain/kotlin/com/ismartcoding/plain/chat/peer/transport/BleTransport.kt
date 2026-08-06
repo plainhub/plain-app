@@ -56,8 +56,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * 4. Wraps the encrypted bytes in a [BleHttpRequest] (base64 body) and sends
  *    it via [BleServices.http]. The server-side
  *    [com.ismartcoding.plain.ble.server.HttpServiceHandler] dispatches the
- *    request through the shared [com.ismartcoding.plain.web.HttpRouteRegistry]
- *    to [com.ismartcoding.plain.web.PeerGraphQLService], which
+ *    request through the shared [com.ismartcoding.plain.httpserver.HttpRouteRegistry]
+ *    to [com.ismartcoding.plain.httpserver.PeerGraphQLService], which
  *    decrypts, executes, and re-encrypts the response.
  * 5. Base64-decodes and ChaCha20-decrypts the [BleHttpResponse] body, then
  *    parses it as a GraphQL JSON response via [GraphQLResponseParser].

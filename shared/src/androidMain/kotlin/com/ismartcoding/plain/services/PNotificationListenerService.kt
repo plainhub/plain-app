@@ -22,7 +22,7 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.preferences.NotificationFilterPreference
-import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.receiveEventHandler

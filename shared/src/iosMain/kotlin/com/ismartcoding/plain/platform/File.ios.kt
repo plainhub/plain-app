@@ -16,7 +16,7 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.lib.toByteArray
-import com.ismartcoding.plain.web.http.StreamSink
+import com.ismartcoding.plain.httpserver.http.StreamSink
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.utils.io.readAvailable

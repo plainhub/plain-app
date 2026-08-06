@@ -24,7 +24,7 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.sent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.httpserver.models.toModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.db.DSession
-import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.SessionList
+import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.SessionList
 
 suspend fun fetchSessionsListItemsAsync(): List<DSession> = SessionList.getItemsAsync()
 

@@ -4,22 +4,22 @@ import android.media.MediaMetadataRetriever
 import androidx.exifinterface.media.ExifInterface
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.helpers.ImageHelper
-import com.ismartcoding.plain.web.models.AudioFileInfo
-import com.ismartcoding.plain.web.models.ImageFileInfo
-import com.ismartcoding.plain.web.models.VideoFileInfo
-import com.ismartcoding.plain.web.models.parseMediaLocation
+import com.ismartcoding.plain.httpserver.models.AudioFileInfo
+import com.ismartcoding.plain.httpserver.models.ImageFileInfo
+import com.ismartcoding.plain.httpserver.models.VideoFileInfo
+import com.ismartcoding.plain.httpserver.models.parseMediaLocation
 import android.net.Uri
 import java.io.File
 
 actual fun loadImageInfo(path: String): ImageFileInfo {
     val rotation = ImageHelper.getRotation(path)
     val size = ImageHelper.getIntrinsicSize(path, rotation)
-    var location: com.ismartcoding.plain.web.models.Location? = null
+    var location: com.ismartcoding.plain.httpserver.models.Location? = null
     if (!path.endsWith(".svg", true)) {
         val exifInterface = ExifInterface(path)
         val latLong = exifInterface.latLong
         if (latLong != null) {
-            location = com.ismartcoding.plain.web.models.Location(latLong[0], latLong[1])
+            location = com.ismartcoding.plain.httpserver.models.Location(latLong[0], latLong[1])
         }
     }
     return ImageFileInfo(size.width, size.height, location)

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.platform.lookupPhoneGeo
-import com.ismartcoding.plain.web.models.PhoneGeo
+import com.ismartcoding.plain.httpserver.models.PhoneGeo
 import kotlin.time.Instant
 
 data class DCall(

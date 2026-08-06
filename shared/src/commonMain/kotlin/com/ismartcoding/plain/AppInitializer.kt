@@ -27,10 +27,8 @@ import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.ServicePreference
-import com.ismartcoding.plain.preferences.ensureKeyPairAsync
-import com.ismartcoding.plain.preferences.ensureValueAsync
 import com.ismartcoding.plain.preferences.getPreferencesAsync
-import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.httpserver.HttpServerManager
 
 /**
  * Shared preference and TempData initialization, called by both Android

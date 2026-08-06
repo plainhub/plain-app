@@ -33,8 +33,8 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.models.toModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

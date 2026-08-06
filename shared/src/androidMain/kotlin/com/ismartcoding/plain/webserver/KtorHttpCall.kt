@@ -1,11 +1,11 @@
-package com.ismartcoding.plain.webserver
+package com.ismartcoding.plain.httpserverserver
 
 import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.web.http.HttpCall
-import com.ismartcoding.plain.web.http.HttpMethod
-import com.ismartcoding.plain.web.http.HttpMultipartPart
-import com.ismartcoding.plain.web.http.StreamSink
+import com.ismartcoding.plain.httpserver.http.HttpCall
+import com.ismartcoding.plain.httpserver.http.HttpMethod
+import com.ismartcoding.plain.httpserver.http.HttpMultipartPart
+import com.ismartcoding.plain.httpserver.http.StreamSink
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData

@@ -13,7 +13,7 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.deletePreviewImage
 import com.ismartcoding.plain.platform.fetchLinkPreviewsAsync
-import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.httpserver.models.toModel
 
 /**
  * Edits a text chat message and reconciles its link previews:

@@ -22,4 +22,8 @@ data class DAudio(
     fun getSubtitle(): String {
         return listOf(artist, duration.formatDuration()).filter { it.isNotEmpty() }.joinToString(" · ")
     }
+
+    fun toPlaylistAudio(): DPlaylistAudio {
+        return DPlaylistAudio(title, path, artist, duration)
+    }
 }

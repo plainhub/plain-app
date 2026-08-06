@@ -44,9 +44,9 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.tipsText
-import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.setOnlineClientIds
-import com.ismartcoding.plain.web.onlineClientIds
+import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.setOnlineClientIds
+import com.ismartcoding.plain.httpserver.onlineClientIds
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource

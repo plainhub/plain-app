@@ -38,7 +38,7 @@ import com.ismartcoding.plain.platform.fetchUrlToStream
 import com.ismartcoding.plain.platform.saveTempFileToDownloads
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.web.http.StreamSink
+import com.ismartcoding.plain.httpserver.http.StreamSink
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString

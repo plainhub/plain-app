@@ -6,9 +6,9 @@ import com.ismartcoding.plain.ble.BleHttpResponse
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.web.HttpRouteRegistry
-import com.ismartcoding.plain.web.http.HttpMethod
-import com.ismartcoding.plain.web.http.HttpStatus
+import com.ismartcoding.plain.httpserver.HttpRouteRegistry
+import com.ismartcoding.plain.httpserver.http.HttpMethod
+import com.ismartcoding.plain.httpserver.http.HttpStatus
 
 /**
  * [BleServiceHandler] registered on [BleUuids.HTTP_CHAR_UUID] that turns the

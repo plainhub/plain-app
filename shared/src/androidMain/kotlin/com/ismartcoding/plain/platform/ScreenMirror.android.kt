@@ -6,7 +6,7 @@ import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.services.PlainAccessibilityService
 import com.ismartcoding.plain.services.ScreenMirrorService
-import com.ismartcoding.plain.web.models.ScreenMirrorVideoCodec
+import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
 
 actual fun isScreenMirrorRunning(): Boolean =
     ScreenMirrorService.instance?.isRunning() == true

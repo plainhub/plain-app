@@ -1,8 +1,8 @@
-package com.ismartcoding.plain.webserver
+package com.ismartcoding.plain.httpserverserver
 
-import com.ismartcoding.plain.web.http.HttpMethod
-import com.ismartcoding.plain.web.http.HttpRouter
-import com.ismartcoding.plain.web.http.WebSocketRouteEntry
+import com.ismartcoding.plain.httpserver.http.HttpMethod
+import com.ismartcoding.plain.httpserver.http.HttpRouter
+import com.ismartcoding.plain.httpserver.http.WebSocketRouteEntry
 import io.ktor.http.HttpMethod as KtorHttpMethod
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.RoutingContext

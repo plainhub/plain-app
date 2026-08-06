@@ -5,7 +5,7 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.web.http.StreamSink
+import com.ismartcoding.plain.httpserver.http.StreamSink
 
 suspend fun releaseAppFile(fidSuffix: String) = withIO {
     val hash = fidSuffix.substringBefore(".")

@@ -17,7 +17,7 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.extensions.queryOpenableFile
 import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
-import com.ismartcoding.plain.web.http.StreamSink
+import com.ismartcoding.plain.httpserver.http.StreamSink
 import android.net.Uri
 import androidx.core.net.toUri
 import com.ismartcoding.plain.data.DownloadFileItem

@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.web.models.AudioFileInfo
-import com.ismartcoding.plain.web.models.ImageFileInfo
-import com.ismartcoding.plain.web.models.VideoFileInfo
+import com.ismartcoding.plain.httpserver.models.AudioFileInfo
+import com.ismartcoding.plain.httpserver.models.ImageFileInfo
+import com.ismartcoding.plain.httpserver.models.VideoFileInfo
 
 /**
  * Loads image metadata (dimensions and EXIF GPS location) from [path].

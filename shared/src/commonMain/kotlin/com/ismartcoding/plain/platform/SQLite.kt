@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.web.models.DbTableInfo
+import com.ismartcoding.plain.httpserver.models.DbTableInfo
 
 /**
  * Absolute path of the SQLite database file. Empty string on platforms without

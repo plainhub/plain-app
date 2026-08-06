@@ -25,7 +25,7 @@ import com.ismartcoding.plain.features.contact.ContentHelper
 import com.ismartcoding.plain.features.contact.DOrganization
 import com.ismartcoding.plain.features.contact.SourceHelper
 import com.ismartcoding.plain.helpers.QueryHelper
-import com.ismartcoding.plain.web.models.ContactInput
+import com.ismartcoding.plain.httpserver.models.ContactInput
 
 object ContactMediaStoreHelper {
     private val uriExternal: Uri = ContactsContract.Data.CONTENT_URI

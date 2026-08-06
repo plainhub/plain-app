@@ -83,7 +83,7 @@ import com.ismartcoding.plain.platform.updateChatMessageTextAsync
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.resetAsync
-import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
