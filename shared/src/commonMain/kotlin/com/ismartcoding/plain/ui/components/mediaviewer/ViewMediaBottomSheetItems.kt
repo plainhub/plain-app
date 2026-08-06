@@ -34,7 +34,8 @@ internal fun ViewMediaActionButtons(
         if (qrScanResult.isNotEmpty()) {
             IconTextScanQrCodeButton { onShowQrScanResult() }
         }
-        if (m.data is DImage || m.data is DVideo) {
+        val isMediaFile = m.data is DImage || m.data is DVideo
+        if (isMediaFile) {
             IconTextShareButton {
                 shareFile(m.path)
                 onDismiss()
@@ -43,11 +44,13 @@ internal fun ViewMediaActionButtons(
         if (onCast != null) {
             IconTextCastButton { onCast() }
         }
-        IconTextRenameButton { onShowRenameDialog() }
-        IconTextDeleteButton {
-            DialogHelper.confirmToDelete {
-                deleteAction()
-                onDismiss()
+        if (isMediaFile) {
+            IconTextRenameButton { onShowRenameDialog() }
+            IconTextDeleteButton {
+                DialogHelper.confirmToDelete {
+                    deleteAction()
+                    onDismiss()
+                }
             }
         }
     }

@@ -24,6 +24,7 @@ import org.intellij.markdown.MarkdownElementTypes.ATX_6
 import org.intellij.markdown.MarkdownElementTypes.BLOCK_QUOTE
 import org.intellij.markdown.MarkdownElementTypes.CODE_BLOCK
 import org.intellij.markdown.MarkdownElementTypes.CODE_FENCE
+import org.intellij.markdown.MarkdownElementTypes.HTML_BLOCK
 import org.intellij.markdown.MarkdownElementTypes.IMAGE
 import org.intellij.markdown.MarkdownElementTypes.ORDERED_LIST
 import org.intellij.markdown.MarkdownElementTypes.PARAGRAPH
@@ -132,7 +133,7 @@ internal fun MarkdownElementInternal(
         IMAGE -> components.image(model)
         HORIZONTAL_RULE -> components.horizontalRule(model)
         TABLE -> components.table(model)
-        HTML_TAG -> {
+        HTML_TAG, HTML_BLOCK -> {
             // Jetbrains-markdown tokenizes inline HTML tags (including `<img src="..." />`)
             // as a single `HTML_TAG` token, but the base renderer only handles markdown
             // elements. Without this branch the tag is silently dropped (the `else` path
@@ -141,7 +142,12 @@ internal fun MarkdownElementInternal(
             // the markdown image syntax so existing `app://` / `fid:` resolution keeps
             // working unchanged.
             //
-            // Note: only top-level HTML tags reach this branch. Inline `<img>` tags
+            // `HTML_BLOCK` is included too: a standalone `<img .../>` line (not
+            // interrupting a paragraph — e.g. an image-only note) is tokenized by GFM
+            // as an `HTML_BLOCK`, not the inline `HTML_TAG` token, but its raw text is
+            // extracted the same way via `getTextInNode`.
+            //
+            // Note: only top-level HTML tags/blocks reach this branch. Inline `<img>` tags
             // nested inside a paragraph are handled by
             // [buildMarkdownAnnotatedString] in the annotator package, which routes
             // them through the inline-content placeholder system.

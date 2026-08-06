@@ -109,18 +109,20 @@ fun ViewMediaBottomSheet(
     PModalBottomSheet(onDismissRequest = { onDismiss() }) {
         LazyColumn {
             item { VerticalSpace(32.dp) }
+            item {
+                ViewMediaActionButtons(
+                    m = m, qrScanResult = qrScanResult,
+                    onShowQrScanResult = { showQrScanResult = true },
+                    onShowRenameDialog = { showRenameDialog = true },
+                    deleteAction = deleteAction, onDismiss = onDismiss,
+                    onCast = castViewModel?.let { vm -> { vm.showCastDialog.value = true } })
+            }
             if (m.data is DImage || m.data is DVideo) {
-                item {
-                    ViewMediaActionButtons(m = m, qrScanResult = qrScanResult,
-                        onShowQrScanResult = { showQrScanResult = true },
-                        onShowRenameDialog = { showRenameDialog = true },
-                        deleteAction = deleteAction, onDismiss = onDismiss,
-                        onCast = castViewModel?.let { vm -> { vm.showCastDialog.value = true } })
-                }
                 item {
                     VerticalSpace(dp = 16.dp)
                     Subtitle(text = stringResource(Res.string.tags))
-                    TagSelector(data = m.data, tagsVM = tagsVM!!, tagsMap = tagsMap!!,
+                    TagSelector(
+                        data = m.data, tagsVM = tagsVM!!, tagsMap = tagsMap!!,
                         tagsState = tagsState, onChangedAsync = { onTagsChangedAsync() })
                     VerticalSpace(dp = 16.dp)
                 }
