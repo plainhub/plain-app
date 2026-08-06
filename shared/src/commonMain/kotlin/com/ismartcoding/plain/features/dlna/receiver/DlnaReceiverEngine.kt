@@ -138,8 +138,10 @@ object DlnaReceiverEngine {
                     is DlnaCommand.Play -> DlnaRendererState.playbackState.value = DlnaPlaybackState.PLAYING
                     is DlnaCommand.Pause -> DlnaRendererState.playbackState.value = DlnaPlaybackState.PAUSED
                     is DlnaCommand.Stop -> {
+                        // Stop also exits the player overlay (mediaUri cleared), matching onExit in DlnaReceiverOverlay.
                         DlnaRendererState.seekTargetMs.value = 0L
-                        DlnaRendererState.playbackState.value = DlnaPlaybackState.STOPPED
+                        DlnaRendererState.mediaUri.value = ""
+                        DlnaRendererState.playbackState.value = DlnaPlaybackState.NO_MEDIA_PRESENT
                     }
                     is DlnaCommand.Seek -> DlnaRendererState.seekTargetMs.value = command.positionMs
                 }
