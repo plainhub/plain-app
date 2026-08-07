@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.platform.shareFile
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.CopyIconButton
@@ -35,11 +36,9 @@ internal fun ViewMediaActionButtons(
             IconTextScanQrCodeButton { onShowQrScanResult() }
         }
         val isMediaFile = m.data is DImage || m.data is DVideo
-        if (isMediaFile) {
-            IconTextShareButton {
-                shareFile(m.path)
-                onDismiss()
-            }
+        IconTextShareButton {
+            shareFile(m.path)
+            onDismiss()
         }
         if (onCast != null) {
             IconTextCastButton { onCast() }

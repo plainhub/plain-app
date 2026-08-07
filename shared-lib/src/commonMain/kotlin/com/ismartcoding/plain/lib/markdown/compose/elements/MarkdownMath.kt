@@ -81,10 +81,18 @@ fun MarkdownMath(
             )
         }
     } else {
+        // Inline math lives inside an InlineTextContent placeholder whose
+        // width is a tight heuristic (≈1.2em). The Latex composable paints
+        // at its natural width regardless of parent constraints, so using
+        // fillMaxWidth() here is actively harmful — it forces the layout
+        // node to claim the full container width before clipping occurs at
+        // the BasicText boundary, which can shift surrounding text off the
+        // intended baseline. wrapContentWidth keeps the composable pinned
+        // to its actual drawn bounds so line-wrapping stays correct.
         Latex(
             latex = latex,
             modifier = modifier
-                .fillMaxWidth()
+                .wrapContentWidth(align = Alignment.CenterHorizontally)
                 .heightIn(min = 24.dp)
                 .padding(vertical = 4.dp)
                 .wrapContentHeight(align = Alignment.CenterVertically),

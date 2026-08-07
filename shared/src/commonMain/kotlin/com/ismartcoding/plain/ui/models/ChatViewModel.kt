@@ -11,6 +11,7 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
+import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
@@ -55,6 +56,8 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     val pendingForwardFiles: StateFlow<Set<String>?> = _pendingForwardFiles.asStateFlow()
     private val _pendingForwardText = MutableStateFlow<String?>(null)
     val pendingForwardText: StateFlow<String?> = _pendingForwardText.asStateFlow()
+    private val _pendingForwardContent = MutableStateFlow<DMessageContent?>(null)
+    val pendingForwardContent: StateFlow<DMessageContent?> = _pendingForwardContent.asStateFlow()
 
     fun setPendingForwardFiles(uris: Set<String>?) {
         _pendingForwardFiles.value = uris
@@ -62,6 +65,10 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     fun setPendingForwardText(text: String?) {
         _pendingForwardText.value = text
+    }
+
+    fun setPendingForwardContent(content: DMessageContent?) {
+        _pendingForwardContent.value = content
     }
 
     suspend fun initializeTargetAsync(chatId: String) = withIO {
@@ -175,6 +182,12 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
         item.status == "sent"
     }
 
+    fun sendContent(content: DMessageContent, onResult: (Boolean) -> Unit = {}) {
+        viewModelScope.launchSafe {
+            onResult(doSendMessage(target.value, content, PeerCacher.getOnlinePeerIds()))
+        }
+    }
+
     fun sendTextMessage(text: String, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
         viewModelScope.launchSafe {
             val content = if (text.length > Constants.MAX_MESSAGE_LENGTH) {
@@ -196,7 +209,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     fun updateFilesMessage(messageId: String, files: List<DMessageFile>, isImageVideo: Boolean, onlinePeerIds: Set<String>) {
         viewModelScope.launchSafe {
             val target = target.value
-            val item = ChatManager.updateFilesMessage(messageId, files, isImageVideo, target, onlinePeerIds) ?: return@launchSafe
+            val item = ChatManager.updateFilesMessage(messageId, files, target, onlinePeerIds) ?: return@launchSafe
             sendEvent(HMessageUpdatedEvent(item.id))
             update(item)
         }

@@ -13,7 +13,7 @@ expect fun isScreenMirrorRunning(): Boolean
  * Returns the video codec advertised by the active screen mirror pipeline, or
  * null if the pipeline is not running or the codec is not yet known.
  */
-expect fun getScreenMirrorVideoCodec(): ScreenMirrorVideoCodec?
+expect suspend fun getScreenMirrorVideoCodec(): ScreenMirrorVideoCodec?
 
 /**
  * Whether the accessibility service (used for screen mirror control) is enabled.

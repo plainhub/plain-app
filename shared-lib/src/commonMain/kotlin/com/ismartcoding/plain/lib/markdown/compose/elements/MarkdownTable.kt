@@ -2,13 +2,16 @@ package com.ismartcoding.plain.lib.markdown.compose.elements
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -23,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onPlaced
-import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.CollectionInfo
 import androidx.compose.ui.semantics.CollectionItemInfo
@@ -34,9 +36,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.times
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings
 import com.ismartcoding.plain.lib.markdown.annotator.annotatorSettings
 import com.ismartcoding.plain.lib.markdown.annotator.buildMarkdownAnnotatedString
@@ -82,10 +84,11 @@ fun MarkdownTable(
     val tableMaxWidth = LocalMarkdownDimens.current.tableMaxWidth
     val tableCellWidth = LocalMarkdownDimens.current.tableCellWidth
     val tableCornerSize = LocalMarkdownDimens.current.tableCornerSize
+    val dividerColor = LocalMarkdownColors.current.dividerColor
 
     val columnsCount = remember(node) { node.findChildOfType(HEADER)?.children?.count { it.type == CELL } ?: 0 }
     val rowsCount = remember(node) { node.children.count { it.type == ROW } + 1 /* header */ }
-    val tableWidth = columnsCount * tableCellWidth
+    val tableMinWidth = tableCellWidth * columnsCount
 
     val backgroundCodeColor = LocalMarkdownColors.current.tableBackground
     BoxWithConstraints(
@@ -96,24 +99,25 @@ fun MarkdownTable(
                 collectionInfo = CollectionInfo(rowCount = rowsCount, columnCount = columnsCount)
             }
     ) {
-        val scrollable = maxWidth <= tableWidth
+        val scrollable = maxWidth <= tableMinWidth
         Column(
             modifier = if (scrollable) {
-                Modifier.horizontalScroll(rememberScrollState()).requiredWidth(tableWidth)
-            } else Modifier.fillMaxWidth()
+                Modifier.horizontalScroll(rememberScrollState()).requiredWidth(tableMinWidth)
+            } else {
+                Modifier.fillMaxWidth()
+            }
         ) {
-            // Body rows start at semantic index 1 because the header occupies row 0.
             var rowIndex = 1
             node.children.forEach {
                 when (it.type) {
-                    HEADER -> headerBlock(content, it, tableWidth, style)
+                    HEADER -> headerBlock(content, it, tableMinWidth, style)
                     ROW -> {
                         CompositionLocalProvider(LocalTableRowIndex provides rowIndex) {
-                            rowBlock(content, it, tableWidth, style)
+                            rowBlock(content, it, tableMinWidth, style)
                         }
                         rowIndex++
                     }
-                    TABLE_SEPARATOR -> MarkdownDivider()
+                    TABLE_SEPARATOR -> { /* Handled by header row bottom border */ }
                 }
             }
         }
@@ -127,37 +131,55 @@ fun MarkdownTableHeader(
     tableWidth: Dp,
     style: TextStyle,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    maxLines: Int = 1,
-    overflow: TextOverflow = TextOverflow.Ellipsis,
     annotatorSettings: AnnotatorSettings = annotatorSettings(),
 ) {
     val tableCellPadding = LocalMarkdownDimens.current.tableCellPadding
-    Row(
-        verticalAlignment = verticalAlignment, modifier = Modifier.widthIn(tableWidth).height(IntrinsicSize.Max)
-    ) {
-        header.children.filter { it.type == CELL }.forEachIndexed { colIndex, cell ->
-            Column(
-                modifier = Modifier
-                    .padding(tableCellPadding)
-                    .weight(1f)
-                    .semantics {
-                        heading()
-                        collectionItemInfo = CollectionItemInfo(
-                            rowIndex = 0, rowSpan = 1,
-                            columnIndex = colIndex, columnSpan = 1,
-                        )
-                    },
-            ) {
-                MarkdownTableBasicText(
-                    content = content,
-                    cell = cell,
-                    style = style.copy(fontWeight = FontWeight.Bold),
-                    maxLines = maxLines,
-                    overflow = overflow,
-                    annotatorSettings = annotatorSettings,
-                )
+    val headerBg = LocalMarkdownColors.current.tableHeaderBackground
+    val dividerColor = LocalMarkdownColors.current.dividerColor
+
+    Column {
+        Row(
+            verticalAlignment = verticalAlignment,
+            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max)
+        ) {
+            header.children.filter { it.type == CELL }.forEachIndexed { colIndex, cell ->
+                if (colIndex > 0) {
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight()
+                            .background(dividerColor)
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .background(headerBg)
+                        .weight(1f)
+                        .padding(tableCellPadding)
+                        .semantics {
+                            heading()
+                            collectionItemInfo = CollectionItemInfo(
+                                rowIndex = 0, rowSpan = 1,
+                                columnIndex = colIndex, columnSpan = 1,
+                            )
+                        }
+                ) {
+                    MarkdownTableBasicText(
+                        content = content,
+                        cell = cell,
+                        style = style.copy(fontWeight = FontWeight.Bold),
+                        softWrap = false,
+                        annotatorSettings = annotatorSettings,
+                    )
+                }
             }
         }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(dividerColor)
+        )
     }
 }
 
@@ -169,36 +191,51 @@ fun MarkdownTableRow(
     style: TextStyle,
     rowIndex: Int = LocalTableRowIndex.current,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    maxLines: Int = 1,
-    overflow: TextOverflow = TextOverflow.Ellipsis,
     annotatorSettings: AnnotatorSettings = annotatorSettings(),
 ) {
     val tableCellPadding = LocalMarkdownDimens.current.tableCellPadding
-    Row(
-        verticalAlignment = verticalAlignment, modifier = Modifier.widthIn(tableWidth)
-    ) {
-        header.children.filter { it.type == CELL }.forEachIndexed { colIndex, cell ->
-            Column(
-                modifier = Modifier
-                    .padding(tableCellPadding)
-                    .weight(1f)
-                    .semantics {
-                        collectionItemInfo = CollectionItemInfo(
-                            rowIndex = rowIndex, rowSpan = 1,
-                            columnIndex = colIndex, columnSpan = 1,
-                        )
-                    },
-            ) {
-                MarkdownTableBasicText(
-                    content = content,
-                    cell = cell,
-                    style = style,
-                    maxLines = maxLines,
-                    overflow = overflow,
-                    annotatorSettings = annotatorSettings,
-                )
+    val dividerColor = LocalMarkdownColors.current.dividerColor
+
+    Column {
+        Row(
+            verticalAlignment = verticalAlignment,
+            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max)
+        ) {
+            header.children.filter { it.type == CELL }.forEachIndexed { colIndex, cell ->
+                if (colIndex > 0) {
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight()
+                            .background(dividerColor)
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(tableCellPadding)
+                        .semantics {
+                            collectionItemInfo = CollectionItemInfo(
+                                rowIndex = rowIndex, rowSpan = 1,
+                                columnIndex = colIndex, columnSpan = 1,
+                            )
+                        },
+                ) {
+                    MarkdownTableBasicText(
+                        content = content,
+                        cell = cell,
+                        style = style,
+                        annotatorSettings = annotatorSettings,
+                    )
+                }
             }
         }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(dividerColor)
+        )
     }
 }
 
@@ -219,8 +256,7 @@ fun MarkdownTableBasicText(
     content: String,
     cell: ASTNode,
     style: TextStyle,
-    maxLines: Int = 1,
-    overflow: TextOverflow = TextOverflow.Ellipsis,
+    softWrap: Boolean = true,
     annotatorSettings: AnnotatorSettings = annotatorSettings(),
 ) {
     val text = buildAnnotatedString {
@@ -261,8 +297,7 @@ fun MarkdownTableBasicText(
             coords.parentLayoutCoordinates?.also { containerSize.value = it.size.toSize() }
         },
         style = style,
-        maxLines = maxLines,
-        overflow = overflow,
+        softWrap = softWrap,
         inlineContent = resolvedInlineContent,
     )
 }

@@ -1,26 +1,39 @@
 package com.ismartcoding.plain.ui.base.markdowntext
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.sp
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.size.Size as CoilSize
+import com.ismartcoding.plain.enums.MarkdownTheme
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
@@ -32,15 +45,15 @@ import com.ismartcoding.plain.lib.markdown.compose.Markdown
 import com.ismartcoding.plain.lib.markdown.compose.components.MarkdownComponentModel
 import com.ismartcoding.plain.lib.markdown.compose.components.markdownComponents
 import com.ismartcoding.plain.lib.markdown.compose.elements.MarkdownText as CoreMarkdownTextElement
-import com.ismartcoding.plain.lib.markdown.model.DefaultMarkdownColors
-import com.ismartcoding.plain.lib.markdown.model.DefaultMarkdownTypography
+import com.ismartcoding.plain.lib.markdown.compose.extendedspans.ExtendedSpans
+import com.ismartcoding.plain.lib.markdown.compose.extendedspans.RoundedCornerSpanPainter
 import com.ismartcoding.plain.lib.markdown.model.ImageData
 import com.ismartcoding.plain.lib.markdown.model.ImageTransformer
-import com.ismartcoding.plain.lib.markdown.model.markdownDimens
-import com.ismartcoding.plain.lib.markdown.model.markdownPadding
+import com.ismartcoding.plain.lib.markdown.model.markdownExtendedSpans
 import com.ismartcoding.plain.lib.markdown.compose.elements.RenderMathNode
 import com.ismartcoding.plain.lib.markdown.utils.getUnescapedTextInNode
 import kotlinx.coroutines.launch
+import org.intellij.markdown.ast.getTextInNode
 import org.intellij.markdown.flavours.gfm.GFMElementTypes
 
 private val IMAGE_MARKDOWN_REGEX = Regex("""!\[.*?]\(([^)\s]+)\)""")
@@ -132,10 +145,6 @@ fun MarkdownText(
 ) {
     val scope = rememberCoroutineScope()
     val defaultColor = MaterialTheme.colorScheme.onSurface
-    val linkTextColor = MaterialTheme.colorScheme.primary
-    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
-    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
-    val outlineVariant = MaterialTheme.colorScheme.outlineVariant
 
     val textStyle = remember(style, defaultColor) {
         TextStyle(
@@ -149,62 +158,35 @@ fun MarkdownText(
         )
     }
 
-    val monoStyle = TextStyle(
-        fontFamily = FontFamily.Monospace,
-        fontSize = 14.sp,
-        color = onSurfaceVariant,
-    )
+    val colors = MarkdownTheme.colors()
+    val typography = MarkdownTheme.typography(textStyle)
+    val padding = MarkdownTheme.padding()
+    val dimens = MarkdownTheme.dimens()
 
-    val colors = DefaultMarkdownColors(
-        text = defaultColor,
-        codeBackground = surfaceVariant,
-        inlineCodeBackground = surfaceVariant,
-        dividerColor = outlineVariant,
-        tableBackground = surfaceVariant,
-    )
+    val inlineCodeFontSize = typography.inlineCode.fontSize
+    val inlineCodeLineHeight = typography.inlineCode.lineHeight
+    val inlineCodeMargin = run {
+        val fontSizePx = if (inlineCodeFontSize.isSpecified) inlineCodeFontSize.value else 14f
+        val lineHeightPx = if (inlineCodeLineHeight.isSpecified) inlineCodeLineHeight.value else fontSizePx
+        ((lineHeightPx - fontSizePx) / 2f).sp
+    }
 
-    val typography = DefaultMarkdownTypography(
-        h1 = textStyle.copy(fontSize = 28.sp, fontWeight = FontWeight.Bold),
-        h2 = textStyle.copy(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-        h3 = textStyle.copy(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
-        h4 = textStyle.copy(fontSize = 18.sp, fontWeight = FontWeight.SemiBold),
-        h5 = textStyle.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold),
-        h6 = textStyle.copy(fontSize = 14.sp, fontWeight = FontWeight.SemiBold),
-        text = textStyle,
-        code = monoStyle,
-        inlineCode = monoStyle.copy(background = surfaceVariant),
-        quote = textStyle.copy(color = onSurfaceVariant),
-        paragraph = textStyle,
-        ordered = textStyle,
-        bullet = textStyle,
-        list = textStyle,
-        textLink = TextLinkStyles(style = SpanStyle(color = linkTextColor, textDecoration = TextDecoration.Underline)),
-        table = textStyle,
-    )
+    val extendedSpans = markdownExtendedSpans {
+        ExtendedSpans(
+            RoundedCornerSpanPainter(
+                cornerRadius = 4.sp,
+                padding = RoundedCornerSpanPainter.TextPaddingValues(horizontal = 5.sp, vertical = 2.sp),
+                topMargin = 0.sp,
+                bottomMargin = 0.sp,
+            ),
+        )
+    }
 
-    // Custom link click handling: image links open the media previewer, others open in browser.
-    // Default components.text does NOT build AnnotatedString with LinkAnnotations, so we override
-    // components.text to use the String-overload that accepts AnnotatorSettings.
-    val components = remember(text, linkTextColor, defaultColor) {
+    val components = remember(text) {
         markdownComponents(
             text = { model: MarkdownComponentModel ->
                 val settings = annotatorSettings(
-                    linkTextSpanStyle = TextLinkStyles(
-                        style = SpanStyle(color = linkTextColor, textDecoration = TextDecoration.Underline)
-                    ),
-                    codeSpanStyle = SpanStyle(
-                        fontFamily = FontFamily.Monospace,
-                        color = onSurfaceVariant,
-                        background = surfaceVariant,
-                    ),
                     linkInteractionListener = LinkInteractionListener { link ->
-                        // Image taps are routed through `ImageData.onClick` (see
-                        // `AppImageTransformer`), so a `LinkAnnotation` reaching
-                        // this listener is always a real markdown link. The
-                        // previous implementation cross-checked against
-                        // `extractImageLinksFromMarkdown` here, which became
-                        // dead code once `MarkdownImage` grew a dedicated
-                        // `clickable` modifier.
                         val url = (link as? LinkAnnotation.Url)?.url ?: return@LinkInteractionListener
                         WebHelper.open(url)
                     },
@@ -216,10 +198,39 @@ fun MarkdownText(
                     annotatorSettings = settings,
                 )
             },
-            // Intercept GFM math nodes ($...$ and $$...$$) and render them through
-            // MTMathView instead of the default text fallback (which would otherwise
-            // surface the raw LaTeX source). Returning Unit signals "handled" to the
-            // MarkdownElementInternal dispatcher.
+            checkbox = { model ->
+                val checked = model.node.getTextInNode(model.content).contains("[x]")
+                val primary = MaterialTheme.colorScheme.primary
+                val outline = MaterialTheme.colorScheme.outlineVariant
+                val onPrimary = MaterialTheme.colorScheme.onPrimary
+                val shape = RoundedCornerShape(6.dp)
+                Box(
+                    modifier = Modifier
+                        .padding(end = 6.dp)
+                        .size(18.dp)
+                        .clip(shape)
+                        .then(
+                            if (checked) Modifier.background(primary)
+                            else Modifier.border(1.5.dp, outline, shape)
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (checked) {
+                        Canvas(modifier = Modifier.size(14.dp)) {
+                            val path = Path().apply {
+                                moveTo(size.width * 0.18f, size.height * 0.52f)
+                                lineTo(size.width * 0.42f, size.height * 0.75f)
+                                lineTo(size.width * 0.82f, size.height * 0.28f)
+                            }
+                            drawPath(
+                                path = path,
+                                color = onPrimary,
+                                style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round),
+                            )
+                        }
+                    }
+                }
+            },
             custom = { type, model ->
                 if (type == GFMElementTypes.BLOCK_MATH || type == GFMElementTypes.INLINE_MATH) {
                     RenderMathNode(model.content, model.node)
@@ -233,8 +244,9 @@ fun MarkdownText(
         modifier = modifier,
         colors = colors,
         typography = typography,
-        padding = markdownPadding(),
-        dimens = markdownDimens(),
+        padding = padding,
+        dimens = dimens,
+        extendedSpans = extendedSpans,
         imageTransformer = remember(text) {
             AppImageTransformer(onImageClick = { link ->
                 val imageLinks = extractImageLinksFromMarkdown(text)

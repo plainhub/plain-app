@@ -72,7 +72,9 @@ object MediaPreviewData {
     ) {
         MediaPreviewData.items = previewItems
         items.find { it.id == selectedItem.id }?.let {
-            if (it.path.isImageFast()) {
+            if (it.isVideo()) {
+                it.initVideoAsync()
+            } else if (it.isImage()) {
                 it.initImageAsync()
             }
             itemState.intrinsicSize = it.intrinsicSize.toSize()

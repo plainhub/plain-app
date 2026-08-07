@@ -11,9 +11,9 @@ import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
 actual fun isScreenMirrorRunning(): Boolean =
     ScreenMirrorService.instance?.isRunning() == true
 
-actual fun getScreenMirrorVideoCodec(): ScreenMirrorVideoCodec? =
+actual suspend fun getScreenMirrorVideoCodec(): ScreenMirrorVideoCodec? =
     ScreenMirrorService.instance?.let { svc ->
-        svc.getPipeline()?.getScreenMirrorVideoCodec()
+        svc.getPipeline()?.awaitVideoCodec()
     }
 
 actual fun isScreenMirrorControlEnabled(): Boolean =

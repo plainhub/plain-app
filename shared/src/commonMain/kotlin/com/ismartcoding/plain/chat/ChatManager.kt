@@ -77,7 +77,6 @@ object ChatManager {
     suspend fun updateFilesMessage(
         messageId: String,
         files: List<DMessageFile>,
-        isImageVideo: Boolean,
         target: ChatTarget,
         onlinePeerIds: Set<String>,
     ): DChat? = withIO {
@@ -89,6 +88,7 @@ object ChatManager {
             ChatDbHelper.updateChatItemStatus(item, "pending")
             ChatSender.send(item, target, onlinePeerIds)
         }
+        refreshLatestChats()
         item
     }
 

@@ -138,16 +138,17 @@ fun MediaVideo(
             return@LaunchedEffect
         }
         videoState.initData(controller)
-        val savedPos = if (model.mediaId.isNotEmpty()) TempData.videoPlayProgressMap[model.mediaId] else null
         val expectedTotalMs = ((model.data as? DVideo)?.duration ?: 0L) * 1000
         if (expectedTotalMs > 0L) {
             videoState.totalTime = expectedTotalMs
         }
-        if (savedPos != null && savedPos > 0L) {
+        val savedPos = if (model.mediaId.isNotEmpty()) TempData.videoPlayProgressMap[model.mediaId] else null
+        val atEnd = savedPos != null && savedPos > 0 && expectedTotalMs > 0 && savedPos >= expectedTotalMs - 1000
+        if (savedPos != null && savedPos > 0L && !atEnd) {
             videoState.currentTime = savedPos
         }
         controller.setMediaItem(model.path)
-        if (savedPos != null && savedPos > 0) {
+        if (savedPos != null && savedPos > 0 && !atEnd) {
             controller.seekTo(savedPos)
         }
         controller.prepare()

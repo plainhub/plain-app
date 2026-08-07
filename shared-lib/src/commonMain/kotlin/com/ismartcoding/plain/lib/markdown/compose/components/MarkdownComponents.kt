@@ -3,7 +3,6 @@ package com.ismartcoding.plain.lib.markdown.compose.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.lib.markdown.compose.elements.MarkdownBlockQuote
 import com.ismartcoding.plain.lib.markdown.compose.elements.MarkdownBulletList
@@ -32,9 +31,23 @@ typealias MarkdownComponent = @Composable (MarkdownComponentModel) -> Unit
 typealias CustomMarkdownComponent = @Composable (IElementType, MarkdownComponentModel) -> Unit
 
 /**
- * Model holding data relevant for a component
+ * Model holding data relevant for a component.
+ *
+ * This class is intentionally NOT marked @Stable. Reason: MarkdownComponentModel is
+ * passed into every MarkdownComponent lambda (codeFence, text, heading, etc.) as a
+ * positional argument. If it were @Stable, Compose's positional memoization would
+ * compare two instances via data-class `equals` and skip the entire downstream
+ * recomposition whenever the model fields are structurally equal — even when the
+ * surrounding theme (via LocalMarkdownColors / MaterialTheme.colorScheme) has
+ * changed. That means code-block backgrounds, inline-code tints, etc. read from
+ * CompositionLocals inside the MarkdownComponent lambda would become stale after
+ * a light → dark mode toggle until the process is killed.
+ *
+ * Treating the model as **unstable** forces Compose to re-run the component lambda
+ * on every parent recomposition, guaranteeing fresh reads of CompositionLocals
+ * (colors, typography overrides). The performance cost is negligible — the model
+ * is a tiny data-class and every downstream component reads locals defensively.
  */
-@Stable
 data class MarkdownComponentModel(
     val content: String,
     val node: ASTNode,

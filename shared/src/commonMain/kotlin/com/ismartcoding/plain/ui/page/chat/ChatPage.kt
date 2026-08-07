@@ -172,6 +172,10 @@ fun ChatPage(
                     chatVM, peerVM, focusManager,
                 )
             }
+            chatVM.pendingForwardContent.value?.let { content ->
+                chatVM.setPendingForwardContent(null)
+                chatVM.sendContent(content)
+            }
             chatVM.pendingForwardText.value?.let { text ->
                 chatVM.setPendingForwardText(null)
                 chatVM.sendTextMessage(text, PeerCacher.getOnlinePeerIds())

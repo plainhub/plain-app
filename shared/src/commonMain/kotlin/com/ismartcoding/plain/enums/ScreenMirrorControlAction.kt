@@ -10,4 +10,8 @@ enum class ScreenMirrorControlAction {
     RECENTS,
     LOCK_SCREEN,
     KEY,
+    TOUCH,
+    TOUCH_DOWN,
+    TOUCH_MOVE,
+    TOUCH_UP,
 }

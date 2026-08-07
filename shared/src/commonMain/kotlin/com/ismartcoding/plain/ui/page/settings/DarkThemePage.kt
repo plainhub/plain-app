@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -9,17 +10,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.preferences.AmoledDarkThemePreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
 import com.ismartcoding.plain.preferences.LocalAmoledDarkTheme
 import com.ismartcoding.plain.preferences.LocalDarkTheme
+import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -53,7 +55,7 @@ fun DarkThemePage(navController: NavHostController) {
                 }
                 item {
                     PCard {
-                        DarkTheme.entries.map {
+                        DarkTheme.entries.forEach {
                             PListItem(
                                 modifier = Modifier.clickable {
                                     scope.launch {
@@ -73,25 +75,32 @@ fun DarkThemePage(navController: NavHostController) {
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(
-                        text = stringResource(Res.string.other),
-                    )
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable {
-                                scope.launch(IODispatcher) {
+                                scope.launch {
                                     AmoledDarkThemePreference.putAsync(!amoledDarkTheme)
                                 }
                             },
                             title = stringResource(Res.string.amoled_dark_theme),
                         ) {
                             PSwitch(activated = amoledDarkTheme) {
-                                scope.launch(IODispatcher) {
+                                scope.launch {
                                     AmoledDarkThemePreference.putAsync(!amoledDarkTheme)
                                 }
                             }
                             HorizontalSpace(8.dp)
                         }
+                    }
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
+                        PListItem(
+                            modifier = Modifier.clickable {
+                                navController.navigate(Routing.MarkdownThemePreview)
+                            },
+                            showMore = true,
+                            title = "Markdown Preview",
+                        )
                     }
                     BottomSpace(paddingValues)
                 }

@@ -29,7 +29,7 @@ object ChatCacher {
             }
             if (chatId != null) {
                 val existing = chatCache[chatId]
-                if (existing == null || chat.createdAt > existing.createdAt) chatCache[chatId] = chat
+                if (existing == null || chat.updatedAt > existing.updatedAt) chatCache[chatId] = chat
             }
         }
 

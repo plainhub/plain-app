@@ -6,7 +6,7 @@ import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
 
 actual fun isScreenMirrorRunning(): Boolean = false
 
-actual fun getScreenMirrorVideoCodec(): ScreenMirrorVideoCodec? = null
+actual suspend fun getScreenMirrorVideoCodec(): ScreenMirrorVideoCodec? = null
 
 actual fun isScreenMirrorControlEnabled(): Boolean = false
 

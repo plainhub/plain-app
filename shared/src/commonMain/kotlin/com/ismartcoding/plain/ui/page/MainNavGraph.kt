@@ -87,10 +87,12 @@ import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
+import com.ismartcoding.plain.ui.page.settings.AutoCheckUpdatePage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
 import com.ismartcoding.plain.ui.page.settings.ComponentShowcasePage
 import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
+import com.ismartcoding.plain.ui.page.settings.MarkdownThemePreviewPage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.videos.VideosPage
@@ -172,6 +174,10 @@ fun MainNavGraph(
         }
         composable<Routing.Settings> { SettingsPage(navController, updateVM, peerVM) }
         composable<Routing.DarkTheme> { DarkThemePage(navController) }
+        composable<Routing.AutoCheckUpdate> { AutoCheckUpdatePage(navController, updateVM) }
+        composable<Routing.MarkdownThemePreview> {
+            MarkdownThemePreviewPage(navController)
+        }
         composable<Routing.Language> { LanguagePage(navController) }
         composable<Routing.BackupRestore> { BackupRestorePage(navController) }
         composable<Routing.DesktopAccessSettings> { DesktopAccessSettingsPage(navController) }
@@ -276,7 +282,7 @@ fun MainNavGraph(
             FilesPage(navController, audioPlaylistVM, r.folderPath)
         }
         composable<Routing.AppFiles> {
-            AppFilesPage(navController)
+            AppFilesPage(navController, audioPlaylistVM, chatVM)
         }
         composable<Routing.Nearby> {
             NearbyPage(navController, peerVM = peerVM)

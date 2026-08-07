@@ -16,6 +16,9 @@ class Routing {
     object DarkTheme
 
     @Serializable
+    object AutoCheckUpdate
+
+    @Serializable
     object BackupRestore
 
     @Serializable
@@ -161,6 +164,9 @@ class Routing {
 
     @Serializable
     object DlnaCastHistory
+
+    @Serializable
+    object MarkdownThemePreview
 
     @Serializable
     object CastSession

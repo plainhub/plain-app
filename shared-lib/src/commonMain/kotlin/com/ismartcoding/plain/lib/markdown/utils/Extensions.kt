@@ -195,6 +195,11 @@ internal fun Density.toPxOrZero(unit: TextUnit, relativeToPx: Float = 0f): Float
 /**
  * Extension property to get the `SpanStyle` for inline code text.
  * This style is defined by the `inlineCode` typography and the current markdown colors.
+ *
+ * Note: `SpanStyle.background` is intentionally set here — it's read by
+ * `RoundedCornerSpanPainter.decorate()` to identify which spans need a rounded
+ * background and to extract the background color. The painter then strips it
+ * from the span and redraws it as a rounded rect with proper padding.
  */
 val MarkdownTypography.codeSpanStyle: SpanStyle
     @Composable

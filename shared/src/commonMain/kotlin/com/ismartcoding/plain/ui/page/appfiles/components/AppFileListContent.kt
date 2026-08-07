@@ -9,6 +9,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
@@ -19,6 +23,8 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.components.NoDataView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
+import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VAppFile
 
 @Composable
@@ -28,9 +34,22 @@ fun AppFileListContent(
     isLoading: Boolean,
     noMore: Boolean,
     previewerState: MediaPreviewerState,
+    audioPlaylistVM: AudioPlaylistViewModel,
+    chatVM: ChatViewModel,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
 ) {
+    var selectedFile by remember { mutableStateOf<VAppFile?>(null) }
+
+    if (selectedFile != null) {
+        AppFileInfoBottomSheet(
+            file = selectedFile!!,
+            chatVM = chatVM,
+            navController = navController,
+            onDismiss = { selectedFile = null }
+        )
+    }
+
     if (isLoading) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -58,8 +77,12 @@ fun AppFileListContent(
                 file = file,
                 itemState = itemState,
                 previewerState = previewerState,
+                audioPlaylistVM = audioPlaylistVM,
                 onClick = {
-                    openAppFile(files, file, navController, previewerState, itemState)
+                    openAppFile(files, file, navController, previewerState, itemState, audioPlaylistVM)
+                },
+                onLongClick = {
+                    selectedFile = file
                 },
             )
         }

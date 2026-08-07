@@ -46,6 +46,11 @@ data class DAppFile(
 
     @ColumnInfo(name = "weak_hash")
     var weakHash: String = ""
+
+    fun getFidUri(): String {
+        val fileName = realPath.substringAfterLast('/', "")
+        return "fid:$fileName"
+    }
 }
 
 @Dao

@@ -67,16 +67,16 @@ internal fun MarkdownElementInternal(
     includeSpacer: Boolean = true,
 ) {
     val typography = LocalMarkdownTypography.current
-    val model = remember(node, content, typography) {
-        // It's safe to pass `CharSequence` and its `toString` here.
-        // Reason: It's guaranteed that even the source `StringBuilder` changes, The render result is not dirty.
-        // So it's fine to remember it.
-        MarkdownComponentModel(
-            content = content.toString(),
-            node = node,
-            typography = typography,
-        )
-    }
+    // Do NOT remember the model across theme changes. MarkdownComponentModel is a
+    // cheap @Stable data class; skipping remember guarantees that downstream
+    // composables (e.g. MarkdownCode which reads LocalMarkdownColors for its
+    // block background) always re-compose when the typography / colors change
+    // instead of being skipped by Compose's stable-argument equality short-circuit.
+    val model = MarkdownComponentModel(
+        content = content.toString(),
+        node = node,
+        typography = typography,
+    )
     var handled = true
     if (includeSpacer) Spacer(Modifier.height(LocalMarkdownPadding.current.block))
     when (node.type) {

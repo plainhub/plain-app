@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.toSize
 import com.ismartcoding.plain.lib.markdown.annotator.AnnotatorSettings
 import com.ismartcoding.plain.lib.markdown.annotator.annotatorSettings
 import com.ismartcoding.plain.lib.markdown.annotator.buildMarkdownAnnotatedString
+import com.ismartcoding.plain.lib.markdown.annotator.injectInlineMathFallbacks
 import com.ismartcoding.plain.lib.markdown.compose.LocalImageTransformer
 import com.ismartcoding.plain.lib.markdown.compose.LocalImageWidth
 import com.ismartcoding.plain.lib.markdown.compose.LocalMarkdownAnimations
@@ -121,6 +122,16 @@ fun MarkdownText(
     sourceContent: String? = null,
     extendedSpans: ExtendedSpans? = null,
 ) {
+    // Run the GFM-missed inline-math fallback *before* any downstream
+    // work so every consumer sees a consistent AnnotatedString with
+    // MARKDOWN_MATH_ tags present. `remember(content)` avoids re-running
+    // the regex on every recomposition where the paragraph text hasn't
+    // actually changed (e.g. when only image size callbacks fire).
+    //
+    // The fallback never touches BLOCK_MATH or native INLINE_MATH
+    // ranges — see `injectInlineMathFallbacks` for the exact guarantees.
+    val resolvedContent = remember(content) { content.injectInlineMathFallbacks() }
+
     val baseColor = LocalMarkdownColors.current.text
     val animations = LocalMarkdownAnimations.current
     val transformer = LocalImageTransformer.current
@@ -153,7 +164,7 @@ fun MarkdownText(
     val resolved by remember(
         node,
         inlineContent.inlineContent,
-        content,
+        resolvedContent,
         transformer,
         inlineImageWidth,
         lineHeightPx,
@@ -167,9 +178,9 @@ fun MarkdownText(
             // invalidate the derived state.
             val blocks = mutableListOf<BlockImageRange>()
             val map = inlineContent.inlineContent +
-                buildMathInlineContent(content = content) +
+                buildMathInlineContent(content = resolvedContent) +
                 buildImageInlineContent(
-                content = content,
+                content = resolvedContent,
                 node = node,
                 transformer = transformer,
                 density = density,
@@ -228,13 +239,13 @@ fun MarkdownText(
     }
 
     if (blockImageRanges.isEmpty()) {
-        val hasLinks = content.getLinkAnnotations(0, content.length).isNotEmpty()
+        val hasLinks = resolvedContent.getLinkAnnotations(0, resolvedContent.length).isNotEmpty()
         if (hasLinks) {
             Box(modifier = containerModifier(modifier)) {
-                textSegment(content, Modifier)
+                textSegment(resolvedContent, Modifier)
             }
         } else {
-            textSegment(content, modifier.onPlaced {
+            textSegment(resolvedContent, modifier.onPlaced {
                 it.parentLayoutCoordinates?.also { coordinates ->
                     containerSize.value = coordinates.size.toSize()
                 }
@@ -247,7 +258,7 @@ fun MarkdownText(
             var cursor = 0
             blockImageRanges.forEach { range ->
                 if (range.start > cursor) {
-                    textSegment(content.subSequence(cursor, range.start), Modifier)
+                    textSegment(resolvedContent.subSequence(cursor, range.start), Modifier)
                 }
                 if (sourceContent != null && range.imageNode != null) {
                     components.image(MarkdownComponentModel(sourceContent, range.imageNode, typography))
@@ -256,8 +267,8 @@ fun MarkdownText(
                 }
                 cursor = range.end
             }
-            if (cursor < content.length) {
-                textSegment(content.subSequence(cursor, content.length), Modifier)
+            if (cursor < resolvedContent.length) {
+                textSegment(resolvedContent.subSequence(cursor, resolvedContent.length), Modifier)
             }
         }
     }
@@ -394,10 +405,27 @@ internal fun buildMathInlineContent(
         // span 15-20em), but `InlineTextContent` caps the rendered
         // composable at the placeholder's width. We size the placeholder
         // to roughly 20em so even a long block formula has room to draw
-        // before being clipped by the text layout. Inline `$…$` math is
-        // kept narrow so it sits on the text baseline cleanly.
+        // before being clipped by the text layout.
+        //
+        // For INLINE `$…$` math we size the placeholder proportional to
+        // the formula body length, because a fixed narrow placeholder
+        // (e.g. 1.2em, the bug we fixed here) would CLIP the Latex
+        // composable to just the first letter (e.g. only "E" visible out
+        // of "E = mc^2"). 0.6em per char is a loose heuristic that
+        // accounts for LaTeX's tighter kerning vs plain text; we clamp
+        // between 2em (tiny formulas like $x$ still have padding) and
+        // 30em (keep inline formulas from swallowing whole paragraphs).
         val isBlock = latex.startsWith("$$")
-        val placeholderWidth = if (isBlock) fontSize.value * 20f else fontSize.value * 1.2f
+        val placeholderWidth: Float = if (isBlock) {
+            fontSize.value * 20f
+        } else {
+            val body = latex.removeSurrounding("$")
+            val perCharEm = 0.6f
+            val minEm = 2f
+            val maxEm = 30f
+            val rawEm = (body.length * perCharEm).coerceIn(minEm, maxEm)
+            fontSize.value * rawEm
+        }
         val placeholderHeight = if (isBlock) fontSize.value * 3f else fontSize.value * 1.4f
         annotation.item to InlineTextContent(
             Placeholder(

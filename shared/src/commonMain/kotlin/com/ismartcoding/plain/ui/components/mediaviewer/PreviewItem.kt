@@ -18,7 +18,7 @@ data class PreviewItem(
     var path: String = "",
     var size: Long = 0L,
     val mediaId: String = "",
-    val data: IData? = null,
+    val data: IData? = null, // DMessageFile, DVideo, DImage
 ) {
     var intrinsicSize: IntSize = IntSize.Zero
     var rotation: Int = -1
@@ -60,41 +60,43 @@ data class PreviewItem(
         intrinsicSize = getImageIntrinsicSize(path, rotation)
     }
 
+    fun initVideoAsync() {
+        resolveVideoIntrinsicSize()
+    }
+
+    private fun resolveVideoIntrinsicSize() {
+        val meta = getVideoMeta(path) ?: return
+        rotation = meta.rotation
+        intrinsicSize = if (rotation == 90 || rotation == 270) {
+            IntSize(meta.height, meta.width)
+        } else {
+            IntSize(meta.width, meta.height)
+        }
+    }
+
     fun initAsync(m: DVideo) {
         rotation = m.rotation
         intrinsicSize = m.getRotatedSize()
         if (intrinsicSize == IntSize.Zero) {
-            val meta = getVideoMeta(path) ?: return
-            rotation = meta.rotation
-            if (rotation == 90 || rotation == 270) {
-                intrinsicSize = IntSize(meta.height, meta.width)
-            } else {
-                intrinsicSize = IntSize(meta.width, meta.height)
-            }
+            resolveVideoIntrinsicSize()
         }
     }
 
     fun initAsync(item: DMessageFile) {
         if (item.fileName.isImageFast()) {
             rotation = getImageRotation(path)
-            if (item.width > 0 && item.height > 0) {
-                intrinsicSize = IntSize(item.width, item.height)
+            intrinsicSize = if (item.width > 0 && item.height > 0) {
+                IntSize(item.width, item.height)
             } else {
-                intrinsicSize = getImageIntrinsicSize(path, rotation)
+                getImageIntrinsicSize(path, rotation)
             }
         } else {
-            val meta = getVideoMeta(path) ?: return
-            rotation = meta.rotation
             if (item.width > 0 && item.height > 0) {
+                val meta = getVideoMeta(path) ?: return
+                rotation = meta.rotation
                 intrinsicSize = IntSize(item.width, item.height)
             } else {
-                val w = meta.width
-                val h = meta.height
-                intrinsicSize = if (rotation == 90 || rotation == 270) {
-                    IntSize(h, w)
-                } else {
-                    IntSize(w, h)
-                }
+                resolveVideoIntrinsicSize()
             }
         }
     }

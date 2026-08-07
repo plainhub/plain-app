@@ -33,8 +33,8 @@ fun markdownDimens(
     codeBackgroundCornerSize: Dp = 8.dp,
     blockQuoteThickness: Dp = 2.dp,
     tableMaxWidth: Dp = Dp.Unspecified,
-    tableCellWidth: Dp = 160.dp,
-    tableCellPadding: Dp = 16.dp,
+    tableCellWidth: Dp = 120.dp,
+    tableCellPadding: Dp = 8.dp,
     tableCornerSize: Dp = 8.dp,
 ): MarkdownDimens = DefaultMarkdownDimens(
     dividerThickness = dividerThickness,

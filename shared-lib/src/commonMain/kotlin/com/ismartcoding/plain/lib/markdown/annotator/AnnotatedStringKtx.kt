@@ -361,11 +361,11 @@ fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
                     }
 
                     MarkdownElementTypes.CODE_SPAN -> {
+                        append(' ')
                         pushStyle(annotatorSettings.codeSpanStyle)
-                        append(' ')
                         buildMarkdownAnnotatedString(content, child.children.innerList(), annotatorSettings)
-                        append(' ')
                         pop()
+                        append(' ')
                     }
 
                     MarkdownElementTypes.AUTOLINK -> appendAutoLink(content, child, annotatorSettings)
@@ -425,4 +425,151 @@ fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
     // stays consistent and `buildAnnotatedString` doesn't throw on malformed
     // user-authored content (e.g. a missing `</font>`).
     repeat(fontOpenCount) { pop() }
+}
+
+// ── Inline-math fallback extractor ──────────────────────────────────────
+
+/**
+ * Regex that matches a single `$…$` inline math run while deliberately
+ * rejecting `$$…$$` block math. The surrounding lookaround assertions
+ * (`(?<!\$)` / `(?!\$)`) require the opening `$` not to be preceded by
+ * another `$` and the closing `$` not to be followed by another `$`,
+ * which means:
+ *
+ *  - `$E = mc^2$`       → MATCHES (inline math)
+ *  - `$$\int_0^1 dx$$`  → never matches, no matter how it is split
+ *                        across lines or wrapped in spaces
+ *  - `price $100`       → no match (lone `$`, needs a pair)
+ *  - `$a$b$c$`          → only `$a$` and `$c$` match; `b` is plain text
+ *
+ * The body character class `[^$\n]+?` forbids literal `$` *inside* the
+ * formula so we don't swallow a later block-math opening delimiter,
+ * and forbids `\n` so a run cannot span paragraphs (matching what the
+ * GFM lexer would do for inline math). The `+?` non-greedy quantifier
+ * stops at the *first* closing `$` it finds, keeping each run tight.
+ *
+ * This is intentionally a *fallback*: the GFM lexer (via
+ * `GFMElementTypes.INLINE_MATH`) already handles whitespace-separated
+ * cases natively. We only reach this codepath when the lexer produced
+ * plain `TEXT` / `DOLLAR` tokens instead — e.g. for CJK-adjacent runs
+ * written without a separating space, for leading/trailing punctuation,
+ * or after `.trimIndent()` has collapsed the boundary between a
+ * paragraph label and a `$`-prefixed formula.
+ */
+private val INLINE_MATH_FALLBACK_REGEX: Regex by lazy {
+    Regex("""(?<!\$)\$([^$\n]+?)\$(?!\$)""")
+}
+
+/**
+ * Return a copy of the receiver with any raw `$…$` runs that the GFM
+ * lexer missed promoted to inline-content placeholders.
+ *
+ * Behavior guarantees (this is what keeps the change safe):
+ *
+ *  1. **BLOCK_MATH is never touched.** The regex rejects runs whose
+ *     delimiter is `$$`, and we additionally skip any character range
+ *     that already carries a `MARKDOWN_MATH_` annotation (which is how
+ *     the native INLINE_MATH / BLOCK_MATH paths book-keep their
+ *     placeholders). So a paragraph that the splitter in
+ *     `MarkdownExtension.kt` has already carved up keeps its block
+ *     math exactly as it was.
+ *  2. **Existing spans are preserved.** For every character range that
+ *     is *not* a fallback match we copy the corresponding
+ *     `AnnotatedString.subSequence`, which carries forward every
+ *     `SpanStyle`, `LinkAnnotation`, `StringAnnotation`, etc. that the
+ *     caller had already pushed. This means bold / italic / link /
+ *     strikethrough / `<font color>` styling all remains intact across
+ *     the fallback boundary.
+ *  3. **Idempotent.** Calling the function twice is a no-op on the
+ *     second pass, because the first pass converts every `$…$` run
+ *     into an inline-content placeholder (annotated with
+ *     `MARKDOWN_MATH_`) and the second pass skips those annotated
+ *     ranges.
+ *
+ * Callers should invoke this after the main annotator loop has run
+ * (i.e. on a fully-populated `AnnotatedString`) and before
+ * `buildMathInlineContent` scans for `MARKDOWN_MATH_` tags, so the
+ * newly-emitted placeholders are picked up in the same map-building
+ * step. In the current architecture that invocation point is inside
+ * `MarkdownText`'s `derivedStateOf` block.
+ */
+fun AnnotatedString.injectInlineMathFallbacks(): AnnotatedString {
+    val original = this@injectInlineMathFallbacks
+    val originalLength = original.length
+    if (originalLength == 0) return this
+
+    // 1. Discover character ranges that are already claimed by a
+    //    MARKDOWN_MATH_ annotation (native INLINE_MATH / any future
+    //    extension). We will not inject a fallback inside those ranges
+    //    because the native path already owns the content there.
+    val nativeRanges: List<IntRange> = original.getStringAnnotations(0, originalLength)
+        .filter { it.item.startsWith("${MARKDOWN_TAG_MATH}_") }
+        .map { it.start until it.end }
+        .sortedBy { it.first }
+
+    fun isRangeNative(start: Int, endExclusive: Int): Boolean {
+        // `endExclusive` is the index *after* the last character of the
+        // match, which matches how `IntRange` is constructed below.
+        for (r in nativeRanges) {
+            if (start < r.last + 1 && endExclusive > r.first) return true
+        }
+        return false
+    }
+
+    // 2. Find all candidate fallback matches. We run the regex *against
+    //    the final text* the annotator emitted, not the original markdown
+    //    source, because entity replacement / link-unrolling may have
+    //    shifted character offsets relative to the input file. Matching
+    //    on the built text guarantees the subSequence copies below use
+    //    consistent indices.
+    val matches = INLINE_MATH_FALLBACK_REGEX.findAll(original.text).toList()
+    if (matches.isEmpty() && nativeRanges.isEmpty()) return this
+
+    // 3. Splice the result: non-matching stretches come from
+    //    `subSequence` (preserving styles/annotations verbatim), and
+    //    each fallback match is rewritten as the same inline-content
+    //    triple the native INLINE_MATH branch would have emitted:
+    //
+    //        id        = MARKDOWN_MATH_<latex with delimiters>
+    //        alternate = latex  (what the renderer shows if Latex fails)
+    //
+    //    The outer `$` delimiters are preserved so `MarkdownMath`'s
+    //    `startsWith("$$")` / single-`$` detector keeps working — it
+    //    treats the payload exactly like a natively-parsed formula.
+    val out = androidx.compose.ui.text.buildAnnotatedString {
+        var cursor = 0
+        for (m in matches) {
+            val start = m.range.first
+            val end = m.range.last + 1  // exclusive
+            if (isRangeNative(start, end)) continue
+            if (start > cursor) {
+                append(original.subSequence(cursor, start))
+            }
+            val latexWithDelimiters = m.value  // already `$body$`
+            appendInlineContent(
+                id = "${MARKDOWN_TAG_MATH}_$latexWithDelimiters",
+                alternateText = latexWithDelimiters,
+            )
+            cursor = end
+        }
+        // NOTE: explicitly use `originalLength` here, NOT the builder's
+        // ever-growing `length` property — in Compose's
+        // `buildAnnotatedString { }` lambda, `length` resolves to the
+        // builder's current length, NOT the input's length. Using the
+        // builder's length here (before the tail is appended) makes the
+        // comparison false when `cursor` exactly equals the builder's
+        // size, which silently drops any post-match content like CJK
+        // suffix text (this was Bug C).
+        if (cursor < originalLength) {
+            append(original.subSequence(cursor, originalLength))
+        }
+    }
+
+    // 4. We always return `out`: even if `out.length == originalLength`
+    //    (which is the typical case — alternateText equals the matched
+    //    `$…$` run), the annotations differ so identity-equality isn't
+    //    useful. Fast-pathing `return this` only happened when there
+    //    were zero matches AND zero native tags — that case was handled
+    //    at the top of the function.
+    return out
 }

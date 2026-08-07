@@ -2,8 +2,6 @@ package com.ismartcoding.plain.ui.page.cast
 
 import com.ismartcoding.plain.i18n.*
 
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.defaultMinSize
@@ -44,14 +42,13 @@ fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
     if (!castVM.showCastDialog.value) return
     val devices by DlnaDeviceScanner.devices.collectAsState()
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val hasDevices = devices.isNotEmpty()
-    val heroHeight by animateDpAsState(if (hasDevices) 104.dp else 156.dp, label = "castHeroHeight")
     val onDismiss = { castVM.showCastDialog.value = false }
 
-    LaunchedEffect(Unit) { DlnaDeviceScanner.start() }
-    LaunchedEffect(hasDevices) {
-        if (hasDevices) sheetState.expand()
+    LaunchedEffect(Unit) {
+        DlnaDeviceScanner.start()
+        sheetState.expand()
     }
     DisposableEffect(Unit) {
         onDispose { DlnaDeviceScanner.stop() }
@@ -63,20 +60,20 @@ fun CastDialog(castVM: CastViewModel, onDeviceSelected: (() -> Unit)? = null) {
         sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().animateContentSize().padding(bottom = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             PBottomSheetTopAppBar(
                 title = stringResource(Res.string.cast_select_screen),
-                subtitle = stringResource(if (hasDevices)  Res.string.cast_dialog_hint else Res.string.cast_looking_for_devices),
+                subtitle = stringResource(if (hasDevices) Res.string.cast_dialog_hint else Res.string.cast_looking_for_devices),
             )
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                SearchingScreenAnimation(Modifier.fillMaxWidth().height(heroHeight))
+                SearchingScreenAnimation(Modifier.fillMaxWidth().height(if (hasDevices) 104.dp else 156.dp))
             }
             if (hasDevices) {
                 LazyColumn(

@@ -20,20 +20,20 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.platform.checkUpdateAsync
 import com.ismartcoding.plain.platform.getAppVersion
 import com.ismartcoding.plain.platform.getCacheSize
 import com.ismartcoding.plain.platform.getLogFileSize
 import com.ismartcoding.plain.platform.getOSVersion
-import com.ismartcoding.plain.platform.checkUpdateAsync
-import com.ismartcoding.plain.preferences.UpdateInfoPreference
-import com.ismartcoding.plain.preferences.LocalAutoCheckUpdate
+import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
+import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.preferences.appDataStore
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
@@ -61,7 +61,6 @@ import com.ismartcoding.plain.ui.page.home.UpdateBanner
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewModel, peerVM: PeerViewModel) {
-    val autoCheckUpdate = LocalAutoCheckUpdate.current
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
     var cacheSize by remember { mutableLongStateOf(0L) }
@@ -120,17 +119,10 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                             title = stringResource(Res.string.system_version),
                             value = getOSVersion(),
                         )
-                        PListItem(
-                            title = stringResource(Res.string.make_discoverable),
-                            subtitle = stringResource(Res.string.make_discoverable_desc),
-                        ) {
-                            PSwitch(activated = isDiscoverable) { newValue ->
-                                peerVM.updateDiscoverable(newValue)
-                            }
-                            HorizontalSpace(8.dp)
-                        }
                         if (AppFeatureType.CHECK_UPDATES.has()) {
-                            PListItem(title = stringResource(Res.string.app_version), subtitle = getAppVersion(), action = {
+                            PListItem(modifier = Modifier.clickable {
+                                navController.navigate(Routing.AutoCheckUpdate)
+                            }, title = stringResource(Res.string.app_version), subtitle = getAppVersion(), separatedActions = true, action = {
                                 PFilledButton(text = stringResource(Res.string.check_update), buttonSize = ButtonSize.SMALL, onClick = {
                                     scope.launch {
                                         DialogHelper.showMessage(Res.string.checking_updates)
@@ -143,14 +135,20 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                     }
                                 })
                             })
-                            PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
-                                PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.Default) {
-                                    UpdateInfoPreference.updateAsync { it.copy(autoCheckUpdate = newValue) } }
-                                }
-                                HorizontalSpace(8.dp)
-                            }
                         } else {
                             PListItem(title = stringResource(Res.string.app_version), value = getAppVersion())
+                        }
+                    }
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
+                        PListItem(
+                            title = stringResource(Res.string.make_discoverable),
+                            subtitle = stringResource(Res.string.make_discoverable_desc),
+                        ) {
+                            PSwitch(activated = isDiscoverable) { newValue ->
+                                peerVM.updateDiscoverable(newValue)
+                            }
+                            HorizontalSpace(8.dp)
                         }
                     }
                 }

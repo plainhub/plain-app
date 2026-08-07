@@ -20,6 +20,9 @@ interface MarkdownColors {
 
     /** Represents the color used for the background of tables. */
     val tableBackground: Color
+
+    /** Represents the color used for the background of table headers. */
+    val tableHeaderBackground: Color
 }
 
 @Immutable
@@ -29,4 +32,5 @@ data class DefaultMarkdownColors(
     override val inlineCodeBackground: Color,
     override val dividerColor: Color,
     override val tableBackground: Color,
+    override val tableHeaderBackground: Color,
 ) : MarkdownColors

@@ -21,10 +21,8 @@ actual suspend fun processSingleDurationZero(
     item: MediaDurationZeroItem,
 ) {
     try {
-        val durationMs = Mp4Helper.getMp4DurationMs(item.path)
-        if (durationMs <= 0) return
-
-        val durationSec = durationMs / 1000
+        val durationSec = Mp4Helper.getMp4Duration(item.path)
+        if (durationSec <= 0) return
         AppDatabase.instance.mediaItemDao().upsert(
             DMediaItem(
                 mediaType = mediaType,

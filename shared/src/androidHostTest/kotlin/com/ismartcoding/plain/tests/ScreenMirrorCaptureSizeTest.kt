@@ -88,6 +88,56 @@ class ScreenMirrorCaptureSizeTest {
         assertEquals(2424, h)
     }
 
+    // ── maxPixels constraint ─────────────────────────────────────────────────
+
+    @Test
+    fun `maxPixels MAX_VALUE does not downscale Pixel 9`() {
+        // Pixel 9 (1080×2424, ~2.62 Mpix) with no pixel cap → native resolution
+        val (w, h) = ScreenMirrorCaptureSize.compute(
+            physW = 1080, physH = 2424, shortTarget = 1080,
+            maxW = 4096, maxH = 4096, wAlign = 2, hAlign = 2,
+            maxPixels = Int.MAX_VALUE,
+        )
+        assertEquals(1080, w)
+        assertEquals(2424, h)
+    }
+
+    @Test
+    fun `maxPixels MAX_VALUE does not downscale 1080p`() {
+        val (w, h) = ScreenMirrorCaptureSize.compute(
+            physW = 1080, physH = 2400, shortTarget = 1080,
+            maxW = 4096, maxH = 4096, wAlign = 2, hAlign = 2,
+            maxPixels = Int.MAX_VALUE,
+        )
+        assertEquals(1080, w)
+        assertEquals(2400, h)
+    }
+
+    @Test
+    fun `maxPixels 1_5M downscales S9`() {
+        // S9: 1080×2220, 1.5 Mpix cap
+        val (w, h) = ScreenMirrorCaptureSize.compute(
+            physW = 1080, physH = 2220, shortTarget = 1080,
+            maxW = 4096, maxH = 4096, wAlign = 2, hAlign = 2,
+            maxPixels = 1_500_000,
+        )
+        val pixels = w.toLong() * h.toLong()
+        assertTrue("pixels $pixels must not exceed 1_500_000", pixels <= 1_500_000)
+        assertTrue("width $w must be > 0", w > 0)
+        assertTrue("height $h must be > 0", h > 0)
+    }
+
+    @Test
+    fun `compute with maxPixels higher than physical has no effect`() {
+        val (w, h) = ScreenMirrorCaptureSize.compute(
+            physW = 720, physH = 1280, shortTarget = 720,
+            maxW = 4096, maxH = 4096, wAlign = 2, hAlign = 2,
+            maxPixels = 2_000_000,
+        )
+        assertEquals(720, w)
+        assertEquals(1280, h)
+    }
+
     // ── alignDown ────────────────────────────────────────────────────────────
 
     @Test

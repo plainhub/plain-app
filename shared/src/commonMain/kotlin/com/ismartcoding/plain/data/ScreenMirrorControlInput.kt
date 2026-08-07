@@ -4,10 +4,6 @@ import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLInput
 import kotlinx.serialization.Serializable
 
-/**
- * Input data from the web client for screen mirror remote control.
- * Coordinates (x, y, endX, endY) are normalized to [0, 1].
- */
 @GraphQLInput
 @Serializable
 data class ScreenMirrorControlInput(
@@ -20,4 +16,7 @@ data class ScreenMirrorControlInput(
     val deltaX: Float? = null,
     val deltaY: Float? = null,
     val key: String? = null,
+    val pathPoints: List<TouchPointInput>? = null,
+    val pointerId: Int? = null,
+    val pressure: Float? = null,
 )

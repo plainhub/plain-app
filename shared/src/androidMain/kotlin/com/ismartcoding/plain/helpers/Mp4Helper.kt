@@ -34,13 +34,13 @@ object Mp4Helper {
     )
 
     /**
-     * Media duration in milliseconds for fMP4 files whose moov reports
+     * Media duration in seconds for fMP4 files whose moov reports
      * duration=0 (real duration lives in moof fragments), where
      * MediaMetadataRetriever fails. Two-tier strategy: MediaExtractor
      * (primary) + MP4 box parsing (fallback). The box parser matches the
      * video track, so audio-only fMP4 returns 0.
      */
-    fun getMp4DurationMs(path: String): Long {
+    fun getMp4Duration(path: String): Long {
         val file = File(path)
         if (!file.exists() || file.length() < 8) return 0L
 
@@ -60,7 +60,7 @@ object Mp4Helper {
             if (extractor.trackCount == 0) return 0L
             val format = extractor.getTrackFormat(0)
             if (!format.containsKey(MediaFormat.KEY_DURATION)) return 0L
-            format.getLong(MediaFormat.KEY_DURATION) / 1000L // microseconds → ms
+            format.getLong(MediaFormat.KEY_DURATION) / 1_000_000L // microseconds → seconds
         } catch (e: Exception) {
             LogCat.e("getDurationViaExtractor failed: ${e.message}")
             0L
@@ -115,7 +115,7 @@ object Mp4Helper {
                 // belong to the video track (matched via tfhd.track_ID).
                 var totalDuration = 0L
                 offset = 0L
-                while (offset < fileLength && offset >= 0) {
+                while (offset in 0..<fileLength) {
                     raf.seek(offset)
                     val boxSize = readBoxSize(raf)
                     if (boxSize <= 0) break
@@ -127,7 +127,7 @@ object Mp4Helper {
                     offset += boxSize
                 }
 
-                if (totalDuration > 0) totalDuration * 1000L / timescale else 0L
+                if (totalDuration > 0) totalDuration / timescale else 0L
             }
         } catch (e: Exception) {
             LogCat.e("getDurationFromMp4Boxes failed: ${e.message}")

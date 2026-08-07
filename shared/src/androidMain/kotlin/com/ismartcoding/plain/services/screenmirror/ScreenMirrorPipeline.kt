@@ -16,6 +16,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
+import com.ismartcoding.plain.platform.isRPlus
 
 /**
  * Owns MediaProjection + VirtualDisplay + the two encoders. Pushes H.264 NAL
@@ -32,9 +33,58 @@ class ScreenMirrorPipeline(
         private const val VD_NAME = "PlainMirrorVD"
     }
 
+    /**
+     * Decides whether this session should run with "low-end" encoder params
+     * (reduced pixel budget, shorter I-frame intervals, etc.).
+     *
+     * Two-tier decision:
+     *  1. **Initial guess** — [API < 30][isRPlus] → true. Prevents the first
+     *     2 seconds of jank on obviously-old devices before the runtime
+     *     detector has enough samples.
+     *  2. **Runtime verdict** — [onEncoderOverloaded] flips [forceLowEnd] to
+     *     true permanently. This catches every slow encoder regardless of
+     *     API level (e.g. underpowered Android 10/11 ROMs).
+     *
+     * One-way latch — once low-end, never goes back. Avoids oscillation.
+     */
+    private inner class LowEndPolicy {
+        private val initiallyLowEnd = !isRPlus()
+
+        @Volatile private var forceLowEnd = false
+        @Volatile private var didDowngrade = false
+
+        val active: Boolean get() = forceLowEnd || initiallyLowEnd
+
+        /** Pixel budget fed to [ScreenMirrorCaptureSize.compute]. */
+        val maxPixels: Int get() = if (active) 1_500_000 else Int.MAX_VALUE
+
+        /** [MediaFormat.KEY_I_FRAME_INTERVAL] in seconds. */
+        val iFrameIntervalSec: Int get() = if (active) 2 else 10
+
+        /** [MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER] in µs. */
+        val repeatPreviousFrameAfterUs: Long get() = if (active) 33_000L else 100_000L
+
+        /** [MediaFormat.KEY_LATENCY] value, null = skip the key entirely. */
+        val latency: Int? get() = if (active) null else 1
+
+        /**
+         * Called from the encoder overload detector. Returns `true` if this
+         * is the first downgrade (caller should rebuild the encoder);
+         * subsequent calls are no-ops to avoid rebuild loops.
+         */
+        fun onEncoderOverloaded(): Boolean {
+            if (didDowngrade) return false
+            didDowngrade = true
+            forceLowEnd = true
+            LogCat.d("$TAG: encoder overloaded — downgrading to low-end profile")
+            return true
+        }
+    }
+
     private var videoEncoder: MediaCodecVideoEncoder? = null
     private var audioEncoder: MediaCodecAudioEncoder? = null
     private var virtualDisplay: VirtualDisplay? = null
+    private val lowEndPolicy = LowEndPolicy()
 
     @Volatile
     private var cachedConfig: ByteArray? = null
@@ -59,6 +109,19 @@ class ScreenMirrorPipeline(
             annexB = Base64.encode(config),
             keyFrame = cachedKeyFrame?.let { Base64.encode(it) },
         )
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    suspend fun awaitVideoCodec(timeoutMs: Long = 3000): ScreenMirrorVideoCodec? {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (cachedConfig == null) {
+            if (System.currentTimeMillis() > deadline) {
+                LogCat.w("$TAG: timed out waiting for codec config (${timeoutMs}ms)")
+                return null
+            }
+            kotlinx.coroutines.delay(50)
+        }
+        return getScreenMirrorVideoCodec()
     }
 
     val effectiveResolution: Int
@@ -165,6 +228,9 @@ class ScreenMirrorPipeline(
             width = w, height = h,
             frameRate = 60,
             bitrateBps = computeStartBitrate(effectiveResolution),
+            iFrameIntervalSec = lowEndPolicy.iFrameIntervalSec,
+            repeatPreviousFrameAfterUs = lowEndPolicy.repeatPreviousFrameAfterUs,
+            latency = lowEndPolicy.latency,
         ).also {
             it.onCodecConfig = { configBytes ->
                 cachedConfig = configBytes
@@ -175,10 +241,6 @@ class ScreenMirrorPipeline(
             it.onEncoded = onEncoded@{ nalu, isKey, pts ->
                 if (isKey) {
                     cachedKeyFrame = nalu
-                    // When the config just changed, bundle it with this keyframe
-                    // in a single codec event instead of sending the keyframe as
-                    // a separate video packet — the web client reconfigures its
-                    // decoder from the event and decodes the bundled keyframe.
                     if (pendingConfigBroadcast != null) {
                         broadcastConfig()
                         pendingConfigBroadcast = null
@@ -193,6 +255,11 @@ class ScreenMirrorPipeline(
                         packet
                     )
                 )
+            }
+            it.onOverloaded = onOverloaded@{
+                if (lowEndPolicy.onEncoderOverloaded()) {
+                    rebuildEncoderAndResize("encoder overloaded")
+                }
             }
             it.start()
         }
@@ -234,8 +301,9 @@ class ScreenMirrorPipeline(
         val hAlign = caps?.heightAlignment ?: 2
         val (w, h) = ScreenMirrorCaptureSize.compute(
             physW, physH, shortTarget, maxW, maxH, wAlign, hAlign,
+            maxPixels = lowEndPolicy.maxPixels,
         )
-        LogCat.d("$TAG: captureSize phys=${physW}x${physH} target=$shortTarget encMax=${maxW}x${maxH} align=${wAlign}x${hAlign} → ${w}x${h}")
+        LogCat.d("$TAG: captureSize phys=${physW}x${physH} target=$shortTarget lowEnd=${lowEndPolicy.active} encMax=${maxW}x${maxH} align=${wAlign}x${hAlign} → ${w}x${h}")
         return Triple(w, h, context.resources.displayMetrics.densityDpi)
     }
 

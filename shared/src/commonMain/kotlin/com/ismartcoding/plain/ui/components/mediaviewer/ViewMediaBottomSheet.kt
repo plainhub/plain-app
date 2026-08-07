@@ -40,6 +40,7 @@ import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.components.VideoMetaRows
 import com.ismartcoding.plain.platform.formatImageMetaTexts
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.page.cast.CastDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -69,7 +70,7 @@ fun ViewMediaBottomSheet(
     // Host the DLNA cast dialog when a CastViewModel is provided. Selecting a
     // device enters cast mode and dismisses this info sheet.
     if (castViewModel != null) {
-        com.ismartcoding.plain.ui.page.cast.CastDialog(castViewModel, onDeviceSelected = {
+        CastDialog(castViewModel, onDeviceSelected = {
             castViewModel.enterCastMode()
             castViewModel.cast(m.path)
             onDismiss()

@@ -12,11 +12,11 @@ import com.ismartcoding.plain.data.DVideoMeta
 import com.ismartcoding.plain.extensions.getDuration
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.MediaShortcutHelper
+import com.ismartcoding.plain.helpers.Mp4Helper
 import com.ismartcoding.plain.helpers.QrCodeGenerateHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
 import com.ismartcoding.plain.helpers.SvgHelper
 import com.ismartcoding.plain.helpers.VideoHelper
-import com.ismartcoding.plain.platform.renameAndScanFile
 import java.io.File
 
 actual fun getImageRotation(path: String): Int = ImageHelper.getRotation(path)
@@ -44,7 +44,11 @@ actual fun fileLength(path: String): Long {
 
 actual suspend fun renameMediaFile(path: String, newName: String): String? = renameAndScanFile(path, newName)
 
-actual fun getMediaDuration(path: String): Long = File(path).getDuration(appContext)
+actual fun getMediaDuration(path: String): Long {
+    val duration = File(path).getDuration(appContext)
+    if (duration > 0) return duration
+    return Mp4Helper.getMp4Duration(path)
+}
 
 actual fun getAudioDurationFromPath(path: String): Long =
     DPlaylistAudio.fromPath(appContext, path).duration

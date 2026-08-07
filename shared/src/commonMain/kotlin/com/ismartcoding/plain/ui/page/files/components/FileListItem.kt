@@ -56,6 +56,7 @@ import com.ismartcoding.plain.platform.extractZipEntryToCache
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -102,7 +103,7 @@ fun FileListItem(
                 bottomStart = if (isCurrentlyPlaying) 0.dp else 8.dp,
                 bottomEnd = if (isCurrentlyPlaying) 0.dp else 8.dp))
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface),
+            .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.cardBackgroundNormal),
             contentAlignment = Alignment.Center) {
             Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (isSelectMode) {

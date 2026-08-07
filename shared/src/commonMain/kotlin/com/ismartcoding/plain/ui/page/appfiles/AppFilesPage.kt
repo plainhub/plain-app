@@ -27,6 +27,8 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AppFilesViewModel
+import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.page.appfiles.components.AppFileListContent
 import kotlinx.coroutines.launch
 
@@ -34,6 +36,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppFilesPage(
     navController: NavHostController,
+    audioPlaylistVM: AudioPlaylistViewModel,
+    chatVM: ChatViewModel,
     appFilesVM: AppFilesViewModel = viewModel { AppFilesViewModel() },
 ) {
     val scope = rememberCoroutineScope()
@@ -82,6 +86,8 @@ fun AppFilesPage(
                         isLoading = isLoading,
                         noMore = noMore,
                         previewerState = previewerState,
+                        audioPlaylistVM = audioPlaylistVM,
+                        chatVM = chatVM,
                         onRefresh = {
                             scope.launch {
                                 appFilesVM.loadAsync()

@@ -55,7 +55,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.compose.PlayerSurface
-import androidx.media3.ui.compose.SURFACE_TYPE_SURFACE_VIEW
+import androidx.media3.ui.compose.SURFACE_TYPE_TEXTURE_VIEW
 import com.ismartcoding.plain.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.plain.lib.extensions.pathToUri
 import com.ismartcoding.plain.mainActivity
@@ -218,12 +218,11 @@ actual fun VideoPlayerSurface(
         }
     }
 
-    // Shared PlayerSurface — rendering + buffering indicator always active.
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.background(Color.Black), contentAlignment = Alignment.Center) {
         PlayerSurface(
             player = exoPlayer,
             modifier = Modifier.then(fitModifier(videoSize)),
-            surfaceType = SURFACE_TYPE_SURFACE_VIEW,
+            surfaceType = SURFACE_TYPE_TEXTURE_VIEW,
         )
         // Before the video size is reported, fitModifier falls back to
         // fillMaxSize which stretches the first frame to fill the entire

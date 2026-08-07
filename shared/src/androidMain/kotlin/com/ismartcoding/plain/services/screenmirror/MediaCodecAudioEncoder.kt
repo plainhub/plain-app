@@ -13,6 +13,7 @@ import android.media.MediaFormat
 import android.media.projection.MediaProjection
 import android.os.Build
 import android.util.Log
+import com.ismartcoding.plain.platform.isQPlus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -50,7 +51,7 @@ class MediaCodecAudioEncoder(
 
     @SuppressLint("MissingPermission")
     fun start() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        if (!isQPlus()) {
             Log.w(TAG, "playback-capture requires Android 10+, skipping")
             return
         }

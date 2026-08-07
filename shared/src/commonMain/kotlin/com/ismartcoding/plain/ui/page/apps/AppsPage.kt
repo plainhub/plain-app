@@ -15,8 +15,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,6 +25,7 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.preferences.PackageSortByPreference
 import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -48,8 +49,12 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch { appsVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
-    val once = rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(Unit) { if (!once.value) { once.value = true; scope.launch(Dispatchers.Default) { appsVM.loadAsync() } } }
+    val lifecycleEvent = rememberLifecycleEvent()
+    LaunchedEffect(lifecycleEvent) {
+        if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+            scope.launch(Dispatchers.Default) { appsVM.loadAsync() }
+        }
+    }
     LaunchedEffect(pagerState.currentPage) {
         if (isFirstTime) { isFirstTime = false; return@LaunchedEffect }
         val tab = appsVM.tabs.value.getOrNull(pagerState.currentPage)

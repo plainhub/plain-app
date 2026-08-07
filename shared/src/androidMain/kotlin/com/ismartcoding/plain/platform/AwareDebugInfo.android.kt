@@ -29,7 +29,7 @@ actual fun getAwareDebugInfo(): AwareDebugInfo {
     // Pairing (Wi-Fi Aware 4.0) and pairing cipher suites were added in API 34.
     // Data-path cipher suites are exposed via getSupportedCipherSuites() (no "Data" prefix)
     // and have been available since API 33.
-    val pairingBitmask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+    val pairingBitmask = if (isUPlus()) {
         runCatching { characteristics?.supportedPairingCipherSuites ?: 0 }.getOrDefault(0)
     } else 0
     val dataBitmask = runCatching { characteristics?.supportedCipherSuites ?: 0 }.getOrDefault(0)
