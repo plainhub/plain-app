@@ -33,7 +33,7 @@ android {
                 else -> 0
             }
 
-        val vCode = 622
+        val vCode = 625
         versionCode = vCode - singleAbiNum
         versionName = "3.2.7"
 
