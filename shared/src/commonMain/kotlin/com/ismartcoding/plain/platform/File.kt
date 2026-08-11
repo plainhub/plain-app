@@ -2,6 +2,7 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -14,7 +15,7 @@ suspend fun releaseAppFile(fidSuffix: String) = withIO {
     val updated = dao.getById(hash) ?: return@withIO
     if (updated.refCount <= 0) {
         dao.delete(hash)
-        deleteFileAt(updated.realPath)
+        deleteFileAt(updated.realPath.resolveAppFileRealPath())
         LogCat.d("AppFileStore: deleted orphan file $hash")
     }
 }

@@ -7,6 +7,7 @@ import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.extensions.newPath
+import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppFileStore
@@ -516,7 +517,7 @@ actual suspend fun searchZipItems(type: String, query: String, tempId: String): 
             val nameMap = AppFileDisplayNameHelper.buildNameMap(chatDao.getAll())
             appFiles.map { file ->
                 val displayName = AppFileDisplayNameHelper.resolveDisplayName(file, nameMap)
-                ZipStreamEntry(file.realPath, displayName)
+                ZipStreamEntry(file.realPath.resolveAppFileRealPath(), displayName)
             }
         }
         DataType.FILE.name -> {

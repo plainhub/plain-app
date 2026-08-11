@@ -15,3 +15,16 @@ fun String.getFinalPath(): String {
 
     return this
 }
+
+/**
+ * Resolve a stored `app_files.real_path` value to an absolute filesystem path.
+ *
+ * New rows store the relative portion (`{aa}/{bb}/{name}`) to avoid repeating
+ * the platform-specific `appDir()` prefix on every row; legacy rows may still
+ * hold absolute paths. Absolute paths (starting with `/`) and empty strings
+ * are returned unchanged.
+ */
+fun String.resolveAppFileRealPath(): String {
+    if (this.isEmpty() || this.startsWith("/")) return this
+    return appDir() + "/" + this
+}

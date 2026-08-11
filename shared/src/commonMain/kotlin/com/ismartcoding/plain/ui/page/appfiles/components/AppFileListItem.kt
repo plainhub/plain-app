@@ -31,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -71,7 +72,7 @@ fun AppFileListItem(
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val fileName = file.fileName
-    val path = file.appFile.realPath
+    val path = file.appFile.realPath.resolveAppFileRealPath()
     val extension = fileName.getFilenameExtension().ifEmpty {
         getExtensionFromMimeType(file.appFile.mimeType)
     }

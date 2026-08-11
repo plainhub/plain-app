@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.page.appfiles.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.platform.openFileExternal
 import com.ismartcoding.plain.platform.shareFiles
 import com.ismartcoding.plain.ui.base.ActionButtons
@@ -25,12 +26,12 @@ fun AppFileInfoActionButtons(
         }
         IconTextShareButton {
             scope.launch(Dispatchers.Default) {
-                shareFiles(listOf(file.appFile.realPath))
+                shareFiles(listOf(file.appFile.realPath.resolveAppFileRealPath()))
             }
             onDismiss()
         }
         IconTextOpenWithButton {
-            openFileExternal(file.appFile.realPath)
+            openFileExternal(file.appFile.realPath.resolveAppFileRealPath())
         }
     }
 }

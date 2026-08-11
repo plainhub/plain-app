@@ -107,8 +107,10 @@ object ChatFidUriMigration {
         if (legacyFile.exists() && !newFile.exists()) {
             legacyFile.renameTo(newFile)
         }
-        if (dFile.realPath != newPath) {
-            dFile.realPath = newPath
+        // Store the relative portion in the DB; resolve to absolute at use sites.
+        val relativePath = AppFileStore.relativeDestPath(hash, ext)
+        if (dFile.realPath != relativePath) {
+            dFile.realPath = relativePath
             fileDao.update(dFile)
         }
     }

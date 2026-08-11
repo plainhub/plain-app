@@ -479,7 +479,7 @@ private suspend fun importAppFileInternal(
         val record = DAppFile(hash).apply {
             size = bytes.size.toLong()
             mimeType = contentType.ifEmpty { "application/octet-stream" }
-            realPath = destPath
+            realPath = "${hash.substring(0, 2)}/${hash.substring(2, 4)}/$fidSuffix"
             refCount = 1
             weakHash = FileHashHelper.weakHash(bytes)
         }

@@ -16,6 +16,7 @@ import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
@@ -79,8 +80,8 @@ fun AppFileInfoBottomSheet(
                 )
                 VerticalSpace(dp = 24.dp)
                 PCard {
-                    PListItem(title = file.appFile.realPath, action = {
-                        CopyIconButton(text = file.appFile.realPath, clipLabel = stringResource(Res.string.file_path))
+                    PListItem(title = file.appFile.realPath.resolveAppFileRealPath(), action = {
+                        CopyIconButton(text = file.appFile.realPath.resolveAppFileRealPath(), clipLabel = stringResource(Res.string.file_path))
                     })
                 }
                 VerticalSpace(dp = 16.dp)

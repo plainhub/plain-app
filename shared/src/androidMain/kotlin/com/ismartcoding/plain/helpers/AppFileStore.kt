@@ -14,13 +14,18 @@ import java.io.File
  * Content-addressable store for chat files.
  *
  * Storage layout inside the app's external-files directory:
- *   files/{hash[0..1]}/{hash[2..3]}/{hash}.{ext}   (lowercase extension)
+ *   {appDir}/{hash[0..1]}/{hash[2..3]}/{hash}.{ext}   (lowercase extension)
  *
  * URI scheme used in [com.ismartcoding.plain.db.DMessageFile.uri]:
  *   fid:{sha256hex}.{ext}   (extension derived from MIME type, lowercase)
  *
  * The fidSuffix (part after "fid:") encodes both the hash and extension so
  * path resolution never needs a database query.
+ *
+ * The `app_files.real_path` column stores the relative portion
+ * (`{aa}/{bb}/{name}`) to avoid repeating the platform-specific `appDir()`
+ * prefix on every row. Use [relativeDestPath] when persisting and
+ * [realPathFromId] (or [resolveUri]) when an absolute path is required.
  */
 object AppFileStore {
     /** Convert a SHA-256 hash and optional lowercase extension into a [fid:] URI. */
@@ -34,7 +39,17 @@ object AppFileStore {
     }
 
     /**
-     * Derive the real file-system path from a fidSuffix (the part after "fid:").
+     * Relative portion of the canonical storage path for a `{hash, ext}` pair —
+     * `{aa}/{bb}/{name}` — stored in `app_files.real_path` so the column
+     * doesn't repeat the platform-specific `appDir()` prefix on every row.
+     */
+    fun relativeDestPath(hash: String, ext: String = ""): String {
+        val name = if (ext.isNotEmpty()) "$hash.$ext" else hash
+        return "${hash.substring(0, 2)}/${hash.substring(2, 4)}/$name"
+    }
+
+    /**
+     * Derive the absolute file-system path from a fidSuffix (the part after "fid:").
      * fidSuffix may be "{hash}" (legacy) or "{hash}.{ext}" (current).
      * Returns the absolute path whether or not the file currently exists.
      */
@@ -133,7 +148,7 @@ object AppFileStore {
         val record = DAppFile(strongHash).apply {
             this.size = size
             this.mimeType = effectiveMime
-            this.realPath = destFile.absolutePath
+            this.realPath = relativeDestPath(strongHash, ext)
             this.refCount = 1
             this.weakHash = weakHash
         }
@@ -145,8 +160,7 @@ object AppFileStore {
 
     private fun destFile(hash: String, ext: String = ""): File {
         val base = appDir()
-        val name = if (ext.isNotEmpty()) "$hash.$ext" else hash
-        return File("$base/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$name")
+        return File("$base/${relativeDestPath(hash, ext)}")
     }
 
     private suspend fun tryReuseExisting(
@@ -158,6 +172,7 @@ object AppFileStore {
         val existing = dao.getById(strongHash) ?: return null
         val ext = extFromMime(existing.mimeType)
         val targetFile = destFile(strongHash, ext)
+        val relativeTarget = relativeDestPath(strongHash, ext)
 
         // DB row may exist while the backing file was deleted; restore it.
         if (!targetFile.exists()) {
@@ -174,8 +189,8 @@ object AppFileStore {
             srcFile.delete()
         }
 
-        if (existing.realPath != targetFile.absolutePath) {
-            existing.realPath = targetFile.absolutePath
+        if (existing.realPath != relativeTarget) {
+            existing.realPath = relativeTarget
             dao.update(existing)
         }
 
@@ -224,7 +239,7 @@ object AppFileStore {
         val record = DAppFile(strongHash).apply {
             this.size = size
             this.mimeType = effectiveMime
-            this.realPath = destFile.absolutePath
+            this.realPath = relativeDestPath(strongHash, ext)
             this.refCount = 1
             this.weakHash = weakHash
         }

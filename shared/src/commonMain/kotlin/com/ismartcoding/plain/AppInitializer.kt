@@ -27,6 +27,8 @@ import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.ServicePreference
+import com.ismartcoding.plain.helpers.AppFileRealPathMigration
+import com.ismartcoding.plain.preferences.AppFileRealPathMigratedPreference
 import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.httpserver.HttpServerManager
 
@@ -67,6 +69,10 @@ suspend fun initCommonPreferences(): Preferences {
     HttpServerManager.loadTokenCache()
     if (TempData.canDLNAAccess()) {
         startDlnaRenderer()
+    }
+    if (!AppFileRealPathMigratedPreference.get(preferences)) {
+        AppFileRealPathMigration.run()
+        AppFileRealPathMigratedPreference.putAsync(true)
     }
     LogCat.d("initCommonPreferences: clientId=${TempData.clientId}, deviceName=${TempData.deviceName.value}")
     return preferences

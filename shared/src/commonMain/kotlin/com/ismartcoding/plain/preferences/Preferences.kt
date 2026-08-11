@@ -556,6 +556,11 @@ object FidUriExtMigratedPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("fid_uri_ext_migrated")
 }
 
+object AppFileRealPathMigratedPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("app_file_real_path_migrated")
+}
+
 object NotificationFilterPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("notification_filter")

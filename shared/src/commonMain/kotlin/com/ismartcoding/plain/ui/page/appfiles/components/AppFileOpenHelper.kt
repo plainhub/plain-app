@@ -12,6 +12,7 @@ import com.ismartcoding.plain.helpers.coMain
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.db.DMessageFile
+import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.platform.fileToUriString
 import com.ismartcoding.plain.platform.playAudioWithNotificationCheck
 import com.ismartcoding.plain.platform.playlistAudioFromPath
@@ -34,7 +35,7 @@ fun openAppFile(
     itemState: TransformItemState,
     audioPlaylistVM: AudioPlaylistViewModel,
 ) {
-    val path = file.appFile.realPath
+    val path = file.appFile.realPath.resolveAppFileRealPath()
     val fileName = file.fileName
 
     when {
@@ -42,11 +43,12 @@ fun openAppFile(
             coMain {
                 val previewItems = withIO {
                     files.filter { it.fileName.isImageFast() || it.fileName.isVideoFast() }.map {
+                        val p = it.appFile.realPath.resolveAppFileRealPath()
                         PreviewItem(
                             it.appFile.id,
-                            it.appFile.realPath,
+                            p,
                             it.appFile.size,
-                            data = DMessageFile(uri = it.appFile.realPath, size = it.appFile.size, fileName = it.fileName),
+                            data = DMessageFile(uri = p, size = it.appFile.size, fileName = it.fileName),
                         )
                     }
                 }
