@@ -40,6 +40,7 @@ import platform.posix.sockaddr_in
 import platform.posix.socket
 import platform.posix.timeval
 
+private const val SO_REUSEPORT_KT = 0x0200
 private const val NEARBY_PORT = 52352
 private const val NEARBY_MULTICAST_ADDRESS = "224.0.0.100"
 private const val NEARBY_RECEIVE_TIMEOUT_MS = 10_000L
@@ -171,6 +172,9 @@ private fun setupReceiverSocket(fd: Int): Boolean = memScoped {
     on.value = 1
     if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, on.ptr, sizeOf<IntVar>().toUInt()) < 0) {
         LogCat.e("NearbyNetwork: SO_REUSEADDR failed")
+    }
+    if (setsockopt(fd, SOL_SOCKET, SO_REUSEPORT_KT, on.ptr, sizeOf<IntVar>().toUInt()) < 0) {
+        LogCat.e("NearbyNetwork: SO_REUSEPORT failed")
     }
     val tv = alloc<timeval>()
     tv.tv_sec = (NEARBY_RECEIVE_TIMEOUT_MS / 1000).convert()
