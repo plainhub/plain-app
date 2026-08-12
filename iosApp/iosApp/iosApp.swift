@@ -16,6 +16,7 @@ struct PlainApp: SwiftUI.App {
     private let filePicker = FilePickerController()
     private let shareController = ShareController()
     private let sslCertManager = SslCertManager()
+    private let soundMeter = SoundMeter()
 
     init() {
         IosPlatformRegistry.shared.setNetworkInfoProvider(provider: networkInfo)
@@ -24,6 +25,7 @@ struct PlainApp: SwiftUI.App {
         IosPlatformRegistry.shared.setFilePicker(picker: filePicker)
         IosPlatformRegistry.shared.setShareController(controller: shareController)
         IosPlatformRegistry.shared.setSslCertProvider(provider: sslCertManager)
+        IosPlatformRegistry.shared.setSoundMeter(meter: soundMeter)
     }
 
     var body: some Scene {

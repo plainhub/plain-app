@@ -111,6 +111,21 @@ interface IosSystemUiController {
 }
 
 /**
+ * Swift-implemented sound meter. iOS audio recording APIs (`AVAudioRecorder`)
+ * are only accessible from Swift/ObjC, so the real recorder lives in Swift and
+ * is bridged through this interface.
+ *
+ * Kotlin calls [start] when the sound meter screen opens, then polls
+ * [peakPower] every ~180 ms to get the latest dBFS reading. When the screen
+ * closes, [stop] releases the audio session.
+ */
+interface IosSoundMeter {
+    fun start(): Boolean
+    fun stop()
+    fun peakPower(): Float
+}
+
+/**
  * Singleton registry that lets Swift register platform implementations at app
  * startup. Kotlin code in iosMain reads [httpServerBridge] when commonMain
  * calls `startHttpServerService()` etc.
@@ -136,6 +151,9 @@ object IosPlatformRegistry {
 
     @Volatile
     private var _systemUiController: IosSystemUiController? = null
+
+    @Volatile
+    private var _soundMeter: IosSoundMeter? = null
 
     fun setHttpServerBridge(bridge: IosHttpServerBridge) {
         _httpServerBridge = bridge
@@ -211,6 +229,13 @@ object IosPlatformRegistry {
         _systemUiController?.setImmersive(enabled)
             ?: LogCat.w("IosPlatformRegistry: setImmersive($enabled) called before SystemUiController registered")
     }
+
+    fun setSoundMeter(meter: IosSoundMeter) {
+        _soundMeter = meter
+        LogCat.d("IosPlatformRegistry: sound meter registered")
+    }
+
+    fun soundMeter(): IosSoundMeter? = _soundMeter
 }
 
 /**

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.loaders
 
+import com.ismartcoding.plain.enums.DriveType
 import com.ismartcoding.plain.platform.appDir
 import com.ismartcoding.plain.platform.getInternalStorageName
 import com.ismartcoding.plain.platform.getInternalStoragePath
@@ -17,7 +18,7 @@ object MountsLoader {
             name: String,
             totalBytes: Long,
             freeBytes: Long,
-            driveType: String,
+            driveType: DriveType,
         ): StorageMount {
             return StorageMount(
                 id = "path:$path",
@@ -44,7 +45,7 @@ object MountsLoader {
                 name = getInternalStorageName(),
                 totalBytes = internalStats.totalBytes,
                 freeBytes = internalStats.freeBytes,
-                driveType = "INTERNAL_STORAGE",
+                driveType = DriveType.INTERNAL_STORAGE,
             )
         )
 
@@ -57,7 +58,7 @@ object MountsLoader {
                     name = "",
                     totalBytes = sdStats.totalBytes,
                     freeBytes = sdStats.freeBytes,
-                    driveType = "SDCARD",
+                    driveType = DriveType.SDCARD,
                 )
             )
         }
@@ -72,7 +73,7 @@ object MountsLoader {
                     name = "",
                     totalBytes = stats.totalBytes,
                     freeBytes = stats.freeBytes,
-                    driveType = "USB_STORAGE",
+                    driveType = DriveType.USB_STORAGE,
                 )
             )
         }
@@ -85,7 +86,7 @@ object MountsLoader {
                     name = "",
                     totalBytes = 0L,
                     freeBytes = 0L,
-                    driveType = "APP",
+                    driveType = DriveType.APP,
                 )
             )
         }

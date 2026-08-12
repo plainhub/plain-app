@@ -1,19 +1,31 @@
 package com.ismartcoding.plain.platform
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableFloatState
-import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.MutableState
+import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlin.math.abs
 
-@Composable
-actual fun SoundMeterRecorder(
-    isRunning: MutableState<Boolean>,
-    decibel: MutableFloatState,
-    total: MutableFloatState,
-    count: MutableIntState,
-    min: MutableFloatState,
-    avg: MutableFloatState,
-    max: MutableFloatState,
-) {
-    // iOS sound meter recording not yet implemented
+actual class SoundMeterDataSource {
+    private val soundMeter = IosPlatformRegistry.soundMeter()
+
+    actual fun start(): Boolean {
+        val meter = soundMeter
+        if (meter == null) {
+            LogCat.e("SoundMeterDataSource: sound meter not registered")
+            return false
+        }
+        if (!meter.start()) {
+            LogCat.e("SoundMeterDataSource: failed to start sound meter")
+            return false
+        }
+        return true
+    }
+
+    actual fun stop() {
+        soundMeter?.stop()
+    }
+
+    actual fun getDecibel(): Float {
+        val peakDbFS = soundMeter?.peakPower() ?: return Float.NaN
+        if (!peakDbFS.isFinite() || peakDbFS > 0f) return Float.NaN
+        return abs(peakDbFS + 89.2f)
+    }
 }

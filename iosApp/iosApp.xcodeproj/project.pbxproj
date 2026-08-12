@@ -17,6 +17,7 @@
 		CC0000020000000000000001 /* FilePickerController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC0000010000000000000001 /* FilePickerController.swift */; };
 		DD0000020000000000000001 /* ShareController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD0000010000000000000001 /* ShareController.swift */; };
 		EE0000020000000000000001 /* SslCertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000010000000000000001 /* SslCertManager.swift */; };
+		FF0001020000000000000001 /* SoundMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0001010000000000000001 /* SoundMeter.swift */; };
 		FF0000010000000000000001 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF0000050000000000000001 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +32,7 @@
 		CC0000010000000000000001 /* FilePickerController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilePickerController.swift; sourceTree = "<group>"; };
 		DD0000010000000000000001 /* ShareController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareController.swift; sourceTree = "<group>"; };
 		EE0000010000000000000001 /* SslCertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SslCertManager.swift; sourceTree = "<group>"; };
+		FF0001010000000000000001 /* SoundMeter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundMeter.swift; sourceTree = "<group>"; };
 		FF0000050000000000000001 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -65,6 +67,7 @@
 				CC0000010000000000000001 /* FilePickerController.swift */,
 				DD0000010000000000000001 /* ShareController.swift */,
 				EE0000010000000000000001 /* SslCertManager.swift */,
+				FF0001010000000000000001 /* SoundMeter.swift */,
 				AA0000040000000000000001 /* Assets.xcassets */,
 				FF0000050000000000000001 /* LaunchScreen.storyboard */,
 				AA0000050000000000000001 /* Info.plist */,
@@ -220,6 +223,7 @@
 				CC0000020000000000000001 /* FilePickerController.swift in Sources */,
 				DD0000020000000000000001 /* ShareController.swift in Sources */,
 				EE0000020000000000000001 /* SslCertManager.swift in Sources */,
+				FF0001020000000000000001 /* SoundMeter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,7 +2,10 @@ package com.ismartcoding.plain.httpserver.mainschemas
 
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.data.DevicePlatform
+import com.ismartcoding.plain.enums.ChatChannelStatus
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.DriveType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.enums.MediaPlayMode
@@ -18,8 +21,11 @@ import com.ismartcoding.plain.httpserver.models.ID
 import kotlin.time.Instant
 
 fun SchemaBuilder.addSchemaTypes() {
+    enum<ChatStatus>()
+    enum<ChatChannelStatus>()
     enum<MediaPlayMode>()
     enum<DataType>()
+    enum<DriveType>()
     enum<DeviceType>()
     enum<Permission>()
     enum<FileSortBy>()

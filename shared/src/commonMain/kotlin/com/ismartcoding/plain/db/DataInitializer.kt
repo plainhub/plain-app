@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.db
 
 import androidx.sqlite.SQLiteConnection
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.helpers.StringHelper
 import com.ismartcoding.plain.helpers.TimeHelper
@@ -100,7 +101,7 @@ class DataInitializer(private val connection: SQLiteConnection) {
                 stmt.bindText(2, it.fromId)
                 stmt.bindText(3, it.toId)
                 stmt.bindText(4, "") // Empty string for local chat (not a channel chat)
-                stmt.bindText(5, "sent") // Set status for welcome message
+                stmt.bindText(5, ChatStatus.SENT.name) // Set status for welcome message
                 stmt.bindText(6, it.content)
                 stmt.bindText(7, now)
                 stmt.bindText(8, now)

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.models
 
+import com.ismartcoding.plain.enums.DriveType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
 @GraphQLType
@@ -14,6 +15,6 @@ data class StorageMount(
     val freeBytes: Long = 0L,
     val remote: Boolean = false,
     val alias: String = "",
-    val driveType: String = "",
+    val driveType: DriveType = DriveType.INTERNAL_STORAGE,
     val diskID: String = "",
 )

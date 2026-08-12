@@ -12,6 +12,7 @@ fun SchemaBuilder.applyMainSchema() {
     configure {
         executor = Executor.DataLoaderPrepared
     }
+    addSchemaTypes()
     registerGeneratedResolvers()
     addChatMessageSchema()
     addChatChannelSchema()
@@ -43,5 +44,4 @@ fun SchemaBuilder.applyMainSchema() {
     addPairingSchema()
     addPeerSchema()
     addImageEditorProjectSchema()
-    addSchemaTypes()
 }
