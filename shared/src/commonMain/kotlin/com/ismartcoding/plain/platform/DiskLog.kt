@@ -80,4 +80,7 @@ fun initDiskLogging() {
         ),
     )
     httpLogSink = HttpLogSink { LogCat.v(it) }
+    // Self-test: guarantee at least one line is written so the log file is
+    // never empty. A WARN always passes the adapter's minPriority filter.
+    LogCat.w("DiskLog: initialized (debug=${isDebugBuild()})")
 }

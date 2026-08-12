@@ -28,6 +28,7 @@ import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSize
+import platform.Foundation.NSLog
 import platform.Foundation.NSNumber
 import platform.Foundation.NSString
 import platform.Foundation.NSTemporaryDirectory
@@ -42,6 +43,7 @@ import platform.UIKit.UIGraphicsEndImageContext
 import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
 import platform.UniformTypeIdentifiers.UTType
 import platform.posix.fclose
+import platform.posix.fflush
 import platform.posix.fopen
 import platform.posix.fwrite
 
@@ -669,18 +671,23 @@ internal actual fun appendLine(path: String, line: String): Long {
         fm.createFileAtPath(path, null, null)
     }
     val fp = fopen(path, "a")
-    if (fp != null) {
+    if (fp == null) {
+        NSLog("DiskLog: fopen failed for %@", path)
+    } else {
         try {
             val data = line.encodeToByteArray()
             data.usePinned { pinned ->
-                fwrite(pinned.addressOf(0), 1.toULong(), data.size.toULong(), fp)
+                val written = fwrite(pinned.addressOf(0), 1.toULong(), data.size.toULong(), fp)
+                if (written < data.size.toULong()) {
+                    NSLog("DiskLog: short write for %@", path)
+                }
             }
+            fflush(fp)
         } finally {
             fclose(fp)
         }
     }
-    val attrs = fm.attributesOfItemAtPath(path, error = null)
-    return (attrs?.get(NSFileSize) as? Long) ?: 0L
+    return (fm.attributesOfItemAtPath(path, null)?.get(NSFileSize) as? Long) ?: 0L
 }
 
 internal actual fun deleteFileIfExists(path: String) {

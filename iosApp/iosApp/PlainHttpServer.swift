@@ -1,4 +1,5 @@
 import Foundation
+import Network
 import NIOCore
 import NIOPosix
 import NIOHTTP1
@@ -36,6 +37,11 @@ public final class PlainHttpServer: NSObject, IosHttpServerBridge {
 
     @objc public func start(httpPort: Int32, httpsPort: Int32) -> Bool {
         if isStarted.load() { return true }
+        // iOS 14+ Local Network Privacy: bind 之前主动向本地链路本地地址
+        // 发送一个 UDP 包触发"本地网络访问"权限弹窗。仅用 127.0.0.1
+        // 健康检查不会触发弹窗，此时外部设备通过 Wi-Fi 接口的入站
+        // 连接会被 iOS 沙盒静默丢弃，表现为连接超时/被拒。
+        Self.triggerLocalNetworkPrivacyPrompt()
         do {
             let upgrader = NIOWebSocketServerUpgrader(
                 maxFrameSize: Int(UInt32.max),
@@ -94,6 +100,34 @@ public final class PlainHttpServer: NSObject, IosHttpServerBridge {
 
     @objc public func isRunning() -> Bool {
         return isStarted.load()
+    }
+
+    // MARK: - Local Network Privacy trigger
+
+    /// 在 HTTP 服务器 bind 之前调用，主动触发 iOS 14+ 的「本地网络访问」
+    /// 权限弹窗。机制：通过 Network.framework 的 NWConnection 向一个链路
+    /// 本地多播地址（224.0.0.1:5353，mDNS 标准多播组）发送一个空 UDP
+    /// 包。系统检测到 app 尝试访问本地网络地址时就会弹出授权对话框；
+    /// 用户授予权限后，外部设备通过 Wi‑Fi 接口访问 HTTP 服务器才不会
+    /// 被 iOS 沙盒静默丢弃。UDP 包本身发送成败无关紧要。
+    private static func triggerLocalNetworkPrivacyPrompt() {
+        // 模拟器共享 Mac 网络栈，没有 iOS 沙盒限制，无需触发。
+        #if targetEnvironment(simulator)
+        return
+        #else
+        let host = NWEndpoint.Host("224.0.0.1")
+        let port = NWEndpoint.Port(integerLiteral: 5353)
+        let conn = NWConnection(host: host, port: port, using: .udp)
+        let empty = Data()
+        conn.send(content: empty, completion: .contentProcessed { _ in
+            conn.cancel()
+        })
+        conn.start(queue: .global())
+        // 100ms 后强制清理，避免 NWConnection 长期存活。
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.1) {
+            conn.cancel()
+        }
+        #endif
     }
 
     // MARK: - WebSocket upgrade
@@ -292,8 +326,12 @@ private final class HTTPHandler: ChannelInboundHandler, RemovableChannelHandler 
         let eventLoop = context.eventLoop
         eventLoop.execute {
             do {
-                let fileHandle = try NIOFileHandle(path: path)
-                let fileRegion = try FileRegion(fileHandle: fileHandle)
+                // ⚠️ iOS 沙盒禁止直接调用 sendfile() 系统调用（SIGSYS），
+                // 因此在 iOS 上绝对不能使用 FileRegion（底层会走 sendfile）。
+                // 这里把文件内容读入 Data，然后通过普通 ByteBuffer 写路径
+                // 走 writev()，完全避开 sendfile。
+                let fileData = try Data(contentsOf: URL(fileURLWithPath: path))
+
                 var responseHeaders = headers
                 if let contentType = ctx.getResponseFileContentType() {
                     responseHeaders.add(name: "Content-Type", value: contentType)
@@ -301,18 +339,19 @@ private final class HTTPHandler: ChannelInboundHandler, RemovableChannelHandler 
                 if let disposition = ctx.getResponseFileContentDisposition() {
                     responseHeaders.add(name: "Content-Disposition", value: disposition)
                 }
-                responseHeaders.add(name: "Content-Length", value: "\(fileRegion.readableBytes)")
+                responseHeaders.add(name: "Content-Length", value: "\(fileData.count)")
                 responseHeaders.add(name: "Accept-Ranges", value: "bytes")
 
                 let head = HTTPResponseHead(version: .http1_1, status: status, headers: responseHeaders)
                 context.write(self.wrapOutboundOut(HTTPServerResponsePart.head(head)), promise: nil)
-                context.write(self.wrapOutboundOut(.body(.fileRegion(fileRegion))), promise: nil)
-                context.writeAndFlush(self.wrapOutboundOut(.end(nil)), promise: nil)
-
-                // Close the file handle after the response has been fully written.
-                context.channel.closeFuture.whenComplete { _ in
-                    try? fileHandle.close()
+                if !fileData.isEmpty {
+                    var buffer = context.channel.allocator.buffer(capacity: fileData.count)
+                    fileData.withUnsafeBytes { raw in
+                        buffer.writeBytes(raw.bindMemory(to: UInt8.self))
+                    }
+                    context.write(self.wrapOutboundOut(.body(.byteBuffer(buffer))), promise: nil)
                 }
+                context.writeAndFlush(self.wrapOutboundOut(.end(nil)), promise: nil)
             } catch {
                 NSLog("HTTPHandler: failed to serve file \(path): \(error)")
                 var errHeaders = HTTPHeaders()

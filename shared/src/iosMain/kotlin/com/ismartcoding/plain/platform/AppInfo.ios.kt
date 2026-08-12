@@ -6,6 +6,7 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSUserDomainMask
+import platform.Foundation.NSProcessInfo
 import platform.UIKit.UIDevice
 import platform.UIKit.UIUserInterfaceIdiomPad
 import platform.UIKit.UIUserInterfaceIdiomPhone
@@ -66,7 +67,9 @@ actual fun getAppVersionCode(): Long {
 actual fun isDebugBuild(): Boolean {
     val bundle = NSBundle.mainBundle
     val debugMode = bundle.objectForInfoDictionaryKey("DEBUG") as? String
-    return debugMode == "YES"
+    if (debugMode == "YES") return true
+    val simulatorName = NSProcessInfo.processInfo.environment["SIMULATOR_DEVICE_NAME"]
+    return simulatorName != null
 }
 
 actual fun getSdkInt(): Int = 0

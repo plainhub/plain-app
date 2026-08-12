@@ -20,7 +20,7 @@ import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.platform.generateChaCha20Key
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.httpserver.models.dchatChannelToModel
+import com.ismartcoding.plain.httpserver.models.toModel
 
 object ChannelManager {
 
@@ -42,6 +42,15 @@ object ChannelManager {
                     ChatManager.refreshLatestChats()
                 }
         }
+    }
+
+    fun broadcastChannelsUpdated() {
+        sendEvent(
+            WebSocketEvent(
+                EventType.CHANNELS_UPDATED,
+                channelsToJsonModelString(ChannelCacher.channels.value),
+            ),
+        )
     }
 
     suspend fun createChannel(name: String): DChatChannel {
@@ -187,4 +196,4 @@ object ChannelManager {
 }
 
 private fun channelsToJsonModelString(channels: List<DChatChannel>): String =
-    JsonHelper.jsonEncode(channels.map { dchatChannelToModel(it) })
+    JsonHelper.jsonEncode(channels.map { it.toModel() })

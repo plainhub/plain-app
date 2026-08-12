@@ -56,6 +56,11 @@
     <string>PlainApp needs microphone access for sound meter and audio recording features.</string>
     <key>NSContactsUsageDescription</key>
     <string>PlainApp needs contacts access to display and manage your contacts.</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
     <key>DEBUG</key>
     <string>$(DEBUG_MODE)</string>
 </dict>

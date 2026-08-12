@@ -44,5 +44,3 @@ fun DChatChannel.toModel(): ChatChannel {
         updatedAt = updatedAt,
     )
 }
-
-fun dchatChannelToModel(c: DChatChannel): ChatChannel = c.toModel()
