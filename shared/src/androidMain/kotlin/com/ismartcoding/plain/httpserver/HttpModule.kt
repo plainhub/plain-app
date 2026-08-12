@@ -91,7 +91,7 @@ object HttpModule {
             // serviceEnabled=true. Main-UI routes are rejected here; the
             // authoritative check still lives in each route handler so BLE
             // RPC (which bypasses this intercept) is also covered.
-            if (!isPeerAccessiblePath(method, path) && !isDlnaPath(method, path) && !TempData.canDesktopAccess()) {
+            if (!isPeerAccessiblePath(method, path) && !isDlnaPath(method, path) && !TempData.desktopAccessEnabled.value) {
                 call.respond(HttpStatusCode.NotFound)
                 return@intercept finish()
             }
