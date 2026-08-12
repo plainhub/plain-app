@@ -15,6 +15,8 @@ import com.ismartcoding.plain.i18n.home
 import com.ismartcoding.plain.i18n.house
 import com.ismartcoding.plain.i18n.message_circle
 import com.ismartcoding.plain.i18n.tools
+import com.ismartcoding.plain.platform.isAndroidOnly
+import com.ismartcoding.plain.platform.isDebugBuild
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -56,19 +58,21 @@ fun MainBottomBar(
                 indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
             ),
         )
-        NavigationBarItem(
-            selected = selectedIndex == 2,
-            onClick = { onTabSelected(2) },
-            icon = {
-                Icon(
-                    painter = painterResource(Res.drawable.grid_3x3),
-                    contentDescription = null,
-                )
-            },
-            label = { Text(stringResource(Res.string.tools)) },
-            colors = NavigationBarItemDefaults.colors(
-                indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-        )
+        if (isAndroidOnly() || isDebugBuild()) {
+            NavigationBarItem(
+                selected = selectedIndex == 2,
+                onClick = { onTabSelected(2) },
+                icon = {
+                    Icon(
+                        painter = painterResource(Res.drawable.grid_3x3),
+                        contentDescription = null,
+                    )
+                },
+                label = { Text(stringResource(Res.string.tools)) },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                ),
+            )
+        }
     }
 }

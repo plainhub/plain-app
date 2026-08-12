@@ -3,11 +3,10 @@ package com.ismartcoding.plain.platform
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
-import com.ismartcoding.plain.db.Migrations
 
 /**
  * iOS actual: builds the [AppDatabase] using the Room KMP API with
- * [BundledSQLiteDriver] and registers the manual 5→6 migration.
+ * [BundledSQLiteDriver] and registers all manual migrations.
  * Instantiation is handled by [AppDatabaseConstructor] (declared via
  * `@ConstructedBy` in commonMain), so no explicit factory is needed.
  * All other database logic (entities, DAOs, auto-migrations, data
@@ -18,5 +17,5 @@ actual fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase> {
         name = databaseFilePath(name),
     )
         .setDriver(BundledSQLiteDriver())
-        .addMigrations(Migrations.MIGRATION_5_6, Migrations.MIGRATION_18_19, Migrations.MIGRATION_19_20, Migrations.MIGRATION_20_21)
+        .addAllMigrations()
 }

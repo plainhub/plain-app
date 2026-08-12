@@ -36,7 +36,7 @@ object Migrations {
                     from_id TEXT NOT NULL,
                     to_id TEXT NOT NULL,
                     group_id TEXT NOT NULL,
-                    status TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'PENDING',
                     content TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
@@ -132,4 +132,114 @@ object Migrations {
             )
         }
     }
+
+    val MIGRATION_21_22 = object : Migration(21, 22) {
+        override fun migrate(connection: SQLiteConnection) {
+            // Clean up invalid data that could cause Enum parsing crashes
+            connection.execSQL("UPDATE chats SET status = 'PENDING' WHERE status = '' OR status IS NULL")
+            connection.execSQL("UPDATE sessions SET type = 'WEB' WHERE type = '' OR type IS NULL")
+            connection.execSQL("UPDATE chat_channels SET status = 'JOINED' WHERE status = '' OR status IS NULL")
+            connection.execSQL("UPDATE peers SET status = 'UNPAIRED' WHERE status = '' OR status IS NULL")
+            connection.execSQL("UPDATE peers SET device_type = 'OTHER' WHERE device_type = '' OR device_type IS NULL")
+
+            // Fix chats.status DEFAULT 'PENDING' and chats.status_data DEFAULT ''
+            connection.execSQL(
+                """
+                CREATE TABLE chats_new (
+                    id TEXT NOT NULL,
+                    from_id TEXT NOT NULL,
+                    to_id TEXT NOT NULL,
+                    channel_id TEXT NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'PENDING',
+                    status_data TEXT NOT NULL DEFAULT '',
+                    content TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    PRIMARY KEY(id)
+                )
+                """
+            )
+            connection.execSQL(
+                """
+                INSERT INTO chats_new (id, from_id, to_id, channel_id, status, status_data, content, created_at, updated_at)
+                SELECT id, from_id, to_id, channel_id, status, status_data, content, created_at, updated_at
+                FROM chats
+                """
+            )
+            connection.execSQL("DROP TABLE chats")
+            connection.execSQL("ALTER TABLE chats_new RENAME TO chats")
+            connection.execSQL("CREATE INDEX index_chats_from_id ON chats(from_id)")
+            connection.execSQL("CREATE INDEX index_chats_to_id ON chats(to_id)")
+            connection.execSQL("CREATE INDEX index_chats_channel_id ON chats(channel_id)")
+
+            // Fix sessions.type DEFAULT 'WEB' (was 'web' before auto-migration 19→20)
+            connection.execSQL(
+                """
+                CREATE TABLE sessions_new (
+                    client_id TEXT NOT NULL,
+                    name TEXT NOT NULL DEFAULT '',
+                    type TEXT NOT NULL DEFAULT 'WEB',
+                    client_ip TEXT NOT NULL,
+                    os_name TEXT NOT NULL,
+                    os_version TEXT NOT NULL,
+                    browser_name TEXT NOT NULL,
+                    browser_version TEXT NOT NULL,
+                    token TEXT NOT NULL,
+                    last_active_at TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    PRIMARY KEY(client_id)
+                )
+                """
+            )
+            connection.execSQL(
+                """
+                INSERT INTO sessions_new (client_id, name, type, client_ip, os_name, os_version, browser_name, browser_version, token, last_active_at, created_at, updated_at)
+                SELECT client_id, name, type, client_ip, os_name, os_version, browser_name, browser_version, token, last_active_at, created_at, updated_at
+                FROM sessions
+                """
+            )
+            connection.execSQL("DROP TABLE sessions")
+            connection.execSQL("ALTER TABLE sessions_new RENAME TO sessions")
+
+            // Fix chat_channels.status DEFAULT 'JOINED' (was 'joined' before auto-migration 19→20)
+            connection.execSQL(
+                """
+                CREATE TABLE chat_channels_new (
+                    id TEXT NOT NULL,
+                    name TEXT NOT NULL,
+                    key TEXT NOT NULL,
+                    owner TEXT NOT NULL DEFAULT '',
+                    members TEXT NOT NULL,
+                    version INTEGER NOT NULL DEFAULT 0,
+                    status TEXT NOT NULL DEFAULT 'JOINED',
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    PRIMARY KEY(id)
+                )
+                """
+            )
+            connection.execSQL(
+                """
+                INSERT INTO chat_channels_new (id, name, key, owner, members, version, status, created_at, updated_at)
+                SELECT id, name, key, owner, members, version, status, created_at, updated_at
+                FROM chat_channels
+                """
+            )
+            connection.execSQL("DROP TABLE chat_channels")
+            connection.execSQL("ALTER TABLE chat_channels_new RENAME TO chat_channels")
+        }
+    }
+
+    /**
+     * All manual migrations in the order they should be applied.
+     * Register this array with `addMigrations()` on the platform-specific builder.
+     */
+    val ALL = arrayOf(
+        MIGRATION_5_6,
+        MIGRATION_18_19,
+        MIGRATION_19_20,
+        MIGRATION_20_21,
+        MIGRATION_21_22,
+    )
 }

@@ -12,6 +12,13 @@ import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import com.ismartcoding.plain.db.*
 
+/**
+ * Adds all manual migrations to this RoomDatabase builder.
+ */
+fun RoomDatabase.Builder<AppDatabase>.addAllMigrations(): RoomDatabase.Builder<AppDatabase> {
+    return this.addMigrations(*Migrations.ALL)
+}
+
 @DeleteTable(tableName = "boxes")
 class BoxesDeletionSpec : AutoMigrationSpec
 
@@ -37,7 +44,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DImageEditorProject::class,
         DMediaItem::class,
     ],
-    version = 21,
+    version = 22,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
