@@ -14,5 +14,5 @@ import com.ismartcoding.plain.db.Migrations
  */
 actual fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase> {
     return Room.databaseBuilder<AppDatabase>(appContext, name)
-        .addMigrations(Migrations.MIGRATION_5_6)
+        .addMigrations(Migrations.MIGRATION_5_6, Migrations.MIGRATION_18_19)
 }

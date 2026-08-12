@@ -18,6 +18,7 @@ import com.ismartcoding.plain.platform.nearbySendUnicast
 import com.ismartcoding.plain.platform.nearbyStartReceiver
 import com.ismartcoding.plain.platform.nearbyStopReceiver
 import com.ismartcoding.plain.enums.NearbyMessageType
+import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
@@ -173,7 +174,7 @@ object LANDiscoverManager {
         if (request.fromId.isEmpty() || request.toId.isEmpty()) return false
 
         val peer = AppDatabase.instance.peerDao().getById(request.fromId)
-        if (peer == null || peer.status != "paired") return false
+        if (peer == null || peer.status != PeerStatus.PAIRED) return false
         val decrypted = chaCha20Decrypt(
             Base64Lenient.decode(peer.key),
             Base64Lenient.decode(request.toId),

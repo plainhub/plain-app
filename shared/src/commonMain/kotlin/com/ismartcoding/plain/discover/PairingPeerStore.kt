@@ -4,6 +4,7 @@ import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -26,10 +27,10 @@ object PairingPeerStore {
                 name = deviceName
                 this.ip = deviceIps.joinToString(",")
                 this.port = port
-                this.deviceType = deviceType.value
+                this.deviceType = deviceType
                 this.key = key
                 publicKey = signaturePublicKey
-                status = "paired"
+                status = PeerStatus.PAIRED
                 updatedAt = now
             }
             // Peers are identified by their clientId (the deviceId). Only an

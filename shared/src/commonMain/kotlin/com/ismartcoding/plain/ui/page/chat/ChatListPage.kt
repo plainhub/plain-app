@@ -206,7 +206,7 @@ fun ChatListPage(
                         PeerListItem(
                             title = peer.name,
                             desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
-                            icon = DeviceType.fromValue(peer.deviceType).getIcon(),
+                            icon = peer.deviceType.getIcon(),
                             online = PeerCacher.getPeerOnlineStatus(peer.id),
                             latestChat = ChatCacher.getLatestChat(peer.id),
                             peerId = peer.id,

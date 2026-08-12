@@ -47,7 +47,7 @@ fun ChannelMemberListItem(
         subtitle = subtitle,
         start = {
             PeerIconWithStatus(
-                icon = DeviceType.fromValue(member.peer.deviceType).getIcon(),
+                icon = member.peer.deviceType.getIcon(),
                 title = member.displayName(), online = null
             )
         },

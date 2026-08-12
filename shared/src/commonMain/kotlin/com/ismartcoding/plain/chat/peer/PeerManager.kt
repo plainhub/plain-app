@@ -7,6 +7,7 @@ import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.helpers.TimeHelper
 
 object PeerManager {
@@ -18,7 +19,7 @@ object PeerManager {
         val isChannelMember = AppDatabase.instance.chatChannelDao().getAll().any { it.hasMember(peerId) }
         if (isChannelMember) {
             peer.key = ""
-            peer.status = "channel"
+            peer.status = PeerStatus.CHANNEL
             peerDao.update(peer)
         } else {
             peerDao.delete(peerId)
@@ -32,7 +33,7 @@ object PeerManager {
     suspend fun markUnpaired(peerId: String): Boolean = withIO {
         val peerDao = AppDatabase.instance.peerDao()
         val peer = peerDao.getById(peerId) ?: return@withIO false
-        peer.status = "unpaired"
+        peer.status = PeerStatus.UNPAIRED
         peer.updatedAt = TimeHelper.now()
         peerDao.update(peer)
         PeerCacher.load()
@@ -48,10 +49,10 @@ object PeerManager {
         deviceType: DeviceType,
     ): DPeer? {
         val existing = PeerCacher.getPeer(deviceId) ?: return null
-        if (existing.status != "paired") return null
+        if (existing.status != PeerStatus.PAIRED) return null
 
         val newIpString = ips.joinToString(",")
-        val newDeviceType = deviceType.value
+        val newDeviceType = deviceType
         return PeerCacher.mutatePeer(deviceId) { p ->
             if (p.ip != newIpString) p.ip = newIpString
             if (p.port != port) p.port = port

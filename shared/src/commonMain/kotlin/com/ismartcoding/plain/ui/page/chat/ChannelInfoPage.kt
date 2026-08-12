@@ -195,7 +195,7 @@ fun ChannelInfoPage(
                                     subtitle = peer.getBestIp(),
                                     start = {
                                         PeerIconWithStatus(
-                                            icon = DeviceType.fromValue(peer.deviceType).getIcon(),
+                                            icon = peer.deviceType.getIcon(),
                                             title = peer.getName(),
                                             online = null
                                         )
@@ -380,8 +380,8 @@ private fun MemberInfoDialog(
                 PDialogListItem(title = stringResource(Res.string.peer_id), value = peer.id)
                 PDialogListItem(title = stringResource(Res.string.ip_address), value = peer.getBestIp())
                 PDialogListItem(title = stringResource(Res.string.port), value = peer.port.toString())
-                PDialogListItem(title = stringResource(Res.string.device_type), value = DeviceType.fromValue(peer.deviceType).getText())
-                val status = peer.getStatusText()
+                PDialogListItem(title = stringResource(Res.string.device_type), value = peer.deviceType.getText())
+                val status = peer.status.getText()
                 if (status.isNotEmpty()) {
                     PDialogListItem(title = stringResource(Res.string.status), value = status)
                 }

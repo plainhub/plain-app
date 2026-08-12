@@ -84,7 +84,7 @@ fun ForwardTargetDialog(
                         },
                         title = peer.name,
                         subtitle = peer.ip,
-                        start = { TargetIcon(DeviceType.fromValue(peer.deviceType).getIcon()) },
+                        start = { TargetIcon(peer.deviceType.getIcon()) },
                         showMore = true,
                     )
                 }

@@ -6,5 +6,5 @@ import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.DeviceType
 
 fun DPeer.toModel(): Peer {
-    return Peer(id, name, getBestIp(), status, port, DeviceType.fromValue(deviceType), createdAt, updatedAt, PeerStatusManager.isOnline(id))
+    return Peer(id, name, getBestIp(), status.name, port, deviceType, createdAt, updatedAt, PeerStatusManager.isOnline(id))
 }

@@ -44,6 +44,7 @@ import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChatChannel
+import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
@@ -310,7 +311,7 @@ fun ChatPage(
                 }
             }
             val peer = if (chatTarget.value.type == ChatTargetType.PEER) PeerCacher.getPeer(chatTarget.value.toId) else null
-            val notAllowChat = (channel != null && !channel.isJoined()) || peer?.status == "unpaired"
+            val notAllowChat = (channel != null && !channel.isJoined()) || peer?.status == PeerStatus.UNPAIRED
             if (notAllowChat) {
                 Box(
                     modifier = Modifier
@@ -319,7 +320,7 @@ fun ChatPage(
                 ) {
                     Text(
                         text = stringResource(
-                            if (peer?.status == "unpaired")
+                            if (peer?.status == PeerStatus.UNPAIRED)
                                 Res.string.unpaired
                             else if (channel?.status == DChatChannel.STATUS_KICKED)
                                 Res.string.channel_kicked_notice
@@ -330,7 +331,7 @@ fun ChatPage(
                     )
                 }
                 Spacer(modifier = Modifier.navigationBarsPadding())
-            } else if (!chatVM.showBottomActions() && (peer == null || peer.status == "paired")) {
+            } else if (!chatVM.showBottomActions() && (peer == null || peer.status == PeerStatus.PAIRED)) {
                 ChatInput(
                     value = inputValue,
                     hint = stringResource(Res.string.chat_input_hint),

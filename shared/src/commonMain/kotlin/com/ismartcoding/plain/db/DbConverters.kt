@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.TypeConverter
+import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.PeerStatus
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -43,4 +45,20 @@ class ChatItemContentConverter {
     fun dataToString(data: DMessageContent): String {
         return data.toJSONString()
     }
+}
+
+class PeerStatusConverter {
+    @TypeConverter
+    fun toDB(value: PeerStatus): String = value.name
+
+    @TypeConverter
+    fun fromDB(value: String): PeerStatus = PeerStatus.valueOf(value)
+}
+
+class DeviceTypeConverter {
+    @TypeConverter
+    fun toDB(value: DeviceType): String = value.name
+
+    @TypeConverter
+    fun fromDB(value: String): DeviceType = DeviceType.valueOf(value)
 }

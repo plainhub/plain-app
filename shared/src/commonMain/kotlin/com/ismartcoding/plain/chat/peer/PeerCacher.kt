@@ -7,6 +7,7 @@ import com.ismartcoding.plain.chat.peer.transport.PeerTransportType
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.enums.PeerStatus
 import androidx.compose.runtime.mutableStateMapOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +52,7 @@ object PeerCacher {
     }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     val unpairedPeers: StateFlow<List<DPeer>> = combine(peersMap, ChatCacher.latestChatMap, onlineMap) { p, c, o ->
-        sortPeers(p.values.filter { it.peer.status == "unpaired" }.map { it.peer }, c, o)
+        sortPeers(p.values.filter { it.peer.status == PeerStatus.UNPAIRED }.map { it.peer }, c, o)
     }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     val onlinePeerIds: StateFlow<Set<String>> = onlineMap

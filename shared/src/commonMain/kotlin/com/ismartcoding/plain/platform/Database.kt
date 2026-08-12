@@ -37,7 +37,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DImageEditorProject::class,
         DMediaItem::class,
     ],
-    version = 18,
+    version = 19,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -59,7 +59,13 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
     exportSchema = true,
 )
 @ConstructedBy(AppDatabaseConstructor::class)
-@TypeConverters(DateConverter::class, ChannelMemberListConverter::class, ChatItemContentConverter::class)
+@TypeConverters(
+    DateConverter::class,
+    ChannelMemberListConverter::class,
+    ChatItemContentConverter::class,
+    PeerStatusConverter::class,
+    DeviceTypeConverter::class,
+)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
     abstract fun sessionDao(): SessionDao

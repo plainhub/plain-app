@@ -20,7 +20,7 @@ data class DPairingRequest(
     val awareSupported: Boolean = false, // Whether the requester's device supports Wi-Fi Aware
 ) {
     fun toSignatureData(): String {
-        return "$fromId|$fromName|$port|${deviceType.value}|$ecdhPublicKey|$signaturePublicKey|$timestamp|${ips.joinToString(",")}"
+        return "$fromId|$fromName|$port|${deviceType.name}|$ecdhPublicKey|$signaturePublicKey|$timestamp|${ips.joinToString(",")}"
     }
 }
 
@@ -59,7 +59,7 @@ data class DPairingResponse(
     val awareSupported: Boolean = false, // Whether the responder's device supports Wi-Fi Aware
 ) {
     fun toSignatureData(): String {
-        return "$fromId|$toId|$port|${deviceType.value}|$ecdhPublicKey|$signaturePublicKey|$accepted|$timestamp|${ips.joinToString(",")}"
+        return "$fromId|$toId|$port|${deviceType.name}|$ecdhPublicKey|$signaturePublicKey|$accepted|$timestamp|${ips.joinToString(",")}"
     }
 }
 

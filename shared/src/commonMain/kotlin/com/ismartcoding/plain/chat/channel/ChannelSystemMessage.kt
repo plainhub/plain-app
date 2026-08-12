@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.plain.db.ChannelMember
+import com.ismartcoding.plain.enums.DeviceType
 import kotlinx.serialization.Serializable
 
 object ChannelSystemMessages {
@@ -41,7 +42,7 @@ object ChannelSystemMessages {
         val id: String,
         val name: String = "",
         val publicKey: String = "",
-        val deviceType: String = "",
+        val deviceType: DeviceType = DeviceType.PHONE,
         val ip: String = "",
         val port: Int = 0,
     )
@@ -51,7 +52,7 @@ object ChannelSystemMessages {
         val channelId: String,
         val publicKey: String = "",
         val name: String = "",
-        val deviceType: String = "",
+        val deviceType: DeviceType = DeviceType.PHONE,
     )
 
     @Serializable

@@ -47,7 +47,7 @@ object ChannelSystemMessageSender {
 
     suspend fun sendInviteAccept(channelId: String, ownerPeer: DPeer): GraphQLResponse = withIO {
         val publicKey = SignatureHelper.getRawPublicKeyBase64Async()
-        val deviceType = getDeviceType().value
+        val deviceType = getDeviceType()
         val payload = jsonEncode(
             ChannelSystemMessages.ChannelInviteAccept(
                 channelId = channelId,

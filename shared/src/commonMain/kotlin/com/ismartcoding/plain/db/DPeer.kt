@@ -9,10 +9,8 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
-import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.paired
-import com.ismartcoding.plain.i18n.unpaired
-import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.PeerStatus
 
 @Entity(tableName = "peers")
 data class DPeer(
@@ -21,23 +19,13 @@ data class DPeer(
     @ColumnInfo(name = "ip") var ip: String = "",
     @ColumnInfo(name = "key") var key: String = "",
     @ColumnInfo(name = "public_key") var publicKey: String = "",
-    @ColumnInfo(name = "status") var status: String = "", // paired, unpaired, channel
+    @ColumnInfo(name = "status") var status: PeerStatus = PeerStatus.UNPAIRED,
     @ColumnInfo(name = "port") var port: Int = 0,
-    @ColumnInfo(name = "device_type") var deviceType: String = "", // phone, tablet, pc, etc.
+    @ColumnInfo(name = "device_type") var deviceType: DeviceType = DeviceType.PHONE,
 ) : DEntityBase() {
-    fun isPaired(): Boolean = status == "paired"
-    fun isChannel(): Boolean = status == "channel"
+    fun isPaired(): Boolean = status == PeerStatus.PAIRED
     fun getIpList(): List<String> {
         return ip.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-    }
-
-    @Composable
-    fun getStatusText(): String {
-        return when (status) {
-            "paired" -> stringResource(Res.string.paired)
-            "unpaired" -> stringResource(Res.string.unpaired)
-            else -> ""
-        }
     }
 }
 
@@ -46,10 +34,10 @@ interface PeerDao {
     @Query("SELECT * FROM peers")
     suspend fun getAll(): List<DPeer>
 
-    @Query("SELECT * FROM peers where status = 'paired'")
+    @Query("SELECT * FROM peers where status = 'PAIRED'")
     suspend fun getAllPaired(): List<DPeer>
 
-    @Query("SELECT * FROM peers where status IN ('paired', 'channel')")
+    @Query("SELECT * FROM peers where status IN ('PAIRED', 'CHANNEL')")
     suspend fun getAllWithPublicKey(): List<DPeer>
 
     @Query("SELECT * FROM peers WHERE id = :id")

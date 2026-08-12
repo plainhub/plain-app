@@ -10,6 +10,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.db.getStatusWsUrl
 import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.events.EventType
@@ -242,7 +243,7 @@ object PeerStatusManager {
     }
 
     private fun shouldConnect(peer: DPeer): Boolean {
-        return peer.status == "paired" && peer.key.isNotEmpty() && TempData.clientId < peer.id
+        return peer.status == PeerStatus.PAIRED && peer.key.isNotEmpty() && TempData.clientId < peer.id
     }
 
     fun setOnline(peerId: String, online: Boolean) {

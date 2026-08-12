@@ -5,6 +5,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
+import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.verifyEd25519Signature
@@ -36,7 +38,7 @@ object ChannelSystemMessageReceiver {
         id: String,
         name: String,
         publicKey: String,
-        deviceType: String,
+        deviceType: DeviceType,
         ip: String = "",
         port: Int = 0,
         logTag: String = "member",
@@ -47,7 +49,7 @@ object ChannelSystemMessageReceiver {
                 id = id,
                 name = name,
                 publicKey = publicKey,
-                status = "channel",
+                status = PeerStatus.CHANNEL,
                 deviceType = deviceType,
                 ip = ip,
                 port = port,

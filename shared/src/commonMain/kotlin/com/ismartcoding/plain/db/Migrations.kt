@@ -92,4 +92,11 @@ object Migrations {
             connection.execSQL("CREATE INDEX index_chats_group_id ON chats(group_id)")
         }
     }
+
+    val MIGRATION_18_19 = object : Migration(18, 19) {
+        override fun migrate(connection: SQLiteConnection) {
+            connection.execSQL("UPDATE peers SET status = UPPER(status) WHERE status != ''")
+            connection.execSQL("UPDATE peers SET device_type = UPPER(device_type) WHERE device_type != ''")
+        }
+    }
 }

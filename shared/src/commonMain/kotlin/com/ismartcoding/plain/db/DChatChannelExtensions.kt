@@ -22,7 +22,7 @@ suspend fun DChatChannel.getPeersAsync(): List<DPeer> = withIO {
                 ip = getDeviceIP4s().joinToString(","),
                 port = TempData.httpsPort.value,
                 publicKey = SignatureHelper.getRawPublicKeyBase64Async(),
-                deviceType = DeviceType.PHONE.value,
+                deviceType = DeviceType.PHONE,
             )
         } else {
             dbPeers[peerId]
@@ -35,7 +35,7 @@ fun mePeer(): DPeer = DPeer(
     name = TempData.deviceName.value,
     ip = getDeviceIP4s().joinToString(","),
     port = TempData.httpsPort.value,
-    deviceType = DeviceType.PHONE.value,
+    deviceType = DeviceType.PHONE,
 )
 
 fun DChatChannel.getOwner(): DPeer? {
