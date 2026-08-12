@@ -366,6 +366,15 @@ enum ChannelMemberStatus {
   PENDING
 }
 
+enum ChannelSystemMessageType {
+  INVITE
+  INVITE_ACCEPT
+  INVITE_DECLINE
+  UPDATE
+  KICK
+  LEAVE
+}
+
 type ChatChannel {
   id: String!
   name: String!

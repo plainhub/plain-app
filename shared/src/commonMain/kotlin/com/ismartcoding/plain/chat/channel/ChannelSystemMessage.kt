@@ -1,23 +1,11 @@
 package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.plain.db.ChannelMember
+import com.ismartcoding.plain.enums.ChannelSystemMessageAction
 import com.ismartcoding.plain.enums.DeviceType
 import kotlinx.serialization.Serializable
 
 object ChannelSystemMessages {
-
-    // ── Type constants ─────────────────────────────────────────────
-    const val TYPE_INVITE = "channel_invite"
-    const val TYPE_INVITE_ACCEPT = "channel_invite_accept"
-    const val TYPE_INVITE_DECLINE = "channel_invite_decline"
-    const val TYPE_UPDATE = "channel_update"
-    const val TYPE_KICK = "channel_kick"
-    const val TYPE_LEAVE = "channel_leave"
-
-    // ── Action constants (signature payload) ───────────────────────
-    const val ACTION_INVITE = "invite"
-    const val ACTION_UPDATE = "update"
-    const val ACTION_KICK = "kick"
 
     @Serializable
     data class ChannelInvite(
@@ -94,6 +82,6 @@ object ChannelSystemMessages {
 fun channelMessagePayload(
     channelId: String,
     version: Long,
-    action: String,
+    action: ChannelSystemMessageAction,
     target: String,
-): String = "$channelId|$version|$action|$target"
+): String = "$channelId|$version|${action.name}|$target"

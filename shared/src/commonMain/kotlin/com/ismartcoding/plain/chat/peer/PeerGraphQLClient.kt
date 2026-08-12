@@ -3,6 +3,7 @@ package com.ismartcoding.plain.chat.peer
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.chat.channel.ChannelCacher
+import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportRouter
 import com.ismartcoding.plain.chat.peer.transport.SignedRequest
 import com.ismartcoding.plain.db.DMessageContent
@@ -41,18 +42,18 @@ object PeerGraphQLClient {
 
     suspend fun sendChannelSystemMessage(
         peer: DPeer,
-        type: String,
+        type: ChannelSystemMessageType,
         payload: String,
         channelId: String = "",
     ): GraphQLResponse {
         val mutation = $$"""
-                mutation ChannelSystemMessage($type: String!, $payload: String!) {
+                mutation ChannelSystemMessage($type: ChannelSystemMessageType!, $payload: String!) {
                     channelSystemMessage(type: $type, payload: $payload)
                 }
             """.trimIndent()
 
         val variables = mapOf(
-            "type" to type,
+            "type" to type.name,
             "payload" to payload,
         )
 

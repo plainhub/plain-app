@@ -3,6 +3,7 @@ package com.ismartcoding.plain.httpserver.peerschemas
 import com.ismartcoding.plain.chat.ChatMessageReceiver
 import com.ismartcoding.plain.chat.ReplayedMessageException
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver
+import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.kgraphql.Context
@@ -19,7 +20,7 @@ import com.ismartcoding.plain.httpserver.models.toModel
 
 
 @GraphQLMutation(target = GraphQLSchemaTarget.PEER)
-suspend fun channelSystemMessage(type: String, payload: String, context: Context): Boolean {
+suspend fun channelSystemMessage(type: ChannelSystemMessageType, payload: String, context: Context): Boolean {
     val ctx = context.get<GraphqlRequestContext>()!!
     val fromId = ctx.header("c-id") ?: ""
     ChannelSystemMessageReceiver.handle(fromId, type, payload)

@@ -5,6 +5,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
+import com.ismartcoding.plain.enums.ChannelSystemMessageAction
+import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.ChannelMemberStatus
 import com.ismartcoding.plain.enums.ChatChannelStatus
@@ -17,22 +19,27 @@ import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInvite
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInviteAccept
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInviteDecline
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelKick
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelLeave
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelUpdate
 
 object ChannelSystemMessageReceiver {
 
-    suspend fun handle(fromId: String, type: String, payload: String) {
+    suspend fun handle(fromId: String, type: ChannelSystemMessageType, payload: String) {
         try {
             when (type) {
-                ChannelSystemMessages.TYPE_INVITE -> handleInvite(fromId, jsonDecode(payload))
-                ChannelSystemMessages.TYPE_INVITE_ACCEPT -> handleInviteAccept(fromId, jsonDecode(payload))
-                ChannelSystemMessages.TYPE_INVITE_DECLINE -> handleInviteDecline(fromId, jsonDecode(payload))
-                ChannelSystemMessages.TYPE_UPDATE -> handleUpdate(fromId, jsonDecode(payload))
-                ChannelSystemMessages.TYPE_KICK -> handleKick(fromId, jsonDecode(payload))
-                ChannelSystemMessages.TYPE_LEAVE -> handleLeave(fromId, jsonDecode(payload))
-                else -> LogCat.e("Unknown channel system message type: $type")
+                ChannelSystemMessageType.INVITE -> handleInvite(fromId, jsonDecode(payload))
+                ChannelSystemMessageType.INVITE_ACCEPT -> handleInviteAccept(fromId, jsonDecode(payload))
+                ChannelSystemMessageType.INVITE_DECLINE -> handleInviteDecline(fromId, jsonDecode(payload))
+                ChannelSystemMessageType.UPDATE -> handleUpdate(fromId, jsonDecode(payload))
+                ChannelSystemMessageType.KICK -> handleKick(fromId, jsonDecode(payload))
+                ChannelSystemMessageType.LEAVE -> handleLeave(fromId, jsonDecode(payload))
             }
         } catch (e: Exception) {
-            LogCat.e("Error handling channel system message [$type] from $fromId: ${e.message}")
+            LogCat.e("Error handling channel system message [${type.name}] from $fromId: ${e.message}")
         }
     }
 
@@ -61,7 +68,7 @@ object ChannelSystemMessageReceiver {
         return true
     }
 
-    private suspend fun handleInvite(fromId: String, msg: ChannelSystemMessages.ChannelInvite) {
+    private suspend fun handleInvite(fromId: String, msg: ChannelInvite) {
         val existingChannel = ChannelCacher.getChannel(msg.channelId)
         val isReinvite = existingChannel != null &&
                 (existingChannel.status == ChatChannelStatus.LEFT || existingChannel.status == ChatChannelStatus.KICKED)
@@ -79,7 +86,7 @@ object ChannelSystemMessageReceiver {
         val invitePayload = channelMessagePayload(
             channelId = msg.channelId,
             version = msg.version,
-            action = ChannelSystemMessages.ACTION_INVITE,
+            action = ChannelSystemMessageAction.INVITE,
             target = TempData.clientId,
         )
         if (!verifyEd25519Signature(ownerMemberInfo.publicKey, invitePayload, msg.signature)) {
@@ -145,7 +152,7 @@ object ChannelSystemMessageReceiver {
         LogCat.d("Channel invite received: ${msg.channelName} from $fromId")
     }
 
-    private suspend fun handleInviteAccept(fromId: String, msg: ChannelSystemMessages.ChannelInviteAccept) {
+    private suspend fun handleInviteAccept(fromId: String, msg: ChannelInviteAccept) {
         val channel = ChannelCacher.getChannel(msg.channelId) ?: run {
             LogCat.e("InviteAccept for unknown channel ${msg.channelId}")
             return
@@ -197,7 +204,7 @@ object ChannelSystemMessageReceiver {
         LogCat.d("Peer $fromId accepted invite for channel ${msg.channelId}")
     }
 
-    private suspend fun handleInviteDecline(fromId: String, msg: ChannelSystemMessages.ChannelInviteDecline) {
+    private suspend fun handleInviteDecline(fromId: String, msg: ChannelInviteDecline) {
         val channel = ChannelCacher.getChannel(msg.channelId) ?: return
 
         if (!channel.isOwnedByMe()) return
@@ -213,7 +220,7 @@ object ChannelSystemMessageReceiver {
         LogCat.d("Peer $fromId declined invite for channel ${msg.channelId}")
     }
 
-    private suspend fun handleUpdate(fromId: String, msg: ChannelSystemMessages.ChannelUpdate) {
+    private suspend fun handleUpdate(fromId: String, msg: ChannelUpdate) {
         val channel = ChannelCacher.getChannel(msg.channelId)
 
         if (channel == null) {
@@ -234,7 +241,7 @@ object ChannelSystemMessageReceiver {
         val updatePayload = channelMessagePayload(
             channelId = msg.channelId,
             version = msg.version,
-            action = ChannelSystemMessages.ACTION_UPDATE,
+            action = ChannelSystemMessageAction.UPDATE,
             target = "",
         )
         if (!verifyEd25519Signature(ownerPeer.publicKey, updatePayload, msg.signature)) {
@@ -271,7 +278,7 @@ object ChannelSystemMessageReceiver {
         LogCat.d("Channel ${msg.channelId} updated to version ${msg.version}")
     }
 
-    private suspend fun handleKick(fromId: String, msg: ChannelSystemMessages.ChannelKick) {
+    private suspend fun handleKick(fromId: String, msg: ChannelKick) {
         val channel = ChannelCacher.getChannel(msg.channelId)
         if (channel == null) {
             // inviting, cancel the dialog
@@ -292,7 +299,7 @@ object ChannelSystemMessageReceiver {
         val kickPayload = channelMessagePayload(
             channelId = msg.channelId,
             version = msg.version,
-            action = ChannelSystemMessages.ACTION_KICK,
+            action = ChannelSystemMessageAction.KICK,
             target = TempData.clientId,
         )
         if (!verifyEd25519Signature(ownerPeer.publicKey, kickPayload, msg.signature)) {
@@ -312,7 +319,7 @@ object ChannelSystemMessageReceiver {
         LogCat.d("Kicked from channel ${msg.channelId} by $fromId")
     }
 
-    private suspend fun handleLeave(fromId: String, msg: ChannelSystemMessages.ChannelLeave) {
+    private suspend fun handleLeave(fromId: String, msg: ChannelLeave) {
         val channel = ChannelCacher.getChannel(msg.channelId) ?: return
 
         if (!channel.isOwnedByMe()) {

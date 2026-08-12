@@ -8,15 +8,24 @@ import com.ismartcoding.plain.chat.peer.PeerGraphQLClient
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getPeersAsync
+import com.ismartcoding.plain.enums.ChannelSystemMessageAction
+import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.platform.getDeviceType
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.MemberPeerInfo
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInvite
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInviteAccept
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInviteDecline
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelUpdate
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelKick
+import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelLeave
 
 object ChannelSystemMessageSender {
 
-    private suspend fun buildMemberPeers(channel: DChatChannel): List<ChannelSystemMessages.MemberPeerInfo> {
+    private suspend fun buildMemberPeers(channel: DChatChannel): List<MemberPeerInfo> {
         return channel.getPeersAsync().map { peer ->
-            ChannelSystemMessages.MemberPeerInfo(
+            MemberPeerInfo(
                 id = peer.id,
                 name = peer.name,
                 publicKey = peer.publicKey,
@@ -29,7 +38,7 @@ object ChannelSystemMessageSender {
 
     suspend fun sendInvite(channel: DChatChannel, peer: DPeer): GraphQLResponse = withIO {
         val payload = jsonEncode(
-            ChannelSystemMessages.ChannelInvite(
+            ChannelInvite(
                 channelId = channel.id,
                 channelName = channel.name,
                 owner = TempData.clientId,
@@ -38,80 +47,80 @@ object ChannelSystemMessageSender {
                 memberPeers = buildMemberPeers(channel),
                 version = channel.version,
                 signature = SignatureHelper.signTextAsync(
-                    channelMessagePayload(channel.id, channel.version, ChannelSystemMessages.ACTION_INVITE, peer.id)
+                    channelMessagePayload(channel.id, channel.version, ChannelSystemMessageAction.INVITE, peer.id)
                 ),
             )
         )
-        sendToPeer(peer, ChannelSystemMessages.TYPE_INVITE, payload)
+        sendToPeer(peer, ChannelSystemMessageType.INVITE, payload)
     }
 
     suspend fun sendInviteAccept(channelId: String, ownerPeer: DPeer): GraphQLResponse = withIO {
         val publicKey = SignatureHelper.getRawPublicKeyBase64Async()
         val deviceType = getDeviceType()
         val payload = jsonEncode(
-            ChannelSystemMessages.ChannelInviteAccept(
+            ChannelInviteAccept(
                 channelId = channelId,
                 publicKey = publicKey,
                 name = TempData.deviceName.value,
                 deviceType = deviceType,
             )
         )
-        sendToPeer(ownerPeer, ChannelSystemMessages.TYPE_INVITE_ACCEPT, payload)
+        sendToPeer(ownerPeer, ChannelSystemMessageType.INVITE_ACCEPT, payload)
     }
 
     suspend fun sendInviteDecline(channelId: String, ownerPeer: DPeer): GraphQLResponse = withIO {
-        val payload = jsonEncode(ChannelSystemMessages.ChannelInviteDecline(channelId))
-        sendToPeer(ownerPeer, ChannelSystemMessages.TYPE_INVITE_DECLINE, payload)
+        val payload = jsonEncode(ChannelInviteDecline(channelId))
+        sendToPeer(ownerPeer, ChannelSystemMessageType.INVITE_DECLINE, payload)
     }
 
     suspend fun broadcastUpdate(channel: DChatChannel) = withIO {
         val payload = jsonEncode(
-            ChannelSystemMessages.ChannelUpdate(
+            ChannelUpdate(
                 channelId = channel.id,
                 channelName = channel.name,
                 members = channel.members,
                 memberPeers = buildMemberPeers(channel),
                 version = channel.version,
                 signature = SignatureHelper.signTextAsync(
-                    channelMessagePayload(channel.id, channel.version, ChannelSystemMessages.ACTION_UPDATE, "")
+                    channelMessagePayload(channel.id, channel.version, ChannelSystemMessageAction.UPDATE, "")
                 ),
             )
         )
-        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessages.TYPE_UPDATE, payload, channel.id)
+        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessageType.UPDATE, payload, channel.id)
     }
 
     suspend fun sendKick(channel: DChatChannel, peer: DPeer): GraphQLResponse = withIO {
         val payload = jsonEncode(
-            ChannelSystemMessages.ChannelKick(
+            ChannelKick(
                 channelId = channel.id,
                 version = channel.version,
                 signature = SignatureHelper.signTextAsync(
-                    channelMessagePayload(channel.id, channel.version, ChannelSystemMessages.ACTION_KICK, peer.id)
+                    channelMessagePayload(channel.id, channel.version, ChannelSystemMessageAction.KICK, peer.id)
                 ),
             )
         )
-        sendToPeer(peer, ChannelSystemMessages.TYPE_KICK, payload, channel.id)
+        sendToPeer(peer, ChannelSystemMessageType.KICK, payload, channel.id)
     }
 
     suspend fun broadcastKick(channel: DChatChannel) = withIO {
         val payload = jsonEncode(
-            ChannelSystemMessages.ChannelKick(
+            ChannelKick(
                 channelId = channel.id,
                 version = channel.version,
                 signature = SignatureHelper.signTextAsync(
-                    channelMessagePayload(channel.id, channel.version, ChannelSystemMessages.ACTION_KICK, "")
+                    channelMessagePayload(channel.id, channel.version, ChannelSystemMessageAction.KICK, "")
                 ),
             )
         )
-        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessages.TYPE_KICK, payload, channel.id)
+        sendToMultiplePeers(channel.memberIdsNotMe(TempData.clientId), ChannelSystemMessageType.KICK, payload, channel.id)
     }
 
     suspend fun sendLeave(channelId: String, ownerPeer: DPeer): GraphQLResponse = withIO {
-        val payload = jsonEncode(ChannelSystemMessages.ChannelLeave(channelId))
-        sendToPeer(ownerPeer, ChannelSystemMessages.TYPE_LEAVE, payload, channelId)
+        val payload = jsonEncode(ChannelLeave(channelId))
+        sendToPeer(ownerPeer, ChannelSystemMessageType.LEAVE, payload, channelId)
     }
 
-    private suspend fun sendToPeer(peer: DPeer, type: String, payload: String, channelId: String = ""): GraphQLResponse = withIO {
+    private suspend fun sendToPeer(peer: DPeer, type: ChannelSystemMessageType, payload: String, channelId: String = ""): GraphQLResponse = withIO {
         PeerGraphQLClient.sendChannelSystemMessage(
             peer = peer,
             type = type,
@@ -120,7 +129,7 @@ object ChannelSystemMessageSender {
         )
     }
 
-    private suspend fun sendToMultiplePeers(peerIds: List<String>, type: String, payload: String, channelId: String = "") = withIO {
+    private suspend fun sendToMultiplePeers(peerIds: List<String>, type: ChannelSystemMessageType, payload: String, channelId: String = "") = withIO {
         for (peerId in peerIds) {
             val peer = PeerCacher.getPeer(peerId) ?: continue
             sendToPeer(peer, type, payload, channelId)
