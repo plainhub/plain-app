@@ -1,12 +1,13 @@
 package com.ismartcoding.plain.httpserver.models
 
+import com.ismartcoding.plain.ai.ImageSearchStatusType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlinx.serialization.Serializable
 
 @GraphQLType
 @Serializable
 data class ImageSearchStatus(
-    val status: String,
+    val status: ImageSearchStatusType,
     val downloadProgress: Int,
     val errorMessage: String,
     val modelSize: Long,

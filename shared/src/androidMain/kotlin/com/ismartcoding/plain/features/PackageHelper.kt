@@ -18,6 +18,7 @@ import com.ismartcoding.plain.data.DCertificate
 import com.ismartcoding.plain.data.DPackage
 import com.ismartcoding.plain.data.DPackageDetail
 import com.ismartcoding.plain.data.DPackageStub
+import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.extensions.isSystemApp
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.helpers.QueryHelper
@@ -28,7 +29,7 @@ import javax.security.cert.X509Certificate
 
 object PackageHelper {
     private val appLabelCache: MutableMap<String, String> = HashMap()
-    private val appTypeCache: MutableMap<String, String> = HashMap()
+    private val appTypeCache: MutableMap<String, PackageType> = HashMap()
     private val appCertsCache: MutableMap<String, List<DCertificate>> = HashMap()
 
     fun getPackageInfoMap(ids: List<String>): Map<String, PackageInfo?> {
@@ -79,7 +80,7 @@ object PackageHelper {
 
                 if (type.isNotEmpty()) {
                     val appType = getAppType(appInfo)
-                    if (appType != type) {
+                    if (appType.name != type) {
                         return@forEach
                     }
                 }
@@ -123,10 +124,10 @@ object PackageHelper {
         }
     }
 
-    private fun getAppType(appInfo: ApplicationInfo): String {
+    private fun getAppType(appInfo: ApplicationInfo): PackageType {
         var appType = appTypeCache[appInfo.packageName]
         if (appType == null) {
-            appType = if (appInfo.isSystemApp()) "system" else "user"
+            appType = if (appInfo.isSystemApp()) PackageType.SYSTEM else PackageType.USER
             appTypeCache[appInfo.packageName] = appType
         }
 
@@ -204,7 +205,7 @@ object PackageHelper {
             LogCat.d(ex.toString())
             return DPackageDetail(ApplicationInfo(), PackageInfo().apply {
                 this.packageName = packageName
-            }, packageName, "", "", "", "", 0, emptyList(), Instant.DISTANT_PAST, Instant.DISTANT_PAST)
+            }, packageName, "", PackageType.USER, "", "", 0, emptyList(), Instant.DISTANT_PAST, Instant.DISTANT_PAST)
         }
     }
 
@@ -233,7 +234,7 @@ object PackageHelper {
                 if (t != null) {
                     val type = t.value
                     return@withIO packageManager.getInstalledApplications(0).count { appInfo ->
-                        getAppType(appInfo) == type
+                        getAppType(appInfo).name == type
                     }
                 }
             }

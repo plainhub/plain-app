@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.data.DCertificate
+import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.features.file.FileSortBy
 import kotlin.time.Instant
 
@@ -18,7 +19,7 @@ import kotlin.time.Instant
 data class DPackageInfo(
     val id: String,
     val name: String,
-    val type: String,
+    val type: PackageType,
     val version: String,
     val path: String,
     val size: Long,

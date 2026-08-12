@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.models
 
+import com.ismartcoding.plain.enums.AppChannelType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.enums.MediaPlayMode
@@ -16,7 +17,7 @@ data class App(
     val battery: Int,
     val appVersion: Int,
     val osVersion: Int,
-    val channel: String,
+    val channel: AppChannelType,
     val permissions: List<Permission>,
     val audios: List<PlaylistAudio>,
     val audioMode: MediaPlayMode,

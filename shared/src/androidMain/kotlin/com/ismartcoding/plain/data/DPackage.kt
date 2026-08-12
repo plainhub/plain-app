@@ -2,6 +2,7 @@ package com.ismartcoding.plain.data
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.features.PackageHelper
 import kotlin.time.Instant
 
@@ -10,7 +11,7 @@ data class DPackage(
     val packageInfo: PackageInfo,
     val id: String,
     val name: String,
-    val type: String,
+    val type: PackageType,
     val version: String,
     val path: String,
     val size: Long,
@@ -36,7 +37,7 @@ data class DPackageDetail(
     val packageInfo: PackageInfo,
     val id: String,
     val name: String,
-    val type: String,
+    val type: PackageType,
     val version: String,
     val path: String,
     val size: Long,

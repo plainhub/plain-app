@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -82,7 +83,7 @@ fun PackageListItem(
                 )
                 VerticalSpace(dp = 8.dp)
                 Text(
-                    text = stringResource(if (item.type == "system") Res.string.app_type_system else Res.string.app_type_user) + " " + item.size.formatBytes(),
+                    text = stringResource(if (item.type == PackageType.SYSTEM) Res.string.app_type_system else Res.string.app_type_user) + " " + item.size.formatBytes(),
                     style = MaterialTheme.typography.listItemDescription(),
                 )
                 VerticalSpace(dp = 8.dp)

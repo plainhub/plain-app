@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.helpers.coMain
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.platform.DPackageInfo
@@ -69,7 +70,7 @@ fun AppPageHeader(
             )
         }
         Row(Modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            SuggestionChip(onClick = {}, label = { Text(text = stringResource(if (item.type == "user") Res.string.user_app else Res.string.system_app)) })
+            SuggestionChip(onClick = {}, label = { Text(text = stringResource(if (item.type == PackageType.USER) Res.string.user_app else Res.string.system_app)) })
             if (item.hasLargeHeap) {
                 HorizontalSpace(dp = 8.dp)
                 SuggestionChip(onClick = {}, label = { Text(text = stringResource(Res.string.large_heap)) })

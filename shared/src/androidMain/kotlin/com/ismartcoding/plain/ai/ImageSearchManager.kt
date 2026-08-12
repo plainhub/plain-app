@@ -29,7 +29,7 @@ object ImageSearchManager {
         ModelFile("$HF_BASE/$TOKENIZER", TOKENIZER, 1_708_304L),
     )
 
-    private val _status = MutableStateFlow(ImageSearchStatus.UNAVAILABLE)
+    private val _status = MutableStateFlow(ImageSearchStatusType.UNAVAILABLE)
     val status = _status.asStateFlow()
     private val _downloadProgress = MutableStateFlow(0)
     val downloadProgress = _downloadProgress.asStateFlow()
@@ -40,7 +40,7 @@ object ImageSearchManager {
 
     fun getModelDir(): String = modelsDir.absolutePath
 
-    fun isModelReady(): Boolean = _status.value == ImageSearchStatus.READY
+    fun isModelReady(): Boolean = _status.value == ImageSearchStatusType.READY
 
     private fun isFdroid(): Boolean = buildChannel == AppChannelType.FDROID.name
 
@@ -64,8 +64,8 @@ object ImageSearchManager {
 
     suspend fun enableAsync() = withIO {
         if (isFdroid()) return@withIO
-        if (_status.value == ImageSearchStatus.DOWNLOADING ||
-            _status.value == ImageSearchStatus.LOADING
+        if (_status.value == ImageSearchStatusType.DOWNLOADING ||
+            _status.value == ImageSearchStatusType.LOADING
         ) {
             return@withIO
         }
@@ -85,14 +85,14 @@ object ImageSearchManager {
         DelegateHelper.closeAll()
         modelsDir.deleteRecursively()
         AppDatabase.instance.imageEmbeddingDao().deleteAll()
-        _status.value = ImageSearchStatus.UNAVAILABLE
+        _status.value = ImageSearchStatusType.UNAVAILABLE
         AiImageSearchEnabledPreference.putAsync(false)
         emitStatus()
     }
 
     fun cancelDownload() {
         ModelDownloader.cancel()
-        _status.value = ImageSearchStatus.UNAVAILABLE
+        _status.value = ImageSearchStatusType.UNAVAILABLE
         _downloadProgress.value = 0
         emitStatus()
     }
@@ -111,7 +111,7 @@ object ImageSearchManager {
         }
 
     private suspend fun downloadModels() {
-        _status.value = ImageSearchStatus.DOWNLOADING
+        _status.value = ImageSearchStatusType.DOWNLOADING
         _downloadProgress.value = 0
         emitStatus()
         val success = ModelDownloader.download(
@@ -121,7 +121,7 @@ object ImageSearchManager {
                 _downloadProgress.value = progress
             },
             onError = { e ->
-                _status.value = ImageSearchStatus.ERROR
+                _status.value = ImageSearchStatusType.ERROR
                 _errorMessage.value = e.message ?: "Download failed"
                 emitStatus()
             },
@@ -134,18 +134,18 @@ object ImageSearchManager {
 
     private fun loadModels() {
         try {
-            _status.value = ImageSearchStatus.LOADING
+            _status.value = ImageSearchStatusType.LOADING
             emitStatus()
             val dir = modelsDir
             ImageEmbedHelper.init(File(dir, IMAGE_MODEL))
             TextEmbedHelper.init(File(dir, TEXT_MODEL), File(dir, TOKENIZER))
-            _status.value = ImageSearchStatus.READY
+            _status.value = ImageSearchStatusType.READY
             _errorMessage.value = ""
             emitStatus()
             LogCat.d("MobileCLIP-S2 loaded successfully")
         } catch (e: Throwable) {
             LogCat.e("Model load failed", e)
-            _status.value = ImageSearchStatus.ERROR
+            _status.value = ImageSearchStatusType.ERROR
             _errorMessage.value = e.message ?: "Load failed"
             emitStatus()
         }

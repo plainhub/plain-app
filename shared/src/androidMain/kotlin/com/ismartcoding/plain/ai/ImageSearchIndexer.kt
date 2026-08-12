@@ -56,7 +56,7 @@ object ImageSearchIndexer {
     /** Full scan with progress tracking (parallel workers). */
     suspend fun start(forceReindex: Boolean = false) = withIO {
         if (isRunning) return@withIO
-        if (ImageSearchManager.status.value != ImageSearchStatus.READY) return@withIO
+        if (ImageSearchManager.status.value != ImageSearchStatusType.READY) return@withIO
         isRunning = true
         cancelled = false
         try {

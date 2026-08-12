@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
 import com.ismartcoding.plain.buildChannel
+import com.ismartcoding.plain.enums.AppChannelType
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
@@ -67,7 +68,7 @@ suspend fun app(): App {
         getBattery().level,
         getAppVersionCode().toInt(),
         getSdkInt(),
-        buildChannel,
+        AppChannelType.fromString(buildChannel),
         grantedPermissions,
         AudioPlaylistPreference.getValueAsync().map { it.toModel() },
         TempData.audioPlayMode.value,

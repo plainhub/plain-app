@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.ai.ImageSearchStatusType
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.IData
@@ -58,7 +59,7 @@ actual fun cancelImageIndex() {}
 
 actual fun buildImageSearchStatus(): com.ismartcoding.plain.httpserver.models.ImageSearchStatus =
     com.ismartcoding.plain.httpserver.models.ImageSearchStatus(
-        status = "UNAVAILABLE",
+        status = ImageSearchStatusType.UNAVAILABLE,
         downloadProgress = 0,
         errorMessage = "",
         modelSize = 0L,

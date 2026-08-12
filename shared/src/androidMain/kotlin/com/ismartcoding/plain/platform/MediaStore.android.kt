@@ -179,7 +179,7 @@ actual fun buildImageSearchStatus(): com.ismartcoding.plain.httpserver.models.Im
     val mgr = com.ismartcoding.plain.ai.ImageSearchManager
     val indexer = com.ismartcoding.plain.ai.ImageSearchIndexer
     return com.ismartcoding.plain.httpserver.models.ImageSearchStatus(
-        status = mgr.status.value.name,
+        status = mgr.status.value,
         downloadProgress = mgr.downloadProgress.value,
         errorMessage = mgr.errorMessage.value,
         modelSize = mgr.totalModelSize(),

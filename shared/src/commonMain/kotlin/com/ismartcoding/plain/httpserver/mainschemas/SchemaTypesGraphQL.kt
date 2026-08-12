@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.ai.ImageSearchStatusType
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.data.DevicePlatform
+import com.ismartcoding.plain.enums.AppChannelType
 import com.ismartcoding.plain.enums.ChannelMemberStatus
 import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
@@ -12,6 +14,7 @@ import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PeerStatus
+import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.platform.Permission
@@ -35,6 +38,8 @@ fun SchemaBuilder.addSchemaTypes() {
     enum<FileSortBy>()
     enum<PomodoroState>()
     enum<ScreenMirrorMode>()
+    enum<PackageType>()
+    enum<AppChannelType>()
     enum<ScreenMirrorControlAction>()
     enum<DevicePlatform>()
     enum<BatteryHealth>()
@@ -43,6 +48,7 @@ fun SchemaBuilder.addSchemaTypes() {
     enum<BatteryPlugged>()
     enum<DiscoveryMethod>()
     enum<ChannelMemberStatus>()
+    enum<ImageSearchStatusType>()
     stringScalar<Instant> {
         deserialize = { value: String -> Instant.parse(value) }
         serialize = Instant::toString

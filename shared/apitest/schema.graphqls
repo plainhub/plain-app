@@ -229,7 +229,7 @@ type App {
   battery: Int!
   appVersion: Int!
   osVersion: Int!
-  channel: String!
+  channel: AppChannelType!
   permissions: [Permission!]!
   audios: [PlaylistAudio!]!
   audioMode: MediaPlayMode!
@@ -241,6 +241,12 @@ type App {
   developerMode: Boolean!
   favoriteFolders: [FavoriteFolder!]!
   debug: Boolean!
+}
+
+enum AppChannelType {
+  GITHUB
+  GOOGLE
+  FDROID
 }
 
 type AppFile {
@@ -711,7 +717,7 @@ type ImageFileInfo {
 }
 
 type ImageSearchStatus {
-  status: String!
+  status: ImageSearchStatusType!
   downloadProgress: Int!
   errorMessage: String!
   modelSize: Long!
@@ -719,6 +725,14 @@ type ImageSearchStatus {
   isIndexing: Boolean!
   totalImages: Int!
   indexedImages: Int!
+}
+
+enum ImageSearchStatusType {
+  UNAVAILABLE
+  DOWNLOADING
+  LOADING
+  READY
+  ERROR
 }
 
 scalar Instant
@@ -835,7 +849,7 @@ input OrganizationInput {
 type Package {
   id: ID!
   name: String!
-  type: String!
+  type: PackageType!
   version: String!
   path: String!
   size: Long!
@@ -854,6 +868,11 @@ type PackageStatus {
   id: ID!
   exist: Boolean!
   updatedAt: Instant
+}
+
+enum PackageType {
+  SYSTEM
+  USER
 }
 
 input PairingDeviceInput {
@@ -1007,7 +1026,7 @@ enum ScreenMirrorMode {
 }
 
 type ScreenMirrorQuality {
-  mode: String!
+  mode: ScreenMirrorMode!
   resolution: Int!
 }
 

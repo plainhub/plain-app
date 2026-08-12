@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.models
 
+import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.platform.DPackageInfo
 
 fun DPackageInfo.toModel(): Package {
