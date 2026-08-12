@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -59,7 +60,7 @@ fun ChatName(
         // Show status indicator based on message status (skip for local chat)
         if (!isLocal) {
             when {
-                m.status == "pending" -> {
+                m.status == ChatStatus.PENDING -> {
                     HorizontalSpace(4.dp)
                     CircularProgressIndicator(
                         modifier = Modifier.size(12.dp),
@@ -109,7 +110,7 @@ fun ChatName(
                 }
 
                 // Peer / no-leader failure — show legacy retry button
-                m.fromId == "me" && m.status == "failed" -> {
+                m.fromId == "me" && m.status == ChatStatus.FAILED -> {
                     if (onRetry != null) {
                         HorizontalSpace(4.dp)
                         PIconButton(

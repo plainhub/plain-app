@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.generateId
 import kotlin.time.Instant
@@ -21,17 +22,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 private val chatJson = Json { ignoreUnknownKeys = true }
-
-/**
- * Coarse-grained delivery status stored on [DChat.status]. Kept as string
- * constants to match the existing column shape; new code should reference
- * these instead of inline literals.
- */
-object ChatMessageStatus {
-    const val SENT = "sent"
-    const val PARTIAL = "partial"
-    const val FAILED = "failed"
-}
 
 fun DMessageContent.toJSONString(): String {
     val valueElement = if (value != null) {
@@ -130,10 +120,10 @@ data class DMessageStatusData(
      * stored on [DChat.status]. Empty / all-delivered -> "sent"; all-failed
      * -> "failed"; mixed -> "partial".
      */
-    fun aggregateStatus(): String = when {
-        total == 0 || allDelivered -> ChatMessageStatus.SENT
-        allFailed -> ChatMessageStatus.FAILED
-        else -> ChatMessageStatus.PARTIAL
+    fun aggregateStatus(): ChatStatus = when {
+        total == 0 || allDelivered -> ChatStatus.SENT
+        allFailed -> ChatStatus.FAILED
+        else -> ChatStatus.PARTIAL
     }
 
     companion object {
@@ -176,8 +166,8 @@ data class DChat(
     @ColumnInfo(name = "channel_id", index = true)
     var channelId: String = "" // chat channel id, empty if not a channel chat
 
-    @ColumnInfo(name = "status")
-    var status: String = "" // pending, sent, partial, failed
+    @ColumnInfo(name = "status", defaultValue = "PENDING")
+    var status: ChatStatus = ChatStatus.PENDING
 
     /**
      * JSON-encoded [DMessageStatusData], populated for channel broadcast messages.
@@ -215,7 +205,7 @@ data class ChatItemDataUpdate(
 
 data class ChatItemStatusUpdate(
     val id: String,
-    val status: String,
+    val status: ChatStatus,
     @ColumnInfo(name = "status_data")
     val statusData: String = "",
     @ColumnInfo(name = "updated_at")
@@ -266,10 +256,10 @@ interface ChatDao {
     suspend fun update(vararg item: DChat)
 
     @Query("UPDATE chats SET status = :status WHERE id = :id")
-    suspend fun updateStatus(id: String, status: String)
+    suspend fun updateStatus(id: String, status: ChatStatus)
 
     @Query("UPDATE chats SET status = :status, status_data = :statusData WHERE id = :id")
-    suspend fun updateStatusAndData(id: String, status: String, statusData: String)
+    suspend fun updateStatusAndData(id: String, status: ChatStatus, statusData: String)
 
     @Update(entity = DChat::class)
     suspend fun updateStatusData(item: ChatItemStatusUpdate)

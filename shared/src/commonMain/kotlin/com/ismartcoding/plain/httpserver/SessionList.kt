@@ -5,6 +5,7 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.generateChaCha20Key
 import com.ismartcoding.plain.db.DSession
+import com.ismartcoding.plain.enums.SessionType
 import com.ismartcoding.plain.helpers.TimeHelper
 
 object SessionList {
@@ -25,7 +26,7 @@ object SessionList {
         if (item == null) {
             item = DSession()
             item.clientId = clientId
-            item.type = DSession.TYPE_WEB
+            item.type = SessionType.WEB
             isInsert = true
         } else {
             item.updatedAt = TimeHelper.now()
@@ -48,7 +49,7 @@ object SessionList {
         val item = DSession()
         item.clientId = StringHelper.shortUUID()
         item.name = name
-        item.type = DSession.TYPE_CUSTOM
+        item.type = SessionType.CUSTOM
         item.token = generateChaCha20Key()
         AppDatabase.instance.sessionDao().insert(item)
         item

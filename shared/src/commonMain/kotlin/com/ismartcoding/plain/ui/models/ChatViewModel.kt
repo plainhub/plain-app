@@ -18,6 +18,7 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
@@ -127,7 +128,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     fun resendMessage(messageId: String) {
         viewModelScope.launchSafe {
             val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
-            ChatManager.updateStatus(item, "pending")
+            ChatManager.updateStatus(item, ChatStatus.PENDING)
             update(item)
             ChatManager.resendMessage(item)
         }
@@ -138,7 +139,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             val target = target.value
             val channel = AppDatabase.instance.chatChannelDao().getById(target.toId) ?: return@launchSafe
             val item = ChatManager.getChatItem(messageId) ?: return@launchSafe
-            ChatManager.updateStatus(item, "pending")
+            ChatManager.updateStatus(item, ChatStatus.PENDING)
             update(item)
             ChatManager.sendToChannelMembers(item, channel, peerIds)
             update(item)
@@ -156,7 +157,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             if (_target.value == target) {
                 addAllAndScroll(listOf(item2))
             }
-            if (item2.status == "sent") {
+            if (item2.status == ChatStatus.SENT) {
                 DialogHelper.showSuccess(Res.string.sent)
             }
         }
@@ -179,7 +180,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             update(item)
         }
         sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
-        item.status == "sent"
+        item.status == ChatStatus.SENT
     }
 
     fun sendContent(content: DMessageContent, onResult: (Boolean) -> Unit = {}) {

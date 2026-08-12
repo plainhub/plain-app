@@ -11,6 +11,7 @@ import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
 import com.ismartcoding.plain.lib.sendEvent
@@ -25,7 +26,7 @@ object ChatManager {
 
     suspend fun getIdsAsync(query: String): Set<String> = ChatDbHelper.getIdsAsync(query)
 
-    suspend fun updateStatus(item: DChat, status: String) {
+    suspend fun updateStatus(item: DChat, status: ChatStatus) {
         ChatDbHelper.updateChatItemStatus(item, status)
     }
 
@@ -83,9 +84,9 @@ object ChatManager {
         val item = ChatDbHelper.getChatItem(messageId) ?: return@withIO null
         ChatDbHelper.updateChatItemFilesContent(item, files)
         if (target.isLocal()) {
-            ChatDbHelper.updateChatItemStatus(item, "sent")
+            ChatDbHelper.updateChatItemStatus(item, ChatStatus.SENT)
         } else {
-            ChatDbHelper.updateChatItemStatus(item, "pending")
+            ChatDbHelper.updateChatItemStatus(item, ChatStatus.PENDING)
             ChatSender.send(item, target, onlinePeerIds)
         }
         refreshLatestChats()

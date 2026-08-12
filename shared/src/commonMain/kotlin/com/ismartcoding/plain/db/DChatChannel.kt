@@ -8,6 +8,8 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.ChatChannelStatus
+import com.ismartcoding.plain.enums.ChannelMemberStatus
 import com.ismartcoding.plain.helpers.generateId
 import kotlinx.serialization.Serializable
 
@@ -16,16 +18,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ChannelMember(
     val id: String,
-    /** "joined" or "pending" */
-    val status: String = STATUS_JOINED,
+    /** JOINED or PENDING */
+    val status: ChannelMemberStatus = ChannelMemberStatus.JOINED,
 ) {
-    companion object {
-        const val STATUS_JOINED = "joined"
-        const val STATUS_PENDING = "pending"
-    }
-
-    fun isJoined(): Boolean = status == STATUS_JOINED
-    fun isPending(): Boolean = status == STATUS_PENDING
+    fun isJoined(): Boolean = status == ChannelMemberStatus.JOINED
+    fun isPending(): Boolean = status == ChannelMemberStatus.PENDING
     fun isMe(): Boolean = id == TempData.clientId
 }
 
@@ -44,7 +41,7 @@ data class DChatChannel(
     /** Monotonically increasing counter; incremented on every mutation.
      *  Receivers ignore updates whose version ≤ their local version. */
     @ColumnInfo(name = "version", defaultValue = "0") var version: Long = 0,
-    @ColumnInfo(name = "status", defaultValue = "joined") var status: String = STATUS_JOINED,
+    @ColumnInfo(name = "status", defaultValue = "JOINED") var status: ChatChannelStatus = ChatChannelStatus.JOINED,
 ) : DEntityBase() {
 
     // ── Helpers ─────────────────────────────────────────────────────
@@ -60,7 +57,7 @@ data class DChatChannel(
 
     fun findMember(peerId: String): ChannelMember? = members.find { it.id == peerId }
 
-    fun isJoined(): Boolean = status == DChatChannel.STATUS_JOINED
+    fun isJoined(): Boolean = status == ChatChannelStatus.JOINED
 
     fun isOwnedByMe(): Boolean {
         return owner == "me" || owner == TempData.clientId
@@ -69,7 +66,7 @@ data class DChatChannel(
     fun canLeave(): Boolean = !isOwnedByMe() && isJoined()
 
     fun canDeleteFromThisDevice(): Boolean =
-        isOwnedByMe() || status == STATUS_LEFT || status == STATUS_KICKED
+        isOwnedByMe() || status == ChatChannelStatus.LEFT || status == ChatChannelStatus.KICKED
 
     /**
      * Elect a leader for this channel from the joined members.
@@ -110,12 +107,6 @@ data class DChatChannel(
             .map { it.id }
             .distinct()
             .filter { it != TempData.clientId }
-    }
-
-    companion object {
-        const val STATUS_JOINED = "joined"
-        const val STATUS_LEFT = "left"
-        const val STATUS_KICKED = "kicked"
     }
 }
 

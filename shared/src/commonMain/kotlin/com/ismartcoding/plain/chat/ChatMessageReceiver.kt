@@ -20,6 +20,7 @@ import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.ChatMessageNotificationEvent
 import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.i18n.Res
@@ -56,7 +57,7 @@ object ChatMessageReceiver {
         val fromChannel: DChatChannel? = if (fromChannelId.isNotEmpty()) {
             val ch = AppDatabase.instance.chatChannelDao().getById(fromChannelId)
                 ?: throw IllegalStateException("Unknown channel")
-            if (ch.status != DChatChannel.STATUS_JOINED) {
+            if (ch.status != ChatChannelStatus.JOINED) {
                 throw IllegalStateException("Channel not joined")
             }
             ch

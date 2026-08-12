@@ -4,6 +4,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DSession
+import com.ismartcoding.plain.enums.SessionType
 import com.ismartcoding.plain.events.WebRequestReceivedEvent
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
@@ -115,7 +116,7 @@ class MainGraphQLService private constructor(
             val session = SessionList.getByClientIdAsync(clientId)
             if (bearerToken.isEmpty() ||
                 session == null ||
-                session.type != DSession.TYPE_CUSTOM ||
+                session.type != SessionType.CUSTOM ||
                 session.token != bearerToken
             ) {
                 call.respondNoBody(HttpStatus.UNAUTHORIZED)

@@ -99,4 +99,22 @@ object Migrations {
             connection.execSQL("UPDATE peers SET device_type = UPPER(device_type) WHERE device_type != ''")
         }
     }
+
+    val MIGRATION_19_20 = object : Migration(19, 20) {
+        override fun migrate(connection: SQLiteConnection) {
+            connection.execSQL("UPDATE chat_channels SET status = UPPER(status) WHERE status != ''")
+            connection.execSQL("UPDATE chats SET status = UPPER(status) WHERE status != ''")
+            connection.execSQL("UPDATE sessions SET type = UPPER(type) WHERE type != ''")
+            connection.execSQL(
+                """
+                UPDATE chat_channels
+                SET members = REPLACE(
+                    REPLACE(members, '"status":"joined"', '"status":"JOINED"'),
+                    '"status":"pending"', '"status":"PENDING"'
+                )
+                WHERE members LIKE '%status%'
+                """.trimIndent()
+            )
+        }
+    }
 }

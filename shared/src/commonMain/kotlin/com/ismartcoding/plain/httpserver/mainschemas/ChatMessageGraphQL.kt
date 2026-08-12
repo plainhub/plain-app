@@ -9,6 +9,7 @@ import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.HChatItemsDeletedEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.EventType
@@ -70,7 +71,7 @@ suspend fun deleteChatItems(query: String): Boolean {
 @GraphQLMutation
 suspend fun retryChatItem(id: ID): ChatItem? {
     val item = ChatManager.getChatItem(id.value) ?: return null
-    ChatManager.updateStatus(item, "pending")
+    ChatManager.updateStatus(item, ChatStatus.PENDING)
     sendEvent(HRetryChatItemEvent(item))
     return item.toModel()
 }

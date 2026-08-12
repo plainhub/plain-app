@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.models
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageStatusData
+import com.ismartcoding.plain.enums.ChatStatus
 import kotlin.time.Instant
 
 data class VChat(
@@ -10,7 +11,7 @@ data class VChat(
     val fromId: String,
     val createdAt: Instant,
     val type: String,
-    val status: String, // pending, sent, partial, failed
+    val status: ChatStatus,
     val statusData: DMessageStatusData? = null,
     var value: Any? = null,
 ) : IData {

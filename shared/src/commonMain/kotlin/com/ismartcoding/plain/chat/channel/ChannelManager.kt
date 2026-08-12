@@ -10,6 +10,8 @@ import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getOwner
+import com.ismartcoding.plain.enums.ChannelMemberStatus
+import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.JsonHelper
@@ -90,7 +92,7 @@ object ChannelManager {
 
             val ownerPeer = AppDatabase.instance.peerDao().getById(existing.owner)
             val channel = ChannelCacher.mutateChannel(channelId) { ch ->
-                ch.status = DChatChannel.STATUS_LEFT
+                ch.status = ChatChannelStatus.LEFT
                 ch.members = ch.members.filter { it.id != TempData.clientId }
             } ?: throw Exception("Channel not found")
             if (ownerPeer != null) {
@@ -107,7 +109,7 @@ object ChannelManager {
                 if (ch.hasMember(peerId)) throw Exception("Already a member")
                 ch.members += ChannelMember(
                     id = peerId,
-                    status = ChannelMember.STATUS_PENDING,
+                    status = ChannelMemberStatus.PENDING,
                 )
                 ch.version++
                 ch.updatedAt = TimeHelper.now()

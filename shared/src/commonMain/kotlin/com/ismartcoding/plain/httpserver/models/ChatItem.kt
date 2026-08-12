@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.db.*
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLIgnore
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLUnion
@@ -25,7 +26,7 @@ data class ChatItem(
     val updatedAt: Instant,
     @Transient private val _content: DMessageContent? = null,
     @GraphQLIgnore @Contextual var data: ChatItemContent? = null,
-    val status: String = "",
+    val status: ChatStatus = ChatStatus.SENT,
     val statusData: String = "",
 ) {
     fun getContentData(): ChatItemContent? {

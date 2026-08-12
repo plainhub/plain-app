@@ -6,6 +6,8 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.ChannelMemberStatus
+import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
@@ -62,7 +64,7 @@ object ChannelSystemMessageReceiver {
     private suspend fun handleInvite(fromId: String, msg: ChannelSystemMessages.ChannelInvite) {
         val existingChannel = ChannelCacher.getChannel(msg.channelId)
         val isReinvite = existingChannel != null &&
-                (existingChannel.status == DChatChannel.STATUS_LEFT || existingChannel.status == DChatChannel.STATUS_KICKED)
+                (existingChannel.status == ChatChannelStatus.LEFT || existingChannel.status == ChatChannelStatus.KICKED)
 
         if (msg.owner != fromId) {
             LogCat.e("Invite from $fromId but payload claims owner=${msg.owner} — rejected")
@@ -113,7 +115,7 @@ object ChannelSystemMessageReceiver {
                 ch.owner = fromId
                 ch.members = msg.members
                 ch.version = msg.version
-                ch.status = DChatChannel.STATUS_JOINED
+                ch.status = ChatChannelStatus.JOINED
             }
             LogCat.d("Re-invite for channel ${msg.channelId} (was ${existingChannel.status}), restored to joined")
         } else {
@@ -184,7 +186,7 @@ object ChannelSystemMessageReceiver {
 
         val updatedChannel = ChannelCacher.mutateChannel(msg.channelId) { ch ->
             ch.members = ch.members.map {
-                if (it.id == fromId) it.copy(status = ChannelMember.STATUS_JOINED) else it
+                if (it.id == fromId) it.copy(status = ChannelMemberStatus.JOINED) else it
             }
             ch.version++
             ch.updatedAt = TimeHelper.now()
@@ -300,7 +302,7 @@ object ChannelSystemMessageReceiver {
 
         val wasPending = channel.findMember(TempData.clientId)?.isPending() == true
         ChannelCacher.mutateChannel(msg.channelId) { ch ->
-            ch.status = DChatChannel.STATUS_KICKED
+            ch.status = ChatChannelStatus.KICKED
             ch.members = ch.members.filter { it.id != TempData.clientId }
         }
 

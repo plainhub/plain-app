@@ -44,6 +44,7 @@ import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.db.DChatChannel
+import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -322,7 +323,7 @@ fun ChatPage(
                         text = stringResource(
                             if (peer?.status == PeerStatus.UNPAIRED)
                                 Res.string.unpaired
-                            else if (channel?.status == DChatChannel.STATUS_KICKED)
+                            else if (channel?.status == ChatChannelStatus.KICKED)
                                 Res.string.channel_kicked_notice
                             else
                                 Res.string.channel_left_notice

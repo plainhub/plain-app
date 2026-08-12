@@ -2,9 +2,9 @@ package com.ismartcoding.plain.chat
 
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
-import com.ismartcoding.plain.db.ChatMessageStatus
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
@@ -23,7 +23,7 @@ object ChatDbHelper {
         item.toId = toId
         item.channelId = channelId
         item.content = message
-        item.status = if (isRemote) "pending" else "sent"
+        item.status = if (isRemote) ChatStatus.PENDING else ChatStatus.SENT
         AppDatabase.instance.chatDao().insert(item)
         item
     }
@@ -32,7 +32,7 @@ object ChatDbHelper {
         AppDatabase.instance.chatDao().getById(id)
     }
 
-    suspend fun updateChatItemStatus(item: DChat, status: String) = withIO {
+    suspend fun updateChatItemStatus(item: DChat, status: ChatStatus) = withIO {
         item.status = status
         AppDatabase.instance.chatDao().updateStatus(item.id, status)
     }
@@ -49,7 +49,7 @@ object ChatDbHelper {
     }
 
     suspend fun updateChannelChatItemStatus(item: DChat, statusData: DMessageStatusData?) = withIO {
-        item.status = statusData?.aggregateStatus() ?: ChatMessageStatus.FAILED
+        item.status = statusData?.aggregateStatus() ?: ChatStatus.FAILED
         item.statusData = if (statusData != null && statusData.total > 0) jsonEncode(statusData) else ""
         AppDatabase.instance.chatDao().updateStatusAndData(item.id, item.status, item.statusData)
     }

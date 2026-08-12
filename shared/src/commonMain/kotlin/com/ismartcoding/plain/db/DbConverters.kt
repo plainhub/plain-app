@@ -1,8 +1,7 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.TypeConverter
-import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.enums.PeerStatus
+import com.ismartcoding.plain.enums.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -61,4 +60,36 @@ class DeviceTypeConverter {
 
     @TypeConverter
     fun fromDB(value: String): DeviceType = DeviceType.valueOf(value)
+}
+
+class ChannelMemberStatusConverter {
+    @TypeConverter
+    fun toDB(value: ChannelMemberStatus): String = value.name
+
+    @TypeConverter
+    fun fromDB(value: String): ChannelMemberStatus = ChannelMemberStatus.valueOf(value)
+}
+
+class ChatChannelStatusConverter {
+    @TypeConverter
+    fun toDB(value: ChatChannelStatus): String = value.name
+
+    @TypeConverter
+    fun fromDB(value: String): ChatChannelStatus = ChatChannelStatus.valueOf(value)
+}
+
+class ChatStatusConverter {
+    @TypeConverter
+    fun toDB(value: ChatStatus): String = value.name
+
+    @TypeConverter
+    fun fromDB(value: String): ChatStatus = ChatStatus.valueOf(value)
+}
+
+class SessionTypeConverter {
+    @TypeConverter
+    fun toDB(value: SessionType): String = value.name
+
+    @TypeConverter
+    fun fromDB(value: String): SessionType = SessionType.valueOf(value)
 }

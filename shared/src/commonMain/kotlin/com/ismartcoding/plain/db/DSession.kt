@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
+import com.ismartcoding.plain.enums.SessionType
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlin.time.Instant
 
@@ -19,8 +20,8 @@ data class DSession(
     @ColumnInfo(name = "name", defaultValue = "")
     var name: String = ""
 
-    @ColumnInfo(name = "type", defaultValue = "web")
-    var type: String = TYPE_WEB
+    @ColumnInfo(name = "type", defaultValue = "WEB")
+    var type: SessionType = SessionType.WEB
 
     @ColumnInfo(name = "client_ip")
     var clientIP: String = ""
@@ -42,11 +43,6 @@ data class DSession(
 
     @ColumnInfo(name = "last_active_at")
     var lastActiveAt: Instant? = null
-
-    companion object {
-        const val TYPE_WEB = "web"
-        const val TYPE_CUSTOM = "custom"
-    }
 }
 
 data class SessionClientTsUpdate(
