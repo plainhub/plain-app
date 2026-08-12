@@ -199,7 +199,6 @@ object ChannelSystemMessageReceiver {
             ch.updatedAt = TimeHelper.now()
         } ?: return
 
-        ChannelManager.broadcastChannelsUpdated()
         ChannelSystemMessageSender.broadcastUpdate(updatedChannel)
 
         LogCat.d("Peer $fromId accepted invite for channel ${msg.channelId}")

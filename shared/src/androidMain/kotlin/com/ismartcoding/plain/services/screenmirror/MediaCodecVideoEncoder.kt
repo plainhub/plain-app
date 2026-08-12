@@ -192,11 +192,6 @@ class MediaCodecVideoEncoder(
                     idx == MediaCodec.INFO_TRY_AGAIN_LATER -> {
                         dequeueTimeouts++
                         overloadDetector.recordTimeout()
-                        val now = System.nanoTime()
-                        val sinceLastFrame = now - lastFrameTime
-                        if (sinceLastFrame > 100_000_000L) { // 100ms, avoid spam
-                            Log.d(TAG, "drain gap: no frame for ${sinceLastFrame / 1_000_000}ms, timeouts=${dequeueTimeouts}")
-                        }
                     }
                     idx == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
                         emitCodecConfig(c.outputFormat)
@@ -213,9 +208,6 @@ class MediaCodecVideoEncoder(
                                 totalFrameSize += it.size
                                 if (it.isKey) keyFrameCount++
                                 if (frameCount % 60 == 0L) logPeriodicStats(frameCount, keyFrameCount, totalFrameSize, sinceLast)
-                                if (sinceLast > 50_000_000L) { // >50ms
-                                    Log.d(TAG, "drain gap: ${sinceLast / 1_000_000}ms since last frame (frameId~${frameCount})")
-                                }
                             }
                         }
                         c.releaseOutputBuffer(idx, false)

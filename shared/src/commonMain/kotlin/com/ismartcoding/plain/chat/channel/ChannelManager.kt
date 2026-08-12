@@ -32,7 +32,6 @@ object ChannelManager {
         coIO {
             ChannelCacher.channels
                 .collect { channels ->
-                    if (channels.isEmpty()) return@collect
                     sendEvent(
                         WebSocketEvent(
                             EventType.CHANNELS_UPDATED,
@@ -42,15 +41,6 @@ object ChannelManager {
                     ChatManager.refreshLatestChats()
                 }
         }
-    }
-
-    fun broadcastChannelsUpdated() {
-        sendEvent(
-            WebSocketEvent(
-                EventType.CHANNELS_UPDATED,
-                channelsToJsonModelString(ChannelCacher.channels.value),
-            ),
-        )
     }
 
     suspend fun createChannel(name: String): DChatChannel {
