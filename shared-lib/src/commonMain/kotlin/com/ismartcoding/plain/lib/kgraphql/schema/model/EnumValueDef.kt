@@ -9,6 +9,7 @@ class EnumValueDef<T : Enum<T>>(
         override val isDeprecated: Boolean = false,
         override val deprecationReason: String? = null
 ) : DescribedDef, Depreciable {
+
     val name = value.name
 
     fun toEnumValue (): EnumValue<T> {

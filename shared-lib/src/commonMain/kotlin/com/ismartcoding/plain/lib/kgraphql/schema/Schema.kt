@@ -24,4 +24,9 @@ interface Schema : __Schema {
         options: ExecutionOptions = ExecutionOptions(),
         operationName: String? = null,
     ) = runBlocking { execute(request, variables, context, options, operationName) }
+
+    /**
+     * Print the entire GraphQL schema as SDL (Schema Definition Language).
+     */
+    fun printSDL(): String = toSDL()
 }

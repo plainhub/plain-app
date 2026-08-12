@@ -73,6 +73,7 @@ interface TypeDef {
             val values: List<EnumValueDef<T>>,
             description : String? = null
     ) : BaseKQLType(name, description), Kotlin<T> {
+
         fun toEnumType() : Type.Enum<T> = Type.Enum(this)
     }
 }

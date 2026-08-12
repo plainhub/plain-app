@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.lib.kgraphql.schema.dsl
 
+import com.ismartcoding.plain.lib.kgraphql.defaultKQLTypeName
 import com.ismartcoding.plain.lib.kgraphql.schema.Publisher
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.SchemaException

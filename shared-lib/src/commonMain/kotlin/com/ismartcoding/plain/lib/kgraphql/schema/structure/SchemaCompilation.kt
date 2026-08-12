@@ -235,7 +235,6 @@ class SchemaCompilation(
             TypeCategory.INPUT -> inputTypeProxies
         }
 
-
         return cachedInstances[kClass]
             ?: enums[kClass]
             ?: scalars[kClass]

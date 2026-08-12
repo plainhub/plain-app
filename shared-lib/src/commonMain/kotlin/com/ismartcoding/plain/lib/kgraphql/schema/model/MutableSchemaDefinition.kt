@@ -44,12 +44,12 @@ data class MutableSchemaDefinition (
     private val mutations: ArrayList<MutationDef<*>> = arrayListOf(),
     private val subscriptions: ArrayList<SubscriptionDef<*>> = arrayListOf(),
         private val enums: ArrayList<TypeDef.Enumeration<*>> = arrayListOf(
-        TypeDef.Enumeration (
+        TypeDef.Enumeration(
             "__" + TypeKind::class.defaultKQLTypeName(),
             TypeKind::class,
             enumValues<TypeKind>().map { EnumValueDef(it) }
         ),
-        TypeDef.Enumeration (
+        TypeDef.Enumeration(
             "__" + DirectiveLocation::class.defaultKQLTypeName(),
             DirectiveLocation::class,
             enumValues<DirectiveLocation>().map { EnumValueDef(it) }

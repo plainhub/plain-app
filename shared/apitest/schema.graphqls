@@ -1,0 +1,1163 @@
+"""Query object"""
+type Query {
+  appFiles(offset: Int!, limit: Int!): [AppFile!]!
+  appFileCount: Int!
+  chatChannels: [ChatChannel!]!
+  notifications: [Notification!]!
+  docCount(query: String!): Int!
+  docExtGroups: [DocExtGroup!]!
+  docs(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Doc!]!
+  smsAllCounts: SmsCounts!
+  sms(offset: Int!, limit: Int!, query: String!): [Message!]!
+  smsConversations(offset: Int!, limit: Int!, query: String!): [MessageConversation!]!
+  smsCount(query: String!): Int!
+  smsConversationCount(query: String!): Int!
+  archivedConversations: [MessageConversation!]!
+  tags(type: DataType!): [Tag!]!
+  tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
+  appLogs(offset: Int!, limit: Int!): [String!]!
+  appLogPath: String!
+  screenMirrorState: Boolean!
+  screenMirrorVideoCodec: ScreenMirrorVideoCodec
+  screenMirrorControlEnabled: Boolean!
+  screenMirrorQuality: ScreenMirrorQuality!
+  uploadedChunks(fileId: String!): [String!]!
+  feeds: [Feed!]!
+  feedsCount: [FeedCount!]!
+  feedEntryCount(query: String!): Int!
+  feedEntry(id: ID!): FeedEntry
+  feedEntries(offset: Int!, limit: Int!, query: String!): [FeedEntry!]!
+  peers: [Peer!]!
+  chatItems(id: String!): [ChatItem!]!
+  latestChatItems: [ChatItem!]!
+  audioCount(query: String!): Int!
+  audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
+  imageCount(query: String!): Int!
+  imageSearchStatus: ImageSearchStatus!
+  images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
+  callCount(query: String!): Int!
+  sims: [Sim!]!
+  calls(offset: Int!, limit: Int!, query: String!): [Call!]!
+  noteCount(query: String!): Int!
+  note(id: ID!): Note
+  notes(offset: Int!, limit: Int!, query: String!): [Note!]!
+  mediaBuckets(type: DataType!): [MediaBucket!]!
+  deviceInfo: DeviceInfo!
+  battery: Battery!
+  app: App!
+  contactCount(query: String!): Int!
+  contactSources: [ContactSource!]!
+  contactGroups: [ContactGroup!]!
+  contacts(offset: Int!, limit: Int!, query: String!): [Contact!]!
+  isDiscovering: Boolean!
+  pomodoroSettings: PomodoroSettings!
+  pomodoroToday: PomodoroToday!
+  dataStorePath: String!
+  dataStoreEntries: [KeyValuePair!]!
+  imageEditorProjects: [ImageEditorProjectSummary!]!
+  imageEditorProject(id: ID!): ImageEditorProject
+  packages(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Package!]!
+  packageStatuses(ids: [ID!]!): [PackageStatus!]!
+  packageCount(query: String!): Int!
+  dbPath: String!
+  dbTables: [String!]!
+  dbTableRowCount(table: String!): Long!
+  dbTableRows(table: String!, offset: Int!, limit: Int!): [String!]!
+  dbTableInfo(table: String!): DbTableInfo!
+  videoCount(query: String!): Int!
+  videos(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Video!]!
+  bookmarks: [Bookmark!]!
+  bookmarkGroups: [BookmarkGroup!]!
+  mounts: [StorageMount!]!
+  recentFiles: [File!]!
+  files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
+  fileInfo(id: ID!, path: String!, fileName: String!): FileInfo!
+  fileIds(paths: [String!]!): [String!]!
+}
+
+"""Mutation object"""
+type Mutation {
+  createChatChannel(name: String!): ChatChannel!
+  updateChatChannel(id: ID!, name: String!): ChatChannel!
+  deleteChatChannel(id: ID!): Boolean!
+  leaveChatChannel(id: ID!): Boolean!
+  addChatChannelMember(id: ID!, peerId: String!): ChatChannel!
+  removeChatChannelMember(id: ID!, peerId: String!): ChatChannel!
+  acceptChatChannelInvite(id: ID!): Boolean!
+  declineChatChannelInvite(id: ID!): Boolean!
+  cancelNotifications(ids: [ID!]!): Boolean!
+  replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
+  unarchiveConversation(id: String!): Boolean!
+  sendSms(number: String!, body: String!, subscriptionId: Int!): Boolean!
+  archiveConversation(id: String!, date: Long!): Boolean!
+  sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: String!): String!
+  createTag(type: DataType!, name: String!): Tag
+  updateTag(id: ID!, name: String!): Tag
+  deleteTag(id: ID!): Boolean!
+  addToTags(type: DataType!, tagIds: [ID!]!, query: String!): Boolean!
+  updateTagRelations(type: DataType!, item: TagRelationStub!, addTagIds: [ID!]!, removeTagIds: [ID!]!): Boolean!
+  removeFromTags(type: DataType!, tagIds: [ID!]!, query: String!): Boolean!
+  clearAppLogs: Boolean!
+  """Initiate pairing with a discovered LAN device."""
+  pairDevice(input: PairingDeviceInput!): Boolean!
+  """Cancel an in-progress pairing initiated by this device."""
+  cancelPairing(deviceId: String!): Boolean!
+  """Respond to an incoming pairing request — accept or reject."""
+  respondToPairing(input: PairingRequestInput!, accepted: Boolean!): Boolean!
+  startScreenMirror(audio: Boolean!): Boolean!
+  requestScreenMirrorAudio: Boolean!
+  stopScreenMirror: Boolean!
+  updateScreenMirrorQuality(mode: ScreenMirrorMode!): Boolean!
+  sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
+  requestScreenMirrorKeyFrame: Boolean!
+  deleteChunks(fileId: String!): Boolean!
+  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, isAppFile: Boolean!): String!
+  deleteFiles(paths: [String!]!): Boolean!
+  createDir(path: String!): File!
+  renameFile(path: String!, name: String!): Boolean!
+  writeTextFile(path: String!, content: String!, overwrite: Boolean!): File!
+  copyFile(src: String!, dst: String!, overwrite: Boolean!): Boolean!
+  moveFile(src: String!, dst: String!, overwrite: Boolean!): Boolean!
+  addFavoriteFolder(rootPath: String!, fullPath: String!): [FavoriteFolder!]!
+  removeFavoriteFolder(fullPath: String!): [FavoriteFolder!]!
+  setFavoriteFolderAlias(fullPath: String!, alias: String!): [FavoriteFolder!]!
+  fetchFeedContent(id: ID!): FeedEntry
+  syncFeeds(id: ID): Boolean!
+  updateFeed(id: ID!, name: String!, fetchContent: Boolean!): Feed
+  createFeed(url: String!, fetchContent: Boolean!): Feed
+  importFeeds(content: String!): Boolean!
+  exportFeeds: String!
+  deleteFeed(id: ID!): Boolean!
+  syncFeedContent(id: ID!): FeedEntry
+  deleteFeedEntries(query: String!): String!
+  deletePeer(id: ID!): Boolean!
+  unpairPeer(id: ID!): Boolean!
+  sendChatItem(toId: String!, content: String!): [ChatItem!]!
+  deleteChatItem(id: ID!): Boolean!
+  deleteChatItems(query: String!): Boolean!
+  retryChatItem(id: ID!): ChatItem
+  playAudio(path: String!): PlaylistAudio!
+  updateAudioPlayMode(mode: MediaPlayMode!): Boolean!
+  clearAudioPlaylist: Boolean!
+  deletePlaylistAudio(path: String!): Boolean!
+  addPlaylistAudios(query: String!): Boolean!
+  reorderPlaylistAudios(paths: [String!]!): Boolean!
+  enableImageSearch: Boolean!
+  disableImageSearch: Boolean!
+  cancelImageModelDownload: Boolean!
+  startImageIndex(force: Boolean): Boolean!
+  cancelImageIndex: Boolean!
+  call(number: String!, showDialer: Boolean!): Boolean!
+  deleteCalls(query: String!): Boolean!
+  saveNote(id: ID!, input: NoteInput!): Note
+  saveFeedEntriesToNotes(query: String!): [String!]!
+  trashNotes(query: String!): String!
+  restoreNotes(query: String!): String!
+  deleteNotes(query: String!): String!
+  exportNotes(query: String!): String!
+  deleteMediaItems(type: DataType!, query: String!): ActionResult!
+  trashMediaItems(type: DataType!, query: String!): ActionResult!
+  restoreMediaItems(type: DataType!, query: String!): ActionResult!
+  setTempValue(key: String!, value: String!): TempValue!
+  relaunchApp: Boolean!
+  openAccessibilitySettings: Boolean!
+  openWebSettings: Boolean!
+  setClip(text: String!): Boolean!
+  updateDeviceName(name: String!): Boolean!
+  deleteContacts(query: String!): Boolean!
+  updateContact(id: ID!, input: ContactInput!): Contact
+  createContact(input: ContactInput!): Contact
+  createContactGroup(name: String!, accountName: String!, accountType: String!): ContactGroup!
+  updateContactGroup(id: ID!, name: String!): ContactGroup!
+  deleteContactGroup(id: ID!): Boolean!
+  startDiscovery: Boolean!
+  stopDiscovery: Boolean!
+  startPomodoro(timeLeft: Int!): Boolean!
+  pausePomodoro: Boolean!
+  stopPomodoro: Boolean!
+  deleteDataStoreEntry(key: String!): Boolean!
+  saveImageEditorProject(id: ID!, input: ImageEditorProjectInput!): ImageEditorProject
+  deleteImageEditorProject(id: ID!): Boolean!
+  broadcastImageEditorUpdate(pid: String!, update: String!): Boolean!
+  uninstallPackages(ids: [ID!]!): Boolean!
+  installPackage(path: String!): PackageInstallPending!
+  createDbTableRow(table: String!, row: String!): Boolean!
+  deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
+  addBookmarks(urls: [String!]!, groupId: String!): [Bookmark!]!
+  updateBookmark(id: ID!, input: BookmarkInput!): Bookmark
+  deleteBookmarks(ids: [ID!]!): Boolean!
+  recordBookmarkClick(id: ID!): Boolean!
+  createBookmarkGroup(name: String!): BookmarkGroup!
+  updateBookmarkGroup(id: ID!, name: String!, collapsed: Boolean!, sortOrder: Int!): BookmarkGroup
+  deleteBookmarkGroup(id: ID!): Boolean!
+}
+
+type ActionResult {
+  type: DataType!
+  query: String!
+}
+
+type AndroidDeviceInfo {
+  sdkVersion: Int!
+  versionCodeName: String!
+  securityPatch: String!
+  bootloader: String!
+  fingerprint: String!
+  hardware: String!
+  radioVersion: String!
+  board: String!
+  buildBrand: String!
+  buildHost: String!
+  buildUser: String!
+  buildNumber: String!
+  product: String!
+  device: String!
+  javaVmVersion: String!
+  glEsVersion: String!
+  serial: String!
+  buildTime: Instant!
+}
+
+type App {
+  clientId: String!
+  usbConnected: Boolean!
+  urlToken: String!
+  httpPort: Int!
+  httpsPort: Int!
+  appDir: String!
+  deviceName: String!
+  battery: Int!
+  appVersion: Int!
+  osVersion: Int!
+  channel: String!
+  permissions: [Permission!]!
+  audios: [PlaylistAudio!]!
+  audioMode: MediaPlayMode!
+  audioCurrent: String!
+  sdcardPath: String!
+  usbDiskPaths: [String!]!
+  internalStoragePath: String!
+  downloadsDir: String!
+  developerMode: Boolean!
+  favoriteFolders: [FavoriteFolder!]!
+  debug: Boolean!
+}
+
+type AppFile {
+  id: ID!
+  size: Long!
+  mimeType: String!
+  realPath: String!
+  fileName: String!
+  createdAt: Instant!
+  updatedAt: Instant!
+}
+
+type Audio {
+  id: ID!
+  title: String!
+  artist: String!
+  path: String!
+  duration: Long!
+  size: Long!
+  bucketId: String!
+  albumFileId: String!
+  createdAt: Instant!
+  updatedAt: Instant!
+  isFavorite: Boolean!
+  tags: [Tag!]!
+}
+
+type AudioFileInfo {
+  duration: Long!
+  location: Location
+}
+
+type Battery {
+  level: Int!
+  voltage: Int!
+  health: BatteryHealth!
+  plugged: BatteryPlugged!
+  temperature: Int!
+  status: BatteryStatus!
+  technology: String!
+  capacity: Int!
+}
+
+enum BatteryHealth {
+  UNKNOWN
+  GOOD
+  OVERHEAT
+  DEAD
+  OVER_VOLTAGE
+  UNSPECIFIED_FAILURE
+  COLD
+}
+
+enum BatteryPlugged {
+  UNPLUGGED
+  AC
+  USB
+  WIRELESS
+}
+
+enum BatteryStatus {
+  UNKNOWN
+  CHARGING
+  DISCHARGING
+  NOT_CHARGING
+  FULL
+}
+
+type Bookmark {
+  id: ID!
+  url: String!
+  title: String!
+  faviconPath: String!
+  groupId: String!
+  pinned: Boolean!
+  clickCount: Int!
+  lastClickedAt: Instant
+  sortOrder: Int!
+  createdAt: Instant!
+  updatedAt: Instant!
+}
+
+type BookmarkGroup {
+  id: ID!
+  name: String!
+  collapsed: Boolean!
+  sortOrder: Int!
+  createdAt: Instant!
+  updatedAt: Instant!
+}
+
+input BookmarkInput {
+  url: String!
+  title: String!
+  groupId: String!
+  pinned: Boolean!
+  sortOrder: Int!
+}
+
+type Call {
+  id: ID!
+  number: String!
+  name: String!
+  photoId: String!
+  startedAt: Instant!
+  duration: Int!
+  type: Int!
+  accountId: ID!
+  geo: PhoneGeo
+  tags: [Tag!]!
+}
+
+type Certificate {
+  issuer: String!
+  subject: String!
+  serialNumber: String!
+  validFrom: Instant!
+  validTo: Instant!
+}
+
+enum ChannelMemberStatus {
+  JOINED
+  PENDING
+}
+
+type ChatChannel {
+  id: String!
+  name: String!
+  owner: String!
+  members: [ChatChannelMember!]!
+  version: Long!
+  status: ChatChannelStatus!
+  createdAt: Instant!
+  updatedAt: Instant!
+}
+
+type ChatChannelMember {
+  id: String!
+  status: ChannelMemberStatus!
+}
+
+enum ChatChannelStatus {
+  JOINED
+  LEFT
+  KICKED
+}
+
+type ChatItem {
+  id: ID!
+  fromId: String!
+  toId: String!
+  channelId: String!
+  content: String!
+  createdAt: Instant!
+  updatedAt: Instant!
+  status: ChatStatus!
+  statusData: String!
+  data: ChatItemContent
+}
+
+union ChatItemContent = MessageFiles | MessageImages | MessageText
+
+enum ChatStatus {
+  SENT
+  PARTIAL
+  FAILED
+  PENDING
+}
+
+type Contact {
+  id: ID!
+  prefix: String!
+  firstName: String!
+  middleName: String!
+  lastName: String!
+  suffix: String!
+  nickname: String!
+  photoId: String!
+  phoneNumbers: [ContactPhoneNumber!]!
+  emails: [ContentItem!]!
+  addresses: [ContentItem!]!
+  events: [ContentItem!]!
+  source: String!
+  starred: Boolean!
+  contactId: ID!
+  thumbnailId: String!
+  notes: String!
+  groups: [ContactGroup!]!
+  organization: Organization
+  websites: [ContentItem!]!
+  ims: [ContentItem!]!
+  ringtone: String!
+  updatedAt: Instant!
+  tags: [Tag!]!
+}
+
+type ContactGroup {
+  id: ID!
+  name: String!
+  contactCount: Int!
+}
+
+input ContactInput {
+  prefix: String!
+  firstName: String!
+  middleName: String!
+  lastName: String!
+  suffix: String!
+  nickname: String!
+  phoneNumbers: [ContentItemInput!]!
+  emails: [ContentItemInput!]!
+  addresses: [ContentItemInput!]!
+  events: [ContentItemInput!]!
+  source: String!
+  starred: Boolean!
+  notes: String!
+  groupIds: [ID!]!
+  organization: OrganizationInput
+  websites: [ContentItemInput!]!
+  ims: [ContentItemInput!]!
+}
+
+type ContactPhoneNumber {
+  value: String!
+  type: Int!
+  label: String!
+  normalizedNumber: String!
+}
+
+type ContactSource {
+  name: String!
+  type: String!
+}
+
+type ContentItem {
+  value: String!
+  type: Int!
+  label: String!
+}
+
+input ContentItemInput {
+  value: String!
+  type: Int!
+  label: String!
+}
+
+enum DataType {
+  DEFAULT
+  AUDIO
+  VIDEO
+  IMAGE
+  SMS
+  CONTACT
+  NOTE
+  FEED_ENTRY
+  CALL
+  BOOK
+  PACKAGE
+  FILE
+  APP_FILE
+  DOC
+}
+
+type DbTableInfo {
+  idKey: String!
+}
+
+type DesktopDeviceInfo {
+  hostname: String!
+  cpuModel: String!
+  gpuModel: String!
+  desktopEnvironment: String!
+  windowManager: String!
+}
+
+type DeviceInfo {
+  name: String!
+  platform: DevicePlatform!
+  manufacturer: String!
+  model: String!
+  osName: String!
+  osVersion: String!
+  kernelVersion: String!
+  appVersion: String!
+  appBuildNumber: String!
+  language: String!
+  uptime: Long!
+  cpuArch: String!
+  totalMemory: Long!
+  totalStorage: Long!
+  display: DisplayInfo
+  android: AndroidDeviceInfo
+  desktop: DesktopDeviceInfo
+}
+
+enum DevicePlatform {
+  ANDROID
+  IOS
+  MACOS
+  WINDOWS
+  LINUX
+}
+
+enum DeviceType {
+  COMPUTER
+  PHONE
+  TABLET
+  TV
+  OTHER
+}
+
+enum DiscoveryMethod {
+  LAN
+  BLE
+}
+
+type DisplayInfo {
+  width: Int!
+  height: Int!
+  density: String!
+}
+
+type Doc {
+  id: ID!
+  title: String!
+  path: String!
+  extension: String!
+  size: Long!
+  bucketId: String!
+  createdAt: Instant!
+  updatedAt: Instant!
+  tags: [Tag!]!
+}
+
+type DocExtGroup {
+  ext: String!
+  count: Int!
+}
+
+enum DriveType {
+  INTERNAL_STORAGE
+  SDCARD
+  USB_STORAGE
+  APP
+}
+
+type FavoriteFolder {
+  rootPath: String!
+  fullPath: String!
+  alias: String
+}
+
+type Feed {
+  id: ID!
+  name: String!
+  url: String!
+  fetchContent: Boolean!
+  createdAt: Instant!
+  updatedAt: Instant!
+}
+
+type FeedCount {
+  id: String!
+  count: Int!
+}
+
+type FeedEntry {
+  id: ID!
+  title: String!
+  url: String!
+  image: String!
+  description: String!
+  author: String!
+  content: String!
+  feedId: String!
+  rawId: String!
+  publishedAt: Instant!
+  createdAt: Instant!
+  updatedAt: Instant!
+  tags: [Tag!]!
+  feed: Feed
+}
+
+type File {
+  name: String!
+  path: String!
+  permission: String!
+  createdAt: Instant
+  updatedAt: Instant!
+  size: Long!
+  isDir: Boolean!
+  children: Int!
+  mediaId: String!
+}
+
+type FileInfo {
+  path: String!
+  updatedAt: Instant!
+  size: Long!
+  tags: [Tag!]!
+  data: MediaFileInfo
+}
+
+enum FileSortBy {
+  DATE_ASC
+  DATE_DESC
+  SIZE_ASC
+  SIZE_DESC
+  NAME_ASC
+  NAME_DESC
+  TAKEN_AT_DESC
+}
+
+type Image {
+  id: ID!
+  title: String!
+  path: String!
+  size: Long!
+  bucketId: String!
+  createdAt: Instant!
+  updatedAt: Instant!
+  takenAt: Instant
+  isFavorite: Boolean!
+  tags: [Tag!]!
+}
+
+type ImageEditorProject {
+  id: ID!
+  stateB64: String!
+  thumbnail: String
+  canvasWidth: Int!
+  canvasHeight: Int!
+  layerCount: Int!
+  createdAt: Instant!
+  updatedAt: Instant!
+}
+
+input ImageEditorProjectInput {
+  stateB64: String!
+  thumbnail: String
+  canvasWidth: Int!
+  canvasHeight: Int!
+  layerCount: Int!
+}
+
+type ImageEditorProjectSummary {
+  id: ID!
+  thumbnail: String
+  canvasWidth: Int!
+  canvasHeight: Int!
+  layerCount: Int!
+  updatedAt: Instant!
+}
+
+type ImageFileInfo {
+  width: Int!
+  height: Int!
+  location: Location
+}
+
+type ImageSearchStatus {
+  status: String!
+  downloadProgress: Int!
+  errorMessage: String!
+  modelSize: Long!
+  modelDir: String!
+  isIndexing: Boolean!
+  totalImages: Int!
+  indexedImages: Int!
+}
+
+scalar Instant
+
+type KeyValuePair {
+  key: String!
+  value: String!
+}
+
+type Location {
+  latitude: Float!
+  longitude: Float!
+}
+
+"""The Long scalar type represents a signed 64-bit numeric non-fractional value"""
+scalar Long
+
+type MediaBucket {
+  id: ID!
+  name: String!
+  itemCount: Int!
+  topItems: [String!]!
+}
+
+union MediaFileInfo = AudioFileInfo | ImageFileInfo | VideoFileInfo
+
+enum MediaPlayMode {
+  REPEAT
+  REPEAT_ONE
+  SHUFFLE
+}
+
+type Message {
+  id: ID!
+  body: String!
+  address: String!
+  date: Instant!
+  serviceCenter: String!
+  read: Boolean!
+  threadId: String!
+  type: Int!
+  subscriptionId: Int!
+  isMms: Boolean!
+  attachments: [MessageAttachment!]!
+  tags: [Tag!]!
+}
+
+type MessageAttachment {
+  path: String!
+  contentType: String!
+  name: String!
+}
+
+type MessageConversation {
+  id: ID!
+  address: String!
+  snippet: String!
+  date: Instant!
+  messageCount: Int!
+  read: Boolean!
+}
+
+type MessageFiles {
+  ids: [String!]!
+}
+
+type MessageImages {
+  ids: [String!]!
+}
+
+type MessageText {
+  ids: [String!]!
+}
+
+type Note {
+  id: ID!
+  title: String!
+  content: String!
+  deletedAt: Instant
+  createdAt: Instant!
+  updatedAt: Instant!
+  tags: [Tag!]!
+}
+
+input NoteInput {
+  title: String!
+  content: String!
+}
+
+type Notification {
+  id: ID!
+  onlyOnce: Boolean!
+  isClearable: Boolean!
+  appId: String!
+  appName: String!
+  time: Instant!
+  silent: Boolean!
+  title: String!
+  body: String!
+  actions: [String!]!
+  replyActions: [String!]!
+}
+
+type Organization {
+  company: String!
+  title: String!
+}
+
+input OrganizationInput {
+  company: String!
+  title: String!
+}
+
+type Package {
+  id: ID!
+  name: String!
+  type: String!
+  version: String!
+  path: String!
+  size: Long!
+  certs: [Certificate!]!
+  installedAt: Instant!
+  updatedAt: Instant!
+}
+
+type PackageInstallPending {
+  packageName: String!
+  updatedAt: Instant
+  isNew: Boolean!
+}
+
+type PackageStatus {
+  id: ID!
+  exist: Boolean!
+  updatedAt: Instant
+}
+
+input PairingDeviceInput {
+  id: String!
+  name: String!
+  ips: [String!]!
+  port: Int!
+  deviceType: DeviceType!
+  version: String!
+  platform: String!
+  lastSeen: Instant!
+  discoveryMethods: [DiscoveryMethod!]!
+}
+
+input PairingRequestInput {
+  fromId: String!
+  fromName: String!
+  port: Int!
+  deviceType: DeviceType!
+  ecdhPublicKey: String!
+  signaturePublicKey: String!
+  timestamp: Long!
+  ips: [String!]!
+  signature: String!
+  fromIp: String!
+  isQrInitiated: Boolean!
+  awareSupported: Boolean!
+}
+
+type Peer {
+  id: String!
+  name: String!
+  ip: String!
+  status: PeerStatus!
+  port: Int!
+  deviceType: DeviceType!
+  createdAt: Instant!
+  updatedAt: Instant!
+  online: Boolean!
+}
+
+enum PeerStatus {
+  PAIRED
+  UNPAIRED
+  CHANNEL
+}
+
+enum Permission {
+  WRITE_EXTERNAL_STORAGE
+  READ_SMS
+  SEND_SMS
+  READ_CONTACTS
+  WRITE_CONTACTS
+  READ_CALL_LOG
+  WRITE_CALL_LOG
+  CALL_PHONE
+  POST_NOTIFICATIONS
+  NEARBY_WIFI_DEVICES
+  ACCESS_FINE_LOCATION
+  CAMERA
+  SYSTEM_ALERT_WINDOW
+  RECORD_AUDIO
+  READ_MEDIA_IMAGES
+  READ_MEDIA_VIDEOS
+  READ_MEDIA_AUDIO
+  NOTIFICATION_LISTENER
+  READ_PHONE_STATE
+  READ_PHONE_NUMBERS
+  SCHEDULE_EXACT_ALARM
+  QUERY_ALL_PACKAGES
+  NONE
+}
+
+type PhoneGeo {
+  province: String!
+  city: String!
+  zipCode: String!
+  areaCode: String!
+  isp: Int!
+}
+
+type PlaylistAudio {
+  title: String!
+  artist: String!
+  path: String!
+  duration: Long!
+}
+
+type PomodoroSettings {
+  workDuration: Int!
+  shortBreakDuration: Int!
+  longBreakDuration: Int!
+  pomodorosBeforeLongBreak: Int!
+  showNotification: Boolean!
+  playSoundOnComplete: Boolean!
+  soundPath: String!
+  originalSoundName: String!
+}
+
+enum PomodoroState {
+  WORK
+  SHORT_BREAK
+  LONG_BREAK
+}
+
+type PomodoroToday {
+  date: String!
+  completedCount: Int!
+  currentRound: Int!
+  timeLeft: Int!
+  totalTime: Int!
+  isRunning: Boolean!
+  isPause: Boolean!
+  state: PomodoroState!
+}
+
+enum ScreenMirrorControlAction {
+  TAP
+  LONG_PRESS
+  SWIPE
+  SCROLL
+  BACK
+  HOME
+  RECENTS
+  LOCK_SCREEN
+  KEY
+  TOUCH
+  TOUCH_DOWN
+  TOUCH_MOVE
+  TOUCH_UP
+}
+
+input ScreenMirrorControlInput {
+  action: ScreenMirrorControlAction!
+  x: Float
+  y: Float
+  endX: Float
+  endY: Float
+  duration: Long
+  deltaX: Float
+  deltaY: Float
+  key: String
+  pathPoints: [TouchPointInput!]
+  pointerId: Int
+  pressure: Float
+}
+
+enum ScreenMirrorMode {
+  HD
+  SMOOTH
+}
+
+type ScreenMirrorQuality {
+  mode: String!
+  resolution: Int!
+}
+
+type ScreenMirrorVideoCodec {
+  annexB: String!
+  keyFrame: String
+}
+
+"""The Short scalar type represents a signed 16-bit numeric non-fractional value"""
+scalar Short
+
+type Sim {
+  id: ID!
+  label: String!
+  number: String!
+  subscriptionId: Int!
+}
+
+type SmsCounts {
+  total: Int!
+  inbox: Int!
+  sent: Int!
+  drafts: Int!
+}
+
+type StorageMount {
+  id: String!
+  name: String!
+  path: String!
+  mountPoint: String!
+  fsType: String!
+  totalBytes: Long!
+  usedBytes: Long!
+  freeBytes: Long!
+  remote: Boolean!
+  alias: String!
+  driveType: DriveType!
+  diskID: String!
+}
+
+type Tag {
+  id: ID!
+  name: String!
+  count: Int!
+}
+
+type TagRelation {
+  tagId: String!
+  key: String!
+}
+
+input TagRelationStub {
+  key: String!
+  title: String!
+  size: Long!
+}
+
+type TempValue {
+  key: String!
+  value: String!
+}
+
+input TouchPointInput {
+  x: Float!
+  y: Float!
+  t: Int!
+}
+
+type Video {
+  id: ID!
+  title: String!
+  path: String!
+  duration: Long!
+  size: Long!
+  bucketId: String!
+  createdAt: Instant!
+  updatedAt: Instant!
+  takenAt: Instant
+  isFavorite: Boolean!
+  tags: [Tag!]!
+}
+
+type VideoFileInfo {
+  width: Int!
+  height: Int!
+  duration: Long!
+  location: Location
+}
+
+type __Directive {
+  name: String!
+  description: String
+  locations: [__DirectiveLocation!]!
+  args: [__InputValue!]!
+  onField: Boolean! @deprecated(reason: "Use `locations`.")
+  onFragment: Boolean! @deprecated(reason: "Use `locations`.")
+  onOperation: Boolean! @deprecated(reason: "Use `locations`.")
+}
+
+enum __DirectiveLocation {
+  QUERY
+  MUTATION
+  SUBSCRIPTION
+  FIELD
+  FRAGMENT_DEFINITION
+  FRAGMENT_SPREAD
+  INLINE_FRAGMENT
+}
+
+type __EnumValue {
+  name: String!
+  description: String
+  isDeprecated: Boolean!
+  deprecationReason: String
+}
+
+type __Field {
+  name: String!
+  description: String
+  type: __Type!
+  args: [__InputValue!]!
+  isDeprecated: Boolean!
+  deprecationReason: String
+}
+
+type __InputValue {
+  name: String!
+  description: String
+  type: __Type!
+  defaultValue: String
+}
+
+type __Schema {
+  types: [__Type!]!
+  queryType: __Type!
+  mutationType: __Type
+  subscriptionType: __Type
+  directives: [__Directive!]!
+}
+
+type __Type {
+  kind: __TypeKind!
+  name: String
+  description: String!
+  fields(includeDeprecated: Boolean): [__Field!]
+  interfaces: [__Type!]
+  possibleTypes: [__Type!]
+  enumValues(includeDeprecated: Boolean): [__EnumValue!]
+  inputFields: [__InputValue!]
+  ofType: __Type
+}
+
+enum __TypeKind {
+  SCALAR
+  OBJECT
+  INTERFACE
+  UNION
+  ENUM
+  INPUT_OBJECT
+  LIST
+  NON_NULL
+}
