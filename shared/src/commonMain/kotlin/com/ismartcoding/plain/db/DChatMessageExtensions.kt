@@ -13,7 +13,7 @@ fun DMessageFile.getPreviewPath(peer: DPeer?): String {
 
 fun DMessageContent.toPeerMessageContent(): DMessageContent {
     return when (type) {
-        DMessageType.FILES.value -> {
+        MessageType.FILES -> {
             val files = value as DMessageFiles
             val modified = files.items.map { file ->
                 val fileId = getFileId(file.uri)
@@ -22,7 +22,7 @@ fun DMessageContent.toPeerMessageContent(): DMessageContent {
             DMessageContent(type, DMessageFiles(modified))
         }
 
-        DMessageType.IMAGES.value -> {
+        MessageType.IMAGES -> {
             val images = value as DMessageImages
             val modified = images.items.map { image ->
                 val fileId = getFileId(image.uri)

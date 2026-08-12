@@ -1,13 +1,12 @@
 package com.ismartcoding.plain.helpers
 
 import android.content.Context
-import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.platform.appDir
 import java.io.File
 
@@ -31,12 +30,12 @@ object ChatFidUriMigration {
         val chats = chatDao.getAll()
         for (chat in chats) {
             val type = chat.content.type
-            if (type != DMessageType.IMAGES.value && type != DMessageType.FILES.value) continue
+            if (type != MessageType.IMAGES && type != MessageType.FILES) continue
 
             var changed = false
 
             when (type) {
-                DMessageType.IMAGES.value -> {
+                MessageType.IMAGES -> {
                     val imgs = chat.content.value as? DMessageImages ?: continue
                     val newItems = imgs.items.map { item ->
                         if (item.uri.startsWith("fid:") && !item.uri.removePrefix("fid:").contains(".")) {
@@ -59,7 +58,7 @@ object ChatFidUriMigration {
                     }
                 }
 
-                DMessageType.FILES.value -> {
+                MessageType.FILES -> {
                     val files = chat.content.value as? DMessageFiles ?: continue
                     val newItems = files.items.map { item ->
                         if (item.uri.startsWith("fid:") && !item.uri.removePrefix("fid:").contains(".")) {

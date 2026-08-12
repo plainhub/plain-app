@@ -12,12 +12,12 @@ import com.ismartcoding.plain.i18n.videos
 
 fun DChat.getMessagePreview(): String {
     return when (content.type) {
-        DMessageType.TEXT.value -> {
+        MessageType.TEXT -> {
             val textMessage = content.value as? DMessageText
             textMessage?.text?.take(50) ?: LocaleHelper.getString(Res.string.message)
         }
 
-        DMessageType.IMAGES.value -> {
+        MessageType.IMAGES -> {
             val imagesMessage = content.value as? DMessageImages
             val items = imagesMessage?.items ?: emptyList()
             val videoCount = items.count { it.duration > 0 }
@@ -39,7 +39,7 @@ fun DChat.getMessagePreview(): String {
             }
         }
 
-        DMessageType.FILES.value -> {
+        MessageType.FILES -> {
             val filesMessage = content.value as? DMessageFiles
             val count = filesMessage?.items?.size ?: 0
             if (count > 1) "$count ${LocaleHelper.getString(Res.string.files)}" else LocaleHelper.getString(Res.string.file)

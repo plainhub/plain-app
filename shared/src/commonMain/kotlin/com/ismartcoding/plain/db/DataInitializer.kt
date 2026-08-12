@@ -92,7 +92,7 @@ class DataInitializer(private val connection: SQLiteConnection) {
         try {
             setOf(
                 MessageItem(
-                    """{"type":"text","value":{"text":"${LocaleHelper.getString(Res.string.welcome_text)}"}}""",
+                    """{"type":"TEXT","value":{"text":"${LocaleHelper.getString(Res.string.welcome_text)}"}}""",
                     "local",
                     "me",
                 ),

@@ -26,26 +26,25 @@ private val chatJson = Json { ignoreUnknownKeys = true }
 fun DMessageContent.toJSONString(): String {
     val valueElement = if (value != null) {
         when (type) {
-            DMessageType.TEXT.value -> chatJson.encodeToJsonElement(DMessageText.serializer(), value as DMessageText)
-            DMessageType.IMAGES.value -> chatJson.encodeToJsonElement(DMessageImages.serializer(), value as DMessageImages)
-            DMessageType.FILES.value -> chatJson.encodeToJsonElement(DMessageFiles.serializer(), value as DMessageFiles)
-            else -> JsonObject(emptyMap())
+            MessageType.TEXT -> chatJson.encodeToJsonElement(DMessageText.serializer(), value as DMessageText)
+            MessageType.IMAGES -> chatJson.encodeToJsonElement(DMessageImages.serializer(), value as DMessageImages)
+            MessageType.FILES -> chatJson.encodeToJsonElement(DMessageFiles.serializer(), value as DMessageFiles)
         }
     } else {
         JsonObject(emptyMap())
     }
     return buildJsonObject {
-        put("type", type)
+        put("type", type.name)
         put("value", valueElement)
     }.toString()
 }
 
-class DMessageContent(val type: String, var value: Any? = null)
+class DMessageContent(val type: MessageType, var value: Any? = null)
 
-enum class DMessageType(val value: String) {
-    TEXT("text"),
-    IMAGES("images"),
-    FILES("files"),
+enum class MessageType {
+    TEXT,
+    IMAGES,
+    FILES,
 }
 
 @Serializable
@@ -184,12 +183,13 @@ data class DChat(
     companion object {
         fun parseContent(content: String): DMessageContent {
             val obj = chatJson.parseToJsonElement(content).jsonObject
-            val message = DMessageContent(obj["type"]?.jsonPrimitive?.content ?: "")
+            val typeStr = obj["type"]?.jsonPrimitive?.content ?: ""
+            val message = DMessageContent(MessageType.valueOf(typeStr))
             val valueJson = obj["value"]?.takeIf { it !is JsonNull }?.toString() ?: ""
             when (message.type) {
-                DMessageType.TEXT.value -> message.value = chatJson.decodeFromString<DMessageText>(valueJson)
-                DMessageType.IMAGES.value -> message.value = chatJson.decodeFromString<DMessageImages>(valueJson)
-                DMessageType.FILES.value -> message.value = chatJson.decodeFromString<DMessageFiles>(valueJson)
+                MessageType.TEXT -> message.value = chatJson.decodeFromString<DMessageText>(valueJson)
+                MessageType.IMAGES -> message.value = chatJson.decodeFromString<DMessageImages>(valueJson)
+                MessageType.FILES -> message.value = chatJson.decodeFromString<DMessageFiles>(valueJson)
             }
             return message
         }

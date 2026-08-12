@@ -12,7 +12,7 @@ import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.events.EventType
@@ -71,12 +71,12 @@ object ChatMessageReceiver {
             isRemote = false,
         )
 
-        if (item.content.type == DMessageType.TEXT.value) {
+        if (item.content.type == MessageType.TEXT) {
             sendEvent(FetchLinkPreviewsEvent(item))
         }
 
-        if (item.content.type == DMessageType.FILES.value ||
-            item.content.type == DMessageType.IMAGES.value
+        if (item.content.type == MessageType.FILES ||
+            item.content.type == MessageType.IMAGES
         ) {
             val files = when (item.content.value) {
                 is DMessageFiles -> (item.content.value as DMessageFiles).items

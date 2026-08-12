@@ -117,4 +117,19 @@ object Migrations {
             )
         }
     }
+
+    val MIGRATION_20_21 = object : Migration(20, 21) {
+        override fun migrate(connection: SQLiteConnection) {
+            connection.execSQL(
+                """
+                UPDATE chats
+                SET content = REPLACE(
+                    REPLACE(REPLACE(content, '"type":"text"', '"type":"TEXT"'), '"type":"images"', '"type":"IMAGES"'),
+                    '"type":"files"', '"type":"FILES"'
+                )
+                WHERE content LIKE '%type%'
+                """.trimIndent()
+            )
+        }
+    }
 }

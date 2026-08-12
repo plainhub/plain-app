@@ -3,12 +3,11 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.FileHashHelper
 import com.ismartcoding.plain.helpers.TimeHelper
@@ -20,9 +19,6 @@ import com.ismartcoding.plain.httpserver.http.StreamSink
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.utils.io.readAvailable
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.time.Instant
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
@@ -30,7 +26,6 @@ import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
-import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSize
 import platform.Foundation.NSNumber
@@ -77,7 +72,7 @@ actual fun createLongTextFile(text: String): DMessageContent {
     val summary = text.substring(0, minOf(text.length, Constants.TEXT_FILE_SUMMARY_LENGTH))
     val size = NSFileManager.defaultManager.contentsAtPath(file)?.length?.toInt()?.toLong() ?: 0L
     val messageFile = DMessageFile(uri = file, size = size, summary = summary, fileName = fileName)
-    return DMessageContent(DMessageType.FILES.value, DMessageFiles(listOf(messageFile)))
+    return DMessageContent(MessageType.FILES, DMessageFiles(listOf(messageFile)))
 }
 
 @OptIn(ExperimentalForeignApi::class)

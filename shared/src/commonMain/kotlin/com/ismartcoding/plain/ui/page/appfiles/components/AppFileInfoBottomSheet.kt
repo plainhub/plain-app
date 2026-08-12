@@ -15,7 +15,7 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -57,9 +57,9 @@ fun AppFileInfoBottomSheet(
                         file.appFile.mimeType.startsWith("image/") ||
                         file.appFile.mimeType.startsWith("video/")
                 val content = if (isImageVideo) {
-                    DMessageContent(DMessageType.IMAGES.value, DMessageImages(listOf(dFile)))
+                    DMessageContent(MessageType.IMAGES, DMessageImages(listOf(dFile)))
                 } else {
-                    DMessageContent(DMessageType.FILES.value, DMessageFiles(listOf(dFile)))
+                    DMessageContent(MessageType.FILES, DMessageFiles(listOf(dFile)))
                 }
                 chatVM.setPendingForwardContent(content)
                 showForwardDialog = false

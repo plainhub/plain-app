@@ -17,7 +17,7 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
@@ -194,7 +194,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             val content = if (text.length > Constants.MAX_MESSAGE_LENGTH) {
                 createLongTextFile(text)
             } else {
-                DMessageContent(DMessageType.TEXT.value, DMessageText(text))
+                DMessageContent(MessageType.TEXT, DMessageText(text))
             }
             onResult(doSendMessage(target.value, content, onlinePeerIds))
         }

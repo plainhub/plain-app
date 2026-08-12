@@ -10,7 +10,7 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
@@ -38,7 +38,7 @@ object ChatManager {
             channelId = if (target.type == ChatTargetType.CHANNEL) target.toId else "",
             isRemote = !target.isLocal(),
         )
-        if (item.content.type == DMessageType.TEXT.value) {
+        if (item.content.type == MessageType.TEXT) {
             sendEvent(FetchLinkPreviewsEvent(item))
         }
         refreshLatestChats()
@@ -60,9 +60,9 @@ object ChatManager {
 
     suspend fun insertFilesImmediate(target: ChatTarget, files: List<DMessageFile>, isImageVideo: Boolean): DChat = withIO {
         val content = if (isImageVideo) {
-            DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
+            DMessageContent(MessageType.IMAGES, DMessageImages(files))
         } else {
-            DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
+            DMessageContent(MessageType.FILES, DMessageFiles(files))
         }
         val item = ChatDbHelper.insertChatItem(
             message = content,

@@ -27,13 +27,12 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModelBase
-import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.enterSelectMode
@@ -97,9 +96,9 @@ fun ChatListItem(
                             { statusData -> showDeliveryDialog.value = statusData }
                         } else null)
                     when (m.type) {
-                        DMessageType.IMAGES.value -> ChatImages(items, m, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
-                        DMessageType.FILES.value -> ChatFiles(items, navController, m, peer, audioPlaylistVM, previewerState)
-                        DMessageType.TEXT.value -> ChatText(focusManager, m, isSelectMode = chatVM.selectMode.value, onSelect = { chatVM.select(it) }, onDoubleClick = {
+                        MessageType.IMAGES -> ChatImages(items, m, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
+                        MessageType.FILES -> ChatFiles(items, navController, m, peer, audioPlaylistVM, previewerState)
+                        MessageType.TEXT -> ChatText(focusManager, m, isSelectMode = chatVM.selectMode.value, onSelect = { chatVM.select(it) }, onDoubleClick = {
                             navController.navigateChatText((m.value as DMessageText).text)
                         }, onLongClick = {
                             if (chatVM.selectMode.value) return@ChatText

@@ -5,7 +5,7 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.features.file.DFile
@@ -71,7 +71,7 @@ actual fun createLongTextFile(text: String): DMessageContent {
     file.writeText(text)
     val summary = text.substring(0, minOf(text.length, Constants.TEXT_FILE_SUMMARY_LENGTH))
     val messageFile = DMessageFile(uri = file.absolutePath, size = file.length(), summary = summary, fileName = fileName)
-    return DMessageContent(DMessageType.FILES.value, DMessageFiles(listOf(messageFile)))
+    return DMessageContent(MessageType.FILES, DMessageFiles(listOf(messageFile)))
 }
 
 actual fun saveFileToDownloads(path: String, fileName: String): String {

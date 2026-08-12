@@ -37,7 +37,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DImageEditorProject::class,
         DMediaItem::class,
     ],
-    version = 20,
+    version = 21,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
