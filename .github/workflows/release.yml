@@ -43,10 +43,16 @@ jobs:
       - name: Build APKs (arm64-v8a + armeabi-v7a)
         run: bash build-apk.sh
 
+      - name: Save mapping.txt (githubRelease)
+        run: cp app/build/outputs/mapping/githubRelease/mapping.txt mapping-github-release.txt
+
       # build-aab.sh patches the manifest, builds the AAB, and writes play-config.json.
       # publishGoogleReleaseBundle uploads the AAB to Play Store internal track.
       - name: Build AAB and publish to Play Store
         run: bash build-aab.sh && ./gradlew publishGoogleReleaseBundle
+
+      - name: Save mapping.txt (googleRelease)
+        run: cp app/build/outputs/mapping/googleRelease/mapping.txt mapping-google-release.txt
 
       - name: Compute SHA-256 hashes
         id: hashes
@@ -66,8 +72,10 @@ jobs:
             PlainApp-${{ steps.meta.outputs.version_name }}-64bit-Universal-Recommended.apk
             PlainApp-${{ steps.meta.outputs.version_name }}-Old-Android-32bit.apk
             PlainApp-${{ steps.meta.outputs.version_name }}-Google-Play.aab
+            mapping-github-release.txt
+            mapping-google-release.txt
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 30
 
   # SLSA Level 3 provenance covers all three release artifacts.
   provenance:
@@ -205,4 +213,4 @@ jobs:
             ```
           draft: true
           prerelease: false
-          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-64bit-Universal-Recommended.apk,PlainApp-${{ needs.build.outputs.version_name }}-Old-Android-32bit.apk,PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab,${{ needs.provenance.outputs.provenance-name }}"
+          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-64bit-Universal-Recommended.apk,PlainApp-${{ needs.build.outputs.version_name }}-Old-Android-32bit.apk,PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab,${{ needs.provenance.outputs.provenance-name }},mapping-github-release.txt,mapping-google-release.txt"

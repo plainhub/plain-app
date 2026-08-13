@@ -123,7 +123,7 @@ fun HttpRouter.addWebSocketRoutes() {
         } catch (ex: Exception) {
             LogCat.e("ws: $ex")
         } finally {
-            LogCat.d("ws: remove session $clientId, ${sessionHandle.id}")
+            // LogCat.d("ws: remove session $clientId, ${sessionHandle.id}")
             HttpServerManager.wsSessions.removeAll { it.id == sessionHandle.id }
             setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
         }
@@ -202,7 +202,7 @@ private suspend fun handleSessionFrame(
         HttpServerManager.wsSessions.add(sessionHandle)
         setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
     } else {
-        LogCat.d("ws: invalid_request: $clientId")
+//        LogCat.d("ws: invalid_request: $clientId")
         ws.close(WsCloseCode.TRY_AGAIN_LATER, "invalid_request")
     }
 }
