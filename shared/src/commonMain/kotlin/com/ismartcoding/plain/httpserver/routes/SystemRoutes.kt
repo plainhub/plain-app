@@ -2,6 +2,7 @@ package com.ismartcoding.plain.httpserver.routes
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.PasswordType
+import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.getOwnPackageName
 import com.ismartcoding.plain.platform.stopHttpEngineAsync
@@ -9,8 +10,16 @@ import com.ismartcoding.plain.preferences.PasswordTypePreference
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.HttpStatus
+import com.ismartcoding.plain.httpserver.http.respondJson
 import com.ismartcoding.plain.httpserver.setOnlineClientIds
 import kotlinx.coroutines.delay
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class InitResponse(
+    val signaturePublicKey: String,
+    val password: String = "",
+)
 
 /**
  * `/health`, `/shutdown`, `/init` — simple system endpoints shared between
@@ -55,16 +64,19 @@ fun HttpRouter.addSystemRoutes() {
             if (token != null) {
                 val decrypted = chaCha20Decrypt(token, bodyBytes)
                 if (decrypted != null) {
-                    call.respondNoBody(HttpStatus.OK)
+                    val response = InitResponse(SignatureHelper.getRawPublicKeyBase64Async())
+                    call.respondJson(response)
                     return@post
                 }
             }
         }
 
+        val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
         if (PasswordTypePreference.getValueAsync() == PasswordType.NONE) {
-            call.respondText(HttpServerManager.resetPasswordAsync())
+            val password = HttpServerManager.resetPasswordAsync()
+            call.respondJson(InitResponse(signaturePublicKey, password))
         } else {
-            call.respondNoBody(HttpStatus.NO_CONTENT)
+            call.respondJson(InitResponse(signaturePublicKey))
         }
     }
 }

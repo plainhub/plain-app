@@ -163,7 +163,7 @@ private suspend fun handleLoginFrame(
         r = jsonDecode<AuthRequest>(decryptedBytes.decodeToString())
     }
     if (r?.password == hash) {
-        val event = ConfirmToAcceptLoginEvent(sessionHandle, clientId, r)
+        val event = ConfirmToAcceptLoginEvent(sessionHandle, clientId, r, r.ecdhPublicKey)
         if (AuthTwoFactorPreference.getAsync()) {
             ws.sendBinary(
                 chaCha20Encrypt(

@@ -54,6 +54,7 @@ class ConfirmToAcceptLoginEvent(
     val session: WsSessionHandle,
     val clientId: String,
     val request: AuthRequest,
+    val clientEcdhPublicKey: String = "",
 ) : ChannelEvent()
 
 // Pairing events

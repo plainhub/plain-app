@@ -7,12 +7,14 @@ import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.platform.generateChaCha20Key
+import com.ismartcoding.plain.platform.computeECDHSharedKey
+import com.ismartcoding.plain.platform.generateECDHKeyPair
 import com.ismartcoding.plain.platform.generateNotificationId
 import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.platform.isPortInUse
@@ -26,6 +28,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Instant
 
 /**
@@ -207,16 +211,38 @@ object HttpServerManager {
     }
 
     /**
-     * Accept a pending web login: generate a new ChaCha20 token, persist the
-     * session, refresh the token cache, notify the user, and send the encrypted
+     * Accept a pending web login: perform ECDH key exchange to derive a
+     * shared token (never transmitted), sign the response with Ed25519,
+     * persist the session, refresh the token cache, and send the encrypted
      * response back to the browser via the WebSocket session handle.
      */
+    @OptIn(ExperimentalEncodingApi::class)
     suspend fun respondTokenAsync(
         event: ConfirmToAcceptLoginEvent,
         clientIp: String,
     ) = withIO {
-        val token = generateChaCha20Key()
         val r = event.request
+        val serverKeyPair = generateECDHKeyPair()
+        val serverPublicKeyBase64 = Base64.encode(serverKeyPair.publicKeyEncoded)
+
+        val clientPublicKeyBytes = Base64Lenient.decode(event.clientEcdhPublicKey)
+        val token = computeECDHSharedKey(serverKeyPair.privateKeyEncoded, clientPublicKeyBytes)
+        if (token == null) {
+            LogCat.e("ECDH shared key computation failed")
+            return@withIO
+        }
+
+        val timestamp = TimeHelper.nowMillis()
+        val response = AuthResponse(
+            clientId = TempData.clientId,
+            status = AuthStatus.COMPLETED,
+            ecdhPublicKey = serverPublicKeyBase64,
+            signature = "", // filled after signing
+            timestamp = timestamp,
+        )
+        val signature = SignatureHelper.signTextAsync(response.toSignatureData())
+        val signedResponse = response.copy(signature = signature)
+
         SessionList.addOrUpdateAsync(event.clientId) {
             it.clientIP = clientIp
             it.osName = r.osName
@@ -230,13 +256,7 @@ object HttpServerManager {
         event.session.send(
             chaCha20Encrypt(
                 passwordToToken(),
-                JsonHelper.jsonEncode(
-                    AuthResponse(
-                        TempData.clientId,
-                        AuthStatus.COMPLETED,
-                        token,
-                    ),
-                ),
+                JsonHelper.jsonEncode(signedResponse),
             ),
         )
     }
