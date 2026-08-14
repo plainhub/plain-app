@@ -130,6 +130,13 @@
     <string name="donation_title">支持 PlainApp 开发</string>
     <string name="buy_me_a_coffee">请我喝杯咖啡</string>
     <string name="service_debug">服务调试</string>
+    <string name="mdns_debug">mDNS 调试</string>
+    <string name="mdns_service_type">服务类型</string>
+    <string name="mdns_instance">实例名</string>
+    <string name="mdns_port">端口</string>
+    <string name="mdns_ips">IP 地址</string>
+    <string name="mdns_txt">TXT 记录</string>
+    <string name="mdns_no_devices">未发现附近的设备</string>
     <string name="http_server">HTTP 服务器</string>
     <string name="service_running">运行中</string>
     <string name="http_server_state">状态</string>

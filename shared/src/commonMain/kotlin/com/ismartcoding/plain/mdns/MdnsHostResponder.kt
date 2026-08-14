@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.mdns
 
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlin.concurrent.Volatile
 
@@ -18,20 +19,63 @@ object MdnsHostResponder {
     private const val MDNS_PORT = 5353
 
     @Volatile private var hostname = "plainapp.local"
+    @Volatile private var serviceInfo: MdnsServiceInfo? = null
     @Volatile private var socket: MdnsSocket? = null
     @Volatile private var worker: MdnsWorkerHandle? = null
+
+    /** Inbound-packet listeners (browser). Kept across socket restarts. */
+    @Volatile private var packetListeners: List<(ByteArray, String) -> Unit> = emptyList()
 
     val isRunning: Boolean
         get() = worker?.isAlive == true && socket != null
 
-    fun start(mdnsHostname: String): Boolean {
+    /**
+     * Starts the mDNS responder. [service] advertises the PlainApp service
+     * (PTR/SRV/TXT/A answers); when null the responder only answers A-record
+     * queries for [mdnsHostname].
+     */
+    internal fun start(mdnsHostname: String, service: MdnsServiceInfo? = null): Boolean {
         val normalized = normalizeHostname(mdnsHostname)
         if (normalized.isEmpty()) {
             LogCat.e("mDNS start skipped: empty hostname")
             return false
         }
-        stop()
         hostname = normalized
+        serviceInfo = service
+        return restartSocket()
+    }
+
+    /**
+     * Ensures the responder socket is up so discovery works even while the HTTP
+     * service is off. When already running this keeps the current configuration.
+     */
+    internal fun ensureStarted(mdnsHostname: String): Boolean {
+        if (isRunning) return true
+        return start(mdnsHostname, serviceInfo)
+    }
+
+    fun stop() {
+        tearDownSocket()
+        hostname = ""
+        serviceInfo = null
+    }
+
+    /**
+     * Withdraws the `_plainapp` service advertisement while KEEPING the socket
+     * and hostname responder alive. Called when the HTTP service stops: the
+     * shared socket must survive so a running browser keeps querying, and the
+     * responder keeps answering A queries for [hostname]. Use [stop] only for
+     * a full teardown.
+     */
+    internal fun clearService() {
+        serviceInfo = null
+        LogCat.d("mDNS service advertisement withdrawn, socket kept for hostname/browser")
+    }
+
+    /** Recreates the socket after a network change, preserving hostname/service config. */
+    internal fun restartSocket(): Boolean {
+        tearDownSocket()
+        if (hostname.isEmpty()) return false
 
         val candidates = candidateInterfaces()
         if (candidates.isEmpty()) {
@@ -69,11 +113,36 @@ object MdnsHostResponder {
         return true
     }
 
-    fun stop() {
+    private fun tearDownSocket() {
         val t = worker; worker = null
         val s = socket; socket = null
         runCatching { s?.close() }
         runCatching { t?.join(300L) }
+    }
+
+    /** Registers a listener for every inbound mDNS packet; survives socket restarts. */
+    internal fun addPacketListener(listener: (ByteArray, String) -> Unit) {
+        if (listener !in packetListeners) packetListeners = packetListeners + listener
+    }
+
+    internal fun removePacketListener(listener: (ByteArray, String) -> Unit) {
+        packetListeners = packetListeners - listener
+    }
+
+    /**
+     * Sends an mDNS query through the shared socket so responses come back on
+     * port 5353 (RFC 6762 §6.7 requires the source port to be 5353).
+     */
+    internal fun sendQuery(bytes: ByteArray) {
+        val s = socket ?: return
+        runCatching {
+            candidateInterfaces().firstOrNull()?.let { (iface, _) -> s.setOutgoingInterface(iface.name) }
+            s.send(bytes, MDNS_GROUP, MDNS_PORT)
+        }.onFailure { LogCat.e("mDNS sendQuery: ${it.message}") }
+    }
+
+    private fun notifyPacketListeners(bytes: ByteArray, senderIp: String) {
+        packetListeners.forEach { it(bytes, senderIp) }
     }
 
     private fun runLoop(s: MdnsSocket) {
@@ -82,14 +151,12 @@ object MdnsHostResponder {
             try {
                 val result = s.receive(buf) ?: continue
                 val senderIp = result.senderIp ?: continue
+                val packet = buf.copyOf(result.length)
+                notifyPacketListeners(packet, senderIp)
                 val fresh = candidateInterfaces()
                 if (fresh.isEmpty()) continue
                 val (responseIface, localIp) = findResponseIface(senderIp, fresh)
-                val response = MdnsPacketCodec.buildResponseIfMatchDetails(
-                    query = buf.copyOf(result.length),
-                    hostname = hostname,
-                    ips = listOf(localIp),
-                ) ?: continue
+                val response = buildResponse(packet, listOf(localIp)) ?: continue
                 val useUnicast = response.unicastResponseRequested || result.senderPort != MDNS_PORT
                 val destAddress = if (useUnicast) senderIp else MDNS_GROUP
                 val destPort = if (useUnicast) result.senderPort else MDNS_PORT
@@ -102,6 +169,31 @@ object MdnsHostResponder {
                 if (s.isClosed) break
             }
         }
+    }
+
+    /**
+     * Answers a query with the PlainApp service records when one is published,
+     * otherwise falls back to the A-record hostname responder.
+     *
+     * The service advertisement is gated by the user's "discoverable" setting:
+     * when disabled we stop announcing the PlainApp service (identity data via
+     * PTR/SRV/TXT) but still answer plain hostname A queries, which leak no
+     * PlainApp-specific information.
+     */
+    private fun buildResponse(query: ByteArray, ips: List<String>): MdnsResponse? {
+        if (serviceInfo != null) {
+            val serviceResponse = MdnsServiceResponseBuilder.buildResponseIfMatch(
+                query,
+                serviceInfo!!.copy(ips = ips),
+            ) ?: return null
+            val questions = MdnsPacketCodec.readQuestions(query) ?: return null
+            return MdnsResponse(
+                bytes = serviceResponse.bytes,
+                questions = questions,
+                matchedQuestions = questions,
+            )
+        }
+        return MdnsPacketCodec.buildResponseIfMatchDetails(query, hostname, ips)
     }
 
     internal fun normalizeHostname(value: String): String {

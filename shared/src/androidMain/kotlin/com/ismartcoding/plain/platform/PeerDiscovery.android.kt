@@ -2,7 +2,6 @@ package com.ismartcoding.plain.platform
 
 import android.Manifest
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.lib.extensions.hasPermission
 
 actual fun canShowNotifications(): Boolean {

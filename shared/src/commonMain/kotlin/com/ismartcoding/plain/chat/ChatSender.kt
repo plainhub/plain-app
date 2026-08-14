@@ -4,14 +4,13 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.chat.channel.ChannelChatSender
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
-import com.ismartcoding.plain.chat.peer.PeerCacher
+import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.chat.peer.PeerChatSender
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.discover.LANDiscoverManager
 import com.ismartcoding.plain.lib.logcat.LogCat
 
 object ChatSender {
@@ -39,10 +38,7 @@ object ChatSender {
 
     fun triggerPeerRediscovery(peerId: String) {
         LogCat.d("triggerPeerRediscovery: $peerId")
-        val key = PeerCacher.getKeyBytes(peerId)
-        if (key != null) {
-            LANDiscoverManager.discoverSpecificDevice(peerId, key)
-        }
+        MdnsDiscoverManager.browse()
     }
 
     suspend fun sendToPeer(item: DChat, peer: DPeer) = withIO {

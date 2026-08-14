@@ -5,7 +5,6 @@ import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.ble.server.BlePairingSessionStore
 import com.ismartcoding.plain.platform.computeECDHSharedKey
 import com.ismartcoding.plain.platform.generateECDHKeyPair
-import com.ismartcoding.plain.data.DDiscoverReply
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
@@ -83,6 +82,7 @@ object PairingCore {
                 deviceId = device.id,
                 deviceName = device.name,
                 deviceIp = deviceIp,
+                devicePort = device.port,
                 keyPair = keyPair,
             )
         )
@@ -185,6 +185,7 @@ object PairingCore {
                 deviceId = request.fromId,
                 deviceName = request.fromName,
                 deviceIp = request.fromIp,
+                devicePort = request.port,
                 keyPair = keyPair,
             )
         )

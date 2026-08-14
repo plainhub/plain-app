@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -19,9 +20,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
@@ -30,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.data.DNearbyDevice
-import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.platform.getBestIp
@@ -45,7 +42,6 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
-import com.ismartcoding.plain.ui.page.chat.NearbyQrBottomSheet
 import com.ismartcoding.plain.ui.page.chat.components.NearbyDeviceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,21 +57,12 @@ fun NearbyPage(
     val isSearching = isDiscovering || isBleScanning
     val pairedPeers by PeerCacher.pairedPeers.collectAsState()
 
-    var showQrSheet by remember { mutableStateOf(false) }
-    var qrData by remember { mutableStateOf<DQrPairData?>(null) }
-
     LaunchedEffect(Unit) {
         if (!isDiscovering) {
             NearbyViewModel.startDiscovering()
         }
         if (blePermissionReady && !isBleScanning) {
             NearbyViewModel.startBleScanning()
-        }
-    }
-
-    LaunchedEffect(showQrSheet) {
-        if (showQrSheet && qrData == null) {
-            qrData = NearbyViewModel.getQrDataAsync()
         }
     }
 
@@ -142,13 +129,6 @@ fun NearbyPage(
             }
         }
     }
-
-    if (showQrSheet) {
-        NearbyQrBottomSheet(
-            qrData = qrData,
-            onDismiss = { showQrSheet = false },
-        )
-    }
 }
 
 internal fun LazyListScope.nearbyDeviceListItems(
@@ -156,19 +136,16 @@ internal fun LazyListScope.nearbyDeviceListItems(
     peerVM: PeerViewModel,
     pairedPeers: List<com.ismartcoding.plain.db.DPeer>,
 ) {
-    if (nearbyDevices.isNotEmpty()) {
-        nearbyDevices.sortedBy { it.name.toSortName() }.forEach { item ->
-            item {
-                val isPaired = pairedPeers.any { it.id == item.id }
-                val status = NearbyViewModel.getStatus(item.id, isPaired)
-                NearbyDeviceItem(
-                    item = item,
-                    status = status,
-                    bestIp = getBestIp(item.ips),
-                )
-                VerticalSpace(8.dp)
-            }
-        }
+    val sortedDevices = nearbyDevices.sortedBy { it.name.toSortName() }
+    items(sortedDevices, key = { it.id }) { item ->
+        val isPaired = pairedPeers.any { it.id == item.id }
+        val status = NearbyViewModel.getStatus(item.id, isPaired)
+        NearbyDeviceItem(
+            item = item,
+            status = status,
+            bestIp = getBestIp(item.ips),
+        )
+        VerticalSpace(8.dp)
     }
 }
 

@@ -2,9 +2,6 @@ package com.ismartcoding.plain.ble.server
 
 import com.ismartcoding.plain.ble.BleRequestData
 import com.ismartcoding.plain.ble.BleUuids
-import com.ismartcoding.plain.data.DPairingCancel
-import com.ismartcoding.plain.data.DPairingRequest
-import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.helpers.JsonHelper

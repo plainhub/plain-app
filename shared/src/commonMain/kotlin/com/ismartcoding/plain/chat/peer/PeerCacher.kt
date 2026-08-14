@@ -36,7 +36,7 @@ object PeerCacher {
     // In-memory Aware running flag per peer. Set from two sources:
     //  1. BLE scan response serviceData (byte[0]) — cheap hint, no GATT needed
     //     (used by PeerTransportPrewarmer.refreshAwareFlagFromScan)
-    //  2. GATT DISCOVER reply (DDiscoverReply.awareRunning) — authoritative
+    //  2. GATT DISCOVER reply (NearbyDeviceInfo.awareRunning) — authoritative
     //     (used by PairingTransport.scanAndDiscover, overwrites the scan hint)
     // When false, WifiAwareTransport skips itself immediately instead of
     // waiting 10s+ for buildLink to time out.

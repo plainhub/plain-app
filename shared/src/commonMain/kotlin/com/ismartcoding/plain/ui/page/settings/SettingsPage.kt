@@ -139,18 +139,18 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                             PListItem(title = stringResource(Res.string.app_version), value = getAppVersion())
                         }
                     }
-                    VerticalSpace(dp = 16.dp)
-                    PCard {
-                        PListItem(
-                            title = stringResource(Res.string.make_discoverable),
-                            subtitle = stringResource(Res.string.make_discoverable_desc),
-                        ) {
-                            PSwitch(activated = isDiscoverable) { newValue ->
-                                peerVM.updateDiscoverable(newValue)
-                            }
-                            HorizontalSpace(8.dp)
-                        }
-                    }
+//                    VerticalSpace(dp = 16.dp)
+//                    PCard {
+//                        PListItem(
+//                            title = stringResource(Res.string.make_discoverable),
+//                            subtitle = stringResource(Res.string.make_discoverable_desc),
+//                        ) {
+//                            PSwitch(activated = isDiscoverable) { newValue ->
+//                                peerVM.updateDiscoverable(newValue)
+//                            }
+//                            HorizontalSpace(8.dp)
+//                        }
+//                    }
                 }
                 item {
                     VerticalSpace(dp = 16.dp)

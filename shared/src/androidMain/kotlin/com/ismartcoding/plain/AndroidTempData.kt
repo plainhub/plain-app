@@ -1,16 +1,15 @@
 package com.ismartcoding.plain
 
 import android.app.Notification
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.data.DNotification
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 
 object AndroidTempData {
     // Mutated from NotificationListenerService callbacks, which the system can
-    // invoke on different background threads concurrently, so plain
-    // mutableListOf/mutableMapOf (ArrayList/LinkedHashMap) are not safe here.
-    val notifications = mutableStateListOf<DNotification>()
+    // invoke on different background threads concurrently.
+    val notifications = CopyOnWriteArrayList<DNotification>()
 
     // Stores notification actions (including RemoteInput reply actions) keyed by notification id
-    val notificationActions = mutableStateMapOf<String, Array<out Notification.Action>>()
+    val notificationActions = ConcurrentHashMap<String, Array<out Notification.Action>>()
 }

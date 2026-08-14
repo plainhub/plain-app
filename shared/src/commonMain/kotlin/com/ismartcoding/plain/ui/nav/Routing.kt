@@ -157,6 +157,9 @@ class Routing {
     object ServiceDebug
 
     @Serializable
+    object MdnsDebug
+
+    @Serializable
     object ComponentShowcase
 
     @Serializable

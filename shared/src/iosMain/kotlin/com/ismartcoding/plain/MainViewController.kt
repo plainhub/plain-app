@@ -93,6 +93,9 @@ fun initIosApp() {
     // iOS window focus events (bridges UIApplication.didBecomeActive/willResignActive → WindowFocusChangedEvent)
     com.ismartcoding.plain.platform.IosWindowFocusEvents.register()
 
+    // Network path monitor (recreates the mDNS responder socket on network changes)
+    com.ismartcoding.plain.platform.IosNetworkMonitor.init()
+
     // Initialize preferences and TempData (shared with Android via initCommonPreferences)
     coIO {
         initCommonPreferences()

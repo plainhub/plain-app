@@ -5,22 +5,25 @@ import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.helpers.JsonHelper
-import com.ismartcoding.plain.platform.nearbySendUnicast
 
+/**
+ * Delivers pairing messages to a peer's `POST /nearby` endpoint over the LAN.
+ *
+ * The request body is the same [NearbyMessageType]-prefixed wire format the
+ * BLE nearby service uses ("PAIR_REQUEST:{…}" — see
+ * [PairingCore.formatMessage]).
+ */
 object PairingMessenger {
-    fun sendRequest(request: DPairingRequest, targetIp: String) {
-        send(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request), targetIp)
-    }
+    suspend fun sendRequest(request: DPairingRequest, targetIp: String, targetPort: Int): Boolean =
+        send(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request), targetIp, targetPort)
 
-    fun sendResponse(response: DPairingResponse, targetIp: String) {
-        send(NearbyMessageType.PAIR_RESPONSE, JsonHelper.jsonEncode(response), targetIp)
-    }
+    suspend fun sendResponse(response: DPairingResponse, targetIp: String, targetPort: Int): Boolean =
+        send(NearbyMessageType.PAIR_RESPONSE, JsonHelper.jsonEncode(response), targetIp, targetPort)
 
-    fun sendCancel(cancel: DPairingCancel, targetIp: String) {
-        send(NearbyMessageType.PAIR_CANCEL, JsonHelper.jsonEncode(cancel), targetIp)
-    }
+    suspend fun sendCancel(cancel: DPairingCancel, targetIp: String, targetPort: Int): Boolean =
+        send(NearbyMessageType.PAIR_CANCEL, JsonHelper.jsonEncode(cancel), targetIp, targetPort)
 
-    private fun send(type: NearbyMessageType, message: String, targetIp: String) {
-        nearbySendUnicast(PairingCore.formatMessage(type, message), targetIp)
+    private suspend fun send(type: NearbyMessageType, json: String, targetIp: String, targetPort: Int): Boolean {
+        return NearbyHttpClient.post(PairingCore.formatMessage(type, json), targetIp, targetPort)
     }
 }

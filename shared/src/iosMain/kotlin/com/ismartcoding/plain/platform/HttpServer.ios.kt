@@ -1,10 +1,12 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.MdnsHostResponder
+import com.ismartcoding.plain.mdns.buildMdnsServiceInfo
 import com.ismartcoding.plain.httpserver.HttpServerManager
 
 /**
@@ -65,13 +67,15 @@ actual suspend fun onHttpServerStarted() {
     val httpPort = TempData.httpPort.value
     val httpsPort = TempData.httpsPort.value
     if (httpPort > 0 || httpsPort > 0) {
-        MdnsHostResponder.start(TempData.mdnsHostname)
+        val hostname = TempData.mdnsHostname
+        val service = buildMdnsServiceInfo(PairingCore.buildDiscoverReply(), hostname)
+        MdnsHostResponder.start(hostname, service)
     }
 }
 
 /** No platform side effects on iOS when the server stops. */
 actual suspend fun onHttpServerStopped() {
-    MdnsHostResponder.stop()
+    MdnsHostResponder.clearService()
 }
 
 /**

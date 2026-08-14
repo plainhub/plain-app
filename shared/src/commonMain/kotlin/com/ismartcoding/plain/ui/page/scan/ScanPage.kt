@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.platform.Permission
@@ -52,7 +51,6 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.ScanCameraView
 import com.ismartcoding.plain.platform.decodeQrFromUri
 import com.ismartcoding.plain.platform.isGestureInteractionMode
-import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -82,13 +80,7 @@ fun ScanPage(navController: NavHostController) {
     fun handleScanResult(text: String) {
         scanResult = text
         addScanResult(scope, text)
-        val pairData = DQrPairData.fromQrContent(text)
-        if (pairData != null) {
-            sendEvent(PairingRequestReceivedEvent(pairData.toDPairingRequest()))
-            cameraDetecting.value = false
-        } else {
-            showScanResultSheet = true
-        }
+        showScanResultSheet = true
     }
 
     LaunchedEffect(Channel.sharedFlow) {

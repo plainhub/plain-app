@@ -3,25 +3,20 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DNearbyDevice
-import com.ismartcoding.plain.data.DQrPairData
-import com.ismartcoding.plain.discover.LANDiscoverManager
+import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.discover.PairingInitiator
 import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.ensureBlePermissionAsync
-import com.ismartcoding.plain.platform.getDeviceIP4s
-import com.ismartcoding.plain.platform.getDeviceType
 import com.ismartcoding.plain.platform.isBluetoothReadyToUse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,13 +45,13 @@ object NearbyViewModel {
 
     fun startDiscovering() {
         isDiscovering.value = true
-        LANDiscoverManager.startPeriodicDiscovery()
+        MdnsDiscoverManager.startPeriodicDiscovery()
         startDeviceCleanup()
     }
 
     fun stopDiscovering() {
         isDiscovering.value = false
-        LANDiscoverManager.stopPeriodicDiscovery()
+        MdnsDiscoverManager.stopPeriodicDiscovery()
         stopDeviceCleanup()
     }
 
@@ -159,17 +154,6 @@ object NearbyViewModel {
             return
         }
         PairingInitiator.cancel(deviceId)
-    }
-
-    suspend fun getQrDataAsync(): DQrPairData = withIO {
-        val allIps = getDeviceIP4s()
-        DQrPairData(
-            id = TempData.clientId,
-            name = TempData.deviceName.value,
-            port = TempData.httpsPort.value,
-            deviceType = getDeviceType(),
-            ips = allIps,
-        )
     }
 
     fun getStatus(deviceId: String, isPaired: Boolean): NearbyItemStatus {

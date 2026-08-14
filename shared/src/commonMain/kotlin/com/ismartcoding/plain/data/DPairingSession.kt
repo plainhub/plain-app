@@ -8,6 +8,7 @@ data class DPairingSession(
     val deviceId: String,
     val deviceName: String,
     val deviceIp: String,
+    val devicePort: Int,
     val keyPair: ECDHKeyPair,
     val timestamp: Instant = TimeHelper.now(),
 )

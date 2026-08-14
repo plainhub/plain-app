@@ -1,0 +1,141 @@
+"""Query object"""
+type Query {
+}
+
+"""Mutation object"""
+type Mutation {
+  channelSystemMessage(type: ChannelSystemMessageType!, payload: String!): Boolean!
+  createChatItem(content: String!): [ChatItem!]!
+  startAware: Boolean!
+}
+
+enum ChannelSystemMessageType {
+  INVITE
+  INVITE_ACCEPT
+  INVITE_DECLINE
+  UPDATE
+  KICK
+  LEAVE
+}
+
+type ChatItem {
+  id: ID!
+  fromId: String!
+  toId: String!
+  channelId: String!
+  content: String!
+  createdAt: Instant!
+  updatedAt: Instant!
+  status: ChatStatus!
+  statusData: String!
+  data: ChatItemContent
+}
+
+union ChatItemContent = MessageFiles | MessageImages | MessageText
+
+enum ChatStatus {
+  SENT
+  PARTIAL
+  FAILED
+  PENDING
+}
+
+scalar Instant
+
+"""The Long scalar type represents a signed 64-bit numeric non-fractional value"""
+scalar Long
+
+type MessageFiles {
+  ids: [String!]!
+}
+
+type MessageImages {
+  ids: [String!]!
+}
+
+type MessageText {
+  ids: [String!]!
+}
+
+enum PeerStatus {
+  PAIRED
+  UNPAIRED
+  CHANNEL
+}
+
+"""The Short scalar type represents a signed 16-bit numeric non-fractional value"""
+scalar Short
+
+type __Directive {
+  name: String!
+  description: String
+  locations: [__DirectiveLocation!]!
+  args: [__InputValue!]!
+  onField: Boolean! @deprecated(reason: "Use `locations`.")
+  onFragment: Boolean! @deprecated(reason: "Use `locations`.")
+  onOperation: Boolean! @deprecated(reason: "Use `locations`.")
+}
+
+enum __DirectiveLocation {
+  QUERY
+  MUTATION
+  SUBSCRIPTION
+  FIELD
+  FRAGMENT_DEFINITION
+  FRAGMENT_SPREAD
+  INLINE_FRAGMENT
+}
+
+type __EnumValue {
+  name: String!
+  description: String
+  isDeprecated: Boolean!
+  deprecationReason: String
+}
+
+type __Field {
+  name: String!
+  description: String
+  type: __Type!
+  args: [__InputValue!]!
+  isDeprecated: Boolean!
+  deprecationReason: String
+}
+
+type __InputValue {
+  name: String!
+  description: String
+  type: __Type!
+  defaultValue: String
+}
+
+type __Schema {
+  types: [__Type!]!
+  queryType: __Type!
+  mutationType: __Type
+  subscriptionType: __Type
+  directives: [__Directive!]!
+}
+
+type __Type {
+  kind: __TypeKind!
+  name: String
+  description: String!
+  fields(includeDeprecated: Boolean): [__Field!]
+  interfaces: [__Type!]
+  possibleTypes: [__Type!]
+  enumValues(includeDeprecated: Boolean): [__EnumValue!]
+  inputFields: [__InputValue!]
+  ofType: __Type
+}
+
+enum __TypeKind {
+  SCALAR
+  OBJECT
+  INTERFACE
+  UNION
+  ENUM
+  INPUT_OBJECT
+  LIST
+  NON_NULL
+}

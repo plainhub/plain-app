@@ -24,6 +24,3 @@ suspend fun respondToPairing(input: PairingRequestInput, accepted: Boolean): Boo
     PairingResponder.respond(input.toModel(), accepted)
     return true
 }
-
-fun SchemaBuilder.addPairingSchema() {
-}

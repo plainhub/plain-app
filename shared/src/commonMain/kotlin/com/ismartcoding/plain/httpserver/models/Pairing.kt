@@ -49,7 +49,6 @@ data class PairingRequestInput(
     val ips: List<String> = emptyList(),
     val signature: String = "",
     val fromIp: String = "",
-    val isQrInitiated: Boolean = false,
     val awareSupported: Boolean = false,
 ) {
     fun toModel(): DPairingRequest {
@@ -64,7 +63,6 @@ data class PairingRequestInput(
             ips = ips,
             signature = signature,
             fromIp = fromIp,
-            isQrInitiated = isQrInitiated,
             awareSupported = awareSupported,
         )
     }

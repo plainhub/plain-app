@@ -18,7 +18,7 @@ interface BleGattClient {
 
     // Aware flags parsed from the BLE scan response serviceData (byte[0]).
     // These are a cheap pre-GATT hint — the authoritative values come from the
-    // GATT DISCOVER reply ([com.ismartcoding.plain.data.DDiscoverReply]).
+    // GATT DISCOVER reply ([com.ismartcoding.plain.discover.NearbyDeviceInfo]).
     val awareSupported: Boolean get() = false
     val awareRunning: Boolean get() = false
 

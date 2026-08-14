@@ -31,7 +31,9 @@ object PairingResponder {
             // Send via both channels simultaneously — the initiator discards the duplicate
             if (request.fromIp.isNotEmpty()) {
                 try {
-                    PairingMessenger.sendResponse(response, request.fromIp)
+                    if (!PairingMessenger.sendResponse(response, request.fromIp, request.port)) {
+                        LogCat.e("LAN response failed for ${request.fromName} (${request.fromId})")
+                    }
                 } catch (e: Exception) {
                     LogCat.e("LAN response failed: ${e.message}")
                 }

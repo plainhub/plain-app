@@ -12,7 +12,7 @@ import com.ismartcoding.plain.lib.extensions.toHexString
  *                  full clientId (TempData.clientId, a 13-char short UUID).
  *
  * The full clientId is NOT broadcast — it is recovered later via the GATT
- * DISCOVER reply ([com.ismartcoding.plain.data.DDiscoverReply]). The 8-byte
+ * DISCOVER reply ([com.ismartcoding.plain.discover.DDiscoverReply]). The 8-byte
  * shortId is only a stable per-peer match key: callers that know a peer's
  * full clientId can compute the same shortId via [shortIdOf] and compare.
  *

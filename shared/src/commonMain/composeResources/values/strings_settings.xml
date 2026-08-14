@@ -131,6 +131,13 @@
     <string name="web_client_connected">Web client connected</string>
     <string name="clients_online">%1$d client(s) online</string>
     <string name="service_debug">Service Debug</string>
+    <string name="mdns_debug">mDNS Debug</string>
+    <string name="mdns_service_type">Service</string>
+    <string name="mdns_instance">Instance</string>
+    <string name="mdns_port">Port</string>
+    <string name="mdns_ips">IPs</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="mdns_no_devices">No nearby devices found</string>
     <string name="http_server">HTTP Server</string>
     <string name="service_running">Running</string>
     <string name="http_server_state">State</string>

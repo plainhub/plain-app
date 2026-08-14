@@ -8,6 +8,7 @@ import com.ismartcoding.plain.httpserver.http.RouteEntry
 import com.ismartcoding.plain.httpserver.routes.addDlnaRoutes
 import com.ismartcoding.plain.httpserver.routes.addFilesRoutes
 import com.ismartcoding.plain.httpserver.routes.addGraphQLRoutes
+import com.ismartcoding.plain.httpserver.routes.addNearbyRoutes
 import com.ismartcoding.plain.httpserver.routes.addSystemRoutes
 import com.ismartcoding.plain.httpserver.routes.addUploadRoutes
 import com.ismartcoding.plain.httpserver.routes.addWebSocketRoutes
@@ -30,6 +31,7 @@ import com.ismartcoding.plain.httpserver.routes.addZipRoutes
  */
 private val PEER_ACCESSIBLE_PATHS: Set<Pair<HttpMethod, String>> = setOf(
     HttpMethod.POST to "/peer_graphql",
+    HttpMethod.POST to "/nearby",
     HttpMethod.GET to "/fs",
     HttpMethod.GET to "/health",
     HttpMethod.GET to "/status", // WebSocket upgrade for peer status heartbeat
@@ -112,6 +114,7 @@ object HttpRouteRegistry {
     val router: HttpRouter by lazy {
         HttpRouter().apply {
             addSystemRoutes()
+            addNearbyRoutes()
             addUploadRoutes()
             addFilesRoutes()
             addZipRoutes()

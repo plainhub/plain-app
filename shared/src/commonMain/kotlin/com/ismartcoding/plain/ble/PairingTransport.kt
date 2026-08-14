@@ -2,12 +2,11 @@ package com.ismartcoding.plain.ble
 import com.ismartcoding.plain.platform.bleTransport
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.DDiscoverReply
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.chat.peer.PeerCacher
+import com.ismartcoding.plain.discover.DDiscoverReply
 import com.ismartcoding.plain.discover.PairingCore
-import com.ismartcoding.plain.discover.PairingSessionStore
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.TimeHelper
@@ -23,11 +22,9 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 
 object PairingTransport {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)

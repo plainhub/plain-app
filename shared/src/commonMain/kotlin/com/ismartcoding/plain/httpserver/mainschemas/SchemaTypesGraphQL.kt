@@ -26,10 +26,11 @@ import com.ismartcoding.plain.httpserver.models.BatteryStatus
 import com.ismartcoding.plain.httpserver.models.ID
 import kotlin.time.Instant
 
-fun SchemaBuilder.addSchemaTypes() {
-    enum<ChatStatus>()
+fun SchemaBuilder.addMainSchemaTypes() {
+    // Main is a superset of the peer schema (peer chat items also flow through
+    // the authenticated schema), so reuse its shared types without duplicating.
+    addPeerSchemaTypes()
     enum<ChatChannelStatus>()
-    enum<ChannelSystemMessageType>()
     enum<MediaPlayMode>()
     enum<DataType>()
     enum<DriveType>()
@@ -44,17 +45,27 @@ fun SchemaBuilder.addSchemaTypes() {
     enum<DevicePlatform>()
     enum<BatteryHealth>()
     enum<BatteryStatus>()
-    enum<PeerStatus>()
     enum<BatteryPlugged>()
     enum<DiscoveryMethod>()
     enum<ChannelMemberStatus>()
     enum<ImageSearchStatusType>()
-    stringScalar<Instant> {
-        deserialize = { value: String -> Instant.parse(value) }
-        serialize = Instant::toString
-    }
+}
+
+/**
+ * Types used by the peer-chat schema (`/peer_graphql`): the [ChatItem] result
+ * references [ID], [Instant], [ChatStatus], and the `ChatItemContent` union;
+ * the `channelSystemMessage` mutation takes a [ChannelSystemMessageType].
+ */
+fun SchemaBuilder.addPeerSchemaTypes() {
+    enum<PeerStatus>()
+    enum<ChatStatus>()
+    enum<ChannelSystemMessageType>()
     stringScalar<ID> {
         deserialize = { it: String -> ID(it) }
         serialize = { it: ID -> it.toString() }
+    }
+    stringScalar<Instant> {
+        deserialize = { value: String -> Instant.parse(value) }
+        serialize = Instant::toString
     }
 }

@@ -2,6 +2,7 @@ package com.ismartcoding.plain.mdns
 
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.discover.PairingCore
 import java.util.concurrent.atomic.AtomicBoolean
 
 object NsdHelper {
@@ -33,13 +34,16 @@ object NsdHelper {
         }
 
         val hostname = TempData.mdnsHostname
-        return MdnsHostResponder.start(hostname)
+        val service = buildMdnsServiceInfo(PairingCore.buildDiscoverReply(), hostname)
+        return MdnsHostResponder.start(hostname, service)
     }
 
     /**
-     * Stop mDNS hostname responder.
+     * Withdraw the mDNS service advertisement. The shared socket and hostname
+     * responder stay alive (the browser may still be discovering), so this is
+     * NOT a full stop — see [MdnsHostResponder.clearService].
      */
     fun unregisterService() {
-        MdnsHostResponder.stop()
+        MdnsHostResponder.clearService()
     }
 }

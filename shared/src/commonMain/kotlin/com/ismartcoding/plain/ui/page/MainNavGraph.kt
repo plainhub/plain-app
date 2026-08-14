@@ -50,6 +50,7 @@ import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.nearby.NearbyPage
 import com.ismartcoding.plain.ui.page.settings.BleDebugPage
+import com.ismartcoding.plain.ui.page.settings.MdnsDebugPage
 import com.ismartcoding.plain.ui.page.settings.ServiceDebugPage
 import com.ismartcoding.plain.ui.page.settings.WifiAwareDebugPage
 import com.ismartcoding.plain.ui.page.chat.PeerInfoPage
@@ -295,6 +296,9 @@ fun MainNavGraph(
         }
         composable<Routing.ServiceDebug> {
             ServiceDebugPage(navController)
+        }
+        composable<Routing.MdnsDebug> {
+            MdnsDebugPage(navController)
         }
         composable<Routing.ComponentShowcase> { ComponentShowcasePage(navController) }
         composable<Routing.DlnaReceiver> { DlnaReceiverPage(navController) }

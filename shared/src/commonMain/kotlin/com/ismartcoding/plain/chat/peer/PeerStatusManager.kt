@@ -12,7 +12,7 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.db.getStatusWsUrl
-import com.ismartcoding.plain.discover.LANDiscoverManager
+import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PeerStatusData
 import com.ismartcoding.plain.events.WebSocketEvent
@@ -126,7 +126,7 @@ object PeerStatusManager {
         // the dead address and schedule another reconnect, never giving the
         // discover reply a chance to refresh the IP.
         val updatedAtBefore = peer.updatedAt
-        LANDiscoverManager.discoverSpecificDevice(peer.id, key)
+        MdnsDiscoverManager.browse()
         delay(DISCOVER_REPLY_WAIT_MS)
 
         val refreshedPeer = AppDatabase.instance.peerDao().getById(peer.id) ?: peer

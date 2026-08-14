@@ -3,7 +3,7 @@ package com.ismartcoding.plain.httpserver.mainschemas
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.discover.LANDiscoverManager
+import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 
 @GraphQLMutation
@@ -20,7 +20,7 @@ suspend fun stopDiscovery(): Boolean {
 
 @GraphQLQuery
 suspend fun isDiscovering(): Boolean {
-    return LANDiscoverManager.isDiscovering()
+    return MdnsDiscoverManager.isDiscovering()
 }
 
 fun SchemaBuilder.addDiscoverSchema() {

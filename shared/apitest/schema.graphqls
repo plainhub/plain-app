@@ -898,7 +898,6 @@ input PairingRequestInput {
   ips: [String!]!
   signature: String!
   fromIp: String!
-  isQrInitiated: Boolean!
   awareSupported: Boolean!
 }
 

@@ -1,18 +1,11 @@
 package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.ChatMessageReceiver
-import com.ismartcoding.plain.chat.ReplayedMessageException
 import com.ismartcoding.plain.chat.channel.ChannelCacher
-import com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerChatParser
-import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.plain.lib.kgraphql.KGraphQL
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
-import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLSchemaTarget
 import com.ismartcoding.plain.lib.kgraphql.context
 import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedPeerResolvers
 import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedSchema
@@ -20,16 +13,12 @@ import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.chaCha20Encrypt
-import com.ismartcoding.plain.platform.startAwareIfNeeded
-import com.ismartcoding.plain.platform.subscribeAwareForPeer
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.httpserver.models.ChatItem
-import com.ismartcoding.plain.httpserver.models.toModel
-import com.ismartcoding.plain.httpserver.mainschemas.addSchemaTypes
+import com.ismartcoding.plain.httpserver.mainschemas.addPeerSchemaTypes
 import kotlinx.serialization.json.Json
 
 /**
@@ -122,7 +111,7 @@ class PeerGraphQLService private constructor(
         fun create(): PeerGraphQLService {
             val schema = KGraphQL.schema {
                 registerGeneratedSchema()
-                addSchemaTypes()
+                addPeerSchemaTypes()
                 applyPeerSchema()
             }
             return PeerGraphQLService(schema)

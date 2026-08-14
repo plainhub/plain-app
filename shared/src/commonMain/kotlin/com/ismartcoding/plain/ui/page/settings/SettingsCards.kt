@@ -21,6 +21,7 @@ import com.ismartcoding.plain.i18n.client_id
 import com.ismartcoding.plain.i18n.developer_mode
 import com.ismartcoding.plain.i18n.layout_grid
 import com.ismartcoding.plain.i18n.nearby_share
+import com.ismartcoding.plain.i18n.mdns_debug
 import com.ismartcoding.plain.i18n.not_supported
 import com.ismartcoding.plain.i18n.service_debug
 import com.ismartcoding.plain.i18n.simulate_crash
@@ -82,6 +83,11 @@ internal fun DeveloperSettingsCard(
             PListItem(
                 modifier = Modifier.clickable { navController.navigate(Routing.ServiceDebug) },
                 title = stringResource(Res.string.service_debug),
+                showMore = true,
+            )
+            PListItem(
+                modifier = Modifier.clickable { navController.navigate(Routing.MdnsDebug) },
+                title = stringResource(Res.string.mdns_debug),
                 showMore = true,
             )
             PListItem(

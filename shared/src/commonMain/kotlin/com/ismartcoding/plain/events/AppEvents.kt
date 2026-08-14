@@ -6,7 +6,7 @@ import com.ismartcoding.plain.ble.PairingTransport
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.discover.LANDiscoverManager
+import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
 import com.ismartcoding.plain.enums.AudioAction
@@ -219,7 +219,7 @@ object AppEvents {
                     }
 
                     is StartNearbyServiceEvent -> {
-                        LANDiscoverManager.startReceiver()
+                        MdnsDiscoverManager.startReceiver()
                         if (isBluetoothAdvertiseReady()) {
                             PairingTransport.startAdvertising()
                         }
