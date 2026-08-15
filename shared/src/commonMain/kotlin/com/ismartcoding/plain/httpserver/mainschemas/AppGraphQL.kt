@@ -38,6 +38,7 @@ import com.ismartcoding.plain.httpserver.models.Battery
 import com.ismartcoding.plain.httpserver.models.DeviceInfo
 import com.ismartcoding.plain.httpserver.models.TempValue
 import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.platform.getDeviceType
 
 @GraphQLQuery
 suspend fun deviceInfo(): DeviceInfo {
@@ -65,6 +66,7 @@ suspend fun app(): App {
         httpsPort = TempData.httpsPort.value,
         appDir = appDir(),
         deviceName = TempData.deviceName.value,
+        deviceType = getDeviceType(),
         getBattery().level,
         getAppVersionCode().toInt(),
         getSdkInt(),
