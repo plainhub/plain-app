@@ -37,6 +37,8 @@ import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.lib.extensions.compress
 import com.ismartcoding.plain.lib.extensions.getContentType
+import com.ismartcoding.plain.thumbnail.DecodeLimiter
+import com.ismartcoding.plain.thumbnail.DecodePolicy
 import com.ismartcoding.plain.thumbnail.ThumbnailProvider
 import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import kotlinx.coroutines.runBlocking
@@ -352,15 +354,30 @@ actual suspend fun decodeImageFileToPng(path: String): ByteArray? = withIO {
             header[6] == 0x79.toByte() && // 'y'
             header[7] == 0x70.toByte() && // 'p'
             String(header.copyOfRange(8, 12)) in listOf("heic", "heix", "hevc", "hevx", "avif")
+    // Cheap header sniff stays outside the permit so non-HEIF requests
+    // (e.g. every <video> playback fetch) never queue behind decodes.
     if (!isHeif) return@withIO null
-    val bitmap = android.graphics.BitmapFactory.decodeFile(path) ?: return@withIO null
-    try {
-        ByteArrayOutputStream().use { baos ->
-            bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, baos)
-            baos.toByteArray()
+    DecodeLimiter.withPermit {
+        // Cap the decoded edge: a 48 MP HEIC would otherwise allocate ~192 MB
+        // per open view, which is fatal on small-heap compatibility containers.
+        // 4096 px keeps 12 MP photos pixel-exact.
+        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        android.graphics.BitmapFactory.decodeFile(path, bounds)
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return@withPermit null
+        val opts = android.graphics.BitmapFactory.Options().apply {
+            inSampleSize = DecodePolicy.capSampleSize(
+                bounds.outWidth, bounds.outHeight, DecodePolicy.MAX_FULL_VIEW_EDGE
+            )
         }
-    } finally {
-        bitmap.recycle()
+        val bitmap = android.graphics.BitmapFactory.decodeFile(path, opts) ?: return@withPermit null
+        try {
+            ByteArrayOutputStream().use { baos ->
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, baos)
+                baos.toByteArray()
+            }
+        } finally {
+            bitmap.recycle()
+        }
     }
 }
 

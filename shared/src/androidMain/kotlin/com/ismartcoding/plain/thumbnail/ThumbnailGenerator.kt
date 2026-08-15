@@ -9,6 +9,7 @@ import android.util.Size
 import androidx.core.graphics.drawable.toBitmap
 import coil3.BitmapImage
 import coil3.SingletonImageLoader
+import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.size.Scale
@@ -138,6 +139,10 @@ object ThumbnailGenerator : ThumbnailProvider {
                     .size(width, height)
                     .scale(if (centerCrop) Scale.FILL else Scale.FIT)
                     .allowHardware(false)
+                    // One-shot decode-and-compress: the shared loader's memory cache
+                    // (up to 75% of the heap) would retain bitmaps that are never
+                    // reused — the disk cache in toThumbBytesAsync covers repeats.
+                    .memoryCachePolicy(CachePolicy.DISABLED)
                     .build()
                 bitmap = (imageLoader.execute(request).image as? BitmapImage)?.bitmap
             } catch (ex: Exception) {
@@ -162,31 +167,40 @@ object ThumbnailGenerator : ThumbnailProvider {
         mediaId: String,
         fileName: String,
     ): ByteArray? {
-        // Priority 1: Android system thumbnail (MediaStore already manages its own cache layer).
-        // Return immediately without touching our disk cache.
-        if (mediaId.isNotEmpty() && width <= 512) {
-            val bitmap = getBitmapAsync(context, file, width, height, centerCrop, mediaId, fileName)
-            if (bitmap != null) {
-                val stream = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream)
-                bitmap.recycle()
-                return stream.toByteArray()
-            }
+        // System thumbnails (mediaId + ≤512 px) bypass our disk cache; every
+        // other request reads it first — a hit is a cheap file read that needs
+        // no decode permit and stays instant on all devices.
+        if (mediaId.isEmpty() || width > 512) {
+            // ~20 ms read vs ~200 ms decode
+            ThumbnailCache.get(context, file.absolutePath, width, height, centerCrop)?.let { return it }
         }
 
-        // Priority 2: Our disk cache — avoids decode entirely on repeated requests (~20 ms read vs ~200 ms decode)
-        ThumbnailCache.get(context, file.absolutePath, width, height, centerCrop)?.let { return it }
+        // All decode work is gated by DecodeLimiter: rapid scrolling queues
+        // here instead of stacking parallel decodes into an OOM.
+        return DecodeLimiter.withPermit {
+            // Priority 1: Android system thumbnail (MediaStore already manages its own cache layer).
+            if (mediaId.isNotEmpty() && width <= 512) {
+                getBitmapAsync(context, file, width, height, centerCrop, mediaId, fileName)
+                    ?.let { return@withPermit compressToJpeg(it) }
+            }
 
-        // Priority 3: Self-generate, then cache the result
-        val bitmap = getBitmapAsync(context, file, width, height, centerCrop, fileName = fileName) ?: return null
+            // Priority 2: our disk cache — reached when the system thumbnail failed
+            ThumbnailCache.get(context, file.absolutePath, width, height, centerCrop)?.let { return@withPermit it }
+
+            // Priority 3: self-generate, then cache the result
+            val bitmap = getBitmapAsync(context, file, width, height, centerCrop, fileName = fileName)
+                ?: return@withPermit null
+            val bytes = compressToJpeg(bitmap)
+            ThumbnailCache.put(context, file.absolutePath, width, height, centerCrop, bytes)
+            bytes
+        }
+    }
+
+    /** Compress to JPEG (quality 85 — ~4-8× faster to encode than WebP) and recycle the bitmap. */
+    private fun compressToJpeg(bitmap: Bitmap): ByteArray {
         val stream = ByteArrayOutputStream()
-        // JPEG is ~4-8× faster to encode than WebP, adequate quality for thumbnails
         bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream)
         bitmap.recycle()
-        val bytes = stream.toByteArray()
-
-        ThumbnailCache.put(context, file.absolutePath, width, height, centerCrop, bytes)
-
-        return bytes
+        return stream.toByteArray()
     }
 }

@@ -226,6 +226,7 @@ type App {
   httpsPort: Int!
   appDir: String!
   deviceName: String!
+  deviceType: DeviceType!
   battery: Int!
   appVersion: Int!
   osVersion: Int!

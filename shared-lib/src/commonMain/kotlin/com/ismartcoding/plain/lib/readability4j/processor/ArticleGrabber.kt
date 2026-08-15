@@ -368,7 +368,7 @@ internal class ArticleGrabber(val options: ReadabilityOptions) {
             topCandidate = HtmlElement("div")
             page.childNodes().toList().forEach { child ->
                 child.remove()
-                topCandidate?.appendChild(child)
+                topCandidate.appendChild(child)
             }
 
             page.appendChild(topCandidate)
