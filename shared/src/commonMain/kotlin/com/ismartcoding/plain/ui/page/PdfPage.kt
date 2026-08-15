@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page
 
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.extensions.urlDecode
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,7 +23,7 @@ fun PdfPage(
     uri: String,
     fileName: String = "",
 ) {
-    val title = fileName.ifEmpty { uri.substringAfterLast('/').decodeURLPartSafe() }
+    val title = fileName.ifEmpty { uri.substringAfterLast('/').urlDecode() }
 
     PScaffold(
         topBar = {
@@ -51,32 +52,4 @@ fun PdfPage(
             )
         },
     )
-}
-
-private fun String.decodeURLPartSafe(): String {
-    return try { decodeURLPart() } catch (_: Exception) { this }
-}
-
-private fun String.decodeURLPart(): String {
-    val sb = StringBuilder(length)
-    var i = 0
-    while (i < length) {
-        val c = this[i]
-        if (c == '%' && i + 2 < length) {
-            val hex = substring(i + 1, i + 3)
-            val code = hex.toIntOrNull(16)
-            if (code != null) {
-                sb.append(code.toChar())
-                i += 3
-                continue
-            }
-        }
-        if (c == '+') {
-            sb.append(' ')
-        } else {
-            sb.append(c)
-        }
-        i++
-    }
-    return sb.toString()
 }
