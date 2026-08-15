@@ -65,6 +65,8 @@
     <string name="style">शैली</string>
     <string name="use_device_language">डिवाइस भाषा का उपयोग करें</string>
     <string name="amoled_dark_theme">AMOLED डार्क थीम</string>
+    <string name="pdf_follow_dark_theme">PDF डार्क थीम का पालन करें</string>
+    <string name="pdf_follow_dark_theme_desc">वर्तमान डार्क थीम को PDF पेजों पर लागू करें। बंद करने पर PDFs अपने मूल रंगों में दिखेंगे।</string>
     <string name="customize_home_features">होम फीचर्स कॉस्टमाइज करें</string>
     <string name="auto_check_update">अपडेट स्वचालित रूप से जांचें</string>
     <string name="auto_check_update_desc">ऐप खुलने पर स्वचालित रूप से नए संस्करण की जांच करें</string>

@@ -65,6 +65,8 @@
     <string name="style">Kiểu</string>
     <string name="use_device_language">Sử dụng ngôn ngữ thiết bị</string>
     <string name="amoled_dark_theme">Chủ đề tối AMOLED</string>
+    <string name="pdf_follow_dark_theme">PDF theo dõi chủ đề tối</string>
+    <string name="pdf_follow_dark_theme_desc">Áp dụng chủ đề tối hiện tại cho các trang PDF. Tắt để hiển thị PDF với màu gốc của chúng.</string>
     <string name="customize_home_features">Tùy chỉnh các tính năng trang chủ</string>
     <string name="auto_check_update">Tự động kiểm tra cập nhật</string>
     <string name="auto_check_update_desc">Tự động kiểm tra phiên bản mới khi khởi động ứng dụng</string>

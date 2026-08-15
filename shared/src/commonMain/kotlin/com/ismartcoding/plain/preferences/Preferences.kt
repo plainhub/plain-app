@@ -185,6 +185,11 @@ object AmoledDarkThemePreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("amoled_dark_theme")
 }
 
+object PdfFollowDarkThemePreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("pdf_follow_dark_theme")
+}
+
 object KeepAwakePreference : BasePreference<Boolean>() {
     override val default = true
     override val key = booleanPreferencesKey("keep_awake")

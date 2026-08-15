@@ -126,6 +126,8 @@
     <string name="style">Style</string>
     <string name="use_device_language">Use device language</string>
     <string name="amoled_dark_theme">AMOLED dark theme</string>
+    <string name="pdf_follow_dark_theme">PDF follow dark theme</string>
+    <string name="pdf_follow_dark_theme_desc">Apply the current dark theme to PDF pages. Turn off to display PDFs in their original colors.</string>
     <string name="customize_home_features">Customize Home Features</string>
     <string name="drag_number_to_reorder_list">Drag the number to reorder the list</string>
     <string name="web_client_connected">Web client connected</string>

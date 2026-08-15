@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
 data class Settings(
     val darkTheme: Int,
     val amoledDarkTheme: Boolean,
+    val pdfFollowDarkTheme: Boolean,
     val locale: Locale?,
     val updateInfo: DUpdateInfo,
 )
@@ -23,6 +24,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
     val defaultSettings = Settings(
         darkTheme = DarkThemePreference.default,
         amoledDarkTheme = AmoledDarkThemePreference.default,
+        pdfFollowDarkTheme = PdfFollowDarkThemePreference.default,
         locale = null,
         updateInfo = DUpdateInfo(),
     )
@@ -31,6 +33,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
             Settings(
                 darkTheme = DarkThemePreference.get(it),
                 amoledDarkTheme = AmoledDarkThemePreference.get(it),
+                pdfFollowDarkTheme = PdfFollowDarkThemePreference.get(it),
                 locale = LanguagePreference.getLocale(it),
                 updateInfo = UpdateInfoPreference.getValue(it),
             )
@@ -40,6 +43,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
     CompositionLocalProvider(
         LocalDarkTheme provides settings.darkTheme,
         LocalAmoledDarkTheme provides settings.amoledDarkTheme,
+        LocalPdfFollowDarkTheme provides settings.pdfFollowDarkTheme,
         LocalLocale provides settings.locale,
         LocalUpdateInfo provides settings.updateInfo,
         LocalNewVersion provides settings.updateInfo.newVersion,

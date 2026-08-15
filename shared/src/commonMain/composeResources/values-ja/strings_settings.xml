@@ -65,6 +65,8 @@
     <string name="style">スタイル</string>
     <string name="use_device_language">デバイスの言語を使用</string>
     <string name="amoled_dark_theme">AMOLEDダークテーマ</string>
+    <string name="pdf_follow_dark_theme">PDF ダークテーマに従う</string>
+    <string name="pdf_follow_dark_theme_desc">現在のダークテーマを PDF ページに適用します。オフにすると、PDF が元の色で表示されます。</string>
     <string name="customize_home_features">ホーム機能をカスタマイズ</string>
     <string name="auto_check_update">自動でアップデートを確認</string>
     <string name="auto_check_update_desc">アプリ起動時に自動で新しいバージョンを確認する</string>

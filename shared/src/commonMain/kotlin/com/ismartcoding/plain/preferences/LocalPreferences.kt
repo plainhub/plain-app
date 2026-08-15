@@ -6,6 +6,7 @@ import com.ismartcoding.plain.enums.DarkTheme
 
 val LocalDarkTheme = compositionLocalOf { DarkTheme.UseDeviceTheme.value }
 val LocalAmoledDarkTheme = compositionLocalOf { false }
+val LocalPdfFollowDarkTheme = compositionLocalOf { false }
 val LocalUpdateInfo = compositionLocalOf { DUpdateInfo() }
 
 val LocalNewVersion = compositionLocalOf { "" }

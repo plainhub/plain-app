@@ -65,6 +65,8 @@
     <string name="style">Stijl</string>
     <string name="use_device_language">Gebruik de taal van het apparaat</string>
     <string name="amoled_dark_theme">AMOLED donker thema</string>
+    <string name="pdf_follow_dark_theme">PDF volgt donker thema</string>
+    <string name="pdf_follow_dark_theme_desc">Pas het huidige donkere thema toe op PDF-pagina's. Zet uit om PDF's in hun originele kleuren te tonen.</string>
     <string name="customize_home_features">Home-functies aanpassen</string>
     <string name="auto_check_update">Automatisch controleren op updates</string>
     <string name="auto_check_update_desc">Automatisch controleren op nieuwe versies bij het openen van de app</string>

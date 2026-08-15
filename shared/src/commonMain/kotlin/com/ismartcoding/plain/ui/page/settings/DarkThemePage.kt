@@ -21,7 +21,6 @@ import com.ismartcoding.plain.preferences.AmoledDarkThemePreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
 import com.ismartcoding.plain.preferences.LocalAmoledDarkTheme
 import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -39,6 +38,7 @@ import kotlinx.coroutines.launch
 fun DarkThemePage(navController: NavHostController) {
     val darkTheme = LocalDarkTheme.current
     val amoledDarkTheme = LocalAmoledDarkTheme.current
+    val pdfFollowDarkTheme = LocalPdfFollowDarkTheme.current
     val scope = rememberCoroutineScope()
 
     PScaffold(
@@ -96,11 +96,20 @@ fun DarkThemePage(navController: NavHostController) {
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable {
-                                navController.navigate(Routing.MarkdownThemePreview)
+                                scope.launch {
+                                    PdfFollowDarkThemePreference.putAsync(!pdfFollowDarkTheme)
+                                }
                             },
-                            showMore = true,
-                            title = "Markdown Preview",
-                        )
+                            title = stringResource(Res.string.pdf_follow_dark_theme),
+                            subtitle = stringResource(Res.string.pdf_follow_dark_theme_desc),
+                        ) {
+                            PSwitch(activated = pdfFollowDarkTheme) {
+                                scope.launch {
+                                    PdfFollowDarkThemePreference.putAsync(!pdfFollowDarkTheme)
+                                }
+                            }
+                            HorizontalSpace(8.dp)
+                        }
                     }
                     BottomSpace(paddingValues)
                 }

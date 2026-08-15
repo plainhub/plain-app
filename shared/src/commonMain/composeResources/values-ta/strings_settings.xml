@@ -65,6 +65,8 @@
     <string name="style">பண்பு</string>
     <string name="use_device_language">கருத்து மொழி பயன்படுத்து</string>
     <string name="amoled_dark_theme">AMOLED கரை தீம்</string>
+    <string name="pdf_follow_dark_theme">PDF இருண்ட தீம் பின்பற்றுகிறது</string>
+    <string name="pdf_follow_dark_theme_desc">தற்போதைய இருண்ட தீம் PDF பக்கங்களில் பயன்படுத்தப்படுகிறது. அணைத்தால் PDF கள் அவற்றின் அசல் வண்ணங்களில் காண்பிக்கப்படும்.</string>
     <string name="customize_home_features">முகப்பு செயல்பாடுகளை மாற்று</string>
     <string name="auto_check_update">தானியங்கு புதுப்பிப்பு சரிபார்ப்பு</string>
     <string name="auto_check_update_desc">பயன்பாடு திறக்கும்போது புதிய பதிப்புகளை தானியங்கியாக சரிபார்க்கவும்</string>

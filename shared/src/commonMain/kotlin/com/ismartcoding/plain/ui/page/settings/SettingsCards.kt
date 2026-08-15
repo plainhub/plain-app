@@ -63,6 +63,13 @@ internal fun DeveloperSettingsCard(
         }
         if (developerMode) {
             PListItem(
+                modifier = Modifier.clickable {
+                    navController.navigate(Routing.MarkdownThemePreview)
+                },
+                showMore = true,
+                title = "Markdown Preview",
+            )
+            PListItem(
                 modifier = Modifier.clickable { navController.navigate(Routing.WifiAwareDebug) },
                 title = stringResource(Res.string.wifi_aware_debug),
                 value = stringResource(

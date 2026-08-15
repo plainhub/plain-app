@@ -10,6 +10,7 @@ import com.ismartcoding.plain.lib.pdfviewer.listener.OnPageErrorListener
 import com.ismartcoding.plain.lib.pdfviewer.util.FitPolicy
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.LocalDarkTheme
+import com.ismartcoding.plain.preferences.LocalPdfFollowDarkTheme
 
 @Composable
 actual fun PdfView(
@@ -19,6 +20,7 @@ actual fun PdfView(
     val parsedUri = Uri.parse(uri)
     val darkTheme = LocalDarkTheme.current
     val isDarkTheme = DarkTheme.isDarkTheme(darkTheme)
+    val pdfFollowDarkTheme = LocalPdfFollowDarkTheme.current
     AndroidView(
         modifier = modifier,
         factory = { factoryContext ->
@@ -37,7 +39,7 @@ actual fun PdfView(
                     }
                 })
                 .pageFitPolicy(FitPolicy.BOTH)
-                .nightMode(isDarkTheme)
+                .nightMode(pdfFollowDarkTheme && isDarkTheme)
                 .load()
             v
         }

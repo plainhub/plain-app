@@ -65,6 +65,8 @@
     <string name="style">শৈলী</string>
     <string name="use_device_language">ডিভাইস ভাষা ব্যবহার করুন</string>
     <string name="amoled_dark_theme">AMOLED ডার্ক থিম</string>
+    <string name="pdf_follow_dark_theme">PDF ডার্ক থিম অনুসরণ করুন</string>
+    <string name="pdf_follow_dark_theme_desc">বর্তমান ডার্ক থিম PDF পেজে প্রয়োগ করুন। বন্ধ করলে PDFগুলি তাদের আসল রঙে প্রদর্শিত হবে।</string>
     <string name="customize_home_features">হোম ফিচার কাস্টমাইজ করুন</string>
     <string name="auto_check_update">স্বয়ংক্রিয় আপডেট পরীক্ষা</string>
     <string name="auto_check_update_desc">অ্যাপ চালু হলে স্বয়ংক্রিয়ভাবে নতুন সংস্করণ খোঁজে</string>

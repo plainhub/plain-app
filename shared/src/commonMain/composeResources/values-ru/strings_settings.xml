@@ -65,6 +65,8 @@
     <string name="style">Стиль</string>
     <string name="use_device_language">Использовать язык устройства</string>
     <string name="amoled_dark_theme">AMOLED темная тема</string>
+    <string name="pdf_follow_dark_theme">PDF следует темной теме</string>
+    <string name="pdf_follow_dark_theme_desc">Примените текущую темную тему к страницам PDF. Выключите, чтобы отображать PDF в их исходных цветах.</string>
     <string name="customize_home_features">Настроить функции дома</string>
     <string name="auto_check_update">Автоматическая проверка обновлений</string>
     <string name="auto_check_update_desc">Автоматически проверять наличие новых версий при запуске приложения</string>
