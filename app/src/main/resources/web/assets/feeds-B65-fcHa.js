@@ -1,0 +1,1 @@
+import{T as e}from"./gql-client-BwDrWtSW.js";import{n as t,qt as n}from"./index-LBJx_1WX.js";var r=r=>({viewAll:()=>{t(r,`/feeds`)},viewFeed:i=>{t(r,`/feeds?q=${e(n([{name:`feed_id`,op:``,value:i.id}]))}`)},viewToday:()=>{t(r,`/feeds?q=${e(n([{name:`today`,op:``,value:`true`}]))}`)}});export{r as t};
