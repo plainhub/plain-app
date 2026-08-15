@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.helpers.coIO
 import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.lib.logcat.LogCat
 import platform.Foundation.NSURL
@@ -75,5 +76,10 @@ actual fun isFileShareable(path: String): Boolean {
 }
 
 actual fun relaunchApp() {
-    // iOS apps cannot programmatically restart; no-op by design.
+    // iOS apps cannot restart their own process, so instead restart the embedded HTTP
+    // server. This picks up newly chosen ports after a conflict fix and retries startup.
+    coIO {
+        stopHttpServiceAsync()
+        startHttpServerService()
+    }
 }
