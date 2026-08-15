@@ -50,7 +50,7 @@ fun NearbyPage(
     navController: NavHostController,
     peerVM: PeerViewModel,
 ) {
-    val nearbyDevices = NearbyViewModel.nearbyDevices
+    val nearbyDevices by NearbyViewModel.nearbyDevices.collectAsState()
     val isDiscovering by NearbyViewModel.isDiscovering
     val isBleScanning by NearbyViewModel.isBleScanning
     val blePermissionReady by NearbyViewModel.blePermissionReady

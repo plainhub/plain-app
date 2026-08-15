@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.models
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import com.ismartcoding.plain.ble.PairingTransport
@@ -24,13 +23,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.time.Duration.Companion.milliseconds
 
 object NearbyViewModel {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-    val nearbyDevices = mutableStateListOf<DNearbyDevice>()
+    val nearbyDevices = MutableStateFlow<List<DNearbyDevice>>(emptyList())
     var isDiscovering = mutableStateOf(false)
     val itemStatus = mutableStateMapOf<String, NearbyItemStatus>()
 
@@ -42,7 +44,8 @@ object NearbyViewModel {
     private var bleJob: Job? = null
     private var blePermissionJob: Job? = null
     private val blePairingJobs = mutableStateMapOf<String, Job>()
-    private val lastDeviceEventTimes = mutableStateMapOf<String, Long>()
+    private val lastDeviceEventTimes = HashMap<String, Long>()
+    private val deviceListMutex = Mutex()
 
     fun startDiscovering() {
         isDiscovering.value = true
@@ -67,8 +70,11 @@ object NearbyViewModel {
                 // timed out and cleared.
                 if (scanner.isScanPaused()) continue
                 val currentTime = TimeHelper.now()
-                val toRemove = nearbyDevices.filter { (currentTime - it.lastSeen).inWholeSeconds > 60 }
-                nearbyDevices.removeAll(toRemove)
+                deviceListMutex.withLock {
+                    nearbyDevices.value = nearbyDevices.value.filterNot {
+                        (currentTime - it.lastSeen).inWholeSeconds > 60
+                    }
+                }
             }
         }
     }
@@ -183,31 +189,36 @@ object NearbyViewModel {
         }
     }
 
-    fun handleNewDevice(incoming: DNearbyDevice) {
-        val existingIndex = nearbyDevices.indexOfFirst { it.id == incoming.id }
-        val paired = PeerCacher.pairedPeers.value.any { it.id == incoming.id }
-        val now = TimeHelper.nowMillis()
-        val shouldSendEvent = (now - (lastDeviceEventTimes[incoming.id] ?: 0L)) >= 1000L
-        if (shouldSendEvent) {
-            lastDeviceEventTimes[incoming.id] = now
-        }
-        if (existingIndex >= 0) {
-            val existing = nearbyDevices[existingIndex]
-            val merged = incoming.copy(
-                discoveryMethods = existing.discoveryMethods + incoming.discoveryMethods,
-                bleClient = incoming.bleClient ?: existing.bleClient,
-                ips = (existing.ips + incoming.ips).distinct(),
-                lastSeen = maxOf(existing.lastSeen, incoming.lastSeen),
-                status = getStatus(incoming.id, paired)
-            )
-            nearbyDevices[existingIndex] = merged
+    suspend fun handleNewDevice(incoming: DNearbyDevice) {
+        deviceListMutex.withLock {
+            val current = nearbyDevices.value
+            val paired = PeerCacher.pairedPeers.value.any { it.id == incoming.id }
+            val now = TimeHelper.nowMillis()
+            val shouldSendEvent = (now - (lastDeviceEventTimes[incoming.id] ?: 0L)) >= 1000L
             if (shouldSendEvent) {
-                sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(merged)))
+                lastDeviceEventTimes[incoming.id] = now
             }
-        } else {
-            val withStatus = incoming.copy(status = getStatus(incoming.id, paired))
-            sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(withStatus)))
-            nearbyDevices.add(withStatus)
+            val existingIndex = current.indexOfFirst { it.id == incoming.id }
+            if (existingIndex >= 0) {
+                val existing = current[existingIndex]
+                val merged = incoming.copy(
+                    discoveryMethods = existing.discoveryMethods + incoming.discoveryMethods,
+                    bleClient = incoming.bleClient ?: existing.bleClient,
+                    ips = (existing.ips + incoming.ips).distinct(),
+                    lastSeen = maxOf(existing.lastSeen, incoming.lastSeen),
+                    status = getStatus(incoming.id, paired)
+                )
+                if (shouldSendEvent) {
+                    sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(merged)))
+                }
+                nearbyDevices.value = current.mapIndexed { index, device ->
+                    if (index == existingIndex) merged else device
+                }
+            } else {
+                val withStatus = incoming.copy(status = getStatus(incoming.id, paired))
+                sendEvent(WebSocketEvent(EventType.NEARBY_DEVICE_FOUND, JsonHelper.jsonEncode(withStatus)))
+                nearbyDevices.value = current + withStatus
+            }
         }
     }
 

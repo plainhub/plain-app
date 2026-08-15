@@ -70,9 +70,7 @@ internal object MdnsServiceBrowser {
     fun start() {
         if (isRunning) return
         clearState()
-        val l: (ByteArray, String) -> Unit = { data, _ -> handlePacket(data) }
-        listener = l
-        MdnsHostResponder.addPacketListener(l)
+        ensureListening()
         discoverJob = coIO {
             while (isActive) {
                 runCatching { browseOnce() }
@@ -92,9 +90,23 @@ internal object MdnsServiceBrowser {
         LogCat.d("mDNS browser stopped")
     }
 
-    /** One-shot PTR query used by [MdnsDiscoverManager.discoverSpecificDevice]. */
+    /**
+     * One-shot PTR query used by [MdnsDiscoverManager.browse]. Safe to call
+     * while periodic discovery is stopped (e.g. a failed chat send triggering
+     * peer rediscovery): without a registered packet listener the PTR reply
+     * would be dropped by the responder and the peer's IP/port never refresh.
+     */
     fun sendPtrQuery() {
+        ensureListening()
         MdnsHostResponder.sendQuery(MdnsPacketCodec.buildPtrQuery(PLAINAPP_SERVICE_TYPE))
+    }
+
+    /** Registers the packet listener so inbound responses reach [handlePacket]; idempotent. */
+    private fun ensureListening() {
+        if (listener != null) return
+        val l: (ByteArray, String) -> Unit = { data, _ -> handlePacket(data) }
+        listener = l
+        MdnsHostResponder.addPacketListener(l)
     }
 
     /** Read-only snapshot of every currently-known service instance, for the mDNS debug page. */
@@ -150,11 +162,13 @@ internal object MdnsServiceBrowser {
         var nextInstances = instances
         var nextHostnames = hostnameToInstance
         val touched = mutableSetOf<String>()
+        val discovered = mutableListOf<Instance>() // instances first seen in this packet
 
         for (record in parsed.allRecords) {
             when (record.type) {
                 MdnsPacketCodec.TYPE_PTR -> record.ptrTarget?.let { target ->
                     findInstance(nextInstances, target)?.let { (key, instance) ->
+                        if (!nextInstances.containsKey(key)) discovered.add(instance)
                         nextInstances = nextInstances + (key to instance)
                         touched.add(key)
                     }
@@ -198,6 +212,23 @@ internal object MdnsServiceBrowser {
                     }
                 }
             }
+        }
+
+        // Immediately resolve newly discovered instances instead of waiting
+        // for the next browseOnce() cycle (up to 5 s). This is the single most
+        // impactful latency optimization for first device appearance.
+        if (discovered.isNotEmpty()) {
+            val now = TimeHelper.nowMillis()
+            val srvNext = srvTxtQueriedAt.toMutableMap()
+            discovered.forEach { instance ->
+                val key = instance.instanceFqdn
+                // Skip when the same packet already carried SRV/TXT (instance complete).
+                if (nextInstances[key]?.complete == true) return@forEach
+                srvNext[key] = now
+                MdnsHostResponder.sendQuery(MdnsPacketCodec.buildSrvQuery(instance.instanceName, PLAINAPP_SERVICE_TYPE))
+                MdnsHostResponder.sendQuery(MdnsPacketCodec.buildTxtQuery(instance.instanceName, PLAINAPP_SERVICE_TYPE))
+            }
+            srvTxtQueriedAt = srvNext
         }
 
         instances = nextInstances

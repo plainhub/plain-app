@@ -53,6 +53,9 @@ object MdnsDiscoverManager {
      * whether the reply arrived within its wait window.
      */
     fun browse() {
+        // The shared socket may be down (e.g. network changed before
+        // scheduleRestart ran); sendQuery silently no-ops without it.
+        MdnsHostResponder.ensureStarted(TempData.mdnsHostname)
         MdnsServiceBrowser.sendPtrQuery()
     }
 
