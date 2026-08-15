@@ -134,7 +134,6 @@ class AndroidBleGattClient(
         ) {
             LogCat.d("[BLE] onConnectionStateChange ${mac} status=$status newState=$newState")
             if (status == GATT_SUCCESS) {
-                publish(ActionType.CONNECTION, ActionResult(null, newState.toString(), true))
                 when (newState) {
                     BluetoothProfile.STATE_DISCONNECTED -> {
                         LogCat.d("[BLE] Disconnected from ${mac}")
@@ -143,12 +142,17 @@ class AndroidBleGattClient(
                     }
                     BluetoothProfile.STATE_CONNECTED -> {
                         LogCat.d("[BLE] Connected to ${mac}")
+                        // Bind bluetoothGatt BEFORE publishing the CONNECTION
+                        // result so ensureConnected() only observes success once
+                        // isConnected() is true (avoids a race where the channel
+                        // handoff resumes ahead of the field assignment).
                         this@AndroidBleGattClient.bluetoothGatt = gatt
                         Handler(Looper.getMainLooper()).post {
                             gatt.discoverServices()
                         }
                     }
                 }
+                publish(ActionType.CONNECTION, ActionResult(null, newState.toString(), true))
             } else {
                 LogCat.e("[BLE] ${mac} gatt failed $status, $newState")
                 publish(ActionType.CONNECTION, ActionResult(null, newState.toString(), false))
@@ -216,7 +220,10 @@ class AndroidBleGattClient(
             if (result?.success == true && result.value == BluetoothProfile.STATE_CONNECTED.toString()) {
                 val mtuResult = waitForResult(ActionType.MTU, timeoutMs = 5_000L)
                 LogCat.d("ensureConnected ${mac}: attempt $attempt mtu result=$mtuResult")
-                if (mtuResult?.success == true) return true
+                // Only report connected once the GATT is actually bound.
+                // A stale MTU result left in the channel from a previous
+                // connection must not make us skip the real connection.
+                if (mtuResult?.success == true && bluetoothGatt != null) return true
             }
         }
         LogCat.e("ensureConnected ${mac}: all $retries retries exhausted, gatt=${bluetoothGatt != null}")
