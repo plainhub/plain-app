@@ -11,6 +11,7 @@ import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.ble.client.BleDeviceApi
 import com.ismartcoding.plain.ble.client.BleGattClient
 import com.ismartcoding.plain.ble.server.BleGattServer
@@ -97,7 +98,12 @@ object PairingTransport {
     }
 
     private suspend fun readDiscoverReply(device: BleGattClient): DDiscoverReply? {
+        val scanner = bleTransport().createScanner()
         return try {
+            // GATT operations (connect, CCCD writes, chunked reads) share the
+            // Bluetooth radio with scanning; pausing discovery for the GATT
+            // session prevents scan traffic from starving them into timeouts.
+            scanner.pauseScan()
             val api = BleDeviceApi(device)
             api.ensureConnected()
             if (!api.isConnected()) return null
@@ -118,7 +124,8 @@ object PairingTransport {
             LogCat.e("[BLE] readDiscoverReply error: ${e.message}")
             null
         } finally {
-            bleTransport().createScanner().teardownConnection(device)
+            scanner.resumeScan()
+            scanner.teardownConnection(device)
         }
     }
 
@@ -127,13 +134,16 @@ object PairingTransport {
             LogCat.e("BLE pairViaBle: no bleClient for ${device.id}")
             return false
         }
+        val scanner = bleTransport().createScanner()
 
         var notificationEnabled = false
         return try {
+            scanner.pauseScan()
             val api = BleDeviceApi(bleDevice)
             api.ensureConnected()
             if (!api.isConnected()) {
                 LogCat.e("BLE pairViaBle: connection failed")
+                PairingCore.notifyFailed(device.id, device.name, "Connection failed")
                 return false
             }
 
@@ -146,6 +156,7 @@ object PairingTransport {
                 PairingCore.notifyFailed(device.id, device.name, "Failed to send pairing request")
                 return false
             }
+            NearbyViewModel.onPairingRequestSent(device.id)
             notificationEnabled = true
             LogCat.d("BLE pairViaBle: request sent, waiting for PAIR_RESPONSE notification")
 
@@ -181,7 +192,8 @@ object PairingTransport {
                     try { bleDevice.setNotification(BleServices.nearby, false) } catch (_: Exception) {}
                 }
             }
-            bleTransport().createScanner().teardownConnection(bleDevice)
+            scanner.resumeScan()
+            scanner.teardownConnection(bleDevice)
         }
     }
 

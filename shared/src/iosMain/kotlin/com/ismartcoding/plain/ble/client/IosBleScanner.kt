@@ -17,6 +17,7 @@ import platform.CoreBluetooth.CBPeripheral
 import platform.CoreBluetooth.CBUUID
 import platform.Foundation.NSError
 import platform.Foundation.NSData
+import platform.Foundation.NSLock
 import platform.Foundation.NSNumber
 import platform.darwin.NSObject
 import kotlin.time.Duration.Companion.milliseconds
@@ -30,6 +31,24 @@ object IosBleScanner : BleScanner {
     private val pendingConnections = mutableMapOf<String, CompletableDeferred<Boolean>>()
     private var scanCallback: ((CBPeripheral, NSNumber, Map<Any?, *>) -> Unit)? = null
     private var stateChangeCallback: (() -> Unit)? = null
+
+    // Scan lifecycle state, guarded by [scanLock]. The lock serializes the
+    // scan flow's setup/teardown against pauseScan/resumeScan calls coming
+    // from GATT users on other coroutines, so a resume can never restart the
+    // radio after the flow has closed (and vice versa).
+    private val scanLock = NSLock()
+    private var scanServiceUuid: String? = null
+    private var scanFlowActive = false
+    private var pauseCount = 0
+
+    private inline fun <T> withScanLock(block: () -> T): T {
+        scanLock.lock()
+        try {
+            return block()
+        } finally {
+            scanLock.unlock()
+        }
+    }
 
     @kotlin.concurrent.Volatile
     var isScanning = false
@@ -70,7 +89,7 @@ object IosBleScanner : BleScanner {
             return@callbackFlow
         }
 
-        scanCallback = { peripheral, rssi, advertisementData ->
+        beginScan(serviceUuid) { peripheral, rssi, advertisementData ->
             val parts = parseServiceData(advertisementData, serviceUuid)
             // Match by shortId when advertised; fall back to peripheral UUID so
             // peers running older app versions (without serviceData) still get
@@ -88,19 +107,52 @@ object IosBleScanner : BleScanner {
             client.rssi = rssi.intValue
             trySend(client)
         }
-
-        val services = listOf(CBUUID.UUIDWithString(serviceUuid))
-        manager.scanForPeripheralsWithServices(services, null)
-        isScanning = true
         LogCat.d("BLE scan started for $serviceUuid")
 
         awaitClose {
-            manager.stopScan()
-            isScanning = false
-            scanCallback = null
+            endScan()
             LogCat.d("BLE scan stopped")
         }
     }
+
+    private fun beginScan(
+        serviceUuid: String,
+        onResult: (CBPeripheral, NSNumber, Map<Any?, *>) -> Unit,
+    ) = withScanLock {
+        scanCallback = onResult
+        scanServiceUuid = serviceUuid
+        scanFlowActive = true
+        pauseCount = 0
+        startRadio()
+    }
+
+    private fun endScan() = withScanLock {
+        scanFlowActive = false
+        ensureCentralManager().stopScan()
+        isScanning = false
+        scanCallback = null
+    }
+
+    private fun startRadio() {
+        val uuid = scanServiceUuid ?: return
+        ensureCentralManager().scanForPeripheralsWithServices(listOf(CBUUID.UUIDWithString(uuid)), null)
+        isScanning = true
+    }
+
+    override fun pauseScan() = withScanLock {
+        if (pauseCount++ == 0) {
+            ensureCentralManager().stopScan()
+            isScanning = false
+        }
+    }
+
+    override fun resumeScan() = withScanLock {
+        if (pauseCount > 0 && --pauseCount == 0 && scanFlowActive) {
+            startRadio()
+        }
+    }
+
+    override fun isScanPaused(): Boolean = withScanLock { pauseCount > 0 }
 
     /**
      * Parses the advertisement serviceData via [BleServiceData.decode].
@@ -162,11 +214,6 @@ object IosBleScanner : BleScanner {
         if (device is IosBleGattClient) {
             ensureCentralManager().cancelPeripheralConnection(device.peripheral)
         }
-    }
-
-    fun stopScan() {
-        centralManager?.stopScan()
-        isScanning = false
     }
 
     internal fun onStateChanged() {

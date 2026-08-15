@@ -41,6 +41,30 @@ interface BleScanner {
     fun scan(serviceUuid: String): Flow<BleGattClient>
 
     /**
+     * Pauses an active scan without closing its flow. Scanning shares the
+     * Bluetooth controller radio with GATT operations (connect, CCCD writes),
+     * and concurrent scanning can starve those operations into timeouts.
+     * Call before GATT-heavy sessions (e.g. pairing) and release with
+     * [resumeScan] when they finish.
+     *
+     * Nestable: the radio restarts only when the last pause is released.
+     */
+    fun pauseScan()
+
+    /**
+     * Releases one [pauseScan]. Restarts scanning when the last pause is
+     * released and the scan flow is still alive; no-op otherwise.
+     */
+    fun resumeScan()
+
+    /**
+     * Whether the scan radio is currently paused (at least one [pauseScan]
+     * is unreleased). While paused, BLE devices cannot refresh their
+     * last-seen time, so device-timeout cleanup must be skipped.
+     */
+    fun isScanPaused(): Boolean
+
+    /**
      * Finds a discovered BLE device whose shortId matches [clientId]. The
      * shortId is computed via [com.ismartcoding.plain.ble.BleServiceData.shortIdOf]
      * (8-byte truncated SHA256 of the full clientId), so callers pass the

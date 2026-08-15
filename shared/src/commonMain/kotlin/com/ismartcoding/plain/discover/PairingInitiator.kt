@@ -12,6 +12,7 @@ import com.ismartcoding.plain.helpers.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getBestIp
+import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,6 +27,7 @@ object PairingInitiator {
             val bestIp = getBestIp(device.ips)
             val request = PairingCore.startPairingSession(device, bestIp)
             if (PairingMessenger.sendRequest(request, bestIp, device.port)) {
+                NearbyViewModel.onPairingRequestSent(device.id)
                 sendEvent(
                     WebSocketEvent(
                         EventType.PAIRING_STARTED,

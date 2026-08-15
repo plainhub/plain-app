@@ -106,6 +106,16 @@ fun NearbyDeviceItem(
                             buttonSize = ButtonSize.SMALL,
                         )
                     }
+
+                    NearbyItemStatus.STARTING -> {
+                        POutlinedButton(
+                            text = stringResource(Res.string.pair),
+                            onClick = {},
+                            buttonSize = ButtonSize.SMALL,
+                            isLoading = true,
+                            enabled = false,
+                        )
+                    }
                 }
             }
         )

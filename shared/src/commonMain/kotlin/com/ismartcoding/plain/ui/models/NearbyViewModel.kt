@@ -16,6 +16,7 @@ import com.ismartcoding.plain.helpers.JsonHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.platform.bleTransport
 import com.ismartcoding.plain.platform.ensureBlePermissionAsync
 import com.ismartcoding.plain.platform.isBluetoothReadyToUse
 import kotlinx.coroutines.CoroutineScope
@@ -57,8 +58,14 @@ object NearbyViewModel {
 
     private fun startDeviceCleanup() {
         cleanupJob = scope.launch {
+            val scanner = bleTransport().createScanner()
             while (isDiscovering.value || isBleScanning.value) {
                 delay(20000.milliseconds)
+                // BLE devices only refresh lastSeen from scan results. While
+                // the scan radio is paused for a GATT session (e.g. pairing),
+                // skipping this sweep prevents every BLE device from being
+                // timed out and cleared.
+                if (scanner.isScanPaused()) continue
                 val currentTime = TimeHelper.now()
                 val toRemove = nearbyDevices.filter { (currentTime - it.lastSeen).inWholeSeconds > 60 }
                 nearbyDevices.removeAll(toRemove)
@@ -119,7 +126,7 @@ object NearbyViewModel {
 
     fun startPairing(device: DNearbyDevice) {
         if (itemStatus[device.id] != null) return
-        itemStatus[device.id] = NearbyItemStatus.PAIRING
+        itemStatus[device.id] = NearbyItemStatus.STARTING
 
         if (DiscoveryMethod.LAN in device.discoveryMethods && device.ips.isNotEmpty()) {
             scope.launchSafe {
@@ -156,9 +163,21 @@ object NearbyViewModel {
         PairingInitiator.cancel(deviceId)
     }
 
+    /**
+     * The pairing request has been sent successfully. Transition from the
+     * STARTING (loading) state to PAIRING (pending) so the user knows the
+     * request reached the peer and we are waiting for its response.
+     */
+    fun onPairingRequestSent(deviceId: String) {
+        if (itemStatus[deviceId] == NearbyItemStatus.STARTING) {
+            itemStatus[deviceId] = NearbyItemStatus.PAIRING
+        }
+    }
+
     fun getStatus(deviceId: String, isPaired: Boolean): NearbyItemStatus {
         return when (itemStatus[deviceId]) {
             NearbyItemStatus.UNPAIRING -> NearbyItemStatus.UNPAIRING
+            NearbyItemStatus.STARTING -> NearbyItemStatus.STARTING
             NearbyItemStatus.PAIRING -> if (isPaired) NearbyItemStatus.PAIRED else NearbyItemStatus.PAIRING
             else -> if (isPaired) NearbyItemStatus.PAIRED else NearbyItemStatus.UNPAIRED
         }

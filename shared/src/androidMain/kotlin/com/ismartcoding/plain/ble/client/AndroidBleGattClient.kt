@@ -16,7 +16,6 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.UUID
-import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration.Companion.milliseconds
 
 @SuppressLint("MissingPermission")
@@ -60,6 +59,15 @@ class AndroidBleGattClient(
         private set
 
     private val channels = mutableMapOf<ActionType, Channel<ActionResult>>()
+
+    // Per-connection operation queue. This MUST be an instance member (not
+    // static): Android allows concurrent operations across independent GATT
+    // connections, so a slow connect on one device must never block writes on
+    // another (previously a global queue let a stuck Connect starve pairing
+    // descriptor writes into a timeout). All access is serialized by the
+    // @Synchronized queue methods below.
+    private val operationQueue = ArrayDeque<Operation>()
+    private var pendingOperation: Operation? = null
 
     override fun isConnected(): Boolean = bluetoothGatt != null
 
@@ -329,6 +337,38 @@ class AndroidBleGattClient(
         return result
     }
 
+    @Synchronized
+    private fun enqueueOperation(operation: Operation) {
+        operationQueue.add(operation)
+        if (pendingOperation == null) {
+            doNextOperation()
+        }
+    }
+
+    @Synchronized
+    private fun signalEndOfOperation() {
+        pendingOperation = null
+        if (operationQueue.isNotEmpty()) {
+            doNextOperation()
+        }
+    }
+
+    @Synchronized
+    private fun doNextOperation() {
+        if (pendingOperation != null) return
+        val operation = operationQueue.removeFirstOrNull() ?: return
+        pendingOperation = operation
+        if (operation is Operation.Connect) {
+            operation.run()
+            return
+        }
+        if (!operation.client.isConnected()) {
+            signalEndOfOperation()
+            return
+        }
+        operation.run()
+    }
+
     enum class ActionType { READ, WRITE, NOTIFY, NOTIFY_VALUE, CONNECTION, MTU }
 
     data class ActionResult(
@@ -396,43 +436,5 @@ class AndroidBleGattClient(
         }
 
         abstract fun run()
-    }
-
-    companion object {
-        private val operationQueue = ConcurrentLinkedQueue<Operation>()
-        @Volatile
-        private var pendingOperation: Operation? = null
-
-        @Synchronized
-        private fun enqueueOperation(operation: Operation) {
-            operationQueue.add(operation)
-            if (pendingOperation == null) {
-                doNextOperation()
-            }
-        }
-
-        @Synchronized
-        private fun signalEndOfOperation() {
-            pendingOperation = null
-            if (operationQueue.isNotEmpty()) {
-                doNextOperation()
-            }
-        }
-
-        @Synchronized
-        private fun doNextOperation() {
-            if (pendingOperation != null) return
-            val operation = operationQueue.poll() ?: return
-            pendingOperation = operation
-            if (operation is Operation.Connect) {
-                operation.run()
-                return
-            }
-            if (!operation.client.isConnected()) {
-                signalEndOfOperation()
-                return
-            }
-            operation.run()
-        }
     }
 }

@@ -11,7 +11,6 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.channels.awaitClose
-import java.util.UUID
 
 object AndroidBleScanner : BleScanner {
 
@@ -30,13 +28,21 @@ object AndroidBleScanner : BleScanner {
     // background threads concurrently, so a plain mutableListOf (ArrayList) is
     // not safe here.
     private val allDevices = mutableStateListOf<AndroidBleGattClient>()
+
+    // Scan lifecycle state, guarded by the scanner monitor (@Synchronized
+    // methods). The lock serializes the scan flow's setup/teardown against
+    // pauseScan/resumeScan calls coming from GATT users on other coroutines,
+    // so a resume can never restart the radio after the flow has closed
+    // (and vice versa).
     private var scanCallback: ScanCallback? = null
+    private var scanFilter: List<ScanFilter>? = null
+    private var scanSettings: ScanSettings? = null
+    private var scanFlowActive = false
+    private var pauseCount = 0
 
     @Volatile
     var isScanning = false
         private set
-
-    private val cachedNames = mutableStateMapOf<String, String>()
 
     fun getBluetoothAdapter(): BluetoothAdapter {
         val manager = appContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -75,23 +81,70 @@ object AndroidBleScanner : BleScanner {
     override fun scan(serviceUuid: String): Flow<BleGattClient> {
         return callbackFlow {
             LogCat.d("Scan bluetooth devices for $serviceUuid")
-
-            scanCallback = object : ScanCallback() {
-                override fun onScanResult(callbackType: Int, result: ScanResult) {
-                    val parts = parseServiceData(result, serviceUuid)
-                    trySend(addDevice(result.device, result.rssi, parts))
-                }
+            beginScan(serviceUuid) { result ->
+                val parts = parseServiceData(result, serviceUuid)
+                trySend(addDevice(result.device, result.rssi, parts))
             }
-            val filterUuid = ParcelUuid.fromString(serviceUuid)
-            val filters = arrayListOf(ScanFilter.Builder().setServiceUuid(filterUuid).build())
-            getBluetoothAdapter().bluetoothLeScanner?.startScan(filters, ScanSettings.Builder().build(), scanCallback)
-            isScanning = true
 
             awaitClose {
-                stopScan()
+                endScan()
             }
         }
     }
+
+    @SuppressLint("MissingPermission")
+    @Synchronized
+    private fun beginScan(serviceUuid: String, onResult: (ScanResult) -> Unit) {
+        scanCallback = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                onResult(result)
+            }
+        }
+        scanFilter = arrayListOf(ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(serviceUuid)).build())
+        scanSettings = ScanSettings.Builder().build()
+        scanFlowActive = true
+        pauseCount = 0
+        startRadio()
+    }
+
+    @Synchronized
+    private fun endScan() {
+        scanFlowActive = false
+        stopRadio()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun startRadio() {
+        val callback = scanCallback ?: return
+        val filters = scanFilter ?: return
+        getBluetoothAdapter().bluetoothLeScanner?.startScan(filters, scanSettings, callback)
+        isScanning = true
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun stopRadio() {
+        if (isScanning) {
+            getBluetoothAdapter().bluetoothLeScanner?.stopScan(scanCallback)
+            isScanning = false
+        }
+    }
+
+    @Synchronized
+    override fun pauseScan() {
+        if (pauseCount++ == 0) {
+            stopRadio()
+        }
+    }
+
+    @Synchronized
+    override fun resumeScan() {
+        if (pauseCount > 0 && --pauseCount == 0 && scanFlowActive) {
+            startRadio()
+        }
+    }
+
+    @Synchronized
+    override fun isScanPaused(): Boolean = pauseCount > 0
 
     /**
      * Parses the scan response serviceData via [BleServiceData.decode].
@@ -151,19 +204,6 @@ object AndroidBleScanner : BleScanner {
         return d
     }
 
-    @SuppressLint("MissingPermission")
-    fun stopScan() {
-        if (isScanning) {
-            getBluetoothAdapter().bluetoothLeScanner?.stopScan(scanCallback)
-            isScanning = false
-        }
-    }
-
-    fun stopScanAndRelease() {
-        stopScan()
-        disconnectAll()
-    }
-
     override fun teardownConnection(device: BleGattClient) {
         if (device is AndroidBleGattClient && device.isConnected()) {
             device.disconnect()
@@ -174,15 +214,5 @@ object AndroidBleScanner : BleScanner {
         if (device.isConnected()) {
             device.disconnect()
         }
-    }
-
-    private fun disconnectAll() {
-        if (allDevices.isEmpty()) return
-        val connected = allDevices.filter { it.isConnected() }.toList()
-        LogCat.d("Disconnecting bluetooth: ${connected.joinToString(", ") { it.id }}")
-        for (device in connected) {
-            device.disconnect()
-        }
-        allDevices.clear()
     }
 }
