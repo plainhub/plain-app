@@ -10,15 +10,16 @@ import Darwin
 
 @main
 struct PlainApp: SwiftUI.App {
-    private let httpServer = PlainHttpServer()
+    private let sslCertManager = SslCertManager()
+    private let httpServer: PlainHttpServer
     private let networkInfo = NetworkInfoProvider()
     private let permissionChecker = PermissionChecker()
     private let filePicker = FilePickerController()
     private let shareController = ShareController()
-    private let sslCertManager = SslCertManager()
     private let soundMeter = SoundMeter()
 
     init() {
+        self.httpServer = PlainHttpServer(sslCertProvider: sslCertManager)
         IosPlatformRegistry.shared.setNetworkInfoProvider(provider: networkInfo)
         IosPlatformRegistry.shared.setHttpServerBridge(bridge: httpServer)
         IosPlatformRegistry.shared.setPermissionChecker(checker: permissionChecker)

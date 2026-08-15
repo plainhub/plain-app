@@ -1,13 +1,15 @@
 import Foundation
 import CryptoKit
+import NIOSSL
 import PlainShared
 
 /// Swift implementation of `IosSslCertProvider`.
 ///
 /// Generates an EC P-256 self-signed X.509 v3 certificate, persists the DER
-/// encoding and its ECDSA signature in the iOS Keychain so the certificate
-/// survives app restarts. This prevents the certificate fingerprint from
-/// changing on every launch (which would force web clients to re-pair).
+/// encoding, its ECDSA signature and the private key in the iOS Keychain so
+/// the certificate survives app restarts. This prevents the certificate
+/// fingerprint from changing on every launch (which would force web clients
+/// to re-pair) and lets the HTTPS connector reuse the same key material.
 ///
 /// The certificate is regenerated only when the user explicitly presses
 /// "Regenerate SSL" in the Web Security page (Kotlin calls `regenerateCert`).
@@ -15,6 +17,7 @@ final class SslCertManager: NSObject, IosSslCertProvider {
 
     private let certKeychainKey = "com.ismartcoding.plain.ssl.cert.der"
     private let sigKeychainKey = "com.ismartcoding.plain.ssl.cert.sig"
+    private let privateKeyKeychainKey = "com.ismartcoding.plain.ssl.private.key"
 
     // MARK: - IosSslCertProvider
 
@@ -29,8 +32,32 @@ final class SslCertManager: NSObject, IosSslCertProvider {
     func regenerateCert() -> KotlinByteArray {
         deleteFromKeychain(key: certKeychainKey)
         deleteFromKeychain(key: sigKeychainKey)
+        deleteFromKeychain(key: privateKeyKeychainKey)
         let (_, signature) = generateAndStoreCert()
         return Self.toKotlinByteArray(signature)
+    }
+
+    /// Build a server TLS configuration from the persisted self-signed
+    /// certificate and its private key. Generates + persists a fresh pair on
+    /// first call (when nothing is stored yet).
+    func makeTLSConfiguration() throws -> TLSConfiguration {
+        var certData = loadFromKeychain(key: certKeychainKey)
+        var keyData = loadFromKeychain(key: privateKeyKeychainKey)
+        if certData == nil || keyData == nil {
+            _ = generateAndStoreCert()
+            certData = loadFromKeychain(key: certKeychainKey)
+            keyData = loadFromKeychain(key: privateKeyKeychainKey)
+        }
+        guard let certData, let keyData else {
+            throw NSError(domain: "SslCertManager", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to load TLS credentials"])
+        }
+        let cert = try NIOSSLCertificate(bytes: Array(certData), format: .der)
+        let key = try NIOSSLPrivateKey(bytes: Array(keyData), format: .der)
+        return TLSConfiguration.makeServerConfiguration(
+            certificateChain: [.certificate(cert)],
+            privateKey: .privateKey(key)
+        )
     }
 
     private static func toKotlinByteArray(_ data: Data) -> KotlinByteArray {
@@ -46,13 +73,17 @@ final class SslCertManager: NSObject, IosSslCertProvider {
     // MARK: - Certificate generation
 
     private func generateAndStoreCert() -> (Data, Data) {
-        let (certDer, signature) = Self.generateSelfSignedCert()
+        let (privateKeyDer, certDer, signature) = Self.generateSelfSignedCert()
+        saveToKeychain(key: privateKeyKeychainKey, data: privateKeyDer)
         saveToKeychain(key: certKeychainKey, data: certDer)
         saveToKeychain(key: sigKeychainKey, data: signature)
         return (certDer, signature)
     }
 
     /// Build a minimal self-signed X.509 v3 certificate using EC P-256.
+    ///
+    /// Returns the PKCS#8 private key DER, the certificate DER and the raw
+    /// ECDSA signature.
     ///
     /// The ASN.1 structure is:
     /// ```
@@ -62,7 +93,7 @@ final class SslCertManager: NSObject, IosSslCertProvider {
     ///     signatureValue       BIT STRING
     /// }
     /// ```
-    private static func generateSelfSignedCert() -> (Data, Data) {
+    private static func generateSelfSignedCert() -> (Data, Data, Data) {
         let privateKey = P256.Signing.PrivateKey()
         let publicKey = privateKey.publicKey
         let cn = "PlainApp"
@@ -78,7 +109,7 @@ final class SslCertManager: NSObject, IosSslCertProvider {
         let bitString = DerEncoder.bitString(sigDer)
         let cert = DerEncoder.sequence([tbs, algorithm, bitString])
 
-        return (cert, sigDer)
+        return (privateKey.derRepresentation, cert, sigDer)
     }
 
     /// Build the TBSCertificate (To-Be-Signed) DER structure.
@@ -89,8 +120,8 @@ final class SslCertManager: NSObject, IosSslCertProvider {
         // version [0] EXPLICIT INTEGER 2 (v3)
         let version = DerEncoder.explicit(tag: 0xA0, inner: DerEncoder.integer(2))
 
-        // serialNumber INTEGER
-        let serial = DerEncoder.integer(UUID().uuidString.hashValue)
+        // serialNumber INTEGER — DER INTEGER 必须非负，取随机正数
+        let serial = DerEncoder.integer(Int.random(in: 1...Int.max))
 
         // signature AlgorithmIdentifier (ecdsa-with-SHA256)
         let sigAlg = DerEncoder.sequence([
@@ -280,6 +311,8 @@ enum DerEncoder {
                 v >>= 7
             }
         }
+        // DER base-128 要求高位组在前，收集时是低位在前，需反转。
+        temp.reverse()
         for i in 0..<temp.count {
             if i < temp.count - 1 {
                 bytes.append(temp[i] | 0x80)

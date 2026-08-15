@@ -19,6 +19,7 @@
 		EE0000020000000000000001 /* SslCertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE0000010000000000000001 /* SslCertManager.swift */; };
 		FF0000010000000000000001 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF0000050000000000000001 /* LaunchScreen.storyboard */; };
 		FF0001020000000000000001 /* SoundMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF0001010000000000000001 /* SoundMeter.swift */; };
+		AB0000010000000000000001 /* NIOSSL in Frameworks */ = {isa = PBXBuildFile; productRef = AB0000020000000000000001 /* NIOSSL */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 				BB0000090000000000000001 /* NIOPosix in Frameworks */,
 				BB00000A0000000000000001 /* NIOHTTP1 in Frameworks */,
 				BB00000B0000000000000001 /* NIOWebSocket in Frameworks */,
+				AB0000010000000000000001 /* NIOSSL in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -133,6 +135,7 @@
 			mainGroup = AA0000300000000000000001;
 			packageReferences = (
 				BB0000D0000000000000001 /* XCRemoteSwiftPackageReference "swift-nio" */,
+				AB0000030000000000000001 /* XCRemoteSwiftPackageReference "swift-nio-ssl" */,
 			);
 			productRefGroup = AA0000500000000000000001 /* Products */;
 			projectDirPath = "";
@@ -452,6 +455,14 @@
 				minimumVersion = 2.65.0;
 			};
 		};
+		AB0000030000000000000001 /* XCRemoteSwiftPackageReference "swift-nio-ssl" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-nio-ssl.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.28.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -474,6 +485,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BB0000D0000000000000001 /* XCRemoteSwiftPackageReference "swift-nio" */;
 			productName = NIOWebSocket;
+		};
+		AB0000020000000000000001 /* NIOSSL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AB0000030000000000000001 /* XCRemoteSwiftPackageReference "swift-nio-ssl" */;
+			productName = NIOSSL;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

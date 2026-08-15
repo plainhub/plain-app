@@ -5,6 +5,7 @@ import NIOPosix
 import NIOHTTP1
 import NIOWebSocket
 import NIOConcurrencyHelpers
+import NIOSSL
 import PlainShared
 
 // MARK: - SwiftNIO HTTP server implementing the Kotlin IosHttpServerBridge protocol
@@ -27,11 +28,14 @@ import PlainShared
 public final class PlainHttpServer: NSObject, IosHttpServerBridge {
 
     private let group: MultiThreadedEventLoopGroup
+    private let sslCertProvider: SslCertManager
     private var serverChannel: NIOCore.Channel?
+    private var serverChannelHTTPS: NIOCore.Channel?
     private let isStarted: NIOAtomic<Bool> = .makeAtomic(value: false)
 
-    public override init() {
+    init(sslCertProvider: SslCertManager) {
         self.group = MultiThreadedEventLoopGroup(numberOfThreads: System.coreCount)
+        self.sslCertProvider = sslCertProvider
         super.init()
     }
 
@@ -58,32 +62,67 @@ public final class PlainHttpServer: NSObject, IosHttpServerBridge {
                 .serverChannelOption(ChannelOptions.backlog, value: 256)
                 .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
                 .childChannelInitializer { channel in
-                    let handler = HTTPHandler(server: self)
-                    return channel.pipeline.configureHTTPServerPipeline(
-                        withServerUpgrade: (
-                            upgraders: [upgrader],
-                            completionHandler: { _ in
-                                // Upgrade succeeded — remove the HTTP handler since
-                                // the pipeline now carries WebSocket frames, not
-                                // HTTPServerRequestPart.
-                                handler.removeFromPipeline()
-                            }
-                        )
-                    ).flatMap {
-                        channel.pipeline.addHandler(handler)
-                    }
+                    self.configureChildPipeline(channel: channel, sslContext: nil, upgrader: upgrader)
                 }
                 .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
                 .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
                 .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
 
-            serverChannel = try bootstrap.bind(host: "0.0.0.0", port: Int(httpPort)).wait()
+            if httpPort > 0 {
+                serverChannel = try bootstrap.bind(host: "0.0.0.0", port: Int(httpPort)).wait()
+            }
+
+            if httpsPort > 0 {
+                let tlsConfig = try sslCertProvider.makeTLSConfiguration()
+                let sslContext = try NIOSSLContext(configuration: tlsConfig)
+                let tlsBootstrap = ServerBootstrap(group: group)
+                    .serverChannelOption(ChannelOptions.backlog, value: 256)
+                    .serverChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
+                    .childChannelInitializer { channel in
+                        self.configureChildPipeline(channel: channel, sslContext: sslContext, upgrader: upgrader)
+                    }
+                    .childChannelOption(ChannelOptions.socketOption(.so_reuseaddr), value: 1)
+                    .childChannelOption(ChannelOptions.maxMessagesPerRead, value: 16)
+                    .childChannelOption(ChannelOptions.recvAllocator, value: AdaptiveRecvByteBufferAllocator())
+                serverChannelHTTPS = try tlsBootstrap.bind(host: "0.0.0.0", port: Int(httpsPort)).wait()
+            }
+
             isStarted.store(true)
             return true
         } catch {
-            NSLog("PlainHttpServer: failed to start on port \(httpPort): \(error)")
+            NSLog("PlainHttpServer: failed to start (http=\(httpPort), https=\(httpsPort)): \(error)")
             isStarted.store(false)
             return false
+        }
+    }
+
+    /// Build the server-side (optionally TLS-wrapped) HTTP + WebSocket pipeline.
+    private func configureChildPipeline(
+        channel: NIOCore.Channel,
+        sslContext: NIOSSLContext?,
+        upgrader: NIOWebSocketServerUpgrader
+    ) -> EventLoopFuture<Void> {
+        let httpPipeline: EventLoopFuture<Void>
+        if let sslContext {
+            httpPipeline = channel.pipeline.addHandler(NIOSSLServerHandler(context: sslContext))
+        } else {
+            httpPipeline = channel.eventLoop.makeSucceededVoidFuture()
+        }
+        return httpPipeline.flatMap {
+            let handler = HTTPHandler(server: self)
+            return channel.pipeline.configureHTTPServerPipeline(
+                withServerUpgrade: (
+                    upgraders: [upgrader],
+                    completionHandler: { _ in
+                        // Upgrade succeeded — remove the HTTP handler since
+                        // the pipeline now carries WebSocket frames, not
+                        // HTTPServerRequestPart.
+                        handler.removeFromPipeline()
+                    }
+                )
+            ).flatMap {
+                channel.pipeline.addHandler(handler)
+            }
         }
     }
 
@@ -92,10 +131,12 @@ public final class PlainHttpServer: NSObject, IosHttpServerBridge {
         isStarted.store(false)
         do {
             try serverChannel?.close().wait()
+            try serverChannelHTTPS?.close().wait()
         } catch {
             NSLog("PlainHttpServer: error stopping server: \(error)")
         }
         serverChannel = nil
+        serverChannelHTTPS = nil
     }
 
     @objc public func isRunning() -> Bool {
