@@ -52,6 +52,7 @@ import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
+import kotlinx.coroutines.delay
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.compose.PlayerSurface
@@ -119,6 +120,17 @@ actual fun VideoPlayerSurface(
     // so we apply Modifier.aspectRatio based on the reported VideoSize.
     var videoSize by remember { mutableStateOf<VideoSize?>(null) }
     var isBuffering by remember { mutableStateOf(false) }
+    // Douyin-like: wait LOADING_GRACE_MILLIS before showing the buffering
+    // spinner, so quick seek / preload scenarios never flash a loading state.
+    var showBuffering by remember { mutableStateOf(false) }
+    LaunchedEffect(isBuffering) {
+        if (isBuffering) {
+            delay(LOADING_GRACE_MILLIS)
+            showBuffering = true
+        } else {
+            showBuffering = false
+        }
+    }
 
     DisposableEffect(exoPlayer) {
         val listener = object : Player.Listener {
@@ -233,7 +245,7 @@ actual fun VideoPlayerSurface(
         if (!sizeKnown) {
             Box(modifier = Modifier.fillMaxSize().background(Color.Black))
         }
-        if (isBuffering && sizeKnown) {
+        if (showBuffering && sizeKnown) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
                 color = Color.White,

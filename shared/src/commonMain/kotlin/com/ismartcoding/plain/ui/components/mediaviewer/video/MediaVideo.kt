@@ -42,6 +42,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.components.mediaviewer.RawGesture
 import com.ismartcoding.plain.ui.components.mediaviewer.SizeChangeContent
 import com.ismartcoding.plain.ui.components.mediaviewer.detectTransformGestures
+import kotlin.math.abs
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -98,11 +99,14 @@ fun MediaVideo(
     val controller = rememberVideoPlayerController()
     val progressDao = remember { AppDatabase.instance.videoPlayProgressDao() }
     var firstFrameRendered by remember { mutableStateOf(false) }
+    // Track which media item is already prepared on this controller so an
+    // already-preloaded (adjacent) video is not reset when it becomes active.
+    var preparedPath by remember { mutableStateOf<String?>(null) }
 
     controller.setEventListener { event ->
-        if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@setEventListener
         when (event) {
             is VideoPlayerEvent.StateChanged -> {
+                if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@setEventListener
                 if (event.duration > 0L) {
                     videoState.totalTime = event.duration
                 }
@@ -110,9 +114,13 @@ fun MediaVideo(
                 videoState.updateTime()
             }
             VideoPlayerEvent.PositionDiscontinuity -> {
+                if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@setEventListener
                 videoState.isSeeking = false
             }
             VideoPlayerEvent.FirstFrameRendered -> {
+                // Always track per-page mounting (even while this page is only
+                // preloaded as an adjacent page) so the page is ready to show
+                // without a loading state the moment it becomes the active page.
                 firstFrameRendered = true
             }
         }
@@ -126,7 +134,7 @@ fun MediaVideo(
     }
 
     LaunchedEffect(controller, pagerState.settledPage, videoState.isPreviewerOpen) {
-        if (!videoState.isPreviewerOpen || pagerState.settledPage != page) {
+        if (!videoState.isPreviewerOpen) {
             if (model.mediaId.isNotEmpty() && controller.currentPosition > 0) {
                 val mediaId = model.mediaId
                 val pos = controller.currentPosition
@@ -135,25 +143,47 @@ fun MediaVideo(
             }
             controller.abandonAudioFocus()
             controller.stop()
+            preparedPath = null
             return@LaunchedEffect
         }
-        videoState.initData(controller)
-        val expectedTotalMs = ((model.data as? DVideo)?.duration ?: 0L) * 1000
-        if (expectedTotalMs > 0L) {
-            videoState.totalTime = expectedTotalMs
+        val isActive = pagerState.settledPage == page
+        if (isActive) {
+            videoState.initData(controller)
+            val expectedTotalMs = ((model.data as? DVideo)?.duration ?: 0L) * 1000
+            if (expectedTotalMs > 0L) {
+                videoState.totalTime = expectedTotalMs
+            }
+            val savedPos = if (model.mediaId.isNotEmpty()) TempData.videoPlayProgressMap[model.mediaId] else null
+            val atEnd = savedPos != null && savedPos > 0 && expectedTotalMs > 0 && savedPos >= expectedTotalMs - 1000
+            if (savedPos != null && savedPos > 0L && !atEnd) {
+                videoState.currentTime = savedPos
+            }
+            if (preparedPath != model.path) {
+                controller.setMediaItem(model.path)
+                controller.prepare()
+                preparedPath = model.path
+            }
+            if (savedPos != null && savedPos > 0 && !atEnd) {
+                controller.seekTo(savedPos)
+            }
+            controller.requestAudioFocus()
+            controller.play()
+        } else if (abs(page - pagerState.settledPage) <= 1) {
+            // Preload the adjacent page: prepare its video so it is buffered and
+            // its first frame is rendered ahead of time — switching to it then
+            // never shows a loading state. Also pause + release audio focus so a
+            // previously-active video stops playing as soon as the user swipes away.
+            if (preparedPath != model.path) {
+                controller.setMediaItem(model.path)
+                controller.prepare()
+                preparedPath = model.path
+            }
+            controller.pause()
+            controller.abandonAudioFocus()
+        } else {
+            controller.stop()
+            preparedPath = null
         }
-        val savedPos = if (model.mediaId.isNotEmpty()) TempData.videoPlayProgressMap[model.mediaId] else null
-        val atEnd = savedPos != null && savedPos > 0 && expectedTotalMs > 0 && savedPos >= expectedTotalMs - 1000
-        if (savedPos != null && savedPos > 0L && !atEnd) {
-            videoState.currentTime = savedPos
-        }
-        controller.setMediaItem(model.path)
-        if (savedPos != null && savedPos > 0 && !atEnd) {
-            controller.seekTo(savedPos)
-        }
-        controller.prepare()
-        controller.requestAudioFocus()
-        controller.play()
     }
 
     DisposableEffect(Unit) {

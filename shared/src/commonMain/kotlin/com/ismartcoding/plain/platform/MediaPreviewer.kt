@@ -22,9 +22,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -54,8 +56,13 @@ import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoPreviewAction
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+
+// Grace period before showing a loading icon: media that becomes ready within
+// this window switches without any visible loading state (Douyin-like).
+internal const val LOADING_GRACE_MILLIS = 1000L
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -123,6 +130,9 @@ fun MediaPreviewer(
                 state = state.pagerState,
                 modifier = Modifier.fillMaxSize(),
                 pageSpacing = 16.dp,
+                // Pre-compose adjacent pages so their media (image/video) is
+                // loaded ahead of time — switching never shows a loading state.
+                beyondViewportPageCount = 1,
                 userScrollEnabled = state.pagerUserScrollEnabled,
             ) { page ->
                 val viewerContainerState = rememberSaveable(saver = ViewerContainerState.Saver) { ViewerContainerState() }
@@ -188,8 +198,20 @@ fun MediaPreviewer(
                         val viewerMounted by viewerState.mountedFlow.collectAsState(initial = false)
                         if (showLoading) {
                             val placeholder = PreviewerPlaceholder()
+                            // Show the loading icon only after the grace period:
+                            // quick switches never flash a loading state, only
+                            // genuinely slow loads reveal it (Douyin-like).
+                            var showLoadingIcon by remember { mutableStateOf(false) }
+                            LaunchedEffect(viewerMounted) {
+                                if (!viewerMounted) {
+                                    delay(LOADING_GRACE_MILLIS)
+                                    showLoadingIcon = true
+                                } else {
+                                    showLoadingIcon = false
+                                }
+                            }
                             AnimatedVisibility(
-                                visible = !viewerMounted,
+                                visible = showLoadingIcon,
                                 enter = placeholder.enterTransition,
                                 exit = placeholder.exitTransition,
                             ) { placeholder.content() }
