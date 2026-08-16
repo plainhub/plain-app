@@ -4,9 +4,9 @@ import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FeedStatusEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.helpers.JsonHelper
-import com.ismartcoding.plain.helpers.pmap
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.pmap
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.NetworkType

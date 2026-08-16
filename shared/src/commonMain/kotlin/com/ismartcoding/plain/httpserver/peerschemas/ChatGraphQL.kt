@@ -5,7 +5,7 @@ import com.ismartcoding.plain.chat.ReplayedMessageException
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessageReceiver
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLSchemaTarget

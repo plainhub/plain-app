@@ -23,11 +23,11 @@ import com.ismartcoding.plain.lib.extensions.isPdfFile
 import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.extensions.isZipFile
-import com.ismartcoding.plain.helpers.coMain
+import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.platform.fileToUriString
 import com.ismartcoding.plain.platform.playAudioWithNotificationCheck
 import com.ismartcoding.plain.platform.saveFileToDownloads
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.TextFileType

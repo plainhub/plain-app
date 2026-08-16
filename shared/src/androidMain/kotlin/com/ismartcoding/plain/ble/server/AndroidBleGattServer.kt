@@ -19,7 +19,7 @@ import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.ble.BleSegmentData
 import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.isWifiAwareSupported
 import kotlinx.coroutines.CompletableDeferred

@@ -11,7 +11,7 @@ import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.getAppVersionName
-import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.check_failure
 import com.ismartcoding.plain.i18n.rate_limit

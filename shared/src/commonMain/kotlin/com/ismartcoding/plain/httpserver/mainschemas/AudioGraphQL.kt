@@ -3,7 +3,7 @@ package com.ismartcoding.plain.httpserver.mainschemas
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.helpers.coMain
+import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.enums.DataType

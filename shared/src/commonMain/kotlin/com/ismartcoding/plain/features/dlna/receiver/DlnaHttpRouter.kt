@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
-import com.ismartcoding.plain.features.dlna.DlnaCommand
+import com.ismartcoding.plain.lib.dlna.DlnaCommand
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.features.dlna.PendingCastRequest
+import com.ismartcoding.plain.lib.dlna.PendingCastRequest
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.getDeviceIP4
 

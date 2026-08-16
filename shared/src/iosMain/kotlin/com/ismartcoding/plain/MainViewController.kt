@@ -2,7 +2,6 @@ package com.ismartcoding.plain
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeUIViewController
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -14,7 +13,7 @@ import androidx.sqlite.SQLiteConnection
 import com.ismartcoding.plain.db.DataInitializer
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.AppEvents
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.buildAppDatabase
 import com.ismartcoding.plain.platform.dataStoreFilePath
 import com.ismartcoding.plain.platform.initDatabase

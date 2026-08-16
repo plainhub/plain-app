@@ -7,7 +7,7 @@ import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlin.concurrent.Volatile

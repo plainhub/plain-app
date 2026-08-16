@@ -9,7 +9,7 @@ import com.ismartcoding.plain.features.dlna.receiver.resolveSenderName
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.lib.logcat.LogCat

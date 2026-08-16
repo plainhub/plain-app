@@ -18,7 +18,7 @@ import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TextFileViewModel
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

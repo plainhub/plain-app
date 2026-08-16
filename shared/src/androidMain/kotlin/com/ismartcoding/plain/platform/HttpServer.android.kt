@@ -6,11 +6,10 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.NsdHelper
-import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.httpserver.HttpServerManager
@@ -18,6 +17,7 @@ import com.ismartcoding.plain.httpserver.createHttpServerAsync
 import com.ismartcoding.plain.httpserver.generateSslKeyStoreFile
 import com.ismartcoding.plain.httpserver.getSslSignatureBytes
 import com.ismartcoding.plain.httpserver.httpServer
+import kotlinx.coroutines.delay
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -88,7 +88,7 @@ actual fun startHttpServerService() {
                 break
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
-                kotlinx.coroutines.delay(500.milliseconds)
+                delay(500.milliseconds)
                 retry--
             }
         }

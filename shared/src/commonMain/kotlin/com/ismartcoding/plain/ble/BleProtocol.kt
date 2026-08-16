@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ble
 
 import com.ismartcoding.plain.api.clientHeadersMap
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

@@ -5,7 +5,7 @@ import com.ismartcoding.plain.ble.BleRequestData
 import com.ismartcoding.plain.ble.BleResult
 import com.ismartcoding.plain.ble.BleSegmentData
 import com.ismartcoding.plain.ble.BleService
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 
 class BleDeviceApi(val device: BleGattClient) {

@@ -2,8 +2,8 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.discover.PairingCore
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.MdnsHostResponder
 import com.ismartcoding.plain.mdns.buildMdnsServiceInfo

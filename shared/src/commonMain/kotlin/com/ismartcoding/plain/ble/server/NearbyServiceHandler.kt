@@ -4,7 +4,7 @@ import com.ismartcoding.plain.ble.BleRequestData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.enums.NearbyMessageType
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 
 class NearbyServiceHandler : BleServiceHandler {

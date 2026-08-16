@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ble.server
 
 import com.ismartcoding.plain.ble.BleHttpRequest
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.streamFileTo
 import com.ismartcoding.plain.httpserver.http.HttpCall

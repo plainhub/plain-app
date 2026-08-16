@@ -12,8 +12,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
-import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.audio.DPlaylistAudio

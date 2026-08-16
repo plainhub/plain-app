@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.features.dlna.common.DlnaSoap
+import com.ismartcoding.plain.lib.dlna.common.DlnaSoap
 
 /** Static XML templates for the DLNA receiver's HTTP server. */
 object DlnaXmlTemplates {

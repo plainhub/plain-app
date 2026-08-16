@@ -23,7 +23,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.applySystemBarAppearanceForDarkTheme
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -41,7 +41,6 @@ import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.preferences.SettingsProvider
-import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.PlainAccessibilityService

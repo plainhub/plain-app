@@ -11,7 +11,7 @@ import com.ismartcoding.plain.platform.getUsbDiskPaths
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.FolderOption
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 
 suspend fun buildFolderOptions(
     filesVM: FilesViewModel,

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features.dlna.common
+package com.ismartcoding.plain.lib.dlna.common
 
 /** Shared UPnP/SOAP namespaces and envelope builders used by both sender and receiver. */
 object DlnaSoap {

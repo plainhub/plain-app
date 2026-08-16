@@ -5,10 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import androidx.core.content.ContextCompat
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.preferences.AdbTokenPreference
-import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.platform.stopHttpServiceAsync
 import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.services.HttpServerService

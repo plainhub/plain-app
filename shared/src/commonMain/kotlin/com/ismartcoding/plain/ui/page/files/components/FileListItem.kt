@@ -37,7 +37,7 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import org.jetbrains.compose.resources.pluralStringResource

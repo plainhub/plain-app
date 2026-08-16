@@ -2,7 +2,7 @@ package com.ismartcoding.plain.httpserver.websocket
 
 import com.ismartcoding.plain.events.WebSocketData
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.httpserver.HttpServerManager
 

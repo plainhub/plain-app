@@ -6,7 +6,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ble.BleSegmentData
 import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -35,7 +35,6 @@ import platform.CoreBluetooth.CBManagerStatePoweredOn
 import platform.CoreBluetooth.CBUUID
 import platform.CoreBluetooth.CBService
 import platform.Foundation.NSError
-import platform.Foundation.NSNumber
 import platform.darwin.NSObject
 import kotlin.time.Duration.Companion.milliseconds
 

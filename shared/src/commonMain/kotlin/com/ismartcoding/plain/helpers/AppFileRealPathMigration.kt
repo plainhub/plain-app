@@ -3,7 +3,7 @@ package com.ismartcoding.plain.helpers
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.appDir
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 
 /**
  * One-time migration: strip the platform-specific `appDir()/` prefix from

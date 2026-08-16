@@ -17,7 +17,7 @@ import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
-import com.ismartcoding.plain.helpers.coMain
+import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.preferences.AudioPlayingPreference

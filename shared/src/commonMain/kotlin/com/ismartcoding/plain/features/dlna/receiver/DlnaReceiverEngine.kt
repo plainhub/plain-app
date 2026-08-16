@@ -1,11 +1,11 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.features.dlna.DlnaCommand
+import com.ismartcoding.plain.lib.dlna.DlnaCommand
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer

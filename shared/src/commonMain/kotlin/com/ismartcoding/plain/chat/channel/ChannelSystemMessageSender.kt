@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.chat.channel
 
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.chat.peer.PeerCacher
@@ -10,7 +10,7 @@ import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getPeersAsync
 import com.ismartcoding.plain.enums.ChannelSystemMessageAction
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
-import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.platform.getDeviceType
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.MemberPeerInfo

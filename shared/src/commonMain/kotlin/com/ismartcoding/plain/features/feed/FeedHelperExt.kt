@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.feed
 
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.opml.OpmlParser
 import com.ismartcoding.plain.lib.opml.OpmlWriter

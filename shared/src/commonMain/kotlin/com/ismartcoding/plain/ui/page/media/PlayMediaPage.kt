@@ -15,8 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.extensions.isAudioFast
-import com.ismartcoding.plain.helpers.coMain
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coMain
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat.channel
 
 import com.ismartcoding.plain.lib.extensions.toSortName
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
 import kotlinx.coroutines.CoroutineScope

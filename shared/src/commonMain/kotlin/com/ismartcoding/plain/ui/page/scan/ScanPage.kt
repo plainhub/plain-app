@@ -43,7 +43,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.platform.Permission

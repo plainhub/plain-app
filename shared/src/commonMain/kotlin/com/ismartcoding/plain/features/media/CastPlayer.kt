@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.media
 
-import com.ismartcoding.plain.features.dlna.common.DlnaDevice
+import com.ismartcoding.plain.lib.dlna.common.DlnaDevice
 import com.ismartcoding.plain.data.IMedia
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

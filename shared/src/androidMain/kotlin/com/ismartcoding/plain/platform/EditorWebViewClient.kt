@@ -3,9 +3,9 @@ package com.ismartcoding.plain.platform
 import android.content.Context
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.ismartcoding.plain.helpers.coMain
-import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.coMain
+import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.ui.components.EditorData
 
 class EditorWebViewClient(

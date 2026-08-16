@@ -10,7 +10,7 @@ import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.NotificationsHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.services.PNotificationListenerService
 
 actual fun toggleNotificationListener(enabled: Boolean) {

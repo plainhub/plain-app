@@ -11,7 +11,7 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import com.ismartcoding.plain.AppIntents
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.pinyin.Pinyin
 import com.ismartcoding.plain.data.DCertificate

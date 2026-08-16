@@ -5,7 +5,7 @@ import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.HtmlUtils
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.isOk
 import com.ismartcoding.plain.lib.html2md.MDConverter
 import com.ismartcoding.plain.lib.logcat.LogCat

@@ -39,14 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.platform.fetchContentAsync
 import com.ismartcoding.plain.platform.IODispatcher
-import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold

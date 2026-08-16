@@ -4,7 +4,6 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.enums.ChannelSystemMessageAction
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.enums.DeviceType
@@ -16,7 +15,7 @@ import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.verifyEd25519Signature
 import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
-import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInvite

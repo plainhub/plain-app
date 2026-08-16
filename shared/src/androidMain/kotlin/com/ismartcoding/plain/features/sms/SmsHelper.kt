@@ -20,7 +20,7 @@ import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.extensions.queryCursor
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DArchivedConversation
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.smsManager

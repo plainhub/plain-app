@@ -19,7 +19,7 @@ import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.events.PowerConnectedEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ChatFidUriMigration
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.platform.isUPlus
 import com.ismartcoding.plain.lib.sendEvent
@@ -38,6 +38,7 @@ import com.ismartcoding.plain.platform.newImageLoader
 import com.ismartcoding.plain.httpserver.warmUpNetty
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 
 object MainAppHelper {
@@ -110,7 +111,7 @@ object MainAppHelper {
                 FeedFetchWorker.startRepeatWorkerAsync(app)
             }
             ImageSearchManager.restoreIfEnabled()
-            val thirtyDaysAgo = (kotlin.time.Clock.System.now() - 30.days).toString()
+            val thirtyDaysAgo = (Clock.System.now() - 30.days).toString()
             AppDatabase.instance.videoPlayProgressDao().getRecentProgress(thirtyDaysAgo).forEach {
                 TempData.videoPlayProgressMap[it.mediaId] = it.duration
             }

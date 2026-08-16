@@ -2,10 +2,9 @@
 
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.components.EditorData
-import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSBundle
 import platform.Foundation.NSURL

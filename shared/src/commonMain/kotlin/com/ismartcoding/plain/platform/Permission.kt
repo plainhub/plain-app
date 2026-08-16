@@ -6,7 +6,7 @@ import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 

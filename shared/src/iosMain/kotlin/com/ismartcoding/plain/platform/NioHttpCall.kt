@@ -2,13 +2,12 @@
 
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpMethod
 import com.ismartcoding.plain.httpserver.http.HttpMultipartPart
 import com.ismartcoding.plain.httpserver.http.StreamSink
 import io.ktor.client.request.get
-import io.ktor.client.request.headers
 import io.ktor.client.statement.readBytes
 import io.ktor.http.HttpHeaders
 import platform.Foundation.NSFileManager

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.mdns
 
 import android.content.Context
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

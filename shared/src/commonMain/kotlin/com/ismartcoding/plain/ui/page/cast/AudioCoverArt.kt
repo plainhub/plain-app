@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.loadAudioCoverBitmap
 import org.jetbrains.compose.resources.painterResource

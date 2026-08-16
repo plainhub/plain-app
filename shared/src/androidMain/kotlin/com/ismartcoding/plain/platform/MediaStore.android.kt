@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import android.net.Uri
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.data.DImage
@@ -17,8 +19,11 @@ import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.sendEvent
+import kotlinx.coroutines.delay
+import java.io.File
 
 actual suspend fun getMediaBuckets(dataType: DataType): List<DMediaBucket> {
     return when (dataType) {
@@ -254,22 +259,22 @@ actual suspend fun deleteContacts(ids: Set<String>) {
 }
 
 actual fun startMmsPolling(pendingId: String, launchTimeSec: Long, attachmentPaths: List<String>) {
-    com.ismartcoding.plain.helpers.coIO {
+    coIO {
         val context = appContext
         repeat(150) { // 2 s × 150 = 5 minutes max
-            kotlinx.coroutines.delay(2000)
+            delay(2000)
             val found = context.contentResolver.query(
-                android.net.Uri.parse("content://mms"),
+                Uri.parse("content://mms"),
                 arrayOf("_id"),
                 "msg_box = 2 AND m_type = 128 AND date >= ?",
                 arrayOf(launchTimeSec.toString()),
                 null,
             )?.use { cursor -> cursor.count > 0 } ?: false
             if (found) {
-                com.ismartcoding.plain.TempData.pendingMmsMessages.removeIf { it.id == pendingId }
+                TempData.pendingMmsMessages.removeIf { it.id == pendingId }
                 attachmentPaths.forEach { path ->
                     try {
-                        java.io.File(path).delete()
+                        File(path).delete()
                     } catch (_: Exception) {
                     }
                 }

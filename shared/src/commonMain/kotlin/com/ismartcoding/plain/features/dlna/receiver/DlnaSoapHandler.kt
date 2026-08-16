@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
-import com.ismartcoding.plain.features.dlna.DlnaMediaType
+import com.ismartcoding.plain.lib.dlna.DlnaMediaType
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.features.dlna.DlnaMediaUtils
-import com.ismartcoding.plain.features.dlna.common.DlnaSoap
+import com.ismartcoding.plain.lib.dlna.common.DlnaSoap
 
 /**
  * Parses incoming UPnP SOAP requests and builds SOAP responses using the

@@ -8,7 +8,6 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.fromPath
 import com.ismartcoding.plain.audio.getAlbumUri
 import com.ismartcoding.plain.helpers.getFileId
-import com.ismartcoding.plain.helpers.withIO
 
 actual suspend fun getAudioMetadata(path: String): Pair<String, String> {
     val audio = DPlaylistAudio.fromPath(appContext, path)

@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.openFileExternal
 import com.ismartcoding.plain.platform.shareFile
 import com.ismartcoding.plain.platform.statFile

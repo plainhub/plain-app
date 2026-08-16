@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.plain.platform.IODispatcher
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.relaunchApp

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features.dlna.common
 
+import com.ismartcoding.plain.lib.dlna.common.DlnaDevice
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

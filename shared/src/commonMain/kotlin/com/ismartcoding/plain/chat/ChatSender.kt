@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.chat
 
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.channel.ChannelChatSender
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType

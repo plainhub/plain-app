@@ -1,6 +1,5 @@
 package com.ismartcoding.plain
 import android.Manifest
-import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
@@ -11,7 +10,7 @@ import android.provider.Settings
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
@@ -34,13 +33,10 @@ import com.ismartcoding.plain.events.HOpenAccessibilitySettingsEvent
 import com.ismartcoding.plain.events.HOpenWebSettingsEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
-import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
-import com.ismartcoding.plain.preferences.DesktopAccessPreference
-import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.launch

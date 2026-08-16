@@ -13,7 +13,7 @@ import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.FolderKanbanDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

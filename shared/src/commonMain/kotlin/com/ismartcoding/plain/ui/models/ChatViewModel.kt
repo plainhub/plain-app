@@ -4,8 +4,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.createLongTextFile
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.chat.ChatManager

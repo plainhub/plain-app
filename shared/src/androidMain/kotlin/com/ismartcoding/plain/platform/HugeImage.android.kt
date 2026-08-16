@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.animation.core.Animatable
 import com.ismartcoding.plain.enums.RotationType
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_OFFSET_X

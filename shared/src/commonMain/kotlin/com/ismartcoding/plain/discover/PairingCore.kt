@@ -19,7 +19,7 @@ import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.crypto.ECDHKeyPair

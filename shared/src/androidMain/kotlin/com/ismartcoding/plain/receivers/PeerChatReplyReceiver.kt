@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.db.DMessageContent

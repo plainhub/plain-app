@@ -1,6 +1,6 @@
-package com.ismartcoding.plain.features.dlna.common
+package com.ismartcoding.plain.lib.dlna.common
 
-import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.lib.xml.decodeXml
 import kotlinx.serialization.Serializable
 

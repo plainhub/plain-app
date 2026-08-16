@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.platform
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.db.DMessageContent
@@ -14,19 +16,20 @@ import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.queryOpenableFile
 import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.httpserver.http.StreamSink
 import android.net.Uri
 import androidx.core.net.toUri
+import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.helpers.ImageHelper
-import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.Mp4Helper
 import com.ismartcoding.plain.helpers.ZipHelper
 import com.ismartcoding.plain.helpers.TempHelper
@@ -47,6 +50,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
+import okhttp3.Request
+import java.io.RandomAccessFile
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
@@ -261,7 +266,7 @@ actual suspend fun readFileRange(path: String, offset: Long, length: Int): ByteA
         val readLen = minOf(length.toLong(), fileLen - offset).toInt()
         if (readLen <= 0) return@withIO ByteArray(0)
         val bytes = ByteArray(readLen)
-        java.io.RandomAccessFile(file, "r").use { raf ->
+        RandomAccessFile(file, "r").use { raf ->
             raf.seek(offset)
             raf.readFully(bytes)
         }
@@ -361,18 +366,18 @@ actual suspend fun decodeImageFileToPng(path: String): ByteArray? = withIO {
         // Cap the decoded edge: a 48 MP HEIC would otherwise allocate ~192 MB
         // per open view, which is fatal on small-heap compatibility containers.
         // 4096 px keeps 12 MP photos pixel-exact.
-        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        android.graphics.BitmapFactory.decodeFile(path, bounds)
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(path, bounds)
         if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return@withPermit null
-        val opts = android.graphics.BitmapFactory.Options().apply {
+        val opts = BitmapFactory.Options().apply {
             inSampleSize = DecodePolicy.capSampleSize(
                 bounds.outWidth, bounds.outHeight, DecodePolicy.MAX_FULL_VIEW_EDGE
             )
         }
-        val bitmap = android.graphics.BitmapFactory.decodeFile(path, opts) ?: return@withPermit null
+        val bitmap = BitmapFactory.decodeFile(path, opts) ?: return@withPermit null
         try {
             ByteArrayOutputStream().use { baos ->
-                bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, baos)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
                 baos.toByteArray()
             }
         } finally {
@@ -482,8 +487,8 @@ actual suspend fun streamZipInternalDirToSink(zipVirtualPath: String, sink: Stre
 
 actual suspend fun fetchUrlToStream(url: String, sink: StreamSink): Pair<Int, String?> = withIO {
     try {
-        val client = com.ismartcoding.plain.api.OkHttpClientFactory.createUnsafeOkHttpClient()
-        val request = okhttp3.Request.Builder().url(url).build()
+        val client = OkHttpClientFactory.createUnsafeOkHttpClient()
+        val request = Request.Builder().url(url).build()
         val response = client.newCall(request).execute()
         val status = response.code
         val contentType = response.header("Content-Type")

@@ -3,6 +3,7 @@ package com.ismartcoding.plain.workers
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.features.feed.FeedFetcher
 import android.content.Context
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -10,7 +11,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
 import java.util.concurrent.TimeUnit
 
@@ -52,7 +53,7 @@ class FeedFetchWorker(
                     FeedAutoRefreshIntervalPreference.getAsync().toLong(),
                     TimeUnit.SECONDS,
                 ).setInputData(workDataOf("auto_refresh" to true))
-                    .setConstraints(androidx.work.Constraints.Builder().build())
+                    .setConstraints(Constraints.Builder().build())
                     .addTag(REPEAT_WORK_NAME)
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(

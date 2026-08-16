@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat.peer
 
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportType
 import com.ismartcoding.plain.platform.AppDatabase

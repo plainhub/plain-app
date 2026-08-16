@@ -6,6 +6,7 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.isOk
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.KtorClientFactory
 import com.ismartcoding.plain.platform.sha1
 import io.ktor.client.request.get

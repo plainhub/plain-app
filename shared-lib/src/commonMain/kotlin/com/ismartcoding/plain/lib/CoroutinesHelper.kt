@@ -1,6 +1,6 @@
-package com.ismartcoding.plain.helpers
-import com.ismartcoding.plain.platform.IODispatcher
+package com.ismartcoding.plain.lib
 
+import com.ismartcoding.plain.platform.IODispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

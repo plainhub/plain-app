@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.BaseColumns
 import com.ismartcoding.plain.helpers.ContentWhere
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.count
 import com.ismartcoding.plain.lib.extensions.getSearchCursor
 import com.ismartcoding.plain.lib.extensions.getStringValue

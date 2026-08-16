@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.ButtonSize
-import com.ismartcoding.plain.features.dlna.DlnaMediaType
+import com.ismartcoding.plain.lib.dlna.DlnaMediaType
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.helpers.TimeHelper

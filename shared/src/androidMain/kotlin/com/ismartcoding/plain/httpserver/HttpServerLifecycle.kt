@@ -3,8 +3,8 @@ package com.ismartcoding.plain.httpserver
 import android.content.Context
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.helpers.JsonHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.helpers.JksHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
@@ -36,13 +36,14 @@ private val SSL_KEY_ALIAS = Constants.SSL_NAME
  * first real server start is fast.
  */
 fun warmUpNetty() {
-    com.ismartcoding.plain.helpers.coIO {
+    coIO {
         try {
             val s = embeddedServer(Netty, port = 0) {}
             s.start(wait = false)
             s.stop(0, 0)
             LogCat.d("Netty warm-up complete")
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 }
 

@@ -4,7 +4,7 @@ import com.ismartcoding.plain.ble.BleRequestData
 import com.ismartcoding.plain.ble.BleHttpRequest
 import com.ismartcoding.plain.ble.BleHttpResponse
 import com.ismartcoding.plain.ble.BleUuids
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.httpserver.HttpRouteRegistry
 import com.ismartcoding.plain.httpserver.http.HttpMethod

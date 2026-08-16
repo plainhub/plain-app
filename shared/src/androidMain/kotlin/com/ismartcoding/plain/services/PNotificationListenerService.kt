@@ -8,8 +8,8 @@ import android.content.pm.PackageManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.AndroidTempData
 import com.ismartcoding.plain.activityManager

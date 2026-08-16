@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.preferences
 
 import androidx.datastore.preferences.core.Preferences
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 
 abstract class BasePreference<T> {
     abstract val default: T

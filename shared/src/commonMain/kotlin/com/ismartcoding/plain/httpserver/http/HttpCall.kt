@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.httpserver.http
 
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import kotlin.jvm.JvmInline
 
 /**

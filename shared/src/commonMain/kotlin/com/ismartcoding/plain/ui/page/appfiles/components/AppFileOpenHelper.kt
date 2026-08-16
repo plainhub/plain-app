@@ -8,8 +8,8 @@ import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isPdfFile
 import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.lib.extensions.isVideoFast
-import com.ismartcoding.plain.helpers.coMain
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coMain
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.extensions.resolveAppFileRealPath

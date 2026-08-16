@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.features.ImageEditorProjectHelper
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.helpers.StringHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.yjs.ArrowLayer
 import com.ismartcoding.plain.lib.yjs.CanvasSize
 import com.ismartcoding.plain.lib.yjs.EditorLayer

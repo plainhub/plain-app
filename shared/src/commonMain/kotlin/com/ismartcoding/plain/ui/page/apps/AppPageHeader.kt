@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.enums.PackageType
-import com.ismartcoding.plain.helpers.coMain
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coMain
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.DPackageInfo
 import com.ismartcoding.plain.platform.canLaunchPackage
 import com.ismartcoding.plain.platform.getApplicationIcon

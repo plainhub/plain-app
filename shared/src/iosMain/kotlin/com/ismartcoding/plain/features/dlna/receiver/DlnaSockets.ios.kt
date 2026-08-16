@@ -30,7 +30,6 @@ import platform.posix.ip_mreq
 import platform.posix.recvfrom
 import platform.posix.sendto
 import platform.posix.setsockopt
-import platform.posix.sockaddr
 import platform.posix.sockaddr_in
 import platform.posix.socket
 import platform.posix.timeval

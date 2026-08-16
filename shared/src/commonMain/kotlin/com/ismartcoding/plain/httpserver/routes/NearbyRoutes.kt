@@ -2,7 +2,7 @@ package com.ismartcoding.plain.httpserver.routes
 
 import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.enums.NearbyMessageType
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.lib.logcat.LogCat

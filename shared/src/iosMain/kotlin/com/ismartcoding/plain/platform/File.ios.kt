@@ -11,11 +11,12 @@ import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.FileHashHelper
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.httpserver.http.StreamSink
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.utils.io.readAvailable
@@ -210,10 +211,10 @@ actual suspend fun mergeUploadedChunks(
     for (i in 0 until totalChunks) {
         val chunkPath = "$chunkDir/${chunkPrefix}$i"
         if (!NSFileManager.defaultManager.fileExistsAtPath(chunkPath)) {
-            throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("Missing chunk $i")
+            throw GraphQLError("Missing chunk $i")
         }
         val size = NSFileManager.defaultManager.attributesOfItemAtPath(chunkPath, null)
-            ?.let { attrs -> attrs[platform.Foundation.NSFileSize] as? Long } ?: 0L
+            ?.let { attrs -> attrs[NSFileSize] as? Long } ?: 0L
         expectedSize += size
     }
 
@@ -240,15 +241,15 @@ actual suspend fun mergeUploadedChunks(
             pos += chunk.size
         }
         if (!mergedBytes.toNSData().writeToFile(tempMergePath, atomically = true)) {
-            throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("Cannot open merge temp file")
+            throw GraphQLError("Cannot open merge temp file")
         }
 
         val mergedSize = NSFileManager.defaultManager.attributesOfItemAtPath(tempMergePath, null)
-            ?.let { attrs -> attrs[platform.Foundation.NSFileSize] as? Long } ?: 0L
+            ?.let { attrs -> attrs[NSFileSize] as? Long } ?: 0L
 
         if (mergedSize != expectedSize) {
             NSFileManager.defaultManager.removeItemAtPath(tempMergePath, null)
-            throw com.ismartcoding.plain.lib.kgraphql.GraphQLError(
+            throw GraphQLError(
                 "Merge integrity failed: expected $expectedSize, got $mergedSize",
             )
         }
@@ -256,7 +257,7 @@ actual suspend fun mergeUploadedChunks(
         if (isAppFile) {
             val fidSuffix = importAppFileInternal(tempMergePath, "", deleteSrc = true)
             if (fidSuffix.isEmpty()) {
-                throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("Failed to import merged app file")
+                throw GraphQLError("Failed to import merged app file")
             }
             deleteUploadedChunks(fileId)
             "$fidSuffix:$mergedSize"
@@ -275,18 +276,18 @@ actual suspend fun mergeUploadedChunks(
                 NSFileManager.defaultManager.removeItemAtPath(destPath, null)
             }
             if (!NSFileManager.defaultManager.moveItemAtPath(tempMergePath, destPath, error = null)) {
-                throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("Failed to move merged file to destination")
+                throw GraphQLError("Failed to move merged file to destination")
             }
             deleteUploadedChunks(fileId)
             "${destPath.substringAfterLast('/')}:$mergedSize"
         }
-    } catch (e: com.ismartcoding.plain.lib.kgraphql.GraphQLError) {
+    } catch (e: GraphQLError) {
         NSFileManager.defaultManager.removeItemAtPath(tempMergePath, null)
         throw e
     } catch (e: Exception) {
         NSFileManager.defaultManager.removeItemAtPath(tempMergePath, null)
         LogCat.e("mergeUploadedChunks: ${e.message}")
-        throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("Merge failed: ${e.message}")
+        throw GraphQLError("Merge failed: ${e.message}")
     }
 }
 
@@ -325,7 +326,7 @@ actual suspend fun readFileRange(path: String, offset: Long, length: Int): ByteA
     try {
         if (!NSFileManager.defaultManager.fileExistsAtPath(path)) return@withIO null
         val attrs = NSFileManager.defaultManager.attributesOfItemAtPath(path, null) ?: return@withIO null
-        val fileLen = (attrs[platform.Foundation.NSFileSize] as? Long) ?: return@withIO null
+        val fileLen = (attrs[NSFileSize] as? Long) ?: return@withIO null
         if (offset >= fileLen) return@withIO ByteArray(0)
         val readLen = minOf(length.toLong(), fileLen - offset).toInt()
         if (readLen <= 0) return@withIO ByteArray(0)

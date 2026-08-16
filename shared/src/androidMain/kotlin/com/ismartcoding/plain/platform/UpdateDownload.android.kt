@@ -5,7 +5,7 @@ import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.events.UpdateDownloadCompleteEvent
 import com.ismartcoding.plain.events.UpdateDownloadFailedEvent
 import com.ismartcoding.plain.events.UpdateDownloadProgressEvent
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.UpdateInfoPreference

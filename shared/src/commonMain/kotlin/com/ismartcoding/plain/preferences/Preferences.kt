@@ -21,9 +21,8 @@ import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.JsonHelper
-import com.ismartcoding.plain.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.helpers.StringHelper
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.generateEd25519KeyPair
@@ -638,12 +637,12 @@ object SignatureKeyPreference : BasePreference<String>() {
                 privateKey = Base64.encode(privateKey),
                 publicKey = Base64.encode(publicKey),
             )
-            putAsync(JsonHelper.jsonEncode(signatureKeyPair))
+            putAsync(jsonEncode(signatureKeyPair))
         }
     }
 
     suspend fun getKeyPairAsync(): DSignatureKeyPair {
-        return JsonHelper.jsonDecode<DSignatureKeyPair>(getAsync())
+        return jsonDecode<DSignatureKeyPair>(getAsync())
     }
 
     suspend fun getPublicKeyBytesAsync(): ByteArray {

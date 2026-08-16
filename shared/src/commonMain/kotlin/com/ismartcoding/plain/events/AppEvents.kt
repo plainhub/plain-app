@@ -17,9 +17,9 @@ import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.BookmarkHelper
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermissionResultEvent
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
-import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.coMain
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.ChannelEvent
 import com.ismartcoding.plain.lib.sendEvent
@@ -42,6 +42,7 @@ import com.ismartcoding.plain.httpserver.AuthRequest
 import com.ismartcoding.plain.httpserver.WsSessionHandle
 import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.httpserver.websocket.WebSocketHelper
+import com.ismartcoding.plain.platform.MediaDurationFixQueue
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
@@ -282,7 +283,7 @@ object AppEvents {
                     }
 
                     is MediaDurationZeroEvent -> {
-                        com.ismartcoding.plain.platform.MediaDurationFixQueue.enqueue(event)
+                        MediaDurationFixQueue.enqueue(event)
                     }
                 }
             }

@@ -5,7 +5,6 @@ import android.content.ContentProviderOperation
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
-import android.provider.BaseColumns
 import android.provider.ContactsContract
 import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.data.SortBy
@@ -17,7 +16,7 @@ import com.ismartcoding.plain.lib.extensions.getSearchCursor
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.getTimeValue
 import com.ismartcoding.plain.lib.extensions.map
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.helpers.StringHelper
 import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.data.DGroup

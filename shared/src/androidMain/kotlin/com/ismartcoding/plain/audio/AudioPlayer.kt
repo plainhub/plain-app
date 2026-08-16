@@ -7,8 +7,8 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.MoreExecutors
-import com.ismartcoding.plain.helpers.coMain
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coMain
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.AudioAction
@@ -169,7 +169,7 @@ object AudioPlayer {
             val playingPath = AudioPlayingPreference.getValueAsync()
             if (playerAudioList.isEmpty()) {
                 if (playingPath.isNotEmpty()) {
-                    audio = DPlaylistAudio.Companion.fromPath(context, playingPath)
+                    audio = DPlaylistAudio.fromPath(context, playingPath)
                     AudioPlaylistPreference.addAsync(listOf(audio))
                     playerAudioList = listOf(audio)
                 } else {

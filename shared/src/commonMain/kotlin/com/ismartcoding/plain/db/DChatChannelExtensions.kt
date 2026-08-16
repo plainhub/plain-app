@@ -3,7 +3,7 @@ import com.ismartcoding.plain.platform.AppDatabase
 
 import kotlin.io.encoding.ExperimentalEncodingApi
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.verifyEd25519Signature
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.TempData

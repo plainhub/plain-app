@@ -3,8 +3,8 @@ package com.ismartcoding.plain.ui.page
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.updateChatMessageTextAsync
 import com.ismartcoding.plain.db.DMessageText

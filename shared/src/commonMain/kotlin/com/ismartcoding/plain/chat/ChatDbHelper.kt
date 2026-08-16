@@ -11,10 +11,10 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.helpers.SearchHelper
 import com.ismartcoding.plain.platform.releaseAppFile
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 
 object ChatDbHelper {
     suspend fun insertChatItem(message: DMessageContent, fromId: String = "me", toId: String = "local", channelId: String = "", isRemote: Boolean): DChat = withIO {

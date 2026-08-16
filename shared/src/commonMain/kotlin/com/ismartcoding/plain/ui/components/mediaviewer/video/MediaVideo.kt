@@ -28,11 +28,10 @@ import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DVideoPlayProgress
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.getVideoMeta
 import com.ismartcoding.plain.platform.rememberVideoPlayerController
 import com.ismartcoding.plain.platform.VideoPlayerSurface
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_OFFSET_X
 import com.ismartcoding.plain.ui.components.mediaviewer.DEFAULT_OFFSET_Y
@@ -43,7 +42,6 @@ import com.ismartcoding.plain.ui.components.mediaviewer.RawGesture
 import com.ismartcoding.plain.ui.components.mediaviewer.SizeChangeContent
 import com.ismartcoding.plain.ui.components.mediaviewer.detectTransformGestures
 import kotlin.math.abs
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

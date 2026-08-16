@@ -10,9 +10,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.models.ISearchableViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -37,7 +37,7 @@ fun <T : IData> SearchableTopBar(
             viewModel = viewModel,
             onSearch = {
                 viewModel.searchActive.value = false
-                scope.launch(com.ismartcoding.plain.platform.IODispatcher) {
+                scope.launch(IODispatcher) {
                     onSearchAction(it)
                 }
             }

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.page.appfiles
 
 import com.ismartcoding.plain.platform.getExtensionFromMimeType
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.DChat

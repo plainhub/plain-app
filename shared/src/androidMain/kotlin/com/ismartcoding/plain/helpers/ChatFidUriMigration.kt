@@ -7,6 +7,7 @@ import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.MessageType
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.appDir
 import java.io.File
 

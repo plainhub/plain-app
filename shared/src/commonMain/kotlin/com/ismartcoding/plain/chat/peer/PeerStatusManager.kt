@@ -2,9 +2,9 @@ package com.ismartcoding.plain.chat.peer
 import com.ismartcoding.plain.platform.subscribeAwareForPeer
 import com.ismartcoding.plain.platform.startAwareIfNeeded
 
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.chaCha20Encrypt
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.platform.isWifiAwareSupported

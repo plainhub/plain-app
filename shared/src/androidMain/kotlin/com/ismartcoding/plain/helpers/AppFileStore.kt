@@ -3,10 +3,10 @@ package com.ismartcoding.plain.helpers
 import android.webkit.MimeTypeMap
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.AppFileDao
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.appDir
 import java.io.File
 
@@ -108,15 +108,15 @@ object AppFileStore {
 
         if (candidates.isNotEmpty()) {
             // ── Step 2: strong check ──────────────────────────────────────
-            tryReuseExisting( dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
+            tryReuseExisting(dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
             // Weak matched but strong differs – fall through to insert new
-            return@withIO insertNew( dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
+            return@withIO insertNew(dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
         }
 
         // No weak match. Double-check by id in case another thread raced us.
-        tryReuseExisting( dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
+        tryReuseExisting(dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
 
-        insertNew( dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
+        insertNew(dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
     }
 
     /**
@@ -141,7 +141,7 @@ object AppFileStore {
 
         val effectiveMime = mimeType.ifEmpty { "application/octet-stream" }
         val ext = extFromMime(effectiveMime)
-        val destFile = destFile( strongHash, ext)
+        val destFile = destFile(strongHash, ext)
         destFile.parentFile?.mkdirs()
         destFile.writeBytes(data)
 

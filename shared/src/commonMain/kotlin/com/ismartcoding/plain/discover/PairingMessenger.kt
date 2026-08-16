@@ -4,7 +4,7 @@ import com.ismartcoding.plain.data.DPairingCancel
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.enums.NearbyMessageType
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 
 /**
  * Delivers pairing messages to a peer's `POST /nearby` endpoint over the LAN.

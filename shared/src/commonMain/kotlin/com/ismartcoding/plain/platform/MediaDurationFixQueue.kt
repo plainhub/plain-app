@@ -2,7 +2,7 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.events.MediaDurationZeroEvent
 import com.ismartcoding.plain.events.MediaDurationZeroItem
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

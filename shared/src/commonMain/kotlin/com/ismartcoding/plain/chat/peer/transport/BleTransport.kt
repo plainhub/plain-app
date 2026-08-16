@@ -8,7 +8,7 @@ import com.ismartcoding.plain.ble.client.BleDeviceApi
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.PlatformLock
 import com.ismartcoding.plain.platform.bleTransport

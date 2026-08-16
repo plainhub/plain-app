@@ -16,8 +16,8 @@ import androidx.compose.ui.platform.LocalDensity
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
-import com.ismartcoding.plain.helpers.coMain
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coMain
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.getMediaItemUriString

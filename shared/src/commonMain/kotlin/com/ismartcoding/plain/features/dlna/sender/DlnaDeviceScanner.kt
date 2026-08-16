@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.dlna.sender
 
-import com.ismartcoding.plain.features.dlna.common.DlnaDevice
+import com.ismartcoding.plain.lib.dlna.common.DlnaDevice
 import com.ismartcoding.plain.features.dlna.receiver.DlnaSsdpMessages
 import com.ismartcoding.plain.features.dlna.receiver.DlnaSsdpSocket
 import com.ismartcoding.plain.features.dlna.receiver.createDlnaSsdpSocket
@@ -12,7 +12,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow

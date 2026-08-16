@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features.dlna
+package com.ismartcoding.plain.lib.dlna
 
 data class PendingCastRequest(
     val senderIp: String,

@@ -81,7 +81,7 @@ import com.ismartcoding.plain.platform.checkNotificationPermission
 import com.ismartcoding.plain.platform.getOwnPackageName
 import com.ismartcoding.plain.platform.printText
 import com.ismartcoding.plain.platform.updateChatMessageTextAsync
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.resetAsync
 import com.ismartcoding.plain.httpserver.HttpServerManager

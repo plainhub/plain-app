@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.lib.logcat.LogCat
 import platform.Foundation.NSURL

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat
 import com.ismartcoding.plain.platform.canShowNotifications
 
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
@@ -22,7 +22,7 @@ import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.peer_chat
 import com.ismartcoding.plain.lib.sendEvent

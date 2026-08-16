@@ -13,6 +13,8 @@ kotlin {
         namespace = "com.ismartcoding.plain.lib"
         compileSdk = 37
         minSdk = 28
+
+        withHostTest {}
     }
 
     iosArm64()

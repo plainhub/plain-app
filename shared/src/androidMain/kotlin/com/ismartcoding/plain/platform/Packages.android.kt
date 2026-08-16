@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.platform
 
+import androidx.core.content.pm.PackageInfoCompat
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.data.DCertificate
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.apk.ApkParsers
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.packageManager
@@ -120,7 +120,7 @@ actual suspend fun getPackageDetail(id: String): DPackageInfo? = withIO {
             dataDir = detail.appInfo.dataDir ?: "",
             targetSdkVersion = detail.appInfo.targetSdkVersion,
             minSdkVersion = detail.appInfo.minSdkVersion,
-            versionCode = androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(detail.packageInfo),
+            versionCode = PackageInfoCompat.getLongVersionCode(detail.packageInfo),
             hasLargeHeap = detail.hasLargeHeap,
         )
     } catch (e: Exception) {

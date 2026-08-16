@@ -25,7 +25,7 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.checkUpdateAsync
 import com.ismartcoding.plain.platform.getAppVersion
 import com.ismartcoding.plain.platform.getCacheSize
@@ -42,14 +42,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDonationBanner
 import com.ismartcoding.plain.ui.base.PExploreBanner
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace

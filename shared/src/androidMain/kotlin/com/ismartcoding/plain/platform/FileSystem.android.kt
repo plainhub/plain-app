@@ -8,8 +8,9 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.extensions.newPath
+import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.helpers.FileHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.File
@@ -36,7 +37,7 @@ actual fun searchFilesByName(query: String, dir: String, showHidden: Boolean, so
 
 actual suspend fun getRecentFiles(): List<DFile> = withIO {
     if (isQPlus()) {
-        com.ismartcoding.plain.features.media.FileMediaStoreHelper.getRecentFilesAsync(appContext)
+        FileMediaStoreHelper.getRecentFilesAsync(appContext)
     } else {
         FileSystemHelper.getRecentFiles().map { file ->
             DFile(

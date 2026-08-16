@@ -13,8 +13,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
-import com.ismartcoding.plain.helpers.coIO
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.plainapp_service_is_running
 import com.ismartcoding.plain.lib.logcat.LogCat

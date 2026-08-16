@@ -11,7 +11,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.helpers.ImageHelper
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import kotlinx.coroutines.launch

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
-import com.ismartcoding.plain.features.dlna.DlnaMediaType
+import com.ismartcoding.plain.lib.dlna.DlnaMediaType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.lib.extensions.isVideoFast
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadStatus
 import com.ismartcoding.plain.chat.download.DownloadTask

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.rss.RssParser
 import com.ismartcoding.plain.lib.rss.model.RssChannel
 import io.ktor.client.request.get

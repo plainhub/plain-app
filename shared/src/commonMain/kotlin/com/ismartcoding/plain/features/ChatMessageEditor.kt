@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features
 
-import com.ismartcoding.plain.helpers.withIO
-import com.ismartcoding.plain.helpers.JsonHelper
+import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DLinkPreview

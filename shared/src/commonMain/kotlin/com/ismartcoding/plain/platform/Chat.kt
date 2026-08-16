@@ -9,8 +9,8 @@ import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.features.ChatMessageEditor
 import com.ismartcoding.plain.helpers.StringHelper
-import com.ismartcoding.plain.helpers.coMain
-import com.ismartcoding.plain.helpers.withIO
+import com.ismartcoding.plain.lib.coMain
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtension
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isImageFast
