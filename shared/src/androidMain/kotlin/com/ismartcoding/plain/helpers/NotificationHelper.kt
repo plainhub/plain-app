@@ -138,7 +138,7 @@ object NotificationHelper {
         val description = listOf(clientIp, browserDisplay, "$osName $osVersion").filter { it.isNotBlank() }.joinToString(" · ")
         val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(notificationDrawableId())
-            .setContentTitle(LocaleHelper.getString(Res.string.web_client_connected))
+            .setContentTitle(LocaleHelper.getString(Res.string.client_connected))
             .setContentText(description)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)

@@ -19,6 +19,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.helpers.coIO
+import com.ismartcoding.plain.platform.restartServer
+import com.ismartcoding.plain.platform.startHttpServerService
+import com.ismartcoding.plain.platform.stopHttpServiceAsync
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
@@ -87,7 +91,7 @@ fun WebAddressBar(
                 }
                 mdnsEditDialogVisible = false
                 if (hostnameChanged || portChanged) {
-                    showRestartAppDialog()
+                    restartServer()
                 }
             },
         )
@@ -101,7 +105,7 @@ fun WebAddressBar(
             onSelect = {
                 persistPort(scope, isHttps, it)
                 portDialogVisible = false
-                showRestartAppDialog()
+                restartServer()
             },
         )
     }

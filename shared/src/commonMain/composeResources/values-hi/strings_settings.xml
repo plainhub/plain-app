@@ -73,7 +73,7 @@
     <string name="donation_desc">PlainApp मुफ़्त, ओपन-सोर्स है और एक ही डेवलपर द्वारा बनाया गया है। अगर इसने आपका समय बचाया है, तो एक कप कॉफ़ी खिलाने पर विचार करें।</string>
     <string name="drag_number_to_reorder_list">सूची को पुनर्व्यवस्थित करने के लिए नंबर खींचें</string>
 
-    <string name="web_client_connected">वेब क्लाइंट कनेक्ट हुआ</string>
+    <string name="client_connected">क्लाइंट कनेक्ट हुआ</string>
     <string name="clients_online">%1$d क्लाइंट ऑनलाइन</string>
     <string name="downloading_update">डाउनलोड हो रहा है… %1$s%</string>
     <string name="download_update_failed">डाउनलोड विफल हुआ</string>
