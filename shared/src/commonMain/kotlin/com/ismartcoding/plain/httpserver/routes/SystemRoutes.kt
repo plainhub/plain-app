@@ -64,8 +64,7 @@ fun HttpRouter.addSystemRoutes() {
             if (token != null) {
                 val decrypted = chaCha20Decrypt(token, bodyBytes)
                 if (decrypted != null) {
-                    val response = InitResponse(SignatureHelper.getRawPublicKeyBase64Async())
-                    call.respondJson(response)
+                    call.respondJson(InitResponse(SignatureHelper.getRawPublicKeyBase64Async()))
                     return@post
                 }
             }

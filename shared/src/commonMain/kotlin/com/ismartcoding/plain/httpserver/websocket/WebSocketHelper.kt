@@ -5,6 +5,8 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.setOnlineClientIds
+import com.ismartcoding.plain.httpserver.WsSessionHandle
 
 object WebSocketHelper {
     suspend fun sendEventAsync(event: WebSocketEvent) = withIO {
@@ -13,11 +15,30 @@ object WebSocketHelper {
             if (data is WebSocketData.Text) {
                 val token = HttpServerManager.tokenCache[it.clientId]
                 if (token != null) {
-                    it.send(addIntPrefixToByteArray(event.type.value, chaCha20Encrypt(token, data.value)))
+                    sendSafe(it, addIntPrefixToByteArray(event.type.value, chaCha20Encrypt(token, data.value)))
                 }
             } else if (data is WebSocketData.Binary) {
-                it.send(addIntPrefixToByteArray(event.type.value, data.value))
+                sendSafe(it, addIntPrefixToByteArray(event.type.value, data.value))
             }
+        }
+    }
+
+    /**
+     * A session stays in [HttpServerManager.wsSessions] until its receive loop
+     * exits, so a client that just disconnected can still receive a broadcast
+     * (e.g. 60fps screen-mirror frames). Sending to it throws, which would
+     * crash the app as an uncaught coroutine exception — drop the dead session
+     * instead and keep broadcasting to the rest.
+     */
+    private suspend fun sendSafe(
+        session: WsSessionHandle,
+        bytes: ByteArray,
+    ) {
+        try {
+            session.send(bytes)
+        } catch (ex: Exception) {
+            HttpServerManager.wsSessions.removeAll { it.id == session.id }
+            setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
         }
     }
 }
