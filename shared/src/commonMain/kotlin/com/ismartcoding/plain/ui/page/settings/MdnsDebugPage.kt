@@ -32,8 +32,8 @@ import com.ismartcoding.plain.i18n.mdns_port
 import com.ismartcoding.plain.i18n.mdns_service_type
 import com.ismartcoding.plain.i18n.mdns_txt
 import com.ismartcoding.plain.i18n.not_available
-import com.ismartcoding.plain.mdns.MdnsServiceSnapshot
-import com.ismartcoding.plain.mdns.MdnsServiceBrowser
+import com.ismartcoding.plain.lib.mdns.MdnsServiceSnapshot
+import com.ismartcoding.plain.lib.mdns.MdnsServiceBrowser
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem

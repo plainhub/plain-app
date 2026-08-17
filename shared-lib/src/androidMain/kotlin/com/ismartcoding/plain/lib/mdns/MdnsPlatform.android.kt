@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.mdns
+package com.ismartcoding.plain.lib.mdns
 
 import android.content.Context
 import android.net.wifi.WifiManager
@@ -37,6 +37,8 @@ internal actual fun startMdnsWorker(name: String, block: () -> Unit): MdnsWorker
         override fun join(timeoutMs: Long) { runCatching { t.join(timeoutMs) } }
     }
 }
+
+internal actual fun mdnsNowMillis(): Long = System.currentTimeMillis()
 
 private fun appContext(): Context? = runCatching {
     val app = Class.forName("android.app.ActivityThread")

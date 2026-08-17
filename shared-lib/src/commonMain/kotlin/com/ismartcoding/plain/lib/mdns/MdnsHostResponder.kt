@@ -1,7 +1,5 @@
-package com.ismartcoding.plain.mdns
+package com.ismartcoding.plain.lib.mdns
 
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlin.concurrent.Volatile
 
 /**
@@ -34,12 +32,9 @@ object MdnsHostResponder {
      * (PTR/SRV/TXT/A answers); when null the responder only answers A-record
      * queries for [mdnsHostname].
      */
-    internal fun start(mdnsHostname: String, service: MdnsServiceInfo? = null): Boolean {
+    fun start(mdnsHostname: String, service: MdnsServiceInfo? = null): Boolean {
         val normalized = normalizeHostname(mdnsHostname)
-        if (normalized.isEmpty()) {
-            LogCat.e("mDNS start skipped: empty hostname")
-            return false
-        }
+        if (normalized.isEmpty()) return false
         hostname = normalized
         serviceInfo = service
         return restartSocket()
@@ -49,7 +44,7 @@ object MdnsHostResponder {
      * Ensures the responder socket is up so discovery works even while the HTTP
      * service is off. When already running this keeps the current configuration.
      */
-    internal fun ensureStarted(mdnsHostname: String): Boolean {
+    fun ensureStarted(mdnsHostname: String): Boolean {
         if (isRunning) return true
         return start(mdnsHostname, serviceInfo)
     }
@@ -67,49 +62,34 @@ object MdnsHostResponder {
      * responder keeps answering A queries for [hostname]. Use [stop] only for
      * a full teardown.
      */
-    internal fun clearService() {
+    fun clearService() {
         serviceInfo = null
-        LogCat.d("mDNS service advertisement withdrawn, socket kept for hostname/browser")
     }
 
     /** Recreates the socket after a network change, preserving hostname/service config. */
-    internal fun restartSocket(): Boolean {
+    fun restartSocket(): Boolean {
         tearDownSocket()
         if (hostname.isEmpty()) return false
 
         val candidates = candidateInterfaces()
-        if (candidates.isEmpty()) {
-            LogCat.e("mDNS: no candidate interfaces found")
-            return false
-        }
+        if (candidates.isEmpty()) return false
 
-        val s = runCatching { createMdnsSocket() }.getOrElse {
-            LogCat.e("mDNS socket create failed: ${it.message}")
-            return false
-        }
+        val s = runCatching { createMdnsSocket() }.getOrNull() ?: return false
 
         runCatching {
             s.bind(MDNS_PORT, 1000)
             var joined = false
             for ((iface, _) in candidates) {
-                runCatching { s.joinGroup(MDNS_GROUP, iface.name) }
-                    .onSuccess { joined = true; LogCat.d("mDNS joined ${iface.name}") }
-                    .onFailure { LogCat.e("mDNS joinGroup ${iface.name}: ${it.message}") }
+                if (runCatching { s.joinGroup(MDNS_GROUP, iface.name) }.isSuccess) joined = true
             }
-            if (!joined) {
-                runCatching { s.joinGroup(MDNS_GROUP, null) }
-                    .onSuccess { LogCat.d("mDNS joined (default)") }
-                    .onFailure { LogCat.e("mDNS joinGroup default: ${it.message}") }
-            }
+            if (!joined) runCatching { s.joinGroup(MDNS_GROUP, null) }
         }.getOrElse {
             runCatching { s.close() }
-            LogCat.e("mDNS bind/join failed: ${it.message}")
             return false
         }
 
         socket = s
         worker = startMdnsWorker("plain-mdns-responder") { runLoop(s) }
-        LogCat.d("mDNS responder started for $hostname on ${candidates.size} interface(s)")
         return true
     }
 
@@ -138,14 +118,13 @@ object MdnsHostResponder {
         val candidates = candidateInterfaces()
         if (candidates.isEmpty()) {
             runCatching { s.send(bytes, MDNS_GROUP, MDNS_PORT) }
-                .onFailure { LogCat.e("mDNS sendQuery: ${it.message}") }
             return
         }
         candidates.forEach { (iface, _) ->
             runCatching {
                 s.setOutgoingInterface(iface.name)
                 s.send(bytes, MDNS_GROUP, MDNS_PORT)
-            }.onFailure { LogCat.e("mDNS sendQuery ${iface.name}: ${it.message}") }
+            }
         }
     }
 
@@ -171,8 +150,7 @@ object MdnsHostResponder {
                 runCatching {
                     if (!useUnicast) s.setOutgoingInterface(responseIface.name)
                     s.send(response.bytes, destAddress, destPort)
-                    LogCat.d("mDNS reply $hostname → $localIp from $senderIp:${result.senderPort} dest=$destAddress:$destPort")
-                }.onFailure { LogCat.e("mDNS send to $senderIp: ${it.message}") }
+                }
             } catch (_: Exception) {
                 if (s.isClosed) break
             }
@@ -183,9 +161,9 @@ object MdnsHostResponder {
      * Answers a query with the PlainApp service records when one is published,
      * otherwise falls back to the A-record hostname responder.
      *
-     * The service advertisement is gated by the user's "discoverable" setting:
-     * when disabled we stop announcing the PlainApp service (identity data via
-     * PTR/SRV/TXT) but still answer plain hostname A queries, which leak no
+     * The service advertisement is gated by the app layer: when disabled we
+     * stop announcing the PlainApp service (identity data via PTR/SRV/TXT)
+     * but still answer plain hostname A queries, which leak no
      * PlainApp-specific information.
      */
     private fun buildResponse(query: ByteArray, ips: List<String>): MdnsResponse? {

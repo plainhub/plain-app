@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.debug
 
-import com.ismartcoding.plain.mdns.MdnsHostResponder
+import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
 import com.ismartcoding.plain.platform.IosPlatformRegistry
 
 actual fun isHttpServerRunning(): Boolean =

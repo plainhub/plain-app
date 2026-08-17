@@ -1,7 +1,7 @@
-package com.ismartcoding.plain.tests
+package com.ismartcoding.plain.lib.mdns
 
-import com.ismartcoding.plain.mdns.ipToInt
-import com.ismartcoding.plain.mdns.isMobileDataInterface
+import com.ismartcoding.plain.lib.mdns.ipToInt
+import com.ismartcoding.plain.lib.mdns.isMobileDataInterface
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

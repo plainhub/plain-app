@@ -1,8 +1,8 @@
-package com.ismartcoding.plain.tests
+package com.ismartcoding.plain.lib.mdns
 
-import com.ismartcoding.plain.mdns.MdnsPacketCodec
-import com.ismartcoding.plain.mdns.MdnsServiceInfo
-import com.ismartcoding.plain.mdns.MdnsServiceResponseBuilder
+import com.ismartcoding.plain.lib.mdns.MdnsPacketCodec
+import com.ismartcoding.plain.lib.mdns.MdnsServiceInfo
+import com.ismartcoding.plain.lib.mdns.MdnsServiceResponseBuilder
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull

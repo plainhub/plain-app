@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.mdns
+package com.ismartcoding.plain.lib.mdns
 
 /**
  * DNS/mDNS wire-format codec shared by the hostname responder, the service

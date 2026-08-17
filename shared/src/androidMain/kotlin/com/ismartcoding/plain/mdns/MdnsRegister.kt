@@ -2,6 +2,9 @@ package com.ismartcoding.plain.mdns
 
 import android.content.Context
 import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.mdns.isMobileDataInterface
+import java.net.Inet4Address
+import java.net.NetworkInterface
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -46,9 +49,7 @@ class MdnsRegister(
         // don't cancel an in-flight debounce job.  This prevents cellular
         // onLinkPropertiesChanged storms (DNS updates, CLAT/NAT64 changes) from
         // continuously resetting the debounce timer and blocking re-registration.
-        val currentIfaces = candidateInterfaces()
-            .map { (iface, ip) -> "${iface.name}:$ip" }
-            .toSet()
+        val currentIfaces = lanIfaces()
         if (currentIfaces.isNotEmpty() && currentIfaces == lastRegisteredIfaces && reregisterJob?.isActive == true) {
             return
         }
@@ -59,9 +60,7 @@ class MdnsRegister(
             if (!isActive()) return@coIO
 
             // Re-fetch — interfaces may have changed since fast-path check above.
-            val freshIfaces = candidateInterfaces()
-                .map { (iface, ip) -> "${iface.name}:$ip" }
-                .toSet()
+            val freshIfaces = lanIfaces()
 
             // Network gone — tear down responder and reset so the next
             // network-up event triggers a fresh registration.
@@ -105,3 +104,18 @@ class MdnsRegister(
         }
     }
 }
+
+    /** Snapshot of current LAN interfaces as "wlan0:192.168.1.5" strings. */
+    private fun lanIfaces(): Set<String> =
+        runCatching {
+            NetworkInterface.getNetworkInterfaces()?.asSequence()
+                ?.filter { it.isUp && !it.isLoopback }
+                ?.filterNot { isMobileDataInterface(it.name) }
+                ?.mapNotNull { iface ->
+                    val ip = iface.inetAddresses.asSequence()
+                        .filterIsInstance<Inet4Address>()
+                        .firstOrNull { !it.isLoopbackAddress } ?: return@mapNotNull null
+                    "${iface.name}:${ip.hostAddress}"
+                }
+                ?.toSet() ?: emptySet()
+        }.getOrElse { emptySet() }

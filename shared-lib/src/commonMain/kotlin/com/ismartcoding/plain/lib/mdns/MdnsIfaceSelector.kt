@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.mdns
+package com.ismartcoding.plain.lib.mdns
 
 /**
  * Collects candidate LAN (non-loopback, non-mobile-data) interfaces with their
@@ -7,7 +7,7 @@ package com.ismartcoding.plain.mdns
 internal expect fun candidateInterfaces(): List<Pair<MdnsIface, String>>
 
 /** Returns true for mobile-data-only bearer interface names (never LAN). */
-internal fun isMobileDataInterface(name: String): Boolean =
+fun isMobileDataInterface(name: String): Boolean =
     name.startsWith("rmnet") || name.startsWith("ccmni") ||
         name.startsWith("v4-rmnet") || name.startsWith("v6-rmnet") ||
         name.startsWith("clat") || name.startsWith("v4-ccmni")

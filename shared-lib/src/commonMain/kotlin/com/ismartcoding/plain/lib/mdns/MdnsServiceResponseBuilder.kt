@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.mdns
+package com.ismartcoding.plain.lib.mdns
 
 /**
  * Builds mDNS responses for the service published by [MdnsServiceInfo].

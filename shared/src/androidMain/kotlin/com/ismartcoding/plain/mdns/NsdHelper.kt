@@ -3,6 +3,8 @@ package com.ismartcoding.plain.mdns
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.discover.PairingCore
+import com.ismartcoding.plain.discover.buildMdnsServiceInfo
+import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
 import java.util.concurrent.atomic.AtomicBoolean
 
 object NsdHelper {

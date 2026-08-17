@@ -1,19 +1,21 @@
-package com.ismartcoding.plain.mdns
+package com.ismartcoding.plain.lib.mdns
 
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.peer.PeerManager
-import com.ismartcoding.plain.chat.peer.PeerStatusManager
-import com.ismartcoding.plain.data.DNearbyDevice
-import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.enums.DiscoveryMethod
-import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.ui.models.NearbyViewModel
 import kotlin.concurrent.Volatile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+
+/** A fully resolved service instance, emitted once id / port / IPs are known. */
+class MdnsFoundDevice(
+    val id: String,
+    val name: String,
+    val ips: List<String>,
+    val port: Int,
+    val deviceType: String,
+    val version: String,
+    val platform: String,
+)
 
 /**
  * mDNS service browser for `_plainapp._tcp.local`.
@@ -22,7 +24,7 @@ import kotlinx.coroutines.isActive
  *  1. periodically send a PTR query for the service type
  *  2. parse PTR responses to learn instance names
  *  3. for each new instance send SRV + TXT (+ A) queries
- *  4. combine port / metadata / IPs into a [DNearbyDevice]
+ *  4. combine port / metadata / IPs into a [MdnsFoundDevice] delivered via [onDevice]
  *
  * The browser shares [MdnsHostResponder]'s socket (one bind on 5353), so its
  * queries and the responder's answers stay on the same port.
@@ -31,11 +33,17 @@ import kotlinx.coroutines.isActive
  * responder worker thread) and publishes immutable state via [Volatile] maps;
  * [browseOnce] / [snapshot] run on other threads and only read snapshots.
  */
-internal object MdnsServiceBrowser {
+object MdnsServiceBrowser {
     private const val DISCOVER_INTERVAL_MS = 5_000L
 
     /** Re-query an incomplete instance at most this often (multicast responses get lost). */
     private const val FOLLOW_UP_RETRY_MS = 10_000L
+
+    /** Supplied by the app layer; self-heals the responder socket with the current hostname. */
+    @Volatile var hostnameProvider: (() -> String)? = null
+
+    /** Called on the responder worker thread for every device whose data became complete. */
+    @Volatile var onDevice: ((MdnsFoundDevice) -> Unit)? = null
 
     /** Immutable mDNS info for one service instance, accumulated across packets. */
     private data class Instance(
@@ -43,7 +51,7 @@ internal object MdnsServiceBrowser {
         val instanceName: String,
         val id: String = "",
         val port: Int = 0,
-        val deviceType: DeviceType = DeviceType.OTHER,
+        val deviceType: String = "",
         val version: String = "",
         val platform: String = "",
         val targetHostname: String = "",
@@ -73,11 +81,9 @@ internal object MdnsServiceBrowser {
         discoverJob = coIO {
             while (isActive) {
                 runCatching { browseOnce() }
-                    .onFailure { LogCat.e("mDNS browse error: ${it.message}") }
                 delay(DISCOVER_INTERVAL_MS)
             }
         }
-        LogCat.d("mDNS browser started")
     }
 
     /**
@@ -88,11 +94,10 @@ internal object MdnsServiceBrowser {
     fun stop() {
         discoverJob?.cancel()
         discoverJob = null
-        LogCat.d("mDNS browser stopped")
     }
 
     /**
-     * One-shot PTR query used by [MdnsDiscoverManager.browse]. Safe to call
+     * One-shot PTR query used by [com.ismartcoding.plain.lib.mdns] consumers. Safe to call
      * while periodic discovery is stopped (e.g. a failed chat send triggering
      * peer rediscovery): without a registered packet listener the PTR reply
      * would be dropped by the responder and the peer's IP/port never refresh.
@@ -103,7 +108,7 @@ internal object MdnsServiceBrowser {
     }
 
     /** Registers the packet listener so inbound responses reach [handlePacket]; idempotent. */
-    internal fun ensureListening() {
+    fun ensureListening() {
         if (listener != null) return
         val l: (ByteArray, String) -> Unit = { data, _ -> handlePacket(data) }
         listener = l
@@ -127,11 +132,11 @@ internal object MdnsServiceBrowser {
     private fun browseOnce() {
         // Self-heal after an external socket teardown (e.g. HTTP service stop):
         // the responder keeps packet listeners, so discovery resumes seamlessly.
-        MdnsHostResponder.ensureStarted(TempData.mdnsHostname)
+        hostnameProvider?.let { MdnsHostResponder.ensureStarted(it()) }
         sendPtrQuery()
         // Follow up on instances that still lack port / metadata / IPs, re-asking
         // periodically because multicast responses can be dropped.
-        val now = TimeHelper.nowMillis()
+        val now = mdnsNowMillis()
         instances.values.forEach { instance ->
             val key = instance.instanceFqdn
             if (!instance.complete && now - (srvTxtQueriedAt[key] ?: 0L) >= FOLLOW_UP_RETRY_MS) {
@@ -185,10 +190,7 @@ internal object MdnsServiceBrowser {
                             if (eq <= 0) continue
                             when (entry.substring(0, eq)) {
                                 "id" -> updated = updated.copy(id = entry.substring(eq + 1))
-                                "dv" -> updated = updated.copy(
-                                    deviceType = runCatching { DeviceType.valueOf(entry.substring(eq + 1)) }
-                                        .getOrDefault(DeviceType.OTHER),
-                                )
+                                "dv" -> updated = updated.copy(deviceType = entry.substring(eq + 1))
                                 "ver" -> updated = updated.copy(version = entry.substring(eq + 1))
                                 "pf" -> updated = updated.copy(platform = entry.substring(eq + 1))
                             }
@@ -215,7 +217,7 @@ internal object MdnsServiceBrowser {
         // for the next browseOnce() cycle (up to 5 s). This is the single most
         // impactful latency optimization for first device appearance.
         if (discovered.isNotEmpty()) {
-            val now = TimeHelper.nowMillis()
+            val now = mdnsNowMillis()
             val srvNext = srvTxtQueriedAt.toMutableMap()
             discovered.forEach { instance ->
                 val key = instance.instanceFqdn
@@ -231,11 +233,20 @@ internal object MdnsServiceBrowser {
         instances = nextInstances
         hostnameToInstance = nextHostnames
 
-        // Skip our own looped-back announcements (multicast loop is enabled on
-        // purpose so multiple same-device sockets keep working) instead of
-        // emitting this device into the nearby list / peer tables.
-        touched.filter { key -> nextInstances[key]?.id != TempData.clientId }.forEach { key ->
-            nextInstances[key]?.takeIf { it.complete }?.let { emitDevice(it) }
+        touched.forEach { key ->
+            nextInstances[key]?.takeIf { it.complete }?.let { instance ->
+                onDevice?.invoke(
+                    MdnsFoundDevice(
+                        id = instance.id,
+                        name = instance.instanceName,
+                        ips = instance.ips.toList(),
+                        port = instance.port,
+                        deviceType = instance.deviceType,
+                        version = instance.version,
+                        platform = instance.platform,
+                    )
+                )
+            }
         }
     }
 
@@ -249,34 +260,4 @@ internal object MdnsServiceBrowser {
     }
 
     private fun instanceKey(fqdn: String): String = fqdn.lowercase()
-
-    private fun emitDevice(instance: Instance) {
-        val device = DNearbyDevice(
-            id = instance.id,
-            name = instance.instanceName,
-            ips = instance.ips.toList(),
-            port = instance.port,
-            deviceType = instance.deviceType,
-            version = instance.version,
-            platform = instance.platform,
-            lastSeen = TimeHelper.now(),
-            discoveryMethods = setOf(DiscoveryMethod.LAN),
-        )
-        coIO {
-            // Resident-listener path: always refresh a paired peer's address so a
-            // changed IP is picked up by the next reconnect attempt even while
-            // the nearby scan loop is off.
-            PeerManager.applyDeviceDiscovered(
-                deviceId = device.id,
-                ips = device.ips,
-                port = device.port,
-                name = device.name,
-                deviceType = device.deviceType,
-            )
-            // Scan-gated path: nearby-list events only fire while discovery runs.
-            if (!isRunning) return@coIO
-            NearbyViewModel.handleNewDevice(device)
-            PeerStatusManager.setOnline(device.id, true)
-        }
-    }
 }

@@ -2,11 +2,12 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.discover.PairingCore
+import com.ismartcoding.plain.discover.ensureMdnsInterfacesInstalled
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.mdns.MdnsHostResponder
-import com.ismartcoding.plain.mdns.buildMdnsServiceInfo
+import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
+import com.ismartcoding.plain.discover.buildMdnsServiceInfo
 import com.ismartcoding.plain.httpserver.HttpServerManager
 
 /**
@@ -63,6 +64,7 @@ actual suspend fun stopHttpEngineAsync(): Unit = withIO {
 
 /** No platform side effects on iOS once the server is healthy. */
 actual suspend fun onHttpServerStarted() {
+    ensureMdnsInterfacesInstalled()
     // Start mDNS hostname responder so peers can discover this device via its .local name.
     val httpPort = TempData.httpPort.value
     val httpsPort = TempData.httpsPort.value

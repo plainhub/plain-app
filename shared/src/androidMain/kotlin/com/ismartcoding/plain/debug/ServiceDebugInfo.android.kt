@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.debug
 
 import com.ismartcoding.plain.chat.peer.transport.WifiAwareTransport
-import com.ismartcoding.plain.mdns.MdnsHostResponder
+import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
 import com.ismartcoding.plain.services.HttpServerService
 
 actual fun isHttpServerRunning(): Boolean = HttpServerService.isRunning()

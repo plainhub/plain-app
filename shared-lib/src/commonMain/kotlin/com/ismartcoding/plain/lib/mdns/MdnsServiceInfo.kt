@@ -1,12 +1,11 @@
-package com.ismartcoding.plain.mdns
+package com.ismartcoding.plain.lib.mdns
 
-import com.ismartcoding.plain.discover.DDiscoverReply
 
 /** mDNS service type advertised by PlainApp devices. */
-internal const val PLAINAPP_SERVICE_TYPE = "_plainapp._tcp.local"
+const val PLAINAPP_SERVICE_TYPE = "_plainapp._tcp.local"
 
 /** A service instance published by a PlainApp device over mDNS. */
-internal data class MdnsServiceInfo(
+data class MdnsServiceInfo(
     val instanceName: String,   // e.g. "Pixel 7 Pro"
     val serviceType: String,    // e.g. "_plainapp._tcp.local"
     val targetHostname: String, // e.g. "plainapp-abc123.local"
@@ -24,7 +23,7 @@ internal data class MdnsServiceInfo(
  * wire data exactly as parsed (service type, instance, hostname, port, TXT
  * records) so the protocol implementation can be checked against RFC 6762.
  */
-internal data class MdnsServiceSnapshot(
+data class MdnsServiceSnapshot(
     val serviceType: String,
     val instanceName: String,
     val instanceFqdn: String,
@@ -43,26 +42,6 @@ internal data class MdnsSrvRecord(
     val target: String,
 )
 
-/**
- * Builds the advertised mDNS service for this device from a discovery reply.
- * TXT keys mirror [DDiscoverReply] fields (see design doc §4.1).
- */
-internal fun buildMdnsServiceInfo(reply: DDiscoverReply, hostname: String): MdnsServiceInfo =
-    MdnsServiceInfo(
-        instanceName = reply.name,
-        serviceType = PLAINAPP_SERVICE_TYPE,
-        targetHostname = hostname,
-        port = reply.port,
-        txtRecords = listOf(
-            "id=${reply.id}",
-            "dv=${reply.deviceType.name}",
-            "ver=${reply.version}",
-            "pf=${reply.platform}",
-            "aw=${if (reply.awareSupported) "1" else "0"}",
-            "ar=${if (reply.awareRunning) "1" else "0"}",
-        ),
-        ips = reply.ips,
-    )
 
 /** One resource record parsed from a DNS/mDNS message. */
 internal data class MdnsRecord(

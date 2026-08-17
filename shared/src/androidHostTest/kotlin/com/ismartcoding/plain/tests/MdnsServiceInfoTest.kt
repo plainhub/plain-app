@@ -2,8 +2,8 @@ package com.ismartcoding.plain.tests
 
 import com.ismartcoding.plain.discover.DDiscoverReply
 import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.mdns.PLAINAPP_SERVICE_TYPE
-import com.ismartcoding.plain.mdns.buildMdnsServiceInfo
+import com.ismartcoding.plain.lib.mdns.PLAINAPP_SERVICE_TYPE
+import com.ismartcoding.plain.discover.buildMdnsServiceInfo
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

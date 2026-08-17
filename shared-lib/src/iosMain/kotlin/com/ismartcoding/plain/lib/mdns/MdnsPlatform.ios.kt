@@ -1,13 +1,7 @@
 @file:OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 
-package com.ismartcoding.plain.mdns
+package com.ismartcoding.plain.lib.mdns
 
-import com.ismartcoding.plain.platform.formatIpv4
-import com.ismartcoding.plain.platform.getDeviceIP4s
-import com.ismartcoding.plain.platform.htonl
-import com.ismartcoding.plain.platform.htons
-import com.ismartcoding.plain.platform.ntohs
-import com.ismartcoding.plain.platform.parseIpv4
 import kotlin.concurrent.AtomicInt
 import kotlin.concurrent.Volatile
 import kotlin.native.concurrent.Worker
@@ -26,6 +20,8 @@ import kotlinx.cinterop.reinterpret
 import kotlinx.cinterop.set
 import kotlinx.cinterop.sizeOf
 import kotlinx.cinterop.value
+import platform.Foundation.NSDate
+import platform.Foundation.timeIntervalSince1970
 import platform.posix.AF_INET
 import platform.posix.IPPROTO_IP
 import platform.posix.IP_ADD_MEMBERSHIP
@@ -38,6 +34,7 @@ import platform.posix.SO_REUSEADDR
 import platform.posix.bind
 import platform.posix.close
 import platform.posix.if_nametoindex
+import platform.posix.in_addr_t
 import platform.posix.ip_mreq
 import platform.posix.recvfrom
 import platform.posix.sendto
@@ -45,8 +42,7 @@ import platform.posix.setsockopt
 import platform.posix.sockaddr_in
 import platform.posix.socket
 import platform.posix.timeval
-
-private const val MDNS_GROUP = "224.0.0.251"
+import platform.posix.usleep
 
 /**
  * Darwin's `SO_REUSEPORT` (0x0200). Not exposed via `platform.posix` in
@@ -58,31 +54,18 @@ private const val SO_REUSEPORT = 0x0200
 internal actual fun createMdnsSocket(): MdnsSocket = PosixMdnsSocket()
 
 /**
- * iOS actual: enumerates IPv4 interfaces via the Swift-bridged
- * [IosPlatformRegistry.getDeviceIP4s]. Interface names and prefix
- * lengths are synthesized; the first IP always uses "en0" (iOS's
- * primary Wi‑Fi interface) so that `IP_MULTICAST_IF` routing via
- * [if_nametoindex] actually works.
- *
- * Real per-interface data would require calling `getifaddrs` from
- * Swift, which is a minor follow-up enhancement to the
- * IosNetworkInfoProvider bridge — the current approach is chosen to
- * keep platform lowest-level code in Swift (per project conventions)
- * and to avoid an extra C-interop .def for a single Darwin header.
+ * iOS interface data needs the app layer's Swift bridge (getifaddrs is not
+ * exposed via `platform.posix`), so the app installs this provider at startup.
+ * Returns `(ifaceName, prefixLength, ip)` triples; mobile-data filtering is
+ * applied here.
  */
-internal actual fun candidateInterfaces(): List<Pair<MdnsIface, String>> {
-    val ips = getDeviceIP4s()
-    val out = ArrayList<Pair<MdnsIface, String>>(ips.size)
-    for ((i, ip) in ips.withIndex()) {
-        val parts = ip.split(".")
-        if (parts.size != 4) continue
-        if (parts[0] == "127") continue
-        val name = if (i == 0) "en0" else "en$i"
-        if (isMobileDataInterface(name)) continue
-        out.add(MdnsIface(name, 24) to ip)
-    }
-    return out
-}
+var mdnsInterfaceProvider: (() -> List<Triple<String, Short, String>>)? = null
+
+internal actual fun candidateInterfaces(): List<Pair<MdnsIface, String>> =
+    mdnsInterfaceProvider?.invoke()
+        ?.filterNot { isMobileDataInterface(it.first) }
+        ?.map { MdnsIface(it.first, it.second) to it.third }
+        ?: emptyList()
 
 internal actual fun startMdnsWorker(name: String, block: () -> Unit): MdnsWorkerHandle {
     val alive = AtomicInt(1)
@@ -102,11 +85,14 @@ internal actual fun startMdnsWorker(name: String, block: () -> Unit): MdnsWorker
             val start = TimeSource.Monotonic.markNow()
             while (alive.value != 0) {
                 if (start.elapsedNow().inWholeMilliseconds >= timeoutMs) break
-                platform.posix.usleep(10_000u)
+                usleep(10_000u)
             }
         }
     }
 }
+
+internal actual fun mdnsNowMillis(): Long =
+    (NSDate().timeIntervalSince1970 * 1000).toLong()
 
 // ── Socket ──────────────────────────────────────────────────────────────────
 
@@ -215,3 +201,40 @@ private fun setSockOptInt(fd: Int, level: Int, opt: Int, value: Int) = memScoped
     v.value = value
     setsockopt(fd, level, opt, v.ptr, sizeOf<IntVar>().toUInt())
 }
+
+private fun parseIpv4(s: String): in_addr_t? {
+    val parts = s.split(".")
+    if (parts.size != 4) return null
+    var host = 0u
+    for (p in parts) {
+        val n = p.toIntOrNull() ?: return null
+        if (n < 0 || n > 255) return null
+        host = (host shl 8) or n.toUInt()
+    }
+    return htonl(host)
+}
+
+private fun formatIpv4(netOrder: in_addr_t): String {
+    val host = ntohl(netOrder)
+    val a = (host shr 24) and 0xFFu
+    val b = (host shr 16) and 0xFFu
+    val c = (host shr 8) and 0xFFu
+    val d = host and 0xFFu
+    return "$a.$b.$c.$d"
+}
+
+private fun htons(value: UShort): UShort {
+    val v = value.toInt() and 0xFFFF
+    return (((v and 0xFF) shl 8) or ((v shr 8) and 0xFF)).toUShort()
+}
+
+private fun htonl(value: UInt): UInt {
+    return ((value and 0xFFu) shl 24) or
+        ((value and 0xFF00u) shl 8) or
+        ((value and 0xFF0000u) shr 8) or
+        ((value and 0xFF000000u) shr 24)
+}
+
+private fun ntohs(value: UShort): UShort = htons(value)
+
+private fun ntohl(value: UInt): UInt = htonl(value)
