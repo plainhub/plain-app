@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
-import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
+import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpMessages
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -11,22 +9,13 @@ import kotlin.test.assertTrue
 class DlnaSsdpMessagesTest {
 
     private val testUuid = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee"
-
-    @BeforeTest
-    fun setup() {
-        DlnaRendererState.port.value = 7878
-    }
-
-    @AfterTest
-    fun teardown() {
-        DlnaRendererState.reset()
-    }
+    private val testIp = "192.168.1.50"
 
     // ── aliveMessages ───
 
     @Test
     fun `aliveMessages returns three NOTIFY ssdp alive messages`() {
-        val messages = DlnaSsdpMessages.aliveMessages(testUuid)
+        val messages = DlnaSsdpMessages.aliveMessages(testUuid, testIp, 7878)
 
         assertEquals(3, messages.size)
         messages.forEach { msg ->
@@ -38,7 +27,7 @@ class DlnaSsdpMessagesTest {
 
     @Test
     fun `aliveMessages includes root device and device type and service entries`() {
-        val messages = DlnaSsdpMessages.aliveMessages(testUuid)
+        val messages = DlnaSsdpMessages.aliveMessages(testUuid, testIp, 7878)
 
         assertTrue(messages.any { it.contains("NT: upnp:rootdevice") }, "should include root device")
         assertTrue(messages.any { it.contains("NT: ${DlnaSsdpMessages.DEVICE_TYPE}") }, "should include device type")
@@ -47,7 +36,7 @@ class DlnaSsdpMessagesTest {
 
     @Test
     fun `aliveMessages USN contains uuid`() {
-        val messages = DlnaSsdpMessages.aliveMessages(testUuid)
+        val messages = DlnaSsdpMessages.aliveMessages(testUuid, testIp, 7878)
 
         messages.forEach { msg ->
             assertTrue(msg.contains("USN: $testUuid"), "USN should contain the uuid")
@@ -56,7 +45,7 @@ class DlnaSsdpMessagesTest {
 
     @Test
     fun `aliveMessages LOCATION contains device port`() {
-        val messages = DlnaSsdpMessages.aliveMessages(testUuid)
+        val messages = DlnaSsdpMessages.aliveMessages(testUuid, testIp, 7878)
 
         messages.forEach { msg ->
             assertTrue(msg.contains("LOCATION: http://"), "LOCATION should be an HTTP URL")
@@ -68,7 +57,7 @@ class DlnaSsdpMessagesTest {
 
     @Test
     fun `byebyeMessages returns three NOTIFY ssdp byebye messages`() {
-        val messages = DlnaSsdpMessages.byebyeMessages(testUuid)
+        val messages = DlnaSsdpMessages.byebyeMessages(testUuid, testIp, 7878)
 
         assertEquals(3, messages.size)
         messages.forEach { msg ->
@@ -79,7 +68,7 @@ class DlnaSsdpMessagesTest {
 
     @Test
     fun `byebyeMessages does not contain alive`() {
-        val messages = DlnaSsdpMessages.byebyeMessages(testUuid)
+        val messages = DlnaSsdpMessages.byebyeMessages(testUuid, testIp, 7878)
 
         messages.forEach { msg ->
             assertFalse(msg.contains("ssdp:alive"), "byebye must not contain ssdp:alive")
@@ -90,7 +79,7 @@ class DlnaSsdpMessagesTest {
 
     @Test
     fun `searchResponses returns three HTTP 200 OK responses`() {
-        val responses = DlnaSsdpMessages.searchResponses(testUuid)
+        val responses = DlnaSsdpMessages.searchResponses(testUuid, testIp, 7878)
 
         assertEquals(3, responses.size)
         responses.forEach { msg ->
@@ -102,7 +91,7 @@ class DlnaSsdpMessagesTest {
 
     @Test
     fun `searchResponses include ST and USN headers with uuid`() {
-        val responses = DlnaSsdpMessages.searchResponses(testUuid)
+        val responses = DlnaSsdpMessages.searchResponses(testUuid, testIp, 7878)
 
         assertTrue(responses.any { it.contains("ST: upnp:rootdevice") })
         assertTrue(responses.any { it.contains("ST: ${DlnaSsdpMessages.DEVICE_TYPE}") })
@@ -114,8 +103,7 @@ class DlnaSsdpMessagesTest {
 
     @Test
     fun `searchResponses LOCATION contains configured port`() {
-        DlnaRendererState.port.value = 7879
-        val responses = DlnaSsdpMessages.searchResponses(testUuid)
+        val responses = DlnaSsdpMessages.searchResponses(testUuid, testIp, 7879)
 
         responses.forEach { msg ->
             assertTrue(msg.contains(":7879/description.xml"), "LOCATION should reflect the current port")

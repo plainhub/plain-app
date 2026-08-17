@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
+import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpPacket
+import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpSocket
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test

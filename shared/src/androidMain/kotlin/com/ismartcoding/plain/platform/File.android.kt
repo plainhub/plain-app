@@ -39,7 +39,6 @@ import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.lib.extensions.compress
-import com.ismartcoding.plain.lib.extensions.getContentType
 import com.ismartcoding.plain.thumbnail.DecodeLimiter
 import com.ismartcoding.plain.thumbnail.DecodePolicy
 import com.ismartcoding.plain.thumbnail.ThumbnailProvider
@@ -304,12 +303,6 @@ actual suspend fun createTempFilePath(prefix: String): String = withIO {
 actual suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String? = withIO {
     val dFile = AppFileStore.importFile(File(tempFilePath), contentType, deleteSrc)
     File(dFile.realPath).name
-}
-
-actual fun getContentTypeForPath(path: String): String? {
-    val file = File(path)
-    if (!file.exists()) return null
-    return file.name.getContentType().toString()
 }
 
 actual suspend fun streamContentUri(uri: String, sink: StreamSink): String? = withIO {

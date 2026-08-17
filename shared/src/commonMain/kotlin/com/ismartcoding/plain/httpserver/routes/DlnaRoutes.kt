@@ -1,12 +1,12 @@
 package com.ismartcoding.plain.httpserver.routes
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.features.dlna.receiver.DlnaHttpRequest
 import com.ismartcoding.plain.features.dlna.receiver.DlnaHttpRouter
-import com.ismartcoding.plain.features.dlna.receiver.DlnaHttpResponse
 import com.ismartcoding.plain.features.dlna.receiver.DlnaReceiverEngine
-import com.ismartcoding.plain.features.dlna.receiver.resolveSenderName
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
+import com.ismartcoding.plain.lib.dlna.common.DlnaHttpRequest
+import com.ismartcoding.plain.lib.dlna.common.DlnaHttpResponse
+import com.ismartcoding.plain.lib.dlna.common.resolveSenderName
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.lib.withIO

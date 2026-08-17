@@ -6,8 +6,12 @@ import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpMessages
+import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpPacket
+import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpSocket
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.IODispatcher
+import com.ismartcoding.plain.platform.getDeviceIP4
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
 import com.ismartcoding.plain.features.dlna.stopDlnaRenderer
 import com.ismartcoding.plain.preferences.DlnaAllowedSendersPreference
@@ -187,7 +191,8 @@ object DlnaReceiverEngine {
     /** SSDP loop: sends initial alive, listens for M-SEARCH, resends alive every 30s. */
     private suspend fun runSsdpLoop(socket: DlnaSsdpSocket) = withIO {
         try {
-            DlnaSsdpMessages.aliveMessages(deviceUuid).forEach { socket.sendMulticast(it) }
+            DlnaSsdpMessages.aliveMessages(deviceUuid, getDeviceIP4(), DlnaRendererState.port.value)
+                .forEach { socket.sendMulticast(it) }
             LogCat.d("DLNA SSDP advertiser started, sent initial alive")
             while (isActive) {
                 val packet = try {
@@ -199,14 +204,16 @@ object DlnaReceiverEngine {
                     handleSsdpPacket(packet, socket, deviceUuid)
                 } else {
                     // Timeout — resend alive notifications
-                    DlnaSsdpMessages.aliveMessages(deviceUuid).forEach { socket.sendMulticast(it) }
+                    DlnaSsdpMessages.aliveMessages(deviceUuid, getDeviceIP4(), DlnaRendererState.port.value)
+                        .forEach { socket.sendMulticast(it) }
                 }
             }
         } catch (e: Exception) {
             LogCat.e("DLNA SSDP error: ${e.message}")
         } finally {
             try {
-                DlnaSsdpMessages.byebyeMessages(deviceUuid).forEach { socket.sendMulticast(it) }
+                DlnaSsdpMessages.byebyeMessages(deviceUuid, getDeviceIP4(), DlnaRendererState.port.value)
+                    .forEach { socket.sendMulticast(it) }
             } catch (_: Exception) {
             }
         }
@@ -221,7 +228,7 @@ object DlnaReceiverEngine {
     internal fun handleSsdpPacket(packet: DlnaSsdpPacket, socket: DlnaSsdpSocket, uuid: String) {
         if (!packet.message.contains("M-SEARCH")) return
         LogCat.d("DLNA M-SEARCH from ${packet.sourceAddress}:${packet.sourcePort}")
-        val responses = DlnaSsdpMessages.searchResponses(uuid)
+        val responses = DlnaSsdpMessages.searchResponses(uuid, getDeviceIP4(), DlnaRendererState.port.value)
         responses.forEach { socket.sendUnicast(it, packet.sourceAddress, packet.sourcePort) }
         LogCat.d("DLNA sent ${responses.size} search responses to ${packet.sourceAddress}:${packet.sourcePort}")
     }

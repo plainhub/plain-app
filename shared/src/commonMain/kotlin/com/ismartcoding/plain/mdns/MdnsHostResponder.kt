@@ -125,20 +125,28 @@ object MdnsHostResponder {
         if (listener !in packetListeners) packetListeners = packetListeners + listener
     }
 
-    internal fun removePacketListener(listener: (ByteArray, String) -> Unit) {
-        packetListeners = packetListeners - listener
-    }
-
     /**
      * Sends an mDNS query through the shared socket so responses come back on
      * port 5353 (RFC 6762 §6.7 requires the source port to be 5353).
      */
     internal fun sendQuery(bytes: ByteArray) {
         val s = socket ?: return
-        runCatching {
-            candidateInterfaces().firstOrNull()?.let { (iface, _) -> s.setOutgoingInterface(iface.name) }
-            s.send(bytes, MDNS_GROUP, MDNS_PORT)
-        }.onFailure { LogCat.e("mDNS sendQuery: ${it.message}") }
+        // Send once per interface: the outgoing interface is a socket-wide
+        // setting, so a single send can only leave one NIC. Picking just the
+        // first candidate silently drops the query when that interface is not
+        // where the peers live.
+        val candidates = candidateInterfaces()
+        if (candidates.isEmpty()) {
+            runCatching { s.send(bytes, MDNS_GROUP, MDNS_PORT) }
+                .onFailure { LogCat.e("mDNS sendQuery: ${it.message}") }
+            return
+        }
+        candidates.forEach { (iface, _) ->
+            runCatching {
+                s.setOutgoingInterface(iface.name)
+                s.send(bytes, MDNS_GROUP, MDNS_PORT)
+            }.onFailure { LogCat.e("mDNS sendQuery ${iface.name}: ${it.message}") }
+        }
     }
 
     private fun notifyPacketListeners(bytes: ByteArray, senderIp: String) {

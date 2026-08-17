@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features.dlna
 
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.dlna.DlnaCommand
 import com.ismartcoding.plain.lib.dlna.DlnaMediaType
@@ -98,14 +99,6 @@ object DlnaRendererState {
     fun formatPositionInfo(): Pair<String, String> {
         val pos = currentPositionMs.value
         val dur = durationMs.value
-        return Pair(formatTime(pos), if (dur > 0) formatTime(dur) else "00:00:00")
-    }
-
-    private fun formatTime(ms: Long): String {
-        val totalSec = ms / 1000
-        val h = totalSec / 3600
-        val m = (totalSec % 3600) / 60
-        val s = totalSec % 60
-        return "${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}"
+        return Pair(TimeHelper.formatTime(pos), if (dur > 0) TimeHelper.formatTime(dur) else "00:00:00")
     }
 }

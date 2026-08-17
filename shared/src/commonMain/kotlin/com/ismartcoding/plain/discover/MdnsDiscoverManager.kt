@@ -8,24 +8,15 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.mdns.MdnsHostResponder
 import com.ismartcoding.plain.mdns.MdnsServiceBrowser
 
-/**
- * Discovery manager that replaces the old LAN discovery (custom UDP multicast
- * on `224.0.0.100:52352`).
- *
- * Discovery now runs over mDNS (RFC 6762). Publishing the `_plainapp._tcp.local` service is
- * driven by the HTTP service lifecycle ([com.ismartcoding.plain.mdns.NsdHelper]
- * on Android / [com.ismartcoding.plain.platform.onHttpServerStarted] on iOS),
- * while this manager guarantees the shared responder socket is up so the
- * browser can send queries, and owns the browser lifecycle.
- *
- * Pairing is handled over HTTP via the `/nearby` REST endpoint instead of UDP.
- */
 object MdnsDiscoverManager {
     fun startReceiver() {
         // Ensure the shared mDNS responder socket is up so the browser can
         // send queries and the responder can answer PTR/SRV/TXT/A queries.
         // Service registration itself happens with the HTTP service lifecycle.
         MdnsHostResponder.ensureStarted(TempData.mdnsHostname)
+        // Resident listener: parse inbound mDNS responses from app start so a
+        // paired peer's IP change is picked up without opening the nearby page.
+        MdnsServiceBrowser.ensureListening()
     }
 
     fun startPeriodicDiscovery() {

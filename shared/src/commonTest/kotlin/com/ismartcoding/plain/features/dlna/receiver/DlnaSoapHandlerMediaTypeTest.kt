@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 import com.ismartcoding.plain.lib.dlna.DlnaMediaType
+import com.ismartcoding.plain.lib.dlna.DlnaMediaUtils
+import com.ismartcoding.plain.lib.dlna.common.DlnaSoapHandler
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -151,7 +153,7 @@ class DlnaSoapHandlerMediaTypeTest {
 
     @Test
     fun `extractMediaTypeFromDidlMeta parses DIDL built by DlnaMediaUtils for video`() {
-        val didl = com.ismartcoding.plain.features.dlna.DlnaMediaUtils.buildDidlLite(
+        val didl = DlnaMediaUtils.buildDidlLite(
             mediaUrl = "http://192.168.1.2/fs?id=v1",
             title = "movie.mp4",
             knownFilePath = "/tmp/movie.mp4",
@@ -161,7 +163,7 @@ class DlnaSoapHandlerMediaTypeTest {
 
     @Test
     fun `extractMediaTypeFromDidlMeta parses DIDL built by DlnaMediaUtils for audio`() {
-        val didl = com.ismartcoding.plain.features.dlna.DlnaMediaUtils.buildDidlLite(
+        val didl = DlnaMediaUtils.buildDidlLite(
             mediaUrl = "http://host/fs?id=a1",
             title = "track.flac",
             knownFilePath = "/tmp/track.flac",
@@ -171,7 +173,7 @@ class DlnaSoapHandlerMediaTypeTest {
 
     @Test
     fun `extractMediaTypeFromDidlMeta parses DIDL built by DlnaMediaUtils for image`() {
-        val didl = com.ismartcoding.plain.features.dlna.DlnaMediaUtils.buildDidlLite(
+        val didl = DlnaMediaUtils.buildDidlLite(
             mediaUrl = "http://host/fs?id=i1",
             title = "pic.png",
             knownFilePath = "/tmp/pic.png",
@@ -181,7 +183,7 @@ class DlnaSoapHandlerMediaTypeTest {
 
     @Test
     fun `extractMediaTypeFromDidlMeta parses DIDL built by DlnaMediaUtils for ts`() {
-        val didl = com.ismartcoding.plain.features.dlna.DlnaMediaUtils.buildDidlLite(
+        val didl = DlnaMediaUtils.buildDidlLite(
             mediaUrl = "http://host/fs?id=t1",
             title = "broadcast.ts",
             knownFilePath = "/tmp/broadcast.ts",

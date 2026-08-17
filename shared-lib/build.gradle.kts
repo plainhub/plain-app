@@ -53,5 +53,14 @@ kotlin {
             // the Android ReflectionBridge actual for createKType.
             implementation(libs.kotlin.reflect)
         }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+        }
     }
+}
+
+dependencies {
+    add("androidHostTestImplementation", kotlin("test"))
+    add("androidHostTestImplementation", libs.junit)
 }

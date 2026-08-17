@@ -1,6 +1,5 @@
-package com.ismartcoding.plain.features.dlna
+package com.ismartcoding.plain.lib.dlna
 
-import com.ismartcoding.plain.lib.dlna.DlnaMediaType
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.platform.getContentTypeForPath

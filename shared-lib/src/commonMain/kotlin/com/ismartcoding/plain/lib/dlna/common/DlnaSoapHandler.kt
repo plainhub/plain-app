@@ -1,20 +1,15 @@
-package com.ismartcoding.plain.features.dlna.receiver
+package com.ismartcoding.plain.lib.dlna.common
 
 import com.ismartcoding.plain.lib.dlna.DlnaMediaType
-import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
-import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.features.dlna.DlnaMediaUtils
-import com.ismartcoding.plain.lib.dlna.common.DlnaSoap
+import com.ismartcoding.plain.lib.dlna.DlnaMediaUtils
 
 /**
  * Parses incoming UPnP SOAP requests and builds SOAP responses using the
  * shared [DlnaSoap] envelope.
  *
- * Migrated from androidMain to commonMain: the previous implementation used
- * `android.util.Xml` (XmlPullParser). This pure-Kotlin version replaces it
- * with a lightweight tag scanner — the SOAP body is simple enough that a
- * full XML parser is unnecessary, and this avoids the platform dependency.
- * `java.net.URLDecoder` is replaced with a pure-Kotlin percent-decoder.
+ * Pure-Kotlin implementation: a lightweight tag scanner is sufficient for
+ * the simple SOAP body (no platform XML parser needed), and `java.net.URLDecoder`
+ * is replaced with a pure-Kotlin percent-decoder.
  */
 object DlnaSoapHandler {
 
@@ -94,32 +89,19 @@ object DlnaSoapHandler {
     fun buildResponse(action: String, elements: String = ""): String =
         DlnaSoap.responseEnvelope(action, elements)
 
-    fun buildTransportInfoResponse(): String {
-        val stateStr = when (DlnaRendererState.playbackState.value) {
-            DlnaPlaybackState.PLAYING -> "PLAYING"
-            DlnaPlaybackState.PAUSED -> "PAUSED_PLAYBACK"
-            DlnaPlaybackState.STOPPED -> "STOPPED"
-            DlnaPlaybackState.TRANSITIONING -> "TRANSITIONING"
-            else -> "NO_MEDIA_PRESENT"
-        }
-        return buildResponse(
-            "GetTransportInfo",
-            "<CurrentTransportState>$stateStr</CurrentTransportState>" +
-                "<CurrentTransportStatus>OK</CurrentTransportStatus><CurrentSpeed>1</CurrentSpeed>",
-        )
-    }
+    fun buildTransportInfoResponse(transportState: String): String = buildResponse(
+        "GetTransportInfo",
+        "<CurrentTransportState>$transportState</CurrentTransportState>" +
+            "<CurrentTransportStatus>OK</CurrentTransportStatus><CurrentSpeed>1</CurrentSpeed>",
+    )
 
-    fun buildPositionInfoResponse(): String {
-        val (rel, dur) = DlnaRendererState.formatPositionInfo()
-        val uri = DlnaRendererState.mediaUri.value.xmlEscape()
-        return buildResponse(
-            "GetPositionInfo",
-            "<Track>1</Track><TrackDuration>$dur</TrackDuration>" +
-                "<TrackMetaData>NOT_IMPLEMENTED</TrackMetaData><TrackURI>$uri</TrackURI>" +
-                "<RelTime>$rel</RelTime><AbsTime>NOT_IMPLEMENTED</AbsTime>" +
-                "<RelCount>2147483647</RelCount><AbsCount>2147483647</AbsCount>",
-        )
-    }
+    fun buildPositionInfoResponse(relTime: String, trackDuration: String, trackUri: String): String = buildResponse(
+        "GetPositionInfo",
+        "<Track>1</Track><TrackDuration>$trackDuration</TrackDuration>" +
+            "<TrackMetaData>NOT_IMPLEMENTED</TrackMetaData><TrackURI>${trackUri.xmlEscape()}</TrackURI>" +
+            "<RelTime>$relTime</RelTime><AbsTime>NOT_IMPLEMENTED</AbsTime>" +
+            "<RelCount>2147483647</RelCount><AbsCount>2147483647</AbsCount>",
+    )
 
     fun buildMediaInfoResponse(): String = buildResponse(
         "GetMediaInfo",

@@ -1,18 +1,15 @@
-package com.ismartcoding.plain.features.dlna.receiver
-
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.lib.dlna.common.DlnaSoap
+package com.ismartcoding.plain.lib.dlna.common
 
 /** Static XML templates for the DLNA receiver's HTTP server. */
 object DlnaXmlTemplates {
 
-    fun deviceDescription(ip: String, port: Int, uuid: String): String = """<?xml version="1.0"?>
+    fun deviceDescription(ip: String, port: Int, uuid: String, deviceName: String): String = """<?xml version="1.0"?>
 <root xmlns="urn:schemas-upnp-org:device-1-0">
   <specVersion><major>1</major><minor>0</minor></specVersion>
   <URLBase>http://$ip:$port</URLBase>
   <device>
     <deviceType>urn:schemas-upnp-org:device:MediaRenderer:1</deviceType>
-    <friendlyName>${TempData.deviceName.value}</friendlyName>
+    <friendlyName>$deviceName</friendlyName>
     <manufacturer>PlainApp</manufacturer>
     <modelName>PlainApp MediaRenderer</modelName>
     <modelNumber>1</modelNumber>

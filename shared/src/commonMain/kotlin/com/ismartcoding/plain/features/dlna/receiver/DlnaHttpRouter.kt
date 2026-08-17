@@ -1,8 +1,19 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.dlna.DlnaCommand
+import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.lib.dlna.PendingCastRequest
+import com.ismartcoding.plain.lib.dlna.common.DlnaHttpRequest
+import com.ismartcoding.plain.lib.dlna.common.DlnaHttpResponse
+import com.ismartcoding.plain.lib.dlna.common.DlnaSoapHandler
+import com.ismartcoding.plain.lib.dlna.common.DlnaXmlTemplates
+import com.ismartcoding.plain.lib.dlna.common.httpInternalError
+import com.ismartcoding.plain.lib.dlna.common.httpNotFound
+import com.ismartcoding.plain.lib.dlna.common.httpOk
+import com.ismartcoding.plain.lib.dlna.common.httpOkSubscribe
+import com.ismartcoding.plain.lib.dlna.common.parseDlnaTimeToMs
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.getDeviceIP4
 
@@ -31,7 +42,7 @@ object DlnaHttpRouter {
             path.endsWith("description.xml") -> {
                 val ip = getDeviceIP4()
                 val port = DlnaRendererState.port.value
-                val xml = DlnaXmlTemplates.deviceDescription(ip, port, deviceUuid)
+                val xml = DlnaXmlTemplates.deviceDescription(ip, port, deviceUuid, TempData.deviceName.value)
                 httpOk(xml, "text/xml; charset=\"utf-8\"")
             }
             path.endsWith("scpd.xml") -> httpOk(DlnaXmlTemplates.scpdXml, "text/xml; charset=\"utf-8\"")
@@ -95,8 +106,13 @@ object DlnaHttpRouter {
                 if (posMs >= 0) DlnaRendererState.commandChannel.trySend(DlnaCommand.Seek(posMs))
                 DlnaSoapHandler.buildResponse("Seek")
             }
-            "GetTransportInfo" -> DlnaSoapHandler.buildTransportInfoResponse()
-            "GetPositionInfo" -> DlnaSoapHandler.buildPositionInfoResponse()
+            "GetTransportInfo" -> DlnaSoapHandler.buildTransportInfoResponse(
+                upnpTransportState(DlnaRendererState.playbackState.value),
+            )
+            "GetPositionInfo" -> {
+                val (rel, dur) = DlnaRendererState.formatPositionInfo()
+                DlnaSoapHandler.buildPositionInfoResponse(rel, dur, DlnaRendererState.mediaUri.value)
+            }
             "GetMediaInfo" -> DlnaSoapHandler.buildMediaInfoResponse()
             "GetDeviceCapabilities" -> DlnaSoapHandler.buildResponse(
                 "GetDeviceCapabilities",
@@ -106,5 +122,13 @@ object DlnaHttpRouter {
             else -> DlnaSoapHandler.buildResponse(action)
         }
         return httpOk(responseBody, "text/xml; charset=\"utf-8\"")
+    }
+
+    private fun upnpTransportState(state: DlnaPlaybackState): String = when (state) {
+        DlnaPlaybackState.PLAYING -> "PLAYING"
+        DlnaPlaybackState.PAUSED -> "PAUSED_PLAYBACK"
+        DlnaPlaybackState.STOPPED -> "STOPPED"
+        DlnaPlaybackState.TRANSITIONING -> "TRANSITIONING"
+        else -> "NO_MEDIA_PRESENT"
     }
 }

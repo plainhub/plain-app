@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.dlna.sender
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.features.dlna.DlnaMediaUtils
+import com.ismartcoding.plain.lib.dlna.DlnaMediaUtils
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.xml.parseData

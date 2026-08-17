@@ -69,7 +69,6 @@ internal object MdnsServiceBrowser {
 
     fun start() {
         if (isRunning) return
-        clearState()
         ensureListening()
         discoverJob = coIO {
             while (isActive) {
@@ -81,12 +80,14 @@ internal object MdnsServiceBrowser {
         LogCat.d("mDNS browser started")
     }
 
+    /**
+     * Stops the periodic scan loop only. The packet listener and accumulated
+     * instance state stay installed: passive listening keeps refreshing paired
+     * peers' IPs after a network change even when no page is scanning.
+     */
     fun stop() {
         discoverJob?.cancel()
         discoverJob = null
-        listener?.let { MdnsHostResponder.removePacketListener(it) }
-        listener = null
-        clearState()
         LogCat.d("mDNS browser stopped")
     }
 
@@ -102,7 +103,7 @@ internal object MdnsServiceBrowser {
     }
 
     /** Registers the packet listener so inbound responses reach [handlePacket]; idempotent. */
-    private fun ensureListening() {
+    internal fun ensureListening() {
         if (listener != null) return
         val l: (ByteArray, String) -> Unit = { data, _ -> handlePacket(data) }
         listener = l
@@ -122,13 +123,6 @@ internal object MdnsServiceBrowser {
             complete = instance.complete,
         )
     }.sortedBy { it.instanceFqdn }
-
-    private fun clearState() {
-        instances = emptyMap()
-        hostnameToInstance = emptyMap()
-        srvTxtQueriedAt = emptyMap()
-        aQueriedAt = emptyMap()
-    }
 
     private fun browseOnce() {
         // Self-heal after an external socket teardown (e.g. HTTP service stop):
@@ -206,7 +200,10 @@ internal object MdnsServiceBrowser {
                 MdnsPacketCodec.TYPE_A -> record.ip?.let { ip ->
                     nextHostnames[record.name.lowercase()]?.let { key ->
                         nextInstances[key]?.let { instance ->
-                            nextInstances = nextInstances + (key to instance.copy(ips = instance.ips + ip))
+                            // An A record is authoritative for the target hostname's CURRENT
+                            // address. Replace, don't accumulate — a device that changed IPs
+                            // would otherwise keep its stale address in the set forever.
+                            nextInstances = nextInstances + (key to instance.copy(ips = setOf(ip)))
                             touched.add(key)
                         }
                     }
@@ -266,8 +263,9 @@ internal object MdnsServiceBrowser {
             discoveryMethods = setOf(DiscoveryMethod.LAN),
         )
         coIO {
-            NearbyViewModel.handleNewDevice(device)
-            PeerStatusManager.setOnline(device.id, true)
+            // Resident-listener path: always refresh a paired peer's address so a
+            // changed IP is picked up by the next reconnect attempt even while
+            // the nearby scan loop is off.
             PeerManager.applyDeviceDiscovered(
                 deviceId = device.id,
                 ips = device.ips,
@@ -275,6 +273,10 @@ internal object MdnsServiceBrowser {
                 name = device.name,
                 deviceType = device.deviceType,
             )
+            // Scan-gated path: nearby-list events only fire while discovery runs.
+            if (!isRunning) return@coIO
+            NearbyViewModel.handleNewDevice(device)
+            PeerStatusManager.setOnline(device.id, true)
         }
     }
 }

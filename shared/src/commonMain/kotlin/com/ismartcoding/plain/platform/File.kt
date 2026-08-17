@@ -157,12 +157,6 @@ expect suspend fun createTempFilePath(prefix: String): String
 expect suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String?
 
 /**
- * Returns the MIME type of a file path based on a platform content resolver or
- * extension lookup. May return null when the type cannot be determined.
- */
-expect fun getContentTypeForPath(path: String): String?
-
-/**
  * Stream the contents of a content:// URI (Android) or a remote resource (iOS)
  * into [sink]. Returns the resolved MIME type, or null if the stream fails.
  */

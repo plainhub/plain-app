@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.features.dlna.sender
 
 import com.ismartcoding.plain.lib.dlna.common.DlnaDevice
-import com.ismartcoding.plain.features.dlna.receiver.DlnaSsdpMessages
-import com.ismartcoding.plain.features.dlna.receiver.DlnaSsdpSocket
 import com.ismartcoding.plain.features.dlna.receiver.createDlnaSsdpSocket
+import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpMessages
+import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpSocket
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.platform.createHttpClient

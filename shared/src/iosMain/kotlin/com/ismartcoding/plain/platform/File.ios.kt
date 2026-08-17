@@ -42,7 +42,6 @@ import platform.UIKit.UIImagePNGRepresentation
 import platform.UIKit.UIGraphicsBeginImageContextWithOptions
 import platform.UIKit.UIGraphicsEndImageContext
 import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
-import platform.UniformTypeIdentifiers.UTType
 import platform.posix.fclose
 import platform.posix.fflush
 import platform.posix.fopen
@@ -489,14 +488,6 @@ private suspend fun importAppFileInternal(
 @OptIn(ExperimentalForeignApi::class)
 actual suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String? =
     importAppFileInternal(tempFilePath, contentType, deleteSrc).takeIf { it.isNotEmpty() }
-
-actual fun getContentTypeForPath(path: String): String? {
-    if (!NSFileManager.defaultManager.fileExistsAtPath(path)) return null
-    val ext = path.substringAfterLast('.', "").lowercase()
-    if (ext.isEmpty()) return null
-    val type = UTType.typeWithFilenameExtension(ext) ?: return null
-    return type.preferredMIMEType
-}
 
 actual suspend fun streamContentUri(uri: String, sink: StreamSink): String? = null
 

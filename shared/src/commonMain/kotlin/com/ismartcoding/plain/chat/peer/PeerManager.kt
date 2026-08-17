@@ -52,6 +52,11 @@ object PeerManager {
         if (existing.status != PeerStatus.PAIRED) return null
 
         val newIpString = ips.joinToString(",")
+        // mDNS announcements repeat every few seconds — skip the DB write when
+        // nothing changed so the peers table isn't hammered by updates.
+        if (existing.ip == newIpString && existing.port == port &&
+            existing.name == name && existing.deviceType == deviceType
+        ) return existing
         val newDeviceType = deviceType
         return PeerCacher.mutatePeer(deviceId) { p ->
             if (p.ip != newIpString) p.ip = newIpString
