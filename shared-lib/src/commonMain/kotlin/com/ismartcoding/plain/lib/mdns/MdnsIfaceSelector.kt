@@ -6,6 +6,10 @@ package com.ismartcoding.plain.lib.mdns
  */
 internal expect fun candidateInterfaces(): List<Pair<MdnsIface, String>>
 
+/** Whether [ip] is one of this host's own IPv4 addresses, used to ignore the
+ *  multicast loop-back of our own queries/announcements (RFC 6762 §5.2). */
+internal fun isLocalIp(ip: String): Boolean = candidateInterfaces().any { it.second == ip }
+
 /** Returns true for mobile-data-only bearer interface names (never LAN). */
 fun isMobileDataInterface(name: String): Boolean =
     name.startsWith("rmnet") || name.startsWith("ccmni") ||

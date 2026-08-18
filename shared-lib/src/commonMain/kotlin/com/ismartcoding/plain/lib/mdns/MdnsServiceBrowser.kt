@@ -110,7 +110,7 @@ object MdnsServiceBrowser {
     /** Registers the packet listener so inbound responses reach [handlePacket]; idempotent. */
     fun ensureListening() {
         if (listener != null) return
-        val l: (ByteArray, String) -> Unit = { data, _ -> handlePacket(data) }
+        val l: (ByteArray, String) -> Unit = { data, sender -> handlePacket(data, sender) }
         listener = l
         MdnsHostResponder.addPacketListener(l)
     }
@@ -156,7 +156,10 @@ object MdnsServiceBrowser {
         }
     }
 
-    private fun handlePacket(data: ByteArray) {
+    private fun handlePacket(data: ByteArray, sender: String) {
+        // Ignore our own looped-back packets so we don't discover ourselves
+        // and re-query our own SRV/TXT records on every discovery cycle.
+        if (isLocalIp(sender)) return
         val parsed = MdnsPacketCodec.parseResponse(data) ?: return
         if (!parsed.isResponse) return
 

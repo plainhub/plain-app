@@ -90,7 +90,45 @@ object MdnsHostResponder {
 
         socket = s
         worker = startMdnsWorker("plain-mdns-responder") { runLoop(s) }
+        // Announce ourselves right after (re)starting so peers on the LAN learn
+        // the full service info (name/port/ip) without waiting for their query.
+        broadcastService()
         return true
+    }
+
+    /**
+     * Sends a gratuitous mDNS announcement (RFC 6762 §8.3). Reuses the regular
+     * response builders: a PTR query yields the full service info (PTR +
+     * SRV/TXT/A), an A query yields the hostname record when no service is
+     * published.
+     */
+    fun broadcastService() {
+        val s = socket ?: return
+        val info = serviceInfo
+        val candidates = candidateInterfaces()
+        if (candidates.isEmpty()) return
+        val ips = candidates.map { it.second }.filter { it.isNotEmpty() }
+        if (ips.isEmpty()) return
+
+        val announcement = if (info != null) {
+            MdnsServiceResponseBuilder.buildResponseIfMatch(
+                MdnsPacketCodec.buildPtrQuery(info.serviceType),
+                info.copy(ips = ips),
+            )?.bytes
+        } else {
+            MdnsPacketCodec.buildResponseIfMatch(
+                MdnsPacketCodec.buildQuery(hostname, MdnsPacketCodec.TYPE_A),
+                hostname,
+                ips,
+            )
+        } ?: return
+
+        candidates.forEach { (iface, _) ->
+            runCatching {
+                s.setOutgoingInterface(iface.name)
+                s.send(announcement, MDNS_GROUP, MDNS_PORT)
+            }
+        }
     }
 
     private fun tearDownSocket() {
@@ -142,6 +180,9 @@ object MdnsHostResponder {
                 notifyPacketListeners(packet, senderIp)
                 val fresh = candidateInterfaces()
                 if (fresh.isEmpty()) continue
+                // Our own multicast packets loop back to this socket; answering
+                // them would double traffic on every discovery cycle.
+                if (fresh.any { it.second == senderIp }) continue
                 val (responseIface, localIp) = findResponseIface(senderIp, fresh)
                 val response = buildResponse(packet, listOf(localIp)) ?: continue
                 val useUnicast = response.unicastResponseRequested || result.senderPort != MDNS_PORT
