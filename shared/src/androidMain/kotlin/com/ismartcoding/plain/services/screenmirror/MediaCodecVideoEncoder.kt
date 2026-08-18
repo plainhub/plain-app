@@ -7,13 +7,13 @@ import android.media.MediaFormat
 import android.os.Bundle
 import android.util.Log
 import android.view.Surface
+import com.ismartcoding.plain.lib.screenmirror.H264AnnexB
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.nio.ByteBuffer
 
 /**
  * H.264 hardware encoder wrapping MediaCodec. Produces annex-b NAL units

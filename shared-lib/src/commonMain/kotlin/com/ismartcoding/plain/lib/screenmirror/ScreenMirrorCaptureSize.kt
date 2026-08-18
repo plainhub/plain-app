@@ -1,4 +1,6 @@
-package com.ismartcoding.plain.services.screenmirror
+package com.ismartcoding.plain.lib.screenmirror
+
+import kotlin.math.sqrt
 
 /**
  * Pure capture-size helpers — no Android types so they're JVM-unit-testable
@@ -51,7 +53,7 @@ object ScreenMirrorCaptureSize {
     ): Pair<Int, Int> {
         val physPixels = physW.toLong() * physH.toLong()
         val pixelScale = if (maxPixels == Int.MAX_VALUE || physPixels <= maxPixels) 1f
-        else kotlin.math.sqrt(maxPixels.toFloat() / physPixels.toFloat())
+        else sqrt(maxPixels.toFloat() / physPixels.toFloat())
         val scale = minOf(
             1f,
             shortTarget.toFloat() / minOf(physW, physH).toFloat(),

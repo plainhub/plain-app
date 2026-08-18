@@ -34,6 +34,8 @@ import com.ismartcoding.plain.ui.theme.primaryPill
 import com.ismartcoding.plain.ui.theme.primaryText
 import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.page.home.HomeFeatureItemsGrid
+import com.ismartcoding.plain.ui.theme.greenPill
+import com.ismartcoding.plain.ui.theme.greenText
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,9 +74,9 @@ fun ToolsPage(
                     StatusIndicator(
                         text = if (deviceName.isNotEmpty()) stringResource(Res.string.casting_to, deviceName) else stringResource(Res.string.casting),
                         onClick = { navController.navigate(Routing.CastSession) },
-                        pillColor = MaterialTheme.colorScheme.primaryPill,
-                        dotColor = MaterialTheme.colorScheme.primaryText,
-                        textColor = MaterialTheme.colorScheme.primaryText,
+                        pillColor = MaterialTheme.colorScheme.greenPill,
+                        dotColor = MaterialTheme.colorScheme.greenText,
+                        textColor = MaterialTheme.colorScheme.greenText,
                         cornerRadius = 24.dp,
                         contentPaddingHorizontal = 16.dp,
                         contentPaddingVertical = 8.dp,

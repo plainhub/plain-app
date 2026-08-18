@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.services.screenmirror
 
+import com.ismartcoding.plain.lib.screenmirror.VideoPacket
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

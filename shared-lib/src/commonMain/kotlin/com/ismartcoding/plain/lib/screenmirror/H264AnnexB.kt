@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.services.screenmirror
+package com.ismartcoding.plain.lib.screenmirror
 
 /**
  * Pure H.264 bitstream helpers — no Android types so they're JVM-unit-testable.

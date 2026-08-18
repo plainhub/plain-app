@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.services.screenmirror
+package com.ismartcoding.plain.lib.screenmirror
 
 /**
  * Binary video frame protocol — wraps raw H.264/Opus NAL data with metadata

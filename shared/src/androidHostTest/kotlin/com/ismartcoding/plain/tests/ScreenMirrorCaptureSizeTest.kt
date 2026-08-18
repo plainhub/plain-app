@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.tests
 
-import com.ismartcoding.plain.services.screenmirror.ScreenMirrorCaptureSize
+import com.ismartcoding.plain.lib.screenmirror.ScreenMirrorCaptureSize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.tests
 
-import com.ismartcoding.plain.services.screenmirror.H264AnnexB
+import com.ismartcoding.plain.lib.screenmirror.H264AnnexB
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

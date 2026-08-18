@@ -16,6 +16,8 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
+import com.ismartcoding.plain.lib.screenmirror.ScreenMirrorCaptureSize
+import com.ismartcoding.plain.lib.screenmirror.VideoPacket
 import com.ismartcoding.plain.platform.isRPlus
 
 /**
@@ -55,7 +57,7 @@ class ScreenMirrorPipeline(
 
         val active: Boolean get() = forceLowEnd || initiallyLowEnd
 
-        /** Pixel budget fed to [ScreenMirrorCaptureSize.compute]. */
+        /** Pixel budget fed to [com.ismartcoding.plain.lib.screenmirror.ScreenMirrorCaptureSize.compute]. */
         val maxPixels: Int get() = if (active) 1_500_000 else Int.MAX_VALUE
 
         /** [MediaFormat.KEY_I_FRAME_INTERVAL] in seconds. */
