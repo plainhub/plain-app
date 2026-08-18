@@ -153,10 +153,13 @@ class MdnsServiceCodecTest {
         )!!
         val parsed = MdnsPacketCodec.parseResponse(response.bytes)!!
         // RFC 6762 §6: only records whose name matches the question are
-        // answered — the PTR (service type) plus the tightly-coupled A
-        // additional. SRV/TXT belong to the instance name, not this question.
+        // answered — the PTR (service type). RFC 6763 §12: SRV/TXT/A ride in
+        // the additional section so one query resolves the full service.
         assertEquals(listOf(MdnsPacketCodec.TYPE_PTR), parsed.answers.map { it.type })
-        assertEquals(listOf(MdnsPacketCodec.TYPE_A), parsed.additional.map { it.type })
+        assertEquals(
+            listOf(MdnsPacketCodec.TYPE_SRV, MdnsPacketCodec.TYPE_TXT, MdnsPacketCodec.TYPE_A),
+            parsed.additional.map { it.type },
+        )
     }
 
     @Test fun `ANY query for the instance fqdn yields SRV TXT and A`() {

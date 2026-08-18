@@ -134,12 +134,14 @@ object MdnsServiceBrowser {
         // the responder keeps packet listeners, so discovery resumes seamlessly.
         hostnameProvider?.let { MdnsHostResponder.ensureStarted(it()) }
         sendPtrQuery()
-        // Follow up on instances that still lack port / metadata / IPs, re-asking
-        // periodically because multicast responses can be dropped.
+        // Follow up on instances that still lack port / metadata / IPs,
+        // re-asking periodically because multicast responses can be dropped.
+        // Completed instances refresh from every PTR announcement, which
+        // carries SRV/TXT/A in its additional section (RFC 6763 §12).
         val now = mdnsNowMillis()
-        instances.values.forEach { instance ->
+        instances.values.filter { !it.complete }.forEach { instance ->
             val key = instance.instanceFqdn
-            if (!instance.complete && now - (srvTxtQueriedAt[key] ?: 0L) >= FOLLOW_UP_RETRY_MS) {
+            if (now - (srvTxtQueriedAt[key] ?: 0L) >= FOLLOW_UP_RETRY_MS) {
                 srvTxtQueriedAt = srvTxtQueriedAt + (key to now)
                 // buildSrvQuery/buildTxtQuery append the service type themselves —
                 // pass the SHORT instance name, NOT the full FQDN (double-suffixed
@@ -147,7 +149,7 @@ object MdnsServiceBrowser {
                 MdnsHostResponder.sendQuery(MdnsPacketCodec.buildSrvQuery(instance.instanceName, PLAINAPP_SERVICE_TYPE))
                 MdnsHostResponder.sendQuery(MdnsPacketCodec.buildTxtQuery(instance.instanceName, PLAINAPP_SERVICE_TYPE))
             }
-            if (!instance.complete && instance.targetHostname.isNotEmpty() && now - (aQueriedAt[key] ?: 0L) >= FOLLOW_UP_RETRY_MS) {
+            if (instance.targetHostname.isNotEmpty() && now - (aQueriedAt[key] ?: 0L) >= FOLLOW_UP_RETRY_MS) {
                 aQueriedAt = aQueriedAt + (key to now)
                 MdnsHostResponder.sendQuery(MdnsPacketCodec.buildQuery(instance.targetHostname, MdnsPacketCodec.TYPE_A))
             }

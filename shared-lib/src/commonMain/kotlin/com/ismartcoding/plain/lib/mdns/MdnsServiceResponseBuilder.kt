@@ -47,8 +47,18 @@ internal object MdnsServiceResponseBuilder {
         if (wantSrv) answers.addAll(srvRecord(service))
         if (wantTxt) answers.addAll(txtRecord(service))
         if (wantA) answers.addAll(aRecords(service))
-        // A records ride along as additional data for service queries.
-        if ((wantPtr || wantSrv || wantTxt) && !wantA) additional.addAll(aRecords(service))
+        // RFC 6763 §12: a PTR answer carries SRV/TXT/A in the additional section
+        // so a single PTR query resolves the full service — the port is learned
+        // in one round trip instead of a follow-up SRV query.
+        var additionalCount = 0
+        if (wantPtr) {
+            if (!wantSrv) { additional.addAll(srvRecord(service)); additionalCount++ }
+            if (!wantTxt) { additional.addAll(txtRecord(service)); additionalCount++ }
+            if (!wantA) { additional.addAll(aRecords(service)); additionalCount += service.ips.size }
+        } else if ((wantSrv || wantTxt) && !wantA) {
+            additional.addAll(aRecords(service))
+            additionalCount += service.ips.size
+        }
         if (answers.isEmpty()) return null
 
         // Each PTR/SRV/TXT is a single record; A records are one per IP.
@@ -58,7 +68,6 @@ internal object MdnsServiceResponseBuilder {
             if (wantTxt) 1 else 0,
             if (wantA) service.ips.size else 0,
         ).sum()
-        val additionalCount = if ((wantPtr || wantSrv || wantTxt) && !wantA) service.ips.size else 0
 
         val out = mutableListOf<Byte>()
         MdnsPacketCodec.writeHeader(out, answers = answerCount, additional = additionalCount)
