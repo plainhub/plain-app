@@ -2,18 +2,18 @@
 
 package com.ismartcoding.plain.platform
 
-import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.features.file.DFile
+import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.FileHashHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.isAnimatedImageOrSvgHeader
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.isHeifHeader
 import com.ismartcoding.plain.lib.toNSData
+import com.ismartcoding.plain.thumbnail.DecodePolicy
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.httpserver.http.StreamSink
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
@@ -45,12 +45,38 @@ import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
 import platform.posix.fclose
 import platform.posix.fflush
 import platform.posix.fopen
+import platform.posix.fread
 import platform.posix.fwrite
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun deleteFileAt(path: String) {
     NSFileManager.defaultManager.removeItemAtPath(path, null)
 }
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun fileSize(path: String): Long =
+    (NSFileManager.defaultManager.attributesOfItemAtPath(path, null)?.get(NSFileSize) as? Long) ?: 0L
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun copyFile(srcPath: String, destPath: String): Boolean {
+    val mgr = NSFileManager.defaultManager
+    if (mgr.fileExistsAtPath(destPath)) {
+        mgr.removeItemAtPath(destPath, null)
+    }
+    return mgr.copyItemAtPath(srcPath, destPath, error = null)
+}
+
+@OptIn(ExperimentalForeignApi::class)
+actual fun moveFile(fromPath: String, toPath: String): Boolean =
+    NSFileManager.defaultManager.moveItemAtPath(fromPath, toPath, error = null)
+
+@OptIn(ExperimentalForeignApi::class)
+actual suspend fun sha256File(path: String): String =
+    NSFileManager.defaultManager.contentsAtPath(path)?.toByteArray()?.let { FileHashHelper.strongHash(it) } ?: ""
+
+@OptIn(ExperimentalForeignApi::class)
+actual suspend fun sha256FileEdges(path: String, size: Long): String =
+    NSFileManager.defaultManager.contentsAtPath(path)?.toByteArray()?.let { FileHashHelper.weakHash(it) } ?: ""
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun writeBytesToPath(path: String, bytes: ByteArray): Boolean {
@@ -71,10 +97,8 @@ actual fun createLongTextFile(text: String): DMessageContent {
     )
     val file = "$dir/$fileName"
     NSString.create(string = text)?.writeToFile(file, atomically = true, encoding = NSUTF8StringEncoding, error = null)
-    val summary = text.substring(0, minOf(text.length, Constants.TEXT_FILE_SUMMARY_LENGTH))
     val size = NSFileManager.defaultManager.contentsAtPath(file)?.length?.toInt()?.toLong() ?: 0L
-    val messageFile = DMessageFile(uri = file, size = size, summary = summary, fileName = fileName)
-    return DMessageContent(MessageType.FILES, DMessageFiles(listOf(messageFile)))
+    return buildLongTextMessage(file, fileName, text, size)
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -144,17 +168,7 @@ actual fun writeFileText(path: String, content: String, overwrite: Boolean): DFi
     }
     NSString.create(string = content)?.writeToFile(path, atomically = true, encoding = NSUTF8StringEncoding, error = null)
     val size = NSFileManager.defaultManager.contentsAtPath(path)?.length?.toInt()?.toLong() ?: 0L
-    return DFile(
-        name = path.substringAfterLast('/'),
-        path = path,
-        permission = "rw",
-        createdAt = null,
-        updatedAt = TimeHelper.now(),
-        size = size,
-        isDir = false,
-        children = 0,
-        mediaId = "",
-    )
+    return buildTextFile(path, size, TimeHelper.nowMillis())
 }
 
 actual fun getUploadTmpDirPath(): String =
@@ -164,141 +178,14 @@ actual fun getUploadCacheMergeDirPath(): String =
     appDir() + "/upload_merge"
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun listUploadedChunks(fileId: String): List<String> {
-    val dir = getUploadTmpDirPath()
-    if (!NSFileManager.defaultManager.fileExistsAtPath(dir)) return emptyList()
-    val names = NSFileManager.defaultManager.contentsOfDirectoryAtPath(dir, null)
-        ?.filterIsInstance<String>() ?: return emptyList()
-    val prefix = "${fileId}_"
-    return names
-        .filter { it.startsWith(prefix) }
-        .mapNotNull { name ->
-            val index = name.removePrefix(prefix).toIntOrNull() ?: return@mapNotNull null
-            val chunkPath = "$dir/$name"
-            val size = NSFileManager.defaultManager.attributesOfItemAtPath(chunkPath, null)
-                ?.let { attrs -> attrs[platform.Foundation.NSFileSize] as? Long } ?: 0L
-            "$index:$size"
-        }
-        .sortedBy { it.substringBefore(':').toInt() }
-}
+actual fun listFilesInDir(path: String): List<String> =
+    NSFileManager.defaultManager.contentsOfDirectoryAtPath(path, null)
+        ?.filterIsInstance<String>()
+        ?: emptyList()
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun deleteUploadedChunks(fileId: String): Boolean {
-    val dir = getUploadTmpDirPath()
-    if (!NSFileManager.defaultManager.fileExistsAtPath(dir)) return true
-    val prefix = "${fileId}_"
-    val names = NSFileManager.defaultManager.contentsOfDirectoryAtPath(dir, null)
-        ?.filterIsInstance<String>() ?: return true
-    names.filter { it.startsWith(prefix) }.forEach { name ->
-        NSFileManager.defaultManager.removeItemAtPath("$dir/$name", null)
-    }
-    return true
-}
-
-@OptIn(ExperimentalForeignApi::class)
-actual suspend fun mergeUploadedChunks(
-    fileId: String,
-    totalChunks: Int,
-    path: String,
-    replace: Boolean,
-    isAppFile: Boolean,
-): String = withIO {
-    val chunkDir = getUploadTmpDirPath()
-    val chunkPrefix = "${fileId}_"
-
-    var expectedSize = 0L
-    for (i in 0 until totalChunks) {
-        val chunkPath = "$chunkDir/${chunkPrefix}$i"
-        if (!NSFileManager.defaultManager.fileExistsAtPath(chunkPath)) {
-            throw GraphQLError("Missing chunk $i")
-        }
-        val size = NSFileManager.defaultManager.attributesOfItemAtPath(chunkPath, null)
-            ?.let { attrs -> attrs[NSFileSize] as? Long } ?: 0L
-        expectedSize += size
-    }
-
-    val mergeDir = getUploadCacheMergeDirPath()
-    NSFileManager.defaultManager.createDirectoryAtPath(
-        mergeDir, withIntermediateDirectories = true, attributes = null, error = null,
-    )
-    val tempMergePath = "$mergeDir/.merge_tmp_${fileId}_${TimeHelper.nowMillis()}"
-
-    try {
-        val chunks = mutableListOf<ByteArray>()
-        for (i in 0 until totalChunks) {
-            val chunkPath = "$chunkDir/${chunkPrefix}$i"
-            val data = NSFileManager.defaultManager.contentsAtPath(chunkPath)
-            if (data != null && data.length > 0uL) {
-                chunks.add(data.toByteArray())
-            }
-        }
-        val mergedSize2 = chunks.sumOf { it.size }
-        val mergedBytes = ByteArray(mergedSize2)
-        var pos = 0
-        for (chunk in chunks) {
-            chunk.copyInto(mergedBytes, pos)
-            pos += chunk.size
-        }
-        if (!mergedBytes.toNSData().writeToFile(tempMergePath, atomically = true)) {
-            throw GraphQLError("Cannot open merge temp file")
-        }
-
-        val mergedSize = NSFileManager.defaultManager.attributesOfItemAtPath(tempMergePath, null)
-            ?.let { attrs -> attrs[NSFileSize] as? Long } ?: 0L
-
-        if (mergedSize != expectedSize) {
-            NSFileManager.defaultManager.removeItemAtPath(tempMergePath, null)
-            throw GraphQLError(
-                "Merge integrity failed: expected $expectedSize, got $mergedSize",
-            )
-        }
-
-        if (isAppFile) {
-            val fidSuffix = importAppFileInternal(tempMergePath, "", deleteSrc = true)
-            if (fidSuffix.isEmpty()) {
-                throw GraphQLError("Failed to import merged app file")
-            }
-            deleteUploadedChunks(fileId)
-            "$fidSuffix:$mergedSize"
-        } else {
-            var destPath = path
-            if (!replace && NSFileManager.defaultManager.fileExistsAtPath(destPath)) {
-                destPath = getNewPath(destPath)
-            }
-            val parent = destPath.substringBeforeLast('/', "")
-            if (parent.isNotEmpty()) {
-                NSFileManager.defaultManager.createDirectoryAtPath(
-                    parent, withIntermediateDirectories = true, attributes = null, error = null,
-                )
-            }
-            if (NSFileManager.defaultManager.fileExistsAtPath(destPath)) {
-                NSFileManager.defaultManager.removeItemAtPath(destPath, null)
-            }
-            if (!NSFileManager.defaultManager.moveItemAtPath(tempMergePath, destPath, error = null)) {
-                throw GraphQLError("Failed to move merged file to destination")
-            }
-            deleteUploadedChunks(fileId)
-            "${destPath.substringAfterLast('/')}:$mergedSize"
-        }
-    } catch (e: GraphQLError) {
-        NSFileManager.defaultManager.removeItemAtPath(tempMergePath, null)
-        throw e
-    } catch (e: Exception) {
-        NSFileManager.defaultManager.removeItemAtPath(tempMergePath, null)
-        LogCat.e("mergeUploadedChunks: ${e.message}")
-        throw GraphQLError("Merge failed: ${e.message}")
-    }
-}
-
-@OptIn(ExperimentalForeignApi::class)
-actual fun saveUploadChunk(fileId: String, chunkIndex: Int, data: ByteArray): String {
-    val dir = getUploadTmpDirPath()
-    NSFileManager.defaultManager.createDirectoryAtPath(
-        dir, withIntermediateDirectories = true, attributes = null, error = null,
-    )
-    val chunkPath = "$dir/${fileId}_$chunkIndex"
-    data.toNSData().writeToFile(chunkPath, atomically = true)
-    return chunkPath
+actual fun deleteDirRecursively(path: String) {
+    NSFileManager.defaultManager.removeItemAtPath(path, null)
 }
 
 @OptIn(ExperimentalForeignApi::class)
@@ -425,69 +312,10 @@ actual suspend fun createTempFilePath(prefix: String): String = withIO {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private suspend fun importAppFileInternal(
-    tempFilePath: String,
-    contentType: String,
-    deleteSrc: Boolean,
-): String = withIO {
-    val mgr = NSFileManager.defaultManager
-    val data = mgr.contentsAtPath(tempFilePath) ?: return@withIO ""
-    val bytes = data.toByteArray()
-    if (bytes.isEmpty()) return@withIO ""
-
-    val hash = FileHashHelper.strongHash(bytes)
-    val ext = if (contentType.isNotEmpty()) {
-        getExtensionFromMimeType(contentType)
-    } else {
-        tempFilePath.substringAfterLast('.', "").lowercase()
-    }
-    val fidSuffix = if (ext.isNotEmpty()) "$hash.$ext" else hash
-    val destPath = "${appDir()}/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$fidSuffix"
-
-    val parent = destPath.substringBeforeLast('/', "")
-    if (parent.isNotEmpty()) {
-        mgr.createDirectoryAtPath(
-            parent, withIntermediateDirectories = true, attributes = null, error = null,
-        )
-    }
-
-    val dao = AppDatabase.instance.appFileDao()
-    val existing = dao.getById(hash)
-    if (existing != null) {
-        if (!mgr.fileExistsAtPath(destPath)) {
-            if (deleteSrc) {
-                mgr.moveItemAtPath(tempFilePath, destPath, error = null)
-            } else {
-                mgr.copyItemAtPath(tempFilePath, destPath, error = null)
-            }
-        } else if (deleteSrc) {
-            mgr.removeItemAtPath(tempFilePath, null)
-        }
-        dao.incrementRefCount(hash)
-    } else {
-        if (mgr.fileExistsAtPath(destPath)) {
-            mgr.removeItemAtPath(destPath, null)
-        }
-        if (deleteSrc) {
-            mgr.moveItemAtPath(tempFilePath, destPath, error = null)
-        } else {
-            mgr.copyItemAtPath(tempFilePath, destPath, error = null)
-        }
-        val record = DAppFile(hash).apply {
-            size = bytes.size.toLong()
-            mimeType = contentType.ifEmpty { "application/octet-stream" }
-            realPath = "${hash.substring(0, 2)}/${hash.substring(2, 4)}/$fidSuffix"
-            refCount = 1
-            weakHash = FileHashHelper.weakHash(bytes)
-        }
-        dao.insert(record)
-    }
-    fidSuffix
+actual suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String? = withIO {
+    val dFile = AppFileStore.importFile(tempFilePath, contentType, deleteSrc)
+    dFile.realPath.substringAfterLast('/')
 }
-
-@OptIn(ExperimentalForeignApi::class)
-actual suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String? =
-    importAppFileInternal(tempFilePath, contentType, deleteSrc).takeIf { it.isNotEmpty() }
 
 actual suspend fun streamContentUri(uri: String, sink: StreamSink): String? = null
 
@@ -503,15 +331,29 @@ actual suspend fun decodeImageFileToPng(path: String): ByteArray? = withIO {
         val data = mgr.contentsAtPath(path) ?: return@withIO null
         val bytes = data.toByteArray()
         if (bytes.size < 12) return@withIO null
-        val isHeif = bytes[4] == 0x66.toByte() && // 'f'
-            bytes[5] == 0x74.toByte() && // 't'
-            bytes[6] == 0x79.toByte() && // 'y'
-            bytes[7] == 0x70.toByte() && // 'p'
-            bytes.copyOfRange(8, 12).decodeToString() in listOf("heic", "heix", "hevc", "hevx", "avif")
-        if (!isHeif) return@withIO null
+        if (!isHeifHeader(bytes)) return@withIO null
         val image = UIImage(data = data) ?: return@withIO null
-        val png = UIImagePNGRepresentation(image) ?: return@withIO null
-        png.toByteArray()
+        // Cap the decoded edge like Android so huge HEIF photos don't blow up the
+        // render buffer; 4096 keeps 12 MP photos pixel-exact.
+        val iw = image.size.useContents { width }
+        val ih = image.size.useContents { height }
+        if (iw <= 0.0 || ih <= 0.0) return@withIO null
+        val cap = DecodePolicy.MAX_FULL_VIEW_EDGE.toDouble()
+        val scale = minOf(cap / iw, cap / ih, 1.0)
+        val png = if (scale >= 1.0) {
+            UIImagePNGRepresentation(image)
+        } else {
+            val outW = iw * scale
+            val outH = ih * scale
+            UIGraphicsBeginImageContextWithOptions(CGSizeMake(outW, outH), false, 0.0)
+            try {
+                image.drawInRect(CGRectMake(0.0, 0.0, outW, outH))
+                UIGraphicsGetImageFromCurrentImageContext()?.let { UIImagePNGRepresentation(it) }
+            } finally {
+                UIGraphicsEndImageContext()
+            }
+        }
+        png?.toByteArray()
     } catch (e: Exception) {
         LogCat.e("decodeImageFileToPng: ${e.message}")
         null
@@ -519,9 +361,17 @@ actual suspend fun decodeImageFileToPng(path: String): ByteArray? = withIO {
 }
 
 actual fun isAnimatedImageOrSvg(path: String, fileName: String): Boolean {
-    val name = if (fileName.isNotEmpty()) fileName else path
-    val ext = name.substringAfterLast('.', "").lowercase()
-    return ext == "gif" || ext == "webp" || ext == "svg"
+    val fp = fopen(path, "rb") ?: return false
+    try {
+        val header = ByteArray(256)
+        val read = header.usePinned { pinned ->
+            fread(pinned.addressOf(0), 1UL, header.size.toULong(), fp)
+        }.toInt()
+        if (read <= 0) return false
+        return isAnimatedImageOrSvgHeader(fileName, header, fileSize(path))
+    } finally {
+        fclose(fp)
+    }
 }
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
@@ -619,7 +469,7 @@ actual suspend fun writeBytesToUri(uriStr: String, bytes: ByteArray): Boolean = 
 
 actual fun getFileNameFromUri(uriStr: String): String? {
     if (uriStr.isEmpty()) return null
-    return uriStr.substringAfterLast('/').ifEmpty { null }
+    return uriStr.getFilenameFromPath().ifEmpty { null }
 }
 
 @OptIn(ExperimentalForeignApi::class)

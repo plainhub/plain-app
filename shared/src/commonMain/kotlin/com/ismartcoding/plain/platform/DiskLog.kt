@@ -31,13 +31,13 @@ class DiskLogFormatStrategy(private val logStrategy: LogStrategy) : FormatStrate
 
         fun logLevel(value: Int): String {
             return when (value) {
-                LogCat.VERBOSE -> "VERBOSE"
-                LogCat.DEBUG -> "DEBUG"
-                LogCat.INFO -> "INFO"
-                LogCat.WARN -> "WARN"
-                LogCat.ERROR -> "ERROR"
-                LogCat.ASSERT -> "ASSERT"
-                else -> "UNKNOWN"
+                LogCat.VERBOSE -> "[V]"
+                LogCat.DEBUG -> "[D]"
+                LogCat.INFO -> "[I]"
+                LogCat.WARN -> "[W]"
+                LogCat.ERROR -> "[E]"
+                LogCat.ASSERT -> "[WTF]"
+                else -> "[?]"
             }
         }
 

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.lib.logcat
 
+import com.ismartcoding.plain.platform.appDir
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
 
@@ -54,7 +55,7 @@ object LogCat {
         printer.clearLogAdapters()
     }
 
-    fun logFolder(): String = logFolderImpl()
+    fun logFolder(): String = appDir() + "/logs"
 
     private fun format(message: Any?, args: Array<out Any?>): String {
         val msg = message?.toString() ?: "null"
@@ -69,5 +70,3 @@ object LogCat {
 }
 
 internal expect fun platformLog(priority: Int, tag: String, message: String)
-
-internal expect fun logFolderImpl(): String

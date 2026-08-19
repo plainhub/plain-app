@@ -1,11 +1,49 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.DMessageFile
+import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.features.file.DFile
+import com.ismartcoding.plain.helpers.AppFileStore
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.httpserver.http.StreamSink
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import kotlin.time.Instant
+
+// ── Shared construction / detection helpers ────────────────────────────────
+// These hold the platform-independent business logic so each actual only keeps
+// the lowest-level file I/O. Android is the reference implementation.
+
+/**
+ * Build the [DMessageContent] for a long-text file written at [path].
+ * Used by [createLongTextFile].
+ */
+fun buildLongTextMessage(path: String, fileName: String, text: String, size: Long): DMessageContent {
+    val summary = text.substring(0, minOf(text.length, Constants.TEXT_FILE_SUMMARY_LENGTH))
+    val messageFile = DMessageFile(uri = path, size = size, summary = summary, fileName = fileName)
+    return DMessageContent(MessageType.FILES, DMessageFiles(listOf(messageFile)))
+}
+
+/**
+ * Build the [DFile] record for a text file at [path] with [size] bytes and the
+ * given (epoch-ms) modification time. Used by [writeFileText].
+ */
+fun buildTextFile(path: String, size: Long, updatedAtMillis: Long): DFile = DFile(
+    name = path.substringAfterLast('/'),
+    path = path,
+    permission = "rw",
+    createdAt = null,
+    updatedAt = Instant.fromEpochMilliseconds(updatedAtMillis),
+    size = size,
+    isDir = false,
+    children = 0,
+    mediaId = "",
+)
 
 suspend fun releaseAppFile(fidSuffix: String) = withIO {
     val hash = fidSuffix.substringBefore(".")
@@ -20,6 +58,23 @@ suspend fun releaseAppFile(fidSuffix: String) = withIO {
 }
 
 expect fun deleteFileAt(path: String)
+
+// ── Lowest-level file primitives used by shared stores (e.g. AppFileStore) ─
+
+/** Size in bytes of the file at [path], or 0 if it does not exist. */
+expect fun fileSize(path: String): Long
+
+/** Copy [srcPath] to [destPath], overwriting an existing destination. false on failure. */
+expect fun copyFile(srcPath: String, destPath: String): Boolean
+
+/** Rename/move [fromPath] to [toPath]. false if it cannot be done atomically. */
+expect fun moveFile(fromPath: String, toPath: String): Boolean
+
+/** Full-file SHA-256 (64 hex chars). Reads in chunks. Empty string on failure. */
+expect suspend fun sha256File(path: String): String
+
+/** SHA-256 of (first 4 KB ++ last 4 KB) of the file at [path]. Reads only those fragments. */
+expect suspend fun sha256FileEdges(path: String, size: Long): String
 
 /**
  * Write [bytes] to a regular file at [path], replacing any existing content.
@@ -75,16 +130,49 @@ expect fun getUploadTmpDirPath(): String
  */
 expect fun getUploadCacheMergeDirPath(): String
 
+/** Names of the files directly inside [path], empty if the directory does not exist. */
+expect fun listFilesInDir(path: String): List<String>
+
+/** Recursively delete the directory at [path]. No-op if it does not exist. */
+expect fun deleteDirRecursively(path: String)
+
+/** Absolute directory holding the uploaded chunks of [fileId]. */
+private fun chunkDir(fileId: String): String = "${getUploadTmpDirPath()}/${fileId}"
+
 /**
  * List uploaded chunk files for [fileId]. Each entry is "<index>:<size>".
  * Returns an empty list if no chunks have been uploaded.
  */
-expect fun listUploadedChunks(fileId: String): List<String>
+fun listUploadedChunks(fileId: String): List<String> {
+    val dir = chunkDir(fileId)
+    return listFilesInDir(dir)
+        .filter { it.startsWith("chunk_") }
+        .mapNotNull { name ->
+            val index = name.removePrefix("chunk_").toIntOrNull()
+            if (index != null) "${index}:${fileSize("$dir/$name")}" else null
+        }
+        .sortedBy { it.substringBefore(':').toInt() }
+}
 
 /**
  * Delete all uploaded chunk files for [fileId]. Returns true on success.
  */
-expect fun deleteUploadedChunks(fileId: String): Boolean
+fun deleteUploadedChunks(fileId: String): Boolean {
+    deleteDirRecursively(chunkDir(fileId))
+    return true
+}
+
+/**
+ * Save an uploaded chunk ([data]) for [fileId] at [chunkIndex] into the upload
+ * tmp directory. Returns the absolute path of the saved chunk file.
+ */
+fun saveUploadChunk(fileId: String, chunkIndex: Int, data: ByteArray): String {
+    val dir = chunkDir(fileId)
+    ensureDir(dir)
+    val chunkPath = "$dir/chunk_$chunkIndex"
+    writeBytesToPath(chunkPath, data)
+    return chunkPath
+}
 
 /**
  * Merge the uploaded chunks for [fileId] (expected [totalChunks] parts) into
@@ -97,19 +185,64 @@ expect fun deleteUploadedChunks(fileId: String): Boolean
  * Throws [com.ismartcoding.plain.lib.kgraphql.GraphQLError] on missing chunks or
  * integrity check failure.
  */
-expect suspend fun mergeUploadedChunks(
+suspend fun mergeUploadedChunks(
     fileId: String,
     totalChunks: Int,
     path: String,
     replace: Boolean,
     isAppFile: Boolean,
-): String
+): String = withIO {
+    val dir = chunkDir(fileId)
+    if (!fileExists(dir)) throw GraphQLError("No chunks found for $fileId")
 
-/**
- * Save an uploaded chunk ([data]) for [fileId] at [chunkIndex] into the upload
- * tmp directory. Returns the absolute path of the saved chunk file.
- */
-expect fun saveUploadChunk(fileId: String, chunkIndex: Int, data: ByteArray): String
+    var expectedSize = 0L
+    for (i in 0 until totalChunks) {
+        val chunkPath = "$dir/chunk_$i"
+        if (!fileExists(chunkPath)) throw GraphQLError("Missing chunk $i")
+        expectedSize += fileSize(chunkPath)
+    }
+
+    val mergeDir = getUploadCacheMergeDirPath()
+    ensureDir(mergeDir)
+    val tempMergePath = "$mergeDir/.merge_tmp_${fileId}_${TimeHelper.nowMillis()}"
+
+    // Stream the chunks into a temp merge file (no full in-memory buffering).
+    val sink = createFileSink(tempMergePath)
+    try {
+        for (i in 0 until totalChunks) {
+            if (!streamFileTo("$dir/chunk_$i", sink)) throw GraphQLError("Failed to read chunk $i")
+        }
+    } finally {
+        sink.close()
+    }
+
+    val mergedSize = fileSize(tempMergePath)
+    if (mergedSize != expectedSize) {
+        deleteFileAt(tempMergePath)
+        throw GraphQLError("Merge integrity failed: expected $expectedSize, got $mergedSize")
+    }
+
+    if (isAppFile) {
+        val dFile = AppFileStore.importFile(tempMergePath, "", deleteSrc = true)
+        deleteUploadedChunks(fileId)
+        return@withIO "${dFile.realPath.substringAfterLast('/')}:$mergedSize"
+    }
+
+    var destPath = path
+    if (!replace && fileExists(destPath)) {
+        destPath = getNewPath(destPath)
+    }
+    val parent = destPath.substringBeforeLast('/', "")
+    if (parent.isNotEmpty()) ensureDir(parent)
+    if (fileExists(destPath)) deleteFileAt(destPath)
+    if (!moveFile(tempMergePath, destPath)) {
+        copyFile(tempMergePath, destPath)
+        deleteFileAt(tempMergePath)
+    }
+    scanFiles(arrayOf(destPath))
+    deleteUploadedChunks(fileId)
+    return@withIO "${destPath.substringAfterLast('/')}:$mergedSize"
+}
 
 /**
  * Stream the contents of the file at [path] into [sink]. Returns true on success,

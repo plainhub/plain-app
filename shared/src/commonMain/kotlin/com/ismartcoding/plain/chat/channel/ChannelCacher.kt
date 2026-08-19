@@ -4,14 +4,17 @@ import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChatChannel
+import com.ismartcoding.plain.db.DChat
+import kotlin.time.Instant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import com.ismartcoding.plain.chat.ChatCacher
 import com.ismartcoding.plain.helpers.Base64Lenient
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -21,9 +24,12 @@ object ChannelCacher {
 
     val channelsMap = MutableStateFlow<Map<String, ChannelRuntime>>(emptyMap())
 
-    val channels: StateFlow<List<DChatChannel>> = channelsMap
-        .map { it.values.map { runtime -> runtime.channel }.sortedBy { c -> c.name.toSortName() } }
-        .stateIn(scope, SharingStarted.Eagerly, emptyList())
+    val channels: StateFlow<List<DChatChannel>> = combine(channelsMap, ChatCacher.latestChatMap) { c, chatCache ->
+        c.values.map { it.channel }.sortedWith(
+            compareByDescending<DChatChannel> { chatCache[it.id]?.createdAt ?: Instant.DISTANT_PAST }
+                .thenBy { it.name.toSortName() },
+        )
+    }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     /** 返回指定 channel 的只读视图。调用方不应直接修改返回对象；
      *  修改请使用 [mutateChannel]。 */

@@ -21,7 +21,7 @@ object ChatFileSaveHelper {
         tempFile.parentFile?.mkdirs()
         try {
             FileHelper.copyFile(context, uri, tempFile.absolutePath)
-            val dFile = AppFileStore.importFile(tempFile, mimeType, deleteSrc = true)
+            val dFile = AppFileStore.importFile(tempFile.absolutePath, mimeType, deleteSrc = true)
             return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
         } finally {
             // Guard: if importFile did not consume (due to error path), clean up
@@ -40,7 +40,7 @@ object ChatFileSaveHelper {
         srcFile: File,
         mimeType: String = "",
     ): String {
-        val dFile = AppFileStore.importFile(srcFile, mimeType, deleteSrc = true)
+        val dFile = AppFileStore.importFile(srcFile.absolutePath, mimeType, deleteSrc = true)
         return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
     }
 }

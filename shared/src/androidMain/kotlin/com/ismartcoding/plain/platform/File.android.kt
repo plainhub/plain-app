@@ -3,12 +3,7 @@ package com.ismartcoding.plain.platform
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.ismartcoding.plain.appContext
-import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.MessageType
-import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppHelper
@@ -17,6 +12,11 @@ import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.helpers.FileHashEdgeBytes
+import com.ismartcoding.plain.lib.extensions.isAnimatedImageOrSvgHeader
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.isHeifHeader
+import com.ismartcoding.plain.lib.extensions.toHexString
 import com.ismartcoding.plain.lib.extensions.queryOpenableFile
 import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
@@ -26,9 +26,7 @@ import androidx.core.net.toUri
 import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.helpers.Mp4Helper
 import com.ismartcoding.plain.helpers.ZipHelper
@@ -59,6 +57,71 @@ actual fun deleteFileAt(path: String) {
     File(path).delete()
 }
 
+actual fun fileSize(path: String): Long = File(path).takeIf { it.isFile }?.length() ?: 0L
+
+actual fun copyFile(srcPath: String, destPath: String): Boolean {
+    return try {
+        File(srcPath).copyTo(File(destPath), overwrite = true)
+        true
+    } catch (_: Exception) {
+        false
+    }
+}
+
+actual fun moveFile(fromPath: String, toPath: String): Boolean {
+    return try {
+        File(fromPath).renameTo(File(toPath))
+    } catch (_: Exception) {
+        false
+    }
+}
+
+actual fun listFilesInDir(path: String): List<String> =
+    File(path).listFiles()?.mapNotNull { it.name } ?: emptyList()
+
+actual fun deleteDirRecursively(path: String) {
+    File(path).deleteRecursively()
+}
+
+actual suspend fun sha256File(path: String): String = withIO {
+    try {
+        java.security.MessageDigest.getInstance("SHA-256").let { digest ->
+            File(path).inputStream().use { stream ->
+                val buffer = ByteArray(8192)
+                var read: Int
+                while (stream.read(buffer).also { read = it } != -1) {
+                    digest.update(buffer, 0, read)
+                }
+            }
+            digest.digest().toHexString()
+        }
+    } catch (_: Exception) {
+        ""
+    }
+}
+
+actual suspend fun sha256FileEdges(path: String, size: Long): String = withIO {
+    try {
+        val sha256Hex = java.security.MessageDigest.getInstance("SHA-256").digest(
+            if (size <= FileHashEdgeBytes * 2) {
+                File(path).readBytes()
+            } else {
+                val first = ByteArray(FileHashEdgeBytes)
+                val last = ByteArray(FileHashEdgeBytes)
+                File(path).inputStream().use { it.read(first) }
+                File(path).inputStream().use { inp ->
+                    inp.skip(size - FileHashEdgeBytes)
+                    inp.read(last)
+                }
+                first + last
+            },
+        ).toHexString()
+        sha256Hex
+    } catch (_: Exception) {
+        ""
+    }
+}
+
 actual fun writeBytesToPath(path: String, bytes: ByteArray): Boolean {
     return try {
         File(path).writeBytes(bytes)
@@ -75,9 +138,7 @@ actual fun createLongTextFile(text: String): DMessageContent {
     if (!dir!!.exists()) dir.mkdirs()
     val file = java.io.File(dir, fileName)
     file.writeText(text)
-    val summary = text.substring(0, minOf(text.length, Constants.TEXT_FILE_SUMMARY_LENGTH))
-    val messageFile = DMessageFile(uri = file.absolutePath, size = file.length(), summary = summary, fileName = fileName)
-    return DMessageContent(MessageType.FILES, DMessageFiles(listOf(messageFile)))
+    return buildLongTextMessage(file.absolutePath, fileName, text, file.length())
 }
 
 actual fun saveFileToDownloads(path: String, fileName: String): String {
@@ -108,17 +169,7 @@ actual fun writeFileText(path: String, content: String, overwrite: Boolean): DFi
     }
     file.writeText(content)
     appContext.scanFileByConnection(path)
-    return DFile(
-        name = file.name,
-        path = file.absolutePath,
-        permission = "rw",
-        createdAt = null,
-        updatedAt = kotlin.time.Instant.fromEpochMilliseconds(file.lastModified()),
-        size = file.length(),
-        isDir = false,
-        children = 0,
-        mediaId = "",
-    )
+    return buildTextFile(file.absolutePath, file.length(), file.lastModified())
 }
 
 actual fun getUploadTmpDirPath(): String =
@@ -126,109 +177,6 @@ actual fun getUploadTmpDirPath(): String =
 
 actual fun getUploadCacheMergeDirPath(): String =
     File(appContext.cacheDir, "upload_merge").apply { mkdirs() }.absolutePath
-
-actual fun listUploadedChunks(fileId: String): List<String> {
-    val chunkDir = File(getUploadTmpDirPath(), fileId)
-    if (!chunkDir.exists()) return emptyList()
-    return chunkDir.listFiles()
-        ?.filter { it.name.startsWith("chunk_") }
-        ?.mapNotNull { file ->
-            val index = file.name.removePrefix("chunk_").toIntOrNull()
-            if (index != null) "${index}:${file.length()}" else null
-        }
-        ?.sortedBy { it.substringBefore(':').toInt() }
-        ?: emptyList()
-}
-
-actual fun deleteUploadedChunks(fileId: String): Boolean {
-    val chunkDir = File(getUploadTmpDirPath(), fileId)
-    if (chunkDir.exists()) {
-        chunkDir.deleteRecursively()
-    }
-    return true
-}
-
-actual suspend fun mergeUploadedChunks(
-    fileId: String,
-    totalChunks: Int,
-    path: String,
-    replace: Boolean,
-    isAppFile: Boolean,
-): String {
-    val chunkDir = File(getUploadTmpDirPath(), fileId)
-    if (!chunkDir.exists()) {
-        throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("No chunks found for $fileId")
-    }
-
-    var expectedMergedSize = 0L
-    for (i in 0 until totalChunks) {
-        val chunkFile = File(chunkDir, "chunk_$i")
-        if (!chunkFile.exists()) {
-            throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("Missing chunk $i")
-        }
-        expectedMergedSize += chunkFile.length()
-    }
-
-    val outputFile = if (replace) {
-        File(path)
-    } else {
-        val originalFile = File(path)
-        if (originalFile.exists()) {
-            File(originalFile.newPath())
-        } else {
-            originalFile
-        }
-    }
-    outputFile.parentFile?.mkdirs()
-
-    val tempMergeFile = File(getUploadCacheMergeDirPath(), ".merge_tmp_${fileId}_${System.currentTimeMillis()}")
-    try {
-        java.io.FileOutputStream(tempMergeFile).use { fos ->
-            for (i in 0 until totalChunks) {
-                val chunkFile = File(chunkDir, "chunk_$i")
-                chunkFile.inputStream().use { input ->
-                    input.copyTo(fos)
-                }
-            }
-        }
-
-        val mergedSize = tempMergeFile.length()
-
-        if (mergedSize != expectedMergedSize) {
-            tempMergeFile.delete()
-            throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("Merge integrity failed: expected $expectedMergedSize, got $mergedSize")
-        }
-
-        if (outputFile.exists() && replace) {
-            outputFile.delete()
-        }
-        tempMergeFile.copyTo(outputFile, overwrite = true)
-        java.io.FileOutputStream(outputFile, true).use { it.fd.sync() }
-        tempMergeFile.delete()
-    } catch (e: Exception) {
-        tempMergeFile.delete()
-        throw e
-    }
-
-    val mergedSize = outputFile.length()
-
-    chunkDir.deleteRecursively()
-    if (isAppFile) {
-        val dFile = com.ismartcoding.plain.helpers.AppFileStore.importFile(outputFile, "", deleteSrc = true)
-        val fidSuffix = java.io.File(dFile.realPath).name
-        return "${fidSuffix}:$mergedSize"
-    } else {
-        appContext.scanFileByConnection(outputFile, null)
-        return "${outputFile.name}:$mergedSize"
-    }
-}
-
-actual fun saveUploadChunk(fileId: String, chunkIndex: Int, data: ByteArray): String {
-    val chunkDir = File(getUploadTmpDirPath(), fileId).apply { mkdirs() }
-    val chunkFile = File(chunkDir, "chunk_$chunkIndex")
-    chunkFile.writeBytes(data)
-    return chunkFile.absolutePath
-}
 
 // --- HTTP streaming & file sink abstractions ---
 
@@ -301,8 +249,8 @@ actual suspend fun createTempFilePath(prefix: String): String = withIO {
 }
 
 actual suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String? = withIO {
-    val dFile = AppFileStore.importFile(File(tempFilePath), contentType, deleteSrc)
-    File(dFile.realPath).name
+    val dFile = AppFileStore.importFile(tempFilePath, contentType, deleteSrc)
+    dFile.realPath.substringAfterLast('/')
 }
 
 actual suspend fun streamContentUri(uri: String, sink: StreamSink): String? = withIO {
@@ -346,12 +294,7 @@ actual suspend fun getPackageIconBytes(packageName: String): ByteArray? = withIO
 actual suspend fun decodeImageFileToPng(path: String): ByteArray? = withIO {
     val header = ByteArray(12)
     val headerSize = File(path).inputStream().use { it.read(header) }
-    val isHeif = headerSize >= 12 &&
-            header[4] == 0x66.toByte() && // 'f'
-            header[5] == 0x74.toByte() && // 't'
-            header[6] == 0x79.toByte() && // 'y'
-            header[7] == 0x70.toByte() && // 'p'
-            String(header.copyOfRange(8, 12)) in listOf("heic", "heix", "hevc", "hevx", "avif")
+    val isHeif = headerSize >= 12 && isHeifHeader(header)
     // Cheap header sniff stays outside the permit so non-HEIF requests
     // (e.g. every <video> playback fetch) never queue behind decodes.
     if (!isHeif) return@withIO null
@@ -380,8 +323,17 @@ actual suspend fun decodeImageFileToPng(path: String): ByteArray? = withIO {
 }
 
 actual fun isAnimatedImageOrSvg(path: String, fileName: String): Boolean {
-    val imageType = ImageHelper.getImageType(path, fileName)
-    return imageType.isApplicableAnimated() || imageType == ImageType.SVG
+    val file = File(path)
+    if (!file.exists()) return false
+    return try {
+        file.inputStream().use { input ->
+            val header = ByteArray(256)
+            input.read(header)
+            isAnimatedImageOrSvgHeader(fileName, header, file.length())
+        }
+    } catch (_: Exception) {
+        false
+    }
 }
 
 actual suspend fun getThumbnailBytes(
@@ -576,7 +528,7 @@ actual suspend fun writeBytesToUri(uriStr: String, bytes: ByteArray): Boolean = 
 
 actual fun getFileNameFromUri(uriStr: String): String? {
     if (!uriStr.startsWith("content://")) {
-        return File(uriStr).name
+        return uriStr.getFilenameFromPath()
     }
     return try {
         appContext.contentResolver.queryOpenableFileName(Uri.parse(uriStr)).takeIf { it.isNotEmpty() }

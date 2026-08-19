@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.lib.logcat
 
 import android.util.Log
-import com.ismartcoding.plain.appContext
 
 internal actual fun platformLog(priority: Int, tag: String, message: String) {
     try {
@@ -17,5 +16,3 @@ internal actual fun platformLog(priority: Int, tag: String, message: String) {
         // Ignore logging failures (e.g. android.util.Log not mocked in unit tests)
     }
 }
-
-internal actual fun logFolderImpl(): String = appContext.filesDir.absolutePath + "/logs"

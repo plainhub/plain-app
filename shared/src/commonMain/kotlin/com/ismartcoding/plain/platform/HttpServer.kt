@@ -21,7 +21,7 @@ import kotlinx.coroutines.withTimeoutOrNull
  * Set of HTTP/HTTPS ports that failed to bind on the current platform.
  * Empty when no port conflicts exist.
  */
-fun httpServerPortsInUse(): Set<Int> = HttpServerManager.portsInUse.toSet()
+fun httpServerPortsInUse(): Set<Int> = HttpServerManager.portsInUse.value
 
 /**
  * SSL certificate signature bytes for the current HTTPS keystore.
@@ -141,7 +141,7 @@ suspend fun startHttpServerAsync(onStateChanged: (HttpServerState) -> Unit = {})
     LogCat.d("startHttpServer")
     onStateChanged(HttpServerState.STARTING)
     sendEvent(HttpServerStateChangedEvent(HttpServerState.STARTING))
-    HttpServerManager.portsInUse.clear()
+    HttpServerManager.portsInUse.value = emptySet()
     HttpServerManager.httpServerError = ""
 
     val httpPort = TempData.httpPort.value
@@ -174,7 +174,7 @@ suspend fun startHttpServerAsync(onStateChanged: (HttpServerState) -> Unit = {})
     val healthy = started && checkHttpServerAsync()
     if (healthy) {
         HttpServerManager.httpServerError = ""
-        HttpServerManager.portsInUse.clear()
+        HttpServerManager.portsInUse.value = emptySet()
         onHttpServerStarted()
         onStateChanged(HttpServerState.ON)
         sendEvent(HttpServerStateChangedEvent(HttpServerState.ON))
@@ -187,14 +187,15 @@ suspend fun startHttpServerAsync(onStateChanged: (HttpServerState) -> Unit = {})
     if (started) {
         stopHttpEngineAsync()
     } else {
-        if (isPortInUse(httpPort)) HttpServerManager.portsInUse.add(httpPort)
-        if (isPortInUse(httpsPort)) HttpServerManager.portsInUse.add(httpsPort)
+        if (isPortInUse(httpPort)) HttpServerManager.portsInUse.value += httpPort
+        if (isPortInUse(httpsPort)) HttpServerManager.portsInUse.value += httpsPort
     }
+    val portsInUse = HttpServerManager.portsInUse.value
     HttpServerManager.httpServerError = when {
-        HttpServerManager.portsInUse.isNotEmpty() -> LocaleHelper.getStringFAsync(
-            if (HttpServerManager.portsInUse.size > 1) Res.string.http_port_conflict_errors
+        portsInUse.isNotEmpty() -> LocaleHelper.getStringFAsync(
+            if (portsInUse.size > 1) Res.string.http_port_conflict_errors
             else Res.string.http_port_conflict_error,
-            "port", HttpServerManager.portsInUse.joinToString(", "),
+            "port", portsInUse.joinToString(", "),
         )
         started -> LocaleHelper.getStringAsync(Res.string.http_server_health_check_failed)
         HttpServerManager.httpServerError.isNotEmpty() ->
@@ -222,7 +223,7 @@ suspend fun stopHttpServerCoreAsync() = withIO {
     stopHttpEngineAsync()
     onHttpServerStopped()
     HttpServerManager.httpServerError = ""
-    HttpServerManager.portsInUse.clear()
+    HttpServerManager.portsInUse.value = emptySet()
     sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
 }
 

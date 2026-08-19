@@ -1,14 +1,23 @@
 package com.ismartcoding.plain.helpers
 
-import android.webkit.MimeTypeMap
+import com.ismartcoding.plain.db.AppFileDao
+import com.ismartcoding.plain.db.DAppFile
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.db.DAppFile
-import com.ismartcoding.plain.db.AppFileDao
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.appDir
-import java.io.File
+import com.ismartcoding.plain.platform.copyFile
+import com.ismartcoding.plain.platform.deleteFileAt
+import com.ismartcoding.plain.platform.ensureDir
+import com.ismartcoding.plain.platform.fileExists
+import com.ismartcoding.plain.platform.fileSize
+import com.ismartcoding.plain.platform.getExtensionFromMimeType
+import com.ismartcoding.plain.platform.getMimeTypeFromExtension
+import com.ismartcoding.plain.platform.moveFile
+import com.ismartcoding.plain.platform.sha256File
+import com.ismartcoding.plain.platform.sha256FileEdges
+import com.ismartcoding.plain.platform.writeBytesToPath
 
 /**
  * Content-addressable store for chat files.
@@ -26,6 +35,10 @@ import java.io.File
  * (`{aa}/{bb}/{name}`) to avoid repeating the platform-specific `appDir()`
  * prefix on every row. Use [relativeDestPath] when persisting and
  * [realPathFromId] (or [resolveUri]) when an absolute path is required.
+ *
+ * All lowest-level file operations (copy/move/size/hash/ensureDir) are
+ * delegated to the [platform primitives][com.ismartcoding.plain.platform]
+ * so the store itself is platform-independent.
  */
 object AppFileStore {
     /** Convert a SHA-256 hash and optional lowercase extension into a [fid:] URI. */
@@ -35,7 +48,7 @@ object AppFileStore {
     /** Derive extension from a MIME type string (lowercase, empty string if unknown). */
     fun extFromMime(mimeType: String): String {
         if (mimeType.isEmpty()) return ""
-        return MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)?.lowercase() ?: ""
+        return getExtensionFromMimeType(mimeType).lowercase()
     }
 
     /**
@@ -66,7 +79,7 @@ object AppFileStore {
      *   - "app://{rel}"      → existing app:// resolution handled by getFinalPath
      *   - absolute path      → returned as-is
      */
-    fun resolveUri( uri: String): String {
+    fun resolveUri(uri: String): String {
         if (uri.startsWith("fid:", ignoreCase = true)) {
             return realPathFromId(uri.removePrefix("fid:"))
         }
@@ -83,40 +96,40 @@ object AppFileStore {
      *
      * - If an identical file already exists, increments refCount and returns
      *   the existing [DAppFile].
-     * - Otherwise copies/moves [srcFile] into the store directory and inserts
+     * - Otherwise copies/moves [srcPath] into the store directory and inserts
      *   a new [DAppFile] row.
      *
-     * @param srcFile    Source file to import. Caller retains ownership; this
+     * @param srcPath    Source file path to import. Caller retains ownership; this
      *                   method copies the content (does not delete srcFile).
      * @param mimeType   Optional MIME type override. Guessed from extension if
      *                   blank.
-     * @param deleteSrc  When true the srcFile is deleted after a successful
+     * @param deleteSrc  When true the source file is deleted after a successful
      *                   copy (move semantics).
      */
     suspend fun importFile(
-        srcFile: File,
+        srcPath: String,
         mimeType: String = "",
         deleteSrc: Boolean = false,
     ): DAppFile = withIO {
         val dao = AppDatabase.instance.appFileDao()
-        val size = srcFile.length()
-        val strongHash by lazy { FileHashHelper.strongHash(srcFile) }
+        val size = fileSize(srcPath)
+        val strongHash = sha256File(srcPath)
 
         // ── Step 1: weak check ────────────────────────────────────────────
-        val weakHash = FileHashHelper.weakHash(srcFile)
+        val weakHash = sha256FileEdges(srcPath, size)
         val candidates = dao.findByWeakKey(size, weakHash)
 
         if (candidates.isNotEmpty()) {
             // ── Step 2: strong check ──────────────────────────────────────
-            tryReuseExisting(dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
+            tryReuseExisting(dao, srcPath, strongHash, deleteSrc)?.let { return@withIO it }
             // Weak matched but strong differs – fall through to insert new
-            return@withIO insertNew(dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
+            return@withIO insertNew(dao, srcPath, size, weakHash, strongHash, mimeType, deleteSrc)
         }
 
         // No weak match. Double-check by id in case another thread raced us.
-        tryReuseExisting(dao, srcFile, strongHash, deleteSrc)?.let { return@withIO it }
+        tryReuseExisting(dao, srcPath, strongHash, deleteSrc)?.let { return@withIO it }
 
-        insertNew(dao, srcFile, size, weakHash, strongHash, mimeType, deleteSrc)
+        insertNew(dao, srcPath, size, weakHash, strongHash, mimeType, deleteSrc)
     }
 
     /**
@@ -140,53 +153,44 @@ object AppFileStore {
         val weakHash = FileHashHelper.weakHash(data)
 
         val effectiveMime = mimeType.ifEmpty { "application/octet-stream" }
-        val ext = extFromMime(effectiveMime)
-        val destFile = destFile(strongHash, ext)
-        destFile.parentFile?.mkdirs()
-        destFile.writeBytes(data)
+        val destPath = destPath(strongHash, extFromMime(effectiveMime))
+        ensureParentFor(destPath)
+        writeBytesToPath(destPath, data)
 
-        val record = DAppFile(strongHash).apply {
-            this.size = size
-            this.mimeType = effectiveMime
-            this.realPath = relativeDestPath(strongHash, ext)
-            this.refCount = 1
-            this.weakHash = weakHash
-        }
-        dao.insert(record)
-        record
+        insertRecord(dao, strongHash, size, weakHash, effectiveMime)
     }
 
     // ── Internals ───────────────────────────────────────────────────────────
 
-    private fun destFile(hash: String, ext: String = ""): File {
+    private fun destPath(hash: String, ext: String = ""): String {
         val base = appDir()
-        return File("$base/${relativeDestPath(hash, ext)}")
+        return "$base/${relativeDestPath(hash, ext)}"
     }
 
     private suspend fun tryReuseExisting(
         dao: AppFileDao,
-        srcFile: File,
+        srcPath: String,
         strongHash: String,
         deleteSrc: Boolean,
     ): DAppFile? {
         val existing = dao.getById(strongHash) ?: return null
         val ext = extFromMime(existing.mimeType)
-        val targetFile = destFile(strongHash, ext)
+        val targetPath = destPath(strongHash, ext)
         val relativeTarget = relativeDestPath(strongHash, ext)
 
         // DB row may exist while the backing file was deleted; restore it.
-        if (!targetFile.exists()) {
+        if (!fileExists(targetPath)) {
             // Check if old file without extension exists (pre-migration) and rename it
-            val legacyFile = destFile(strongHash)
-            if (legacyFile.exists()) {
-                legacyFile.renameTo(targetFile)
+            val legacyPath = destPath(strongHash)
+            if (fileExists(legacyPath)) {
+                moveFile(legacyPath, targetPath)
                 LogCat.d("ChatFileStore: renamed legacy file $strongHash to include extension")
             } else {
-                storeSourceFile(srcFile, targetFile, deleteSrc)
+                storeSourceFile(srcPath, targetPath, deleteSrc)
                 LogCat.d("ChatFileStore: restored missing file $strongHash")
             }
         } else if (deleteSrc) {
-            srcFile.delete()
+            deleteFileAt(srcPath)
         }
 
         if (existing.realPath != relativeTarget) {
@@ -200,28 +204,23 @@ object AppFileStore {
         return existing
     }
 
-    private fun storeSourceFile(
-        srcFile: File,
-        destFile: File,
-        deleteSrc: Boolean,
-    ) {
-        destFile.parentFile?.mkdirs()
+    private fun storeSourceFile(srcPath: String, destPath: String, deleteSrc: Boolean) {
+        ensureParentFor(destPath)
         if (deleteSrc) {
             // renameTo is atomic but fails silently across mount points
-            // (e.g. cacheDir → getExternalFilesDir()).  Fall back to copy+delete.
-            val renamed = srcFile.renameTo(destFile)
-            if (!renamed) {
-                srcFile.copyTo(destFile, overwrite = true)
-                srcFile.delete()
+            // (e.g. cacheDir → getExternalFilesDir()). Fall back to copy+delete.
+            if (!moveFile(srcPath, destPath)) {
+                copyFile(srcPath, destPath)
+                deleteFileAt(srcPath)
             }
         } else {
-            srcFile.copyTo(destFile, overwrite = true)
+            copyFile(srcPath, destPath)
         }
     }
 
     private suspend fun insertNew(
         dao: AppFileDao,
-        srcFile: File,
+        srcPath: String,
         size: Long,
         weakHash: String,
         strongHash: String,
@@ -229,22 +228,39 @@ object AppFileStore {
         deleteSrc: Boolean,
     ): DAppFile {
         val effectiveMime = mimeType.ifEmpty {
-            val srcExt = srcFile.name.getFilenameExtension()
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(srcExt) ?: "application/octet-stream"
+            val srcExt = srcPath.getFilenameExtension()
+            getMimeTypeFromExtension(srcExt).ifEmpty { "application/octet-stream" }
         }
-        val ext = extFromMime(effectiveMime)
-        val destFile = destFile(strongHash, ext)
-        storeSourceFile(srcFile, destFile, deleteSrc)
+        val dest = destPath(strongHash, extFromMime(effectiveMime))
+        storeSourceFile(srcPath, dest, deleteSrc)
 
+        val record = insertRecord(dao, strongHash, size, weakHash, effectiveMime)
+        LogCat.d("ChatFileStore: stored new file $strongHash (${size} bytes)")
+        return record
+    }
+
+    private suspend fun insertRecord(
+        dao: AppFileDao,
+        strongHash: String,
+        size: Long,
+        weakHash: String,
+        effectiveMime: String,
+    ): DAppFile {
         val record = DAppFile(strongHash).apply {
             this.size = size
             this.mimeType = effectiveMime
-            this.realPath = relativeDestPath(strongHash, ext)
+            this.realPath = relativeDestPath(strongHash, extFromMime(effectiveMime))
             this.refCount = 1
             this.weakHash = weakHash
         }
         dao.insert(record)
-        LogCat.d("ChatFileStore: stored new file $strongHash (${size} bytes)")
         return record
+    }
+
+    private fun ensureParentFor(path: String) {
+        val parent = path.substringBeforeLast('/', "")
+        if (parent.isNotEmpty()) {
+            ensureDir(parent)
+        }
     }
 }
