@@ -2,10 +2,8 @@ package com.ismartcoding.plain.mdns
 
 import android.content.Context
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.mdns.isMobileDataInterface
-import java.net.Inet4Address
-import java.net.NetworkInterface
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.mdns.lanInterfaceSnapshot
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -103,19 +101,7 @@ class MdnsRegister(
                 }
         }
     }
-}
 
     /** Snapshot of current LAN interfaces as "wlan0:192.168.1.5" strings. */
-    private fun lanIfaces(): Set<String> =
-        runCatching {
-            NetworkInterface.getNetworkInterfaces()?.asSequence()
-                ?.filter { it.isUp && !it.isLoopback }
-                ?.filterNot { isMobileDataInterface(it.name) }
-                ?.mapNotNull { iface ->
-                    val ip = iface.inetAddresses.asSequence()
-                        .filterIsInstance<Inet4Address>()
-                        .firstOrNull { !it.isLoopbackAddress } ?: return@mapNotNull null
-                    "${iface.name}:${ip.hostAddress}"
-                }
-                ?.toSet() ?: emptySet()
-        }.getOrElse { emptySet() }
+    private fun lanIfaces(): Set<String> = lanInterfaceSnapshot()
+}

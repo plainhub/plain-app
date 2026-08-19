@@ -37,6 +37,33 @@ class MdnsHostResponderTest {
     @Test fun `blank string returns empty`() =
         assertEquals("", MdnsHostResponder.normalizeHostname("   "))
 
+    // ── interfacesToJoin (incremental multicast membership) ──────────────────
+
+    @Test fun `nothing joined yet — all desired interfaces need joining`() =
+        assertEquals(listOf("wlan0", "ap0"), MdnsHostResponder.interfacesToJoin(setOf("wlan0", "ap0"), emptySet()))
+
+    @Test fun `partially joined — only the missing ones are returned`() =
+        assertEquals(listOf("ap0"), MdnsHostResponder.interfacesToJoin(setOf("wlan0", "ap0"), setOf("wlan0")))
+
+    @Test fun `fully joined — nothing to join`() =
+        assertEquals(emptyList<String>(), MdnsHostResponder.interfacesToJoin(setOf("wlan0", "ap0"), setOf("wlan0", "ap0")))
+
+    @Test fun `stale joined interfaces not in desired are ignored`() =
+        assertEquals(listOf("wlan0"), MdnsHostResponder.interfacesToJoin(setOf("wlan0"), setOf("tun0")))
+
+    // ── nextRetryDelay (exponential backoff) ─────────────────────────────────
+
+    @Test fun `backoff doubles`() =
+        assertEquals(4_000L, MdnsHostResponder.nextRetryDelay(2_000L))
+
+    @Test fun `backoff doubles up to the cap`() {
+        assertEquals(16_000L, MdnsHostResponder.nextRetryDelay(8_000L))
+        assertEquals(32_000L, MdnsHostResponder.nextRetryDelay(16_000L))
+    }
+
+    @Test fun `backoff never exceeds the cap`() =
+        assertEquals(32_000L, MdnsHostResponder.nextRetryDelay(32_000L))
+
     // ── ipToInt ───────────────────────────────────────────────────────────────
 
     @Test fun `192 168 1 1 converts correctly`() {

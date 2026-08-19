@@ -29,8 +29,9 @@ class MdnsFoundDevice(
  * The browser shares [MdnsHostResponder]'s socket (one bind on 5353), so its
  * queries and the responder's answers stay on the same port.
  *
- * Concurrency: [handlePacket] is the single writer (called serially from the
- * responder worker thread) and publishes immutable state via [Volatile] maps;
+ * Concurrency: [handlePacket] is the single writer. It is invoked from
+ * [MdnsHostResponder]'s single inbound-consumer coroutine, which serializes every
+ * packet (multicast + QU), and publishes immutable state via [Volatile] maps;
  * [browseOnce] / [snapshot] run on other threads and only read snapshots.
  */
 object MdnsServiceBrowser {

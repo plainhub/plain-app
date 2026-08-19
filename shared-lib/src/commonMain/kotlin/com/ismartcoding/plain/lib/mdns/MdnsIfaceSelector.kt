@@ -10,6 +10,15 @@ internal expect fun candidateInterfaces(): List<Pair<MdnsIface, String>>
  *  multicast loop-back of our own queries/announcements (RFC 6762 §5.2). */
 internal fun isLocalIp(ip: String): Boolean = candidateInterfaces().any { it.second == ip }
 
+/**
+ * Public LAN interface snapshot as "iface:ip" strings (loopback and mobile-data
+ * bearers excluded). Mirrors [candidateInterfaces]; exported so consumers in
+ * other modules (e.g. `MdnsRegister`) can track which interfaces mDNS was
+ * registered on without re-implementing interface enumeration.
+ */
+fun lanInterfaceSnapshot(): Set<String> =
+    candidateInterfaces().map { "${it.first.name}:${it.second}" }.toSet()
+
 /** Returns true for mobile-data-only bearer interface names (never LAN). */
 fun isMobileDataInterface(name: String): Boolean =
     name.startsWith("rmnet") || name.startsWith("ccmni") ||
