@@ -24,7 +24,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.platform.applySystemBarAppearanceForDarkTheme
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.ExportFileType
@@ -140,18 +139,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         sendEvent(WindowFocusChangedEvent(hasFocus))
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Re-apply the system bar appearance from the activity's actual rendered
-        // configuration. During a theme-triggered recreation the Compose
-        // DisposableEffect may run before the window is fully attached, so the
-        // appearance can be dropped; re-applying here guarantees the status bar
-        // icons always match the theme that is actually shown.
-        val useDarkTheme =
-            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        applySystemBarAppearanceForDarkTheme(useDarkTheme)
     }
 
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")

@@ -5,9 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,9 +78,13 @@ fun Main(
         clearToast = { toastState = null },
     )
 
-    DisposableEffect(useDarkTheme) {
+    // Single source of truth for the system bar appearance: the theme Compose
+    // is actually rendering. SideEffect re-applies after EVERY recomposition,
+    // so any competing writer (enableEdgeToEdge's config-change re-apply,
+    // insets controller state, etc.) is corrected on the next frame instead of
+    // leaving inverted status bar icons until restart.
+    SideEffect {
         applySystemBarAppearanceForDarkTheme(useDarkTheme)
-        onDispose { }
     }
 
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
