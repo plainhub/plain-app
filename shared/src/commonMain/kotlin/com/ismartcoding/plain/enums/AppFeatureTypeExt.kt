@@ -31,7 +31,7 @@ fun AppFeatureType.has(): Boolean {
         }
 
         AppFeatureType.MEDIA_FAVORITE -> {
-            isQPlus() && !isHuawei()
+            isRPlus()// && !isHuawei()
         }
 
         else -> true
