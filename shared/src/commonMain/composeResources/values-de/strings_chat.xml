@@ -81,7 +81,7 @@
     <string name="peer_chat">Peer-Chat</string>
     <string name="group_chat">Gruppen-Chat</string>
     <string name="pair_devices_hint">Gehen Sie zum Tab "In der Nähe", um Geräte zu koppeln</string>
-    <string name="add_device">Gerät hinzufügen</string>
+    <string name="pair_device">Gerät koppeln</string>
     <string name="computer">Computer</string>
     <string name="phone">Telefon</string>
     <string name="tablet">Tablet</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">Antwort eingeben…</string>
     <string name="peer_id">ID</string>
     <string name="channels">Kanäle</string>
-    <string name="new_channel">Neuer Kanal</string>
+    <string name="create_channel">Kanal erstellen</string>
     <string name="channel_name">Kanalname</string>
     <string name="channel_created">Kanal erstellt!</string>
     <string name="no_channels">Noch keine Kanäle</string>

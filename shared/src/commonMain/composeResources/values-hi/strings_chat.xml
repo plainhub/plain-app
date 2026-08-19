@@ -81,7 +81,7 @@
     <string name="peer_chat">पीयर चैट</string>
     <string name="group_chat">समूह चैट</string>
     <string name="pair_devices_hint">उपकरणों को जोड़ने के लिए "नजदीक" टैब पर जाएं</string>
-    <string name="add_device">उपकरण जोड़ें</string>
+    <string name="pair_device">उपकरण पेयर करें</string>
     <string name="computer">कंप्यूटर</string>
     <string name="phone">फ़ोन</string>
     <string name="tablet">टैबलेट</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">उत्तर टाइप करें…</string>
     <string name="peer_id">आईडी</string>
     <string name="channels">चैनल</string>
-    <string name="new_channel">नया चैनल</string>
+    <string name="create_channel">चैनल बनाएं</string>
     <string name="channel_name">चैनल का नाम</string>
     <string name="channel_created">चैनल बनाया गया!</string>
     <string name="no_channels">अभी तक कोई चैनल नहीं</string>

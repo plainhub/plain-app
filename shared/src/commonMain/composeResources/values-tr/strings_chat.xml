@@ -81,7 +81,7 @@
     <string name="peer_chat">Eş sohbet</string>
     <string name="group_chat">Grup sohbeti</string>
     <string name="pair_devices_hint">Cihazları eşleştirmek için "Yakındaki" sekmesine gidin</string>
-    <string name="add_device">Cihaz ekle</string>
+    <string name="pair_device">Cihaz eşleştir</string>
     <string name="computer">Bilgisayar</string>
     <string name="phone">Telefon</string>
     <string name="tablet">Tablet</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">Bir yanıt yazın…</string>
     <string name="peer_id">Kimlik</string>
     <string name="channels">Kanallar</string>
-    <string name="new_channel">Yeni Kanal</string>
+    <string name="create_channel">Kanal oluştur</string>
     <string name="channel_name">Kanal adı</string>
     <string name="channel_created">Kanal oluşturuldu!</string>
     <string name="no_channels">Henüz kanal yok</string>

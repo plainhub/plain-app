@@ -81,7 +81,7 @@
     <string name="peer_chat">Чат с устройством</string>
     <string name="group_chat">Групповой чат</string>
     <string name="pair_devices_hint">Перейдите на вкладку "Поблизости" для сопряжения устройств</string>
-    <string name="add_device">Добавить устройство</string>
+    <string name="pair_device">Сопряжение устройства</string>
     <string name="computer">Компьютер</string>
     <string name="phone">Телефон</string>
     <string name="tablet">Планшет</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">Введите ответ…</string>
     <string name="peer_id">ID</string>
     <string name="channels">Каналы</string>
-    <string name="new_channel">Новый канал</string>
+    <string name="create_channel">Создать канал</string>
     <string name="channel_name">Название канала</string>
     <string name="channel_created">Канал создан!</string>
     <string name="no_channels">Пока нет каналов</string>

@@ -81,7 +81,7 @@
     <string name="peer_chat">Trò chuyện ngang hàng</string>
     <string name="group_chat">Trò chuyện nhóm</string>
     <string name="pair_devices_hint">Đi đến tab "Gần đây" để ghép nối thiết bị</string>
-    <string name="add_device">Thêm thiết bị</string>
+    <string name="pair_device">Ghép nối thiết bị</string>
     <string name="computer">Máy tính</string>
     <string name="phone">Điện thoại</string>
     <string name="tablet">Máy tính bảng</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">Nhập câu trả lời…</string>
     <string name="peer_id">ID</string>
     <string name="channels">Kênh</string>
-    <string name="new_channel">Kênh mới</string>
+    <string name="create_channel">Tạo kênh</string>
     <string name="channel_name">Tên kênh</string>
     <string name="channel_created">Kênh đã được tạo!</string>
     <string name="no_channels">Chưa có kênh nào</string>

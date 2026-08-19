@@ -81,7 +81,7 @@
     <string name="peer_chat">பீர் அரட்டை</string>
     <string name="group_chat">குழு அரட்டை</string>
     <string name="pair_devices_hint">சாதனங்களை இணைக்க "அருகில்" தாவலுக்கு செல்லுங்கள்</string>
-    <string name="add_device">சாதனம் சேர்க்க</string>
+    <string name="pair_device">சாதனம் இணை</string>
     <string name="computer">கணினி</string>
     <string name="phone">தொலைபேசி</string>
     <string name="tablet">டேப்லெட்</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">பதிலை தட்டச்சு செய்யவும்…</string>
     <string name="peer_id">அடையாளம்</string>
     <string name="channels">சேனல்கள்</string>
-    <string name="new_channel">புதிய சேனல்</string>
+    <string name="create_channel">சேனலை உருவாக்கு</string>
     <string name="channel_name">சேனல் பெயர்</string>
     <string name="channel_created">சேனல் உருவாக்கப்பட்டது!</string>
     <string name="no_channels">இன்னும் சேனல்கள் இல்லை</string>

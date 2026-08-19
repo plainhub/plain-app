@@ -81,7 +81,7 @@
     <string name="peer_chat">Chat pair</string>
     <string name="group_chat">Chat de groupe</string>
     <string name="pair_devices_hint">Allez dans l'onglet "À proximité" pour coupler des appareils</string>
-    <string name="add_device">Ajouter un appareil</string>
+    <string name="pair_device">Jumeler un appareil</string>
     <string name="computer">Ordinateur</string>
     <string name="phone">Téléphone</string>
     <string name="tablet">Tablette</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">Écrire une réponse…</string>
     <string name="peer_id">ID</string>
     <string name="channels">Canaux</string>
-    <string name="new_channel">Nouveau canal</string>
+    <string name="create_channel">Créer un canal</string>
     <string name="channel_name">Nom du canal</string>
     <string name="channel_created">Canal créé !</string>
     <string name="no_channels">Pas encore de canaux</string>

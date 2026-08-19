@@ -81,7 +81,7 @@
     <string name="peer_chat">Peer-chat</string>
     <string name="group_chat">Groepschat</string>
     <string name="pair_devices_hint">Ga naar het tabblad "Dichtbij" om apparaten te koppelen</string>
-    <string name="add_device">Apparaat toevoegen</string>
+    <string name="pair_device">Apparaat koppelen</string>
     <string name="computer">Computer</string>
     <string name="phone">Telefoon</string>
     <string name="tablet">Tablet</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">Typ een antwoord…</string>
     <string name="peer_id">ID</string>
     <string name="channels">Kanalen</string>
-    <string name="new_channel">Nieuw kanaal</string>
+    <string name="create_channel">Kanaal aanmaken</string>
     <string name="channel_name">Kanaalnaam</string>
     <string name="channel_created">Kanaal aangemaakt!</string>
     <string name="no_channels">Nog geen kanalen</string>

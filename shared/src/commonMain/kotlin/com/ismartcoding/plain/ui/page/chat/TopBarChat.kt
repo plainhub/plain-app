@@ -29,7 +29,7 @@ fun TopBarChat(
             }
             ActionButtonAddWithMenu { dismiss ->
                 PDropdownMenuItem(
-                    text = { Text(stringResource(Res.string.new_channel)) },
+                    text = { Text(stringResource(Res.string.create_channel)) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(Res.drawable.hash),
@@ -42,7 +42,7 @@ fun TopBarChat(
                     },
                 )
                 PDropdownMenuItem(
-                    text = { Text(stringResource(Res.string.add_device)) },
+                    text = { Text(stringResource(Res.string.pair_device)) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(Res.drawable.plus),

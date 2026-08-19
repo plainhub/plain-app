@@ -14,7 +14,7 @@ fun CreateChannelDialog(
 ) {
     if (visible.value) {
         TextFieldDialog(
-            title = stringResource(Res.string.new_channel),
+            title = stringResource(Res.string.create_channel),
             onDismissRequest = {
                 visible.value = false
             },

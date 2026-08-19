@@ -83,7 +83,7 @@
     <string name="peer_chat">設備聊天</string>
     <string name="group_chat">群組聊天</string>
     <string name="pair_devices_hint">前往「附近」分頁配對設備</string>
-    <string name="add_device">新增設備</string>
+    <string name="pair_device">配對裝置</string>
     <string name="computer">電腦</string>
     <string name="phone">電話</string>
     <string name="tablet">平板電腦</string>
@@ -104,7 +104,7 @@
     <string name="peer_chat_type_reply">輸入回覆…</string>
     <string name="peer_id">ID</string>
     <string name="channels">頻道</string>
-    <string name="new_channel">新建頻道</string>
+    <string name="create_channel">建立頻道</string>
     <string name="channel_name">頻道名稱</string>
     <string name="channel_created">頻道已建立！</string>
     <string name="no_channels">尚無頻道</string>

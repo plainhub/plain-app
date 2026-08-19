@@ -81,7 +81,7 @@
     <string name="peer_chat">ピアチャット</string>
     <string name="group_chat">グループチャット</string>
     <string name="pair_devices_hint">デバイスをペアリングするには「近くのデバイス」タブに移動してください</string>
-    <string name="add_device">デバイスを追加</string>
+    <string name="pair_device">デバイスをペアリング</string>
     <string name="computer">コンピュータ</string>
     <string name="phone">電話</string>
     <string name="tablet">タブレット</string>
@@ -102,7 +102,7 @@
     <string name="peer_chat_type_reply">返信を入力…</string>
     <string name="peer_id">ID</string>
     <string name="channels">チャンネル</string>
-    <string name="new_channel">新しいチャンネル</string>
+    <string name="create_channel">チャンネルを作成</string>
     <string name="channel_name">チャンネル名</string>
     <string name="channel_created">チャンネルを作成しました！</string>
     <string name="no_channels">チャンネルはまだありません</string>
