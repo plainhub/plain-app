@@ -17,6 +17,7 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.features.dlna.DlnaCastRequestEvent
 import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
@@ -127,6 +128,15 @@ internal fun MainActivity.initEvents() {
                 is ExportFileEvent -> handleExportFileEvent(event)
                 is ConfirmToAcceptLoginEvent -> {
                     openNew()
+                }
+
+                is DlnaCastRequestEvent -> {
+                    // A DLNA cast is being handled — bring the app to the foreground
+                    // when it is in the background so the request dialog / player
+                    // appears and playback starts immediately (same as login requests).
+                    if (!AppHelper.foregrounded()) {
+                        openNew()
+                    }
                 }
 
                 is PairingRequestReceivedEvent -> {

@@ -2,9 +2,11 @@ package com.ismartcoding.plain.features.dlna.receiver
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.lib.dlna.DlnaCommand
+import com.ismartcoding.plain.features.dlna.DlnaCastRequestEvent
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpMessages
 import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpPacket
@@ -174,6 +176,7 @@ object DlnaReceiverEngine {
                             DlnaCommand.SetUri(pending.mediaUri, pending.mediaTitle, pending.mediaType, pending.albumArtUri)
                         )
                         if (playQueued) DlnaRendererState.commandChannel.trySend(DlnaCommand.Play)
+                        sendEvent(DlnaCastRequestEvent())
                     }
                     DlnaDeniedSendersPreference.containsIp(denied, pending.senderIp) -> {
                         DlnaRendererState.rawPendingCastRequest.value = null
@@ -182,6 +185,7 @@ object DlnaReceiverEngine {
                     else -> {
                         DlnaRendererState.pendingCastRequest.value = pending
                         DlnaRendererState.rawPendingCastRequest.value = null
+                        sendEvent(DlnaCastRequestEvent())
                     }
                 }
             }
