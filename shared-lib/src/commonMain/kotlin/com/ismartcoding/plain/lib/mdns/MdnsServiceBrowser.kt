@@ -39,6 +39,11 @@ object MdnsServiceBrowser {
     /** Re-query an incomplete instance at most this often (multicast responses get lost). */
     private const val FOLLOW_UP_RETRY_MS = 10_000L
 
+    /** Switch to QU (unicast-response) queries after this many scan cycles with
+     *  zero external multicast packets — broken APs silently drop cross-band
+     *  multicast while unicast still flows. */
+    private const val QU_FALLBACK_AFTER_CYCLES = 2L
+
     /** Supplied by the app layer; self-heals the responder socket with the current hostname. */
     @Volatile var hostnameProvider: (() -> String)? = null
 
@@ -72,6 +77,10 @@ object MdnsServiceBrowser {
     @Volatile private var discoverJob: Job? = null
     @Volatile private var listener: ((ByteArray, String) -> Unit)? = null
 
+    /** Sticky: once QU fallback activates it stays on — QU also works on healthy networks. */
+    @Volatile private var quActive = false
+    private var browseCycles = 0L // written only by the browse coroutine
+
     val isRunning: Boolean
         get() = discoverJob?.isActive == true
 
@@ -104,7 +113,7 @@ object MdnsServiceBrowser {
      */
     fun sendPtrQuery() {
         ensureListening()
-        MdnsHostResponder.sendQuery(MdnsPacketCodec.buildPtrQuery(PLAINAPP_SERVICE_TYPE))
+        dispatchQuery(PLAINAPP_SERVICE_TYPE, MdnsPacketCodec.TYPE_PTR)
     }
 
     /** Registers the packet listener so inbound responses reach [handlePacket]; idempotent. */
@@ -133,7 +142,10 @@ object MdnsServiceBrowser {
         // Self-heal after an external socket teardown (e.g. HTTP service stop):
         // the responder keeps packet listeners, so discovery resumes seamlessly.
         hostnameProvider?.let { MdnsHostResponder.ensureStarted(it()) }
-        sendPtrQuery()
+        if (shouldActivateQuFallback(++browseCycles, quActive, MdnsHostResponder.takeExternalMulticastSeen())) {
+            quActive = true
+        }
+        dispatchQuery(PLAINAPP_SERVICE_TYPE, MdnsPacketCodec.TYPE_PTR)
         // Follow up on instances that still lack port / metadata / IPs,
         // re-asking periodically because multicast responses can be dropped.
         // Completed instances refresh from every PTR announcement, which
@@ -143,15 +155,14 @@ object MdnsServiceBrowser {
             val key = instance.instanceFqdn
             if (now - (srvTxtQueriedAt[key] ?: 0L) >= FOLLOW_UP_RETRY_MS) {
                 srvTxtQueriedAt = srvTxtQueriedAt + (key to now)
-                // buildSrvQuery/buildTxtQuery append the service type themselves —
-                // pass the SHORT instance name, NOT the full FQDN (double-suffixed
-                // query names never match the responder's instanceFqdn).
-                MdnsHostResponder.sendQuery(MdnsPacketCodec.buildSrvQuery(instance.instanceName, PLAINAPP_SERVICE_TYPE))
-                MdnsHostResponder.sendQuery(MdnsPacketCodec.buildTxtQuery(instance.instanceName, PLAINAPP_SERVICE_TYPE))
+                // Query the full instance FQDN directly — buildSrvQuery/buildTxtQuery
+                // append the service type themselves and take no QU flag.
+                dispatchQuery(instance.instanceFqdn, MdnsPacketCodec.TYPE_SRV)
+                dispatchQuery(instance.instanceFqdn, MdnsPacketCodec.TYPE_TXT)
             }
             if (instance.targetHostname.isNotEmpty() && now - (aQueriedAt[key] ?: 0L) >= FOLLOW_UP_RETRY_MS) {
                 aQueriedAt = aQueriedAt + (key to now)
-                MdnsHostResponder.sendQuery(MdnsPacketCodec.buildQuery(instance.targetHostname, MdnsPacketCodec.TYPE_A))
+                dispatchQuery(instance.targetHostname, MdnsPacketCodec.TYPE_A)
             }
         }
     }
@@ -229,8 +240,8 @@ object MdnsServiceBrowser {
                 // Skip when the same packet already carried SRV/TXT (instance complete).
                 if (nextInstances[key]?.complete == true) return@forEach
                 srvNext[key] = now
-                MdnsHostResponder.sendQuery(MdnsPacketCodec.buildSrvQuery(instance.instanceName, PLAINAPP_SERVICE_TYPE))
-                MdnsHostResponder.sendQuery(MdnsPacketCodec.buildTxtQuery(instance.instanceName, PLAINAPP_SERVICE_TYPE))
+                dispatchQuery(instance.instanceFqdn, MdnsPacketCodec.TYPE_SRV)
+                dispatchQuery(instance.instanceFqdn, MdnsPacketCodec.TYPE_TXT)
             }
             srvTxtQueriedAt = srvNext
         }
@@ -263,6 +274,21 @@ object MdnsServiceBrowser {
         if (instanceName.isEmpty()) return null
         return key to (current[key] ?: Instance(key, instanceName))
     }
+
+    /**
+     * Routes a query through the QU socket once multicast responses have proven
+     * unreachable; unicast responses then arrive on the QU socket and reach
+     * [handlePacket] through the shared packet listeners.
+     */
+    private fun dispatchQuery(name: String, qtype: Int) {
+        val qu = quActive
+        val bytes = MdnsPacketCodec.buildQuery(name, qtype, unicastResponse = qu)
+        if (qu) MdnsHostResponder.sendQuQuery(bytes) else MdnsHostResponder.sendQuery(bytes)
+    }
+
+    /** QU fallback activates after [QU_FALLBACK_AFTER_CYCLES] scan cycles with no external multicast. */
+    internal fun shouldActivateQuFallback(cycle: Long, quActive: Boolean, externalMulticastSeen: Boolean): Boolean =
+        !quActive && cycle >= QU_FALLBACK_AFTER_CYCLES && !externalMulticastSeen
 
     private fun instanceKey(fqdn: String): String = fqdn.lowercase()
 }

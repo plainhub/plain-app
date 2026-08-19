@@ -24,6 +24,24 @@ object MdnsHostResponder {
     /** Inbound-packet listeners (browser). Kept across socket restarts. */
     @Volatile private var packetListeners: List<(ByteArray, String) -> Unit> = emptyList()
 
+    /** Whether any external (non-local) packet reached the shared socket since the last [takeExternalMulticastSeen]. */
+    @Volatile private var sawExternalMulticast = false
+
+    /** QU (unicast-response) query socket: ephemeral port, created with the responder socket. */
+    @Volatile private var quSocket: MdnsSocket? = null
+    @Volatile private var quWorker: MdnsWorkerHandle? = null
+
+    /**
+     * Reads and resets the external-multicast-seen flag. The browser polls this
+     * every scan cycle: no external multicast means the receive path is dead
+     * (e.g. an AP dropping cross-band multicast) and QU queries must take over.
+     */
+    internal fun takeExternalMulticastSeen(): Boolean {
+        val seen = sawExternalMulticast
+        sawExternalMulticast = false
+        return seen
+    }
+
     val isRunning: Boolean
         get() = worker?.isAlive == true && socket != null
 
@@ -90,6 +108,7 @@ object MdnsHostResponder {
 
         socket = s
         worker = startMdnsWorker("plain-mdns-responder") { runLoop(s) }
+        ensureQuSocket()
         // Announce ourselves right after (re)starting so peers on the LAN learn
         // the full service info (name/port/ip) without waiting for their query.
         broadcastService()
@@ -134,8 +153,12 @@ object MdnsHostResponder {
     private fun tearDownSocket() {
         val t = worker; worker = null
         val s = socket; socket = null
+        val qt = quWorker; quWorker = null
+        val qs = quSocket; quSocket = null
         runCatching { s?.close() }
+        runCatching { qs?.close() }
         runCatching { t?.join(300L) }
+        runCatching { qt?.join(300L) }
     }
 
     /** Registers a listener for every inbound mDNS packet; survives socket restarts. */
@@ -149,6 +172,22 @@ object MdnsHostResponder {
      */
     internal fun sendQuery(bytes: ByteArray) {
         val s = socket ?: return
+        sendToGroup(s, bytes)
+    }
+
+    /**
+     * Sends a QU (unicast-response requested, RFC 6762 §5.4) query through a
+     * dedicated ephemeral-port socket. Broken APs drop cross-band multicast
+     * while unicast still flows; the unicast responses then come back to this
+     * exact socket — a 5353-bound socket could lose them to another
+     * SO_REUSEPORT peer on the same device.
+     */
+    internal fun sendQuQuery(bytes: ByteArray) {
+        val s = quSocket ?: return
+        sendToGroup(s, bytes)
+    }
+
+    private fun sendToGroup(s: MdnsSocket, bytes: ByteArray) {
         // Send once per interface: the outgoing interface is a socket-wide
         // setting, so a single send can only leave one NIC. Picking just the
         // first candidate silently drops the query when that interface is not
@@ -162,6 +201,29 @@ object MdnsHostResponder {
             runCatching {
                 s.setOutgoingInterface(iface.name)
                 s.send(bytes, MDNS_GROUP, MDNS_PORT)
+            }
+        }
+    }
+
+    /** Best-effort: QU queries simply no-op until the socket exists. */
+    private fun ensureQuSocket() {
+        val s = runCatching {
+            createMdnsSocket().apply { bind(0, 1000) }
+        }.getOrNull() ?: return
+        quSocket = s
+        quWorker = startMdnsWorker("plain-mdns-qu") { quReceiveLoop(s) }
+    }
+
+    /** The QU socket is not group-joined: only unicast responses addressed to its ephemeral port arrive here. */
+    private fun quReceiveLoop(s: MdnsSocket) {
+        val buf = ByteArray(1500)
+        while (!s.isClosed) {
+            try {
+                val result = s.receive(buf) ?: continue
+                val senderIp = result.senderIp ?: continue
+                notifyPacketListeners(buf.copyOf(result.length), senderIp)
+            } catch (_: Exception) {
+                if (s.isClosed) break
             }
         }
     }
@@ -180,9 +242,13 @@ object MdnsHostResponder {
                 notifyPacketListeners(packet, senderIp)
                 val fresh = candidateInterfaces()
                 if (fresh.isEmpty()) continue
+                val local = fresh.any { it.second == senderIp }
+                // Any external packet proves the multicast receive path works;
+                // the browser polls this for the QU fallback.
+                if (!local) sawExternalMulticast = true
                 // Our own multicast packets loop back to this socket; answering
                 // them would double traffic on every discovery cycle.
-                if (fresh.any { it.second == senderIp }) continue
+                if (local) continue
                 val (responseIface, localIp) = findResponseIface(senderIp, fresh)
                 val response = buildResponse(packet, listOf(localIp)) ?: continue
                 val useUnicast = response.unicastResponseRequested || result.senderPort != MDNS_PORT
