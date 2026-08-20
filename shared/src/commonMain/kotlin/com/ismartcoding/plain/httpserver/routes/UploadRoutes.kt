@@ -45,7 +45,7 @@ fun HttpRouter.addUploadRoutes() {
             call.respondText("c-id header is missing", status = HttpStatus.BAD_REQUEST)
             return@post
         }
-        val token = HttpServerManager.tokenCache[clientId]
+        val token = HttpServerManager.tokenCache.get(clientId)
         if (token == null) {
             call.respondNoBody(HttpStatus.UNAUTHORIZED)
             return@post
@@ -103,7 +103,7 @@ fun HttpRouter.addUploadRoutes() {
             call.respondText("c-id header is missing", status = HttpStatus.BAD_REQUEST)
             return@post
         }
-        val token = HttpServerManager.tokenCache[clientId]
+        val token = HttpServerManager.tokenCache.get(clientId)
         if (token == null) {
             call.respondNoBody(HttpStatus.UNAUTHORIZED)
             return@post

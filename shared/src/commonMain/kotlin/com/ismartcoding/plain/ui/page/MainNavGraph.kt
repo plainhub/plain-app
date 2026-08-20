@@ -322,7 +322,7 @@ fun MainNavGraph(
         composableNoAnim<Routing.LoginRequest> {
             val event = mainVM.pendingLoginEvent.value
             if (event != null) {
-                val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
+                val clientIp = HttpServerManager.clientIpCache.getCachedOrNull(event.clientId) ?: ""
                 LoginRequestPage(
                     event = event,
                     clientIp = clientIp,

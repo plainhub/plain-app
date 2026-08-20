@@ -66,7 +66,6 @@ suspend fun initCommonPreferences(): Preferences {
     ChatCacher.load()
     HttpServerManager.clientTsInterval()
     sendEvent(StartNearbyServiceEvent())
-    HttpServerManager.loadTokenCache()
     if (TempData.canDLNAAccess()) {
         startDlnaRenderer()
     }

@@ -4,10 +4,17 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.db.ShareRoot
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.httpserver.ExpiringCache
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.getCanonicalPath
 import com.ismartcoding.plain.platform.statFile
 import kotlin.time.Instant
+
+/** Cached per-share auth: the share row plus its derived `shared_token`. */
+data class SharedAuth(
+    val share: DShare,
+    val token: ByteArray,
+)
 
 /**
  * Business logic for creating, managing, and resolving shared file links.
@@ -19,6 +26,29 @@ import kotlin.time.Instant
  *   root whitelist (no arbitrary path reads)
  */
 object ShareManager {
+    private const val SHARE_TTL_MS = 24 * 60 * 60 * 1000L // 24h
+    private const val NEGATIVE_TTL_MS = 5 * 1000L // 5s unknown-share negative TTL
+
+    /**
+     * Cached guest-share auth: the share snapshot plus its derived `shared_token`,
+     * keyed by `shared_id`. Loads lazily from the DB and derives the token once,
+     * so per-request `/guest_graphql` auth avoids both a DB read and an HMAC.
+     *
+     * [DShare.isActive] is (re)evaluated from the cached snapshot's `expiresAt`
+     * at request time, so time-based expiration stays exact. Revocation via
+     * [deleteShare] invalidates the entry immediately.
+     */
+    val authCache = ExpiringCache<String, SharedAuth>(
+        positiveTtlMillis = SHARE_TTL_MS,
+        negativeTtlMillis = NEGATIVE_TTL_MS,
+        load = { id -> loadAuth(id) },
+    )
+
+    private suspend fun loadAuth(id: String): SharedAuth? {
+        val share = AppDatabase.instance.shareDao().getById(id) ?: return null
+        return SharedAuth(share, ShareCrypto.deriveSharedToken(id))
+    }
+
     suspend fun createShare(
         name: String,
         realPaths: List<String>,
@@ -50,6 +80,7 @@ object ShareManager {
 
     suspend fun deleteShare(id: String) {
         AppDatabase.instance.shareDao().delete(id)
+        authCache.invalidate(id)
     }
 
     suspend fun listShares(): List<DShare> {

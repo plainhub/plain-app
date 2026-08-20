@@ -77,7 +77,7 @@ class MainGraphQLService private constructor(
         val authStr = call.header("authorization")?.split(" ")
         if (authStr.isNullOrEmpty()) {
             // Token mode — decrypt request body.
-            val token = HttpServerManager.tokenCache[clientId]
+            val token = HttpServerManager.tokenCache.get(clientId)
             if (token == null) {
                 call.respondNoBody(HttpStatus.UNAUTHORIZED)
                 return
@@ -127,7 +127,7 @@ class MainGraphQLService private constructor(
             val token = if (channelId.isNotEmpty()) {
                 ChannelCacher.getKeyBytes(channelId)
             } else {
-                PeerCacher.getKeyBytes(clientId) ?: HttpServerManager.tokenCache[clientId]
+                PeerCacher.getKeyBytes(clientId) ?: HttpServerManager.tokenCache.get(clientId)
             }
             if (token != null) {
                 call.respond(

@@ -195,7 +195,7 @@ private suspend fun handleSessionFrame(
     frame: ByteArray,
     sessionHandle: WsSessionAsHandle,
 ) {
-    val token = HttpServerManager.tokenCache[clientId]
+    val token = HttpServerManager.tokenCache.get(clientId)
     val decryptedBytes = token?.let { chaCha20Decrypt(it, frame) }
     if (decryptedBytes != null) {
         LogCat.d("ws: add session ${sessionHandle.id}, ts: ${decryptedBytes.decodeToString()}")

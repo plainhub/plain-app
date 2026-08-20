@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.features.share.ShareCrypto
+import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.plain.lib.kgraphql.KGraphQL
 import com.ismartcoding.plain.lib.kgraphql.context
@@ -10,7 +10,6 @@ import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedSchema
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpStatus
@@ -60,16 +59,18 @@ class GuestGraphQLService private constructor(
             return
         }
 
-        // Gate on an active share for this id before touching the derivation.
-        val share = AppDatabase.instance.shareDao().getById(sharedId)
-        if (share == null || !share.isActive) {
+        // Gate on an active share for this id. The share snapshot + derived
+        // token are cached per shared_id; a negative (unknown) entry rejects
+        // fast without hitting the DB, and `isActive` is still evaluated from
+        // the snapshot's `expiresAt` at request time.
+        val auth = ShareManager.authCache.get(sharedId)
+        if (auth == null || !auth.share.isActive) {
             LogCat.w("[GuestGraphQL] reject inactive share id=$sharedId")
             call.respondNoBody(HttpStatus.FORBIDDEN)
             return
         }
 
-        val key = ShareCrypto.deriveSharedToken(sharedId)
-        TokenGraphQLHandler.handle(sharedId, key, call) { query, c ->
+        TokenGraphQLHandler.handle(sharedId, auth.token, call) { query, c ->
             executeSchema(query, c)
         }
     }

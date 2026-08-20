@@ -56,11 +56,11 @@ fun HttpRouter.addSystemRoutes() {
             call.respondText("desktop_access_disabled", status = HttpStatus.FORBIDDEN)
             return@post
         }
-        HttpServerManager.clientIpCache[clientId] = call.remoteHost
+        HttpServerManager.clientIpCache.put(clientId, call.remoteHost)
 
         val bodyBytes = runCatching { call.receiveBody() }.getOrNull()
         if (bodyBytes != null && bodyBytes.isNotEmpty()) {
-            val token = HttpServerManager.tokenCache[clientId]
+            val token = HttpServerManager.tokenCache.get(clientId)
             if (token != null) {
                 val decrypted = chaCha20Decrypt(token, bodyBytes)
                 if (decrypted != null) {

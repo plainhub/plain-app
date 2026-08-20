@@ -41,18 +41,35 @@ import kotlin.time.Instant
  * `webserver` package and calls into this object for shared state.
  */
 object HttpServerManager {
-    // These caches are mutated concurrently from every in-flight HTTP/WebSocket
-    // request (each handled on its own Netty/IO thread), so a plain
-    // mutableMapOf/mutableSetOf (LinkedHashMap/LinkedHashSet) is not safe here —
-    // concurrent puts can corrupt the internal structure and crash the app
-    // (observed as repeated-request crashes). Use Compose's SnapshotStateMap/Set
-    // for KMP-safe concurrent access (same convention as PeerTransportPrewarmer).
+    // Session caches are mutated concurrently from every in-flight HTTP/WebSocket
+    // request (each handled on its own Netty/IO thread). They use the thread-safe
+    // [ExpiringCache] (Mutex-guarded), and load tokens lazily from the DB instead
+    // of preloading the whole sessions table.
+    //
+    // The mutable sets below are also touched concurrrently, so a plain
+    // mutableSetOf/mutableMapOf (LinkedHashSet/LinkedHashMap) is not safe — use
+    // Compose's SnapshotStateSet/Map for KMP-safe concurrent access (same
+    // convention as PeerTransportPrewarmer).
 
-    /** Cached session token keyed by client id. */
-    val tokenCache = mutableStateMapOf<String, ByteArray>()
+    private const val TOKEN_TTL_MS = 24 * 60 * 60 * 1000L // 24h
+    private const val NEGATIVE_TTL_MS = 5 * 1000L // 5s unknown-client negative TTL
 
-    /** Cached client IP keyed by client id. */
-    val clientIpCache = mutableStateMapOf<String, String>()
+    /** Cached session token keyed by client id, loaded lazily from the DB. */
+    val tokenCache = ExpiringCache<String, ByteArray>(
+        positiveTtlMillis = TOKEN_TTL_MS,
+        negativeTtlMillis = NEGATIVE_TTL_MS,
+        load = { clientId ->
+            val session = SessionList.getByClientIdAsync(clientId)
+            session?.token?.takeIf { it.isNotEmpty() }?.let { Base64Lenient.decode(it) }
+        },
+    )
+
+    /** Cached client IP keyed by client id (pure cache, no DB source). */
+    val clientIpCache = ExpiringCache<String, String>(
+        positiveTtlMillis = TOKEN_TTL_MS,
+        negativeTtlMillis = NEGATIVE_TTL_MS,
+        load = null,
+    )
 
     /** Active WebSocket sessions. Platform implementations register here on connect. */
     val wsSessions = mutableStateSetOf<WsSessionHandle>()
@@ -117,11 +134,11 @@ object HttpServerManager {
      * Resolve the client IP to attribute a login attempt to. Prefers the cached
      * value (set by `/init`) and falls back to [remoteAddress] from the socket.
      */
-    fun getClientIpForLogin(clientId: String, remoteAddress: String): String {
-        val cached = clientIpCache[clientId]
+    suspend fun getClientIpForLogin(clientId: String, remoteAddress: String): String {
+        val cached = clientIpCache.get(clientId)
         if (!cached.isNullOrEmpty()) return cached
         if (remoteAddress.isNotEmpty()) {
-            clientIpCache[clientId] = remoteAddress
+            clientIpCache.put(clientId, remoteAddress)
         }
         return remoteAddress
     }
@@ -142,16 +159,6 @@ object HttpServerManager {
     /** Truncate a SHA-512 hex hash to the 32-byte ChaCha20 key. */
     fun hashToToken(hash: String): ByteArray {
         return hash.substring(0, 32).encodeToByteArray()
-    }
-
-    /** Reload [tokenCache] from the persisted sessions. */
-    suspend fun loadTokenCache() = withIO {
-        tokenCache.clear()
-        SessionList.getItemsAsync().forEach {
-            if (it.token.isNotEmpty()) {
-                tokenCache[it.clientId] = Base64Lenient.decode(it.token)
-            }
-        }
     }
 
     /**
@@ -259,7 +266,7 @@ object HttpServerManager {
             it.browserVersion = r.browserVersion
             it.token = token
         }
-        loadTokenCache()
+        tokenCache.put(event.clientId, Base64Lenient.decode(token))
         sendWebLoginNotification(r.browserName, r.browserVersion, r.osName, r.osVersion, clientIp)
         event.session.send(
             chaCha20Encrypt(

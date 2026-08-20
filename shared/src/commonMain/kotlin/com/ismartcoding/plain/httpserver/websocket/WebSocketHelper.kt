@@ -13,7 +13,7 @@ object WebSocketHelper {
         HttpServerManager.wsSessions.toList().forEach {
             val data = event.data
             if (data is WebSocketData.Text) {
-                val token = HttpServerManager.tokenCache[it.clientId]
+                val token = HttpServerManager.tokenCache.get(it.clientId)
                 if (token != null) {
                     sendSafe(it, addIntPrefixToByteArray(event.type.value, chaCha20Encrypt(token, data.value)))
                 }
