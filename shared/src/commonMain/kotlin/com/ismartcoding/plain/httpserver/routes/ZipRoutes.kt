@@ -8,6 +8,7 @@ import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.lib.extensions.urlEncode
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
+import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.platform.ZipStreamEntry
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.searchZipItems
@@ -16,6 +17,7 @@ import com.ismartcoding.plain.platform.streamZipFolderToSink
 import com.ismartcoding.plain.platform.streamZipInternalDirToSink
 import com.ismartcoding.plain.platform.streamZipToSink
 import com.ismartcoding.plain.httpserver.FileIdParams
+import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import kotlinx.coroutines.sync.Semaphore
@@ -37,10 +39,17 @@ private val zipSemaphore = Semaphore(1)
  * The actual zip encoding is delegated to the platform abstraction
  * (`streamZipFolderToSink` / `streamZipToSink`) so that commonMain does not
  * depend on `java.util.zip`.
+ *
+ * `/zip/dir` also serves shared-link directory downloads when a `sid` query
+ * parameter is present: `id` is a `{sharedId, virtualPath}` payload
+ * ChaCha20-encrypted with the share's `url_token` (resolved via
+ * [ShareManager.resolveSharedPath]); the directory is zipped exactly like the
+ * main-UI variant.
  */
 fun HttpRouter.addZipRoutes() {
     get("/zip/dir") { call ->
-        if (!TempData.canDesktopAccess()) {
+        val sid = call.queryParam("sid")
+        if (sid == null && !TempData.canDesktopAccess()) {
             call.respondNoBody(HttpStatus.FORBIDDEN)
             return@get
         }
@@ -54,6 +63,17 @@ fun HttpRouter.addZipRoutes() {
             return@get
         }
         try {
+            if (sid != null) {
+                // Shared-link mode: `id` is encrypted with the share's url_token.
+                val realPath = ShareManager.resolveSharedPath(sid, id)
+                if (realPath == null) {
+                    call.respondNoBody(HttpStatus.FORBIDDEN)
+                    return@get
+                }
+                call.respondZipDir(realPath, jsonName = "")
+                return@get
+            }
+
             val decryptedId = UrlHelper.decrypt(id)
             val dirPath: String
             val jsonName: String
@@ -83,23 +103,7 @@ fun HttpRouter.addZipRoutes() {
                 return@get
             }
 
-            val stat = statFile(dirPath)
-            if (stat == null || !stat.isDir) {
-                call.respondNoBody(HttpStatus.NOT_FOUND)
-                return@get
-            }
-
-            val folderName = dirPath.substringAfterLast('/')
-            val fileName = (jsonName.ifEmpty { "$folderName.zip" }).urlEncode()
-            call.respondStream(
-                contentType = "application/zip",
-                headers = mapOf(
-                    "Content-Disposition" to
-                        "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\""
-                ),
-            ) { sink ->
-                streamZipFolderToSink(dirPath, sink)
-            }
+            call.respondZipDir(dirPath, jsonName)
         } finally {
             zipSemaphore.release()
         }
@@ -161,6 +165,31 @@ fun HttpRouter.addZipRoutes() {
         } finally {
             zipSemaphore.release()
         }
+    }
+}
+
+/**
+ * Zip a real filesystem directory and stream it as `application/zip`
+ * (attachment `Content-Disposition`). Responds 404 when [dirPath] is not a
+ * directory. Shared by the main-UI and shared-link (`sid`) `/zip/dir` paths,
+ * which only differ in how they resolve [dirPath].
+ */
+private suspend fun HttpCall.respondZipDir(dirPath: String, jsonName: String) {
+    val stat = statFile(dirPath)
+    if (stat == null || !stat.isDir) {
+        respondNoBody(HttpStatus.NOT_FOUND)
+        return
+    }
+    val folderName = dirPath.substringAfterLast('/')
+    val fileName = (jsonName.ifEmpty { "$folderName.zip" }).urlEncode()
+    respondStream(
+        contentType = "application/zip",
+        headers = mapOf(
+            "Content-Disposition" to
+                "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\""
+        ),
+    ) { sink ->
+        streamZipFolderToSink(dirPath, sink)
     }
 }
 

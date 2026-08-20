@@ -18,7 +18,7 @@ data class SharedFile(
 /**
  * Result of the `sharedInfo` query: share metadata + the entries of the
  * requested [virtualPath] directory, plus the dedicated `urlToken` used to
- * fetch files via `/sfs`.
+ * fetch files via `/fs` / `/zip/dir`.
  */
 @GraphQLType
 data class SharedInfo(

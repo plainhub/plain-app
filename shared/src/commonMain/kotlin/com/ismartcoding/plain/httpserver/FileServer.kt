@@ -19,7 +19,7 @@ import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 
 /**
- * Shared file-serving core used by both `/fs` and `/sfs`.
+ * Shared file-serving core used by `/fs` (main-UI, peer and shared-link modes).
  *
  * Given a resolved filesystem path (plus an optional media id / display name),
  * streams the bytes out with support for:

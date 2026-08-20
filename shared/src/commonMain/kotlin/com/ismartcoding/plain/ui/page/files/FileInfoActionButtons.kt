@@ -14,6 +14,7 @@ import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
+import com.ismartcoding.plain.ui.base.IconTextShareLinkButton
 import com.ismartcoding.plain.ui.base.IconTextZipButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FilesViewModel
@@ -58,6 +59,12 @@ internal fun FileInfoActionButtons(
         IconTextShareButton {
             shareFiles(listOf(file.path))
             onDismiss()
+        }
+        IconTextShareLinkButton {
+            filesVM.sharePaths.clear()
+            filesVM.sharePaths.add(file.path)
+            onDismiss()
+            filesVM.showCreateShareDialog.value = true
         }
         if (!file.isDir) {
             IconTextOpenWithButton {

@@ -145,6 +145,9 @@ class Routing {
     object AppFiles
 
     @Serializable
+    object Shares
+
+    @Serializable
     object Nearby
 
     @Serializable

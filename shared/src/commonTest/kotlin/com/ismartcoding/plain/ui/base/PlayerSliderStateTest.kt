@@ -46,7 +46,7 @@ class PlayerSliderStateTest {
     }
 
     @Test
-    fun `after seek hold expires, external progress syncs again`() {
+    fun `after seek hold expires external progress syncs again`() {
         val state = PlayerSliderState(initialProgress = 0f)
 
         state.startDrag(0.5f)
@@ -137,7 +137,7 @@ class PlayerSliderStateTest {
     }
 
     @Test
-    fun `external progress syncs when idle (no drag, no hold)`() {
+    fun `external progress syncs when idle no drag no hold`() {
         val state = PlayerSliderState(initialProgress = 0f)
 
         state.syncExternalProgress(0.42f)

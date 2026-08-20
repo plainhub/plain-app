@@ -10,6 +10,11 @@ fun IconTextSmallButtonShare(click: () -> Unit) {
 }
 
 @Composable
+fun IconTextSmallButtonShareLink(click: () -> Unit) {
+    PIconTextSmallButton(Res.drawable.link, text = stringResource(Res.string.share_link), click = click)
+}
+
+@Composable
 fun IconTextSmallButtonLabel(click: () -> Unit) {
     PIconTextSmallButton(Res.drawable.label, text = stringResource(Res.string.add_to_tags), click = click)
 }
@@ -67,4 +72,9 @@ fun IconTextSmallButtonZip(click: () -> Unit) {
 @Composable
 fun IconTextSmallButtonUnzip(click: () -> Unit) {
     PIconTextSmallButton(Res.drawable.package_open, text = stringResource(Res.string.decompress), click = click)
+}
+
+@Composable
+fun IconTextSmallButtonForward(click: () -> Unit) {
+    PIconTextSmallButton(Res.drawable.double_arrow_right, text = stringResource(Res.string.forward), click = click)
 }

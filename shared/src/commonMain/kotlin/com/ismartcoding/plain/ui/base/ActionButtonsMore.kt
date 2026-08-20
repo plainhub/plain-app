@@ -36,16 +36,6 @@ fun ActionButtonSearch(onClick: () -> Unit) {
 }
 
 @Composable
-fun ActionButtonFolderKanban(onClick: () -> Unit) {
-    PIconButton(
-        icon = Res.drawable.folder_kanban,
-        contentDescription = stringResource(Res.string.folders),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-@Composable
 fun ActionButtonFolders(onClick: () -> Unit) {
     PIconButton(
         icon = Res.drawable.folder,

@@ -13,7 +13,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * - `shared_id` (public, in the link path) and `shared_token` (derived
  *   `HMAC-SHA256(masterSecret, shared_id)`, never stored) mirror the
  *   pairing/client_id model.
- * - `url_token` is a per-share random key used to encrypt `/sfs` ids.
+ * - `url_token` is a per-share random key used to encrypt guest `/fs` / `/zip/dir` ids.
  */
 object ShareCrypto {
     @OptIn(ExperimentalEncodingApi::class)
@@ -22,17 +22,28 @@ object ShareCrypto {
     }
 
     /**
-     * Derive the 32-byte `shared_token` from [sharedId]; equal on the sharing
-     * device (which has [masterSecret]) and on the server given the same
-     * [sharedId]. The client never stores it — it is recomputed per request.
+     * Derive the 32-byte `shared_token` from [sharedId] using the given
+     * [secret]; equal on the sharing device (which has [masterSecret]) and on
+     * the server given the same [sharedId]. The client never stores it — it is
+     * recomputed per request.
      */
+    fun deriveSharedToken(secret: ByteArray, sharedId: String): ByteArray {
+        return hmacSha256(secret, sharedId.encodeToByteArray())
+    }
+
+    /** Derive the `shared_token` from the stored [masterSecret]. */
     suspend fun deriveSharedToken(sharedId: String): ByteArray {
-        return hmacSha256(masterSecret(), sharedId.encodeToByteArray())
+        return deriveSharedToken(masterSecret(), sharedId)
     }
 
     @OptIn(ExperimentalEncodingApi::class)
     suspend fun deriveSharedTokenEncoded(sharedId: String): String {
         return Base64.UrlSafe.encode(deriveSharedToken(sharedId))
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    fun deriveSharedTokenEncoded(secret: ByteArray, sharedId: String): String {
+        return Base64.UrlSafe.encode(deriveSharedToken(secret, sharedId))
     }
 
     /** Generate a fresh random `shared_id`, reusing the `client_id` scheme. */

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="share_link">Share link</string>
+    <string name="share_links">Shared links</string>
+    <string name="share_links_desc">Links you created for files and folders</string>
+    <string name="create_share_link">Create share link</string>
+    <string name="share_name_placeholder">Name</string>
+    <string name="share_expiry">Expiry</string>
+    <string name="share_expiry_never">Never</string>
+    <string name="share_expiry_1h">1 hour</string>
+    <string name="share_expiry_1d">1 day</string>
+    <string name="share_expiry_7d">7 days</string>
+    <string name="share_expiry_30d">30 days</string>
+    <string name="share_read_only">Read only</string>
+    <string name="share_link_desc">Anyone with this link can access the shared files until it expires</string>
+    <string name="share_created">Link created</string>
+    <string name="share_link_copied">Link copied</string>
+    <string name="share_expires_on">Expires {{date}}</string>
+    <string name="share_expired">Expired</string>
+    <string name="share_no_links">No shared links</string>
+    <string name="share_delete_desc">Deleting this share immediately revokes the link</string>
+</resources>

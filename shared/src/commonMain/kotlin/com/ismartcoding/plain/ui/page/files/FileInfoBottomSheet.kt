@@ -71,6 +71,7 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                                 FavoriteFoldersPreference.addAsync(DFavoriteFolder(rootPath = filesVM.rootPath, fullPath = file.path))
                                 isFavorite = true
                             }
+                            filesVM.favoriteFoldersVersion.value++
                         }
                     },
                     showRenameDialog = filesVM.showRenameDialog,

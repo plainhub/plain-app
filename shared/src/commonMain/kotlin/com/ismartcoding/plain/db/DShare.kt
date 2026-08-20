@@ -14,7 +14,7 @@ import kotlin.time.Instant
 /**
  * A share link. [id] doubles as the public `shared_id` that appears in the
  * link path. The `shared_token` is never stored – it is derived on demand via
- * HMAC(masterSecret, id), and [urlToken] is the dedicated key for `/sfs`.
+ * HMAC(masterSecret, id), and [urlToken] is the dedicated key for guest `/fs` / `/zip/dir`.
  */
 @Entity(tableName = "shares")
 data class DShare(

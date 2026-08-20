@@ -3,13 +3,6 @@ package com.ismartcoding.plain.ui.page
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -38,6 +31,10 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.models.DesktopAccessSettingsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.nav.navEnterTransition
+import com.ismartcoding.plain.ui.nav.navExitTransition
+import com.ismartcoding.plain.ui.nav.navPopEnterTransition
+import com.ismartcoding.plain.ui.nav.navPopExitTransition
 import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
@@ -95,6 +92,7 @@ import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.MarkdownThemePreviewPage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
+import com.ismartcoding.plain.ui.page.shares.SharesPage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.web.HowToUsePage
@@ -120,30 +118,10 @@ fun MainNavGraph(
         modifier = Modifier.background(MaterialTheme.colorScheme.surface),
         navController = navController,
         startDestination = Routing.Home,
-        enterTransition = {
-            slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(300, easing = LinearOutSlowInEasing),
-            ) + fadeIn(animationSpec = tween(150, 50, easing = LinearOutSlowInEasing))
-        },
-        exitTransition = {
-            slideOutHorizontally(
-                targetOffsetX = { -it / 3 },
-                animationSpec = tween(300, easing = FastOutLinearInEasing),
-            ) + fadeOut(animationSpec = tween(150, easing = FastOutLinearInEasing))
-        },
-        popEnterTransition = {
-            slideInHorizontally(
-                initialOffsetX = { -it / 3 },
-                animationSpec = tween(300, easing = LinearOutSlowInEasing),
-            ) + fadeIn(animationSpec = tween(150, 50, easing = LinearOutSlowInEasing))
-        },
-        popExitTransition = {
-            slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(300, easing = FastOutLinearInEasing),
-            ) + fadeOut(animationSpec = tween(150, easing = FastOutLinearInEasing))
-        },
+        enterTransition = { navEnterTransition() },
+        exitTransition = { navExitTransition() },
+        popEnterTransition = { navPopEnterTransition() },
+        popExitTransition = { navPopExitTransition() },
     ) {
         composable<Routing.Home> {
             val selectedTab by mainVM.currentRootTab
@@ -280,11 +258,12 @@ fun MainNavGraph(
         }
         composable<Routing.Files> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Files>()
-            FilesPage(navController, audioPlaylistVM, r.folderPath)
+            FilesPage(navController, audioPlaylistVM, chatVM, r.folderPath)
         }
         composable<Routing.AppFiles> {
             AppFilesPage(navController, audioPlaylistVM, chatVM)
         }
+        composable<Routing.Shares> { SharesPage(navController) }
         composable<Routing.Nearby> {
             NearbyPage(navController, peerVM = peerVM)
         }

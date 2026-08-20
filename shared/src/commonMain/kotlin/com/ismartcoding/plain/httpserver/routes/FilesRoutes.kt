@@ -5,15 +5,10 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.features.share.ShareManager
-import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.httpserver.FileIdParams
-import com.ismartcoding.plain.httpserver.ShareFileParams
 import com.ismartcoding.plain.httpserver.FileServer
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.HttpStatus
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
  * `/fs` and `/proxyfs` — file serving endpoints shared between Android (Ktor)
@@ -23,6 +18,11 @@ import kotlin.io.encoding.ExperimentalEncodingApi
  * `content://` URI, or a `pkgicon://` URI, then streams the appropriate bytes
  * back to the client. Supports thumbnail generation, HEIF→PNG conversion,
  * 3gp→MP4 transcoding, and download (`dl=1`) mode with Content-Disposition.
+ *
+ * With a `sid` query parameter `/fs` serves a shared file link instead: `id`
+ * is a `{sharedId, virtualPath}` payload ChaCha20-encrypted with the share's
+ * `url_token` and `sid` carries the public `shared_id`. The bytes stream
+ * through [FileServer] exactly like the main-UI variant.
  *
  * `/proxyfs` decrypts the `id` into a peer HTTP URL and proxies the upstream
  * response (status, headers, body) through to the client — used for
@@ -35,7 +35,18 @@ fun HttpRouter.addFilesRoutes() {
             call.respondNoBody(HttpStatus.BAD_REQUEST)
             return@get
         }
+        val sid = call.queryParam("sid")
         try {
+            if (sid != null) {
+                // Shared-link mode: `id` is encrypted with the share's url_token.
+                val realPath = ShareManager.resolveSharedPath(sid, id)
+                if (realPath == null) {
+                    call.respondNoBody(HttpStatus.FORBIDDEN)
+                    return@get
+                }
+                FileServer.serve(call, realPath, jsonName = realPath.substringAfterLast('/'))
+                return@get
+            }
             val decryptedId = UrlHelper.decrypt(id).getFinalPath()
             val path: String
             val mediaId: String
@@ -51,59 +62,10 @@ fun HttpRouter.addFilesRoutes() {
                 jsonName = ""
             }
 
-            // Byte streaming (zip extraction, byte-range, thumbnails, HEIF→PNG,
-            // download mode) is shared with `/sfs` via FileServer.
             FileServer.serve(call, path, mediaId = mediaId, jsonName = jsonName)
         } catch (ex: Exception) {
             ex.printStackTrace()
             call.respondText("File is expired or does not exist. $ex", status = HttpStatus.FORBIDDEN)
-        }
-    }
-
-    /**
-     * `/sfs` — file serving behind a shared link. Reuses [FileServer] (the exact
-     * same byte stream as `/fs`) but authenticates differently:
-     * - `sid` is the public `shared_id` (used as the lookup + whitelist key).
-     * - `id` is a [ShareFileParams] payload ChaCha20-encrypted with the share's
-     *   dedicated `url_token`. Decryption yields `{sharedId, virtualPath}`,
-     *   which is then whitelisted against the share's roots via
-     *   [ShareManager.resolveVirtualPath].
-     */
-    get("/sfs") { call ->
-        if (!TempData.serviceEnabled.value) {
-            call.respondNoBody(HttpStatus.FORBIDDEN)
-            return@get
-        }
-        val sid = call.queryParam("sid") ?: ""
-        val id = call.queryParam("id") ?: ""
-        if (sid.isEmpty() || id.isEmpty()) {
-            call.respondNoBody(HttpStatus.BAD_REQUEST)
-            return@get
-        }
-        val share = withIO { AppDatabase.instance.shareDao().getById(sid) }
-        if (share == null || !share.isActive) {
-            call.respondNoBody(HttpStatus.FORBIDDEN)
-            return@get
-        }
-        try {
-            @OptIn(ExperimentalEncodingApi::class)
-            val key = Base64.decode(share.urlToken)
-            val decrypted = UrlHelper.decrypt(id, key)
-            val params = jsonDecode<ShareFileParams>(decrypted)
-            // The decrypted payload must reference the same share id as `sid`.
-            if (params.sharedId != sid) {
-                call.respondNoBody(HttpStatus.FORBIDDEN)
-                return@get
-            }
-            val realPath = ShareManager.resolveVirtualPath(share, params.virtualPath)
-            if (realPath == null) {
-                call.respondNoBody(HttpStatus.FORBIDDEN)
-                return@get
-            }
-            FileServer.serve(call, realPath, jsonName = params.virtualPath.substringAfterLast('/'))
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            call.respondNoBody(HttpStatus.BAD_REQUEST)
         }
     }
 

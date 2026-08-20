@@ -4,10 +4,15 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.db.ShareRoot
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.httpserver.ExpiringCache
+import com.ismartcoding.plain.httpserver.ShareFileParams
+import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.getCanonicalPath
 import com.ismartcoding.plain.platform.statFile
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Instant
 
 /** Cached per-share auth: the share row plus its derived `shared_token`. */
@@ -105,7 +110,7 @@ object ShareManager {
      * device path. Enforces that the path is under one of the share's roots.
      * Returns null if the path is outside any root or the share is invalid.
      */
-    suspend fun resolveVirtualPath(share: DShare, virtualPath: String): String? {
+    fun resolveVirtualPath(share: DShare, virtualPath: String): String? {
         if (!share.isActive) return null
         val normalized = virtualPath.trim().trimStart('/')
         val roots = share.data
@@ -118,11 +123,49 @@ object ShareManager {
         val rest = if (sep == -1) "" else normalized.substring(sep + 1)
         val root = roots.firstOrNull { it.virtualPath.trimEnd('/') == top } ?: return null
         val realRoot = getCanonicalPath(root.realPath.trimEnd('/'))
-        val candidate = getCanonicalPath(
-            if (rest.isEmpty()) root.realPath else "${root.realPath.trimEnd('/')}/$rest",
-        )
+        val candidate = getCanonicalPath(resolveUnder(realRoot, rest))
         // Block traversal outside the root.
         return if (isUnder(realRoot, candidate)) candidate else null
+    }
+
+    /**
+     * Authenticate a guest `/fs` / `/zip/dir` request and resolve [id]
+     * (a [ShareFileParams] payload ChaCha20-encrypted with the share's
+     * `url_token`, [sid] carries the public `shared_id`) to a real device
+     * path. Returns null when the request is not authorized: service off,
+     * unknown/inactive share, id bound to a different share, or a virtual
+     * path outside the roots.
+     */
+    suspend fun resolveSharedPath(sid: String, id: String): String? {
+        if (!TempData.serviceEnabled.value) return null
+        val share = authCache.get(sid)?.share ?: return null
+        if (!share.isActive) return null
+        return try {
+            @OptIn(ExperimentalEncodingApi::class)
+            val key = Base64.decode(share.urlToken)
+            val params = jsonDecode<ShareFileParams>(UrlHelper.decrypt(id, key))
+            if (params.sharedId != sid) null else resolveVirtualPath(share, params.virtualPath)
+        } catch (ex: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Collapse `.` and `..` segments relative to [root] purely in commonMain so
+     * a `..` can never escape the root, independent of how the platform
+     * canonicalizes paths (e.g. iOS `getCanonicalPath` is identity).
+     */
+    private fun resolveUnder(root: String, relPath: String): String {
+        val segments = mutableListOf<String>()
+        root.split('/').filter { it.isNotEmpty() }.forEach { segments.add(it) }
+        relPath.split('/').forEach { seg ->
+            when (seg) {
+                "", "." -> {}
+                ".." -> if (segments.isNotEmpty()) segments.removeAt(segments.size - 1)
+                else -> segments.add(seg)
+            }
+        }
+        return "/" + segments.joinToString("/")
     }
 
     private fun isUnder(root: String, candidate: String): Boolean {

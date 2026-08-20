@@ -100,13 +100,14 @@ fun isDlnaPath(method: HttpMethod, path: String): Boolean =
 /**
  * Share-link routes that must remain accessible when
  * `desktopAccessEnabled=false` (as long as `serviceEnabled=true`). A shared
- * file link (`/s/<shared_id>` page → `/guest_graphql` + `/sfs`) is meant to
- * work as a standalone page without the desktop/web UI being enabled; each
- * handler enforces `serviceEnabled` and the share's active state itself.
+ * file link (`/s/<shared_id>` page → `/guest_graphql` + `/fs` + `/zip/dir`) is
+ * meant to work as a standalone page without the desktop/web UI being enabled;
+ * each handler enforces `serviceEnabled` and the share's active state itself.
  */
 private val SHARE_PATHS: Set<Pair<HttpMethod, String>> = setOf(
     HttpMethod.POST to "/guest_graphql",
-    HttpMethod.GET to "/sfs",
+    HttpMethod.GET to "/fs",
+    HttpMethod.GET to "/zip/dir",
 )
 
 /**

@@ -11,7 +11,7 @@ data class FileIdParams(
 )
 
 /**
- * Payload encrypted inside a `/sfs?id` parameter, encrypted with the share's
+ * Payload encrypted inside a guest `/fs?id` / `/zip/dir?id` parameter, encrypted with the share's
  * dedicated `url_token`. [sharedId] binds the request to a single share and
  * [virtualPath] is a public (root-relative) path later whitelisted against the
  * share's roots.

@@ -12,9 +12,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,21 +34,21 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
-import com.ismartcoding.plain.ui.base.ActionButtonFolderKanban
-import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
-import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
+import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemCreateFile
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemCreateFolder
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemSort
+import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.base.SearchableTopBar
@@ -53,8 +57,10 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.platform.MediaPreviewer
+import com.ismartcoding.plain.ui.components.FolderKanbanList
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -72,10 +78,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun FilesPage(
     navController: NavHostController, audioPlaylistVM: AudioPlaylistViewModel,
-    folderPath: String = "", filesVM: FilesViewModel = viewModel { FilesViewModel() },
+    chatVM: ChatViewModel, folderPath: String = "", filesVM: FilesViewModel = viewModel { FilesViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
     val topRefreshLayoutState = rememberRefreshLayoutState {
@@ -83,7 +90,7 @@ fun FilesPage(
     }
 
     FilesPageEffects(filesVM, scope, folderPath, previewerState, audioPlaylistVM)
-    FilesPageDialogs(filesVM, scope)
+    FilesPageDialogs(filesVM, scope, navController, chatVM)
 
     val title = when {
         filesVM.selectMode.value -> stringRes(Res.string.x_selected, "count" to filesVM.selectedIds.size)
@@ -102,6 +109,21 @@ fun FilesPage(
         sl.joinToString(", ")
     } else ""
 
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                FolderKanbanList(
+                    filesVM = filesVM,
+                    onSelect = { scope.launch { drawerState.close() } },
+                    refreshSignal = filesVM.favoriteFoldersVersion.value,
+                    onNavigateShares = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate(Routing.Shares)
+                    },
+                )
+            }
+        }) {
     PScaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
         SearchableTopBar(
             navController = navController,
@@ -109,13 +131,17 @@ fun FilesPage(
             scrollBehavior = scrollBehavior,
             title = title,
             subtitle = subtitle,
-            navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() } },
+            navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else PIconButton(icon = if (drawerState.isOpen) Res.drawable.left_panel_close else Res.drawable.left_panel_open, contentDescription = stringResource(Res.string.folders), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
             actions = {
                 if (!filesVM.selectMode.value) {
                     ActionButtonSearch { filesVM.enterSearchMode() }
-                    ActionButtonFolderKanban { filesVM.showFolderKanbanDialog.value = true }
-                    ActionButtonSort { filesVM.showSortDialog.value = true }
-                    ActionButtonMoreWithMenu { dismiss ->
+                    PCapsuleMoreClose(
+                        onClose = { navController.navigateUp() },
+                    ) { dismiss ->
+                        PDropdownMenuItemSort {
+                            dismiss()
+                            filesVM.showSortDialog.value = true
+                        }
                         var showHiddenFiles by remember { mutableStateOf(false) }
                         LaunchedEffect(Unit) {
                             showHiddenFiles = ShowHiddenFilesPreference.getAsync()
@@ -199,6 +225,7 @@ fun FilesPage(
                 )
             }
         }
+    }
     }
     MediaPreviewer(state = previewerState)
 }

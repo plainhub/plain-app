@@ -17,7 +17,7 @@ import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 /**
  * The only query exposed to a shared-file link (`/guest_graphql`). Returns the
  * share metadata (name, read-only, expiry, the dedicated `url_token` for
- * `/sfs`) plus the entries of the requested [virtualPath] directory. Clients
+ * `/fs` / `/zip/dir`) plus the entries of the requested [virtualPath] directory. Clients
  * select whichever fields they need — GraphQL handles projection.
  *
  * Authentication is the request itself: the body is encrypted with the derived

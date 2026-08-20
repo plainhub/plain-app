@@ -45,6 +45,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
             val isChanged = _selectedPath != value
             _selectedPath = value
             if (isChanged) {
+                selectedPathVersion.value++
                 viewModelScope.launchSafe {
                     val breadcrumbsCopy = breadcrumbs.toList()
                     val fullPath = if (breadcrumbsCopy.isNotEmpty()) breadcrumbsCopy.last().path else value
@@ -52,6 +53,9 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
                 }
             }
         }
+
+    /** Bumped whenever the selected path changes, so observers (e.g. the drawer folder list) can refresh. */
+    val selectedPathVersion = mutableIntStateOf(0)
 
     val breadcrumbs = mutableStateListOf<BreadcrumbItem>()
     val selectedBreadcrumbIndex = mutableIntStateOf(0)
@@ -80,8 +84,10 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     val showPasteBar = mutableStateOf(false)
     val showCreateFolderDialog = mutableStateOf(false)
     val showCreateFileDialog = mutableStateOf(false)
-    val showFolderKanbanDialog = mutableStateOf(false)
+    val showCreateShareDialog = mutableStateOf(false)
+    val sharePaths = mutableStateListOf<String>()
     val isDeleting = mutableStateOf(false)
+    val favoriteFoldersVersion = mutableIntStateOf(0)
 
     internal fun updateItemsInternal(items: List<DFile>) { _itemsFlow.value = items }
 

@@ -22,6 +22,7 @@ import com.ismartcoding.plain.ui.base.IconTextSmallButtonCut
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonRename
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonShare
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonShareLink
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonUnzip
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonZip
 import com.ismartcoding.plain.ui.base.PBottomAppBar
@@ -72,6 +73,11 @@ fun FilesSelectModeBottomActions(
             }
             IconTextSmallButtonShare {
                 shareFiles(filesVM.selectedIds.toList())
+            }
+            IconTextSmallButtonShareLink {
+                filesVM.sharePaths.clear()
+                filesVM.sharePaths.addAll(filesVM.selectedIds)
+                filesVM.showCreateShareDialog.value = true
             }
             IconTextSmallButtonDelete {
                 DialogHelper.confirmToDelete {

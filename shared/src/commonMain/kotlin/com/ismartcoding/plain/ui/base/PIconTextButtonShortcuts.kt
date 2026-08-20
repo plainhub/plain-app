@@ -25,6 +25,11 @@ fun IconTextShareButton(click: () -> Unit) {
 }
 
 @Composable
+fun IconTextShareLinkButton(click: () -> Unit) {
+    PIconTextActionButton(Res.drawable.link, text = stringResource(Res.string.share_link), click = click)
+}
+
+@Composable
 fun IconTextOpenWithButton(click: () -> Unit) {
     PIconTextActionButton(Res.drawable.square_arrow_out_up_right, text = stringResource(Res.string.open_with), click = click)
 }
