@@ -1,5 +1,16 @@
 package com.ismartcoding.plain.lib.mdns
 
+import kotlin.concurrent.Volatile
+
+/**
+ * Cross-platform monitor lock. `kotlin.synchronized` is JVM-only, so the
+ * packet capture buffer uses this primitive (Android: `synchronized`, iOS:
+ * `NSLock`) instead.
+ */
+internal expect fun newMdnsLock(): Any
+
+internal expect fun <T> mdnsSynchronized(lock: Any, block: () -> T): T
+
 /** Direction of one captured mDNS packet. */
 enum class MdnsPacketDirection { IN, OUT }
 
@@ -29,7 +40,7 @@ data class MdnsPacketLog(
 object MdnsPacketCapture {
     private const val CAPACITY = 50
 
-    private val lock = Any()
+    private val lock = newMdnsLock()
     private val inbound = ArrayDeque<MdnsPacketLog>()
     private val outbound = ArrayDeque<MdnsPacketLog>()
 
@@ -40,7 +51,7 @@ object MdnsPacketCapture {
     /** Enables/disables capture; disabling also clears both buffers. */
     fun setEnabled(value: Boolean) {
         if (enabled == value) return
-        synchronized(lock) {
+        mdnsSynchronized(lock) {
             enabled = value
             if (!value) {
                 inbound.clear()
@@ -55,9 +66,9 @@ object MdnsPacketCapture {
     fun recordOut(srcIp: String, srcPort: Int, dstIp: String, dstPort: Int, bytes: ByteArray) =
         record(MdnsPacketDirection.OUT, srcIp, srcPort, dstIp, dstPort, bytes)
 
-    fun snapshotIn(): List<MdnsPacketLog> = synchronized(lock) { inbound.toList() }
+    fun snapshotIn(): List<MdnsPacketLog> = mdnsSynchronized(lock) { inbound.toList() }
 
-    fun snapshotOut(): List<MdnsPacketLog> = synchronized(lock) { outbound.toList() }
+    fun snapshotOut(): List<MdnsPacketLog> = mdnsSynchronized(lock) { outbound.toList() }
 
     private fun record(
         direction: MdnsPacketDirection,
@@ -81,7 +92,7 @@ object MdnsPacketCapture {
             summary = decoded.first,
             detail = decoded.second,
         )
-        synchronized(lock) {
+        mdnsSynchronized(lock) {
             val buffer = if (direction == MdnsPacketDirection.IN) inbound else outbound
             buffer.addFirst(log)
             while (buffer.size > CAPACITY) buffer.removeLast()

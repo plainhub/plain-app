@@ -21,6 +21,7 @@ import kotlinx.cinterop.set
 import kotlinx.cinterop.sizeOf
 import kotlinx.cinterop.value
 import platform.Foundation.NSDate
+import platform.Foundation.NSLock
 import platform.Foundation.timeIntervalSince1970
 import platform.posix.AF_INET
 import platform.posix.IPPROTO_IP
@@ -93,6 +94,18 @@ internal actual fun startMdnsWorker(name: String, block: () -> Unit): MdnsWorker
 
 internal actual fun mdnsNowMillis(): Long =
     (NSDate().timeIntervalSince1970 * 1000).toLong()
+
+internal actual fun newMdnsLock(): Any = NSLock()
+
+internal actual fun <T> mdnsSynchronized(lock: Any, block: () -> T): T {
+    val nsLock = lock as NSLock
+    nsLock.lock()
+    try {
+        return block()
+    } finally {
+        nsLock.unlock()
+    }
+}
 
 // ── Socket ──────────────────────────────────────────────────────────────────
 

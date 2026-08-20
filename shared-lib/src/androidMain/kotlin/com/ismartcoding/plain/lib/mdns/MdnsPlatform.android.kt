@@ -40,6 +40,10 @@ internal actual fun startMdnsWorker(name: String, block: () -> Unit): MdnsWorker
 
 internal actual fun mdnsNowMillis(): Long = System.currentTimeMillis()
 
+internal actual fun newMdnsLock(): Any = Any()
+
+internal actual fun <T> mdnsSynchronized(lock: Any, block: () -> T): T = synchronized(lock, block)
+
 private fun appContext(): Context? = runCatching {
     val app = Class.forName("android.app.ActivityThread")
         .getMethod("currentApplication").invoke(null) as? android.app.Application
