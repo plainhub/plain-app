@@ -1,66 +1,27 @@
 """Query object"""
 type Query {
+  sharedInfo(virtualPath: String): SharedInfo!
 }
-
-"""Mutation object"""
-type Mutation {
-  channelSystemMessage(type: ChannelSystemMessageType!, payload: String!): Boolean!
-  createChatItem(content: String!): [ChatItem!]!
-  startAware: Boolean!
-}
-
-enum ChannelSystemMessageType {
-  INVITE
-  INVITE_ACCEPT
-  INVITE_DECLINE
-  UPDATE
-  KICK
-  LEAVE
-}
-
-type ChatItem {
-  id: ID!
-  fromId: String!
-  toId: String!
-  channelId: String!
-  content: String!
-  createdAt: Instant!
-  updatedAt: Instant!
-  status: ChatStatus!
-  statusData: String!
-  data: ChatItemContent
-}
-
-union ChatItemContent = MessageFiles | MessageImages | MessageText
-
-enum ChatStatus {
-  SENT
-  PARTIAL
-  FAILED
-  PENDING
-}
-
-scalar Instant
 
 """The Long scalar type represents a signed 64-bit numeric non-fractional value"""
 scalar Long
 
-type MessageFiles {
-  ids: [String!]!
+type SharedFile {
+  name: String!
+  virtualPath: String!
+  isDir: Boolean!
+  size: Long!
+  mimeType: String!
+  hasThumb: Boolean!
 }
 
-type MessageImages {
-  ids: [String!]!
-}
-
-type MessageText {
-  ids: [String!]!
-}
-
-enum PeerStatus {
-  PAIRED
-  UNPAIRED
-  CHANNEL
+type SharedInfo {
+  name: String!
+  readOnly: Boolean!
+  requiresPassword: Boolean!
+  expiresAt: Long
+  urlToken: String!
+  entries: [SharedFile!]!
 }
 
 """The Short scalar type represents a signed 16-bit numeric non-fractional value"""

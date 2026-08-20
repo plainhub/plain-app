@@ -22,6 +22,21 @@ class ChannelMemberListConverter {
     }
 }
 
+class ShareRootListConverter {
+    @TypeConverter
+    fun toJSON(list: List<ShareRoot>): String {
+        return converterJson.encodeToString(list)
+    }
+
+    @TypeConverter
+    fun fromJSON(value: String): List<ShareRoot> {
+        if (value.isEmpty()) {
+            return emptyList()
+        }
+        return converterJson.decodeFromString<List<ShareRoot>>(value)
+    }
+}
+
 class DateConverter {
     @TypeConverter
     fun stringFromDate(date: kotlin.time.Instant?): String? {

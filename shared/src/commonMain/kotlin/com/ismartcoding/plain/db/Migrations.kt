@@ -231,6 +231,27 @@ object Migrations {
         }
     }
 
+    val MIGRATION_22_23 = object : Migration(22, 23) {
+        override fun migrate(connection: SQLiteConnection) {
+            connection.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `shares` (
+                    `id` TEXT NOT NULL,
+                    `name` TEXT NOT NULL,
+                    `password` TEXT NOT NULL,
+                    `url_token` TEXT NOT NULL,
+                    `expires_at` TEXT,
+                    `read_only` INTEGER NOT NULL,
+                    `data` TEXT NOT NULL,
+                    `created_at` TEXT NOT NULL,
+                    `updated_at` TEXT NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+                """
+            )
+        }
+    }
+
     /**
      * All manual migrations in the order they should be applied.
      * Register this array with `addMigrations()` on the platform-specific builder.
@@ -241,5 +262,6 @@ object Migrations {
         MIGRATION_19_20,
         MIGRATION_20_21,
         MIGRATION_21_22,
+        MIGRATION_22_23,
     )
 }

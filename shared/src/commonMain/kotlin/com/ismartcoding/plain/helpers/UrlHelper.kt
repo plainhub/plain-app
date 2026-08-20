@@ -45,13 +45,25 @@ object UrlHelper {
     }
 
     fun encrypt(path: String): String {
-        val bytes = chaCha20Encrypt(TempData.urlToken, path)
-        return Base64.encode(bytes)
+        return encrypt(path, TempData.urlToken)
     }
 
     fun decrypt(id: String): String {
+        return decrypt(id, TempData.urlToken)
+    }
+
+    /** Encrypt [text] with a caller-supplied [key]; used by `/sfs` (per-share key). */
+    @OptIn(ExperimentalEncodingApi::class)
+    fun encrypt(text: String, key: ByteArray): String {
+        val bytes = chaCha20Encrypt(key, text)
+        return Base64.encode(bytes)
+    }
+
+    /** Decrypt [id] with a caller-supplied [key]; used by `/sfs` (per-share key). */
+    @OptIn(ExperimentalEncodingApi::class)
+    fun decrypt(id: String, key: ByteArray): String {
         val bytes = Base64Lenient.decode(id)
-        return chaCha20Decrypt(TempData.urlToken, bytes)?.decodeToString() ?: ""
+        return chaCha20Decrypt(key, bytes)?.decodeToString() ?: ""
     }
 
     fun getPolicyUrl(): String {

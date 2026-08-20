@@ -14,6 +14,7 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.KSValueArgument
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.google.devtools.ksp.symbol.Modifier
 import java.io.OutputStreamWriter
@@ -84,6 +85,13 @@ class GraphQLSymbolProcessor(
     private val unionEntries = mutableListOf<UnionEntry>()
     private val interfaceEntries = mutableListOf<InterfaceEntry>()
 
+    /**
+     * Mirror of `GraphQLSchemaTarget` from the shared annotations. Kept local
+     * because this processor module has no compile dependency on :shared — it
+     * resolves the annotation argument to one of these three constants.
+     */
+    private enum class GraphQLSchemaTarget { MAIN, PEER, GUEST }
+
     private data class ResolverEntry(
         val operationType: String,
         val name: String,
@@ -93,7 +101,7 @@ class GraphQLSymbolProcessor(
         val packageName: String,
         val parameters: List<Pair<String, String>>,
         val returnTypeString: String,
-        val isPeer: Boolean,
+        val target: GraphQLSchemaTarget,
     )
 
     private val resolverEntries = mutableListOf<ResolverEntry>()
@@ -571,6 +579,21 @@ class GraphQLSymbolProcessor(
     // @GraphQLQuery / @GraphQLMutation / @GraphQLSubscription
     // =========================================================================
 
+    /** Resolve the `target` annotation argument to a [GraphQLSchemaTarget]. */
+    private fun resolveTarget(targetArg: KSValueArgument?): GraphQLSchemaTarget {
+        val v = targetArg?.value ?: return GraphQLSchemaTarget.MAIN
+        val name = when (v) {
+            is KSType -> v.declaration.simpleName.asString()
+            is String -> v
+            else -> v.toString().substringAfterLast('.')
+        }
+        return when (name) {
+            "PEER" -> GraphQLSchemaTarget.PEER
+            "GUEST" -> GraphQLSchemaTarget.GUEST
+            else -> GraphQLSchemaTarget.MAIN
+        }
+    }
+
     private fun collectResolver(fn: KSFunctionDeclaration, operationType: String) {
         val annFqn = when (operationType) {
             "query" -> QUERY_ANN
@@ -583,12 +606,7 @@ class GraphQLSymbolProcessor(
         val customName = ann?.getArgument("name")?.takeIf { it.isNotEmpty() }
         val description = ann?.getArgument("description")?.takeIf { it.isNotEmpty() }
         val targetArg = ann?.arguments?.firstOrNull { it.name?.asString() == "target" }
-        val isPeer = when (val v = targetArg?.value) {
-            null -> false
-            is KSType -> v.declaration.simpleName.asString() == "PEER"
-            is String -> v == "PEER"
-            else -> v.toString().substringAfterLast('.') == "PEER"
-        }
+        val target = resolveTarget(targetArg)
         val name = customName ?: fn.simpleName.asString()
 
         val params = fn.parameters.map { p ->
@@ -622,7 +640,7 @@ class GraphQLSymbolProcessor(
                 packageName = pkg,
                 parameters = params,
                 returnTypeString = retTypeStr,
-                isPeer = isPeer,
+                target = target,
             )
         )
     }
@@ -631,8 +649,9 @@ class GraphQLSymbolProcessor(
         val packageName = "com.ismartcoding.plain.lib.kgraphql.generated"
         val fileName = "GeneratedResolverRegistration"
 
-        val mainEntries = resolverEntries.filter { !it.isPeer }
-        val peerEntries = resolverEntries.filter { it.isPeer }
+        val mainEntries = resolverEntries.filter { it.target == GraphQLSchemaTarget.MAIN }
+        val peerEntries = resolverEntries.filter { it.target == GraphQLSchemaTarget.PEER }
+        val guestEntries = resolverEntries.filter { it.target == GraphQLSchemaTarget.GUEST }
 
         val imports = mutableSetOf(
             "com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder",
@@ -646,6 +665,8 @@ class GraphQLSymbolProcessor(
             "\n" + mainEntries.joinToString("\n\n") { e -> buildResolverBlock(e) }
         val peerBody = if (peerEntries.isEmpty()) "" else
             "\n" + peerEntries.joinToString("\n\n") { e -> buildResolverBlock(e) }
+        val guestBody = if (guestEntries.isEmpty()) "" else
+            "\n" + guestEntries.joinToString("\n\n") { e -> buildResolverBlock(e) }
 
         val content = """
             |package $packageName
@@ -656,6 +677,9 @@ class GraphQLSymbolProcessor(
             |}
             |
             |internal actual fun SchemaBuilder.registerGeneratedPeerResolvers() {$peerBody
+            |}
+            |
+            |internal actual fun SchemaBuilder.registerGeneratedGuestResolvers() {$guestBody
             |}
         """.trimMargin()
 

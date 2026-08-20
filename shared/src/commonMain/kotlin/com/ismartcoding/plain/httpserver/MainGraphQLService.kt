@@ -5,17 +5,16 @@ import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.enums.SessionType
 import com.ismartcoding.plain.events.WebRequestReceivedEvent
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.GraphqlRequest
 import com.ismartcoding.plain.lib.kgraphql.KGraphQL
 import com.ismartcoding.plain.lib.kgraphql.context
 import com.ismartcoding.plain.lib.kgraphql.generated.registerGeneratedSchema
 import com.ismartcoding.plain.lib.kgraphql.schema.Schema
-import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.httpserver.http.HttpCall
@@ -84,31 +83,9 @@ class MainGraphQLService private constructor(
                 return
             }
 
-            val decryptedBytes = chaCha20Decrypt(token, call.receiveBody())
-            val decryptedStr = decryptedBytes?.decodeToString() ?: ""
-            if (decryptedStr.isEmpty()) {
-                call.respondNoBody(HttpStatus.UNAUTHORIZED)
-                return
+            TokenGraphQLHandler.handle(clientId, token, call) { query, c ->
+                executeSchema(query, c)
             }
-
-            val parsed = ReplayGuard.parse(decryptedStr)
-            if (parsed == null) {
-                call.respondNoBody(HttpStatus.BAD_REQUEST)
-                return
-            }
-            val err = ReplayGuard.validate(clientId, parsed)
-            if (err != null) {
-                call.respondNoBody(HttpStatus.BAD_REQUEST)
-                return
-            }
-
-            HttpServerManager.clientRequestTs[clientId] = TimeHelper.nowMillis()
-            sendEvent(WebRequestReceivedEvent())
-            val result = executeSchema(parsed.body, call)
-            call.respond(
-                chaCha20Encrypt(token, result),
-                contentType = "application/octet-stream",
-            )
         } else {
             // Bearer mode — plain JSON request.
             val bearerToken = authStr.getOrNull(1) ?: ""

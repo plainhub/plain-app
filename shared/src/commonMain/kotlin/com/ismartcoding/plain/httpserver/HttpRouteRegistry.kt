@@ -98,6 +98,28 @@ fun isDlnaPath(method: HttpMethod, path: String): Boolean =
     isDlnaSenderPath(method, path) || isDlnaReceiverPath(method, path)
 
 /**
+ * Share-link routes that must remain accessible when
+ * `desktopAccessEnabled=false` (as long as `serviceEnabled=true`). A shared
+ * file link (`/s/<shared_id>` page → `/guest_graphql` + `/sfs`) is meant to
+ * work as a standalone page without the desktop/web UI being enabled; each
+ * handler enforces `serviceEnabled` and the share's active state itself.
+ */
+private val SHARE_PATHS: Set<Pair<HttpMethod, String>> = setOf(
+    HttpMethod.POST to "/guest_graphql",
+    HttpMethod.GET to "/sfs",
+)
+
+/**
+ * Returns `true` when [method] + [path] is a share-link route that must bypass
+ * the `desktopAccessEnabled` gate at the platform HTTP intercept. See
+ * [SHARE_PATHS].
+ */
+fun isSharePath(method: HttpMethod, path: String): Boolean {
+    val cleanPath = path.substringBefore("?")
+    return SHARE_PATHS.contains(method to cleanPath)
+}
+
+/**
  * Shared HTTP route registry built once per process and dispatch from both
  * the platform HTTP server (Ktor on Android, SwiftNIO on iOS future) and
  * the BLE [com.ismartcoding.plain.ble.server.HttpServiceHandler].
@@ -110,6 +132,7 @@ fun isDlnaPath(method: HttpMethod, path: String): Boolean =
 object HttpRouteRegistry {
     val mainGraphQL: MainGraphQLService by lazy { MainGraphQLService.create() }
     val peerGraphQL: PeerGraphQLService by lazy { PeerGraphQLService.create() }
+    val guestGraphQL: GuestGraphQLService by lazy { GuestGraphQLService.create() }
 
     val router: HttpRouter by lazy {
         HttpRouter().apply {

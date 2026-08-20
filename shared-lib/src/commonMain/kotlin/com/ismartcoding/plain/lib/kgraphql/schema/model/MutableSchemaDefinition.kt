@@ -194,33 +194,6 @@ private fun create__DirectiveDefinition() = TypeDSL(
     property(__Directive::description, typeOf<String?>())
     property(__Directive::locations, typeOf<List<DirectiveLocation>>())
     property(__Directive::args, typeOf<List<__InputValue>>())
-    // Deprecated extension properties (computed from locations).
-    property<Boolean>("onField") {
-        resolver { dir: __Directive ->
-            dir.locations.contains(DirectiveLocation.FIELD)
-        }
-        deprecate("Use `locations`.")
-    }
-    property<Boolean>("onFragment") {
-        resolver { dir: __Directive ->
-            dir.locations.containsAny(
-                DirectiveLocation.FRAGMENT_SPREAD,
-                DirectiveLocation.FRAGMENT_DEFINITION,
-                DirectiveLocation.INLINE_FRAGMENT
-            )
-        }
-        deprecate("Use `locations`.")
-    }
-    property<Boolean>("onOperation") {
-        resolver { dir: __Directive ->
-            dir.locations.containsAny(
-                DirectiveLocation.QUERY,
-                DirectiveLocation.MUTATION,
-                DirectiveLocation.SUBSCRIPTION
-            )
-        }
-        deprecate("Use `locations`.")
-    }
 }.toKQLObject()
 
 private fun create__FieldDefinition() = TypeDSL(emptyList(), __Field::class).apply {

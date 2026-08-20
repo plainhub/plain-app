@@ -17,4 +17,5 @@ import com.ismartcoding.plain.httpserver.http.HttpRouter
 fun HttpRouter.addGraphQLRoutes() {
     post("/graphql") { call -> HttpRouteRegistry.mainGraphQL.handle(call) }
     post("/peer_graphql") { call -> HttpRouteRegistry.peerGraphQL.handle(call) }
+    post("/guest_graphql") { call -> HttpRouteRegistry.guestGraphQL.handle(call) }
 }

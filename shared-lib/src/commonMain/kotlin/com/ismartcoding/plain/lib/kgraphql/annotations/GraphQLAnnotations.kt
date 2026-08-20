@@ -98,7 +98,7 @@ annotation class GraphQLField(
     val description: String = "",
 )
 
-enum class GraphQLSchemaTarget { MAIN, PEER }
+enum class GraphQLSchemaTarget { MAIN, PEER, GUEST }
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)

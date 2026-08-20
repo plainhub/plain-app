@@ -8,6 +8,7 @@ import com.ismartcoding.plain.httpserver.http.HttpMethod
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.isPeerAccessiblePath
 import com.ismartcoding.plain.httpserver.isDlnaPath
+import com.ismartcoding.plain.httpserver.isSharePath
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -91,7 +92,7 @@ object HttpModule {
             // serviceEnabled=true. Main-UI routes are rejected here; the
             // authoritative check still lives in each route handler so BLE
             // RPC (which bypasses this intercept) is also covered.
-            if (!isPeerAccessiblePath(method, path) && !isDlnaPath(method, path) && !TempData.desktopAccessEnabled.value) {
+            if (!TempData.desktopAccessEnabled.value && !isPeerAccessiblePath(method, path) && !isDlnaPath(method, path) && !isSharePath(method, path)) {
                 call.respond(HttpStatusCode.NotFound)
                 return@intercept finish()
             }

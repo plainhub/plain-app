@@ -4,25 +4,16 @@ import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.extensions.getFinalPath
-import com.ismartcoding.plain.lib.extensions.isImageFast
-import com.ismartcoding.plain.lib.extensions.urlEncode
-import com.ismartcoding.plain.platform.convert3gpToMp4
-import com.ismartcoding.plain.platform.decodeImageFileToPng
-import com.ismartcoding.plain.platform.extractZipEntryToCache
-import com.ismartcoding.plain.platform.fileExists
-import com.ismartcoding.plain.platform.getContentTypeForPath
-import com.ismartcoding.plain.platform.getPackageIconBytes
-import com.ismartcoding.plain.platform.getThumbnailBytes
-import com.ismartcoding.plain.platform.isAnimatedImageOrSvg
-import com.ismartcoding.plain.platform.isContentUri
-import com.ismartcoding.plain.platform.readFileRange
-import com.ismartcoding.plain.platform.statFile
-import com.ismartcoding.plain.platform.streamContentUri
-import com.ismartcoding.plain.features.file.ZipBrowserHelper
+import com.ismartcoding.plain.features.share.ShareManager
+import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.httpserver.FileIdParams
-import com.ismartcoding.plain.httpserver.http.HttpCall
+import com.ismartcoding.plain.httpserver.ShareFileParams
+import com.ismartcoding.plain.httpserver.FileServer
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.HttpStatus
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
  * `/fs` and `/proxyfs` — file serving endpoints shared between Android (Ktor)
@@ -60,74 +51,59 @@ fun HttpRouter.addFilesRoutes() {
                 jsonName = ""
             }
 
-            val isDownload = call.queryParam("dl") == "1"
-            val widthParam = call.queryParam("w")?.toIntOrNull()
-            val heightParam = call.queryParam("h")?.toIntOrNull()
-            // `cc` defaults to true (matches the original `!= false` behavior).
-            val centerCrop = call.queryParam("cc")?.toBooleanStrictOrNull() != false
-
-            // Zip virtual path: extract the entry to cache and serve it.
-            if (ZipBrowserHelper.isZipPath(path)) {
-                val cachePath = extractZipEntryToCache(path)
-                if (cachePath == null) {
-                    call.respondNoBody(HttpStatus.NOT_FOUND)
-                    return@get
-                }
-                val zipEntryName = ZipBrowserHelper.getInternalPath(path).trimEnd('/').substringAfterLast('/')
-                val displayName = jsonName.ifEmpty { zipEntryName }.urlEncode()
-                val contentDisposition = if (isDownload) {
-                    "attachment; filename=\"${displayName}\"; filename*=utf-8''${displayName}"
-                } else {
-                    "inline; filename=\"${displayName}\"; filename*=utf-8''${displayName}"
-                }
-                val contentType = getContentTypeForPath(cachePath) ?: "application/octet-stream"
-                call.responseHeader("Access-Control-Expose-Headers", "Content-Disposition")
-                call.respondFile(cachePath, contentType = contentType, contentDisposition = contentDisposition)
-                return@get
-            }
-
-            // Byte-range request: used by low-throughput transports (BLE) to
-            // download a file in small chunks. Only applies to regular files
-            // (not content:// URIs or package icons) and skips all
-            // conversion/thumbnail logic — raw bytes are served directly.
-            val rangeOffset = call.queryParam("offset")?.toLongOrNull()
-            val rangeLength = call.queryParam("length")?.toIntOrNull()
-            if (rangeOffset != null && rangeLength != null && rangeLength > 0 &&
-                !isContentUri(path) && !path.startsWith("pkgicon://")
-            ) {
-                val bytes = readFileRange(path, rangeOffset, rangeLength)
-                if (bytes == null) {
-                    call.respondNoBody(HttpStatus.NOT_FOUND)
-                } else {
-                    call.respond(bytes, contentType = "application/octet-stream")
-                }
-                return@get
-            }
-
-            when {
-                isContentUri(path) -> serveContentUri(
-                    call,
-                    path = path,
-                    jsonName = jsonName,
-                    isDownload = isDownload,
-                )
-
-                path.startsWith("pkgicon://") -> servePackageIcon(call, path.substring("pkgicon://".length))
-
-                else -> serveRegularFile(
-                    call,
-                    path = path,
-                    jsonName = jsonName,
-                    mediaId = mediaId,
-                    isDownload = isDownload,
-                    widthParam = widthParam,
-                    heightParam = heightParam,
-                    centerCrop = centerCrop,
-                )
-            }
+            // Byte streaming (zip extraction, byte-range, thumbnails, HEIF→PNG,
+            // download mode) is shared with `/sfs` via FileServer.
+            FileServer.serve(call, path, mediaId = mediaId, jsonName = jsonName)
         } catch (ex: Exception) {
             ex.printStackTrace()
             call.respondText("File is expired or does not exist. $ex", status = HttpStatus.FORBIDDEN)
+        }
+    }
+
+    /**
+     * `/sfs` — file serving behind a shared link. Reuses [FileServer] (the exact
+     * same byte stream as `/fs`) but authenticates differently:
+     * - `sid` is the public `shared_id` (used as the lookup + whitelist key).
+     * - `id` is a [ShareFileParams] payload ChaCha20-encrypted with the share's
+     *   dedicated `url_token`. Decryption yields `{sharedId, virtualPath}`,
+     *   which is then whitelisted against the share's roots via
+     *   [ShareManager.resolveVirtualPath].
+     */
+    get("/sfs") { call ->
+        if (!TempData.serviceEnabled.value) {
+            call.respondNoBody(HttpStatus.FORBIDDEN)
+            return@get
+        }
+        val sid = call.queryParam("sid") ?: ""
+        val id = call.queryParam("id") ?: ""
+        if (sid.isEmpty() || id.isEmpty()) {
+            call.respondNoBody(HttpStatus.BAD_REQUEST)
+            return@get
+        }
+        val share = withIO { AppDatabase.instance.shareDao().getById(sid) }
+        if (share == null || !share.isActive) {
+            call.respondNoBody(HttpStatus.FORBIDDEN)
+            return@get
+        }
+        try {
+            @OptIn(ExperimentalEncodingApi::class)
+            val key = Base64.decode(share.urlToken)
+            val decrypted = UrlHelper.decrypt(id, key)
+            val params = jsonDecode<ShareFileParams>(decrypted)
+            // The decrypted payload must reference the same share id as `sid`.
+            if (params.sharedId != sid) {
+                call.respondNoBody(HttpStatus.FORBIDDEN)
+                return@get
+            }
+            val realPath = ShareManager.resolveVirtualPath(share, params.virtualPath)
+            if (realPath == null) {
+                call.respondNoBody(HttpStatus.FORBIDDEN)
+                return@get
+            }
+            FileServer.serve(call, realPath, jsonName = params.virtualPath.substringAfterLast('/'))
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            call.respondNoBody(HttpStatus.BAD_REQUEST)
         }
     }
 
@@ -159,124 +135,4 @@ fun HttpRouter.addFilesRoutes() {
             call.respondText(ex.message ?: "", status = HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
-}
-
-/**
- * Serve a `content://` URI: try 3gp→MP4 conversion first, then stream the
- * raw bytes. When [isDownload] is true, attach a `Content-Disposition:
- * attachment` header built from [jsonName] or the URI's last path segment.
- */
-private suspend fun serveContentUri(
-    call: HttpCall,
-    path: String,
-    jsonName: String,
-    isDownload: Boolean,
-) {
-    val mp4Bytes = convert3gpToMp4(path)
-    if (mp4Bytes != null) {
-        call.respond(mp4Bytes, contentType = "video/mp4")
-        return
-    }
-
-    val headers = mutableMapOf<String, String>()
-    if (isDownload) {
-        val fileName = (jsonName.ifEmpty { path.substringAfterLast('/') }).urlEncode()
-        if (fileName.isNotEmpty()) {
-            headers["Access-Control-Expose-Headers"] = "Content-Disposition"
-            headers["Content-Disposition"] =
-                "attachment; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
-        }
-    }
-    // Content-Type is unknown until we open the stream; let the platform default
-    // to application/octet-stream. The browser infers the type from the
-    // Content-Disposition filename extension when present.
-    call.respondStream(headers = headers) { sink ->
-        streamContentUri(path, sink)
-    }
-}
-
-/** Serve a package icon as JPEG bytes. */
-private suspend fun servePackageIcon(call: HttpCall, packageName: String) {
-    val bytes = getPackageIconBytes(packageName)
-    if (bytes != null) {
-        call.respond(bytes)
-    } else {
-        call.respondNoBody(HttpStatus.NOT_FOUND)
-    }
-}
-
-/**
- * Serve a regular file from the filesystem. Supports:
- * - Download mode (`dl=1`) with Content-Disposition attachment header
- * - Animated images / SVG served as-is with native range support
- * - Thumbnail generation when `w` and `h` query params are present
- * - HEIF → PNG conversion for browsers that cannot render HEIF natively
- * - Default: serve the file as-is
- */
-private suspend fun serveRegularFile(
-    call: HttpCall,
-    path: String,
-    jsonName: String,
-    mediaId: String,
-    isDownload: Boolean,
-    widthParam: Int?,
-    heightParam: Int?,
-    centerCrop: Boolean,
-) {
-    if (!fileExists(path)) {
-        call.respondNoBody(HttpStatus.NOT_FOUND)
-        return
-    }
-    val stat = statFile(path)
-    if (stat == null || stat.isDir) {
-        call.respondNoBody(HttpStatus.BAD_REQUEST)
-        return
-    }
-
-    val fileName = (jsonName.ifEmpty { path.substringAfterLast('/') }).urlEncode()
-    call.responseHeader("Access-Control-Expose-Headers", "Content-Disposition")
-
-    if (isDownload) {
-        val contentDisposition =
-            "attachment; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
-        val contentType = getContentTypeForPath(path) ?: "application/octet-stream"
-        call.respondFile(path, contentType = contentType, contentDisposition = contentDisposition)
-        return
-    }
-    call.responseHeader("Content-Disposition", "inline; filename=\"${fileName}\"; filename*=utf-8''${fileName}")
-
-    // Animated images (GIF, animated WebP, animated HEIF) and SVG: serve as-is
-    // so the browser can render them with native range support.
-    if (fileName.isImageFast() && isAnimatedImageOrSvg(path, fileName)) {
-        val contentType = getContentTypeForPath(path) ?: "application/octet-stream"
-        call.respondFile(path, contentType = contentType)
-        return
-    }
-
-    // Thumbnail request: ?w=...&h=...[&cc=false]
-    if (widthParam != null && heightParam != null) {
-        val thumbBytes = getThumbnailBytes(
-            path = path,
-            width = widthParam,
-            height = heightParam,
-            centerCrop = centerCrop,
-            mediaId = mediaId,
-            fileName = fileName,
-        )
-        if (thumbBytes != null) {
-            call.respond(thumbBytes)
-        }
-        return
-    }
-
-    // HEIF → PNG conversion for browsers without native HEIF support.
-    val pngBytes = decodeImageFileToPng(path)
-    if (pngBytes != null) {
-        call.respond(pngBytes, contentType = "image/png")
-        return
-    }
-
-    // Default: serve the file as-is with content type sniffed from extension.
-    val contentType = getContentTypeForPath(path) ?: "application/octet-stream"
-    call.respondFile(path, contentType = contentType)
 }

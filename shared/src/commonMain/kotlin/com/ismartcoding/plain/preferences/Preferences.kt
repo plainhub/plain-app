@@ -143,6 +143,19 @@ object UrlTokenPreference : BasePreference<String>() {
 
 }
 
+object MasterSecretPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("master_secret")
+
+    /** Returns the per-install 32-byte master secret (base64), generating and persisting it on first use. */
+    suspend fun ensureValueAsync(): String {
+        getAsync()?.takeIf { it.isNotEmpty() }?.let { return it }
+        val generated = com.ismartcoding.plain.platform.generateChaCha20Key()
+        putAsync(generated)
+        return generated
+    }
+}
+
 object ApiPermissionsPreference : BasePreference<Set<String>>() {
     override val default = setOf<String>()
     override val key = stringSetPreferencesKey("api_permissions")

@@ -9,6 +9,7 @@ import com.ismartcoding.plain.httpserver.http.HttpMethod
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.httpserver.isPeerAccessiblePath
 import com.ismartcoding.plain.httpserver.isDlnaPath
+import com.ismartcoding.plain.httpserver.isSharePath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -85,7 +86,7 @@ object IosRequestProcessor {
             // serviceEnabled=true. Main-UI routes are rejected here; the
             // authoritative check still lives in each route handler so BLE
             // RPC (which bypasses this processor) is also covered.
-            if (!isPeerAccessiblePath(method, ctx.path) && !isDlnaPath(method, ctx.path) && !TempData.desktopAccessEnabled.value) {
+            if (!TempData.desktopAccessEnabled.value && !isPeerAccessiblePath(method, ctx.path) && !isDlnaPath(method, ctx.path) && !isSharePath(method, ctx.path)) {
                 ctx.responseStatus = HttpStatus.NOT_FOUND
                 return
             }
