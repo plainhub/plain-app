@@ -51,12 +51,19 @@
 -keep class kotlinx.coroutines.** { *; }
 -dontwarn io.ktor.**
 
-# ===== App code (vendored kgraphql + GraphQL model classes) =====
-# kgraphql discovers type fields via Kotlin reflection (KClass.memberProperties,
-# primaryConstructor). R8 obfuscation strips/renames properties and corrupts
-# @kotlin.Metadata, producing "An Object type must define one or more fields"
-# at schema build time. Keep the app's own classes intact.
--keep class com.ismartcoding.plain.** { *; }
+# ===== App GraphQL model / enum classes =====
+# kgraphql was migrated to KSP-generated reflection-free descriptors, so R8 may
+# freely shrink/optimize/obfuscate ordinary app code. The ONLY remaining runtime
+# reflection hook is `defaultKQLTypeName()` (TypeDSL / EnumDSL / SchemaCompilation)
+# which falls back to the RUNTIME `KClass.simpleName` to derive a GraphQL type name
+# when a type is not explicitly registered. Obfuscating those class names would
+# corrupt the published schema, so preserve the names — but still allow R8 to
+# shrink unused members (the class members themselves are reached directly via
+# KSP `::class` / `::property` references or kotlinx.serialization serializers,
+# and those enlistment rules for serialization are listed above).
+-keepnames class com.ismartcoding.plain.httpserver.models.** { *; }
+-keepnames class com.ismartcoding.plain.data.** { *; }
+-keepnames class com.ismartcoding.plain.enums.** { *; }
 
 # ===== BouncyCastle (reflection-heavy crypto) =====
 -keep class org.bouncycastle.** { *; }
