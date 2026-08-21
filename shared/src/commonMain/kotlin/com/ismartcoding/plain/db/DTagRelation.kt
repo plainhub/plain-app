@@ -8,7 +8,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.RoomRawQuery
 import androidx.room.Update
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
 
 @Entity(tableName = "tag_relations", primaryKeys = ["tag_id", "key", "type"])

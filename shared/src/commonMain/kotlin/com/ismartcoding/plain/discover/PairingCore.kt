@@ -21,7 +21,7 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.crypto.ECDHKeyPair
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent

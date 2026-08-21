@@ -27,7 +27,7 @@ import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.platform.searchSmsConversations
 import com.ismartcoding.plain.platform.sendSmsText
 import com.ismartcoding.plain.db.DArchivedConversation
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.sendEvent

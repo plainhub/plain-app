@@ -7,7 +7,7 @@ import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.NoteDao
 import com.ismartcoding.plain.helpers.QueryHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 
 object NoteHelper {
     private val noteDao: NoteDao by lazy {

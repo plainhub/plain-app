@@ -7,7 +7,7 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.events.HPomodoroPauseEvent
 import com.ismartcoding.plain.events.HPomodoroStartEvent
 import com.ismartcoding.plain.events.HPomodoroStopEvent
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState

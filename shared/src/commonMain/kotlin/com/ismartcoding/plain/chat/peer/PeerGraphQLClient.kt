@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat.peer
 
 import com.ismartcoding.plain.helpers.SignatureHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.chat.channel.ChannelCacher
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportRouter

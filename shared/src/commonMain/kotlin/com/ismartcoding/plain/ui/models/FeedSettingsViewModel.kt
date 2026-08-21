@@ -13,7 +13,7 @@ import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
 import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference
 import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.feedWorkerCancelRepeat
 import com.ismartcoding.plain.platform.feedWorkerStartRepeat
 import kotlinx.coroutines.launch

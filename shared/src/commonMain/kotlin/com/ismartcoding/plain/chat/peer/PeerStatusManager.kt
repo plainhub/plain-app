@@ -17,7 +17,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PeerStatusData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.SignatureHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.createPeerStatusHttpClient
 import io.ktor.client.HttpClient

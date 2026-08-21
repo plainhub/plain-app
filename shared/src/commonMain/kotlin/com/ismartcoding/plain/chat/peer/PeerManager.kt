@@ -8,7 +8,7 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.PeerStatus
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 
 object PeerManager {
     suspend fun deletePeer(peerId: String): Boolean = withIO {

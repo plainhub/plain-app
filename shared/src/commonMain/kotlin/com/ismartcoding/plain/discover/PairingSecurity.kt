@@ -4,7 +4,7 @@ import com.ismartcoding.plain.platform.verifyEd25519
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.data.DPairingResponse
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.math.abs

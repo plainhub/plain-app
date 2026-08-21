@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.data.DownloadResult
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.isOk

@@ -9,7 +9,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DPomodoroItem
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.platform.showPomodoroNotification

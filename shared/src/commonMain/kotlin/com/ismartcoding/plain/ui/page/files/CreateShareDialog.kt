@@ -27,7 +27,7 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.share.ShareCrypto
 import com.ismartcoding.plain.features.share.ShareExpiry
 import com.ismartcoding.plain.features.share.ShareManager
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.shareText

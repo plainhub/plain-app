@@ -7,7 +7,7 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao
 import com.ismartcoding.plain.helpers.QueryHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime

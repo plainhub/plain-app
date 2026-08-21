@@ -16,7 +16,7 @@ import com.ismartcoding.plain.db.verifyEd25519Signature
 import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInvite
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInviteAccept

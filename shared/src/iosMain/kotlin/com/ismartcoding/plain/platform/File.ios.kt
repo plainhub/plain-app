@@ -6,7 +6,7 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.FileHashHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.extensions.isAnimatedImageOrSvgHeader
@@ -16,7 +16,6 @@ import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.thumbnail.DecodePolicy
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.httpserver.http.StreamSink
-import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.utils.io.readAvailable

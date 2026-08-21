@@ -4,7 +4,7 @@ import androidx.sqlite.SQLiteConnection
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.helpers.StringHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.family
 import com.ismartcoding.plain.i18n.important

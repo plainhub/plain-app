@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.helpers
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

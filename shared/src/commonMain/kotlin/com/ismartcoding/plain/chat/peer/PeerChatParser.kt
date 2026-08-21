@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.chat.peer
 
 import com.ismartcoding.plain.helpers.Base64Lenient
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.verifyEd25519Signature
 import com.ismartcoding.plain.lib.logcat.LogCat

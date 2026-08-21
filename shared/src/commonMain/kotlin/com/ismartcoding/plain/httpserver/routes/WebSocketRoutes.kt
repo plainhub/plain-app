@@ -7,7 +7,7 @@ import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent

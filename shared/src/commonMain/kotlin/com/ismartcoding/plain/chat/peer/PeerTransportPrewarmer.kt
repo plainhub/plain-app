@@ -5,7 +5,7 @@ import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.chat.peer.transport.TransportUnavailable
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.bleTransport
 import com.ismartcoding.plain.platform.isBleReady

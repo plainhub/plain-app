@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.helpers
+package com.ismartcoding.plain.lib
 
 import kotlin.time.Clock
 import kotlin.time.Instant

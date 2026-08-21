@@ -11,7 +11,7 @@ import com.ismartcoding.plain.lib.opml.entity.Outline
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 
 suspend fun FeedHelper.importAsync(content: String) = withIO {
     val feedList = mutableListOf<DFeed>()

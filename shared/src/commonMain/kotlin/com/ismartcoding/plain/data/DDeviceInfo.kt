@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.data
 
 import kotlin.time.Instant
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 
 enum class DevicePlatform {
     ANDROID, IOS, MACOS, WINDOWS, LINUX

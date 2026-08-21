@@ -10,7 +10,7 @@ import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.FileHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.helpers.FileHashEdgeBytes
 import com.ismartcoding.plain.lib.extensions.isAnimatedImageOrSvgHeader

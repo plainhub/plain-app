@@ -5,7 +5,7 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedCount
 import com.ismartcoding.plain.db.FeedDao
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.feedWorkerOneTimeRequest
 
 object FeedHelper {

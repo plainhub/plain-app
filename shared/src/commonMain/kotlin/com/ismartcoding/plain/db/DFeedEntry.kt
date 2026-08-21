@@ -12,7 +12,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.ismartcoding.plain.data.IDData
 import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.helpers.generateId
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable

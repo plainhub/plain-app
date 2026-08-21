@@ -6,7 +6,7 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.generateChaCha20Key
 import com.ismartcoding.plain.db.DSession
 import com.ismartcoding.plain.enums.SessionType
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 
 object SessionList {
     suspend fun getItemsAsync(): List<DSession> = withIO {

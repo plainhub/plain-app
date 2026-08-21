@@ -8,7 +8,7 @@ import com.ismartcoding.plain.db.DTagCount
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.db.TagDao
 import com.ismartcoding.plain.db.TagRelationDao
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 
 object TagHelper {
     private val tagDao: TagDao by lazy {

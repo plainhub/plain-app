@@ -8,7 +8,7 @@ import com.ismartcoding.plain.platform.deleteBookmarkFavicons
 import com.ismartcoding.plain.platform.downloadBookmarkFavicon
 import com.ismartcoding.plain.db.DBookmark
 import com.ismartcoding.plain.db.DBookmarkGroup
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Url

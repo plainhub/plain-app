@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import com.ismartcoding.plain.enums.SessionType
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
 
 @Entity(tableName = "sessions")

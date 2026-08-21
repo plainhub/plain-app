@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DVideoPlayProgress
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.getVideoMeta
 import com.ismartcoding.plain.platform.rememberVideoPlayerController

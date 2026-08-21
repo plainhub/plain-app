@@ -9,7 +9,7 @@ import com.ismartcoding.plain.discover.DDiscoverReply
 import com.ismartcoding.plain.discover.PairingCore
 import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.ble.client.BleDeviceApi

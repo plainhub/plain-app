@@ -31,7 +31,7 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.lib.dlna.DlnaMediaType
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
-import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.createDownloadTempFile
 import com.ismartcoding.plain.platform.fetchUrlToStream
