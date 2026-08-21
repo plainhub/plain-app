@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import com.ismartcoding.plain.i18n.*
 
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +12,7 @@ import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.getMediaBuckets
+import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.ui.helpers.LoadingHelper
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +26,7 @@ class MediaFoldersViewModel : ViewModel() {
     private val _itemsFlow = MutableStateFlow<List<DMediaBucket>>(emptyList())
     val itemsFlow: StateFlow<List<DMediaBucket>> = _itemsFlow.asStateFlow()
     val totalBucket = mutableStateOf<DMediaBucket?>(null)
+    val trashCount = mutableIntStateOf(0)
 
     val bucketsMapFlow: StateFlow<Map<String, DMediaBucket>> =
         _itemsFlow
@@ -36,6 +39,7 @@ class MediaFoldersViewModel : ViewModel() {
     suspend fun loadAsync() = withIO {
         val startTime = TimeHelper.nowMillis()
         _itemsFlow.value = getMediaBuckets(dataType.value)
+        trashCount.intValue = countMedia(dataType.value, "trash:true")
 
         var totalValue = 0
         var sizeValue = 0L

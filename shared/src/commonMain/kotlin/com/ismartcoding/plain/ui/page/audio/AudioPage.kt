@@ -32,7 +32,6 @@ import com.ismartcoding.plain.ui.base.MediaTopBar
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
@@ -50,7 +49,6 @@ import com.ismartcoding.plain.ui.page.audio.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
 import com.ismartcoding.plain.ui.page.cast.CastDialog
-import com.ismartcoding.plain.ui.page.home.MediaFoldersBottomSheet
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,7 +65,6 @@ fun AudioPage(
 ) {
     val scope = rememberCoroutineScope()
     val audioState = AudioPageState.create(audioVM, tagsVM, mediaFoldersVM)
-    val pagerState = audioState.pagerState
     val scrollBehavior = audioState.scrollBehavior
     val tagsState = audioState.tagsState
     val tagsMapState = audioState.tagsMapState
@@ -75,13 +72,7 @@ fun AudioPage(
     val itemsState = audioState.itemsState
     val scrollState = audioState.scrollState
     val isAudioPlaying by audioIsPlayingFlow().collectAsState()
-
-    val tabs = remember(tagsState, audioVM.total.intValue, audioVM.totalTrash.intValue) {
-        val baseTabs = mutableListOf(VTabData(LocaleHelper.getString(Res.string.all), "all", audioVM.total.intValue))
-        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(Res.string.trash), "trash", audioVM.totalTrash.intValue))
-        baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) })
-        baseTabs
-    }
+    audioVM.scrollStateMap[0] = scrollState
 
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
@@ -106,48 +97,27 @@ fun AudioPage(
 
     AudioPageEffects(audioState, audioVM, audioPlaylistVM, tagsVM, mediaFoldersVM)
 
-    LaunchedEffect(pagerState.currentPage) {
-        val tab = tabs.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
-        when (tab.value) {
-            "all" -> {
-                audioVM.trash.value = false; audioVM.tag.value = null
-            }
-
-            "trash" -> {
-                audioVM.trash.value = true; audioVM.tag.value = null
-            }
-
-            else -> {
-                audioVM.trash.value = false; audioVM.tag.value = tagsState.find { it.id == tab.value }
-            }
-        }
-        scope.launch { scrollBehavior.reset(); audioVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0) ?: scrollState.scrollToItem(0) }
-        scope.launch(Dispatchers.Default) { audioVM.loadAsync(tagsVM) }
-    }
-
     val audioTagsMap = remember(tagsMapState, tagsState) {
         tagsMapState.mapValues { entry -> entry.value.mapNotNull { relation -> tagsState.find { it.id == relation.tagId } } }
     }
 
     ViewAudioBottomSheet(audioVM = audioVM, tagsVM = tagsVM, tagsMapState = tagsMapState, tagsState = tagsState, dragSelectState = dragSelectState, castVM = castVM)
-    MediaFoldersBottomSheet(audioVM, mediaFoldersVM, tagsVM)
     if (audioVM.showTagsDialog.value) {
         TagsBottomSheet(tagsVM) { audioVM.showTagsDialog.value = false }
     }
     CastDialog(castVM)
 
-    PScaffold(
-        topBar = {
-            MediaTopBar(
-                navController = navController,
-                mediaVM = audioVM,
-                tagsVM = tagsVM,
-                castVM = castVM,
-                dragSelectState = dragSelectState,
+    MediaTopBar(
+        navController = navController,
+        mediaVM = audioVM,
+        tagsVM = tagsVM,
+        castVM = castVM,
+        mediaFoldersVM = mediaFoldersVM,
+        dragSelectState = dragSelectState,
                 scrollBehavior = scrollBehavior,
                 bucketsMap = audioState.bucketsMap,
                 itemsState = itemsState,
-                scrollToTop = { scope.launch { audioVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } },
+                scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
                 defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
                 onSortSelected = { sortBy ->
                     scope.launch(Dispatchers.Default) {
@@ -161,8 +131,6 @@ fun AudioPage(
                         audioVM.loadAsync(tv)
                     }
                 },
-            )
-        },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
                 AudioFilesSelectModeBottomActions(audioVM, audioPlaylistVM, tagsVM, tagsState, dragSelectState)
@@ -178,19 +146,9 @@ fun AudioPage(
                 if (!audioVM.hasPermission.value) {
                     NeedPermissionColumn(Res.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column
                 }
-                if (!dragSelectState.selectMode) {
-                    PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
-                        tabs.forEachIndexed { index, s ->
-                            PFilterChip(
-                                modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
-                                selected = pagerState.currentPage == index,
-                                onClick = { scope.launch { pagerState.scrollToPage(index) } },
-                                label = { Text(if (index == 0) s.title + " (" + s.count + ")" else if (audioVM.bucketId.value.isNotEmpty() || audioVM.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})") })
-                        }
-                    }
-                }
+
                 AudioPageList(
-                    pagerState, scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
+                    scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
                     tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues
                 )
             }

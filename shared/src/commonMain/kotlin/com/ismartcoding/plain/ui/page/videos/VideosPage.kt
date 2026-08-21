@@ -55,7 +55,6 @@ import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
@@ -77,11 +76,9 @@ import com.ismartcoding.plain.ui.helpers.groupMediaByDate
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.models.VTabData
 import com.ismartcoding.plain.ui.models.VideosViewModel
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.page.cast.CastDialog
-import com.ismartcoding.plain.ui.page.home.MediaFoldersBottomSheet
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import com.ismartcoding.plain.platform.getMediaItemUriString
 import kotlinx.coroutines.Dispatchers
@@ -105,32 +102,22 @@ fun VideosPage(
         tagsVM.dataType.value = videosVM.dataType
     }
     val tagsState by tagsVM.itemsFlow.collectAsState()
-    val pagerState = rememberPagerState(pageCount = {
-        tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1
-    })
     val itemsState by videosVM.itemsFlow.collectAsState()
-    val dragSelectState = rememberDragSelectState({
-        videosVM.scrollStateMap[pagerState.currentPage]
-    })
+    val scrollState = rememberLazyGridState()
+    videosVM.scrollStateMap[0] = scrollState
+    val dragSelectState = rememberDragSelectState({ scrollState })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-        (videosVM.scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !dragSelectState.selectMode
+        scrollState.firstVisibleItemIndex > 0 && !dragSelectState.selectMode
     })
     val previewerState = rememberPreviewerState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
     val cellsPerRow = remember { mutableIntStateOf(VideoGridCellsPerRowPreference.default) }
-    val isFirstTime = remember { mutableStateOf(true) }
     val windowInfo = LocalWindowInfo.current
     val imageWidthPx = remember(cellsPerRow.value, windowInfo.containerSize.width) {
         with(density) {
             ((windowInfo.containerSize.width.toDp() - ((cellsPerRow.value - 1) * 2).dp) / cellsPerRow.value).toPx().toInt()
         }
-    }
-    val tabs = remember(tagsState, videosVM.total.intValue, videosVM.totalTrash.intValue) {
-        val baseTabs = mutableListOf(VTabData(LocaleHelper.getString(Res.string.all), "all", videosVM.total.intValue))
-        if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(Res.string.trash), "trash", videosVM.totalTrash.intValue))
-        baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) })
-        baseTabs
     }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
@@ -176,49 +163,24 @@ fun VideosPage(
     LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !isGestureInteractionMode())) {
         if (dragSelectState.selectMode || (previewerState.visible && !isGestureInteractionMode())) scrollBehavior.reset()
     }
-    LaunchedEffect(pagerState.currentPage) {
-        if (isFirstTime.value) {
-            isFirstTime.value = false
-            return@LaunchedEffect
-        }
-        val tab = tabs.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
-        when (tab.value) {
-            "all" -> {
-                videosVM.trash.value = false; videosVM.tag.value = null
-            }
-            "trash" -> {
-                videosVM.trash.value = true; videosVM.tag.value = null
-            }
-            else -> {
-                videosVM.trash.value = false; videosVM.tag.value = tagsState.find { it.id == tab.value }
-            }
-        }
-        scope.launch {
-            scrollBehavior.reset()
-            videosVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
-        }
-        scope.launch(Dispatchers.Default) { videosVM.loadAsync(tagsVM) }
-    }
 
     ViewVideoBottomSheet(videosVM, tagsVM, tagsMapState, tagsState, dragSelectState)
-    MediaFoldersBottomSheet(videosVM, mediaFoldersVM, tagsVM)
     if (videosVM.showTagsDialog.value) {
         TagsBottomSheet(tagsVM) { videosVM.showTagsDialog.value = false }
     }
     CastDialog(castVM)
 
-    PScaffold(
-        topBar = {
-            MediaTopBar(
-                navController = navController,
-                mediaVM = videosVM,
-                tagsVM = tagsVM,
-                castVM = castVM,
-                dragSelectState = dragSelectState,
+    MediaTopBar(
+        navController = navController,
+        mediaVM = videosVM,
+        tagsVM = tagsVM,
+        castVM = castVM,
+        mediaFoldersVM = mediaFoldersVM,
+        dragSelectState = dragSelectState,
                 scrollBehavior = scrollBehavior,
                 bucketsMap = bucketsMap,
                 itemsState = itemsState,
-                scrollToTop = { scope.launch { videosVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } },
+                scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
                 defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
                 onSortSelected = { sortBy ->
                     scope.launch(Dispatchers.Default) {
@@ -228,8 +190,6 @@ fun VideosPage(
                     }
                 },
                 onSearchAction = { tv -> scope.launch(Dispatchers.Default) { videosVM.loadAsync(tv) } },
-            )
-        },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
                 MediaFilesSelectModeBottomActions(
@@ -250,73 +210,37 @@ fun VideosPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (!videosVM.hasPermission.value) {
-                NeedPermissionColumn(Res.drawable.video, AppFeatureType.FILES.getPermission()!!); return@PScaffold
+                NeedPermissionColumn(Res.drawable.video, AppFeatureType.FILES.getPermission()!!); return@Column
             }
-            if (!dragSelectState.selectMode) {
-                PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
-                    tabs.forEachIndexed { index, s ->
-                        PFilterChip(
-                            modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
-                            selected = pagerState.currentPage == index,
-                            onClick = { scope.launch { pagerState.scrollToPage(index) } },
-                            label = {
-                                if (index == 0) Text(text = s.title + " (" + s.count + ")")
-                                else Text(if (videosVM.bucketId.value.isNotEmpty() || videosVM.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})")
-                            },
-                        )
-                    }
-                }
-            }
-            if (pagerState.pageCount == 0) {
-                NoDataColumn(loading = videosVM.showLoading.value, search = videosVM.showSearchBar.value)
-                return@Column
-            }
-            HorizontalPager(state = pagerState) { index ->
-                PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        if (itemsState.isNotEmpty()) {
-                            val scrollState = rememberLazyGridState()
-                            videosVM.scrollStateMap[index] = scrollState
-                            val flingBehavior = rememberBoostFlingBehavior(cellsPerRow.value / 3f)
-                            LazyVerticalGridScrollbar(state = scrollState) {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(cellsPerRow.value),
-                                    state = scrollState,
-                                    flingBehavior = flingBehavior,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .nestedScroll(scrollBehavior.nestedScrollConnection)
-                                        .gridDragSelect(items = itemsState, state = dragSelectState)
-                                        .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
-                                            VideoGridCellsPerRowPreference.putAsync(it)
-                                        },
-                                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                                ) {
-                                    val isGroupMode = videosVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
-                                            && videosVM.queryText.value.isEmpty()
-                                    if (isGroupMode) {
-                                        val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
-                                        groupedItems.forEach { group ->
-                                            item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.dateKey}", contentType = "header") {
-                                                Text(text = group.dateLabel, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.titleSmall)
-                                            }
-                                            items(group.items, key = { it.id }, contentType = { "video" }, span = { GridItemSpan(1) }) { m ->
-                                                VideoGridItem(
-                                                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
-                                                    videosVM,
-                                                    castVM,
-                                                    m,
-                                                    showSize = cellsPerRow.value < 6,
-                                                    previewerState,
-                                                    dragSelectState,
-                                                    imageWidthPx,
-                                                    sort = videosVM.sortBy.value,
-                                                )
-                                            }
+
+            PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
+                AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    if (itemsState.isNotEmpty()) {
+                        val flingBehavior = rememberBoostFlingBehavior(cellsPerRow.value / 3f)
+                        LazyVerticalGridScrollbar(state = scrollState) {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(cellsPerRow.value),
+                                state = scrollState,
+                                flingBehavior = flingBehavior,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                                    .gridDragSelect(items = itemsState, state = dragSelectState)
+                                    .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
+                                        VideoGridCellsPerRowPreference.putAsync(it)
+                                    },
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
+                            ) {
+                                val isGroupMode = videosVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+                                        && videosVM.queryText.value.isEmpty()
+                                if (isGroupMode) {
+                                    val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
+                                    groupedItems.forEach { group ->
+                                        item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.dateKey}", contentType = "header") {
+                                            Text(text = group.dateLabel, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.titleSmall)
                                         }
-                                    } else {
-                                        items(itemsState, key = { it.id }, contentType = { "video" }, span = { GridItemSpan(1) }) { m ->
+                                        items(group.items, key = { it.id }, contentType = { "video" }, span = { GridItemSpan(1) }) { m ->
                                             VideoGridItem(
                                                 modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
                                                 videosVM,
@@ -330,18 +254,32 @@ fun VideosPage(
                                             )
                                         }
                                     }
-                                    item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
-                                        if (itemsState.isNotEmpty() && !videosVM.noMore.value) {
-                                            LaunchedEffect(Unit) { scope.launch(Dispatchers.Default) { videosVM.moreAsync(tagsVM) } }
-                                        }
-                                        LoadMoreRefreshContent(videosVM.noMore.value)
+                                } else {
+                                    items(itemsState, key = { it.id }, contentType = { "video" }, span = { GridItemSpan(1) }) { m ->
+                                        VideoGridItem(
+                                            modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                                            videosVM,
+                                            castVM,
+                                            m,
+                                            showSize = cellsPerRow.value < 6,
+                                            previewerState,
+                                            dragSelectState,
+                                            imageWidthPx,
+                                            sort = videosVM.sortBy.value,
+                                        )
                                     }
-                                    item(span = { GridItemSpan(maxLineSpan) }, key = "bottomSpace") { BottomSpace(paddingValues) }
                                 }
+                                item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
+                                    if (itemsState.isNotEmpty() && !videosVM.noMore.value) {
+                                        LaunchedEffect(Unit) { scope.launch(Dispatchers.Default) { videosVM.moreAsync(tagsVM) } }
+                                    }
+                                    LoadMoreRefreshContent(videosVM.noMore.value)
+                                }
+                                item(span = { GridItemSpan(maxLineSpan) }, key = "bottomSpace") { BottomSpace(paddingValues) }
                             }
-                        } else {
-                            NoDataColumn(loading = videosVM.showLoading.value, search = videosVM.showSearchBar.value)
                         }
+                    } else {
+                        NoDataColumn(loading = videosVM.showLoading.value, search = videosVM.showSearchBar.value)
                     }
                 }
             }

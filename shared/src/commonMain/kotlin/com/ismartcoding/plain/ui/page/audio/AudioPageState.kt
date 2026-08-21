@@ -25,7 +25,6 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 data class AudioPageState(
-    val pagerState: PagerState,
     val itemsState: List<DAudio>,
     val dragSelectState: DragSelectState,
     val scrollBehavior: TopAppBarScrollBehavior,
@@ -48,21 +47,17 @@ data class AudioPageState(
             }
 
             val tagsState by tagsVM.itemsFlow.collectAsState()
-            val pagerState = rememberPagerState(pageCount = {
-                tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1
-            })
             val itemsState by audioVM.itemsFlow.collectAsState()
             val scrollState = rememberLazyListState()
-            val dragSelectState = rememberListDragSelectState({ audioVM.scrollStateMap[pagerState.currentPage] })
+            val dragSelectState = rememberListDragSelectState({ scrollState })
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-                (audioVM.scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !dragSelectState.selectMode
+                scrollState.firstVisibleItemIndex > 0 && !dragSelectState.selectMode
             })
 
             val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
             val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
 
             return AudioPageState(
-                pagerState = pagerState,
                 itemsState = itemsState,
                 dragSelectState = dragSelectState,
                 scrollBehavior = scrollBehavior,

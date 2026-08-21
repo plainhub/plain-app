@@ -23,7 +23,6 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 data class DocsPageState(
-    val pagerState: PagerState,
     val itemsState: List<DDoc>,
     val dragSelectState: DragSelectState,
     val scrollBehavior: TopAppBarScrollBehavior,
@@ -46,20 +45,18 @@ data class DocsPageState(
             }
 
             val tagsState by tagsVM.itemsFlow.collectAsState()
-            val pagerState = rememberPagerState(pageCount = { docsVM.tabs.value.size })
             val itemsState by docsVM.itemsFlow.collectAsState()
             val scrollState = rememberLazyListState()
-            val dragSelectState = rememberListDragSelectState({ docsVM.scrollStateMap[pagerState.currentPage] })
+            val dragSelectState = rememberListDragSelectState({ scrollState })
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
                 canScroll = {
-                    (docsVM.scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !dragSelectState.selectMode
+                    scrollState.firstVisibleItemIndex > 0 && !dragSelectState.selectMode
                 }
             )
             val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
             val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
 
             return DocsPageState(
-                pagerState = pagerState,
                 itemsState = itemsState,
                 dragSelectState = dragSelectState,
                 scrollBehavior = scrollBehavior,

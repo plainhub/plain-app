@@ -30,7 +30,6 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     var hasPermission = mutableStateOf(false)
     var total = mutableIntStateOf(0)
     var totalTrash = mutableIntStateOf(0)
-    val showFoldersDialog = mutableStateOf(false)
     val noMore = mutableStateOf(false)
     val offset = mutableIntStateOf(0)
     val limit = mutableIntStateOf(1000)

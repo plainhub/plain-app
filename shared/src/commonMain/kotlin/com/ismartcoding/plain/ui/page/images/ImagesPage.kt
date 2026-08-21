@@ -54,7 +54,6 @@ import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
@@ -77,10 +76,8 @@ import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.models.VTabData
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.page.cast.CastDialog
-import com.ismartcoding.plain.ui.page.home.MediaFoldersBottomSheet
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import com.ismartcoding.plain.platform.getMediaItemUriString
 import kotlinx.coroutines.Dispatchers
@@ -99,38 +96,24 @@ fun ImagesPage(
     tagsVM.dataType.value = imagesVM.dataType
     mediaFoldersVM.dataType.value = imagesVM.dataType
     val tagsState by tagsVM.itemsFlow.collectAsState()
-    val pagerState = rememberPagerState(pageCount = {
-        tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1
-    })
     val hapticFeedback = LocalHapticFeedback.current
     val itemsState by imagesVM.itemsFlow.collectAsState()
-    val dragSelectState = rememberDragSelectState({
-        imagesVM.scrollStateMap[pagerState.currentPage]
-    })
+    val scrollState = rememberLazyGridState()
+    imagesVM.scrollStateMap[0] = scrollState
+    val dragSelectState = rememberDragSelectState({ scrollState })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-        (imagesVM.scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !dragSelectState.selectMode
+        scrollState.firstVisibleItemIndex > 0 && !dragSelectState.selectMode
     })
     val previewerState = rememberPreviewerState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val bucketsMap by mediaFoldersVM.bucketsMapFlow.collectAsState()
     val cellsPerRow = remember { mutableIntStateOf(ImageGridCellsPerRowPreference.default) }
-    val isFirstTime = remember { mutableStateOf(true) }
     val density = LocalDensity.current
     val windowInfo = LocalWindowInfo.current
     val imageWidthPx = remember(cellsPerRow.value, windowInfo.containerSize.width) {
         with(density) {
             ((windowInfo.containerSize.width.toDp() - ((cellsPerRow.value - 1) * 2).dp) / cellsPerRow.value).toPx().toInt()
         }
-    }
-    val tabs = remember(tagsState, imagesVM.total.intValue, imagesVM.totalTrash.intValue) {
-        val baseTabs = mutableListOf(VTabData(LocaleHelper.getString(Res.string.all), "all", imagesVM.total.intValue))
-        if (AppFeatureType.MEDIA_TRASH.has()) {
-            baseTabs.add(VTabData(LocaleHelper.getString(Res.string.trash), "trash", imagesVM.totalTrash.intValue))
-        }
-        baseTabs.addAll(tagsState.map {
-            VTabData(it.name, it.id, it.count)
-        })
-        baseTabs
     }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
@@ -184,36 +167,8 @@ fun ImagesPage(
             scrollBehavior.reset()
         }
     }
-    LaunchedEffect(pagerState.currentPage) {
-        if (isFirstTime.value) {
-            isFirstTime.value = false; return@LaunchedEffect
-        }
-        val tab = tabs.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
-        when (tab.value) {
-            "all" -> {
-                imagesVM.trash.value = false; imagesVM.tag.value = null
-            }
-
-            "trash" -> {
-                imagesVM.trash.value = true; imagesVM.tag.value = null
-            }
-
-            else -> {
-                imagesVM.trash.value = false; imagesVM.tag.value = tagsState.find { it.id == tab.value }
-            }
-        }
-        scope.launch {
-            scrollBehavior.reset()
-            imagesVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
-        }
-        scope.launch {
-            imagesVM.loadAsync(tagsVM)
-        }
-    }
 
     ViewImageBottomSheet(imagesVM, tagsVM, tagsMapState, tagsState, dragSelectState)
-
-    MediaFoldersBottomSheet(imagesVM, mediaFoldersVM, tagsVM)
 
     if (imagesVM.showTagsDialog.value) {
         TagsBottomSheet(tagsVM) {
@@ -223,20 +178,19 @@ fun ImagesPage(
 
     CastDialog(castVM)
 
-    PScaffold(
-        topBar = {
-            MediaTopBar(
-                navController = navController,
-                mediaVM = imagesVM,
-                tagsVM = tagsVM,
-                castVM = castVM,
-                dragSelectState = dragSelectState,
+    MediaTopBar(
+        navController = navController,
+        mediaVM = imagesVM,
+        tagsVM = tagsVM,
+        castVM = castVM,
+        mediaFoldersVM = mediaFoldersVM,
+        dragSelectState = dragSelectState,
                 scrollBehavior = scrollBehavior,
                 bucketsMap = bucketsMap,
                 itemsState = itemsState,
                 scrollToTop = {
                     scope.launch {
-                        imagesVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
+                        scrollState.scrollToItem(0)
                     }
                 },
                 defaultNavigationIcon = {
@@ -256,8 +210,6 @@ fun ImagesPage(
                         imagesVM.loadWithAiSearchAsync(tv)
                     }
                 },
-            )
-        },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
                 MediaFilesSelectModeBottomActions(
@@ -278,68 +230,36 @@ fun ImagesPage(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             if (!imagesVM.hasPermission.value) {
-                NeedPermissionColumn(Res.drawable.image, AppFeatureType.FILES.getPermission()!!); return@PScaffold
+                NeedPermissionColumn(Res.drawable.image, AppFeatureType.FILES.getPermission()!!); return@Column
             }
-            if (!dragSelectState.selectMode) {
-                PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
-                    tabs.forEachIndexed { index, s ->
-                        PFilterChip(
-                            modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
-                            selected = pagerState.currentPage == index,
-                            onClick = { scope.launch { pagerState.scrollToPage(index) } },
-                            label = { if (index == 0) Text(text = s.title + " (" + s.count + ")") else Text(if (imagesVM.bucketId.value.isNotEmpty() || imagesVM.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})") })
-                    }
-                }
-            }
-            if (pagerState.pageCount == 0) {
-                NoDataColumn(loading = imagesVM.showLoading.value, search = imagesVM.showSearchBar.value)
-                return@Column
-            }
-            HorizontalPager(state = pagerState) { index ->
-                PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        if (itemsState.isNotEmpty()) {
-                            val scrollState = rememberLazyGridState()
-                            imagesVM.scrollStateMap[index] = scrollState
-                            val flingBehavior = rememberBoostFlingBehavior(cellsPerRow.value / 3f)
-                            LazyVerticalGridScrollbar(state = scrollState) {
-                                LazyVerticalGrid(
-                                    columns = GridCells.Fixed(cellsPerRow.value), state = scrollState, flingBehavior = flingBehavior,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .nestedScroll(scrollBehavior.nestedScrollConnection)
-                                        .gridDragSelect(items = itemsState, state = dragSelectState)
-                                        .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
-                                            ImageGridCellsPerRowPreference.putAsync(it)
-                                        },
-                                    horizontalArrangement = Arrangement.spacedBy(2.dp),
-                                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                                ) {
-                                    val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
-                                            && imagesVM.queryText.value.isEmpty()
-                                            && !imagesVM.useAiSearch.value
-                                    if (isGroupMode) {
-                                        val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
-                                        groupedItems.forEach { group ->
-                                            item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.dateKey}", contentType = "header") {
-                                                Text(text = group.dateLabel, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.titleSmall)
-                                            }
-                                            items(group.items, key = { it.id }, contentType = { "image" }, span = { GridItemSpan(1) }) { m ->
-                                                ImageGridItem(
-                                                    scope,
-                                                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
-                                                    imagesVM,
-                                                    castVM,
-                                                    m,
-                                                    showSize = cellsPerRow.value < 6,
-                                                    previewerState,
-                                                    dragSelectState,
-                                                    imageWidthPx
-                                                )
-                                            }
+
+            PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
+                AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    if (itemsState.isNotEmpty()) {
+                        val flingBehavior = rememberBoostFlingBehavior(cellsPerRow.value / 3f)
+                        LazyVerticalGridScrollbar(state = scrollState) {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(cellsPerRow.value), state = scrollState, flingBehavior = flingBehavior,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+                                    .gridDragSelect(items = itemsState, state = dragSelectState)
+                                    .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) {
+                                        ImageGridCellsPerRowPreference.putAsync(it)
+                                    },
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+                                        && imagesVM.queryText.value.isEmpty()
+                                        && !imagesVM.useAiSearch.value
+                                if (isGroupMode) {
+                                    val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
+                                    groupedItems.forEach { group ->
+                                        item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.dateKey}", contentType = "header") {
+                                            Text(text = group.dateLabel, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.titleSmall)
                                         }
-                                    } else {
-                                        items(itemsState, key = { it.id }, contentType = { "image" }, span = { GridItemSpan(1) }) { m ->
+                                        items(group.items, key = { it.id }, contentType = { "image" }, span = { GridItemSpan(1) }) { m ->
                                             ImageGridItem(
                                                 scope,
                                                 modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
@@ -353,18 +273,32 @@ fun ImagesPage(
                                             )
                                         }
                                     }
-                                    item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
-                                        if (itemsState.isNotEmpty() && !imagesVM.noMore.value) {
-                                            LaunchedEffect(Unit) { scope.launch(Dispatchers.Default) { imagesVM.moreAsync(tagsVM) } }
-                                        }
-                                        LoadMoreRefreshContent(imagesVM.noMore.value)
+                                } else {
+                                    items(itemsState, key = { it.id }, contentType = { "image" }, span = { GridItemSpan(1) }) { m ->
+                                        ImageGridItem(
+                                            scope,
+                                            modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                                            imagesVM,
+                                            castVM,
+                                            m,
+                                            showSize = cellsPerRow.value < 6,
+                                            previewerState,
+                                            dragSelectState,
+                                            imageWidthPx
+                                        )
                                     }
-                                    item(span = { GridItemSpan(maxLineSpan) }, key = "bottomSpace") { BottomSpace(paddingValues) }
                                 }
+                                item(span = { GridItemSpan(maxLineSpan) }, key = "loadMore") {
+                                    if (itemsState.isNotEmpty() && !imagesVM.noMore.value) {
+                                        LaunchedEffect(Unit) { scope.launch(Dispatchers.Default) { imagesVM.moreAsync(tagsVM) } }
+                                    }
+                                    LoadMoreRefreshContent(imagesVM.noMore.value)
+                                }
+                                item(span = { GridItemSpan(maxLineSpan) }, key = "bottomSpace") { BottomSpace(paddingValues) }
                             }
-                        } else {
-                            NoDataColumn(loading = imagesVM.showLoading.value, search = imagesVM.showSearchBar.value)
                         }
+                    } else {
+                        NoDataColumn(loading = imagesVM.showLoading.value, search = imagesVM.showSearchBar.value)
                     }
                 }
             }

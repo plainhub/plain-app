@@ -131,7 +131,7 @@ fun FilesPage(
             scrollBehavior = scrollBehavior,
             title = title,
             subtitle = subtitle,
-            navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else PIconButton(icon = if (drawerState.isOpen) Res.drawable.left_panel_close else Res.drawable.left_panel_open, contentDescription = stringResource(Res.string.folders), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
+            navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else PIconButton(icon = Res.drawable.left_panel_open, contentDescription = stringResource(Res.string.folders), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
             actions = {
                 if (!filesVM.selectMode.value) {
                     ActionButtonSearch { filesVM.enterSearchMode() }

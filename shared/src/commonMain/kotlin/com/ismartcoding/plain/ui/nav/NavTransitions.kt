@@ -15,20 +15,30 @@ import androidx.compose.animation.slideOutVertically
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
+import kotlin.reflect.KClass
 
 private const val PUSH_DURATION = 300
 private const val PUSH_FADE_DURATION = 150
 private const val PRESENT_DURATION = 300
 
 /**
- * 导航转场由页面左上角图标决定：
- * PUSH —— 有返回箭头的页面，水平方向推入/推出；
- * PRESENT —— 有关闭按钮的页面（模态呈现），垂直方向升起/落下，进出互为反向。
+ * 以模态方式呈现的路由集合：这些页面从底部垂直升起/落下，其余页面左右水平推入/推出。
+ * 拥有文件夹抽屉的媒体详情页（Images/Audio/Videos/Docs）与 [Routing.Files] 保持一致的转场。
  *
  * 层级关系由 NavHost 管理：push 的页面盖在栈上方，pop 时退出的页面绘制在最上层，
  * 因此 PRESENT 页面升降时下方页面保持静止（[EnterTransition.None]/[ExitTransition.None]）。
  */
-private fun NavDestination.isPresented() = hasRoute<Routing.Files>() || hasRoute<Routing.ChatText>()
+private val PRESENTED_ROUTES: Set<KClass<out Any>> = setOf(
+    Routing.Files::class,
+    Routing.ChatText::class,
+    Routing.Images::class,
+    Routing.Audio::class,
+    Routing.Videos::class,
+    Routing.Docs::class,
+)
+
+/** 当前目的地是否为模态呈现 */
+private fun NavDestination.isPresented(): Boolean = PRESENTED_ROUTES.any { hasRoute(it) }
 
 /** 目标页面为模态呈现（垂直升起） */
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.presenting() = targetState.destination.isPresented()

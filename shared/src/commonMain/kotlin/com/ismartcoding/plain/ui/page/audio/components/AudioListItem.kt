@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 fun AudioListItem(
     item: DAudio, audioVM: AudioViewModel, audioPlaylistVM: AudioPlaylistViewModel,
     tagsVM: TagsViewModel, castVM: CastViewModel, tags: List<DTag>,
-    pagerState: PagerState, dragSelectState: DragSelectState,
+    dragSelectState: DragSelectState,
     isCurrentlyPlaying: Boolean = false, isInPlaylist: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
@@ -108,8 +108,12 @@ fun AudioListItem(
                                     .padding(end = 8.dp)
                                     .clickable {
                                         if (dragSelectState.selectMode) return@clickable
-                                        val idx = tagsVM.itemsFlow.value.indexOfFirst { it.id == tag.id }
-                                        if (idx != -1) scope.launch { pagerState.scrollToPage(idx + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1) }
+                                        audioVM.trash.value = false
+                                        audioVM.bucketId.value = ""
+                                        audioVM.tag.value = tag
+                                        scope.launch(Dispatchers.Default) {
+                                            audioVM.loadAsync(tagsVM)
+                                        }
                                     },
                                 style = MaterialTheme.typography.listItemTag(),
                             )

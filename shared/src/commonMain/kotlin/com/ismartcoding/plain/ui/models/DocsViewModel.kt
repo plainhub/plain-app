@@ -19,6 +19,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 class DocsViewModel : BaseMediaViewModel<DDoc>() {
     override val dataType = DataType.DOC
+    override val showFoldersAsList = true
     val scrollStateMap = mutableStateMapOf<Int, LazyListState>()
     val fileType = mutableStateOf("")
     var tabsShowTags = mutableStateOf(false)

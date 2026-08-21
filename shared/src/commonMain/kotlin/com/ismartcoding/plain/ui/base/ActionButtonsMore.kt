@@ -46,16 +46,6 @@ fun ActionButtonFolders(onClick: () -> Unit) {
 }
 
 @Composable
-fun ActionButtonCast(onClick: () -> Unit) {
-    PIconButton(
-        icon = Res.drawable.cast,
-        contentDescription = stringResource(Res.string.cast),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-@Composable
 fun ActionButtonInfo(contentDescription: String, onClick: () -> Unit) {
     PIconButton(
         icon = Res.drawable.info,

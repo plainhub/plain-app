@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 internal fun ColumnScope.AudioPageList(
-    pagerState: PagerState, scrollBehavior: TopAppBarScrollBehavior,
+    scrollBehavior: TopAppBarScrollBehavior,
     dragSelectState: DragSelectState, itemsState: List<DAudio>,
     audioVM: AudioViewModel, audioPlaylistVM: AudioPlaylistViewModel,
     tagsVM: TagsViewModel, castVM: CastViewModel,
@@ -51,42 +51,36 @@ internal fun ColumnScope.AudioPageList(
     topRefreshLayoutState: RefreshLayoutState, paddingValues: PaddingValues,
 ) {
     val scope = rememberCoroutineScope()
-    if (pagerState.pageCount == 0) {
-        NoDataColumn(loading = audioVM.showLoading.value, search = audioVM.showSearchBar.value)
-        return
-    }
-    HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { index ->
-        PullToRefresh(refreshLayoutState = topRefreshLayoutState, userEnable = !dragSelectState.selectMode) {
-            AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                if (itemsState.isNotEmpty()) {
-                    val scrollState = rememberLazyListState()
-                    audioVM.scrollStateMap[index] = scrollState
-                    LazyColumnScrollbar(state = scrollState) {
-                        LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
-                            .listDragSelect(items = itemsState, state = dragSelectState), state = scrollState) {
-                            item { TopSpace() }
-                            items(items = itemsState, key = { it.id }) { item ->
-                                val tags = audioTagsMap[item.id] ?: emptyList()
-                                AudioListItem(item = item, audioVM = audioVM, audioPlaylistVM, tagsVM = tagsVM,
-                                    castVM = castVM, tags = tags, pagerState = pagerState, dragSelectState = dragSelectState,
-                                    isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                                    isInPlaylist = audioPlaylistVM.isInPlaylist(item.path))
-                                VerticalSpace(dp = 8.dp)
-                            }
-                            item(key = "loadMore") {
-                                if (itemsState.isNotEmpty() && !audioVM.noMore.value) {
-                                    LaunchedEffect(Unit) {
-                                        scope.launch(Dispatchers.Default) { audioVM.moreAsync(tagsVM) }
-                                    }
-                                }
-                                LoadMoreRefreshContent(audioVM.noMore.value)
-                            }
-                            item(key = "bottomSpace") { BottomSpace(paddingValues) }
+
+    PullToRefresh(refreshLayoutState = topRefreshLayoutState, userEnable = !dragSelectState.selectMode, modifier = Modifier.weight(1f)) {
+        AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+            if (itemsState.isNotEmpty()) {
+                val scrollState = audioVM.scrollStateMap[0] ?: rememberLazyListState()
+                LazyColumnScrollbar(state = scrollState) {
+                    LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
+                        .listDragSelect(items = itemsState, state = dragSelectState), state = scrollState) {
+                        item { TopSpace() }
+                        items(items = itemsState, key = { it.id }) { item ->
+                            val tags = audioTagsMap[item.id] ?: emptyList()
+                            AudioListItem(item = item, audioVM = audioVM, audioPlaylistVM, tagsVM = tagsVM,
+                                castVM = castVM, tags = tags, dragSelectState = dragSelectState,
+                                isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
+                                isInPlaylist = audioPlaylistVM.isInPlaylist(item.path))
+                            VerticalSpace(dp = 8.dp)
                         }
+                        item(key = "loadMore") {
+                            if (itemsState.isNotEmpty() && !audioVM.noMore.value) {
+                                LaunchedEffect(Unit) {
+                                    scope.launch(Dispatchers.Default) { audioVM.moreAsync(tagsVM) }
+                                }
+                            }
+                            LoadMoreRefreshContent(audioVM.noMore.value)
+                        }
+                        item(key = "bottomSpace") { BottomSpace(paddingValues) }
                     }
-                } else {
-                    NoDataColumn(loading = audioVM.showLoading.value, search = audioVM.showSearchBar.value)
                 }
+            } else {
+                NoDataColumn(loading = audioVM.showLoading.value, search = audioVM.showSearchBar.value)
             }
         }
     }
