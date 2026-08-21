@@ -36,10 +36,11 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.presenting() = tar
 /** 初始页面为模态呈现（垂直落下） */
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.dismissing() = initialState.destination.isPresented()
 
-/** 进入：模态页面从底部升起，普通页面从右侧推入 */
+/** 进入：模态页面从底部升起（渐显），普通页面从右侧推入 */
 fun AnimatedContentTransitionScope<NavBackStackEntry>.navEnterTransition(): EnterTransition =
     if (presenting()) {
-        slideInVertically(tween(PRESENT_DURATION, easing = LinearOutSlowInEasing)) { it }
+        slideInVertically(tween(PRESENT_DURATION, easing = LinearOutSlowInEasing)) { it } +
+            fadeIn(tween(PRESENT_DURATION, easing = LinearOutSlowInEasing))
     } else {
         slideInHorizontally(tween(PUSH_DURATION, easing = LinearOutSlowInEasing)) { it } +
             fadeIn(tween(PUSH_FADE_DURATION, 50, easing = LinearOutSlowInEasing))
@@ -57,10 +58,11 @@ fun AnimatedContentTransitionScope<NavBackStackEntry>.navPopEnterTransition(): E
     else slideInHorizontally(tween(PUSH_DURATION, easing = LinearOutSlowInEasing)) { -it / 3 } +
         fadeIn(tween(PUSH_FADE_DURATION, 50, easing = LinearOutSlowInEasing))
 
-/** pop 退出：模态页面向底部落下，普通页面滑向右侧 */
+/** pop 退出：模态页面向底部落下（渐隐），普通页面滑向右侧 */
 fun AnimatedContentTransitionScope<NavBackStackEntry>.navPopExitTransition(): ExitTransition =
     if (dismissing()) {
-        slideOutVertically(tween(PRESENT_DURATION, easing = FastOutLinearInEasing)) { it }
+        slideOutVertically(tween(PRESENT_DURATION, easing = FastOutLinearInEasing)) { it } +
+            fadeOut(tween(PRESENT_DURATION, easing = FastOutLinearInEasing))
     } else {
         slideOutHorizontally(tween(PUSH_DURATION, easing = FastOutLinearInEasing)) { it } +
             fadeOut(tween(PUSH_FADE_DURATION, easing = FastOutLinearInEasing))
