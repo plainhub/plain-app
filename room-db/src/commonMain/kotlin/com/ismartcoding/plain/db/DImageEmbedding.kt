@@ -7,7 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 
 @Entity(tableName = "image_embeddings")
 data class DImageEmbedding(

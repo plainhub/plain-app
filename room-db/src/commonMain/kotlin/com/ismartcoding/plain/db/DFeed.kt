@@ -10,8 +10,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.RoomRawQuery
 import androidx.room.Update
-import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.helpers.generateId
+import com.ismartcoding.plain.lib.generateId
 
 @Entity(
     tableName = "feeds",

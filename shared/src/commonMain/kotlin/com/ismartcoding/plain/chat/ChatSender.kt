@@ -11,6 +11,7 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getRecipientIds
 import com.ismartcoding.plain.lib.logcat.LogCat
 
 object ChatSender {

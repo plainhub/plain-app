@@ -7,10 +7,9 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
-import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.helpers.generateId
+import com.ismartcoding.plain.lib.generateId
 import kotlin.time.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json

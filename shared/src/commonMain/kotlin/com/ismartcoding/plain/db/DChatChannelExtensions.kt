@@ -8,8 +8,27 @@ import com.ismartcoding.plain.platform.verifyEd25519Signature
 import com.ismartcoding.plain.platform.getDeviceIP4s
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerCacher
+import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.SignatureHelper
+
+fun ChannelMember.isMe(): Boolean = id == TempData.clientId
+
+fun DChatChannel.isOwnedByMe(): Boolean {
+    return owner == "me" || owner == TempData.clientId
+}
+
+fun DChatChannel.canLeave(): Boolean = !isOwnedByMe() && isJoined()
+
+fun DChatChannel.canDeleteFromThisDevice(): Boolean =
+    isOwnedByMe() || status == ChatChannelStatus.LEFT || status == ChatChannelStatus.KICKED
+
+fun DChatChannel.getRecipientIds(): List<String> {
+    return joinedMembers()
+        .map { it.id }
+        .distinct()
+        .filter { it != TempData.clientId }
+}
 
 suspend fun DChatChannel.getPeersAsync(): List<DPeer> = withIO {
     val ids = memberIds()

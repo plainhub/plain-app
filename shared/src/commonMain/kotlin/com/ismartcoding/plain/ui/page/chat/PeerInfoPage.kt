@@ -23,6 +23,7 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.getText
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PCard

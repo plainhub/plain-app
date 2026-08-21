@@ -17,6 +17,7 @@ import com.ismartcoding.plain.enums.BadgeType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DiscoveryMethod
+import com.ismartcoding.plain.enums.getIcon
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton

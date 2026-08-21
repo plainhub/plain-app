@@ -149,7 +149,7 @@ object MasterSecretPreference : BasePreference<String>() {
 
     /** Returns the per-install 32-byte master secret (base64), generating and persisting it on first use. */
     suspend fun ensureValueAsync(): String {
-        getAsync()?.takeIf { it.isNotEmpty() }?.let { return it }
+        getAsync().takeIf { it.isNotEmpty() }?.let { return it }
         val generated = com.ismartcoding.plain.platform.generateChaCha20Key()
         putAsync(generated)
         return generated

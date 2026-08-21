@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.data
+package com.ismartcoding.plain.db
 
 interface IData {
     var id: String

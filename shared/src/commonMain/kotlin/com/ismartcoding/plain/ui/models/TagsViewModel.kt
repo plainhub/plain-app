@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation

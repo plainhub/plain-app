@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.media.CastPlayer

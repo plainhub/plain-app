@@ -24,6 +24,7 @@ import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelInviteDe
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelKick
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelLeave
 import com.ismartcoding.plain.chat.channel.ChannelSystemMessages.ChannelUpdate
+import com.ismartcoding.plain.db.isOwnedByMe
 
 object ChannelSystemMessageReceiver {
 

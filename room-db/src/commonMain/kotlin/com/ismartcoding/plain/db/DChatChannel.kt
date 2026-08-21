@@ -7,10 +7,9 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.ChannelMemberStatus
-import com.ismartcoding.plain.helpers.generateId
+import com.ismartcoding.plain.lib.generateId
 import kotlinx.serialization.Serializable
 
 /** A channel member: peer id + membership status.
@@ -23,7 +22,6 @@ data class ChannelMember(
 ) {
     fun isJoined(): Boolean = status == ChannelMemberStatus.JOINED
     fun isPending(): Boolean = status == ChannelMemberStatus.PENDING
-    fun isMe(): Boolean = id == TempData.clientId
 }
 
 @Entity(tableName = "chat_channels")
@@ -59,15 +57,6 @@ data class DChatChannel(
 
     fun isJoined(): Boolean = status == ChatChannelStatus.JOINED
 
-    fun isOwnedByMe(): Boolean {
-        return owner == "me" || owner == TempData.clientId
-    }
-
-    fun canLeave(): Boolean = !isOwnedByMe() && isJoined()
-
-    fun canDeleteFromThisDevice(): Boolean =
-        isOwnedByMe() || status == ChatChannelStatus.LEFT || status == ChatChannelStatus.KICKED
-
     /**
      * Elect a leader for this channel from the joined members.
      *
@@ -96,17 +85,6 @@ data class DChatChannel(
     /** Check whether this device is currently the channel leader. */
     fun isLeader(onlinePeerIds: Set<String>, myId: String): Boolean {
         return electLeader(onlinePeerIds, myId) == myId
-    }
-
-    /**
-     * Compute the list of peer IDs that should receive a channel message (everyone except self).
-     * Only includes joined members.
-     */
-    fun getRecipientIds(): List<String> {
-        return joinedMembers()
-            .map { it.id }
-            .distinct()
-            .filter { it != TempData.clientId }
     }
 }
 

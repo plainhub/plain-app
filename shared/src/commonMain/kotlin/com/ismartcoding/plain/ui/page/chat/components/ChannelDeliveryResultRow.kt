@@ -61,7 +61,7 @@ internal fun ChannelDeliveryResultRow(
             )
             if (!isSuccess) {
                 Text(
-                    text = result.error,
+                    text = result.error ?: "",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                     maxLines = 2,

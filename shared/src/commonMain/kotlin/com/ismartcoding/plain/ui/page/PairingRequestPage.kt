@@ -35,6 +35,7 @@ import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.discover.PairingResponder
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.enums.getIcon
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem

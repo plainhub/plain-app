@@ -11,6 +11,7 @@ import com.ismartcoding.plain.enums.BadgeType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.getIcon
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.cancel
 import com.ismartcoding.plain.i18n.channel_creator

@@ -13,7 +13,7 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.toIntRect
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 

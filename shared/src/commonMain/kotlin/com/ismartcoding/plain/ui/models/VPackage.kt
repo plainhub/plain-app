@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import com.ismartcoding.plain.data.DCertificate
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.enums.PackageType
 import kotlin.time.Instant
 

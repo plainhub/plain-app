@@ -18,7 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.ui.base.ActionButtonRefresh
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar

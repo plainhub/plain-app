@@ -21,6 +21,7 @@ import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.db.getBestIp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.getIcon
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.StartNearbyServiceEvent

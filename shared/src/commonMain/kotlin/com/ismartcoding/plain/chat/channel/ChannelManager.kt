@@ -10,6 +10,7 @@ import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getOwner
+import com.ismartcoding.plain.db.isOwnedByMe
 import com.ismartcoding.plain.enums.ChannelMemberStatus
 import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.events.EventType

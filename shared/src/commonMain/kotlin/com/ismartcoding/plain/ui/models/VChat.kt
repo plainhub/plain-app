@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.MessageType

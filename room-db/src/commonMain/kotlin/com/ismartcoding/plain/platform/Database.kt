@@ -125,7 +125,12 @@ fun initDatabase(db: AppDatabase) {
  * KSP generates the `actual object` for each platform.
  */
 @Suppress("NO_ACTUAL_FOR_EXPECT")
-expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase>
+expect object AppDatabaseConstructor : RoomDatabaseConstructor<AppDatabase> {
+    // K2 metadata compiler requires the expect to declare the member that the
+    // commonMain RoomDatabaseConstructor interface leaves abstract. The KSP-
+    // generated actual provides the real implementation.
+    override fun initialize(): AppDatabase
+}
 
 /**
  * Platform-specific database builder factory. The Android actual uses

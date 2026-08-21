@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.sms
 
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import kotlin.time.Instant
 
 data class DMessage(

@@ -3,6 +3,9 @@ package com.ismartcoding.plain.platform
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSUserDomainMask
 
 /**
  * iOS actual: builds the [AppDatabase] using the Room KMP API with
@@ -12,6 +15,9 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
  * All other database logic (entities, DAOs, auto-migrations, data
  * initializer) lives in commonMain.
  */
+private fun databaseFilePath(name: String): String =
+    NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)[0] as String + "/" + name
+
 actual fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase> {
     return Room.databaseBuilder<AppDatabase>(
         name = databaseFilePath(name),

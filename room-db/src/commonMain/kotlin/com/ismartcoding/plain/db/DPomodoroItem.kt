@@ -8,8 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
-import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.helpers.generateId
+import com.ismartcoding.plain.lib.generateId
 
 @Entity(tableName = "pomodoro_items")
 data class DPomodoroItem(

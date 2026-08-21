@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 
 
 @Suppress("MemberVisibilityCanBePrivate")

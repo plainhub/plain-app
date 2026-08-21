@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.devtools.ksp)
     kotlin("plugin.parcelize")
-    id("androidx.room")
 }
 
 // Dev-only single-target mode: pass -PenableDeviceTarget=false to skip
@@ -54,6 +53,10 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":shared-lib"))
+            // Room database module. Exposes AppDatabase, DAOs, entities and the
+            // Room runtime so the rest of :shared can reference them without
+            // triggering the Room KSP here.
+            api(project(":room-db"))
             implementation(libs.runtime)
             implementation(libs.foundation)
             implementation(libs.material3)
@@ -170,14 +173,7 @@ kotlin {
     }
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
-}
-
 dependencies {
-    add("kspAndroid", libs.room.compiler)
-    if (enableDeviceTarget) add("kspIosArm64", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
     // KGraphQL KSP2 processor — generates reflection-free schema descriptors.
     // Uses expect/actual pattern: commonMain declares expect, each platform's
     // KSP generates the actual + descriptor objects. No kspCommonMainMetadata

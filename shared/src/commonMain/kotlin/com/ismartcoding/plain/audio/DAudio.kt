@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.audio
 
 import com.ismartcoding.plain.lib.extensions.formatDuration
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.data.IItemMetadata
-import com.ismartcoding.plain.data.IMedia
+import com.ismartcoding.plain.db.IMedia
 import kotlin.time.Instant
 
 data class DAudio(

@@ -20,6 +20,7 @@ import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.enums.getIcon
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.bot
 import com.ismartcoding.plain.i18n.channel_members

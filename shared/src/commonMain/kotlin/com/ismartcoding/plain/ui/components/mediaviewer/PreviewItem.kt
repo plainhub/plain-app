@@ -6,7 +6,7 @@ import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
-import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.platform.getImageIntrinsicSize
 import com.ismartcoding.plain.platform.getImageRotation

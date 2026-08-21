@@ -10,6 +10,7 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.getRecipientIds
 import com.ismartcoding.plain.db.toPeerMessageContent
 
 object ChannelChatSender {

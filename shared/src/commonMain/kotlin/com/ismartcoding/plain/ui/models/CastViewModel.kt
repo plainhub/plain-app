@@ -11,7 +11,7 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.features.dlna.sender.DlnaDeviceScanner
-import com.ismartcoding.plain.data.IMedia
+import com.ismartcoding.plain.db.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper

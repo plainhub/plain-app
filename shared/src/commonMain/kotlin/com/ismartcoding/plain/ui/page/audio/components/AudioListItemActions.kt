@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.material3.MaterialTheme
 import com.ismartcoding.plain.audio.DAudio
-import com.ismartcoding.plain.data.IMedia
+import com.ismartcoding.plain.db.IMedia
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.theme.red
 import kotlinx.coroutines.Dispatchers

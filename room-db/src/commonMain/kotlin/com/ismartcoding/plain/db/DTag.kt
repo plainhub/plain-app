@@ -6,8 +6,7 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
-import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.helpers.generateId
+import com.ismartcoding.plain.lib.generateId
 
 @Entity(tableName = "tags")
 data class DTag(
