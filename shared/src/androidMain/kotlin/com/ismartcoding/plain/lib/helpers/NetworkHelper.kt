@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.lib.helpers
 
+import com.ismartcoding.plain.platform.bestLanIp
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -96,18 +97,6 @@ object NetworkHelper {
             ex.printStackTrace()
         }
         return result
-    }
-
-    fun getBestIp(ips: List<String>): String {
-        if (ips.isEmpty()) return ""
-        if (ips.size == 1) return ips[0]
-        val localInterfaces = getDeviceIP4sWithPrefixLength()
-        for (ip in ips) {
-            if (localInterfaces.any { (localIp, prefixLen) -> isSameSubnet(ip, localIp, prefixLen) }) {
-                return ip
-            }
-        }
-        return ips[0]
     }
 
     private fun isSameSubnet(ip1: String, ip2: String, prefixLength: Short): Boolean {

@@ -16,7 +16,7 @@ expect fun getDeviceIP4(): String
  * Returns the best IP address from [ips] — preferring one on the same subnet
  * as a local interface. Returns empty string if [ips] is empty.
  */
-expect fun getBestIp(ips: List<String>): String
+fun getBestIp(ips: List<String>): String = bestLanIp(ips, getDeviceIP4sWithPrefixLength())
 
 expect fun getDeviceIP4sWithPrefixLength(): Set<Pair<String, Short>>
 
@@ -44,4 +44,21 @@ fun isSameSubnet(ip1: String, ip2: String, prefixLength: Short): Boolean {
     } catch (e: Exception) {
         false
     }
+}
+
+fun isLanAddress(ip: String): Boolean {
+    if (ip.startsWith("127.")) return false
+    return ip.startsWith("10.") ||
+        ip.startsWith("192.168.") ||
+        Regex("""172\.(1[6-9]|2[0-9]|3[0-1])\.""").containsMatchIn(ip)
+}
+
+fun bestLanIp(ips: List<String>, localPrefixes: Set<Pair<String, Short>>): String {
+    if (ips.isEmpty()) return ""
+    for (ip in ips) {
+        if (localPrefixes.any { (localIp, prefixLength) -> isSameSubnet(ip, localIp, prefixLength) }) {
+            return ip
+        }
+    }
+    return ips.firstOrNull { isLanAddress(it) } ?: ips[0]
 }

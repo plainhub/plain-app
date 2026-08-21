@@ -30,16 +30,6 @@ actual fun getDeviceIP4(): String {
     return ips.firstOrNull { !it.startsWith("127.") } ?: ""
 }
 
-actual fun getBestIp(ips: List<String>): String {
-    if (ips.isEmpty()) return ""
-    val local = getDeviceIP4s().filter { !it.startsWith("127.") }
-    for (ip in ips) {
-        val match = local.firstOrNull { isSameSubnet(it, ip, 24) }
-        if (match != null) return match
-    }
-    return ips.first()
-}
-
 actual fun getDeviceIP4sWithPrefixLength(): Set<Pair<String, Short>> {
     val ips = getDeviceIP4s().filter { !it.startsWith("127.") }
     return ips.map { it to 24.toShort() }.toSet()

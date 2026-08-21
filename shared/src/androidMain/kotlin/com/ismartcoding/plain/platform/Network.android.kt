@@ -22,7 +22,6 @@ actual fun getNetworkType(): NetworkType {
 
 actual fun getDeviceIP4(): String = NetworkHelper.getDeviceIP4()
 
-actual fun getBestIp(ips: List<String>): String = NetworkHelper.getBestIp(ips)
 
 actual fun getDeviceIP4sWithPrefixLength(): Set<Pair<String, Short>> {
     return NetworkHelper.getDeviceIP4sWithPrefixLength()
