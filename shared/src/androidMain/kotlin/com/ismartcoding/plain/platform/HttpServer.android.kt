@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.platform
 
 import android.content.Intent
+import android.net.Uri
 import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
@@ -10,6 +11,7 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.NsdHelper
+import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.httpserver.HttpServerManager
@@ -17,6 +19,8 @@ import com.ismartcoding.plain.httpserver.createHttpServerAsync
 import com.ismartcoding.plain.httpserver.generateSslKeyStoreFile
 import com.ismartcoding.plain.httpserver.getSslSignatureBytes
 import com.ismartcoding.plain.httpserver.httpServer
+import com.ismartcoding.plain.httpserver.replaceSslKeyStoreBytes
+import com.ismartcoding.plain.httpserver.replaceSslKeyStoreFromPem
 import kotlinx.coroutines.delay
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -27,6 +31,35 @@ actual fun getSSLSignature(password: String): ByteArray =
 actual fun generateSSLKeyStore(password: String) {
     generateSslKeyStoreFile(File(appContext.filesDir, Constants.KEY_STORE_FILE_NAME), password)
 }
+
+actual suspend fun replaceSSLKeyStoreAsync(
+    mode: SslCertImportMode,
+    firstUri: String,
+    secondUri: String,
+    password: String,
+): ByteArray = withIO {
+    val file = File(appContext.filesDir, Constants.KEY_STORE_FILE_NAME)
+    val keystorePassword = KeyStorePasswordPreference.getAsync()
+    when (mode) {
+        SslCertImportMode.PKCS12 -> {
+            val bytes = readUriBytes(firstUri)
+            replaceSslKeyStoreBytes(file, bytes, password, keystorePassword)
+        }
+        SslCertImportMode.PEM -> {
+            val certPem = readUriText(firstUri)
+            val keyPem = readUriText(secondUri)
+            replaceSslKeyStoreFromPem(file, certPem, keyPem, keystorePassword)
+        }
+    }
+}
+
+private fun readUriBytes(uriStr: String): ByteArray {
+    val uri = Uri.parse(uriStr)
+    return appContext.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        ?: throw IllegalStateException("Failed to read the selected file")
+}
+
+private fun readUriText(uriStr: String): String = readUriBytes(uriStr).toString(Charsets.UTF_8)
 
 /**
  * Android engine start: create the Ktor/Netty embedded server, bind the

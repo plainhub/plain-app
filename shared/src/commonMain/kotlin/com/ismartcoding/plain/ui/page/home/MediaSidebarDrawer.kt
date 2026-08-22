@@ -29,6 +29,7 @@ import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.MediaSidebarBucketItem
 import com.ismartcoding.plain.ui.components.MediaSidebarTagItem
@@ -220,6 +221,7 @@ fun <T : IData> MediaSidebarDrawer(
                 )
             }
         }
+        BottomSpace()
     }
 
     TagNameDialog(tagsVM) {

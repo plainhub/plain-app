@@ -34,6 +34,9 @@ class Routing {
     object WebSecurity
 
     @Serializable
+    object ReplaceSslCertificate
+
+    @Serializable
     object HowToUse
 
     @Serializable

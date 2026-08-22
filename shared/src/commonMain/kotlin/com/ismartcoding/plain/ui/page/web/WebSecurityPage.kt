@@ -46,6 +46,7 @@ import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -146,6 +147,13 @@ fun WebSecurityPage(navController: NavHostController) {
                                     }
                                 }
                             })
+                        VerticalSpace(dp = 16.dp)
+                        PFilledButton(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            text = stringResource(Res.string.replace_ssl_certificate),
+                            onClick = { navController.navigate(Routing.ReplaceSslCertificate) })
                         VerticalSpace(dp = 24.dp)
                         Subtitle(text = stringResource(Res.string.url_token))
                         ClipboardCard(label = stringResource(Res.string.url_token), text = urlToken)

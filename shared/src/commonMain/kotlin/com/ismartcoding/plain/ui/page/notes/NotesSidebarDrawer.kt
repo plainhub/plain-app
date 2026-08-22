@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.IODispatcher
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.MediaSidebarTagItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
@@ -122,6 +123,7 @@ fun NotesSidebarDrawer(
                 )
             }
         }
+        BottomSpace()
     }
 
     TagNameDialog(tagsVM) {

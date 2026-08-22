@@ -15,4 +15,7 @@ enum class PickFileTag {
     BOOK,
     RESTORE,
     POMODORO,
+    SSL_CERT,
+    SSL_CERT_PEM,
+    SSL_KEY_PEM,
 }

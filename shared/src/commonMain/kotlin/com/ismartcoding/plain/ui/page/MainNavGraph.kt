@@ -97,6 +97,7 @@ import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.web.HowToUsePage
 import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
+import com.ismartcoding.plain.ui.page.web.ReplaceSslCertificatePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.web.DesktopAccessSettingsPage
 
@@ -173,6 +174,7 @@ fun MainNavGraph(
             })
         }
         composable<Routing.WebSecurity> { WebSecurityPage(navController) }
+        composable<Routing.ReplaceSslCertificate> { ReplaceSslCertificatePage(navController) }
         composable<Routing.Chat> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Chat>()
             ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM, r.id)

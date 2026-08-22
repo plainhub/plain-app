@@ -36,6 +36,36 @@ expect fun getSSLSignature(password: String): ByteArray
 expect fun generateSSLKeyStore(password: String)
 
 /**
+ * Source format of a user-provided SSL certificate for [replaceSSLKeyStoreAsync].
+ */
+enum class SslCertImportMode {
+    /** Single PKCS#12 bundle (.p12/.pfx) + its password. */
+    PKCS12,
+
+    /** Two separate PEM files: certificate (CRT/PEM) + private key (KEY/PEM). */
+    PEM,
+}
+
+/**
+ * Replace the HTTPS keystore with a user-provided certificate.
+ *
+ * @param mode import format; see [SslCertImportMode]
+ * @param firstUri URI of the picked file. For [SslCertImportMode.PKCS12] this is
+ *        the PKCS#12 bundle; for [SslCertImportMode.PEM] it is the certificate file.
+ * @param secondUri URI of the picked private key file (PEM mode only; ignored otherwise).
+ * @param password password of the PKCS#12 bundle (PKCS12 mode only; ignored otherwise).
+ * @return the raw signature bytes of the newly installed certificate
+ * @throws Exception when the file cannot be read or parsed, the password is wrong,
+ *         or no usable private key is found
+ */
+expect suspend fun replaceSSLKeyStoreAsync(
+    mode: SslCertImportMode,
+    firstUri: String,
+    secondUri: String = "",
+    password: String = "",
+): ByteArray
+
+/**
  * Reset the web console password to a new random value and persist it.
  * @return the new password
  */

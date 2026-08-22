@@ -1,4 +1,5 @@
 import Foundation
+import Security
 import CryptoKit
 import NIOSSL
 import PlainShared
@@ -13,6 +14,11 @@ import PlainShared
 ///
 /// The certificate is regenerated only when the user explicitly presses
 /// "Regenerate SSL" in the Web Security page (Kotlin calls `regenerateCert`).
+///
+/// User-provided certificates (PKCS#12 bundles or PEM cert+key pairs) are
+/// imported via Security.framework and stored in the same Keychain slots
+/// (cert DER + PKCS#8 private key DER), so `makeTLSConfiguration` works
+/// unchanged.
 final class SslCertManager: NSObject, IosSslCertProvider {
 
     private let certKeychainKey = "com.ismartcoding.plain.ssl.cert.der"
@@ -35,6 +41,55 @@ final class SslCertManager: NSObject, IosSslCertProvider {
         deleteFromKeychain(key: privateKeyKeychainKey)
         let (_, signature) = generateAndStoreCert()
         return Self.toKotlinByteArray(signature)
+    }
+
+    func replaceCertWithPkcs12(p12Data: KotlinByteArray, password: String) throws -> KotlinByteArray {
+        let data = p12Data.toNSData() as Data
+        guard !data.isEmpty else {
+            throw Self.error("Invalid certificate file")
+        }
+        let options: [String: Any] = [kSecImportExportPassphrase as String: password]
+        var rawItems: CFArray?
+        let status = SecPKCS12Import(data as CFData, options as CFDictionary, &rawItems)
+        guard status == errSecSuccess else {
+            throw Self.error(status == errSecAuthFailed ? "Wrong password" : "Invalid certificate file")
+        }
+        guard let items = rawItems as? [[String: Any]],
+              let first = items.first,
+              let identity = first[kSecImportItemIdentity as String] as? SecIdentity else {
+            throw Self.error("No private key found in the certificate file")
+        }
+        return try storeIdentity(identity)
+    }
+
+    func replaceCertWithPem(certPem: String, keyPem: String) throws -> KotlinByteArray {
+        guard let certDer = Self.pemDERBlock(certPem, type: "CERTIFICATE"),
+              let cert = SecCertificateCreateWithData(nil, certDer as CFData) else {
+            throw Self.error("Invalid certificate file")
+        }
+        // SecItemImport handles all common PEM key encodings (PKCS#8, PKCS#1 RSA,
+        // SEC1 EC) and adds the key to the default keychain so it can back a SecIdentity.
+        var format: SecExternalFormat = .formatPEMSequence
+        var itemType: SecItemClass = kSecItemTypeAggregate
+        var importedItems: CFArray?
+        let importStatus = SecItemImport(Data(keyPem.utf8) as CFData, nil, &format, &itemType, [], nil, nil, &importedItems)
+        guard importStatus == errSecSuccess, let importedItems = importedItems as? [CFTypeRef] else {
+            throw Self.error("Invalid private key")
+        }
+        var key: SecKey?
+        for item in importedItems where CFGetTypeID(item) == SecKeyGetTypeID() {
+            key = (item as! SecKey)
+            break
+        }
+        guard let key else {
+            throw Self.error("No private key found in the PEM file")
+        }
+        var identity: SecIdentity?
+        let identityStatus = SecIdentityCreateWithCertificate(nil, cert, &identity)
+        guard identityStatus == errSecSuccess, let identity else {
+            throw Self.error("Certificate and private key do not match")
+        }
+        return try storeIdentity(identity)
     }
 
     /// Build a server TLS configuration from the persisted self-signed
@@ -68,6 +123,106 @@ final class SslCertManager: NSObject, IosSslCertProvider {
             }
         }
         return array
+    }
+
+    // MARK: - User certificate import
+
+    /// Extract the certificate + private key from a `SecIdentity` (produced by
+    /// `SecPKCS12Import` or `SecIdentityCreateWithCertificate`) and persist them
+    /// in the Keychain in the same slots used by the self-signed flow.
+    private func storeIdentity(_ identity: SecIdentity) throws -> KotlinByteArray {
+        var certRef: SecCertificate?
+        guard SecIdentityCopyCertificate(identity, &certRef) == errSecSuccess, let certRef else {
+            throw Self.error("No certificate found in the certificate file")
+        }
+        let certDer = SecCertificateCopyData(certRef) as Data
+
+        var keyRef: SecKey?
+        guard SecIdentityCopyPrivateKey(identity, &keyRef) == errSecSuccess, let keyRef else {
+            throw Self.error("No private key found in the certificate file")
+        }
+        // NIOSSL loads private keys from DER as PKCS#8 (`d2i_AutoPrivateKey` also
+        // accepts PKCS#1/SEC1), so export the key in PKCS#8 format.
+        var pkcs8Out: CFData?
+        let exportStatus = SecItemExport(keyRef, .formatPKCS8, [], nil, &pkcs8Out)
+        guard exportStatus == errSecSuccess, let pkcs8Data = pkcs8Out as Data, !pkcs8Data.isEmpty else {
+            throw Self.error("Failed to export the private key")
+        }
+
+        let signature = try Self.extractSignature(fromCertDer: certDer)
+        saveToKeychain(key: certKeychainKey, data: certDer)
+        saveToKeychain(key: privateKeyKeychainKey, data: pkcs8Data)
+        saveToKeychain(key: sigKeychainKey, data: signature)
+        return Self.toKotlinByteArray(signature)
+    }
+
+    /// Extract the `signatureValue` (BIT STRING) from a DER-encoded X.509
+    /// certificate: `SEQUENCE { tbsCertificate, signatureAlgorithm, signatureValue }`.
+    private static func extractSignature(fromCertDer der: Data) throws -> Data {
+        var idx = 0
+        let outer = try readTLV(der, at: &idx)
+        guard outer.tag == 0x30 else { throw error("Invalid certificate file") }
+        let content = outer.content
+        var i = 0
+        let tbs = try readTLV(content, at: &i)
+        guard tbs.tag == 0x30 else { throw error("Invalid certificate file") }
+        let sigAlg = try readTLV(content, at: &i)
+        guard sigAlg.tag == 0x30 else { throw error("Invalid certificate file") }
+        let sig = try readTLV(content, at: &i)
+        guard sig.tag == 0x03, !sig.content.isEmpty else { throw error("Invalid certificate file") }
+        // BIT STRING payload: first byte = number of unused bits, rest = signature bytes
+        return sig.content.dropFirst()
+    }
+
+    private static func readTLV(_ data: Data, at index: inout Int) throws -> (tag: UInt8, content: Data) {
+        guard index < data.count else { throw error("Invalid certificate file") }
+        let tag = data[index]
+        index += 1
+        guard index < data.count else { throw error("Invalid certificate file") }
+        let firstLen = data[index]
+        index += 1
+        var length = 0
+        if firstLen < 0x80 {
+            length = Int(firstLen)
+        } else {
+            let numBytes = Int(firstLen & 0x7F)
+            guard numBytes > 0, numBytes <= 4, index + numBytes <= data.count else { throw error("Invalid certificate file") }
+            for _ in 0..<numBytes {
+                length = (length << 8) | Int(data[index])
+                index += 1
+            }
+        }
+        guard length >= 0, index + length <= data.count else { throw error("Invalid certificate file") }
+        let content = data.subdata(in: index..<(index + length))
+        index += length
+        return (tag, content)
+    }
+
+    /// Locate the first PEM block of [type] (e.g. "CERTIFICATE") and return its DER bytes.
+    private static func pemDERBlock(_ pem: String, type: String) -> Data? {
+        var inBlock = false
+        var base64 = ""
+        for rawLine in pem.components(separatedBy: .newlines) {
+            let line = rawLine.trimmingCharacters(in: .whitespaces)
+            if line.hasPrefix("-----BEGIN ") && line.contains(type) {
+                inBlock = true
+                continue
+            }
+            if line.hasPrefix("-----END ") {
+                inBlock = false
+                break
+            }
+            if inBlock {
+                base64 += line
+            }
+        }
+        guard !base64.isEmpty else { return nil }
+        return Data(base64Encoded: base64)
+    }
+
+    private static func error(_ message: String) -> NSError {
+        NSError(domain: "SslCertManager", code: -1,
+                userInfo: [NSLocalizedDescriptionKey: message])
     }
 
     // MARK: - Certificate generation
@@ -197,6 +352,19 @@ final class SslCertManager: NSObject, IosSslCertProvider {
             kSecAttrAccount as String: key
         ]
         SecItemDelete(query as CFDictionary)
+    }
+}
+
+// MARK: - KotlinByteArray → Data conversion
+
+private extension KotlinByteArray {
+    func toNSData() -> Data {
+        let count = Int(self.size)
+        var bytes = [UInt8](repeating: 0, count: count)
+        for i in 0..<count {
+            bytes[i] = UInt8(bitPattern: self.get(index: Int32(i)))
+        }
+        return Data(bytes)
     }
 }
 

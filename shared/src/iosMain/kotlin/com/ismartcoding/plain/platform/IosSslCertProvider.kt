@@ -23,4 +23,23 @@ interface IosSslCertProvider {
      * fresh one. Returns the new certificate's signature bytes.
      */
     fun regenerateCert(): ByteArray
+
+    /**
+     * Replace the stored certificate with the user-provided PKCS#12 bundle
+     * ([p12Data] raw file bytes, [password] bundle password). Returns the new
+     * certificate's signature bytes.
+     *
+     * @throws Exception when the bundle can't be parsed, the password is wrong,
+     *         or no private key is found.
+     */
+    fun replaceCertWithPkcs12(p12Data: ByteArray, password: String): ByteArray
+
+    /**
+     * Replace the stored certificate with the user-provided PEM certificate
+     * ([certPem]) and private key ([keyPem]). Returns the new certificate's
+     * signature bytes.
+     *
+     * @throws Exception when either PEM file is malformed or they don't match.
+     */
+    fun replaceCertWithPem(certPem: String, keyPem: String): ByteArray
 }
