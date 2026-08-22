@@ -325,12 +325,21 @@ actual suspend fun getPackageIconBytes(packageName: String): ByteArray? = null
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual suspend fun decodeImageFileToPng(path: String): ByteArray? = withIO {
     try {
+        // Cheap header sniff stays outside the UIImage decode so non-HEIF
+        // requests (e.g. every <video> playback fetch) never read the whole
+        // file or queue behind decodes — mirrors the Android implementation.
+        val fp = fopen(path, "rb") ?: return@withIO null
+        val header = ByteArray(12)
+        try {
+            val read = header.usePinned { pinned ->
+                fread(pinned.addressOf(0), 1UL, header.size.toULong(), fp)
+            }.toInt()
+            if (read < 12 || !isHeifHeader(header)) return@withIO null
+        } finally {
+            fclose(fp)
+        }
         val mgr = NSFileManager.defaultManager
-        if (!mgr.fileExistsAtPath(path)) return@withIO null
         val data = mgr.contentsAtPath(path) ?: return@withIO null
-        val bytes = data.toByteArray()
-        if (bytes.size < 12) return@withIO null
-        if (!isHeifHeader(bytes)) return@withIO null
         val image = UIImage(data = data) ?: return@withIO null
         // Cap the decoded edge like Android so huge HEIF photos don't blow up the
         // render buffer; 4096 keeps 12 MP photos pixel-exact.
