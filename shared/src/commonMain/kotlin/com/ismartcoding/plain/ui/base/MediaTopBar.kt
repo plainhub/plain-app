@@ -27,7 +27,7 @@ import com.ismartcoding.plain.ui.models.BaseMediaViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
-import com.ismartcoding.plain.ui.page.home.MediaFoldersDrawer
+import com.ismartcoding.plain.ui.page.home.MediaSidebarDrawer
 import kotlinx.coroutines.launch
 
 /**
@@ -72,7 +72,7 @@ fun <T : IData> MediaTopBar(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                MediaFoldersDrawer(
+                MediaSidebarDrawer(
                     mediaVM = mediaVM,
                     mediaFoldersVM = mediaFoldersVM,
                     tagsVM = tagsVM,

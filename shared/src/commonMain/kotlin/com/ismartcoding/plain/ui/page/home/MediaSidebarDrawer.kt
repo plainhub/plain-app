@@ -73,7 +73,7 @@ import org.jetbrains.compose.resources.stringResource
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun <T : IData> MediaFoldersDrawer(
+fun <T : IData> MediaSidebarDrawer(
     mediaVM: BaseMediaViewModel<T>,
     mediaFoldersVM: MediaFoldersViewModel,
     tagsVM: TagsViewModel,
