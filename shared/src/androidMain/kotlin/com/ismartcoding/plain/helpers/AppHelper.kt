@@ -69,7 +69,7 @@ object AppHelper {
                 val only32BitDevice = Build.SUPPORTED_64_BIT_ABIS.isEmpty()
                 val apk = if (only32BitDevice) {
                     latest.assets.firstOrNull {
-                        it.name.endsWith("-Old-Android-32bit.apk")
+                        it.name.endsWith("-Old-32bit.apk")
                     }
                 } else {
                     latest.assets.firstOrNull {

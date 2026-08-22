@@ -59,8 +59,8 @@ jobs:
         run: |
           VERSION="${{ steps.meta.outputs.version_name }}"
           echo "hashes=$(sha256sum \
-            "PlainApp-${VERSION}-64bit-Universal-Recommended.apk" \
-            "PlainApp-${VERSION}-Old-Android-32bit.apk" \
+            "PlainApp-${VERSION}-64bit-Recommended.apk" \
+            "PlainApp-${VERSION}-Old-32bit.apk" \
             "PlainApp-${VERSION}-Google-Play.aab" \
             | base64 -w0)" >> $GITHUB_OUTPUT
 
@@ -69,8 +69,8 @@ jobs:
         with:
           name: release-artifacts
           path: |
-            PlainApp-${{ steps.meta.outputs.version_name }}-64bit-Universal-Recommended.apk
-            PlainApp-${{ steps.meta.outputs.version_name }}-Old-Android-32bit.apk
+            PlainApp-${{ steps.meta.outputs.version_name }}-64bit-Recommended.apk
+            PlainApp-${{ steps.meta.outputs.version_name }}-Old-32bit.apk
             PlainApp-${{ steps.meta.outputs.version_name }}-Google-Play.aab
             mapping-github-release.txt
             mapping-google-release.txt
@@ -159,8 +159,8 @@ jobs:
             printf '%s' "https://www.virustotal.com/gui/file/$sha256/detection" > "${outprefix}.url"
             printf '%s' "$result_status" > "${outprefix}.status"
           }
-          upload_and_poll "PlainApp-${VERSION}-64bit-Universal-Recommended.apk"     /tmp/vt_default &
-          upload_and_poll "PlainApp-${VERSION}-Old-Android-32bit.apk" /tmp/vt_armv7   &
+          upload_and_poll "PlainApp-${VERSION}-64bit-Recommended.apk"     /tmp/vt_default &
+          upload_and_poll "PlainApp-${VERSION}-Old-32bit.apk" /tmp/vt_armv7   &
           upload_and_poll "PlainApp-${VERSION}-Google-Play.aab"              /tmp/vt_aab     &
           wait
           {
@@ -171,6 +171,53 @@ jobs:
             echo "aab_report=$(cat /tmp/vt_aab.url)"
             echo "aab_status=$(cat /tmp/vt_aab.status)"
           } >> $GITHUB_OUTPUT
+
+  r2-upload:
+    name: Upload Recommended APK to Cloudflare R2
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT_URL }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: release-artifacts
+
+      - name: Validate R2 configuration
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT_URL: ${{ vars.R2_ENDPOINT_URL }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT_URL R2_BUCKET; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Missing R2 configuration: ${name}"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Upload Recommended APK to R2
+        env:
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          R2_PREFIX: ${{ vars.R2_PREFIX }}
+          VERSION: ${{ needs.build.outputs.version_name }}
+        run: |
+          set -euo pipefail
+          file="PlainApp-${VERSION}-64bit-Recommended.apk"
+          dest="s3://${R2_BUCKET}/${R2_PREFIX}"
+          [[ "$dest" != */ ]] && dest="${dest}/"
+          aws --version
+          aws s3 cp "release-artifacts/$file" "$dest" --cache-control "public, max-age=31536000, immutable"
 
   release:
     needs: [build, provenance, virustotal]
@@ -199,18 +246,18 @@ jobs:
             ### VirusTotal Scan
             | File | Status | Scan Report |
             |------|--------|-------------|
-            | `PlainApp-${{ needs.build.outputs.version_name }}-64bit-Universal-Recommended.apk` | ${{ needs.virustotal.outputs.default_status }} | [View Report](${{ needs.virustotal.outputs.default_report }}) |
-            | `PlainApp-${{ needs.build.outputs.version_name }}-Old-Android-32bit.apk` | ${{ needs.virustotal.outputs.armv7_status }} | [View Report](${{ needs.virustotal.outputs.armv7_report }}) |
+            | `PlainApp-${{ needs.build.outputs.version_name }}-64bit-Recommended.apk` | ${{ needs.virustotal.outputs.default_status }} | [View Report](${{ needs.virustotal.outputs.default_report }}) |
+            | `PlainApp-${{ needs.build.outputs.version_name }}-Old-32bit.apk` | ${{ needs.virustotal.outputs.armv7_status }} | [View Report](${{ needs.virustotal.outputs.armv7_report }}) |
             | `PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab` | ${{ needs.virustotal.outputs.aab_status }} | [View Report](${{ needs.virustotal.outputs.aab_report }}) |
 
             ### SLSA Provenance (Level 3)
             The `.intoto.jsonl` file is a signed SLSA provenance document covering all release artifacts (APKs + AAB).
             Verify with [slsa-verifier](https://github.com/slsa-framework/slsa-verifier):
             ```sh
-            slsa-verifier verify-artifact PlainApp-${{ needs.build.outputs.version_name }}-64bit-Universal-Recommended.apk \
+            slsa-verifier verify-artifact PlainApp-${{ needs.build.outputs.version_name }}-64bit-Recommended.apk \
               --provenance-path ${{ needs.provenance.outputs.provenance-name }} \
               --source-uri github.com/${{ github.repository }}
             ```
           draft: true
           prerelease: false
-          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-64bit-Universal-Recommended.apk,PlainApp-${{ needs.build.outputs.version_name }}-Old-Android-32bit.apk,PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab,${{ needs.provenance.outputs.provenance-name }},mapping-github-release.txt,mapping-google-release.txt"
+          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-64bit-Recommended.apk,PlainApp-${{ needs.build.outputs.version_name }}-Old-32bit.apk,PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab,${{ needs.provenance.outputs.provenance-name }},mapping-github-release.txt,mapping-google-release.txt"
