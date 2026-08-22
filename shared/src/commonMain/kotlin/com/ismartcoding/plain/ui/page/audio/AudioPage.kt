@@ -29,7 +29,6 @@ import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.MediaTopBar
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
@@ -118,7 +117,6 @@ fun AudioPage(
                 bucketsMap = audioState.bucketsMap,
                 itemsState = itemsState,
                 scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
-                defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
                 onSortSelected = { sortBy ->
                     scope.launch(Dispatchers.Default) {
                         AudioSortByPreference.putAsync(sortBy)

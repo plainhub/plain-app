@@ -180,54 +180,56 @@ fun <T : IData> MediaFoldersDrawer(
             }
         }
 
-        // Folders Section
-        SidebarSectionHeader(
-            title = stringResource(Res.string.folders),
-            isExpanded = foldersExpanded,
-            onToggle = { foldersExpanded = !foldersExpanded },
-            onAction = null // No action for folders header yet
-        )
+        // Folders Section (hidden when the platform reports no bucket data, e.g. older Android)
+        if (buckets.isNotEmpty()) {
+            SidebarSectionHeader(
+                title = stringResource(Res.string.folders),
+                isExpanded = foldersExpanded,
+                onToggle = { foldersExpanded = !foldersExpanded },
+                onAction = null // No action for folders header yet
+            )
 
-        if (foldersExpanded) {
-            val isMedia = mediaVM.dataType == DataType.IMAGE || mediaVM.dataType == DataType.VIDEO
-            buckets.forEach { bucket ->
-                NavigationDrawerItem(
-                    label = { Text(bucket.name) },
-                    icon = {
-                        if (isMedia && bucket.topItems.isNotEmpty()) {
-                            val bitmapResult = remember(bucket.id, bucket.topItems) { mutableStateOf<Any?>(null) }
-                            LaunchedEffect(bucket.id, bucket.topItems) {
-                                bitmapResult.value = withContext(Dispatchers.Default) {
-                                    combineBitmapGrid(bucket.topItems, 100)
+            if (foldersExpanded) {
+                val isMedia = mediaVM.dataType == DataType.IMAGE || mediaVM.dataType == DataType.VIDEO
+                buckets.forEach { bucket ->
+                    NavigationDrawerItem(
+                        label = { Text(bucket.name) },
+                        icon = {
+                            if (isMedia && bucket.topItems.isNotEmpty()) {
+                                val bitmapResult = remember(bucket.id, bucket.topItems) { mutableStateOf<Any?>(null) }
+                                LaunchedEffect(bucket.id, bucket.topItems) {
+                                    bitmapResult.value = withContext(Dispatchers.Default) {
+                                        combineBitmapGrid(bucket.topItems, 100)
+                                    }
                                 }
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        ImageRequest.Builder(LocalPlatformContext.current)
+                                            .data(bitmapResult.value)
+                                            .build()
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clip(RoundedCornerShape(4.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                Icon(painterResource(Res.drawable.folder), null, modifier = Modifier.size(24.dp))
                             }
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    ImageRequest.Builder(LocalPlatformContext.current)
-                                        .data(bitmapResult.value)
-                                        .build()
-                                ),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .clip(RoundedCornerShape(4.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Icon(painterResource(Res.drawable.folder), null, modifier = Modifier.size(24.dp))
-                        }
-                    },
-                    selected = !mediaVM.trash.value && mediaVM.bucketId.value == bucket.id,
-                    onClick = {
-                        mediaVM.trash.value = false
-                        mediaVM.bucketId.value = bucket.id
-                        mediaVM.tag.value = null
-                        if (mediaVM is DocsViewModel) (mediaVM as DocsViewModel).fileType.value = ""
-                        loadMedia()
-                        scope.launch { drawerState.close() }
-                    },
-                    badge = { Text(bucket.itemCount.toString()) }
-                )
+                        },
+                        selected = !mediaVM.trash.value && mediaVM.bucketId.value == bucket.id,
+                        onClick = {
+                            mediaVM.trash.value = false
+                            mediaVM.bucketId.value = bucket.id
+                            mediaVM.tag.value = null
+                            if (mediaVM is DocsViewModel) (mediaVM as DocsViewModel).fileType.value = ""
+                            loadMedia()
+                            scope.launch { drawerState.close() }
+                        },
+                        badge = { Text(bucket.itemCount.toString()) }
+                    )
+                }
             }
         }
 

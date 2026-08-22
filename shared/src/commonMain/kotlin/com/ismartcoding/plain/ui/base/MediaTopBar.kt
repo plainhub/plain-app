@@ -15,7 +15,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.enums.DataType
@@ -51,7 +50,6 @@ fun <T : IData> MediaTopBar(
     bucketsMap: Map<String, DMediaBucket>,
     itemsState: List<T>,
     scrollToTop: () -> Unit,
-    defaultNavigationIcon: (@Composable () -> Unit)? = null,
     onSortSelected: (sortBy: FileSortBy) -> Unit = {},
     onSearchAction: (tagsViewModel: TagsViewModel) -> Unit,
     bottomBar: (@Composable () -> Unit)? = null,
@@ -73,15 +71,13 @@ fun <T : IData> MediaTopBar(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            if (isQPlus()) {
-                ModalDrawerSheet {
-                    MediaFoldersDrawer(
-                        mediaVM = mediaVM,
-                        mediaFoldersVM = mediaFoldersVM,
-                        tagsVM = tagsVM,
-                        drawerState = drawerState,
-                    )
-                }
+            ModalDrawerSheet {
+                MediaFoldersDrawer(
+                    mediaVM = mediaVM,
+                    mediaFoldersVM = mediaFoldersVM,
+                    tagsVM = tagsVM,
+                    drawerState = drawerState,
+                )
             }
         },
     ) {
@@ -103,7 +99,7 @@ fun <T : IData> MediaTopBar(
                             NavigationCloseIcon {
                                 castVM.exitCastMode()
                             }
-                        } else if (isQPlus()) {
+                        } else {
                             PIconButton(
                                 icon = Res.drawable.left_panel_open,
                                 contentDescription = stringResource(Res.string.folders),
@@ -113,8 +109,6 @@ fun <T : IData> MediaTopBar(
                                     }
                                 }
                             )
-                        } else {
-                            defaultNavigationIcon?.invoke()
                         }
                     },
                     actions = {

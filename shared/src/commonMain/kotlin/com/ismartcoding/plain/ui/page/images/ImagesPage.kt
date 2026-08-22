@@ -50,7 +50,6 @@ import com.ismartcoding.plain.preferences.ImageSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.MediaTopBar
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
@@ -191,11 +190,6 @@ fun ImagesPage(
                 scrollToTop = {
                     scope.launch {
                         scrollState.scrollToItem(0)
-                    }
-                },
-                defaultNavigationIcon = {
-                    NavigationBackIcon {
-                        navController.popBackStack()
                     }
                 },
                 onSortSelected = { sortBy ->

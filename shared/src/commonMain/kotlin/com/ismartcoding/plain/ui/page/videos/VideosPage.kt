@@ -51,7 +51,6 @@ import com.ismartcoding.plain.preferences.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.MediaTopBar
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
@@ -181,7 +180,6 @@ fun VideosPage(
                 bucketsMap = bucketsMap,
                 itemsState = itemsState,
                 scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
-                defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
                 onSortSelected = { sortBy ->
                     scope.launch(Dispatchers.Default) {
                         VideoSortByPreference.putAsync(sortBy)
