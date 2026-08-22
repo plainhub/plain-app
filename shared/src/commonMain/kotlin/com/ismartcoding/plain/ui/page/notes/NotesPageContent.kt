@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -31,7 +29,6 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshLayoutState
 import com.ismartcoding.plain.ui.components.NoteListItem
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.models.VTabData
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.platform.IODispatcher
@@ -43,16 +40,14 @@ import kotlinx.coroutines.launch
 internal fun NotesPageContent(
     notesVM: NotesViewModel, tagsVM: TagsViewModel,
     itemsState: List<DNote>, tagsState: List<DTag>, tagsMapState: Map<String, List<DTagRelation>>,
-    scrollStateMap: MutableMap<Int, LazyListState>, index: Int,
+    scrollState: LazyListState,
     scrollBehavior: TopAppBarScrollBehavior, topRefreshLayoutState: RefreshLayoutState,
     navController: NavHostController, bottomPadding: Dp,
-    tabs: List<VTabData>, scope: CoroutineScope, pagerState: PagerState,
+    scope: CoroutineScope,
 ) {
     PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
         AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
             if (itemsState.isNotEmpty()) {
-                val scrollState = rememberLazyListState()
-                scrollStateMap[index] = scrollState
                 LazyColumnScrollbar(state = scrollState) {
                     LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection), state = scrollState) {
                         item { TopSpace() }
@@ -63,8 +58,8 @@ internal fun NotesPageContent(
                                 onLongClick = { if (notesVM.selectMode.value) return@NoteListItem; notesVM.selectedItem.value = m },
                                 onClickTag = { tag ->
                                     if (notesVM.selectMode.value) return@NoteListItem
-                                    val idx = tabs.indexOfFirst { it.value == tag.id }
-                                    if (idx != -1) scope.launch { pagerState.scrollToPage(idx) }
+                                    notesVM.trash.value = false
+                                    notesVM.tag.value = tag
                                 },
                             )
                             VerticalSpace(dp = 8.dp)

@@ -2,15 +2,10 @@ package com.ismartcoding.plain.ui.page.home
 
 import com.ismartcoding.plain.i18n.*
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,19 +23,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.has
-import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.MediaSidebarBucketItem
 import com.ismartcoding.plain.ui.components.MediaSidebarTagItem
+import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.BaseMediaViewModel
@@ -232,51 +224,5 @@ fun <T : IData> MediaSidebarDrawer(
 
     TagNameDialog(tagsVM) {
         tagsVM.loadAsync()
-    }
-}
-
-@Composable
-private fun SidebarSectionHeader(
-    title: String,
-    isExpanded: Boolean,
-    onToggle: () -> Unit,
-    onAction: (() -> Unit)? = null,
-    actionIcon: org.jetbrains.compose.resources.DrawableResource? = null,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .clip(RoundedCornerShape(4.dp))
-                .clickable { onToggle() }
-                .padding(vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            HorizontalSpace(dp = 4.dp)
-            Icon(
-                painter = painterResource(if (isExpanded) Res.drawable.chevron_down else Res.drawable.chevron_right),
-                contentDescription = null,
-                modifier = Modifier.size(16.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-        if (onAction != null && actionIcon != null) {
-            PIconButton(
-                icon = actionIcon,
-                contentDescription = null,
-                click = onAction
-            )
-        }
     }
 }
