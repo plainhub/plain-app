@@ -74,7 +74,7 @@ class TagsViewModel : ViewModel() {
             this.name = name
         }
         _itemsFlow.update { list ->
-            list.map { if (it.id == id) it.apply { this.name = name } else it }
+            list.map { if (it.id == id) it.copy(name = name) else it }
         }
         tagNameDialogVisible.value = false
     }

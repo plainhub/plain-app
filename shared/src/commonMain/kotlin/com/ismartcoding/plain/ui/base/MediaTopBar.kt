@@ -143,10 +143,6 @@ fun <T : IData> MediaTopBar(
                                         castVM.showCastDialog.value = true
                                     }
                                 }
-                                PDropdownMenuItemTags {
-                                    dismiss()
-                                    mediaVM.showTagsDialog.value = true
-                                }
                             }
                         }
                     },
