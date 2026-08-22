@@ -2,6 +2,8 @@
 <resources>
     <string name="app_data">应用数据</string>
     <string name="developer_mode">开发者模式</string>
+    <string name="allow_any_host">允许任意来源访问</string>
+    <string name="allow_any_host_desc">接受任何网站的跨域请求。</string>
     <string name="local_cache">本地缓存</string>
     <string name="clear_cache">清除缓存</string>
     <string name="local_cache_cleared">本地缓存已清除。</string>

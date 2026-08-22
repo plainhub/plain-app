@@ -247,6 +247,16 @@ object DeveloperModePreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("developer_mode")
 }
 
+object AllowAnyHostPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("allow_any_host")
+
+    override suspend fun putAsync(value: Boolean) {
+        super.putAsync(value)
+        TempData.allowAnyHost.value = value
+    }
+}
+
 object DeviceNamePreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("device_name")

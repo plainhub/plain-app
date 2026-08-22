@@ -4,7 +4,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,12 +14,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.allow_any_host
+import com.ismartcoding.plain.i18n.allow_any_host_desc
 import com.ismartcoding.plain.i18n.ble_debug
 import com.ismartcoding.plain.i18n.circle_alert
 import com.ismartcoding.plain.i18n.client_id
 import com.ismartcoding.plain.i18n.developer_mode
 import com.ismartcoding.plain.i18n.layout_grid
-import com.ismartcoding.plain.i18n.nearby_share
 import com.ismartcoding.plain.i18n.mdns_debug
 import com.ismartcoding.plain.i18n.not_supported
 import com.ismartcoding.plain.i18n.service_debug
@@ -30,7 +30,10 @@ import com.ismartcoding.plain.i18n.supported
 import com.ismartcoding.plain.i18n.ui_components
 import com.ismartcoding.plain.i18n.wifi_aware_debug
 import com.ismartcoding.plain.platform.isBluetoothSupported
+import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.platform.isWifiAwareSupported
+import com.ismartcoding.plain.platform.restartServer
+import com.ismartcoding.plain.preferences.AllowAnyHostPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -48,6 +51,7 @@ internal fun DeveloperSettingsCard(
 ) {
     val scope = rememberCoroutineScope()
     var developerMode by remember { mutableStateOf(TempData.developerMode) }
+    var allowAnyHost by remember { mutableStateOf(TempData.allowAnyHost.value) }
 
     PCard {
         PListItem(title = stringResource(Res.string.client_id), value = TempData.clientId)
@@ -62,13 +66,6 @@ internal fun DeveloperSettingsCard(
             HorizontalSpace(8.dp)
         }
         if (developerMode) {
-            PListItem(
-                modifier = Modifier.clickable {
-                    navController.navigate(Routing.MarkdownThemePreview)
-                },
-                showMore = true,
-                title = "Markdown Preview",
-            )
             PListItem(
                 modifier = Modifier.clickable { navController.navigate(Routing.WifiAwareDebug) },
                 title = stringResource(Res.string.wifi_aware_debug),
@@ -97,18 +94,38 @@ internal fun DeveloperSettingsCard(
                 title = stringResource(Res.string.mdns_debug),
                 showMore = true,
             )
-            PListItem(
-                modifier = Modifier.clickable { navController.navigate(Routing.ComponentShowcase) },
-                title = stringResource(Res.string.ui_components),
-                icon = Res.drawable.layout_grid,
-                showMore = true,
-            )
-            PListItem(
-                modifier = Modifier.clickable { throw RuntimeException("Test crash triggered from Developer Options") },
-                title = stringResource(Res.string.simulate_crash),
-                subtitle = stringResource(Res.string.simulate_crash_desc),
-                icon = Res.drawable.circle_alert,
-            )
+            if (isDebugBuild()) {
+                PListItem(
+                    title = stringResource(Res.string.allow_any_host),
+                    subtitle = stringResource(Res.string.allow_any_host_desc),
+                ) {
+                    PSwitch(activated = allowAnyHost) {
+                        scope.launch(Dispatchers.Default) {
+                            allowAnyHost = it
+                            AllowAnyHostPreference.putAsync(it)
+                            restartServer()
+                        }
+                    }
+                    HorizontalSpace(8.dp)
+                }
+                PListItem(
+                    modifier = Modifier.clickable { navController.navigate(Routing.ComponentShowcase) },
+                    title = stringResource(Res.string.ui_components),
+                    showMore = true,
+                )
+                PListItem(
+                    modifier = Modifier.clickable {
+                        navController.navigate(Routing.MarkdownThemePreview)
+                    },
+                    showMore = true,
+                    title = "Markdown Preview",
+                )
+                PListItem(
+                    modifier = Modifier.clickable { throw RuntimeException("Test crash triggered from Developer Options") },
+                    title = stringResource(Res.string.simulate_crash),
+                    subtitle = stringResource(Res.string.simulate_crash_desc),
+                )
+            }
         }
     }
 }

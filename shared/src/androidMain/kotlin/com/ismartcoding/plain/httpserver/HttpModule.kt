@@ -59,10 +59,8 @@ object HttpModule {
         }
 
         install(CORS) {
-            if (CorsPolicy.anyHostAllowed) {
+            if (TempData.allowAnyHost.value) {
                 anyHost()
-            } else {
-                CorsPolicy.releaseHosts.forEach { allowHost(it) }
             }
             CorsPolicy.allowedHeaderPrefixes.forEach { allowHeadersPrefixed(it) }
         }

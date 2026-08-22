@@ -140,6 +140,10 @@ object NetworkHelper {
     }
 
     fun isLocalNetworkAddress(hostname: String): Boolean {
+        // When "allow any host" is enabled in Developer settings, treat every
+        // hostname as local so the internal unsafe OkHttp client skips TLS
+        // hostname verification (e.g. https://192-168-1-23.nip.io:8443).
+        if (com.ismartcoding.plain.TempData.allowAnyHost.value) return true
         return hostname == "localhost" ||
                 hostname == "127.0.0.1" ||
                 hostname.startsWith("192.168.") ||

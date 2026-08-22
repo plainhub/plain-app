@@ -29,6 +29,9 @@ object TempData {
     var nearbyDiscoverable = false
     var developerMode = false
 
+    /** User toggled "allow any host" (CORS open to all origins) in Developer settings. */
+    val allowAnyHost = MutableStateFlow(false)
+
     val awareRunning = MutableStateFlow(false)
 
     var audioSleepTimerFutureTime = 0L

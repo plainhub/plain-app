@@ -10,6 +10,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.getDeviceName
 import com.ismartcoding.plain.features.dlna.startDlnaRenderer
+import com.ismartcoding.plain.preferences.AllowAnyHostPreference
 import com.ismartcoding.plain.preferences.AudioPlaybackSpeedPreference
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
 import com.ismartcoding.plain.preferences.ClientIdPreference
@@ -45,6 +46,7 @@ suspend fun initCommonPreferences(): Preferences {
     TempData.dlnaEnabled.value = DlnaPreference.get(preferences)
     TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync()
     TempData.developerMode = DeveloperModePreference.get(preferences)
+    TempData.allowAnyHost.value = AllowAnyHostPreference.get(preferences)
     SignatureKeyPreference.ensureKeyPairAsync()
     TempData.desktopAccessEnabled.value = DesktopAccessPreference.get(preferences)
     TempData.serviceEnabled.value = ServicePreference.get(preferences)

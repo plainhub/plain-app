@@ -2,6 +2,8 @@
 <resources>
     <string name="app_data">應用程式資料</string>
     <string name="developer_mode">開發者模式</string>
+    <string name="allow_any_host">允許任意來源存取</string>
+    <string name="allow_any_host_desc">接受任何網站的跨域請求。</string>
     <string name="local_cache">本地快取</string>
     <string name="clear_cache">清除快取</string>
     <string name="local_cache_cleared">本地快取已清除。</string>

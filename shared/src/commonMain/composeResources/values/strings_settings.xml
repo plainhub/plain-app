@@ -3,6 +3,8 @@
     <string name="app_name" translatable="false">PlainApp</string>
     <string name="app_data">App data</string>
     <string name="developer_mode">Developer mode</string>
+    <string name="allow_any_host">Allow any host</string>
+    <string name="allow_any_host_desc">Accept cross-origin requests from any website.</string>
     <string name="simulate_crash">Simulate crash</string>
     <string name="simulate_crash_desc">Trigger a test crash to verify crash report works</string>
     <string name="ui_components">UI Components</string>

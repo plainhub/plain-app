@@ -53,15 +53,11 @@ object IosRequestProcessor {
             // Ktor CORS plugin on Android. Without this the browser blocks
             // every cross-origin request to the iOS SwiftNIO server.
             val origin = ctx.getRequestHeader("origin")
-            if (origin != null && CorsPolicy.isOriginAllowed(origin)) {
-                // Credentials are not enabled, so the wildcard is safe in
-                // debug builds; otherwise echo the specific origin and vary
-                // on Origin so caches don't leak across origins.
-                val allowOrigin = if (CorsPolicy.anyHostAllowed) "*" else origin
-                ctx.setResponseHeader("Access-Control-Allow-Origin", allowOrigin)
-                if (allowOrigin != "*") {
-                    ctx.setResponseHeader("Vary", "Origin")
-                }
+            if (origin != null && TempData.allowAnyHost.value) {
+                // Credentials are not enabled, so the wildcard is safe — any-host
+                // mode is only active in debug builds or when the user enabled
+                // "Allow any host" in Developer settings.
+                ctx.setResponseHeader("Access-Control-Allow-Origin", "*")
 
                 // CORS preflight: short-circuit OPTIONS requests carrying an
                 // Origin header before route matching or static-file serving.
