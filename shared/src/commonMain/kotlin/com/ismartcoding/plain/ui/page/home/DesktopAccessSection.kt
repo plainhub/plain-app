@@ -103,7 +103,9 @@ fun DesktopAccessSection(navController: NavHostController) {
             state = pagerState,
             modifier = Modifier.fillMaxWidth(),
         ) { page ->
-            WebAddressBar(isHttps = page == 1)
+            WebAddressBar(
+                isHttps = page == 1,
+            )
         }
         Row(
             modifier = Modifier.fillMaxWidth(),

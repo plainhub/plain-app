@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">이미지 편집기</string>
+    <string name="image_editor_bring_forward">앞으로 가져오기</string>
+    <string name="image_editor_clear_all">모두 지우기</string>
+    <string name="image_editor_color">색상</string>
+    <string name="image_editor_delete_layer">레이어 삭제</string>
+    <string name="image_editor_duplicate_layer">레이어 복제</string>
+    <string name="image_editor_layer_count">레이어 %1$d개</string>
+    <string name="image_editor_layer_visibility">표시 전환</string>
+    <string name="image_editor_layers">레이어</string>
+    <string name="image_editor_line_width">선 굵기</string>
+    <string name="image_editor_no_layers">레이어 없음</string>
+    <string name="image_editor_no_projects">아직 프로젝트가 없습니다</string>
+    <string name="image_editor_no_projects_desc">웹 UI에서 만들거나 +를 눌러 시작하세요</string>
+    <string name="image_editor_send_backward">뒤로 보내기</string>
+    <string name="image_editor_tool_arrow">화살표</string>
+    <string name="image_editor_tool_ellipse">타원</string>
+    <string name="image_editor_tool_freehand">브러시</string>
+    <string name="image_editor_tool_highlight">형광펜</string>
+    <string name="image_editor_tool_image">이미지</string>
+    <string name="image_editor_tool_mosaic">모자이크</string>
+    <string name="image_editor_tool_rect">사각형</string>
+    <string name="image_editor_tool_select">선택</string>
+    <string name="image_editor_tool_sticker">스티커</string>
+    <string name="image_editor_tool_text">텍스트</string>
+</resources>

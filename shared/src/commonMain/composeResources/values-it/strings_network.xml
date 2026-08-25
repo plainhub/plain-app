@@ -90,4 +90,26 @@
     <string name="enable_adb_token">Abilita token ADB</string>
     <string name="http_server_health_check_failed">Il servizio è stato avviato ma non è raggiungibile. Un'app firewall o VPN potrebbe bloccare le connessioni localhost. Controlla le impostazioni di rete e riavvia l'app.</string>
     <string name="access_settings">Impostazioni di accesso</string>
+    <string name="certificate">Certificato</string>
+    <string name="certificate_file">File certificato</string>
+    <string name="certificate_password">Password del certificato</string>
+    <string name="collapse_backup_addresses">Comprimi indirizzi alternativi</string>
+    <string name="https_certificate">Certificato HTTPS</string>
+    <string name="import_certificate">Importa</string>
+    <string name="import_ssl_certificate_tips">Dopo l\'importazione, riavvia l\'app per applicare il nuovo certificato. I client web dovranno riapprovare il certificato HTTPS.</string>
+    <string name="importing">Importazione…</string>
+    <string name="invalid_certificate_file">File certificato non valido</string>
+    <string name="invalid_private_key">Chiave privata non valida</string>
+    <string name="no_file_selected">Nessun file selezionato</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">Importa un certificato e la relativa chiave privata come file PEM separati (CRT/PEM + KEY/PEM).</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">Importa un singolo pacchetto PKCS#12 (P12/PFX) con la relativa password.</string>
+    <string name="private_key">Chiave privata</string>
+    <string name="private_key_file">File chiave privata</string>
+    <string name="replace_ssl_certificate">Sostituisci certificato SSL</string>
+    <string name="select_certificate_file">Seleziona file certificato</string>
+    <string name="select_private_key_file">Seleziona file chiave privata</string>
+    <string name="ssl_certificate_replaced">Certificato SSL sostituito</string>
+    <string name="try_more_addresses">Impossibile connettersi? Prova altri indirizzi</string>
 </resources>

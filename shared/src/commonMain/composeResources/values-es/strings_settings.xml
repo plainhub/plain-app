@@ -131,4 +131,26 @@
     <string name="ble_service_uuid">UUID de servicio</string>
     <string name="donation_title">Apoya el desarrollo de PlainApp</string>
     <string name="buy_me_a_coffee">Cómprame un café</string>
+    <string name="allow_any_host">Permitir cualquier host</string>
+    <string name="allow_any_host_desc">Aceptar solicitudes de cualquier sitio web.</string>
+    <string name="aware_attach_status">Estado de conexión</string>
+    <string name="aware_discovered_peer_count">Dispositivos encontrados</string>
+    <string name="aware_service">Servicio Aware</string>
+    <string name="ble_service">Servicio BLE</string>
+    <string name="dlna_playback_state">Estado de reproducción</string>
+    <string name="dlna_service">Servicio DLNA</string>
+    <string name="dlna_start_error">Error de inicio</string>
+    <string name="http_server">Servidor HTTP</string>
+    <string name="http_server_state">Estado</string>
+    <string name="mdns_debug">Depuración mDNS</string>
+    <string name="mdns_instance">Instancia</string>
+    <string name="mdns_ips">IPs</string>
+    <string name="mdns_no_devices">No se encontraron dispositivos cercanos</string>
+    <string name="mdns_port">Puerto</string>
+    <string name="mdns_server">Servidor mDNS</string>
+    <string name="mdns_service_type">Servicio</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">Depuración de servicios</string>
+    <string name="service_running">En ejecución</string>
+    <string name="ws_session_count">Sesiones WebSocket</string>
 </resources>

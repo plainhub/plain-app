@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">Afbeeldingseditor</string>
+    <string name="image_editor_bring_forward">Naar voren brengen</string>
+    <string name="image_editor_clear_all">Alles wissen</string>
+    <string name="image_editor_color">Kleur</string>
+    <string name="image_editor_delete_layer">Laag verwijderen</string>
+    <string name="image_editor_duplicate_layer">Laag dupliceren</string>
+    <string name="image_editor_layer_count">%1$d lagen</string>
+    <string name="image_editor_layer_visibility">Zichtbaarheid wisselen</string>
+    <string name="image_editor_layers">Lagen</string>
+    <string name="image_editor_line_width">Lijndikte</string>
+    <string name="image_editor_no_layers">Geen lagen</string>
+    <string name="image_editor_no_projects">Nog geen projecten</string>
+    <string name="image_editor_no_projects_desc">Maak een project via de webinterface of tik op + om te beginnen</string>
+    <string name="image_editor_send_backward">Naar achteren sturen</string>
+    <string name="image_editor_tool_arrow">Pijl</string>
+    <string name="image_editor_tool_ellipse">Ellips</string>
+    <string name="image_editor_tool_freehand">Penseel</string>
+    <string name="image_editor_tool_highlight">Markeren</string>
+    <string name="image_editor_tool_image">Afbeelding</string>
+    <string name="image_editor_tool_mosaic">Mozaïek</string>
+    <string name="image_editor_tool_rect">Rechthoek</string>
+    <string name="image_editor_tool_select">Selecteren</string>
+    <string name="image_editor_tool_sticker">Sticker</string>
+    <string name="image_editor_tool_text">Tekst</string>
+</resources>

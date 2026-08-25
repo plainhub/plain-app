@@ -37,4 +37,6 @@
     <string name="accessibility_service_description">திரை பிரதிபலிப்பின் போது தொலை கட்டுப்பாட்டை இயக்க PlainApp இந்த அணுகல்திறன் சேவையை பயன்படுத்துகிறது. இது வலை இடைமுகத்திலிருந்து அனுப்பப்படும் தொடுதல் நிகழ்வுகள் (தட்டுதல், ஸ்வைப், ஸ்க்ரோல்) மற்றும் வழிசெலுத்தல் செயல்கள் (பின்னால், முகப்பு, சமீபத்தியவை) ஆகியவற்றை செலுத்துகிறது.</string>
     <string name="accessibility_service_label">PlainApp தொலை கட்டுப்பாடு</string>
     <string name="location_required_for_aware_chat">சில Android சாதனங்களில், அருகிலுள்ள சாதன தகவல்தொடர்புக்கு இருப்பிட அனுமதி தேவை. PlainApp உங்களைக் கண்காணிக்க உங்கள் இருப்பிடத்தைப் பயன்படுத்துவதில்லை.</string>
+    <string name="go_to_settings">அமைப்புகளுக்குச் செல்</string>
+    <string name="permission_denied_message">அனுமதி மறுக்கப்பட்டது. இந்த அம்சத்தைப் பயன்படுத்த அமைப்புகளில் இயக்கவும்.</string>
 </resources>

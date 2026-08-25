@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">Crear enlace para compartir</string>
+    <string name="share_created">Enlace creado</string>
+    <string name="share_delete_desc">Eliminar este recurso revoca el enlace de inmediato</string>
+    <string name="share_expired">Caducado</string>
+    <string name="share_expires_on">Caduca {{date}}</string>
+    <string name="share_expiry">Caducidad</string>
+    <string name="share_expiry_1d">1 día</string>
+    <string name="share_expiry_1h">1 hora</string>
+    <string name="share_expiry_30d">30 días</string>
+    <string name="share_expiry_7d">7 días</string>
+    <string name="share_expiry_never">Nunca</string>
+    <string name="share_link">Enlace para compartir</string>
+    <string name="share_link_copied">Enlace copiado</string>
+    <string name="share_link_desc">Cualquier persona con este enlace puede acceder a los archivos compartidos hasta que caduque</string>
+    <string name="share_links">Enlaces compartidos</string>
+    <string name="share_links_desc">Enlaces que creó para archivos y carpetas</string>
+    <string name="share_name_placeholder">Nombre</string>
+    <string name="share_no_links">No hay enlaces compartidos</string>
+    <string name="share_read_only">Solo lectura</string>
+</resources>

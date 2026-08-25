@@ -131,4 +131,26 @@
     <string name="ble_service_uuid">Hizmet UUID'si</string>
     <string name="donation_title">PlainApp geliştirmesini destekleyin</string>
     <string name="buy_me_a_coffee">Bana bir kahve ısmarla</string>
+    <string name="allow_any_host">Herhangi bir ana makineye izin ver</string>
+    <string name="allow_any_host_desc">Her web sitesinden çapraz kaynak isteklerini kabul et.</string>
+    <string name="aware_attach_status">Bağlantı durumu</string>
+    <string name="aware_discovered_peer_count">Bulunan cihazlar</string>
+    <string name="aware_service">Aware hizmeti</string>
+    <string name="ble_service">BLE hizmeti</string>
+    <string name="dlna_playback_state">Oynatma durumu</string>
+    <string name="dlna_service">DLNA hizmeti</string>
+    <string name="dlna_start_error">Başlatma hatası</string>
+    <string name="http_server">HTTP sunucusu</string>
+    <string name="http_server_state">Durum</string>
+    <string name="mdns_debug">mDNS hata ayıklama</string>
+    <string name="mdns_instance">Örnek</string>
+    <string name="mdns_ips">IP\'ler</string>
+    <string name="mdns_no_devices">Yakında cihaz bulunamadı</string>
+    <string name="mdns_port">Port</string>
+    <string name="mdns_server">mDNS sunucusu</string>
+    <string name="mdns_service_type">Hizmet</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">Hizmet hata ayıklama</string>
+    <string name="service_running">Çalışıyor</string>
+    <string name="ws_session_count">WebSocket oturumları</string>
 </resources>

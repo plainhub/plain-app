@@ -65,10 +65,6 @@
 -keepnames class com.ismartcoding.plain.data.** { *; }
 -keepnames class com.ismartcoding.plain.enums.** { *; }
 
-# ===== BouncyCastle (reflection-heavy crypto) =====
--keep class org.bouncycastle.** { *; }
--dontwarn org.bouncycastle.**
-
 # ===== Google Tink =====
 -keep class com.google.crypto.tink.** { *; }
 -dontwarn com.google.crypto.tink.**
@@ -82,5 +78,4 @@
 # ===== OkHttp / Okio =====
 -dontwarn okhttp3.internal.platform.**
 -dontwarn org.conscrypt.**
--dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**

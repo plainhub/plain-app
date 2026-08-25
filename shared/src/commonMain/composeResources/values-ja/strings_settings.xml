@@ -131,4 +131,26 @@
     <string name="ble_service_uuid">サービス UUID</string>
     <string name="donation_title">PlainAppの開発をサポート</string>
     <string name="buy_me_a_coffee">コーヒーをおごる</string>
+    <string name="allow_any_host">任意のホストを許可</string>
+    <string name="allow_any_host_desc">すべてのウェブサイトからのクロスオリジンリクエストを許可します。</string>
+    <string name="aware_attach_status">接続状態</string>
+    <string name="aware_discovered_peer_count">検出された端末</string>
+    <string name="aware_service">Aware サービス</string>
+    <string name="ble_service">BLE サービス</string>
+    <string name="dlna_playback_state">再生状態</string>
+    <string name="dlna_service">DLNA サービス</string>
+    <string name="dlna_start_error">起動エラー</string>
+    <string name="http_server">HTTP サーバー</string>
+    <string name="http_server_state">状態</string>
+    <string name="mdns_debug">mDNS デバッグ</string>
+    <string name="mdns_instance">インスタンス</string>
+    <string name="mdns_ips">IP</string>
+    <string name="mdns_no_devices">近くのデバイスが見つかりません</string>
+    <string name="mdns_port">ポート</string>
+    <string name="mdns_server">mDNS サーバー</string>
+    <string name="mdns_service_type">サービス</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">サービスデバッグ</string>
+    <string name="service_running">実行中</string>
+    <string name="ws_session_count">WebSocket セッション</string>
 </resources>

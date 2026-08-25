@@ -90,4 +90,26 @@
     <string name="enable_adb_token">启用 ADB 令牌</string>
     <string name="http_server_health_check_failed">服务已启动但无法访问。防火墙或 VPN 应用可能阻止了 localhost 连接。请检查您的网络设置并重启应用。</string>
     <string name="access_settings">访问设置</string>
+    <string name="try_more_addresses">无法访问？尝试更多地址</string>
+    <string name="collapse_backup_addresses">收起备用地址</string>
+    <string name="certificate">证书</string>
+    <string name="certificate_file">证书文件</string>
+    <string name="certificate_password">证书密码</string>
+    <string name="https_certificate">HTTPS 证书</string>
+    <string name="import_certificate">导入</string>
+    <string name="import_ssl_certificate_tips">导入后需重启应用以应用新证书。Web 客户端需要重新信任 HTTPS 证书。</string>
+    <string name="importing">正在导入…</string>
+    <string name="invalid_certificate_file">无效的证书文件</string>
+    <string name="invalid_private_key">无效的私钥</string>
+    <string name="no_file_selected">未选择文件</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">将证书和私钥作为单独的 PEM 文件导入（CRT/PEM + KEY/PEM）。</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">导入单个 PKCS#12 文件（P12/PFX）及其密码。</string>
+    <string name="private_key">私钥</string>
+    <string name="private_key_file">私钥文件</string>
+    <string name="replace_ssl_certificate">替换 SSL 证书</string>
+    <string name="select_certificate_file">选择证书文件</string>
+    <string name="select_private_key_file">选择私钥文件</string>
+    <string name="ssl_certificate_replaced">SSL 证书已替换</string>
 </resources>

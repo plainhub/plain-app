@@ -90,4 +90,26 @@
     <string name="enable_adb_token">Bật mã thông báo ADB</string>
     <string name="http_server_health_check_failed">Dịch vụ đã khởi động nhưng không thể truy cập. Một ứng dụng tường lửa hoặc VPN có thể đang chặn các kết nối localhost. Vui lòng kiểm tra cài đặt mạng và khởi động lại ứng dụng.</string>
     <string name="access_settings">Cài đặt truy cập</string>
+    <string name="certificate">Chứng chỉ</string>
+    <string name="certificate_file">Tệp chứng chỉ</string>
+    <string name="certificate_password">Mật khẩu chứng chỉ</string>
+    <string name="collapse_backup_addresses">Thu gọn các địa chỉ dự phòng</string>
+    <string name="https_certificate">Chứng chỉ HTTPS</string>
+    <string name="import_certificate">Nhập</string>
+    <string name="import_ssl_certificate_tips">Sau khi nhập, hãy khởi động lại ứng dụng để áp dụng chứng chỉ mới. Máy khách web sẽ cần tin tưởng lại chứng chỉ HTTPS.</string>
+    <string name="importing">Đang nhập…</string>
+    <string name="invalid_certificate_file">Tệp chứng chỉ không hợp lệ</string>
+    <string name="invalid_private_key">Khóa riêng không hợp lệ</string>
+    <string name="no_file_selected">Chưa chọn tệp</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">Nhập chứng chỉ và khóa riêng dưới dạng các tệp PEM riêng biệt (CRT/PEM + KEY/PEM).</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">Nhập một gói PKCS#12 (P12/PFX) duy nhất kèm mật khẩu.</string>
+    <string name="private_key">Khóa riêng</string>
+    <string name="private_key_file">Tệp khóa riêng</string>
+    <string name="replace_ssl_certificate">Thay chứng chỉ SSL</string>
+    <string name="select_certificate_file">Chọn tệp chứng chỉ</string>
+    <string name="select_private_key_file">Chọn tệp khóa riêng</string>
+    <string name="ssl_certificate_replaced">Đã thay chứng chỉ SSL</string>
+    <string name="try_more_addresses">Không kết nối được? Thử các địa chỉ khác</string>
 </resources>

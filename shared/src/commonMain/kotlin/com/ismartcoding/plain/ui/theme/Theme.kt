@@ -29,7 +29,7 @@ private fun plainDarkColorScheme(): ColorScheme {
     val surfaceVariant = if (amoled) Color(0xFF1C1C1E) else Color(0xFF2C2C2E)
     return darkColorScheme(
         primary = Color(0xFF0A84FF), onPrimary = Color(0xFFFFFFFF),
-        primaryContainer = Color(0xFF163B66), onPrimaryContainer = Color(0xFFF5F9FF),
+        primaryContainer = Color(0xFF163B66), onPrimaryContainer = Color(0xFFE5E5EA),
         inversePrimary = Color(0xFF007AFF),
         secondary = Color(0xFF0A84FF), onSecondary = Color(0xFFFFFFFF),
         secondaryContainer = Color(0xFF003380), onSecondaryContainer = Color(0xFFCCDFFF),
@@ -37,8 +37,8 @@ private fun plainDarkColorScheme(): ColorScheme {
         tertiaryContainer = Color(0xFF4A4458), onTertiaryContainer = Color(0xFFEADDFF),
         error = Color(0xFFFF453A), onError = Color(0xFFFFFFFF),
         errorContainer = Color(0xFF3A1C1C), onErrorContainer = Color(0xFFFFDAD6),
-        background = bg, onBackground = Color(0xFFFFFFFF),
-        surface = surface, onSurface = Color(0xFFFFFFFF),
+        background = bg, onBackground = Color(0xFFE5E5EA),
+        surface = surface, onSurface = Color(0xFFE5E5EA),
         surfaceVariant = surfaceVariant, onSurfaceVariant = Color(0xFFB8B8BE),
         surfaceTint = Color(0xFF0A84FF).copy(alpha = 0.08f),
         inverseSurface = Color(0xFFF2F2F7), inverseOnSurface = Color(0xFF000000),
@@ -102,6 +102,12 @@ val ColorScheme.orange: Color
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFFF9F0A) else Color(0xFFFF9500)
 
 // -------- App semantic colors --------
+
+// Filled button text/icon color: pure white glares against the pure black
+// dark background, so use the app's soft white there instead.
+val ColorScheme.filledButtonContent: Color
+    @Composable @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFE5E5EA) else Color(0xFFFFFFFF)
 
 val ColorScheme.backgroundNormal: Color
     @Composable @ReadOnlyComposable

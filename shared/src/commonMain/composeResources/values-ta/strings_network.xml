@@ -90,4 +90,26 @@
     <string name="enable_adb_token">ADB டோக்கன் இயக்கு</string>
     <string name="http_server_health_check_failed">சேவை தொடங்கப்பட்டது ஆனால் அணுக முடியவில்லை. ஃபயர்வால் அல்லது VPN பயன்பாடு localhost இணைப்புகளைத் தடுக்கலாம். உங்கள் நெட்வொர்க் அமைப்புகளைச் சரிபார்த்து, பயன்பாட்டை மறுதொடக்கம் செய்யவும்.</string>
     <string name="access_settings">அணுகல் அமைப்புகள்</string>
+    <string name="certificate">சான்றிதழ்</string>
+    <string name="certificate_file">சான்றிதழ் கோப்பு</string>
+    <string name="certificate_password">சான்றிதழ் கடவுச்சொல்</string>
+    <string name="collapse_backup_addresses">காப்பு முகவரிகளை சுருக்கு</string>
+    <string name="https_certificate">HTTPS சான்றிதழ்</string>
+    <string name="import_certificate">இறக்குமதி</string>
+    <string name="import_ssl_certificate_tips">இறக்குமதி செய்த பிறகு புதிய சான்றிதழைப் பயன்படுத்த ஆப்பை மறுதொடக்கம் செய்யவும். வலை கிளையன்டுகள் HTTPS சான்றிதழை மீண்டும் நம்ப வேண்டும்.</string>
+    <string name="importing">இறக்குமதி ஆகிறது…</string>
+    <string name="invalid_certificate_file">தவறான சான்றிதழ் கோப்பு</string>
+    <string name="invalid_private_key">தவறான தனிப்பட்ட கீ</string>
+    <string name="no_file_selected">கோப்பு தேர்ந்தெடுக்கப்படவில்லை</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">சான்றிதழையும் தனிப்பட்ட கீயையும் தனித்தனி PEM கோப்புகளாக (CRT/PEM + KEY/PEM) இறக்குமதி செய்யவும்.</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">கடவுச்சொல்லுடன் ஒரே ஒரு PKCS#12 பண்டில் (P12/PFX) இறக்குமதி செய்யவும்.</string>
+    <string name="private_key">தனிப்பட்ட கீ</string>
+    <string name="private_key_file">தனிப்பட்ட கீ கோப்பு</string>
+    <string name="replace_ssl_certificate">SSL சான்றிதழை மாற்று</string>
+    <string name="select_certificate_file">சான்றிதழ் கோப்பைத் தேர்ந்தெடு</string>
+    <string name="select_private_key_file">தனிப்பட்ட கீ கோப்பைத் தேர்ந்தெடு</string>
+    <string name="ssl_certificate_replaced">SSL சான்றிதழ் மாற்றப்பட்டது</string>
+    <string name="try_more_addresses">இணைக்க முடியவில்லையா? பிற முகவரிகளை முயற்சிக்கவும்</string>
 </resources>

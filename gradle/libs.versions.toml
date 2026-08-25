@@ -1,6 +1,5 @@
 [versions]
 appcompatVersion="1.7.1"
-bcprovJdk15onVersion="1.70"
 coil="3.5.0"
 coreKtxVersion="1.19.0"
 foundationVersion="1.11.1"
@@ -58,8 +57,6 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundationVersion" }
 jetbrains-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrainsLifecycleViewmodel" }
 androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycleViewmodelKtxVersion" }
-bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bcprovJdk15onVersion" }
-bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15onVersion" }
 
 # Coil
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }

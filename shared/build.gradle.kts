@@ -104,8 +104,6 @@ kotlin {
             implementation(libs.coil.network.okhttp)
 
             // Vendored libraries (lib/) dependencies
-            implementation(libs.bcprov.jdk15on)
-            implementation(libs.bcpkix.jdk15on)
             implementation(libs.pdfium.android)
             implementation(libs.zxing.core)
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">Paylaşım bağlantısı oluştur</string>
+    <string name="share_created">Bağlantı oluşturuldu</string>
+    <string name="share_delete_desc">Silme, bağlantıyı hemen geçersiz kılar</string>
+    <string name="share_expired">Süresi doldu</string>
+    <string name="share_expires_on">Son kullanma: {{date}}</string>
+    <string name="share_expiry">Son kullanma</string>
+    <string name="share_expiry_1d">1 gün</string>
+    <string name="share_expiry_1h">1 saat</string>
+    <string name="share_expiry_30d">30 gün</string>
+    <string name="share_expiry_7d">7 gün</string>
+    <string name="share_expiry_never">Hiçbir zaman</string>
+    <string name="share_link">Paylaşım bağlantısı</string>
+    <string name="share_link_copied">Bağlantı kopyalandı</string>
+    <string name="share_link_desc">Bu bağlantıya sahip olan herkes, süresi dolana kadar paylaşılan dosyalara erişebilir</string>
+    <string name="share_links">Paylaşılan bağlantılar</string>
+    <string name="share_links_desc">Dosya ve klasörler için oluşturduğunuz bağlantılar</string>
+    <string name="share_name_placeholder">Ad</string>
+    <string name="share_no_links">Paylaşılan bağlantı yok</string>
+    <string name="share_read_only">Salt okunur</string>
+</resources>

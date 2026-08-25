@@ -5,15 +5,6 @@ import java.io.File
 import java.util.Locale
 
 object ApkParsers {
-    private var useBouncyCastle = false
-    fun useBouncyCastle(): Boolean {
-        return useBouncyCastle
-    }
-
-    fun useBouncyCastle(useBouncyCastle: Boolean) {
-        ApkParsers.useBouncyCastle = useBouncyCastle
-    }
-
     fun getMetaInfo(apkFilePath: String): ApkMeta? {
         ApkFile(apkFilePath).use { apkFile -> return apkFile.apkMeta }
     }

@@ -90,4 +90,26 @@
     <string name="enable_adb_token">ADB-token inschakelen</string>
     <string name="http_server_health_check_failed">Service gestart maar niet bereikbaar. Een firewall- of VPN-app blokkeert mogelijk localhost-verbindingen. Controleer uw netwerkinstellingen en start de app opnieuw.</string>
     <string name="access_settings">Toegangsinstellingen</string>
+    <string name="certificate">Certificaat</string>
+    <string name="certificate_file">Certificaatbestand</string>
+    <string name="certificate_password">Certificaatwachtwoord</string>
+    <string name="collapse_backup_addresses">Reserveadressen samenvouwen</string>
+    <string name="https_certificate">HTTPS-certificaat</string>
+    <string name="import_certificate">Importeren</string>
+    <string name="import_ssl_certificate_tips">Start de app na het importeren opnieuw om het nieuwe certificaat toe te passen. Webclients moeten het HTTPS-certificaat opnieuw vertrouwen.</string>
+    <string name="importing">Importeren…</string>
+    <string name="invalid_certificate_file">Ongeldig certificaatbestand</string>
+    <string name="invalid_private_key">Ongeldige privésleutel</string>
+    <string name="no_file_selected">Geen bestand geselecteerd</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">Importeer een certificaat en de privésleutel als aparte PEM-bestanden (CRT/PEM + KEY/PEM).</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">Importeer één PKCS#12-bundel (P12/PFX) met bijbehorend wachtwoord.</string>
+    <string name="private_key">Privésleutel</string>
+    <string name="private_key_file">Bestand met privésleutel</string>
+    <string name="replace_ssl_certificate">SSL-certificaat vervangen</string>
+    <string name="select_certificate_file">Certificaatbestand kiezen</string>
+    <string name="select_private_key_file">Bestand met privésleutel kiezen</string>
+    <string name="ssl_certificate_replaced">SSL-certificaat is vervangen</string>
+    <string name="try_more_addresses">Geen verbinding? Probeer andere adressen</string>
 </resources>

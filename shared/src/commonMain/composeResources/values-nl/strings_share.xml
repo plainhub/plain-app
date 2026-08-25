@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">Deellink maken</string>
+    <string name="share_created">Link gemaakt</string>
+    <string name="share_delete_desc">Verwijderen trekt de link onmiddellijk in</string>
+    <string name="share_expired">Verlopen</string>
+    <string name="share_expires_on">Verloopt op {{date}}</string>
+    <string name="share_expiry">Vervaldatum</string>
+    <string name="share_expiry_1d">1 dag</string>
+    <string name="share_expiry_1h">1 uur</string>
+    <string name="share_expiry_30d">30 dagen</string>
+    <string name="share_expiry_7d">7 dagen</string>
+    <string name="share_expiry_never">Nooit</string>
+    <string name="share_link">Deellink</string>
+    <string name="share_link_copied">Link gekopieerd</string>
+    <string name="share_link_desc">Iedereen met deze link heeft tot het verlopen toegang tot de gedeelde bestanden</string>
+    <string name="share_links">Gedeelde links</string>
+    <string name="share_links_desc">Links die u voor bestanden en mappen hebt gemaakt</string>
+    <string name="share_name_placeholder">Naam</string>
+    <string name="share_no_links">Geen gedeelde links</string>
+    <string name="share_read_only">Alleen-lezen</string>
+</resources>

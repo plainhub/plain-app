@@ -20,9 +20,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
-import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.PermissionItem
 import com.ismartcoding.plain.features.getWebList
+import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.openBatteryOptimizationSettings
@@ -48,8 +48,8 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }) {
-    WebSettingsProvider {
-        val keepAwake = LocalKeepAwake.current
+        WebSettingsProvider {
+            val keepAwake = LocalKeepAwake.current
         val scope = rememberCoroutineScope()
         val enabledPermissions = LocalApiPermissions.current
         val permissionList = remember { mutableStateOf(getWebList()) }

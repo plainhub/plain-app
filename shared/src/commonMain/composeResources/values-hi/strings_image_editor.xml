@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">इमेज संपादक</string>
+    <string name="image_editor_bring_forward">आगे लाएँ</string>
+    <string name="image_editor_clear_all">सब साफ़ करें</string>
+    <string name="image_editor_color">रंग</string>
+    <string name="image_editor_delete_layer">लेयर हटाएँ</string>
+    <string name="image_editor_duplicate_layer">लेयर डुप्लिकेट करें</string>
+    <string name="image_editor_layer_count">%1$d लेयर</string>
+    <string name="image_editor_layer_visibility">दृश्यता टॉगल करें</string>
+    <string name="image_editor_layers">लेयर</string>
+    <string name="image_editor_line_width">रेखा की मोटाई</string>
+    <string name="image_editor_no_layers">कोई लेयर नहीं</string>
+    <string name="image_editor_no_projects">अभी कोई प्रोजेक्ट नहीं</string>
+    <string name="image_editor_no_projects_desc">वेब UI से प्रोजेक्ट बनाएँ या शुरू करने के लिए + दबाएँ</string>
+    <string name="image_editor_send_backward">पीछे भेजें</string>
+    <string name="image_editor_tool_arrow">तीर</string>
+    <string name="image_editor_tool_ellipse">दीर्घवृत्त</string>
+    <string name="image_editor_tool_freehand">ब्रश</string>
+    <string name="image_editor_tool_highlight">हाइलाइट</string>
+    <string name="image_editor_tool_image">इमेज</string>
+    <string name="image_editor_tool_mosaic">मोज़ेक</string>
+    <string name="image_editor_tool_rect">आयत</string>
+    <string name="image_editor_tool_select">चुनें</string>
+    <string name="image_editor_tool_sticker">स्टिकर</string>
+    <string name="image_editor_tool_text">टेक्स्ट</string>
+</resources>

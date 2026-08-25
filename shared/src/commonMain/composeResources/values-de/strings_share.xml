@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">Freigabelink erstellen</string>
+    <string name="share_created">Link erstellt</string>
+    <string name="share_delete_desc">Durch das Löschen wird der Link sofort ungültig</string>
+    <string name="share_expired">Abgelaufen</string>
+    <string name="share_expires_on">Läuft ab {{date}}</string>
+    <string name="share_expiry">Ablauf</string>
+    <string name="share_expiry_1d">1 Tag</string>
+    <string name="share_expiry_1h">1 Stunde</string>
+    <string name="share_expiry_30d">30 Tage</string>
+    <string name="share_expiry_7d">7 Tage</string>
+    <string name="share_expiry_never">Nie</string>
+    <string name="share_link">Freigabelink</string>
+    <string name="share_link_copied">Link kopiert</string>
+    <string name="share_link_desc">Jeder mit diesem Link kann bis zum Ablauf auf die freigegebenen Dateien zugreifen</string>
+    <string name="share_links">Freigabelinks</string>
+    <string name="share_links_desc">Links, die Sie für Dateien und Ordner erstellt haben</string>
+    <string name="share_name_placeholder">Name</string>
+    <string name="share_no_links">Keine Freigabelinks</string>
+    <string name="share_read_only">Schreibgeschützt</string>
+</resources>

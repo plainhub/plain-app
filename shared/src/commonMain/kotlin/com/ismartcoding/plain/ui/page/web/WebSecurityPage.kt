@@ -23,6 +23,7 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.extensions.toSignature
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
@@ -33,6 +34,7 @@ import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.generateSSLKeyStore
 import com.ismartcoding.plain.platform.getSSLSignature
 import com.ismartcoding.plain.platform.resetPasswordAsync
+import com.ismartcoding.plain.platform.restartServer
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.preferences.LocalAuthTwoFactor
@@ -69,7 +71,7 @@ fun WebSecurityPage(navController: NavHostController) {
             scope.launch(Dispatchers.Default) {
                 keyStorePassword = KeyStorePasswordPreference.getAsync()
                 try {
-                    sslSignature = getSSLSignature(keyStorePassword).joinToString(" ") { (it.toInt() and 0xFF).toString(16).padStart(2, '0').uppercase() }
+                    sslSignature = getSSLSignature(keyStorePassword).toSignature()
                 } catch (ex: Exception) {
                     LogCat.e("Failed to get SSL signature: ${ex.message}"); ex.printStackTrace()
                 }
@@ -141,10 +143,10 @@ fun WebSecurityPage(navController: NavHostController) {
                                     KeyStorePasswordPreference.resetAsync()
                                     keyStorePassword = KeyStorePasswordPreference.getAsync()
                                     generateSSLKeyStore(keyStorePassword)
+                                    sslSignature = getSSLSignature(keyStorePassword).toSignature()
+                                    restartServer()
                                     DialogHelper.hideLoading()
-                                    DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset)) {
-                                        sendEvent(RestartAppEvent())
-                                    }
+                                    DialogHelper.showConfirmDialog("", LocaleHelper.getStringAsync(Res.string.ssl_certificate_reset))
                                 }
                             })
                         VerticalSpace(dp = 16.dp)

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">பங்கு இணைப்பை உருவாக்கு</string>
+    <string name="share_created">இணைப்பு உருவாக்கப்பட்டது</string>
+    <string name="share_delete_desc">நீக்கினால் இணைப்பு உடனடியாக ரத்து ஆகும்</string>
+    <string name="share_expired">காலாவதியானது</string>
+    <string name="share_expires_on">காலாவதி {{date}}</string>
+    <string name="share_expiry">காலாவதி</string>
+    <string name="share_expiry_1d">1 நாள்</string>
+    <string name="share_expiry_1h">1 மணி</string>
+    <string name="share_expiry_30d">30 நாட்கள்</string>
+    <string name="share_expiry_7d">7 நாட்கள்</string>
+    <string name="share_expiry_never">ஒருபோதும் இல்லை</string>
+    <string name="share_link">பங்கு இணைப்பு</string>
+    <string name="share_link_copied">இணைப்பு நகலெடுக்கப்பட்டது</string>
+    <string name="share_link_desc">இந்த இணைப்பு உள்ளவர்கள் காலாவதி வரை பங்கிடப்பட்ட கோப்புகளை அணுகலாம்</string>
+    <string name="share_links">பங்கிடப்பட்ட இணைப்புகள்</string>
+    <string name="share_links_desc">கோப்புகள் மற்றும் கோப்புறைகளுக்கு நீங்கள் உருவாக்கிய இணைப்புகள்</string>
+    <string name="share_name_placeholder">பெயர்</string>
+    <string name="share_no_links">பங்கிடப்பட்ட இணைப்புகள் இல்லை</string>
+    <string name="share_read_only">படிக்க மட்டும்</string>
+</resources>

@@ -1,16 +1,11 @@
 package com.ismartcoding.plain.lib.apk.parser
 
-import com.ismartcoding.plain.lib.apk.ApkParsers
 import com.ismartcoding.plain.lib.apk.bean.CertificateMeta
 
 abstract class CertificateParser(protected val data: ByteArray) {
     abstract fun parse(): List<CertificateMeta>
 
     companion object {
-        fun getInstance(data: ByteArray): CertificateParser {
-            return if (ApkParsers.useBouncyCastle()) {
-                BCCertificateParser(data)
-            } else JSSECertificateParser(data)
-        }
+        fun getInstance(data: ByteArray): CertificateParser = JSSECertificateParser(data)
     }
 }

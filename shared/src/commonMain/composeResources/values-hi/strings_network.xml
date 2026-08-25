@@ -90,4 +90,26 @@
     <string name="enable_adb_token">ADB टोकन सक्षम करें</string>
     <string name="http_server_health_check_failed">सेवा शुरू हो गई है लेकिन एक्सेस नहीं की जा सकती। फ़ायरवॉल या VPN ऐप localhost कनेक्शन को ब्लॉक कर सकता है। कृपया अपनी नेटवर्क सेटिंग जांचें और ऐप को पुनर्प्रारंभ करें।</string>
     <string name="access_settings">एक्सेस सेटिंग्स</string>
+    <string name="certificate">प्रमाणपत्र</string>
+    <string name="certificate_file">प्रमाणपत्र फ़ाइल</string>
+    <string name="certificate_password">प्रमाणपत्र पासवर्ड</string>
+    <string name="collapse_backup_addresses">बैकअप पते सिकोड़ें</string>
+    <string name="https_certificate">HTTPS प्रमाणपत्र</string>
+    <string name="import_certificate">आयात करें</string>
+    <string name="import_ssl_certificate_tips">आयात के बाद नया प्रमाणपत्र लागू करने के लिए ऐप पुनर्आरंभ करें। वेब क्लाइंट को HTTPS प्रमाणपत्र पर फिर से भरोसा करना होगा।</string>
+    <string name="importing">आयात हो रहा है…</string>
+    <string name="invalid_certificate_file">अमान्य प्रमाणपत्र फ़ाइल</string>
+    <string name="invalid_private_key">अमान्य निजी कुंजी</string>
+    <string name="no_file_selected">कोई फ़ाइल चयनित नहीं</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">प्रमाणपत्र और निजी कुंजी को अलग PEM फ़ाइलों (CRT/PEM + KEY/PEM) के रूप में आयात करें।</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">पासवर्ड के साथ एकल PKCS#12 बंडल (P12/PFX) आयात करें।</string>
+    <string name="private_key">निजी कुंजी</string>
+    <string name="private_key_file">निजी कुंजी फ़ाइल</string>
+    <string name="replace_ssl_certificate">SSL प्रमाणपत्र बदलें</string>
+    <string name="select_certificate_file">प्रमाणपत्र फ़ाइल चुनें</string>
+    <string name="select_private_key_file">निजी कुंजी फ़ाइल चुनें</string>
+    <string name="ssl_certificate_replaced">SSL प्रमाणपत्र बदल दिया गया</string>
+    <string name="try_more_addresses">कनेक्ट नहीं हो रहा? अन्य पते आज़माएँ</string>
 </resources>

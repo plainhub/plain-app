@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">Editor de imagens</string>
+    <string name="image_editor_bring_forward">Trazer para frente</string>
+    <string name="image_editor_clear_all">Limpar tudo</string>
+    <string name="image_editor_color">Cor</string>
+    <string name="image_editor_delete_layer">Excluir camada</string>
+    <string name="image_editor_duplicate_layer">Duplicar camada</string>
+    <string name="image_editor_layer_count">%1$d camadas</string>
+    <string name="image_editor_layer_visibility">Alternar visibilidade</string>
+    <string name="image_editor_layers">Camadas</string>
+    <string name="image_editor_line_width">Espessura da linha</string>
+    <string name="image_editor_no_layers">Sem camadas</string>
+    <string name="image_editor_no_projects">Nenhum projeto ainda</string>
+    <string name="image_editor_no_projects_desc">Crie um projeto pela interface web ou toque em + para começar</string>
+    <string name="image_editor_send_backward">Enviar para trás</string>
+    <string name="image_editor_tool_arrow">Seta</string>
+    <string name="image_editor_tool_ellipse">Elipse</string>
+    <string name="image_editor_tool_freehand">Pincel</string>
+    <string name="image_editor_tool_highlight">Destaque</string>
+    <string name="image_editor_tool_image">Imagem</string>
+    <string name="image_editor_tool_mosaic">Mosaico</string>
+    <string name="image_editor_tool_rect">Retângulo</string>
+    <string name="image_editor_tool_select">Selecionar</string>
+    <string name="image_editor_tool_sticker">Adesivo</string>
+    <string name="image_editor_tool_text">Texto</string>
+</resources>

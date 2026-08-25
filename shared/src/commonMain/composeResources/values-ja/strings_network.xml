@@ -90,4 +90,26 @@
     <string name="enable_adb_token">ADB トークンを有効化</string>
     <string name="http_server_health_check_failed">サービスは開始されましたが、アクセスできません。ファイアウォールまたはVPNアプリがlocalhost接続をブロックしている可能性があります。ネットワーク設定を確認してアプリを再起動してください。</string>
     <string name="access_settings">アクセス設定</string>
+    <string name="certificate">証明書</string>
+    <string name="certificate_file">証明書ファイル</string>
+    <string name="certificate_password">証明書のパスワード</string>
+    <string name="collapse_backup_addresses">バックアップアドレスを折りたたむ</string>
+    <string name="https_certificate">HTTPS 証明書</string>
+    <string name="import_certificate">インポート</string>
+    <string name="import_ssl_certificate_tips">インポート後、アプリを再起動すると新しい証明書が適用されます。Web クライアントは HTTPS 証明書を再度信頼する必要があります。</string>
+    <string name="importing">インポート中…</string>
+    <string name="invalid_certificate_file">無効な証明書ファイル</string>
+    <string name="invalid_private_key">無効な秘密鍵</string>
+    <string name="no_file_selected">ファイルが選択されていません</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">証明書と秘密鍵を別々の PEM ファイル（CRT/PEM + KEY/PEM）としてインポートします。</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">パスワード付きの単一の PKCS#12 バンドル（P12/PFX）をインポートします。</string>
+    <string name="private_key">秘密鍵</string>
+    <string name="private_key_file">秘密鍵ファイル</string>
+    <string name="replace_ssl_certificate">SSL 証明書を置き換える</string>
+    <string name="select_certificate_file">証明書ファイルを選択</string>
+    <string name="select_private_key_file">秘密鍵ファイルを選択</string>
+    <string name="ssl_certificate_replaced">SSL 証明書が置き換えられました</string>
+    <string name="try_more_addresses">接続できない場合は他のアドレスをお試しください</string>
 </resources>

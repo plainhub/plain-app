@@ -131,4 +131,26 @@
     <string name="ble_service_uuid">சேவை UUID</string>
     <string name="donation_title">PlainApp உருவாக்கத்தை ஆதரிக்கவும்</string>
     <string name="buy_me_a_coffee">எனக்கு ஒரு காபி வாங்கு</string>
+    <string name="allow_any_host">எந்த ஹோஸ்டையும் அனுமதி</string>
+    <string name="allow_any_host_desc">எந்த இணையதளத்திலிருந்தும் க்ராஸ்-ஆரிஜின் கோரிக்கைகளை ஏற்கவும்.</string>
+    <string name="aware_attach_status">இணைப்பு நிலை</string>
+    <string name="aware_discovered_peer_count">கண்டறியப்பட்ட சாதனங்கள்</string>
+    <string name="aware_service">Aware சேவை</string>
+    <string name="ble_service">BLE சேவை</string>
+    <string name="dlna_playback_state">பிளேபேக் நிலை</string>
+    <string name="dlna_service">DLNA சேவை</string>
+    <string name="dlna_start_error">தொடங்குவதில் பிழை</string>
+    <string name="http_server">HTTP சேவையகம்</string>
+    <string name="http_server_state">நிலை</string>
+    <string name="mdns_debug">mDNS டீபக்</string>
+    <string name="mdns_instance">நிகழ்வு</string>
+    <string name="mdns_ips">IP-கள்</string>
+    <string name="mdns_no_devices">அருகில் சாதனங்கள் இல்லை</string>
+    <string name="mdns_port">போர்ட்</string>
+    <string name="mdns_server">mDNS சேவையகம்</string>
+    <string name="mdns_service_type">சேவை</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">சேவை டீபக்</string>
+    <string name="service_running">இயங்குகிறது</string>
+    <string name="ws_session_count">WebSocket அமர்வுகள்</string>
 </resources>

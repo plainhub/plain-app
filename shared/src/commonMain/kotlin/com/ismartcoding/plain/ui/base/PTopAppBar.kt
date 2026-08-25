@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -20,6 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.NavigationBackIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,53 +41,60 @@ fun PTopAppBar(
     val topBarColor = containerColor ?: MaterialTheme.colorScheme.background
     val topBarSubtitleColor = subtitleColor ?: MaterialTheme.colorScheme.onSurfaceVariant
     val nav = navController as? NavHostController
-    TopAppBar(
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                if (subtitle.isEmpty()) {
-                    Text(
-                        title,
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false),
-                    )
-                } else {
-                    Column(modifier = Modifier.weight(1f, fill = false)) {
+    // Material3 TopAppBar animates its container color internally, which lags behind the
+    // instantly-changing page background during theme switches. Draw the color on an instant
+    // Surface here and keep the inner bar transparent so both change together.
+    Surface(
+        color = topBarColor,
+        modifier = modifier,
+    ) {
+        TopAppBar(
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (subtitle.isEmpty()) {
                         Text(
-                            text = title,
+                            title,
                             style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
-                            color = topBarSubtitleColor,
-                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(top = 4.dp)
+                            modifier = Modifier.weight(1f, fill = false),
                         )
+                    } else {
+                        Column(modifier = Modifier.weight(1f, fill = false)) {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, fontWeight = FontWeight.SemiBold),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = subtitle,
+                                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                                color = topBarSubtitleColor,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
                     }
+                    titleTrailing?.invoke()
                 }
-                titleTrailing?.invoke()
-            }
-        },
-        navigationIcon = {
-            when {
-                navigationIcon != null -> navigationIcon()
-                nav != null -> NavigationBackIcon(onClick = { nav.navigateUp() })
-            }
-        },
-        actions = {
-            actions?.invoke(this)
-            HorizontalSpace(8.dp)
-        },
-        modifier = modifier,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = topBarColor,
-            scrolledContainerColor = topBarColor,
-        ),
-        scrollBehavior = scrollBehavior,
-    )
+            },
+            navigationIcon = {
+                when {
+                    navigationIcon != null -> navigationIcon()
+                    nav != null -> NavigationBackIcon(onClick = { nav.navigateUp() })
+                }
+            },
+            actions = {
+                actions?.invoke(this)
+                HorizontalSpace(8.dp)
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.Transparent,
+                scrolledContainerColor = Color.Transparent,
+            ),
+            scrollBehavior = scrollBehavior,
+        )
+    }
 }

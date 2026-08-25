@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">共有リンクを作成</string>
+    <string name="share_created">リンクを作成しました</string>
+    <string name="share_delete_desc">削除するとリンクは直ちに無効になります</string>
+    <string name="share_expired">期限切れ</string>
+    <string name="share_expires_on">有効期限：{{date}}</string>
+    <string name="share_expiry">有効期限</string>
+    <string name="share_expiry_1d">1 日</string>
+    <string name="share_expiry_1h">1 時間</string>
+    <string name="share_expiry_30d">30 日</string>
+    <string name="share_expiry_7d">7 日</string>
+    <string name="share_expiry_never">無期限</string>
+    <string name="share_link">共有リンク</string>
+    <string name="share_link_copied">リンクをコピーしました</string>
+    <string name="share_link_desc">このリンクを知る人は、期限まで共有ファイルにアクセスできます</string>
+    <string name="share_links">共有リンク</string>
+    <string name="share_links_desc">ファイルやフォルダー用に作成したリンク</string>
+    <string name="share_name_placeholder">名前</string>
+    <string name="share_no_links">共有リンクはありません</string>
+    <string name="share_read_only">読み取り専用</string>
+</resources>

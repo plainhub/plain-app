@@ -21,11 +21,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.ui.theme.filledButtonContent
 import com.ismartcoding.plain.ui.theme.red
 
 
@@ -46,8 +46,8 @@ fun PFilledButton(
         ButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiary
     }
     val contentColor = when (type) {
-        ButtonType.PRIMARY -> MaterialTheme.colorScheme.onPrimary
-        ButtonType.DANGER -> Color.White
+        ButtonType.PRIMARY -> MaterialTheme.colorScheme.filledButtonContent
+        ButtonType.DANGER -> MaterialTheme.colorScheme.filledButtonContent
         ButtonType.TERTIARY -> MaterialTheme.colorScheme.onTertiary
     }
     val padding = if (buttonSize == ButtonSize.SMALL) PaddingValues(horizontal = 12.dp) else ButtonDefaults.ContentPadding

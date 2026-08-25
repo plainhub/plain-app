@@ -1,4 +1,5 @@
 package com.ismartcoding.plain
+
 import android.Manifest
 
 import com.ismartcoding.plain.i18n.*
@@ -65,8 +66,11 @@ internal fun MainActivity.initEvents() {
 
                 is HStartScreenMirrorEvent -> {
                     try {
-                        if (event.audio && !Permission.RECORD_AUDIO.isGranted()) recordAudioForMirror.launch(Manifest.permission.RECORD_AUDIO)
-                        else screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+                        if (event.audio && !Permission.RECORD_AUDIO.isGranted()) {
+                            recordAudioForMirror.launch(Manifest.permission.RECORD_AUDIO)
+                        } else {
+                            screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+                        }
                     } catch (e: IllegalStateException) {
                         LogCat.e("Error launching screen capture: ${e.message}")
                     }
@@ -184,6 +188,7 @@ internal fun MainActivity.initEvents() {
                         nav.popBackStack<Routing.ChannelInviteRequest>(inclusive = true)
                     }
                 }
+
                 is PairingSuccessEvent -> {
                     PeerStatusManager.reconnectNow("post_pairing")
                 }

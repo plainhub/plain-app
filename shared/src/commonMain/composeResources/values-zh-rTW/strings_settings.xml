@@ -133,4 +133,24 @@
     <string name="ble_service_uuid">服務 UUID</string>
     <string name="donation_title">支持 PlainApp 開發</string>
     <string name="buy_me_a_coffee">請我喝杯咖啡</string>
+    <string name="aware_attach_status">連線狀態</string>
+    <string name="aware_discovered_peer_count">已發現的裝置</string>
+    <string name="aware_service">Aware 服務</string>
+    <string name="ble_service">BLE 服務</string>
+    <string name="dlna_playback_state">播放狀態</string>
+    <string name="dlna_service">DLNA 服務</string>
+    <string name="dlna_start_error">啟動錯誤</string>
+    <string name="http_server">HTTP 伺服器</string>
+    <string name="http_server_state">狀態</string>
+    <string name="mdns_debug">mDNS 除錯</string>
+    <string name="mdns_instance">執行個體</string>
+    <string name="mdns_ips">IP 位址</string>
+    <string name="mdns_no_devices">未發現附近的裝置</string>
+    <string name="mdns_port">連接埠</string>
+    <string name="mdns_server">mDNS 伺服器</string>
+    <string name="mdns_service_type">服務</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">服務除錯</string>
+    <string name="service_running">執行中</string>
+    <string name="ws_session_count">WebSocket 連線</string>
 </resources>

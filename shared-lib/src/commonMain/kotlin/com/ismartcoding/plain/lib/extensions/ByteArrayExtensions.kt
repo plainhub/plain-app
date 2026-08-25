@@ -9,3 +9,12 @@ package com.ismartcoding.plain.lib.extensions
  */
 fun ByteArray.toHexString(): String =
     joinToString("") { (it.toInt() and 0xFF).toString(16).padStart(2, '0') }
+
+/**
+ * Converts this byte array to a space-separated uppercase hexadecimal string.
+ *
+ * Each byte is rendered as exactly two uppercase hex digits separated by a space,
+ * producing a fingerprint-style signature display for the HTTPS certificate.
+ */
+fun ByteArray.toSignature(): String =
+    joinToString(" ") { (it.toInt() and 0xFF).toString(16).padStart(2, '0').uppercase() }

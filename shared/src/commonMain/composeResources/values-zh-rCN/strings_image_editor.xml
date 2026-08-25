@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">图片编辑器</string>
+    <string name="image_editor_bring_forward">上移一层</string>
+    <string name="image_editor_clear_all">全部清除</string>
+    <string name="image_editor_color">颜色</string>
+    <string name="image_editor_delete_layer">删除图层</string>
+    <string name="image_editor_duplicate_layer">复制图层</string>
+    <string name="image_editor_layer_count">%1$d 个图层</string>
+    <string name="image_editor_layer_visibility">切换可见性</string>
+    <string name="image_editor_layers">图层</string>
+    <string name="image_editor_line_width">线条宽度</string>
+    <string name="image_editor_no_layers">暂无图层</string>
+    <string name="image_editor_no_projects">暂无项目</string>
+    <string name="image_editor_no_projects_desc">从 Web 端创建项目，或点击 + 开始</string>
+    <string name="image_editor_send_backward">下移一层</string>
+    <string name="image_editor_tool_arrow">箭头</string>
+    <string name="image_editor_tool_ellipse">椭圆</string>
+    <string name="image_editor_tool_freehand">画笔</string>
+    <string name="image_editor_tool_highlight">高亮</string>
+    <string name="image_editor_tool_image">图片</string>
+    <string name="image_editor_tool_mosaic">马赛克</string>
+    <string name="image_editor_tool_rect">矩形</string>
+    <string name="image_editor_tool_select">选择</string>
+    <string name="image_editor_tool_sticker">贴纸</string>
+    <string name="image_editor_tool_text">文本</string>
+</resources>

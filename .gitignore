@@ -120,3 +120,4 @@ build/
 # CocoaPods
 Pods/
 .workbuddy
+AGENTS.md

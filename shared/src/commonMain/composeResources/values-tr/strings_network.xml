@@ -90,4 +90,26 @@
     <string name="enable_adb_token">ADB jetonunu etkinleştir</string>
     <string name="http_server_health_check_failed">Hizmet başlatıldı ancak erişilemiyor. Bir güvenlik duvarı veya VPN uygulaması localhost bağlantılarını engelliyor olabilir. Lütfen ağ ayarlarınızı kontrol edin ve uygulamayı yeniden başlatın.</string>
     <string name="access_settings">Erişim ayarları</string>
+    <string name="certificate">Sertifika</string>
+    <string name="certificate_file">Sertifika dosyası</string>
+    <string name="certificate_password">Sertifika parolası</string>
+    <string name="collapse_backup_addresses">Yedek adresleri daralt</string>
+    <string name="https_certificate">HTTPS sertifikası</string>
+    <string name="import_certificate">İçe aktar</string>
+    <string name="import_ssl_certificate_tips">İçe aktardıktan sonra yeni sertifikanın uygulanması için uygulamayı yeniden başlatın. Web istemcileri HTTPS sertifikasına yeniden güvenmelidir.</string>
+    <string name="importing">İçe aktarılıyor…</string>
+    <string name="invalid_certificate_file">Geçersiz sertifika dosyası</string>
+    <string name="invalid_private_key">Geçersiz özel anahtar</string>
+    <string name="no_file_selected">Dosya seçilmedi</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">Sertifikayı ve özel anahtarı ayrı PEM dosyaları olarak içe aktarın (CRT/PEM + KEY/PEM).</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">Parolasıyla birlikte tek bir PKCS#12 paketi (P12/PFX) içe aktarın.</string>
+    <string name="private_key">Özel anahtar</string>
+    <string name="private_key_file">Özel anahtar dosyası</string>
+    <string name="replace_ssl_certificate">SSL sertifikasını değiştir</string>
+    <string name="select_certificate_file">Sertifika dosyası seç</string>
+    <string name="select_private_key_file">Özel anahtar dosyası seç</string>
+    <string name="ssl_certificate_replaced">SSL sertifikası değiştirildi</string>
+    <string name="try_more_addresses">Bağlanamıyor musunuz? Diğer adresleri deneyin</string>
 </resources>

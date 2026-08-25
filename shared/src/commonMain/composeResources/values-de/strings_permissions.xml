@@ -37,4 +37,6 @@
     <string name="accessibility_service_description">PlainApp verwendet diesen Bedienungshilfen-/Accessibility-Dienst, um während der Bildschirmspiegelung die Fernsteuerung zu ermöglichen. Er injiziert Touch-Ereignisse (Tippen, Wischen, Scrollen) und Navigationsaktionen (Zurück, Home, Zuletzt verwendet), die von der Weboberfläche gesendet werden.</string>
     <string name="accessibility_service_label">PlainApp Fernsteuerung</string>
     <string name="location_required_for_aware_chat">Auf einigen Android-Geräten ist die Standortberechtigung für die Kommunikation mit Geräten in der Nähe erforderlich. PlainApp verwendet Ihren Standort nicht, um Sie zu verfolgen.</string>
+    <string name="go_to_settings">Zu den Einstellungen</string>
+    <string name="permission_denied_message">Berechtigung wurde verweigert. Bitte aktivieren Sie sie in den Einstellungen, um diese Funktion zu nutzen.</string>
 </resources>

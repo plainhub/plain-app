@@ -90,4 +90,26 @@
     <string name="enable_adb_token">ADB 토큰 사용</string>
     <string name="http_server_health_check_failed">서비스가 시작되었지만 접근할 수 없습니다. 방화벽 또는 VPN 앱이 localhost 연결을 차단하고 있을 수 있습니다. 네트워크 설정을 확인하고 앱을 다시 시작하세요.</string>
     <string name="access_settings">접근 설정</string>
+    <string name="certificate">인증서</string>
+    <string name="certificate_file">인증서 파일</string>
+    <string name="certificate_password">인증서 비밀번호</string>
+    <string name="collapse_backup_addresses">대체 주소 접기</string>
+    <string name="https_certificate">HTTPS 인증서</string>
+    <string name="import_certificate">가져오기</string>
+    <string name="import_ssl_certificate_tips">가져온 후 앱을 재시작하면 새 인증서가 적용됩니다. 웹 클라이언트는 HTTPS 인증서를 다시 신뢰해야 합니다.</string>
+    <string name="importing">가져오는 중…</string>
+    <string name="invalid_certificate_file">잘못된 인증서 파일</string>
+    <string name="invalid_private_key">잘못된 개인 키</string>
+    <string name="no_file_selected">선택된 파일이 없습니다</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">인증서와 개인 키를 별도의 PEM 파일(CRT/PEM + KEY/PEM)로 가져옵니다.</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">비밀번호가 있는 단일 PKCS#12 번들(P12/PFX)을 가져옵니다.</string>
+    <string name="private_key">개인 키</string>
+    <string name="private_key_file">개인 키 파일</string>
+    <string name="replace_ssl_certificate">SSL 인증서 교체</string>
+    <string name="select_certificate_file">인증서 파일 선택</string>
+    <string name="select_private_key_file">개인 키 파일 선택</string>
+    <string name="ssl_certificate_replaced">SSL 인증서가 교체되었습니다</string>
+    <string name="try_more_addresses">연결되지 않나요? 다른 주소를 시도해 보세요</string>
 </resources>

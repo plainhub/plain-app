@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">Создать ссылку</string>
+    <string name="share_created">Ссылка создана</string>
+    <string name="share_delete_desc">Удаление немедленно отзовёт ссылку</string>
+    <string name="share_expired">Истёк</string>
+    <string name="share_expires_on">Истекает {{date}}</string>
+    <string name="share_expiry">Срок действия</string>
+    <string name="share_expiry_1d">1 день</string>
+    <string name="share_expiry_1h">1 час</string>
+    <string name="share_expiry_30d">30 дней</string>
+    <string name="share_expiry_7d">7 дней</string>
+    <string name="share_expiry_never">Никогда</string>
+    <string name="share_link">Ссылка</string>
+    <string name="share_link_copied">Ссылка скопирована</string>
+    <string name="share_link_desc">Любой, у кого есть ссылка, может получить доступ к файлам до истечения срока</string>
+    <string name="share_links">Ссылки</string>
+    <string name="share_links_desc">Ссылки, созданные для файлов и папок</string>
+    <string name="share_name_placeholder">Название</string>
+    <string name="share_no_links">Нет ссылок</string>
+    <string name="share_read_only">Только чтение</string>
+</resources>

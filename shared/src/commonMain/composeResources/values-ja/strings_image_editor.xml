@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">画像エディター</string>
+    <string name="image_editor_bring_forward">前面へ</string>
+    <string name="image_editor_clear_all">すべてクリア</string>
+    <string name="image_editor_color">色</string>
+    <string name="image_editor_delete_layer">レイヤーを削除</string>
+    <string name="image_editor_duplicate_layer">レイヤーを複製</string>
+    <string name="image_editor_layer_count">%1$d レイヤー</string>
+    <string name="image_editor_layer_visibility">表示切替</string>
+    <string name="image_editor_layers">レイヤー</string>
+    <string name="image_editor_line_width">線の太さ</string>
+    <string name="image_editor_no_layers">レイヤーはありません</string>
+    <string name="image_editor_no_projects">プロジェクトはまだありません</string>
+    <string name="image_editor_no_projects_desc">Web UI で作成するか、+ をタップして開始</string>
+    <string name="image_editor_send_backward">背面へ</string>
+    <string name="image_editor_tool_arrow">矢印</string>
+    <string name="image_editor_tool_ellipse">楕円</string>
+    <string name="image_editor_tool_freehand">ブラシ</string>
+    <string name="image_editor_tool_highlight">ハイライト</string>
+    <string name="image_editor_tool_image">画像</string>
+    <string name="image_editor_tool_mosaic">モザイク</string>
+    <string name="image_editor_tool_rect">長方形</string>
+    <string name="image_editor_tool_select">選択</string>
+    <string name="image_editor_tool_sticker">スタンプ</string>
+    <string name="image_editor_tool_text">テキスト</string>
+</resources>

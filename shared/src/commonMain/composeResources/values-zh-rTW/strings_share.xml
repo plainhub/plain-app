@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">建立分享連結</string>
+    <string name="share_created">連結已建立</string>
+    <string name="share_delete_desc">刪除後連結立即失效</string>
+    <string name="share_expired">已過期</string>
+    <string name="share_expires_on">到期時間 {{date}}</string>
+    <string name="share_expiry">有效期限</string>
+    <string name="share_expiry_1d">1 天</string>
+    <string name="share_expiry_1h">1 小時</string>
+    <string name="share_expiry_30d">30 天</string>
+    <string name="share_expiry_7d">7 天</string>
+    <string name="share_expiry_never">永不過期</string>
+    <string name="share_link">分享連結</string>
+    <string name="share_link_copied">連結已複製</string>
+    <string name="share_link_desc">任何擁有此連結的人都可以在到期前存取共享檔案</string>
+    <string name="share_links">分享連結</string>
+    <string name="share_links_desc">你為檔案和資料夾建立的連結</string>
+    <string name="share_name_placeholder">名稱</string>
+    <string name="share_no_links">尚無分享連結</string>
+    <string name="share_read_only">唯讀</string>
+</resources>

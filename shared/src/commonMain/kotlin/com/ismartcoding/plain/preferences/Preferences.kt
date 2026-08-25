@@ -272,6 +272,16 @@ object HttpsPreference : BasePreference<Boolean>() {
     }
 }
 
+object WebAddressBarExpandedPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("web_address_bar_expanded")
+
+    override suspend fun putAsync(value: Boolean) {
+        super.putAsync(value)
+        TempData.webAddressBarExpanded.value = value
+    }
+}
+
 object ScreenMirrorQualityPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("screen_mirror_quality")

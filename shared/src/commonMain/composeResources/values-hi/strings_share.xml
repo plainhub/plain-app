@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">शेयर लिंक बनाएँ</string>
+    <string name="share_created">लिंक बन गया</string>
+    <string name="share_delete_desc">हटाने से लिंक तुरंत निष्क्रिय हो जाएगा</string>
+    <string name="share_expired">समाप्त</string>
+    <string name="share_expires_on">समाप्ति {{date}}</string>
+    <string name="share_expiry">समाप्ति</string>
+    <string name="share_expiry_1d">1 दिन</string>
+    <string name="share_expiry_1h">1 घंटा</string>
+    <string name="share_expiry_30d">30 दिन</string>
+    <string name="share_expiry_7d">7 दिन</string>
+    <string name="share_expiry_never">कभी नहीं</string>
+    <string name="share_link">शेयर लिंक</string>
+    <string name="share_link_copied">लिंक कॉपी हुआ</string>
+    <string name="share_link_desc">इस लिंक वाला कोई भी व्यक्ति समाप्ति तक साझा फ़ाइलों तक पहुँच सकता है</string>
+    <string name="share_links">शेयर किए गए लिंक</string>
+    <string name="share_links_desc">फ़ाइलों और फ़ोल्डरों के लिए बनाए गए लिंक</string>
+    <string name="share_name_placeholder">नाम</string>
+    <string name="share_no_links">कोई शेयर लिंक नहीं</string>
+    <string name="share_read_only">केवल पढ़ने के लिए</string>
+</resources>

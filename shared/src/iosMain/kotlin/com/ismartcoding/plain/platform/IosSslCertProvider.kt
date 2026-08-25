@@ -32,6 +32,7 @@ interface IosSslCertProvider {
      * @throws Exception when the bundle can't be parsed, the password is wrong,
      *         or no private key is found.
      */
+    @Throws(Exception::class)
     fun replaceCertWithPkcs12(p12Data: ByteArray, password: String): ByteArray
 
     /**
@@ -41,5 +42,6 @@ interface IosSslCertProvider {
      *
      * @throws Exception when either PEM file is malformed or they don't match.
      */
+    @Throws(Exception::class)
     fun replaceCertWithPem(certPem: String, keyPem: String): ByteArray
 }

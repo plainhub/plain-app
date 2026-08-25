@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">ছবি সম্পাদক</string>
+    <string name="image_editor_bring_forward">সামনে আনুন</string>
+    <string name="image_editor_clear_all">সব মুছুন</string>
+    <string name="image_editor_color">রঙ</string>
+    <string name="image_editor_delete_layer">লেয়ার মুছুন</string>
+    <string name="image_editor_duplicate_layer">লেয়ার ডুপ্লিকেট</string>
+    <string name="image_editor_layer_count">%1$d লেয়ার</string>
+    <string name="image_editor_layer_visibility">দৃশ্যমানতা টগল</string>
+    <string name="image_editor_layers">লেয়ার</string>
+    <string name="image_editor_line_width">রেখার প্রস্থ</string>
+    <string name="image_editor_no_layers">কোনো লেয়ার নেই</string>
+    <string name="image_editor_no_projects">এখনো কোনো প্রজেক্ট নেই</string>
+    <string name="image_editor_no_projects_desc">ওয়েব UI থেকে প্রজেক্ট তৈরি করুন বা শুরু করতে + চাপুন</string>
+    <string name="image_editor_send_backward">পেছনে পাঠান</string>
+    <string name="image_editor_tool_arrow">তীর</string>
+    <string name="image_editor_tool_ellipse">উপবৃত্ত</string>
+    <string name="image_editor_tool_freehand">ব্রাশ</string>
+    <string name="image_editor_tool_highlight">হাইলাইট</string>
+    <string name="image_editor_tool_image">ছবি</string>
+    <string name="image_editor_tool_mosaic">মোজাইক</string>
+    <string name="image_editor_tool_rect">আয়তক্ষেত্র</string>
+    <string name="image_editor_tool_select">নির্বাচন</string>
+    <string name="image_editor_tool_sticker">স্টিকার</string>
+    <string name="image_editor_tool_text">টেক্সট</string>
+</resources>

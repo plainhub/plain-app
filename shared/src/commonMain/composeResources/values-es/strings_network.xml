@@ -90,4 +90,26 @@
     <string name="enable_adb_token">Habilitar token ADB</string>
     <string name="http_server_health_check_failed">El servicio se inició pero no se puede acceder. Es posible que una aplicación de firewall o VPN esté bloqueando las conexiones a localhost. Verifique la configuración de red y reinicie la aplicación.</string>
     <string name="access_settings">Ajustes de acceso</string>
+    <string name="certificate">Certificado</string>
+    <string name="certificate_file">Archivo de certificado</string>
+    <string name="certificate_password">Contraseña del certificado</string>
+    <string name="collapse_backup_addresses">Contraer direcciones alternativas</string>
+    <string name="https_certificate">Certificado HTTPS</string>
+    <string name="import_certificate">Importar</string>
+    <string name="import_ssl_certificate_tips">Después de importar, reinicie la aplicación para aplicar el nuevo certificado. Los clientes web deberán confiar de nuevo en el certificado HTTPS.</string>
+    <string name="importing">Importando…</string>
+    <string name="invalid_certificate_file">Archivo de certificado no válido</string>
+    <string name="invalid_private_key">Clave privada no válida</string>
+    <string name="no_file_selected">No se seleccionó ningún archivo</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">Importar un certificado y su clave privada como archivos PEM separados (CRT/PEM + KEY/PEM).</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">Importar un único paquete PKCS#12 (P12/PFX) con su contraseña.</string>
+    <string name="private_key">Clave privada</string>
+    <string name="private_key_file">Archivo de clave privada</string>
+    <string name="replace_ssl_certificate">Reemplazar certificado SSL</string>
+    <string name="select_certificate_file">Seleccionar archivo de certificado</string>
+    <string name="select_private_key_file">Seleccionar archivo de clave privada</string>
+    <string name="ssl_certificate_replaced">El certificado SSL se ha reemplazado</string>
+    <string name="try_more_addresses">¿No se puede conectar? Pruebe otras direcciones</string>
 </resources>

@@ -131,4 +131,26 @@
     <string name="ble_service_uuid">UUID dịch vụ</string>
     <string name="donation_title">Ủng hộ phát triển PlainApp</string>
     <string name="buy_me_a_coffee">Mời tôi ly cà phê</string>
+    <string name="allow_any_host">Cho phép mọi máy chủ</string>
+    <string name="allow_any_host_desc">Chấp nhận yêu cầu từ bất kỳ trang web nào.</string>
+    <string name="aware_attach_status">Trạng thái kết nối</string>
+    <string name="aware_discovered_peer_count">Thiết bị đã tìm thấy</string>
+    <string name="aware_service">Dịch vụ Aware</string>
+    <string name="ble_service">Dịch vụ BLE</string>
+    <string name="dlna_playback_state">Trạng thái phát</string>
+    <string name="dlna_service">Dịch vụ DLNA</string>
+    <string name="dlna_start_error">Lỗi khởi động</string>
+    <string name="http_server">Máy chủ HTTP</string>
+    <string name="http_server_state">Trạng thái</string>
+    <string name="mdns_debug">Gỡ lỗi mDNS</string>
+    <string name="mdns_instance">Phiên bản</string>
+    <string name="mdns_ips">Địa chỉ IP</string>
+    <string name="mdns_no_devices">Không tìm thấy thiết bị gần đây</string>
+    <string name="mdns_port">Cổng</string>
+    <string name="mdns_server">Máy chủ mDNS</string>
+    <string name="mdns_service_type">Dịch vụ</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">Gỡ lỗi dịch vụ</string>
+    <string name="service_running">Đang chạy</string>
+    <string name="ws_session_count">Phiên WebSocket</string>
 </resources>

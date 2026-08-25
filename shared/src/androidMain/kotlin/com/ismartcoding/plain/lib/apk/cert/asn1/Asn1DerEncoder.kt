@@ -150,6 +150,8 @@ object Asn1DerEncoder {
                             + containerClass.name + "." + field.name
                 )
             }
+            // Kotlin `var` backing fields are private; make them readable via reflection.
+            field.isAccessible = true
             var annotatedField: AnnotatedField
             annotatedField = try {
                 AnnotatedField(container, field, annotation)
@@ -454,6 +456,37 @@ object Asn1DerEncoder {
                             value
                         )
                     }
+                }
+
+                // DER BIT STRING: a leading "number of unused bits" octet, then the bits.
+                // The generator only ever emits whole-octet values, so the count is always 0.
+                Asn1Type.BIT_STRING -> if (source is ByteArray) {
+                    return createTag(
+                        BerEncoding.TAG_CLASS_UNIVERSAL,
+                        false,
+                        BerEncoding.TAG_NUMBER_BIT_STRING,
+                        byteArrayOf(0),
+                        source
+                    )
+                }
+
+                // X.690 GeneralizedTime: yyyyMMddHHmmss'Z' (UTC), ASCII-encoded.
+                Asn1Type.GENERALIZED_TIME -> if (source is String) {
+                    return createTag(
+                        BerEncoding.TAG_CLASS_UNIVERSAL,
+                        false,
+                        BerEncoding.TAG_NUMBER_GENERALIZED_TIME,
+                        source.toByteArray(Charsets.US_ASCII)
+                    )
+                }
+
+                Asn1Type.UTF8_STRING -> if (source is String) {
+                    return createTag(
+                        BerEncoding.TAG_CLASS_UNIVERSAL,
+                        false,
+                        BerEncoding.TAG_NUMBER_UTF8_STRING,
+                        source.toByteArray(Charsets.UTF_8)
+                    )
                 }
 
                 Asn1Type.INTEGER -> if (source is Int) {

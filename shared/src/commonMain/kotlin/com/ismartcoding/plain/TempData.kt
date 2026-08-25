@@ -11,9 +11,12 @@ object TempData {
     val serviceEnabled = MutableStateFlow(false)
     val desktopAccessEnabled = MutableStateFlow(false)
     val webHttps = MutableStateFlow(false)
+    /** Whether the WebAddressBar's backup address list is expanded. Persisted via [com.ismartcoding.plain.preferences.WebAddressBarExpandedPreference]. */
+    val webAddressBarExpanded = MutableStateFlow(false)
     val httpPort = MutableStateFlow(8080)
     val httpsPort = MutableStateFlow(8443)
     val dlnaEnabled = MutableStateFlow(false)
+
     var ip4s = mutableStateOf(emptyList<String>())
     var clientId = ""
     val deviceName = MutableStateFlow("")

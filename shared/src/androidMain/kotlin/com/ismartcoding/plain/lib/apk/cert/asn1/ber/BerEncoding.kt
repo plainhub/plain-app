@@ -33,6 +33,11 @@ object BerEncoding {
     const val TAG_CLASS_PRIVATE = 3
 
     /**
+     * Tag number: BIT STRING
+     */
+    const val TAG_NUMBER_BIT_STRING = 0x3
+
+    /**
      * Tag number: INTEGER
      */
     const val TAG_NUMBER_INTEGER = 0x2
@@ -61,13 +66,27 @@ object BerEncoding {
      * Tag number: SET
      */
     const val TAG_NUMBER_SET = 0x11
+
+    /**
+     * Tag number: GeneralizedTime
+     */
+    const val TAG_NUMBER_GENERALIZED_TIME = 0x18
+
+    /**
+     * Tag number: UTF8String
+     */
+    const val TAG_NUMBER_UTF8_STRING = 0x0c
+
     fun getTagNumber(dataType: Asn1Type): Int {
         return when (dataType) {
             Asn1Type.INTEGER -> TAG_NUMBER_INTEGER
+            Asn1Type.BIT_STRING -> TAG_NUMBER_BIT_STRING
             Asn1Type.OBJECT_IDENTIFIER -> TAG_NUMBER_OBJECT_IDENTIFIER
             Asn1Type.OCTET_STRING -> TAG_NUMBER_OCTET_STRING
             Asn1Type.SET_OF -> TAG_NUMBER_SET
             Asn1Type.SEQUENCE, Asn1Type.SEQUENCE_OF -> TAG_NUMBER_SEQUENCE
+            Asn1Type.GENERALIZED_TIME -> TAG_NUMBER_GENERALIZED_TIME
+            Asn1Type.UTF8_STRING -> TAG_NUMBER_UTF8_STRING
             else -> throw IllegalArgumentException("Unsupported data type: $dataType")
         }
     }
@@ -101,11 +120,14 @@ object BerEncoding {
     fun tagNumberToString(tagNumber: Int): String {
         return when (tagNumber) {
             TAG_NUMBER_INTEGER -> "INTEGER"
+            TAG_NUMBER_BIT_STRING -> "BIT STRING"
             TAG_NUMBER_OCTET_STRING -> "OCTET STRING"
             TAG_NUMBER_NULL -> "NULL"
             TAG_NUMBER_OBJECT_IDENTIFIER -> "OBJECT IDENTIFIER"
             TAG_NUMBER_SEQUENCE -> "SEQUENCE"
             TAG_NUMBER_SET -> "SET"
+            TAG_NUMBER_GENERALIZED_TIME -> "GeneralizedTime"
+            TAG_NUMBER_UTF8_STRING -> "UTF8String"
             else -> "0x" + tagNumber.toString(16)
         }
     }

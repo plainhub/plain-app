@@ -67,7 +67,7 @@ object DialogHelper {
     fun showConfirmDialog(
         title: String,
         message: String,
-        callback: () -> Unit,
+        callback: () -> Unit = {},
     ) {
         coIO {
             sendEvent(ConfirmDialogEvent(title, message, Pair(getComposeString(Res.string.ok), callback), null))

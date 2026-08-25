@@ -1,5 +1,3 @@
-@file:JvmName("AppContextLib")
-
 package com.ismartcoding.plain
 
 import android.content.Context

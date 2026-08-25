@@ -37,4 +37,6 @@
     <string name="accessibility_service_description">স্ক্রিন মিররিং চলাকালীন দূরবর্তী নিয়ন্ত্রণ সক্ষম করতে PlainApp এই অ্যাক্সেসিবিলিটি সার্ভিস ব্যবহার করে। এটি ওয়েব ইন্টারফেস থেকে পাঠানো টাচ ইভেন্ট (ট্যাপ, সোয়াইপ, স্ক্রল) এবং ন্যাভিগেশন অ্যাকশন (পেছনে, হোম, সাম্প্রতিক) ইনজেক্ট করে।</string>
     <string name="accessibility_service_label">PlainApp দূরবর্তী নিয়ন্ত্রণ</string>
     <string name="location_required_for_aware_chat">কিছু অ্যান্ড্রয়েড ডিভাইসে, নিকটবর্তী ডিভাইস যোগাযোগের জন্য অবস্থান অনুমতি প্রয়োজন। PlainApp আপনাকে ট্র্যাক করতে আপনার অবস্থান ব্যবহার করে না।</string>
+    <string name="go_to_settings">সেটিংসে যান</string>
+    <string name="permission_denied_message">অনুমতি অস্বীকৃত হয়েছে। এই ফিচার ব্যবহার করতে সেটিংসে এটি চালু করুন।</string>
 </resources>

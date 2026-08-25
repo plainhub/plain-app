@@ -131,4 +131,26 @@
     <string name="ble_service_uuid">UUID службы</string>
     <string name="donation_title">Поддержите разработку PlainApp</string>
     <string name="buy_me_a_coffee">Купите мне кофе</string>
+    <string name="allow_any_host">Разрешить любой узел</string>
+    <string name="allow_any_host_desc">Принимать кросс-доменные запросы с любого сайта.</string>
+    <string name="aware_attach_status">Статус подключения</string>
+    <string name="aware_discovered_peer_count">Найденные устройства</string>
+    <string name="aware_service">Служба Aware</string>
+    <string name="ble_service">Служба BLE</string>
+    <string name="dlna_playback_state">Состояние воспроизведения</string>
+    <string name="dlna_service">Служба DLNA</string>
+    <string name="dlna_start_error">Ошибка запуска</string>
+    <string name="http_server">HTTP-сервер</string>
+    <string name="http_server_state">Состояние</string>
+    <string name="mdns_debug">Отладка mDNS</string>
+    <string name="mdns_instance">Экземпляр</string>
+    <string name="mdns_ips">IP-адреса</string>
+    <string name="mdns_no_devices">Ближайшие устройства не найдены</string>
+    <string name="mdns_port">Порт</string>
+    <string name="mdns_server">Сервер mDNS</string>
+    <string name="mdns_service_type">Служба</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">Отладка служб</string>
+    <string name="service_running">Работает</string>
+    <string name="ws_session_count">Сессии WebSocket</string>
 </resources>

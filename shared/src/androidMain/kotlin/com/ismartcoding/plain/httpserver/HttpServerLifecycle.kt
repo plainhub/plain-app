@@ -3,9 +3,9 @@ package com.ismartcoding.plain.httpserver
 import android.content.Context
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.lib.apk.cert.x509.X509SelfSignedGenerator
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.lib.helpers.JksHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import io.ktor.server.engine.EmbeddedServer
@@ -16,22 +16,17 @@ import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
 import org.slf4j.LoggerFactory
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
-import org.bouncycastle.cert.X509CertificateHolder
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
-import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.openssl.PEMKeyPair
-import org.bouncycastle.openssl.PEMParser
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.StringReader
+import java.security.KeyFactory
 import java.security.KeyStore
 import java.security.PrivateKey
-import java.security.Security
 import java.security.cert.Certificate
+import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+import java.security.spec.PKCS8EncodedKeySpec
+import java.util.Base64
 
 /**
  * The live Ktor/Netty embedded server instance, or null when the server is stopped.
@@ -60,10 +55,10 @@ fun warmUpNetty() {
 }
 
 /**
- * Generate a fresh JKS keystore file and atomically replace [file].
+ * Generate a fresh PKCS#12 keystore file and atomically replace [file].
  */
 fun generateSslKeyStoreFile(file: File, password: String) {
-    val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
+    val keyStore = X509SelfSignedGenerator.newSelfSignedKeyStore(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
     // Write to a temp file first, then atomically rename to the target.
     // This prevents a partially-written (corrupted) keystore if the process
     // is killed mid-write (OOM, force-stop, reboot, etc.).
@@ -83,22 +78,16 @@ fun generateSslKeyStoreFile(file: File, password: String) {
  * Replace the HTTPS keystore with a user-provided PKCS#12 (.p12/.pfx) bundle.
  *
  * Loads the bundle with [p12Password], extracts the first private-key entry,
- * and re-stores it as a BKS keystore under the app's own alias ([SSL_KEY_ALIAS])
- * and [keystorePassword] using an atomic write (see [storeSslKeyStore]).
+ * and re-stores it as a platform PKCS#12 keystore under the app's own alias
+ * ([SSL_KEY_ALIAS]) and [keystorePassword] using an atomic write (see
+ * [storeSslKeyStore]).
  *
  * @return the raw signature bytes of the newly installed certificate
  * @throws Exception when the bundle can't be parsed, the password is wrong, or
  *         no private key / certificate is found
  */
 fun replaceSslKeyStoreBytes(file: File, p12Bytes: ByteArray, p12Password: String, keystorePassword: String): ByteArray {
-    ensureBouncyCastleRegistered()
-    val p12 = try {
-        KeyStore.getInstance("PKCS12").apply { ByteArrayInputStream(p12Bytes).use { load(it, p12Password.toCharArray()) } }
-    } catch (_: Exception) {
-        // Fall back to the app's BouncyCastle provider, which supports modern
-        // PBES2/AES-encrypted bundles that the platform default provider rejects.
-        KeyStore.getInstance("PKCS12", "BC").apply { ByteArrayInputStream(p12Bytes).use { load(it, p12Password.toCharArray()) } }
-    }
+    val p12 = KeyStore.getInstance("PKCS12").apply { ByteArrayInputStream(p12Bytes).use { load(it, p12Password.toCharArray()) } }
     val alias = p12.aliases().asSequence().firstOrNull { p12.isKeyEntry(it) }
         ?: throw IllegalStateException("No private key found in the certificate file")
     val key = p12.getKey(alias, p12Password.toCharArray()) as? PrivateKey
@@ -122,12 +111,12 @@ fun replaceSslKeyStoreFromPem(file: File, certPem: String, keyPem: String, keyst
 }
 
 /**
- * Store [key] + [chain] into a fresh BKS keystore at [file] (atomic write) under
- * the app's own alias and password, then return the certificate's signature bytes.
+ * Store [key] + [chain] into a fresh platform PKCS#12 keystore at [file] (atomic
+ * write) under the app's own alias and password, then return the certificate's
+ * signature bytes.
  */
 private fun storeSslKeyStore(file: File, key: PrivateKey, chain: Array<Certificate>, keystorePassword: String): ByteArray {
-    ensureBouncyCastleRegistered()
-    val keystore = KeyStore.getInstance("BKS", "BC").apply { load(null, null) }
+    val keystore = KeyStore.getInstance("PKCS12").apply { load(null, null) }
     keystore.setKeyEntry(SSL_KEY_ALIAS, key, keystorePassword.toCharArray(), chain)
     val tmp = File(file.parent, "${file.name}.tmp")
     try {
@@ -141,35 +130,36 @@ private fun storeSslKeyStore(file: File, key: PrivateKey, chain: Array<Certifica
     return cert.signature
 }
 
-private fun ensureBouncyCastleRegistered() {
-    if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-        Security.insertProviderAt(BouncyCastleProvider(), 1)
-    }
+/** Strip the `-----BEGIN X-----`/`-----END X-----` armor and Base64-decode the body. */
+private fun decodePemBlock(pem: String, label: String): ByteArray {
+    val begin = "-----BEGIN $label-----"
+    val end = "-----END $label-----"
+    val start = pem.indexOf(begin).takeIf { it >= 0 }
+        ?: throw IllegalStateException("No $label block found in the PEM data")
+    val bodyStart = start + begin.length
+    val endIndex = pem.indexOf(end, bodyStart)
+        ?: throw IllegalStateException("Malformed $label block in the PEM data")
+    val body = pem.substring(bodyStart, endIndex).replace(Regex("\\s"), "")
+    return Base64.getDecoder().decode(body)
 }
 
 private fun parsePemCertificate(pem: String): X509Certificate {
-    PEMParser(StringReader(pem)).use { parser ->
-        val obj = parser.readObject()
-        val holder = obj as? X509CertificateHolder
-            ?: throw IllegalStateException("No certificate found in the PEM file")
-        return JcaX509CertificateConverter().setProvider("BC").getCertificate(holder)
-    }
-}
-
-private fun parsePemPrivateKey(pem: String): PrivateKey {
-    PEMParser(StringReader(pem)).use { parser ->
-        val obj = parser.readObject() ?: throw IllegalStateException("No private key found in the PEM file")
-        val converter = JcaPEMKeyConverter().setProvider("BC")
-        return when (obj) {
-            is PEMKeyPair -> converter.getKeyPair(obj).private
-            is PrivateKeyInfo -> converter.getPrivateKey(obj)
-            else -> throw IllegalStateException("Unsupported private key format")
-        }
-    }
+    val der = decodePemBlock(pem, "CERTIFICATE")
+    return CertificateFactory.getInstance("X.509").generateCertificate(ByteArrayInputStream(der)) as X509Certificate
 }
 
 /**
- * Load (or regenerate on corruption) the BKS keystore used by the HTTPS connector.
+ * Parse a PEM-encoded EC private key, PKCS#8 (`BEGIN PRIVATE KEY`) only.
+ * SEC1 (`BEGIN EC PRIVATE KEY`) is not supported and fails with a clear error.
+ */
+private fun parsePemPrivateKey(pem: String): PrivateKey {
+    val der = decodePemBlock(pem, "PRIVATE KEY")
+    val keyFactory = KeyFactory.getInstance("EC")
+    return keyFactory.generatePrivate(PKCS8EncodedKeySpec(der))
+}
+
+/**
+ * Load (or regenerate on corruption) the platform PKCS#12 keystore used by the HTTPS connector.
  */
 private fun getSslKeyStore(context: Context, password: String): KeyStore {
     val file = File(context.filesDir, Constants.KEY_STORE_FILE_NAME)
@@ -177,7 +167,7 @@ private fun getSslKeyStore(context: Context, password: String): KeyStore {
         generateSslKeyStoreFile(file, password)
     }
 
-    return KeyStore.getInstance("BKS", "BC").apply {
+    return KeyStore.getInstance("PKCS12").apply {
         try {
             file.inputStream().use {
                 load(it, password.toCharArray())
@@ -226,6 +216,9 @@ suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplica
             tcpKeepAlive = true
             enableHttp2 = false
 
+            // Bind on all interfaces (0.0.0.0): local/loopback access (health
+            // checks, the desktop web console) arrives directly, and LAN devices
+            // reach the server through the Wi-Fi address.
             connector {
                 port = httpPort
             }

@@ -131,4 +131,26 @@
     <string name="ble_service_uuid">সার্ভিস UUID</string>
     <string name="donation_title">PlainApp ডেভেলপমেন্ট সমর্থন করুন</string>
     <string name="buy_me_a_coffee">আমাকে এক কাপ কফি পান করান</string>
+    <string name="allow_any_host">যেকোনো হোস্টের অনুমতি দিন</string>
+    <string name="allow_any_host_desc">যেকোনো ওয়েবসাইট থেকে ক্রস-অরিজিন অনুরোধ গ্রহণ করুন।</string>
+    <string name="aware_attach_status">সংযোগ অবস্থা</string>
+    <string name="aware_discovered_peer_count">খুঁজে পাওয়া ডিভাইস</string>
+    <string name="aware_service">Aware পরিষেবা</string>
+    <string name="ble_service">BLE পরিষেবা</string>
+    <string name="dlna_playback_state">প্লেব্যাক অবস্থা</string>
+    <string name="dlna_service">DLNA পরিষেবা</string>
+    <string name="dlna_start_error">শুরু করতে ত্রুটি</string>
+    <string name="http_server">HTTP সার্ভার</string>
+    <string name="http_server_state">অবস্থা</string>
+    <string name="mdns_debug">mDNS ডিবাগ</string>
+    <string name="mdns_instance">ইনস্ট্যান্স</string>
+    <string name="mdns_ips">IP</string>
+    <string name="mdns_no_devices">কাছাকাছি কোনো ডিভাইস পাওয়া যায়নি</string>
+    <string name="mdns_port">পোর্ট</string>
+    <string name="mdns_server">mDNS সার্ভার</string>
+    <string name="mdns_service_type">পরিষেবা</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">পরিষেবা ডিবাগ</string>
+    <string name="service_running">চলছে</string>
+    <string name="ws_session_count">WebSocket সেশন</string>
 </resources>

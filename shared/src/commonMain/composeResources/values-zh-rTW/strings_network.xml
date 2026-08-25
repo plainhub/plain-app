@@ -90,4 +90,26 @@
     <string name="enable_adb_token">啟用 ADB 令牌</string>
     <string name="http_server_health_check_failed">服務已啟動但無法存取。防火牆或 VPN 應用程式可能封鎖了 localhost 連線。請檢查您的網路設定並重新啟動應用程式。</string>
     <string name="access_settings">存取設定</string>
+    <string name="certificate">憑證</string>
+    <string name="certificate_file">憑證檔案</string>
+    <string name="certificate_password">憑證密碼</string>
+    <string name="collapse_backup_addresses">收合備用位址</string>
+    <string name="https_certificate">HTTPS 憑證</string>
+    <string name="import_certificate">匯入</string>
+    <string name="import_ssl_certificate_tips">匯入後需重新啟動應用程式以套用新憑證。Web 用戶端需要重新信任 HTTPS 憑證。</string>
+    <string name="importing">匯入中…</string>
+    <string name="invalid_certificate_file">無效的憑證檔案</string>
+    <string name="invalid_private_key">無效的私鑰</string>
+    <string name="no_file_selected">未選擇檔案</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">將憑證和私鑰以個別的 PEM 檔案匯入（CRT/PEM + KEY/PEM）。</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">匯入單一 PKCS#12 檔案（P12/PFX）及其密碼。</string>
+    <string name="private_key">私鑰</string>
+    <string name="private_key_file">私鑰檔案</string>
+    <string name="replace_ssl_certificate">取代 SSL 憑證</string>
+    <string name="select_certificate_file">選擇憑證檔案</string>
+    <string name="select_private_key_file">選擇私鑰檔案</string>
+    <string name="ssl_certificate_replaced">SSL 憑證已取代</string>
+    <string name="try_more_addresses">無法連線？嘗試其他位址</string>
 </resources>

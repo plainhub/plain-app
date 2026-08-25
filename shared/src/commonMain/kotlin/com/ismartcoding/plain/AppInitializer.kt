@@ -28,6 +28,7 @@ import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.DesktopAccessPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.ServicePreference
+import com.ismartcoding.plain.preferences.WebAddressBarExpandedPreference
 import com.ismartcoding.plain.helpers.AppFileRealPathMigration
 import com.ismartcoding.plain.preferences.AppFileRealPathMigratedPreference
 import com.ismartcoding.plain.preferences.getPreferencesAsync
@@ -51,6 +52,7 @@ suspend fun initCommonPreferences(): Preferences {
     TempData.desktopAccessEnabled.value = DesktopAccessPreference.get(preferences)
     TempData.serviceEnabled.value = ServicePreference.get(preferences)
     TempData.webHttps.value = HttpsPreference.get(preferences)
+    TempData.webAddressBarExpanded.value = WebAddressBarExpandedPreference.get(preferences)
     TempData.httpPort.value = HttpPortPreference.get(preferences)
     TempData.httpsPort.value = HttpsPortPreference.get(preferences)
     TempData.audioPlayMode.value = AudioPlayModePreference.getValue(preferences)

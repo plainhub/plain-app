@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">படத் திருத்தி</string>
+    <string name="image_editor_bring_forward">முன்னுக்கு கொண்டு வா</string>
+    <string name="image_editor_clear_all">அனைத்தையும் அழி</string>
+    <string name="image_editor_color">நிறம்</string>
+    <string name="image_editor_delete_layer">லேயரை நீக்கு</string>
+    <string name="image_editor_duplicate_layer">லேயரை நகலெடு</string>
+    <string name="image_editor_layer_count">%1$d லேயர்கள்</string>
+    <string name="image_editor_layer_visibility">தெரிவுநிலையை மாற்று</string>
+    <string name="image_editor_layers">லேயர்கள்</string>
+    <string name="image_editor_line_width">கோட்டின் அகலம்</string>
+    <string name="image_editor_no_layers">லேயர்கள் இல்லை</string>
+    <string name="image_editor_no_projects">இன்னும் திட்டங்கள் இல்லை</string>
+    <string name="image_editor_no_projects_desc">வலை UI-இல் திட்டத்தை உருவாக்கவும் அல்லது தொடங்க + ஐ அழுத்தவும்</string>
+    <string name="image_editor_send_backward">பின்னுக்கு அனுப்பு</string>
+    <string name="image_editor_tool_arrow">அம்பு</string>
+    <string name="image_editor_tool_ellipse">நீள்வட்டம்</string>
+    <string name="image_editor_tool_freehand">தூரிகை</string>
+    <string name="image_editor_tool_highlight">ஹைலைட்</string>
+    <string name="image_editor_tool_image">படம்</string>
+    <string name="image_editor_tool_mosaic">மொசைக்</string>
+    <string name="image_editor_tool_rect">செவ்வகம்</string>
+    <string name="image_editor_tool_select">தேர்வு</string>
+    <string name="image_editor_tool_sticker">ஸ்டிக்கர்</string>
+    <string name="image_editor_tool_text">உரை</string>
+</resources>

@@ -37,4 +37,6 @@
     <string name="accessibility_service_description">PlainApp sử dụng dịch vụ hỗ trợ tiếp cận này để bật điều khiển từ xa khi phản chiếu màn hình. Nó chèn các sự kiện chạm (chạm, vuốt, cuộn) và các thao tác điều hướng (Quay lại, Trang chủ, Gần đây) được gửi từ giao diện web.</string>
     <string name="accessibility_service_label">Điều khiển từ xa PlainApp</string>
     <string name="location_required_for_aware_chat">Trên một số thiết bị Android, quyền vị trí là bắt buộc để giao tiếp với thiết bị gần đó. PlainApp không sử dụng vị trí của bạn để theo dõi bạn.</string>
+    <string name="go_to_settings">Đến Cài đặt</string>
+    <string name="permission_denied_message">Quyền bị từ chối. Hãy bật trong Cài đặt để sử dụng tính năng này.</string>
 </resources>

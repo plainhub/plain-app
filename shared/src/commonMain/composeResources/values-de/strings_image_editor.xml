@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="image_editor">Bildeditor</string>
+    <string name="image_editor_bring_forward">Nach vorn bringen</string>
+    <string name="image_editor_clear_all">Alles löschen</string>
+    <string name="image_editor_color">Farbe</string>
+    <string name="image_editor_delete_layer">Ebene löschen</string>
+    <string name="image_editor_duplicate_layer">Ebene duplizieren</string>
+    <string name="image_editor_layer_count">%1$d Ebenen</string>
+    <string name="image_editor_layer_visibility">Sichtbarkeit umschalten</string>
+    <string name="image_editor_layers">Ebenen</string>
+    <string name="image_editor_line_width">Linienbreite</string>
+    <string name="image_editor_no_layers">Keine Ebenen</string>
+    <string name="image_editor_no_projects">Noch keine Projekte</string>
+    <string name="image_editor_no_projects_desc">Erstellen Sie ein Projekt in der Web-UI oder tippen Sie auf +, um zu starten</string>
+    <string name="image_editor_send_backward">Nach hinten senden</string>
+    <string name="image_editor_tool_arrow">Pfeil</string>
+    <string name="image_editor_tool_ellipse">Ellipse</string>
+    <string name="image_editor_tool_freehand">Pinsel</string>
+    <string name="image_editor_tool_highlight">Markierung</string>
+    <string name="image_editor_tool_image">Bild</string>
+    <string name="image_editor_tool_mosaic">Mosaik</string>
+    <string name="image_editor_tool_rect">Rechteck</string>
+    <string name="image_editor_tool_select">Auswählen</string>
+    <string name="image_editor_tool_sticker">Sticker</string>
+    <string name="image_editor_tool_text">Text</string>
+</resources>

@@ -131,4 +131,26 @@
     <string name="ble_service_uuid">서비스 UUID</string>
     <string name="donation_title">PlainApp 개발 지원하기</string>
     <string name="buy_me_a_coffee">커피 한 잔 사주기</string>
+    <string name="allow_any_host">모든 호스트 허용</string>
+    <string name="allow_any_host_desc">모든 웹사이트의 크로스 오리진 요청을 허용합니다.</string>
+    <string name="aware_attach_status">연결 상태</string>
+    <string name="aware_discovered_peer_count">발견된 기기</string>
+    <string name="aware_service">Aware 서비스</string>
+    <string name="ble_service">BLE 서비스</string>
+    <string name="dlna_playback_state">재생 상태</string>
+    <string name="dlna_service">DLNA 서비스</string>
+    <string name="dlna_start_error">시작 오류</string>
+    <string name="http_server">HTTP 서버</string>
+    <string name="http_server_state">상태</string>
+    <string name="mdns_debug">mDNS 디버그</string>
+    <string name="mdns_instance">인스턴스</string>
+    <string name="mdns_ips">IP</string>
+    <string name="mdns_no_devices">근처 기기를 찾을 수 없습니다</string>
+    <string name="mdns_port">포트</string>
+    <string name="mdns_server">mDNS 서버</string>
+    <string name="mdns_service_type">서비스</string>
+    <string name="mdns_txt">TXT</string>
+    <string name="service_debug">서비스 디버그</string>
+    <string name="service_running">실행 중</string>
+    <string name="ws_session_count">WebSocket 세션</string>
 </resources>

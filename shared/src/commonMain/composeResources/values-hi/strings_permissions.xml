@@ -37,4 +37,6 @@
     <string name="accessibility_service_description">PlainApp स्क्रीन मिररिंग के दौरान रिमोट नियंत्रण सक्षम करने के लिए इस एक्सेसिबिलिटी सेवा का उपयोग करता है। यह वेब इंटरफ़ेस से भेजे गए टच इवेंट (टैप, स्वाइप, स्क्रॉल) और नेविगेशन क्रियाएँ (वापस, होम, हाल के ऐप्स) इंजेक्ट करता है।</string>
     <string name="accessibility_service_label">PlainApp रिमोट नियंत्रण</string>
     <string name="location_required_for_aware_chat">कुछ Android डिवाइस पर, आसपास के डिवाइस संचार के लिए स्थान अनुमति आवश्यक है। PlainApp आपको ट्रैक करने के लिए आपका स्थान उपयोग नहीं करता है।</string>
+    <string name="go_to_settings">सेटिंग पर जाएँ</string>
+    <string name="permission_denied_message">अनुमति अस्वीकृत हुई। इस सुविधा का उपयोग करने के लिए इसे सेटिंग में सक्षम करें।</string>
 </resources>

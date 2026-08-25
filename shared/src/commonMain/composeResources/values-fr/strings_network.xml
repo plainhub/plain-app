@@ -90,4 +90,26 @@
     <string name="enable_adb_token">Activer le jeton ADB</string>
     <string name="http_server_health_check_failed">Le service a démarré mais est inaccessible. Un pare-feu ou une application VPN peut bloquer les connexions localhost. Veuillez vérifier vos paramètres réseau et redémarrer l'application.</string>
     <string name="access_settings">Paramètres d'accès</string>
+    <string name="certificate">Certificat</string>
+    <string name="certificate_file">Fichier de certificat</string>
+    <string name="certificate_password">Mot de passe du certificat</string>
+    <string name="collapse_backup_addresses">Replier les adresses de secours</string>
+    <string name="https_certificate">Certificat HTTPS</string>
+    <string name="import_certificate">Importer</string>
+    <string name="import_ssl_certificate_tips">Après l\'importation, redémarrez l\'application pour appliquer le nouveau certificat. Les clients web devront approuver à nouveau le certificat HTTPS.</string>
+    <string name="importing">Importation…</string>
+    <string name="invalid_certificate_file">Fichier de certificat invalide</string>
+    <string name="invalid_private_key">Clé privée invalide</string>
+    <string name="no_file_selected">Aucun fichier sélectionné</string>
+    <string name="pem">PEM</string>
+    <string name="pem_mode_desc">Importer un certificat et sa clé privée sous forme de fichiers PEM distincts (CRT/PEM + KEY/PEM).</string>
+    <string name="pkcs12">PKCS#12</string>
+    <string name="pkcs12_mode_desc">Importer un unique paquet PKCS#12 (P12/PFX) avec son mot de passe.</string>
+    <string name="private_key">Clé privée</string>
+    <string name="private_key_file">Fichier de clé privée</string>
+    <string name="replace_ssl_certificate">Remplacer le certificat SSL</string>
+    <string name="select_certificate_file">Sélectionner le fichier de certificat</string>
+    <string name="select_private_key_file">Sélectionner le fichier de clé privée</string>
+    <string name="ssl_certificate_replaced">Le certificat SSL a été remplacé</string>
+    <string name="try_more_addresses">Connexion impossible ? Essayez d\'autres adresses</string>
 </resources>

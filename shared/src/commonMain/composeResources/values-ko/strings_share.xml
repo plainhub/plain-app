@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_share_link">공유 링크 만들기</string>
+    <string name="share_created">링크가 생성되었습니다</string>
+    <string name="share_delete_desc">삭제하면 링크가 즉시 취소됩니다</string>
+    <string name="share_expired">만료됨</string>
+    <string name="share_expires_on">만료: {{date}}</string>
+    <string name="share_expiry">만료 기한</string>
+    <string name="share_expiry_1d">1일</string>
+    <string name="share_expiry_1h">1시간</string>
+    <string name="share_expiry_30d">30일</string>
+    <string name="share_expiry_7d">7일</string>
+    <string name="share_expiry_never">만료 없음</string>
+    <string name="share_link">공유 링크</string>
+    <string name="share_link_copied">링크가 복사되었습니다</string>
+    <string name="share_link_desc">이 링크가 있는 사람은 만료될 때까지 공유 파일에 접근할 수 있습니다</string>
+    <string name="share_links">공유 링크</string>
+    <string name="share_links_desc">파일과 폴더에 대해 만든 링크</string>
+    <string name="share_name_placeholder">이름</string>
+    <string name="share_no_links">공유 링크가 없습니다</string>
+    <string name="share_read_only">읽기 전용</string>
+</resources>
