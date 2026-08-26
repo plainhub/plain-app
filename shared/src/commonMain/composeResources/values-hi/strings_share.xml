@@ -4,7 +4,7 @@
     <string name="share_created">लिंक बन गया</string>
     <string name="share_delete_desc">हटाने से लिंक तुरंत निष्क्रिय हो जाएगा</string>
     <string name="share_expired">समाप्त</string>
-    <string name="share_expires_on">समाप्ति {{date}}</string>
+    <string name="share_expires_on">समाप्ति %1$s</string>
     <string name="share_expiry">समाप्ति</string>
     <string name="share_expiry_1d">1 दिन</string>
     <string name="share_expiry_1h">1 घंटा</string>

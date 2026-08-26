@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">비디오가 {{path}}에 저장되었습니다</string>
+    <string name="video_save_to">비디오가 %1$s에 저장되었습니다</string>
     <string name="video_save_to_failed">비디오 저장 실패</string>
-    <string name="image_save_to">이미지가 {{path}}에 저장되었습니다</string>
+    <string name="image_save_to">이미지가 %1$s에 저장되었습니다</string>
     <string name="image_save_to_failed">이미지 저장 실패</string>
     <string name="open_with_other_app">다른 앱으로 열기</string>
     <string name="file_size">파일 크기</string>
     <string name="files">파일</string>
     <string name="sdcard">SD 카드</string>
-    <string name="files_title">파일 ({{count}})</string>
-    <string name="trash_title">휴지통 ({{count}})</string>
+    <string name="files_title">파일 (%1$s)</string>
+    <string name="trash_title">휴지통 (%1$s)</string>
     <string name="delete_file">파일 삭제</string>
     <string name="delete_files">파일 삭제</string>
     <string name="copy_path">경로 복사</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">이 기기에 파일 선택 앱이 없습니다. 파일 관리자 앱을 설치해 주세요.</string>
     <string name="cannot_move_folder_into_itself">폴더를 자기 자신 또는 하위 폴더로 이동할 수 없습니다.</string>
     <string name="cannot_copy_folder_into_itself">폴더를 자기 자신 또는 하위 폴더로 복사할 수 없습니다.</string>
-    <string name="file_save_to">파일이 {{path}}에 저장되었습니다</string>
+    <string name="file_save_to">파일이 %1$s에 저장되었습니다</string>
     <string name="group_by_taken_at">촬영 시간으로 그룹화</string>
     <string name="view_mode">보기 모드</string>
     <string name="browse_by_tags">태그별로 탐색</string>

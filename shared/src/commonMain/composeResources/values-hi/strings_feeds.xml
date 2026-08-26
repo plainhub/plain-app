@@ -11,8 +11,8 @@
     <string name="rss_url">आरएसएस यूआरएल</string>
     <string name="import_opml_file">OPML से आयात करें</string>
     <string name="export_opml_file">OPML में निर्यात करें</string>
-    <string name="books_title">किताबें ({{count}})</string>
-    <string name="subscriptions_title">सदस्यता ({{count}})</string>
+    <string name="books_title">किताबें (%1$s)</string>
+    <string name="subscriptions_title">सदस्यता (%1$s)</string>
     <string name="feeds">फ़ीड्स</string>
     <string name="books">किताबें</string>
     <string name="subscriptions">सदस्यताएँ</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">सभी फ़ीड्स सिंक कर रहा है...</string>
     <string name="syncing">सिंक कर रहा है…</string>
     <string name="sync_failed">सिंक विफल हो गया</string>
-    <string name="exported_to">निर्यातित किया गया {{name}} में।</string>
+    <string name="exported_to">निर्यातित किया गया %1$s में।</string>
     <string name="invalid_file">अमान्य फ़ाइल</string>
     <string name="pull_down_to_fetch_content">पूरी सामग्री प्राप्त करने के लिए नीचे खींचें</string>
     <string name="fetching_content">पूरी सामग्री प्राप्त कर रहा है...</string>

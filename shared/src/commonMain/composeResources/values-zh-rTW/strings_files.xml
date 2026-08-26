@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">影片已儲存在{{path}}</string>
+    <string name="video_save_to">影片已儲存在%1$s</string>
     <string name="video_save_to_failed">無法儲存影片</string>
-    <string name="image_save_to">圖片已保存至{{path}}</string>
+    <string name="image_save_to">圖片已保存至%1$s</string>
     <string name="image_save_to_failed">無法儲存圖片</string>
     <string name="open_with_other_app">使用其他應用程式開啟</string>
     <string name="file_size">文件大小</string>
     <string name="files">檔案</string>
     <string name="sdcard">存儲卡</string>
-    <string name="files_title">檔案 ({{count}})</string>
-    <string name="trash_title">回收站 ({{count}})</string>
+    <string name="files_title">檔案 (%1$s)</string>
+    <string name="trash_title">回收站 (%1$s)</string>
     <string name="delete_file">刪除檔案</string>
     <string name="delete_files">刪除檔案</string>
     <string name="copy_path">複製路徑</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">此設備上沒有可用的檔案選擇器應用程式。請安裝檔案管理器應用程式。</string>
     <string name="cannot_move_folder_into_itself">無法將資料夾移動到其自身或其子資料夾中。</string>
     <string name="cannot_copy_folder_into_itself">無法將資料夾複製到其自身或其子資料夾中。</string>
-    <string name="file_save_to">檔案已儲存至 {{path}}</string>
+    <string name="file_save_to">檔案已儲存至 %1$s</string>
     <string name="group_by_taken_at">按拍攝時間分組</string>
     <string name="view_mode">瀏覽方式</string>
     <string name="browse_by_tags">按標籤</string>

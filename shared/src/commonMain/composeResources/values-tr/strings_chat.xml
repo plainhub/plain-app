@@ -46,8 +46,8 @@
     <string name="share_message">Mesajı paylaş</string>
     <string name="delete_message">Mesajı sil</string>
     <string name="accept">Kabul et</string>
-    <string name="request_to_connect">{{ip}} bağlanmak istiyor</string>
-    <string name="client_ua">İS: {{os_name}} {{os_version}}\nTarayıcı: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s bağlanmak istiyor</string>
+    <string name="client_ua">İS: %1$s %2$s\nTarayıcı: %3$s %4$s</string>
     <string name="os">İS</string>
     <string name="browser">Tarayıcı</string>
     <string name="reject">Reddet</string>

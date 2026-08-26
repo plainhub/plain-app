@@ -46,8 +46,8 @@
     <string name="share_message">Chia sẻ tin nhắn</string>
     <string name="delete_message">Xóa tin nhắn</string>
     <string name="accept">Chấp nhận</string>
-    <string name="request_to_connect">{{ip}} yêu cầu kết nối</string>
-    <string name="client_ua">HĐH: {{os_name}} {{os_version}}\nTrình duyệt: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s yêu cầu kết nối</string>
+    <string name="client_ua">HĐH: %1$s %2$s\nTrình duyệt: %3$s %4$s</string>
     <string name="os">Hệ điều hành</string>
     <string name="browser">Trình duyệt</string>
     <string name="reject">Từ chối</string>

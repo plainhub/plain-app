@@ -11,8 +11,8 @@
     <string name="rss_url">RSS முகவரி</string>
     <string name="import_opml_file">OPML இருப்புக்கு இறக்குமதி செய்</string>
     <string name="export_opml_file">OPML இருப்புக்கு ஏற்றுமதி செய்</string>
-    <string name="books_title">புத்தகங்கள் ({{count}})</string>
-    <string name="subscriptions_title">சந்தாக்கள் ({{count}})</string>
+    <string name="books_title">புத்தகங்கள் (%1$s)</string>
+    <string name="subscriptions_title">சந்தாக்கள் (%1$s)</string>
     <string name="feeds">செய்திகள்</string>
     <string name="books">புத்தகங்கள்</string>
     <string name="subscriptions">சந்தாக்கள்</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">அனைத்து செய்திகளையும் ஒத்துகொள்ளுங்கள்...</string>
     <string name="syncing">ஒத்துகொள்ளுங்கள்...</string>
     <string name="sync_failed">ஒத்துகொள்ள தோல்வி</string>
-    <string name="exported_to">ஏற்றுமதி செய்யப்பட்டது {{name}} இல்.</string>
+    <string name="exported_to">ஏற்றுமதி செய்யப்பட்டது %1$s இல்.</string>
     <string name="invalid_file">தவறான கோப்பு</string>
     <string name="pull_down_to_fetch_content">முழு உள்ளடக்கம் எடு</string>
     <string name="fetching_content">முழு உள்ளடக்கம் எடுகின்றது...</string>

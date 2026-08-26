@@ -20,8 +20,8 @@
     <string name="run">Exécuter</string>
     <string name="troubleshoot">Dépanner</string>
     <string name="allow_desktop_access_from_pc">Autoriser l'accès à distance depuis un PC</string>
-    <string name="http_port_conflict_error">Le port {{ port }} est occupé. Appuyez sur "Redémarrer l’application" pour corriger automatiquement.</string>
-    <string name="http_port_conflict_errors">Les ports {{ port }} sont occupés. Appuyez sur "Redémarrer l’application" pour corriger automatiquement.</string>
+    <string name="http_port_conflict_error">Le port %1$s est occupé. Appuyez sur "Redémarrer l’application" pour corriger automatiquement.</string>
+    <string name="http_port_conflict_errors">Les ports %1$s sont occupés. Appuyez sur "Redémarrer l’application" pour corriger automatiquement.</string>
     <string name="fix">Réparer</string>
     <string name="security">Sécurité</string>
     <string name="url_token">Jeton d'URL</string>

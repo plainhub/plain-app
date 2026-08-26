@@ -20,8 +20,8 @@
     <string name="run">運行</string>
     <string name="troubleshoot">排除問題</string>
     <string name="allow_desktop_access_from_pc">允許電腦遠端存取網頁</string>
-    <string name="http_port_conflict_error">埠 {{ port }} 目前被佔用。點按「重新啟動應用程式」可自動修復。</string>
-    <string name="http_port_conflict_errors">埠 {{ port }} 目前被佔用。點按「重新啟動應用程式」可自動修復。</string>
+    <string name="http_port_conflict_error">埠 %1$s 目前被佔用。點按「重新啟動應用程式」可自動修復。</string>
+    <string name="http_port_conflict_errors">埠 %1$s 目前被佔用。點按「重新啟動應用程式」可自動修復。</string>
     <string name="fix">修復</string>
     <string name="security">安全</string>
     <string name="url_token">URL令牌</string>

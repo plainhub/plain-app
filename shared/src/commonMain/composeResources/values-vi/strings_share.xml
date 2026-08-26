@@ -4,7 +4,7 @@
     <string name="share_created">Đã tạo liên kết</string>
     <string name="share_delete_desc">Xóa sẽ hủy liên kết ngay lập tức</string>
     <string name="share_expired">Đã hết hạn</string>
-    <string name="share_expires_on">Hết hạn {{date}}</string>
+    <string name="share_expires_on">Hết hạn %1$s</string>
     <string name="share_expiry">Thời hạn</string>
     <string name="share_expiry_1d">1 ngày</string>
     <string name="share_expiry_1h">1 giờ</string>

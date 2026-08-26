@@ -11,8 +11,8 @@
     <string name="rss_url">RSS URL</string>
     <string name="import_opml_file">OPMLからインポート</string>
     <string name="export_opml_file">OPMLにエクスポート</string>
-    <string name="books_title">書籍（{{count}}）</string>
-    <string name="subscriptions_title">購読（{{count}}）</string>
+    <string name="books_title">書籍（%1$s）</string>
+    <string name="subscriptions_title">購読（%1$s）</string>
     <string name="feeds">フィード</string>
     <string name="books">書籍</string>
     <string name="subscriptions">購読</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">すべてのフィードを同期しています...</string>
     <string name="syncing">同期中...</string>
     <string name="sync_failed">同期に失敗しました</string>
-    <string name="exported_to">{{name}}にエクスポートされました。</string>
+    <string name="exported_to">%1$sにエクスポートされました。</string>
     <string name="invalid_file">無効なファイル</string>
     <string name="pull_down_to_fetch_content">完全なコンテンツを取得するには下に引っ張ります</string>
     <string name="fetching_content">コンテンツを取得中...</string>

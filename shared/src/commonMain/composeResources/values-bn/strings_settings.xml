@@ -28,7 +28,7 @@
     <string name="generate_password">পাসওয়ার্ড তৈরি করুন</string>
     <string name="privacy_policy">গোপনীয়তা নীতি</string>
     <string name="terms_of_use">ব্যবহারের শর্তাবলী</string>
-    <string name="version_name_with_code">সংস্করণ {{version_name}} ({{version_code}})</string>
+    <string name="version_name_with_code">সংস্করণ %1$s (%2$s)</string>
     <string name="dark">অন্ধকার</string>
     <string name="sort">ক্রম</string>
     <string name="language">ভাষা</string>

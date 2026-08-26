@@ -7,7 +7,7 @@
     <string name="source_directory">ソースディレクトリ</string>
     <string name="data_directory">データディレクトリ</string>
     <string name="more_info">詳細</string>
-    <string name="sdk">ターゲット: {{ target }}, 最小: {{ min }}</string>
+    <string name="sdk">ターゲット: %1$s, 最小: %2$s</string>
     <string name="installed_at">インストール日時</string>
     <string name="app_size">アプリサイズ</string>
     <string name="user_app">ユーザーアプリ</string>

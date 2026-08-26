@@ -46,8 +46,8 @@
     <string name="share_message">Bericht delen</string>
     <string name="delete_message">Bericht verwijderen</string>
     <string name="accept">Accepteren</string>
-    <string name="request_to_connect">{{ip}} vraagt om verbinding</string>
-    <string name="client_ua">Besturingssysteem: {{os_name}} {{os_version}}\nBrowser: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s vraagt om verbinding</string>
+    <string name="client_ua">Besturingssysteem: %1$s %2$s\nBrowser: %3$s %4$s</string>
     <string name="os">Besturingssysteem</string>
     <string name="browser">Browser</string>
     <string name="reject">Afwijzen</string>

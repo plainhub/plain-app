@@ -30,7 +30,7 @@
     <string name="generate_password">生成密码</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="terms_of_use">用户协议</string>
-    <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
+    <string name="version_name_with_code">版本 %1$s (%2$s)</string>
     <string name="dark">黑暗</string>
     <string name="sort">排序</string>
     <string name="language">语言</string>

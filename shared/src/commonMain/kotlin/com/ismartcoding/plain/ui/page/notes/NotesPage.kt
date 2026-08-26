@@ -74,7 +74,7 @@ fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM:
     tagsVM.dataType.value = notesVM.dataType
     NotesPageEffects(notesVM, tagsVM, scrollBehavior, scrollState, scope, isFirstTime)
 
-    val pageTitle = if (notesVM.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, "count", notesVM.selectedIds.size)
+    val pageTitle = if (notesVM.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, notesVM.selectedIds.size)
         else if (notesVM.tag.value != null) notesVM.tag.value!!.name
         else if (notesVM.trash.value) stringResource(Res.string.notes) + " - " + stringResource(Res.string.trash)
         else stringResource(Res.string.notes)

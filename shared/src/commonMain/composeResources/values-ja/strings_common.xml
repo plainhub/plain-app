@@ -51,7 +51,7 @@
     <string name="updated_at">更新日時</string>
     <string name="active_at">アクティブ日時</string>
     <string name="offline_at">オフライン日時</string>
-    <string name="last_update">最終更新 {{time}}</string>
+    <string name="last_update">最終更新 %1$s</string>
     <string name="status">ステータス</string>
     <string name="rename">名前を変更</string>
     <string name="save">保存</string>
@@ -116,11 +116,11 @@
     <string name="_default">デフォルト</string>
     <string name="add_to_tags">タグに追加</string>
     <string name="add_tag">タグを追加</string>
-    <string name="x_selected">{{count}} 選択済み</string>
+    <string name="x_selected">%1$s 選択済み</string>
     <string name="select_all">すべて選択</string>
     <string name="unselect_all">すべて選択解除</string>
-    <string name="notes_title">メモ（{{count}}）</string>
-    <string name="tag_title">{{name}}（{{count}}）</string>
+    <string name="notes_title">メモ（%1$s）</string>
+    <string name="tag_title">%1$s（%2$s）</string>
     <string name="updated">更新済み</string>
     <string name="remove_from_tags">タグから削除</string>
     <string name="update_tags">タグを更新</string>

@@ -30,7 +30,7 @@ internal fun getMediaPageTitle(
     return if (isCastMode) {
         stringResource(Res.string.cast_mode) + " - " + castDeviceName
     } else if (dragSelectState.selectMode) {
-        LocaleHelper.getStringF(Res.string.x_selected, "count", dragSelectState.selectedIds.size)
+        LocaleHelper.getStringF(Res.string.x_selected, dragSelectState.selectedIds.size)
     } else {
         mediaName
     }

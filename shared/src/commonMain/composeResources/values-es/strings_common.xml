@@ -51,7 +51,7 @@
     <string name="updated_at">Actualizado el</string>
     <string name="active_at">Activo el</string>
     <string name="offline_at">Desconectado el</string>
-    <string name="last_update">Última actualización {{time}}</string>
+    <string name="last_update">Última actualización %1$s</string>
     <string name="status">Estado</string>
     <string name="rename">Renombrar</string>
     <string name="save">Guardar</string>
@@ -116,11 +116,11 @@
     <string name="_default">Predeterminado</string>
     <string name="add_to_tags">Agregar a etiquetas</string>
     <string name="add_tag">Agregar etiqueta</string>
-    <string name="x_selected">{{count}} seleccionados</string>
+    <string name="x_selected">%1$s seleccionados</string>
     <string name="select_all">Seleccionar todo</string>
     <string name="unselect_all">Deseleccionar todo</string>
-    <string name="notes_title">Notas ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">Notas (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">Actualizado</string>
     <string name="remove_from_tags">Eliminar de etiquetas</string>
     <string name="update_tags">Actualizar etiquetas</string>

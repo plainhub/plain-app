@@ -46,8 +46,8 @@
     <string name="share_message">메시지 공유</string>
     <string name="delete_message">메시지 삭제</string>
     <string name="accept">수락</string>
-    <string name="request_to_connect">{{ip}}이(가) 연결을 요청했습니다</string>
-    <string name="client_ua">OS: {{os_name}} {{os_version}}\n브라우저: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s이(가) 연결을 요청했습니다</string>
+    <string name="client_ua">OS: %1$s %2$s\n브라우저: %3$s %4$s</string>
     <string name="os">운영체제</string>
     <string name="browser">브라우저</string>
     <string name="reject">거부</string>

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">Video gespeichert unter {{path}}</string>
+    <string name="video_save_to">Video gespeichert unter %1$s</string>
     <string name="video_save_to_failed">Video konnte nicht gespeichert werden</string>
-    <string name="image_save_to">Bild gespeichert unter {{path}}</string>
+    <string name="image_save_to">Bild gespeichert unter %1$s</string>
     <string name="image_save_to_failed">Speichern des Bildes fehlgeschlagen</string>
     <string name="open_with_other_app">Mit anderer App öffnen</string>
     <string name="file_size">Dateigröße</string>
     <string name="files">Dateien</string>
     <string name="sdcard">SD-Karte</string>
-    <string name="files_title">Dateien ({{count}})</string>
-    <string name="trash_title">Papierkorb ({{count}})</string>
+    <string name="files_title">Dateien (%1$s)</string>
+    <string name="trash_title">Papierkorb (%1$s)</string>
     <string name="delete_file">Datei löschen</string>
     <string name="delete_files">Dateien löschen</string>
     <string name="copy_path">Pfad kopieren</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">Es ist keine Dateiauswahl-App auf diesem Gerät verfügbar. Bitte installieren Sie eine Dateimanager-App.</string>
     <string name="cannot_move_folder_into_itself">Ein Ordner kann nicht in sich selbst oder in einen Unterordner verschoben werden.</string>
     <string name="cannot_copy_folder_into_itself">Ein Ordner kann nicht in sich selbst oder in einen Unterordner kopiert werden.</string>
-    <string name="file_save_to">Datei gespeichert unter {{path}}</string>
+    <string name="file_save_to">Datei gespeichert unter %1$s</string>
     <string name="group_by_taken_at">Nach Aufnahmezeit gruppieren</string>
     <string name="view_mode">Ansichtsmodus</string>
     <string name="browse_by_tags">Nach Tags durchsuchen</string>

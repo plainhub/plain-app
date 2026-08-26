@@ -11,8 +11,8 @@
     <string name="rss_url">URL du flux RSS</string>
     <string name="import_opml_file">Importer depuis OPML</string>
     <string name="export_opml_file">Exporter vers OPML</string>
-    <string name="books_title">Livres ({{count}})</string>
-    <string name="subscriptions_title">Abonnements ({{count}})</string>
+    <string name="books_title">Livres (%1$s)</string>
+    <string name="subscriptions_title">Abonnements (%1$s)</string>
     <string name="feeds">Flux</string>
     <string name="books">Livres</string>
     <string name="subscriptions">Abonnements</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">Synchronisation de tous les flux…</string>
     <string name="syncing">Synchronisation…</string>
     <string name="sync_failed">Échec de la synchronisation</string>
-    <string name="exported_to">Exporté dans {{name}}.</string>
+    <string name="exported_to">Exporté dans %1$s.</string>
     <string name="invalid_file">Fichier invalide</string>
     <string name="pull_down_to_fetch_content">Tirez vers le bas pour afficher le contenu complet</string>
     <string name="fetching_content">Récupération du contenu complet…</string>

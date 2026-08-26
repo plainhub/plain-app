@@ -7,7 +7,7 @@
     <string name="source_directory">소스 디렉터리</string>
     <string name="data_directory">데이터 디렉터리</string>
     <string name="more_info">더보기</string>
-    <string name="sdk">대상: {{ target }}, 최소: {{ min }}</string>
+    <string name="sdk">대상: %1$s, 최소: %2$s</string>
     <string name="installed_at">설치 날짜</string>
     <string name="app_size">앱 크기</string>
     <string name="user_app">사용자 앱</string>

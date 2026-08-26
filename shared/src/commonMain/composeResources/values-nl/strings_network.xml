@@ -20,8 +20,8 @@
     <string name="run">Uitvoeren</string>
     <string name="troubleshoot">Problemen oplossen</string>
     <string name="allow_desktop_access_from_pc">Toegang op afstand vanaf de pc toestaan</string>
-    <string name="http_port_conflict_error">Poort {{ port }} is in gebruik. Tik op "App opnieuw starten", om dit automatisch te herstellen.</string>
-    <string name="http_port_conflict_errors">Poorten {{ port }} zijn in gebruik. Tik op "App opnieuw starten", om dit automatisch te herstellen.</string>
+    <string name="http_port_conflict_error">Poort %1$s is in gebruik. Tik op "App opnieuw starten", om dit automatisch te herstellen.</string>
+    <string name="http_port_conflict_errors">Poorten %1$s zijn in gebruik. Tik op "App opnieuw starten", om dit automatisch te herstellen.</string>
     <string name="fix">Herstellen</string>
     <string name="security">Beveiliging</string>
     <string name="url_token">URL-token</string>

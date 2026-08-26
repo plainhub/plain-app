@@ -20,8 +20,8 @@
     <string name="run">启动</string>
     <string name="troubleshoot">排查问题</string>
     <string name="allow_desktop_access_from_pc">允许电脑远程访问网页</string>
-    <string name="http_port_conflict_error">端口 {{ port }} 已被占用。轻触“重启应用”可自动修复。</string>
-    <string name="http_port_conflict_errors">端口 {{ port }} 已被占用。轻触“重启应用”可自动修复。</string>
+    <string name="http_port_conflict_error">端口 %1$s 已被占用。轻触“重启应用”可自动修复。</string>
+    <string name="http_port_conflict_errors">端口 %1$s 已被占用。轻触“重启应用”可自动修复。</string>
     <string name="fix">修复</string>
     <string name="security">安全</string>
     <string name="url_token">URL令牌</string>

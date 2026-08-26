@@ -20,8 +20,8 @@
     <string name="run">Esegui</string>
     <string name="troubleshoot">Risoluzione dei problemi</string>
     <string name="allow_desktop_access_from_pc">Consenti l'accesso remoto dal PC</string>
-    <string name="http_port_conflict_error">La porta {{ port }} è occupata. Tocca "Riavvia app" per risolvere automaticamente.</string>
-    <string name="http_port_conflict_errors">Le porte {{ port }} sono occupate. Tocca "Riavvia app" per risolvere automaticamente.</string>
+    <string name="http_port_conflict_error">La porta %1$s è occupata. Tocca "Riavvia app" per risolvere automaticamente.</string>
+    <string name="http_port_conflict_errors">Le porte %1$s sono occupate. Tocca "Riavvia app" per risolvere automaticamente.</string>
     <string name="fix">Correggi</string>
     <string name="security">Sicurezza</string>
     <string name="url_token">Token URL</string>

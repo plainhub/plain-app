@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">视频已保存到{{path}}</string>
+    <string name="video_save_to">视频已保存到%1$s</string>
     <string name="video_save_to_failed">保存视频失败</string>
-    <string name="image_save_to">图像已保存至{{path}}</string>
+    <string name="image_save_to">图像已保存至%1$s</string>
     <string name="image_save_to_failed">保存图像失败</string>
     <string name="open_with_other_app">使用其他应用打开</string>
     <string name="file_size">文件大小</string>
     <string name="files">文件</string>
     <string name="sdcard">存储卡</string>
-    <string name="files_title">文件 ({{count}})</string>
-    <string name="trash_title">回收站 ({{count}})</string>
+    <string name="files_title">文件 (%1$s)</string>
+    <string name="trash_title">回收站 (%1$s)</string>
     <string name="delete_file">删除文件</string>
     <string name="delete_files">删除文件</string>
     <string name="copy_path">复制路径</string>
@@ -48,7 +48,7 @@
     <string name="view_mode">浏览方式</string>
     <string name="browse_by_tags">按标签</string>
     <string name="browse_by_file_type">按文件类型</string>
-    <string name="file_save_to">文件已保存到 {{path}}</string>
+    <string name="file_save_to">文件已保存到 %1$s</string>
     <string name="group_by_taken_at">按拍摄时间分组</string>
     <string name="app_files">应用文件</string>
     <string name="app_files_desc">聊天中共享的文件</string>

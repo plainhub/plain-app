@@ -59,7 +59,7 @@ actual fun backup(uriStr: String) {
             }
             val fileName = contentResolver.queryOpenableFileName(uri)
             DialogHelper.hideLoading()
-            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, "name", fileName))
+            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, fileName))
         } catch (e: Throwable) {
             LogCat.e("Backup failed: ${e.message}")
             DialogHelper.hideLoading()
@@ -124,7 +124,7 @@ actual fun backupToFile(fileName: String) {
             tmpFile.copyTo(destFile, overwrite = true)
             tmpFile.delete()
             DialogHelper.hideLoading()
-            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, "name", destFile.absolutePath))
+            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.exported_to, destFile.absolutePath))
         } catch (e: Throwable) {
             LogCat.e("Backup failed: ${e.message}")
             DialogHelper.hideLoading()

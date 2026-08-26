@@ -33,8 +33,8 @@
     <string name="connecting">連接中</string>
     <string name="password">密碼</string>
     <string name="confirm">確認</string>
-    <string name="request_to_connect">{{ip}}請求連接</string>
-    <string name="client_ua">操作系統：{{os_name}} {{os_version}}\n瀏覽器：{{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s請求連接</string>
+    <string name="client_ua">操作系統：%1$s %2$s\n瀏覽器：%3$s %4$s</string>
     <string name="os">操作系統</string>
     <string name="browser">瀏覽器</string>
     <string name="accept">允許</string>

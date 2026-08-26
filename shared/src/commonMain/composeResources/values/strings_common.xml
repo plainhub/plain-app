@@ -53,7 +53,7 @@
     <string name="updated_at">Updated at</string>
     <string name="active_at">Active at</string>
     <string name="offline_at">Offline at</string>
-    <string name="last_update">Last update {{time}}</string>
+    <string name="last_update">Last update %1$s</string>
     <string name="status">Status</string>
     <string name="rename">Rename</string>
     <string name="save">Save</string>
@@ -122,11 +122,11 @@
     <string name="_default">Default</string>
     <string name="add_to_tags">Add to tags</string>
     <string name="add_tag">Add tag</string>
-    <string name="x_selected">{{count}} selected</string>
+    <string name="x_selected">%1$s selected</string>
     <string name="select_all">Select all</string>
     <string name="unselect_all">Unselect all</string>
-    <string name="notes_title">Notes ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">Notes (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">Updated</string>
     <string name="remove_from_tags">Remove from tags</string>
     <string name="update_tags">Update tags</string>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">Video saved to {{path}}</string>
+    <string name="video_save_to">Video saved to %1$s</string>
     <string name="video_save_to_failed">Failed to save video</string>
-    <string name="image_save_to">Image saved to {{path}}</string>
+    <string name="image_save_to">Image saved to %1$s</string>
     <string name="image_save_to_failed">Failed to save image</string>
     <string name="open_with_other_app">Open with other app</string>
     <string name="file_size">File size</string>
-    <string name="file_save_to">File saved to {{path}}</string>
+    <string name="file_save_to">File saved to %1$s</string>
     <string name="files">Files</string>
     <string name="sdcard">SD card</string>
-    <string name="files_title">Files ({{count}})</string>
-    <string name="trash_title">Trash ({{count}})</string>
+    <string name="files_title">Files (%1$s)</string>
+    <string name="trash_title">Trash (%1$s)</string>
     <string name="delete_file">Delete file</string>
     <string name="delete_files">Delete files</string>
     <string name="copy_path">Copy path</string>

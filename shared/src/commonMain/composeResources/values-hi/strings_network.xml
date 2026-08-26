@@ -20,8 +20,8 @@
     <string name="run">चलाएं</string>
     <string name="troubleshoot">समस्या समाधान करें</string>
     <string name="allow_desktop_access_from_pc">पीसी से दूरस्थ पहुंच की अनुमति दें</string>
-    <string name="http_port_conflict_error">पोर्ट {{ port }} उपयोग में है। "ऐप पुनरारंभ करें" पर टैप करें ताकि यह स्वचालित रूप से ठीक हो जाए।</string>
-    <string name="http_port_conflict_errors">पोर्ट {{ port }} उपयोग में हैं। "ऐप पुनरारंभ करें" पर टैप करें ताकि यह स्वचालित रूप से ठीक हो जाए।</string>
+    <string name="http_port_conflict_error">पोर्ट %1$s उपयोग में है। "ऐप पुनरारंभ करें" पर टैप करें ताकि यह स्वचालित रूप से ठीक हो जाए।</string>
+    <string name="http_port_conflict_errors">पोर्ट %1$s उपयोग में हैं। "ऐप पुनरारंभ करें" पर टैप करें ताकि यह स्वचालित रूप से ठीक हो जाए।</string>
     <string name="fix">सुधारें</string>
     <string name="security">सुरक्षा</string>
     <string name="url_token">यूआरएल टोकन</string>

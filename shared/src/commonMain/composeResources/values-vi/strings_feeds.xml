@@ -11,8 +11,8 @@
     <string name="rss_url">URL RSS</string>
     <string name="import_opml_file">Nhập từ OPML</string>
     <string name="export_opml_file">Xuất ra OPML</string>
-    <string name="books_title">Sách ({{count}})</string>
-    <string name="subscriptions_title">Đăng ký ({{count}})</string>
+    <string name="books_title">Sách (%1$s)</string>
+    <string name="subscriptions_title">Đăng ký (%1$s)</string>
     <string name="feeds">Nguồn cấp</string>
     <string name="books">Sách</string>
     <string name="subscriptions">Đăng ký</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">Đồng bộ tất cả nguồn cấp...</string>
     <string name="syncing">Đang đồng bộ...</string>
     <string name="sync_failed">Đồng bộ thất bại</string>
-    <string name="exported_to">Xuất vào {{name}}.</string>
+    <string name="exported_to">Xuất vào %1$s.</string>
     <string name="invalid_file">Tập tin không hợp lệ</string>
     <string name="pull_down_to_fetch_content">Kéo xuống để tải nội dung đầy đủ</string>
     <string name="fetching_content">Đang tải nội dung đầy đủ...</string>

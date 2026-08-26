@@ -4,7 +4,7 @@
     <string name="share_created">இணைப்பு உருவாக்கப்பட்டது</string>
     <string name="share_delete_desc">நீக்கினால் இணைப்பு உடனடியாக ரத்து ஆகும்</string>
     <string name="share_expired">காலாவதியானது</string>
-    <string name="share_expires_on">காலாவதி {{date}}</string>
+    <string name="share_expires_on">காலாவதி %1$s</string>
     <string name="share_expiry">காலாவதி</string>
     <string name="share_expiry_1d">1 நாள்</string>
     <string name="share_expiry_1h">1 மணி</string>

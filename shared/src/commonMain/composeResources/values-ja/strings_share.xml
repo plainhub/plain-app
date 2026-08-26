@@ -4,7 +4,7 @@
     <string name="share_created">リンクを作成しました</string>
     <string name="share_delete_desc">削除するとリンクは直ちに無効になります</string>
     <string name="share_expired">期限切れ</string>
-    <string name="share_expires_on">有効期限：{{date}}</string>
+    <string name="share_expires_on">有効期限：%1$s</string>
     <string name="share_expiry">有効期限</string>
     <string name="share_expiry_1d">1 日</string>
     <string name="share_expiry_1h">1 時間</string>

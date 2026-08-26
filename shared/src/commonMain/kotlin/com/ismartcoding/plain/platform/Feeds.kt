@@ -52,7 +52,7 @@ fun FeedsPageEffects(feedsVM: FeedsViewModel) {
                     val fileName = getFileNameFromUri(event.uri) ?: ""
                     DialogHelper.showConfirmDialog(
                         "",
-                        LocaleHelper.getStringFAsync(Res.string.exported_to, "name", fileName),
+                        LocaleHelper.getStringFAsync(Res.string.exported_to, fileName),
                     )
                 }
             }

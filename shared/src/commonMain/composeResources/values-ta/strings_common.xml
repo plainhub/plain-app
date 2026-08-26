@@ -52,7 +52,7 @@
     <string name="updated_at">புதுப்பிக்கப்பட்டது</string>
     <string name="active_at">செயலில்</string>
     <string name="offline_at">இடைவெளியில்</string>
-    <string name="last_update">கடைசி புதுப்பிப்பு {{time}}</string>
+    <string name="last_update">கடைசி புதுப்பிப்பு %1$s</string>
     <string name="status">நிலை</string>
     <string name="rename">மறுபெயரிடு</string>
     <string name="save">சேமி</string>
@@ -116,11 +116,11 @@
     <string name="_default">இயல்புநிலை</string>
     <string name="add_to_tags">குறிச்சொல்லுகளில் சேர்</string>
     <string name="add_tag">குறிச்சொல் சேர்</string>
-    <string name="x_selected">{{count}} தேர்ந்தெடுக்கப்பட்டன</string>
+    <string name="x_selected">%1$s தேர்ந்தெடுக்கப்பட்டன</string>
     <string name="select_all">அனைத்தையும் தேர்ந்தெடு</string>
     <string name="unselect_all">அனைத்தையும் தேர்ந்தெடுக்காதே</string>
-    <string name="notes_title">குறிப்புகள் ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">குறிப்புகள் (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">புதுப்பிக்கப்பட்டது</string>
     <string name="remove_from_tags">குறிச்சொல்லுகளில் இருந்து அகற்று</string>
     <string name="update_tags">குறிச்சொல்லுகளை புதுப்பிக்க</string>

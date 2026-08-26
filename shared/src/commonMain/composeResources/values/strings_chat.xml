@@ -48,8 +48,8 @@
     <string name="share_message">Share message</string>
     <string name="delete_message">Delete message</string>
     <string name="accept">Accept</string>
-    <string name="request_to_connect">{{ip}} requests to connect</string>
-    <string name="client_ua">OS: {{os_name}} {{os_version}}\nBrowser: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s requests to connect</string>
+    <string name="client_ua">OS: %1$s %2$s\nBrowser: %3$s %4$s</string>
     <string name="os">OS</string>
     <string name="browser">Browser</string>
     <string name="reject">Reject</string>

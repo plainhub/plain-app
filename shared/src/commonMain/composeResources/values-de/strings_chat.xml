@@ -46,8 +46,8 @@
     <string name="share_message">Nachricht teilen</string>
     <string name="delete_message">Nachricht löschen</string>
     <string name="accept">Akzeptieren</string>
-    <string name="request_to_connect">{{ip}} möchte sich verbinden</string>
-    <string name="client_ua">Betriebssystem: {{os_name}} {{os_version}}\nBrowser: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s möchte sich verbinden</string>
+    <string name="client_ua">Betriebssystem: %1$s %2$s\nBrowser: %3$s %4$s</string>
     <string name="os">Betriebssystem</string>
     <string name="browser">Browser</string>
     <string name="reject">Ablehnen</string>

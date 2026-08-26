@@ -28,7 +28,7 @@
     <string name="generate_password">Generar contraseña</string>
     <string name="privacy_policy">Política de privacidad</string>
     <string name="terms_of_use">Términos de uso</string>
-    <string name="version_name_with_code">Versión {{version_name}} ({{version_code}})</string>
+    <string name="version_name_with_code">Versión %1$s (%2$s)</string>
     <string name="dark">Oscuro</string>
     <string name="sort">Ordenar</string>
     <string name="language">Idioma</string>

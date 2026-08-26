@@ -46,8 +46,8 @@
     <string name="share_message">செய்தி பகிர்</string>
     <string name="delete_message">செய்தியை நீக்கு</string>
     <string name="accept">ஏற்கனவே</string>
-    <string name="request_to_connect">{{ip}} இணைய கோரி</string>
-    <string name="client_ua">ஓ.எஸ்: {{os_name}} {{os_version}}\nஉலாவர: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s இணைய கோரி</string>
+    <string name="client_ua">ஓ.எஸ்: %1$s %2$s\nஉலாவர: %3$s %4$s</string>
     <string name="os">ஓ.எஸ்</string>
     <string name="browser">உலாவர</string>
     <string name="reject">நிராகரி</string>

@@ -4,7 +4,7 @@
     <string name="share_created">Enlace creado</string>
     <string name="share_delete_desc">Eliminar este recurso revoca el enlace de inmediato</string>
     <string name="share_expired">Caducado</string>
-    <string name="share_expires_on">Caduca {{date}}</string>
+    <string name="share_expires_on">Caduca %1$s</string>
     <string name="share_expiry">Caducidad</string>
     <string name="share_expiry_1d">1 día</string>
     <string name="share_expiry_1h">1 hora</string>

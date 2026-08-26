@@ -20,8 +20,8 @@
     <string name="run">চালান</string>
     <string name="troubleshoot">সমস্যা সমাধান করা</string>
     <string name="allow_desktop_access_from_pc">পিসি থেকে দূরবর্তী অ্যাক্সেস অনুমোদন দিন</string>
-    <string name="http_port_conflict_error">পোর্ট {{ port }} ব্যবহার হচ্ছে। "অ্যাপ পুনরায় চালু করুন" চাপুন যাতে এটি স্বয়ংক্রিয়ভাবে ঠিক হয়।</string>
-    <string name="http_port_conflict_errors">পোর্ট {{ port }} ব্যবহার হচ্ছে। "অ্যাপ পুনরায় চালু করুন" চাপুন যাতে এটি স্বয়ংক্রিয়ভাবে ঠিক হয়।</string>
+    <string name="http_port_conflict_error">পোর্ট %1$s ব্যবহার হচ্ছে। "অ্যাপ পুনরায় চালু করুন" চাপুন যাতে এটি স্বয়ংক্রিয়ভাবে ঠিক হয়।</string>
+    <string name="http_port_conflict_errors">পোর্ট %1$s ব্যবহার হচ্ছে। "অ্যাপ পুনরায় চালু করুন" চাপুন যাতে এটি স্বয়ংক্রিয়ভাবে ঠিক হয়।</string>
     <string name="fix">ঠিক করুন</string>
     <string name="security">নিরাপত্তা</string>
     <string name="url_token">ইউআরএল টোকেন</string>

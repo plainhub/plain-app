@@ -46,8 +46,8 @@
     <string name="share_message">संदेश साझा करें</string>
     <string name="delete_message">संदेश हटाएं</string>
     <string name="accept">स्वीकार करें</string>
-    <string name="request_to_connect">{{ip}} कनेक्ट करने का अनुरोध करता है</string>
-    <string name="client_ua">ऑपरेटिंग सिस्टम: {{os_name}} {{os_version}}\nब्राउज़र: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s कनेक्ट करने का अनुरोध करता है</string>
+    <string name="client_ua">ऑपरेटिंग सिस्टम: %1$s %2$s\nब्राउज़र: %3$s %4$s</string>
     <string name="os">ऑपरेटिंग सिस्टम</string>
     <string name="browser">ब्राउज़र</string>
     <string name="reject">अस्वीकार करें</string>

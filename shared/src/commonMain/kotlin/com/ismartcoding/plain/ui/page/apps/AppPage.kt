@@ -71,7 +71,7 @@ fun AppPage(navController: NavHostController, id: String) {
                     VerticalSpace(dp = 16.dp)
                     PCard {
                         PListItem(title = stringResource(Res.string.app_size), value = pkg.size.formatBytes())
-                        PListItem(title = "SDK", value = LocaleHelper.getStringF(Res.string.sdk, "target", pkg.targetSdkVersion, "min", pkg.minSdkVersion))
+                        PListItem(title = "SDK", value = LocaleHelper.getStringF(Res.string.sdk, pkg.targetSdkVersion, pkg.minSdkVersion))
                         PListItem(title = stringResource(Res.string.installed_at), value = pkg.installedAt.formatDateTime())
                         PListItem(title = stringResource(Res.string.updated_at), value = pkg.updatedAt.formatDateTime())
                     }

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">Vidéo enregistrée dans {{path}}</string>
+    <string name="video_save_to">Vidéo enregistrée dans %1$s</string>
     <string name="video_save_to_failed">Impossible d'enregistrer la vidéo</string>
-    <string name="image_save_to">Image enregistrée dans {{path}}</string>
+    <string name="image_save_to">Image enregistrée dans %1$s</string>
     <string name="image_save_to_failed">Échec de l'enregistrement de l'image</string>
     <string name="open_with_other_app">Ouvrir avec une autre application</string>
     <string name="file_size">Taille du fichier</string>
     <string name="files">Fichiers</string>
     <string name="sdcard">Carte SD</string>
-    <string name="files_title">Fichiers ({{count}})</string>
-    <string name="trash_title">Corbeille ({{count}})</string>
+    <string name="files_title">Fichiers (%1$s)</string>
+    <string name="trash_title">Corbeille (%1$s)</string>
     <string name="delete_file">Supprimer le fichier</string>
     <string name="delete_files">Supprimer les fichiers</string>
     <string name="copy_path">Copier le chemin</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">Aucune application de sélection de fichiers n'est disponible sur cet appareil. Veuillez installer une application de gestionnaire de fichiers.</string>
     <string name="cannot_move_folder_into_itself">Impossible de déplacer un dossier dans lui-même ou dans l’un de ses sous-dossiers.</string>
     <string name="cannot_copy_folder_into_itself">Impossible de copier un dossier dans lui-même ou dans l’un de ses sous-dossiers.</string>
-    <string name="file_save_to">Fichier enregistré dans {{path}}</string>
+    <string name="file_save_to">Fichier enregistré dans %1$s</string>
     <string name="group_by_taken_at">Regrouper par date de prise</string>
     <string name="view_mode">Mode d'affichage</string>
     <string name="browse_by_tags">Parcourir par tags</string>

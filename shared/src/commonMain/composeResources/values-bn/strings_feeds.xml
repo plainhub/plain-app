@@ -11,8 +11,8 @@
     <string name="rss_url">আরএসএস ইউআরএল</string>
     <string name="import_opml_file">OPML থেকে আমদানি করুন</string>
     <string name="export_opml_file">OPML এ রপ্ত করুন</string>
-    <string name="books_title">বই ({{count}})</string>
-    <string name="subscriptions_title">সাবস্ক্রিপশন ({{count}})</string>
+    <string name="books_title">বই (%1$s)</string>
+    <string name="subscriptions_title">সাবস্ক্রিপশন (%1$s)</string>
     <string name="feeds">ফিডস</string>
     <string name="books">বই</string>
     <string name="subscriptions">সাবস্ক্রিপশন</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">সমস্ত ফিডস সিঙ্ক করা হচ্ছে ...</string>
     <string name="syncing">সিঙ্ক করা হচ্ছে ...</string>
     <string name="sync_failed">সিঙ্ক ব্যর্থ হয়েছে</string>
-    <string name="exported_to">এই {{name}} এ নির্যাতিত।</string>
+    <string name="exported_to">এই %1$s এ নির্যাতিত।</string>
     <string name="invalid_file">অবৈধ ফাইল</string>
     <string name="pull_down_to_fetch_content">পূর্ণ সামগ্রী মুছুন</string>
     <string name="fetching_content">পূর্ণ সামগ্রী আনছি...</string>

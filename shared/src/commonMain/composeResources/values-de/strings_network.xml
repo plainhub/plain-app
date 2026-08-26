@@ -20,8 +20,8 @@
     <string name="run">Ausführen</string>
     <string name="troubleshoot">Fehlerbehebung</string>
     <string name="allow_desktop_access_from_pc">Remote-Zugriff vom PC erlauben</string>
-    <string name="http_port_conflict_error">Port {{ port }} ist belegt. Tippen Sie auf "App neu starten", um das automatisch zu beheben.</string>
-    <string name="http_port_conflict_errors">Ports {{ port }} sind belegt. Tippen Sie auf "App neu starten", um das automatisch zu beheben.</string>
+    <string name="http_port_conflict_error">Port %1$s ist belegt. Tippen Sie auf "App neu starten", um das automatisch zu beheben.</string>
+    <string name="http_port_conflict_errors">Ports %1$s sind belegt. Tippen Sie auf "App neu starten", um das automatisch zu beheben.</string>
     <string name="fix">Beheben</string>
     <string name="security">Sicherheit</string>
     <string name="url_token">URL-Token</string>

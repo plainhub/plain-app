@@ -56,7 +56,7 @@ actual suspend fun savePreviewMedia(m: PreviewItem) {
             val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = m.path.getFilenameFromPath()) }
             DialogHelper.hideLoading()
             if (r.isNotEmpty()) {
-                DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, "path", r))
+                DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, r))
             } else {
                 DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.image_save_to_failed))
             }
@@ -66,7 +66,7 @@ actual suspend fun savePreviewMedia(m: PreviewItem) {
         val r = DownloadHelper.downloadAsync(m.path, dir.absolutePath)
         DialogHelper.hideLoading()
         if (r.success) {
-            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.image_save_to, "path", r.path))
+            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.image_save_to, r.path))
         } else {
             DialogHelper.showMessage(r.message)
         }
@@ -74,7 +74,7 @@ actual suspend fun savePreviewMedia(m: PreviewItem) {
         val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""
         val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES, newName = newName) }
         if (r.isNotEmpty()) {
-            DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, "path", r))
+            DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, r))
         } else {
             DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.image_save_to_failed))
         }

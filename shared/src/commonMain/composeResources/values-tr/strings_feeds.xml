@@ -11,8 +11,8 @@
     <string name="rss_url">RSS URL'si</string>
     <string name="import_opml_file">OPML'den İçe Aktar</string>
     <string name="export_opml_file">OPML'yi Dışa Aktar</string>
-    <string name="books_title">Kitaplar ({{count}})</string>
-    <string name="subscriptions_title">Abonelikler ({{count}})</string>
+    <string name="books_title">Kitaplar (%1$s)</string>
+    <string name="subscriptions_title">Abonelikler (%1$s)</string>
     <string name="feeds">Beslemeler</string>
     <string name="books">Kitaplar</string>
     <string name="subscriptions">Abonelikler</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">Tüm beslemeler senkronize ediliyor…</string>
     <string name="syncing">Senkronize ediliyor…</string>
     <string name="sync_failed">Senkronizasyon başarısız</string>
-    <string name="exported_to">{{name}} içine dışa aktarıldı.</string>
+    <string name="exported_to">%1$s içine dışa aktarıldı.</string>
     <string name="invalid_file">Geçersiz dosya</string>
     <string name="pull_down_to_fetch_content">Tam içeriği almak için aşağı çekin</string>
     <string name="fetching_content">Tam içerik alınıyor…</string>

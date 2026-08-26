@@ -52,7 +52,7 @@
     <string name="updated_at">Güncellenme zamanı</string>
     <string name="active_at">Etkin olma zamanı</string>
     <string name="offline_at">Çevrimdışı olma zamanı</string>
-    <string name="last_update">Son güncelleme {{time}}</string>
+    <string name="last_update">Son güncelleme %1$s</string>
     <string name="status">Durum</string>
     <string name="rename">Yeniden Adlandır</string>
     <string name="save">Kaydet</string>
@@ -116,11 +116,11 @@
     <string name="_default">Varsayılan</string>
     <string name="add_to_tags">Etiketlere ekle</string>
     <string name="add_tag">Etiket ekle</string>
-    <string name="x_selected">{{count}} seçildi</string>
+    <string name="x_selected">%1$s seçildi</string>
     <string name="select_all">Tümünü seç</string>
     <string name="unselect_all">Tüm seçimi kaldır</string>
-    <string name="notes_title">Notlar ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">Notlar (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">Güncellendi</string>
     <string name="remove_from_tags">Etiketlerden kaldır</string>
     <string name="update_tags">Etiketleri güncelle</string>

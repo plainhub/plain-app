@@ -11,8 +11,8 @@
     <string name="rss_url">RSS地址</string>
     <string name="import_opml_file">导入OPML文件</string>
     <string name="export_opml_file">导出OPML文件</string>
-    <string name="books_title">书籍 ({{count}})</string>
-    <string name="subscriptions_title">订阅源 ({{count}})</string>
+    <string name="books_title">书籍 (%1$s)</string>
+    <string name="subscriptions_title">订阅源 (%1$s)</string>
     <string name="feeds">订阅</string>
     <string name="books">书籍</string>
     <string name="subscriptions">订阅源</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">同步所有订阅中…</string>
     <string name="syncing">同步中…</string>
     <string name="sync_failed">同步失败</string>
-    <string name="exported_to">已导出到{{name}}。</string>
+    <string name="exported_to">已导出到%1$s。</string>
     <string name="invalid_file">文件格式不对</string>
     <string name="pull_down_to_fetch_content">下拉获取完整内容</string>
     <string name="fetching_content">获取完整内容中…</string>

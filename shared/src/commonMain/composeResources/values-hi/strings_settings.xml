@@ -28,7 +28,7 @@
     <string name="generate_password">पासवर्ड बनाएं</string>
     <string name="privacy_policy">गोपनीयता नीति</string>
     <string name="terms_of_use">उपयोग की शर्तें</string>
-    <string name="version_name_with_code">संस्करण {{version_name}} ({{version_code}})</string>
+    <string name="version_name_with_code">संस्करण %1$s (%2$s)</string>
     <string name="dark">डार्क</string>
     <string name="sort">क्रमबद्ध करें</string>
     <string name="language">भाषा</string>

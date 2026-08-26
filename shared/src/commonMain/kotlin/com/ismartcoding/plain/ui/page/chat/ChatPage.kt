@@ -216,7 +216,7 @@ fun ChatPage(
     }
 
     val pageTitle = if (chatVM.selectMode.value) {
-        LocaleHelper.getStringF(Res.string.x_selected, "count", chatVM.selectedIds.size)
+        LocaleHelper.getStringF(Res.string.x_selected, chatVM.selectedIds.size)
     } else {
         val target = chatTarget.value
         if (target.type == ChatTargetType.CHANNEL) {

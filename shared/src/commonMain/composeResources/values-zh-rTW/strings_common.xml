@@ -52,7 +52,7 @@
     <string name="updated_at">更新時間</string>
     <string name="active_at">活躍時間</string>
     <string name="offline_at">離線時間</string>
-    <string name="last_update">上次更新 {{time}}</string>
+    <string name="last_update">上次更新 %1$s</string>
     <string name="status">狀態</string>
     <string name="rename">重命名</string>
     <string name="save">保存</string>
@@ -116,11 +116,11 @@
     <string name="_default">默認</string>
     <string name="add_to_tags">添加到標簽</string>
     <string name="add_tag">添加標簽</string>
-    <string name="x_selected">已選擇{{count}}項</string>
+    <string name="x_selected">已選擇%1$s項</string>
     <string name="select_all">全選</string>
     <string name="unselect_all">取消全選</string>
-    <string name="notes_title">筆記 ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">筆記 (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">已更新</string>
     <string name="remove_from_tags">從標籤中移除</string>
     <string name="update_tags">更新標籤</string>

@@ -58,7 +58,7 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
         Column {
             PBottomSheetTopAppBar(
                 title = if (audioPlaylistVM.playlistItems.value.isNotEmpty())
-                    LocaleHelper.getStringF(Res.string.playlist_title, "total", audioPlaylistVM.playlistItems.value.size)
+                    LocaleHelper.getStringF(Res.string.playlist_title, audioPlaylistVM.playlistItems.value.size)
                 else stringResource(Res.string.playlist),
                 subtitle = if (audioPlaylistVM.playlistItems.value.isEmpty()) "" else stringResource(Res.string.drag_number_to_reorder_list),
                 actions = {

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">Video opgeslagen in {{path}}</string>
+    <string name="video_save_to">Video opgeslagen in %1$s</string>
     <string name="video_save_to_failed">Mislukt om video op te slaan</string>
-    <string name="image_save_to">Afbeelding opgeslagen in {{path}}</string>
+    <string name="image_save_to">Afbeelding opgeslagen in %1$s</string>
     <string name="image_save_to_failed">Afbeelding opslaan mislukt</string>
     <string name="open_with_other_app">Openen met een andere app</string>
     <string name="file_size">Bestandsgrootte</string>
     <string name="files">Bestanden</string>
     <string name="sdcard">SD-kaart</string>
-    <string name="files_title">Bestanden ({{count}})</string>
-    <string name="trash_title">Prullenbak ({{count}})</string>
+    <string name="files_title">Bestanden (%1$s)</string>
+    <string name="trash_title">Prullenbak (%1$s)</string>
     <string name="delete_file">Bestand verwijderen</string>
     <string name="delete_files">Bestanden verwijderen</string>
     <string name="copy_path">Pad kopiëren</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">Er is geen bestandsselectie-app beschikbaar op dit apparaat. Installeer een bestandsbeheer-app.</string>
     <string name="cannot_move_folder_into_itself">Kan een map niet naar zichzelf of een submap verplaatsen.</string>
     <string name="cannot_copy_folder_into_itself">Kan een map niet naar zichzelf of een submap kopiëren.</string>
-    <string name="file_save_to">Bestand opgeslagen naar {{path}}</string>
+    <string name="file_save_to">Bestand opgeslagen naar %1$s</string>
     <string name="group_by_taken_at">Groepeeren op tijdstip</string>
     <string name="view_mode">Weergavemodus</string>
     <string name="browse_by_tags">Bladeren op tags</string>

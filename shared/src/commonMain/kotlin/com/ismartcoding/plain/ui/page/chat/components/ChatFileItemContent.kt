@@ -107,7 +107,7 @@ internal fun ChatFileItemContent(
                     coMain {
                         val result = withIO { saveFileToDownloads(path, fileName) }
                         if (result.isNotEmpty()) {
-                            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, "path", result))
+                            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, result))
                         } else {
                             DialogHelper.showErrorMessage(result)
                         }

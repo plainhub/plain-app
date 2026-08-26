@@ -28,7 +28,7 @@
     <string name="generate_password">கடவுச்சொல் உருவாக்கு</string>
     <string name="privacy_policy">தனியுரிமை கொள்கை</string>
     <string name="terms_of_use">பயன்பாடு விதிகள்</string>
-    <string name="version_name_with_code">பதிப்பு {{version_name}} ({{version_code}})</string>
+    <string name="version_name_with_code">பதிப்பு %1$s (%2$s)</string>
     <string name="dark">கருப்பு</string>
     <string name="sort">வகைப்படு</string>
     <string name="language">மொழி</string>

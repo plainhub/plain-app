@@ -52,7 +52,7 @@
     <string name="updated_at">में अपडेट किया गया</string>
     <string name="active_at">में सक्रिय</string>
     <string name="offline_at">में ऑफ़लाइन</string>
-    <string name="last_update">आखिरी अपडेट {{time}}</string>
+    <string name="last_update">आखिरी अपडेट %1$s</string>
     <string name="status">स्थिति</string>
     <string name="rename">नाम बदलें</string>
     <string name="save">सहेजें</string>
@@ -116,11 +116,11 @@
     <string name="_default">डिफ़ॉल्ट</string>
     <string name="add_to_tags">टैग्स में जोड़ें</string>
     <string name="add_tag">टैग जोड़ें</string>
-    <string name="x_selected">{{count}} चयनित</string>
+    <string name="x_selected">%1$s चयनित</string>
     <string name="select_all">सभी चुनें</string>
     <string name="unselect_all">सभी का चयन नहीं करें</string>
-    <string name="notes_title">नोट्स ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">नोट्स (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">अद्यतित</string>
     <string name="remove_from_tags">टैग से हटाएँ</string>
     <string name="update_tags">टैग अपडेट करें</string>

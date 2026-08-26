@@ -7,7 +7,7 @@
     <string name="source_directory">Bronmap</string>
     <string name="data_directory">Gegevensmap</string>
     <string name="more_info">Meer informatie</string>
-    <string name="sdk">Doel: {{ target }}, Min: {{ min }}</string>
+    <string name="sdk">Doel: %1$s, Min: %2$s</string>
     <string name="installed_at">Geïnstalleerd op</string>
     <string name="app_size">App-grootte</string>
     <string name="user_app">Gebruikersapp</string>

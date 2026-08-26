@@ -20,8 +20,8 @@
     <string name="run">실행</string>
     <string name="troubleshoot">문제 해결</string>
     <string name="allow_desktop_access_from_pc">PC에서 원격 액세스 허용</string>
-    <string name="http_port_conflict_error">포트 {{ port }}가 사용 중입니다. "앱 재시작"을 탭하여 자동으로 수정하세요.</string>
-    <string name="http_port_conflict_errors">포트 {{ port }}들이 사용 중입니다. "앱 재시작"을 탭하여 자동으로 수정하세요.</string>
+    <string name="http_port_conflict_error">포트 %1$s가 사용 중입니다. "앱 재시작"을 탭하여 자동으로 수정하세요.</string>
+    <string name="http_port_conflict_errors">포트 %1$s들이 사용 중입니다. "앱 재시작"을 탭하여 자동으로 수정하세요.</string>
     <string name="fix">수정</string>
     <string name="security">보안</string>
     <string name="url_token">URL 토큰</string>

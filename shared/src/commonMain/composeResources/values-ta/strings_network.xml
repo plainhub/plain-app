@@ -20,8 +20,8 @@
     <string name="run">இயக்கு</string>
     <string name="troubleshoot">சிக்கல்களை தீர்க்க</string>
     <string name="allow_desktop_access_from_pc">கணினியிலிருந்து தொலைநோக்கி அணுகல் அனுமதி</string>
-    <string name="http_port_conflict_error">போர்ட் {{ port }} பயன்படுத்தப்படுகிறது. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
-    <string name="http_port_conflict_errors">போர்டுகள் {{ port }} பயன்படுத்தப்படுகின்றன. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
+    <string name="http_port_conflict_error">போர்ட் %1$s பயன்படுத்தப்படுகிறது. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
+    <string name="http_port_conflict_errors">போர்டுகள் %1$s பயன்படுத்தப்படுகின்றன. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
     <string name="fix">பிக்ஸ்</string>
     <string name="security">பாதுகாப்பு</string>
     <string name="url_token">URL டோக்கன்</string>

@@ -7,7 +7,7 @@
     <string name="source_directory">উৎস ডিরেক্টরি</string>
     <string name="data_directory">ডেটা ডিরেক্টরি</string>
     <string name="more_info">আরও তথ্য</string>
-    <string name="sdk">লক্ষ্য: {{ target }}, ন্যূনতম: {{ min }}</string>
+    <string name="sdk">লক্ষ্য: %1$s, ন্যূনতম: %2$s</string>
     <string name="installed_at">ইনস্টল হয়েছে</string>
     <string name="app_size">অ্যাপ সাইজ</string>
     <string name="user_app">ব্যবহারকারী অ্যাপ</string>

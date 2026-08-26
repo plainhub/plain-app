@@ -7,7 +7,7 @@
     <string name="source_directory">Répertoire source</string>
     <string name="data_directory">Répertoire de données</string>
     <string name="more_info">Plus d'informations</string>
-    <string name="sdk">Cible : {{ target }}, Min : {{ min }}</string>
+    <string name="sdk">Cible : %1$s, Min : %2$s</string>
     <string name="installed_at">Installé le</string>
     <string name="app_size">Taille de l'application</string>
     <string name="user_app">Application utilisateur</string>

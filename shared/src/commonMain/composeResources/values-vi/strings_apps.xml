@@ -7,7 +7,7 @@
     <string name="source_directory">Thư mục nguồn</string>
     <string name="data_directory">Thư mục dữ liệu</string>
     <string name="more_info">Thông tin thêm</string>
-    <string name="sdk">Mục tiêu: {{ target }}, Tối thiểu: {{ min }}</string>
+    <string name="sdk">Mục tiêu: %1$s, Tối thiểu: %2$s</string>
     <string name="installed_at">Đã cài đặt vào</string>
     <string name="app_size">Kích thước ứng dụng</string>
     <string name="user_app">Ứng dụng người dùng</string>

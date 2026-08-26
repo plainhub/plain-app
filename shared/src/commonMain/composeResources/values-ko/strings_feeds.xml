@@ -11,8 +11,8 @@
     <string name="rss_url">RSS URL</string>
     <string name="import_opml_file">OPML에서 가져오기</string>
     <string name="export_opml_file">OPML로 내보내기</string>
-    <string name="books_title">책 ({{count}})</string>
-    <string name="subscriptions_title">구독 ({{count}})</string>
+    <string name="books_title">책 (%1$s)</string>
+    <string name="subscriptions_title">구독 (%1$s)</string>
     <string name="feeds">피드</string>
     <string name="books">책</string>
     <string name="subscriptions">구독</string>
@@ -26,7 +26,7 @@
     <string name="syncing_all_feeds">모든 피드 동기화 중...</string>
     <string name="syncing">동기화 중...</string>
     <string name="sync_failed">동기화 실패</string>
-    <string name="exported_to">다음 위치로 내보내기: {{name}}.</string>
+    <string name="exported_to">다음 위치로 내보내기: %1$s.</string>
     <string name="invalid_file">잘못된 파일</string>
     <string name="pull_down_to_fetch_content">전체 콘텐츨 가져오려면 아래로 당기세요</string>
     <string name="fetching_content">전체 콘텐츨 가져오는 중...</string>

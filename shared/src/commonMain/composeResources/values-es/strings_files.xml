@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">Video guardado en {{path}}</string>
+    <string name="video_save_to">Video guardado en %1$s</string>
     <string name="video_save_to_failed">Error al guardar el video</string>
-    <string name="image_save_to">Imagen guardada en {{path}}</string>
+    <string name="image_save_to">Imagen guardada en %1$s</string>
     <string name="image_save_to_failed">Error al guardar la imagen</string>
     <string name="open_with_other_app">Abrir con otra aplicación</string>
     <string name="file_size">Tamaño del archivo</string>
     <string name="files">Archivos</string>
     <string name="sdcard">Tarjeta SD</string>
-    <string name="files_title">Archivos ({{count}})</string>
-    <string name="trash_title">Papelera ({{count}})</string>
+    <string name="files_title">Archivos (%1$s)</string>
+    <string name="trash_title">Papelera (%1$s)</string>
     <string name="delete_file">Eliminar archivo</string>
     <string name="delete_files">Eliminar archivos</string>
     <string name="copy_path">Copiar ruta</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">No hay una aplicación de selección de archivos disponible en este dispositivo. Por favor instale una aplicación de administrador de archivos.</string>
     <string name="cannot_move_folder_into_itself">No se puede mover una carpeta dentro de sí misma o de una subcarpeta.</string>
     <string name="cannot_copy_folder_into_itself">No se puede copiar una carpeta dentro de sí misma o de una subcarpeta.</string>
-    <string name="file_save_to">Archivo guardado en {{path}}</string>
+    <string name="file_save_to">Archivo guardado en %1$s</string>
     <string name="group_by_taken_at">Agrupar por fecha de captura</string>
     <string name="view_mode">Modo de visualización</string>
     <string name="browse_by_tags">Explorar por etiquetas</string>

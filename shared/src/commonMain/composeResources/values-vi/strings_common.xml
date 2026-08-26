@@ -52,7 +52,7 @@
     <string name="updated_at">Cập nhật lúc</string>
     <string name="active_at">Hoạt động lúc</string>
     <string name="offline_at">Ngoại tuyến lúc</string>
-    <string name="last_update">Cập nhật lần cuối {{time}}</string>
+    <string name="last_update">Cập nhật lần cuối %1$s</string>
     <string name="status">Trạng thái</string>
     <string name="rename">Đổi tên</string>
     <string name="save">Lưu</string>
@@ -116,11 +116,11 @@
     <string name="_default">Mặc định</string>
     <string name="add_to_tags">Thêm vào thẻ</string>
     <string name="add_tag">Thêm thẻ</string>
-    <string name="x_selected">{{count}} đã chọn</string>
+    <string name="x_selected">%1$s đã chọn</string>
     <string name="select_all">Chọn tất cả</string>
     <string name="unselect_all">Bỏ chọn tất cả</string>
-    <string name="notes_title">Ghi chú ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">Ghi chú (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">Đã cập nhật</string>
     <string name="remove_from_tags">Xóa khỏi thẻ</string>
     <string name="update_tags">Cập nhật thẻ</string>

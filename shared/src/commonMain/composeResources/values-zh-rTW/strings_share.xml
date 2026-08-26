@@ -5,7 +5,7 @@
     <string name="share_created">連結已建立</string>
     <string name="share_delete_desc">刪除後連結立即失效</string>
     <string name="share_expired">已過期</string>
-    <string name="share_expires_on">到期時間 {{date}}</string>
+    <string name="share_expires_on">到期時間 %1$s</string>
     <string name="share_expiry">有效期限</string>
     <string name="share_expiry_1d">1 天</string>
     <string name="share_expiry_1h">1 小時</string>

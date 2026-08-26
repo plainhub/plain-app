@@ -61,10 +61,7 @@ fun AppPageHeader(
         VerticalSpace(dp = 8.dp)
         SelectionContainer {
             Text(
-                text = stringRes(
-                    Res.string.version_name_with_code, "version_name" to item.version, "version_code" to
-                    item.versionCode
-                ),
+                text = stringResource(Res.string.version_name_with_code, item.version, item.versionCode),
                 textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 32.dp),
                 style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

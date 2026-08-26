@@ -28,7 +28,7 @@
     <string name="generate_password">Сгенерировать пароль</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="terms_of_use">Условия использования</string>
-    <string name="version_name_with_code">Версия {{version_name}} ({{version_code}})</string>
+    <string name="version_name_with_code">Версия %1$s (%2$s)</string>
     <string name="dark">Тёмная</string>
     <string name="sort">Сортировка</string>
     <string name="language">Язык</string>

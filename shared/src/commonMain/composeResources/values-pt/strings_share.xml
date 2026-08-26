@@ -4,7 +4,7 @@
     <string name="share_created">Link criado</string>
     <string name="share_delete_desc">Excluir revoga o link imediatamente</string>
     <string name="share_expired">Expirado</string>
-    <string name="share_expires_on">Expira em {{date}}</string>
+    <string name="share_expires_on">Expira em %1$s</string>
     <string name="share_expiry">Validade</string>
     <string name="share_expiry_1d">1 dia</string>
     <string name="share_expiry_1h">1 hora</string>

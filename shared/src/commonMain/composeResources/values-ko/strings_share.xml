@@ -4,7 +4,7 @@
     <string name="share_created">링크가 생성되었습니다</string>
     <string name="share_delete_desc">삭제하면 링크가 즉시 취소됩니다</string>
     <string name="share_expired">만료됨</string>
-    <string name="share_expires_on">만료: {{date}}</string>
+    <string name="share_expires_on">만료: %1$s</string>
     <string name="share_expiry">만료 기한</string>
     <string name="share_expiry_1d">1일</string>
     <string name="share_expiry_1h">1시간</string>

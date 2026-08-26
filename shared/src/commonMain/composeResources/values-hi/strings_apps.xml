@@ -7,7 +7,7 @@
     <string name="source_directory">स्रोत निर्देशिका</string>
     <string name="data_directory">डेटा निर्देशिका</string>
     <string name="more_info">अधिक जानकारी</string>
-    <string name="sdk">लक्ष्य: {{ target }}, न्यूनतम: {{ min }}</string>
+    <string name="sdk">लक्ष्य: %1$s, न्यूनतम: %2$s</string>
     <string name="installed_at">इंस्टॉल किया गया</string>
     <string name="app_size">एप्लिकेशन का आकार</string>
     <string name="user_app">उपयोगकर्ता ऐप</string>

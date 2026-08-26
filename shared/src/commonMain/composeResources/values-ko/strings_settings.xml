@@ -28,7 +28,7 @@
     <string name="generate_password">비밀번호 생성</string>
     <string name="privacy_policy">개인 정보 보호 정책</string>
     <string name="terms_of_use">이용 약관</string>
-    <string name="version_name_with_code">버전 {{version_name}} ({{version_code}})</string>
+    <string name="version_name_with_code">버전 %1$s (%2$s)</string>
     <string name="dark">다크</string>
     <string name="sort">정렬</string>
     <string name="language">언어</string>

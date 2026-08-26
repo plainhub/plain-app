@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">Video đã được lưu vào {{path}}</string>
+    <string name="video_save_to">Video đã được lưu vào %1$s</string>
     <string name="video_save_to_failed">Không thể lưu video</string>
-    <string name="image_save_to">Hình ảnh đã được lưu vào {{path}}</string>
+    <string name="image_save_to">Hình ảnh đã được lưu vào %1$s</string>
     <string name="image_save_to_failed">Không thể lưu hình ảnh</string>
     <string name="open_with_other_app">Mở với ứng dụng khác</string>
     <string name="file_size">Kích thước tập tin</string>
     <string name="files">Tập tin</string>
     <string name="sdcard">Thẻ nhớ SD</string>
-    <string name="files_title">Tập tin ({{count}})</string>
-    <string name="trash_title">Thùng rác ({{count}})</string>
+    <string name="files_title">Tập tin (%1$s)</string>
+    <string name="trash_title">Thùng rác (%1$s)</string>
     <string name="delete_file">Xóa tập tin</string>
     <string name="delete_files">Xóa tập tin</string>
     <string name="copy_path">Sao chép đường dẫn</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">Không có ứng dụng chọn tệp nào có sẵn trên thiết bị này. Vui lòng cài đặt ứng dụng quản lý tệp.</string>
     <string name="cannot_move_folder_into_itself">Không thể di chuyển một thư mục vào chính nó hoặc vào thư mục con của nó.</string>
     <string name="cannot_copy_folder_into_itself">Không thể sao chép một thư mục vào chính nó hoặc vào thư mục con của nó.</string>
-    <string name="file_save_to">Tệp đã lưu vào {{path}}</string>
+    <string name="file_save_to">Tệp đã lưu vào %1$s</string>
     <string name="group_by_taken_at">Nhóm theo thời gian chụp</string>
     <string name="view_mode">Chế độ xem</string>
     <string name="browse_by_tags">Duyệt theo thẻ</string>

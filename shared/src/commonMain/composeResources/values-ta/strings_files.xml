@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">வீடியோ {{path}} க்கு சேமிக்கப்பட்டது</string>
+    <string name="video_save_to">வீடியோ %1$s க்கு சேமிக்கப்பட்டது</string>
     <string name="video_save_to_failed">வீடியோ சேமிக்க முடியவில்லை</string>
-    <string name="image_save_to">படம் {{path}} இல் சேமிக்கப்பட்டது</string>
+    <string name="image_save_to">படம் %1$s இல் சேமிக்கப்பட்டது</string>
     <string name="image_save_to_failed">படத்தை சேமிக்க தோல்வி</string>
     <string name="open_with_other_app">மற்ற பயன்பாட்டுடன் திறக்கவும்</string>
     <string name="file_size">கோப்பு அளவு</string>
     <string name="files">கோப்புகள்</string>
     <string name="sdcard">SD கார்டு</string>
-    <string name="files_title">கோப்புகள் ({{count}})</string>
-    <string name="trash_title">குப்பை ({{count}})</string>
+    <string name="files_title">கோப்புகள் (%1$s)</string>
+    <string name="trash_title">குப்பை (%1$s)</string>
     <string name="delete_file">கோப்பை நீக்கு</string>
     <string name="delete_files">கோப்புகளை நீக்கு</string>
     <string name="copy_path">பாதையை நகர்த்து</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">இந்த சாதனத்தில் கோப்பு தேர்வு பயன்பாடு கிடைக்கவில்லை. தயவுசெய்து ஒரு கோப்பு மேலாளர் பயன்பாட்டை நிறுவுங்கள்.</string>
     <string name="cannot_move_folder_into_itself">ஒரு கோப்புறையை அதற்குள்ளே அல்லது அதன் உட்புறை கோப்புறைக்கு நகர்த்த முடியாது.</string>
     <string name="cannot_copy_folder_into_itself">ஒரு கோப்புறையை அதற்குள்ளே அல்லது அதன் உட்புறை கோப்புறைக்கு நகலெடுக்க முடியாது.</string>
-    <string name="file_save_to">கோப்பு {{path}} இல் சேமிக்கப்பட்டது</string>
+    <string name="file_save_to">கோப்பு %1$s இல் சேமிக்கப்பட்டது</string>
     <string name="group_by_taken_at">எடுக்கப்பட்ட நேரத்தின் படி குழுவாக்கு</string>
     <string name="view_mode">காட்சி முறை</string>
     <string name="browse_by_tags">குறிச்சொற்கள் அடிப்படையில் உலாவுக</string>

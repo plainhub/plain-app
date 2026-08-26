@@ -7,7 +7,7 @@
     <string name="source_directory">源目录</string>
     <string name="data_directory">数据目录</string>
     <string name="more_info">更多信息</string>
-    <string name="sdk">目标：{{ target }}，最小：{{ min }}</string>
+    <string name="sdk">目标：%1$s，最小：%2$s</string>
     <string name="installed_at">安装时间</string>
     <string name="app_size">应用大小</string>
     <string name="user_app">用户应用</string>

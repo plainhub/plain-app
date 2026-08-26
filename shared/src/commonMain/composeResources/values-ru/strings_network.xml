@@ -20,8 +20,8 @@
     <string name="run">Запустить</string>
     <string name="troubleshoot">Устранить неполадки</string>
     <string name="allow_desktop_access_from_pc">Разрешить удаленный доступ с ПК</string>
-    <string name="http_port_conflict_error">Порт {{ port }} занят. Нажмите "Перезапустить приложение", чтобы исправить автоматически.</string>
-    <string name="http_port_conflict_errors">Порты {{ port }} заняты. Нажмите "Перезапустить приложение", чтобы исправить автоматически.</string>
+    <string name="http_port_conflict_error">Порт %1$s занят. Нажмите "Перезапустить приложение", чтобы исправить автоматически.</string>
+    <string name="http_port_conflict_errors">Порты %1$s заняты. Нажмите "Перезапустить приложение", чтобы исправить автоматически.</string>
     <string name="fix">Исправить</string>
     <string name="security">Безопасность</string>
     <string name="url_token">Токен URL</string>

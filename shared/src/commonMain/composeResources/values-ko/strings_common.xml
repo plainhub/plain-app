@@ -52,7 +52,7 @@
     <string name="updated_at">업데이트일</string>
     <string name="active_at">활성화 일시</string>
     <string name="offline_at">오프라인 일시</string>
-    <string name="last_update">최근 업데이트 {{time}}</string>
+    <string name="last_update">최근 업데이트 %1$s</string>
     <string name="status">상태</string>
     <string name="rename">이름 변경</string>
     <string name="save">저장</string>
@@ -116,11 +116,11 @@
     <string name="_default">기본값</string>
     <string name="add_to_tags">태그에 추가</string>
     <string name="add_tag">태그 추가</string>
-    <string name="x_selected">{{count}}개 선택됨</string>
+    <string name="x_selected">%1$s개 선택됨</string>
     <string name="select_all">모두 선택</string>
     <string name="unselect_all">모두 선택 해제</string>
-    <string name="notes_title">노트 ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">노트 (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">업데이트됨</string>
     <string name="remove_from_tags">태그에서 제거</string>
     <string name="update_tags">태그 업데이트</string>

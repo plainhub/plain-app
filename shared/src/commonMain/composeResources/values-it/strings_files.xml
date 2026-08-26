@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="video_save_to">Video salvato in {{path}}</string>
+    <string name="video_save_to">Video salvato in %1$s</string>
     <string name="video_save_to_failed">Impossibile salvare il video</string>
-    <string name="image_save_to">Immagine salvata in {{path}}</string>
+    <string name="image_save_to">Immagine salvata in %1$s</string>
     <string name="image_save_to_failed">Salvataggio dell'immagine non riuscito</string>
     <string name="open_with_other_app">Apri con un'altra app</string>
     <string name="file_size">Dimensioni file</string>
     <string name="files">File</string>
     <string name="sdcard">Scheda SD</string>
-    <string name="files_title">File ({{count}})</string>
-    <string name="trash_title">Cestino ({{count}})</string>
+    <string name="files_title">File (%1$s)</string>
+    <string name="trash_title">Cestino (%1$s)</string>
     <string name="delete_file">Elimina file</string>
     <string name="delete_files">Elimina file</string>
     <string name="copy_path">Copia percorso</string>
@@ -45,7 +45,7 @@
     <string name="file_picker_not_available">Nessuna app di selezione file disponibile su questo dispositivo. Si prega di installare un'app file manager.</string>
     <string name="cannot_move_folder_into_itself">Impossibile spostare una cartella in se stessa o in una sua sottocartella.</string>
     <string name="cannot_copy_folder_into_itself">Impossibile copiare una cartella in se stessa o in una sua sottocartella.</string>
-    <string name="file_save_to">File salvato in {{path}}</string>
+    <string name="file_save_to">File salvato in %1$s</string>
     <string name="group_by_taken_at">Raggruppa per data di acquisizione</string>
     <string name="view_mode">Modalità di visualizzazione</string>
     <string name="browse_by_tags">Sfoglia per tag</string>

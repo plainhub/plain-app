@@ -20,8 +20,8 @@
     <string name="run">Çalıştır</string>
     <string name="troubleshoot">Sorun gider</string>
     <string name="allow_desktop_access_from_pc">PC'den uzaktan erişime izin ver</string>
-    <string name="http_port_conflict_error">{{ port }} portu meşgul. Otomatik düzeltmek için "Uygulamayı Yeniden Başlat"a dokunun.</string>
-    <string name="http_port_conflict_errors">{{ port }} portları meşgul. Otomatik düzeltmek için "Uygulamayı Yeniden Başlat"a dokunun.</string>
+    <string name="http_port_conflict_error">%1$s portu meşgul. Otomatik düzeltmek için "Uygulamayı Yeniden Başlat"a dokunun.</string>
+    <string name="http_port_conflict_errors">%1$s portları meşgul. Otomatik düzeltmek için "Uygulamayı Yeniden Başlat"a dokunun.</string>
     <string name="fix">Düzelt</string>
     <string name="security">Güvenlik</string>
     <string name="url_token">URL belirteci</string>

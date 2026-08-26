@@ -4,7 +4,7 @@
     <string name="share_created">Bağlantı oluşturuldu</string>
     <string name="share_delete_desc">Silme, bağlantıyı hemen geçersiz kılar</string>
     <string name="share_expired">Süresi doldu</string>
-    <string name="share_expires_on">Son kullanma: {{date}}</string>
+    <string name="share_expires_on">Son kullanma: %1$s</string>
     <string name="share_expiry">Son kullanma</string>
     <string name="share_expiry_1d">1 gün</string>
     <string name="share_expiry_1h">1 saat</string>

@@ -92,7 +92,7 @@ fun FilesPage(
 
     val drawerFolderTitle = filesVM.currentFolderTitleOverride()
     val title = when {
-        filesVM.selectMode.value -> stringRes(Res.string.x_selected, "count" to filesVM.selectedIds.size)
+        filesVM.selectMode.value -> stringResource(Res.string.x_selected, filesVM.selectedIds.size)
 
         drawerFolderTitle != null -> drawerFolderTitle
         filesVM.type == FilesType.RECENTS -> stringResource(Res.string.recents)

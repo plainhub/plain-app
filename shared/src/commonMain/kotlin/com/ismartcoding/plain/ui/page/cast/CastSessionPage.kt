@@ -111,7 +111,7 @@ fun CastSessionPage(
             if (castItems.size > 1) {
                 VerticalSpace(16.dp)
                 Text(
-                    text = LocaleHelper.getStringF(Res.string.playlist_title, "total", castItems.size),
+                    text = LocaleHelper.getStringF(Res.string.playlist_title, castItems.size),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 4.dp),
                 )

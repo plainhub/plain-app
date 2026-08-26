@@ -4,7 +4,7 @@
     <string name="share_created">Ссылка создана</string>
     <string name="share_delete_desc">Удаление немедленно отзовёт ссылку</string>
     <string name="share_expired">Истёк</string>
-    <string name="share_expires_on">Истекает {{date}}</string>
+    <string name="share_expires_on">Истекает %1$s</string>
     <string name="share_expiry">Срок действия</string>
     <string name="share_expiry_1d">1 день</string>
     <string name="share_expiry_1h">1 час</string>

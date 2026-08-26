@@ -20,8 +20,8 @@
     <string name="run">Chạy</string>
     <string name="troubleshoot">Khắc phục sự cố</string>
     <string name="allow_desktop_access_from_pc">Cho phép truy cập từ xa từ PC</string>
-    <string name="http_port_conflict_error">Cổng {{ port }} đang bị chiếm. Nhấn "Khởi động lại ứng dụng" để tự động khắc phục.</string>
-    <string name="http_port_conflict_errors">Các cổng {{ port }} đang bị chiếm. Nhấn "Khởi động lại ứng dụng" để tự động khắc phục.</string>
+    <string name="http_port_conflict_error">Cổng %1$s đang bị chiếm. Nhấn "Khởi động lại ứng dụng" để tự động khắc phục.</string>
+    <string name="http_port_conflict_errors">Các cổng %1$s đang bị chiếm. Nhấn "Khởi động lại ứng dụng" để tự động khắc phục.</string>
     <string name="fix">Sửa</string>
     <string name="security">Bảo mật</string>
     <string name="url_token">Token URL</string>

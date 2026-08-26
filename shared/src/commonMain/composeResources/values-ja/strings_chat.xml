@@ -46,8 +46,8 @@
     <string name="share_message">メッセージを共有</string>
     <string name="delete_message">メッセージを削除</string>
     <string name="accept">承認</string>
-    <string name="request_to_connect">{{ip}}からの接続リクエスト</string>
-    <string name="client_ua">OS: {{os_name}} {{os_version}}\nブラウザ: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$sからの接続リクエスト</string>
+    <string name="client_ua">OS: %1$s %2$s\nブラウザ: %3$s %4$s</string>
     <string name="os">OS</string>
     <string name="browser">ブラウザ</string>
     <string name="reject">拒否</string>

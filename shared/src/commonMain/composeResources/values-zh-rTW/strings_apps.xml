@@ -7,7 +7,7 @@
     <string name="source_directory">來源目錄</string>
     <string name="data_directory">資料目錄</string>
     <string name="more_info">更多資訊</string>
-    <string name="sdk">目標: {{ target }}, 最小: {{ min }}</string>
+    <string name="sdk">目標: %1$s, 最小: %2$s</string>
     <string name="installed_at">安裝時間</string>
     <string name="app_size">應用程式大小</string>
     <string name="user_app">用戶應用</string>

@@ -46,8 +46,8 @@
     <string name="share_message">Поделиться сообщением</string>
     <string name="delete_message">Удалить сообщение</string>
     <string name="accept">Принять</string>
-    <string name="request_to_connect">{{ip}} запрашивает подключение</string>
-    <string name="client_ua">ОС: {{os_name}} {{os_version}}\nБраузер: {{browser_name}} {{browser_version}}</string>
+    <string name="request_to_connect">%1$s запрашивает подключение</string>
+    <string name="client_ua">ОС: %1$s %2$s\nБраузер: %3$s %4$s</string>
     <string name="os">ОС</string>
     <string name="browser">Браузер</string>
     <string name="reject">Отклонить</string>

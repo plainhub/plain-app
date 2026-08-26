@@ -41,8 +41,8 @@
     <string name="run">Run</string>
     <string name="troubleshoot">Troubleshoot</string>
     <string name="allow_desktop_access_from_pc">Allow remote access from PC</string>
-    <string name="http_port_conflict_error">Port {{ port }} is occupied. Tap "Restart App" to fix it automatically.</string>
-    <string name="http_port_conflict_errors">Ports {{ port }} are occupied. Tap "Restart App" to fix it automatically.</string>
+    <string name="http_port_conflict_error">Port %1$s is occupied. Tap "Restart App" to fix it automatically.</string>
+    <string name="http_port_conflict_errors">Ports %1$s are occupied. Tap "Restart App" to fix it automatically.</string>
     <string name="fix">Fix</string>
     <string name="security">Security</string>
     <string name="url_token">URL token</string>

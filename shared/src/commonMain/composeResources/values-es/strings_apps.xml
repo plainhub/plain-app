@@ -7,7 +7,7 @@
     <string name="source_directory">Directorio de origen</string>
     <string name="data_directory">Directorio de datos</string>
     <string name="more_info">Más información</string>
-    <string name="sdk">Objetivo: {{ target }}, Mín: {{ min }}</string>
+    <string name="sdk">Objetivo: %1$s, Mín: %2$s</string>
     <string name="installed_at">Instalado en</string>
     <string name="app_size">Tamaño de la aplicación</string>
     <string name="user_app">Aplicación de usuario</string>

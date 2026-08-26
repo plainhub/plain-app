@@ -51,7 +51,7 @@
     <string name="updated_at">Обновлено</string>
     <string name="active_at">Активно</string>
     <string name="offline_at">Неактивно</string>
-    <string name="last_update">Последнее обновление {{time}}</string>
+    <string name="last_update">Последнее обновление %1$s</string>
     <string name="status">Статус</string>
     <string name="rename">Переименовать</string>
     <string name="save">Сохранить</string>
@@ -116,11 +116,11 @@
     <string name="_default">По умолчанию</string>
     <string name="add_to_tags">Добавить к тегам</string>
     <string name="add_tag">Добавить тег</string>
-    <string name="x_selected">{{count}} выбрано</string>
+    <string name="x_selected">%1$s выбрано</string>
     <string name="select_all">Выбрать все</string>
     <string name="unselect_all">Снять выбор со всех</string>
-    <string name="notes_title">Заметки ({{count}})</string>
-    <string name="tag_title">{{name}} ({{count}})</string>
+    <string name="notes_title">Заметки (%1$s)</string>
+    <string name="tag_title">%1$s (%2$s)</string>
     <string name="updated">Обновлено</string>
     <string name="remove_from_tags">Убрать из тегов</string>
     <string name="update_tags">Обновить теги</string>
