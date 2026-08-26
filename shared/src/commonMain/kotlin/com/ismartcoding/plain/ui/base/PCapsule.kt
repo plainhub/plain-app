@@ -42,6 +42,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun PCapsuleMoreClose(
     onClose: () -> Unit,
+    showMore: Boolean = true,
+    onMore: (() -> Unit)? = null,
     moreMenu: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit = {},
 ) {
     var isSheetOpen by remember { mutableStateOf(false) }
@@ -56,29 +58,31 @@ fun PCapsuleMoreClose(
             modifier = Modifier.height(32.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                    ) { isSheetOpen = true },
-                contentAlignment = Alignment.Center,
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.more_three_dots),
-                    contentDescription = stringResource(Res.string.more),
-                    modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
-                    colorFilter = ColorFilter.tint(tint),
+            if (showMore) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                        ) { onMore?.invoke() ?: run { isSheetOpen = true } },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.more_three_dots),
+                        contentDescription = stringResource(Res.string.more),
+                        modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
+                        colorFilter = ColorFilter.tint(tint),
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 6.dp)
+                        .width(1.dp)
+                        .height(20.dp)
+                        .background(tint.copy(alpha = 0.2f))
                 )
             }
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 6.dp)
-                    .width(1.dp)
-                    .height(20.dp)
-                    .background(tint.copy(alpha = 0.2f))
-            )
             Box(
                 modifier = Modifier
                     .fillMaxHeight()

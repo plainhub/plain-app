@@ -43,8 +43,8 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DImageEditorProject
 import com.ismartcoding.plain.platform.formatTime
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
+import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -76,10 +76,14 @@ fun ImageEditorListPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
-                navigationIcon = { NavigationBackIcon { navController.navigateUp() } },
                 title = stringResource(Res.string.image_editor),
                 scrollBehavior = scrollBehavior,
+                actions = {
+                    PCapsuleMoreClose(
+                        showMore = false,
+                        onClose = { navController.navigateUp() },
+                    )
+                },
             )
         },
         floatingActionButton = {

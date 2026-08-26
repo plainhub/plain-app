@@ -37,6 +37,9 @@ private val PRESENTED_ROUTES: Set<KClass<out Any>> = setOf(
     Routing.Docs::class,
     Routing.Notes::class,
     Routing.FeedEntries::class,
+    Routing.SoundMeter::class,
+    Routing.PomodoroTimer::class,
+    Routing.ImageEditor::class,
 )
 
 /** 当前目的地是否为模态呈现 */
