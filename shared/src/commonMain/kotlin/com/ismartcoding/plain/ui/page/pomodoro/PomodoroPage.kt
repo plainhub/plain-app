@@ -30,7 +30,8 @@ import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemSettings
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -59,8 +60,13 @@ fun PomodoroPage(
     }
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController, title = "", actions = {
-            PIconButton(icon = Res.drawable.settings, contentDescription = stringResource(Res.string.settings), tint = MaterialTheme.colorScheme.onSurface) { pomodoroVM.showSettings.value = true }
+        PTopAppBar(title = "", actions = {
+            PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
+                PDropdownMenuItemSettings(onClick = {
+                    dismiss()
+                    pomodoroVM.showSettings.value = true
+                })
+            }
         })
     }) { paddingValues ->
         LazyColumn(modifier = Modifier

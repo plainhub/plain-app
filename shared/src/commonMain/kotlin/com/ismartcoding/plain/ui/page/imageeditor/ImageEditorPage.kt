@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,12 +49,13 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.helpers.StringHelper
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
-import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TextFieldDialog
@@ -149,29 +151,33 @@ fun ImageEditorPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
-                navigationIcon = { NavigationBackIcon { handleBack() } },
                 title = stringResource(Res.string.image_editor),
                 actions = {
-                    PIconButton(
-                        icon = Res.drawable.undo,
-                        contentDescription = stringResource(Res.string.undo),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        enabled = vm.canUndo.value,
-                    ) { vm.undo() }
-                    PIconButton(
-                        icon = Res.drawable.redo,
-                        contentDescription = stringResource(Res.string.redo),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        enabled = vm.canRedo.value,
-                    ) { vm.redo() }
-                    val sel = vm.selectedLayerId.value
-                    if (sel != null) {
-                        PIconButton(
-                            icon = Res.drawable.trash_2,
-                            contentDescription = stringResource(Res.string.image_editor_delete_layer),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                        ) { vm.deleteLayer(sel) }
+                    PCapsuleMoreClose(onClose = { handleBack() }) { dismiss ->
+                        // Keep the sheet open so undo/redo can be tapped repeatedly
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(Res.string.undo)) },
+                            leadingIcon = { Icon(painterResource(Res.drawable.undo), contentDescription = stringResource(Res.string.undo)) },
+                            enabled = vm.canUndo.value,
+                            onClick = { vm.undo() },
+                        )
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(Res.string.redo)) },
+                            leadingIcon = { Icon(painterResource(Res.drawable.redo), contentDescription = stringResource(Res.string.redo)) },
+                            enabled = vm.canRedo.value,
+                            onClick = { vm.redo() },
+                        )
+                        val sel = vm.selectedLayerId.value
+                        if (sel != null) {
+                            PDropdownMenuItem(
+                                text = { Text(stringResource(Res.string.image_editor_delete_layer)) },
+                                leadingIcon = { Icon(painterResource(Res.drawable.trash_2), contentDescription = stringResource(Res.string.image_editor_delete_layer)) },
+                                onClick = {
+                                    dismiss()
+                                    vm.deleteLayer(sel)
+                                },
+                            )
+                        }
                     }
                 },
             )

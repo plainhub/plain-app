@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -62,12 +64,17 @@ fun SoundMeterPage(navController: NavHostController) {
 
     PScaffold(topBar = {
         PTopAppBar(
-            navController = navController,
             title = stringResource(Res.string.sound_meter), actions = {
-                PIconButton(
-                    icon = Res.drawable.info, contentDescription = stringResource(Res.string.decibel_values),
-                    tint = MaterialTheme.colorScheme.onSurface
-                ) { decibelValuesDialogVisible.value = true }
+                PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
+                    PDropdownMenuItem(
+                        text = { Text(stringResource(Res.string.decibel_values)) },
+                        leadingIcon = { Icon(painterResource(Res.drawable.info), contentDescription = stringResource(Res.string.decibel_values)) },
+                        onClick = {
+                            dismiss()
+                            decibelValuesDialogVisible.value = true
+                        },
+                    )
+                }
             })
     }, content = { paddingValues ->
         LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
