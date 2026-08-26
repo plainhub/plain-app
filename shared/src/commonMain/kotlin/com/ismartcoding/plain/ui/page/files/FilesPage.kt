@@ -68,6 +68,7 @@ import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.buildFolderOptions
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -260,6 +261,12 @@ private fun FilesDrawerContent(
     val fileTransferAssistantText = stringResource(Res.string.app_data)
     val scope = rememberCoroutineScope()
     val options = remember { mutableStateListOf<FolderOption>() }
+    val removeFavorite: (String) -> Unit = { fullPath ->
+        scope.launch {
+            FavoriteFoldersPreference.removeAsync(fullPath)
+            filesVM.favoriteFoldersVersion.value++
+        }
+    }
 
     LaunchedEffect(refreshSignal, filesVM.selectedPathVersion.value) {
         val items = buildFolderOptions(filesVM, recentsText, internalStorageText, sdcardText, usbStorageText, fileTransferAssistantText)
@@ -279,12 +286,7 @@ private fun FilesDrawerContent(
                 icon = if (item.type == FilesType.RECENTS) Res.drawable.history else Res.drawable.folder,
                 isSelected = item.isChecked,
                 onLongClick = if (item.isFavoriteFolder) {
-                    {
-                        scope.launch {
-                            FavoriteFoldersPreference.removeAsync(item.fullPath)
-                            filesVM.favoriteFoldersVersion.value++
-                        }
-                    }
+                    { DialogHelper.confirmToDelete { removeFavorite(item.fullPath) } }
                 } else null,
                 onClick = { sendEvent(FolderKanbanSelectEvent(item)); onSelect(item) }
             )
