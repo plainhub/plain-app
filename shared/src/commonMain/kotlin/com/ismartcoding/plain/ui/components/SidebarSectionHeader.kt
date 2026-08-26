@@ -35,16 +35,16 @@ fun SidebarSectionHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 12.dp),
+            .padding(vertical = 4.dp, horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(
             modifier = Modifier
                 .weight(1f)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(24.dp))
                 .clickable { onToggle() }
-                .padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
+                .padding(start = 8.dp, top = 4.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(

@@ -126,11 +126,13 @@ fun FeedEntriesPage(
     val feed = if (feedEntriesVM.feedId.value.isEmpty()) null else feedsMap.value[feedEntriesVM.feedId.value]
     val feedName = feed?.name ?: stringResource(Res.string.feeds)
     val pageTitle = if (feedEntriesVM.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, "count", feedEntriesVM.selectedIds.size)
-        else if (feedEntriesVM.tag.value != null) listOf(feedName, feedEntriesVM.tag.value!!.name).joinToString(" - ")
-        else if (feedEntriesVM.filterType.value == FeedEntryFilterType.TODAY) feedName + " - " + stringResource(Res.string.today) else feedName
+    else if (feedEntriesVM.tag.value != null) listOf(feedName, feedEntriesVM.tag.value!!.name).joinToString(" - ")
+    else if (feedEntriesVM.filterType.value == FeedEntryFilterType.TODAY) feedName + " - " + stringResource(Res.string.today) else feedName
 
     ViewFeedEntryBottomSheet(feedEntriesVM, tagsVM, tagsMapState, tagsState)
-    if (feedEntriesVM.showTagsDialog.value) { TagsBottomSheet(tagsVM) { feedEntriesVM.showTagsDialog.value = false } }
+    if (feedEntriesVM.showTagsDialog.value) {
+        TagsBottomSheet(tagsVM) { feedEntriesVM.showTagsDialog.value = false }
+    }
     AddFeedDialog(feedsVM); EditFeedDialog(feedsVM); ViewFeedBottomSheet(feedsVM)
 
     ModalNavigationDrawer(
@@ -142,7 +144,8 @@ fun FeedEntriesPage(
         },
     ) {
         PScaffold(topBar = {
-            SearchableTopBar(navController = navController, viewModel = feedEntriesVM, scrollBehavior = scrollBehavior, title = pageTitle,
+            SearchableTopBar(
+                navController = navController, viewModel = feedEntriesVM, scrollBehavior = scrollBehavior, title = pageTitle,
                 scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
                 navigationIcon = {
                     if (feedEntriesVM.selectMode.value) NavigationCloseIcon { feedEntriesVM.exitSelectMode() }
@@ -150,11 +153,13 @@ fun FeedEntriesPage(
                         scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() }
                     })
                 }, actions = {
-                    if (feedEntriesVM.selectMode.value) { PTopRightButton(label = stringResource(if (feedEntriesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { feedEntriesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
-                    else {
+                    if (feedEntriesVM.selectMode.value) {
+                        PTopRightButton(
+                            label = stringResource(if (feedEntriesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all),
+                            click = { feedEntriesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp)
+                    } else {
                         ActionButtonSearch { feedEntriesVM.enterSearchMode() }
                         PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
-                            PDropdownMenuItemTags(onClick = { dismiss(); feedEntriesVM.showTagsDialog.value = true })
                             PDropdownMenuItemSettings(onClick = { dismiss(); navController.navigate(Routing.FeedSettings) })
                             PDropdownMenuItem(
                                 text = { Text(stringResource(Res.string.import_opml_file)) },
@@ -179,20 +184,22 @@ fun FeedEntriesPage(
             Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 PullToRefresh(
                     refreshLayoutState = topRefreshLayoutState,
-                    refreshContent = remember { {
-                        PullToRefreshContent(createText = {
-                            when (it) {
-                                RefreshContentState.Failed -> stringResource(Res.string.sync_failed)
-                                RefreshContentState.Finished -> stringResource(Res.string.synced)
-                                RefreshContentState.Refreshing -> stringResource(Res.string.syncing)
-                                RefreshContentState.Dragging -> {
-                                    if (abs(getRefreshContentOffset()) < getRefreshContentThreshold())
-                                        stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) Res.string.pull_down_to_sync_current_feed else Res.string.pull_down_to_sync_all_feeds)
-                                    else stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) Res.string.release_to_sync_current_feed else Res.string.release_to_sync_all_feeds)
+                    refreshContent = remember {
+                        {
+                            PullToRefreshContent(createText = {
+                                when (it) {
+                                    RefreshContentState.Failed -> stringResource(Res.string.sync_failed)
+                                    RefreshContentState.Finished -> stringResource(Res.string.synced)
+                                    RefreshContentState.Refreshing -> stringResource(Res.string.syncing)
+                                    RefreshContentState.Dragging -> {
+                                        if (abs(getRefreshContentOffset()) < getRefreshContentThreshold())
+                                            stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) Res.string.pull_down_to_sync_current_feed else Res.string.pull_down_to_sync_all_feeds)
+                                        else stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) Res.string.release_to_sync_current_feed else Res.string.release_to_sync_all_feeds)
+                                    }
                                 }
-                            }
-                        })
-                    } },
+                            })
+                        }
+                    },
                 ) {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
                         if (itemsState.isNotEmpty()) {
@@ -201,7 +208,8 @@ fun FeedEntriesPage(
                                     item(key = "top") { TopSpace() }
                                     itemsIndexed(itemsState, key = { _, m -> m.id }) { idx, m ->
                                         val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
-                                        FeedEntryListItem(feedEntriesVM, idx, m, feedsMap.value[m.feedId], tagsState.filter { tagIds.contains(it.id) },
+                                        FeedEntryListItem(
+                                            feedEntriesVM, idx, m, feedsMap.value[m.feedId], tagsState.filter { tagIds.contains(it.id) },
                                             onClick = { if (feedEntriesVM.selectMode.value) feedEntriesVM.select(m.id) else navController.navigate(Routing.FeedEntry(m.id)) },
                                             onLongClick = { if (!feedEntriesVM.selectMode.value) feedEntriesVM.selectedItem.value = m },
                                             onClickTag = { tag -> if (!feedEntriesVM.selectMode.value) applyFilter("", FeedEntryFilterType.DEFAULT, tag) }

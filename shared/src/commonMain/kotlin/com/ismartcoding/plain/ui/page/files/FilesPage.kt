@@ -11,11 +11,15 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -23,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,7 +62,13 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.platform.MediaPreviewer
-import com.ismartcoding.plain.ui.components.FolderKanbanList
+import com.ismartcoding.plain.events.FolderKanbanSelectEvent
+import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
+import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.SidebarItem
+import com.ismartcoding.plain.ui.components.buildFolderOptions
+import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
@@ -113,7 +124,7 @@ fun FilesPage(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                FolderKanbanList(
+                FilesDrawerContent(
                     filesVM = filesVM,
                     onSelect = { scope.launch { drawerState.close() } },
                     refreshSignal = filesVM.favoriteFoldersVersion.value,
@@ -228,4 +239,65 @@ fun FilesPage(
     }
     }
     MediaPreviewer(state = previewerState)
+}
+
+/**
+ * Drawer content for the Files page: folder picker options as SidebarItems,
+ * with a "Share links" entry at the top-level.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FilesDrawerContent(
+    filesVM: FilesViewModel,
+    onSelect: (FolderOption) -> Unit,
+    refreshSignal: Int,
+    onNavigateShares: () -> Unit,
+) {
+    val recentsText = stringResource(Res.string.recents)
+    val internalStorageText = stringResource(Res.string.internal_storage)
+    val sdcardText = stringResource(Res.string.sdcard)
+    val usbStorageText = stringResource(Res.string.usb_storage)
+    val fileTransferAssistantText = stringResource(Res.string.app_data)
+    val scope = rememberCoroutineScope()
+    val options = remember { mutableStateListOf<FolderOption>() }
+
+    LaunchedEffect(refreshSignal, filesVM.selectedPathVersion.value) {
+        val items = buildFolderOptions(filesVM, recentsText, internalStorageText, sdcardText, usbStorageText, fileTransferAssistantText)
+        options.clear()
+        options.addAll(items)
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(NavigationDrawerItemDefaults.ItemPadding)
+            .verticalScroll(rememberScrollState())
+    ) {
+        VerticalSpace(dp = 16.dp)
+        options.forEach { item ->
+            SidebarItem(
+                label = item.title + if (item.isFavoriteFolder) " ⭐" else "",
+                icon = if (item.type == FilesType.RECENTS) Res.drawable.history else Res.drawable.folder,
+                isSelected = item.isChecked,
+                onLongClick = if (item.isFavoriteFolder) {
+                    {
+                        scope.launch {
+                            FavoriteFoldersPreference.removeAsync(item.fullPath)
+                            filesVM.favoriteFoldersVersion.value++
+                        }
+                    }
+                } else null,
+                onClick = { sendEvent(FolderKanbanSelectEvent(item)); onSelect(item) }
+            )
+        }
+        VerticalSpace(dp = 16.dp)
+        HorizontalDivider()
+        VerticalSpace(dp = 8.dp)
+        SidebarItem(
+            label = stringResource(Res.string.share_links),
+            subtitle = stringResource(Res.string.share_links_desc),
+            icon = Res.drawable.link,
+            onClick = onNavigateShares
+        )
+        VerticalSpace(dp = 16.dp)
+    }
 }
