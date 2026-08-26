@@ -35,6 +35,7 @@ import com.ismartcoding.plain.i18n.share_link
 import com.ismartcoding.plain.i18n.share_link_copied
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
+import com.ismartcoding.plain.i18n.stringRes
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.formatDateTime
@@ -196,7 +197,7 @@ fun DShare.expiryLabel(): String {
     val expiresAt = this.expiresAt
     return when {
         isExpired -> stringResource(Res.string.share_expired)
-        expiresAt != null -> stringResource(Res.string.share_expires_on, expiresAt.formatDateTime())
+        expiresAt != null -> stringRes(Res.string.share_expires_on, "date" to expiresAt.formatDateTime())
         else -> stringResource(Res.string.share_expiry_never)
     }
 }
