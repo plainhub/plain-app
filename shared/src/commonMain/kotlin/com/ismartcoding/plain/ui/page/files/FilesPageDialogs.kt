@@ -77,6 +77,7 @@ internal fun FilesPageDialogs(
             onDismiss = { filesVM.showCreateShareDialog.value = false },
             navController = navController,
             chatVM = chatVM,
+            onCreated = { filesVM.sharesVersion.value++ },
         )
     }
 

@@ -145,7 +145,7 @@ class Routing {
     object AppFiles
 
     @Serializable
-    object Shares
+    data class EditShare(val id: String)
 
     @Serializable
     object Nearby

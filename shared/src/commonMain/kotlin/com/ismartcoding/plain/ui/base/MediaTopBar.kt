@@ -65,6 +65,7 @@ fun <T : IData> MediaTopBar(
         castDeviceName = CastPlayer.currentDevice?.description?.device?.friendlyName,
         bucket = bucketsMap[mediaVM.bucketId.value],
         dragSelectState = dragSelectState,
+        tagName = mediaVM.tag.value?.name,
     )
     val containerColor = if (castVM.castMode.value) MaterialTheme.colorScheme.secondaryContainer else null
 

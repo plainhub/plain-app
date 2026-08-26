@@ -91,7 +91,7 @@ import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.MarkdownThemePreviewPage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
-import com.ismartcoding.plain.ui.page.shares.SharesPage
+import com.ismartcoding.plain.ui.page.shares.EditSharePage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.web.HowToUsePage
@@ -263,7 +263,10 @@ fun MainNavGraph(
         composable<Routing.AppFiles> {
             AppFilesPage(navController, audioPlaylistVM, chatVM)
         }
-        composable<Routing.Shares> { SharesPage(navController) }
+        composable<Routing.EditShare> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.EditShare>()
+            EditSharePage(navController, chatVM, r.id)
+        }
         composable<Routing.Nearby> {
             NearbyPage(navController, peerVM = peerVM)
         }

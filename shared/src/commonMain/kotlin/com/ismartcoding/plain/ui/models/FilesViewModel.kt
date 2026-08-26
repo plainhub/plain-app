@@ -89,6 +89,18 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     val isDeleting = mutableStateOf(false)
     val favoriteFoldersVersion = mutableIntStateOf(0)
 
+    /** Bumped whenever the share list changes, so the drawer share section can refresh. */
+    val sharesVersion = mutableIntStateOf(0)
+
+    /**
+     * Title override for the folder picked from the drawer, stored as
+     * (fullPath to title) — e.g. a favorite folder's alias. Applies only
+     * while the selected path matches, so navigating away reverts the title.
+     */
+    val drawerFolderTitle = mutableStateOf<Pair<String, String>?>(null)
+
+    fun currentFolderTitleOverride(): String? = drawerFolderTitle.value?.takeIf { it.first == selectedPath }?.second
+
     internal fun updateItemsInternal(items: List<DFile>) { _itemsFlow.value = items }
 
     fun navigateToDirectory(newPath: String) {

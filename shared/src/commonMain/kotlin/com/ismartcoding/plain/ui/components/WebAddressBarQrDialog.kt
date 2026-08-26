@@ -46,7 +46,9 @@ fun WebAddressBarQrDialog(
                     modifier = Modifier.size(300.dp),
                 )
                 Text(
-                    text = url,
+                    text = url.mapIndexed { index, c ->
+                        if (index == 0) c.toString() else "\u200B$c"
+                    }.joinToString(""),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

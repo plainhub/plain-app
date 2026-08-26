@@ -5,7 +5,6 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
-import com.ismartcoding.plain.ui.theme.red
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemDelete
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -57,14 +56,10 @@ fun MediaSidebarTagItem(
                         onEdit()
                     }
                 )
-                PDropdownMenuItem(
-                    text = { Text(stringResource(Res.string.delete), color = MaterialTheme.colorScheme.red) },
-                    leadingIcon = { Icon(painterResource(Res.drawable.trash_2), null, modifier = Modifier.size(20.dp), tint = MaterialTheme.colorScheme.red) },
-                    onClick = {
-                        menuExpanded = false
-                        onDelete()
-                    }
-                )
+                PDropdownMenuItemDelete {
+                    menuExpanded = false
+                    onDelete()
+                }
             }
         }
     }

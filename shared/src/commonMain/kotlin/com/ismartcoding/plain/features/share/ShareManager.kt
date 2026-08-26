@@ -104,6 +104,10 @@ object ShareManager {
         return AppDatabase.instance.shareDao().getAll()
     }
 
+    suspend fun getShare(id: String): DShare? {
+        return AppDatabase.instance.shareDao().getById(id)
+    }
+
     /**
      * Build the share link:
      * `https://<host>:<httpsPort>/s/<shared_id>#<shared_token>`.

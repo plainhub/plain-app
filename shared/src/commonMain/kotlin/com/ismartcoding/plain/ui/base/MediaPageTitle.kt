@@ -16,6 +16,7 @@ internal fun getMediaPageTitle(
     castDeviceName: String?,
     bucket: DMediaBucket?,
     dragSelectState: DragSelectState,
+    tagName: String? = null,
 ): String {
     val resourceId = when (mediaType) {
         DataType.IMAGE -> Res.string.images
@@ -25,7 +26,7 @@ internal fun getMediaPageTitle(
         else -> Res.string.files
     }
 
-    val mediaName = bucket?.name ?: stringResource(resourceId)
+    val mediaName = tagName ?: bucket?.name ?: stringResource(resourceId)
     return if (isCastMode) {
         stringResource(Res.string.cast_mode) + " - " + castDeviceName
     } else if (dragSelectState.selectMode) {

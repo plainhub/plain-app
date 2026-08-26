@@ -75,7 +75,7 @@ fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM:
     NotesPageEffects(notesVM, tagsVM, scrollBehavior, scrollState, scope, isFirstTime)
 
     val pageTitle = if (notesVM.selectMode.value) LocaleHelper.getStringF(Res.string.x_selected, "count", notesVM.selectedIds.size)
-        else if (notesVM.tag.value != null) stringResource(Res.string.notes) + " - " + notesVM.tag.value!!.name
+        else if (notesVM.tag.value != null) notesVM.tag.value!!.name
         else if (notesVM.trash.value) stringResource(Res.string.notes) + " - " + stringResource(Res.string.trash)
         else stringResource(Res.string.notes)
     ViewNoteBottomSheet(notesVM, tagsVM, tagsMapState, tagsState)

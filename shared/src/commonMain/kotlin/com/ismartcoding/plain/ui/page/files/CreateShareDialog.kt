@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.page.files
 
-import com.ismartcoding.plain.i18n.*
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -18,15 +16,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import org.jetbrains.compose.resources.StringResource
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.share.ShareCrypto
 import com.ismartcoding.plain.features.share.ShareExpiry
 import com.ismartcoding.plain.features.share.ShareManager
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.cancel
+import com.ismartcoding.plain.i18n.close
+import com.ismartcoding.plain.i18n.create
+import com.ismartcoding.plain.i18n.create_share_link
+import com.ismartcoding.plain.i18n.share_created
+import com.ismartcoding.plain.i18n.share_expiry
+import com.ismartcoding.plain.i18n.share_expiry_1d
+import com.ismartcoding.plain.i18n.share_expiry_1h
+import com.ismartcoding.plain.i18n.share_expiry_30d
+import com.ismartcoding.plain.i18n.share_expiry_7d
+import com.ismartcoding.plain.i18n.share_expiry_never
+import com.ismartcoding.plain.i18n.share_link
+import com.ismartcoding.plain.i18n.share_link_copied
+import com.ismartcoding.plain.i18n.share_link_desc
+import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.withIO
@@ -35,10 +47,11 @@ import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonForward
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonQrCode
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonShare
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -47,6 +60,8 @@ import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Dialog to create a share link for the selected [paths]. First collects the
@@ -102,7 +117,7 @@ fun CreateShareDialog(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     VerticalSpace(8.dp)
-                    PCard {
+                    PCard(horizontal = 0.dp) {
                         PListItem(title = link, action = {
                             CopyIconButton(
                                 text = link,
@@ -113,8 +128,8 @@ fun CreateShareDialog(
                     }
                     VerticalSpace(8.dp)
                     BottomActionButtons {
-                        PIconTextSmallButton(icon = Res.drawable.qr_code, text = stringResource(Res.string.qrcode)) { showQr = true }
-                        PIconTextSmallButton(icon = Res.drawable.share_2, text = stringResource(Res.string.share)) { shareText(link) }
+                        IconTextSmallButtonQrCode { showQr = true }
+                        IconTextSmallButtonShare { shareText(link) }
                         IconTextSmallButtonForward { showForwardDialog = true }
                     }
                 }

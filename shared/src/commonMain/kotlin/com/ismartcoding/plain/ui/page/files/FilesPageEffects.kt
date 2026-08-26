@@ -69,6 +69,7 @@ internal fun FilesPageEffects(
                 is FolderKanbanSelectEvent -> {
                     val m = event.data
                     filesVM.offset = 0
+                    filesVM.drawerFolderTitle.value = if (m.isFavoriteFolder) m.fullPath to m.title else null
                     filesVM.initSelectedPath(m.rootPath, m.type, m.fullPath, m.fullPath)
                     scope.launch(Dispatchers.Default) { filesVM.loadAsync() }
                 }

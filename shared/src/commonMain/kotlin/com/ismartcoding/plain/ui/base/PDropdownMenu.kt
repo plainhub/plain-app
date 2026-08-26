@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.theme.red
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +55,22 @@ fun PDropdownMenuItem(
             vertical = 0.dp,
         ),
         enabled = enabled,
+    )
+}
+
+@Composable
+fun PDropdownMenuItemDelete(onClick: () -> Unit) {
+    PDropdownMenuItem(
+        text = { Text(stringResource(Res.string.delete), color = MaterialTheme.colorScheme.red) },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(Res.drawable.trash_2),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.red,
+            )
+        },
+        onClick = onClick,
     )
 }
 
