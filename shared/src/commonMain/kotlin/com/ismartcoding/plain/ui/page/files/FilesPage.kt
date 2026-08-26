@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItemDefaults
@@ -34,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,6 +52,7 @@ import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
+import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemCreateFile
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemCreateFolder
@@ -68,7 +72,6 @@ import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.buildFolderOptions
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -261,6 +264,7 @@ private fun FilesDrawerContent(
     val fileTransferAssistantText = stringResource(Res.string.app_data)
     val scope = rememberCoroutineScope()
     val options = remember { mutableStateListOf<FolderOption>() }
+    var contextMenuPath by remember { mutableStateOf<String?>(null) }
     val removeFavorite: (String) -> Unit = { fullPath ->
         scope.launch {
             FavoriteFoldersPreference.removeAsync(fullPath)
@@ -281,15 +285,37 @@ private fun FilesDrawerContent(
     ) {
         VerticalSpace(dp = 16.dp)
         options.forEach { item ->
-            SidebarItem(
-                label = item.title + if (item.isFavoriteFolder) " ⭐" else "",
-                icon = if (item.type == FilesType.RECENTS) Res.drawable.history else Res.drawable.folder,
-                isSelected = item.isChecked,
-                onLongClick = if (item.isFavoriteFolder) {
-                    { DialogHelper.confirmToDelete { removeFavorite(item.fullPath) } }
-                } else null,
-                onClick = { sendEvent(FolderKanbanSelectEvent(item)); onSelect(item) }
-            )
+            if (item.isFavoriteFolder) {
+                Box {
+                    SidebarItem(
+                        label = item.title + " ⭐",
+                        icon = Res.drawable.folder,
+                        isSelected = item.isChecked,
+                        onLongClick = { contextMenuPath = item.fullPath },
+                        onClick = { sendEvent(FolderKanbanSelectEvent(item)); onSelect(item) }
+                    )
+                    PDropdownMenu(
+                        expanded = contextMenuPath == item.fullPath,
+                        onDismissRequest = { contextMenuPath = null },
+                    ) {
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(Res.string.delete)) },
+                            leadingIcon = { Icon(painterResource(Res.drawable.delete_forever), contentDescription = null) },
+                            onClick = {
+                                contextMenuPath = null
+                                removeFavorite(item.fullPath)
+                            },
+                        )
+                    }
+                }
+            } else {
+                SidebarItem(
+                    label = item.title,
+                    icon = if (item.type == FilesType.RECENTS) Res.drawable.history else Res.drawable.folder,
+                    isSelected = item.isChecked,
+                    onClick = { sendEvent(FolderKanbanSelectEvent(item)); onSelect(item) }
+                )
+            }
         }
         VerticalSpace(dp = 16.dp)
         HorizontalDivider()
