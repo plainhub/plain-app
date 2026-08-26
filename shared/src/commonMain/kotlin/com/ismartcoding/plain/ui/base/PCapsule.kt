@@ -49,11 +49,13 @@ fun PCapsuleMoreClose(
     var isSheetOpen by remember { mutableStateOf(false) }
     val tint = MaterialTheme.colorScheme.onSurface
     val shape = RoundedCornerShape(percent = 50)
-    Box(
-        modifier = Modifier
-            .clip(shape)
-            .border(width = 1.dp, color = tint.copy(alpha = 0.15f), shape = shape)
-    ) {
+    // No capsule outline when the more button is hidden — the close dot stands alone
+    val boxModifier = if (showMore) {
+        Modifier.clip(shape).border(width = 1.dp, color = tint.copy(alpha = 0.15f), shape = shape)
+    } else {
+        Modifier
+    }
+    Box(modifier = boxModifier) {
         Row(
             modifier = Modifier.height(32.dp),
             verticalAlignment = Alignment.CenterVertically,
