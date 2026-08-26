@@ -60,7 +60,7 @@ suspend fun buildFolderOptions(
             }
             val relativePath = if (fav.fullPath.startsWith(fav.rootPath)) fav.fullPath.removePrefix(fav.rootPath).removePrefix("/") else fav.fullPath.getFilenameFromPath()
             val displayTitle = if (relativePath.isNotEmpty()) "$rootName/$relativePath" else rootName
-            menuItems.add(FolderOption(rootPath = fav.rootPath, fullPath = fav.fullPath, type = FilesType.INTERNAL_STORAGE, isChecked = longestMatchPath == fav.fullPath, title = displayTitle, isFavoriteFolder = true))
+            menuItems.add(FolderOption(rootPath = fav.rootPath, fullPath = fav.fullPath, type = FilesType.INTERNAL_STORAGE, isChecked = longestMatchPath == fav.fullPath, title = fav.alias ?: displayTitle, isFavoriteFolder = true))
         }
     }
     menuItems

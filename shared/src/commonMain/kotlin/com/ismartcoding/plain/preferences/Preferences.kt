@@ -480,6 +480,17 @@ object FavoriteFoldersPreference : BasePreference<String>() {
         return items
     }
 
+    /** Rename a favorite folder entry by updating its display alias. */
+    suspend fun renameAsync(fullPath: String, alias: String): List<DFavoriteFolder> {
+        val items = getValueAsync().toMutableList()
+        val index = items.indexOfFirst { it.fullPath == fullPath }
+        if (index >= 0) {
+            items[index] = items[index].copy(alias = alias.trim().ifEmpty { null })
+            putAsync(items)
+        }
+        return items
+    }
+
     suspend fun isFavoriteAsync(fullPath: String): Boolean {
         return getValueAsync().any { it.fullPath == fullPath }
     }

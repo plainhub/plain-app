@@ -83,6 +83,18 @@ object ShareManager {
         return share
     }
 
+    /** Update the editable fields of a share (name / expiry). Returns null if the id is unknown. */
+    suspend fun updateShare(id: String, name: String, expiresAt: Instant?): DShare? {
+        val dao = AppDatabase.instance.shareDao()
+        val share = dao.getById(id) ?: return null
+        share.name = name
+        share.expiresAt = expiresAt
+        share.updatedAt = TimeHelper.now()
+        dao.update(share)
+        authCache.invalidate(id)
+        return share
+    }
+
     suspend fun deleteShare(id: String) {
         AppDatabase.instance.shareDao().delete(id)
         authCache.invalidate(id)
