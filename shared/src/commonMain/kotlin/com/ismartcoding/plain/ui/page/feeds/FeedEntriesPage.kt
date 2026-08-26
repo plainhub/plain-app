@@ -7,14 +7,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,12 +20,9 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -43,12 +35,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -74,6 +62,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.FeedEntryListItem
+import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
@@ -265,20 +254,20 @@ private fun FeedEntriesDrawerContent(
     ) {
         VerticalSpace(dp = 16.dp)
 
-        NavigationDrawerItem(
-            label = { Text(stringResource(Res.string.all)) },
-            icon = { Icon(painterResource(Res.drawable.layout_grid), null, modifier = Modifier.size(24.dp)) },
-            selected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null && feedEntriesVM.filterType.value == FeedEntryFilterType.DEFAULT,
+        SidebarItem(
+            label = stringResource(Res.string.all),
+            icon = Res.drawable.layout_grid,
+            isSelected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null && feedEntriesVM.filterType.value == FeedEntryFilterType.DEFAULT,
             onClick = { onSelect("", FeedEntryFilterType.DEFAULT, null) },
-            badge = { Text(feedEntriesVM.total.intValue.toString()) }
+            badge = feedEntriesVM.total.intValue.toString()
         )
 
-        NavigationDrawerItem(
-            label = { Text(stringResource(Res.string.today)) },
-            icon = { Icon(painterResource(Res.drawable.history), null, modifier = Modifier.size(24.dp)) },
-            selected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null && feedEntriesVM.filterType.value == FeedEntryFilterType.TODAY,
+        SidebarItem(
+            label = stringResource(Res.string.today),
+            icon = Res.drawable.history,
+            isSelected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null && feedEntriesVM.filterType.value == FeedEntryFilterType.TODAY,
             onClick = { onSelect("", FeedEntryFilterType.TODAY, null) },
-            badge = { Text(feedEntriesVM.totalToday.value.toString()) }
+            badge = feedEntriesVM.totalToday.value.toString()
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -292,11 +281,13 @@ private fun FeedEntriesDrawerContent(
         )
         if (feedsExpanded) {
             feedsState.forEach { feed ->
-                FeedDrawerFeedItem(
-                    m = feed,
+                SidebarItem(
+                    label = feed.name,
+                    icon = Res.drawable.rss,
                     isSelected = feedEntriesVM.feedId.value == feed.id,
                     onClick = { onSelect(feed.id, FeedEntryFilterType.DEFAULT, null) },
-                    onLongClick = { feedsVM.selectedItem.value = feed }
+                    onLongClick = { feedsVM.selectedItem.value = feed },
+                    badge = feed.count.toString()
                 )
             }
         }
@@ -312,12 +303,12 @@ private fun FeedEntriesDrawerContent(
         )
         if (tagsExpanded) {
             tagsState.forEach { tag ->
-                NavigationDrawerItem(
-                    label = { Text(tag.name) },
-                    icon = { Icon(painterResource(Res.drawable.tag), null, modifier = Modifier.size(24.dp)) },
-                    selected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value?.id == tag.id,
+                SidebarItem(
+                    label = tag.name,
+                    icon = Res.drawable.tag,
+                    isSelected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value?.id == tag.id,
                     onClick = { onSelect("", FeedEntryFilterType.DEFAULT, tag) },
-                    badge = { Text(tag.count.toString()) }
+                    badge = tag.count.toString()
                 )
             }
         }
@@ -325,40 +316,3 @@ private fun FeedEntriesDrawerContent(
     }
 }
 
-/**
- * Drawer item for a single feed. Long-press opens the manage-feed sheet.
- */
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun FeedDrawerFeedItem(
-    m: DFeed,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .clip(MaterialTheme.shapes.extraLarge)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
-        color = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
-        contentColor = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(painterResource(Res.drawable.rss), null, modifier = Modifier.size(24.dp))
-            HorizontalSpace(12.dp)
-            Text(
-                text = m.name,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.labelLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(text = m.count.toString(), style = MaterialTheme.typography.labelLarge)
-        }
-    }
-}

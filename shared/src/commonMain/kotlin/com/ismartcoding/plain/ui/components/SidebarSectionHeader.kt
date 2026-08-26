@@ -44,7 +44,7 @@ fun SidebarSectionHeader(
                 .weight(1f)
                 .clip(RoundedCornerShape(4.dp))
                 .clickable { onToggle() }
-                .padding(vertical = 4.dp),
+                .padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(

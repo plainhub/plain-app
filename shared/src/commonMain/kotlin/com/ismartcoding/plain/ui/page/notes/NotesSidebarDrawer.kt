@@ -4,16 +4,12 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,13 +24,13 @@ import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.MediaSidebarTagItem
+import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -68,29 +64,29 @@ fun NotesSidebarDrawer(
         VerticalSpace(dp = 16.dp)
 
         // All
-        NavigationDrawerItem(
-            label = { Text(stringResource(Res.string.all)) },
-            icon = { Icon(painterResource(Res.drawable.layout_grid), null, modifier = Modifier.size(24.dp)) },
-            selected = !notesVM.trash.value && notesVM.tag.value == null,
+        SidebarItem(
+            label = stringResource(Res.string.all),
+            icon = Res.drawable.layout_grid,
+            isSelected = !notesVM.trash.value && notesVM.tag.value == null,
             onClick = {
                 notesVM.trash.value = false
                 notesVM.tag.value = null
                 scope.launch { drawerState.close() }
             },
-            badge = { Text(notesVM.total.intValue.toString()) }
+            badge = notesVM.total.intValue.toString()
         )
 
         // Trash
-        NavigationDrawerItem(
-            label = { Text(stringResource(Res.string.trash)) },
-            icon = { Icon(painterResource(Res.drawable.trash_2), null, modifier = Modifier.size(24.dp)) },
-            selected = notesVM.trash.value,
+        SidebarItem(
+            label = stringResource(Res.string.trash),
+            icon = Res.drawable.trash_2,
+            isSelected = notesVM.trash.value,
             onClick = {
                 notesVM.trash.value = true
                 notesVM.tag.value = null
                 scope.launch { drawerState.close() }
             },
-            badge = { Text(notesVM.totalTrash.intValue.toString()) }
+            badge = notesVM.totalTrash.intValue.toString()
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))

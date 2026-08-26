@@ -4,17 +4,12 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,6 +28,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.MediaSidebarBucketItem
 import com.ismartcoding.plain.ui.components.MediaSidebarTagItem
+import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -42,7 +38,6 @@ import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -88,10 +83,10 @@ fun <T : IData> MediaSidebarDrawer(
         VerticalSpace(dp = 16.dp)
 
         // All
-        NavigationDrawerItem(
-            label = { Text(stringResource(Res.string.all)) },
-            icon = { Icon(painterResource(Res.drawable.layout_grid), null, modifier = Modifier.size(24.dp)) },
-            selected = !mediaVM.trash.value && mediaVM.bucketId.value.isEmpty() && mediaVM.tag.value == null && (mediaVM !is DocsViewModel || (mediaVM as DocsViewModel).fileType.value.isEmpty()),
+        SidebarItem(
+            label = stringResource(Res.string.all),
+            icon = Res.drawable.layout_grid,
+            isSelected = !mediaVM.trash.value && mediaVM.bucketId.value.isEmpty() && mediaVM.tag.value == null && (mediaVM !is DocsViewModel || (mediaVM as DocsViewModel).fileType.value.isEmpty()),
             onClick = {
                 mediaVM.trash.value = false
                 mediaVM.bucketId.value = ""
@@ -100,15 +95,15 @@ fun <T : IData> MediaSidebarDrawer(
                 loadMedia()
                 scope.launch { drawerState.close() }
             },
-            badge = { Text(mediaFoldersVM.totalBucket.value?.itemCount?.toString() ?: "0") }
+            badge = mediaFoldersVM.totalBucket.value?.itemCount?.toString() ?: "0"
         )
 
         // Trash
         if (AppFeatureType.MEDIA_TRASH.has()) {
-            NavigationDrawerItem(
-                label = { Text(stringResource(Res.string.trash)) },
-                icon = { Icon(painterResource(Res.drawable.trash_2), null, modifier = Modifier.size(24.dp)) },
-                selected = mediaVM.trash.value,
+            SidebarItem(
+                label = stringResource(Res.string.trash),
+                icon = Res.drawable.trash_2,
+                isSelected = mediaVM.trash.value,
                 onClick = {
                     mediaVM.trash.value = true
                     mediaVM.bucketId.value = ""
@@ -117,7 +112,7 @@ fun <T : IData> MediaSidebarDrawer(
                     loadMedia()
                     scope.launch { drawerState.close() }
                 },
-                badge = { Text(mediaFoldersVM.trashCount.intValue.toString()) }
+                badge = mediaFoldersVM.trashCount.intValue.toString()
             )
         }
 
@@ -137,10 +132,10 @@ fun <T : IData> MediaSidebarDrawer(
 
                 if (extensionsExpanded) {
                     extensionTabs.forEach { tab ->
-                        NavigationDrawerItem(
-                            label = { Text(tab.title) },
-                            icon = { Icon(painterResource(Res.drawable.file_digit), null, modifier = Modifier.size(24.dp)) },
-                            selected = !mediaVM.trash.value && docsVM.fileType.value == tab.value,
+                        SidebarItem(
+                            label = tab.title,
+                            icon = Res.drawable.file_digit,
+                            isSelected = !mediaVM.trash.value && docsVM.fileType.value == tab.value,
                             onClick = {
                                 mediaVM.trash.value = false
                                 mediaVM.bucketId.value = ""
@@ -149,7 +144,7 @@ fun <T : IData> MediaSidebarDrawer(
                                 loadMedia()
                                 scope.launch { drawerState.close() }
                             },
-                            badge = { Text(tab.count.toString()) }
+                            badge = tab.count.toString()
                         )
                     }
                 }
