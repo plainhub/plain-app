@@ -34,13 +34,3 @@ fun persistPort(
         }
     }
 }
-
-fun showRestartAppDialog() {
-    coIO {
-        DialogHelper.showConfirmDialog(
-            title = LocaleHelper.getStringAsync(Res.string.restart_app_title),
-            message = LocaleHelper.getStringAsync(Res.string.restart_app_message),
-            confirmButton = Pair(LocaleHelper.getStringAsync(Res.string.relaunch_app)) { relaunchApp() },
-        )
-    }
-}

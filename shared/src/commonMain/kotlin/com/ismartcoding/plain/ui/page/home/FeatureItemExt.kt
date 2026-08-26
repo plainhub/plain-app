@@ -31,7 +31,7 @@ fun FeatureItem.Companion.getList(navController: NavHostController): List<Featur
                 navController.navigate(Routing.Notes)
             },
             FeatureItem(AppFeatureType.FEEDS, Res.string.feeds, Res.drawable.rss) {
-                navController.navigate(Routing.Feeds)
+                navController.navigate(Routing.FeedEntries(""))
             },
             FeatureItem(AppFeatureType.AUDIO, Res.string.audios, Res.drawable.music) {
                 navController.navigate(Routing.Audio)

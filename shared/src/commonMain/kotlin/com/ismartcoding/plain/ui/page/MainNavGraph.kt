@@ -61,7 +61,6 @@ import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
-import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.files.FilesPage
 import com.ismartcoding.plain.ui.page.files.ZipFilePage
 import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
@@ -189,7 +188,6 @@ fun MainNavGraph(
         }
         composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
         composable<Routing.Scan> { ScanPage(navController) }
-        composable<Routing.Feeds> { FeedsPage(navController) }
         composable<Routing.FeedSettings> { FeedSettingsPage(navController) }
         composable<Routing.HowToUse> {
             val webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }

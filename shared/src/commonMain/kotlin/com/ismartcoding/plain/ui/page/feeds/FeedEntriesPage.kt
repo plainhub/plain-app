@@ -2,58 +2,95 @@ package com.ismartcoding.plain.ui.page.feeds
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.db.DFeed
+import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
-import com.ismartcoding.plain.platform.LocaleHelper
+import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.events.ExportFileEvent
+import com.ismartcoding.plain.events.PickFileEvent
+import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.platform.FeedsPageEffects
 import com.ismartcoding.plain.platform.IODispatcher
-import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
-import com.ismartcoding.plain.ui.base.ActionButtonSearch
-import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
-import com.ismartcoding.plain.ui.base.NavigationCloseIcon
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemSettings
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemTags
-import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.PTopRightButton
-import com.ismartcoding.plain.ui.components.ListSearchBar
+import com.ismartcoding.plain.platform.LocaleHelper
+import com.ismartcoding.plain.platform.formatName
+import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
+import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
+import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
+import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
+import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.components.FeedEntryListItem
+import com.ismartcoding.plain.ui.components.SidebarSectionHeader
+import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.models.VTabData
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
+import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -65,27 +102,37 @@ fun FeedEntriesPage(
     val feedsMap = remember(feedsState) { derivedStateOf { feedsState.associateBy { it.id } } }
     val tagsState by tagsVM.itemsFlow.collectAsState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
+    val itemsState by feedEntriesVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    val scrollStateMap = remember { mutableStateMapOf<Int, LazyListState>() }
-    val pagerState = rememberPagerState(pageCount = { tagsState.size + 2 })
+    val scrollState = rememberLazyListState()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !feedEntriesVM.selectMode.value
+        scrollState.firstVisibleItemIndex > 0 && !feedEntriesVM.selectMode.value
     })
-    val isFirstTime = remember { mutableStateOf(true) }
-    val tabs = remember(tagsState, feedEntriesVM.total.intValue) {
-        listOf(VTabData(LocaleHelper.getString(Res.string.all), "all", feedEntriesVM.total.intValue),
-            VTabData(LocaleHelper.getString(Res.string.today), "today", feedEntriesVM.totalToday.value),
-            *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray())
-    }
     val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { feedEntriesVM.sync() } }
 
-    val onSearch: (String) -> Unit = {
-        feedEntriesVM.searchActive.value = false; feedEntriesVM.showLoading.value = true
-        scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) }
+    val applyFilter: (String, FeedEntryFilterType, DTag?) -> Unit = { newFeedId, filterType, tag ->
+        feedEntriesVM.feedId.value = newFeedId
+        feedEntriesVM.filterType.value = filterType
+        feedEntriesVM.tag.value = tag
+        scope.launch { scrollState.scrollToItem(0) }
         scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
     }
+    val onSelectDrawerItem: (String, FeedEntryFilterType, DTag?) -> Unit = { newFeedId, filterType, tag ->
+        applyFilter(newFeedId, filterType, tag)
+        scope.launch { drawerState.close() }
+    }
 
-    FeedEntriesPageEffects(feedEntriesVM, feedsVM, tagsVM, feedId, scope, tabs, pagerState, scrollBehavior, scrollStateMap, topRefreshLayoutState, isFirstTime, onSearch)
+    FeedEntriesPageEffects(feedEntriesVM, feedsVM, tagsVM, feedId, scope, topRefreshLayoutState) {
+        feedEntriesVM.showLoading.value = true
+        scope.launch { scrollState.scrollToItem(0) }
+        scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
+    }
+    FeedsPageEffects(feedsVM)
+
+    LaunchedEffect(feedEntriesVM.selectMode.value) {
+        if (feedEntriesVM.selectMode.value) scrollBehavior.reset()
+    }
 
     val feed = if (feedEntriesVM.feedId.value.isEmpty()) null else feedsMap.value[feedEntriesVM.feedId.value]
     val feedName = feed?.name ?: stringResource(Res.string.feeds)
@@ -95,29 +142,223 @@ fun FeedEntriesPage(
 
     ViewFeedEntryBottomSheet(feedEntriesVM, tagsVM, tagsMapState, tagsState)
     if (feedEntriesVM.showTagsDialog.value) { TagsBottomSheet(tagsVM) { feedEntriesVM.showTagsDialog.value = false } }
+    AddFeedDialog(feedsVM); EditFeedDialog(feedsVM); ViewFeedBottomSheet(feedsVM)
 
-    PScaffold(topBar = {
-        if (feedEntriesVM.showSearchBar.value) { ListSearchBar(viewModel = feedEntriesVM, onSearch = onSearch); return@PScaffold }
-        PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } }),
-            navController = navController, navigationIcon = {
-                if (feedEntriesVM.selectMode.value) NavigationCloseIcon { feedEntriesVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() }
-            }, title = pageTitle, scrollBehavior = scrollBehavior, actions = {
-                if (feedEntriesVM.selectMode.value) { PTopRightButton(label = stringResource(if (feedEntriesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { feedEntriesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
-                else {
-                    ActionButtonSearch { feedEntriesVM.enterSearchMode() }
-                    if (feedEntriesVM.feedId.value.isEmpty()) { PIconButton(icon = Res.drawable.rss, contentDescription = stringResource(Res.string.subscriptions), tint = MaterialTheme.colorScheme.onSurface) { navController.navigate(Routing.Feeds) } }
-                    ActionButtonMoreWithMenu { dismiss -> PDropdownMenuItemTags(onClick = { dismiss(); feedEntriesVM.showTagsDialog.value = true })
-                        if (feedEntriesVM.feedId.value.isEmpty()) PDropdownMenuItemSettings(onClick = { dismiss(); navController.navigate(Routing.FeedSettings) }) }
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                FeedEntriesDrawerContent(feedEntriesVM, feedsVM, feedsState, tagsState, drawerState, onSelectDrawerItem)
+            }
+        },
+    ) {
+        PScaffold(topBar = {
+            SearchableTopBar(navController = navController, viewModel = feedEntriesVM, scrollBehavior = scrollBehavior, title = pageTitle,
+                scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
+                navigationIcon = {
+                    if (feedEntriesVM.selectMode.value) NavigationCloseIcon { feedEntriesVM.exitSelectMode() }
+                    else PIconButton(icon = Res.drawable.left_panel_open, contentDescription = stringResource(Res.string.feeds), click = {
+                        scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() }
+                    })
+                }, actions = {
+                    if (feedEntriesVM.selectMode.value) { PTopRightButton(label = stringResource(if (feedEntriesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all), click = { feedEntriesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
+                    else {
+                        ActionButtonSearch { feedEntriesVM.enterSearchMode() }
+                        PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
+                            PDropdownMenuItemTags(onClick = { dismiss(); feedEntriesVM.showTagsDialog.value = true })
+                            PDropdownMenuItemSettings(onClick = { dismiss(); navController.navigate(Routing.FeedSettings) })
+                            PDropdownMenuItem(
+                                text = { Text(stringResource(Res.string.import_opml_file)) },
+                                leadingIcon = { Icon(painterResource(Res.drawable.upload), contentDescription = stringResource(Res.string.import_opml_file)) },
+                                onClick = { dismiss(); sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false)) })
+                            PDropdownMenuItem(
+                                text = { Text(stringResource(Res.string.export_opml_file)) },
+                                leadingIcon = { Icon(painterResource(Res.drawable.download), contentDescription = stringResource(Res.string.export_opml_file)) },
+                                onClick = { dismiss(); sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + TimeHelper.now().formatName() + ".opml")) })
+                        }
+                    }
+                },
+                onSearchAction = {
+                    feedEntriesVM.showLoading.value = true
+                    applyFilter(feedEntriesVM.feedId.value, feedEntriesVM.filterType.value, feedEntriesVM.tag.value)
+                })
+        }, bottomBar = {
+            AnimatedVisibility(visible = feedEntriesVM.showBottomActions(), enter = slideInVertically { it }, exit = slideOutVertically { it }) {
+                FeedEntriesSelectModeBottomActions(feedEntriesVM, tagsVM, tagsState)
+            }
+        }) { paddingValues ->
+            Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+                PullToRefresh(
+                    refreshLayoutState = topRefreshLayoutState,
+                    refreshContent = remember { {
+                        PullToRefreshContent(createText = {
+                            when (it) {
+                                RefreshContentState.Failed -> stringResource(Res.string.sync_failed)
+                                RefreshContentState.Finished -> stringResource(Res.string.synced)
+                                RefreshContentState.Refreshing -> stringResource(Res.string.syncing)
+                                RefreshContentState.Dragging -> {
+                                    if (abs(getRefreshContentOffset()) < getRefreshContentThreshold())
+                                        stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) Res.string.pull_down_to_sync_current_feed else Res.string.pull_down_to_sync_all_feeds)
+                                    else stringResource(if (feedEntriesVM.feedId.value.isNotEmpty()) Res.string.release_to_sync_current_feed else Res.string.release_to_sync_all_feeds)
+                                }
+                            }
+                        })
+                    } },
+                ) {
+                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                        if (itemsState.isNotEmpty()) {
+                            LazyColumnScrollbar(state = scrollState) {
+                                LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection), state = scrollState) {
+                                    item(key = "top") { TopSpace() }
+                                    itemsIndexed(itemsState, key = { _, m -> m.id }) { idx, m ->
+                                        val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
+                                        FeedEntryListItem(feedEntriesVM, idx, m, feedsMap.value[m.feedId], tagsState.filter { tagIds.contains(it.id) },
+                                            onClick = { if (feedEntriesVM.selectMode.value) feedEntriesVM.select(m.id) else navController.navigate(Routing.FeedEntry(m.id)) },
+                                            onLongClick = { if (!feedEntriesVM.selectMode.value) feedEntriesVM.selectedItem.value = m },
+                                            onClickTag = { tag -> if (!feedEntriesVM.selectMode.value) applyFilter("", FeedEntryFilterType.DEFAULT, tag) }
+                                        )
+                                        VerticalSpace(dp = 8.dp)
+                                    }
+                                    item(key = "bottom") {
+                                        if (!feedEntriesVM.noMore.value) {
+                                            LaunchedEffect(Unit) { scope.launch(IODispatcher) { feedEntriesVM.moreAsync(tagsVM) } }
+                                        }
+                                        LoadMoreRefreshContent(feedEntriesVM.noMore.value)
+                                        VerticalSpace(dp = paddingValues.calculateBottomPadding().value.dp)
+                                    }
+                                }
+                            }
+                        } else {
+                            NoDataColumn(loading = feedEntriesVM.showLoading.value, search = feedEntriesVM.showSearchBar.value)
+                        }
+                    }
                 }
-            })
-    }, bottomBar = {
-        AnimatedVisibility(visible = feedEntriesVM.showBottomActions(), enter = slideInVertically { it }, exit = slideOutVertically { it }) {
-            FeedEntriesSelectModeBottomActions(feedEntriesVM, tagsVM, tagsState)
+            }
         }
-    }) { paddingValues ->
-        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-            FeedEntriesPageContent(feedEntriesVM, tagsVM, navController, scope, tabs, pagerState, scrollBehavior, scrollStateMap,
-                topRefreshLayoutState, feedsMap, tagsState, tagsMapState, paddingValues.calculateBottomPadding().value)
+    }
+}
+
+/**
+ * Drawer content for the feed entries page: All, Today, Feeds (with a "+"
+ * action to add a feed; long-press manages a feed), then Tags.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FeedEntriesDrawerContent(
+    feedEntriesVM: FeedEntriesViewModel,
+    feedsVM: FeedsViewModel,
+    feedsState: List<DFeed>,
+    tagsState: List<DTag>,
+    drawerState: DrawerState,
+    onSelect: (feedId: String, filterType: FeedEntryFilterType, tag: DTag?) -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+    var feedsExpanded by remember { mutableStateOf(true) }
+    var tagsExpanded by remember { mutableStateOf(true) }
+    val closeDrawer: () -> Unit = { scope.launch { drawerState.close() } }
+
+    Column(
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .padding(NavigationDrawerItemDefaults.ItemPadding)
+    ) {
+        VerticalSpace(dp = 16.dp)
+
+        NavigationDrawerItem(
+            label = { Text(stringResource(Res.string.all)) },
+            icon = { Icon(painterResource(Res.drawable.layout_grid), null, modifier = Modifier.size(24.dp)) },
+            selected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null && feedEntriesVM.filterType.value == FeedEntryFilterType.DEFAULT,
+            onClick = { onSelect("", FeedEntryFilterType.DEFAULT, null) },
+            badge = { Text(feedEntriesVM.total.intValue.toString()) }
+        )
+
+        NavigationDrawerItem(
+            label = { Text(stringResource(Res.string.today)) },
+            icon = { Icon(painterResource(Res.drawable.history), null, modifier = Modifier.size(24.dp)) },
+            selected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null && feedEntriesVM.filterType.value == FeedEntryFilterType.TODAY,
+            onClick = { onSelect("", FeedEntryFilterType.TODAY, null) },
+            badge = { Text(feedEntriesVM.totalToday.value.toString()) }
+        )
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+        SidebarSectionHeader(
+            title = stringResource(Res.string.feeds),
+            isExpanded = feedsExpanded,
+            onToggle = { feedsExpanded = !feedsExpanded },
+            onAction = { feedsVM.showAddDialog() },
+            actionIcon = Res.drawable.plus
+        )
+        if (feedsExpanded) {
+            feedsState.forEach { feed ->
+                FeedDrawerFeedItem(
+                    m = feed,
+                    isSelected = feedEntriesVM.feedId.value == feed.id,
+                    onClick = { onSelect(feed.id, FeedEntryFilterType.DEFAULT, null) },
+                    onLongClick = { feedsVM.selectedItem.value = feed }
+                )
+            }
+        }
+
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+        SidebarSectionHeader(
+            title = stringResource(Res.string.tags),
+            isExpanded = tagsExpanded,
+            onToggle = { tagsExpanded = !tagsExpanded },
+            onAction = { feedEntriesVM.showTagsDialog.value = true; closeDrawer() },
+            actionIcon = Res.drawable.plus
+        )
+        if (tagsExpanded) {
+            tagsState.forEach { tag ->
+                NavigationDrawerItem(
+                    label = { Text(tag.name) },
+                    icon = { Icon(painterResource(Res.drawable.tag), null, modifier = Modifier.size(24.dp)) },
+                    selected = feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value?.id == tag.id,
+                    onClick = { onSelect("", FeedEntryFilterType.DEFAULT, tag) },
+                    badge = { Text(tag.count.toString()) }
+                )
+            }
+        }
+        BottomSpace()
+    }
+}
+
+/**
+ * Drawer item for a single feed. Long-press opens the manage-feed sheet.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun FeedDrawerFeedItem(
+    m: DFeed,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(MaterialTheme.shapes.extraLarge)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
+        color = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
+        contentColor = if (isSelected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(painterResource(Res.drawable.rss), null, modifier = Modifier.size(24.dp))
+            HorizontalSpace(12.dp)
+            Text(
+                text = m.name,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(text = m.count.toString(), style = MaterialTheme.typography.labelLarge)
         }
     }
 }

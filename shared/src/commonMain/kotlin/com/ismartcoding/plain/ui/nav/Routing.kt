@@ -121,9 +121,6 @@ class Routing {
     data class PdfViewer(val uri: String, val fileName: String = "")
 
     @Serializable
-    object Feeds
-
-    @Serializable
     data class FeedEntries(val feedId: String)
 
     @Serializable
