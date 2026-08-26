@@ -19,16 +19,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.enums.ButtonSize
-import com.ismartcoding.plain.features.share.ShareCrypto
 import com.ismartcoding.plain.features.share.ShareExpiry
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.shareText
 import com.ismartcoding.plain.ui.base.BottomActionButtons
@@ -46,29 +43,28 @@ import com.ismartcoding.plain.ui.components.WebAddressBarQrDialog
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import kotlin.math.abs
 import kotlinx.coroutines.launch
 
 /**
- * Dialog to create a share link for the selected [paths]. First collects the
- * name / expiry options, then shows the generated link with copy, QR code and
- * system-share actions. Shares are always read-only.
+ * Dialog to edit an existing share link: rename it, change the expiry, and
+ * access the link itself (copy, QR code, system share, forward to a chat).
+ * Mirrors [CreateShareDialog].
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CreateShareDialog(
-    paths: List<String>,
+fun EditShareDialog(
+    share: DShare,
+    link: String,
     onDismiss: () -> Unit,
     navController: NavHostController,
     chatVM: ChatViewModel,
-    onCreated: (DShare) -> Unit = {},
+    onSaved: (DShare) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val defaultName = remember(paths) { if (paths.size == 1) paths[0].getFilenameFromPath() else "" }
-    var name by remember { mutableStateOf(defaultName) }
-    var expiry by remember { mutableStateOf(ShareExpiry.NEVER) }
+    var name by remember(share.id) { mutableStateOf(share.name) }
+    var expiry by remember(share.id) { mutableStateOf(share.toExpiryOption()) }
     var isLoading by remember { mutableStateOf(false) }
-    var share by remember { mutableStateOf<DShare?>(null) }
-    var link by remember { mutableStateOf("") }
     var showQr by remember { mutableStateOf(false) }
     var showForwardDialog by remember { mutableStateOf(false) }
 
@@ -89,47 +85,10 @@ fun CreateShareDialog(
         return
     }
 
-    if (share != null) {
-        AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surface,
-            onDismissRequest = onDismiss,
-            title = { Text(stringResource(Res.string.share_created), style = MaterialTheme.typography.titleLarge) },
-            text = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(Res.string.share_link_desc),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    VerticalSpace(8.dp)
-                    PCard {
-                        PListItem(title = link, action = {
-                            CopyIconButton(
-                                text = link,
-                                clipLabel = stringResource(Res.string.share_link),
-                                copiedMessage = stringResource(Res.string.share_link_copied),
-                            )
-                        })
-                    }
-                    VerticalSpace(8.dp)
-                    BottomActionButtons {
-                        PIconTextSmallButton(icon = Res.drawable.qr_code, text = stringResource(Res.string.qrcode)) { showQr = true }
-                        PIconTextSmallButton(icon = Res.drawable.share_2, text = stringResource(Res.string.share)) { shareText(link) }
-                        IconTextSmallButtonForward { showForwardDialog = true }
-                    }
-                }
-            },
-            confirmButton = {
-                PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
-            },
-        )
-        return
-    }
-
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.create_share_link), style = MaterialTheme.typography.titleLarge) },
+        title = { Text(stringResource(Res.string.edit_share_link), style = MaterialTheme.typography.titleLarge) },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -156,30 +115,37 @@ fun CreateShareDialog(
                         )
                     }
                 }
+                VerticalSpace(8.dp)
+                PCard {
+                    PListItem(title = link, action = {
+                        CopyIconButton(
+                            text = link,
+                            clipLabel = stringResource(Res.string.share_link),
+                            copiedMessage = stringResource(Res.string.share_link_copied),
+                        )
+                    })
+                }
+                VerticalSpace(8.dp)
+                BottomActionButtons {
+                    PIconTextSmallButton(icon = Res.drawable.qr_code, text = stringResource(Res.string.qrcode)) { showQr = true }
+                    PIconTextSmallButton(icon = Res.drawable.share_2, text = stringResource(Res.string.share)) { shareText(link) }
+                    IconTextSmallButtonForward { showForwardDialog = true }
+                }
             }
         },
         confirmButton = {
             PFilledButton(
-                text = stringResource(Res.string.create),
+                text = stringResource(Res.string.save),
                 buttonSize = ButtonSize.MEDIUM,
                 isLoading = isLoading,
                 onClick = {
                     scope.launch {
                         isLoading = true
-                        val created = withIO {
-                            val s = ShareManager.createShare(
-                                name = name.ifBlank { defaultName },
-                                realPaths = paths,
-                                urlToken = ShareCrypto.newUrlToken(),
-                                readOnly = true,
-                                expiresAt = expiry.expiresAt(TimeHelper.now()),
-                            )
-                            link = ShareManager.buildLink(s)
-                            s
+                        val updated = withIO {
+                            ShareManager.updateShare(share.id, name, expiry.expiresAt(TimeHelper.now()))
                         }
                         isLoading = false
-                        share = created
-                        onCreated(created)
+                        if (updated != null) onSaved(updated)
                     }
                 },
             )
@@ -190,11 +156,11 @@ fun CreateShareDialog(
     )
 }
 
-internal val ShareExpiry.label: StringResource
-    get() = when (this) {
-        ShareExpiry.NEVER -> Res.string.share_expiry_never
-        ShareExpiry.HOUR_1 -> Res.string.share_expiry_1h
-        ShareExpiry.DAY_1 -> Res.string.share_expiry_1d
-        ShareExpiry.DAY_7 -> Res.string.share_expiry_7d
-        ShareExpiry.DAY_30 -> Res.string.share_expiry_30d
-    }
+/** Pick the expiry chip closest to the share's remaining lifetime (null = NEVER). */
+private fun DShare.toExpiryOption(): ShareExpiry {
+    val expiresAt = expiresAt ?: return ShareExpiry.NEVER
+    val remainingHours = (expiresAt - TimeHelper.now()).inWholeHours
+    return ShareExpiry.entries.filter { it != ShareExpiry.NEVER }
+        .minByOrNull { abs(it.hours - remainingHours) }
+        ?: ShareExpiry.NEVER
+}

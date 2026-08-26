@@ -4,6 +4,7 @@
     <string name="share_links">Shared links</string>
     <string name="share_links_desc">Links you created for files and folders</string>
     <string name="create_share_link">Create share link</string>
+    <string name="edit_share_link">Edit share link</string>
     <string name="share_name_placeholder">Name</string>
     <string name="share_expiry">Expiry</string>
     <string name="share_expiry_never">Never</string>

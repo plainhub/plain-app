@@ -4,6 +4,7 @@
     <string name="share_links">共享链接</string>
     <string name="share_links_desc">您为文件和文件夹创建的链接</string>
     <string name="create_share_link">创建共享链接</string>
+    <string name="edit_share_link">编辑共享链接</string>
     <string name="share_name_placeholder">名称</string>
     <string name="share_expiry">有效期</string>
     <string name="share_expiry_never">永久</string>

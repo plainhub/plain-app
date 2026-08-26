@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="create_share_link">建立分享連結</string>
+    <string name="edit_share_link">編輯分享連結</string>
     <string name="share_created">連結已建立</string>
     <string name="share_delete_desc">刪除後連結立即失效</string>
     <string name="share_expired">已過期</string>

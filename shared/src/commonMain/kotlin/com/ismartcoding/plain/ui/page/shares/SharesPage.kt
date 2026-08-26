@@ -122,11 +122,14 @@ fun SharesPage(navController: NavHostController) {
 }
 
 @Composable
-private fun ShareItem.subtitle(): String {
-    val share = this.share
-    val expiresAt = share.expiresAt
+private fun ShareItem.subtitle(): String = this.share.expiryLabel()
+
+/** Human-readable expiry status of a share, e.g. "Expired" / "Expires …" / "Never". */
+@Composable
+fun DShare.expiryLabel(): String {
+    val expiresAt = this.expiresAt
     return when {
-        share.isExpired -> stringResource(Res.string.share_expired)
+        isExpired -> stringResource(Res.string.share_expired)
         expiresAt != null -> stringResource(Res.string.share_expires_on, expiresAt.formatDateTime())
         else -> stringResource(Res.string.share_expiry_never)
     }
