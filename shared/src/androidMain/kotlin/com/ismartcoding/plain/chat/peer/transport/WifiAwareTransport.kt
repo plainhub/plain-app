@@ -15,6 +15,7 @@ import com.ismartcoding.plain.chat.peer.transport.aware.AwareSession
 import com.ismartcoding.plain.connectivityManager
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getAwareFileUrl
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -113,7 +114,7 @@ object WifiAwareTransport : PeerTransport {
             LogCat.d("[AWARE] buildLink failed peer=${peer.id} type=${e::class.simpleName} msg=${e.message}")
             throw TransportUnavailable(type, peer.id, e)
         }
-        val url = "https://${AwareHttpClientFactory.AWARE_HOST}:${connection.peerPort}/peer_graphql"
+        val url = UrlHelper.buildUrl("https", AwareHttpClientFactory.AWARE_HOST, connection.peerPort, "/peer_graphql")
         LogCat.d("[AWARE] send http peer=${peer.id} url=$url")
         val resp = executeGraphQLRequest(
             transportType = type,

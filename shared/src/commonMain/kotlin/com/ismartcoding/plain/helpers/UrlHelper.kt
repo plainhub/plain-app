@@ -12,6 +12,15 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 @OptIn(ExperimentalEncodingApi::class)
 object UrlHelper {
+    /**
+     * Build `scheme://host[:port][/path]`. The port is omitted when it is the
+     * scheme default (http: 80, https/wss: 443).
+     */
+    fun buildUrl(scheme: String, host: String, port: Int, path: String = ""): String {
+        val portPart = if ((scheme == "http" && port == 80) || (scheme == "https" || scheme == "wss") && port == 443) "" else ":$port"
+        return "$scheme://$host$portPart$path"
+    }
+
     // Written from every /media HTTP URL generation call (concurrent GraphQL/HTTP
     // requests), so a plain mutableMapOf (LinkedHashMap) is not safe here.
     private val mediaPathMap = mutableStateMapOf<String, String>() // format: <short_path>:<raw_path>
@@ -20,25 +29,25 @@ object UrlHelper {
         val id = TimeHelper.nowMillis().toString()
         mediaPathMap[id] = path
         val extension = path.getFilenameExtension()
-        return "http://${getDeviceIP4()}:${TempData.httpPort.value}/media/$id.$extension"
+        return buildUrl("http", getDeviceIP4(), TempData.httpPort.value, "/media/$id.$extension")
     }
 
     fun getAlbumArtHttpUrl(albumUri: String): String {
         val id = "art_${TimeHelper.nowMillis()}"
         mediaPathMap[id] = albumUri
-        return "http://${getDeviceIP4()}:${TempData.httpPort.value}/media/$id.jpg"
+        return buildUrl("http", getDeviceIP4(), TempData.httpPort.value, "/media/$id.jpg")
     }
 
     fun getCastCallbackUrl(): String {
-        return "http://${getDeviceIP4()}:${TempData.httpPort.value}/callback/cast"
+        return buildUrl("http", getDeviceIP4(), TempData.httpPort.value, "/callback/cast")
     }
 
     fun getHealthCheckUrl(): String {
-        return "http://127.0.0.1:${TempData.httpPort.value}/health"
+        return buildUrl("http", "127.0.0.1", TempData.httpPort.value, "/health")
     }
 
     fun getShutdownUrl(): String {
-        return "http://127.0.0.1:${TempData.httpPort.value}/shutdown"
+        return buildUrl("http", "127.0.0.1", TempData.httpPort.value, "/shutdown")
     }
 
     fun getMediaPath(id: String): String {

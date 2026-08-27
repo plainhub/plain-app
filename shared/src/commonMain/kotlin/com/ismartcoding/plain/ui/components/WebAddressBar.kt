@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.isLanAddress
 import com.ismartcoding.plain.platform.restartServer
@@ -65,7 +66,7 @@ fun WebAddressBar(
             )
             .padding(vertical = 8.dp),
     ) {
-        val primaryUrl = "$scheme://$primaryIp:${port.value}"
+        val primaryUrl = UrlHelper.buildUrl(scheme, primaryIp, port.value)
         AddressRow(
             url = primaryUrl,
             isHostnameRow = false,
@@ -82,7 +83,7 @@ fun WebAddressBar(
         ) {
             Column {
                 backupIps.forEach { ip ->
-                    val url = "$scheme://$ip:${port.value}"
+                    val url = UrlHelper.buildUrl(scheme, ip, port.value)
                     AddressRow(
                         url = url,
                         isHostnameRow = ip == hostname,

@@ -8,6 +8,7 @@ import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
@@ -167,7 +168,9 @@ object HttpServerManager {
      */
     fun getNotificationContent(): String {
         val ip = TempData.mdnsHostname
-        return "http://$ip:${TempData.httpPort.value}\nhttps://$ip:${TempData.httpsPort.value}"
+        val http = UrlHelper.buildUrl("http", ip, TempData.httpPort.value)
+        val https = UrlHelper.buildUrl("https", ip, TempData.httpsPort.value)
+        return "$http\n$https"
     }
 
     /**

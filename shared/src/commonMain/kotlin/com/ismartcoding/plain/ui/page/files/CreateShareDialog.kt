@@ -98,6 +98,7 @@ fun CreateShareDialog(
             onTargetSelected = { target ->
                 chatVM.setPendingForwardText(link)
                 showForwardDialog = false
+                onDismiss()
                 navController.navigate(Routing.Chat(target.encodedToId))
             },
         )

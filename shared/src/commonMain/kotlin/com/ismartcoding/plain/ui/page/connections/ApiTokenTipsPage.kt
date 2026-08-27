@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CornerCopyCard
@@ -39,7 +40,7 @@ fun ApiTokenTipsPage(
     val httpPort = TempData.httpPort.collectAsState()
 
     val curlReal = remember(clientId, token, hostname, httpPort.value) {
-        """curl -X POST "http://$hostname:${httpPort.value}/graphql" -H "c-id: $clientId" -H "Authorization: Bearer $token" -H "Content-Type: application/json" --data '{"query":"{ app { appVersion } }"}'"""
+        """curl -X POST "${UrlHelper.buildUrl("http", hostname, httpPort.value, "/graphql")}" -H "c-id: $clientId" -H "Authorization: Bearer $token" -H "Content-Type: application/json" --data '{"query":"{ app { appVersion } }"}'"""
     }
 
     PScaffold(

@@ -110,11 +110,11 @@ object ShareManager {
 
     /**
      * Build the share link:
-     * `https://<host>:<httpsPort>/s/<shared_id>#<shared_token>`.
+     * `https://<host>[:port]/s/<shared_id>#<shared_token>` (port omitted if 443).
      */
     suspend fun buildLink(share: DShare, host: String = getHost()): String {
         val sharedToken = ShareCrypto.deriveSharedTokenEncoded(share.id)
-        return "https://$host:${TempData.httpsPort.value}/s/${share.id}#$sharedToken"
+        return UrlHelper.buildUrl("https", host, TempData.httpsPort.value, "/s/${share.id}#$sharedToken")
     }
 
     private fun getHost(): String {

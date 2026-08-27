@@ -34,8 +34,19 @@ suspend fun sharedInfo(context: Context, virtualPath: String? = null): SharedInf
         if (!share.isActive) throw GraphQLError("Share is inactive or expired")
         val roots = share.data
         val entries = if (virtualPath.isNullOrBlank()) {
-            // Top level: expose each whitelisted root as a directory entry.
-            roots.map { SharedFile(it.virtualPath.trimEnd('/'), it.virtualPath, true, 0L, "", false) }
+            // Top level: expose each whitelisted root entry (dir or single file).
+            roots.map {
+                val isDir = it.isDir
+                val name = it.virtualPath.trimEnd('/')
+                SharedFile(
+                    name = name,
+                    virtualPath = it.virtualPath,
+                    isDir = isDir,
+                    size = if (isDir) 0L else statFile(it.realPath)?.size ?: 0L,
+                    mimeType = if (isDir) "" else getContentTypeForPath(it.realPath) ?: "",
+                    hasThumb = !isDir && name.isImageFast(),
+                )
+            }
         } else {
             val path = virtualPath
             val realPath = ShareManager.resolveVirtualPath(share, path)
