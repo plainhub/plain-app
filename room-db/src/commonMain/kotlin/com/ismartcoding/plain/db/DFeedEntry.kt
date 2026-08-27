@@ -64,6 +64,9 @@ interface FeedEntryDao {
     @Query("SELECT * FROM feed_entries WHERE id=:id")
     suspend fun getById(id: String): DFeedEntry?
 
+    @Query("SELECT * FROM feed_entries WHERE id in (:ids)")
+    suspend fun getByIds(ids: Set<String>): List<DFeedEntry>
+
     @Insert
     suspend fun insert(vararg item: DFeedEntry)
 
@@ -78,6 +81,9 @@ interface FeedEntryDao {
 
     @Query("DELETE FROM feed_entries WHERE feed_id in (:ids)")
     suspend fun deleteByFeedIds(ids: Set<String>)
+
+    @Query("SELECT * FROM feed_entries WHERE feed_id in (:ids)")
+    suspend fun getByFeedIds(ids: Set<String>): List<DFeedEntry>
 
     @Query("SELECT * from feed_entries WHERE url=:url AND feed_id=:feedId")
     suspend fun getByUrl(url: String, feedId: String): DFeedEntry?

@@ -33,14 +33,15 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult = withIO {
                         }
                     }
 
-                    if (image.isNotEmpty() && !image.startsWith("/")) {
+                    if (image.isNotEmpty() && !image.startsWith("/") && !image.startsWith("fid:", true)) {
                         try {
                             val r = httpClient.get(image)
                             if (r.isOk()) {
                                 val imageBytes = r.body<ByteArray>()
-                                val savedPath = saveFeedImage(feedId, image, imageBytes)
-                                if (savedPath != null) {
-                                    image = savedPath
+                                val contentType = r.headers["Content-Type"]?.lowercase() ?: ""
+                                val fidUri = importImageBytesToFid(imageBytes, contentType)
+                                if (fidUri != null) {
+                                    image = fidUri
                                 }
                             }
                         } catch (ex: Exception) {
@@ -65,5 +66,3 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult = withIO {
         return@withIO ApiResult(null, ex)
     }
 }
-
-expect fun saveFeedImage(feedId: String, imageUrl: String, bytes: ByteArray): String?

@@ -28,6 +28,7 @@ import coil3.compose.AsyncImage
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -90,7 +91,7 @@ fun FeedEntryListItem(
                     if (m.image.isNotEmpty()) {
                         HorizontalSpace(dp = 12.dp)
                         AsyncImage(
-                            model = m.image,
+                            model = m.image.getFinalPath(),
                             modifier = Modifier
                                 .size(64.dp)
                                 .clip(RoundedCornerShape(4.dp)),

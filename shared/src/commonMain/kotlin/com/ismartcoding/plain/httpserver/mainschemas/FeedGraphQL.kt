@@ -94,7 +94,7 @@ suspend fun deleteFeed(id: ID): Boolean {
     val entryIds = FeedEntryHelper.feedEntryDao.getIds(newIds)
     if (entryIds.isNotEmpty()) {
         TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
-        FeedEntryHelper.feedEntryDao.deleteByFeedIds(newIds)
+        FeedEntryHelper.deleteByFeedIdsAsync(newIds)
     }
     FeedHelper.deleteAsync(newIds)
     return true

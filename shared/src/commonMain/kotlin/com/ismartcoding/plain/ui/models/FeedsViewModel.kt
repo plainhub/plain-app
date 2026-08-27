@@ -66,7 +66,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
             val entryIds = FeedEntryHelper.feedEntryDao.getIds(ids)
             if (entryIds.isNotEmpty()) {
                 TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
-                FeedEntryHelper.feedEntryDao.deleteByFeedIds(ids)
+                FeedEntryHelper.deleteByFeedIdsAsync(ids)
             }
             FeedHelper.deleteAsync(ids)
             _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }

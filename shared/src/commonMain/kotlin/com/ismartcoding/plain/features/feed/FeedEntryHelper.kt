@@ -8,6 +8,7 @@ import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.platform.releaseAppFile
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
@@ -85,12 +86,31 @@ object FeedEntryHelper {
 
     suspend fun deleteAsync(ids: Set<String>) = withIO {
         ids.chunked(50).forEach { chunk ->
+            releaseImageRefs(feedEntryDao.getByIds(chunk.toSet()))
             feedEntryDao.delete(chunk.toSet())
         }
     }
 
     suspend fun deleteAllAsync() = withIO {
+        releaseImageRefs(feedEntryDao.getAll())
         feedEntryDao.deleteAll()
+    }
+
+    suspend fun deleteByFeedIdsAsync(ids: Set<String>) = withIO {
+        releaseImageRefs(feedEntryDao.getByFeedIds(ids))
+        feedEntryDao.deleteByFeedIds(ids)
+    }
+
+    /**
+     * Decrement the app-file reference count for every entry image stored as a
+     * `fid:` URI. Files whose count reaches zero are deleted by [releaseAppFile].
+     */
+    private suspend fun releaseImageRefs(entries: List<DFeedEntry>) = withIO {
+        entries.forEach { entry ->
+            if (entry.image.startsWith("fid:", ignoreCase = true)) {
+                releaseAppFile(entry.image.removePrefix("fid:"))
+            }
+        }
     }
 
     private suspend fun parseQuery(

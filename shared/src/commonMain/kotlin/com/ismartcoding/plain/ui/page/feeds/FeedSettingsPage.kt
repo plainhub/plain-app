@@ -121,7 +121,7 @@ fun FeedSettingsPage(
             item {
                 VerticalSpace(dp = 48.dp)
                 PFilledButton(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     text = stringResource(Res.string.clear_feed_items),
                     type = ButtonType.DANGER, onClick = {
                         feedSettingsVM.showClearFeedsDialog.value = true
