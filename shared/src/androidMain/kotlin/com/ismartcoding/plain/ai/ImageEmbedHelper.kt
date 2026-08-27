@@ -13,6 +13,8 @@ object ImageEmbedHelper {
     private var model: CompiledModel? = null
     private var inputBuffers: List<TensorBuffer>? = null
     private var outputBuffers: List<TensorBuffer>? = null
+    private var modelFile: File? = null
+    private var savedInputSize = 256
 
     // MobileCLIP-S2 uses identity normalization: mean=(0,0,0) std=(1,1,1)
     // Just scale pixels to [0, 1] — no further normalization needed.
@@ -21,15 +23,23 @@ object ImageEmbedHelper {
     private var pixelsBuf: IntArray? = null
     private var chwBuf: FloatArray? = null
 
+    // Guards init/release against concurrent embedBitmap calls (IO threads vs onTrimMemory).
+    private val lock = Any()
+
     fun init(modelFile: File, inputSize: Int = 256) {
-        close()
-        val m = DelegateHelper.createModel(modelFile)
-        model = m
-        inputBuffers = m.createInputBuffers()
-        outputBuffers = m.createOutputBuffers()
-        // Pre-allocate reusable buffers
-        pixelsBuf = IntArray(inputSize * inputSize)
-        chwBuf = FloatArray(3 * inputSize * inputSize)
+        synchronized(lock) {
+            close()
+            this.modelFile = modelFile
+            this.savedInputSize = inputSize
+            if (!loadLocked()) {
+                throw IllegalStateException("ImageEmbedHelper: model init failed")
+            }
+        }
+    }
+
+    /** Free native model memory under system pressure; reloaded lazily on next embed. */
+    fun release() {
+        synchronized(lock) { close() }
     }
 
     fun embed(imagePath: String, inputSize: Int = 256): FloatArray? {
@@ -44,24 +54,47 @@ object ImageEmbedHelper {
 
     /** Run model inference on a pre-loaded bitmap. Caller must not reuse bitmap after this. */
     fun embedBitmap(bitmap: Bitmap, inputSize: Int = 256): FloatArray? {
-        val inBufs = inputBuffers ?: return null
-        val outBufs = outputBuffers ?: return null
-        return try {
-            bitmapToNCHW(bitmap, inputSize, pixelsBuf!!, chwBuf!!)
-            inBufs[0].writeFloat(chwBuf!!)
-            model!!.run(inBufs, outBufs)
-            val emb = outBufs[0].readFloat()
-            if (hasInvalidValues(emb)) null else l2Normalize(emb)
-        } catch (e: Exception) {
-            LogCat.e("ImageEmbedHelper: inference failed", e)
-            null
-        } finally {
-            bitmap.recycle()
+        synchronized(lock) {
+            if (model == null && !loadLocked()) return null
+            val inBufs = inputBuffers ?: return null
+            val outBufs = outputBuffers ?: return null
+            return try {
+                bitmapToNCHW(bitmap, inputSize, pixelsBuf!!, chwBuf!!)
+                inBufs[0].writeFloat(chwBuf!!)
+                model!!.run(inBufs, outBufs)
+                val emb = outBufs[0].readFloat()
+                if (hasInvalidValues(emb)) null else l2Normalize(emb)
+            } catch (e: Exception) {
+                LogCat.e("ImageEmbedHelper: inference failed", e)
+                null
+            } finally {
+                bitmap.recycle()
+            }
         }
     }
 
+    /** Create the model from the remembered file; caller must hold [lock]. */
+    private fun loadLocked(): Boolean {
+        val mf = modelFile?.takeIf { it.exists() } ?: return false
+        return try {
+            val m = DelegateHelper.createModel(mf)
+            model = m
+            inputBuffers = m.createInputBuffers()
+            outputBuffers = m.createOutputBuffers()
+            // Pre-allocate reusable buffers
+            pixelsBuf = IntArray(savedInputSize * savedInputSize)
+            chwBuf = FloatArray(3 * savedInputSize * savedInputSize)
+            true
+        } catch (e: Throwable) {
+            LogCat.e("ImageEmbedHelper: model load failed", e)
+            false
+        }
+    }
+
+    /** Release native resources but keep the remembered file for lazy reload. */
     fun close() {
-        model?.close(); model = null
+        model?.let { DelegateHelper.close(it) }
+        model = null
         inputBuffers = null; outputBuffers = null
         pixelsBuf = null; chwBuf = null
     }

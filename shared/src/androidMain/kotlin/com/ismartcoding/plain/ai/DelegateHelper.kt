@@ -24,6 +24,13 @@ object DelegateHelper {
         }
     }
 
+    /** Close one model and drop its reference so a later lazy reload does not
+     *  leave a stale entry that closeAll() would close twice. */
+    fun close(model: CompiledModel) {
+        model.close()
+        models.remove(model)
+    }
+
     fun closeAll() {
         models.forEach { it.close() }
         models.clear()

@@ -90,6 +90,19 @@ object ImageSearchManager {
         emitStatus()
     }
 
+    /**
+     * Free the resident model memory under system pressure (~400MB native).
+     * The helpers reload lazily from disk on the next search, so the feature
+     * stays transparent to the user. Skipped while indexing owns its workers.
+     */
+    fun releaseModels() {
+        if (_status.value != ImageSearchStatusType.READY) return
+        if (ImageSearchIndexer.isRunning) return
+        ImageEmbedHelper.release()
+        TextEmbedHelper.release()
+        LogCat.d("AI models released under memory pressure")
+    }
+
     fun cancelDownload() {
         ModelDownloader.cancel()
         _status.value = ImageSearchStatusType.UNAVAILABLE

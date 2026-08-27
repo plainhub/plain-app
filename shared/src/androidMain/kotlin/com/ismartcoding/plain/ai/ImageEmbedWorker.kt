@@ -36,7 +36,7 @@ class ImageEmbedWorker(modelFile: File, private val inputSize: Int = 256) : Auto
     }
 
     override fun close() {
-        model.close()
+        DelegateHelper.close(model)
     }
 
     private fun bitmapToNCHW(bitmap: Bitmap, pixels: IntArray, chw: FloatArray) {
