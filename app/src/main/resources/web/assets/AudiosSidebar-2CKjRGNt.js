@@ -1,0 +1,1 @@
+import{H as e,T as t,mt as n,v as r}from"./vue.runtime.esm-bundler-DB7W0Wog.js";import{Ki as i,Lt as a}from"./index-B6qY067y.js";import{t as o}from"./MediaSidebar-adDtvJK5.js";var s=t({__name:`AudiosSidebar`,setup(t){return(t,s)=>{let c=o;return e(),r(c,{type:n(i).AUDIO,gql:n(a)},null,8,[`type`,`gql`])}}});export{s as default};

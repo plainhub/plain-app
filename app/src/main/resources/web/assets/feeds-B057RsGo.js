@@ -1,0 +1,1 @@
+import{Ka as e,n as t,nr as n}from"./index-B6qY067y.js";var r=r=>({viewAll:()=>{t(r,`/feeds`)},viewFeed:i=>{t(r,`/feeds?q=${e(n([{name:`feed_id`,op:``,value:i.id}]))}`)},viewToday:()=>{t(r,`/feeds?q=${e(n([{name:`today`,op:``,value:`true`}]))}`)}});export{r as t};

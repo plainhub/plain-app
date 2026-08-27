@@ -1,1 +1,0 @@
-import{H as e,T as t,mt as n,v as r}from"./vue.runtime.esm-bundler-DB7W0Wog.js";import{F as i}from"./query-DOEkVgam.js";import{on as a}from"./index-BZO-8hcq.js";import{t as o}from"./MediaSidebar-BnLve164.js";var s=t({__name:`ImagesSidebar`,setup(t){return(t,s)=>{let c=o;return e(),r(c,{type:n(a).IMAGE,gql:n(i)},null,8,[`type`,`gql`])}}});export{s as default};
