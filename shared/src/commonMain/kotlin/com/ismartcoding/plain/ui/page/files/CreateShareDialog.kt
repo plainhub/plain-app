@@ -36,6 +36,7 @@ import com.ismartcoding.plain.i18n.share_expiry_1h
 import com.ismartcoding.plain.i18n.share_expiry_30d
 import com.ismartcoding.plain.i18n.share_expiry_7d
 import com.ismartcoding.plain.i18n.share_expiry_never
+import com.ismartcoding.plain.i18n.share_link
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
@@ -116,7 +117,7 @@ fun CreateShareDialog(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     VerticalSpace(8.dp)
-                    CornerCopyCard(text = link.toBreakableUrl())
+                    CornerCopyCard(label = stringResource(Res.string.share_link), text = link.toBreakableUrl())
                     VerticalSpace(8.dp)
                     ActionButtons {
                         IconTextQrCodeButton { showQr = true }

@@ -32,6 +32,7 @@ import com.ismartcoding.plain.i18n.share_expired
 import com.ismartcoding.plain.i18n.share_expires_on
 import com.ismartcoding.plain.i18n.share_expiry
 import com.ismartcoding.plain.i18n.share_expiry_never
+import com.ismartcoding.plain.i18n.share_link
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
@@ -154,7 +155,7 @@ fun EditSharePage(
                 }
             }
             VerticalSpace(8.dp)
-            CornerCopyCard(text = link.toBreakableUrl())
+            CornerCopyCard(label = stringResource(Res.string.share_link), text = link.toBreakableUrl())
             VerticalSpace(16.dp)
             ActionButtons {
                 IconTextQrCodeButton { showQr = true }

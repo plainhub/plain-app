@@ -7,7 +7,7 @@ import com.ismartcoding.plain.platform.renameFile
 
 class DiskLogStrategy : LogStrategy {
     override fun log(priority: Int, tag: String?, message: String) {
-        val folder = LogCat.logFolder()
+        val folder = LogCat.logFolderPath
         if (folder.isEmpty()) return
         ensureDir(folder)
         val filePath = "$folder/latest.log"

@@ -439,25 +439,3 @@ expect suspend fun importChatFile(uriStr: String, mimeType: String): String?
  * On iOS, always returns null (no MediaStore equivalent).
  */
 expect suspend fun getFileByMediaId(mediaId: String): DFile?
-
-/**
- * Ensure the directory at [path] exists, creating it (and any missing parents)
- * if necessary. Basic file system operation — not log-specific.
- */
-internal expect fun ensureDir(path: String)
-
-/**
- * Append [line] to the text file at [path] and return the resulting file size
- * in bytes. Creates the file if it does not exist. Basic file system operation.
- */
-internal expect fun appendLine(path: String, line: String): Long
-
-/**
- * Delete the file at [path] if it exists. Basic file system operation.
- */
-internal expect fun deleteFileIfExists(path: String)
-
-/**
- * Rename a file from [from] to [to]. Basic file system operation.
- */
-internal expect fun renameFile(from: String, to: String)

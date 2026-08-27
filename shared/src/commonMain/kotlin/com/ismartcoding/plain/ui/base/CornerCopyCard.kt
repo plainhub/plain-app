@@ -32,6 +32,7 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.check
 import com.ismartcoding.plain.i18n.copy
 import com.ismartcoding.plain.i18n.copy_text
+import com.ismartcoding.plain.lib.extensions.toBreakableUrl
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.delay
@@ -47,6 +48,7 @@ private const val COPIED_ICON_DURATION_MS = 1500L
 
 @Composable
 fun CornerCopyCard(
+    label: String,
     text: String,
     modifier: Modifier = Modifier,
 ) {
@@ -67,13 +69,13 @@ fun CornerCopyCard(
         PCard {
             Text(
                 modifier = Modifier.padding(16.dp),
-                text = text,
+                text = text.toBreakableUrl(),
                 style = MaterialTheme.typography.listItemTitle(),
             )
         }
         IconButton(
             onClick = {
-                setClipboardText(text, text)
+                setClipboardText(label, text)
                 copiedTick++
             },
             modifier = Modifier

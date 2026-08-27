@@ -29,19 +29,9 @@ class DiskLogFormatStrategy(private val logStrategy: LogStrategy) : FormatStrate
         private const val NEW_LINE = "\n"
         private const val SEPARATOR = " "
 
-        fun logLevel(value: Int): String {
-            return when (value) {
-                LogCat.VERBOSE -> "[V]"
-                LogCat.DEBUG -> "[D]"
-                LogCat.INFO -> "[I]"
-                LogCat.WARN -> "[W]"
-                LogCat.ERROR -> "[E]"
-                LogCat.ASSERT -> "[WTF]"
-                else -> "[?]"
-            }
-        }
+        fun logLevel(value: Int): String = LogCat.logLevel(value)
 
-        fun getLogFolder(): String = LogCat.logFolder()
+        fun getLogFolder(): String = appDir() + "/logs"
 
         fun getInstance(): DiskLogFormatStrategy = DiskLogFormatStrategy(DiskLogStrategy())
     }
@@ -73,6 +63,7 @@ expect fun clearLatestLogFile()
  * Idempotent — safe to call multiple times (LogCat.addLogAdapter just appends).
  */
 fun initDiskLogging() {
+    LogCat.logFolderPath = appDir() + "/logs"
     LogCat.addLogAdapter(
         DiskLogAdapter(
             DiskLogFormatStrategy.getInstance(),

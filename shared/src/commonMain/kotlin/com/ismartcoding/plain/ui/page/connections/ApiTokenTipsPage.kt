@@ -54,6 +54,7 @@ fun ApiTokenTipsPage(
                 item { TopSpace() }
                 item {
                     CornerCopyCard(
+                        label = "CURL",
                         modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                         text = curlReal,
                     )

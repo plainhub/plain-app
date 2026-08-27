@@ -52,18 +52,21 @@ fun WebDevPage(
                         TopSpace()
                         Subtitle(text = stringResource(Res.string.token))
                         CornerCopyCard(
+                            label = stringResource(Res.string.token),
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             text = adbToken
                         )
                         VerticalSpace(dp = 16.dp)
                         Subtitle(text = stringResource(Res.string.start_service))
                         CornerCopyCard(
+                            label = stringResource(Res.string.adb_cmd_start),
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             text = "adb shell am broadcast -a $packageId.action.START_HTTP_SERVER -p $packageId --es token $adbToken",
                         )
                         VerticalSpace(dp = 16.dp)
                         Subtitle(text = stringResource(Res.string.stop_service))
                         CornerCopyCard(
+                            label = stringResource(Res.string.adb_cmd_stop),
                             text = "adb shell am broadcast -a $packageId.action.STOP_HTTP_SERVER -p $packageId --es token $adbToken",
                         )
                         Tips(text = stringResource(Res.string.adb_token_desc))

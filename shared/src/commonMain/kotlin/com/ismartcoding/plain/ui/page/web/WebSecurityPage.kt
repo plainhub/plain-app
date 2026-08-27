@@ -133,6 +133,7 @@ fun WebSecurityPage(navController: NavHostController) {
                     item {
                         Subtitle(text = stringResource(Res.string.https_certificate_signature))
                         CornerCopyCard(
+                            label = stringResource(Res.string.https_certificate_signature),
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             text = sslSignature
                         )
@@ -164,6 +165,7 @@ fun WebSecurityPage(navController: NavHostController) {
                         VerticalSpace(dp = 24.dp)
                         Subtitle(text = stringResource(Res.string.url_token))
                         CornerCopyCard(
+                            label = stringResource(Res.string.url_token),
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             text = urlToken
                         )

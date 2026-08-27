@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.lib.logcat
 
-import com.ismartcoding.plain.platform.appDir
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.native.HiddenFromObjC
 
@@ -55,7 +54,23 @@ object LogCat {
         printer.clearLogAdapters()
     }
 
-    fun logFolder(): String = appDir() + "/logs"
+    /**
+     * Absolute path of the log folder. Must be injected by the host app
+     * (shared-lib has no access to platform app directories).
+     */
+    var logFolderPath: String = ""
+
+    fun logLevel(value: Int): String {
+        return when (value) {
+            VERBOSE -> "[V]"
+            DEBUG -> "[D]"
+            INFO -> "[I]"
+            WARN -> "[W]"
+            ERROR -> "[E]"
+            ASSERT -> "[WTF]"
+            else -> "[?]"
+        }
+    }
 
     private fun format(message: Any?, args: Array<out Any?>): String {
         val msg = message?.toString() ?: "null"
