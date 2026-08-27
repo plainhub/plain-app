@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7일</string>
     <string name="share_expiry_never">만료 없음</string>
     <string name="share_link">공유 링크</string>
-    <string name="share_link_copied">링크가 복사되었습니다</string>
     <string name="share_link_desc">이 링크가 있는 사람은 만료될 때까지 공유 파일에 접근할 수 있습니다</string>
     <string name="share_links">공유 링크</string>
     <string name="share_links_desc">파일과 폴더에 대해 만든 링크</string>

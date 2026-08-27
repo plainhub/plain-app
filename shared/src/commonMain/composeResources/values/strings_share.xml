@@ -15,7 +15,6 @@
     <string name="share_read_only">Read only</string>
     <string name="share_link_desc">Anyone with this link can access the shared files until it expires</string>
     <string name="share_created">Link created</string>
-    <string name="share_link_copied">Link copied</string>
     <string name="share_expires_on">Expires %1$s</string>
     <string name="share_expired">Expired</string>
     <string name="share_no_links">No shared links</string>

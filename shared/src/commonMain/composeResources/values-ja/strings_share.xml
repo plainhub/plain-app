@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7 日</string>
     <string name="share_expiry_never">無期限</string>
     <string name="share_link">共有リンク</string>
-    <string name="share_link_copied">リンクをコピーしました</string>
     <string name="share_link_desc">このリンクを知る人は、期限まで共有ファイルにアクセスできます</string>
     <string name="share_links">共有リンク</string>
     <string name="share_links_desc">ファイルやフォルダー用に作成したリンク</string>

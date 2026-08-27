@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7 ngày</string>
     <string name="share_expiry_never">Không bao giờ</string>
     <string name="share_link">Liên kết chia sẻ</string>
-    <string name="share_link_copied">Đã sao chép liên kết</string>
     <string name="share_link_desc">Bất kỳ ai có liên kết này đều có thể truy cập tệp được chia sẻ đến khi hết hạn</string>
     <string name="share_links">Liên kết đã chia sẻ</string>
     <string name="share_links_desc">Liên kết bạn tạo cho tệp và thư mục</string>

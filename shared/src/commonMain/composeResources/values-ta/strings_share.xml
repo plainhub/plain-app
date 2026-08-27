@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7 நாட்கள்</string>
     <string name="share_expiry_never">ஒருபோதும் இல்லை</string>
     <string name="share_link">பங்கு இணைப்பு</string>
-    <string name="share_link_copied">இணைப்பு நகலெடுக்கப்பட்டது</string>
     <string name="share_link_desc">இந்த இணைப்பு உள்ளவர்கள் காலாவதி வரை பங்கிடப்பட்ட கோப்புகளை அணுகலாம்</string>
     <string name="share_links">பங்கிடப்பட்ட இணைப்புகள்</string>
     <string name="share_links_desc">கோப்புகள் மற்றும் கோப்புறைகளுக்கு நீங்கள் உருவாக்கிய இணைப்புகள்</string>

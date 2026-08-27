@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7 दिन</string>
     <string name="share_expiry_never">कभी नहीं</string>
     <string name="share_link">शेयर लिंक</string>
-    <string name="share_link_copied">लिंक कॉपी हुआ</string>
     <string name="share_link_desc">इस लिंक वाला कोई भी व्यक्ति समाप्ति तक साझा फ़ाइलों तक पहुँच सकता है</string>
     <string name="share_links">शेयर किए गए लिंक</string>
     <string name="share_links_desc">फ़ाइलों और फ़ोल्डरों के लिए बनाए गए लिंक</string>

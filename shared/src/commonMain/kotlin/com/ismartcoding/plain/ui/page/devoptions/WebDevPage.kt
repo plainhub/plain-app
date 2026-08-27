@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.devoptions
+
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,7 @@ import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.preferences.LocalAdbToken
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.ClipboardCard
+import com.ismartcoding.plain.ui.base.CornerCopyCard
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -50,18 +51,19 @@ fun WebDevPage(
                     item {
                         TopSpace()
                         Subtitle(text = stringResource(Res.string.token))
-                        ClipboardCard(label = stringResource(Res.string.token), text = adbToken)
+                        CornerCopyCard(
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            text = adbToken
+                        )
                         VerticalSpace(dp = 16.dp)
                         Subtitle(text = stringResource(Res.string.start_service))
-                        ClipboardCard(
+                        CornerCopyCard(
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                            label = stringResource(Res.string.adb_cmd_start),
                             text = "adb shell am broadcast -a $packageId.action.START_HTTP_SERVER -p $packageId --es token $adbToken",
                         )
                         VerticalSpace(dp = 16.dp)
                         Subtitle(text = stringResource(Res.string.stop_service))
-                        ClipboardCard(
-                            label = stringResource(Res.string.adb_cmd_stop),
+                        CornerCopyCard(
                             text = "adb shell am broadcast -a $packageId.action.STOP_HTTP_SERVER -p $packageId --es token $adbToken",
                         )
                         Tips(text = stringResource(Res.string.adb_token_desc))

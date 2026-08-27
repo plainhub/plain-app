@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.preferences.*
@@ -131,7 +132,10 @@ fun WebSecurityPage(navController: NavHostController) {
                     }
                     item {
                         Subtitle(text = stringResource(Res.string.https_certificate_signature))
-                        ClipboardCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), label = stringResource(Res.string.https_certificate_signature), text = sslSignature)
+                        CornerCopyCard(
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            text = sslSignature
+                        )
                         VerticalSpace(dp = 16.dp)
                         PFilledButton(
                             modifier = Modifier
@@ -159,8 +163,12 @@ fun WebSecurityPage(navController: NavHostController) {
                             onClick = { navController.navigate(Routing.ReplaceSslCertificate) })
                         VerticalSpace(dp = 24.dp)
                         Subtitle(text = stringResource(Res.string.url_token))
-                        ClipboardCard(label = stringResource(Res.string.url_token), text = urlToken)
-                        Tips(text = stringResource(Res.string.url_token_tips)); VerticalSpace(dp = 16.dp)
+                        CornerCopyCard(
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            text = urlToken
+                        )
+                        Tips(text = stringResource(Res.string.url_token_tips))
+                        VerticalSpace(dp = 16.dp)
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(modifier = Modifier.clickable {
                                 scope.launch(Dispatchers.Default) { RotateUrlTokenOnRestartPreference.putAsync(!rotateUrlTokenOnRestart) }

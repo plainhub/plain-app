@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.generateQrCode
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.lib.extensions.toBreakableUrl
 
 @Composable
 fun WebAddressBarQrDialog(
@@ -46,9 +47,7 @@ fun WebAddressBarQrDialog(
                     modifier = Modifier.size(300.dp),
                 )
                 Text(
-                    text = url.mapIndexed { index, c ->
-                        if (index == 0) c.toString() else "\u200B$c"
-                    }.joinToString(""),
+                    text = url.toBreakableUrl(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

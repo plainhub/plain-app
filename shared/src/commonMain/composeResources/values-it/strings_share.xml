@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7 giorni</string>
     <string name="share_expiry_never">Mai</string>
     <string name="share_link">Link di condivisione</string>
-    <string name="share_link_copied">Link copiato</string>
     <string name="share_link_desc">Chiunque abbia questo link può accedere ai file condivisi fino alla scadenza</string>
     <string name="share_links">Link condivisi</string>
     <string name="share_links_desc">Link creati per file e cartelle</string>

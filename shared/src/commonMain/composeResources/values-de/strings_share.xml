@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7 Tage</string>
     <string name="share_expiry_never">Nie</string>
     <string name="share_link">Freigabelink</string>
-    <string name="share_link_copied">Link kopiert</string>
     <string name="share_link_desc">Jeder mit diesem Link kann bis zum Ablauf auf die freigegebenen Dateien zugreifen</string>
     <string name="share_links">Freigabelinks</string>
     <string name="share_links_desc">Links, die Sie für Dateien und Ordner erstellt haben</string>

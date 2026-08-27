@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7 gün</string>
     <string name="share_expiry_never">Hiçbir zaman</string>
     <string name="share_link">Paylaşım bağlantısı</string>
-    <string name="share_link_copied">Bağlantı kopyalandı</string>
     <string name="share_link_desc">Bu bağlantıya sahip olan herkes, süresi dolana kadar paylaşılan dosyalara erişebilir</string>
     <string name="share_links">Paylaşılan bağlantılar</string>
     <string name="share_links_desc">Dosya ve klasörler için oluşturduğunuz bağlantılar</string>

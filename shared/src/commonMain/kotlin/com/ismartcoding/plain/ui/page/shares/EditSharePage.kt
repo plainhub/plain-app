@@ -35,6 +35,7 @@ import com.ismartcoding.plain.i18n.share_expiry_never
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.extensions.toBreakableUrl
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.shareText
@@ -153,7 +154,7 @@ fun EditSharePage(
                 }
             }
             VerticalSpace(8.dp)
-            CornerCopyCard(text = link)
+            CornerCopyCard(text = link.toBreakableUrl())
             VerticalSpace(16.dp)
             ActionButtons {
                 IconTextQrCodeButton { showQr = true }

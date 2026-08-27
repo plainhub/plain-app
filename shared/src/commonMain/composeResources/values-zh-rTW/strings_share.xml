@@ -13,7 +13,6 @@
     <string name="share_expiry_7d">7 天</string>
     <string name="share_expiry_never">永不過期</string>
     <string name="share_link">分享連結</string>
-    <string name="share_link_copied">連結已複製</string>
     <string name="share_link_desc">任何擁有此連結的人都可以在到期前存取共享檔案</string>
     <string name="share_links">分享連結</string>
     <string name="share_links_desc">你為檔案和資料夾建立的連結</string>

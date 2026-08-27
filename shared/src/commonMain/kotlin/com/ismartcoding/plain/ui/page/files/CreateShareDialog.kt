@@ -40,6 +40,7 @@ import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.toBreakableUrl
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.shareText
 import com.ismartcoding.plain.ui.base.ActionButtons
@@ -115,7 +116,7 @@ fun CreateShareDialog(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     VerticalSpace(8.dp)
-                    CornerCopyCard(text = link)
+                    CornerCopyCard(text = link.toBreakableUrl())
                     VerticalSpace(8.dp)
                     ActionButtons {
                         IconTextQrCodeButton { showQr = true }

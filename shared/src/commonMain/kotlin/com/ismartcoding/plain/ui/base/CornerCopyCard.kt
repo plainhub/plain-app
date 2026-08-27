@@ -40,7 +40,7 @@ import org.jetbrains.compose.resources.stringResource
 
 // The corner copy button is a small circle whose center sits exactly on the
 // card's bottom-right corner, so ~50% overlaps the card and ~50% floats outside.
-private val CornerButtonSize = 48.dp
+private val CornerButtonSize = 32.dp
 
 // How long the copy button shows the check icon before switching back.
 private const val COPIED_ICON_DURATION_MS = 1500L
@@ -66,6 +66,7 @@ fun CornerCopyCard(
     ) {
         PCard {
             Text(
+                modifier = Modifier.padding(16.dp),
                 text = text,
                 style = MaterialTheme.typography.listItemTitle(),
             )
@@ -78,24 +79,24 @@ fun CornerCopyCard(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .size(CornerButtonSize)
-                .offset(x = halfButton, y = halfButton)
+                .offset(y = halfButton)
                 .shadow(2.dp, CircleShape)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh),
         ) {
             AnimatedContent(
                 targetState = copiedTick > 0,
                 transitionSpec = {
                     (scaleIn(tween(150)) + fadeIn(tween(150))) togetherWith
-                        (scaleOut(tween(150)) + fadeOut(tween(150)))
+                            (scaleOut(tween(150)) + fadeOut(tween(150)))
                 },
                 label = "cornerCopyIcon",
             ) { copied ->
                 PIcon(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(16.dp),
                     icon = painterResource(if (copied) Res.drawable.check else Res.drawable.copy),
                     contentDescription = stringResource(Res.string.copy_text),
-                    tint = MaterialTheme.colorScheme.onPrimary,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

@@ -12,7 +12,6 @@
     <string name="share_expiry_7d">7 дней</string>
     <string name="share_expiry_never">Никогда</string>
     <string name="share_link">Ссылка</string>
-    <string name="share_link_copied">Ссылка скопирована</string>
     <string name="share_link_desc">Любой, у кого есть ссылка, может получить доступ к файлам до истечения срока</string>
     <string name="share_links">Ссылки</string>
     <string name="share_links_desc">Ссылки, созданные для файлов и папок</string>

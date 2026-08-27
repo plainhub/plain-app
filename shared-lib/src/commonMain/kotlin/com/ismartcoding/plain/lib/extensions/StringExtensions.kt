@@ -786,3 +786,10 @@ fun String.htmlToPlainText(): String {
         .replace(Regex("\\s+"), " ")
         .trim()
 }
+
+
+fun String.toBreakableUrl(): String {
+    return this.mapIndexed { index, c ->
+        if (index == 0) c.toString() else "\u200B$c"
+    }.joinToString("")
+}

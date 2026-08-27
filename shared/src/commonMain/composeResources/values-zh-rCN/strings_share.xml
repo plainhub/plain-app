@@ -15,7 +15,6 @@
     <string name="share_read_only">只读</string>
     <string name="share_link_desc">任何拥有此链接的人都可以在到期前访问共享文件</string>
     <string name="share_created">链接已创建</string>
-    <string name="share_link_copied">链接已复制</string>
     <string name="share_expires_on">%1$s 过期</string>
     <string name="share_expired">已过期</string>
     <string name="share_no_links">暂无共享链接</string>

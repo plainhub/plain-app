@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.ClipboardCard
+import com.ismartcoding.plain.ui.base.CornerCopyCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -53,9 +53,8 @@ fun ApiTokenTipsPage(
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item { TopSpace() }
                 item {
-                    ClipboardCard(
+                    CornerCopyCard(
                         modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                        label = "CURL",
                         text = curlReal,
                     )
                     Tips(
