@@ -4,9 +4,12 @@ import com.google.ai.edge.litert.Accelerator
 import com.google.ai.edge.litert.CompiledModel
 import com.ismartcoding.plain.lib.logcat.LogCat
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
 
 object DelegateHelper {
-    private val models = mutableListOf<CompiledModel>()
+    // createModel runs on IO workers while onTrimMemory-triggered close() runs
+    // on the main thread; CopyOnWriteArrayList makes add/remove race-free.
+    private val models = CopyOnWriteArrayList<CompiledModel>()
 
     fun createModel(modelFile: File): CompiledModel {
         tryAccelerator(modelFile, Accelerator.NPU, "NPU")?.let { return it }
