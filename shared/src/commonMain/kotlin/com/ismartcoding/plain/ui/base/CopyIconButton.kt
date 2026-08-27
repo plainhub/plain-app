@@ -24,7 +24,6 @@ fun CopyIconButton(
         contentDescription = contentDescription,
         click = {
             setClipboardText(clipLabel, text)
-            DialogHelper.showTextCopiedMessage(copiedMessage)
             onCopied?.invoke()
         },
     )
