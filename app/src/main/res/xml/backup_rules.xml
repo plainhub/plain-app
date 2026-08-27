@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Full backup content for Android 9-11 (API 28-30).
+     Defaults already cover databases, files and shared preferences;
+     exclude re-downloadable AI models and device-local logs. -->
+<full-backup-content>
+    <exclude domain="file" path="ai_models" />
+    <exclude domain="external" path="logs" />
+</full-backup-content>

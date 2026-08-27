@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Data extraction rules for Android 12+ (API 31+).
+     Defaults already cover databases, files and shared preferences;
+     exclude re-downloadable AI models and device-local logs from both
+     cloud backup and device-to-device transfer. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="ai_models" />
+        <exclude domain="external" path="logs" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="ai_models" />
+        <exclude domain="external" path="logs" />
+    </device-transfer>
+</data-extraction-rules>
