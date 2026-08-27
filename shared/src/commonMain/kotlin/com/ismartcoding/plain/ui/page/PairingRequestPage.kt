@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -130,7 +131,7 @@ fun PairingRequestPage(
             VerticalSpace(dp = 40.dp)
         }
         item {
-            PCard {
+            PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                 PListItem(title = stringResource(Res.string.device_name), value = request.fromName)
                 if (displayIp.isNotEmpty()) {
                     PListItem(title = stringResource(Res.string.ip_address), value = displayIp)

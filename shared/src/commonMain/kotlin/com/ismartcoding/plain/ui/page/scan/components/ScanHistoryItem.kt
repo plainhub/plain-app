@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.scan.components
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import org.jetbrains.compose.resources.DrawableResource
 import com.ismartcoding.plain.platform.LocaleHelper
@@ -70,7 +71,7 @@ fun ScanHistoryItem(
     text: String,
     onDelete: () -> Unit,
 ) {
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

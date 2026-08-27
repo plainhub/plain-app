@@ -115,7 +115,7 @@ fun NotePage(
                 item {
                     val tags = tagsState.filter { tagIds.contains(it.id) }
                     if (tags.isNotEmpty()) {
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             FlowRow(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 tags.forEach { tag ->
                                     Text(text = AnnotatedString("#" + tag.name), modifier = Modifier.wrapContentHeight().align(Alignment.Bottom),

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.layout.fillMaxWidth
 
@@ -43,7 +44,7 @@ fun HowToUsePage(
                     item {
                         TopSpace()
                         Subtitle(text = stringResource(Res.string.instruction_for_use))
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             Text(
                                 stringResource(Res.string.web_how_to),
                                 modifier = Modifier.padding(16.dp),
@@ -54,7 +55,7 @@ fun HowToUsePage(
                     }
                     item {
                         Subtitle(text = stringResource(Res.string.recommendation))
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             Text(
                                 stringResource(Res.string.usb_connect_recommendation),
                                 modifier = Modifier.padding(16.dp),

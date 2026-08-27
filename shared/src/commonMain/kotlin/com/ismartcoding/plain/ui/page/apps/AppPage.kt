@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.apps
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.padding
@@ -62,14 +63,14 @@ fun AppPage(navController: NavHostController, id: String) {
                 item { AppPageHeader(navController = navController, item = pkg) }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.source_directory), subtitle = pkg.sourceDir)
                         PListItem(title = stringResource(Res.string.data_directory), subtitle = pkg.dataDir)
                     }
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.app_size), value = pkg.size.formatBytes())
                         PListItem(title = "SDK", value = LocaleHelper.getStringF(Res.string.sdk, pkg.targetSdkVersion, pkg.minSdkVersion))
                         PListItem(title = stringResource(Res.string.installed_at), value = pkg.installedAt.formatDateTime())

@@ -1,4 +1,7 @@
 package com.ismartcoding.plain.ui.page
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -59,7 +62,7 @@ fun ViewTextContentBottomSheet(
             }
             item {
                 VerticalSpace(dp = 24.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.wrap_content), action = {
                         PSwitch(
                             activated = textFileVM.wrapContent.value,

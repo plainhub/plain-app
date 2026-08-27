@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.scan.components
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,7 @@ import com.ismartcoding.plain.ui.base.urlAt
 fun ScanResult(
     text: String,
 ) {
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Row(
             modifier =
             Modifier

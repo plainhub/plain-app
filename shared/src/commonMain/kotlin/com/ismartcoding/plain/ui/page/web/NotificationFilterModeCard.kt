@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -22,7 +23,7 @@ fun NotificationFilterModeCard(
     mode: String,
     onToggleMode: () -> Unit,
 ) {
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = stringResource(Res.string.notification_filter_mode_desc),

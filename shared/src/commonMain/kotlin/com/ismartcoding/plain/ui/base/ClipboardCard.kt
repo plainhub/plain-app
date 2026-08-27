@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.base
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -9,19 +10,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.platform.setClipboardText
 
 @Composable
 fun ClipboardCard(
-    horizontal: Dp = PlainTheme.PAGE_HORIZONTAL_MARGIN,
+    modifier: Modifier = Modifier,
     label: String,
     text: String,
 ) {
-    PCard(horizontal) {
+    PCard(modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

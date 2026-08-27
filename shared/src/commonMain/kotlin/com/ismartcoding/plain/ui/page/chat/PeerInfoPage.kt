@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.chat
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -62,7 +63,7 @@ fun PeerInfoPage(
         ) {
             if (peer != null) {
                 item {
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.peer_id), value = peer.id)
                         PListItem(title = stringResource(Res.string.ip_address), value = peer.getBestIp())
                         PListItem(title = stringResource(Res.string.port), value = peer.port.toString())

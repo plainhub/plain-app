@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.preferences.*
 
@@ -84,7 +85,7 @@ fun WebSecurityPage(navController: NavHostController) {
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item { TopSpace() }
                     item {
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(modifier = Modifier.clickable {
                                 scope.launch(Dispatchers.Default) {
                                     PasswordTypePreference.putAsync(
@@ -115,7 +116,7 @@ fun WebSecurityPage(navController: NavHostController) {
                     }
                     item {
                         VerticalSpace(dp = 16.dp)
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 modifier = Modifier.clickable { scope.launch(Dispatchers.Default) { AuthTwoFactorPreference.putAsync(!authTwoFactor) } },
                                 title = stringResource(Res.string.require_confirmation)
@@ -130,7 +131,7 @@ fun WebSecurityPage(navController: NavHostController) {
                     }
                     item {
                         Subtitle(text = stringResource(Res.string.https_certificate_signature))
-                        ClipboardCard(label = stringResource(Res.string.https_certificate_signature), text = sslSignature)
+                        ClipboardCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), label = stringResource(Res.string.https_certificate_signature), text = sslSignature)
                         VerticalSpace(dp = 16.dp)
                         PFilledButton(
                             modifier = Modifier
@@ -160,7 +161,7 @@ fun WebSecurityPage(navController: NavHostController) {
                         Subtitle(text = stringResource(Res.string.url_token))
                         ClipboardCard(label = stringResource(Res.string.url_token), text = urlToken)
                         Tips(text = stringResource(Res.string.url_token_tips)); VerticalSpace(dp = 16.dp)
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(modifier = Modifier.clickable {
                                 scope.launch(Dispatchers.Default) { RotateUrlTokenOnRestartPreference.putAsync(!rotateUrlTokenOnRestart) }
                             }, title = stringResource(Res.string.rotate_url_token_on_restart)) {

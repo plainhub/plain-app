@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -92,7 +93,7 @@ fun WifiAwareDebugPage(navController: NavHostController) {
 @Composable
 private fun AwareSupportCard(info: AwareDebugInfo) {
     Subtitle(stringResource(Res.string.wifi_aware_support))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.wifi_aware_supported),
             value = booleanText(info.supported),
@@ -122,7 +123,7 @@ private fun AwareSupportCard(info: AwareDebugInfo) {
 @Composable
 private fun AwareCharacteristicsCard(info: AwareDebugInfo) {
     Subtitle(stringResource(Res.string.wifi_aware_characteristics))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.wifi_aware_max_service_name_length),
             value = info.maxServiceNameLength?.toString()
@@ -149,7 +150,7 @@ private fun AwareCharacteristicsCard(info: AwareDebugInfo) {
 @Composable
 private fun AwarePermissionsCard(info: AwareDebugInfo) {
     Subtitle(stringResource(Res.string.wifi_aware_permissions))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.wifi_aware_nearby_devices_permission),
             value = booleanText(info.nearbyDevicesPermissionGranted),
@@ -168,7 +169,7 @@ private fun AwarePermissionsCard(info: AwareDebugInfo) {
 @Composable
 private fun AwareRuntimeStatusCard(info: AwareDebugInfo) {
     Subtitle(stringResource(Res.string.wifi_aware_runtime_status))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.wifi_aware_attach_status),
             value = info.attachStatus.ifEmpty { stringResource(Res.string.not_available) },

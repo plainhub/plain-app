@@ -1,4 +1,7 @@
 package com.ismartcoding.plain.ui.page.docs
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -138,13 +141,13 @@ fun ViewDocBottomSheet(
                     )
                     VerticalSpace(dp = 16.dp)
                 }
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = m.path, action = {
                         CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
                     })
                 }
                 VerticalSpace(dp = 16.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
                     PListItem(title = stringResource(Res.string.type), value = m.path.getMimeType())
                     PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())

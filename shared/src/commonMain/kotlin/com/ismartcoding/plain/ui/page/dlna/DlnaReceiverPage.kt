@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.dlna
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
@@ -97,7 +98,7 @@ fun DlnaReceiverPage(navController: NavHostController) {
 @Composable
 private fun DlnaReceiverDisabledScreen() {
     val scope = rememberCoroutineScope()
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),

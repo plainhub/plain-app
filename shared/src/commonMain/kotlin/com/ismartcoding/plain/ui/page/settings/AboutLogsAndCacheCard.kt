@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
+import androidx.compose.foundation.layout.padding
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -40,7 +42,7 @@ fun AboutLogsAndCacheCard(
     onCacheCleared: (Long) -> Unit,
 ) {
     val logsTitle = stringResource(Res.string.logs)
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             modifier = Modifier.clickable {
                 navController.navigateTextFile(

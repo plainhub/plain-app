@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
+import androidx.compose.foundation.layout.padding
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
@@ -25,7 +27,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
     val darkTheme = LocalDarkTheme.current
     val scope = rememberCoroutineScope()
 
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             modifier = Modifier.clickable {
                 navController.navigate(Routing.DarkTheme)
@@ -46,7 +48,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
         }
     }
     VerticalSpace(dp = 16.dp)
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             modifier = Modifier.clickable {
                 navController.navigate(Routing.Language)
@@ -58,7 +60,7 @@ internal fun SettingsCardItems(navController: NavHostController) {
         )
     }
     VerticalSpace(16.dp)
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             modifier = Modifier.clickable {
                 navController.navigate(Routing.BackupRestore)

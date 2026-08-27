@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -72,7 +73,7 @@ fun DesktopAccessSection(navController: NavHostController) {
         }
     }
 
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(icon = Res.drawable.devices, title = stringResource(Res.string.desktop_access)) {
             PSwitch(activated = desktopAccessEnabled) { enable ->
                 scope.launchSafe {

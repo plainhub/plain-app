@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.chat
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -144,7 +145,7 @@ fun ChannelInfoPage(
             if (liveChannel != null) {
                 item { VerticalSpace(dp = 16.dp) }
                 item {
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(
                             modifier = if (ownedByMe) Modifier.clickable { showRenameDialog.value = true } else Modifier,
                             title = stringResource(Res.string.channel_name),
@@ -157,7 +158,7 @@ fun ChannelInfoPage(
                 item { VerticalSpace(dp = 16.dp) }
                 item { Subtitle(text = "${stringResource(Res.string.members)} (${displayMembers.size})") }
                 item {
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         displayMembers.forEach { pm ->
                             val canManage = ownedByMe && !pm.isSelf && !pm.isOwner
                             val selfPendingInvite = pm.isSelf && pm.isPending()
@@ -193,7 +194,7 @@ fun ChannelInfoPage(
                     item { VerticalSpace(dp = 16.dp) }
                     item { Subtitle(text = stringResource(Res.string.add_member)) }
                     item {
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             addablePeers.forEach { peer ->
                                 PListItem(
                                     title = peer.getName(),

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -204,7 +205,7 @@ private fun PacketCard(log: MdnsPacketLog, expanded: Boolean, onClick: () -> Uni
             )
         }
         if (expanded) {
-            PCard {
+            PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                 Text(
                     text = log.detail,
                     style = MaterialTheme.typography.bodySmall,
@@ -219,7 +220,7 @@ private fun PacketCard(log: MdnsPacketLog, expanded: Boolean, onClick: () -> Uni
 private fun MdnsDeviceCard(snapshot: MdnsServiceSnapshot) {
     Column {
         Subtitle(snapshot.instanceFqdn)
-        PCard {
+        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             PListItem(
                 title = stringResource(Res.string.mdns_service_type),
                 value = snapshot.serviceType.ifEmpty { null }

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -66,7 +67,7 @@ fun BleDebugPage(navController: NavHostController) {
 @Composable
 private fun BleSupportCard(info: BleDebugInfo) {
     Subtitle(stringResource(Res.string.ble_support))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.ble_bluetooth_supported),
             value = booleanText(info.bluetoothSupported),
@@ -86,7 +87,7 @@ private fun BleSupportCard(info: BleDebugInfo) {
 @Composable
 private fun BlePermissionsCard(info: BleDebugInfo) {
     Subtitle(stringResource(Res.string.ble_permissions))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.ble_scan_permission),
             value = booleanText(info.scanPermissionGranted),
@@ -113,7 +114,7 @@ private fun BlePermissionsCard(info: BleDebugInfo) {
 @Composable
 private fun BleRuntimeStatusCard(info: BleDebugInfo) {
     Subtitle(stringResource(Res.string.ble_runtime_status))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.ble_advertising_running),
             value = booleanText(info.advertisingRunning),

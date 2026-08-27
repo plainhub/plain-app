@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.web
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -113,7 +114,7 @@ fun ReplaceSslCertificatePage(navController: NavHostController) {
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item { TopSpace() }
                 item {
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         VerticalSpace(dp = 16.dp)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                             PSelectionChip(

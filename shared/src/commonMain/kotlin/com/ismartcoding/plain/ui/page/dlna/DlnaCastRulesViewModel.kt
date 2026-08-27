@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.dlna
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.fillMaxSize
@@ -88,7 +89,7 @@ fun DlnaCastHistoryPage(
                 if (allowed.isNotEmpty()) {
                     item { Subtitle(text = stringResource(Res.string.dlna_cast_accepted)) }
                     items(allowed, key = { it.first }) { (ip, name) ->
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 title = if (name.isNotEmpty() && name != ip) "$name ($ip)" else ip,
                                 action = {
@@ -109,7 +110,7 @@ fun DlnaCastHistoryPage(
                     item { VerticalSpace(8.dp) }
                     item { Subtitle(text = stringResource(Res.string.dlna_cast_rejected)) }
                     items(denied, key = { it.first }) { (ip, name) ->
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 title = if (name.isNotEmpty() && name != ip) "$name ($ip)" else ip,
                                 action = {

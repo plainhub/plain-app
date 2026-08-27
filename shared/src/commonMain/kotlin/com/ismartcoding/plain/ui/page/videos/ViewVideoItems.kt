@@ -1,4 +1,7 @@
 package com.ismartcoding.plain.ui.page.videos
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -111,7 +114,7 @@ internal fun VideoActionButtons(
 
 @Composable
 internal fun VideoPathCard(m: DVideo) {
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(title = m.path, action = {
             CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
         })

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,7 +49,7 @@ fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: Updat
                     TopSpace()
                 }
                 item {
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(title = stringResource(Res.string.auto_check_update), subtitle = stringResource(Res.string.auto_check_update_desc)) {
                             PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.Default) {
                                 UpdateInfoPreference.updateAsync { it.copy(autoCheckUpdate = newValue) } }

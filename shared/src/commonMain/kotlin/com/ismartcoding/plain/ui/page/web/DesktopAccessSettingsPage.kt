@@ -65,7 +65,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     TopSpace()
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.Connections) },
                             icon = Res.drawable.devices, title = stringResource(Res.string.connections), showMore = true
@@ -104,7 +104,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                 if (AppFeatureType.NOTIFICATIONS.has()) {
                     item {
                         VerticalSpace(dp = 16.dp)
-                        PCard {
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             val m = PermissionItem.create(Res.drawable.bell, Permission.NOTIFICATION_LISTENER)
                             val permission = m.permission
                             val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
@@ -129,13 +129,13 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                 item {
                     VerticalSpace(dp = 16.dp)
                     val m = PermissionItem(null, Permission.NONE, setOf(Permission.NONE))
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(modifier = Modifier.clickable { openAppSettings() }, icon = m.icon, title = m.permission.getText(), showMore = true)
                     }
                 }
                 item {
                     VerticalSpace(dp = 16.dp); Subtitle(text = stringResource(Res.string.performance))
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(!keepAwake) }, title = stringResource(Res.string.keep_awake)) {
                             PSwitch(activated = keepAwake) { enable -> webVM.enableKeepAwake(enable) }
                             HorizontalSpace(8.dp)
@@ -143,7 +143,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                     }
                     Tips(stringResource(Res.string.keep_awake_tips))
                     VerticalSpace(dp = 16.dp)
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(modifier = Modifier.clickable {
                             if (shouldIgnoreOptimize.value) webVM.requestIgnoreBatteryOptimization()
                             else openBatteryOptimizationSettings()
@@ -153,7 +153,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
                             icon = Res.drawable.code, title = stringResource(Res.string.adb_automation), showMore = true

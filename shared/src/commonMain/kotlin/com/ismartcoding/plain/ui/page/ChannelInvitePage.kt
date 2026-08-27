@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.background
@@ -92,7 +93,7 @@ fun ChannelInvitePage(
             VerticalSpace(dp = 40.dp)
         }
         item {
-            PCard {
+            PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                 PListItem(title = stringResource(Res.string.channel_name), value = channelName)
                 PListItem(title = stringResource(Res.string.inviter), value = ownerPeerName)
             }

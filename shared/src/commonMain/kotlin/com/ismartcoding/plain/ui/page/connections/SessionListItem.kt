@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.connections
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
@@ -70,7 +71,7 @@ internal fun SessionListItem(
         )
     }
 
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Column {
             SessionMainListItem(
                 title = m.name.ifEmpty { osDisplay },

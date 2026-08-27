@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.connections
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ fun ApiTokenTipsPage(
                 item { TopSpace() }
                 item {
                     ClipboardCard(
+                        modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                         label = "CURL",
                         text = curlReal,
                     )

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.cast
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.clickable
@@ -26,7 +27,7 @@ fun CastDeviceCard(
     subtitle: String,
     onClick: () -> Unit,
 ) {
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Row(
             modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,

@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.feeds
+import androidx.compose.foundation.layout.padding
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -81,7 +83,7 @@ fun ViewFeedEntryBottomSheet(
                     }
                 )
                 VerticalSpace(dp = 16.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(modifier = Modifier.clickable {
                         try { launchUrl(m.url) } catch (_: Exception) { DialogHelper.showMessage(Res.string.no_browser_error) }
                     }, title = m.url, separatedActions = true, action = {
@@ -89,7 +91,7 @@ fun ViewFeedEntryBottomSheet(
                     })
                 }
                 VerticalSpace(dp = 16.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.published_at), value = m.publishedAt.formatDateTime())
                     PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
                     PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())

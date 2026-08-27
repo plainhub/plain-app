@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.Arrangement
@@ -85,7 +86,7 @@ private fun ShowcaseBanners() {
 @Composable
 private fun ShowcaseCards() {
     Subtitle("PCard + PListItem")
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(title = "List item with icon", subtitle = "Subtitle", icon = Res.drawable.settings, showMore = true)
         PListItem(title = "List item with value", value = "Value")
         PListItem(title = "List item with switch", separatedActions = true) {

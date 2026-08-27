@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.feeds
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -78,7 +79,7 @@ fun FeedSettingsPage(
                 TopSpace()
             }
             item {
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(
                         modifier = Modifier.clickable {
                             feedSettingsVM.setAutoRefresh(!feedSettingsVM.autoRefresh.value)

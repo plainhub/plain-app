@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.dlna
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.animation.core.LinearEasing
@@ -39,7 +40,7 @@ fun DlnaReceiverWaitingScreen() {
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        PCard {
+        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -59,7 +60,7 @@ fun DlnaReceiverWaitingScreen() {
             }
         }
         VerticalSpace(16.dp)
-        PCard {
+        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             PListItem(
                 title = stringResource(Res.string.dlna_receiver_step1_title),
                 subtitle = stringResource(Res.string.dlna_receiver_step1_desc),

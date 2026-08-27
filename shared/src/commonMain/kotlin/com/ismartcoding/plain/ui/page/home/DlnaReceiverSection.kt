@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.home
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
@@ -33,7 +34,7 @@ fun DlnaReceiverSection(navController: NavHostController) {
     val dlnaReceiverEnabled = TempData.dlnaEnabled.collectAsStateValue()
     val scope = rememberCoroutineScope()
 
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             modifier = Modifier.clickable { navController.navigate(Routing.DlnaReceiver) },
             icon = Res.drawable.cast,

@@ -1,4 +1,7 @@
 package com.ismartcoding.plain.ui.page.appfiles.components
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -79,13 +82,13 @@ fun AppFileInfoBottomSheet(
                     onDismiss = onDismiss,
                 )
                 VerticalSpace(dp = 24.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = file.appFile.realPath.resolveAppFileRealPath(), action = {
                         CopyIconButton(text = file.appFile.realPath.resolveAppFileRealPath(), clipLabel = stringResource(Res.string.file_path))
                     })
                 }
                 VerticalSpace(dp = 16.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.file_size), value = file.appFile.size.formatBytes())
                     PListItem(title = stringResource(Res.string.type), value = file.appFile.mimeType)
                     PListItem(title = stringResource(Res.string.file_name), value = file.fileName)

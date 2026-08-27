@@ -1,4 +1,7 @@
 package com.ismartcoding.plain.ui.page.images
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -104,7 +107,7 @@ fun ViewImageBottomSheet(
             }
             item {
                 VerticalSpace(dp = 16.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
                     PListItem(title = stringResource(Res.string.type), value = m.path.getMimeType())
                     PListItem(title = stringResource(Res.string.dimensions), value = "${viewSize.width}\u00d7${viewSize.height}")

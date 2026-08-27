@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -68,7 +69,7 @@ fun ServiceDebugPage(navController: NavHostController) {
 @Composable
 private fun HttpServerCard(info: ServiceDebugInfo) {
     Subtitle(stringResource(Res.string.http_server))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.service_running),
             value = booleanText(info.httpServerRunning),
@@ -101,7 +102,7 @@ private fun HttpServerCard(info: ServiceDebugInfo) {
 @Composable
 private fun MdnsServerCard(info: ServiceDebugInfo) {
     Subtitle(stringResource(Res.string.mdns_server))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.service_running),
             value = booleanText(info.mdnsRunning),
@@ -116,7 +117,7 @@ private fun MdnsServerCard(info: ServiceDebugInfo) {
 @Composable
 private fun DlnaServiceCard(info: ServiceDebugInfo) {
     Subtitle(stringResource(Res.string.dlna_service))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.service_running),
             value = booleanText(info.dlnaRunning),
@@ -137,7 +138,7 @@ private fun DlnaServiceCard(info: ServiceDebugInfo) {
 @Composable
 private fun BleServiceCard(info: ServiceDebugInfo) {
     Subtitle(stringResource(Res.string.ble_service))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.service_running),
             value = booleanText(info.bleRunning),
@@ -156,7 +157,7 @@ private fun BleServiceCard(info: ServiceDebugInfo) {
 @Composable
 private fun AwareServiceCard(info: ServiceDebugInfo) {
     Subtitle(stringResource(Res.string.aware_service))
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(
             title = stringResource(Res.string.service_running),
             value = booleanText(info.awareRunning),

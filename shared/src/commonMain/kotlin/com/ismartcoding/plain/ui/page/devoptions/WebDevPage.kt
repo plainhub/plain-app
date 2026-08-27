@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.devoptions
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.preferences.*
 import androidx.compose.foundation.layout.fillMaxWidth
 
@@ -53,6 +54,7 @@ fun WebDevPage(
                         VerticalSpace(dp = 16.dp)
                         Subtitle(text = stringResource(Res.string.start_service))
                         ClipboardCard(
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             label = stringResource(Res.string.adb_cmd_start),
                             text = "adb shell am broadcast -a $packageId.action.START_HTTP_SERVER -p $packageId --es token $adbToken",
                         )

@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -112,7 +113,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
 
                 item {
                     VerticalSpace(dp = 16.dp)
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(
                             title = stringResource(Res.string.system_version),
                             value = getOSVersion(),
@@ -138,7 +139,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                         }
                     }
 //                    VerticalSpace(dp = 16.dp)
-//                    PCard {
+//                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
 //                        PListItem(
 //                            title = stringResource(Res.string.make_discoverable),
 //                            subtitle = stringResource(Res.string.make_discoverable_desc),
@@ -160,7 +161,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(
                             modifier = Modifier.clickable { WebHelper.open(UrlHelper.getTermsUrl()) },
                             title = stringResource(Res.string.terms_of_use), showMore = true

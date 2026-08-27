@@ -1,4 +1,7 @@
 package com.ismartcoding.plain.ui.page.files
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -79,13 +82,13 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                     onShowPasteBar = { filesVM.showPasteBar.value = it },
                 )
                 VerticalSpace(dp = 24.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = file.path, action = {
                         CopyIconButton(text = file.path, clipLabel = stringResource(Res.string.file_path))
                     })
                 }
                 VerticalSpace(dp = 16.dp)
-                PCard {
+                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     if (!file.isDir) {
                         PListItem(title = stringResource(Res.string.file_size), value = file.size.formatBytes())
                     }

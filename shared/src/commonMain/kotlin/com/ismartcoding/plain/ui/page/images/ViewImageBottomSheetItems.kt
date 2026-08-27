@@ -1,4 +1,7 @@
 package com.ismartcoding.plain.ui.page.images
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
@@ -119,7 +122,7 @@ internal fun ViewImageActionButtons(
 internal fun ViewImagePathCard(
     m: com.ismartcoding.plain.data.DImage,
 ) {
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(title = m.path, action = {
             CopyIconButton(text = m.path, clipLabel = stringResource(Res.string.file_path))
         })

@@ -1,4 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
+import androidx.compose.foundation.layout.padding
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
@@ -53,7 +55,7 @@ internal fun DeveloperSettingsCard(
     var developerMode by remember { mutableStateOf(TempData.developerMode) }
     var allowAnyHost by remember { mutableStateOf(TempData.allowAnyHost.value) }
 
-    PCard {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PListItem(title = stringResource(Res.string.client_id), value = TempData.clientId)
         PListItem(title = stringResource(Res.string.developer_mode)) {
             PSwitch(activated = developerMode) {

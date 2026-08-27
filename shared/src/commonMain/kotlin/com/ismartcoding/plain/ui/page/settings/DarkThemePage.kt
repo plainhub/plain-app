@@ -1,4 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.preferences.*
 
@@ -54,7 +55,7 @@ fun DarkThemePage(navController: NavHostController) {
                     TopSpace()
                 }
                 item {
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         DarkTheme.entries.forEach {
                             PListItem(
                                 modifier = Modifier.clickable {
@@ -75,7 +76,7 @@ fun DarkThemePage(navController: NavHostController) {
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(
                             modifier = Modifier.clickable {
                                 scope.launch {
@@ -93,7 +94,7 @@ fun DarkThemePage(navController: NavHostController) {
                         }
                     }
                     VerticalSpace(dp = 16.dp)
-                    PCard {
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         PListItem(
                             modifier = Modifier.clickable {
                                 scope.launch {
