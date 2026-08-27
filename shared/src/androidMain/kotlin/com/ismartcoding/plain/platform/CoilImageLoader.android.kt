@@ -65,9 +65,13 @@ class ForceVideoDecoder(
             val bitmap = retriever.getFrameAtTime(-1L, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
                 ?: throw kotlinx.io.IOException("ForceVideoDecoder: failed to extract video frame from $filePath")
 
+            // getFrameAtTime returns a full-resolution frame (a 4K frame is ~33MB);
+            // scale it to the requested size before it reaches the memory cache.
+            val normalizedBitmap = normalizeBitmap(bitmap, options)
+
             return DecodeResult(
-                image = bitmap.toDrawable(options.context.resources).asImage(),
-                isSampled = false,
+                image = normalizedBitmap.toDrawable(options.context.resources).asImage(),
+                isSampled = normalizedBitmap !== bitmap,
             )
         } finally {
             retriever.release()
@@ -96,7 +100,9 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
     // Always use applicationContext to avoid leaking Activity instances through
     // the lazy diskCache / memoryCache initializer lambdas held by RealImageLoader.
     val appContext = context.applicationContext
-    val memoryPercent = if (activityManager.isLowRamDevice) 0.25 else 0.75
+    // Keep the memory cache at Coil's recommended share of the heap (default 0.20-0.25);
+    // larger values inflate the bitmap-memory footprint measured by Play vitals.
+    val memoryPercent = if (activityManager.isLowRamDevice) 0.15 else 0.25
 
     // Dedicated OkHttp client for image loading. It uses the system trust store and
     // OkHttp's default OkHostnameVerifier, which is what every other Android image
@@ -135,6 +141,57 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
         .build()
 }
 
+/** Return [inBitmap] or a copy of [inBitmap] that is valid for [options] and [Options.size]. */
+private fun normalizeBitmap(inBitmap: Bitmap, options: Options): Bitmap {
+    // Fast path: if the input bitmap is valid, return it.
+    if (isConfigValid(inBitmap, options) && isSizeValid(inBitmap, options, options.size)) {
+        return inBitmap
+    }
+
+    // Slow path: re-render the bitmap with the correct size + config.
+    val scale = DecodeUtils.computeSizeMultiplier(
+        srcWidth = inBitmap.width,
+        srcHeight = inBitmap.height,
+        dstWidth = options.size.width.pxOrElse { inBitmap.width },
+        dstHeight = options.size.height.pxOrElse { inBitmap.height },
+        scale = options.scale,
+    ).toFloat()
+    val dstWidth = (scale * inBitmap.width).roundToInt()
+    val dstHeight = (scale * inBitmap.height).roundToInt()
+    val safeConfig = when {
+        options.bitmapConfig == Bitmap.Config.HARDWARE -> Bitmap.Config.ARGB_8888
+        else -> options.bitmapConfig
+    }
+
+    val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    val outBitmap = createBitmap(dstWidth, dstHeight, safeConfig)
+    outBitmap.applyCanvas {
+        scale(scale, scale)
+        drawBitmap(inBitmap, 0f, 0f, paint)
+    }
+    inBitmap.recycle()
+
+    return outBitmap
+}
+
+private fun isConfigValid(bitmap: Bitmap, options: Options): Boolean {
+    return bitmap.config != Bitmap.Config.HARDWARE ||
+            options.bitmapConfig == Bitmap.Config.HARDWARE
+}
+
+private fun isSizeValid(bitmap: Bitmap, options: Options, size: Size): Boolean {
+    // Accept any bitmap that already fits within the requested bounds (multiplier <= 1.0)
+    // to avoid an unnecessary slow-path software canvas redraw.
+    val multiplier = DecodeUtils.computeSizeMultiplier(
+        srcWidth = bitmap.width,
+        srcHeight = bitmap.height,
+        dstWidth = size.width.pxOrElse { bitmap.width },
+        dstHeight = size.height.pxOrElse { bitmap.height },
+        scale = options.scale,
+    )
+    return multiplier <= 1.0
+}
+
 class ThumbnailDecoder(
     private val source: ImageSource,
     private val options: Options,
@@ -149,7 +206,7 @@ class ThumbnailDecoder(
             options.size.toAndroidSize(),
             null
         )
-        val normalizedBitmap = normalizeBitmap(bitmap, options.size)
+        val normalizedBitmap = normalizeBitmap(bitmap, options)
 
 
         return DecodeResult(
@@ -158,58 +215,6 @@ class ThumbnailDecoder(
         )
     }
 
-
-    /** Return [inBitmap] or a copy of [inBitmap] that is valid for the input [options] and [size]. */
-    private fun normalizeBitmap(inBitmap: Bitmap, size: Size): Bitmap {
-        // Fast path: if the input bitmap is valid, return it.
-        if (isConfigValid(inBitmap, options) && isSizeValid(inBitmap, options, size)) {
-            return inBitmap
-        }
-
-        // Slow path: re-render the bitmap with the correct size + config.
-        val scale = DecodeUtils.computeSizeMultiplier(
-            srcWidth = inBitmap.width,
-            srcHeight = inBitmap.height,
-            dstWidth = size.width.pxOrElse { inBitmap.width },
-            dstHeight = size.height.pxOrElse { inBitmap.height },
-            scale = options.scale,
-        ).toFloat()
-        val dstWidth = (scale * inBitmap.width).roundToInt()
-        val dstHeight = (scale * inBitmap.height).roundToInt()
-        val safeConfig = when {
-            options.bitmapConfig == Bitmap.Config.HARDWARE -> Bitmap.Config.ARGB_8888
-            else -> options.bitmapConfig
-        }
-
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
-        val outBitmap = createBitmap(dstWidth, dstHeight, safeConfig)
-        outBitmap.applyCanvas {
-            scale(scale, scale)
-            drawBitmap(inBitmap, 0f, 0f, paint)
-        }
-        inBitmap.recycle()
-
-        return outBitmap
-    }
-
-    private fun isConfigValid(bitmap: Bitmap, options: Options): Boolean {
-        return bitmap.config != Bitmap.Config.HARDWARE ||
-                options.bitmapConfig == Bitmap.Config.HARDWARE
-    }
-
-    private fun isSizeValid(bitmap: Bitmap, options: Options, size: Size): Boolean {
-        // Thumbnails from ContentResolver.loadThumbnail() are already scaled to the requested
-        // size. Accept any bitmap that already fits within the requested bounds (multiplier <= 1.0)
-        // to avoid an unnecessary slow-path software canvas redraw.
-        val multiplier = DecodeUtils.computeSizeMultiplier(
-            srcWidth = bitmap.width,
-            srcHeight = bitmap.height,
-            dstWidth = size.width.pxOrElse { bitmap.width },
-            dstHeight = size.height.pxOrElse { bitmap.height },
-            scale = options.scale,
-        )
-        return multiplier <= 1.0
-    }
 
     private fun Size.toAndroidSize(fallbackWidth: Int = 200, fallbackHeight: Int = 200) =
         android.util.Size(
