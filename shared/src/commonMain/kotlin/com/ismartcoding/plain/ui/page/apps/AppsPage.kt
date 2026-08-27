@@ -10,16 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -39,7 +34,6 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.ListSearchBar
-import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.AppsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
@@ -131,29 +125,3 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
     }
 }
 
-/**
- * Drawer content for the apps page: All / System / User app filters with counts.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AppsDrawerContent(appsVM: AppsViewModel, pagerState: PagerState, drawerState: DrawerState) {
-    val scope = rememberCoroutineScope()
-    val tabIcons = listOf(Res.drawable.layout_grid, Res.drawable.package2, Res.drawable.rocket)
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(NavigationDrawerItemDefaults.ItemPadding)
-    ) {
-        VerticalSpace(dp = 16.dp)
-        appsVM.tabs.value.forEachIndexed { index, tab ->
-            SidebarItem(
-                label = tab.title,
-                icon = tabIcons.getOrElse(index) { Res.drawable.layout_grid },
-                isSelected = pagerState.currentPage == index,
-                onClick = { scope.launch { drawerState.close(); pagerState.scrollToPage(index) } },
-                badge = tab.count.toString()
-            )
-        }
-        BottomSpace()
-    }
-}

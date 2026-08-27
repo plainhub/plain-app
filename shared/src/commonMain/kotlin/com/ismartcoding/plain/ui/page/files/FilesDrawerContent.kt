@@ -167,7 +167,7 @@ fun FilesDrawerContent(
                 Box {
                     SidebarItem(
                         label = share.name.ifBlank { share.id },
-                        badge = share.expiryLabel(),
+                        subtitle = share.expiryLabel(),
                         icon = Res.drawable.link,
                         onClick = { navController.navigate(Routing.EditShare(share.id)) },
                         onLongClick = { contextMenuShareId = share.id },
