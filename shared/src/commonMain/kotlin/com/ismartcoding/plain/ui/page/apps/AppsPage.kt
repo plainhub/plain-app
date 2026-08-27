@@ -6,23 +6,18 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -36,6 +31,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.AppsViewModel
+import com.ismartcoding.plain.ui.models.VTabData
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import kotlinx.coroutines.Dispatchers
@@ -46,11 +42,9 @@ import kotlinx.coroutines.launch
 fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel { AppsViewModel() }) {
     val itemsState by appsVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    val scrollStateMap = remember { mutableStateMapOf<Int, LazyListState>() }
-    val pagerState = rememberPagerState(pageCount = { appsVM.tabs.value.size })
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 })
+    val scrollState = rememberLazyListState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { scrollState.firstVisibleItemIndex > 0 })
     val drawerState = rememberDrawerState(DrawerValue.Closed)
-    var isFirstTime by remember { mutableStateOf(true) }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch { appsVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
@@ -60,14 +54,11 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
             scope.launch(Dispatchers.Default) { appsVM.loadAsync() }
         }
     }
-    LaunchedEffect(pagerState.currentPage) {
-        if (isFirstTime) { isFirstTime = false; return@LaunchedEffect }
-        val tab = appsVM.tabs.value.getOrNull(pagerState.currentPage)
-        if (tab != null) {
-            appsVM.appType.value = tab.value
-            scope.launch { scrollBehavior.reset(); scrollStateMap[pagerState.currentPage]?.scrollToItem(0) }
-            scope.launch(Dispatchers.Default) { appsVM.loadAsync() }
-        }
+    val onSelectTab: (VTabData) -> Unit = { tab ->
+        appsVM.appType.value = tab.value
+        appsVM.showLoading.value = true
+        scope.launch { drawerState.close(); scrollBehavior.reset(); scrollState.scrollToItem(0) }
+        scope.launch(Dispatchers.Default) { appsVM.loadAsync() }
     }
     if (appsVM.showSortDialog.value) {
         RadioDialog(title = stringResource(Res.string.sort), options = FileSortBy.entries.map {
@@ -77,6 +68,9 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
         }) { appsVM.showSortDialog.value = false }
     }
     val onSearch: (String) -> Unit = { appsVM.searchActive.value = false; appsVM.showLoading.value = true; scope.launch(Dispatchers.Default) { appsVM.loadAsync() } }
+    // Like the media pages, the title reflects the filter picked in the drawer
+    val title = if (appsVM.appType.value.isEmpty()) stringResource(Res.string.apps)
+    else appsVM.tabs.value.firstOrNull { it.value == appsVM.appType.value }?.title ?: stringResource(Res.string.apps)
     PBackHandler(enabled = appsVM.showSearchBar.value || drawerState.isOpen) {
         when {
             drawerState.isOpen -> scope.launch { drawerState.close() }
@@ -87,16 +81,16 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                AppsDrawerContent(appsVM, pagerState, drawerState)
+                AppsDrawerContent(appsVM, onSelectTab)
             }
         },
     ) {
     PScaffold(topBar = {
         if (appsVM.showSearchBar.value) { ListSearchBar(viewModel = appsVM, onSearch = onSearch); return@PScaffold }
-        PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } }),
+        PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollState.scrollToItem(0) } }),
             navController = navController,
             navigationIcon = { PIconButton(icon = Res.drawable.left_panel_open, contentDescription = stringResource(Res.string.apps), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
-            title = stringResource(Res.string.apps), scrollBehavior = scrollBehavior, actions = {
+            title = title, scrollBehavior = scrollBehavior, actions = {
                 ActionButtonSearch { appsVM.enterSearchMode() }
                 PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
                     PDropdownMenuItemSort {
@@ -107,19 +101,9 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
             })
     }) { paddingValues ->
         Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-            if (!appsVM.showLoading.value) {
-                PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
-                    appsVM.tabs.value.forEachIndexed { index, s ->
-                        PFilterChip(modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp), selected = pagerState.currentPage == index,
-                            onClick = { scope.launch { pagerState.scrollToPage(index) } }, label = { Text(text = s.title + " (" + s.count + ")") })
-                    }
-                }
-            }
-            if (pagerState.pageCount == 0) { NoDataColumn(loading = appsVM.showLoading.value, search = appsVM.showSearchBar.value); return@PScaffold }
-            HorizontalPager(state = pagerState, userScrollEnabled = false) { index ->
-                AppsPageList(navController = navController, appsVM = appsVM, items = itemsState, index = index,
-                    scrollStateMap = scrollStateMap, scrollBehavior = scrollBehavior, topRefreshLayoutState = topRefreshLayoutState, paddingValues = paddingValues)
-            }
+            if (appsVM.tabs.value.isEmpty()) { NoDataColumn(loading = appsVM.showLoading.value, search = appsVM.showSearchBar.value); return@PScaffold }
+            AppsPageList(navController = navController, appsVM = appsVM, items = itemsState,
+                scrollState = scrollState, scrollBehavior = scrollBehavior, topRefreshLayoutState = topRefreshLayoutState, paddingValues = paddingValues)
         }
     }
     }

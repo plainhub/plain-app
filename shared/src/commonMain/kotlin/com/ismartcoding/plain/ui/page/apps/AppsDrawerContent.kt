@@ -4,29 +4,25 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.models.AppsViewModel
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.models.VTabData
 
 /**
  * Drawer content for the apps page: All / System / User app filters with counts.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppsDrawerContent(appsVM: AppsViewModel, pagerState: PagerState, drawerState: DrawerState) {
-    val scope = rememberCoroutineScope()
+fun AppsDrawerContent(appsVM: AppsViewModel, onSelect: (VTabData) -> Unit) {
     val tabIcons = listOf(Res.drawable.layout_grid, Res.drawable.package2, Res.drawable.rocket)
     Column(
         modifier = Modifier
@@ -38,8 +34,8 @@ fun AppsDrawerContent(appsVM: AppsViewModel, pagerState: PagerState, drawerState
             SidebarItem(
                 label = tab.title,
                 icon = tabIcons.getOrElse(index) { Res.drawable.layout_grid },
-                isSelected = pagerState.currentPage == index,
-                onClick = { scope.launch { drawerState.close(); pagerState.scrollToPage(index) } },
+                isSelected = appsVM.appType.value == tab.value,
+                onClick = { onSelect(tab) },
                 badge = tab.count.toString()
             )
         }

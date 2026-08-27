@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -38,8 +37,7 @@ fun AppsPageList(
     navController: NavHostController,
     appsVM: AppsViewModel,
     items: List<VPackage>,
-    index: Int,
-    scrollStateMap: MutableMap<Int, LazyListState>,
+    scrollState: LazyListState,
     scrollBehavior: TopAppBarScrollBehavior,
     topRefreshLayoutState: RefreshLayoutState,
     paddingValues: PaddingValues,
@@ -48,8 +46,6 @@ fun AppsPageList(
     PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
         AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
             if (items.isNotEmpty()) {
-                val scrollState = rememberLazyListState()
-                scrollStateMap[index] = scrollState
                 LazyColumnScrollbar(state = scrollState) {
                     LazyColumn(
                         Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),

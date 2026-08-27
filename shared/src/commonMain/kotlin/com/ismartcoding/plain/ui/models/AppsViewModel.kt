@@ -9,6 +9,7 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.countPackages
 import com.ismartcoding.plain.platform.searchPackages
+import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.features.file.FileSortBy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,12 +45,12 @@ class AppsViewModel : ISearchableViewModel<VPackage>, ViewModel() {
         offset.intValue = 0
         _itemsFlow.value = searchPackages(getQuery(), limit.intValue, 0, sortBy.value).map { VPackage.from(it) }
         total.intValue = countPackages(queryText.value)
-        totalSystem.intValue = countPackages("${queryText.value} type:system")
+        totalSystem.intValue = countPackages("${queryText.value} type:${PackageType.SYSTEM.name}")
         noMore.value = _itemsFlow.value.size < limit.intValue
         tabs.value = listOf(
             VTabData(LocaleHelper.getStringAsync(Res.string.all), "", total.intValue),
-            VTabData(LocaleHelper.getStringAsync(Res.string.app_type_system), "system", totalSystem.intValue),
-            VTabData(LocaleHelper.getStringAsync(Res.string.app_type_user), "user", total.intValue - totalSystem.intValue)
+            VTabData(LocaleHelper.getStringAsync(Res.string.app_type_system), PackageType.SYSTEM.name, totalSystem.intValue),
+            VTabData(LocaleHelper.getStringAsync(Res.string.app_type_user), PackageType.USER.name, total.intValue - totalSystem.intValue)
         )
         showLoading.value = false
     }
