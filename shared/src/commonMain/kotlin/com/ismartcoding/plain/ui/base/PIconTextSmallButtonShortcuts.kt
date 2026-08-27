@@ -74,13 +74,3 @@ fun IconTextSmallButtonUnzip(click: () -> Unit) {
     PIconTextSmallButton(Res.drawable.package_open, text = stringResource(Res.string.decompress), click = click)
 }
 
-@Composable
-fun IconTextSmallButtonForward(click: () -> Unit) {
-    PIconTextSmallButton(Res.drawable.double_arrow_right, text = stringResource(Res.string.forward), click = click)
-}
-
-@Composable
-fun IconTextSmallButtonQrCode(click: () -> Unit) {
-    PIconTextSmallButton(Res.drawable.qr_code, text = stringResource(Res.string.qrcode), click = click)
-}
-

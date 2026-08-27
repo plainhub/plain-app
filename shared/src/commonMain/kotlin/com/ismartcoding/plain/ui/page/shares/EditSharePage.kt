@@ -26,13 +26,12 @@ import com.ismartcoding.plain.features.share.ShareExpiry
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.edit_share_link
+import com.ismartcoding.plain.i18n.name
 import com.ismartcoding.plain.i18n.save
 import com.ismartcoding.plain.i18n.share_expired
 import com.ismartcoding.plain.i18n.share_expires_on
 import com.ismartcoding.plain.i18n.share_expiry
 import com.ismartcoding.plain.i18n.share_expiry_never
-import com.ismartcoding.plain.i18n.share_link
-import com.ismartcoding.plain.i18n.share_link_copied
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
@@ -42,13 +41,11 @@ import com.ismartcoding.plain.platform.shareText
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardTextField
-import com.ismartcoding.plain.ui.base.CopyIconButton
-import com.ismartcoding.plain.ui.base.IconTextSmallButtonForward
-import com.ismartcoding.plain.ui.base.IconTextSmallButtonQrCode
-import com.ismartcoding.plain.ui.base.IconTextSmallButtonShare
-import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.CornerCopyCard
+import com.ismartcoding.plain.ui.base.IconTextQrCodeButton
+import com.ismartcoding.plain.ui.base.IconTextForwardButton
+import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -138,6 +135,7 @@ fun EditSharePage(
             VerticalSpace(8.dp)
             ClipboardTextField(
                 value = name,
+                label = stringResource(Res.string.name),
                 placeholder = stringResource(Res.string.share_name_placeholder),
                 onValueChange = { name = it },
             )
@@ -155,20 +153,12 @@ fun EditSharePage(
                 }
             }
             VerticalSpace(8.dp)
-            PCard(horizontal = 0.dp) {
-                PListItem(title = link, action = {
-                    CopyIconButton(
-                        text = link,
-                        clipLabel = stringResource(Res.string.share_link),
-                        copiedMessage = stringResource(Res.string.share_link_copied),
-                    )
-                })
-            }
+            CornerCopyCard(text = link)
             VerticalSpace(16.dp)
             ActionButtons {
-                IconTextSmallButtonQrCode { showQr = true }
-                IconTextSmallButtonShare { shareText(link) }
-                IconTextSmallButtonForward { showForwardDialog = true }
+                IconTextQrCodeButton { showQr = true }
+                IconTextShareButton { shareText(link) }
+                IconTextForwardButton { showForwardDialog = true }
             }
             BottomSpace(paddingValues)
         }

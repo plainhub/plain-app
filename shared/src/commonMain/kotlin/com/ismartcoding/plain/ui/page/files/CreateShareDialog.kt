@@ -28,6 +28,7 @@ import com.ismartcoding.plain.i18n.cancel
 import com.ismartcoding.plain.i18n.close
 import com.ismartcoding.plain.i18n.create
 import com.ismartcoding.plain.i18n.create_share_link
+import com.ismartcoding.plain.i18n.name
 import com.ismartcoding.plain.i18n.share_created
 import com.ismartcoding.plain.i18n.share_expiry
 import com.ismartcoding.plain.i18n.share_expiry_1d
@@ -35,24 +36,21 @@ import com.ismartcoding.plain.i18n.share_expiry_1h
 import com.ismartcoding.plain.i18n.share_expiry_30d
 import com.ismartcoding.plain.i18n.share_expiry_7d
 import com.ismartcoding.plain.i18n.share_expiry_never
-import com.ismartcoding.plain.i18n.share_link
-import com.ismartcoding.plain.i18n.share_link_copied
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.shareText
+import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.ClipboardTextField
-import com.ismartcoding.plain.ui.base.CopyIconButton
-import com.ismartcoding.plain.ui.base.IconTextSmallButtonForward
-import com.ismartcoding.plain.ui.base.IconTextSmallButtonQrCode
-import com.ismartcoding.plain.ui.base.IconTextSmallButtonShare
-import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.CornerCopyCard
+import com.ismartcoding.plain.ui.base.IconTextQrCodeButton
+import com.ismartcoding.plain.ui.base.IconTextForwardButton
+import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.WebAddressBarQrDialog
@@ -117,20 +115,12 @@ fun CreateShareDialog(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     VerticalSpace(8.dp)
-                    PCard(horizontal = 0.dp) {
-                        PListItem(title = link, action = {
-                            CopyIconButton(
-                                text = link,
-                                clipLabel = stringResource(Res.string.share_link),
-                                copiedMessage = stringResource(Res.string.share_link_copied),
-                            )
-                        })
-                    }
+                    CornerCopyCard(text = link)
                     VerticalSpace(8.dp)
-                    BottomActionButtons {
-                        IconTextSmallButtonQrCode { showQr = true }
-                        IconTextSmallButtonShare { shareText(link) }
-                        IconTextSmallButtonForward { showForwardDialog = true }
+                    ActionButtons {
+                        IconTextQrCodeButton { showQr = true }
+                        IconTextShareButton { shareText(link) }
+                        IconTextForwardButton { showForwardDialog = true }
                     }
                 }
             },
@@ -155,6 +145,7 @@ fun CreateShareDialog(
                 VerticalSpace(8.dp)
                 ClipboardTextField(
                     value = name,
+                    label = stringResource(Res.string.name),
                     placeholder = stringResource(Res.string.share_name_placeholder),
                     onValueChange = { name = it },
                 )
