@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.lib.mdns
 
 /**
- * Collects candidate LAN (non-loopback, non-mobile-data) interfaces with their
- * primary IPv4 address string. Platform-specific: java.net on Android, getifaddrs on iOS.
+ * Collects candidate LAN interfaces with their primary IPv4 address string.
+ * Platform-specific: java.net on Android, getifaddrs on iOS.
  */
 internal expect fun candidateInterfaces(): List<Pair<MdnsIface, String>>
 
@@ -24,6 +24,17 @@ fun isMobileDataInterface(name: String): Boolean =
     name.startsWith("rmnet") || name.startsWith("ccmni") ||
         name.startsWith("v4-rmnet") || name.startsWith("v6-rmnet") ||
         name.startsWith("clat") || name.startsWith("v4-ccmni")
+
+/** Whether an Android network interface can carry LAN multicast discovery. */
+internal fun isMdnsInterfaceEligible(
+    name: String,
+    isUp: Boolean,
+    isLoopback: Boolean,
+    isPointToPoint: Boolean,
+    supportsMulticast: Boolean,
+): Boolean =
+    isUp && !isLoopback && !isPointToPoint && supportsMulticast &&
+        !isMobileDataInterface(name)
 
 /** Finds the interface whose subnet contains [senderIp]; falls back to first candidate. */
 internal fun findResponseIface(

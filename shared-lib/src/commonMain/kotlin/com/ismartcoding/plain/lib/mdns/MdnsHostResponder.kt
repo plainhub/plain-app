@@ -265,30 +265,31 @@ object MdnsHostResponder {
         val info = serviceInfo
         val candidates = candidateInterfaces()
         if (candidates.isEmpty()) return
-        val ips = candidates.map { it.second }.filter { it.isNotEmpty() }
-        if (ips.isEmpty()) return
+        log("announce ${info?.serviceType ?: hostname} -> $MDNS_GROUP:$MDNS_PORT on ${candidates.size} iface(s)")
+        candidates.forEach { (iface, ip) ->
+            val announcement = buildAnnouncement(info, hostname, ip) ?: return@forEach
+            MdnsPacketCapture.recordOut(ip, MDNS_PORT, MDNS_GROUP, MDNS_PORT, announcement)
+            runCatching {
+                s.setOutgoingInterface(iface.name)
+                s.send(announcement, MDNS_GROUP, MDNS_PORT)
+            }
+        }
+    }
 
-        val announcement = if (info != null) {
+    /** Builds an announcement containing only the address reachable on its outgoing interface. */
+    internal fun buildAnnouncement(info: MdnsServiceInfo?, hostname: String, ip: String): ByteArray? {
+        if (ip.isEmpty()) return null
+        return if (info != null) {
             MdnsServiceResponseBuilder.buildResponseIfMatch(
                 MdnsPacketCodec.buildPtrQuery(info.serviceType),
-                info.copy(ips = ips),
+                info.copy(ips = listOf(ip)),
             )?.bytes
         } else {
             MdnsPacketCodec.buildResponseIfMatch(
                 MdnsPacketCodec.buildQuery(hostname, MdnsPacketCodec.TYPE_A),
                 hostname,
-                ips,
+                listOf(ip),
             )
-        } ?: return
-
-        log("announce ${info?.serviceType ?: hostname} -> $MDNS_GROUP:$MDNS_PORT on ${candidates.size} iface(s)")
-        val srcIp = candidates.first().second
-        MdnsPacketCapture.recordOut(srcIp, MDNS_PORT, MDNS_GROUP, MDNS_PORT, announcement)
-        candidates.forEach { (iface, _) ->
-            runCatching {
-                s.setOutgoingInterface(iface.name)
-                s.send(announcement, MDNS_GROUP, MDNS_PORT)
-            }
         }
     }
 

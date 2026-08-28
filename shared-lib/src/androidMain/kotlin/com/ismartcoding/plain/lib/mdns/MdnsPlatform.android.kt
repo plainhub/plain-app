@@ -16,8 +16,17 @@ internal actual fun createMdnsSocket(): MdnsSocket = JvmMdnsSocket()
 internal actual fun candidateInterfaces(): List<Pair<MdnsIface, String>> =
     runCatching {
         NetworkInterface.getNetworkInterfaces()?.asSequence()
-            ?.filter { it.isUp && !it.isLoopback }
-            ?.filterNot { isMobileDataInterface(it.name) }
+            ?.filter { iface ->
+                runCatching {
+                    isMdnsInterfaceEligible(
+                        name = iface.name,
+                        isUp = iface.isUp,
+                        isLoopback = iface.isLoopback,
+                        isPointToPoint = iface.isPointToPoint,
+                        supportsMulticast = iface.supportsMulticast(),
+                    )
+                }.getOrDefault(false)
+            }
             ?.mapNotNull { iface ->
                 val ip = iface.inetAddresses.asSequence()
                     .filterIsInstance<Inet4Address>()

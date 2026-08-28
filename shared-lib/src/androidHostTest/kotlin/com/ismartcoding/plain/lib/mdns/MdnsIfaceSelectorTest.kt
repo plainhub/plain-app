@@ -3,6 +3,7 @@ package com.ismartcoding.plain.lib.mdns
 import com.ismartcoding.plain.lib.mdns.ipToInt
 import com.ismartcoding.plain.lib.mdns.isMobileDataInterface
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.net.DatagramPacket
@@ -63,6 +64,20 @@ class MdnsIfaceSelectorTest {
 
     @Test fun `dummy0 is not mobile data`() = assertTrue(!isMobileDataInterface("dummy0"))
     @Test fun `v4-wlan0 is not mobile data`() = assertTrue(!isMobileDataInterface("v4-wlan0"))
+
+    // ── isMdnsInterfaceEligible ─────────────────────────────────────────────
+
+    @Test fun `active multicast wifi interface is eligible`() =
+        assertTrue(isMdnsInterfaceEligible("wlan0", true, false, false, true))
+
+    @Test fun `point to point tunnel interface is not eligible`() =
+        assertFalse(isMdnsInterfaceEligible("tun0", true, false, true, true))
+
+    @Test fun `interface without multicast support is not eligible`() =
+        assertFalse(isMdnsInterfaceEligible("dummy0", true, false, false, false))
+
+    @Test fun `mobile data interface is not eligible`() =
+        assertFalse(isMdnsInterfaceEligible("rmnet_data0", true, false, false, true))
 
     // ── helpers ───────────────────────────────────────────────────────────────
 
