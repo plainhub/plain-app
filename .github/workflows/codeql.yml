@@ -102,7 +102,7 @@ jobs:
       shell: bash
       run: |
         chmod +x gradlew
-        ./gradlew :app:compileGithubDebugKotlin :lib:compileDebugKotlin --no-daemon
+        ./gradlew :app:compileGithubDebugKotlin :shared:compileAndroidMain --no-daemon
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
