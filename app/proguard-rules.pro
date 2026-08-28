@@ -65,6 +65,13 @@
 -keepnames class com.ismartcoding.plain.data.** { *; }
 -keepnames class com.ismartcoding.plain.enums.** { *; }
 
+# ===== ASN.1 / X.509 self-signed certificate generation =====
+# Asn1DerEncoder/Asn1BerParser drive (de)serialization purely via the
+# @Asn1Class/@Asn1Field RUNTIME annotations, which are invisible to R8.
+# Without this rule R8 strips the annotations and HTTPS keystore generation
+# crashes on fresh installs with "<class> not annotated with <annotation>".
+-keep class com.ismartcoding.plain.lib.apk.cert.** { *; }
+
 # ===== Google Tink =====
 -keep class com.google.crypto.tink.** { *; }
 -dontwarn com.google.crypto.tink.**
