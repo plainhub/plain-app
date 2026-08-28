@@ -2,7 +2,6 @@ package com.ismartcoding.plain.lib.kgraphql.schema.model
 
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kdataloader.factories.DataLoaderFactory
-import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
 
 interface PropertyDef<T> : Depreciable, DescribedDef {
@@ -40,14 +39,15 @@ interface PropertyDef<T> : Depreciable, DescribedDef {
     ): PropertyDef<T>
 
     open class Kotlin<T : Any, R> (
-        val kProperty: KProperty1<T, R>,
+        name : String,
+        val accessor: (T) -> R,
         val returnType: KType? = null,
         override val description: String? = null,
         override val isDeprecated: Boolean = false,
         override val deprecationReason: String? = null,
         override val accessRule : ((T?, Context) -> Exception?)? = null,
         val isIgnored : Boolean = false
-    ) : Definition(kProperty.name), PropertyDef<T>
+    ) : Definition(name), PropertyDef<T>
 
     class Union<T> (
         name : String,

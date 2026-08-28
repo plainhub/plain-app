@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.lib.kgraphql.schema.model
 
 import com.ismartcoding.plain.lib.kgraphql.defaultKQLTypeName
+import com.ismartcoding.plain.lib.kgraphql.generated.GeneratedSchemaRegistry
 import com.ismartcoding.plain.lib.kgraphql.schema.SchemaException
 import com.ismartcoding.plain.lib.kgraphql.schema.builtin.BUILT_IN_TYPE
 import com.ismartcoding.plain.lib.kgraphql.schema.directive.Directive
@@ -44,13 +45,15 @@ data class MutableSchemaDefinition (
     private val mutations: ArrayList<MutationDef<*>> = arrayListOf(),
     private val subscriptions: ArrayList<SubscriptionDef<*>> = arrayListOf(),
         private val enums: ArrayList<TypeDef.Enumeration<*>> = arrayListOf(
+        // Introspection-reserved names — must NOT be derived from
+        // KClass.simpleName (obfuscated in release builds).
         TypeDef.Enumeration(
-            "__" + TypeKind::class.defaultKQLTypeName(),
+            "__TypeKind",
             TypeKind::class,
             enumValues<TypeKind>().map { EnumValueDef(it) }
         ),
         TypeDef.Enumeration(
-            "__" + DirectiveLocation::class.defaultKQLTypeName(),
+            "__DirectiveLocation",
             DirectiveLocation::class,
             enumValues<DirectiveLocation>().map { EnumValueDef(it) }
         )
@@ -99,7 +102,9 @@ data class MutableSchemaDefinition (
         }
 
         if (compiledObjects.none { it.kClass == member }) {
-            compiledObjects.add(TypeDef.Object(member.defaultKQLTypeName(), member))
+            // Prefer the KSP-fixed name; simpleName is unsafe under obfuscation.
+            val name = GeneratedSchemaRegistry.types[member]?.name ?: member.defaultKQLTypeName()
+            compiledObjects.add(TypeDef.Object(name, member))
         }
     }
 
@@ -153,33 +158,33 @@ data class MutableSchemaDefinition (
     }
 }
 
+// Introspection types use spec-reserved names and accessor lambdas — no
+// KProperty1 handles, no simpleName (both break under R8 obfuscation).
 private fun create__SchemaDefinition() = TypeDSL(emptyList(), __Schema::class).apply {
-    // KSP-only: explicitly declare all __Schema properties with typeOf<>() return
-    // types. No memberPropertiesList() reflection (iOS-safe).
-    property(__Schema::types, typeOf<List<__Type>>())
-    property(__Schema::queryType, typeOf<__Type>())
-    property(__Schema::mutationType, typeOf<__Type?>())
-    property(__Schema::subscriptionType, typeOf<__Type?>())
-    property(__Schema::directives, typeOf<List<__Directive>>())
+    name = "__Schema"
+    property("types", typeOf<List<__Type>>(), accessor = { it.types })
+    property("queryType", typeOf<__Type>(), accessor = { it.queryType })
+    property("mutationType", typeOf<__Type?>(), accessor = { it.mutationType })
+    property("subscriptionType", typeOf<__Type?>(), accessor = { it.subscriptionType })
+    property("directives", typeOf<List<__Directive>>(), accessor = { it.directives })
 }.toKQLObject()
 
 private fun create__TypeDefinition() = TypeDSL(emptyList(), __Type::class).apply {
-    // KSP-only: explicitly declare all __Type properties with typeOf<>() return
-    // types. No memberPropertiesList() reflection (iOS-safe).
-    property(__Type::kind, typeOf<TypeKind>())
-    property(__Type::name, typeOf<String?>())
-    property(__Type::description, typeOf<String>())
-    property(__Type::fields, typeOf<List<__Field>?>())
-    property(__Type::interfaces, typeOf<List<__Type>?>())
-    property(__Type::possibleTypes, typeOf<List<__Type>?>())
-    property(__Type::enumValues, typeOf<List<__EnumValue>?>())
-    property(__Type::inputFields, typeOf<List<__InputValue>?>())
-    property(__Type::ofType, typeOf<__Type?>())
+    name = "__Type"
+    property("kind", typeOf<TypeKind>(), accessor = { it.kind })
+    property("name", typeOf<String?>(), accessor = { it.name })
+    property("description", typeOf<String>(), accessor = { it.description })
+    property("fields", typeOf<List<__Field>?>(), accessor = { it.fields })
+    property("interfaces", typeOf<List<__Type>?>(), accessor = { it.interfaces })
+    property("possibleTypes", typeOf<List<__Type>?>(), accessor = { it.possibleTypes })
+    property("enumValues", typeOf<List<__EnumValue>?>(), accessor = { it.enumValues })
+    property("inputFields", typeOf<List<__InputValue>?>(), accessor = { it.inputFields })
+    property("ofType", typeOf<__Type?>(), accessor = { it.ofType })
     // Transformations apply to the declared properties above (matched by name).
-    transformation(__Type::fields, "includeDeprecated") { fields: List<__Field>?, includeDeprecated: Boolean? ->
+    transformation("fields", "includeDeprecated") { fields: List<__Field>?, includeDeprecated: Boolean? ->
         if (includeDeprecated == true) fields else fields?.filterNot { it.isDeprecated }
     }
-    transformation(__Type::enumValues, "includeDeprecated") { enumValues: List<__EnumValue>?, includeDeprecated: Boolean? ->
+    transformation("enumValues", "includeDeprecated") { enumValues: List<__EnumValue>?, includeDeprecated: Boolean? ->
         if (includeDeprecated == true) enumValues else enumValues?.filterNot { it.isDeprecated }
     }
 }.toKQLObject()
@@ -188,41 +193,37 @@ private fun create__DirectiveDefinition() = TypeDSL(
     emptyList(),
     __Directive::class
 ).apply {
-    // KSP-only: explicitly declare all __Directive properties (inherited from
-    // __Described + declared in __Directive) with typeOf<>() return types.
-    property(__Directive::name, typeOf<String>())
-    property(__Directive::description, typeOf<String?>())
-    property(__Directive::locations, typeOf<List<DirectiveLocation>>())
-    property(__Directive::args, typeOf<List<__InputValue>>())
+    name = "__Directive"
+    property("name", typeOf<String>(), accessor = { it.name })
+    property("description", typeOf<String?>(), accessor = { it.description })
+    property("locations", typeOf<List<DirectiveLocation>>(), accessor = { it.locations })
+    property("args", typeOf<List<__InputValue>>(), accessor = { it.args })
 }.toKQLObject()
 
 private fun create__FieldDefinition() = TypeDSL(emptyList(), __Field::class).apply {
-    // KSP-only: explicitly declare all __Field properties (inherited from
-    // __Described + Depreciable + declared in __Field) with typeOf<>() return types.
-    property(__Field::name, typeOf<String>())
-    property(__Field::description, typeOf<String?>())
-    property(__Field::type, typeOf<__Type>())
-    property(__Field::args, typeOf<List<__InputValue>>())
-    property(__Field::isDeprecated, typeOf<Boolean>())
-    property(__Field::deprecationReason, typeOf<String?>())
+    name = "__Field"
+    property("name", typeOf<String>(), accessor = { it.name })
+    property("description", typeOf<String?>(), accessor = { it.description })
+    property("type", typeOf<__Type>(), accessor = { it.type })
+    property("args", typeOf<List<__InputValue>>(), accessor = { it.args })
+    property("isDeprecated", typeOf<Boolean>(), accessor = { it.isDeprecated })
+    property("deprecationReason", typeOf<String?>(), accessor = { it.deprecationReason })
 }.toKQLObject()
 
 private fun create__InputValueDefinition() = TypeDSL(emptyList(), __InputValue::class).apply {
-    // KSP-only: explicitly declare all __InputValue properties (inherited from
-    // __Described + declared in __InputValue) with typeOf<>() return types.
-    property(__InputValue::name, typeOf<String>())
-    property(__InputValue::description, typeOf<String?>())
-    property(__InputValue::type, typeOf<__Type>())
-    property(__InputValue::defaultValue, typeOf<String?>())
+    name = "__InputValue"
+    property("name", typeOf<String>(), accessor = { it.name })
+    property("description", typeOf<String?>(), accessor = { it.description })
+    property("type", typeOf<__Type>(), accessor = { it.type })
+    property("defaultValue", typeOf<String?>(), accessor = { it.defaultValue })
 }.toKQLObject()
 
 private fun create__EnumValueDefinition() = TypeDSL(emptyList(), __EnumValue::class).apply {
-    // KSP-only: explicitly declare all __EnumValue properties (inherited from
-    // __Described + Depreciable) with typeOf<>() return types.
-    property(__EnumValue::name, typeOf<String>())
-    property(__EnumValue::description, typeOf<String?>())
-    property(__EnumValue::isDeprecated, typeOf<Boolean>())
-    property(__EnumValue::deprecationReason, typeOf<String?>())
+    name = "__EnumValue"
+    property("name", typeOf<String>(), accessor = { it.name })
+    property("description", typeOf<String?>(), accessor = { it.description })
+    property("isDeprecated", typeOf<Boolean>(), accessor = { it.isDeprecated })
+    property("deprecationReason", typeOf<String?>(), accessor = { it.deprecationReason })
 }.toKQLObject()
 
 private fun <T> List<T>.containsAny(vararg elements: T) = elements.filter { this.contains(it) }.any()

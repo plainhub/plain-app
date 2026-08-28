@@ -49,9 +49,6 @@ kotlin {
 
         androidMain.dependencies {
             api(libs.androidx.core.ktx)
-            // kotlin-reflect provides kotlin.reflect.full.createType used by
-            // the Android ReflectionBridge actual for createKType.
-            implementation(libs.kotlin.reflect)
         }
 
         commonTest.dependencies {

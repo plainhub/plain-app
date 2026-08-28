@@ -89,11 +89,6 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.okhttp)
             implementation(libs.tink.android)
-            // kotlin-reflect provides kotlin.reflect.full (memberProperties,
-            // isSubclassOf, etc.) used by the Android ReflectionBridge actual.
-            // Not needed in commonMain — the stdlib provides the base
-            // KClass/KProperty1/KType interfaces including KCallable.returnType.
-            implementation(libs.kotlin.reflect)
             implementation(libs.androidx.exifinterface)
             implementation(libs.androidx.appcompat)
             implementation(libs.androidx.datastore.preferences)
@@ -181,6 +176,8 @@ dependencies {
     add("kspIosSimulatorArm64", project(":kgraphql-ksp"))
     add("androidHostTestImplementation", kotlin("test"))
     add("androidHostTestImplementation", libs.junit)
+    // Test-only: KGraphQLTest synthesizes accessor lambdas via memberProperties
+    add("androidHostTestImplementation", libs.kotlin.reflect)
 }
 
 compose.resources {

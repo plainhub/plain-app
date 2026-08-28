@@ -1,24 +1,22 @@
 package com.ismartcoding.plain.lib.kgraphql.generated
 
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
 
 /**
  * Compile-time-fixed description of a single GraphQL field.
  *
- * [kProperty] is a `::foo` reference captured at code-generation time. On iOS
- * (Kotlin/Native) property references support `.get()` and `.returnType`
- * without `kotlin.reflect.full`, so reading field values and types is
- * reflection-free. The return type is obtained at runtime via
- * `kProperty.returnType` (available in common Kotlin).
+ * [accessor] is a KSP-generated lambda `{ it: T -> it.foo }` — a plain
+ * method call on every platform. No `KProperty1` handle is kept: on the JVM
+ * `KProperty1.get()` resolves through kotlin-reflect metadata by name and
+ * signature, which breaks under R8 obfuscation.
  *
  * @param T The parent (owner) type.
  * @param R The field's Kotlin return type.
  */
 data class FieldDescriptor<T : Any, R>(
     val name: String,
-    val kProperty: KProperty1<T, R>,
+    val accessor: (T) -> R,
     val returnType: KType,
     val description: String? = null,
     val isIgnored: Boolean = false,

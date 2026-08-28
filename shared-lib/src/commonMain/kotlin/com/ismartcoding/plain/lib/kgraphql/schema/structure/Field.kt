@@ -72,7 +72,7 @@ sealed class Field : __Field {
         val transformation : Transformation<T, R>?
     ) : Field(){
 
-        val kProperty = kql.kProperty
+        val accessor: (T) -> R = kql.accessor
 
         override val name: String = kql.name
 

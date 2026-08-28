@@ -227,6 +227,8 @@ interface Type : __Type {
         typenameResolver: Field,
         override val possibleTypes: List<Type>
     ) : ComplexType(listOf(typenameResolver)) {
+        val members: Set<KClass<*>> = kqlType.members
+
         override val kClass: KClass<*>? = null
 
         override val kind: TypeKind = TypeKind.UNION

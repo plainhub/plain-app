@@ -19,7 +19,6 @@ import com.ismartcoding.plain.lib.kdataloader.DataLoader
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.ExecutionException
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
-import kotlin.reflect.KProperty1
 
 
 @Suppress("UNCHECKED_CAST") // For valid structure there is no risk of ClassCastException
@@ -239,10 +238,11 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
             when (field) {
                 is Field.Kotlin<*, *> -> {
                     val rawValue = try {
-                        (field.kProperty as KProperty1<T, *>).get(parentValue)
+                        @Suppress("UNCHECKED_CAST")
+                        (field.accessor as (T) -> Any?).invoke(parentValue)
                     } catch (e: IllegalArgumentException) {
                         throw ExecutionException(
-                            "Couldn't retrieve '${field.kProperty.name}' from class ${parentValue}}",
+                            "Couldn't retrieve '${field.name}' from class ${parentValue}}",
                             node,
                             e
                         )

@@ -19,7 +19,6 @@ import com.ismartcoding.plain.lib.kgraphql.schema.structure.Type
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.*
 import com.ismartcoding.plain.lib.kdataloader.DataLoader
-import kotlin.reflect.KProperty1
 
 
 class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
@@ -266,7 +265,8 @@ class DataLoaderPreparedRequestExecutor(val schema: DefaultSchema) : RequestExec
         when (field) {
             is Field.Kotlin<*, *> -> {
                 val rawValue = try {
-                    (field.kProperty as KProperty1<T, *>).get(parentValue)
+                    @Suppress("UNCHECKED_CAST")
+                    (field.accessor as (T) -> Any?).invoke(parentValue)
                 } catch(e: NullPointerException) {
                     throw e
                 }

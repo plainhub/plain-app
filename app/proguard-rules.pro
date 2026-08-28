@@ -51,19 +51,21 @@
 -keep class kotlinx.coroutines.** { *; }
 -dontwarn io.ktor.**
 
-# ===== App GraphQL model / enum classes =====
-# kgraphql was migrated to KSP-generated reflection-free descriptors, so R8 may
-# freely shrink/optimize/obfuscate ordinary app code. The ONLY remaining runtime
-# reflection hook is `defaultKQLTypeName()` (TypeDSL / EnumDSL / SchemaCompilation)
-# which falls back to the RUNTIME `KClass.simpleName` to derive a GraphQL type name
-# when a type is not explicitly registered. Obfuscating those class names would
-# corrupt the published schema, so preserve the names — but still allow R8 to
-# shrink unused members (the class members themselves are reached directly via
-# KSP `::class` / `::property` references or kotlinx.serialization serializers,
-# and those enlistment rules for serialization are listed above).
--keepnames class com.ismartcoding.plain.httpserver.models.** { *; }
--keepnames class com.ismartcoding.plain.data.** { *; }
--keepnames class com.ismartcoding.plain.enums.** { *; }
+# ===== kgraphql engine + app GraphQL models =====
+# Fully reflection-free since the KSP accessor-lambda migration: field access,
+# type names, and unions are all compile-time fixed; the last kotlin-reflect
+# dependency was removed. R8 may shrink/optimize/obfuscate everything here.
+
+# ===== Enum names (cross-process data contracts) =====
+# Enum class names and constant names ARE data contracts and cannot be fixed at
+# compile time:
+#  - GraphQL enum type names default to KClass.simpleName (EnumDSL)
+#  - GraphQL enum VALUE names are matched via runtime `it.name` (nameToValue),
+#    including introspection TypeKind/DirectiveLocation ("OBJECT", "SCALAR", ...)
+#  - `Enum.valueOf(str)` lookups on protocol/persisted keys:
+#    DeviceType (mDNS TXT), AppFeatureType (Preferences), iOS pick callbacks
+-keepnames enum com.ismartcoding.plain.** { *; }
+-keepclassmembers enum com.ismartcoding.plain.** { <fields>; }
 
 # ===== ASN.1 / X.509 self-signed certificate generation =====
 # Asn1DerEncoder/Asn1BerParser drive (de)serialization purely via the

@@ -25,7 +25,8 @@ import java.io.OutputStreamWriter
  * in commonMain.
  *
  * Generated code uses only KMP-safe constructs:
- *  - `ClassName::propertyName` references (KProperty1.get() works on iOS)
+ *  - accessor lambdas `{ it: ClassName -> it.propertyName }` — plain method
+ *    calls, reflection-free and R8-obfuscation-safe on every platform
  *  - `KClass::class` references
  *  - `kotlinx.serialization` serializers (resolved via reified inline at call site)
  *
@@ -200,10 +201,11 @@ class GraphQLSymbolProcessor(
             |import kotlin.reflect.typeOf
             |
             |/**
-            | * KSP-generated descriptor for [$classRef]. Do not edit — regenerated on every build.
-            | * Replaces runtime reflection (`memberProperties`, `isPublicVisibility`) with
-            | * compile-time-fixed `::foo` property references that work on iOS (Kotlin/Native).
-            | */
+        | * KSP-generated descriptor for [$classRef]. Do not edit — regenerated on every build.
+        | * Replaces runtime reflection (`memberProperties`, `isPublicVisibility`) with
+        | * compile-time-fixed accessor lambdas that work on iOS (Kotlin/Native) and
+        | * survive R8 obfuscation on Android.
+        | */
             |object $descriptorObject {
             |    val descriptor: TypeDescriptor<$classRef> = TypeDescriptor(
             |        kClass = $classRef::class,
@@ -799,7 +801,9 @@ class GraphQLSymbolProcessor(
 
     private fun buildFieldDescriptor(f: FieldInfo, classRef: String): String {
         val descArg = f.description?.let { "\"$it\"" } ?: "null"
-        return """FieldDescriptor(name = "${f.graphQLName}", kProperty = $classRef::${f.name}, returnType = typeOf<${f.kotlinTypeString}>(), description = $descArg, isIgnored = ${f.isIgnored})"""
+        // Accessor lambda compiles to a plain method call — survives R8
+        // obfuscation, unlike KProperty1 name/signature resolution.
+        return """FieldDescriptor(name = "${f.graphQLName}", accessor = { it: $classRef -> it.${f.name} }, returnType = typeOf<${f.kotlinTypeString}>(), description = $descArg, isIgnored = ${f.isIgnored})"""
     }
 
     /**

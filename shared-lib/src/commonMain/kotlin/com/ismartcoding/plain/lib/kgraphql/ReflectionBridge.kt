@@ -5,17 +5,14 @@ import kotlin.reflect.KType
 import kotlin.reflect.KTypeProjection
 
 /**
- * Bridge for JVM-only reflection operations (kotlin.reflect.full).
+ * Bridge for the single remaining KType materialization need: `Type.toKType()`
+ * uses it for `VariablesJson` variable resolution. All reflection
+ * (memberProperties, isSubclassOf, isSealed, callConstructor, createType,
+ * KProperty1 handles) has been replaced by KSP-generated descriptors and
+ * accessor lambdas on every platform — including the JVM.
  *
- * After the KSP2 migration, the only reflection operation still required at
- * runtime is [createKType] — used by `Type.toKType()` to materialize a [KType]
- * for `VariablesJson` variable resolution. All other reflection
- * (`memberProperties`, `isSubclassOf`, `isSealed`, `callConstructor`, etc.)
- * has been replaced by KSP-generated descriptors.
- *
- * On Android, [createKType] delegates to `kotlin.reflect.full.createType`.
- * On iOS, [createKType] constructs a lightweight anonymous [KType] that
- * captures the [KClass] classifier and projection info — sufficient for
- * `KType.kClass()` and `KType.arguments` access used by VariablesJson.
+ * Both actuals construct a lightweight anonymous [KType] that captures the
+ * [KClass] classifier and projection info — sufficient for `KType.kClass()`
+ * and `KType.arguments` access used by VariablesJson.
  */
 internal expect fun KClass<*>.createKType(args: List<KTypeProjection>, nullable: Boolean): KType

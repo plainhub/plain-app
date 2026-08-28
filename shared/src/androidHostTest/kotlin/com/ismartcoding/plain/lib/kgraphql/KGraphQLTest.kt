@@ -53,8 +53,9 @@ class KGraphQLTest {
     /**
      * Registers [T] as a GraphQL Object type with all its public properties
      * auto-discovered via JVM reflection. Tests run on androidHostTest (JVM)
-     * where kotlin.reflect.full is available, so we can use reflection here
-     * without affecting iOS. Production code uses @GraphQLType + KSP instead.
+     * where kotlin.reflect.full is available, so we can use reflection here to
+     * synthesize accessor lambdas without affecting iOS. Production code uses
+     * @GraphQLType + KSP instead.
      */
     private inline fun <reified T : Any> SchemaBuilder.typeWithProperties(
         noinline block: TypeDSL<T>.() -> Unit = {}
@@ -62,7 +63,11 @@ class KGraphQLTest {
         type<T> {
             @Suppress("UNCHECKED_CAST")
             T::class.memberProperties.forEach { prop ->
-                property(prop as KProperty1<T, *>, prop.returnType)
+                property(
+                    prop.name,
+                    prop.returnType,
+                    { receiver: T -> (prop as KProperty1<T, *>).get(receiver) as Any? }
+                )
             }
             block()
         }
@@ -76,7 +81,7 @@ class KGraphQLTest {
         inputType<T> {
             @Suppress("UNCHECKED_CAST")
             T::class.memberProperties.forEach { prop ->
-                property(prop as KProperty1<T, *>, prop.returnType)
+                property(prop.name, prop.returnType)
             }
         }
     }
@@ -479,7 +484,7 @@ class KGraphQLTest {
                 resolver { -> Product("p1", 9999) }
             }
             typeWithProperties<Product> {
-                transformation(Product::priceCents, "divisor") { cents: Int, divisor: Int ->
+                transformation("priceCents", "divisor") { cents: Int, divisor: Int ->
                     cents / divisor
                 }
             }
@@ -512,12 +517,12 @@ class KGraphQLTest {
                 fields = listOf(
                     com.ismartcoding.plain.lib.kgraphql.generated.FieldDescriptor(
                         name = "id",
-                        kProperty = SynthType::id,
+                        accessor = { it: SynthType -> it.id },
                         returnType = kotlin.reflect.typeOf<String>()
                     ),
                     com.ismartcoding.plain.lib.kgraphql.generated.FieldDescriptor(
                         name = "label",
-                        kProperty = SynthType::label,
+                        accessor = { it: SynthType -> it.label },
                         returnType = kotlin.reflect.typeOf<String>()
                     )
                 )

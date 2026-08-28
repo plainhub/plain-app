@@ -2,12 +2,12 @@ package com.ismartcoding.plain.lib.kgraphql.schema.dsl
 
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.schema.model.PropertyDef
-import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
 
 
 class KotlinPropertyDSL<T : Any, R> (
-        private val kProperty: KProperty1<T, R>,
+        private val name: String,
+        private val accessor: (T) -> R,
         private val returnType: KType? = null,
         block : KotlinPropertyDSL<T, R>.() -> Unit
 ) : LimitedAccessItemDSL<T>(){
@@ -28,7 +28,8 @@ class KotlinPropertyDSL<T : Any, R> (
     }
 
     fun toKQLProperty() = PropertyDef.Kotlin (
-            kProperty = kProperty,
+            name = name,
+            accessor = accessor,
             returnType = returnType,
             description = description,
             isDeprecated = isDeprecated,

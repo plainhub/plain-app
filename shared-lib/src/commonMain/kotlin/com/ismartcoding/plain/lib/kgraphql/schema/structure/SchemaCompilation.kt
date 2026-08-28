@@ -26,7 +26,6 @@ import com.ismartcoding.plain.lib.kgraphql.schema.model.TypeDef
 import com.ismartcoding.plain.lib.kgraphql.kClass
 import kotlin.collections.get
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
 
 @Suppress("UNCHECKED_CAST")
@@ -223,7 +222,8 @@ class SchemaCompilation(
     }
 
     private suspend fun handleRawType(kClass: KClass<*>, typeCategory: TypeCategory) : Type {
-        when (val type = unions.find { it.name == kClass.simpleName }) {
+        // KClass-based lookup — name/simpleName matching is unsafe under R8 obfuscation.
+        when (val type = unions.find { kClass in it.members }) {
             null -> Unit
             else -> return type
         }
@@ -281,17 +281,16 @@ class SchemaCompilation(
         queryTypeProxies[kClass] = typeProxy
 
         val allKotlinProperties = effectiveDefs.fold(emptyMap<String, PropertyDef.Kotlin<*, *>>()) { acc, def ->
-            acc + def.kotlinProperties.mapKeys { (property) -> property.name }
+            acc + def.kotlinProperties
         }
-        val allTransformations= effectiveDefs.fold(emptyMap<String, Transformation<*, *>>()) { acc, def ->
-            acc + def.transformations.mapKeys { (property) -> property.name }
+        val allTransformations = effectiveDefs.fold(emptyMap<String, Transformation<*, *>>()) { acc, def ->
+            acc + def.transformations
         }
 
         // KSP-only: properties must be explicitly declared via @GraphQLType descriptor or DSL.
         // No memberPropertiesList()/isPublicVisibility() reflection.
         val kotlinFields = allKotlinProperties.map { (name, kqlProperty) ->
-            handleKotlinProperty(
-                kProperty = kqlProperty.kProperty,
+            handleKotlinProperty<Any, Any?>(
                 kqlProperty = kqlProperty,
                 transformation = allTransformations[name]
             )
@@ -343,9 +342,9 @@ class SchemaCompilation(
 
         // KSP-only: properties must be explicitly declared via @GraphQLInput descriptor or DSL.
         // No memberPropertiesList() reflection.
-        val fields = inputObjectDef.kotlinProperties.map { property ->
-            handleKotlinInputProperty(property, inputObjectDef.returnTypes[property.name]
-                ?: throw SchemaException("Missing return type for input property '${property.name}' on ${kClass.simpleName}. " +
+        val fields = inputObjectDef.properties.map { name ->
+            handleKotlinInputProperty(name, inputObjectDef.returnTypes[name]
+                ?: throw SchemaException("Missing return type for input property '$name' on ${inputObjectDef.name}. " +
                     "Ensure @GraphQLInput descriptor is generated."))
         }
 
@@ -370,9 +369,13 @@ class SchemaCompilation(
             ?: return TypeDef.Object(kClass.defaultKQLTypeName(), kClass)
 
         val kClassAny = desc.kClass as KClass<Any>
-        val properties: Map<KProperty1<Any, *>, PropertyDef.Kotlin<Any, *>> = desc.fields.map { f ->
-            val prop = f.kProperty as KProperty1<Any, *>
-            prop to PropertyDef.Kotlin(prop, f.returnType, f.description)
+        val properties: Map<String, PropertyDef.Kotlin<Any, *>> = desc.fields.map { f ->
+            f.name to PropertyDef.Kotlin(
+                name = f.name,
+                accessor = f.accessor as (Any) -> Any?,
+                returnType = f.returnType,
+                description = f.description
+            )
         }.toMap()
 
         return TypeDef.Object(
@@ -396,13 +399,13 @@ class SchemaCompilation(
             ?: return TypeDef.Input(kClass.defaultKQLTypeName(), kClass)
 
         val kClassAny = desc.kClass as KClass<Any>
-        val properties: List<KProperty1<Any, *>> = desc.fields.map { it.kProperty as KProperty1<Any, *> }
+        val properties: List<String> = desc.fields.map { it.name }
         val returnTypes: Map<String, KType> = desc.fields.associate { it.name to it.returnType }
 
         return TypeDef.Input(
             name = desc.name,
             kClass = kClassAny,
-            kotlinProperties = properties,
+            properties = properties,
             returnTypes = returnTypes
         )
     }
@@ -445,30 +448,27 @@ class SchemaCompilation(
         return unionType
     }
 
-    private suspend fun handleKotlinInputProperty(kProperty: KProperty1<*, *>, returnType: KType) : InputValue<*> {
+    private suspend fun handleKotlinInputProperty(name: String, returnType: KType) : InputValue<*> {
         val type = handlePossiblyWrappedType(returnType, TypeCategory.INPUT)
-        return InputValue(InputValueDef(returnType.kClass(), kProperty.name), type)
+        return InputValue(InputValueDef(returnType.kClass(), name), type)
     }
 
     private suspend fun <T : Any, R> handleKotlinProperty (
-        kProperty: KProperty1<T, R>,
-        kqlProperty: PropertyDef.Kotlin<*, *>?,
+        kqlProperty: PropertyDef.Kotlin<*, *>,
         transformation: Transformation<*, *>?
     ) : Field.Kotlin<*, *> {
         // KSP-only: returnType is always provided by KSP descriptor or DSL.
         // No returnTypeBridge() reflection needed.
-        val kType = kqlProperty!!.returnType!!
+        val kType = kqlProperty.returnType!!
         val returnType = handlePossiblyWrappedType(kType, TypeCategory.QUERY)
         val inputValues = if(transformation != null){
-            handleInputValues("$kProperty transformation", transformation.transformation, emptyList())
+            handleInputValues("'${kqlProperty.name}' transformation", transformation.transformation, emptyList())
         } else {
             emptyList()
         }
 
-        val actualKqlProperty = kqlProperty ?: PropertyDef.Kotlin(kProperty)
-
         return Field.Kotlin (
-                kql = actualKqlProperty as PropertyDef.Kotlin<T, R>,
+                kql = kqlProperty as PropertyDef.Kotlin<T, R>,
                 returnType = returnType,
                 arguments = inputValues,
                 transformation = transformation as Transformation<T, R>?

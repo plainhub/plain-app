@@ -3,7 +3,6 @@ package com.ismartcoding.plain.lib.kgraphql.schema.model
 import com.ismartcoding.plain.lib.kgraphql.schema.scalar.ScalarCoercion
 import com.ismartcoding.plain.lib.kgraphql.schema.structure.Type
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty1
 import kotlin.reflect.KType
 
 interface TypeDef {
@@ -21,11 +20,13 @@ interface TypeDef {
     class Object<T : Any> (
             name : String,
             override val kClass: KClass<T>,
-            val kotlinProperties: Map<KProperty1<T, *>, PropertyDef.Kotlin<T, *>> = emptyMap(),
+            // Property name -> property definition. KSP-generated accessors replace
+            // KProperty1 handles — reflection-free on every platform.
+            val kotlinProperties: Map<String, PropertyDef.Kotlin<T, *>> = emptyMap(),
             val extensionProperties : List<PropertyDef.Function<T, *>> = emptyList(),
             val dataloadExtensionProperties: List<PropertyDef.DataLoadedFunction<T, *, *>> = emptyList(),
             val unionProperties : List<PropertyDef.Union<T>> = emptyList(),
-            val transformations : Map<KProperty1<T, *>, Transformation<T, *>> = emptyMap(),
+            val transformations : Map<String, Transformation<T, *>> = emptyMap(),
             description : String? = null,
             // KSP-generated metadata — when set, SchemaCompilation uses these instead of
             // kotlin.reflect.full calls (isKotlinFinal, isKotlinSubclassOf, isKotlinSuperclassOf).
@@ -34,19 +35,15 @@ interface TypeDef {
             val possibleTypes : List<KClass<*>> = emptyList()
     ) : BaseKQLType(name, description), Kotlin<T> {
 
-        val propertiesByName = kotlinProperties.mapKeys { entry -> entry.key.name }
-
-        fun isIgnored(property: String): Boolean = propertiesByName[property]?.isIgnored ?: false
+        fun isIgnored(property: String): Boolean = kotlinProperties[property]?.isIgnored ?: false
     }
 
     class Input<T : Any>(
             name : String,
             override val kClass: KClass<T>,
-            // KSP bridge: when non-empty, SchemaCompilation uses these KProperty1 references
-            // instead of memberPropertiesList() reflection. Enables iOS (Kotlin/Native).
-            val kotlinProperties: List<KProperty1<T, *>> = emptyList(),
-            // KSP bridge: return types keyed by property name — avoids KProperty1.returnType
-            // reflection (kotlin.reflect.full) which is unavailable on iOS (Kotlin/Native).
+            // Property names declared via @GraphQLInput descriptor or DSL.
+            val properties: List<String> = emptyList(),
+            // Return types keyed by property name — KSP-generated via typeOf<R>().
             val returnTypes: Map<String, KType> = emptyMap(),
             description: String? = null
     ) : BaseKQLType(name, description), Kotlin<T>

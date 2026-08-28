@@ -160,9 +160,15 @@ class SchemaBuilder internal constructor() {
             @Suppress("UNCHECKED_CAST")
             val typedDesc = desc as com.ismartcoding.plain.lib.kgraphql.generated.TypeDescriptor<T>
             typedDesc.fields.forEach { f ->
-                if (f.kProperty !in type.describedKotlinProperties) {
-                    type.property(f.kProperty, f.returnType) {}
+                if (f.name !in type.describedKotlinProperties) {
+                    @Suppress("UNCHECKED_CAST")
+                    type.property(f.name, f.returnType, f.accessor as (T) -> Any?) {}
                 }
+            }
+            // The descriptor name is fixed at compile time — use it unless the
+            // user customized the name (KClass.simpleName is unsafe under R8).
+            if (!type.nameCustomized) {
+                type.name = typedDesc.name
             }
             // If the descriptor marks this as an interface, propagate the flag
             // and possibleTypes (no-op for regular @GraphQLType objects).
@@ -249,11 +255,12 @@ class SchemaBuilder internal constructor() {
         GeneratedSchemaRegistry.inputs[kClass]?.let { desc ->
             @Suppress("UNCHECKED_CAST")
             val typedDesc = desc as com.ismartcoding.plain.lib.kgraphql.generated.InputDescriptor<T>
-            val declaredNames = input.declaredKotlinProperties.map { it.name }.toMutableSet()
+            if (!input.nameCustomized) {
+                input.name = typedDesc.name
+            }
             typedDesc.fields.forEach { f ->
-                if (f.name !in declaredNames) {
-                    input.property(f.kProperty, f.returnType)
-                    declaredNames.add(f.name)
+                if (f.name !in input.declaredProperties) {
+                    input.property(f.name, f.returnType)
                 }
             }
         }
