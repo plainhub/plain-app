@@ -214,6 +214,7 @@ dependencies {
     implementation(libs.zxing.core)
 
     debugImplementation(libs.leakcanary.android)
+    debugImplementation(libs.androidx.work.multiprocess)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
 
     // AI Image Search: both MediaPipe and LiteRT are excluded from fdroid
