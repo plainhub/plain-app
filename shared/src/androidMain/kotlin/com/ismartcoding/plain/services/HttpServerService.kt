@@ -12,8 +12,10 @@ import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.plainapp_service_is_running
@@ -29,6 +31,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 class HttpServerService : LifecycleService() {
+    // Written from the start/stop coroutines (IO), read on main in
+    // ensureServerRunning() — volatile for cross-thread visibility.
+    @Volatile
     private var serverState: HttpServerState = HttpServerState.OFF
     var mdnsRegister: MdnsRegister? = null
     private var serverJob: Job? = null
@@ -55,21 +60,7 @@ class HttpServerService : LifecycleService() {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 when (event) {
                     Lifecycle.Event.ON_START -> {
-                        if (serverState == HttpServerState.STARTING || serverState == HttpServerState.ON) return
                         lockManager?.start()
-                        serverJob?.cancel()
-                        serverJob = coIO {
-                            if (isStickyRestart) {
-                                // Give previous Ktor instance time to release its TCP ports
-                                // before we try to bind again. Without this, the rapid
-                                // START_STICKY kill/restart cycle on OnePlus/ColorOS causes
-                                // a port-in-use loop that overwhelms the system.
-                                LogCat.d("START_STICKY restart — waiting 5s for port release")
-                                delay(5_000)
-                                isStickyRestart = false
-                            }
-                            startServer()
-                        }
                     }
 
                     Lifecycle.Event.ON_STOP -> {
@@ -129,11 +120,45 @@ class HttpServerService : LifecycleService() {
             return START_NOT_STICKY
         }
 
+        ensureServerRunning()
+
         return START_STICKY
     }
 
+    /**
+     * Single idempotent entry point for "ensure the server is running".
+     * onStartCommand is delivered for every start request (first start, user
+     * retry, QS tile, ADB, state sync, START_STICKY restart), unlike the
+     * ON_START lifecycle event which fires only once per service instance —
+     * relying on ON_START made later requests dead letters and left the UI
+     * stuck in STARTING after a failed start.
+     */
+    private fun ensureServerRunning() {
+        if (serverState == HttpServerState.ON || serverJob?.isActive == true) return
+        serverJob = coIO {
+            if (isStickyRestart) {
+                // Give previous Ktor instance time to release its TCP ports
+                // before we try to bind again. Without this, the rapid
+                // START_STICKY kill/restart cycle on OnePlus/ColorOS causes
+                // a port-in-use loop that overwhelms the system.
+                LogCat.d("START_STICKY restart — waiting 5s for port release")
+                delay(5_000)
+                isStickyRestart = false
+            }
+            startServer()
+        }
+    }
+
     private suspend fun startServer() {
-        startHttpServerAsync { serverState = it }
+        try {
+            startHttpServerAsync { serverState = it }
+        } catch (ex: Exception) {
+            // Ensure a terminal state even if the orchestrator throws before
+            // emitting its own ERROR event.
+            LogCat.e("Server start failed unexpectedly: ${ex.message}")
+            serverState = HttpServerState.ERROR
+            sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))
+        }
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
