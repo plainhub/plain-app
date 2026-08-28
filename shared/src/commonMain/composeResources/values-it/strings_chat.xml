@@ -66,7 +66,7 @@
     <string name="discovered_devices">Dispositivi scoperti</string>
     <string name="pairing_request">Richiesta di accoppiamento</string>
     <string name="pairing_request_message">Vuoi accoppiarti con il dispositivo "%1$s"?</string>
-    <string name="pairing_request_hint">Dopo l\'associazione, puoi scambiare messaggi tra entrambi i dispositivi.</string>
+    <string name="pairing_request_hint">Dopo l'associazione, puoi scambiare messaggi tra entrambi i dispositivi.</string>
     <string name="allow">Consenti</string>
     <string name="deny">Rifiuta</string>
     <string name="chat">Chat</string>

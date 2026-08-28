@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="image_editor">Éditeur d\'images</string>
+    <string name="image_editor">Éditeur d'images</string>
     <string name="image_editor_bring_forward">Avancer</string>
     <string name="image_editor_clear_all">Tout effacer</string>
     <string name="image_editor_color">Couleur</string>
@@ -12,7 +12,7 @@
     <string name="image_editor_line_width">Largeur de ligne</string>
     <string name="image_editor_no_layers">Aucun calque</string>
     <string name="image_editor_no_projects">Aucun projet pour le moment</string>
-    <string name="image_editor_no_projects_desc">Créez un projet depuis l\'interface web ou touchez + pour commencer</string>
+    <string name="image_editor_no_projects_desc">Créez un projet depuis l'interface web ou touchez + pour commencer</string>
     <string name="image_editor_send_backward">Reculer</string>
     <string name="image_editor_tool_arrow">Flèche</string>
     <string name="image_editor_tool_ellipse">Ellipse</string>

@@ -17,11 +17,11 @@
         <item quantity="other">%1$d file</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Copia dell\'elemento %1$d</item>
+        <item quantity="one">Copia dell'elemento %1$d</item>
         <item quantity="other">Copia degli elementi %1$d</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Spostamento dell\'elemento %1$d</item>
+        <item quantity="one">Spostamento dell'elemento %1$d</item>
         <item quantity="other">Spostamento degli elementi %1$d</item>
     </plurals>
     <plurals name="n_hours">

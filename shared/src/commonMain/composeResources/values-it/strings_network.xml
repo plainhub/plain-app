@@ -96,7 +96,7 @@
     <string name="collapse_backup_addresses">Comprimi indirizzi alternativi</string>
     <string name="https_certificate">Certificato HTTPS</string>
     <string name="import_certificate">Importa</string>
-    <string name="import_ssl_certificate_tips">Dopo l\'importazione, riavvia l\'app per applicare il nuovo certificato. I client web dovranno riapprovare il certificato HTTPS.</string>
+    <string name="import_ssl_certificate_tips">Dopo l'importazione, riavvia l'app per applicare il nuovo certificato. I client web dovranno riapprovare il certificato HTTPS.</string>
     <string name="importing">Importazione…</string>
     <string name="invalid_certificate_file">File certificato non valido</string>
     <string name="invalid_private_key">Chiave privata non valida</string>

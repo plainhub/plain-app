@@ -12,7 +12,7 @@
     <string name="image_editor_line_width">Spessore linea</string>
     <string name="image_editor_no_layers">Nessun livello</string>
     <string name="image_editor_no_projects">Nessun progetto</string>
-    <string name="image_editor_no_projects_desc">Crea un progetto dall\'interfaccia web o tocca + per iniziare</string>
+    <string name="image_editor_no_projects_desc">Crea un progetto dall'interfaccia web o tocca + per iniziare</string>
     <string name="image_editor_send_backward">Porta indietro</string>
     <string name="image_editor_tool_arrow">Freccia</string>
     <string name="image_editor_tool_ellipse">Ellisse</string>

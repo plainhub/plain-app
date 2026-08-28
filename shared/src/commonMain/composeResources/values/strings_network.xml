@@ -110,6 +110,6 @@
     <string name="adb_cmd_start">Start HTTP Server</string>
     <string name="adb_cmd_stop">Stop HTTP Server</string>
     <string name="enable_adb_token">Enable ADB token</string>
-    <string name="try_more_addresses">Can\'t connect? Try more addresses</string>
+    <string name="try_more_addresses">Can't connect? Try more addresses</string>
     <string name="collapse_backup_addresses">Collapse backup addresses</string>
 </resources>

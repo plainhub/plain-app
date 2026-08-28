@@ -144,7 +144,7 @@
     <string name="http_server_state">Status</string>
     <string name="mdns_debug">mDNS-debug</string>
     <string name="mdns_instance">Instantie</string>
-    <string name="mdns_ips">IP\'s</string>
+    <string name="mdns_ips">IP's</string>
     <string name="mdns_no_devices">Geen apparaten in de buurt gevonden</string>
     <string name="mdns_port">Poort</string>
     <string name="mdns_server">mDNS-server</string>

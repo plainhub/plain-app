@@ -144,7 +144,7 @@
     <string name="http_server_state">Durum</string>
     <string name="mdns_debug">mDNS hata ayıklama</string>
     <string name="mdns_instance">Örnek</string>
-    <string name="mdns_ips">IP\'ler</string>
+    <string name="mdns_ips">IP'ler</string>
     <string name="mdns_no_devices">Yakında cihaz bulunamadı</string>
     <string name="mdns_port">Port</string>
     <string name="mdns_server">mDNS sunucusu</string>

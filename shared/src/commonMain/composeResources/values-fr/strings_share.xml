@@ -12,7 +12,7 @@
     <string name="share_expiry_7d">7 jours</string>
     <string name="share_expiry_never">Jamais</string>
     <string name="share_link">Lien de partage</string>
-    <string name="share_link_desc">Toute personne disposant de ce lien peut accéder aux fichiers partagés jusqu\'à son expiration</string>
+    <string name="share_link_desc">Toute personne disposant de ce lien peut accéder aux fichiers partagés jusqu'à son expiration</string>
     <string name="share_links">Liens partagés</string>
     <string name="share_links_desc">Liens créés pour des fichiers et dossiers</string>
     <string name="share_name_placeholder">Nom</string>

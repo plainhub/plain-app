@@ -12,7 +12,7 @@
     <string name="image_editor_line_width">Çizgi kalınlığı</string>
     <string name="image_editor_no_layers">Katman yok</string>
     <string name="image_editor_no_projects">Henüz proje yok</string>
-    <string name="image_editor_no_projects_desc">Web arayüzünden bir proje oluşturun veya başlamak için +\'ya dokunun</string>
+    <string name="image_editor_no_projects_desc">Web arayüzünden bir proje oluşturun veya başlamak için +'ya dokunun</string>
     <string name="image_editor_send_backward">Geriye gönder</string>
     <string name="image_editor_tool_arrow">Ok</string>
     <string name="image_editor_tool_ellipse">Elips</string>

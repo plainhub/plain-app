@@ -132,7 +132,7 @@
     <string name="donation_title">Soutenez le développement de PlainApp</string>
     <string name="buy_me_a_coffee">Offrez-moi un café</string>
     <string name="allow_any_host">Autoriser tout hôte</string>
-    <string name="allow_any_host_desc">Accepter les requêtes multi-origines de n\'importe quel site.</string>
+    <string name="allow_any_host_desc">Accepter les requêtes multi-origines de n'importe quel site.</string>
     <string name="aware_attach_status">État de connexion</string>
     <string name="aware_discovered_peer_count">Appareils découverts</string>
     <string name="aware_service">Service Aware</string>
@@ -151,6 +151,6 @@
     <string name="mdns_service_type">Service</string>
     <string name="mdns_txt">TXT</string>
     <string name="service_debug">Débogage des services</string>
-    <string name="service_running">En cours d\'exécution</string>
+    <string name="service_running">En cours d'exécution</string>
     <string name="ws_session_count">Sessions WebSocket</string>
 </resources>

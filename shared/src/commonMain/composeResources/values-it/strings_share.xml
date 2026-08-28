@@ -2,7 +2,7 @@
 <resources>
     <string name="create_share_link">Crea link di condivisione</string>
     <string name="share_created">Link creato</string>
-    <string name="share_delete_desc">L\'eliminazione revoca immediatamente il link</string>
+    <string name="share_delete_desc">L'eliminazione revoca immediatamente il link</string>
     <string name="share_expired">Scaduto</string>
     <string name="share_expires_on">Scade %1$s</string>
     <string name="share_expiry">Scadenza</string>
