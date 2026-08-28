@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Resources resolved only at runtime via Resources.getIdentifier(name, ...).
+     The release resource shrinker cannot see those references and strips them,
+     causing crashes like "Invalid notification (no valid small icon)". -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/notification,@drawable/app_icon,@mipmap/ic_launcher,@color/scrollbar_primary,@drawable/default_scroll_handle_left,@drawable/default_scroll_handle_right,@drawable/default_scroll_handle_top,@drawable/default_scroll_handle_bottom" />
