@@ -128,6 +128,18 @@ class ScreenMirrorCaptureSizeTest {
     }
 
     @Test
+    fun `maxPixels 1_5M preserves reproduced landscape orientation`() {
+        val (w, h) = ScreenMirrorCaptureSize.compute(
+            physW = 2340, physH = 1080, shortTarget = 1080,
+            maxW = 4096, maxH = 4096, wAlign = 2, hAlign = 2,
+            maxPixels = 1_500_000,
+        )
+        assertEquals(1802, w)
+        assertEquals(832, h)
+        assertTrue("landscape width $w must exceed height $h", w > h)
+    }
+
+    @Test
     fun `compute with maxPixels higher than physical has no effect`() {
         val (w, h) = ScreenMirrorCaptureSize.compute(
             physW = 720, physH = 1280, shortTarget = 720,
