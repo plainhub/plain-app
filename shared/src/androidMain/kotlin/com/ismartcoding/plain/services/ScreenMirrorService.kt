@@ -4,12 +4,9 @@ import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.i18n.*
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.hardware.display.DisplayManager
-import android.view.Display
-import android.view.Surface
-import android.view.OrientationEventListener
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import android.media.projection.MediaProjection
@@ -22,12 +19,12 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.mediaProjectionManager
+import com.ismartcoding.plain.services.screenmirror.ScreenMirrorOrientationState
 import com.ismartcoding.plain.services.screenmirror.ScreenMirrorPipeline
 
 class ScreenMirrorService : LifecycleService() {
 
-    private var orientationEventListener: OrientationEventListener? = null
-    private var isPortrait = true
+    private lateinit var orientationState: ScreenMirrorOrientationState
     private var notificationId: Int = 0
 
     private var pipeline: ScreenMirrorPipeline? = null
@@ -40,25 +37,25 @@ class ScreenMirrorService : LifecycleService() {
         super.onCreate()
         instance = this
         NotificationHelper.ensureDefaultChannel()
-        isPortrait = currentDisplayIsPortrait()
-        orientationEventListener =
-            object : OrientationEventListener(this) {
-                override fun onOrientationChanged(orientation: Int) {
-                    val newIsPortrait = currentDisplayIsPortrait()
-                    LogCat.d("screen mirror: sensor=$orientation newIsPortrait=$newIsPortrait (was $isPortrait)")
-                    if (isPortrait != newIsPortrait) {
-                        isPortrait = newIsPortrait
-                        PlainAccessibilityService.invalidateScreenSizeCache()
-                        pipeline?.onOrientationChanged()
-                    }
-                }
+        orientationState =
+            ScreenMirrorOrientationState(currentConfigurationIsPortrait()) { isPortrait ->
+                LogCat.d("screen mirror: configuration changed (portrait=$isPortrait)")
+                PlainAccessibilityService.invalidateScreenSizeCache()
+                pipeline?.onOrientationChanged()
             }
     }
 
-    private fun currentDisplayIsPortrait(): Boolean {
-        val rotation = (getSystemService(DisplayManager::class.java))
-            ?.getDisplay(Display.DEFAULT_DISPLAY)?.rotation ?: Surface.ROTATION_0
-        return rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180
+    private fun currentConfigurationIsPortrait(): Boolean {
+        return when (resources.configuration.orientation) {
+            Configuration.ORIENTATION_PORTRAIT -> true
+            Configuration.ORIENTATION_LANDSCAPE -> false
+            else -> resources.displayMetrics.widthPixels <= resources.displayMetrics.heightPixels
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        orientationState.onConfigurationChanged(newConfig.orientation)
     }
 
     @SuppressLint("WrongConstant")
@@ -120,14 +117,13 @@ class ScreenMirrorService : LifecycleService() {
             return START_NOT_STICKY
         }
 
-        orientationEventListener?.enable()
         running = true
 
         val p = ScreenMirrorPipeline(
             context = this,
             projection = mMediaProjection,
             quality = qualityData,
-            getIsPortrait = { isPortrait },
+            getIsPortrait = { orientationState.isPortrait },
         )
         try {
             p.start()
@@ -152,7 +148,6 @@ class ScreenMirrorService : LifecycleService() {
         running = false
         pipeline?.stop()
         pipeline = null
-        orientationEventListener?.disable()
         instance = null
     }
 
