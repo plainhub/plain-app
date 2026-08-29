@@ -49,7 +49,8 @@ interface MarkdownAnnotatorConfig {
 @Stable
 @Immutable
 class DefaultMarkdownAnnotatorConfig(
-    override val eolAsNewLine: Boolean = false,
+    // plain-app renders a single `\n` as a line break (Obsidian-style), not per GFM
+    override val eolAsNewLine: Boolean = true,
     override val inlineImageAsBlock: Boolean = true,
     override val showImageAltTooltip: Boolean = false,
     override val imageAltTooltipHoverDelayMs: Long = 2_000L,
@@ -77,7 +78,7 @@ class DefaultMarkdownAnnotatorConfig(
 }
 
 fun markdownAnnotatorConfig(
-    eolAsNewLine: Boolean = false,
+    eolAsNewLine: Boolean = true,
     inlineImageAsBlock: Boolean = true,
     showImageAltTooltip: Boolean = false,
     imageAltTooltipHoverDelayMs: Long = 2_000L,

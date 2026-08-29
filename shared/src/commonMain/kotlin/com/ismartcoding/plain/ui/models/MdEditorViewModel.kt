@@ -9,6 +9,7 @@ import com.ismartcoding.plain.preferences.EditorAccessoryLevelPreference
 import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
 import com.ismartcoding.plain.preferences.EditorSyntaxHighlightPreference
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
+import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.base.mdeditor.blocks.BlockEditorState
 
 data class MdAccessoryItem(val text: String, val before: String, val after: String = "")
@@ -55,6 +56,24 @@ class MdEditorViewModel : ViewModel() {
     fun moveCaretToStart() = blocks.moveCaretToStart()
 
     fun moveCaretToEnd() = blocks.moveCaretToEnd()
+
+    // ---- cross-block selection ----
+
+    fun enterSelectionMode() = blocks.enterSelectionMode()
+
+    fun exitSelectionMode() = blocks.exitSelectionMode()
+
+    fun selectAllBlocks() = blocks.selectAllBlocks()
+
+    fun copySelected(): Boolean {
+        val t = blocks.selectedText() ?: return false
+        setClipboardText("text", t)
+        return true
+    }
+
+    fun cutSelected() {
+        if (copySelected()) blocks.deleteSelectedRange()
+    }
 
     fun toggleLevel() {
         level.intValue = if (level.intValue == 1) 0 else 1

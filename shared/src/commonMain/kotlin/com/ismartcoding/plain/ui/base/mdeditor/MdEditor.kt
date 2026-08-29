@@ -1,7 +1,11 @@
 package com.ismartcoding.plain.ui.base.mdeditor
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
@@ -21,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -32,6 +37,10 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.boundsInRoot
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -41,16 +50,15 @@ import com.ismartcoding.plain.ui.base.mdeditor.blocks.MdBlockKind
 import com.ismartcoding.plain.ui.base.mdeditor.blocks.MdEditorBlock
 import com.ismartcoding.plain.ui.base.mdeditor.livepreview.MarkdownLivePreviewTransformation
 import com.ismartcoding.plain.ui.base.mdeditor.livepreview.rememberLivePreviewStyles
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import androidx.compose.runtime.withFrameNanos
 
 /**
  * Block-based markdown editor. Each text line is its own editable block with
  * live-preview styling when unfocused; fenced code, math blocks, tables and
  * standalone images are atomic blocks rendered with the real markdown renderer.
- * Tapping an atomic block reveals its raw source for editing.
+ * Tapping an atomic block reveals its raw source for editing. A cross-block
+ * selection mode renders every block read-only with selection highlights.
  */
 @Composable
 fun MdEditor(
@@ -59,10 +67,11 @@ fun MdEditor(
     scrollState: ScrollState,
     shouldRequestFocus: Boolean = false,
     onFocusRequested: () -> Unit = {},
-    previewerState: MediaPreviewerState,
 ) {
     val editor = mdEditorVM.blocks
     val focusRequesters = remember { HashMap<Long, FocusRequester>() }
+    // selection-mode drag-to-extend: latest root-space bounds of every rendered block
+    val selectionBounds = remember { HashMap<Long, Rect>() }
 
     LaunchedEffect(shouldRequestFocus) {
         if (shouldRequestFocus) {
@@ -97,10 +106,12 @@ fun MdEditor(
     ) {
         editor.blocks.forEach { block ->
             key(block.id) {
-                if (block.kind == MdBlockKind.TEXT) {
+                if (editor.selectionMode) {
+                    SelectionBlockView(editor, block, focusRequesters, selectionBounds)
+                } else if (block.kind == MdBlockKind.TEXT) {
                     TextBlockField(editor, block, focusRequesters)
                 } else {
-                    AtomicBlockView(editor, block, focusRequesters, previewerState)
+                    AtomicBlockView(editor, block, focusRequesters)
                 }
             }
         }
@@ -159,7 +170,6 @@ private fun AtomicBlockView(
     editor: BlockEditorState,
     block: MdEditorBlock,
     focusRequesters: MutableMap<Long, FocusRequester>,
-    previewerState: MediaPreviewerState,
 ) {
     val fr = remember { FocusRequester() }
 
@@ -204,14 +214,94 @@ private fun AtomicBlockView(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { editor.startEdit(block) },
+                .combinedClickable(
+                    onClick = { editor.startEdit(block) },
+                    onLongClick = {
+                        // long-press on a rendered atomic block starts cross-block selection
+                        // anchored on this whole block
+                        editor.enterSelectionMode()
+                        editor.tapBlockInSelection(block)
+                    },
+                ),
         ) {
             MarkdownText(
                 text = block.state.text.toString(),
                 isTextSelectable = false,
-                previewerState = previewerState,
             )
         }
+    }
+}
+
+/**
+ * Read-only rendered view used in cross-block selection mode: selected blocks are
+ * highlighted; taps extend the selection. Tapping an already-selected boundary
+ * (anchor/focus) block switches it to a read-only text field with a preset native
+ * selection so the handles can refine that boundary to character precision.
+ */
+@Composable
+private fun SelectionBlockView(
+    editor: BlockEditorState,
+    block: MdEditorBlock,
+    focusRequesters: MutableMap<Long, FocusRequester>,
+    selectionBounds: MutableMap<Long, Rect>,
+) {
+    val selected = editor.isBlockSelected(block.id)
+    val highlight = Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f))
+
+    if (editor.refinedBlockId == block.id) {
+        val fr = remember { FocusRequester() }
+        DisposableEffect(block.id) {
+            focusRequesters[block.id] = fr
+            onDispose { focusRequesters.remove(block.id) }
+        }
+        LaunchedEffect(block.id) {
+            snapshotFlow { block.state.selection }.collect {
+                if (editor.refinedBlockId == block.id) editor.updateSelectionBoundary(block)
+            }
+        }
+        BasicTextField(
+            state = block.state,
+            readOnly = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 28.dp)
+                .then(highlight)
+                .focusRequester(fr)
+                .onFocusChanged { if (!it.isFocused) editor.exitRefine() },
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        )
+        return
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 28.dp)
+            .then(if (selected) highlight else Modifier)
+            .onGloballyPositioned { selectionBounds[block.id] = it.boundsInRoot() }
+            .pointerInput(block.id, editor.selectionMode) {
+                // drag across blocks extends the selection to the block under the finger
+                detectDragGestures { change, _ ->
+                    change.consume()
+                    val top = selectionBounds[block.id]?.top ?: return@detectDragGestures
+                    val y = top + change.position.y
+                    selectionBounds.entries
+                        .filter { y >= it.value.top && y < it.value.bottom }
+                        .minByOrNull { it.value.top }
+                        ?.let { editor.setFocusEndToBlock(it.key) }
+                }
+            }
+            .clickable {
+                val isBoundary = editor.selectionAnchor?.blockId == block.id ||
+                    editor.selectionFocus?.blockId == block.id
+                if (selected && isBoundary) editor.startRefine(block) else editor.tapBlockInSelection(block)
+            },
+    ) {
+        MarkdownText(
+            text = block.state.text.toString(),
+            isTextSelectable = false,
+        )
     }
 }
 

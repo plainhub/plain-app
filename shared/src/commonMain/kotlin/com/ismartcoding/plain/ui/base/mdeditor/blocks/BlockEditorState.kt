@@ -34,12 +34,23 @@ class MdEditorBlock(
     fun content(): String = state.text.toString()
 }
 
+/** A selection endpoint: a caret offset inside a specific block. */
+data class BlockAnchor(val blockId: Long, val offset: Int)
+
 class BlockEditorState {
     val blocks = mutableStateListOf<MdEditorBlock>()
     val focusedBlockId = mutableStateOf<Long?>(null)
     val pendingFocus = mutableStateOf<Long?>(null)
     val canUndo = mutableStateOf(false)
     val canRedo = mutableStateOf(false)
+
+    // ── cross-block selection (whole blocks + boundary refinement) ──
+    // anchor stays fixed while the focus follows taps; both are (blockId, offset)
+    // pairs that map to absolute document offsets for copy/cut.
+    var selectionMode by mutableStateOf(false)
+    var selectionAnchor by mutableStateOf<BlockAnchor?>(null)
+    var selectionFocus by mutableStateOf<BlockAnchor?>(null)
+    var refinedBlockId by mutableStateOf<Long?>(null)
 
     private var nextId = 1L
     private val undoStack = ArrayDeque<String>()
@@ -211,6 +222,128 @@ class BlockEditorState {
         val p = pendingFocus.value
         if (p != null && blocks.any { it.id == p }) return
         blocks.firstOrNull()?.let { focusBlock(it, 0) }
+    }
+
+    // ---- cross-block selection ------------------------------------------------
+
+    fun enterSelectionMode() {
+        exitSelectionMode()
+        selectionMode = true
+        focusedBlockId.value = null
+        pendingFocus.value = null
+    }
+
+    fun exitSelectionMode() {
+        selectionMode = false
+        selectionAnchor = null
+        selectionFocus = null
+        refinedBlockId = null
+    }
+
+    /**
+     * Tap in selection mode: the first tap anchors on a whole block, later taps move
+     * the focus end (block-granular). Both endpoints are re-bound to the block edge
+     * facing the other endpoint so the selection always covers whole blocks.
+     * Tapping an already-selected boundary block is handled by the UI via [startRefine].
+     */
+    fun tapBlockInSelection(block: MdEditorBlock) {
+        if (selectionAnchor == null) {
+            selectionAnchor = BlockAnchor(block.id, 0)
+            selectionFocus = BlockAnchor(block.id, block.content().length)
+            return
+        }
+        setFocusEndToBlock(block.id)
+    }
+
+    /** Move the selection's focus end to fully cover [blockId]. Shared by tap and drag extension. */
+    fun setFocusEndToBlock(blockId: Long) {
+        val a = selectionAnchor ?: return
+        val anchorIdx = blocks.indexOfFirst { it.id == a.blockId }
+        val anchorBlock = blocks.getOrNull(anchorIdx) ?: return
+        val idx = blocks.indexOfFirst { it.id == blockId }
+        if (idx < 0) return
+        if (idx >= anchorIdx) {
+            selectionAnchor = BlockAnchor(anchorBlock.id, 0)
+            selectionFocus = BlockAnchor(blockId, blocks[idx].content().length)
+        } else {
+            selectionAnchor = BlockAnchor(anchorBlock.id, anchorBlock.content().length)
+            selectionFocus = BlockAnchor(blockId, 0)
+        }
+    }
+
+    fun selectAllBlocks() {
+        blocks.firstOrNull() ?: return
+        selectionAnchor = BlockAnchor(blocks.first().id, 0)
+        selectionFocus = BlockAnchor(blocks.last().id, blocks.last().content().length)
+    }
+
+    fun isBlockSelected(id: Long): Boolean {
+        val range = selectedDocRange() ?: return false
+        var abs = 0
+        for (b in blocks) {
+            val len = b.content().length
+            if (b.id == id) return abs <= range.second && range.first <= abs + len
+            abs += len + 1
+        }
+        return false
+    }
+
+    /** Absolute document range [start, end) covered by the selection, or null. */
+    fun selectedDocRange(): Pair<Int, Int>? {
+        val a = selectionAnchor ?: return null
+        val f = selectionFocus ?: return null
+        val start = blockAbsoluteOffset(a)
+        val end = blockAbsoluteOffset(f)
+        return if (start <= end) start to end else end to start
+    }
+
+    fun selectedText(): String? {
+        val range = selectedDocRange() ?: return null
+        if (range.second <= range.first) return null
+        return text().substring(range.first.coerceIn(0, text().length), range.second.coerceIn(0, text().length))
+    }
+
+    fun deleteSelectedRange() {
+        val range = selectedDocRange() ?: return
+        val t = text()
+        if (range.first < 0 || range.second > t.length || range.second <= range.first) return
+        exitSelectionMode()
+        applyText(t.removeRange(range.first, range.second))
+    }
+
+    /** Boundary refinement: preset the native selection inside the anchor/focus block. */
+    fun startRefine(block: MdEditorBlock) {
+        val len = block.content().length
+        val isAnchor = selectionAnchor?.blockId == block.id
+        val from = if (isAnchor) (selectionAnchor?.offset ?: 0) else 0
+        val to = if (isAnchor) len else (selectionFocus?.offset ?: len)
+        refinedBlockId = block.id
+        block.state.edit { selection = TextRange(from.coerceIn(0, length), to.coerceIn(0, length)) }
+        pendingFocus.value = block.id
+    }
+
+    /** Called by the refining block whenever its native selection changes. */
+    fun updateSelectionBoundary(block: MdEditorBlock) {
+        val sel = block.state.selection
+        val isAnchor = selectionAnchor?.blockId == block.id
+        if (isAnchor) {
+            selectionAnchor = BlockAnchor(block.id, sel.min)
+        } else if (selectionFocus?.blockId == block.id) {
+            selectionFocus = BlockAnchor(block.id, sel.max)
+        }
+    }
+
+    fun exitRefine() {
+        refinedBlockId = null
+    }
+
+    private fun blockAbsoluteOffset(a: BlockAnchor): Int {
+        var abs = 0
+        for (b in blocks) {
+            if (b.id == a.blockId) return abs + a.offset.coerceIn(0, b.content().length)
+            abs += b.content().length + 1
+        }
+        return abs
     }
 
     // ---- undo / redo -------------------------------------------------------

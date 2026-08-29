@@ -99,7 +99,7 @@ private fun extractImageLinksFromMarkdown(markdown: String): List<String> {
  * wraps the painter in a `Modifier.clickable` when this is non-null).
  */
 private class AppImageTransformer(
-    private val onImageClick: (String) -> Unit,
+    private val onImageClick: ((String) -> Unit)?,
 ) : ImageTransformer {
     @Composable
     override fun transform(link: String): ImageData? {
@@ -125,7 +125,7 @@ private class AppImageTransformer(
         return ImageData(
             painter = painter,
             contentDescription = link,
-            onClick = { onImageClick(link) },
+            onClick = onImageClick?.let { cb -> { cb(link) } },
         )
     }
 }
@@ -141,7 +141,7 @@ fun MarkdownText(
         fontSize = 16.sp,
         lineHeight = 24.sp,
     ),
-    previewerState: MediaPreviewerState,
+    previewerState: MediaPreviewerState? = null,
 ) {
     val scope = rememberCoroutineScope()
     val defaultColor = MaterialTheme.colorScheme.onSurface
@@ -247,18 +247,18 @@ fun MarkdownText(
         padding = padding,
         dimens = dimens,
         extendedSpans = extendedSpans,
-        imageTransformer = remember(text) {
-            AppImageTransformer(onImageClick = { link ->
+        imageTransformer = remember(text, previewerState) {
+            // no previewer state (block editor) → images get no click handler and let
+            // taps fall through to the block's own edit affordance
+            AppImageTransformer(onImageClick = previewerState?.let { state -> { link ->
                 val imageLinks = extractImageLinksFromMarkdown(text)
                 val items = imageLinks.map { src ->
                     PreviewItem(src, src.getFinalPath())
                 }
                 MediaPreviewData.items = items
                 val index = items.indexOfFirst { it.id == link || it.path == link }
-                scope.launch {
-                    previewerState.open(index = index.coerceAtLeast(0))
-                }
-            })
+                scope.launch { state.open(index = index.coerceAtLeast(0)) }
+            } })
         },
         components = components,
     )

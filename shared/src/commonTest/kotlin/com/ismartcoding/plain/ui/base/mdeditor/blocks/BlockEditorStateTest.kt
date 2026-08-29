@@ -252,4 +252,74 @@ class BlockEditorStateTest {
         s.redo()
         assertEquals("ac", s.text())
     }
+
+    // ── cross-block selection ───
+
+    @Test
+    fun `selection spans whole blocks and produces document text`() {
+        val s = stateWith("hello", "brave", "world")
+        s.enterSelectionMode()
+        s.tapBlockInSelection(s.blocks[0])
+        s.tapBlockInSelection(s.blocks[2])
+        assertEquals("hello\nbrave\nworld", s.selectedText())
+        assertTrue(s.isBlockSelected(s.blocks[1].id))
+    }
+
+    @Test
+    fun `reversed selection still yields ordered range`() {
+        val s = stateWith("aa", "bb", "cc")
+        s.enterSelectionMode()
+        s.tapBlockInSelection(s.blocks[2])
+        s.tapBlockInSelection(s.blocks[0])
+        assertEquals("aa\nbb\ncc", s.selectedText())
+    }
+
+    @Test
+    fun `boundary refinement crops selected text`() {
+        val s = stateWith("hello", "world")
+        s.enterSelectionMode()
+        s.tapBlockInSelection(s.blocks[0])
+        s.tapBlockInSelection(s.blocks[1])
+        s.startRefine(s.blocks[0])
+        assertEquals(TextRange(0, 5), s.blocks[0].state.selection)
+        // simulate a handle drag inside the refining block
+        s.blocks[0].state.edit { selection = TextRange(1, 5) }
+        s.updateSelectionBoundary(s.blocks[0])
+        assertEquals("ello\nworld", s.selectedText())
+    }
+
+    @Test
+    fun `delete selected range removes content and is undoable`() {
+        val s = stateWith("aa", "bb", "cc")
+        s.enterSelectionMode()
+        s.tapBlockInSelection(s.blocks[0])
+        s.tapBlockInSelection(s.blocks[2])
+        s.deleteSelectedRange()
+        assertEquals("", s.text())
+        assertFalse(s.selectionMode)
+        s.undo()
+        assertEquals("aa\nbb\ncc", s.text())
+    }
+
+    @Test
+    fun `partial boundary selection crops first and last blocks`() {
+        val s = stateWith("hello", "mid", "world")
+        s.enterSelectionMode()
+        s.tapBlockInSelection(s.blocks[0])
+        s.tapBlockInSelection(s.blocks[2])
+        s.selectionAnchor = BlockAnchor(s.blocks[0].id, 2)
+        s.selectionFocus = BlockAnchor(s.blocks[2].id, 3)
+        assertEquals("llo\nmid\nwor", s.selectedText())
+        s.deleteSelectedRange()
+        // the deleted range swallows both newlines inside it, joining the remainders
+        assertEquals("held", s.text())
+    }
+
+    @Test
+    fun `select all covers the whole document`() {
+        val s = stateWith("aa", "```\ncode\n```")
+        s.enterSelectionMode()
+        s.selectAllBlocks()
+        assertEquals("aa\n```\ncode\n```", s.selectedText())
+    }
 }

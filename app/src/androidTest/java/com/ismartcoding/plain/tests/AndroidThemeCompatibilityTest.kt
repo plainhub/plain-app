@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.tests
 
-import android.os.Build
 import android.view.ContextThemeWrapper
 import android.view.WindowManager
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -25,12 +24,8 @@ class AndroidThemeCompatibilityTest {
         } finally {
             attributes.recycle()
         }
-        val expected = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
-        } else {
-            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
-
-        assertEquals(expected, actual)
+        // ALWAYS crashes on Samsung One UI builds whose PhoneWindow rejects the mode even
+        // when the framework API level supports it; SHORT_EDGES is safe everywhere.
+        assertEquals(WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES, actual)
     }
 }

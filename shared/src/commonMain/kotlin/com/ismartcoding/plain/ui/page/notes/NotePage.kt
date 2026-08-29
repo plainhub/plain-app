@@ -106,8 +106,7 @@ fun NotePage(
         if (noteVM.editMode.value) {
             MdEditor(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding(), top = paddingValues.calculateTopPadding()),
                 mdEditorVM = mdEditorVM, scrollState = editorScrollState,
-                shouldRequestFocus = shouldRequestFocus.value, onFocusRequested = { shouldRequestFocus.value = false },
-                previewerState = previewerState)
+                shouldRequestFocus = shouldRequestFocus.value, onFocusRequested = { shouldRequestFocus.value = false })
         } else {
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection), state = mdListState) {
                 item {

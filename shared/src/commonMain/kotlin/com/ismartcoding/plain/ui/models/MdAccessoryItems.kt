@@ -66,6 +66,9 @@ val mdAccessoryItems2 =
         MdAccessoryItem2(Res.drawable.link, click = {
             it.insertAtFocused("[Link](", ")")
         }),
+        MdAccessoryItem2(Res.drawable.list_checks, click = {
+            it.enterSelectionMode()
+        }),
         MdAccessoryItem2(Res.drawable.image, click = {
             it.showInsertImage.value = true
         }),

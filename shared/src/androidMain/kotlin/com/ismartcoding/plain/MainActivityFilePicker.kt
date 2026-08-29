@@ -5,6 +5,7 @@ import com.ismartcoding.plain.platform.LocaleHelper
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import com.ismartcoding.plain.platform.isQPlus
@@ -15,6 +16,7 @@ import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.platform.FilePickHelper
+import com.ismartcoding.plain.platform.isRPlus
 
 internal fun MainActivity.handlePickFileEvent(event: PickFileEvent) {
     try {
@@ -27,6 +29,19 @@ internal fun MainActivity.handlePickFileEvent(event: PickFileEvent) {
             else -> {}
         }
         if (type != null) {
+            // Below Android 11 the photo picker is a Google Play Services backport whose
+            // availability probe is unreliable: an outdated GMS still claims the module,
+            // then hijacks the launch into a "update Google Play services" screen instead
+            // of throwing, so no fallback can trigger. Only trust the system picker
+            // (Android 13+) or the ACTION_PICK_IMAGES intent probe (Android 11-12);
+            // older devices go straight to the document picker.
+            val usePhotoPicker = isRPlus() &&
+                ActivityResultContracts.PickVisualMedia.isPhotoPickerAvailable(this)
+            if (!usePhotoPicker) {
+                LogCat.e("Photo picker not available, falling back to file picker")
+                doPickFile(event)
+                return
+            }
             try {
                 if (event.multiple) pickMultipleMedia.launch(PickVisualMediaRequest(type))
                 else pickMedia.launch(PickVisualMediaRequest(type))
