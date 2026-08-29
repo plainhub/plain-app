@@ -34,10 +34,11 @@ class SelfSignedCertificate(
  */
 object X509SelfSignedGenerator {
     private const val SIG_ALGORITHM = "SHA256withECDSA"
-    // Android's EC provider recognizes "P-256", but the desktop JVM (host unit
-    // tests) does not. The OID is understood by both, so use it as the source
-    // of truth for the curve parameter.
-    private const val CURVE_PARAMETER = X509Oid.CURVE_P256
+    // Android 9's Conscrypt rejects OID-form curve names ("unknown curve name:
+    // 1.2.840.10045.3.1.7"), while "secp256r1" is the standard JCA name accepted
+    // by Android (all versions) and the desktop JVM. Fall back to the OID for
+    // other providers.
+    private val CURVE_PARAMETERS = listOf("secp256r1", "prime256v1", X509Oid.CURVE_P256)
     private const val KEY_SIZE_BYTES = 32
     private const val DEFAULT_VALIDITY_YEARS = 20L
 
@@ -87,9 +88,17 @@ object X509SelfSignedGenerator {
         }
 
     private fun newEcKeyPair(): KeyPair {
-        val generator = KeyPairGenerator.getInstance("EC")
-        generator.initialize(ECGenParameterSpec(CURVE_PARAMETER))
-        return generator.generateKeyPair()
+        var lastError: Exception? = null
+        for (curve in CURVE_PARAMETERS) {
+            try {
+                val generator = KeyPairGenerator.getInstance("EC")
+                generator.initialize(ECGenParameterSpec(curve))
+                return generator.generateKeyPair()
+            } catch (ex: Exception) {
+                lastError = ex
+            }
+        }
+        throw lastError!!
     }
 
     private fun buildTbsCertificate(keyPair: KeyPair, commonName: String, notBefore: Date, notAfter: Date): ByteArray {
