@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.components.ColorPickerDialog
-import com.ismartcoding.plain.ui.extensions.inlineWrap
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import com.ismartcoding.plain.ui.models.mdAccessoryItems
@@ -85,7 +84,7 @@ fun MdEditorBottomAppBar(
             ) {
                 mdAccessoryItems.forEach { button ->
                     TextButton(onClick = {
-                        mdEditorVM.textFieldState.edit { inlineWrap(button.before, button.after) }
+                        mdEditorVM.insertAtFocused(button.before, button.after)
                     }) {
                         Text(button.text, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp))
                     }

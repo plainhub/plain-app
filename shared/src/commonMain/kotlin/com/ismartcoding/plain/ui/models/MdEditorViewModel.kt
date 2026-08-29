@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
 import org.jetbrains.compose.resources.DrawableResource
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,22 +9,24 @@ import com.ismartcoding.plain.preferences.EditorAccessoryLevelPreference
 import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
 import com.ismartcoding.plain.preferences.EditorSyntaxHighlightPreference
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
-import com.ismartcoding.plain.ui.extensions.inlineWrap
+import com.ismartcoding.plain.ui.base.mdeditor.blocks.BlockEditorState
 
 data class MdAccessoryItem(val text: String, val before: String, val after: String = "")
 data class MdAccessoryItem2(val icon: DrawableResource, val click: (MdEditorViewModel) -> Unit = {})
 
-@OptIn(ExperimentalFoundationApi::class)
 class MdEditorViewModel : ViewModel() {
-    val textFieldState = TextFieldState("")
+    val blocks = BlockEditorState()
     var showSettings = mutableStateOf(false)
     var showInsertImage = mutableStateOf(false)
     var showColorPicker = mutableStateOf(false)
     var wrapContent = mutableStateOf(true)
     var showLineNumbers = mutableStateOf(true)
     var syntaxHighLight = mutableStateOf(true)
-    var linesText = mutableStateOf("1")
     var level = mutableIntStateOf(0)
+
+    init {
+        blocks.start(viewModelScope)
+    }
 
     fun load() {
         viewModelScope.launchSafe {
@@ -36,6 +36,25 @@ class MdEditorViewModel : ViewModel() {
             syntaxHighLight.value = EditorSyntaxHighlightPreference.getAsync()
         }
     }
+
+    fun loadText(text: String) = blocks.loadText(text)
+
+    fun text(): String = blocks.text()
+
+    val canUndo get() = blocks.canUndo
+    val canRedo get() = blocks.canRedo
+
+    fun undo() = blocks.undo()
+
+    fun redo() = blocks.redo()
+
+    fun insertAtFocused(before: String, after: String = "") = blocks.insertAtFocused(before, after)
+
+    fun insertText(s: String) = blocks.insertText(s)
+
+    fun moveCaretToStart() = blocks.moveCaretToStart()
+
+    fun moveCaretToEnd() = blocks.moveCaretToEnd()
 
     fun toggleLevel() {
         level.intValue = if (level.intValue == 1) 0 else 1
@@ -59,7 +78,7 @@ class MdEditorViewModel : ViewModel() {
     }
 
     fun insertColor(color: String) {
-        textFieldState.edit { inlineWrap("<font color=\"$color\">", "</font>") }
+        insertAtFocused("<font color=\"$color\">", "</font>")
         showColorPicker.value = false
     }
 }

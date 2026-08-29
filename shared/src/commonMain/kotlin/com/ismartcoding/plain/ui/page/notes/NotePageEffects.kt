@@ -18,7 +18,6 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.extensions.setSelection
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import com.ismartcoding.plain.ui.models.NoteViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
@@ -43,22 +42,21 @@ internal fun NotePageEffects(
 
     LaunchedEffect(Unit) {
         tagsVM.dataType.value = DataType.NOTE
-        noteVM.editMode.value = id.value.isEmpty()
+        noteVM.editMode.value = true
         mdEditorVM.load()
         scope.launch(Dispatchers.Default) {
             if (id.value.isNotEmpty()) {
                 val item = NoteHelper.getById(id.value)
                 noteVM.item.value = item
                 noteVM.content.value = item?.content ?: ""
-                mdEditorVM.textFieldState.edit { append(noteVM.content.value); setSelection(0) }
             }
-            snapshotFlow { mdEditorVM.textFieldState.text }.debounce(200).collectLatest { t ->
+            mdEditorVM.loadText(noteVM.content.value)
+            snapshotFlow { mdEditorVM.text() }.debounce(200).collectLatest { t ->
                 val isNew = id.value.isEmpty()
-                val text = t.toString()
-                if (noteVM.content.value == text) return@collectLatest
+                if (noteVM.content.value == t) return@collectLatest
                 scope.launch(Dispatchers.Default) {
                     val newItem = NoteHelper.addOrUpdateAsync(id.value) {
-                        title = text.cut(250).replace("\n", ""); content = text; noteVM.content.value = text
+                        title = t.cut(250).replace("\n", ""); content = t; noteVM.content.value = t
                     }
                     id.value = newItem.id
                     if (isNew && tagId.isNotEmpty()) {

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -66,7 +66,6 @@ fun NotePage(
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val mdListState = rememberLazyListState()
     val editorScrollState = rememberScrollState()
-    val focusRequester = remember { FocusRequester() }
     val shouldRequestFocus = remember { mutableStateOf(true) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { !noteVM.editMode.value })
     val tagIds = tagsMapState[id.value]?.map { it.tagId } ?: emptyList()
@@ -81,12 +80,10 @@ fun NotePage(
     PScaffold(topBar = {
         PTopAppBar(navController = navController, title = "", scrollBehavior = scrollBehavior, actions = {
             if (noteVM.editMode.value) {
-                PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.textFieldState.undoState.canUndo,
-                    tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.textFieldState.undoState.undo() }
-                PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(Res.string.redo), enabled = mdEditorVM.textFieldState.undoState.canRedo,
-                    tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.textFieldState.undoState.redo() }
-                PIconButton(icon = Res.drawable.wrap_text, contentDescription = stringResource(Res.string.wrap_content),
-                    tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.toggleWrapContent() }
+                PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.canUndo.value,
+                    tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.undo() }
+                PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(Res.string.redo), enabled = mdEditorVM.canRedo.value,
+                    tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.redo() }
             } else if (id.value.isNotEmpty()) {
                 ActionButtonTags { noteVM.showSelectTagsDialog.value = true }
                 PIconButton(
@@ -108,8 +105,9 @@ fun NotePage(
     }, content = { paddingValues ->
         if (noteVM.editMode.value) {
             MdEditor(modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding(), top = paddingValues.calculateTopPadding()),
-                mdEditorVM = mdEditorVM, scrollState = editorScrollState, focusRequester = focusRequester,
-                shouldRequestFocus = shouldRequestFocus.value, onFocusRequested = { shouldRequestFocus.value = false })
+                mdEditorVM = mdEditorVM, scrollState = editorScrollState,
+                shouldRequestFocus = shouldRequestFocus.value, onFocusRequested = { shouldRequestFocus.value = false },
+                previewerState = previewerState)
         } else {
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()).nestedScroll(scrollBehavior.nestedScrollConnection), state = mdListState) {
                 item {
@@ -126,7 +124,7 @@ fun NotePage(
                         VerticalSpace(dp = 16.dp)
                     }
                 }
-                item { MarkdownText(text = noteVM.content.value, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), previewerState = previewerState) }
+                item { SelectionContainer { MarkdownText(text = noteVM.content.value, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), previewerState = previewerState) } }
                 item { BottomSpace(paddingValues) }
             }
         }

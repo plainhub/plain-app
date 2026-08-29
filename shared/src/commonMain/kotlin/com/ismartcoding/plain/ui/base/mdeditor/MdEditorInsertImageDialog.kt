@@ -30,7 +30,6 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.PickImageEffect
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.extensions.add
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
@@ -62,9 +61,7 @@ fun MdEditorInsertImageDialog(
                     if (description.isNotEmpty()) {
                         html += " alt=\"${description}\""
                     }
-                    mdEditorVM.textFieldState.edit {
-                        add("$html />")
-                    }
+                    mdEditorVM.insertText("$html />")
                     mdEditorVM.showInsertImage.value = false
                 },
             )

@@ -1,9 +1,6 @@
 package com.ismartcoding.plain.ui.models
 import com.ismartcoding.plain.i18n.*
 
-import com.ismartcoding.plain.ui.extensions.add
-import com.ismartcoding.plain.ui.extensions.inlineWrap
-import com.ismartcoding.plain.ui.extensions.setSelection
 import com.ismartcoding.plain.ui.helpers.WebHelper
 
 val mdAccessoryItems = listOf(
@@ -29,47 +26,45 @@ val mdAccessoryItems = listOf(
 val mdAccessoryItems2 =
     listOf(
         MdAccessoryItem2(Res.drawable.bold, click = {
-            it.textFieldState.edit { inlineWrap("**", "**") }
+            it.insertAtFocused("**", "**")
         }),
         MdAccessoryItem2(Res.drawable.italic, click = {
-            it.textFieldState.edit { inlineWrap("*", "*") }
+            it.insertAtFocused("*", "*")
         }),
         MdAccessoryItem2(Res.drawable.underline, click = {
-            it.textFieldState.edit { inlineWrap("<u>", "</u>") }
+            it.insertAtFocused("<u>", "</u>")
         }),
         MdAccessoryItem2(Res.drawable.strikethrough, click = {
-            it.textFieldState.edit { inlineWrap("~~", "~~") }
+            it.insertAtFocused("~~", "~~")
         }),
         MdAccessoryItem2(Res.drawable.code, click = {
-            it.textFieldState.edit { inlineWrap("```\n", "\n```") }
+            it.insertAtFocused("```\n", "\n```")
         }),
         MdAccessoryItem2(Res.drawable.superscript, click = {
-            it.textFieldState.edit { inlineWrap("\$\$\n", "\n\$\$") }
+            it.insertAtFocused("\$\$\n", "\n\$\$")
         }),
         MdAccessoryItem2(
             Res.drawable.table,
             click = {
-                it.textFieldState.edit {
-                    add(
-                        """
+                it.insertText(
+                    """
 | HEADER | HEADER | HEADER |
 |:----:|:----:|:----:|
 |      |      |      |
 |      |      |      |
 |      |      |      |
 """
-                    )
-                }
+                )
             },
         ),
         MdAccessoryItem2(Res.drawable.square_check, click = {
-            it.textFieldState.edit { inlineWrap("\n- [x] ") }
+            it.insertAtFocused("\n- [x] ")
         }),
         MdAccessoryItem2(Res.drawable.square, click = {
-            it.textFieldState.edit { inlineWrap("\n- [ ] ") }
+            it.insertAtFocused("\n- [ ] ")
         }),
         MdAccessoryItem2(Res.drawable.link, click = {
-            it.textFieldState.edit { inlineWrap("[Link](", ")") }
+            it.insertAtFocused("[Link](", ")")
         }),
         MdAccessoryItem2(Res.drawable.image, click = {
             it.showInsertImage.value = true
@@ -78,10 +73,10 @@ val mdAccessoryItems2 =
             it.showColorPicker.value = true
         }),
         MdAccessoryItem2(Res.drawable.arrow_up_to_line, click = {
-            it.textFieldState.edit { setSelection(0) }
+            it.moveCaretToStart()
         }),
         MdAccessoryItem2(Res.drawable.arrow_down_to_line, click = {
-            it.textFieldState.edit { setSelection(length) }
+            it.moveCaretToEnd()
         }),
         MdAccessoryItem2(Res.drawable.circle_help, click = {
             WebHelper.open("https://www.markdownguide.org/basic-syntax")
