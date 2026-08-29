@@ -23,6 +23,7 @@ import io.ktor.server.response.respondText
 import io.ktor.utils.io.readAvailable
 import io.ktor.utils.io.toByteArray
 import io.ktor.util.toMap
+import java.io.File
 import java.io.OutputStream
 
 /**
@@ -121,12 +122,37 @@ class KtorHttpCall(
         contentDisposition: String?,
     ) {
         contentDisposition?.let { applicationCall.response.header("Content-Disposition", it) }
-        val file = java.io.File(path)
-        if (contentType != null) {
-            applicationCall.respond(io.ktor.server.http.content.LocalFileContent(file, ContentType.parse(contentType)))
-        } else {
-            applicationCall.respond(io.ktor.server.http.content.LocalFileContent(file))
+        val file = File(path)
+        if (!file.exists() || !file.isFile) {
+            applicationCall.response.status(HttpStatusCode.NotFound)
+            applicationCall.respondBytes(ByteArray(0))
+            return
         }
+
+        val fileLength = file.length()
+        val range = resolveSingleByteRange(applicationCall.request.headers["Range"], fileLength)
+        if (range == null) {
+            applicationCall.response.run {
+                status(HttpStatusCode.RequestedRangeNotSatisfiable)
+                header("Accept-Ranges", "bytes")
+                header("Content-Range", "bytes */$fileLength")
+            }
+            applicationCall.respondBytes(ByteArray(0))
+            return
+        }
+
+        val status = if (range.isPartial) HttpStatusCode.PartialContent else HttpStatusCode.OK
+        val parsedContentType = contentType?.let { ContentType.parse(it) }
+        applicationCall.respond(
+            LowMemoryFileContent(
+                file = file,
+                contentType = parsedContentType,
+                status = status,
+                contentLength = range.length,
+                range = range,
+                totalLength = fileLength,
+            )
+        )
     }
 
     override suspend fun proxyUrl(url: String): Boolean {
@@ -155,7 +181,7 @@ class KtorHttpCall(
     }
 
     override suspend fun respondDlnaFile(path: String): Boolean {
-        val file = java.io.File(path)
+        val file = File(path)
         if (!file.exists()) return false
         applicationCall.response.run {
             header("realTimeInfo.dlna.org", "DLNA.ORG_TLAG=*")

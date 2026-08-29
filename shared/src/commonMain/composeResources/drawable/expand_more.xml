@@ -5,7 +5,7 @@
     android:viewportHeight="960">
   <group android:translateY="960">
     <path
-        android:pathData="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm240-240H200v160h240v-160Zm80 0v160h240v-160H520Zm-80-80v-160H200v160h240Zm80 0h240v-160H520v160ZM200-680h560v-80H200v80Z"
+        android:pathData="M465-364.5q-7-2.5-13-8.5L268-557q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-373q-6 6-13 8.5t-15 2.5q-8 0-15-2.5Z"
         android:fillColor="#000000"/>
   </group>
 </vector>

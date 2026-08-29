@@ -25,6 +25,26 @@ fun TextFieldBuffer.inlineWrap(
 
 fun TextFieldBuffer.mark() = inlineWrap("<mark>", "</mark>")
 
+/** Wrap the selection in markers; unwrap when it already carries them. */
+fun TextFieldBuffer.toggleWrap(start: String, end: String = start) {
+    val sel = selection
+    if (sel.collapsed) {
+        replace(sel.min, sel.min, start + end)
+        selection = TextRange(sel.min + start.length)
+        return
+    }
+    val selected = toString().substring(sel.min, sel.max)
+    if (selected.length >= start.length + end.length &&
+        selected.startsWith(start) && selected.endsWith(end)
+    ) {
+        replace(sel.max - end.length, sel.max, "")
+        replace(sel.min, sel.min + start.length, "")
+        selection = TextRange(sel.min, sel.max - start.length - end.length)
+    } else {
+        inlineWrap(start, end)
+    }
+}
+
 fun TextFieldBuffer.diagram() = inlineWrap("<pre class=\"mermaid\">", "\n</pre>")
 
 fun TextFieldBuffer.quote() {

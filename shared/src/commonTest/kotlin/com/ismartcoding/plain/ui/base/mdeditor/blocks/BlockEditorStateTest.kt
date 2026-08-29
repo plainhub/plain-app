@@ -16,6 +16,72 @@ class BlockEditorStateTest {
         return s
     }
 
+    // ── toolbar actions ───
+
+    @Test
+    fun `toggleWrap wraps selection and unwraps again`() {
+        val s = stateWith("hello world")
+        val b = s.blocks[0]
+        s.focusedBlockId.value = b.id
+        b.state.edit { selection = TextRange(0, 5) }
+        s.toggleWrap("**")
+        assertEquals("**hello** world", b.content())
+        b.state.edit { selection = TextRange(0, 9) }
+        s.toggleWrap("**")
+        assertEquals("hello world", b.content())
+    }
+
+    @Test
+    fun `toggleLinePrefix toggles heading levels`() {
+        val s = stateWith("title")
+        s.toggleLinePrefix("## ")
+        assertEquals("## title", s.blocks[0].content())
+        s.toggleLinePrefix("# ")
+        assertEquals("# title", s.blocks[0].content())
+        s.toggleLinePrefix("# ")
+        assertEquals("title", s.blocks[0].content())
+    }
+
+    @Test
+    fun `toggleLinePrefix strips list and callout markers`() {
+        val s = stateWith("- [ ] task")
+        s.toggleLinePrefix("")
+        assertEquals("task", s.blocks[0].content())
+        s.toggleLinePrefix("> [!note] ")
+        assertEquals("> [!note] task", s.blocks[0].content())
+        s.toggleLinePrefix("")
+        assertEquals("task", s.blocks[0].content())
+    }
+
+    // ── list continuation ───
+
+    @Test
+    fun `enter after a bulleted item continues the marker`() {
+        val s = stateWith("- one")
+        val b = s.blocks[0]
+        b.state.edit { append("\n"); setSelection(6) }
+        s.splitMultilineBlock(b)
+        assertEquals(listOf("- one", "- "), s.blocks.map { it.content() })
+    }
+
+    @Test
+    fun `enter after a numbered item increments the number`() {
+        val s = stateWith("3. item")
+        val b = s.blocks[0]
+        b.state.edit { append("\n"); setSelection(8) }
+        s.splitMultilineBlock(b)
+        assertEquals(listOf("3. item", "4. "), s.blocks.map { it.content() })
+    }
+
+    @Test
+    fun `enter on a marker-only line clears the marker`() {
+        val s = stateWith("- ")
+        val b = s.blocks[0]
+        b.state.edit { append("\n"); setSelection(3) }
+        s.splitMultilineBlock(b)
+        assertEquals(listOf(""), s.blocks.map { it.content() })
+    }
+
     // ── load / serialize ───
 
     @Test

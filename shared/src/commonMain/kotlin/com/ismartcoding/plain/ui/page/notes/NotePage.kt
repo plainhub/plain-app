@@ -5,10 +5,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,12 +39,20 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.shareText
+import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonTags
+import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonCopy
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonCut
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
+import com.ismartcoding.plain.ui.base.NavigationCloseIcon
+import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
 import com.ismartcoding.plain.ui.base.mdeditor.MdEditor
@@ -52,6 +65,7 @@ import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -78,29 +92,53 @@ fun NotePage(
     }
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController, title = "", scrollBehavior = scrollBehavior, actions = {
-            if (noteVM.editMode.value) {
-                PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.canUndo.value,
-                    tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.undo() }
-                PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(Res.string.redo), enabled = mdEditorVM.canRedo.value,
-                    tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.redo() }
-            } else if (id.value.isNotEmpty()) {
-                ActionButtonTags { noteVM.showSelectTagsDialog.value = true }
-                PIconButton(
-                    icon = Res.drawable.share_2,
-                    contentDescription = stringResource(Res.string.share),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                ) {
-                    shareText(noteVM.content.value)
+        if (mdEditorVM.blocks.selectionMode) {
+            PTopAppBar(navigationIcon = {
+                NavigationCloseIcon { mdEditorVM.exitSelectionMode() }
+            }, title = LocaleHelper.getStringF(Res.string.x_selected, mdEditorVM.blocks.selectedBlockCount()), actions = {
+                PTopRightButton(
+                    label = stringResource(if (mdEditorVM.blocks.isAllSelected()) Res.string.unselect_all else Res.string.select_all),
+                    click = { if (mdEditorVM.blocks.isAllSelected()) mdEditorVM.exitSelectionMode() else mdEditorVM.selectAllBlocks() },
+                )
+            })
+        } else {
+            PTopAppBar(navController = navController, title = "", scrollBehavior = scrollBehavior, actions = {
+                if (noteVM.editMode.value) {
+                    PIconButton(icon = Res.drawable.undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.canUndo.value,
+                        tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.undo() }
+                    PIconButton(icon = Res.drawable.redo, contentDescription = stringResource(Res.string.redo), enabled = mdEditorVM.canRedo.value,
+                        tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.redo() }
+                } else if (id.value.isNotEmpty()) {
+                    ActionButtonTags { noteVM.showSelectTagsDialog.value = true }
+                    PIconButton(
+                        icon = Res.drawable.share_2,
+                        contentDescription = stringResource(Res.string.share),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        shareText(noteVM.content.value)
+                    }
+                }
+                PIconButton(icon = if (noteVM.editMode.value) Res.drawable.markdown else Res.drawable.square_pen,
+                    contentDescription = stringResource(if (noteVM.editMode.value) Res.string.view else Res.string.edit),
+                    tint = MaterialTheme.colorScheme.onSurface) { noteVM.editMode.value = !noteVM.editMode.value }
+            })
+        }
+    }, modifier = Modifier.imePadding(), bottomBar = {
+        if (mdEditorVM.blocks.selectionMode) {
+            PBottomAppBar {
+                BottomActionButtons {
+                    IconTextSmallButtonCopy { mdEditorVM.copySelected() }
+                    IconTextSmallButtonCut { mdEditorVM.cutSelected() }
+                    IconTextSmallButtonDelete {
+                        mdEditorVM.deleteSelected()
+                        mdEditorVM.exitSelectionMode()
+                    }
                 }
             }
-            PIconButton(icon = if (noteVM.editMode.value) Res.drawable.markdown else Res.drawable.square_pen,
-                contentDescription = stringResource(if (noteVM.editMode.value) Res.string.view else Res.string.edit),
-                tint = MaterialTheme.colorScheme.onSurface) { noteVM.editMode.value = !noteVM.editMode.value }
-        })
-    }, modifier = Modifier.imePadding(), bottomBar = {
-        AnimatedVisibility(visible = noteVM.editMode.value, enter = slideInVertically { it }, exit = slideOutVertically { it }) {
-            MdEditorBottomAppBar(mdEditorVM)
+        } else {
+            AnimatedVisibility(visible = noteVM.editMode.value, enter = slideInVertically { it }, exit = slideOutVertically { it }) {
+                MdEditorBottomAppBar(mdEditorVM)
+            }
         }
     }, content = { paddingValues ->
         if (noteVM.editMode.value) {

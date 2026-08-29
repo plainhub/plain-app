@@ -9,6 +9,7 @@ import androidx.compose.ui.text.TextRange
 import com.ismartcoding.plain.ui.extensions.add
 import com.ismartcoding.plain.ui.extensions.inlineWrap
 import com.ismartcoding.plain.ui.extensions.setSelection
+import com.ismartcoding.plain.ui.extensions.toggleWrap
 import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -99,20 +100,48 @@ class BlockEditorState {
     /**
      * Re-parses a block whose text gained a newline (Enter key or multi-line paste)
      * into several blocks and moves the caret into the block under the old caret.
+     * Enter at the end of a list line continues the marker on the next line
+     * (numbered markers increment); Enter on a marker-only line clears the marker.
      */
     fun splitMultilineBlock(block: MdEditorBlock) {
         val idx = blocks.indexOf(block)
         if (idx < 0) return
         val content = block.content()
         if (!content.contains('\n')) return
-        val caret = block.state.selection.min
-        val parsed = MdBlockParser.parse(content)
+        var caret = block.state.selection.min
+        var text = content
+        val firstLine = text.substringBefore('\n')
+        val m = listContinuationRegex.find(firstLine)
+        if (m != null && caret == firstLine.length + 1) {
+            val rest = text.substringAfter('\n', "")
+            if (m.value.length >= firstLine.length) {
+                text = rest
+                caret = 0
+            } else {
+                val next = if (m.groups[1] != null) {
+                    val box = m.groups[2]?.value?.replace("[xX]", "[ ]") ?: ""
+                    m.groups[1]!!.value + box + " "
+                } else {
+                    "${m.groups[3]!!.value.toInt() + 1}. "
+                }
+                text = firstLine + "\n" + next + rest
+                caret += next.length
+            }
+            block.state.edit {
+                replace(0, length, text)
+                setSelection(caret.coerceIn(0, length))
+            }
+        }
+        val parsed = MdBlockParser.parse(text)
         if (parsed.size == 1) {
             block.kind = parsed[0].kind
             return
         }
         splice(idx, parsed, caret)
     }
+
+    // list marker at line start: indent, then bullet [+ task box] or "N."
+    private val listContinuationRegex = Regex("""^\s*(?:([-*+])(\s+\[[ xX]])?\s|(\d+)\.\s)""")
 
     /** Backspace at the very start of a block: deletes an empty block or merges into the previous one. */
     fun backspaceAtStart(block: MdEditorBlock): Boolean {
@@ -208,6 +237,33 @@ class BlockEditorState {
         focusBlock(b, b.state.selection.min)
     }
 
+    /** Wrap (or unwrap) the focused block's selection with inline markers. */
+    fun toggleWrap(before: String, after: String = before) {
+        val b = targetBlockForInsert() ?: return
+        b.state.edit { toggleWrap(before, after) }
+    }
+
+    // heading / list / quote / callout markers at the start of the focused block's line
+    private val linePrefixRegex = Regex("""^(?:#{1,6}|[-*+]|\d+\.|>)(?: ?\[[^\]]*])? +""")
+
+    /** Toggle a line-start marker on the focused text block; empty [prefix] strips any marker. */
+    fun toggleLinePrefix(prefix: String) {
+        val b = focusedBlock() ?: blocks.firstOrNull() ?: return
+        if (b.kind != MdBlockKind.TEXT) return
+        b.state.edit {
+            val m = linePrefixRegex.find(toString())
+            if (m == null) {
+                replace(0, 0, prefix)
+            } else if (!m.value.startsWith(prefix)) {
+                replace(0, m.value.length, prefix)
+            } else {
+                replace(0, m.value.length, "")
+                return@edit
+            }
+            setSelection((selection.min + prefix.length).coerceIn(0, length))
+        }
+    }
+
     fun moveCaretToStart() {
         val b = focusedBlock() ?: blocks.firstOrNull() ?: return
         focusBlock(b, 0)
@@ -276,6 +332,10 @@ class BlockEditorState {
         selectionAnchor = BlockAnchor(blocks.first().id, 0)
         selectionFocus = BlockAnchor(blocks.last().id, blocks.last().content().length)
     }
+
+    fun selectedBlockCount(): Int = blocks.count { isBlockSelected(it.id) }
+
+    fun isAllSelected(): Boolean = blocks.isNotEmpty() && blocks.all { isBlockSelected(it.id) }
 
     fun isBlockSelected(id: Long): Boolean {
         val range = selectedDocRange() ?: return false

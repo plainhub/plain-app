@@ -54,7 +54,7 @@ fun SidebarSectionHeader(
             )
             HorizontalSpace(dp = 4.dp)
             Icon(
-                painter = painterResource(if (isExpanded) Res.drawable.chevron_down else Res.drawable.chevron_right),
+                painter = painterResource(if (isExpanded) Res.drawable.expand_more else Res.drawable.chevron_right),
                 contentDescription = null,
                 modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant

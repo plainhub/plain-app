@@ -3,6 +3,7 @@ import com.ismartcoding.plain.preferences.*
 
 import com.ismartcoding.plain.i18n.*
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.AlertDialog
@@ -11,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
@@ -20,6 +22,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,6 +79,18 @@ fun MdEditorSettingsDialog(
                         }
                     }
                     HorizontalSpace(8.dp)
+                }
+                PDialogListItem(
+                    title = stringResource(Res.string.markdown_guide),
+                ) {
+                    Text(
+                        text = stringResource(Res.string.open_in_web),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable {
+                            WebHelper.open("https://www.markdownguide.org/basic-syntax")
+                        },
+                    )
                 }
             }
         })

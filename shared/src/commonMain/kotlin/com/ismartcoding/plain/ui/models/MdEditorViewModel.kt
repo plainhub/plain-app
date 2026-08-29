@@ -23,7 +23,6 @@ class MdEditorViewModel : ViewModel() {
     var wrapContent = mutableStateOf(true)
     var showLineNumbers = mutableStateOf(true)
     var syntaxHighLight = mutableStateOf(true)
-    var level = mutableIntStateOf(0)
 
     init {
         blocks.start(viewModelScope)
@@ -31,7 +30,6 @@ class MdEditorViewModel : ViewModel() {
 
     fun load() {
         viewModelScope.launchSafe {
-            level.intValue = EditorAccessoryLevelPreference.getAsync()
             wrapContent.value = EditorWrapContentPreference.getAsync()
             showLineNumbers.value = EditorShowLineNumbersPreference.getAsync()
             syntaxHighLight.value = EditorSyntaxHighlightPreference.getAsync()
@@ -51,11 +49,12 @@ class MdEditorViewModel : ViewModel() {
 
     fun insertAtFocused(before: String, after: String = "") = blocks.insertAtFocused(before, after)
 
+    fun toggleWrap(before: String, after: String = "") =
+        blocks.toggleWrap(before, after.ifEmpty { before })
+
     fun insertText(s: String) = blocks.insertText(s)
 
-    fun moveCaretToStart() = blocks.moveCaretToStart()
-
-    fun moveCaretToEnd() = blocks.moveCaretToEnd()
+    fun toggleLinePrefix(prefix: String) = blocks.toggleLinePrefix(prefix)
 
     // ---- cross-block selection ----
 
@@ -75,12 +74,7 @@ class MdEditorViewModel : ViewModel() {
         if (copySelected()) blocks.deleteSelectedRange()
     }
 
-    fun toggleLevel() {
-        level.intValue = if (level.intValue == 1) 0 else 1
-        viewModelScope.launchSafe {
-            EditorAccessoryLevelPreference.putAsync(level.intValue)
-        }
-    }
+    fun deleteSelected() = blocks.deleteSelectedRange()
 
     fun toggleLineNumbers() {
         showLineNumbers.value = !showLineNumbers.value

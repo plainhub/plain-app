@@ -35,6 +35,8 @@ import com.ismartcoding.plain.httpserver.http.HttpStatus
  * to a real device path before delegating here — byte output is not duplicated.
  */
 object FileServer {
+    private const val MAX_MANUAL_RANGE_LENGTH = 256 * 1024
+
     suspend fun serve(
         call: HttpCall,
         path: String,
@@ -76,6 +78,10 @@ object FileServer {
         if (rangeOffset != null && rangeLength != null && rangeLength > 0 &&
             !isContentUri(path) && !path.startsWith("pkgicon://")
         ) {
+            if (rangeLength > MAX_MANUAL_RANGE_LENGTH) {
+                call.respondText("range length is too large", status = HttpStatus.BAD_REQUEST)
+                return
+            }
             val bytes = readFileRange(path, rangeOffset, rangeLength)
             if (bytes == null) {
                 call.respondNoBody(HttpStatus.NOT_FOUND)

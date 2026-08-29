@@ -197,7 +197,7 @@ private fun ExpandCollapseBar(expanded: Boolean, onClick: () -> Unit) {
         )
         HorizontalSpace(dp = 4.dp)
         Icon(
-            painter = painterResource(if (expanded) Res.drawable.chevron_up else Res.drawable.chevron_down),
+            painter = painterResource(if (expanded) Res.drawable.chevron_up else Res.drawable.expand_more),
             contentDescription = null,
             modifier = Modifier.size(16.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,

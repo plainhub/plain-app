@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.lib.markdown.annotator
 
 import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
@@ -10,8 +11,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
+import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.lib.markdown.annotator.appendAutoLink
 import com.ismartcoding.plain.lib.markdown.annotator.appendMarkdownLink
 import com.ismartcoding.plain.lib.markdown.annotator.appendMarkdownReference
@@ -235,6 +238,48 @@ fun AnnotatedString.Builder.appendAutoLink(
     }
 }
 
+// Non-GFM inline syntaxes emitted by the editor toolbar but not parsed by the
+// GFM flavour: ^sup^, ~sub~, %%comment%%, [^n] footnote markers and [!type]
+// callout badges. They arrive as plain TEXT tokens, so style them here.
+private val inlineCustomSyntaxRegex =
+    Regex("""\^[^\s^]+\^|~[^\s~]+~|%%[^%\n]+%%|\[\^\d+]|\[!\w+]""")
+
+private fun AnnotatedString.Builder.appendTextWithInlineSyntax(text: String) {
+    var last = 0
+    for (m in inlineCustomSyntaxRegex.findAll(text)) {
+        if (m.range.first > last) append(text, last, m.range.first)
+        val raw = m.value
+        when (raw.first()) {
+            '^' -> supSpan(raw.substring(1, raw.length - 1))
+            '~' -> subSpan(raw.substring(1, raw.length - 1))
+            '%' -> {
+                pushStyle(SpanStyle(color = Color.Gray, fontStyle = FontStyle.Italic))
+                append(raw.substring(2, raw.length - 2))
+                pop()
+            }
+            '[' -> if (raw[1] == '^') supSpan(raw.substring(2, raw.length - 1)) else {
+                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                append(raw.uppercase())
+                pop()
+            }
+        }
+        last = m.range.last + 1
+    }
+    if (last < text.length) append(text, last, text.length)
+}
+
+private fun AnnotatedString.Builder.supSpan(body: String) {
+    pushStyle(SpanStyle(baselineShift = BaselineShift.Superscript, fontSize = 12.sp))
+    append(body)
+    pop()
+}
+
+private fun AnnotatedString.Builder.subSpan(body: String) {
+    pushStyle(SpanStyle(baselineShift = BaselineShift.Subscript, fontSize = 12.sp))
+    append(body)
+    pop()
+}
+
 /**
  * Builds an [AnnotatedString] with the contents of the given Markdown [ASTNode] node.
  *
@@ -374,7 +419,7 @@ fun AnnotatedString.Builder.buildMarkdownAnnotatedString(
                     MarkdownElementTypes.FULL_REFERENCE_LINK -> appendMarkdownReference(content, child, annotatorSettings)
 
                     // Token Types
-                    MarkdownTokenTypes.TEXT -> append(child.getUnescapedTextInNode(content))
+                    MarkdownTokenTypes.TEXT -> appendTextWithInlineSyntax(child.getUnescapedTextInNode(content))
                     GFMTokenTypes.GFM_AUTOLINK -> if (child.parent == MarkdownElementTypes.LINK_TEXT) {
                         append(child.getUnescapedTextInNode(content))
                     } else appendAutoLink(content, child, annotatorSettings)

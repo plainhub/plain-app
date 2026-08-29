@@ -156,7 +156,7 @@ private fun LayerRow(
             click = onBringForward,
         )
         PIconButton(
-            icon = Res.drawable.chevron_down,
+            icon = Res.drawable.expand_more,
             contentDescription = stringResource(Res.string.image_editor_send_backward),
             iconSize = 18.dp,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
