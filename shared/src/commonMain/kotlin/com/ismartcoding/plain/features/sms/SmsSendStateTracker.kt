@@ -67,7 +67,7 @@ class SmsSendStateTracker(private val store: SmsSendStateStore) {
         store.readAll().mapNotNull { state ->
             val success = state.terminalSuccess ?: return@mapNotNull null
             val resultCode = state.terminalResultCode ?: return@mapNotNull null
-            SmsSendResultData(state.clientId, state.clientRequestId, success, resultCode)
+            SmsSendResultData(state.clientRequestId, success, resultCode)
         }
     }
 
@@ -75,7 +75,6 @@ class SmsSendStateTracker(private val store: SmsSendStateStore) {
         val send = store.read(requestId) ?: return@withLock null
         if (send.terminalResultCode != null) return@withLock null
         val result = SmsSendResultData(
-            send.clientId,
             send.clientRequestId,
             false,
             SmsProviderContract.SEND_RESULT_TIMEOUT,
@@ -103,7 +102,7 @@ class SmsSendStateTracker(private val store: SmsSendStateStore) {
         if (partCount.coerceAtLeast(1) != send.partCount || partIndex !in 0 until send.partCount) return@withLock null
 
         if (resultCode != successResultCode) {
-            val result = SmsSendResultData(send.clientId, send.clientRequestId, false, resultCode)
+            val result = SmsSendResultData(send.clientRequestId, false, resultCode)
             store.write(
                 send.copy(
                     terminalSuccess = false,
@@ -120,7 +119,7 @@ class SmsSendStateTracker(private val store: SmsSendStateStore) {
             return@withLock null
         }
 
-        val result = SmsSendResultData(send.clientId, send.clientRequestId, true, resultCode)
+        val result = SmsSendResultData(send.clientRequestId, true, resultCode)
         store.write(
             send.copy(
                 completedParts = completedParts,

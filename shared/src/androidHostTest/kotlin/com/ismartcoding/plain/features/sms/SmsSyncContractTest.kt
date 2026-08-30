@@ -91,7 +91,7 @@ class SmsSyncContractTest {
 
         assertEquals(null, tracker.record("request", 0, 2, -1, -1, 200L))
         assertEquals(
-            SmsSendResultData("client", "pending-a", true, -1),
+            SmsSendResultData("pending-a", true, -1),
             tracker.record("request", 1, 2, -1, -1, 300L),
         )
     }
@@ -102,7 +102,7 @@ class SmsSyncContractTest {
         tracker.register("request", "client", "pending-a", 2, 100L)
 
         assertEquals(
-            SmsSendResultData("client", "pending-a", false, 4),
+            SmsSendResultData("pending-a", false, 4),
             tracker.record("request", 0, 2, 4, -1, 200L),
         )
         assertEquals(null, tracker.record("request", 1, 2, -1, -1, 300L))
@@ -115,11 +115,11 @@ class SmsSyncContractTest {
         tracker.register("send-b", "client", "pending-b", 1, 110L)
 
         assertEquals(
-            SmsSendResultData("client", "pending-b", false, 4),
+            SmsSendResultData("pending-b", false, 4),
             tracker.record("send-b", 0, 1, 4, -1, 200L),
         )
         assertEquals(
-            SmsSendResultData("client", "pending-a", true, -1),
+            SmsSendResultData("pending-a", true, -1),
             tracker.record("send-a", 0, 1, -1, -1, 210L),
         )
     }
@@ -130,7 +130,7 @@ class SmsSyncContractTest {
         tracker.register("request", "client", "pending-a", 1, 100L)
 
         assertEquals(
-            SmsSendResultData("client", "pending-a", false, SmsProviderContract.SEND_RESULT_TIMEOUT),
+            SmsSendResultData("pending-a", false, SmsProviderContract.SEND_RESULT_TIMEOUT),
             tracker.expire("request", 500L),
         )
         assertEquals(null, tracker.expire("request", 600L))
@@ -144,14 +144,14 @@ class SmsSyncContractTest {
         SmsSendStateTracker(store).apply {
             register("request", "client", "pending-a", 1, 100L)
             assertEquals(
-                SmsSendResultData("client", "pending-a", true, -1),
+                SmsSendResultData("pending-a", true, -1),
                 record("request", 0, 1, -1, -1, 500L),
             )
         }
 
         val restored = SmsSendStateTracker(store)
-        assertEquals(listOf(SmsSendResultData("client", "pending-a", true, -1)), restored.terminalResults())
-        assertEquals(listOf(SmsSendResultData("client", "pending-a", true, -1)), restored.terminalResults())
+        assertEquals(listOf(SmsSendResultData("pending-a", true, -1)), restored.terminalResults())
+        assertEquals(listOf(SmsSendResultData("pending-a", true, -1)), restored.terminalResults())
         assertEquals(500L, restored.pending().single().terminalAtMillis)
         restored.acknowledge("request")
         assertTrue(restored.terminalResults().isEmpty())
@@ -167,7 +167,7 @@ class SmsSyncContractTest {
 
         val restored = SmsSendStateTracker(store)
         assertEquals(
-            SmsSendResultData("client", "pending-a", true, -1),
+            SmsSendResultData("pending-a", true, -1),
             restored.record("request", 1, 2, -1, -1, 300L),
         )
         assertEquals(setOf(0, 1), restored.pending().single().completedParts)

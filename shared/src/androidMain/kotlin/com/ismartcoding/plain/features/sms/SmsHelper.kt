@@ -32,6 +32,7 @@ import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.smsManager
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.receivers.SmsSentReceiver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -169,12 +170,7 @@ object SmsHelper {
     }
 
     private suspend fun sendSmsResultEvent(result: SmsSendResultData) {
-        WebSocketHelper.sendEventAsync(
-            WebSocketEvent(
-                EventType.SMS_SEND_RESULT,
-                JsonHelper.jsonEncode(result),
-            ),
-        )
+        sendEvent(WebSocketEvent(EventType.SMS_SEND_RESULT, JsonHelper.jsonEncode(result)))
     }
 
     private fun getProjection(): Array<String> {

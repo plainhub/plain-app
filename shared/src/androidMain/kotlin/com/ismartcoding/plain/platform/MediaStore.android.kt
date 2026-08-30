@@ -65,11 +65,11 @@ suspend fun replayTerminalMmsSendResults() {
         TimeHelper.nowMillis(),
         MMS_TERMINAL_RESULT_TTL_MILLIS,
     ).forEach { result ->
-        WebSocketHelper.sendEventAsync(
+        sendEvent(
             WebSocketEvent(
                 EventType.MMS_SEND_RESULT,
                 JsonHelper.jsonEncode(result),
-            ),
+            )
         )
     }
 }
@@ -365,7 +365,7 @@ actual fun startMmsPolling(
                         Telephony.Mms.CONTENT_URI,
                         arrayOf(Telephony.Mms._ID, Telephony.Mms.THREAD_ID),
                         "${Telephony.Mms.MESSAGE_BOX} = 2 AND m_type = ${SmsProviderContract.MMS_PDU_SEND_REQ} " +
-                            "AND ${Telephony.Mms._ID} > ? AND ${Telephony.Mms.DATE} >= ?",
+                                "AND ${Telephony.Mms._ID} > ? AND ${Telephony.Mms.DATE} >= ?",
                         arrayOf(minimumMmsId.toString(), launchTimeSec.toString()),
                         "${Telephony.Mms._ID} ASC",
                     )?.use { cursor ->
