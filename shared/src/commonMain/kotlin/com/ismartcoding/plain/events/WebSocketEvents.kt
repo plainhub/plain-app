@@ -64,6 +64,9 @@ enum class EventType(val value: Int) {
     NEARBY_DISCOVERY_STARTED(29),
     NEARBY_DISCOVERY_STOPPED(30),
     IMAGE_EDITOR_UPDATE(34),
+    SMS_PROVIDER_CHANGED(35),
+    SMS_SEND_RESULT(36),
+    MMS_SEND_RESULT(37),
 }
 
 
@@ -79,3 +82,48 @@ data class PeerStatusData(
     val id: String,
     val online: Boolean,
 )
+
+@Serializable
+data class SmsProviderChangedData(
+    val uris: List<String>,
+)
+
+@Serializable
+data class SmsSendResultData(
+    val clientId: String?,
+    val requestId: String?,
+    val success: Boolean,
+    val resultCode: Int,
+)
+
+object SendResultCodes {
+    const val TIMEOUT = -1000
+    const val CANCELLED = -1001
+}
+
+@Serializable
+data class MmsSendResultData(
+    val pendingId: String,
+    val success: Boolean,
+    val resultCode: Int,
+) {
+    companion object {
+        fun success(pendingId: String) = MmsSendResultData(
+            pendingId = pendingId,
+            success = true,
+            resultCode = 0,
+        )
+
+        fun timeout(pendingId: String) = MmsSendResultData(
+            pendingId = pendingId,
+            success = false,
+            resultCode = SendResultCodes.TIMEOUT,
+        )
+
+        fun cancelled(pendingId: String) = MmsSendResultData(
+            pendingId = pendingId,
+            success = false,
+            resultCode = SendResultCodes.CANCELLED,
+        )
+    }
+}

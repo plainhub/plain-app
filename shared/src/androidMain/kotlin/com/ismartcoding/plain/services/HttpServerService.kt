@@ -13,6 +13,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
+import com.ismartcoding.plain.features.sms.SmsProviderObserver
+import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.sendEvent
@@ -23,6 +25,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.mdns.MdnsRegister
 import com.ismartcoding.plain.mdns.NsdHelper
 import com.ismartcoding.plain.platform.LocaleHelper
+import com.ismartcoding.plain.platform.cancelMmsPolling
 import com.ismartcoding.plain.platform.startHttpServerAsync
 import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import com.ismartcoding.plain.httpserver.HttpServerManager
@@ -171,6 +174,9 @@ class HttpServerService : LifecycleService() {
             LogCat.e("Error stopping server on task removed: ${e.message}")
         } finally {
             PeerStatusManager.stop()
+            SmsProviderObserver.stop()
+            SmsHelper.stopSmsSendTracking()
+            cancelMmsPolling()
             httpServer = null
         }
         stopSelf()
@@ -188,6 +194,9 @@ class HttpServerService : LifecycleService() {
         // Ensure mDNS responder is stopped
         NsdHelper.unregisterService()
         PeerStatusManager.stop()
+        SmsProviderObserver.stop()
+        SmsHelper.stopSmsSendTracking()
+        cancelMmsPolling()
         try {
             httpServer?.stop(0, 1000)
         } catch (_: Exception) {

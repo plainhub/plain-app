@@ -88,7 +88,7 @@ type Mutation {
   cancelNotifications(ids: [ID!]!): Boolean!
   replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
   unarchiveConversation(id: String!): Boolean!
-  sendSms(number: String!, body: String!, subscriptionId: Int!): Boolean!
+  sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
   archiveConversation(id: String!, date: Long!): Boolean!
   sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: String!): String!
   createTag(type: DataType!, name: String!): Tag
@@ -794,6 +794,7 @@ type MessageConversation {
   date: Instant!
   messageCount: Int!
   read: Boolean!
+  addresses: [String!]!
 }
 
 type MessageFiles {

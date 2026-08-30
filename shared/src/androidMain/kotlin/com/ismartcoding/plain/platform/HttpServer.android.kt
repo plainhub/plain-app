@@ -7,6 +7,8 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
+import com.ismartcoding.plain.features.sms.SmsProviderObserver
+import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -94,12 +96,22 @@ actual suspend fun onHttpServerStarted() {
     val service = HttpServerService.instance ?: return
     NsdHelper.registerServices(TempData.httpPort.value, TempData.httpsPort.value)
     PNotificationListenerService.toggle(service, Permission.NOTIFICATION_LISTENER.isEnabledAsync())
+    SmsProviderObserver.start(service)
+    SmsHelper.restoreSmsSendTracking()
     PeerStatusManager.start()
+}
+
+actual suspend fun onWebSocketSessionStarted() {
+    SmsHelper.replayTerminalSmsSendResults()
+    replayTerminalMmsSendResults()
 }
 
 actual suspend fun onHttpServerStopped() {
     NsdHelper.unregisterService()
     PeerStatusManager.stop()
+    SmsProviderObserver.stop()
+    SmsHelper.stopSmsSendTracking()
+    cancelMmsPolling()
     HttpServerService.instance?.let { PNotificationListenerService.toggle(it, false) }
 }
 

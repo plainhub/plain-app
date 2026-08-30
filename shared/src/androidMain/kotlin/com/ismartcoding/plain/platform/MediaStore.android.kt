@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.platform
 
-import android.net.Uri
+import android.provider.Telephony
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.audio.AudioMediaStoreHelper
@@ -11,6 +11,7 @@ import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.docs.DocMediaStoreHelper
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.MmsSendResultData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.call.PhoneGeoCache
 import com.ismartcoding.plain.features.media.CallMediaStoreHelper
@@ -18,12 +19,71 @@ import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
+import com.ismartcoding.plain.features.sms.MmsSendResultTracker
+import com.ismartcoding.plain.features.sms.SmsProviderContract
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.httpserver.websocket.WebSocketHelper
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
+
+private val claimedSentMmsIds = linkedSetOf<Long>()
+private val mmsPollingJobs = ConcurrentHashMap<String, Job>()
+private const val MMS_TERMINAL_RESULT_TTL_MILLIS = 5 * 60 * 1000L
+private const val MMS_CANCELLED_ATTACHMENT_RETENTION_MILLIS = 5 * 60 * 1000L
+
+private fun claimSentMmsId(id: Long): Boolean = synchronized(claimedSentMmsIds) {
+    if (!claimedSentMmsIds.add(id)) return@synchronized false
+    if (claimedSentMmsIds.size > 500) claimedSentMmsIds.remove(claimedSentMmsIds.first())
+    true
+}
+
+private fun dispatchMmsTerminalResult(result: MmsSendResultData, legacySuccessEvent: Boolean = false) {
+    MmsSendResultTracker.record(appContext, result, TimeHelper.nowMillis())
+    val data = if (legacySuccessEvent) {
+        JsonHelper.jsonEncode(result.pendingId)
+    } else {
+        JsonHelper.jsonEncode(result)
+    }
+    sendEvent(
+        WebSocketEvent(
+            if (legacySuccessEvent) EventType.MMS_SENT else EventType.MMS_SEND_RESULT,
+            data,
+        ),
+    )
+}
+
+suspend fun replayTerminalMmsSendResults() {
+    MmsSendResultTracker.replayable(
+        appContext,
+        TimeHelper.nowMillis(),
+        MMS_TERMINAL_RESULT_TTL_MILLIS,
+    ).forEach { result ->
+        WebSocketHelper.sendEventAsync(
+            WebSocketEvent(
+                EventType.MMS_SEND_RESULT,
+                JsonHelper.jsonEncode(result),
+            ),
+        )
+    }
+}
+
+private fun deleteMmsAttachments(attachmentPaths: List<String>) {
+    attachmentPaths.forEach { path -> runCatching { File(path).delete() } }
+}
+
+private fun scheduleCancelledMmsAttachmentCleanup(attachmentPaths: List<String>) {
+    coIO {
+        delay(MMS_CANCELLED_ATTACHMENT_RETENTION_MILLIS)
+        deleteMmsAttachments(attachmentPaths)
+    }
+}
 
 actual suspend fun getMediaBuckets(dataType: DataType): List<DMediaBucket> {
     return when (dataType) {
@@ -216,8 +276,19 @@ actual suspend fun getSmsAllCounts(): DSmsCounts =
         DSmsCounts(it.total, it.inbox, it.sent, it.drafts)
     }
 
-actual fun sendSmsText(number: String, body: String, subscriptionId: Int?) =
-    com.ismartcoding.plain.features.sms.SmsHelper.sendText(number, body, subscriptionId)
+actual fun sendSmsText(
+    number: String,
+    body: String,
+    subscriptionId: Int?,
+    clientId: String?,
+    clientRequestId: String?,
+) = com.ismartcoding.plain.features.sms.SmsHelper.sendText(
+    number,
+    body,
+    subscriptionId,
+    clientId,
+    clientRequestId,
+)
 
 actual fun call(number: String, showDialer: Boolean) =
     com.ismartcoding.plain.features.media.CallMediaStoreHelper.call(appContext, number, showDialer)
@@ -235,6 +306,20 @@ actual fun launchDefaultSmsApp(
 ): Long {
     com.ismartcoding.plain.features.sms.MmsHelper.launchDefaultSmsApp(number, body, attachments)
     return System.currentTimeMillis() / 1000 - 1
+}
+
+actual fun getLatestSentMmsId(): Long {
+    return runCatching {
+        appContext.contentResolver.query(
+            Telephony.Mms.CONTENT_URI,
+            arrayOf(Telephony.Mms._ID),
+            "${Telephony.Mms.MESSAGE_BOX} = 2 AND m_type = ${SmsProviderContract.MMS_PDU_SEND_REQ}",
+            null,
+            "${Telephony.Mms._ID} DESC LIMIT 1",
+        )?.use { cursor ->
+            if (cursor.moveToFirst()) cursor.getLong(0) else 0L
+        } ?: 0L
+    }.getOrDefault(0L)
 }
 
 actual fun getScreenSize(): Pair<Int, Int> {
@@ -258,36 +343,85 @@ actual suspend fun deleteContacts(ids: Set<String>) {
     com.ismartcoding.plain.features.media.ContactMediaStoreHelper.deleteByIdsAsync(appContext, ids)
 }
 
-actual fun startMmsPolling(pendingId: String, launchTimeSec: Long, attachmentPaths: List<String>) {
-    coIO {
-        val context = appContext
-        repeat(150) { // 2 s × 150 = 5 minutes max
-            delay(2000)
-            val found = context.contentResolver.query(
-                Uri.parse("content://mms"),
-                arrayOf("_id"),
-                "msg_box = 2 AND m_type = 128 AND date >= ?",
-                arrayOf(launchTimeSec.toString()),
-                null,
-            )?.use { cursor -> cursor.count > 0 } ?: false
-            if (found) {
-                TempData.pendingMmsMessages.removeIf { it.id == pendingId }
-                attachmentPaths.forEach { path ->
-                    try {
-                        File(path).delete()
-                    } catch (_: Exception) {
+actual fun startMmsPolling(
+    pendingId: String,
+    launchTimeSec: Long,
+    minimumMmsId: Long,
+    number: String,
+    body: String,
+    threadId: String,
+    attachmentPaths: List<String>,
+    attachmentContentTypes: List<String>,
+) {
+    mmsPollingJobs.remove(pendingId)?.cancel()
+    val job = coIO {
+        var cancelled = false
+        try {
+            val context = appContext
+            repeat(150) { // 2 s × 150 = 5 minutes max
+                delay(2000)
+                val matchedId = runCatching {
+                    context.contentResolver.query(
+                        Telephony.Mms.CONTENT_URI,
+                        arrayOf(Telephony.Mms._ID, Telephony.Mms.THREAD_ID),
+                        "${Telephony.Mms.MESSAGE_BOX} = 2 AND m_type = ${SmsProviderContract.MMS_PDU_SEND_REQ} " +
+                            "AND ${Telephony.Mms._ID} > ? AND ${Telephony.Mms.DATE} >= ?",
+                        arrayOf(minimumMmsId.toString(), launchTimeSec.toString()),
+                        "${Telephony.Mms._ID} ASC",
+                    )?.use { cursor ->
+                        val idIndex = cursor.getColumnIndexOrThrow(Telephony.Mms._ID)
+                        val threadIndex = cursor.getColumnIndexOrThrow(Telephony.Mms.THREAD_ID)
+                        val candidates = mutableListOf<SmsProviderContract.MmsCandidateFingerprint>()
+                        while (cursor.moveToNext()) {
+                            val id = cursor.getLong(idIndex)
+                            val bodyAndAttachments = SmsHelper.readMmsBodyAndAttachments(context, id.toString())
+                            candidates += SmsProviderContract.MmsCandidateFingerprint(
+                                id = id,
+                                address = SmsHelper.readMmsAddress(context, id.toString()),
+                                body = bodyAndAttachments.first,
+                                threadId = cursor.getString(threadIndex).orEmpty(),
+                                attachmentContentTypes = bodyAndAttachments.second
+                                    .filterNot { it.contentType.equals("application/smil", ignoreCase = true) }
+                                    .map { it.contentType },
+                            )
+                        }
+                        val requested = SmsProviderContract.MmsSendFingerprint(
+                            address = number,
+                            body = body,
+                            threadId = threadId,
+                            attachmentContentTypes = attachmentContentTypes,
+                        )
+                        SmsProviderContract.matchingMmsCandidateIds(requested, candidates)
+                            .firstOrNull(::claimSentMmsId)
                     }
+                }.getOrNull()
+                if (matchedId != null) {
+                    dispatchMmsTerminalResult(MmsSendResultData.success(pendingId), legacySuccessEvent = true)
+                    return@coIO
                 }
-                sendEvent(
-                    WebSocketEvent(
-                        EventType.MMS_SENT,
-                        JsonHelper.jsonEncode(pendingId),
-                    ),
-                )
-                return@coIO
             }
+            dispatchMmsTerminalResult(MmsSendResultData.timeout(pendingId))
+        } catch (e: CancellationException) {
+            cancelled = true
+            dispatchMmsTerminalResult(MmsSendResultData.cancelled(pendingId))
+            throw e
+        } finally {
+            TempData.pendingMmsMessages.removeIf { it.id == pendingId }
+            if (cancelled) {
+                scheduleCancelledMmsAttachmentCleanup(attachmentPaths)
+            } else {
+                deleteMmsAttachments(attachmentPaths)
+            }
+            mmsPollingJobs.remove(pendingId)
         }
     }
+    mmsPollingJobs[pendingId] = job
+}
+
+fun cancelMmsPolling() {
+    val jobs = mmsPollingJobs.values.toList()
+    mmsPollingJobs.clear()
+    jobs.forEach(Job::cancel)
 }
 
 actual suspend fun enableImageSearchAsync() {

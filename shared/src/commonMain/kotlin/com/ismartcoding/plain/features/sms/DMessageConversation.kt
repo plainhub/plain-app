@@ -9,4 +9,5 @@ data class DMessageConversation(
     val date: kotlin.time.Instant,
     val messageCount: Int,
     val read: Boolean,
+    val addresses: List<String> = if (address.isEmpty()) emptyList() else listOf(address),
 ) : IData

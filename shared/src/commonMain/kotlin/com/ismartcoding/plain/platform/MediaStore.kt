@@ -163,8 +163,16 @@ expect suspend fun getSmsAllCounts(): DSmsCounts
 /**
  * Send an SMS text message to [number] with body [body].
  * @param subscriptionId SIM subscription id, or null for default.
+ * @param clientId web client identity derived from the authenticated request headers.
+ * @param clientRequestId optional per-send correlation id returned in the asynchronous result event.
  */
-expect fun sendSmsText(number: String, body: String, subscriptionId: Int?)
+expect fun sendSmsText(
+    number: String,
+    body: String,
+    subscriptionId: Int?,
+    clientId: String?,
+    clientRequestId: String?,
+)
 
 /**
  * Initiate a phone call to [number].
@@ -195,6 +203,9 @@ expect fun launchDefaultSmsApp(
     body: String,
     attachments: List<Pair<String, String>>,
 ): Long
+
+/** Returns the newest sent MMS provider row ID, or zero when unavailable. */
+expect fun getLatestSentMmsId(): Long
 
 /**
  * Returns the screen size in pixels as a [Pair] of (width, height) on supported
@@ -241,14 +252,22 @@ expect fun createContact(input: com.ismartcoding.plain.httpserver.models.Contact
 expect suspend fun deleteContacts(ids: Set<String>)
 
 /**
- * Poll the platform MMS provider for up to 5 minutes waiting for a sent MMS
- * to appear (identified by [launchTimeSec]). When found, removes the pending
- * entry identified by [pendingId] from [TempData.pendingMmsMessages], deletes
- * the temporary [attachmentPaths], and emits an `MMS_SENT` WebSocket event.
+ * Poll the platform MMS provider for up to 5 minutes waiting for the correlated
+ * sent MMS. Temporary state is cleared on either success or timeout; clients
+ * receive `MMS_SENT` on success or `MMS_SEND_RESULT` on timeout.
  *
  * No-op on platforms without an MMS provider (iOS).
  */
-expect fun startMmsPolling(pendingId: String, launchTimeSec: Long, attachmentPaths: List<String>)
+expect fun startMmsPolling(
+    pendingId: String,
+    launchTimeSec: Long,
+    minimumMmsId: Long,
+    number: String,
+    body: String,
+    threadId: String,
+    attachmentPaths: List<String>,
+    attachmentContentTypes: List<String>,
+)
 
 /**
  * Enable the on-device AI image search model (downloads model if needed).

@@ -118,6 +118,9 @@ actual suspend fun onHttpServerStarted() {
     }
 }
 
+/** iOS has no Android SMS send-result state to replay. */
+actual suspend fun onWebSocketSessionStarted() = Unit
+
 /** No platform side effects on iOS when the server stops. */
 actual suspend fun onHttpServerStopped() {
     MdnsHostResponder.clearService()
@@ -139,7 +142,6 @@ actual fun startHttpServerService() {
 actual suspend fun stopHttpServiceAsync(): Unit = withIO {
     stopHttpServerCoreAsync()
 }
-
 
 
 

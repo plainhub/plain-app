@@ -14,7 +14,7 @@ import kotlin.time.Instant
  * `content://mms`.
  */
 data class DPendingMms(
-    val id: String,                        // e.g. "pending_mms_<timestampMs>"
+    val id: String,                        // e.g. "pending_mms_<uuid>"
     val number: String,
     val body: String,
     val attachments: List<DMessageAttachment>,

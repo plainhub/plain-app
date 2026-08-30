@@ -5,6 +5,9 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.features.sms.DPendingMms
+import com.ismartcoding.plain.features.sms.SmsProviderContract
+import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
+import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
@@ -20,6 +23,7 @@ import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.getArchivedSmsConversations
 import com.ismartcoding.plain.platform.getSmsAllCounts
+import com.ismartcoding.plain.platform.getLatestSentMmsId
 import com.ismartcoding.plain.platform.launchDefaultSmsApp
 import com.ismartcoding.plain.platform.mimeTypeFromExtension
 import com.ismartcoding.plain.platform.resolveAppFileUri
@@ -36,6 +40,12 @@ import com.ismartcoding.plain.httpserver.models.Message
 import com.ismartcoding.plain.httpserver.models.MessageConversation
 import com.ismartcoding.plain.httpserver.models.SmsCounts
 import com.ismartcoding.plain.httpserver.models.toModel
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
+private val mmsSendMutex = Mutex()
 
 @GraphQLQuery
 suspend fun smsAllCounts(): SmsCounts {
@@ -53,11 +63,18 @@ suspend fun unarchiveConversation(id: String): Boolean {
 }
 
 @GraphQLMutation
-suspend fun sendSms(number: String, body: String, subscriptionId: Int): Boolean {
+suspend fun sendSms(
+    number: String,
+    body: String,
+    subscriptionId: Int,
+    requestId: String? = null,
+    context: Context,
+): Boolean {
     Permission.SEND_SMS.checkEnabledAsync()
     val simId = if (subscriptionId >= 0) subscriptionId else null
+    val clientId = context.get<GraphqlRequestContext>()?.header("c-id")
     try {
-        sendSmsText(number, body, simId)
+        sendSmsText(number, body, simId, clientId, requestId)
     } catch (e: Exception) {
         e.printStackTrace()
         throw GraphQLError(e.message ?: "Invalid SMS input")
@@ -67,7 +84,7 @@ suspend fun sendSms(number: String, body: String, subscriptionId: Int): Boolean 
 
 @GraphQLQuery
 suspend fun sms(offset: Int, limit: Int, query: String): List<Message> {
-    Permission.READ_SMS.checkEnabledAsync()
+    if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
     return searchMedia(DataType.SMS, query, limit, offset, FileSortBy.DATE_DESC)
         .filterIsInstance<DMessage>()
         .map { it.toModel() }
@@ -75,7 +92,7 @@ suspend fun sms(offset: Int, limit: Int, query: String): List<Message> {
 
 @GraphQLQuery
 suspend fun smsConversations(offset: Int, limit: Int, query: String): List<MessageConversation> {
-    Permission.READ_SMS.checkEnabledAsync()
+    if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
     return searchSmsConversations(query, limit, offset).map { it.toModel() }
 }
 
@@ -99,7 +116,7 @@ suspend fun smsConversationCount(query: String): Int {
 
 @GraphQLQuery
 suspend fun archivedConversations(): List<MessageConversation> {
-    Permission.READ_SMS.checkEnabledAsync()
+    if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
     return getArchivedSmsConversations().map { it.toModel() }
 }
 
@@ -110,8 +127,10 @@ suspend fun archiveConversation(id: String, date: Long): Boolean {
 }
 
 @GraphQLMutation
-suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>, threadId: String): String {
+@OptIn(ExperimentalUuidApi::class)
+suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>, threadId: String): String = mmsSendMutex.withLock {
     try {
+        require(number.isNotBlank()) { "MMS recipient is required" }
         val resolvedAttachments = attachmentPaths.map { path ->
             val resolvedPath = resolveAppFileUri(path)
             if (!fileExists(resolvedPath)) {
@@ -120,10 +139,29 @@ suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>,
             val mimeType = mimeTypeFromExtension(resolvedPath.getFilenameExtension())
             Pair(resolvedPath, mimeType)
         }
+        val requestedFingerprint = SmsProviderContract.MmsSendFingerprint(
+            address = number,
+            body = body,
+            threadId = threadId,
+            attachmentContentTypes = resolvedAttachments.map { it.second },
+        )
+        val duplicatePendingSend = TempData.pendingMmsMessages.any { pending ->
+            SmsProviderContract.mmsOperationsAreIndistinguishable(
+                requestedFingerprint,
+                SmsProviderContract.MmsSendFingerprint(
+                    address = pending.number,
+                    body = pending.body,
+                    threadId = pending.threadId,
+                    attachmentContentTypes = pending.attachments.map { it.contentType },
+                ),
+            )
+        }
+        if (duplicatePendingSend) {
+            throw IllegalStateException("An indistinguishable MMS send is already pending")
+        }
+        val minimumMmsId = getLatestSentMmsId()
         val launchTimeSec = launchDefaultSmsApp(number, body, resolvedAttachments)
-        val nowMs = TimeHelper.nowMillis()
-
-        val pendingId = "pending_mms_$nowMs"
+        val pendingId = "pending_mms_${Uuid.random()}"
         val pendingEntry = DPendingMms(
             id = pendingId,
             number = number,
@@ -136,8 +174,19 @@ suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>,
             createdAt = TimeHelper.now(),
         )
         TempData.pendingMmsMessages.add(pendingEntry)
-        sendEvent(HStartMmsPollingEvent(pendingId, launchTimeSec, resolvedAttachments.map { it.first }))
-        return pendingId
+        sendEvent(
+            HStartMmsPollingEvent(
+                pendingId,
+                launchTimeSec,
+                minimumMmsId,
+                number,
+                body,
+                threadId,
+                resolvedAttachments.map { it.first },
+                resolvedAttachments.map { it.second },
+            ),
+        )
+        pendingId
     } catch (e: Exception) {
         e.printStackTrace()
         throw GraphQLError(e.message ?: "Failed to launch SMS app for MMS")

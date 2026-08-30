@@ -26,6 +26,7 @@ import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.WsCloseCode
 import com.ismartcoding.plain.httpserver.http.WsSession
 import com.ismartcoding.plain.httpserver.WsSessionHandle
+import com.ismartcoding.plain.platform.onWebSocketSessionStarted
 
 /**
  * Adapter that exposes a [WsSession] (platform-agnostic WebSocket session
@@ -198,9 +199,11 @@ private suspend fun handleSessionFrame(
     val token = HttpServerManager.tokenCache.get(clientId)
     val decryptedBytes = token?.let { chaCha20Decrypt(it, frame) }
     if (decryptedBytes != null) {
-        LogCat.d("ws: add session ${sessionHandle.id}, ts: ${decryptedBytes.decodeToString()}")
-        HttpServerManager.wsSessions.add(sessionHandle)
-        setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
+        if (HttpServerManager.wsSessions.add(sessionHandle)) {
+            LogCat.d("ws: add session ${sessionHandle.id}, ts: ${decryptedBytes.decodeToString()}")
+            setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
+            onWebSocketSessionStarted()
+        }
     } else {
 //        LogCat.d("ws: invalid_request: $clientId")
         ws.close(WsCloseCode.TRY_AGAIN_LATER, "invalid_request")

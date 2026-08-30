@@ -12,6 +12,7 @@ data class MessageConversation(
     val date: Instant,
     val messageCount: Int,
     val read: Boolean,
+    val addresses: List<String>,
 )
 
 fun DMessageConversation.toModel(): MessageConversation {
@@ -22,5 +23,6 @@ fun DMessageConversation.toModel(): MessageConversation {
         date = date,
         messageCount = messageCount,
         read = read,
+        addresses = addresses,
     )
 }
