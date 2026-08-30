@@ -1,45 +1,39 @@
 package com.ismartcoding.plain.features.sms
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.ismartcoding.plain.events.MmsSendResultData
-import org.json.JSONObject
+import com.ismartcoding.plain.lib.JsonHelper
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
-private class AndroidMmsSendResultStateStore(context: Context) : MmsSendResultStateStore {
-    private val preferences = context.applicationContext.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
+private val Context.mmsSendResultsDataStore: DataStore<Preferences> by preferencesDataStore(
+    name = "mms_send_results",
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+)
 
+private class AndroidMmsSendResultStateStore(private val context: Context) : MmsSendResultStateStore {
     override fun readAll(): List<MmsTerminalResultState> {
-        return preferences.all.mapNotNull { (key, value) ->
-            if (!key.startsWith(KEY_PREFIX) || value !is String) null else runCatching { decode(value) }.getOrNull()
+        return runBlocking { context.mmsSendResultsDataStore.data.first() }.asMap().mapNotNull { (key, value) ->
+            if (!key.name.startsWith(KEY_PREFIX) || value !is String) null else runCatching { JsonHelper.jsonDecode<MmsTerminalResultState>(value) }.getOrNull()
         }
     }
 
     override fun write(state: MmsTerminalResultState) {
-        check(preferences.edit().putString(KEY_PREFIX + state.pendingId, encode(state)).commit())
+        runBlocking { context.mmsSendResultsDataStore.edit { it[stringPreferencesKey(KEY_PREFIX + state.pendingId)] = JsonHelper.jsonEncode(state) } }
     }
 
     override fun remove(pendingId: String) {
-        check(preferences.edit().remove(KEY_PREFIX + pendingId).commit())
-    }
-
-    private fun encode(state: MmsTerminalResultState): String = JSONObject().apply {
-        put("pendingId", state.pendingId)
-        put("success", state.success)
-        put("resultCode", state.resultCode)
-        put("terminalAtMillis", state.terminalAtMillis)
-    }.toString()
-
-    private fun decode(value: String): MmsTerminalResultState {
-        val json = JSONObject(value)
-        return MmsTerminalResultState(
-            pendingId = json.getString("pendingId"),
-            success = json.getBoolean("success"),
-            resultCode = json.getInt("resultCode"),
-            terminalAtMillis = json.getLong("terminalAtMillis"),
-        )
+        runBlocking { context.mmsSendResultsDataStore.edit { it.remove(stringPreferencesKey(KEY_PREFIX + pendingId)) } }
     }
 
     private companion object {
-        const val STORE_NAME = "mms_send_results"
         const val KEY_PREFIX = "terminal_"
     }
 }

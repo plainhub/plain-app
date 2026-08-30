@@ -1,72 +1,44 @@
 package com.ismartcoding.plain.features.sms
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.ismartcoding.plain.events.SmsSendResultData
-import org.json.JSONArray
-import org.json.JSONObject
+import com.ismartcoding.plain.lib.JsonHelper
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
-private class AndroidSmsSendStateStore(context: Context) : SmsSendStateStore {
-    private val preferences = context.applicationContext.getSharedPreferences(STORE_NAME, Context.MODE_PRIVATE)
+private val Context.smsSendResultsDataStore: DataStore<Preferences> by preferencesDataStore(
+    name = "sms_send_results",
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+)
 
+private class AndroidSmsSendStateStore(private val context: Context) : SmsSendStateStore {
     override fun read(requestId: String): SmsPendingSendState? {
-        val encoded = preferences.getString(KEY_PREFIX + requestId, null) ?: return null
-        return runCatching { decode(encoded) }.getOrNull()
+        val encoded = runBlocking { context.smsSendResultsDataStore.data.first() }[stringPreferencesKey(KEY_PREFIX + requestId)]
+        return encoded?.let { runCatching { JsonHelper.jsonDecode<SmsPendingSendState>(it) }.getOrNull() }
     }
 
     override fun readAll(): List<SmsPendingSendState> {
-        return preferences.all.mapNotNull { (key, value) ->
-            if (!key.startsWith(KEY_PREFIX) || value !is String) null else runCatching { decode(value) }.getOrNull()
+        return runBlocking { context.smsSendResultsDataStore.data.first() }.asMap().mapNotNull { (key, value) ->
+            if (!key.name.startsWith(KEY_PREFIX) || value !is String) null else runCatching { JsonHelper.jsonDecode<SmsPendingSendState>(value) }.getOrNull()
         }
     }
 
     override fun write(state: SmsPendingSendState) {
-        check(preferences.edit().putString(KEY_PREFIX + state.requestId, encode(state)).commit())
+        runBlocking { context.smsSendResultsDataStore.edit { it[stringPreferencesKey(KEY_PREFIX + state.requestId)] = JsonHelper.jsonEncode(state) } }
     }
 
     override fun remove(requestId: String) {
-        check(preferences.edit().remove(KEY_PREFIX + requestId).commit())
-    }
-
-    private fun encode(state: SmsPendingSendState): String = JSONObject().apply {
-        put("requestId", state.requestId)
-        put("clientId", state.clientId ?: JSONObject.NULL)
-        put("clientRequestId", state.clientRequestId ?: JSONObject.NULL)
-        put("partCount", state.partCount)
-        put("completedParts", JSONArray(state.completedParts.sorted()))
-        put("createdAtMillis", state.createdAtMillis)
-        put("terminalSuccess", state.terminalSuccess ?: JSONObject.NULL)
-        put("terminalResultCode", state.terminalResultCode ?: JSONObject.NULL)
-        put("terminalAtMillis", state.terminalAtMillis ?: JSONObject.NULL)
-    }.toString()
-
-    private fun decode(value: String): SmsPendingSendState {
-        val json = JSONObject(value)
-        val completed = json.getJSONArray("completedParts")
-        return SmsPendingSendState(
-            requestId = json.getString("requestId"),
-            clientId = if (json.isNull("clientId")) null else json.getString("clientId"),
-            clientRequestId = if (!json.has("clientRequestId") || json.isNull("clientRequestId")) {
-                null
-            } else {
-                json.getString("clientRequestId")
-            },
-            partCount = json.getInt("partCount"),
-            completedParts = buildSet {
-                repeat(completed.length()) { add(completed.getInt(it)) }
-            },
-            createdAtMillis = json.getLong("createdAtMillis"),
-            terminalSuccess = if (json.isNull("terminalSuccess")) null else json.getBoolean("terminalSuccess"),
-            terminalResultCode = if (json.isNull("terminalResultCode")) null else json.getInt("terminalResultCode"),
-            terminalAtMillis = if (!json.has("terminalAtMillis") || json.isNull("terminalAtMillis")) {
-                null
-            } else {
-                json.getLong("terminalAtMillis")
-            },
-        )
+        runBlocking { context.smsSendResultsDataStore.edit { it.remove(stringPreferencesKey(KEY_PREFIX + requestId)) } }
     }
 
     private companion object {
-        const val STORE_NAME = "sms_send_results"
         const val KEY_PREFIX = "pending_"
     }
 }

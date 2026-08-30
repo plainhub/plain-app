@@ -2,7 +2,9 @@ package com.ismartcoding.plain.features.sms
 
 import com.ismartcoding.plain.events.SmsSendResultData
 import com.ismartcoding.plain.platform.PlainLock
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class SmsPendingSendState(
     val requestId: String,
     val clientId: String?,

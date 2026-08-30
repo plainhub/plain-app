@@ -2,7 +2,9 @@ package com.ismartcoding.plain.features.sms
 
 import com.ismartcoding.plain.events.MmsSendResultData
 import com.ismartcoding.plain.platform.PlainLock
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MmsTerminalResultState(
     val pendingId: String,
     val success: Boolean,
