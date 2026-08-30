@@ -256,6 +256,10 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name=".receivers.SmsSentReceiver"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

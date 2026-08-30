@@ -10,17 +10,21 @@ import com.ismartcoding.plain.httpserver.WsSessionHandle
 
 object WebSocketHelper {
     suspend fun sendEventAsync(event: WebSocketEvent) = withIO {
+        var delivered = 0
         HttpServerManager.wsSessions.toList().forEach {
             val data = event.data
             if (data is WebSocketData.Text) {
                 val token = HttpServerManager.tokenCache.get(it.clientId)
                 if (token != null) {
-                    sendSafe(it, addIntPrefixToByteArray(event.type.value, chaCha20Encrypt(token, data.value)))
+                    if (sendSafe(it, addIntPrefixToByteArray(event.type.value, chaCha20Encrypt(token, data.value)))) {
+                        delivered++
+                    }
                 }
             } else if (data is WebSocketData.Binary) {
-                sendSafe(it, addIntPrefixToByteArray(event.type.value, data.value))
+                if (sendSafe(it, addIntPrefixToByteArray(event.type.value, data.value))) delivered++
             }
         }
+        delivered
     }
 
     /**
@@ -33,12 +37,14 @@ object WebSocketHelper {
     private suspend fun sendSafe(
         session: WsSessionHandle,
         bytes: ByteArray,
-    ) {
+    ): Boolean {
         try {
             session.send(bytes)
+            return true
         } catch (ex: Exception) {
             HttpServerManager.wsSessions.removeAll { it.id == session.id }
             setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
+            return false
         }
     }
 }

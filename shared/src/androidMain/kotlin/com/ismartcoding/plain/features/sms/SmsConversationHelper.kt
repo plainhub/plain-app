@@ -5,14 +5,17 @@ import android.provider.BaseColumns
 import android.provider.Telephony
 import androidx.core.net.toUri
 import com.ismartcoding.plain.helpers.ContentWhere
+import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.lib.extensions.find
 import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
+import com.ismartcoding.plain.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.plain.lib.extensions.getTimeValue
 import com.ismartcoding.plain.lib.extensions.map
 import com.ismartcoding.plain.lib.extensions.queryCursor
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.platform.getSims
 import com.ismartcoding.plain.helpers.QueryHelper
 import kotlin.time.Instant
 
@@ -35,19 +38,35 @@ object SmsConversationHelper {
         }.map { it.conversationId }.toSet()
     }
 
-    /**
-     * Returns the latest SMS snippet before the given date for a conversation.
-     */
+    private data class DatedSnippet(val value: String, val dateMillis: Long)
+
     private fun getSnippetBeforeDate(context: Context, threadId: String, beforeDate: Long): String? {
-        return context.contentResolver.queryCursor(
+        val smsSnippet = context.contentResolver.queryCursor(
             smsUri,
-            arrayOf(Telephony.Sms.BODY),
+            arrayOf(Telephony.Sms.BODY, Telephony.Sms.DATE),
             "${Telephony.Sms.THREAD_ID} = ? AND ${Telephony.Sms.DATE} <= ?",
             arrayOf(threadId, beforeDate.toString()),
-            "${Telephony.Sms.DATE} DESC"
+            "${Telephony.Sms.DATE} DESC LIMIT 1",
         )?.find { cursor, cache ->
-            cursor.getStringValue(Telephony.Sms.BODY, cache)
+            DatedSnippet(
+                cursor.getStringValue(Telephony.Sms.BODY, cache),
+                cursor.getTimeValue(Telephony.Sms.DATE, cache).toEpochMilliseconds(),
+            )
         }
+        val mmsSnippet = context.contentResolver.queryCursor(
+            mmsUri,
+            arrayOf(Telephony.Mms._ID, Telephony.Mms.DATE),
+            "${Telephony.Mms.THREAD_ID} = ? AND ${Telephony.Mms.DATE} <= ? AND ${SmsProviderContract.MMS_CONTENT_FILTER}",
+            arrayOf(threadId, (beforeDate / 1000).toString()),
+            "${Telephony.Mms.DATE} DESC LIMIT 1",
+        )?.find { cursor, cache ->
+            val id = cursor.getStringValue(Telephony.Mms._ID, cache)
+            DatedSnippet(
+                SmsHelper.readMmsBodyAndAttachments(context, id).first,
+                cursor.getTimeSecondsValue(Telephony.Mms.DATE, cache).toEpochMilliseconds(),
+            )
+        }
+        return listOfNotNull(smsSnippet, mmsSnippet).maxByOrNull { it.dateMillis }?.value
     }
 
     /**
@@ -137,7 +156,7 @@ object SmsConversationHelper {
         if (threadIds.isEmpty()) return emptyMap()
 
         val where = ContentWhere().apply { addIn(BaseColumns._ID, threadIds) }
-        val threadRecipientMap = mutableMapOf<String, String>()
+        val threadRecipientMap = mutableMapOf<String, List<String>>()
         val conversationMap = mutableMapOf<String, DMessageConversation>()
 
         context.contentResolver.queryCursor(
@@ -162,17 +181,23 @@ object SmsConversationHelper {
                 )
                 val recipientIds = cursor.getStringValue("recipient_ids", cache)
                 if (recipientIds.isNotEmpty()) {
-                    val firstId = recipientIds.trim().split("\\s+".toRegex()).firstOrNull()
-                    if (firstId != null) threadRecipientMap[threadId] = firstId
+                    threadRecipientMap[threadId] = SmsProviderContract.parseRecipientIds(recipientIds)
                 }
             }
         }
 
-        val addressMap = batchGetCanonicalAddresses(context, threadRecipientMap.values.toSet())
-        threadRecipientMap.forEach { (threadId, recipientId) ->
-            val address = addressMap[recipientId]
-            if (!address.isNullOrEmpty()) {
-                conversationMap[threadId] = conversationMap[threadId]!!.copy(address = address)
+        val addressMap = batchGetCanonicalAddresses(context, threadRecipientMap.values.flatten().toSet())
+        val ownNumbers = getSims().map { it.number }.filter(String::isNotEmpty).toSet()
+        threadRecipientMap.forEach { (threadId, recipientIds) ->
+            val addresses = SmsProviderContract.selectConversationAddresses(
+                recipientIds.mapNotNull(addressMap::get),
+                ownNumbers,
+            )
+            if (addresses.isNotEmpty()) {
+                conversationMap[threadId] = conversationMap[threadId]!!.copy(
+                    address = addresses.first(),
+                    addresses = addresses,
+                )
             }
         }
 
@@ -189,7 +214,8 @@ object SmsConversationHelper {
                     }
 
                     "ids" -> {
-                        where.addIn(BaseColumns._ID, it.value.split(","))
+                        val ids = SmsProviderContract.partitionMessageIds(it.value).sms
+                        if (ids.isEmpty()) where.add("${BaseColumns._ID} = ?", "-1") else where.addIn(BaseColumns._ID, ids)
                     }
 
                     "type" -> {
@@ -206,6 +232,30 @@ object SmsConversationHelper {
         return where
     }
 
+    private fun buildMmsWhere(conditions: List<FilterField>, textMatchedMmsIds: Set<String>?): ContentWhere? {
+        val where = ContentWhere()
+        if (conditions.any { it.name == "text" }) {
+            if (textMatchedMmsIds.isNullOrEmpty()) return null
+            val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, textMatchedMmsIds) ?: return null
+            where.add(predicate)
+        }
+        conditions.forEach {
+            when (it.name) {
+                "ids" -> {
+                    val ids = SmsProviderContract.partitionMessageIds(it.value).mms
+                    if (ids.isEmpty()) return null
+                    val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, ids) ?: return null
+                    where.add(predicate)
+                }
+
+                "type" -> where.add("${Telephony.Mms.MESSAGE_BOX} = ?", it.value)
+                "thread_id" -> where.add("${Telephony.Mms.THREAD_ID} = ?", it.value)
+            }
+        }
+        where.add(SmsProviderContract.MMS_CONTENT_FILTER)
+        return where
+    }
+
     private suspend fun getMatchedThreadIdsAsync(context: Context, query: String): List<String> = withIO {
         if (query.isEmpty()) {
             return@withIO emptyList()
@@ -213,6 +263,10 @@ object SmsConversationHelper {
 
         val conditions = QueryHelper.parseAsync(query)
         val where = buildWhereAsync(query)
+        val textMatchedMmsIds = SmsHelper.findMmsIdsMatchingText(
+            context,
+            conditions.filter { it.name == "text" }.map { it.value },
+        )
         val ids = linkedSetOf<String>()
 
         // Query SMS table for matching thread IDs
@@ -229,20 +283,7 @@ object SmsConversationHelper {
             }
         }
 
-        // Also query MMS table for matching thread IDs (SMS type maps to MMS msg_box)
-        val hasTextOrIdsFilter = conditions.any { it.name == "text" || it.name == "ids" }
-        if (!hasTextOrIdsFilter) {
-            val mmsWhere = ContentWhere()
-            val typeCondition = conditions.firstOrNull { it.name == "type" }
-            if (typeCondition != null) {
-                mmsWhere.add("${Telephony.Mms.MESSAGE_BOX} = ?", typeCondition.value)
-            }
-            val threadIdCondition = conditions.firstOrNull { it.name == "thread_id" }
-            if (threadIdCondition != null) {
-                mmsWhere.add("${Telephony.Mms.THREAD_ID} = ?", threadIdCondition.value)
-            }
-            mmsWhere.add("m_type IN (128, 130)")
-
+        buildMmsWhere(conditions, textMatchedMmsIds)?.let { mmsWhere ->
             context.contentResolver.queryCursor(
                 mmsUri,
                 arrayOf(Telephony.Mms.THREAD_ID),
@@ -274,12 +315,14 @@ object SmsConversationHelper {
     ): List<DMessageConversation> = withIO {
         if (query.isNotEmpty()) {
             val activeArchivedIds = getActiveArchivedIds(context)
-            val threadIds = getMatchedThreadIdsAsync(context, query)
+            val matchedThreadIds = getMatchedThreadIdsAsync(context, query)
                 .filter { !activeArchivedIds.contains(it) }
-                .drop(offset).take(limit)
-            if (threadIds.isEmpty()) return@withIO emptyList()
-            val conversationMap = queryConversationsWithAddresses(context, threadIds)
-            return@withIO threadIds.mapNotNull { conversationMap[it] }
+            if (matchedThreadIds.isEmpty()) return@withIO emptyList()
+            val conversationMap = queryConversationsWithAddresses(context, matchedThreadIds)
+            return@withIO conversationMap.values
+                .sortedByDescending { it.date }
+                .drop(offset)
+                .take(limit)
         }
 
         // Single-pass: read conversations with full data, filter archived, paginate, resolve addresses
@@ -287,7 +330,7 @@ object SmsConversationHelper {
         val archivedMap = archivedRecords.associateBy { it.conversationId }
 
         val conversations = mutableListOf<DMessageConversation>()
-        val recipientMap = mutableMapOf<String, String>() // threadId -> recipientId
+        val recipientMap = mutableMapOf<String, List<String>>()
         var skip = 0
 
         // Use SQL LIMIT when no archived conversations to skip (common case)
@@ -326,8 +369,7 @@ object SmsConversationHelper {
                 ))
                 val recipientIds = cursor.getStringValue("recipient_ids", cache)
                 if (recipientIds.isNotEmpty()) {
-                    val firstId = recipientIds.trim().split("\\s+".toRegex()).firstOrNull()
-                    if (firstId != null) recipientMap[id] = firstId
+                    recipientMap[id] = SmsProviderContract.parseRecipientIds(recipientIds)
                 }
             }
         }
@@ -335,13 +377,18 @@ object SmsConversationHelper {
         if (conversations.isEmpty()) return@withIO emptyList()
 
         // Batch resolve addresses
-        val addressMap = batchGetCanonicalAddresses(context, recipientMap.values.toSet())
+        val addressMap = batchGetCanonicalAddresses(context, recipientMap.values.flatten().toSet())
+        val ownNumbers = getSims().map { it.number }.filter(String::isNotEmpty).toSet()
         return@withIO conversations.map { conv ->
-            val recipientId = recipientMap[conv.id]
-            if (recipientId != null) {
-                val address = addressMap[recipientId]
-                if (!address.isNullOrEmpty()) conv.copy(address = address) else conv
-            } else conv
+            val addresses = SmsProviderContract.selectConversationAddresses(
+                recipientMap[conv.id].orEmpty().mapNotNull(addressMap::get),
+                ownNumbers,
+            )
+            if (addresses.isNotEmpty()) {
+                conv.copy(address = addresses.first(), addresses = addresses)
+            } else {
+                conv
+            }
         }
     }
 

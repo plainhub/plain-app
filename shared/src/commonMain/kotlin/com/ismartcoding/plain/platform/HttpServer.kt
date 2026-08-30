@@ -101,6 +101,9 @@ expect suspend fun stopHttpEngineAsync()
  */
 expect suspend fun onHttpServerStarted()
 
+/** Platform hook invoked after an authenticated WebSocket session is active. */
+expect suspend fun onWebSocketSessionStarted()
+
 /**
  * Side effects to run when the server stops or fails to start: unregister mDNS,
  * stop the peer-status manager, and disable the notification listener

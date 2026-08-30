@@ -27,14 +27,18 @@ class HOpenWebSettingsEvent : ChannelEvent()
 class HRetryChatItemEvent(val item: DChat) : ChannelEvent()
 /**
  * Fired after the default SMS app is launched for an MMS send.
- * AppEvents will poll content://mms until the row appears, then
- * remove the pending entry from TempData, delete the attachment
- * files on device, and emit MMS_SENT to all web clients.
+ * AppEvents polls content://mms for the correlated row and always clears
+ * temporary state, emitting MMS_SENT on success or MMS_SEND_RESULT on timeout.
  */
 data class HStartMmsPollingEvent(
     val pendingId: String,
     val launchTimeSec: Long,
+    val minimumMmsId: Long,
+    val number: String,
+    val body: String,
+    val threadId: String,
     val attachmentPaths: List<String>,
+    val attachmentContentTypes: List<String>,
 ) : ChannelEvent()
 
 class HEnableImageSearchEvent : ChannelEvent()

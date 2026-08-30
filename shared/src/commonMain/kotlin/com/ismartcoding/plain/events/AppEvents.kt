@@ -257,7 +257,16 @@ object AppEvents {
                     }
 
                     is HStartMmsPollingEvent -> {
-                        startMmsPolling(event.pendingId, event.launchTimeSec, event.attachmentPaths)
+                        startMmsPolling(
+                            event.pendingId,
+                            event.launchTimeSec,
+                            event.minimumMmsId,
+                            event.number,
+                            event.body,
+                            event.threadId,
+                            event.attachmentPaths,
+                            event.attachmentContentTypes,
+                        )
                     }
 
                     is DownloadUpdateEvent -> {
