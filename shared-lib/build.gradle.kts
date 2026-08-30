@@ -24,7 +24,7 @@ kotlin {
         commonMain.dependencies {
             api(libs.kotlinx.coroutines.core)
             api(libs.kotlinx.serialization.json)
-            api(libs.ktor.client.core)
+            api(libs.ktor.http)
 
             // Compose Multiplatform — required by vendored markdown renderer
             api(libs.runtime)

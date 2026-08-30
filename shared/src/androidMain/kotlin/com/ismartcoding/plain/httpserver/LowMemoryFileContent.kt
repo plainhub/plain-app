@@ -11,7 +11,7 @@ import io.ktor.utils.io.writeFully
 import java.io.File
 import java.io.FileInputStream
 
-private const val FILE_RESPONSE_BUFFER_SIZE = 16 * 1024
+private const val FILE_RESPONSE_BUFFER_SIZE = 64 * 1024
 private const val FILE_RESPONSE_FLUSH_BYTES = 64 * 1024
 
 internal data class ResolvedFileRange(

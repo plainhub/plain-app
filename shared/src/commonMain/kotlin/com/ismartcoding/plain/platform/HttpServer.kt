@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.api.isOk
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.lib.TimeHelper
@@ -12,8 +11,6 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.HttpServerManager
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 
@@ -147,8 +144,10 @@ suspend fun checkHttpServerAsync(): Boolean = withIO {
         while (!healthy && TimeHelper.nowMillis() < deadline) {
             try {
                 val response = client.get(UrlHelper.getHealthCheckUrl())
-                if (response.isOk() && response.bodyAsText() == getOwnPackageName()) {
-                    healthy = true
+                response.use {
+                    if (it.isOk() && it.bodyAsText() == getOwnPackageName()) {
+                        healthy = true
+                    }
                 }
             } catch (ex: Exception) {
                 delay(300)
@@ -251,7 +250,7 @@ suspend fun stopHttpServerCoreAsync() = withIO {
     try {
         // Best-effort graceful shutdown via /shutdown endpoint.
         val client = createHttpClient()
-        client.get(UrlHelper.getShutdownUrl())
+        client.get(UrlHelper.getShutdownUrl()).close()
     } catch (_: Exception) {}
     stopHttpEngineAsync()
     onHttpServerStopped()

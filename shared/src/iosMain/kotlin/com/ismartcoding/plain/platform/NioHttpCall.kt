@@ -7,8 +7,6 @@ import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpMethod
 import com.ismartcoding.plain.httpserver.http.HttpMultipartPart
 import com.ismartcoding.plain.httpserver.http.StreamSink
-import io.ktor.client.request.get
-import io.ktor.client.statement.readBytes
 import io.ktor.http.HttpHeaders
 import platform.Foundation.NSFileManager
 
@@ -131,16 +129,18 @@ class NioHttpCall(
         return try {
             val client = createUnsafeHttpClient()
             val response = withIO { client.get(url) }
-            ctx.responseStatus = response.status.value
-            // Copy selected headers through (skip hop-by-hop ones).
-            response.headers.entries().forEach { (name, values) ->
-                if (!name.equals(HttpHeaders.TransferEncoding, true) &&
-                    !name.equals(HttpHeaders.Connection, true)
-                ) {
-                    values.forEach { ctx.setResponseHeader(name, it) }
+            response.use { resp ->
+                ctx.responseStatus = resp.status.value
+                // Copy selected headers through (skip hop-by-hop ones).
+                resp.headers.forEach { (name, values) ->
+                    if (!name.equals(HttpHeaders.TransferEncoding, true) &&
+                        !name.equals(HttpHeaders.Connection, true)
+                    ) {
+                        values.forEach { ctx.setResponseHeader(name, it) }
+                    }
                 }
+                ctx.setResponseBody(withIO { resp.bodyAsBytes() })
             }
-            ctx.setResponseBody(withIO { response.readBytes() })
             true
         } catch (e: Exception) {
             false

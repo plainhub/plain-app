@@ -6,20 +6,17 @@ import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.HtmlUtils
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.lib.extensions.isOk
 import com.ismartcoding.plain.lib.html2md.MDConverter
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.readability4j.Readability4J
-import io.ktor.client.call.body
-import io.ktor.client.request.get
 
 suspend fun DFeedEntry.fetchContentAsync(): ApiResult = withIO {
     try {
-        val httpClient = KtorClientFactory.browserClient()
+        val httpClient = createBrowserHttpClient()
         val response = httpClient.get(url)
 
         if (response.isOk()) {
-            val input = response.body<String>()
+            val input = response.bodyAsText()
             Readability4J.parse(url, input).articleContent?.let { articleContent ->
                 articleContent.selectFirst("h1")?.remove()
                 val c = articleContent.toString()
@@ -36,12 +33,14 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult = withIO {
                     if (image.isNotEmpty() && !image.startsWith("/") && !image.startsWith("fid:", true)) {
                         try {
                             val r = httpClient.get(image)
-                            if (r.isOk()) {
-                                val imageBytes = r.body<ByteArray>()
-                                val contentType = r.headers["Content-Type"]?.lowercase() ?: ""
-                                val fidUri = importImageBytesToFid(imageBytes, contentType)
-                                if (fidUri != null) {
-                                    image = fidUri
+                            r.use {
+                                if (it.isOk()) {
+                                    val imageBytes = it.bodyAsBytes()
+                                    val contentType = it.header("Content-Type")?.lowercase() ?: ""
+                                    val fidUri = importImageBytesToFid(imageBytes, contentType)
+                                    if (fidUri != null) {
+                                        image = fidUri
+                                    }
                                 }
                             }
                         } catch (ex: Exception) {
@@ -60,6 +59,7 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult = withIO {
             }
         }
 
+        response.close()
         return@withIO ApiResult(response)
     } catch (ex: Throwable) {
         LogCat.e("fetchContentAsync: ${ex.message}")

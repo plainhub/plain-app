@@ -4,16 +4,15 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.platform.getAppVersion
 import com.ismartcoding.plain.platform.getDeviceName
 import com.ismartcoding.plain.platform.getPlatformName
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.headers
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 /**
  * Returns the common client identification headers (c-id, c-platform, c-version).
  *
- * Used by [addClientHeaders] for Ktor requests and by non-HTTP transports (e.g. BLE)
- * that need to forward the same metadata to the peer's HTTP router.
+ * Used by plain HTTP requests sent through [com.ismartcoding.plain.platform.PlainHttpClient]
+ * and by non-HTTP transports (e.g. BLE) that need to forward the same metadata
+ * to the peer's HTTP router.
  */
 @OptIn(ExperimentalEncodingApi::class)
 fun clientHeadersMap(): Map<String, String> = mapOf(
@@ -23,17 +22,9 @@ fun clientHeadersMap(): Map<String, String> = mapOf(
 )
 
 /**
- * Adds the common client identification headers to this Ktor request builder.
- *
- * Note: the import must be [io.ktor.client.request.headers] (the extension on
- * [HttpMessageBuilder] that mutates the builder's own [HeadersBuilder]). Importing
- * [io.ktor.http.headers] instead resolves to a top-level factory function that
- * returns a detached [io.ktor.http.Headers] instance, silently dropping the headers.
+ * Client identification headers merged with [extra] entries, ready to be passed
+ * as the header map of a [com.ismartcoding.plain.platform.PlainRequest].
  */
 @OptIn(ExperimentalEncodingApi::class)
-fun HttpRequestBuilder.addClientHeaders() {
-    val map = clientHeadersMap()
-    headers {
-        map.forEach { (key, value) -> append(key, value) }
-    }
-}
+fun clientHeadersWith(vararg extra: Pair<String, String>): Map<String, String> =
+    clientHeadersMap() + extra

@@ -1,23 +1,14 @@
 package com.ismartcoding.plain.chat.peer.transport
 
-import com.ismartcoding.plain.api.addClientHeaders
+import com.ismartcoding.plain.api.clientHeadersWith
 import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.platform.CryptoKeyAttribute
+import com.ismartcoding.plain.platform.PlainHttpClient
+import com.ismartcoding.plain.platform.get
+import com.ismartcoding.plain.platform.post
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.chaCha20Encrypt
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.readBytes
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -61,29 +52,28 @@ class DownloadedResponse(
 internal suspend fun executeGraphQLRequest(
     transportType: PeerTransportType,
     peerId: String,
-    client: HttpClient,
+    client: PlainHttpClient,
     url: String,
     body: String,
     channelId: String,
 ): GraphQLResponse = withContext(Dispatchers.Default) {
     val tid = transportType.name.lowercase()
-    val cryptoKey = runCatching {
-        client.attributes.getOrNull(CryptoKeyAttribute)
-    }.getOrNull()
+    val cryptoKey = client.cryptoKey
     val response = try {
-        client.post(url) {
-            if (cryptoKey != null) {
-                val encrypted = chaCha20Encrypt(cryptoKey, body)
-                setBody(encrypted)
-                contentType(ContentType.Application.OctetStream)
-            } else {
-                setBody(body)
-                contentType(ContentType.Application.Json)
-            }
-            addClientHeaders()
-            if (channelId.isNotEmpty()) {
-                header("c-cid", channelId)
-            }
+        if (cryptoKey != null) {
+            client.post(
+                url,
+                body = chaCha20Encrypt(cryptoKey, body),
+                contentType = "application/octet-stream",
+                headers = clientHeadersWith("c-cid" to channelId),
+            )
+        } else {
+            client.post(
+                url,
+                body = body.encodeToByteArray(),
+                contentType = "application/json",
+                headers = clientHeadersWith("c-cid" to channelId),
+            )
         }
     } catch (e: CancellationException) {
         throw e
@@ -91,41 +81,42 @@ internal suspend fun executeGraphQLRequest(
         LogCat.d("$tid request to peer $peerId threw ${e::class.simpleName}: ${e.message}")
         throw TransportUnavailable(transportType, peerId, e)
     }
-    val responseBody = if (cryptoKey != null) {
-        val encryptedBytes = response.readBytes()
-        val decrypted = chaCha20Decrypt(cryptoKey, encryptedBytes)
-        decrypted?.decodeToString() ?: encryptedBytes.decodeToString()
-    } else {
-        response.bodyAsText()
-    }
-    if (!response.status.isSuccess()) {
-        LogCat.e("$tid GraphQL request failed: ${response.status.value} body=${responseBody.take(200)}")
-        GraphQLResponse(null, null, Exception("${response.status.value} - ${response.status.description}"))
-    } else {
-        GraphQLResponseParser.parse(responseBody)
+    response.use {
+        val responseBody = if (cryptoKey != null) {
+            val encryptedBytes = it.bodyAsBytes()
+            val decrypted = chaCha20Decrypt(cryptoKey, encryptedBytes)
+            decrypted?.decodeToString() ?: encryptedBytes.decodeToString()
+        } else {
+            it.bodyAsText()
+        }
+        if (!it.isSuccess()) {
+            LogCat.e("$tid GraphQL request failed: ${it.status} body=${responseBody.take(200)}")
+            GraphQLResponse(null, null, Exception("${it.status.value} - ${it.status.description}"))
+        } else {
+            GraphQLResponseParser.parse(responseBody)
+        }
     }
 }
 
 internal suspend fun executeDownloadRequest(
     transportType: PeerTransportType,
     peerId: String,
-    client: HttpClient,
+    client: PlainHttpClient,
     url: String,
 ): DownloadedResponse = withContext(Dispatchers.Default) {
     val tid = transportType.name.lowercase()
     val response = try {
-        client.get(url) {
-            addClientHeaders()
-        }
+        client.get(url, headers = clientHeadersWith())
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
         LogCat.d("$tid download to peer $peerId threw ${e::class.simpleName}: ${e.message}")
         throw TransportUnavailable(transportType, peerId, e)
     }
-    if (!response.status.isSuccess()) {
-        LogCat.e("$tid downloadFile error: ${response.status.value}")
+    if (!response.isSuccess()) {
+        LogCat.e("$tid downloadFile error: ${response.status}")
+        response.close()
         throw TransportUnavailable(transportType, peerId, null)
     }
-    DownloadedResponse(response.status.value, response.bodyAsChannel())
+    DownloadedResponse(response.status.value, response.channel) { response.close() }
 }

@@ -11,11 +11,7 @@ import com.ismartcoding.plain.lib.dlna.common.DlnaSoap
 import com.ismartcoding.plain.lib.dlna.common.DlnaTransportInfoResponse
 import com.ismartcoding.plain.platform.createHttpClient
 import com.ismartcoding.plain.platform.getDeviceName
-import io.ktor.client.call.body
-import io.ktor.client.request.headers
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.HttpStatusCode
+import com.ismartcoding.plain.platform.postText
 
 object DlnaTransportController {
 
@@ -87,19 +83,22 @@ object DlnaTransportController {
         return try {
             val client = createHttpClient()
             val response = withIO {
-                client.post(device.getBaseUrl() + "/" + service.controlURL.trimStart('/')) {
-                    headers {
-                        set("Content-Type", "text/xml")
-                        set("SOAPAction", "\"${service.serviceType}#$action\"")
-                        set("c-name", senderName)
-                    }
-                    setBody(DlnaSoap.requestEnvelope(soapBody))
-                }
+                client.postText(
+                    device.getBaseUrl() + "/" + service.controlURL.trimStart('/'),
+                    DlnaSoap.requestEnvelope(soapBody),
+                    contentType = "text/xml",
+                    headers = mapOf(
+                        "SOAPAction" to "\"${service.serviceType}#$action\"",
+                        "c-name" to senderName,
+                    ),
+                )
             }
-            if (logResponse) LogCat.e(response.toString())
-            val xml = response.body<String>()
-            if (logResponse) LogCat.e(xml)
-            if (response.status == HttpStatusCode.OK) xml else ""
+            response.use {
+                if (logResponse) LogCat.e(it.toString())
+                val xml = it.bodyAsText()
+                if (logResponse) LogCat.e(xml)
+                if (it.isOk()) xml else ""
+            }
         } catch (ex: Exception) {
             ex.printStackTrace()
             ""

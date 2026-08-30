@@ -95,6 +95,10 @@ fun initIosApp() {
     // Network path monitor (recreates the mDNS responder socket on network changes)
     com.ismartcoding.plain.platform.IosNetworkMonitor.init()
 
+    // Coil image loader: iOS has no ServiceLoader-discovered network fetcher,
+    // so register our NSURLSession-backed one explicitly.
+    com.ismartcoding.plain.platform.setupIosImageLoader()
+
     // Initialize preferences and TempData (shared with Android via initCommonPreferences)
     coIO {
         initCommonPreferences()

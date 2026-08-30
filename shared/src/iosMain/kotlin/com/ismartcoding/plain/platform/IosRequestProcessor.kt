@@ -179,6 +179,12 @@ object IosRequestProcessor {
         val filePath = IosWebAssets.resolve(resourcePath)
         if (filePath != null) {
             ctx.responseStatus = HttpStatus.OK
+            if (resourcePath.startsWith("assets/")) {
+                // Hashed build outputs are immutable
+                ctx.setResponseHeader("Cache-Control", "public, max-age=31536000")
+            } else {
+                ctx.setResponseHeader("Cache-Control", "no-cache, no-store")
+            }
             ctx.setResponseFilePath(filePath, IosWebAssets.contentTypeFor(resourcePath), null)
             return true
         }

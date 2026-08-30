@@ -19,11 +19,8 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.platform.PlainHttpClient
 import com.ismartcoding.plain.platform.createPeerStatusHttpClient
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.websocket.Frame
-import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -47,7 +44,7 @@ object PeerStatusManager {
     )
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val client: HttpClient by lazy { createPeerStatusHttpClient() }
+    private val client: PlainHttpClient by lazy { createPeerStatusHttpClient() }
     private val statesFlow = MutableStateFlow<Map<String, PeerState>>(emptyMap())
 
     private val startedFlow = MutableStateFlow(false)
@@ -171,11 +168,10 @@ object PeerStatusManager {
         val job = scope.launch {
             val currentJob = coroutineContext[Job]!!
             try {
-                client.webSocket("$wsUrl?cid=${TempData.clientId}") {
-                    send(Frame.Binary(true, payload))
-                    for (frame in incoming) {
-                        if (frame !is Frame.Text) continue
-                        val text = frame.readText()
+                client.webSocket("$wsUrl?cid=${TempData.clientId}") { session ->
+                    session.sendBinary(payload)
+                    for (frame in session.incoming) {
+                        val text = frame.text ?: continue
                         if (text != "ok") continue
                         updateState(peerId) {
                             it.copy(reconnectJob = null, reconnectAttempts = 0)

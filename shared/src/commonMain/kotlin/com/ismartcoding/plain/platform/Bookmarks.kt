@@ -4,10 +4,7 @@ import com.ismartcoding.plain.db.DBookmark
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.logcat.LogCat
-import io.ktor.client.call.body
-import io.ktor.client.request.get
 import io.ktor.http.Url
-import io.ktor.http.isSuccess
 
 /**
  * Absolute directory in which bookmark favicons are stored. Platform-specific
@@ -42,30 +39,28 @@ fun deleteBookmarkFavicons(bookmarks: List<DBookmark>) {
 suspend fun downloadBookmarkFavicon(faviconUrl: String, pageUrl: String): String? {
     return try {
         withIO {
-            val client = KtorClientFactory.browserClient()
+            val client = createBrowserHttpClient()
             val resp = client.get(faviconUrl)
-            if (!resp.status.isSuccess()) {
-                client.close()
-                return@withIO null
-            }
-            val bytes: ByteArray = resp.body()
-            client.close()
-            if (bytes.isEmpty()) return@withIO null
+            resp.use {
+                if (!it.isSuccess()) return@withIO null
+                val bytes = it.bodyAsBytes()
+                if (bytes.isEmpty()) return@withIO null
 
-            val ext = when {
-                faviconUrl.endsWith(".png", ignoreCase = true) -> "png"
-                faviconUrl.endsWith(".ico", ignoreCase = true) -> "ico"
-                faviconUrl.endsWith(".svg", ignoreCase = true) -> "svg"
-                else -> "ico"
+                val ext = when {
+                    faviconUrl.endsWith(".png", ignoreCase = true) -> "png"
+                    faviconUrl.endsWith(".ico", ignoreCase = true) -> "ico"
+                    faviconUrl.endsWith(".svg", ignoreCase = true) -> "svg"
+                    else -> "ico"
+                }
+                val host = try { Url(pageUrl).host } catch (_: Exception) { "unknown" }
+                val fileName = "bm_favicon_${host.replace(".", "_")}.$ext"
+                val dir = bookmarkFaviconDirPath()
+                val absPath = "$dir/$fileName"
+                ensureParentDir(absPath)
+                if (!writeBytesToPath(absPath, bytes)) return@withIO null
+                val rel = dir.removePrefix(appDir()).removePrefix("/")
+                "app://$rel/$fileName"
             }
-            val host = try { Url(pageUrl).host } catch (_: Exception) { "unknown" }
-            val fileName = "bm_favicon_${host.replace(".", "_")}.$ext"
-            val dir = bookmarkFaviconDirPath()
-            val absPath = "$dir/$fileName"
-            ensureParentDir(absPath)
-            if (!writeBytesToPath(absPath, bytes)) return@withIO null
-            val rel = dir.removePrefix(appDir()).removePrefix("/")
-            "app://$rel/$fileName"
         }
     } catch (e: Exception) {
         LogCat.e("downloadBookmarkFavicon: ${e.message}")

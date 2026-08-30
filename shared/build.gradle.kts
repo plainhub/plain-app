@@ -69,9 +69,8 @@ kotlin {
             implementation(libs.androidx.datastore.preferences.core)
             api(libs.room.runtime)
             implementation(libs.sqlite.bundled)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.client.logging)
+            // ktor-io only (ByteReadChannel streaming) — no HTTP client dependency from ktor
+            implementation(libs.ktor.io)
             implementation(libs.coil.compose)
 
             // Vendored multiplatform-markdown-renderer (lib/markdown/) depends on these.
@@ -86,7 +85,6 @@ kotlin {
         }
         androidMain.dependencies {
             api(project(":shared-lib"))
-            implementation(libs.ktor.client.okhttp)
             implementation(libs.okhttp)
             implementation(libs.tink.android)
             implementation(libs.androidx.exifinterface)
@@ -156,9 +154,9 @@ kotlin {
         }
         iosMain.dependencies {
             implementation(libs.sqlite.bundled)
-            implementation(libs.ktor.client.darwin)
+
             implementation(libs.coil)
-            implementation(libs.coil.network.ktor3)
+            implementation(libs.coil.network.core)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

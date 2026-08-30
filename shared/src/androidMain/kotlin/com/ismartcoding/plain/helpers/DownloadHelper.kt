@@ -3,37 +3,38 @@ package com.ismartcoding.plain.helpers
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.data.DownloadResult
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
-import com.ismartcoding.plain.lib.extensions.isOk
 import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.KtorClientFactory
+import com.ismartcoding.plain.platform.PlainResponse
+import com.ismartcoding.plain.platform.copyTo
+import com.ismartcoding.plain.platform.createBrowserHttpClient
+import com.ismartcoding.plain.platform.get
 import com.ismartcoding.plain.platform.sha1
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.util.cio.writeChannel
-import io.ktor.utils.io.copyAndClose
 import java.io.File
+import java.io.FileOutputStream
 
 object DownloadHelper {
     suspend fun downloadAsync(url: String, dir: String): DownloadResult = withIO {
-        val httpClient = KtorClientFactory.browserClient()
+        val httpClient = createBrowserHttpClient()
         try {
             val r = httpClient.get(url)
-            if (r.isOk()) {
-                File(dir).mkdirs()
-                var path = "$dir/${sha1(url.toByteArray())}"
-                val extension = url.getFilenameExtension()
-                if (extension.isNotEmpty()) {
-                    path += ".$extension"
+            r.use {
+                if (it.isOk()) {
+                    File(dir).mkdirs()
+                    var path = "$dir/${sha1(url.toByteArray())}"
+                    val extension = url.getFilenameExtension()
+                    if (extension.isNotEmpty()) {
+                        path += ".$extension"
+                    }
+                    val file = File(path)
+                    file.createNewFile()
+                    it.writeBodyToFile(file)
+                    appContext.scanFileByConnection(file, null)
+                    DownloadResult(path, true)
+                } else {
+                    DownloadResult("", false, "HTTP ${it.status}")
                 }
-                val file = File(path)
-                file.createNewFile()
-                r.bodyAsChannel().copyAndClose(file.writeChannel())
-                appContext.scanFileByConnection(file, null)
-                DownloadResult(path, true)
-            } else {
-                DownloadResult("", false, r.toString())
             }
         } catch (ex: Exception) {
             LogCat.e(ex.toString())
@@ -43,19 +44,27 @@ object DownloadHelper {
     }
 
     suspend fun downloadToTempAsync(url: String, tempFile: File): DownloadResult = withIO {
-        val httpClient = KtorClientFactory.browserClient()
+        val httpClient = createBrowserHttpClient()
         try {
             val r = httpClient.get(url)
-            if (r.isOk()) {
-                r.bodyAsChannel().copyAndClose(tempFile.writeChannel())
-                DownloadResult(tempFile.absolutePath, true)
-            } else {
-                DownloadResult("", false, r.toString())
+            r.use {
+                if (it.isOk()) {
+                    it.writeBodyToFile(tempFile)
+                    DownloadResult(tempFile.absolutePath, true)
+                } else {
+                    DownloadResult("", false, "HTTP ${it.status}")
+                }
             }
         } catch (ex: Exception) {
             LogCat.e(ex.toString())
             ex.printStackTrace()
             DownloadResult("", false, ex.toString())
+        }
+    }
+
+    private suspend fun PlainResponse.writeBodyToFile(file: File) {
+        FileOutputStream(file).use { out ->
+            channel.copyTo { buffer, length -> out.write(buffer, 0, length) }
         }
     }
 }

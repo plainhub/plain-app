@@ -1,12 +1,11 @@
 package com.ismartcoding.plain.chat.peer.transport.aware
 
 import android.net.Network
-import com.ismartcoding.plain.api.OkHttpClientFactory
 import com.ismartcoding.plain.chat.peer.PeerCacher
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.websocket.WebSockets
+import com.ismartcoding.plain.platform.OkHttpPlainClient
+import com.ismartcoding.plain.platform.PlainHttpClient
+import com.ismartcoding.plain.platform.SharedOkHttpClients
+import com.ismartcoding.plain.platform.createCryptoPlainClient
 import okhttp3.Dns
 import java.net.Inet6Address
 import java.net.InetAddress
@@ -17,37 +16,24 @@ class AwareHttpClientFactory {
         peerId: String,
         network: Network,
         peerIpv6: Inet6Address,
-    ): HttpClient {
+    ): PlainHttpClient {
         val keyBytes = requireNotNull(PeerCacher.getKeyBytes(peerId)) {
             "PeerCacher has no key bytes for peer $peerId"
         }
-        val okHttpClient = OkHttpClientFactory.createCryptoHttpClient(
+        return createCryptoPlainClient(
             keyBytes = keyBytes,
-            timeout = 30,
             socketFactory = network.socketFactory,
             dns = awareDns(peerIpv6),
+            timeoutSeconds = 30,
             connectTimeoutMs = 5_000L,
-        ).newBuilder()
-            .retryOnConnectionFailure(true)
-            .build()
-        return HttpClient(OkHttp) {
-            install(HttpTimeout) {
-                requestTimeoutMillis = 30_000L
-                connectTimeoutMillis = 5_000L
-            }
-            install(WebSockets)
-            engine {
-                preconfigured = okHttpClient
-            }
-        }
+        )
     }
 
     fun buildFileDownload(
         network: Network,
         peerIpv6: Inet6Address,
-    ): HttpClient {
-        val okHttpClient = OkHttpClientFactory.createUnsafeOkHttpClient()
-            .newBuilder()
+    ): PlainHttpClient {
+        val okHttpClient = SharedOkHttpClients.unsafe.newBuilder()
             .socketFactory(network.socketFactory)
             .dns(awareDns(peerIpv6))
             .hostnameVerifier { _, _ -> true }
@@ -56,15 +42,7 @@ class AwareHttpClientFactory {
             .writeTimeout(120, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
             .build()
-        return HttpClient(OkHttp) {
-            install(HttpTimeout) {
-                requestTimeoutMillis = 120_000L
-                connectTimeoutMillis = 10_000L
-            }
-            engine {
-                preconfigured = okHttpClient
-            }
-        }
+        return OkHttpPlainClient(okHttpClient)
     }
 
     companion object {

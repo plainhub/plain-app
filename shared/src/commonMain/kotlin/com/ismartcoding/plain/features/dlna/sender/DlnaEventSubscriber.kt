@@ -3,16 +3,9 @@ package com.ismartcoding.plain.features.dlna.sender
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.dlna.common.DlnaDevice
+import com.ismartcoding.plain.platform.PlainRequest
 import com.ismartcoding.plain.platform.createHttpClient
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.headers
-import io.ktor.client.request.request
-import io.ktor.client.request.url
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
+import com.ismartcoding.plain.platform.request
 
 object DlnaEventSubscriber {
 
@@ -20,15 +13,19 @@ object DlnaEventSubscriber {
         val service = device.getAVTransportService() ?: return ""
         return try {
             val response = withIO {
-                createHttpClient().subscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
-                    headers {
-                        set("NT", "upnp:event")
-                        set("TIMEOUT", "Second-3600")
-                        set("CALLBACK", "<$callbackUrl>")
-                    }
-                }
+                createHttpClient().request(
+                    PlainRequest(
+                        "SUBSCRIBE",
+                        device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/'),
+                        headers = mapOf(
+                            "NT" to "upnp:event",
+                            "TIMEOUT" to "Second-3600",
+                            "CALLBACK" to "<$callbackUrl>",
+                        ),
+                    ),
+                )
             }
-            response.headers["SID"].orEmpty()
+            response.use { it.header("SID").orEmpty() }
         } catch (ex: Exception) { ex.printStackTrace(); "" }
     }
 
@@ -36,11 +33,18 @@ object DlnaEventSubscriber {
         val service = device.getAVTransportService() ?: return ""
         return try {
             val response = withIO {
-                createHttpClient().subscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
-                    headers { set("SID", sid); set("TIMEOUT", "Second-3600") }
-                }
+                createHttpClient().request(
+                    PlainRequest(
+                        "SUBSCRIBE",
+                        device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/'),
+                        headers = mapOf(
+                            "SID" to sid,
+                            "TIMEOUT" to "Second-3600",
+                        ),
+                    ),
+                )
             }
-            response.headers["SID"].orEmpty()
+            response.use { it.header("SID").orEmpty() }
         } catch (ex: Exception) { ex.printStackTrace(); "" }
     }
 
@@ -48,24 +52,20 @@ object DlnaEventSubscriber {
         val service = device.getAVTransportService() ?: return ""
         return try {
             val response = withIO {
-                createHttpClient().unsubscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
-                    headers { set("SID", sid) }
-                }
+                createHttpClient().request(
+                    PlainRequest(
+                        "UNSUBSCRIBE",
+                        device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/'),
+                        headers = mapOf("SID" to sid),
+                    ),
+                )
             }
-            LogCat.e(response.toString())
-            val xml = response.body<String>()
-            LogCat.e(xml)
-            if (response.status == HttpStatusCode.OK) xml else ""
+            response.use {
+                LogCat.e(it.toString())
+                val xml = it.bodyAsText()
+                LogCat.e(xml)
+                if (it.isOk()) xml else ""
+            }
         } catch (ex: Exception) { ex.printStackTrace(); "" }
     }
-
-    private suspend fun HttpClient.subscribe(
-        urlString: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ): HttpResponse = request(HttpRequestBuilder().apply { method = HttpMethod("SUBSCRIBE"); url(urlString); block() })
-
-    private suspend fun HttpClient.unsubscribe(
-        urlString: String,
-        block: HttpRequestBuilder.() -> Unit = {},
-    ): HttpResponse = request(HttpRequestBuilder().apply { method = HttpMethod("UNSUBSCRIBE"); url(urlString); block() })
 }

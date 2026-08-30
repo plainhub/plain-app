@@ -7,10 +7,8 @@ import com.ismartcoding.plain.lib.dlna.common.DlnaSsdpSocket
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.platform.createHttpClient
+import com.ismartcoding.plain.platform.get
 import com.ismartcoding.plain.platform.getDeviceIP4s
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -86,10 +84,12 @@ object DlnaDeviceScanner {
         try {
             val client = createHttpClient()
             val response = client.get(device.location)
-            if (response.status != HttpStatusCode.OK) return
-            val xml = response.body<String>()
-            device.update(xml)
-            if (!device.isAVTransport()) return
+            response.use {
+                if (!it.isOk()) return
+                val xml = it.bodyAsText()
+                device.update(xml)
+                if (!device.isAVTransport()) return
+            }
         } catch (e: Exception) {
             LogCat.e("DLNA scanner: failed to fetch description for ${ssdp.hostAddress}: ${e.message}")
             return
@@ -108,4 +108,3 @@ object DlnaDeviceScanner {
         LogCat.d("DLNA scanner: stopped and socket closed")
     }
 }
-

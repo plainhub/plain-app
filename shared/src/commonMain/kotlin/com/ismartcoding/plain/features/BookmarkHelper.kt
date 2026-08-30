@@ -3,16 +3,14 @@ package com.ismartcoding.plain.features
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
-import com.ismartcoding.plain.platform.KtorClientFactory
+import com.ismartcoding.plain.platform.createBrowserHttpClient
+import com.ismartcoding.plain.platform.get
+import io.ktor.http.Url
 import com.ismartcoding.plain.platform.deleteBookmarkFavicons
 import com.ismartcoding.plain.platform.downloadBookmarkFavicon
 import com.ismartcoding.plain.db.DBookmark
 import com.ismartcoding.plain.db.DBookmarkGroup
 import com.ismartcoding.plain.lib.TimeHelper
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.Url
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -162,24 +160,21 @@ object BookmarkHelper {
     private suspend fun fetchPageMeta(url: String): Pair<String?, String?> {
         return withIO {
             try {
-                val client = KtorClientFactory.browserClient()
-                val response = client.get(url)
-                if (!response.status.isSuccess()) {
-                    client.close()
-                    return@withIO Pair(null, null)
+                val response = createBrowserHttpClient().get(url)
+                response.use {
+                    if (!it.isSuccess()) {
+                        return@withIO Pair(null, null)
+                    }
+                    val contentType = it.header("Content-Type")?.lowercase() ?: ""
+                    if (!contentType.contains("text/html")) {
+                        return@withIO Pair(null, null)
+                    }
+                    val html = it.bodyAsText()
+                    val title = extractTitle(html)
+                    val faviconUrl = extractFaviconUrl(url, html)
+                    val localPath = if (faviconUrl != null) downloadBookmarkFavicon(faviconUrl, url) else null
+                    Pair(title, localPath)
                 }
-                val contentType = response.headers["Content-Type"]?.lowercase() ?: ""
-                if (!contentType.contains("text/html")) {
-                    client.close()
-                    return@withIO Pair(null, null)
-                }
-                val html = response.bodyAsText()
-                client.close()
-
-                val title = extractTitle(html)
-                val faviconUrl = extractFaviconUrl(url, html)
-                val localPath = if (faviconUrl != null) downloadBookmarkFavicon(faviconUrl, url) else null
-                Pair(title, localPath)
             } catch (e: Exception) {
                 LogCat.e("BookmarkHelper.fetchPageMeta($url): ${e.message}")
                 Pair(null, null)

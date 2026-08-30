@@ -12,7 +12,6 @@ import com.ismartcoding.plain.httpserver.isSharePath
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.CachingOptions
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
@@ -20,7 +19,6 @@ import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.plugins.autohead.AutoHeadResponse
-import io.ktor.server.plugins.cachingheaders.CachingHeaders
 import io.ktor.server.plugins.conditionalheaders.ConditionalHeaders
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
@@ -45,19 +43,6 @@ object HttpModule {
     private val commonRouter: HttpRouter get() = HttpRouteRegistry.router
 
     val module: Application.() -> Unit = {
-        install(CachingHeaders) {
-            options { _, outgoingContent ->
-                when (outgoingContent.contentType?.withoutParameters()) {
-                    ContentType.Text.CSS, ContentType.Application.JavaScript ->
-                        CachingOptions(
-                            CacheControl.MaxAge(maxAgeSeconds = 3600 * 24 * 30),
-                        )
-
-                    else -> null
-                }
-            }
-        }
-
         install(CORS) {
             if (TempData.allowAnyHost.value) {
                 anyHost()
@@ -121,11 +106,21 @@ object HttpModule {
             // SPA: serve all resources from classpath "web/", inject __SERVER_TIME__ into index.html
             // for every non-file path (no extension) so the Vue SPA can boot with a clock-sync value.
             staticResources("/", "web", index = null) {
-                cacheControl {
-                    arrayListOf(
-                        CacheControl.NoCache(CacheControl.Visibility.Public),
-                        CacheControl.NoStore(CacheControl.Visibility.Public),
-                    )
+                cacheControl { url ->
+                    if (url.path.contains("/assets/")) {
+                        // Hashed build outputs are immutable
+                        arrayListOf(
+                            CacheControl.MaxAge(
+                                maxAgeSeconds = 3600 * 24 * 365,
+                                visibility = CacheControl.Visibility.Public,
+                            ),
+                        )
+                    } else {
+                        arrayListOf(
+                            CacheControl.NoCache(CacheControl.Visibility.Public),
+                            CacheControl.NoStore(CacheControl.Visibility.Public),
+                        )
+                    }
                 }
                 fallback { requestedPath, call ->
                     if (requestedPath.contains('.')) {

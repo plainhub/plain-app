@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.sms
 
 import com.ismartcoding.plain.events.MmsSendResultData
+import com.ismartcoding.plain.platform.PlainLock
 
 data class MmsTerminalResultState(
     val pendingId: String,
@@ -19,12 +20,13 @@ class MmsSendResultOutbox(
     private val store: MmsSendResultStateStore,
     private val maxEntries: Int = 500,
 ) {
+    private val lock = PlainLock()
+
     init {
         require(maxEntries > 0)
     }
 
-    @Synchronized
-    fun record(result: MmsSendResultData, terminalAtMillis: Long) {
+    fun record(result: MmsSendResultData, terminalAtMillis: Long) = lock.withLock {
         store.write(
             MmsTerminalResultState(
                 pendingId = result.pendingId,
@@ -39,10 +41,9 @@ class MmsSendResultOutbox(
             .forEach { store.remove(it.pendingId) }
     }
 
-    @Synchronized
-    fun replayable(nowMillis: Long, ttlMillis: Long): List<MmsSendResultData> {
+    fun replayable(nowMillis: Long, ttlMillis: Long): List<MmsSendResultData> = lock.withLock {
         require(ttlMillis >= 0L)
-        return store.readAll()
+        return@withLock store.readAll()
             .sortedBy { it.terminalAtMillis }
             .mapNotNull { state ->
                 if ((nowMillis - state.terminalAtMillis).coerceAtLeast(0L) >= ttlMillis) {

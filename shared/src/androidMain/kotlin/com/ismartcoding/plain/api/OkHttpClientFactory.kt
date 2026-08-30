@@ -1,20 +1,13 @@
 package com.ismartcoding.plain.api
 
 import com.ismartcoding.plain.lib.helpers.NetworkHelper
-import com.ismartcoding.plain.platform.chaCha20Decrypt
-import com.ismartcoding.plain.platform.chaCha20Encrypt
-import okhttp3.Dns
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.ResponseBody.Companion.toResponseBody
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
-import javax.net.SocketFactory
-import javax.net.ssl.SSLContext
 import javax.net.ssl.KeyManager
+import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
@@ -27,73 +20,6 @@ object OkHttpClientFactory {
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(120, TimeUnit.SECONDS)
             .build()
-
-    private fun OkHttpClient.Builder.ignoreAllSSLErrors(): OkHttpClient.Builder {
-        val naiveTrustManager =
-            object : X509TrustManager {
-                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-
-                override fun checkClientTrusted(
-                    certs: Array<X509Certificate>,
-                    authType: String,
-                ) = Unit
-
-                override fun checkServerTrusted(
-                    certs: Array<X509Certificate>,
-                    authType: String,
-                ) = Unit
-            }
-
-        val insecureSocketFactory =
-            SSLContext.getInstance("TLSv1.2").apply {
-                val trustAllCerts = arrayOf<TrustManager>(naiveTrustManager)
-                // Avoid triggering default KeyManager lookup (which can require BKS on some devices)
-                init(arrayOf<KeyManager>(), trustAllCerts, SecureRandom())
-            }.socketFactory
-
-        sslSocketFactory(insecureSocketFactory, naiveTrustManager)
-        hostnameVerifier { _, _ -> true }
-        return this
-    }
-
-    fun createCryptoHttpClient(
-        keyBytes: ByteArray,
-        timeout: Int,
-        socketFactory: SocketFactory? = null,
-        dns: Dns? = null,
-        connectTimeoutMs: Long = 1_000L,
-    ): OkHttpClient {
-        val builder =
-            OkHttpClient.Builder()
-                .addInterceptor { chain ->
-                    val request = chain.request()
-                    val requestBody = request.body!!
-                    val requestBodyStr = bodyToString(requestBody)
-                    val response =
-                        chain.proceed(
-                            request.newBuilder()
-                                .post(chaCha20Encrypt(keyBytes, requestBodyStr).toRequestBody(requestBody.contentType()))
-                                .build(),
-                        )
-                    val responseBody = response.body
-                    val decryptedBytes = chaCha20Decrypt(keyBytes, responseBody.bytes())
-                    if (decryptedBytes != null) {
-                        val json = decryptedBytes.decodeToString()
-                        return@addInterceptor response.newBuilder()
-                            .body(json.toResponseBody(responseBody.contentType()))
-                            .removeHeader("Content-Length")
-                            .build()
-                    }
-                    response.newBuilder().build()
-                }
-                .connectTimeout(connectTimeoutMs, TimeUnit.MILLISECONDS)
-                .writeTimeout(timeout.toLong(), TimeUnit.SECONDS)
-                .readTimeout(timeout.toLong(), TimeUnit.SECONDS)
-                .ignoreAllSSLErrors()
-        if (socketFactory != null) builder.socketFactory(socketFactory)
-        if (dns != null) builder.dns(dns)
-        return builder.build()
-    }
 
     fun createUnsafeOkHttpClient(): OkHttpClient {
         val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -136,11 +62,4 @@ object OkHttpClientFactory {
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .build()
-
-    private fun bodyToString(request: RequestBody): String {
-        val buffer = okio.Buffer()
-        request.writeTo(buffer)
-        return buffer.readUtf8()
-    }
 }
-

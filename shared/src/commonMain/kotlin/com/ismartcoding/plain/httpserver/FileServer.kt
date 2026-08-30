@@ -217,6 +217,7 @@ object FileServer {
                 fileName = fileName,
             )
             if (thumbBytes != null) {
+                call.responseHeader("Cache-Control", "private, max-age=86400")
                 call.respond(thumbBytes)
             }
             return

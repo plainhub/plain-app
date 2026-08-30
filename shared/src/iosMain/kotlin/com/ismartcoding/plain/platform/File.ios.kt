@@ -16,9 +16,7 @@ import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.thumbnail.DecodePolicy
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.httpserver.http.StreamSink
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsChannel
-import io.ktor.utils.io.readAvailable
+import com.ismartcoding.plain.platform.copyTo
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
@@ -436,16 +434,12 @@ actual suspend fun fetchUrlToStream(url: String, sink: StreamSink): Pair<Int, St
     val client = createDownloadClient()
     try {
         val response = client.get(url)
-        val status = response.status.value
-        val contentType = response.headers["Content-Type"]
-        val channel = response.bodyAsChannel()
-        val buffer = ByteArray(64 * 1024)
-        while (true) {
-            val read = channel.readAvailable(buffer)
-            if (read <= 0) break
-            sink.write(buffer, 0, read)
+        response.use {
+            val status = it.status.value
+            val contentType = it.header("Content-Type")
+            it.channel.copyTo { buffer, length -> sink.write(buffer, 0, length) }
+            status to contentType
         }
-        status to contentType
     } catch (e: Exception) {
         LogCat.e("fetchUrlToStream: ${e.message}")
         0 to null

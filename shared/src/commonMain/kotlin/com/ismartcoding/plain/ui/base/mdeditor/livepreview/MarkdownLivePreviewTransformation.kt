@@ -113,7 +113,7 @@ class MarkdownLivePreviewTransformation(
         val edits = planEdits(src, sourceLines)
         if (edits.isEmpty()) return src.toString()
         return StringBuilder(src).also { b ->
-            for (e in edits) b.replace(e.start, e.start + e.origLen, e.text)
+            for (e in edits) b.replaceRange(e.start, e.start + e.origLen, e.text)
         }.toString()
     }
 

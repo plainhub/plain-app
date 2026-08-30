@@ -15,12 +15,11 @@ import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.check_failure
 import com.ismartcoding.plain.i18n.rate_limit
-import com.ismartcoding.plain.platform.KtorClientFactory
+import com.ismartcoding.plain.platform.HttpStatusCode
+import com.ismartcoding.plain.platform.createHttpClient
+import com.ismartcoding.plain.platform.get
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpStatusCode
 import java.io.File
 
 object AppHelper {
@@ -42,52 +41,53 @@ object AppHelper {
 
     suspend fun checkUpdateAsync(context: Context, showToast: Boolean): Boolean? {
         return try {
-            val client = KtorClientFactory.httpClient()
-            val r = client.get(Constants.LATEST_RELEASE_URL)
-            UpdateInfoPreference.updateAsync { it.copy(checkUpdateTime = System.currentTimeMillis()) }
-            if (r.status == HttpStatusCode.Forbidden) {
-                if (showToast) {
-                    DialogHelper.showMessage(Res.string.rate_limit)
-                }
-                return false
-            }
-
-            val latestJSON = r.bodyAsText()
-            if (latestJSON.isEmpty()) {
-                if (showToast) {
-                    DialogHelper.showMessage(Res.string.check_failure)
-                }
-                return null
-            }
-
-            val latest = jsonDecode<LatestRelease>(latestJSON)
-            val current = UpdateInfoPreference.getValueAsync()
-            val skipVersion = Version(current.skipVersion)
-            val currentVersion = Version(getAppVersionName())
-            val latestVersion = Version(latest.tagName.substring(1))
-            if (latestVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
-                val only32BitDevice = Build.SUPPORTED_64_BIT_ABIS.isEmpty()
-                val apk = if (only32BitDevice) {
-                    latest.assets.firstOrNull {
-                        it.name.endsWith("-Old-32bit.apk")
+            val r = createHttpClient().get(Constants.LATEST_RELEASE_URL)
+            r.use {
+                UpdateInfoPreference.updateAsync { it.copy(checkUpdateTime = System.currentTimeMillis()) }
+                if (it.status == HttpStatusCode.Forbidden) {
+                    if (showToast) {
+                        DialogHelper.showMessage(Res.string.rate_limit)
                     }
+                    return false
+                }
+
+                val latestJSON = it.bodyAsText()
+                if (latestJSON.isEmpty()) {
+                    if (showToast) {
+                        DialogHelper.showMessage(Res.string.check_failure)
+                    }
+                    return null
+                }
+
+                val latest = jsonDecode<LatestRelease>(latestJSON)
+                val current = UpdateInfoPreference.getValueAsync()
+                val skipVersion = Version(current.skipVersion)
+                val currentVersion = Version(getAppVersionName())
+                val latestVersion = Version(latest.tagName.substring(1))
+                if (latestVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
+                    val only32BitDevice = Build.SUPPORTED_64_BIT_ABIS.isEmpty()
+                    val apk = if (only32BitDevice) {
+                        latest.assets.firstOrNull {
+                            it.name.endsWith("-Old-32bit.apk")
+                        }
+                    } else {
+                        latest.assets.firstOrNull {
+                            it.name.contains("Recommended")
+                        }
+                    }
+                    UpdateInfoPreference.updateAsync {
+                        it.copy(
+                            newVersion = latestVersion.toString(),
+                            log = latest.body,
+                            publishDate = latest.publishedAt.ifEmpty { latest.createdAt },
+                            size = apk?.size ?: 0,
+                            downloadUrl = apk?.browserDownloadUrl ?: "",
+                        )
+                    }
+                    true
                 } else {
-                    latest.assets.firstOrNull {
-                        it.name.contains("Recommended")
-                    }
+                    false
                 }
-                UpdateInfoPreference.updateAsync {
-                    it.copy(
-                        newVersion = latestVersion.toString(),
-                        log = latest.body,
-                        publishDate = latest.publishedAt.ifEmpty { latest.createdAt },
-                        size = apk?.size ?: 0,
-                        downloadUrl = apk?.browserDownloadUrl ?: "",
-                    )
-                }
-                true
-            } else {
-                false
             }
         } catch (e: Exception) {
             e.printStackTrace()

@@ -4,10 +4,6 @@ import com.ismartcoding.plain.db.DLinkPreview
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.isSuccess
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -68,23 +64,22 @@ private fun extractHost(url: String): String =
 
 private suspend fun fetchLinkPreview(url: String): DLinkPreview {
     return try {
-        val client = KtorClientFactory.browserClient()
-        val response = client.get(url)
+        val response = createBrowserHttpClient().get(url)
 
-        if (!response.status.isSuccess()) {
-            client.close()
+        if (!response.isSuccess()) {
+            response.close()
             return DLinkPreview(url = url, hasError = true)
         }
 
-        val contentType = response.headers["Content-Type"]?.lowercase() ?: ""
+        val contentType = response.header("Content-Type")?.lowercase() ?: ""
         if (!contentType.contains("text/html")) {
-            client.close()
+            response.close()
             return DLinkPreview(url = url, hasError = true)
         }
 
-        val contentLength = response.headers["Content-Length"]?.toIntOrNull() ?: 0
+        val contentLength = response.header("Content-Length")?.toIntOrNull() ?: 0
         if (contentLength > MAX_RESPONSE_SIZE) {
-            client.close()
+            response.close()
             return DLinkPreview(url = url, hasError = true)
         }
 
@@ -168,7 +163,7 @@ private suspend fun fetchLinkPreview(url: String): DLinkPreview {
             }
         }
 
-        client.close()
+        response.close()
         DLinkPreview(
             url = url,
             title = title?.ifEmpty { null },
@@ -188,26 +183,25 @@ private suspend fun fetchLinkPreview(url: String): DLinkPreview {
 
 private suspend fun downloadImageWithSize(imageUrl: String, originalUrl: String): Triple<String?, Int, Int> {
     return try {
-        val client = KtorClientFactory.browserClient()
-        val response = client.get(imageUrl)
+        val response = createBrowserHttpClient().get(imageUrl)
 
-        if (!response.status.isSuccess()) {
-            client.close()
+        if (!response.isSuccess()) {
+            response.close()
             return Triple(null, 0, 0)
         }
 
-        val contentType = response.headers["Content-Type"]?.lowercase() ?: ""
+        val contentType = response.header("Content-Type")?.lowercase() ?: ""
         val isFaviconFile = imageUrl.contains("favicon") || imageUrl.endsWith(".ico")
         if (!contentType.startsWith("image/") &&
             !(isFaviconFile && (contentType.contains("icon") || contentType.contains("octet-stream")))
         ) {
-            client.close()
+            response.close()
             return Triple(null, 0, 0)
         }
 
-        val imageBytes = response.body<ByteArray>()
+        val imageBytes = response.bodyAsBytes()
         if (imageBytes.size > MAX_IMAGE_SIZE) {
-            client.close()
+            response.close()
             return Triple(null, 0, 0)
         }
 
@@ -218,13 +212,13 @@ private suspend fun downloadImageWithSize(imageUrl: String, originalUrl: String)
 
         if (imageWidth < 100 || imageHeight < 100) {
             if (!isFavicon) {
-                client.close()
+                response.close()
                 return Triple(null, imageWidth, imageHeight)
             }
         }
 
         val imageLocalPath = importImageBytesToFid(imageBytes, contentType)
-        client.close()
+        response.close()
         Triple(imageLocalPath, imageWidth, imageHeight)
     } catch (e: Exception) {
         LogCat.e("Error downloading preview image: ${e.message}")

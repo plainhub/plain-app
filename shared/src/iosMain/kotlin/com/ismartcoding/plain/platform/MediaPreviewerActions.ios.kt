@@ -4,13 +4,10 @@ import com.ismartcoding.plain.data.DownloadResult
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
-import com.ismartcoding.plain.lib.extensions.isOk
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import io.ktor.client.request.get
-import io.ktor.client.statement.readBytes
 import platform.Foundation.writeToFile
 
 actual val canSavePreviewMedia: Boolean = false
@@ -41,14 +38,16 @@ private suspend fun downloadUrlToTemp(url: String): DownloadResult {
     val ext = url.getFilenameExtension().ifEmpty { "bin" }
     val tempPath = "$tempDir/preview_share_${TimeHelper.nowMillis()}.$ext"
     return try {
-        val client = KtorClientFactory.browserClient()
+        val client = createBrowserHttpClient()
         val r = client.get(url)
-        if (r.isOk()) {
-            val bytes = r.readBytes()
-            bytes.toNSData().writeToFile(tempPath, atomically = true)
-            DownloadResult(tempPath, true)
-        } else {
-            DownloadResult("", false, "${r.status.value} ${r.status.description}")
+        r.use {
+            if (it.isOk()) {
+                val bytes = it.bodyAsBytes()
+                bytes.toNSData().writeToFile(tempPath, atomically = true)
+                DownloadResult(tempPath, true)
+            } else {
+                DownloadResult("", false, "${it.status.value} ${it.status.description}")
+            }
         }
     } catch (e: Exception) {
         DownloadResult("", false, e.message ?: "download failed")
