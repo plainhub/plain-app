@@ -50,6 +50,11 @@ kotlin {
         androidMain.dependencies {
             api(libs.androidx.core.ktx)
             implementation(libs.ktor.server.core)
+            api(libs.atomicfu)
+            api(libs.netty.handler)
+            api(libs.netty.codec.http)
+            api(libs.netty.transport.native.epoll)
+            api(libs.netty.transport.native.kqueue)
         }
 
         commonTest.dependencies {

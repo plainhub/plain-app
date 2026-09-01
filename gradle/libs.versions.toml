@@ -18,9 +18,11 @@ jsonVersion="20260814"
 junitVersion="4.13.2"
 kotlin ="2.4.10"
 kotlinxDatetimeVersion="0.8.0"
+atomicfu = "0.32.1"
 kotlinxSerializationJsonVersion="1.11.0"
 kotlinxCoroutinesVersion ="1.11.0"
 ktor = "3.5.2"
+netty = "4.2.16.Final"
 leakcanaryAndroidVersion = "2.14"
 lifecycleViewmodelKtxVersion="2.11.0"
 jetbrainsLifecycleViewmodel = "2.11.0"
@@ -132,10 +134,16 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 # ktor common (server stack + io/http used by commonMain)
 ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 ktor-io = { module = "io.ktor:ktor-io", version.ref = "ktor" }
+atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 
 # ktor server
-ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+
+# netty (runtime for vendored ktor-server-netty)
+netty-codec-http = { module = "io.netty:netty-codec-http", version.ref = "netty" }
+netty-handler = { module = "io.netty:netty-handler", version.ref = "netty" }
+netty-transport-native-epoll = { module = "io.netty:netty-transport-native-epoll", version.ref = "netty" }
+netty-transport-native-kqueue = { module = "io.netty:netty-transport-native-kqueue", version.ref = "netty" }
 
 jetbrains-markdown = { module = "org.jetbrains:markdown", version.ref = "jetbrainsMarkdown" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }

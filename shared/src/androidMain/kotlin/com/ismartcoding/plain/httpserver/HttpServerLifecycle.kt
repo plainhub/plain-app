@@ -13,8 +13,8 @@ import io.ktor.server.engine.applicationEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
-import io.ktor.server.netty.Netty
-import io.ktor.server.netty.NettyApplicationEngine
+import com.ismartcoding.plain.lib.ktorserver.Netty
+import com.ismartcoding.plain.lib.ktorserver.NettyApplicationEngine
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -214,7 +214,6 @@ suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplica
             // Android compatibility container during repeated API calls.
             runningLimit = 32
             tcpKeepAlive = true
-            enableHttp2 = false
 
             // Bind on all interfaces (0.0.0.0): local/loopback access (health
             // checks, the desktop web console) arrives directly, and LAN devices
