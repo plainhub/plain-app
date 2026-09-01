@@ -111,7 +111,6 @@ kotlin {
             implementation(libs.ktor.server.forwarded.header)
             implementation(libs.ktor.server.partial.content)
             implementation(libs.ktor.server.conditional.headers)
-            implementation(libs.ktor.network.tls.certificates)
 
             // Media3 (AudioPlayerService, audio playback, PlayerView UI)
             implementation(libs.media3.exoplayer)
