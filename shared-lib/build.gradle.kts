@@ -49,6 +49,7 @@ kotlin {
 
         androidMain.dependencies {
             api(libs.androidx.core.ktx)
+            implementation(libs.ktor.server.core)
         }
 
         commonTest.dependencies {

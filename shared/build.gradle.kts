@@ -111,7 +111,6 @@ kotlin {
             implementation(libs.ktor.server.cors)
             implementation(libs.ktor.server.forwarded.header)
             implementation(libs.ktor.server.partial.content)
-            implementation(libs.ktor.server.auto.head.response)
             implementation(libs.ktor.server.conditional.headers)
             implementation(libs.ktor.network.tls.certificates)
 
