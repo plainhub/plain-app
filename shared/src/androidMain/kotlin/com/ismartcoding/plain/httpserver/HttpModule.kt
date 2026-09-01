@@ -52,7 +52,6 @@ object HttpModule {
 
         install(ConditionalHeaders)
         install(WebSockets)
-//        install(Compression) // this will slow down the download speed
         install(ForwardedHeaders)
         install(PartialContent)
         install(AutoHeadResponse)
