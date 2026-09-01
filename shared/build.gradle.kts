@@ -103,8 +103,6 @@ kotlin {
             // Ktor server (used by vendored kgraphql and web server code)
             implementation(libs.ktor.server.core)
             implementation(libs.ktor.server.netty)
-            implementation(libs.ktor.server.websockets)
-            implementation(libs.ktor.server.forwarded.header)
 
             // Media3 (AudioPlayerService, audio playback, PlayerView UI)
             implementation(libs.media3.exoplayer)

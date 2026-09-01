@@ -2,7 +2,7 @@ package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.httpserver.http.WsSession
 import io.ktor.server.plugins.origin
-import io.ktor.server.websocket.DefaultWebSocketServerSession
+import com.ismartcoding.plain.lib.ktorserver.DefaultWebSocketServerSession
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readBytes

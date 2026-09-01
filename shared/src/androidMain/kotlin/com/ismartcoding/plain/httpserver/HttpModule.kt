@@ -28,7 +28,7 @@ import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.routing
-import io.ktor.server.websocket.WebSockets
+import com.ismartcoding.plain.lib.ktorserver.WebSockets
 import kotlinx.serialization.json.Json
 
 object HttpModule {
