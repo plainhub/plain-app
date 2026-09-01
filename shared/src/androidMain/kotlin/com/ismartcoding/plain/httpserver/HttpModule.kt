@@ -22,8 +22,8 @@ import com.ismartcoding.plain.lib.ktorserver.AutoHeadResponse
 import com.ismartcoding.plain.lib.ktorserver.ConditionalHeaders
 import com.ismartcoding.plain.lib.ktorserver.ContentNegotiation
 import com.ismartcoding.plain.lib.ktorserver.PartialContent
-import io.ktor.server.plugins.cors.routing.CORS
-import io.ktor.server.plugins.forwardedheaders.ForwardedHeaders
+import com.ismartcoding.plain.lib.ktorserver.CORS
+import com.ismartcoding.plain.lib.ktorserver.ForwardedHeaders
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText

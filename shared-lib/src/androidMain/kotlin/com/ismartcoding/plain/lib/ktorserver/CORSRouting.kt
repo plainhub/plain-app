@@ -1,0 +1,39 @@
+/*
+ * Copyright 2014-2022 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
+ */
+
+/**
+ * Vendored from io.ktor:ktor-server-cors:3.5.2.
+ */
+
+
+package com.ismartcoding.plain.lib.ktorserver
+
+import io.ktor.server.application.*
+import io.ktor.server.routing.options
+
+/**
+ * A plugin that allows you to configure handling cross-origin requests.
+ * This plugin allows you to configure allowed hosts, HTTP methods, headers set by the client, and so on.
+ *
+ * CORS preflight requests (`OPTIONS` with an `Access-Control-Request-Method` header) are intercepted by the plugin
+ * and answered before routing, including when the request origin matches the server origin.
+ *
+ * The configuration below allows requests from the specified address and allows sending the `Content-Type` header:
+ * ```kotlin
+ * install(CORS) {
+ *     host("0.0.0.0:8081")
+ *     header(HttpHeaders.ContentType)
+ * }
+ * ```
+ *
+ * You can learn more from [CORS](https://ktor.io/docs/cors.html).
+ *
+ */
+public val CORS: RouteScopedPlugin<CORSConfig> = createRouteScopedPlugin("CORS", ::CORSConfig) {
+    route?.options("{cors-options-wildcard...}") {
+        // Handled by an interceptor of the Validators phase added in the plugin
+    }
+
+    buildPlugin()
+}
