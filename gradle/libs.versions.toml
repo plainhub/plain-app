@@ -134,7 +134,6 @@ ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 ktor-io = { module = "io.ktor:ktor-io", version.ref = "ktor" }
 
 # ktor server
-ktor-server-conditional-headers = { module = "io.ktor:ktor-server-conditional-headers", version.ref = "ktor" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-partial-content = { module = "io.ktor:ktor-server-partial-content", version.ref = "ktor" }
 ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }

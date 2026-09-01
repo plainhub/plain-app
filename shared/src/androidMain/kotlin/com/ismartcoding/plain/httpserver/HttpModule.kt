@@ -19,7 +19,7 @@ import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.http.content.staticResources
 import com.ismartcoding.plain.lib.ktorserver.AutoHeadResponse
-import io.ktor.server.plugins.conditionalheaders.ConditionalHeaders
+import com.ismartcoding.plain.lib.ktorserver.ConditionalHeaders
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.forwardedheaders.ForwardedHeaders
