@@ -17,7 +17,7 @@ import io.ktor.util.logging.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.charsets.*
 
-internal val LOGGER = KtorSimpleLogger("com.ismartcoding.plain.lib.ktorserver.ContentNegotiation")
+internal val CONTENT_NEGOTIATION_LOGGER = KtorSimpleLogger("com.ismartcoding.plain.lib.ktorserver.ContentNegotiation")
 
 /**
  * Vendored from io.ktor:ktor-server-content-negotiation:3.5.2.

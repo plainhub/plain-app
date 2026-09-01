@@ -19,7 +19,7 @@ internal fun PluginBuilder<ContentNegotiationConfig>.convertRequestBody() {
         val requestedType = call.receiveType
 
         if (requestedType.type in pluginConfig.ignoredTypes) {
-            LOGGER.trace(
+            CONTENT_NEGOTIATION_LOGGER.trace(
                 "Skipping for request type ${requestedType.type} because the type is ignored."
             )
             return@onCallReceive
@@ -41,7 +41,7 @@ internal fun PluginBuilder<ContentNegotiationConfig>.convertRequestBody() {
                     ?: continue
             }
 
-            LOGGER.trace("No suitable content converter found for request type ${requestedType.type}")
+            CONTENT_NEGOTIATION_LOGGER.trace("No suitable content converter found for request type ${requestedType.type}")
             return@transformBody body
         }
     }
@@ -55,7 +55,7 @@ private suspend fun convertBody(
     requestContentType: ContentType
 ): Any? {
     if (!requestContentType.match(registration.contentType.withoutParameters())) {
-        LOGGER.trace(
+        CONTENT_NEGOTIATION_LOGGER.trace(
             "Skipping content converter for request type ${receiveType.type} because " +
                 "content type $requestContentType does not match ${registration.contentType}"
         )

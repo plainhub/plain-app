@@ -17,7 +17,7 @@ private val NOT_ACCEPTABLE = HttpStatusCodeContent(HttpStatusCode.NotAcceptable)
 
 internal fun PluginBuilder<ContentNegotiationConfig>.convertResponseBody() = onCallRespond { call, subject ->
     if (subject is OutgoingContent) {
-        LOGGER.trace("Skipping because body is already converted.")
+        CONTENT_NEGOTIATION_LOGGER.trace("Skipping because body is already converted.")
         return@onCallRespond
     }
 
@@ -25,7 +25,7 @@ internal fun PluginBuilder<ContentNegotiationConfig>.convertResponseBody() = onC
         val sourceClass = subject::class.simpleName
         val requestInfo = "${call.request.httpMethod.value} ${call.request.uri}"
 
-        LOGGER.trace(
+        CONTENT_NEGOTIATION_LOGGER.trace(
             "Skipping response body transformation from $sourceClass to OutgoingContent for the $requestInfo request" +
                 " because the $sourceClass type is ignored."
         )
@@ -71,18 +71,18 @@ internal fun PluginBuilder<ContentNegotiationConfig>.convertResponseBody() = onC
             )
 
             if (result == null) {
-                LOGGER.trace("Can't convert body $subject with ${registration.converter}")
+                CONTENT_NEGOTIATION_LOGGER.trace("Can't convert body $subject with ${registration.converter}")
                 continue
             }
 
             val transformedContent = transformDefaultContent(call, result)
             if (transformedContent == null) {
-                LOGGER.trace("Can't convert body $subject with ${registration.converter}")
+                CONTENT_NEGOTIATION_LOGGER.trace("Can't convert body $subject with ${registration.converter}")
                 continue
             }
 
             if (checkAcceptHeader && !checkAcceptHeader(acceptItems, transformedContent.contentType)) {
-                LOGGER.trace(
+                CONTENT_NEGOTIATION_LOGGER.trace(
                     "Can't send content with ${transformedContent.contentType} to client " +
                         "because it is not acceptable"
                 )
@@ -92,7 +92,7 @@ internal fun PluginBuilder<ContentNegotiationConfig>.convertResponseBody() = onC
             return@transformBody transformedContent
         }
 
-        LOGGER.trace(
+        CONTENT_NEGOTIATION_LOGGER.trace(
             "No suitable content converter found for response type ${responseType.type}" +
                 " and body $subject"
         )
