@@ -248,8 +248,8 @@ actual suspend fun createTempFilePath(prefix: String): String = withIO {
     File(appContext.cacheDir, "${prefix}_${System.currentTimeMillis()}_${Thread.currentThread().id}").absolutePath
 }
 
-actual suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String? = withIO {
-    val dFile = AppFileStore.importFile(tempFilePath, contentType, deleteSrc)
+actual suspend fun importAppFile(tempFilePath: String, fileName: String, contentType: String, deleteSrc: Boolean): String? = withIO {
+    val dFile = AppFileStore.importFile(tempFilePath, fileName, contentType, deleteSrc)
     dFile.realPath.substringAfterLast('/')
 }
 

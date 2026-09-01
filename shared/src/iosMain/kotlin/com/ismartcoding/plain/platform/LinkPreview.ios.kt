@@ -18,7 +18,7 @@ actual suspend fun importImageBytesToFid(data: ByteArray, mimeType: String): Str
     return try {
         val tempPath = createTempFilePath("linkpreview")
         if (!writeBytesToPath(tempPath, data)) return null
-        importAppFile(tempPath, mimeType, deleteSrc = true)?.let { "fid:$it" }
+        importAppFile(tempPath, "", mimeType, deleteSrc = true)?.let { "fid:$it" }
     } catch (e: Exception) {
         LogCat.e("importImageBytesToFid: ${e.message}")
         null

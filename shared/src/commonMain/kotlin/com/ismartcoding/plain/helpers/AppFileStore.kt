@@ -45,10 +45,28 @@ object AppFileStore {
     fun toFidUri(fileId: String, ext: String = ""): String =
         if (ext.isNotEmpty()) "fid:$fileId.$ext" else "fid:$fileId"
 
+    /** [fid:] URI for an imported record — derived from its stored [DAppFile.realPath]
+     *  so the URI always matches the on-disk file name (whose extension may have
+     *  come from the original upload file name rather than the MIME type). */
+    fun toFidUri(dFile: DAppFile): String = "fid:" + dFile.realPath.substringAfterLast('/')
+
     /** Derive extension from a MIME type string (lowercase, empty string if unknown). */
     fun extFromMime(mimeType: String): String {
         if (mimeType.isEmpty()) return ""
         return getExtensionFromMimeType(mimeType).lowercase()
+    }
+
+    /**
+     * File-name extension (lowercased), falling back to the MIME-derived one.
+     * The original file name is the ground truth for the extension: clients
+     * often send an empty or generic Content-Type for less-common extensions
+     * (`properties`, `apk`, …), and the chunked-merge path has no MIME at all.
+     * Only when the name carries no extension do we consult the MIME type.
+     */
+    fun extFromFileName(fileName: String, mimeType: String): String {
+        val dot = fileName.lastIndexOf('.')
+        val nameExt = if (dot > 0) fileName.substring(dot + 1).lowercase() else ""
+        return nameExt.ifEmpty { extFromMime(mimeType) }
     }
 
     /**
@@ -101,6 +119,8 @@ object AppFileStore {
      *
      * @param srcPath    Source file path to import. Caller retains ownership; this
      *                   method copies the content (does not delete srcFile).
+     * @param fileName   Original upload file name — its extension is the primary
+     *                   source for the on-disk extension.
      * @param mimeType   Optional MIME type override. Guessed from extension if
      *                   blank.
      * @param deleteSrc  When true the source file is deleted after a successful
@@ -108,6 +128,7 @@ object AppFileStore {
      */
     suspend fun importFile(
         srcPath: String,
+        fileName: String = "",
         mimeType: String = "",
         deleteSrc: Boolean = false,
     ): DAppFile = withIO {
@@ -123,13 +144,13 @@ object AppFileStore {
             // ── Step 2: strong check ──────────────────────────────────────
             tryReuseExisting(dao, srcPath, strongHash, deleteSrc)?.let { return@withIO it }
             // Weak matched but strong differs – fall through to insert new
-            return@withIO insertNew(dao, srcPath, size, weakHash, strongHash, mimeType, deleteSrc)
+            return@withIO insertNew(dao, srcPath, size, weakHash, strongHash, fileName, mimeType, deleteSrc)
         }
 
         // No weak match. Double-check by id in case another thread raced us.
         tryReuseExisting(dao, srcPath, strongHash, deleteSrc)?.let { return@withIO it }
 
-        insertNew(dao, srcPath, size, weakHash, strongHash, mimeType, deleteSrc)
+        insertNew(dao, srcPath, size, weakHash, strongHash, fileName, mimeType, deleteSrc)
     }
 
     /**
@@ -157,7 +178,7 @@ object AppFileStore {
         ensureParentFor(destPath)
         writeBytesToPath(destPath, data)
 
-        insertRecord(dao, strongHash, size, weakHash, effectiveMime)
+        insertRecord(dao, strongHash, size, weakHash, "", effectiveMime)
     }
 
     // ── Internals ───────────────────────────────────────────────────────────
@@ -174,15 +195,13 @@ object AppFileStore {
         deleteSrc: Boolean,
     ): DAppFile? {
         val existing = dao.getById(strongHash) ?: return null
-        val ext = extFromMime(existing.mimeType)
-        val targetPath = destPath(strongHash, ext)
-        val relativeTarget = relativeDestPath(strongHash, ext)
+        val targetPath = "${appDir()}/${existing.realPath}"
 
         // DB row may exist while the backing file was deleted; restore it.
         if (!fileExists(targetPath)) {
             // Check if old file without extension exists (pre-migration) and rename it
             val legacyPath = destPath(strongHash)
-            if (fileExists(legacyPath)) {
+            if (legacyPath != targetPath && fileExists(legacyPath)) {
                 moveFile(legacyPath, targetPath)
                 LogCat.d("ChatFileStore: renamed legacy file $strongHash to include extension")
             } else {
@@ -191,11 +210,6 @@ object AppFileStore {
             }
         } else if (deleteSrc) {
             deleteFileAt(srcPath)
-        }
-
-        if (existing.realPath != relativeTarget) {
-            existing.realPath = relativeTarget
-            dao.update(existing)
         }
 
         dao.incrementRefCount(strongHash)
@@ -224,17 +238,18 @@ object AppFileStore {
         size: Long,
         weakHash: String,
         strongHash: String,
+        fileName: String,
         mimeType: String,
         deleteSrc: Boolean,
     ): DAppFile {
         val effectiveMime = mimeType.ifEmpty {
-            val srcExt = srcPath.getFilenameExtension()
+            val srcExt = fileName.ifEmpty { srcPath }.getFilenameExtension()
             getMimeTypeFromExtension(srcExt).ifEmpty { "application/octet-stream" }
         }
-        val dest = destPath(strongHash, extFromMime(effectiveMime))
+        val dest = destPath(strongHash, extFromFileName(fileName, effectiveMime))
         storeSourceFile(srcPath, dest, deleteSrc)
 
-        val record = insertRecord(dao, strongHash, size, weakHash, effectiveMime)
+        val record = insertRecord(dao, strongHash, size, weakHash, fileName, effectiveMime)
         LogCat.d("ChatFileStore: stored new file $strongHash (${size} bytes)")
         return record
     }
@@ -244,12 +259,13 @@ object AppFileStore {
         strongHash: String,
         size: Long,
         weakHash: String,
+        fileName: String,
         effectiveMime: String,
     ): DAppFile {
         val record = DAppFile(strongHash).apply {
             this.size = size
             this.mimeType = effectiveMime
-            this.realPath = relativeDestPath(strongHash, extFromMime(effectiveMime))
+            this.realPath = relativeDestPath(strongHash, extFromFileName(fileName, effectiveMime))
             this.refCount = 1
             this.weakHash = weakHash
         }

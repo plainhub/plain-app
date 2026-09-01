@@ -37,10 +37,10 @@ actual fun getMimeTypeFromExtension(extension: String): String {
     return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: ""
 }
 
-actual suspend fun importDownloadedFile(handle: DownloadTempFileHandle, mimeType: String): String {
+actual suspend fun importDownloadedFile(handle: DownloadTempFileHandle, fileName: String, mimeType: String): String {
     val androidHandle = handle as AndroidDownloadTempFileHandle
     androidHandle.close()
-    return ChatFileSaveHelper.importDownloadedFile(androidHandle.file, mimeType)
+    return ChatFileSaveHelper.importDownloadedFile(androidHandle.file, fileName, mimeType)
 }
 
 actual suspend fun saveTempFileToDownloads(handle: DownloadTempFileHandle, filename: String): String = withIO {

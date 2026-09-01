@@ -309,8 +309,8 @@ actual suspend fun createTempFilePath(prefix: String): String = withIO {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-actual suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String? = withIO {
-    val dFile = AppFileStore.importFile(tempFilePath, contentType, deleteSrc)
+actual suspend fun importAppFile(tempFilePath: String, fileName: String, contentType: String, deleteSrc: Boolean): String? = withIO {
+    val dFile = AppFileStore.importFile(tempFilePath, fileName, contentType, deleteSrc)
     dFile.realPath.substringAfterLast('/')
 }
 
@@ -494,7 +494,7 @@ actual suspend fun importChatFile(uriStr: String, mimeType: String): String? = w
         val url = NSURL.URLWithString(uriStr) ?: return@withIO null
         val path = url.path ?: return@withIO null
         if (!NSFileManager.defaultManager.fileExistsAtPath(path)) return@withIO null
-        importAppFile(path, mimeType, deleteSrc = false)
+        importAppFile(path, path.substringAfterLast('/'), mimeType, deleteSrc = false)
     } catch (_: Exception) {
         null
     }

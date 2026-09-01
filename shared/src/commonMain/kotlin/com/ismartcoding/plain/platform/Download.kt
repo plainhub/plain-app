@@ -10,7 +10,7 @@ expect fun createDownloadTempFile(taskId: String): DownloadTempFileHandle
 
 expect fun getMimeTypeFromExtension(extension: String): String
 
-expect suspend fun importDownloadedFile(handle: DownloadTempFileHandle, mimeType: String): String
+expect suspend fun importDownloadedFile(handle: DownloadTempFileHandle, fileName: String, mimeType: String): String
 
 /**
  * Moves a downloaded temp file ([handle]) to the system Downloads directory

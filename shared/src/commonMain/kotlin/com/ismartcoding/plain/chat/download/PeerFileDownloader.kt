@@ -78,7 +78,7 @@ object PeerFileDownloader {
 
                 val mimeType = getMimeTypeFromExtension(fileName.getFilenameExtension())
 
-                val fidUri = importDownloadedFile(tempFile, mimeType)
+                val fidUri = importDownloadedFile(tempFile, fileName, mimeType)
                 val realPath = resolveAppFilePath(fidUri)
 
                 updateMessageFileUri(task.messageId, messageFile.uri, fidUri)

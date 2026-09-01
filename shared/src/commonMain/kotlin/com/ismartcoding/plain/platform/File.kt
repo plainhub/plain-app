@@ -223,7 +223,7 @@ suspend fun mergeUploadedChunks(
     }
 
     if (isAppFile) {
-        val dFile = AppFileStore.importFile(tempMergePath, "", deleteSrc = true)
+        val dFile = AppFileStore.importFile(tempMergePath, path.substringAfterLast('/'), "", deleteSrc = true)
         deleteUploadedChunks(fileId)
         return@withIO "${dFile.realPath.substringAfterLast('/')}:$mergedSize"
     }
@@ -284,10 +284,12 @@ expect suspend fun createTempFilePath(prefix: String): String
 
 /**
  * Import a file (identified by [tempFilePath]) into the content-addressable AppFileStore.
- * When [deleteSrc] is true the source file is deleted after a successful import.
- * Returns "{hash}.{ext}" suffix used to build `fid:` URIs, or null on failure.
+ * [fileName] is the original upload file name — its extension is the primary source
+ * for the on-disk extension. When [deleteSrc] is true the source file is deleted
+ * after a successful import. Returns "{hash}.{ext}" suffix used to build `fid:` URIs,
+ * or null on failure.
  */
-expect suspend fun importAppFile(tempFilePath: String, contentType: String, deleteSrc: Boolean): String?
+expect suspend fun importAppFile(tempFilePath: String, fileName: String, contentType: String, deleteSrc: Boolean): String?
 
 /**
  * Stream the contents of a content:// URI (Android) or a remote resource (iOS)

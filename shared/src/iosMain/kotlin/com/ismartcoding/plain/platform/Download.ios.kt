@@ -59,7 +59,7 @@ actual fun getMimeTypeFromExtension(extension: String): String {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-actual suspend fun importDownloadedFile(handle: DownloadTempFileHandle, mimeType: String): String = withIO {
+actual suspend fun importDownloadedFile(handle: DownloadTempFileHandle, fileName: String, mimeType: String): String = withIO {
     val iosHandle = handle as? IosDownloadTempFileHandle ?: return@withIO ""
     iosHandle.close()
     val srcPath = iosHandle.filePath

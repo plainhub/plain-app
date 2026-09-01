@@ -2,6 +2,7 @@ package com.ismartcoding.plain.helpers
 
 import android.content.Context
 import android.net.Uri
+import com.ismartcoding.plain.lib.extensions.queryOpenableFileName
 import java.io.File
 
 
@@ -21,8 +22,9 @@ object ChatFileSaveHelper {
         tempFile.parentFile?.mkdirs()
         try {
             FileHelper.copyFile(context, uri, tempFile.absolutePath)
-            val dFile = AppFileStore.importFile(tempFile.absolutePath, mimeType, deleteSrc = true)
-            return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
+            val fileName = context.contentResolver.queryOpenableFileName(uri)
+            val dFile = AppFileStore.importFile(tempFile.absolutePath, fileName, mimeType, deleteSrc = true)
+            return AppFileStore.toFidUri(dFile)
         } finally {
             // Guard: if importFile did not consume (due to error path), clean up
             if (tempFile.exists()) tempFile.delete()
@@ -38,9 +40,10 @@ object ChatFileSaveHelper {
      */
     suspend fun importDownloadedFile(
         srcFile: File,
-        mimeType: String = "",
+        fileName: String,
+        mimeType: String,
     ): String {
-        val dFile = AppFileStore.importFile(srcFile.absolutePath, mimeType, deleteSrc = true)
-        return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
+        val dFile = AppFileStore.importFile(srcFile.absolutePath, fileName, mimeType, deleteSrc = true)
+        return AppFileStore.toFidUri(dFile)
     }
 }

@@ -177,7 +177,7 @@ private suspend fun handleAppFileUpload(
         throw Exception("Size mismatch: expected ${info.size}, got $actualSize")
     }
 
-    val fidSuffix = importAppFile(tempFilePath, part.contentType ?: "", deleteSrc = true)
+    val fidSuffix = importAppFile(tempFilePath, fileName, part.contentType ?: "", deleteSrc = true)
     return fidSuffix ?: throw Exception("Failed to import app file")
 }
 

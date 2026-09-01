@@ -80,8 +80,10 @@ fun MdEditor(
         }
     }
 
-    // central focus consumer: focus requesters are registered by the block composables,
-    // which may not exist yet in the same frame a new block was created — retry a few frames
+    // fallback focus consumer for blocks already in composition (arrow-key moves):
+    // newly composed fields claim pendingFocus themselves in their LaunchedEffect,
+    // keeping the IME target continuous within a single frame; this collector only
+    // serves targets whose FocusRequester was registered in an earlier frame
     LaunchedEffect(Unit) {
         snapshotFlow { editor.pendingFocus.value }.collect { id ->
             if (id != null) {
@@ -135,6 +137,15 @@ private fun TextBlockField(
         onDispose { focusRequesters.remove(block.id) }
     }
 
+    // claim pending focus in the same frame this field enters composition so the
+    // IME target never drops — prevents keyboard hide/show flicker on block switches
+    LaunchedEffect(block.id) {
+        if (editor.pendingFocus.value == block.id) {
+            editor.pendingFocus.value = null
+            fr.requestFocus()
+        }
+    }
+
     // Enter / multi-line paste: re-split this block into parsed sub-blocks
     LaunchedEffect(block.id) {
         snapshotFlow { block.state.text }.collect {
@@ -181,6 +192,14 @@ private fun AtomicBlockView(
         DisposableEffect(block.id) {
             focusRequesters[block.id] = fr
             onDispose { focusRequesters.remove(block.id) }
+        }
+        // claim pending focus in the same frame this field enters composition so the
+        // IME target never drops — prevents keyboard hide/show flicker on block switches
+        LaunchedEffect(block.id) {
+            if (editor.pendingFocus.value == block.id) {
+                editor.pendingFocus.value = null
+                fr.requestFocus()
+            }
         }
         BasicTextField(
             state = block.state,
@@ -253,6 +272,14 @@ private fun SelectionBlockView(
         DisposableEffect(block.id) {
             focusRequesters[block.id] = fr
             onDispose { focusRequesters.remove(block.id) }
+        }
+        // claim pending focus in the same frame this field enters composition so the
+        // IME target never drops — prevents keyboard hide/show flicker on block switches
+        LaunchedEffect(block.id) {
+            if (editor.pendingFocus.value == block.id) {
+                editor.pendingFocus.value = null
+                fr.requestFocus()
+            }
         }
         LaunchedEffect(block.id) {
             snapshotFlow { block.state.selection }.collect {
