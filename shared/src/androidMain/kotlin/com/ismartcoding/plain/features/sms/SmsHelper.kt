@@ -197,7 +197,8 @@ object SmsHelper {
                 "text" -> where.add("${Telephony.Sms.BODY} LIKE ?", "%${it.value}%")
                 "ids" -> {
                     val ids = SmsProviderContract.partitionMessageIds(it.value).sms
-                    if (ids.isEmpty()) where.add("${BaseColumns._ID} = ?", "-1") else where.addIn(BaseColumns._ID, ids)
+                    val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, ids)
+                    if (predicate == null) where.add("${BaseColumns._ID} = ?", "-1") else where.add(predicate)
                 }
                 "type" -> where.add("${Telephony.Sms.TYPE} = ?", it.value)
                 "thread_id" -> where.add("${Telephony.Sms.THREAD_ID} = ?", it.value)

@@ -104,15 +104,15 @@ object SmsConversationHelper {
             return emptyMap()
         }
 
-        val where = ContentWhere().apply {
-            addIn(BaseColumns._ID, threadIds)
-        }
+        // Thread IDs are numeric; inline them as literals because the MmsSms provider
+        // hits the SQLite host-parameter limit (999) with large bind-only IN lists.
+        val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, threadIds) ?: return emptyMap()
 
         return context.contentResolver.queryCursor(
             conversationsUri,
             getConversationsProjection(),
-            where.toSelection(),
-            where.args.toTypedArray(),
+            predicate,
+            null,
             "${Telephony.Threads.DATE} DESC"
         )?.map { cursor, cache ->
             DMessageConversation(
@@ -131,14 +131,14 @@ object SmsConversationHelper {
     private fun batchGetCanonicalAddresses(context: Context, recipientIds: Set<String>): Map<String, String> {
         if (recipientIds.isEmpty()) return emptyMap()
 
-        val where = ContentWhere().apply { addIn(BaseColumns._ID, recipientIds.toList()) }
+        val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, recipientIds) ?: return emptyMap()
         val result = mutableMapOf<String, String>()
 
         context.contentResolver.queryCursor(
             canonicalAddressesUri,
             arrayOf(BaseColumns._ID, "address"),
-            where.toSelection(),
-            where.args.toTypedArray(),
+            predicate,
+            null,
             null
         )?.use { cursor ->
             val cache = mutableMapOf<String, Int>()
@@ -155,7 +155,7 @@ object SmsConversationHelper {
     private fun queryConversationsWithAddresses(context: Context, threadIds: List<String>): Map<String, DMessageConversation> {
         if (threadIds.isEmpty()) return emptyMap()
 
-        val where = ContentWhere().apply { addIn(BaseColumns._ID, threadIds) }
+        val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, threadIds) ?: return emptyMap()
         val threadRecipientMap = mutableMapOf<String, List<String>>()
         val conversationMap = mutableMapOf<String, DMessageConversation>()
 
@@ -165,8 +165,8 @@ object SmsConversationHelper {
                 BaseColumns._ID, Telephony.Threads.SNIPPET, Telephony.Threads.DATE,
                 Telephony.Threads.MESSAGE_COUNT, Telephony.Threads.READ, "recipient_ids",
             ),
-            where.toSelection(),
-            where.args.toTypedArray(),
+            predicate,
+            null,
             "${Telephony.Threads.DATE} DESC"
         )?.use { cursor ->
             val cache = mutableMapOf<String, Int>()
@@ -215,7 +215,8 @@ object SmsConversationHelper {
 
                     "ids" -> {
                         val ids = SmsProviderContract.partitionMessageIds(it.value).sms
-                        if (ids.isEmpty()) where.add("${BaseColumns._ID} = ?", "-1") else where.addIn(BaseColumns._ID, ids)
+                        val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, ids)
+                        if (predicate == null) where.add("${BaseColumns._ID} = ?", "-1") else where.add(predicate)
                     }
 
                     "type" -> {
