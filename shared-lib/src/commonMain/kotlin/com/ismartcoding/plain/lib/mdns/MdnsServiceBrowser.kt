@@ -179,6 +179,7 @@ object MdnsServiceBrowser {
         var nextHostnames = hostnameToInstance
         val touched = mutableSetOf<String>()
         val discovered = mutableListOf<Instance>() // instances first seen in this packet
+        val aIpsByHostname = groupARecordsByHostname(parsed.allRecords)
 
         for (record in parsed.allRecords) {
             when (record.type) {
@@ -216,16 +217,19 @@ object MdnsServiceBrowser {
                         touched.add(key)
                     }
                 }
-                MdnsPacketCodec.TYPE_A -> record.ip?.let { ip ->
-                    nextHostnames[record.name.lowercase()]?.let { key ->
-                        nextInstances[key]?.let { instance ->
-                            // An A record is authoritative for the target hostname's CURRENT
-                            // address. Replace, don't accumulate — a device that changed IPs
-                            // would otherwise keep its stale address in the set forever.
-                            nextInstances = nextInstances + (key to instance.copy(ips = setOf(ip)))
-                            touched.add(key)
-                        }
-                    }
+            }
+        }
+
+        // The packet's A-record set is authoritative for the hostname's CURRENT
+        // addresses. Applied once per packet, after SRV records may have
+        // registered the hostname mapping: a host that moved networks replaces
+        // the set (stale IP dropped), while one packet carrying several
+        // interface addresses keeps them all.
+        for ((hostname, ips) in aIpsByHostname) {
+            nextHostnames[hostname]?.let { key ->
+                nextInstances[key]?.let { instance ->
+                    nextInstances = nextInstances + (key to instance.copy(ips = ips))
+                    touched.add(key)
                 }
             }
         }
@@ -285,6 +289,22 @@ object MdnsServiceBrowser {
         val qu = quActive
         val bytes = MdnsPacketCodec.buildQuery(name, qtype, unicastResponse = qu)
         if (qu) MdnsHostResponder.sendQuQuery(bytes) else MdnsHostResponder.sendQuery(bytes)
+    }
+
+    /**
+     * Groups one packet's A records by hostname (lowercased). A multi-homed
+     * host (e.g. Wi-Fi + VPN) announces several addresses for the SAME
+     * hostname in one packet and the whole set is authoritative — replacing
+     * per record would keep only the last one (typically the VPN address).
+     */
+    internal fun groupARecordsByHostname(records: List<MdnsRecord>): Map<String, Set<String>> {
+        val grouped = mutableMapOf<String, MutableSet<String>>()
+        for (record in records) {
+            if (record.type != MdnsPacketCodec.TYPE_A) continue
+            val ip = record.ip ?: continue
+            grouped.getOrPut(record.name.lowercase()) { mutableSetOf() }.add(ip)
+        }
+        return grouped
     }
 
     /** QU fallback activates after [QU_FALLBACK_AFTER_CYCLES] scan cycles with no external multicast. */
