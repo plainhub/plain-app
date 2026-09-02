@@ -5,7 +5,7 @@
 package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
-import io.ktor.serialization.*
+import com.ismartcoding.plain.lib.ktorserver.serialization.*
 import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import com.ismartcoding.plain.lib.ktorserver.core.plugins.*
 import com.ismartcoding.plain.lib.ktorserver.core.request.*

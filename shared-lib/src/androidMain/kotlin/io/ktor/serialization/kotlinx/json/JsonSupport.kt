@@ -5,7 +5,7 @@
 package io.ktor.serialization.kotlinx.json
 
 import io.ktor.http.*
-import io.ktor.serialization.*
+import com.ismartcoding.plain.lib.ktorserver.serialization.*
 import io.ktor.serialization.kotlinx.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*

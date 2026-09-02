@@ -6,7 +6,7 @@ package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.serialization.*
+import com.ismartcoding.plain.lib.ktorserver.serialization.*
 import io.ktor.utils.io.*
 import java.io.InputStream
 import kotlin.reflect.*
