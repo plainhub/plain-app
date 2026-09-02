@@ -183,12 +183,17 @@ data class DChat(
         fun parseContent(content: String): DMessageContent {
             val obj = chatJson.parseToJsonElement(content).jsonObject
             val typeStr = obj["type"]?.jsonPrimitive?.content ?: ""
-            val message = DMessageContent(MessageType.valueOf(typeStr))
+            val message = DMessageContent(MessageType.entries.firstOrNull { it.name == typeStr } ?: MessageType.TEXT)
             val valueJson = obj["value"]?.takeIf { it !is JsonNull }?.toString() ?: ""
-            when (message.type) {
-                MessageType.TEXT -> message.value = chatJson.decodeFromString<DMessageText>(valueJson)
-                MessageType.IMAGES -> message.value = chatJson.decodeFromString<DMessageImages>(valueJson)
-                MessageType.FILES -> message.value = chatJson.decodeFromString<DMessageFiles>(valueJson)
+            try {
+                when (message.type) {
+                    MessageType.TEXT -> message.value = chatJson.decodeFromString<DMessageText>(valueJson)
+                    MessageType.IMAGES -> message.value = chatJson.decodeFromString<DMessageImages>(valueJson)
+                    MessageType.FILES -> message.value = chatJson.decodeFromString<DMessageFiles>(valueJson)
+                }
+            } catch (_: Exception) {
+                // Show the full raw content (type + value) so the user can report the original data.
+                message.value = DMessageText(content)
             }
             return message
         }

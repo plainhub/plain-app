@@ -121,3 +121,5 @@ build/
 Pods/
 .workbuddy
 AGENTS.md
+play-service-account.json
+tmp_pc_fetch.sh
