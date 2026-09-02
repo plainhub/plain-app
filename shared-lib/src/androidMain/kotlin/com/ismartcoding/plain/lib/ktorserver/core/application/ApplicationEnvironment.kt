@@ -8,7 +8,7 @@
 
 package com.ismartcoding.plain.lib.ktorserver.core.application
 
-import io.ktor.events.*
+import com.ismartcoding.plain.lib.ktorserver.events.*
 import com.ismartcoding.plain.lib.ktorserver.core.config.*
 import io.ktor.util.logging.*
 import kotlin.coroutines.Continuation

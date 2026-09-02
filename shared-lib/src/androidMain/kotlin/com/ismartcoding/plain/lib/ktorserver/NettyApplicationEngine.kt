@@ -8,7 +8,7 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.events.*
+import com.ismartcoding.plain.lib.ktorserver.events.*
 import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import com.ismartcoding.plain.lib.ktorserver.core.engine.*
 import io.ktor.util.network.*

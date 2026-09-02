@@ -8,8 +8,8 @@
 
 package com.ismartcoding.plain.lib.ktorserver.core.engine
 
-import io.ktor.events.*
-import io.ktor.events.EventDefinition
+import com.ismartcoding.plain.lib.ktorserver.events.*
+import com.ismartcoding.plain.lib.ktorserver.events.EventDefinition
 import io.ktor.http.*
 import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import com.ismartcoding.plain.lib.ktorserver.core.engine.internal.*

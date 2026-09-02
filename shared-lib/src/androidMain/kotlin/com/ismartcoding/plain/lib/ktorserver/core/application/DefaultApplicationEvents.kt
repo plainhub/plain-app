@@ -10,7 +10,7 @@
 
 package com.ismartcoding.plain.lib.ktorserver.core.application
 
-import io.ktor.events.EventDefinition
+import com.ismartcoding.plain.lib.ktorserver.events.EventDefinition
 
 /**
  * Event definition for Application Starting event

@@ -15,20 +15,20 @@ package com.ismartcoding.plain.lib.ktorserver.core.application
 @Deprecated(
     "ApplicationEvents has been renamed to Events.",
     level = DeprecationLevel.ERROR,
-    replaceWith = ReplaceWith("Events", "io.ktor.events.Events")
+    replaceWith = ReplaceWith("Events", "com.ismartcoding.plain.lib.ktorserver.events.Events")
 )
-public typealias ApplicationEvents = io.ktor.events.Events
+public typealias ApplicationEvents = com.ismartcoding.plain.lib.ktorserver.events.Events
 
 /**
  * Specifies signature for the event handler.
  *
  */
 @Deprecated(
-    "EventHandler has been moved to package io.ktor.events",
+    "EventHandler has been moved to package com.ismartcoding.plain.lib.ktorserver.events",
     level = DeprecationLevel.ERROR,
-    replaceWith = ReplaceWith("EventHandler<T>", "io.ktor.events.EventHandler")
+    replaceWith = ReplaceWith("EventHandler<T>", "com.ismartcoding.plain.lib.ktorserver.events.EventHandler")
 )
-public typealias EventHandler<T> = io.ktor.events.EventHandler<T>
+public typealias EventHandler<T> = com.ismartcoding.plain.lib.ktorserver.events.EventHandler<T>
 
 /**
  * Definition of an event.
@@ -41,8 +41,8 @@ public typealias EventHandler<T> = io.ktor.events.EventHandler<T>
  * @param T specifies what is a type of a value passed to the event
  */
 @Deprecated(
-    "EventDefinition<T> has been moved to io.ktor.events",
+    "EventDefinition<T> has been moved to com.ismartcoding.plain.lib.ktorserver.events",
     level = DeprecationLevel.ERROR,
-    replaceWith = ReplaceWith("EventDefinition<T>", "io.ktor.events.EventDefinition")
+    replaceWith = ReplaceWith("EventDefinition<T>", "com.ismartcoding.plain.lib.ktorserver.events.EventDefinition")
 )
-public typealias EventDefinition<T> = io.ktor.events.EventDefinition<T>
+public typealias EventDefinition<T> = com.ismartcoding.plain.lib.ktorserver.events.EventDefinition<T>

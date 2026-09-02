@@ -8,7 +8,7 @@
 
 package com.ismartcoding.plain.lib.ktorserver.core.application.hooks
 
-import io.ktor.events.EventDefinition
+import com.ismartcoding.plain.lib.ktorserver.events.EventDefinition
 import io.ktor.http.content.*
 import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import com.ismartcoding.plain.lib.ktorserver.core.request.*

@@ -51,7 +51,6 @@ kotlin {
             api(libs.androidx.core.ktx)
             api(libs.kotlin.reflect)
             api(libs.ktor.serialization)
-            api(libs.ktor.events)
             api(libs.ktor.websockets)
             api(libs.atomicfu)
             api(libs.netty.handler)
