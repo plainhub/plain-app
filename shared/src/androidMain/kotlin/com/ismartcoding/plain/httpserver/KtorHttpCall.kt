@@ -24,6 +24,7 @@ import io.ktor.utils.io.readAvailable
 import io.ktor.utils.io.toByteArray
 import io.ktor.util.toMap
 import java.io.File
+import java.io.FileInputStream
 import java.io.OutputStream
 
 /**
@@ -130,8 +131,12 @@ class KtorHttpCall(
         }
 
         val fileLength = file.length()
-        val range = resolveSingleByteRange(applicationCall.request.headers["Range"], fileLength)
-        if (range == null) {
+        val plan = resolveFileResponsePlan(
+            rangeHeader = applicationCall.request.headers["Range"],
+            fileLength = fileLength,
+            fetchDestination = applicationCall.request.headers["Sec-Fetch-Dest"],
+        )
+        if (plan == null) {
             applicationCall.response.run {
                 status(HttpStatusCode.RequestedRangeNotSatisfiable)
                 header("Accept-Ranges", "bytes")
@@ -141,8 +146,22 @@ class KtorHttpCall(
             return
         }
 
+        val range = plan.range
         val status = if (range.isPartial) HttpStatusCode.PartialContent else HttpStatusCode.OK
         val parsedContentType = contentType?.let { ContentType.parse(it) }
+        if (plan.useBufferedResponse) {
+            applicationCall.response.run {
+                header("Accept-Ranges", "bytes")
+                header("Content-Range", "bytes ${range.start}-${range.endInclusive}/$fileLength")
+            }
+            applicationCall.respondBytes(
+                bytes = readBufferedFileRange(file, range),
+                contentType = parsedContentType,
+                status = status,
+            )
+            return
+        }
+
         applicationCall.respond(
             LowMemoryFileContent(
                 file = file,
@@ -198,6 +217,20 @@ class KtorHttpCall(
         }
         applicationCall.respond(io.ktor.server.http.content.LocalFileContent(file))
         return true
+    }
+}
+
+private suspend fun readBufferedFileRange(file: File, range: ResolvedFileRange): ByteArray = withIO {
+    val bytes = ByteArray(range.length.toInt())
+    FileInputStream(file).use { input ->
+        input.channel.position(range.start)
+        var offset = 0
+        while (offset < bytes.size) {
+            val read = input.read(bytes, offset, bytes.size - offset)
+            if (read <= 0) break
+            offset += read
+        }
+        if (offset == bytes.size) bytes else bytes.copyOf(offset)
     }
 }
 
