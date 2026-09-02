@@ -215,6 +215,8 @@ dependencies {
 
     debugImplementation(libs.leakcanary.android)
     debugImplementation(libs.androidx.work.multiprocess)
+    // Diagnostic: expose ktor/netty SLF4J logs to logcat (System.err)
+    // debugImplementation("org.slf4j:slf4j-simple:2.0.17")
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
 
     // AI Image Search: both MediaPipe and LiteRT are excluded from fdroid
