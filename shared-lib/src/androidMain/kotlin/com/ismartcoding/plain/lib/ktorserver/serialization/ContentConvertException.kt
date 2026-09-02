@@ -7,7 +7,7 @@
 
 package com.ismartcoding.plain.lib.ktorserver.serialization
 
-import io.ktor.websocket.*
+import com.ismartcoding.plain.lib.ktorserver.websocket.*
 
 public open class ContentConvertException(
     message: String,

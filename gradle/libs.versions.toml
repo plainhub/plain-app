@@ -136,8 +136,6 @@ ktor-http = { module = "io.ktor:ktor-http", version.ref = "ktor" }
 ktor-io = { module = "io.ktor:ktor-io", version.ref = "ktor" }
 atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 
-# ktor libs (compile deps for vendored ktor-server-core + websocket plugin)
-ktor-websockets = { module = "io.ktor:ktor-websockets", version.ref = "ktor" }
 
 # netty (runtime for vendored ktor-server-netty)
 netty-codec-http = { module = "io.netty:netty-codec-http", version.ref = "netty" }

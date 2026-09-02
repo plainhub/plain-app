@@ -3,11 +3,11 @@ package com.ismartcoding.plain.httpserver
 import com.ismartcoding.plain.httpserver.http.WsSession
 import com.ismartcoding.plain.lib.ktorserver.core.plugins.origin
 import com.ismartcoding.plain.lib.ktorserver.DefaultWebSocketServerSession
-import io.ktor.websocket.Frame
-import io.ktor.websocket.close
-import io.ktor.websocket.readBytes
-import io.ktor.websocket.readText
-import io.ktor.websocket.send
+import com.ismartcoding.plain.lib.ktorserver.websocket.Frame
+import com.ismartcoding.plain.lib.ktorserver.websocket.close
+import com.ismartcoding.plain.lib.ktorserver.websocket.readBytes
+import com.ismartcoding.plain.lib.ktorserver.websocket.readText
+import com.ismartcoding.plain.lib.ktorserver.websocket.send
 
 /**
  * Adapts a Ktor [DefaultWebSocketServerSession] to the commonMain [WsSession]
@@ -49,7 +49,7 @@ class KtorWsSession(
     }
 
     override suspend fun close(code: Int, reason: String) {
-        session.close(io.ktor.websocket.CloseReason(code.toShort(), reason))
+        session.close(com.ismartcoding.plain.lib.ktorserver.websocket.CloseReason(code.toShort(), reason))
     }
 
     override suspend fun close() {

@@ -19,7 +19,7 @@ import com.ismartcoding.plain.lib.ktorserver.core.response.*
 import com.ismartcoding.plain.lib.ktorserver.core.routing.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
-import io.ktor.websocket.*
+import com.ismartcoding.plain.lib.ktorserver.websocket.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.CancellationException
 

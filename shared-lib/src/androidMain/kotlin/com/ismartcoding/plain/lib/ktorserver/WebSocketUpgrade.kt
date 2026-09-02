@@ -15,7 +15,7 @@ import io.ktor.http.websocket.*
 import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import com.ismartcoding.plain.lib.ktorserver.core.request.*
 import io.ktor.utils.io.*
-import io.ktor.websocket.*
+import com.ismartcoding.plain.lib.ktorserver.websocket.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.*
 

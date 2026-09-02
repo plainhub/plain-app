@@ -11,7 +11,7 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.websocket.*
+import com.ismartcoding.plain.lib.ktorserver.websocket.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 

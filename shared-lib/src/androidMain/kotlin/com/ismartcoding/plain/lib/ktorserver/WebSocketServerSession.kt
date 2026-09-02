@@ -10,7 +10,7 @@
 package com.ismartcoding.plain.lib.ktorserver
 
 import com.ismartcoding.plain.lib.ktorserver.core.application.*
-import io.ktor.websocket.*
+import com.ismartcoding.plain.lib.ktorserver.websocket.*
 
 /**
  * Represents a server-side web socket session
