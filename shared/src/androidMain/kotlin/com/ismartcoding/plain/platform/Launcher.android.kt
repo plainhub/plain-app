@@ -6,6 +6,8 @@ import androidx.core.content.FileProvider
 import com.ismartcoding.plain.appContextValue
 import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.helpers.ShareHelper
+import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import java.io.File
 
 actual fun launchUrl(url: String) {
@@ -47,22 +49,18 @@ actual fun shareFileAs(path: String, displayName: String) {
 actual fun shareFiles(paths: List<String>) {
     val ctx = appContextValue ?: return
     if (paths.isEmpty()) return
-    val uris = paths.map { FileProvider.getUriForFile(ctx, AppIntents.AUTHORITY, File(it)) }
-    val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-        type = "*/*"
-        putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    val chooser = Intent.createChooser(intent, null).apply {
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
-    ctx.startActivity(chooser)
+    ShareHelper.shareFiles(ctx, paths.map { File(it) })
 }
 
 actual fun openFileExternal(path: String) {
     val ctx = appContextValue ?: return
     val file = File(path)
-    val uri = FileProvider.getUriForFile(ctx, AppIntents.AUTHORITY, file)
+    val uri = try {
+        FileProvider.getUriForFile(ctx, AppIntents.AUTHORITY, file)
+    } catch (e: IllegalArgumentException) {
+        DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.cannot_share_file_not_accessible))
+        return
+    }
     val intent = Intent(Intent.ACTION_VIEW).apply {
         data = uri
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
