@@ -13,6 +13,7 @@ import java.io.FileInputStream
 
 private const val FILE_RESPONSE_BUFFER_SIZE = 64 * 1024
 private const val FILE_RESPONSE_FLUSH_BYTES = 64 * 1024
+internal const val BROWSER_MEDIA_RANGE_BYTES = 4L * 1024 * 1024
 
 internal data class ResolvedFileRange(
     val start: Long,
@@ -29,6 +30,37 @@ internal fun fullFileRange(fileLength: Long): ResolvedFileRange =
         endInclusive = fileLength - 1,
         isPartial = false,
     )
+
+internal data class FileResponsePlan(
+    val range: ResolvedFileRange,
+    val useBufferedResponse: Boolean,
+)
+
+/**
+ * HTML media elements support incremental range requests. Bound each requested
+ * video/audio range so Ktor can hand Netty one ByteArray-backed message instead
+ * of converting thousands of channel segments on affected Android runtimes.
+ * Ordinary downloads and requests without a Range header keep streaming.
+ */
+internal fun resolveFileResponsePlan(
+    rangeHeader: String?,
+    fileLength: Long,
+    fetchDestination: String?,
+): FileResponsePlan? {
+    val requested = resolveSingleByteRange(rangeHeader, fileLength) ?: return null
+    val isMediaElement = fetchDestination.equals("video", ignoreCase = true) ||
+        fetchDestination.equals("audio", ignoreCase = true)
+    if (!isMediaElement || !requested.isPartial) {
+        return FileResponsePlan(requested, useBufferedResponse = false)
+    }
+
+    val bufferedLength = minOf(requested.length, BROWSER_MEDIA_RANGE_BYTES)
+    val limitedEnd = requested.start + bufferedLength - 1
+    return FileResponsePlan(
+        range = ResolvedFileRange(requested.start, limitedEnd, isPartial = true),
+        useBufferedResponse = true,
+    )
+}
 
 /**
  * Resolve the single byte-range form used by browsers/downloaders. Multipart
@@ -78,7 +110,7 @@ internal fun resolveSingleByteRange(rangeHeader: String?, fileLength: Long): Res
 }
 
 /**
- * Streams a file (optionally a byte range of it) through a fixed 16KB buffer
+ * Streams a file (optionally a byte range of it) through a fixed-size buffer
  * so that serving a large APK never allocates heap proportional to file size.
  */
 internal class LowMemoryFileContent(
