@@ -6,7 +6,7 @@ package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.server.response.*
+import com.ismartcoding.plain.lib.ktorserver.core.response.*
 import io.ktor.util.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.*

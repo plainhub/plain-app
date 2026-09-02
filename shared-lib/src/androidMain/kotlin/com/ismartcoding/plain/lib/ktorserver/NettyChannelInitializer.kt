@@ -8,8 +8,8 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.engine.*
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.ChannelPipeline

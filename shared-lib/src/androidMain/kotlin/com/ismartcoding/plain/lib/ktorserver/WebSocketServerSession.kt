@@ -9,7 +9,7 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.server.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import io.ktor.websocket.*
 
 /**

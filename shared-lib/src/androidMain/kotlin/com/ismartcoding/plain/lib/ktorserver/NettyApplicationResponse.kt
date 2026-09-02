@@ -11,7 +11,7 @@ package com.ismartcoding.plain.lib.ktorserver
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.*
-import io.ktor.server.engine.*
+import com.ismartcoding.plain.lib.ktorserver.core.engine.*
 import io.ktor.utils.io.*
 import io.netty.channel.*
 import io.netty.handler.codec.http.*

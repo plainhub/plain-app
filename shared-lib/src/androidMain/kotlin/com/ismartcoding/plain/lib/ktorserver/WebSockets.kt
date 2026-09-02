@@ -9,8 +9,8 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.server.application.*
-import io.ktor.server.response.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.response.*
 import io.ktor.util.*
 import io.ktor.util.logging.*
 import io.ktor.utils.io.*

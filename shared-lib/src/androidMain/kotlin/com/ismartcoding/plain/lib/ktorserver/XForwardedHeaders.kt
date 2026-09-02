@@ -12,9 +12,9 @@
 package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.application.hooks.*
-import io.ktor.server.plugins.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.hooks.*
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.*
 import io.ktor.utils.io.*
 
 /**

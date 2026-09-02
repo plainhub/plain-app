@@ -13,10 +13,10 @@
 package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.response.*
+import com.ismartcoding.plain.lib.ktorserver.core.routing.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import io.ktor.websocket.*

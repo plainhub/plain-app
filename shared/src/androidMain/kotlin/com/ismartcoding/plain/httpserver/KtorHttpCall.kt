@@ -10,16 +10,16 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.plugins.origin
-import io.ktor.server.request.path
-import io.ktor.server.request.receive
-import io.ktor.server.request.receiveMultipart
-import io.ktor.server.response.header
-import io.ktor.server.response.respond
-import io.ktor.server.response.respondBytes
-import io.ktor.server.response.respondOutputStream
-import io.ktor.server.response.respondText
+import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationCall
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.origin
+import com.ismartcoding.plain.lib.ktorserver.core.request.path
+import com.ismartcoding.plain.lib.ktorserver.core.request.receive
+import com.ismartcoding.plain.lib.ktorserver.core.request.receiveMultipart
+import com.ismartcoding.plain.lib.ktorserver.core.response.header
+import com.ismartcoding.plain.lib.ktorserver.core.response.respond
+import com.ismartcoding.plain.lib.ktorserver.core.response.respondBytes
+import com.ismartcoding.plain.lib.ktorserver.core.response.respondOutputStream
+import com.ismartcoding.plain.lib.ktorserver.core.response.respondText
 import io.ktor.utils.io.readAvailable
 import io.ktor.utils.io.toByteArray
 import io.ktor.util.toMap
@@ -196,7 +196,7 @@ class KtorHttpCall(
             io.ktor.http.content.LastModifiedVersion(java.util.Date(file.lastModified()))
             status(HttpStatusCode.PartialContent) // some TV OS only accept 206
         }
-        applicationCall.respond(io.ktor.server.http.content.LocalFileContent(file))
+        applicationCall.respond(com.ismartcoding.plain.lib.ktorserver.core.http.content.LocalFileContent(file))
         return true
     }
 }

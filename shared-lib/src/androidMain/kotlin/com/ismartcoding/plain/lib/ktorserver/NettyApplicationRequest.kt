@@ -9,10 +9,10 @@
 package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.plugins.BadRequestException
-import io.ktor.server.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.engine.*
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.BadRequestException
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
 import io.ktor.utils.io.*
 import io.netty.channel.*
 import io.netty.handler.codec.http.*

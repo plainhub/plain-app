@@ -9,8 +9,8 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.server.application.*
-import io.ktor.server.routing.options
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.routing.options
 
 /**
  * A plugin that allows you to configure handling cross-origin requests.

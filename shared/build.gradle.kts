@@ -100,8 +100,8 @@ kotlin {
             implementation(libs.pdfium.android)
             implementation(libs.zxing.core)
 
-            // Ktor server (used by vendored kgraphql and web server code)
-            implementation(libs.ktor.server.core)
+            // Vendored ktor server stack deps (formerly provided by ktor-server-core)
+            implementation(libs.ktor.websockets)
 
             // Media3 (AudioPlayerService, audio playback, PlayerView UI)
             implementation(libs.media3.exoplayer)

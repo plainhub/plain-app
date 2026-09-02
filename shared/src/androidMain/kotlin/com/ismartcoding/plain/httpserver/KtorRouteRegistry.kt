@@ -4,17 +4,17 @@ import com.ismartcoding.plain.httpserver.http.HttpMethod
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.WebSocketRouteEntry
 import io.ktor.http.HttpMethod as KtorHttpMethod
-import io.ktor.server.routing.Route
-import io.ktor.server.routing.RoutingContext
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.method
-import io.ktor.server.routing.post
-import io.ktor.server.routing.put
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationCall
+import com.ismartcoding.plain.lib.ktorserver.core.routing.Route
+import com.ismartcoding.plain.lib.ktorserver.core.routing.RoutingContext
+import com.ismartcoding.plain.lib.ktorserver.core.routing.delete
+import com.ismartcoding.plain.lib.ktorserver.core.routing.get
+import com.ismartcoding.plain.lib.ktorserver.core.routing.method
+import com.ismartcoding.plain.lib.ktorserver.core.routing.post
+import com.ismartcoding.plain.lib.ktorserver.core.routing.put
+import com.ismartcoding.plain.lib.ktorserver.core.routing.route
+import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
+import com.ismartcoding.plain.lib.ktorserver.core.application.Application
+import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationCall
 import com.ismartcoding.plain.lib.ktorserver.webSocket
 
 /**

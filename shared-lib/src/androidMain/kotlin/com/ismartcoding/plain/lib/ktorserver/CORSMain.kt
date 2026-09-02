@@ -10,10 +10,10 @@
 package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.*
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.response.*
 import io.ktor.util.*
 import io.ktor.util.logging.*
 

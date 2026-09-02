@@ -10,10 +10,10 @@ import com.ismartcoding.plain.lib.kgraphql.schema.Schema
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.response.*
+import com.ismartcoding.plain.lib.ktorserver.core.routing.*
 import io.ktor.util.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.*

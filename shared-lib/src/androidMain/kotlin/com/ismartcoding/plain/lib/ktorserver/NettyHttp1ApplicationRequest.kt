@@ -9,7 +9,7 @@
 package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
-import io.ktor.server.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import io.ktor.utils.io.*
 import io.netty.channel.*
 import io.netty.handler.codec.http.*

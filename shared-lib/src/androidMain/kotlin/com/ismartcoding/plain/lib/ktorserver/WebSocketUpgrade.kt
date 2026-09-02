@@ -12,8 +12,8 @@ package com.ismartcoding.plain.lib.ktorserver
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.http.websocket.*
-import io.ktor.server.application.*
-import io.ktor.server.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
 import io.ktor.utils.io.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*

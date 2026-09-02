@@ -6,9 +6,9 @@ package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
 import io.ktor.serialization.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.*
-import io.ktor.server.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.*
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
 
 /**
  * Vendored from io.ktor:ktor-server-content-negotiation:3.5.2.

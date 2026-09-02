@@ -8,9 +8,9 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.http.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.engine.*
+import com.ismartcoding.plain.lib.ktorserver.core.http.*
 import io.ktor.util.pipeline.*
 import io.ktor.utils.io.*
 import io.netty.channel.ChannelHandler

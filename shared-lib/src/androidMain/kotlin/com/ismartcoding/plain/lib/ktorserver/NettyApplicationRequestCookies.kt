@@ -8,7 +8,7 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.server.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
 import io.netty.handler.codec.http.cookie.*
 
 internal class NettyApplicationRequestCookies(request: PipelineRequest) : RequestCookies(request) {

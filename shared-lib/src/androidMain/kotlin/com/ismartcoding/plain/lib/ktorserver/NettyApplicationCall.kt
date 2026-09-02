@@ -8,8 +8,8 @@
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.engine.*
 import io.ktor.util.*
 import io.netty.buffer.*
 import io.netty.channel.*

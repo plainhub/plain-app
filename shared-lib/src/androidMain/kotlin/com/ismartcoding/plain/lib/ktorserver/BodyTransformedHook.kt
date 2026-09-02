@@ -6,8 +6,8 @@ package com.ismartcoding.plain.lib.ktorserver
 
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.response.*
 import io.ktor.util.pipeline.*
 
 internal object BodyTransformedHook :
