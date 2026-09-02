@@ -388,12 +388,6 @@ object MdnsHostResponder {
                 )
             } catch (_: Exception) {
                 if (s.isClosed) break
-            } catch (_: Error) {
-                // Transient JVM/native Errors (e.g. OutOfMemoryError in
-                // DatagramSocket.receive under memory pressure) must not kill the
-                // responder thread; back off briefly and keep receiving.
-                if (s.isClosed) break
-                Thread.sleep(1000)
             }
         }
     }
