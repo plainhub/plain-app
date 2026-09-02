@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.withIO
@@ -108,8 +110,8 @@ fun ImageGridItem(
         }
 
         if (inSelectionMode) {
-            Box(modifier = Modifier.align(Alignment.TopStart)) {
-                SelectionCheckbox(selected = selected, id = m.id, dragSelectState = dragSelectState)
+            Box(modifier = Modifier.align(Alignment.TopStart).padding(2.dp)) {
+                SelectionCheckbox(selected = selected, onClick = { dragSelectState.select(m.id) })
             }
         }
         if (showSize) {

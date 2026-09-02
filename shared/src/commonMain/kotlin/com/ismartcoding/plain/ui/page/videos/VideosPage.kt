@@ -19,7 +19,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,6 +64,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.rememberBoostFlingBehavior
+import com.ismartcoding.plain.ui.components.MediaDateGroupHeader
 import com.ismartcoding.plain.ui.components.MediaFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.components.VideoGridItem
 import com.ismartcoding.plain.platform.MediaPreviewer
@@ -236,7 +236,17 @@ fun VideosPage(
                                     val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
                                     groupedItems.forEach { group ->
                                         item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.dateKey}", contentType = "header") {
-                                            Text(text = group.dateLabel, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), style = MaterialTheme.typography.titleSmall)
+                                            val ids = group.items.map { it.id }
+                                            val allSelected = ids.isNotEmpty() && ids.all { dragSelectState.isSelected(it) }
+                                            MediaDateGroupHeader(
+                                                dateLabel = group.dateLabel,
+                                                allSelected = allSelected,
+                                                partialSelected = !allSelected && ids.any { dragSelectState.isSelected(it) },
+                                                showCheckbox = dragSelectState.selectMode,
+                                            ) {
+                                                if (!dragSelectState.selectMode) dragSelectState.enterSelectMode()
+                                                if (allSelected) dragSelectState.removeSelectedIds(ids) else dragSelectState.addSelectedIds(ids)
+                                            }
                                         }
                                         items(group.items, key = { it.id }, contentType = { "video" }, span = { GridItemSpan(1) }) { m ->
                                             VideoGridItem(

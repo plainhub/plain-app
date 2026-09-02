@@ -78,6 +78,14 @@ class DragSelectState(
         }
     }
 
+    fun addSelectedIds(ids: List<String>) {
+        selectedIds = (selectedIds + ids).distinct()
+    }
+
+    fun removeSelectedIds(ids: List<String>) {
+        selectedIds = selectedIds - ids.toSet()
+    }
+
     fun removeSelected(id: String) {
         if (selectedIds.contains(id)) {
             selectedIds -= id
