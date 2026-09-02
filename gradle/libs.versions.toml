@@ -139,7 +139,6 @@ atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu"
 # ktor libs (compile deps for vendored ktor-server-core + websocket plugin)
 ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
 ktor-events = { module = "io.ktor:ktor-events", version.ref = "ktor" }
-ktor-http-cio = { module = "io.ktor:ktor-http-cio", version.ref = "ktor" }
 ktor-websockets = { module = "io.ktor:ktor-websockets", version.ref = "ktor" }
 
 # netty (runtime for vendored ktor-server-netty)
