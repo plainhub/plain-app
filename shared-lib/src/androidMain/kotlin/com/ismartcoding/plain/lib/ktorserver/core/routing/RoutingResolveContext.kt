@@ -170,7 +170,8 @@ public class RoutingResolveContext(
             }
         }
 
-        trait.removeLast()
+        // Not removeLast(): that name binds to Java 21 ArrayList.removeLast (API 35+), NoSuchMethodError on API < 35
+        trait.removeAt(trait.lastIndex)
 
         trace?.finish(entry, newIndex, result)
         return if (bestSucceedChildQuality > 0) evaluation.quality else MIN_QUALITY
