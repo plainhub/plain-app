@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.i18n.Res
@@ -38,6 +39,7 @@ fun DeviceRenameDialog(name: String, onDismiss: () -> Unit, onDone: (String) -> 
             scope.launch {
                 DeviceNamePreference.putAsync(newName.value)
                 TempData.deviceName.value = newName.value
+                MdnsDiscoverManager.updateAdvertisedService()
                 sendEvent(WebSocketEvent(EventType.DEVICE_NAME_UPDATED, jsonEncode(newName.value)))
                 onDone(newName.value)
                 onDismiss()

@@ -95,4 +95,46 @@ class MdnsServiceBrowserTest {
 
         assertTrue(grouped.isEmpty())
     }
+
+    // ── goodbyeInstanceKeys (RFC 6762 §8.4) ──────────────────────────────────
+    // A renamed peer withdraws its old instance with a TTL=0 packet; the
+    // browser must drop that instance instead of listing the old name forever.
+
+    private fun service(instanceName: String): MdnsServiceInfo = MdnsServiceInfo(
+        instanceName = instanceName,
+        serviceType = PLAINAPP_SERVICE_TYPE,
+        targetHostname = "plainapp-abc.local",
+        port = 8443,
+        txtRecords = listOf("id=abc"),
+        ips = listOf("192.168.1.50"),
+    )
+
+    private fun goodbyeKeys(bytes: ByteArray): Set<String> {
+        val parsed = MdnsPacketCodec.parseResponse(bytes)!!
+        return MdnsServiceBrowser.goodbyeInstanceKeys(parsed.allRecords)
+    }
+
+    @Test fun `goodbye packet withdraws the renamed instance`() =
+        assertEquals(
+            setOf("pixel 7 pro.$PLAINAPP_SERVICE_TYPE"),
+            goodbyeKeys(MdnsServiceResponseBuilder.buildGoodbye(service("Pixel 7 Pro"))),
+        )
+
+    @Test fun `records with a live TTL are not a goodbye`() {
+        val response = MdnsServiceResponseBuilder.buildResponseIfMatch(
+            MdnsPacketCodec.buildPtrQuery(PLAINAPP_SERVICE_TYPE),
+            service("Pixel 7 Pro"),
+        )!!
+        assertTrue(goodbyeKeys(response.bytes).isEmpty())
+    }
+
+    @Test fun `goodbye for another service type is ignored`() {
+        val other = service("Speaker").copy(serviceType = "_airplay._tcp.local")
+        assertTrue(goodbyeKeys(MdnsServiceResponseBuilder.buildGoodbye(other)).isEmpty())
+    }
+
+    @Test fun `zero-TTL A record does not withdraw an instance`() {
+        val record = aRecord("p9.local", "192.168.1.10").copy(ttl = 0)
+        assertTrue(MdnsServiceBrowser.goodbyeInstanceKeys(listOf(record)).isEmpty())
+    }
 }

@@ -142,6 +142,35 @@ object MdnsHostResponder {
     }
 
     /**
+     * Replaces the published service and re-announces it right away instead of
+     * waiting for the next [REANNOUNCE_MS] cycle. Used when the advertised data
+     * changed while the service stays up (e.g. the device was renamed).
+     *
+     * A different instance FQDN makes the old instance's records stale in every
+     * peer cache, so the previous instance is withdrawn first with an RFC 6762
+     * §8.4 goodbye (TTL=0); peers then list only the new name.
+     *
+     * No-op when nothing is published: with the web service off the responder
+     * only answers hostname queries, and republishing would advertise a dead
+     * service. Returns false when the responder socket is down — the new
+     * service is stored either way and goes out with the next
+     * [start]/[restartSocket].
+     */
+    fun updateService(service: MdnsServiceInfo): Boolean {
+        val previous = serviceInfo ?: return false
+        serviceInfo = service
+        if (!isRunning) {
+            log("updateService: responder down, stored ${service.instanceFqdn}")
+            return false
+        }
+        if (!previous.instanceFqdn.equals(service.instanceFqdn, ignoreCase = true)) {
+            sendGoodbye(previous)
+        }
+        broadcastService()
+        return true
+    }
+
+    /**
      * Withdraws the `_plainapp` service advertisement while KEEPING the socket
      * and hostname responder alive. Called when the HTTP service stops: the
      * shared socket must survive so a running browser keeps querying, and the
@@ -272,6 +301,22 @@ object MdnsHostResponder {
             runCatching {
                 s.setOutgoingInterface(iface.name)
                 s.send(announcement, MDNS_GROUP, MDNS_PORT)
+            }
+        }
+    }
+
+    /** Sends the TTL=0 goodbye for [previous] on every LAN interface. */
+    private fun sendGoodbye(previous: MdnsServiceInfo) {
+        val s = socket ?: return
+        val candidates = candidateInterfaces()
+        if (candidates.isEmpty()) return
+        val bytes = MdnsServiceResponseBuilder.buildGoodbye(previous)
+        log("goodbye ${previous.instanceFqdn} -> $MDNS_GROUP:$MDNS_PORT on ${candidates.size} iface(s)")
+        candidates.forEach { (iface, ip) ->
+            MdnsPacketCapture.recordOut(ip, MDNS_PORT, MDNS_GROUP, MDNS_PORT, bytes)
+            runCatching {
+                s.setOutgoingInterface(iface.name)
+                s.send(bytes, MDNS_GROUP, MDNS_PORT)
             }
         }
     }

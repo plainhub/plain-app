@@ -179,9 +179,26 @@ object MdnsServiceBrowser {
         var nextHostnames = hostnameToInstance
         val touched = mutableSetOf<String>()
         val discovered = mutableListOf<Instance>() // instances first seen in this packet
-        val aIpsByHostname = groupARecordsByHostname(parsed.allRecords)
 
-        for (record in parsed.allRecords) {
+        // RFC 6762 §8.4 goodbye: TTL=0 records withdraw an instance — a peer
+        // that renamed itself republishes under a new instance FQDN. Cached
+        // entries never expire here, so without dropping the withdrawn one the
+        // old name would be listed forever (next to the new one). Online status
+        // is deliberately left untouched: the same id is re-announced under the
+        // new name moments later, so clearing it would only flicker the UI.
+        val goodbye = goodbyeInstanceKeys(parsed.allRecords)
+        if (goodbye.isNotEmpty()) {
+            nextInstances = nextInstances - goodbye
+            nextHostnames = nextHostnames.filterValues { it !in goodbye }
+        }
+
+        // Withdrawn records must not be merged back in: findInstance() recreates
+        // a bare Instance for any name it does not know.
+        val records =
+            if (goodbye.isEmpty()) parsed.allRecords else parsed.allRecords.filter { it.ttl != 0L }
+        val aIpsByHostname = groupARecordsByHostname(records)
+
+        for (record in records) {
             when (record.type) {
                 MdnsPacketCodec.TYPE_PTR -> record.ptrTarget?.let { target ->
                     findInstance(nextInstances, target)?.let { (key, instance) ->
@@ -253,6 +270,10 @@ object MdnsServiceBrowser {
 
         instances = nextInstances
         hostnameToInstance = nextHostnames
+        if (goodbye.isNotEmpty()) {
+            srvTxtQueriedAt = srvTxtQueriedAt - goodbye
+            aQueriedAt = aQueriedAt - goodbye
+        }
 
         touched.forEach { key ->
             nextInstances[key]?.takeIf { it.complete }?.let { instance ->
@@ -271,13 +292,37 @@ object MdnsServiceBrowser {
         }
     }
 
+    /**
+     * Instances withdrawn by one packet's TTL=0 (goodbye) records, keyed like
+     * [instances]. A PTR goodbye carries the instance in its rdata, SRV/TXT in
+     * the record name. A records are hostname-scoped, so they never withdraw an
+     * instance. Pure — unit-tested.
+     */
+    internal fun goodbyeInstanceKeys(records: List<MdnsRecord>): Set<String> {
+        val keys = mutableSetOf<String>()
+        for (record in records) {
+            if (record.ttl != 0L) continue
+            val fqdn = when (record.type) {
+                MdnsPacketCodec.TYPE_PTR -> record.ptrTarget
+                MdnsPacketCodec.TYPE_SRV, MdnsPacketCodec.TYPE_TXT -> record.name
+                else -> null
+            } ?: continue
+            instanceKeyOf(fqdn)?.let { keys.add(it) }
+        }
+        return keys
+    }
+
     /** Resolves [name] against [current]; null when it is not one of our service instances. */
     private fun findInstance(current: Map<String, Instance>, name: String): Pair<String, Instance>? {
-        if (!name.endsWith(PLAINAPP_SERVICE_TYPE, ignoreCase = true)) return null
-        val key = instanceKey(name)
-        val instanceName = name.dropLast(PLAINAPP_SERVICE_TYPE.length + 1)
-        if (instanceName.isEmpty()) return null
-        return key to (current[key] ?: Instance(key, instanceName))
+        val key = instanceKeyOf(name) ?: return null
+        return key to (current[key] ?: Instance(key, name.dropLast(PLAINAPP_SERVICE_TYPE.length + 1)))
+    }
+
+    /** [fqdn] as an instance key when it names one of our service instances. */
+    private fun instanceKeyOf(fqdn: String): String? {
+        if (!fqdn.endsWith(PLAINAPP_SERVICE_TYPE, ignoreCase = true)) return null
+        if (fqdn.dropLast(PLAINAPP_SERVICE_TYPE.length + 1).isEmpty()) return null
+        return fqdn.lowercase()
     }
 
     /**
@@ -310,6 +355,4 @@ object MdnsServiceBrowser {
     /** QU fallback activates after [QU_FALLBACK_AFTER_CYCLES] scan cycles with no external multicast. */
     internal fun shouldActivateQuFallback(cycle: Long, quActive: Boolean, externalMulticastSeen: Boolean): Boolean =
         !quActive && cycle >= QU_FALLBACK_AFTER_CYCLES && !externalMulticastSeen
-
-    private fun instanceKey(fqdn: String): String = fqdn.lowercase()
 }

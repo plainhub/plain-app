@@ -25,6 +25,7 @@ import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.platform.getAppVersionCode
 import com.ismartcoding.plain.platform.getSdkInt
 import com.ismartcoding.plain.platform.setClipboardText
+import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
@@ -119,6 +120,7 @@ suspend fun setClip(text: String): Boolean {
 suspend fun updateDeviceName(name: String): Boolean {
     DeviceNamePreference.putAsync(name)
     TempData.deviceName.value = name
+    MdnsDiscoverManager.updateAdvertisedService()
     return true
 }
 

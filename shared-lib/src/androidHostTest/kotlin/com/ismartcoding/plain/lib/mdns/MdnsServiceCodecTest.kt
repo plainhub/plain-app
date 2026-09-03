@@ -5,6 +5,7 @@ import com.ismartcoding.plain.lib.mdns.MdnsServiceInfo
 import com.ismartcoding.plain.lib.mdns.MdnsServiceResponseBuilder
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -182,6 +183,31 @@ class MdnsServiceCodecTest {
                 service,
             ),
         )
+    }
+
+    // ── Goodbye (RFC 6762 §8.4) ──────────────────────────────────────────────
+    // Sent when a published instance is replaced by one with a different
+    // instance FQDN (device renamed): TTL=0 makes peers drop the stale records
+    // at once instead of listing the old name until the 120s TTL expires.
+
+    @Test fun `goodbye carries PTR SRV and TXT with zero TTL`() {
+        val parsed = MdnsPacketCodec.parseResponse(MdnsServiceResponseBuilder.buildGoodbye(service))!!
+        assertTrue(parsed.isResponse)
+        assertEquals(
+            listOf(MdnsPacketCodec.TYPE_PTR, MdnsPacketCodec.TYPE_SRV, MdnsPacketCodec.TYPE_TXT),
+            parsed.answers.map { it.type },
+        )
+        parsed.answers.forEach { assertEquals(0L, it.ttl) }
+        assertEquals(service.instanceFqdn, parsed.answers.first().ptrTarget)
+    }
+
+    @Test fun `goodbye withdraws the renamed instance only`() {
+        val renamed = service.copy(instanceName = "Pixel 8")
+        val parsed = MdnsPacketCodec.parseResponse(MdnsServiceResponseBuilder.buildGoodbye(service))!!
+        val ptr = parsed.answers.single { it.type == MdnsPacketCodec.TYPE_PTR }
+        assertEquals(service.instanceFqdn, ptr.ptrTarget)
+        assertEquals(service.instanceFqdn, parsed.answers.single { it.type == MdnsPacketCodec.TYPE_SRV }.name)
+        assertNotEquals(renamed.instanceFqdn, ptr.ptrTarget)
     }
 
     // ── Negative cases ────────────────────────────────────────────────────────

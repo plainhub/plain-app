@@ -53,6 +53,23 @@ object MdnsDiscoverManager {
     }
 
     /**
+     * Republishes the local service after the advertised data changed (device
+     * renamed, port changed) so peers pick it up without waiting for the next
+     * re-announce. No-op while no service is published (web service off).
+     *
+     * Runs on IO: building the reply enumerates network interfaces and the
+     * republish sends multicast datagrams — the UI rename path calls this from
+     * the main dispatcher.
+     */
+    fun updateAdvertisedService() {
+        coIO {
+            MdnsHostResponder.updateService(
+                buildMdnsServiceInfo(PairingCore.buildDiscoverReply(), TempData.mdnsHostname)
+            )
+        }
+    }
+
+    /**
      * Triggers an immediate one-shot mDNS PTR browse. Responses for a paired
      * peer refresh its IP/port via
      * [PeerManager.applyDeviceDiscovered]
