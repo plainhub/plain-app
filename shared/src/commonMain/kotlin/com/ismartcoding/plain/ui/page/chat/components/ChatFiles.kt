@@ -47,7 +47,6 @@ fun ChatFiles(
 
     Column(
         Modifier
-            .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.cardBackgroundNormal)
     ) {

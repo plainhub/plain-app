@@ -26,35 +26,29 @@ fun ChatText(
     val messageText = m.value as DMessageText
     val text = messageText.text.linkify()
 
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        PClickableText(
-            text = text,
-            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth(),
-            onClick = { position ->
-                if (isSelectMode) {
-                    onSelect(m.id)
-                } else {
-                    focusManager.clearFocus()
-                    text.urlAt(position)
-                }
-            },
-            onDoubleClick = onDoubleClick,
-            onLongClick = onLongClick
-        )
-
-        if (messageText.linkPreviews.isNotEmpty()) {
-            messageText.linkPreviews.forEach { linkPreview ->
-                ChatLinkPreview(
-                    linkPreview = linkPreview,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                )
+    PClickableText(
+        text = text,
+        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+        modifier = Modifier
+            .padding(vertical = 8.dp)
+            .fillMaxWidth(),
+        onClick = { position ->
+            if (isSelectMode) {
+                onSelect(m.id)
+            } else {
+                focusManager.clearFocus()
+                text.urlAt(position)
             }
+        },
+        onDoubleClick = onDoubleClick,
+        onLongClick = onLongClick
+    )
+
+    if (messageText.linkPreviews.isNotEmpty()) {
+        messageText.linkPreviews.forEach { linkPreview ->
+            ChatLinkPreview(
+                linkPreview = linkPreview,
+            )
         }
     }
 }

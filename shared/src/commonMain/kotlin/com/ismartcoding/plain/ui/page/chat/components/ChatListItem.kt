@@ -6,9 +6,13 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
@@ -62,14 +66,29 @@ fun ChatListItem(
     val selected = chatVM.selectedItem.value?.id == m.id || chatVM.selectedIds.contains(m.id)
     Column {
         ChatDate(items, m, index)
-        Row(Modifier.background(if (selected) MaterialTheme.colorScheme.cardBackgroundActive else Color.Unspecified)) {
+        Row(
+            Modifier
+                .height(IntrinsicSize.Min)
+                .background(if (selected) MaterialTheme.colorScheme.cardBackgroundActive else Color.Unspecified)
+        ) {
             if (chatVM.selectMode.value) {
                 HorizontalSpace(dp = 16.dp)
                 Checkbox(checked = chatVM.selectedIds.contains(m.id), onCheckedChange = { chatVM.select(m.id) })
             }
+            if (m.fromId == "me") {
+                Box(
+                    modifier = Modifier
+                        .width(4.dp)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.primary)
+                )
+            } else {
+                HorizontalSpace(dp = 4.dp)
+            }
             Box(modifier = Modifier.weight(1f)) {
                 Column(
                     modifier = Modifier
+                        .padding(start = 12.dp, end = 16.dp)
                         .clip(RoundedCornerShape(if (chatVM.selectMode.value && !selected) 12.dp else 0.dp))
                         .combinedClickable(
                             onClick = { if (chatVM.selectMode.value) chatVM.select(m.id) else focusManager.clearFocus() },
@@ -106,7 +125,7 @@ fun ChatListItem(
                             showContextMenu.value = true
                         })
                     }
-                    VerticalSpace(4.dp)
+                    VerticalSpace(8.dp)
                 }
                 Box(
                     modifier = Modifier
@@ -127,8 +146,6 @@ fun ChatListItem(
                 }
             }
         }
-        VerticalSpace(4.dp)
-
         showDeliveryDialog.value?.let { statusData ->
             if (peer != null) {
                 PeerDeliveryStatusDialog(statusData = statusData, onRetry = { chatVM.resendMessage(m.id) }, onDismiss = { showDeliveryDialog.value = null })
