@@ -81,20 +81,31 @@ class MainViewModel : ViewModel() {
                 return@launch
             }
 
-            if (httpServerState.value == HttpServerState.ERROR) {
-                return@launch
-            }
-
-            if (!httpServerState.value.isProcessing() && httpServerState.value != HttpServerState.ON) {
-                httpServerState.value = HttpServerState.STARTING
-            }
-
-            val serverUp = checkHttpServerAsync()
-            if (serverUp) {
-                httpServerError.value = ""
-                httpServerState.value = HttpServerState.ON
-            } else {
-                enableHttpServer(true)
+            when (httpServerState.value) {
+                HttpServerState.ERROR -> return@launch
+                // A start/stop orchestration is in flight and its state event is
+                // authoritative; running a parallel health check here raced with
+                // the service-side check and could leave the UI ON on a dead server.
+                HttpServerState.STARTING, HttpServerState.STOPPING -> return@launch
+                HttpServerState.OFF -> {
+                    httpServerState.value = HttpServerState.STARTING
+                    val serverUp = checkHttpServerAsync()
+                    // Apply the verdict only if no server event changed the state meanwhile.
+                    if (httpServerState.value == HttpServerState.STARTING) {
+                        if (serverUp) {
+                            httpServerError.value = ""
+                            httpServerState.value = HttpServerState.ON
+                        } else {
+                            enableHttpServer(true)
+                        }
+                    }
+                }
+                HttpServerState.ON -> {
+                    val serverUp = checkHttpServerAsync()
+                    if (!serverUp && httpServerState.value == HttpServerState.ON) {
+                        enableHttpServer(true)
+                    }
+                }
             }
         }
     }

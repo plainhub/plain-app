@@ -12,6 +12,8 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 
 /**
@@ -130,6 +132,19 @@ expect suspend fun stopHttpServiceAsync()
 // ----------------------------------------------------------------------------------
 
 /**
+ * Single-shot probe of the embedded HTTP server's `/health` endpoint.
+ * @return `true` when the server responds 200 with our own package name.
+ */
+suspend fun checkHttpServerOnce(): Boolean = withIO {
+    try {
+        val response = createHttpClient().get(UrlHelper.getHealthCheckUrl())
+        response.use { it.isOk() && it.bodyAsText() == getOwnPackageName() }
+    } catch (ex: Exception) {
+        false
+    }
+}
+
+/**
  * Probe the embedded HTTP server's `/health` endpoint with a bounded retry
  * loop. Shared by Android and iOS — previously each platform duplicated this
  * loop (Android `checkServerHealthAsync`, iOS `checkHttpServerAsync`).
@@ -150,14 +165,18 @@ suspend fun checkHttpServerAsync(): Boolean = withIO {
                     }
                 }
             } catch (ex: Exception) {
-                delay(300)
                 LogCat.e("HTTP server check failed: ${ex.message}")
             }
+            if (!healthy) delay(300)
         }
         LogCat.d("HTTP server check healthy: $healthy")
         healthy
     } ?: false
 }
+
+// Serializes start orchestrations so two concurrent runs cannot interleave
+// their engine stop/start calls and emit contradictory state events.
+private val startMutex = Mutex()
 
 /**
  * Shared start orchestration: emits state transitions, clears stale state,
@@ -170,6 +189,10 @@ suspend fun checkHttpServerAsync(): Boolean = withIO {
  * for callers (the Android service) that need synchronous local state.
  */
 suspend fun startHttpServerAsync(onStateChanged: (HttpServerState) -> Unit = {}) = withIO {
+    startMutex.withLock { startHttpServerAsyncLocked(onStateChanged) }
+}
+
+private suspend fun startHttpServerAsyncLocked(onStateChanged: (HttpServerState) -> Unit) = withIO {
     LogCat.d("startHttpServer")
     onStateChanged(HttpServerState.STARTING)
     sendEvent(HttpServerStateChangedEvent(HttpServerState.STARTING))
@@ -203,7 +226,13 @@ suspend fun startHttpServerAsync(onStateChanged: (HttpServerState) -> Unit = {})
         }
     }
 
-    val healthy = started && checkHttpServerAsync()
+    var healthy = started && checkHttpServerAsync()
+    if (!healthy && started) {
+        // A concurrent probe (e.g. UI state sync) may have seen the engine
+        // healthy right after our deadline expired; re-probe once before
+        // tearing down a possibly-healthy engine.
+        healthy = checkHttpServerOnce()
+    }
     if (healthy) {
         HttpServerManager.httpServerError = ""
         HttpServerManager.portsInUse.value = emptySet()
