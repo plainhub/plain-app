@@ -226,7 +226,7 @@ object PairingCore {
         sendEvent(
             WebSocketEvent(
                 EventType.PAIRING_SUCCESS,
-                JsonHelper.jsonEncode(DPairingResult(deviceId = response.fromId, deviceName = request.fromName)),
+                JsonHelper.jsonEncode(DPairingResult(deviceId = request.fromId, deviceName = request.fromName)),
             )
         )
         return response

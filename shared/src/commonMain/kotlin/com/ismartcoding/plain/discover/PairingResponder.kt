@@ -28,6 +28,12 @@ object PairingResponder {
                 return@withIO
             }
 
+            // The same request may be shown in a web client's (plain-desktop)
+            // invite modal — broadcast the rejection so it can dismiss itself.
+            if (!accepted) {
+                PairingCore.notifyFailed(request.fromId, request.fromName, "Pairing request was rejected")
+            }
+
             // Send via both channels simultaneously — the initiator discards the duplicate
             if (request.fromIp.isNotEmpty()) {
                 try {
