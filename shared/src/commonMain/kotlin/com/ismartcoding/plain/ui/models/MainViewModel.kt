@@ -103,7 +103,7 @@ class MainViewModel : ViewModel() {
                 HttpServerState.ON -> {
                     val serverUp = checkHttpServerAsync()
                     if (!serverUp && httpServerState.value == HttpServerState.ON) {
-                        enableHttpServer(true)
+                        httpServerState.value = HttpServerState.ERROR
                     }
                 }
             }

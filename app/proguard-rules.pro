@@ -51,6 +51,19 @@
 -keep class kotlinx.coroutines.** { *; }
 -dontwarn io.ktor.**
 
+# ===== Vendored ktor (com.ismartcoding.plain.lib.ktorserver) =====
+# The vendored 3.5.2 sources live under our own package, so the io.ktor rule
+# above does not cover them. Unprotected, R8's optimizations corrupt the engine
+# the same way they corrupted netty's VarHandle call sites (see above): the
+# server accepts connections then closes them without a response, while the
+# in-app health check passes intermittently thanks to client-side retries.
+# Also keep the SLF4J provider (slf4j-simple): it is ServiceLoader-loaded and
+# R8 strips it, silencing all server-side error logs (NOP logger).
+-keep class com.ismartcoding.plain.lib.ktorserver.** { *; }
+-dontwarn com.ismartcoding.plain.lib.ktorserver.**
+-keep class org.slf4j.** { *; }
+-dontwarn org.slf4j.**
+
 # ===== kgraphql engine + app GraphQL models =====
 # Fully reflection-free since the KSP accessor-lambda migration: field access,
 # type names, and unions are all compile-time fixed; the last kotlin-reflect
