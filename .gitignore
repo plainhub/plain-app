@@ -124,3 +124,4 @@ play-service-account.json
 tmp_pc_fetch.sh
 *.dm
 .ai
+AGENTS.md
