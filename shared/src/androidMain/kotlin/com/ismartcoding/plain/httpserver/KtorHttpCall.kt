@@ -7,10 +7,16 @@ import com.ismartcoding.plain.httpserver.http.HttpMethod
 import com.ismartcoding.plain.httpserver.http.HttpMultipartPart
 import com.ismartcoding.plain.httpserver.http.StreamSink
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.EntityTagVersion
+import io.ktor.http.content.LastModifiedVersion
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
+import io.ktor.http.content.versions
+import io.ktor.http.headersOf
 import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationCall
+import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import com.ismartcoding.plain.lib.ktorserver.core.plugins.origin
 import com.ismartcoding.plain.lib.ktorserver.core.request.path
 import com.ismartcoding.plain.lib.ktorserver.core.request.receive
@@ -24,7 +30,6 @@ import io.ktor.utils.io.readAvailable
 import io.ktor.utils.io.toByteArray
 import io.ktor.util.toMap
 import java.io.File
-import java.io.FileInputStream
 import java.io.OutputStream
 
 /**
@@ -131,12 +136,8 @@ class KtorHttpCall(
         }
 
         val fileLength = file.length()
-        val plan = resolveFileResponsePlan(
-            rangeHeader = applicationCall.request.headers["Range"],
-            fileLength = fileLength,
-            fetchDestination = applicationCall.request.headers["Sec-Fetch-Dest"],
-        )
-        if (plan == null) {
+        val range = resolveSingleByteRange(applicationCall.request.headers["Range"], fileLength)
+        if (range == null) {
             applicationCall.response.run {
                 status(HttpStatusCode.RequestedRangeNotSatisfiable)
                 header("Accept-Ranges", "bytes")
@@ -146,30 +147,14 @@ class KtorHttpCall(
             return
         }
 
-        val range = plan.range
-        val status = if (range.isPartial) HttpStatusCode.PartialContent else HttpStatusCode.OK
-        val parsedContentType = contentType?.let { ContentType.parse(it) }
-        if (plan.useBufferedResponse) {
-            applicationCall.response.run {
-                header("Accept-Ranges", "bytes")
-                header("Content-Range", "bytes ${range.start}-${range.endInclusive}/$fileLength")
-            }
-            applicationCall.respondBytes(
-                bytes = readBufferedFileRange(file, range),
-                contentType = parsedContentType,
-                status = status,
-            )
-            return
-        }
-
         applicationCall.respond(
-            LowMemoryFileContent(
+            FileRegionContent(
                 file = file,
-                contentType = parsedContentType,
-                status = status,
-                contentLength = range.length,
-                range = range,
-                totalLength = fileLength,
+                offset = range.start,
+                length = range.length,
+                contentType = contentType?.let { ContentType.parse(it) },
+                status = if (range.isPartial) HttpStatusCode.PartialContent else HttpStatusCode.OK,
+                headers = fileRangeHeaders(range, fileLength),
             )
         )
     }
@@ -201,7 +186,10 @@ class KtorHttpCall(
 
     override suspend fun respondDlnaFile(path: String): Boolean {
         val file = File(path)
-        if (!file.exists()) return false
+        if (!file.exists() || !file.isFile) return false
+        val fileLength = file.length()
+        val range = resolveSingleByteRange(applicationCall.request.headers["Range"], fileLength)
+            ?: fullFileRange(fileLength)
         applicationCall.response.run {
             header("realTimeInfo.dlna.org", "DLNA.ORG_TLAG=*")
             header("contentFeatures.dlna.org", "")
@@ -211,27 +199,34 @@ class KtorHttpCall(
                 "Server",
                 "DLNADOC/1.50 UPnP/1.0 Plain/1.0 Android/${android.os.Build.VERSION.RELEASE}",
             )
-            io.ktor.http.content.EntityTagVersion(file.lastModified().hashCode().toString())
-            io.ktor.http.content.LastModifiedVersion(java.util.Date(file.lastModified()))
             status(HttpStatusCode.PartialContent) // some TV OS only accept 206
         }
-        applicationCall.respond(com.ismartcoding.plain.lib.ktorserver.core.http.content.LocalFileContent(file))
+        applicationCall.respond(
+            FileRegionContent(
+                file = file,
+                offset = range.start,
+                length = range.length,
+                status = HttpStatusCode.PartialContent,
+                headers = fileRangeHeaders(range, fileLength),
+            ).apply {
+                versions += EntityTagVersion(file.lastModified().hashCode().toString())
+                versions += LastModifiedVersion(java.util.Date(file.lastModified()))
+            }
+        )
         return true
     }
 }
 
-private suspend fun readBufferedFileRange(file: File, range: ResolvedFileRange): ByteArray = withIO {
-    val bytes = ByteArray(range.length.toInt())
-    FileInputStream(file).use { input ->
-        input.channel.position(range.start)
-        var offset = 0
-        while (offset < bytes.size) {
-            val read = input.read(bytes, offset, bytes.size - offset)
-            if (read <= 0) break
-            offset += read
-        }
-        if (offset == bytes.size) bytes else bytes.copyOf(offset)
-    }
+/**
+ * Accept-Ranges plus Content-Range headers for a resolved file range.
+ */
+internal fun fileRangeHeaders(range: ResolvedFileRange, fileLength: Long): Headers = if (range.isPartial) {
+    headersOf(
+        "Accept-Ranges" to listOf("bytes"),
+        "Content-Range" to listOf("bytes ${range.start}-${range.endInclusive}/$fileLength"),
+    )
+} else {
+    headersOf("Accept-Ranges" to listOf("bytes"))
 }
 
 /**

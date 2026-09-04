@@ -58,7 +58,7 @@ object HttpModule {
         install(ContentNegotiation) {
             json(
                 Json {
-                    prettyPrint = true
+                    prettyPrint = false
                     isLenient = true
                 },
             )

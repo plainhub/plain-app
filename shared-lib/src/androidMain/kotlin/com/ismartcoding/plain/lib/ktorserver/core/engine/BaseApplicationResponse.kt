@@ -13,6 +13,7 @@ import io.ktor.http.content.*
 import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import com.ismartcoding.plain.lib.ktorserver.core.engine.internal.*
 import com.ismartcoding.plain.lib.ktorserver.core.http.*
+import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import com.ismartcoding.plain.lib.ktorserver.core.response.*
 import io.ktor.util.*
 import io.ktor.util.cio.*
@@ -131,6 +132,13 @@ public abstract class BaseApplicationResponse(
                 respondUpgrade(content)
             }
 
+            // FileRegionContent is most efficient for file-backed responses:
+            // engines may send it with zero user-space copies (sendfile)
+            is FileRegionContent -> {
+                commitHeaders(content)
+                respondFileRegion(content)
+            }
+
             // ByteArrayContent is most efficient
             is OutgoingContent.ByteArrayContent -> {
                 // First call user code to acquire bytes, because it could fail
@@ -170,6 +178,15 @@ public abstract class BaseApplicationResponse(
             is OutgoingContent.ContentWrapper -> respondOutgoingContent(content.delegate())
         }
         isSent = true
+    }
+
+    /**
+     * Process response [content] representing a file region. The default
+     * implementation streams the bytes through the response channel; engines
+     * that can bypass user-space copies (sendfile) override this.
+     */
+    protected open suspend fun respondFileRegion(content: FileRegionContent) {
+        respondWriteChannelContent(content)
     }
 
     /**

@@ -12,6 +12,7 @@ import io.ktor.http.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.*
 import com.ismartcoding.plain.lib.ktorserver.core.engine.*
+import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import io.ktor.utils.io.*
 import io.netty.channel.*
 import io.netty.handler.codec.http.*
@@ -36,6 +37,12 @@ public abstract class NettyApplicationResponse(
     protected var responseMessageSent: Boolean = false
 
     internal var responseChannel: ByteReadChannel = ByteReadChannel.Empty
+
+    /**
+     * Set when the response body is served as a Netty [io.netty.channel.FileRegion]
+     * instead of streaming through [responseChannel]. Consumed by the response pipeline.
+     */
+    internal var fileRegionContent: FileRegionContent? = null
 
     private val canRespond: Boolean
         get() = !responseMessageSent && context.channel().isActive
@@ -69,6 +76,26 @@ public abstract class NettyApplicationResponse(
             else -> ByteReadChannel(bytes)
         }
         responseMessage = message
+        responseReady.setSuccess()
+        responseMessageSent = true
+
+        awaitProcessingResponseIfInfoOrNoContent()
+    }
+
+    /**
+     * Sends the response header only and hands the body to the response
+     * pipeline as a file region. The body is written by the Netty I/O thread
+     * via [io.netty.channel.FileRegion] without user-space copies.
+     */
+    override suspend fun respondFileRegion(content: FileRegionContent) {
+        if (!canRespond) {
+            cancelIfChannelNotActive()
+            return
+        }
+
+        fileRegionContent = content
+        responseChannel = ByteReadChannel.Empty
+        responseMessage = responseMessage(chunked = false, last = false)
         responseReady.setSuccess()
         responseMessageSent = true
 

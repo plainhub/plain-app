@@ -122,7 +122,12 @@ public suspend fun ApplicationCall.respondText(
     status: HttpStatusCode? = null,
     configure: OutgoingContent.() -> Unit = {}
 ) {
-    val message = TextContent(text, defaultTextContentType(contentType), status).apply(configure)
+    val resolvedContentType = defaultTextContentType(contentType)
+    val message = ByteArrayContent(
+        text.toByteArray(resolvedContentType.charset() ?: Charsets.UTF_8),
+        resolvedContentType,
+        status
+    ).apply(configure)
     respond(message)
 }
 
@@ -139,7 +144,12 @@ public suspend fun ApplicationCall.respondText(
     status: HttpStatusCode? = null,
     provider: suspend () -> String
 ) {
-    val message = TextContent(provider(), defaultTextContentType(contentType), status)
+    val resolvedContentType = defaultTextContentType(contentType)
+    val message = ByteArrayContent(
+        provider().toByteArray(resolvedContentType.charset() ?: Charsets.UTF_8),
+        resolvedContentType,
+        status
+    )
     respond(message)
 }
 

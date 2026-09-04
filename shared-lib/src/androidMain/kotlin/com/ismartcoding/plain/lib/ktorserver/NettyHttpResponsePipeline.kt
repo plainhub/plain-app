@@ -11,9 +11,11 @@ package com.ismartcoding.plain.lib.ktorserver
 import io.ktor.http.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
+import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
+import io.netty.channel.DefaultFileRegion
 import io.netty.handler.codec.http.FullHttpResponse
 import io.netty.handler.codec.http.HttpResponse
 import kotlinx.atomicfu.AtomicBoolean
@@ -23,6 +25,8 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.nio.channels.FileChannel
+import java.nio.file.StandardOpenOption
 import kotlin.coroutines.CoroutineContext
 
 private const val UNFLUSHED_LIMIT = 65536
@@ -217,6 +221,16 @@ internal class NettyHttpResponsePipeline(
             respondWithHeader(responseMessage)
         }
 
+        response.fileRegionContent?.let { fileRegion ->
+            call.isStreamingResponse = true
+            httpHandlerState.streamingResponses.incrementAndGet()
+
+            launch(context.executor().asCoroutineDispatcher(), start = CoroutineStart.UNDISPATCHED) {
+                respondWithFileRegion(call, fileRegion, requestMessageFuture)
+            }
+            return
+        }
+
         if (responseMessage is FullHttpResponse) {
             return handleLastResponseMessage(call, null, requestMessageFuture)
         }
@@ -238,6 +252,37 @@ internal class NettyHttpResponsePipeline(
                 bodySize,
                 requestMessageFuture
             )
+        }
+    }
+
+    /**
+     * Writes the response body as a Netty [DefaultFileRegion] so file bytes go
+     * straight from the file system to the socket (kernel sendfile on plain-text
+     * ports; the SslHandler encrypts region chunks on TLS ports).
+     */
+    private suspend fun respondWithFileRegion(
+        call: NettyApplicationCall,
+        content: FileRegionContent,
+        headerFuture: ChannelFuture
+    ) {
+        try {
+            var lastFuture: ChannelFuture = headerFuture
+
+            if (content.length > 0) {
+                FileChannel.open(content.file.toPath(), StandardOpenOption.READ).use { fileChannel ->
+                    val region = DefaultFileRegion(fileChannel, content.offset, content.length)
+                    // Flush here: the region's future only completes once the bytes
+                    // are handed to the socket, and nothing else would trigger a flush.
+                    val future = context.writeAndFlush(region)
+                    isDataNotFlushed.compareAndSet(expect = true, update = false)
+                    future.suspendAwait()
+                    lastFuture = future
+                }
+            }
+
+            handleLastResponseMessage(call, call.prepareEndOfStreamMessage(false), lastFuture)
+        } catch (actualException: Throwable) {
+            respondWithFailure(call, actualException)
         }
     }
 
