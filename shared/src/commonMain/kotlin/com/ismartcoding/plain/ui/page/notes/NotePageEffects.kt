@@ -8,7 +8,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalFocusManager
-import com.ismartcoding.plain.lib.extensions.cut
+import com.ismartcoding.plain.lib.extensions.getMarkdownTitle
 import com.ismartcoding.plain.platform.isGestureInteractionMode
 import com.ismartcoding.plain.platform.hideNavigationBar
 import com.ismartcoding.plain.platform.showNavigationBar
@@ -55,7 +55,7 @@ internal fun NotePageEffects(
                 if (noteVM.content.value == t) return@collectLatest
                 scope.launch(Dispatchers.Default) {
                     val newItem = NoteHelper.addOrUpdateAsync(id.value) {
-                        title = t.cut(250).replace("\n", ""); content = t; noteVM.content.value = t
+                        title = t.getMarkdownTitle(); content = t; noteVM.content.value = t
                     }
                     id.value = newItem.id
                     if (isNew && tagId.isNotEmpty()) {

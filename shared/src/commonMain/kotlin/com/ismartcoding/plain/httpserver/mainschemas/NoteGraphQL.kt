@@ -3,7 +3,7 @@ package com.ismartcoding.plain.httpserver.mainschemas
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.lib.extensions.cut
+import com.ismartcoding.plain.lib.extensions.getMarkdownTitle
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
@@ -44,7 +44,7 @@ suspend fun saveFeedEntriesToNotes(query: String): List<String> {
     entries.forEach { m ->
         val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
         NoteHelper.saveToNotesAsync(m.id) {
-            title = c.cut(250).replace("\n", "")
+            title = c.getMarkdownTitle()
             content = c
         }
         ids.add(m.id)

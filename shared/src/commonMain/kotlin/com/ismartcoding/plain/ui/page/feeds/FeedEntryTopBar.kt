@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.lib.extensions.cut
+import com.ismartcoding.plain.lib.extensions.getMarkdownTitle
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.platform.shareText
@@ -58,7 +58,7 @@ internal fun FeedEntryTopBar(
                         dismiss(); val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
                         scope.launch(IODispatcher) {
                             val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
-                            NoteHelper.saveToNotesAsync(m.id) { title = c.cut(250).replace("\n", ""); content = c }
+                            NoteHelper.saveToNotesAsync(m.id) { title = c.getMarkdownTitle(); content = c }
                             DialogHelper.showMessage(Res.string.saved)
                         }
                     })

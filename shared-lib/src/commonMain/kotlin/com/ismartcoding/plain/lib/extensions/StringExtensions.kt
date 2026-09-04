@@ -15,6 +15,17 @@ fun String.getFilenameWithoutExtension() = substringBeforeLast(".")
 
 fun String.getFilenameExtension() = substring(lastIndexOf(".") + 1).lowercase()
 
+fun String.getMarkdownTitle(): String {
+    val imageRegex = Regex("!\\[.*?\\]\\(.*?\\)|!\\[.*?\\]\\[.*?\\]|<img.*?>", RegexOption.IGNORE_CASE)
+    for (line in lineSequence()) {
+        val t = line.trim()
+        if (t.startsWith("# ")) {
+            return t.substring(2).trim().replace(imageRegex, "🖼")
+        }
+    }
+    return replace(imageRegex, "🖼").replace("\n", "").replaceFirst("^\\s*".toRegex(), "").trim().take(50)
+}
+
 fun String.cut(length: Int): String {
     if (length > this.length) {
         return this
