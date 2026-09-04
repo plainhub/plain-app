@@ -1,0 +1,257 @@
+/*
+ * Copyright 2014-2024 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
+ */
+
+/**
+ * Vendored from io.ktor:ktor-server-cors:3.5.2.
+ */
+
+
+package com.ismartcoding.plain.lib.ktorserver
+
+import io.ktor.http.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.*
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.*
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.response.*
+import io.ktor.util.*
+import io.ktor.util.logging.*
+
+internal val CORS_LOGGER = KtorSimpleLogger("io.ktor.server.plugins.cors.CORS")
+
+internal fun PluginBuilder<CORSConfig>.buildPlugin() {
+    val allowSameOrigin: Boolean = pluginConfig.allowSameOrigin
+    val allowsAnyHost: Boolean = "*" in pluginConfig.hosts
+    val allowCredentials: Boolean = pluginConfig.allowCredentials
+    val allHeaders: Set<String> =
+        (pluginConfig.headers + CORSConfig.CorsSimpleRequestHeaders).let { headers ->
+            if (pluginConfig.allowNonSimpleContentTypes) headers else headers.minus(HttpHeaders.ContentType)
+        }
+    val originPredicates: List<(String) -> Boolean> = pluginConfig.originPredicates
+    val headerPredicates: List<(String) -> Boolean> = pluginConfig.headerPredicates
+    val methods: Set<HttpMethod> = HashSet(pluginConfig.methods + CORSConfig.CorsDefaultMethods)
+    val allHeadersSet: Set<String> = allHeaders.map { it.toLowerCasePreservingASCIIRules() }.toSet()
+    val allowNonSimpleContentTypes: Boolean = pluginConfig.allowNonSimpleContentTypes
+    val headersList = pluginConfig.headers.filterNot { it in CORSConfig.CorsSimpleRequestHeaders }
+        .let { if (allowNonSimpleContentTypes) it + HttpHeaders.ContentType else it }
+    val methodsListHeaderValue = methods.map { it.value }.sorted().joinToString(", ")
+    val maxAgeHeaderValue = pluginConfig.maxAgeInSeconds.let { if (it > 0) it.toString() else null }
+    val exposedHeaders = when {
+        pluginConfig.exposedHeaders.isNotEmpty() -> pluginConfig.exposedHeaders.sorted().joinToString(", ")
+        else -> null
+    }
+    val hostsNormalized = HashSet(
+        pluginConfig.hosts
+            .filterNot { it.contains('*') }
+            .map { normalizeOrigin(it) }
+    )
+    val hostsWithWildcard = HashSet(
+        pluginConfig.hosts
+            .filter { it.contains('*') }
+            .map {
+                val normalizedOrigin = normalizeOrigin(it)
+                val (prefix, suffix) = normalizedOrigin.split('*')
+                prefix to suffix
+            }
+    )
+
+    /*
+     * A plugin's [call] interceptor that does all the job. Usually there is no need to install it as it is done during
+     * a plugin installation.
+     */
+    @Suppress("INVISIBLE_REFERENCE")
+    onCallValidators { call ->
+        if (call.response.isCommitted) {
+            return@onCallValidators
+        }
+
+        CORS_LOGGER.trace { "${call.request.id()}: Start handler" }
+
+        if (!allowsAnyHost || allowCredentials) {
+            call.corsVary()
+        }
+
+        val origin = call.request.headers.getAll(HttpHeaders.Origin)?.singleOrNull()
+
+        if (origin == null) {
+            CORS_LOGGER.trace { "${call.request.id()}: Skip CORS handler because request lacks the Origin header" }
+            return@onCallValidators
+        }
+
+        val checkOrigin = checkOrigin(
+            origin,
+            call.request,
+            allowSameOrigin,
+            allowsAnyHost,
+            hostsNormalized,
+            hostsWithWildcard,
+            pluginConfig.hosts,
+            originPredicates
+        )
+        when (checkOrigin) {
+            OriginCheckResult.OK -> {
+            }
+
+            OriginCheckResult.SkipCORS -> return@onCallValidators
+
+            OriginCheckResult.Failed -> {
+                CORS_LOGGER.trace { "${call.request.id()}: CORS check fails because Origin $origin does not match" }
+                call.respondCorsFailed()
+                return@onCallValidators
+            }
+        }
+
+        if (!allowNonSimpleContentTypes) {
+            val contentType = call.request.header(HttpHeaders.ContentType)?.let { ContentType.parse(it) }
+            if (contentType != null) {
+                if (contentType.withoutParameters() !in CORSConfig.CorsSimpleContentTypes) {
+                    CORS_LOGGER.trace {
+                        "${call.request.id()}: CORS check fails because the requested content type $contentType " +
+                            "is not in the list of the only allowed simple types ${CORSConfig.CorsSimpleContentTypes}"
+                    }
+                    call.respondCorsFailed()
+                    return@onCallValidators
+                }
+            }
+        }
+
+        if (call.request.httpMethod == HttpMethod.Options) {
+            CORS_LOGGER.trace { "${call.request.id()}: Start preflight handler" }
+            call.respondPreflight(
+                origin,
+                methodsListHeaderValue,
+                headersList,
+                methods,
+                allowsAnyHost,
+                allowCredentials,
+                maxAgeHeaderValue,
+                headerPredicates,
+                allHeadersSet
+            )
+            return@onCallValidators
+        }
+
+        if (!call.corsCheckCurrentMethod(methods)) {
+            CORS_LOGGER.trace {
+                "${call.request.id()}: CORS check fails because HTTP method ${call.request.httpMethod.value} " +
+                    "is not allowed. Allowed methods: $methods"
+            }
+            call.respondCorsFailed()
+            return@onCallValidators
+        }
+
+        CORS_LOGGER.trace { "${call.request.id()}: CORS check is succeeded" }
+
+        call.accessControlAllowOrigin(origin, allowsAnyHost, allowCredentials)
+        call.accessControlAllowCredentials(allowCredentials)
+
+        if (exposedHeaders != null) {
+            call.response.header(HttpHeaders.AccessControlExposeHeaders, exposedHeaders)
+        }
+    }
+}
+
+internal fun ApplicationRequest.id(): String {
+    return "${httpMethod.value} $uri"
+}
+
+private enum class OriginCheckResult {
+    OK,
+    SkipCORS,
+    Failed,
+}
+
+private fun checkOrigin(
+    origin: String,
+    request: ApplicationRequest,
+    allowSameOrigin: Boolean,
+    allowsAnyHost: Boolean,
+    hostsNormalized: Set<String>,
+    hostsWithWildcard: Set<Pair<String, String>>,
+    allowedHosts: Set<String>,
+    originPredicates: List<(String) -> Boolean>
+): OriginCheckResult = when {
+    !isValidOrigin(origin) -> {
+        CORS_LOGGER.trace { "${request.id()}: Skip CORS handler because Origin $origin is malformed" }
+        OriginCheckResult.SkipCORS
+    }
+
+    allowSameOrigin && isSameOrigin(origin, request.origin) -> {
+        if (request.isCorsPreflightRequest()) {
+            CORS_LOGGER.trace { "${request.id()}: Handle same-origin CORS preflight" }
+            return OriginCheckResult.OK
+        }
+        CORS_LOGGER.trace { "${request.id()}: Skip CORS handler because Origin $origin matches the server origin exactly" }
+        OriginCheckResult.SkipCORS
+    }
+
+    !corsCheckOrigins(
+        request,
+        origin,
+        allowsAnyHost,
+        hostsNormalized,
+        hostsWithWildcard,
+        allowedHosts,
+        originPredicates
+    ) -> OriginCheckResult.Failed
+
+    else -> OriginCheckResult.OK
+}
+
+private suspend fun ApplicationCall.respondPreflight(
+    origin: String,
+    methodsListHeaderValue: String,
+    headersList: List<String>,
+    methods: Set<HttpMethod>,
+    allowsAnyHost: Boolean,
+    allowCredentials: Boolean,
+    maxAgeHeaderValue: String?,
+    headerPredicates: List<(String) -> Boolean>,
+    allHeadersSet: Set<String>
+) {
+    val requestHeaders = request.headers
+        .getAll(HttpHeaders.AccessControlRequestHeaders)
+        ?.flatMap { it.split(",") }
+        ?.filter { it.isNotBlank() }
+        ?.map {
+            it.trim().toLowerCasePreservingASCIIRules()
+        } ?: emptyList()
+
+    if (!corsCheckRequestMethod(methods)) {
+        CORS_LOGGER.trace { "${request.id()}: Preflight: Request method check fails" }
+        respond(HttpStatusCode.Forbidden)
+        return
+    }
+
+    if (!corsCheckRequestHeaders(requestHeaders, allHeadersSet, headerPredicates)) {
+        CORS_LOGGER.trace {
+            val disallowedHeaders = requestHeaders.filterNot { header ->
+                header in allHeadersSet || headerMatchesAPredicate(header, headerPredicates)
+            }
+
+            "${request.id()}: Preflight: Headers $disallowedHeaders are not allowed. " +
+                "Allowed headers: $allHeadersSet. " +
+                if (headerPredicates.isNotEmpty()) "Allowed Header predicates: $headerPredicates" else ""
+        }
+
+        CORS_LOGGER.trace { "${request.id()}: Preflight: Check on headers from Access-Control-Request-Headers fails" }
+        respond(HttpStatusCode.Forbidden)
+        return
+    }
+
+    accessControlAllowOrigin(origin, allowsAnyHost, allowCredentials)
+    accessControlAllowCredentials(allowCredentials)
+    if (methodsListHeaderValue.isNotEmpty()) {
+        response.header(HttpHeaders.AccessControlAllowMethods, methodsListHeaderValue)
+    }
+
+    val requestHeadersMatchingPrefix = requestHeaders
+        .filter { header -> headerMatchesAPredicate(header, headerPredicates) }
+
+    val headersListHeaderValue = (headersList + requestHeadersMatchingPrefix).sorted().joinToString(", ")
+
+    response.header(HttpHeaders.AccessControlAllowHeaders, headersListHeaderValue)
+    accessControlMaxAge(maxAgeHeaderValue)
+
+    respond(HttpStatusCode.OK)
+}

@@ -8,8 +8,6 @@
 
 package com.ismartcoding.plain.lib.ktorserver.core.engine
 
-import com.ismartcoding.plain.lib.ktorserver.PlainNettyServer
-
 /**
  * Represents a type of a connector, e.g HTTP or HTTPS.
  *
@@ -68,7 +66,7 @@ public interface EngineConnectorConfig {
  * Adds a non-secure connector to this engine environment
  *
  */
-public inline fun PlainNettyServer.Configuration.connector(builder: EngineConnectorBuilder.() -> Unit) {
+public inline fun ApplicationEngine.Configuration.connector(builder: EngineConnectorBuilder.() -> Unit) {
     connectors.add(EngineConnectorBuilder().apply(builder))
 }
 

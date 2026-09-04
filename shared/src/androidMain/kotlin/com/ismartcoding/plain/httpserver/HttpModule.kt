@@ -1,0 +1,159 @@
+package com.ismartcoding.plain.httpserver
+
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
+import com.ismartcoding.plain.httpserver.CorsPolicy
+import com.ismartcoding.plain.httpserver.HttpRouteRegistry
+import com.ismartcoding.plain.httpserver.http.HttpMethod
+import com.ismartcoding.plain.httpserver.http.HttpRouter
+import com.ismartcoding.plain.httpserver.isPeerAccessiblePath
+import com.ismartcoding.plain.httpserver.isDlnaPath
+import com.ismartcoding.plain.httpserver.isSharePath
+import io.ktor.http.CacheControl
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.kotlinx.json.json
+import com.ismartcoding.plain.lib.ktorserver.core.application.Application
+import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationCallPipeline
+import com.ismartcoding.plain.lib.ktorserver.core.application.call
+import com.ismartcoding.plain.lib.ktorserver.core.application.install
+import com.ismartcoding.plain.lib.ktorserver.core.http.content.staticResources
+import com.ismartcoding.plain.lib.ktorserver.AutoHeadResponse
+import com.ismartcoding.plain.lib.ktorserver.ConditionalHeaders
+import com.ismartcoding.plain.lib.ktorserver.ContentNegotiation
+import com.ismartcoding.plain.lib.ktorserver.PartialContent
+import com.ismartcoding.plain.lib.ktorserver.CORS
+import com.ismartcoding.plain.lib.ktorserver.ForwardedHeaders
+import com.ismartcoding.plain.lib.ktorserver.core.request.path
+import com.ismartcoding.plain.lib.ktorserver.core.response.respond
+import com.ismartcoding.plain.lib.ktorserver.core.response.respondText
+import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
+import com.ismartcoding.plain.lib.ktorserver.WebSockets
+import kotlinx.serialization.json.Json
+
+object HttpModule {
+
+    /**
+     * Shared GraphQL services and the commonMain router live in
+     * [HttpRouteRegistry] so the BLE RPC channel can dispatch to the same
+     * route handlers without re-building the schema or duplicating the route
+     * table.
+     */
+    private val mainGraphQL get() = HttpRouteRegistry.mainGraphQL
+    private val commonRouter: HttpRouter get() = HttpRouteRegistry.router
+
+    /**
+     * index.html is baked into the APK and never changes at runtime; read it
+     * once instead of re-reading the resource on every SPA fallback hit.
+     */
+    @Volatile
+    private var cachedIndexHtml: String? = null
+
+    val module: Application.() -> Unit = {
+        install(CORS) {
+            if (TempData.allowAnyHost.value) {
+                anyHost()
+            }
+            CorsPolicy.allowedHeaderPrefixes.forEach { allowHeadersPrefixed(it) }
+        }
+
+        install(ConditionalHeaders)
+        install(WebSockets)
+        install(ForwardedHeaders)
+        install(PartialContent)
+        install(AutoHeadResponse)
+        install(ContentNegotiation) {
+            json(
+                Json {
+                    // Indentation roughly doubles response size; the web UI
+                    // never pretty-prints requests
+                    prettyPrint = false
+                    isLenient = true
+                },
+            )
+        }
+
+        intercept(ApplicationCallPipeline.Plugins) {
+            val method = HttpMethod(call.request.local.method.value.uppercase())
+            val path = call.request.path()
+            // Peer-accessible routes (PeerGraphQL, /fs, /health, WS /status)
+            // and DLNA routes (sender /media/{id}, NOTIFY /callback/cast;
+            // receiver /description.xml, /AVTransport/*, /RenderingControl/*)
+            // remain available when desktopAccessEnabled=false but
+            // serviceEnabled=true. Main-UI routes are rejected here; the
+            // authoritative check still lives in each route handler so BLE
+            // RPC (which bypasses this intercept) is also covered.
+            if (!TempData.desktopAccessEnabled.value && !isPeerAccessiblePath(method, path) && !isDlnaPath(method, path) && !isSharePath(method, path)) {
+                call.respond(HttpStatusCode.NotFound)
+                return@intercept finish()
+            }
+            call.response.headers.append("X-Server-Time", System.currentTimeMillis().toString())
+        }
+
+        // Catch GraphQL errors thrown during request execution and deliver
+        // them to the client through the same encryption/bearer channel used
+        // by the /graphql and /peer_graphql handlers. Non-GraphQL exceptions
+        // are re-thrown so Ktor returns a 500.
+        intercept(ApplicationCallPipeline.Monitoring) {
+            try {
+                proceed()
+            } catch (e: Throwable) {
+                if (e is GraphQLError) {
+                    val httpCall = KtorHttpCall(call, emptyMap())
+                    val sent = mainGraphQL.handleError(e, httpCall)
+                    if (!sent) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                    }
+                } else {
+                    throw e
+                }
+            }
+        }
+
+        routing {
+            // SPA: serve all resources from classpath "web/", inject __SERVER_TIME__ into index.html
+            // for every non-file path (no extension) so the Vue SPA can boot with a clock-sync value.
+            staticResources("/", "web", index = null) {
+                cacheControl { url ->
+                    if (url.path.contains("/assets/")) {
+                        // Hashed build outputs are immutable
+                        arrayListOf(
+                            CacheControl.MaxAge(
+                                maxAgeSeconds = 3600 * 24 * 365,
+                                visibility = CacheControl.Visibility.Public,
+                            ),
+                        )
+                    } else {
+                        arrayListOf(
+                            CacheControl.NoCache(CacheControl.Visibility.Public),
+                            CacheControl.NoStore(CacheControl.Visibility.Public),
+                        )
+                    }
+                }
+                fallback { requestedPath, call ->
+                    if (requestedPath.contains('.')) {
+                        // Real static asset that doesn't exist → 404
+                        call.respond(HttpStatusCode.NotFound)
+                    } else {
+                        // SPA route (no extension) → serve index.html with injected server time
+                        val html = cachedIndexHtml ?: call.application.environment.classLoader
+                            .getResourceAsStream("web/index.html")
+                            ?.bufferedReader()?.readText()
+                            ?.also { cachedIndexHtml = it } ?: ""
+                        val injected = html.replace(
+                            "<head>",
+                            "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>"
+                        )
+                        call.respondText(injected, ContentType.Text.Html)
+                    }
+                }
+            }
+
+            // All business-logic routes (HTTP + WebSocket) live in commonMain
+            // and are dispatched through KtorHttpCall/KtorWsSession so shared
+            // code never touches Ktor APIs directly.
+            registerCommonRoutes(commonRouter)
+        }
+    }
+
+}

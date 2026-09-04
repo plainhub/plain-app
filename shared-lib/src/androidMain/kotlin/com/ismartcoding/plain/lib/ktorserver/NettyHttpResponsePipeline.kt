@@ -11,14 +11,11 @@ package com.ismartcoding.plain.lib.ktorserver
 import io.ktor.http.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
-import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelPromise
-import io.netty.channel.DefaultFileRegion
 import io.netty.handler.codec.http.FullHttpResponse
 import io.netty.handler.codec.http.HttpResponse
-import io.netty.handler.ssl.SslHandler
 import kotlinx.atomicfu.AtomicBoolean
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
@@ -26,17 +23,9 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.nio.channels.FileChannel
-import java.nio.file.StandardOpenOption
 import kotlin.coroutines.CoroutineContext
 
 private const val UNFLUSHED_LIMIT = 65536
-
-/**
- * Heap chunk size when a file body must pass through [SslHandler], which only
- * accepts ByteBuf (a FileRegion fails its write with UnsupportedMessageType).
- */
-private const val SSL_FILE_CHUNK_BYTES = 256 * 1024
 
 /**
  * Contains methods for handling HTTP responses with Netty.
@@ -228,16 +217,6 @@ internal class NettyHttpResponsePipeline(
             respondWithHeader(responseMessage)
         }
 
-        response.fileRegionContent?.let { fileRegion ->
-            call.isStreamingResponse = true
-            httpHandlerState.streamingResponses.incrementAndGet()
-
-            launch(context.executor().asCoroutineDispatcher(), start = CoroutineStart.UNDISPATCHED) {
-                respondWithFileRegion(call, fileRegion, requestMessageFuture)
-            }
-            return
-        }
-
         if (responseMessage is FullHttpResponse) {
             return handleLastResponseMessage(call, null, requestMessageFuture)
         }
@@ -259,54 +238,6 @@ internal class NettyHttpResponsePipeline(
                 bodySize,
                 requestMessageFuture
             )
-        }
-    }
-
-    /**
-     * Writes the response body as a Netty [DefaultFileRegion] so file bytes go
-     * straight from the file system to the socket (kernel sendfile on plain-text
-     * ports). On TLS ports [SslHandler] cannot encrypt a FileRegion, so the body
-     * is streamed in bounded heap chunks instead.
-     */
-    private suspend fun respondWithFileRegion(
-        call: NettyApplicationCall,
-        content: FileRegionContent,
-        headerFuture: ChannelFuture
-    ) {
-        try {
-            var lastFuture: ChannelFuture = headerFuture
-
-            if (content.length > 0) {
-                FileChannel.open(content.file.toPath(), StandardOpenOption.READ).use { fileChannel ->
-                    lastFuture = if (context.pipeline().get(SslHandler::class.java) == null) {
-                        val region = DefaultFileRegion(fileChannel, content.offset, content.length)
-                        // Flush here: the region's future only completes once the bytes
-                        // are handed to the socket, and nothing else would trigger a flush.
-                        val future = context.writeAndFlush(region)
-                        isDataNotFlushed.compareAndSet(expect = true, update = false)
-                        future.suspendAwait()
-                        future
-                    } else {
-                        fileChannel.position(content.offset)
-                        var remaining = content.length
-                        var future: ChannelFuture = headerFuture
-                        while (remaining > 0) {
-                            val chunkSize = minOf(SSL_FILE_CHUNK_BYTES.toLong(), remaining).toInt()
-                            val buffer = context.alloc().buffer(chunkSize)
-                            buffer.writeBytes(fileChannel, chunkSize)
-                            future = context.writeAndFlush(buffer)
-                            isDataNotFlushed.compareAndSet(expect = true, update = false)
-                            future.suspendAwait()
-                            remaining -= chunkSize
-                        }
-                        future
-                    }
-                }
-            }
-
-            handleLastResponseMessage(call, call.prepareEndOfStreamMessage(false), lastFuture)
-        } catch (actualException: Throwable) {
-            respondWithFailure(call, actualException)
         }
     }
 

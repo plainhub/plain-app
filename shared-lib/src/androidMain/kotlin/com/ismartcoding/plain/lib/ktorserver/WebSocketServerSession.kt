@@ -42,7 +42,7 @@ public val WebSocketServerSession.application: Application get() = call.applicat
 internal fun WebSocketSession.toServerSession(call: ApplicationCall): WebSocketServerSession =
     DelegatedWebSocketServerSession(call, this)
 
-public fun DefaultWebSocketSession.toServerSession(call: ApplicationCall): DefaultWebSocketServerSession =
+internal fun DefaultWebSocketSession.toServerSession(call: ApplicationCall): DefaultWebSocketServerSession =
     DelegatedDefaultWebSocketServerSession(call, this)
 
 private class DelegatedWebSocketServerSession(

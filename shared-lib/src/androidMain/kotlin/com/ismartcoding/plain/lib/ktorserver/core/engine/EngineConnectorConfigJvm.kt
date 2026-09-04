@@ -8,8 +8,6 @@
 
 package com.ismartcoding.plain.lib.ktorserver.core.engine
 
-import com.ismartcoding.plain.lib.ktorserver.PlainNettyServer
-
 import java.io.*
 import java.security.*
 
@@ -17,7 +15,7 @@ import java.security.*
  * Adds a secure connector to this engine environment
  *
  */
-public inline fun PlainNettyServer.Configuration.sslConnector(
+public inline fun ApplicationEngine.Configuration.sslConnector(
     keyStore: KeyStore,
     keyAlias: String,
     noinline keyStorePassword: () -> CharArray,

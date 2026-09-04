@@ -36,7 +36,7 @@ import kotlin.coroutines.CoroutineContext
  */
 public class NettyChannelInitializer(
     private val applicationProvider: () -> Application,
-    private val requestHandler: suspend (PipelineCall) -> Unit,
+    private val enginePipeline: EnginePipeline,
     private val environment: ApplicationEnvironment,
     private val callEventGroup: EventExecutorGroup,
     private val engineContext: CoroutineContext,
@@ -88,7 +88,7 @@ public class NettyChannelInitializer(
     private fun configurePipeline(pipeline: ChannelPipeline) {
         val handler = NettyHttp1Handler(
             applicationProvider,
-            requestHandler,
+            enginePipeline,
             environment,
             callEventGroup,
             engineContext,

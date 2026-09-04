@@ -8,9 +8,13 @@ import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
-import com.ismartcoding.plain.lib.ktorserver.PlainNettyServer
+import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
+import com.ismartcoding.plain.lib.ktorserver.core.engine.applicationEnvironment
 import com.ismartcoding.plain.lib.ktorserver.core.engine.connector
+import com.ismartcoding.plain.lib.ktorserver.core.engine.embeddedServer
 import com.ismartcoding.plain.lib.ktorserver.core.engine.sslConnector
+import com.ismartcoding.plain.lib.ktorserver.Netty
+import com.ismartcoding.plain.lib.ktorserver.NettyApplicationEngine
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -25,30 +29,24 @@ import java.security.spec.PKCS8EncodedKeySpec
 import java.util.Base64
 
 /**
- * The live Netty server instance, or null when the server is stopped.
+ * The live Ktor/Netty embedded server instance, or null when the server is stopped.
  * Platform lifecycle code below owns this reference; business state lives in
  * [HttpServerManager] (commonMain).
  */
 @Volatile
-var httpServer: PlainNettyServer? = null
+var httpServer: EmbeddedServer<*, *>? = null
 
 private val SSL_KEY_ALIAS = Constants.SSL_NAME
 
 /**
- * Start a throwaway Netty server to preload classes/JIT on app launch so the
+ * Start a throwaway Netty engine to preload classes/JIT on app launch so the
  * first real server start is fast.
  */
 fun warmUpNetty() {
     coIO {
         try {
-            val s = PlainNettyServer(
-                requestHandler = {},
-            ) {
-                connector {
-                    port = 0
-                    host = "127.0.0.1"
-                }
-            }.start(wait = false)
+            val s = embeddedServer(Netty, port = 0) {}
+            s.start(wait = false)
             s.stop(0, 0)
             LogCat.d("Netty warm-up complete")
         } catch (_: Exception) {
@@ -200,17 +198,17 @@ private fun getSslKeyStore(context: Context, password: String): KeyStore {
  * Create and configure the Ktor/Netty embedded server with HTTP+HTTPS connectors.
  * Does not start the server; caller is responsible for calling `start(wait = false)`.
  */
-suspend fun createHttpServerAsync(context: Context): PlainNettyServer {
+suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
     val password = KeyStorePasswordPreference.getAsync()
     return withIO {
         val passwordArray = password.toCharArray()
         val httpPort = TempData.httpPort.value
         val httpsPort = TempData.httpsPort.value
-
-        PlainNettyServer(
-            requestHandler = PlainHttpServer.requestHandler,
-        ) {
+        val environment = applicationEnvironment {
             log = LoggerFactory.getLogger("ktor.application")
+        }
+
+        embeddedServer(Netty, environment, configure = {
             // Ktor's default is 32 requests per HTTP pipeline. Allowing 1,000
             // lets a single browser connection overwhelm a memory-constrained
             // Android compatibility container during repeated API calls.
@@ -231,7 +229,7 @@ suspend fun createHttpServerAsync(context: Context): PlainNettyServer {
             ) {
                 port = httpsPort
             }
-        }
+        }, HttpModule.module)
     }
 }
 

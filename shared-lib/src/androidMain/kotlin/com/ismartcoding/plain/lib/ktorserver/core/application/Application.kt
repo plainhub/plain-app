@@ -120,12 +120,12 @@ public class Application internal constructor(
     public var rootPath: String,
     public val monitor: Events,
     public val parentCoroutineContext: CoroutineContext,
-    private val engineProvider: () -> Any
+    private val engineProvider: () -> ApplicationEngine
 ) : ApplicationCallPipeline(developmentMode, environment), CoroutineScope {
 
     private val applicationJob = SupervisorJob(parentCoroutineContext[Job])
 
-    public val engine: Any get() = engineProvider()
+    public val engine: ApplicationEngine get() = engineProvider()
 
     override val coroutineContext: CoroutineContext = parentCoroutineContext + applicationJob
 
@@ -141,6 +141,7 @@ public class Application internal constructor(
     @Suppress("DEPRECATION_ERROR")
     public fun dispose() {
         applicationJob.cancel()
+        uninstallAllPlugins()
     }
 
     /**
@@ -151,6 +152,7 @@ public class Application internal constructor(
     @Suppress("DEPRECATION_ERROR")
     public suspend fun disposeAndJoin() {
         applicationJob.cancelAndJoin()
+        uninstallAllPlugins()
     }
 }
 

@@ -12,9 +12,7 @@ import io.ktor.http.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.*
 import com.ismartcoding.plain.lib.ktorserver.core.engine.*
-import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import io.ktor.utils.io.*
-import io.ktor.util.AttributeKey
 import io.netty.channel.*
 import io.netty.handler.codec.http.*
 import java.util.concurrent.CancellationException
@@ -39,30 +37,12 @@ public abstract class NettyApplicationResponse(
 
     internal var responseChannel: ByteReadChannel = ByteReadChannel.Empty
 
-    /**
-     * Set when the response body is served as a Netty [io.netty.channel.FileRegion]
-     * instead of streaming through [responseChannel]. Consumed by the response pipeline.
-     */
-    internal var fileRegionContent: FileRegionContent? = null
-
     private val canRespond: Boolean
         get() = !responseMessageSent && context.channel().isActive
 
     override suspend fun respondOutgoingContent(content: OutgoingContent) {
-        // HEAD responses carry headers only (Content-Length preserved); the
-        // body is never produced. This replaces the removed AutoHeadResponse
-        // plugin — the request method is rewritten to GET for routing, so the
-        // raw wire method is checked here.
-        val effective = if (isHeadRequest() &&
-            content !is OutgoingContent.ProtocolUpgrade &&
-            content !is OutgoingContent.NoContent
-        ) {
-            HeadResponseBody(content)
-        } else {
-            content
-        }
         try {
-            super.respondOutgoingContent(effective)
+            super.respondOutgoingContent(content)
         } catch (t: Throwable) {
             val out = responseChannel as? ByteWriteChannel
             out?.close(t)
@@ -71,22 +51,6 @@ public abstract class NettyApplicationResponse(
             val out = responseChannel as? ByteWriteChannel
             out?.flushAndClose()
         }
-    }
-
-    private fun isHeadRequest(): Boolean =
-        (call as? NettyHttp1ApplicationCall)?.httpRequest?.method() == io.netty.handler.codec.http.HttpMethod.HEAD
-
-    /**
-     * Headers-only view of [original]: commitHeaders still emits
-     * Content-Length, Content-Range, etc., but no body branch is taken.
-     */
-    private class HeadResponseBody(val original: OutgoingContent) : OutgoingContent.NoContent() {
-        override val status: HttpStatusCode? get() = original.status
-        override val contentType: ContentType? get() = original.contentType
-        override val contentLength: Long? get() = original.contentLength
-        override val headers get() = original.headers
-        override fun <T : Any> getProperty(key: AttributeKey<T>) = original.getProperty(key)
-        override fun <T : Any> setProperty(key: AttributeKey<T>, value: T?) = original.setProperty(key, value)
     }
 
     override suspend fun respondFromBytes(bytes: ByteArray) {
@@ -105,43 +69,6 @@ public abstract class NettyApplicationResponse(
             else -> ByteReadChannel(bytes)
         }
         responseMessage = message
-        responseReady.setSuccess()
-        responseMessageSent = true
-
-        awaitProcessingResponseIfInfoOrNoContent()
-    }
-
-    /**
-     * Sends the response header only and hands the body to the response
-     * pipeline as a file region (kernel sendfile on plain-text ports).
-     *
-     * Two cases must NOT take the region path because it executes file I/O on
-     * the Netty event loop, where a blocked read stalls every connection on
-     * that loop (Android storage goes through FUSE and can sleep for tens of
-     * milliseconds per read):
-     * - TLS ports: the body would need chunked heap encryption anyway.
-     * - Large bodies: the sendfile/transferTo syscall sleeps on cold reads.
-     * Those stream through the response channel instead, which performs file
-     * reads on IO threads (Dispatchers.IOBridge) exactly like ordinary
-     * WriteChannelContent.
-     */
-    override suspend fun respondFileRegion(content: FileRegionContent) {
-        if (!canRespond) {
-            cancelIfChannelNotActive()
-            return
-        }
-
-        val tls = context.pipeline().get(io.netty.handler.ssl.SslHandler::class.java) != null
-        if (tls || content.length > FILE_REGION_MAX_ON_LOOP_BYTES) {
-            // Headers are already committed (Content-Length included); stream
-            // the bytes through the response channel on IO threads.
-            respondWriteChannelContent(content)
-            return
-        }
-
-        fileRegionContent = content
-        responseChannel = ByteReadChannel.Empty
-        responseMessage = responseMessage(chunked = false, last = false)
         responseReady.setSuccess()
         responseMessageSent = true
 
@@ -245,13 +172,6 @@ public abstract class NettyApplicationResponse(
 
     public companion object {
         private val EmptyByteArray = ByteArray(0)
-
-        /**
-         * Largest body served through a file region on the event loop. Beyond
-         * this, a cold FUSE read inside the transferTo syscall would stall the
-         * event loop long enough to delay every connection on it.
-         */
-        internal const val FILE_REGION_MAX_ON_LOOP_BYTES: Long = 4L * 1024 * 1024
 
         public val responseStatusCache: Array<HttpResponseStatus?> = HttpStatusCode.allStatusCodes
             .associateBy { it.value }.let { codes ->
