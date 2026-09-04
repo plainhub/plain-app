@@ -15,6 +15,7 @@ import com.ismartcoding.plain.lib.ktorserver.core.routing.get
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import io.ktor.util.pipeline.intercept
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.InputStream
