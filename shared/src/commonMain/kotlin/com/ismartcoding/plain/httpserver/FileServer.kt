@@ -218,6 +218,14 @@ object FileServer {
             )
             if (thumbBytes != null) {
                 call.responseHeader("Cache-Control", "private, max-age=86400")
+                // The encrypted /fs id is regenerated per GraphQL response, so
+                // max-age only covers same-URL remounts; the ETag lets the
+                // ConditionalHeaders plugin answer revalidations with 304
+                // once the browser has stored a response under any id.
+                call.responseHeader(
+                    "ETag",
+                    "\"thumb-${stat.size}-${stat.updatedAt.toEpochMilliseconds()}-$widthParam-$heightParam-${path.hashCode()}\"",
+                )
                 call.respond(thumbBytes)
             }
             return
