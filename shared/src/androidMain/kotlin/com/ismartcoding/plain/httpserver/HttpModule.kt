@@ -12,24 +12,19 @@ import com.ismartcoding.plain.httpserver.isSharePath
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.kotlinx.json.json
 import com.ismartcoding.plain.lib.ktorserver.core.application.Application
 import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationCallPipeline
 import com.ismartcoding.plain.lib.ktorserver.core.application.call
 import com.ismartcoding.plain.lib.ktorserver.core.application.install
 import com.ismartcoding.plain.lib.ktorserver.core.http.content.staticResources
-import com.ismartcoding.plain.lib.ktorserver.AutoHeadResponse
-import com.ismartcoding.plain.lib.ktorserver.ConditionalHeaders
-import com.ismartcoding.plain.lib.ktorserver.ContentNegotiation
-import com.ismartcoding.plain.lib.ktorserver.PartialContent
 import com.ismartcoding.plain.lib.ktorserver.CORS
-import com.ismartcoding.plain.lib.ktorserver.ForwardedHeaders
+import com.ismartcoding.plain.lib.ktorserver.WebSockets
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.mutableOriginConnectionPoint
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.origin
 import com.ismartcoding.plain.lib.ktorserver.core.request.path
 import com.ismartcoding.plain.lib.ktorserver.core.response.respond
 import com.ismartcoding.plain.lib.ktorserver.core.response.respondText
 import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
-import com.ismartcoding.plain.lib.ktorserver.WebSockets
-import kotlinx.serialization.json.Json
 
 object HttpModule {
 
@@ -42,6 +37,13 @@ object HttpModule {
     private val mainGraphQL get() = HttpRouteRegistry.mainGraphQL
     private val commonRouter: HttpRouter get() = HttpRouteRegistry.router
 
+    /**
+     * index.html is baked into the APK and never changes at runtime; read it
+     * once instead of re-reading the resource on every SPA fallback hit.
+     */
+    @Volatile
+    private var cachedIndexHtml: String? = null
+
     val module: Application.() -> Unit = {
         install(CORS) {
             if (TempData.allowAnyHost.value) {
@@ -50,22 +52,16 @@ object HttpModule {
             CorsPolicy.allowedHeaderPrefixes.forEach { allowHeadersPrefixed(it) }
         }
 
-        install(ConditionalHeaders)
         install(WebSockets)
-        install(ForwardedHeaders)
-        install(PartialContent)
-        install(AutoHeadResponse)
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    prettyPrint = false
-                    isLenient = true
-                },
-            )
-        }
 
         intercept(ApplicationCallPipeline.Plugins) {
-            val method = HttpMethod(call.request.local.method.value.uppercase())
+            // Serve HEAD requests through the matching GET route; the engine
+            // suppresses the body while keeping Content-Length (replaces the
+            // removed AutoHeadResponse plugin).
+            if (call.request.local.method == io.ktor.http.HttpMethod.Head) {
+                call.mutableOriginConnectionPoint.method = io.ktor.http.HttpMethod.Get
+            }
+            val method = HttpMethod(call.request.origin.method.value.uppercase())
             val path = call.request.path()
             // Peer-accessible routes (PeerGraphQL, /fs, /health, WS /status)
             // and DLNA routes (sender /media/{id}, NOTIFY /callback/cast;
@@ -127,9 +123,9 @@ object HttpModule {
                         call.respond(HttpStatusCode.NotFound)
                     } else {
                         // SPA route (no extension) → serve index.html with injected server time
-                        val classLoader = call.application.environment.classLoader
-                        val html = classLoader.getResourceAsStream("web/index.html")
-                            ?.bufferedReader()?.readText() ?: ""
+                        val html = cachedIndexHtml ?: call.application.environment.classLoader
+                            .getResourceAsStream("web/index.html")?.bufferedReader()?.readText()
+                            ?.also { cachedIndexHtml = it } ?: ""
                         val injected = html.replace(
                             "<head>",
                             "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>"

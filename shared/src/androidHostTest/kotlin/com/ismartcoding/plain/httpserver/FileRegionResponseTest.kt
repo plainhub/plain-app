@@ -2,9 +2,12 @@ package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.lib.ktorserver.Netty
 import com.ismartcoding.plain.lib.ktorserver.NettyApplicationEngine
+import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationCallPipeline
+import com.ismartcoding.plain.lib.ktorserver.core.application.call
 import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
 import com.ismartcoding.plain.lib.ktorserver.core.engine.embeddedServer
 import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.mutableOriginConnectionPoint
 import com.ismartcoding.plain.lib.ktorserver.core.response.respond
 import com.ismartcoding.plain.lib.ktorserver.core.response.respondText
 import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
@@ -14,7 +17,9 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.runBlocking
 import java.io.File
+import java.io.InputStream
 import java.net.HttpURLConnection
+import java.net.Socket
 import java.net.URI
 import java.net.URL
 import kotlin.test.AfterTest
@@ -43,6 +48,13 @@ class FileRegionResponseTest {
         writePattern(mediaFile, mediaFileSize)
 
         engine = embeddedServer(Netty, port = 0, host = "127.0.0.1") {
+            // Mirror production wiring: HEAD requests are rewritten to GET for
+            // routing; the engine suppresses the response body.
+            intercept(ApplicationCallPipeline.Plugins) {
+                if (call.request.local.method == io.ktor.http.HttpMethod.Head) {
+                    call.mutableOriginConnectionPoint.method = io.ktor.http.HttpMethod.Get
+                }
+            }
             routing {
                 get("/file") {
                     call.respond(
@@ -186,6 +198,63 @@ class FileRegionResponseTest {
         assertEquals(206, response.statusCode())
         assertEquals("bytes 0-${mediaFileSize - 1}/$mediaFileSize", response.headers().firstValue("Content-Range").orElse(null))
         assertEquals(mediaFileSize.toInt(), response.body().size)
+    }
+
+    @Test
+    fun headRequest_returnsHeadersOnly() {
+        val connection = get("/file").apply { requestMethod = "HEAD" }
+        assertEquals(200, connection.responseCode)
+        assertEquals(fileSize.toString(), connection.getHeaderField("Content-Length"))
+        val body = connection.inputStream.use { it.readBytes() }
+        assertEquals(0, body.size)
+    }
+
+    @Test
+    fun headRequest_keepAliveConnectionStaysUsable() {
+        Socket("127.0.0.1", port).use { socket ->
+            val output = socket.getOutputStream()
+            val input = socket.getInputStream()
+
+            output.write("HEAD /file HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n".toByteArray())
+            output.flush()
+            val head = readRawResponse(input, readBody = false)
+            assertTrue(head.statusLine.contains(" 200 "), "unexpected status: ${head.statusLine}")
+            assertEquals(fileSize.toString(), head.headers["content-length"])
+
+            // A HEAD response must carry no body bytes; the next bytes on this
+            // socket have to be the response to the following request.
+            output.write("GET /text HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n".toByteArray())
+            output.flush()
+            val next = readRawResponse(input, readBody = true)
+            assertTrue(next.statusLine.contains(" 200 "), "connection corrupted after HEAD: ${next.statusLine}")
+            assertEquals("hello-region", next.body.decodeToString())
+        }
+    }
+
+    private class RawResponse(val statusLine: String, val headers: Map<String, String>, val body: ByteArray)
+
+    private fun readRawResponse(input: InputStream, readBody: Boolean): RawResponse {
+        val head = StringBuilder()
+        val one = ByteArray(1)
+        while (!head.endsWith("\r\n\r\n")) {
+            val n = input.read(one)
+            if (n <= 0) break
+            head.append(one[0].toInt().toChar())
+        }
+        val lines = head.toString().trim().split("\r\n")
+        val headers = lines.drop(1).mapNotNull {
+            val idx = it.indexOf(':')
+            if (idx > 0) it.substring(0, idx).trim().lowercase() to it.substring(idx + 1).trim() else null
+        }.toMap()
+        val length = headers["content-length"]?.toIntOrNull() ?: 0
+        val body = ByteArray(if (readBody) length else 0)
+        var read = 0
+        while (read < body.size) {
+            val n = input.read(body, read, body.size - read)
+            if (n <= 0) break
+            read += n
+        }
+        return RawResponse(lines.first(), headers, body)
     }
 
     private fun readPattern(source: File, offset: Long, length: Int): ByteArray {

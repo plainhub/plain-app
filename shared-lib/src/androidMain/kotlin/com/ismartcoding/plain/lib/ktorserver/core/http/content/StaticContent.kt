@@ -45,24 +45,6 @@ private const val pathParameterName = "static-content-path-parameter"
 
 private val staticRootFolderKey = AttributeKey<File>("BaseFolder")
 
-private val StaticContentAutoHead = createRouteScopedPlugin("StaticContentAutoHead") {
-
-    class HeadResponse(val original: OutgoingContent) : OutgoingContent.NoContent() {
-        override val status: HttpStatusCode? get() = original.status
-        override val contentType: ContentType? get() = original.contentType
-        override val contentLength: Long? get() = original.contentLength
-        override fun <T : Any> getProperty(key: AttributeKey<T>) = original.getProperty(key)
-        override fun <T : Any> setProperty(key: AttributeKey<T>, value: T?) = original.setProperty(key, value)
-        override val headers get() = original.headers
-    }
-
-    on(ResponseBodyReadyForSend) { call, content ->
-        check(call.request.local.method == HttpMethod.Head)
-        if (content is OutgoingContent.ReadChannelContent) content.readFrom().cancel(null)
-        transformBodyTo(HeadResponse(content))
-    }
-}
-
 /**
  * A config for serving static content
  *
@@ -89,7 +71,6 @@ public class StaticContentConfig<Resource : Any> internal constructor() {
     internal var defaultPath: String? = null
     internal var fallback: suspend (String, ApplicationCall) -> Unit = { _, _ -> }
     internal var preCompressedFileTypes: List<CompressedFileType> = emptyList()
-    internal var autoHeadResponse: Boolean = false
     internal var lastModifiedExtractor: (Resource) -> GMTDate? = { null }
     internal var etagExtractor: ETagProvider = ETagProvider { null }
 
@@ -107,14 +88,6 @@ public class StaticContentConfig<Resource : Any> internal constructor() {
      */
     public fun preCompressed(vararg types: CompressedFileType) {
         preCompressedFileTypes = types.toList()
-    }
-
-    /**
-     * Enables automatic response to a `HEAD` request for every file/resource that has a `GET` defined.
-     *
-     */
-    public fun enableAutoHeadResponse() {
-        autoHeadResponse = true
     }
 
     /**
@@ -261,7 +234,6 @@ public fun Route.staticFiles(
     block: StaticContentConfig<File>.() -> Unit = {}
 ): Route {
     val staticRoute = StaticContentConfig<File>().apply(block)
-    val autoHead = staticRoute.autoHeadResponse
     val compressedTypes = staticRoute.preCompressedFileTypes
     val contentType = staticRoute.contentType
     val cacheControl = staticRoute.cacheControl
@@ -272,7 +244,7 @@ public fun Route.staticFiles(
     val fallback = staticRoute.fallback
     val lastModified = staticRoute.lastModifiedExtractor
     val etag = staticRoute.etagExtractor
-    return staticContentRoute(remotePath, autoHead) {
+    return staticContentRoute(remotePath) {
         respondStaticFile(
             index = index,
             dir = dir,
@@ -308,7 +280,6 @@ public fun Route.staticResources(
     block: StaticContentConfig<URL>.() -> Unit = {}
 ): Route {
     val staticRoute = StaticContentConfig<URL>().apply(block)
-    val autoHead = staticRoute.autoHeadResponse
     val compressedTypes = staticRoute.preCompressedFileTypes
     val contentType = staticRoute.contentType
     val cacheControl = staticRoute.cacheControl
@@ -319,7 +290,7 @@ public fun Route.staticResources(
     val fallback = staticRoute.fallback
     val lastModified = staticRoute.lastModifiedExtractor
     val etag = staticRoute.etagExtractor
-    return staticContentRoute(remotePath, autoHead) {
+    return staticContentRoute(remotePath) {
         respondStaticResource(
             index = index,
             basePackage = basePackage,
@@ -424,7 +395,6 @@ public fun Route.staticFileSystem(
     block: StaticContentConfig<Path>.() -> Unit = {}
 ): Route {
     val staticRoute = StaticContentConfig<Path>().apply(block)
-    val autoHead = staticRoute.autoHeadResponse
     val compressedTypes = staticRoute.preCompressedFileTypes
     val contentType = staticRoute.contentType
     val cacheControl = staticRoute.cacheControl
@@ -435,7 +405,7 @@ public fun Route.staticFileSystem(
     val fallback = staticRoute.fallback
     val lastModified = staticRoute.lastModifiedExtractor
     val etag = staticRoute.etagExtractor
-    return staticContentRoute(remotePath, autoHead) {
+    return staticContentRoute(remotePath) {
         respondStaticPath(
             fileSystem = fileSystem,
             index = index,
@@ -689,21 +659,12 @@ public fun ApplicationCall.isStaticContent(): Boolean = attributes.contains(Stat
 
 private fun Route.staticContentRoute(
     remotePath: String,
-    autoHead: Boolean,
     handler: suspend (ApplicationCall).() -> Unit
 ) = createChild(TailcardSelector).apply {
     route(remotePath) {
         route("{$pathParameterName...}") {
             get {
                 call.handler()
-            }
-            if (autoHead) {
-                method(HttpMethod.Head) {
-                    install(StaticContentAutoHead)
-                    handle {
-                        call.handler()
-                    }
-                }
             }
         }
     }

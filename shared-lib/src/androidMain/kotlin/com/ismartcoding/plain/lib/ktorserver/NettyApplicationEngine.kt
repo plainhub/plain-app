@@ -210,6 +210,8 @@ public class NettyApplicationEngine(
                     configuration.channelPipelineConfig,
                 )
             )
+            // Send small responses immediately instead of waiting for Nagle
+            childOption(ChannelOption.TCP_NODELAY, true)
             if (configuration.tcpKeepAlive) {
                 childOption(ChannelOption.SO_KEEPALIVE, true)
             }

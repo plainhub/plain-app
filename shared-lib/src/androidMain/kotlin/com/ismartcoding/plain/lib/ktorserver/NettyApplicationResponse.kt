@@ -14,6 +14,7 @@ import io.ktor.http.content.*
 import com.ismartcoding.plain.lib.ktorserver.core.engine.*
 import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import io.ktor.utils.io.*
+import io.ktor.util.AttributeKey
 import io.netty.channel.*
 import io.netty.handler.codec.http.*
 import java.util.concurrent.CancellationException
@@ -48,8 +49,20 @@ public abstract class NettyApplicationResponse(
         get() = !responseMessageSent && context.channel().isActive
 
     override suspend fun respondOutgoingContent(content: OutgoingContent) {
+        // HEAD responses carry headers only (Content-Length preserved); the
+        // body is never produced. This replaces the removed AutoHeadResponse
+        // plugin — the request method is rewritten to GET for routing, so the
+        // raw wire method is checked here.
+        val effective = if (isHeadRequest() &&
+            content !is OutgoingContent.ProtocolUpgrade &&
+            content !is OutgoingContent.NoContent
+        ) {
+            HeadResponseBody(content)
+        } else {
+            content
+        }
         try {
-            super.respondOutgoingContent(content)
+            super.respondOutgoingContent(effective)
         } catch (t: Throwable) {
             val out = responseChannel as? ByteWriteChannel
             out?.close(t)
@@ -58,6 +71,22 @@ public abstract class NettyApplicationResponse(
             val out = responseChannel as? ByteWriteChannel
             out?.flushAndClose()
         }
+    }
+
+    private fun isHeadRequest(): Boolean =
+        (call as? NettyHttp1ApplicationCall)?.httpRequest?.method() == io.netty.handler.codec.http.HttpMethod.HEAD
+
+    /**
+     * Headers-only view of [original]: commitHeaders still emits
+     * Content-Length, Content-Range, etc., but no body branch is taken.
+     */
+    private class HeadResponseBody(val original: OutgoingContent) : OutgoingContent.NoContent() {
+        override val status: HttpStatusCode? get() = original.status
+        override val contentType: ContentType? get() = original.contentType
+        override val contentLength: Long? get() = original.contentLength
+        override val headers get() = original.headers
+        override fun <T : Any> getProperty(key: AttributeKey<T>) = original.getProperty(key)
+        override fun <T : Any> setProperty(key: AttributeKey<T>, value: T?) = original.setProperty(key, value)
     }
 
     override suspend fun respondFromBytes(bytes: ByteArray) {

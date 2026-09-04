@@ -9,11 +9,8 @@ import com.ismartcoding.plain.httpserver.http.StreamSink
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.EntityTagVersion
-import io.ktor.http.content.LastModifiedVersion
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
-import io.ktor.http.content.versions
 import io.ktor.http.headersOf
 import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationCall
 import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
@@ -42,7 +39,7 @@ class KtorHttpCall(
 ) : HttpCall {
 
     override val method: HttpMethod
-        get() = HttpMethod(applicationCall.request.local.method.value)
+        get() = HttpMethod(applicationCall.request.origin.method.value)
 
     override val path: String
         get() = applicationCall.request.path()
@@ -207,12 +204,9 @@ class KtorHttpCall(
                 file = file,
                 offset = range.start,
                 length = range.length,
-                status = HttpStatusCode.PartialContent,
+                status = HttpStatusCode.PartialContent, // some TV OS only accept 206
                 headers = fileRangeHeaders(range, fileLength),
-            ).apply {
-                versions += EntityTagVersion(file.lastModified().hashCode().toString())
-                versions += LastModifiedVersion(java.util.Date(file.lastModified()))
-            }
+            )
         )
         return true
     }
