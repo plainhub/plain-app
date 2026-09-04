@@ -20,7 +20,6 @@ import com.ismartcoding.plain.events.PowerConnectedEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ChatFidUriMigration
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.isQPlus
 import com.ismartcoding.plain.platform.isUPlus
 import com.ismartcoding.plain.lib.sendEvent
@@ -39,8 +38,6 @@ import com.ismartcoding.plain.platform.newImageLoader
 import com.ismartcoding.plain.httpserver.warmUpNetty
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
-import java.io.File
-import kotlinx.coroutines.delay
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 
@@ -125,54 +122,6 @@ object MainAppHelper {
             if (AppFeatureType.CHECK_UPDATES.has() && autoCheckUpdate && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
                 AppHelper.checkUpdateAsync(app, false)
             }
-        }
-
-        startMemoryHeartbeat()
-    }
-
-    /**
-     * Memory heartbeat for post-mortem diagnosis on devices without adb or a
-     * crash report (memory-sandboxed containers kill the process silently).
-     *
-     * Every beat logs heap/native usage plus the live ExoPlayer count into the
-     * on-disk log (latest.log) and stamps a marker file. On the next startup a
-     * leftover marker means the previous process ended abruptly - its last
-     * recorded state is logged so the memory trend right before the kill is
-     * recoverable.
-     */
-    private fun startMemoryHeartbeat() {
-        val markerFile = File(LogCat.logFolderPath, "memory_marker.txt")
-
-        val previous = runCatching {
-            if (markerFile.exists()) markerFile.readText() else ""
-        }.getOrDefault("")
-        if (previous.isNotBlank()) {
-            LogCat.w("PREVIOUS_ABNORMAL_EXIT last heartbeat: $previous")
-        }
-        runCatching { markerFile.parentFile?.mkdirs() }
-        writeHeartbeatMarker(markerFile)
-
-        coIO {
-            while (true) {
-                delay(10_000)
-                val rt = Runtime.getRuntime()
-                val line = "heapUsed=${(rt.totalMemory() - rt.freeMemory()) / 1048576}MB heapMax=${rt.maxMemory() / 1048576}MB " +
-                    "nativeAlloc=${android.os.Debug.getNativeHeapAllocatedSize() / 1048576}MB " +
-                    "players=${com.ismartcoding.plain.platform.ExoPlayerVideoController.liveInstances}"
-                LogCat.d("MemoryHeartbeat $line")
-                writeHeartbeatMarker(markerFile)
-            }
-        }
-    }
-
-    private fun writeHeartbeatMarker(markerFile: File) {
-        runCatching {
-            val rt = Runtime.getRuntime()
-            markerFile.writeText(
-                "ts=${System.currentTimeMillis()} heapUsed=${(rt.totalMemory() - rt.freeMemory()) / 1048576}MB " +
-                    "heapMax=${rt.maxMemory() / 1048576}MB nativeAlloc=${android.os.Debug.getNativeHeapAllocatedSize() / 1048576}MB " +
-                    "players=${com.ismartcoding.plain.platform.ExoPlayerVideoController.liveInstances}",
-            )
         }
     }
 }
