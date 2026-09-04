@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -188,6 +189,12 @@ private fun ActiveEditorField(editor: BlockEditorState, fieldFocus: FocusRequest
         if (!focused) MarkdownLivePreviewTransformation(liveStyles, IntRange.EMPTY) else null
     }
 
+    // Enter-to-confirm for wrap actions (bold/italic/link…): a pending closing marker
+    // turns the keyboard's Enter into "jump past the marker" instead of a newline
+    val wrapConfirmTransformation = remember(editor) {
+        InputTransformation { editor.onFieldInput(this) }
+    }
+
     BasicTextField(
         state = editor.buffer,
         modifier = Modifier
@@ -199,6 +206,7 @@ private fun ActiveEditorField(editor: BlockEditorState, fieldFocus: FocusRequest
             .onPreviewKeyEvent { e -> handleBlockNavKeys(editor, e, layout) },
         textStyle = activeTextStyle(editor),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        inputTransformation = wrapConfirmTransformation,
         outputTransformation = transformation,
         onTextLayout = { layout = it() },
     )
@@ -228,6 +236,7 @@ private fun ActivePlaceholder(editor: BlockEditorState, block: MdEditorBlock) {
             .pointerInput(block.id) {
                 detectTapGestures { pos ->
                     val l = layout ?: return@detectTapGestures
+                    editor.clearWrapConfirm()
                     editor.buffer.edit {
                         setSelection(l.getOffsetForPosition(pos).coerceIn(0, length))
                     }

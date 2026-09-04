@@ -248,6 +248,62 @@ class BlockEditorStateTest {
         assertEquals("hello****", s.text())
     }
 
+    // ── wrap confirm (Enter skips the closing marker) ───
+
+    /** Simulates an IME edit of [newText] with the original selection restored, then runs the hook. */
+    private fun imeInsert(s: BlockEditorState, at: Int, text: String) {
+        s.buffer.edit {
+            replace(at, at, text)
+            s.onFieldInput(this)
+        }
+    }
+
+    @Test
+    fun `enter right before a pending wrap suffix jumps past it instead of newline`() {
+        val s = stateWith("")
+        s.toggleWrap("**")
+        assertEquals("****", s.text())
+        assertEquals("**", s.pendingWrapSuffix)
+        assertEquals(2, s.buffer.selection.min)
+        imeInsert(s, 2, "hello")
+        imeInsert(s, 7, "\n")
+        assertEquals("**hello**", s.text())
+        assertEquals(9, s.buffer.selection.min)
+        assertNull(s.pendingWrapSuffix)
+    }
+
+    @Test
+    fun `typing while a wrap suffix is pending keeps it armed until enter`() {
+        val s = stateWith("")
+        s.toggleWrap("**")
+        imeInsert(s, 2, "x")
+        assertEquals("**x**", s.text())
+        assertEquals("**", s.pendingWrapSuffix)
+        imeInsert(s, 3, "\n")
+        assertEquals("**x**", s.text())
+        assertEquals(5, s.buffer.selection.min)
+    }
+
+    @Test
+    fun `newline away from the pending suffix inserts normally and disarms`() {
+        val s = stateWith("")
+        s.toggleWrap("**")
+        imeInsert(s, 2, "ab")
+        // caret moved to the very end (past the closing marker) before Enter
+        s.buffer.edit { setSelection(6) }
+        imeInsert(s, 6, "\n")
+        assertEquals("**ab**\n", s.text())
+        assertNull(s.pendingWrapSuffix)
+    }
+
+    @Test
+    fun `insertAtFocused with a trailing marker arms confirm too`() {
+        val s = stateWith("")
+        s.insertAtFocused("[Link](", ")")
+        assertEquals("[Link]()", s.text())
+        assertEquals(")", s.pendingWrapSuffix)
+    }
+
     @Test
     fun `insert into a rendered atomic block creates a text block after it`() {
         val s = BlockEditorState()

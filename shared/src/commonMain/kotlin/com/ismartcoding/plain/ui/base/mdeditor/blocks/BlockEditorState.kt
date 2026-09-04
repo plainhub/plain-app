@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base.mdeditor.blocks
 
+import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -61,6 +62,14 @@ class BlockEditorState {
      * the document caret while [focusedBlockId] is set.
      */
     val buffer = TextFieldState()
+
+    /**
+     * Closing marker awaiting confirmation after a wrap action (bold, italic, link…):
+     * the caret sits right before it, and pressing Enter should jump past the marker
+     * instead of inserting a newline. Null when no wrap is pending.
+     */
+    var pendingWrapSuffix: String? = null
+        private set
 
     // ── cross-block selection (whole blocks + boundary refinement) ──
     // anchor stays fixed while the focus follows taps; both are (blockId, offset)
@@ -145,6 +154,7 @@ class BlockEditorState {
         if (current != null && current.id != block.id) {
             syncActiveBlockToBuffer()
             if (current.kind != MdBlockKind.TEXT) commitAtomic(current)
+            pendingWrapSuffix = null
         }
         if (block.id == focusedBlockId.value) {
             buffer.edit { setSelection(offset.coerceIn(0, length)) }
@@ -328,6 +338,7 @@ class BlockEditorState {
         val b = targetBlockForInsert() ?: return
         if (b.id != focusedBlockId.value) activate(b, b.content().length)
         buffer.edit { inlineWrap(before, after) }
+        armWrapConfirm(after)
     }
 
     fun insertText(s: String) {
@@ -342,6 +353,52 @@ class BlockEditorState {
     fun toggleWrap(before: String, after: String = before) {
         val b = activeBlock() ?: return
         buffer.edit { toggleWrap(before, after) }
+        armWrapConfirm(after)
+    }
+
+    /**
+     * Arms Enter-to-confirm when the caret now sits directly before the closing
+     * marker [after] (collapsed selection inside a freshly inserted wrap).
+     */
+    private fun armWrapConfirm(after: String) {
+        pendingWrapSuffix = null
+        if (after.isEmpty()) return
+        val caret = buffer.selection
+        if (!caret.collapsed) return
+        if (buffer.text.startsWith(after, caret.min)) pendingWrapSuffix = after
+    }
+
+    /** Drops any pending wrap confirmation (caret moved elsewhere, block switched…). */
+    fun clearWrapConfirm() {
+        pendingWrapSuffix = null
+    }
+
+    /**
+     * Runs inside the editor field's [androidx.compose.foundation.text.input.InputTransformation].
+     * When a wrap suffix is pending and the incoming edit is exactly one newline typed
+     * right before it, the newline is rejected and the caret jumps past the marker —
+     * the keyboard's Enter "confirms" the wrap instead of breaking the line. Any other
+     * edit, or a caret that no longer sits before the marker, disarms the pending suffix.
+     */
+    fun onFieldInput(buffer: TextFieldBuffer) {
+        val suffix = pendingWrapSuffix ?: return
+        val orig = buffer.originalText
+        val caret = buffer.originalSelection
+        if (!caret.collapsed || caret.min + suffix.length > orig.length ||
+            !orig.startsWith(suffix, caret.min)
+        ) {
+            pendingWrapSuffix = null
+            return
+        }
+        // proposed text must be the original with a single '\n' inserted at the caret
+        if (buffer.length != orig.length + 1) return
+        var p = 0
+        while (p < orig.length && buffer.charAt(p) == orig[p]) p++
+        if (p == caret.min && buffer.charAt(p) == '\n') {
+            buffer.revertAllChanges()
+            buffer.selection = androidx.compose.ui.text.TextRange(caret.min + suffix.length)
+            pendingWrapSuffix = null
+        }
     }
 
     // heading / list / quote / callout markers at the start of the focused block's line
@@ -378,6 +435,7 @@ class BlockEditorState {
     fun enterSelectionMode() {
         exitSelectionMode()
         syncActiveBlockToBuffer()
+        pendingWrapSuffix = null
         selectionMode = true
     }
 
