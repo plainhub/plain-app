@@ -1,21 +1,16 @@
 package com.ismartcoding.plain.httpserver
 
-import com.ismartcoding.plain.lib.ktorserver.Netty
-import com.ismartcoding.plain.lib.ktorserver.NettyApplicationEngine
-import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationCallPipeline
-import com.ismartcoding.plain.lib.ktorserver.core.application.call
-import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
-import com.ismartcoding.plain.lib.ktorserver.core.engine.embeddedServer
+import com.ismartcoding.plain.lib.ktorserver.PlainNettyServer
+import com.ismartcoding.plain.lib.ktorserver.core.engine.EngineConnectorBuilder
+import com.ismartcoding.plain.lib.ktorserver.core.engine.connector
 import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import com.ismartcoding.plain.lib.ktorserver.core.plugins.mutableOriginConnectionPoint
+import com.ismartcoding.plain.lib.ktorserver.core.request.path
 import com.ismartcoding.plain.lib.ktorserver.core.response.respond
 import com.ismartcoding.plain.lib.ktorserver.core.response.respondText
-import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
-import com.ismartcoding.plain.lib.ktorserver.core.routing.get
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.util.pipeline.intercept
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.InputStream
@@ -30,8 +25,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
- * Boots the real Netty engine and verifies that FileRegionContent responses
- * arrive intact (status, headers, exact bytes) for full-file and Range cases.
+ * Boots the real Netty server through [PlainNettyServer] and verifies that
+ * FileRegionContent responses arrive intact (status, headers, exact bytes)
+ * for full-file and Range cases, and that HEAD requests keep keep-alive
+ * connections usable.
  */
 class FileRegionResponseTest {
     private val fileSize = 3L * 1024 * 1024
@@ -39,7 +36,7 @@ class FileRegionResponseTest {
     private lateinit var file: File
     private lateinit var mediaFile: File
     private var port: Int = 0
-    private lateinit var engine: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>
+    private lateinit var engine: PlainNettyServer
 
     @BeforeTest
     fun setUp() {
@@ -48,17 +45,15 @@ class FileRegionResponseTest {
         mediaFile = File.createTempFile("fileregion-media-test", ".bin")
         writePattern(mediaFile, mediaFileSize)
 
-        engine = embeddedServer(Netty, port = 0, host = "127.0.0.1") {
-            // Mirror production wiring: HEAD requests are rewritten to GET for
-            // routing; the engine suppresses the response body.
-            intercept(ApplicationCallPipeline.Plugins) {
+        engine = PlainNettyServer(
+            requestHandler = { call ->
+                // Mirror production wiring: HEAD requests are rewritten to GET
+                // for dispatch; the engine suppresses the response body.
                 if (call.request.local.method == io.ktor.http.HttpMethod.Head) {
                     call.mutableOriginConnectionPoint.method = io.ktor.http.HttpMethod.Get
                 }
-            }
-            routing {
-                get("/file") {
-                    call.respond(
+                when (call.request.path()) {
+                    "/file" -> call.respond(
                         FileRegionContent(
                             file = file,
                             offset = 0,
@@ -68,9 +63,7 @@ class FileRegionResponseTest {
                             headers = headersOf("Accept-Ranges" to listOf("bytes")),
                         )
                     )
-                }
-                get("/range") {
-                    call.respond(
+                    "/range" -> call.respond(
                         FileRegionContent(
                             file = file,
                             offset = 1000,
@@ -83,29 +76,33 @@ class FileRegionResponseTest {
                             ),
                         )
                     )
+                    "/media" -> {
+                        val range = resolveSingleByteRange(call.request.headers["Range"], mediaFileSize)
+                            ?.let { capBrowserMediaRange(it, call.request.headers["Sec-Fetch-Dest"]) }
+                        if (range != null) {
+                            call.respond(
+                                FileRegionContent(
+                                    file = mediaFile,
+                                    offset = range.start,
+                                    length = range.length,
+                                    contentType = ContentType.Video.MP4,
+                                    status = if (range.isPartial) HttpStatusCode.PartialContent else HttpStatusCode.OK,
+                                    headers = fileRangeHeaders(range, mediaFileSize),
+                                )
+                            )
+                        }
+                    }
+                    "/text" -> call.respondText("hello-region", ContentType.Text.Plain)
                 }
-                get("/media") {
-                    val range = resolveSingleByteRange(call.request.headers["Range"], mediaFileSize)
-                        ?.let { capBrowserMediaRange(it, call.request.headers["Sec-Fetch-Dest"]) }
-                        ?: return@get
-                    call.respond(
-                        FileRegionContent(
-                            file = mediaFile,
-                            offset = range.start,
-                            length = range.length,
-                            contentType = ContentType.Video.MP4,
-                            status = if (range.isPartial) HttpStatusCode.PartialContent else HttpStatusCode.OK,
-                            headers = fileRangeHeaders(range, mediaFileSize),
-                        )
-                    )
-                }
-                get("/text") {
-                    call.respondText("hello-region", ContentType.Text.Plain)
-                }
+            },
+        ) {
+            connector {
+                port = 0
+                host = "127.0.0.1"
             }
         }
         engine.start(wait = false)
-        port = runBlocking { engine.engine.resolvedConnectors().first().port }
+        port = runBlocking { engine.resolvedConnectors().first().port }
     }
 
     @AfterTest
@@ -147,16 +144,7 @@ class FileRegionResponseTest {
         assertEquals("4096", connection.getHeaderField("Content-Length"))
         val body = connection.inputStream.use { it.readBytes() }
         assertEquals(4096, body.size)
-        val expected = ByteArray(4096)
-        file.inputStream().use { input ->
-            input.channel.position(1000)
-            var read = 0
-            while (read < expected.size) {
-                val n = input.read(expected, read, expected.size - read)
-                if (n <= 0) break
-                read += n
-            }
-        }
+        val expected = readPattern(file, 1000, 4096)
         assertTrue(expected.contentEquals(body), "range body mismatch")
     }
 

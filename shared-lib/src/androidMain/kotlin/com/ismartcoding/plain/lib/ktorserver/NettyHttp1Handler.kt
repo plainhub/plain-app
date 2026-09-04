@@ -11,6 +11,17 @@ package com.ismartcoding.plain.lib.ktorserver
 import com.ismartcoding.plain.lib.ktorserver.core.application.*
 import com.ismartcoding.plain.lib.ktorserver.core.engine.*
 import com.ismartcoding.plain.lib.ktorserver.core.http.*
+import com.ismartcoding.plain.lib.ktorserver.core.logging.mdcProvider
+import com.ismartcoding.plain.lib.ktorserver.core.logging.toLogString
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.BadRequestException
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.CannotTransformContentToTypeException
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.NotFoundException
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.PayloadTooLargeException
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.UnsupportedMediaTypeException
+import com.ismartcoding.plain.lib.ktorserver.core.request.*
+import com.ismartcoding.plain.lib.ktorserver.core.response.*
+import io.ktor.http.*
+import io.ktor.util.cio.*
 import io.ktor.util.pipeline.*
 import io.ktor.utils.io.*
 import io.netty.channel.ChannelHandler
@@ -20,15 +31,17 @@ import io.netty.handler.codec.http.*
 import io.netty.handler.timeout.ReadTimeoutException
 import io.netty.util.concurrent.EventExecutorGroup
 import kotlinx.coroutines.*
-import java.io.IOException
+import kotlinx.io.IOException
+import java.nio.channels.ClosedChannelException
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.TimeoutException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
 internal class NettyHttp1Handler(
     private val applicationProvider: () -> Application,
-    private val enginePipeline: EnginePipeline,
+    private val requestHandler: suspend (PipelineCall) -> Unit,
     private val environment: ApplicationEnvironment,
     private val callEventGroup: EventExecutorGroup,
     private val engineContext: CoroutineContext,
@@ -123,11 +136,7 @@ internal class NettyHttp1Handler(
         if (context.channel().isActive) {
             return
         }
-        while (true) {
-            val call = activeCalls.poll() ?: break
-            @OptIn(InternalAPI::class)
-            call.attributes.getOrNull(HttpRequestCloseHandlerKey)?.invoke()
-        }
+        activeCalls.clear()
     }
 
     @Suppress("OverridingDeprecatedMember")
@@ -209,9 +218,30 @@ internal class NettyHttp1Handler(
                         call.respondError400BadRequest()
                         return@launch
                     }
-                    enginePipeline.execute(call)
-                } catch (error: Throwable) {
-                    handleFailure(call, error)
+                    try {
+                        requestHandler(call)
+                    } catch (error: ChannelIOException) {
+                        call.application.mdcProvider.withMDCBlock(call) {
+                            logFailure(call, error)
+                        }
+                    } catch (error: Throwable) {
+                        handleFailure(call, error)
+                    } finally {
+                        // [NettyApplicationCall.finish] is non-suspending: it only ensures the
+                        // response is committed (headers + status flushed). The actual write
+                        // completion is awaited via structured concurrency — the call's
+                        // responseWriteJob is a child of the call's coroutine Job.
+                        (call as? NettyApplicationCall)?.finish()
+                        try {
+                            val version = HttpProtocolVersion.parse(call.request.httpVersion)
+                            if (version.major == 1) {
+                                // In HTTP/1.1, we should read the entire request body to reuse
+                                // the persistent connection.
+                                call.request.receiveChannel().discard()
+                            }
+                        } catch (_: Throwable) {
+                        }
+                    }
                 } finally {
                     activeCalls.remove(call)
                     callJob.complete()
@@ -232,7 +262,7 @@ internal class NettyHttp1Handler(
         val requestBodyChannel = when {
             message is LastHttpContent && !message.content().isReadable -> null
 
-            message.method() === HttpMethod.GET &&
+            message.method() === io.netty.handler.codec.http.HttpMethod.GET &&
                 !HttpUtil.isContentLengthSet(message) &&
                 !HttpUtil.isTransferEncodingChunked(message) -> {
                 skipEmpty = true
@@ -287,5 +317,65 @@ internal object NettyHttp1ApplicationCallSink : ChannelInboundHandlerAdapter() {
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         if (msg is NettyHttp1ApplicationCall) return
         ctx.fireChannelRead(msg)
+    }
+}
+
+/**
+ * Logs the [error] and responds with an appropriate error status code.
+ */
+internal suspend fun handleFailure(call: NettyHttp1ApplicationCall, error: Throwable) {
+    try {
+        logFailure(call, error)
+    } catch (_: OutOfMemoryError) {
+    }
+    val statusCode = defaultExceptionStatusCode(error) ?: HttpStatusCode.InternalServerError
+    tryRespondError(call, statusCode, error.message)
+}
+
+private fun defaultExceptionStatusCode(cause: Throwable): HttpStatusCode? = when (cause) {
+    is BadRequestException -> HttpStatusCode.BadRequest
+    is NotFoundException -> HttpStatusCode.NotFound
+    is UnsupportedMediaTypeException,
+    is CannotTransformContentToTypeException -> HttpStatusCode.UnsupportedMediaType
+    is PayloadTooLargeException -> HttpStatusCode.PayloadTooLarge
+    is TimeoutException, is TimeoutCancellationException -> HttpStatusCode.GatewayTimeout
+    else -> null
+}
+
+private suspend fun tryRespondError(call: NettyHttp1ApplicationCall, statusCode: HttpStatusCode, message: String?) {
+    if (call.response.isCommitted || call.response.isSent) return
+    try {
+        when (message) {
+            null -> call.respond(statusCode)
+            else -> call.respond(statusCode, message)
+        }
+    } catch (_: BaseApplicationResponse.ResponseAlreadySentException) {
+    }
+}
+
+private fun logFailure(call: NettyHttp1ApplicationCall, cause: Throwable) {
+    try {
+        val status = call.response.status() ?: "Unhandled"
+        val logString = try {
+            call.request.toLogString()
+        } catch (logCause: Throwable) {
+            "(request error: $logCause)"
+        }
+
+        val infoString = "$status: $logString. Exception ${cause::class}: ${cause.message}"
+        when (cause) {
+            is CancellationException,
+            is ClosedChannelException,
+            is ChannelIOException,
+            is IOException,
+            is BadRequestException,
+            is NotFoundException,
+            is PayloadTooLargeException,
+            is UnsupportedMediaTypeException,
+            is CannotTransformContentToTypeException -> call.application.environment.log.debug(infoString, cause)
+
+            else -> call.application.environment.log.error(infoString, cause)
+        }
+    } catch (_: OutOfMemoryError) {
     }
 }

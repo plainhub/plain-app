@@ -1,18 +1,14 @@
 package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.lib.apk.cert.x509.X509SelfSignedGenerator
-import com.ismartcoding.plain.lib.ktorserver.Netty
-import com.ismartcoding.plain.lib.ktorserver.NettyApplicationEngine
-import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
+import com.ismartcoding.plain.lib.ktorserver.PlainNettyServer
+import com.ismartcoding.plain.lib.ktorserver.core.engine.EngineConnectorBuilder
 import com.ismartcoding.plain.lib.ktorserver.core.engine.EngineSSLConnectorConfig
-import com.ismartcoding.plain.lib.ktorserver.core.engine.applicationEnvironment
-import com.ismartcoding.plain.lib.ktorserver.core.engine.embeddedServer
 import com.ismartcoding.plain.lib.ktorserver.core.engine.sslConnector
+import com.ismartcoding.plain.lib.ktorserver.core.request.path
 import com.ismartcoding.plain.lib.ktorserver.core.http.content.FileRegionContent
 import com.ismartcoding.plain.lib.ktorserver.core.response.respond
 import com.ismartcoding.plain.lib.ktorserver.core.response.respondText
-import com.ismartcoding.plain.lib.ktorserver.core.routing.get
-import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
@@ -43,7 +39,7 @@ class SslFileRegionResponseTest {
     private val fileSize = 3L * 1024 * 1024
     private lateinit var file: File
     private var port: Int = 0
-    private lateinit var engine: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>
+    private lateinit var engine: PlainNettyServer
     private val password = "test-keystore"
 
     @BeforeTest
@@ -70,58 +66,50 @@ class SslFileRegionResponseTest {
             setKeyEntry("plain", generated.privateKey, password.toCharArray(), arrayOf(generated.certificate))
         }
 
-        engine = embeddedServer(
-            Netty,
-            applicationEnvironment { log = LoggerFactory.getLogger("ssl-fileregion-test") },
-            configure = {
-                sslConnector(
-                    keyStore = keyStore,
-                    keyAlias = "plain",
-                    keyStorePassword = { password.toCharArray() },
-                    privateKeyPassword = { password.toCharArray() },
-                ) {
-                    port = 0
-                    host = "127.0.0.1"
+        engine = PlainNettyServer(
+            requestHandler = { call ->
+                when (call.request.path()) {
+                    "/file" -> call.respond(
+                        FileRegionContent(
+                            file = file,
+                            offset = 0,
+                            length = fileSize,
+                            contentType = ContentType.Application.OctetStream,
+                            status = HttpStatusCode.OK,
+                            headers = headersOf("Accept-Ranges" to listOf("bytes")),
+                        )
+                    )
+                    "/range" -> call.respond(
+                        FileRegionContent(
+                            file = file,
+                            offset = 1000,
+                            length = 4096,
+                            contentType = ContentType.Application.OctetStream,
+                            status = HttpStatusCode.PartialContent,
+                            headers = headersOf(
+                                "Accept-Ranges" to listOf("bytes"),
+                                "Content-Range" to listOf("bytes 1000-5095/$fileSize"),
+                            ),
+                        )
+                    )
+                    "/text" -> call.respondText("hello-ssl-region", ContentType.Text.Plain)
                 }
             },
-            module = {
-                routing {
-                    get("/file") {
-                        call.respond(
-                            FileRegionContent(
-                                file = file,
-                                offset = 0,
-                                length = fileSize,
-                                contentType = ContentType.Application.OctetStream,
-                                status = HttpStatusCode.OK,
-                                headers = headersOf("Accept-Ranges" to listOf("bytes")),
-                            )
-                        )
-                    }
-                    get("/range") {
-                        call.respond(
-                            FileRegionContent(
-                                file = file,
-                                offset = 1000,
-                                length = 4096,
-                                contentType = ContentType.Application.OctetStream,
-                                status = HttpStatusCode.PartialContent,
-                                headers = headersOf(
-                                    "Accept-Ranges" to listOf("bytes"),
-                                    "Content-Range" to listOf("bytes 1000-5095/$fileSize"),
-                                ),
-                            )
-                        )
-                    }
-                    get("/text") {
-                        call.respondText("hello-ssl-region", ContentType.Text.Plain)
-                    }
-                }
-            },
-        )
+        ) {
+            log = LoggerFactory.getLogger("ssl-fileregion-test")
+            sslConnector(
+                keyStore = keyStore,
+                keyAlias = "plain",
+                keyStorePassword = { password.toCharArray() },
+                privateKeyPassword = { password.toCharArray() },
+            ) {
+                port = 0
+                host = "127.0.0.1"
+            }
+        }
         engine.start(wait = false)
         port = runBlocking {
-            engine.engine.resolvedConnectors().filterIsInstance<EngineSSLConnectorConfig>().first().port
+            engine.resolvedConnectors().filterIsInstance<EngineSSLConnectorConfig>().first().port
         }
         trustAll()
     }

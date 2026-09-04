@@ -6,7 +6,7 @@ import com.ismartcoding.plain.platform.isDebugBuild
 /**
  * Shared CORS policy for the embedded HTTP server.
  *
- * Android applies it through Ktor's `CORS` plugin (see `HttpModule`); iOS
+ * Android applies it in the direct dispatch path (see `PlainHttpServer`); iOS
  * applies it manually in `IosRequestProcessor` because its SwiftNIO request
  * pipeline does not run through Ktor. Keeping the policy here ensures both
  * platforms enforce the same cross-origin rules — previously iOS silently

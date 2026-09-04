@@ -1,18 +1,25 @@
 /*
-* Copyright 2014-2021 JetBrains s.r.o and contributors. Use of this source code is governed by the Apache 2.0 license.
-*/
-
-/**
- * Vendored from io.ktor:ktor-server-netty:3.5.2.
+ * Plain single-engine Netty server. Collapses the former
+ * ApplicationEngine/EmbeddedServer abstraction into one class: it builds the
+ * Application, wires the default send/receive transformations, and serves
+ * requests through a single user-supplied handler — no call pipeline, no
+ * routing tree, no plugin system.
  */
 
 package com.ismartcoding.plain.lib.ktorserver
 
-import com.ismartcoding.plain.lib.ktorserver.events.*
-import com.ismartcoding.plain.lib.ktorserver.core.application.*
-import com.ismartcoding.plain.lib.ktorserver.core.engine.*
-import io.ktor.util.network.*
-import io.ktor.util.pipeline.*
+import com.ismartcoding.plain.lib.ktorserver.core.application.Application
+import com.ismartcoding.plain.lib.ktorserver.core.application.PipelineCall
+import com.ismartcoding.plain.lib.ktorserver.core.engine.DefaultUncaughtExceptionHandler
+import com.ismartcoding.plain.lib.ktorserver.core.engine.EngineConnectorConfig
+import com.ismartcoding.plain.lib.ktorserver.core.engine.applicationEnvironment
+import com.ismartcoding.plain.lib.ktorserver.core.engine.installDefaultTransformations
+import com.ismartcoding.plain.lib.ktorserver.core.engine.BaseApplicationResponse
+import com.ismartcoding.plain.lib.ktorserver.core.engine.withPort
+import io.ktor.util.network.port
+import com.ismartcoding.plain.lib.ktorserver.core.response.ApplicationSendPipeline
+import com.ismartcoding.plain.lib.ktorserver.core.application.ApplicationEnvironment
+import com.ismartcoding.plain.lib.ktorserver.events.Events
 import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.Channel
 import io.netty.channel.ChannelOption
@@ -26,140 +33,126 @@ import io.netty.channel.socket.ServerSocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.codec.http.HttpObjectDecoder
 import io.netty.handler.codec.http.HttpServerCodec
-import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.asCoroutineDispatcher
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 import kotlin.system.measureTimeMillis
 
-private val AFTER_CALL_PHASE = PipelinePhase("After")
-
 /**
- * [ApplicationEngine] implementation for running in a standalone Netty
+ * A Netty-based HTTP(S) server driven by a single [requestHandler].
  *
+ * Connectors (plain HTTP and/or SSL) are registered in the configure block via
+ * the [connector][com.ismartcoding.plain.lib.ktorserver.core.engine.connector]
+ * and [sslConnector][com.ismartcoding.plain.lib.ktorserver.core.engine.sslConnector]
+ * builders.
+ *
+ * @param requestHandler invoked for every request; must produce exactly one
+ *   response (the engine commits an empty response if none was sent)
  */
-public class NettyApplicationEngine(
-    environment: ApplicationEnvironment,
-    monitor: Events,
-    developmentMode: Boolean,
-    public val configuration: Configuration,
-    private val applicationProvider: () -> Application
-) : BaseApplicationEngine(environment, monitor, developmentMode) {
-
-    /**
-     * Configuration for the [NettyApplicationEngine]
-     *
-     */
-    public class Configuration : BaseApplicationEngine.Configuration() {
+public class PlainNettyServer(
+    public val requestHandler: suspend (PipelineCall) -> Unit,
+    configure: Configuration.() -> Unit = {},
+) {
+    public class Configuration {
+        /**
+         * The connectors to bind (plain HTTP and/or SSL). Populated via the
+         * [connector][com.ismartcoding.plain.lib.ktorserver.core.engine.connector]
+         * and [sslConnector][com.ismartcoding.plain.lib.ktorserver.core.engine.sslConnector]
+         * builders.
+         */
+        public val connectors: MutableList<EngineConnectorConfig> = mutableListOf()
 
         /**
          * Number of concurrently running requests from the same http pipeline
-         *
          */
         public var runningLimit: Int = 32
 
         /**
          * Do not create separate call event group and reuse worker group for processing calls
-         *
          */
         public var shareWorkGroup: Boolean = false
 
         /**
-         * User-provided function to configure Netty's [ServerBootstrap]
-         *
+         * If set to `true`, enables TCP keep alive for connections so all
+         * dead client connections will be discarded.
          */
-        public var configureBootstrap: ServerBootstrap.() -> Unit = {}
+        public var tcpKeepAlive: Boolean = false
 
         /**
          * Timeout in seconds for sending responses to client
-         *
          */
         public var responseWriteTimeoutSeconds: Int = 10
 
         /**
          * Timeout in seconds for reading requests from client, "0" is infinite.
-         *
          */
         public var requestReadTimeoutSeconds: Int = 0
 
-        /**
-         * If set to `true`, enables TCP keep alive for connections so all
-         * dead client connections will be discarded.
-         * The timeout period is configured by the system so configure
-         * your host accordingly.
-         *
-         */
-        public var tcpKeepAlive: Boolean = false
+        public var connectionGroupSize: Int = Runtime.getRuntime().availableProcessors().coerceAtMost(4)
+
+        public var workerGroupSize: Int = Runtime.getRuntime().availableProcessors().coerceAtMost(4)
+
+        public var callGroupSize: Int = Runtime.getRuntime().availableProcessors().coerceAtMost(4)
 
         /**
-         * The url limit including query parameters
-         *
+         * User-provided function to configure Netty's [ServerBootstrap]
          */
-        public var maxInitialLineLength: Int = HttpObjectDecoder.DEFAULT_MAX_INITIAL_LINE_LENGTH
-
-        /**
-         * The maximum length of all headers.
-         * If the sum of the length of each header exceeds this value, a TooLongFrameException will be raised.
-         *
-         */
-        public var maxHeaderSize: Int = HttpObjectDecoder.DEFAULT_MAX_HEADER_SIZE
-
-        /**
-         * The maximum length of the content or each chunk
-         *
-         */
-        public var maxChunkSize: Int = HttpObjectDecoder.DEFAULT_MAX_CHUNK_SIZE
+        public var configureBootstrap: ServerBootstrap.() -> Unit = {}
 
         /**
          * User-provided function to configure Netty's [HttpServerCodec]
-         *
          */
-        public var httpServerCodec: () -> HttpServerCodec = this::defaultHttpServerCodec
+        public var httpServerCodec: () -> HttpServerCodec = {
+            HttpServerCodec(
+                io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_MAX_INITIAL_LINE_LENGTH,
+                io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_MAX_HEADER_SIZE,
+                io.netty.handler.codec.http.HttpObjectDecoder.DEFAULT_MAX_CHUNK_SIZE
+            )
+        }
 
         /**
          * User-provided function to configure Netty's [ChannelPipeline]
-         *
          */
         public var channelPipelineConfig: ChannelPipeline.() -> Unit = {}
 
-        /**
-         * Default function to configure Netty's
-         */
-        private fun defaultHttpServerCodec() = HttpServerCodec(
-            maxInitialLineLength,
-            maxHeaderSize,
-            maxChunkSize
-        )
+        public var shutdownGracePeriod: Long = 1000
+
+        public var shutdownTimeout: Long = 2000
+
+        public var log: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger("plain.netty")
+    }
+
+    private val configuration: Configuration = Configuration().apply(configure)
+
+    public val environment: ApplicationEnvironment = applicationEnvironment {
+        log = configuration.log
     }
 
     /**
-     * [EventLoopGroupProxy] for accepting connections
+     * The Application hosting the shared send/receive pipelines and log.
      */
+    public val application: Application = Application(
+        environment,
+        developmentMode = false,
+        rootPath = "",
+        monitor = Events(),
+        parentCoroutineContext = kotlin.coroutines.EmptyCoroutineContext,
+        engineProvider = { error("PlainNettyServer has no engine abstraction") }
+    )
+
     private val connectionEventGroup: EventLoopGroup by lazy {
-        customBootstrap.config().group() ?: EventLoopGroupProxy.create(configuration.connectionGroupSize)
+        EventLoopGroupProxy.create(configuration.connectionGroupSize)
     }
 
-    /**
-     * [EventLoopGroupProxy] for processing incoming requests and doing engine's internal work
-     */
     private val workerEventGroup: EventLoopGroup by lazy {
-        customBootstrap.config().childGroup()?.let {
-            return@lazy it
-        }
         if (configuration.shareWorkGroup) {
-            EventLoopGroupProxy.create(configuration.workerGroupSize + configuration.callGroupSize)
+            connectionEventGroup
         } else {
             EventLoopGroupProxy.create(configuration.workerGroupSize)
         }
     }
 
-    private val customBootstrap: ServerBootstrap by lazy {
-        ServerBootstrap().apply(configuration.configureBootstrap)
-    }
-
-    /**
-     * [EventLoopGroupProxy] for processing [PipelineCall] instances
-     */
     private val callEventGroup: EventLoopGroup by lazy {
         if (configuration.shareWorkGroup) {
             workerEventGroup
@@ -172,15 +165,22 @@ public class NettyApplicationEngine(
         workerEventGroup.asCoroutineDispatcher()
     }
 
-    private var cancellationJob: CompletableJob? = null
-
     private var channels: List<Channel>? = null
-    internal val bootstraps: List<ServerBootstrap> by lazy {
+
+    private val resolvedConnectors = CompletableDeferred<List<EngineConnectorConfig>>()
+
+    private val bootstraps: List<ServerBootstrap> by lazy {
         configuration.connectors.map(::createBootstrap)
     }
 
+    init {
+        BaseApplicationResponse.setupSendPipeline(application.sendPipeline)
+        application.receivePipeline.installDefaultTransformations()
+        application.sendPipeline.installDefaultTransformations()
+    }
+
     private fun createBootstrap(connector: EngineConnectorConfig): ServerBootstrap {
-        return customBootstrap.clone().apply {
+        return ServerBootstrap().apply(configuration.configureBootstrap).apply {
             if (config().group() == null && config().childGroup() == null) {
                 group(connectionEventGroup, workerEventGroup)
             }
@@ -196,8 +196,8 @@ public class NettyApplicationEngine(
 
             childHandler(
                 NettyChannelInitializer(
-                    applicationProvider,
-                    pipeline,
+                    { application },
+                    requestHandler,
                     environment,
                     callEventGroup,
                     workerDispatcher,
@@ -218,38 +218,22 @@ public class NettyApplicationEngine(
         }
     }
 
-    init {
-        pipeline.insertPhaseAfter(EnginePipeline.Call, AFTER_CALL_PHASE)
-        pipeline.intercept(AFTER_CALL_PHASE) {
-            // [NettyApplicationCall.finish] is non-suspending: it only ensures the response is
-            // committed (headers + status flushed). The actual write completion is awaited via
-            // structured concurrency — the call's responseWriteJob is a child of the call's
-            // coroutine Job, so the call coroutine remains "completing" until the I/O-thread
-            // writer finishes and cleanup runs from responseWriteJob's invokeOnCompletion handler.
-            (call as? NettyApplicationCall)?.finish()
-        }
-    }
-
-    override fun start(wait: Boolean): NettyApplicationEngine {
+    /**
+     * Starts the server. When [wait] is true this call blocks until the
+     * server stops; otherwise it returns immediately after binding.
+     */
+    public fun start(wait: Boolean = false): PlainNettyServer {
         try {
             channels = bootstraps.zip(configuration.connectors)
                 .map { it.first.bind(it.second.host, it.second.port) }
                 .map { it.sync().channel() }
-            val connectors = channels!!.zip(configuration.connectors)
+            val resolved = channels!!.zip(configuration.connectors)
                 .map { it.second.withPort(it.first.localAddress().port) }
-            resolvedConnectorsDeferred.complete(connectors)
+            resolvedConnectors.complete(resolved)
         } catch (cause: Throwable) {
             terminate()
             throw cause
         }
-
-        monitor.raiseCatching(ServerReady, environment, environment.log)
-
-        cancellationJob = stopServerOnCancellation(
-            applicationProvider(),
-            configuration.shutdownGracePeriod,
-            configuration.shutdownTimeout
-        )
 
         if (wait) {
             channels?.map { it.closeFuture() }?.forEach { it.sync() }
@@ -258,25 +242,14 @@ public class NettyApplicationEngine(
         return this
     }
 
-    private fun terminate() {
-        withStopException {
-            connectionEventGroup.shutdownGracefully().sync()
-        }
-        withStopException {
-            callEventGroup.shutdownGracefully().sync()
-        }
+    /**
+     * The actually bound connectors — use to read ephemeral ports (port = 0).
+     */
+    public suspend fun resolvedConnectors(): List<EngineConnectorConfig> {
+        return resolvedConnectors.await()
     }
 
-    private inline fun <R> withStopException(crossinline block: () -> R) {
-        runCatching(block).onFailure {
-            environment.log.error("Exception thrown during engine stop", it)
-        }
-    }
-
-    override fun stop(gracePeriodMillis: Long, timeoutMillis: Long) {
-        cancellationJob?.complete()
-        monitor.raise(ApplicationStopPreparing, environment)
-
+    public fun stop(gracePeriodMillis: Long, timeoutMillis: Long) {
         val channelsCloseTime = measureTimeMillis {
             val channelFutures = channels?.mapNotNull { if (it.isOpen) it.close() else null }.orEmpty()
             channelFutures.forEach { future ->
@@ -284,10 +257,8 @@ public class NettyApplicationEngine(
             }
         }
 
-        // Quiet period in Ktor Server and Netty EventLoopGroup are different.
-        // Ktor Server waits for all requests to finish without accepting new ones.
-        // Netty's EventLoopGroup accepts new tasks during the gracePeriod
-        // and always waits at least gracePeriod, even if there are no tasks to complete.
+        // No quiet period: Netty's EventLoopGroup accepts new tasks during the
+        // grace period, which would stall shutdown.
         val noQuietPeriod = 0L
 
         var remainingTimeoutMillis = (timeoutMillis - channelsCloseTime).coerceAtLeast(100L)
@@ -316,15 +287,31 @@ public class NettyApplicationEngine(
 
         if (!configuration.shareWorkGroup) {
             withStopException {
-                // There should be no new tasks to be scheduled at this point; no quiet period is needed.
                 remainingTimeoutMillis = (remainingTimeoutMillis - workersShutdownTime).coerceAtLeast(100L)
                 callEventGroup.shutdownGracefully(noQuietPeriod, remainingTimeoutMillis, TimeUnit.MILLISECONDS).sync()
             }
         }
     }
 
-    override fun toString(): String {
-        return "Netty($environment)"
+    private fun terminate() {
+        withStopException {
+            if (connectionEventGroup !== workerEventGroup) {
+                connectionEventGroup.shutdownGracefully().sync()
+            }
+        }
+        withStopException {
+            workerEventGroup.shutdownGracefully().sync()
+        }
+    }
+
+    private inline fun <R> withStopException(crossinline block: () -> R) {
+        runCatching(block).onFailure {
+            environment.log.error("Exception thrown during server stop", it)
+        }
+    }
+
+    public override fun toString(): String {
+        return "PlainNettyServer(${configuration.connectors})"
     }
 }
 

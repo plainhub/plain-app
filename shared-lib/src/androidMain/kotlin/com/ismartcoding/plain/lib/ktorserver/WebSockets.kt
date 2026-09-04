@@ -136,41 +136,17 @@ public class WebSockets private constructor(
     }
 
     /**
-     * Plugin installation object.
+     * Shared constants. The WebSockets settings are no longer installed
+     * through the plugin system; callers construct a [WebSockets] instance
+     * directly and hand it to [WebSocketUpgrade].
      *
      */
-    public companion object Plugin : BaseApplicationPlugin<Application, WebSocketOptions, WebSockets> {
-        override val key: AttributeKey<WebSockets> = AttributeKey("WebSockets")
-
+    public companion object {
         /**
          * Key for saving configured WebSocket extensions for the specific call.
          *
          */
         public val EXTENSIONS_KEY: AttributeKey<List<WebSocketExtension<*>>> =
             AttributeKey("WebSocket extensions")
-
-        override fun install(pipeline: Application, configure: WebSocketOptions.() -> Unit): WebSockets {
-            val config = WebSocketOptions().also(configure)
-            with(config) {
-                val webSockets = WebSockets(
-                    pingPeriodMillis,
-                    timeoutMillis,
-                    maxFrameSize,
-                    masking,
-                    extensionsConfig,
-                )
-
-                pipeline.monitor.subscribe(ApplicationStopPreparing) {
-                    WEBSOCKETS_LOGGER.trace("Shutdown WebSockets due to application stop")
-                    webSockets.shutdown()
-                }
-
-                pipeline.sendPipeline.intercept(ApplicationSendPipeline.Transform) {
-                    if (it !is WebSocketUpgrade) return@intercept
-                }
-
-                return webSockets
-            }
-        }
     }
 }

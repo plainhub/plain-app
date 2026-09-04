@@ -38,6 +38,7 @@ import kotlin.coroutines.*
  */
 public class WebSocketUpgrade(
     public val call: ApplicationCall,
+    private val plugin: WebSockets,
     @Suppress("MemberVisibilityCanBePrivate") public val protocol: String? = null,
     private val installExtensions: Boolean = false,
     public val handle: suspend WebSocketSession.() -> Unit
@@ -62,12 +63,12 @@ public class WebSocketUpgrade(
     @Suppress("unused")
     public constructor(
         call: ApplicationCall,
+        plugin: WebSockets,
         protocol: String? = null,
         handle: suspend WebSocketSession.() -> Unit
-    ) : this(call, protocol, installExtensions = false, handle)
+    ) : this(call, plugin, protocol, installExtensions = false, handle)
 
     private val key = call.request.header(HttpHeaders.SecWebSocketKey)
-    private val plugin = call.application.plugin(WebSockets)
 
     override val headers: Headers
 

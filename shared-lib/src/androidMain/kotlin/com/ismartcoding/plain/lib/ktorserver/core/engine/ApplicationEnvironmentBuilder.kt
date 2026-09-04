@@ -25,19 +25,6 @@ public fun applicationEnvironment(
     return ApplicationEnvironmentBuilder().apply(block).build()
 }
 
-/**
- * Configures the application environment using the provided configuration file paths.
- *
- * If no paths are provided, the default configuration is loaded.
- * If one path is provided, the corresponding configuration file is loaded.
- * If multiple paths are provided, the configurations are merged in the given order.
- *
- *
- * @param configPaths Optional paths to configuration files.
- */
-public fun ApplicationEnvironmentBuilder.configure(vararg configPaths: String) {
-    config = ConfigLoader.loadAll(*configPaths)
-}
 
 /**
  * Configures the application environment builder by merging the provided configurations.
