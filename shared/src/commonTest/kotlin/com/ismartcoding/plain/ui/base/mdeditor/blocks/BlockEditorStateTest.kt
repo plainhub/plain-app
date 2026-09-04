@@ -21,36 +21,34 @@ class BlockEditorStateTest {
     @Test
     fun `toggleWrap wraps selection and unwraps again`() {
         val s = stateWith("hello world")
-        val b = s.blocks[0]
-        s.focusedBlockId.value = b.id
-        b.state.edit { selection = TextRange(0, 5) }
+        s.buffer.edit { selection = TextRange(0, 5) }
         s.toggleWrap("**")
-        assertEquals("**hello** world", b.content())
-        b.state.edit { selection = TextRange(0, 9) }
+        assertEquals("**hello** world", s.text())
+        s.buffer.edit { selection = TextRange(0, 9) }
         s.toggleWrap("**")
-        assertEquals("hello world", b.content())
+        assertEquals("hello world", s.text())
     }
 
     @Test
     fun `toggleLinePrefix toggles heading levels`() {
         val s = stateWith("title")
         s.toggleLinePrefix("## ")
-        assertEquals("## title", s.blocks[0].content())
+        assertEquals("## title", s.text())
         s.toggleLinePrefix("# ")
-        assertEquals("# title", s.blocks[0].content())
+        assertEquals("# title", s.text())
         s.toggleLinePrefix("# ")
-        assertEquals("title", s.blocks[0].content())
+        assertEquals("title", s.text())
     }
 
     @Test
     fun `toggleLinePrefix strips list and callout markers`() {
         val s = stateWith("- [ ] task")
         s.toggleLinePrefix("")
-        assertEquals("task", s.blocks[0].content())
+        assertEquals("task", s.text())
         s.toggleLinePrefix("> [!note] ")
-        assertEquals("> [!note] task", s.blocks[0].content())
+        assertEquals("> [!note] task", s.text())
         s.toggleLinePrefix("")
-        assertEquals("task", s.blocks[0].content())
+        assertEquals("task", s.text())
     }
 
     // ── list continuation ───
@@ -58,27 +56,24 @@ class BlockEditorStateTest {
     @Test
     fun `enter after a bulleted item continues the marker`() {
         val s = stateWith("- one")
-        val b = s.blocks[0]
-        b.state.edit { append("\n"); setSelection(6) }
-        s.splitMultilineBlock(b)
+        s.buffer.edit { append("\n"); setSelection(6) }
+        s.splitActiveBlock()
         assertEquals(listOf("- one", "- "), s.blocks.map { it.content() })
     }
 
     @Test
     fun `enter after a numbered item increments the number`() {
         val s = stateWith("3. item")
-        val b = s.blocks[0]
-        b.state.edit { append("\n"); setSelection(8) }
-        s.splitMultilineBlock(b)
+        s.buffer.edit { append("\n"); setSelection(8) }
+        s.splitActiveBlock()
         assertEquals(listOf("3. item", "4. "), s.blocks.map { it.content() })
     }
 
     @Test
     fun `enter on a marker-only line clears the marker`() {
         val s = stateWith("- ")
-        val b = s.blocks[0]
-        b.state.edit { append("\n"); setSelection(3) }
-        s.splitMultilineBlock(b)
+        s.buffer.edit { append("\n"); setSelection(3) }
+        s.splitActiveBlock()
         assertEquals(listOf(""), s.blocks.map { it.content() })
     }
 
@@ -103,10 +98,11 @@ class BlockEditorStateTest {
     }
 
     @Test
-    fun `loadText queues focus on the first block`() {
+    fun `loadText activates the first block`() {
         val s = BlockEditorState()
         s.loadText("hello")
-        assertEquals(s.blocks[0].id, s.pendingFocus.value)
+        assertEquals(s.blocks[0].id, s.focusedBlockId.value)
+        assertEquals("hello", s.buffer.text.toString())
     }
 
     // ── Enter / multiline split ───
@@ -114,76 +110,69 @@ class BlockEditorStateTest {
     @Test
     fun `newline in a text block splits into two blocks with caret in the second`() {
         val s = stateWith("")
-        val b = s.blocks[0]
-        b.state.edit {
+        s.buffer.edit {
             append("first\nsecond")
             setSelection(6)
         }
-        s.splitMultilineBlock(b)
+        s.splitActiveBlock()
         assertEquals("first\nsecond", s.text())
         assertEquals(2, s.blocks.size)
         val target = s.blocks.first { it.content() == "second" }
         assertEquals(target.id, s.focusedBlockId.value)
-        assertEquals(TextRange(0), target.state.selection)
+        assertEquals(TextRange(0), s.buffer.selection)
+        assertEquals("second", s.buffer.text.toString())
     }
 
     @Test
-    fun `split morphing a single line into an atomic block keeps it editable`() {
+    fun `single image line becomes an atomic image block`() {
         val s = stateWith("")
-        val b = s.blocks[0]
-        s.focusedBlockId.value = b.id
-        b.state.edit { append("![pic](u.png)") }
-        s.splitMultilineBlock(b)
-        // no newline: nothing to split, but the image line should become an IMAGE block in source mode
+        s.buffer.edit { append("![pic](u.png)") }
+        s.splitActiveBlock()
+        // no newline: nothing to split, but the image line should become an IMAGE block
         s.normalize()
         assertEquals(1, s.blocks.size)
         assertEquals(MdBlockKind.IMAGE, s.blocks[0].kind)
-        assertTrue(s.blocks[0].editing)
     }
 
     @Test
-    fun `toolbar code insert splits with the code block opened in source mode`() {
+    fun `toolbar code insert splits with the code block activated`() {
         val s = stateWith("hello")
-        val b = s.blocks[0]
-        s.focusedBlockId.value = b.id
-        b.state.edit { append("```\n\n```") }
-        s.splitMultilineBlock(b)
+        s.buffer.edit { append("```\n\n```"); setSelection(length) }
+        s.splitActiveBlock()
         assertEquals(listOf(MdBlockKind.TEXT, MdBlockKind.TEXT, MdBlockKind.CODE), s.blocks.map { it.kind })
         val code = s.blocks[2]
-        assertTrue(code.editing)
         assertEquals(code.id, s.focusedBlockId.value)
+        assertEquals("```", s.buffer.text.toString())
         assertEquals("hello```\n\n```", s.text())
     }
 
     // ── backspace merges ───
 
     @Test
-    fun `backspace in empty block deletes it and focuses previous end`() {
+    fun `backspace in empty block deletes it and activates previous end`() {
         val s = stateWith("hello", "")
-        val removed = s.blocks[1]
-        s.focusedBlockId.value = removed.id
-        assertTrue(s.backspaceAtStart(removed))
+        s.activate(s.blocks[1], 0)
+        assertTrue(s.backspaceAtStart())
         assertEquals(1, s.blocks.size)
-        assertEquals("hello", s.focusedBlock()?.content())
+        assertEquals("hello", s.buffer.text.toString())
+        assertEquals(s.blocks[0].id, s.focusedBlockId.value)
     }
 
     @Test
-    fun `backspace at start of non-empty block merges into previous text block`() {
+    fun `backspace at start of non-empty block merges previous block into the buffer`() {
         val s = stateWith("hello", "world")
-        val second = s.blocks[1]
-        second.state.edit { setSelection(0) }
-        s.focusedBlockId.value = second.id
-        assertTrue(s.backspaceAtStart(second))
+        s.activate(s.blocks[1], 0)
+        assertTrue(s.backspaceAtStart())
         assertEquals(1, s.blocks.size)
         assertEquals("helloworld", s.text())
         assertEquals(s.blocks[0].id, s.focusedBlockId.value)
-        assertEquals(TextRange(5), s.blocks[0].state.selection)
+        assertEquals(TextRange(5), s.buffer.selection)
     }
 
     @Test
     fun `backspace at start of first block is a no-op`() {
         val s = stateWith("hello")
-        assertFalse(s.backspaceAtStart(s.blocks[0]))
+        assertFalse(s.backspaceAtStart())
         assertEquals(1, s.blocks.size)
     }
 
@@ -192,11 +181,11 @@ class BlockEditorStateTest {
         val s = BlockEditorState()
         s.loadText("```\ncode\n```\n")
         val atomic = s.blocks[0]
-        val empty = s.blocks[1]
-        s.focusedBlockId.value = empty.id
-        assertTrue(s.backspaceAtStart(empty))
-        assertTrue(atomic.editing)
+        s.activate(s.blocks[1], 0)
+        assertTrue(s.backspaceAtStart())
+        assertEquals(MdBlockKind.CODE, atomic.kind)
         assertEquals(atomic.id, s.focusedBlockId.value)
+        assertEquals("```\ncode\n```", s.buffer.text.toString())
     }
 
     // ── atomic commit ───
@@ -204,29 +193,23 @@ class BlockEditorStateTest {
     @Test
     fun `committing an atomic block whose content is no longer atomic splits it back`() {
         val s = BlockEditorState()
-        s.loadText("```\ncode\n```")
-        val atomic = s.blocks[0]
-        atomic.editing = true
-        atomic.state.edit {
+        s.loadText("```\ncode\n```\ntail")
+        s.buffer.edit {
             replace(0, length, "just text now")
         }
-        s.commitAtomic(atomic)
-        assertFalse(atomic.editing)
-        assertEquals(1, s.blocks.size)
+        s.activate(s.blocks[1], 0)
+        assertEquals(2, s.blocks.size)
         assertEquals(MdBlockKind.TEXT, s.blocks[0].kind)
-        assertEquals("just text now", s.text())
+        assertEquals("just text now\ntail", s.text())
     }
 
     @Test
     fun `committing an unchanged atomic block keeps it rendered`() {
         val s = BlockEditorState()
-        s.loadText("```\ncode\n```")
-        val atomic = s.blocks[0]
-        atomic.editing = true
-        s.commitAtomic(atomic)
-        assertFalse(atomic.editing)
+        s.loadText("```\ncode\n```\ntail")
+        s.activate(s.blocks[1], 0)
         assertEquals(MdBlockKind.CODE, s.blocks[0].kind)
-        assertEquals("```\ncode\n```", s.text())
+        assertEquals("```\ncode\n```\ntail", s.text())
     }
 
     // ── normalize ───
@@ -235,9 +218,8 @@ class BlockEditorStateTest {
     fun `normalize merges separately typed table lines into one atomic block`() {
         // start as three plain text lines (middle row not yet a separator), then type the separator
         val s = stateWith("| a | b |", "| x |", "| 1 | 2 |")
-        val middle = s.blocks[1]
-        s.focusedBlockId.value = middle.id
-        middle.state.edit {
+        s.activate(s.blocks[1], s.blocks[1].content().length)
+        s.buffer.edit {
             replace(0, length, "|---|---|")
         }
         s.normalize()
@@ -245,7 +227,6 @@ class BlockEditorStateTest {
         assertEquals(MdBlockKind.TABLE, s.blocks[0].kind)
         assertEquals("| a | b |\n|---|---|\n| 1 | 2 |", s.blocks[0].content())
         assertEquals(s.blocks[0].id, s.focusedBlockId.value)
-        assertTrue(s.blocks[0].editing)
     }
 
     @Test
@@ -260,20 +241,21 @@ class BlockEditorStateTest {
     // ── toolbar inserts ───
 
     @Test
-    fun `insert without focus appends to a new text block at the end`() {
+    fun `insert into the active block wraps the caret`() {
         val s = stateWith("hello")
-        assertNull(s.focusedBlockId.value)
+        s.buffer.edit { setSelection(5) }
         s.insertAtFocused("**", "**")
-        assertEquals("hello\n****", s.text())
+        assertEquals("hello****", s.text())
     }
 
     @Test
     fun `insert into a rendered atomic block creates a text block after it`() {
         val s = BlockEditorState()
         s.loadText("```\ncode\n```")
-        s.focusedBlockId.value = s.blocks[0].id
         s.insertText("tail")
         assertEquals("```\ncode\n```\ntail", s.text())
+        assertEquals(MdBlockKind.TEXT, s.blocks[1].kind)
+        assertEquals("tail", s.buffer.text.toString())
     }
 
     // ── undo / redo ───
@@ -282,7 +264,7 @@ class BlockEditorStateTest {
     fun `undo restores the text before an edit`() {
         val s = BlockEditorState()
         s.loadText("a")
-        s.blocks[0].state.edit { append("b") }
+        s.buffer.edit { append("b") }
         s.undo()
         assertEquals("a", s.text())
         assertFalse(s.canUndo.value)
@@ -294,10 +276,9 @@ class BlockEditorStateTest {
     @Test
     fun `undo covers structural merges`() {
         val s = stateWith("hello", "world")
-        s.focusedBlockId.value = s.blocks[1].id
-        s.blocks[1].state.edit { setSelection(0) }
+        s.activate(s.blocks[1], 0)
         s.blocks[0].state.edit { append("!") }
-        assertTrue(s.backspaceAtStart(s.blocks[1]))
+        assertTrue(s.backspaceAtStart())
         assertEquals("hello!world", s.text())
         s.undo()
         assertEquals("hello\nworld", s.text())
@@ -308,10 +289,10 @@ class BlockEditorStateTest {
     fun `typing after undo abandons the old redo branch`() {
         val s = BlockEditorState()
         s.loadText("a")
-        s.blocks[0].state.edit { append("b") }
+        s.buffer.edit { append("b") }
         s.undo()
         assertTrue(s.canRedo.value)
-        s.blocks[0].state.edit { append("c") }
+        s.buffer.edit { append("c") }
         s.undo()
         assertEquals("a", s.text())
         // the only redoable state is the second typing, not the abandoned "ab" branch

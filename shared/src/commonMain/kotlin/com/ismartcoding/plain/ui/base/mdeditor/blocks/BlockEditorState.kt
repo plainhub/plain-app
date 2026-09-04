@@ -17,21 +17,31 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * Holds the block list of the markdown editor. Every block owns a [TextFieldState]
- * whose text is the block's raw markdown, so the full document is always
- * [text] = blocks joined with newlines — the raw text remains the single source
- * of truth for autosave. Undo/redo is document-level (debounced snapshots for
- * typing, flushed on structural changes), which also covers block splits/merges.
+ * Holds the block list of the markdown editor. Inactive blocks store their raw
+ * markdown in their own [MdEditorBlock.state]; the block being edited lives in
+ * [buffer] — the single [TextFieldState] the one long-lived editor field renders.
+ *
+ * The editor field keeps IME focus and [buffer] for its whole lifetime: moving
+ * the caret between blocks swaps the buffer content instead of transferring
+ * focus. Transferring focus between two fields makes Compose tear down the old
+ * IME session and start a new one, and the two commands routinely land in
+ * separate IME command flushes — the keyboard hides and immediately re-shows.
+ * With a single session that never changes owner, block switches never touch
+ * the IME connection.
+ *
+ * The full document is always [text] = blocks joined with newlines (the active
+ * block's contribution comes from [buffer]), so the raw text remains the single
+ * source of truth for autosave. Undo/redo is document-level (debounced
+ * snapshots for typing, flushed on structural changes), which also covers
+ * block splits/merges.
  */
 
 class MdEditorBlock(
     val id: Long,
     val state: TextFieldState,
     kind: MdBlockKind,
-    editing: Boolean = false,
 ) {
     var kind by mutableStateOf(kind)
-    var editing by mutableStateOf(editing)
     fun content(): String = state.text.toString()
 }
 
@@ -40,10 +50,17 @@ data class BlockAnchor(val blockId: Long, val offset: Int)
 
 class BlockEditorState {
     val blocks = mutableStateListOf<MdEditorBlock>()
+
+    /** The block whose content [buffer] currently holds. */
     val focusedBlockId = mutableStateOf<Long?>(null)
-    val pendingFocus = mutableStateOf<Long?>(null)
     val canUndo = mutableStateOf(false)
     val canRedo = mutableStateOf(false)
+
+    /**
+     * The single editing buffer of the persistent editor field. Selection here is
+     * the document caret while [focusedBlockId] is set.
+     */
+    val buffer = TextFieldState()
 
     // ── cross-block selection (whole blocks + boundary refinement) ──
     // anchor stays fixed while the focus follows taps; both are (blockId, offset)
@@ -60,7 +77,12 @@ class BlockEditorState {
     private var snapshotJob: Job? = null
     private var normalizeJob: Job? = null
 
-    fun text(): String = blocks.joinToString("\n") { it.content() }
+    fun text(): String {
+        val activeId = focusedBlockId.value
+        return blocks.joinToString("\n") { b ->
+            if (b.id == activeId) buffer.text.toString() else b.content()
+        }
+    }
 
     /** Starts the debounced observers that maintain undo snapshots and structure. */
     fun start(scope: CoroutineScope) {
@@ -92,24 +114,84 @@ class BlockEditorState {
         canUndo.value = false
         canRedo.value = false
         focusedBlockId.value = null
-        blocks.firstOrNull()?.let { pendingFocus.value = it.id }
+        blocks.firstOrNull()?.let { activate(it, 0) }
+    }
+
+    // ---- active block / buffer ------------------------------------------------
+
+    fun activeBlock(): MdEditorBlock? =
+        focusedBlockId.value?.let { id -> blocks.firstOrNull { it.id == id } }
+
+    private fun contentOf(b: MdEditorBlock): String =
+        if (b.id == focusedBlockId.value) buffer.text.toString() else b.content()
+
+    private fun syncActiveBlockToBuffer() {
+        val b = activeBlock() ?: return
+        val t = buffer.text.toString()
+        if (t != b.content()) {
+            b.state.edit { replace(0, length, t) }
+        }
+    }
+
+    /**
+     * Makes [block] the block the editor field edits. The previously active block
+     * (including a rendered atomic block) is committed back to storage first, then
+     * the buffer is loaded with [block]'s content and the caret placed at [offset].
+     * No focus is requested here: the editor field never loses or regains focus
+     * during block switches, so the IME session is never restarted.
+     */
+    fun activate(block: MdEditorBlock, offset: Int) {
+        val current = activeBlock()
+        if (current != null && current.id != block.id) {
+            syncActiveBlockToBuffer()
+            if (current.kind != MdBlockKind.TEXT) commitAtomic(current)
+        }
+        if (block.id == focusedBlockId.value) {
+            buffer.edit { setSelection(offset.coerceIn(0, length)) }
+        } else {
+            buffer.edit {
+                replace(0, length, block.content())
+                setSelection(offset.coerceIn(0, length))
+            }
+            focusedBlockId.value = block.id
+        }
+    }
+
+    fun activateInitial() {
+        val p = focusedBlockId.value
+        if (p != null && blocks.any { it.id == p }) return
+        blocks.firstOrNull()?.let { activate(it, 0) }
+    }
+
+    fun activatePrevious(): Boolean {
+        val idx = blocks.indexOfFirst { it.id == focusedBlockId.value }
+        if (idx <= 0) return false
+        val prev = blocks[idx - 1]
+        activate(prev, prev.content().length)
+        return true
+    }
+
+    fun activateNext(): Boolean {
+        val idx = blocks.indexOfFirst { it.id == focusedBlockId.value }
+        if (idx < 0 || idx >= blocks.size - 1) return false
+        activate(blocks[idx + 1], 0)
+        return true
     }
 
     // ---- block operations -------------------------------------------------
 
     /**
-     * Re-parses a block whose text gained a newline (Enter key or multi-line paste)
-     * into several blocks and moves the caret into the block under the old caret.
-     * Enter at the end of a list line continues the marker on the next line
-     * (numbered markers increment); Enter on a marker-only line clears the marker.
+     * Enter key or multi-line paste: the buffer gained a newline, so re-parse its
+     * text into several blocks. The caret's segment becomes the new active block
+     * and the buffer is reloaded with just that segment. Enter at the end of a
+     * list line continues the marker on the next line (numbered markers
+     * increment); Enter on a marker-only line clears the marker.
      */
-    fun splitMultilineBlock(block: MdEditorBlock) {
-        val idx = blocks.indexOf(block)
-        if (idx < 0) return
-        val content = block.content()
-        if (!content.contains('\n')) return
-        var caret = block.state.selection.min
-        var text = content
+    fun splitActiveBlock() {
+        val b = activeBlock() ?: return
+        if (!buffer.text.contains('\n')) return
+        var caret = buffer.selection.min
+        var text = buffer.text.toString()
         val firstLine = text.substringBefore('\n')
         val m = listContinuationRegex.find(firstLine)
         if (m != null && caret == firstLine.length + 1) {
@@ -127,95 +209,112 @@ class BlockEditorState {
                 text = firstLine + "\n" + next + rest
                 caret += next.length
             }
-            block.state.edit {
+            buffer.edit {
                 replace(0, length, text)
                 setSelection(caret.coerceIn(0, length))
             }
+            caret = buffer.selection.min
+            text = buffer.text.toString()
         }
+        val idx = blocks.indexOf(b)
+        if (idx < 0) return
         val parsed = MdBlockParser.parse(text)
         if (parsed.size == 1) {
-            block.kind = parsed[0].kind
+            syncActiveBlockToBuffer()
+            b.kind = parsed[0].kind
             return
         }
-        splice(idx, parsed, caret)
+        var targetIdx = parsed.size - 1
+        var targetOffset = parsed.last().content.length
+        var abs = 0
+        for (i in parsed.indices) {
+            val len = parsed[i].content.length
+            if (caret <= abs + len) {
+                targetIdx = i
+                targetOffset = caret - abs
+                break
+            }
+            abs += len + 1
+        }
+        val newList = parsed.mapIndexed { i, p ->
+            // the caret segment reuses the block id so focusedBlockId stays stable
+            if (i == targetIdx) MdEditorBlock(b.id, TextFieldState(p.content), p.kind)
+            else newBlock(p.kind, p.content)
+        }
+        blocks.removeAt(idx)
+        blocks.addAll(idx, newList)
+        focusedBlockId.value = newList[targetIdx].id
+        buffer.edit {
+            replace(0, length, newList[targetIdx].content())
+            setSelection(targetOffset.coerceIn(0, length))
+        }
     }
 
     // list marker at line start: indent, then bullet [+ task box] or "N."
     private val listContinuationRegex = Regex("""^\s*(?:([-*+])(\s+\[[ xX]])?\s|(\d+)\.\s)""")
 
-    /** Backspace at the very start of a block: deletes an empty block or merges into the previous one. */
-    fun backspaceAtStart(block: MdEditorBlock): Boolean {
-        val idx = blocks.indexOf(block)
-        if (idx <= 0) return false
-        val sel = block.state.selection
+    /**
+     * Backspace at the very start of the active block: deletes an empty block or
+     * merges the previous block into the buffer (the active block survives, so the
+     * IME session is untouched).
+     */
+    fun backspaceAtStart(): Boolean {
+        val b = activeBlock() ?: return false
+        val sel = buffer.selection
         if (sel.min != 0 || sel.max != 0) return false
+        val idx = blocks.indexOf(b)
+        if (idx <= 0) return false
         val prev = blocks[idx - 1]
-        val content = block.content()
-        if (content.isEmpty()) {
+        if (buffer.text.isEmpty()) {
             blocks.removeAt(idx)
-            focusBlock(prev, prev.content().length)
+            activate(prev, prev.content().length)
             return true
         }
         if (prev.kind == MdBlockKind.TEXT) {
             val prevLen = prev.content().length
-            prev.state.edit {
-                append(content)
+            buffer.edit {
+                replace(0, 0, prev.content())
                 setSelection(prevLen)
             }
-            blocks.removeAt(idx)
-            focusedBlockId.value = prev.id
+            blocks.removeAt(idx - 1)
             return true
         }
         // previous is a rendered atomic block: open it in source mode at its end
-        focusBlock(prev, prev.content().length)
+        activate(prev, prev.content().length)
         return true
     }
 
-    fun moveFocusToPrevious(block: MdEditorBlock): Boolean {
-        val idx = blocks.indexOf(block)
-        if (idx <= 0) return false
-        val prev = blocks[idx - 1]
-        focusBlock(prev, prev.content().length)
-        return true
-    }
-
-    fun moveFocusToNext(block: MdEditorBlock): Boolean {
-        val idx = blocks.indexOf(block)
-        if (idx < 0 || idx >= blocks.size - 1) return false
-        focusBlock(blocks[idx + 1], 0)
-        return true
-    }
-
-    fun startEdit(block: MdEditorBlock) {
-        focusBlock(block, block.content().length)
-    }
-
-    /** Leaves source mode of an atomic block; re-splits it when its raw text no longer matches its kind. */
+    /**
+     * Leaves source mode of a former active atomic block; re-splits it when its
+     * raw text no longer matches its kind. Storage-only: never touches the buffer.
+     */
     fun commitAtomic(block: MdEditorBlock) {
-        if (!block.editing) return
-        block.editing = false
         val idx = blocks.indexOf(block)
         if (idx < 0) return
         val parsed = MdBlockParser.parse(block.content())
         if (parsed.size == 1 && parsed[0].kind == block.kind) return
-        splice(idx, parsed, null)
+        spliceStorage(idx, parsed)
+    }
+
+    /** Replaces blocks[idx] with the parsed sub-blocks (storage-level, no activation). */
+    private fun spliceStorage(idx: Int, parsed: List<ParsedBlock>) {
+        val newList = parsed.map { newBlock(it.kind, it.content) }
+        blocks.removeAt(idx)
+        blocks.addAll(idx, newList)
     }
 
     /**
      * Re-parses the whole document so that line-by-line typed fences/tables/math
      * collapse into atomic blocks. States of blocks whose content is unchanged are
-     * reused so caret and IME state survive; the focused block is preserved by
-     * mapping its caret offset into the new structure.
+     * reused; the active block is preserved by mapping its caret offset into the
+     * new structure.
      */
     fun normalize() {
         if (blocks.isEmpty()) return
         val parsed = MdBlockParser.parse(text())
-        if (parsed.size == blocks.size && parsed.indices.all { parsed[it].content == blocks[it].content() }) {
+        if (parsed.size == blocks.size && parsed.indices.all { parsed[it].content == contentOf(blocks[it]) }) {
             parsed.indices.forEach {
-                val b = blocks[it]
-                b.kind = parsed[it].kind
-                // a focused block that just turned atomic must keep its source editable
-                if (b.kind != MdBlockKind.TEXT && focusedBlockId.value == b.id) b.editing = true
+                blocks[it].kind = parsed[it].kind
             }
             return
         }
@@ -227,30 +326,32 @@ class BlockEditorState {
 
     fun insertAtFocused(before: String, after: String = "") {
         val b = targetBlockForInsert() ?: return
-        b.state.edit { inlineWrap(before, after) }
-        focusBlock(b, b.state.selection.min)
+        if (b.id != focusedBlockId.value) activate(b, b.content().length)
+        buffer.edit { inlineWrap(before, after) }
     }
 
     fun insertText(s: String) {
         val b = targetBlockForInsert() ?: return
-        b.state.edit { add(s) }
-        focusBlock(b, b.state.selection.min)
+        if (b.id != focusedBlockId.value) activate(b, b.content().length)
+        buffer.edit {
+            add(s)
+        }
     }
 
-    /** Wrap (or unwrap) the focused block's selection with inline markers. */
+    /** Wrap (or unwrap) the active block's selection with inline markers. */
     fun toggleWrap(before: String, after: String = before) {
-        val b = targetBlockForInsert() ?: return
-        b.state.edit { toggleWrap(before, after) }
+        val b = activeBlock() ?: return
+        buffer.edit { toggleWrap(before, after) }
     }
 
     // heading / list / quote / callout markers at the start of the focused block's line
     private val linePrefixRegex = Regex("""^(?:#{1,6}|[-*+]|\d+\.|>)(?: ?\[[^\]]*])? +""")
 
-    /** Toggle a line-start marker on the focused text block; empty [prefix] strips any marker. */
+    /** Toggle a line-start marker on the active text block; empty [prefix] strips any marker. */
     fun toggleLinePrefix(prefix: String) {
-        val b = focusedBlock() ?: blocks.firstOrNull() ?: return
+        val b = activeBlock() ?: return
         if (b.kind != MdBlockKind.TEXT) return
-        b.state.edit {
+        buffer.edit {
             val m = linePrefixRegex.find(toString())
             if (m == null) {
                 replace(0, 0, prefix)
@@ -265,28 +366,19 @@ class BlockEditorState {
     }
 
     fun moveCaretToStart() {
-        val b = focusedBlock() ?: blocks.firstOrNull() ?: return
-        focusBlock(b, 0)
+        buffer.edit { setSelection(0) }
     }
 
     fun moveCaretToEnd() {
-        val b = focusedBlock() ?: blocks.lastOrNull() ?: return
-        focusBlock(b, b.content().length)
-    }
-
-    fun focusInitial() {
-        val p = pendingFocus.value
-        if (p != null && blocks.any { it.id == p }) return
-        blocks.firstOrNull()?.let { focusBlock(it, 0) }
+        buffer.edit { setSelection(length) }
     }
 
     // ---- cross-block selection ------------------------------------------------
 
     fun enterSelectionMode() {
         exitSelectionMode()
+        syncActiveBlockToBuffer()
         selectionMode = true
-        focusedBlockId.value = null
-        pendingFocus.value = null
     }
 
     fun exitSelectionMode() {
@@ -379,7 +471,6 @@ class BlockEditorState {
         val to = if (isAnchor) len else (selectionFocus?.offset ?: len)
         refinedBlockId = block.id
         block.state.edit { selection = TextRange(from.coerceIn(0, length), to.coerceIn(0, length)) }
-        pendingFocus.value = block.id
     }
 
     /** Called by the refining block whenever its native selection changes. */
@@ -433,71 +524,35 @@ class BlockEditorState {
     private fun newBlock(kind: MdBlockKind, content: String): MdEditorBlock =
         MdEditorBlock(nextId++, TextFieldState(content), kind)
 
-    internal fun focusedBlock(): MdEditorBlock? =
-        focusedBlockId.value?.let { id -> blocks.firstOrNull { it.id == id } }
-
     /**
-     * Toolbar inserts go to the focused text block; when the focused block is a
-     * rendered atomic block (or nothing is focused) a fresh text block is inserted
+     * Toolbar inserts go to the active text block; when the active block is a
+     * rendered atomic block (or nothing is active) a fresh text block is inserted
      * after it so raw markdown never lands inside rendered content.
      */
     private fun targetBlockForInsert(): MdEditorBlock? {
-        val focused = focusedBlock()
-        if (focused != null && (focused.kind == MdBlockKind.TEXT || focused.editing)) return focused
+        val focused = activeBlock()
+        if (focused != null && focused.kind == MdBlockKind.TEXT) return focused
         val idx = if (focused != null) blocks.indexOf(focused) + 1 else blocks.size
         val nb = newBlock(MdBlockKind.TEXT, "")
         blocks.add(idx.coerceIn(0, blocks.size), nb)
         return nb
     }
 
-    private fun focusBlock(b: MdEditorBlock, offset: Int) {
-        if (b.kind != MdBlockKind.TEXT) b.editing = true
-        b.state.edit { setSelection(offset.coerceIn(0, length)) }
-        focusedBlockId.value = b.id
-        pendingFocus.value = b.id
-    }
-
-    /** Replaces blocks[idx] with the parsed sub-blocks; caretAbs positions the caret inside them. */
-    private fun splice(idx: Int, parsed: List<ParsedBlock>, caretAbs: Int?) {
-        var targetIdx = parsed.size - 1
-        var targetOffset = parsed.last().content.length
-        if (caretAbs != null) {
-            var abs = 0
-            for (i in parsed.indices) {
-                val len = parsed[i].content.length
-                if (caretAbs <= abs + len) {
-                    targetIdx = i
-                    targetOffset = caretAbs - abs
-                    break
-                }
-                abs += len + 1
-            }
-        }
-        val newList = parsed.map { newBlock(it.kind, it.content) }
-        blocks.removeAt(idx)
-        blocks.addAll(idx, newList)
-        // only take focus when this splice originates from caret activity (Enter/paste),
-        // never from commitAtomic which runs because focus already moved elsewhere
-        if (caretAbs != null) {
-            focusBlock(newList[targetIdx], targetOffset)
-        }
-    }
-
-    /** Absolute caret offset in the full document, or null when nothing is focused. */
+    /** Absolute caret offset in the full document, or null when nothing is active. */
     private fun focusedAbsoluteOffset(): Int? {
-        val focused = focusedBlock() ?: return null
+        val idx = blocks.indexOfFirst { it.id == focusedBlockId.value }
+        if (idx < 0) return null
         var abs = 0
-        for (b in blocks) {
-            if (b.id == focused.id) return abs + focused.state.selection.min
-            abs += b.content().length + 1
+        for (i in 0 until idx) {
+            abs += contentOf(blocks[i]).length + 1
         }
-        return null
+        return abs + buffer.selection.min
     }
 
     private fun rebuild(parsed: List<ParsedBlock>, focusAbs: Int?) {
         val used = HashSet<Long>()
         val newList = parsed.map { p ->
-            val match = blocks.firstOrNull { it.id !in used && it.content() == p.content }
+            val match = blocks.firstOrNull { it.id !in used && contentOf(it) == p.content }
             if (match != null) {
                 used.add(match.id)
                 match.kind = p.kind
@@ -508,7 +563,10 @@ class BlockEditorState {
         }
         blocks.clear()
         blocks.addAll(newList)
-        if (focusAbs == null) return
+        if (focusAbs == null) {
+            focusedBlockId.value = null
+            return
+        }
         var abs = 0
         var target: MdEditorBlock? = null
         var offset = 0
@@ -525,16 +583,16 @@ class BlockEditorState {
             target = newList.last()
             offset = target.content().length
         }
-        target?.let { focusBlock(it, offset) }
+        target?.let { activate(it, offset) }
     }
 
     private fun applyText(t: String) {
-        val focused = focusedBlock()
+        val focused = activeBlock()
         val focusIdx = if (focused != null) blocks.indexOf(focused) else 0
-        val offset = focused?.state?.selection?.min ?: 0
+        val offset = buffer.selection.min
         rebuild(MdBlockParser.parse(t), null)
         val target = blocks.getOrNull(focusIdx.coerceIn(0, blocks.size - 1)) ?: return
-        focusBlock(target, offset)
+        activate(target, offset)
     }
 
     private fun commitSnapshot() {
