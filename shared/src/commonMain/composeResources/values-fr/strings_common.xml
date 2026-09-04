@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">Raccourci ajouté à l'écran d'accueil</string>
     <string name="shortcut_not_supported">Votre lanceur ne prend pas en charge les raccourcis</string>
     <string name="shortcut_label_hint">Remarque : Certains lanceurs (p. ex. MIUI) pourraient ne pas ajouter les raccourcis avec succès.</string>
+    <string name="help">Aide</string>
 </resources>

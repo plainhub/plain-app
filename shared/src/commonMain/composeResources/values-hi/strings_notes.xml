@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">नोट्स में सहेजें</string>
     <string name="note">नोट</string>
-    <string name="editor_settings">संपादक सेटिंग्स</string>
-    <string name="show_line_numbers">लाइन नंबर दिखाएं</string>
     <string name="wrap_content">सामग्री लपेटें</string>
-    <string name="syntax_highlight">सिंटैक्स हाइलाइट</string>
     <string name="insert_image">तस्वीर डालें</string>
     <string name="image_url">तस्वीर URL</string>
     <string name="image_description">तस्वीर विवरण</string>

@@ -43,7 +43,6 @@ internal fun NotePageEffects(
     LaunchedEffect(Unit) {
         tagsVM.dataType.value = DataType.NOTE
         noteVM.editMode.value = true
-        mdEditorVM.load()
         scope.launch(Dispatchers.Default) {
             if (id.value.isNotEmpty()) {
                 val item = NoteHelper.getById(id.value)

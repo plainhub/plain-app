@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">노트에 저장</string>
     <string name="note">노트</string>
-    <string name="editor_settings">편집기 설정</string>
-    <string name="show_line_numbers">줄 번호 표시</string>
     <string name="wrap_content">콘텐츠 자동 줄 바꿈</string>
-    <string name="syntax_highlight">구문 강조</string>
     <string name="insert_image">이미지 삽입</string>
     <string name="image_url">이미지 URL</string>
     <string name="image_description">이미지 설명</string>

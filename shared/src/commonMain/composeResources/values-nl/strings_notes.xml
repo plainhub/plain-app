@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">Opslaan in notities</string>
     <string name="note">Notitie</string>
-    <string name="editor_settings">Instellingen van de editor</string>
-    <string name="show_line_numbers">Regelnummers weergeven</string>
     <string name="wrap_content">Inhoud omvouwen</string>
-    <string name="syntax_highlight">Syntax highlighting</string>
     <string name="insert_image">Afbeelding invoegen</string>
     <string name="image_url">Afbeeldings-URL</string>
     <string name="image_description">Afbeeldingsbeschrijving</string>

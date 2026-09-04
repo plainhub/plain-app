@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">হোম স্ক্রিনে শর্টকাট যোগ করা হয়েছে</string>
     <string name="shortcut_not_supported">আপনার লঞ্চার শর্টকাট যোগ করা সমর্থন করে না</string>
     <string name="shortcut_label_hint">দ্রষ্টব্য: কিছু লঞ্চার (যেমন MIUI) হোম স্ক্রিনে শর্টকাট যোগ করতে ব্যর্থ হতে পারে।</string>
+    <string name="help">সাহায্য</string>
 </resources>

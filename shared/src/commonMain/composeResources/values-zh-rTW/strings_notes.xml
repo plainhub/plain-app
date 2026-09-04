@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">保存到筆記</string>
     <string name="note">筆記</string>
-    <string name="editor_settings">編輯器設置</string>
-    <string name="show_line_numbers">顯示行號</string>
     <string name="wrap_content">自動換行</string>
-    <string name="syntax_highlight">語法高亮</string>
     <string name="insert_image">插入圖片</string>
     <string name="image_url">圖片鏈接</string>
     <string name="image_description">圖片描述</string>

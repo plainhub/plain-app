@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">குறிப்புகளில் சேமி</string>
     <string name="note">குறிப்பு</string>
-    <string name="editor_settings">தொகுப்பு அமைப்புகள்</string>
-    <string name="show_line_numbers">வரி எண்ணிக்கைகளை காட்டு</string>
     <string name="wrap_content">உள்ளடக்கத்தை முழுவதும் அமை</string>
-    <string name="syntax_highlight">சிந்தனை ஹைலைட்</string>
     <string name="insert_image">புகைப்படம் சேர்</string>
     <string name="image_url">புகைப்பட URL</string>
     <string name="image_description">புகைப்பட விளக்கம்</string>

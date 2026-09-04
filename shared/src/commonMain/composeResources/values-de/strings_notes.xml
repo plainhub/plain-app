@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">In Notizen speichern</string>
     <string name="note">Notiz</string>
-    <string name="editor_settings">Editor-Einstellungen</string>
-    <string name="show_line_numbers">Zeilennummern anzeigen</string>
     <string name="wrap_content">Inhalt umbrechen</string>
-    <string name="syntax_highlight">Syntax hervorheben</string>
     <string name="insert_image">Bild einfügen</string>
     <string name="image_url">Bild-URL</string>
     <string name="image_description">Bildbeschreibung</string>

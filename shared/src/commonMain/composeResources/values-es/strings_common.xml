@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">Acceso directo añadido a la pantalla principal</string>
     <string name="shortcut_not_supported">Tu lanzador no admite añadir accesos directos</string>
     <string name="shortcut_label_hint">Nota: Algunos lanzadores (p. ej. MIUI) podrían no añadir accesos directos correctamente.</string>
+    <string name="help">Ayuda</string>
 </resources>

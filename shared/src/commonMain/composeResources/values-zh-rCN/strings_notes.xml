@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">保存到笔记</string>
     <string name="note">笔记</string>
-    <string name="editor_settings">编辑器设置</string>
-    <string name="show_line_numbers">显示行号</string>
     <string name="wrap_content">自动换行</string>
-    <string name="syntax_highlight">语法高亮</string>
     <string name="insert_image">插入图片</string>
     <string name="image_url">图片链接</string>
     <string name="image_description">图片描述</string>

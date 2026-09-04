@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">快捷方式已添加到主屏幕</string>
     <string name="shortcut_not_supported">您的桌面不支持添加快捷方式</string>
     <string name="shortcut_label_hint">注意：部分手机（如 MIUI）可能无法成功添加快捷方式到主屏幕。</string>
+    <string name="help">帮助</string>
 </resources>

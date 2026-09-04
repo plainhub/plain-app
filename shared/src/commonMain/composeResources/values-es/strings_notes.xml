@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">Guardar en notas</string>
     <string name="note">Nota</string>
-    <string name="editor_settings">Configuración del editor</string>
-    <string name="show_line_numbers">Mostrar números de línea</string>
     <string name="wrap_content">Ajustar contenido</string>
-    <string name="syntax_highlight">Resaltado de sintaxis</string>
     <string name="insert_image">Insertar imagen</string>
     <string name="image_url">URL de la imagen</string>
     <string name="image_description">Descripción de la imagen</string>

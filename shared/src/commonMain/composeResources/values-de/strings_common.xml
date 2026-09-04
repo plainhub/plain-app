@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">Verknüpfung zum Startbildschirm hinzugefügt</string>
     <string name="shortcut_not_supported">Ihr Launcher unterstützt keine Verknüpfungen</string>
     <string name="shortcut_label_hint">Hinweis: Einige Launcher (z. B. MIUI) unterstützen möglicherweise das Hinzufügen von Verknüpfungen nicht.</string>
+    <string name="help">Hilfe</string>
 </resources>

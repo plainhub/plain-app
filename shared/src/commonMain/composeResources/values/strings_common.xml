@@ -153,5 +153,6 @@
     <string name="stay_online_screen_black_countdown">The screen will turn black after %1$d seconds.</string>
     <string name="stay_online_keep_running">Some devices may disconnect when the screen is off or when the app is in the background. Keep this page open to keep PlainApp running and maintain desktop access.</string>
     <string name="stay_online_tap_to_exit">Tap anywhere to exit</string>
+    <string name="help">Help</string>
     <string name="markdown_guide">Markdown guide</string>
 </resources>

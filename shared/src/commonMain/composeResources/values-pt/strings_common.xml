@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">Atalho adicionado à tela inicial</string>
     <string name="shortcut_not_supported">Seu launcher não suporta adicionar atalhos</string>
     <string name="shortcut_label_hint">Nota: alguns launchers (ex. MIUI) podem não adicionar atalhos com êxito.</string>
+    <string name="help">Ajuda</string>
 </resources>

@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">Đã thêm lối tắt vào màn hình chính</string>
     <string name="shortcut_not_supported">Trình khởi chạy của bạn không hỗ trợ thêm lối tắt</string>
     <string name="shortcut_label_hint">Lưu ý: Một số trình khởi chạy (như MIUI) có thể không thêm lối tắt vào màn hình chính thành công.</string>
+    <string name="help">Trợ giúp</string>
 </resources>

@@ -398,24 +398,9 @@ object FeedAutoRefreshOnlyWifiPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("feed_auto_refresh_only_wifi")
 }
 
-object EditorAccessoryLevelPreference : BasePreference<Int>() {
-    override val default = 0
-    override val key = intPreferencesKey("editor_accessory_level")
-}
-
 object EditorWrapContentPreference : BasePreference<Boolean>() {
     override val default = true
     override val key = booleanPreferencesKey("editor_wrap_content")
-}
-
-object EditorShowLineNumbersPreference : BasePreference<Boolean>() {
-    override val default = true
-    override val key = booleanPreferencesKey("editor_show_line_numbers")
-}
-
-object EditorSyntaxHighlightPreference : BasePreference<Boolean>() {
-    override val default = true
-    override val key = booleanPreferencesKey("editor_syntax_highlight")
 }
 
 object AudioSleepTimerMinutesPreference : BasePreference<Int>() {

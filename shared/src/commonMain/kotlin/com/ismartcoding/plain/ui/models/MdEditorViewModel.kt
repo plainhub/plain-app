@@ -5,10 +5,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.preferences.EditorAccessoryLevelPreference
-import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
-import com.ismartcoding.plain.preferences.EditorSyntaxHighlightPreference
-import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.base.mdeditor.blocks.BlockEditorState
 
@@ -17,23 +13,11 @@ data class MdAccessoryItem2(val icon: DrawableResource, val click: (MdEditorView
 
 class MdEditorViewModel : ViewModel() {
     val blocks = BlockEditorState()
-    var showSettings = mutableStateOf(false)
     var showInsertImage = mutableStateOf(false)
     var showColorPicker = mutableStateOf(false)
-    var wrapContent = mutableStateOf(true)
-    var showLineNumbers = mutableStateOf(true)
-    var syntaxHighLight = mutableStateOf(true)
 
     init {
         blocks.start(viewModelScope)
-    }
-
-    fun load() {
-        viewModelScope.launchSafe {
-            wrapContent.value = EditorWrapContentPreference.getAsync()
-            showLineNumbers.value = EditorShowLineNumbersPreference.getAsync()
-            syntaxHighLight.value = EditorSyntaxHighlightPreference.getAsync()
-        }
     }
 
     fun loadText(text: String) = blocks.loadText(text)
@@ -75,20 +59,6 @@ class MdEditorViewModel : ViewModel() {
     }
 
     fun deleteSelected() = blocks.deleteSelectedRange()
-
-    fun toggleLineNumbers() {
-        showLineNumbers.value = !showLineNumbers.value
-        viewModelScope.launchSafe {
-            EditorShowLineNumbersPreference.putAsync(showLineNumbers.value)
-        }
-    }
-
-    fun toggleWrapContent() {
-        wrapContent.value = !wrapContent.value
-        viewModelScope.launchSafe {
-            EditorWrapContentPreference.putAsync(wrapContent.value)
-        }
-    }
 
     fun insertColor(color: String) {
         insertAtFocused("<font color=\"$color\">", "</font>")

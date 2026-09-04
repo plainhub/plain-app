@@ -39,6 +39,7 @@ import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.ui.components.ColorPickerDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import com.ismartcoding.plain.ui.models.MdToolbarCategory
 import com.ismartcoding.plain.ui.models.MdToolbarItem
@@ -55,9 +56,6 @@ fun MdEditorBottomAppBar(
     var activeKey by rememberSaveable { mutableStateOf<String?>(null) }
     val active = mdToolbarCategories.firstOrNull { it.key == activeKey }
 
-    if (mdEditorVM.showSettings.value) {
-        MdEditorSettingsDialog(mdEditorVM = mdEditorVM)
-    }
     if (mdEditorVM.showInsertImage.value) {
         MdEditorInsertImageDialog(mdEditorVM = mdEditorVM)
     }
@@ -114,13 +112,13 @@ fun MdEditorBottomAppBar(
                 }
             }
             CategoryButton(
-                category = MdToolbarCategory("settings", stringResource(Res.string.settings), icon = Res.drawable.settings, items = emptyList()),
+                category = MdToolbarCategory("help", stringResource(Res.string.help), icon = Res.drawable.circle_help, items = emptyList()),
                 active = false,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             ) {
-                mdEditorVM.showSettings.value = true
+                WebHelper.open("https://www.markdownguide.org/basic-syntax")
             }
         }
     }

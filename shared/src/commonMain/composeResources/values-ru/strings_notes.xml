@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">Сохранить в заметки</string>
     <string name="note">Заметка</string>
-    <string name="editor_settings">Настройки редактора</string>
-    <string name="show_line_numbers">Показать номера строк</string>
     <string name="wrap_content">Переносить содержимое</string>
-    <string name="syntax_highlight">Подсветка синтаксиса</string>
     <string name="insert_image">Вставить изображение</string>
     <string name="image_url">URL изображения</string>
     <string name="image_description">Описание изображения</string>

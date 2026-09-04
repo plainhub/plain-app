@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">Notlara kaydet</string>
     <string name="note">Not</string>
-    <string name="editor_settings">Düzenleyici ayarları</string>
-    <string name="show_line_numbers">Satır numaralarını göster</string>
     <string name="wrap_content">İçeriği kaydır</string>
-    <string name="syntax_highlight">Sözdizimi vurgulama</string>
     <string name="insert_image">Resim ekle</string>
     <string name="image_url">Resim URL'si</string>
     <string name="image_description">Resim açıklaması</string>

@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">Lưu vào ghi chú</string>
     <string name="note">Ghi chú</string>
-    <string name="editor_settings">Cài đặt biên tập</string>
-    <string name="show_line_numbers">Hiển thị số dòng</string>
     <string name="wrap_content">Bọc nội dung</string>
-    <string name="syntax_highlight">Đánh dấu cú pháp</string>
     <string name="insert_image">Chèn hình ảnh</string>
     <string name="image_url">URL hình ảnh</string>
     <string name="image_description">Mô tả hình ảnh</string>

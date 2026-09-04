@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">ショートカットをホーム画面に追加しました</string>
     <string name="shortcut_not_supported">ランチャーがショートカットの追加をサポートしていません</string>
     <string name="shortcut_label_hint">注意：一部のランチャー（MIUIなど）ではホーム画面へのショートカット追加が失敗する場合があります。</string>
+    <string name="help">ヘルプ</string>
 </resources>

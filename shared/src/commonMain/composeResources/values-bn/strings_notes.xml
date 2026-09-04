@@ -2,10 +2,7 @@
 <resources>
     <string name="save_to_notes">নোটসে সংরক্ষণ করুন</string>
     <string name="note">নোট</string>
-    <string name="editor_settings">সম্পাদক সেটিংস</string>
-    <string name="show_line_numbers">লাইন সংখ্যা দেখান</string>
     <string name="wrap_content">যে সামগ্রী মুক্তভাবে লুপ্ত</string>
-    <string name="syntax_highlight">সিনট্যাক্স হাইলাইট</string>
     <string name="insert_image">চিত্র সন্নিবেশ করুন</string>
     <string name="image_url">চিত্র URL</string>
     <string name="image_description">চিত্র বর্ণনা</string>

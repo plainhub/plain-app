@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">Snelkoppeling toegevoegd aan startscherm</string>
     <string name="shortcut_not_supported">Uw launcher ondersteunt geen snelkoppelingen</string>
     <string name="shortcut_label_hint">Opmerking: sommige launchers (bijv. MIUI) ondersteunen mogelijk geen snelkoppelingen.</string>
+    <string name="help">Help</string>
 </resources>

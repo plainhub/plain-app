@@ -154,4 +154,5 @@
     <string name="shortcut_added_to_home">होम स्क्रीन पर शॉर्टकट जोड़ा गया</string>
     <string name="shortcut_not_supported">आपका लॉन्चर शॉर्टकट जोड़ने का समर्थन नहीं करता</string>
     <string name="shortcut_label_hint">नोट: कुछ लॉन्चर (जैसे MIUI) होम स्क्रीन पर शॉर्टकट जोड़ने में विफल हो सकते हैं।</string>
+    <string name="help">सहायता</string>
 </resources>
