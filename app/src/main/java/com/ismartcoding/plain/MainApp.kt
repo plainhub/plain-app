@@ -8,12 +8,20 @@ import com.ismartcoding.plain.platform.clearImageMemoryCache
 class MainApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        // Cap Netty's off-heap pool BEFORE any Netty class loads: by default
-        // its ceiling is Runtime.maxMemory() — a whole extra heap of native
-        // memory on top of the heap. Inside memory-sandboxed environments
-        // (Huawei Zhuoyitong container, Work Profile) that double allocation
-        // gets the process killed when several video streams ramp the pool.
-        // Must run before warmUpNetty()/first Netty use in MainAppHelper.
+        // Bound the HTTP server's buffer memory BEFORE any Netty class loads
+        // (must precede MainAppHelper.init -> warmUpNetty).
+        //
+        // 1. Prefer HEAP buffers: Netty's default allocator prefers direct
+        //    (off-heap) buffers with a ceiling of Runtime.maxMemory() — a
+        //    whole extra memory budget on top of the heap. In memory-sandboxed
+        //    environments (Huawei Zhuoyitong container) that double budget
+        //    gets the process killed when several video streams ramp the
+        //    pool. With heap preference every buffer lives inside the Java
+        //    heap budget; socket writes with heap buffers cost one extra
+        //    memcpy per 64KiB chunk, immeasurable next to network time.
+        // 2. Cap direct memory as a safety net for any explicit
+        //    directBuffer() caller.
+        System.setProperty("io.netty.noPreferDirect", "true")
         System.setProperty("io.netty.maxDirectMemory", (32L * 1024 * 1024).toString())
         setAppContext(this, buildChannel = BuildConfig.CHANNEL)
         MainAppHelper.init(this)
