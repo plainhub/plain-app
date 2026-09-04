@@ -17,6 +17,30 @@ internal fun fullFileRange(fileLength: Long): ResolvedFileRange =
     )
 
 /**
+ * Upper bound for one browser media range response. Web pages keep several
+ * <video> elements alive at once (grid previews, lightbox preload="auto"), and
+ * an open-ended whole-file 206 lets each of them buffer the entire file, which
+ * splits the phone's uplink across concurrent downloads and stalls playback
+ * start. Bounding each response makes the browser finish its fetch and come
+ * back for more only when it actually plays; Content-Range stays accurate so
+ * follow-up requests continue from the right offset.
+ */
+internal const val BROWSER_MEDIA_RANGE_BYTES = 4L * 1024 * 1024
+
+internal fun capBrowserMediaRange(range: ResolvedFileRange, fetchDestination: String?): ResolvedFileRange {
+    val isMediaElement = fetchDestination.equals("video", ignoreCase = true) ||
+        fetchDestination.equals("audio", ignoreCase = true)
+    if (!isMediaElement || !range.isPartial || range.length <= BROWSER_MEDIA_RANGE_BYTES) {
+        return range
+    }
+    return ResolvedFileRange(
+        start = range.start,
+        endInclusive = range.start + BROWSER_MEDIA_RANGE_BYTES - 1,
+        isPartial = true,
+    )
+}
+
+/**
  * Resolve the single byte-range form used by browsers/downloaders. Multipart
  * ranges are intentionally ignored so responses stay on the single-pass
  * file-region path. Returns null when the range is unsatisfiable.

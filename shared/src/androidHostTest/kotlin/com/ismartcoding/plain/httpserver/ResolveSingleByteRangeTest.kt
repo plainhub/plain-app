@@ -147,3 +147,58 @@ class ResolveSingleByteRangeTest {
         assertEquals(20L, range.endInclusive)
     }
 }
+
+class CapBrowserMediaRangeTest {
+    private val cap = BROWSER_MEDIA_RANGE_BYTES
+    private val fileLength = 100L * 1024 * 1024
+
+    @Test
+    fun openEndedVideoRange_isCappedTo4MiB() {
+        val range = capBrowserMediaRange(ResolvedFileRange(0, fileLength - 1, isPartial = true), "video")
+        assertEquals(0L, range.start)
+        assertEquals(BROWSER_MEDIA_RANGE_BYTES - 1, range.endInclusive)
+        assertEquals(BROWSER_MEDIA_RANGE_BYTES, range.length)
+        assertTrue(range.isPartial)
+    }
+
+    @Test
+    fun audioDestination_isCapped_caseInsensitive() {
+        val range = capBrowserMediaRange(ResolvedFileRange(0, fileLength - 1, isPartial = true), "AUDIO")
+        assertEquals(BROWSER_MEDIA_RANGE_BYTES, range.length)
+    }
+
+    @Test
+    fun offsetRange_isCappedFromItsStart() {
+        val range = capBrowserMediaRange(ResolvedFileRange(10L * 1024 * 1024, fileLength - 1, isPartial = true), "Video")
+        assertEquals(10L * 1024 * 1024, range.start)
+        assertEquals(10L * 1024 * 1024 + BROWSER_MEDIA_RANGE_BYTES - 1, range.endInclusive)
+    }
+
+    @Test
+    fun rangeWithinCap_isPreserved() {
+        val range = ResolvedFileRange(0, 1023, isPartial = true)
+        assertEquals(range, capBrowserMediaRange(range, "video"))
+    }
+
+    @Test
+    fun nonMediaDestination_isNotCapped() {
+        val full = ResolvedFileRange(0, fileLength - 1, isPartial = true)
+        assertEquals(full, capBrowserMediaRange(full, "document"))
+        assertEquals(full, capBrowserMediaRange(full, null))
+        assertEquals(full, capBrowserMediaRange(full, ""))
+    }
+
+    @Test
+    fun nonPartialRange_isNotCapped() {
+        val full = ResolvedFileRange(0, fileLength - 1, isPartial = false)
+        assertEquals(full, capBrowserMediaRange(full, "video"))
+    }
+
+    @Test
+    fun cappedEnd_staysWithinFile() {
+        val tinyFile = 5L * 1024 * 1024
+        val range = capBrowserMediaRange(ResolvedFileRange(0, tinyFile - 1, isPartial = true), "video")
+        assertEquals(BROWSER_MEDIA_RANGE_BYTES - 1, range.endInclusive)
+        assertTrue(range.endInclusive < tinyFile)
+    }
+}

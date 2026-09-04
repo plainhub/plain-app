@@ -18,6 +18,7 @@ import io.netty.channel.ChannelPromise
 import io.netty.channel.DefaultFileRegion
 import io.netty.handler.codec.http.FullHttpResponse
 import io.netty.handler.codec.http.HttpResponse
+import io.netty.handler.ssl.SslHandler
 import kotlinx.atomicfu.AtomicBoolean
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
@@ -30,6 +31,12 @@ import java.nio.file.StandardOpenOption
 import kotlin.coroutines.CoroutineContext
 
 private const val UNFLUSHED_LIMIT = 65536
+
+/**
+ * Heap chunk size when a file body must pass through [SslHandler], which only
+ * accepts ByteBuf (a FileRegion fails its write with UnsupportedMessageType).
+ */
+private const val SSL_FILE_CHUNK_BYTES = 256 * 1024
 
 /**
  * Contains methods for handling HTTP responses with Netty.
@@ -258,7 +265,8 @@ internal class NettyHttpResponsePipeline(
     /**
      * Writes the response body as a Netty [DefaultFileRegion] so file bytes go
      * straight from the file system to the socket (kernel sendfile on plain-text
-     * ports; the SslHandler encrypts region chunks on TLS ports).
+     * ports). On TLS ports [SslHandler] cannot encrypt a FileRegion, so the body
+     * is streamed in bounded heap chunks instead.
      */
     private suspend fun respondWithFileRegion(
         call: NettyApplicationCall,
@@ -270,13 +278,29 @@ internal class NettyHttpResponsePipeline(
 
             if (content.length > 0) {
                 FileChannel.open(content.file.toPath(), StandardOpenOption.READ).use { fileChannel ->
-                    val region = DefaultFileRegion(fileChannel, content.offset, content.length)
-                    // Flush here: the region's future only completes once the bytes
-                    // are handed to the socket, and nothing else would trigger a flush.
-                    val future = context.writeAndFlush(region)
-                    isDataNotFlushed.compareAndSet(expect = true, update = false)
-                    future.suspendAwait()
-                    lastFuture = future
+                    lastFuture = if (context.pipeline().get(SslHandler::class.java) == null) {
+                        val region = DefaultFileRegion(fileChannel, content.offset, content.length)
+                        // Flush here: the region's future only completes once the bytes
+                        // are handed to the socket, and nothing else would trigger a flush.
+                        val future = context.writeAndFlush(region)
+                        isDataNotFlushed.compareAndSet(expect = true, update = false)
+                        future.suspendAwait()
+                        future
+                    } else {
+                        fileChannel.position(content.offset)
+                        var remaining = content.length
+                        var future: ChannelFuture = headerFuture
+                        while (remaining > 0) {
+                            val chunkSize = minOf(SSL_FILE_CHUNK_BYTES.toLong(), remaining).toInt()
+                            val buffer = context.alloc().buffer(chunkSize)
+                            buffer.writeBytes(fileChannel, chunkSize)
+                            future = context.writeAndFlush(buffer)
+                            isDataNotFlushed.compareAndSet(expect = true, update = false)
+                            future.suspendAwait()
+                            remaining -= chunkSize
+                        }
+                        future
+                    }
                 }
             }
 

@@ -137,6 +137,7 @@ class KtorHttpCall(
 
         val fileLength = file.length()
         val range = resolveSingleByteRange(applicationCall.request.headers["Range"], fileLength)
+            ?.let { capBrowserMediaRange(it, applicationCall.request.headers["Sec-Fetch-Dest"]) }
         if (range == null) {
             applicationCall.response.run {
                 status(HttpStatusCode.RequestedRangeNotSatisfiable)
