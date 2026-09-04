@@ -113,12 +113,29 @@ public abstract class NettyApplicationResponse(
 
     /**
      * Sends the response header only and hands the body to the response
-     * pipeline as a file region. The body is written by the Netty I/O thread
-     * via [io.netty.channel.FileRegion] without user-space copies.
+     * pipeline as a file region (kernel sendfile on plain-text ports).
+     *
+     * Two cases must NOT take the region path because it executes file I/O on
+     * the Netty event loop, where a blocked read stalls every connection on
+     * that loop (Android storage goes through FUSE and can sleep for tens of
+     * milliseconds per read):
+     * - TLS ports: the body would need chunked heap encryption anyway.
+     * - Large bodies: the sendfile/transferTo syscall sleeps on cold reads.
+     * Those stream through the response channel instead, which performs file
+     * reads on IO threads (Dispatchers.IOBridge) exactly like ordinary
+     * WriteChannelContent.
      */
     override suspend fun respondFileRegion(content: FileRegionContent) {
         if (!canRespond) {
             cancelIfChannelNotActive()
+            return
+        }
+
+        val tls = context.pipeline().get(io.netty.handler.ssl.SslHandler::class.java) != null
+        if (tls || content.length > FILE_REGION_MAX_ON_LOOP_BYTES) {
+            // Headers are already committed (Content-Length included); stream
+            // the bytes through the response channel on IO threads.
+            respondWriteChannelContent(content)
             return
         }
 
@@ -228,6 +245,13 @@ public abstract class NettyApplicationResponse(
 
     public companion object {
         private val EmptyByteArray = ByteArray(0)
+
+        /**
+         * Largest body served through a file region on the event loop. Beyond
+         * this, a cold FUSE read inside the transferTo syscall would stall the
+         * event loop long enough to delay every connection on it.
+         */
+        internal const val FILE_REGION_MAX_ON_LOOP_BYTES: Long = 4L * 1024 * 1024
 
         public val responseStatusCache: Array<HttpResponseStatus?> = HttpStatusCode.allStatusCodes
             .associateBy { it.value }.let { codes ->

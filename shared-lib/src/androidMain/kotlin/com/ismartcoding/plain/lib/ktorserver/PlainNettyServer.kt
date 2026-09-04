@@ -89,11 +89,15 @@ public class PlainNettyServer(
          */
         public var requestReadTimeoutSeconds: Int = 0
 
-        public var connectionGroupSize: Int = Runtime.getRuntime().availableProcessors().coerceAtMost(4)
+        /**
+         * Thread group sizing mirrors the former Ktor Netty defaults: the call
+         * group gets one thread per processor because route handlers run there.
+         */
+        public var connectionGroupSize: Int = Runtime.getRuntime().availableProcessors() / 2 + 1
 
-        public var workerGroupSize: Int = Runtime.getRuntime().availableProcessors().coerceAtMost(4)
+        public var workerGroupSize: Int = Runtime.getRuntime().availableProcessors() / 2 + 1
 
-        public var callGroupSize: Int = Runtime.getRuntime().availableProcessors().coerceAtMost(4)
+        public var callGroupSize: Int = Runtime.getRuntime().availableProcessors()
 
         /**
          * User-provided function to configure Netty's [ServerBootstrap]
