@@ -51,6 +51,7 @@ import androidx.media3.datasource.cache.Cache
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.delay
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
@@ -78,7 +79,25 @@ actual fun rememberVideoPlayerController(claimAudioSession: Boolean): VideoPlaye
 @OptIn(UnstableApi::class)
 private fun buildExoPlayer(context: Context): ExoPlayer {
     val httpDataSourceFactory = DefaultHttpDataSource.Factory()
+    // Playback is from local files, so far-ahead buffering has no UX value —
+    // re-buffering reads from storage are as fast as playback. The default
+    // LoadControl allows each player up to ~125MiB of buffered segments
+    // (2000 x 64KiB, 50s max buffer), and the previewer keeps three players
+    // composed at once (current + 2 adjacent preload pages), which overwhelms
+    // the heap inside memory-sandboxed containers (e.g. Zhuoyitong) when the
+    // user rapidly switches videos.
+    val loadControl = DefaultLoadControl.Builder()
+        .setBufferDurationsMs(
+            /* minBufferMs = */ 10_000,
+            /* maxBufferMs = */ 15_000,
+            /* bufferForPlaybackMs = */ 2_500,
+            /* bufferForPlaybackAfterRebufferMs = */ 5_000,
+        )
+        .setBackBuffer(/* backBufferDurationMs = */ 5_000, /* retainBackBufferFromKeyframe = */ false)
+        .setTargetBufferBytes(32 * 1024 * 1024)
+        .build()
     return ExoPlayer.Builder(context)
+        .setLoadControl(loadControl)
         .setSeekBackIncrementMs(10000L)
         .setSeekForwardIncrementMs(10000L)
         .setAudioAttributes(
@@ -293,6 +312,17 @@ class ExoPlayerVideoController(
     private val claimAudioSession: Boolean,
 ) : VideoPlayerController {
 
+    companion object {
+        @Volatile
+        internal var liveInstances: Int = 0
+            private set
+    }
+
+    init {
+        liveInstances += 1
+        com.ismartcoding.plain.lib.logcat.LogCat.d("ExoPlayer created, live=$liveInstances")
+    }
+
     private val focusManager = if (claimAudioSession) {
         VideoAudioFocusManager(
             context.getSystemService(Context.AUDIO_SERVICE) as AudioManager,
@@ -349,6 +379,8 @@ class ExoPlayerVideoController(
     }
 
     override fun release() {
+        liveInstances -= 1
+        com.ismartcoding.plain.lib.logcat.LogCat.d("ExoPlayer released, live=$liveInstances")
         mediaSession?.release()
         mediaSession = null
         focusManager?.abandonFocus()
