@@ -118,7 +118,7 @@ fun MdEditorBottomAppBar(
                     .weight(1f)
                     .fillMaxHeight(),
             ) {
-                WebHelper.open("https://www.markdownguide.org/basic-syntax")
+                WebHelper.open("https://plainapp.app/docs/markdown")
             }
         }
     }

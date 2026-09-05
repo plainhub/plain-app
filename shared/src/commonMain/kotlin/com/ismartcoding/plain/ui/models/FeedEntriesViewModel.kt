@@ -36,6 +36,12 @@ class FeedEntriesViewModel :
     var selectedItem = mutableStateOf<DFeedEntry?>(null)
     val showTagsDialog = mutableStateOf(false)
 
+    // The feed filter coming from the navigation route must be applied exactly
+    // once per VM lifetime; LaunchedEffect(Unit) reruns whenever the page
+    // re-enters composition (e.g. back from FeedEntryPage) and must not reset
+    // a filter the user picked in the drawer.
+    var routeFeedIdApplied = false
+
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")

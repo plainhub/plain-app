@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.lib.opml
 
+import com.ismartcoding.plain.lib.extensions.decodeNumericCharRefs
+
 /**
  * Minimal pure-Kotlin event-based XML reader.
  * Provides a subset of XmlPullParser interface sufficient for OPML parsing.
@@ -174,7 +176,8 @@ internal class SimpleXmlReader(private val xml: String) {
 
     private fun decodeEntities(s: String): String {
         if ('&' !in s) return s
-        return s.replace("&lt;", "<")
+        return s.decodeNumericCharRefs()
+            .replace("&lt;", "<")
             .replace("&gt;", ">")
             .replace("&quot;", "\"")
             .replace("&apos;", "'")

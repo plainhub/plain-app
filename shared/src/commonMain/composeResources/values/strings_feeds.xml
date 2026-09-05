@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">Pull down to sync all feeds</string>
     <string name="release_to_sync_all_feeds">Release to sync all feeds</string>
     <string name="synced">Synced</string>
+    <string name="feed_catalog">Feed Catalog</string>
+    <string name="category_tech_cn">Tech (Chinese)</string>
+    <string name="category_dev_cn">Dev (Chinese)</string>
+    <string name="category_tech_en">Tech (English)</string>
+    <string name="category_news_en">News (English)</string>
+    <string name="category_reads">Reads &amp; Science</string>
+    <string name="subscribe_n">Subscribe (%1$s)</string>
+    <string name="already_subscribed">Subscribed</string>
+    <string name="added_n_subscriptions">Added %1$s subscriptions</string>
+    <string name="add_rss_manually">Add RSS manually</string>
+    <string name="font_size">Font size</string>
+    <string name="font_size_small">Small</string>
+    <string name="font_size_standard">Standard</string>
+    <string name="font_size_large">Large</string>
+    <string name="font_size_xlarge">Extra large</string>
+    <string name="font_size_xxlarge">Huge</string>
 </resources>

@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">सभी फ़ीड्स को सिंक करने के लिए नीचे खींचें</string>
     <string name="release_to_sync_all_feeds">सभी फ़ीड्स को सिंक करने के लिए छोड़ें</string>
     <string name="synced">सिंक किया गया</string>
+    <string name="feed_catalog">सदस्यता कैटलॉग</string>
+    <string name="category_tech_cn">टेक (चीनी)</string>
+    <string name="category_dev_cn">डेव (चीनी)</string>
+    <string name="category_tech_en">टेक (अंग्रेज़ी)</string>
+    <string name="category_news_en">समाचार (अंग्रेज़ी)</string>
+    <string name="category_reads">पढ़ना और विज्ञान</string>
+    <string name="subscribe_n">सदस्यता लें (%1$s)</string>
+    <string name="already_subscribed">सदस्यता ली गई</string>
+    <string name="added_n_subscriptions">%1$s सदस्यताएँ जोड़ी गईं</string>
+    <string name="add_rss_manually">RSS मैन्युअली जोड़ें</string>
+    <string name="font_size">फ़ॉन्ट आकार</string>
+    <string name="font_size_small">छोटा</string>
+    <string name="font_size_standard">सामान्य</string>
+    <string name="font_size_large">बड़ा</string>
+    <string name="font_size_xlarge">बहुत बड़ा</string>
+    <string name="font_size_xxlarge">सबसे बड़ा</string>
 </resources>

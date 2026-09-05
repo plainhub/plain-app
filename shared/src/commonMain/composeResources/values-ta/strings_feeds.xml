@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">அனைத்து செய்திகளையும் ஒத்துகொள்</string>
     <string name="release_to_sync_all_feeds">அனைத்து செய்திகளையும் ஒத்துகொள்</string>
     <string name="synced">ஒத்துகொள்ளப்பட்டது</string>
+    <string name="feed_catalog">சந்தா கேட்டலாக்</string>
+    <string name="category_tech_cn">டெக் (சீனம்)</string>
+    <string name="category_dev_cn">டெவ் (சீனம்)</string>
+    <string name="category_tech_en">டெக் (ஆங்கிலம்)</string>
+    <string name="category_news_en">செய்திகள் (ஆங்கிலம்)</string>
+    <string name="category_reads">வாசிப்பு &amp; அறிவியல்</string>
+    <string name="subscribe_n">சந்தா (%1$s)</string>
+    <string name="already_subscribed">சந்தா செய்யப்பட்டது</string>
+    <string name="added_n_subscriptions">%1$s சந்தாக்கள் சேர்க்கப்பட்டன</string>
+    <string name="add_rss_manually">RSS ஐ கைமுறையாகச் சேர்</string>
+    <string name="font_size">எழுத்து அளவு</string>
+    <string name="font_size_small">சிறியது</string>
+    <string name="font_size_standard">நிலையான</string>
+    <string name="font_size_large">பெரியது</string>
+    <string name="font_size_xlarge">மிகப் பெரியது</string>
+    <string name="font_size_xxlarge">மிக பெரியது</string>
 </resources>

@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">Tirez vers le bas pour synchroniser tous les flux</string>
     <string name="release_to_sync_all_feeds">Relâchez pour synchroniser tous les flux</string>
     <string name="synced">Synchronisé</string>
+    <string name="feed_catalog">Catalogue d'abonnements</string>
+    <string name="category_tech_cn">Tech (chinois)</string>
+    <string name="category_dev_cn">Dev (chinois)</string>
+    <string name="category_tech_en">Tech (anglais)</string>
+    <string name="category_news_en">Actualités (anglais)</string>
+    <string name="category_reads">Lecture et science</string>
+    <string name="subscribe_n">S'abonner (%1$s)</string>
+    <string name="already_subscribed">Abonné</string>
+    <string name="added_n_subscriptions">%1$s abonnements ajoutés</string>
+    <string name="add_rss_manually">Ajouter un flux RSS manuellement</string>
+    <string name="font_size">Taille de police</string>
+    <string name="font_size_small">Petite</string>
+    <string name="font_size_standard">Standard</string>
+    <string name="font_size_large">Grande</string>
+    <string name="font_size_xlarge">Très grande</string>
+    <string name="font_size_xxlarge">Énorme</string>
 </resources>

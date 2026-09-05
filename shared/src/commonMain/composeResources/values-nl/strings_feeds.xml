@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">Trek omlaag om alle feeds te synchroniseren</string>
     <string name="release_to_sync_all_feeds">Loslaten om alle feeds te synchroniseren</string>
     <string name="synced">Gesynchroniseerd</string>
+    <string name="feed_catalog">Feedcatalogus</string>
+    <string name="category_tech_cn">Tech (Chinees)</string>
+    <string name="category_dev_cn">Ontwikkeling (Chinees)</string>
+    <string name="category_tech_en">Tech (Engels)</string>
+    <string name="category_news_en">Nieuws (Engels)</string>
+    <string name="category_reads">Lezen &amp; wetenschap</string>
+    <string name="subscribe_n">Abonneren (%1$s)</string>
+    <string name="already_subscribed">Géabonneerd</string>
+    <string name="added_n_subscriptions">%1$s abonnementen toegevoegd</string>
+    <string name="add_rss_manually">RSS handmatig toevoegen</string>
+    <string name="font_size">Tekstgrootte</string>
+    <string name="font_size_small">Klein</string>
+    <string name="font_size_standard">Standaard</string>
+    <string name="font_size_large">Groot</string>
+    <string name="font_size_xlarge">Zeer groot</string>
+    <string name="font_size_xxlarge">Maximaal</string>
 </resources>

@@ -130,6 +130,9 @@ class Routing {
     object FeedSettings
 
     @Serializable
+    object FeedCatalog
+
+    @Serializable
     object AudioPlayer
 
     @Serializable

@@ -88,6 +88,8 @@ object HttpModule {
                 return@intercept finish()
             }
             call.response.headers.append("X-Server-Time", System.currentTimeMillis().toString())
+            call.response.headers.append("Cross-Origin-Opener-Policy", CorsPolicy.crossOriginOpenerPolicy)
+            call.response.headers.append("Cross-Origin-Embedder-Policy", CorsPolicy.crossOriginEmbedderPolicy)
         }
 
         // Catch GraphQL errors thrown during request execution and deliver

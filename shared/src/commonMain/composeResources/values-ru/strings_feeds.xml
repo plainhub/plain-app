@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">Потяните вниз, чтобы синхронизировать все подписки</string>
     <string name="release_to_sync_all_feeds">Отпустите, чтобы синхронизировать все подписки</string>
     <string name="synced">Синхронизировано</string>
+    <string name="feed_catalog">Каталог подписок</string>
+    <string name="category_tech_cn">Технологии (кит.)</string>
+    <string name="category_dev_cn">Разработка (кит.)</string>
+    <string name="category_tech_en">Технологии (англ.)</string>
+    <string name="category_news_en">Новости (англ.)</string>
+    <string name="category_reads">Чтение и наука</string>
+    <string name="subscribe_n">Подписаться (%1$s)</string>
+    <string name="already_subscribed">Подписка оформлена</string>
+    <string name="added_n_subscriptions">Добавлено подписок: %1$s</string>
+    <string name="add_rss_manually">Добавить RSS вручную</string>
+    <string name="font_size">Размер шрифта</string>
+    <string name="font_size_small">Мелкий</string>
+    <string name="font_size_standard">Обычный</string>
+    <string name="font_size_large">Крупный</string>
+    <string name="font_size_xlarge">Очень крупный</string>
+    <string name="font_size_xxlarge">Огромный</string>
 </resources>

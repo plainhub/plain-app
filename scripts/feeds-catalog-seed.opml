@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Plain Feeds 内置精选目录种子（2026-09-06 全部 curl 验证 200 + feed content-type）
+  用途：随 app 打包的「精选目录」初始快照，Discover 页按分类勾选订阅。
+  结构与 OPML 分层导入设计一致：顶层 outline = 分组（folder），叶子 = feed。
+  维护建议：迁到 plainhub 下的 catalog 仓库管理，app 打包静态快照；失效源随版本更新剔除。
+-->
+<opml version="2.0">
+  <head>
+    <title>Plain Feeds Catalog</title>
+    <dateCreated>2026-09-06</dateCreated>
+  </head>
+  <body>
+    <outline text="科技 · 中文" title="科技 · 中文">
+      <outline type="rss" text="少数派" title="少数派" xmlUrl="https://sspai.com/feed" htmlUrl="https://sspai.com"/>
+      <outline type="rss" text="爱范儿" title="爱范儿" xmlUrl="https://www.ifanr.com/feed" htmlUrl="https://www.ifanr.com"/>
+      <outline type="rss" text="小众软件" title="小众软件" xmlUrl="https://www.appinn.com/feed/" htmlUrl="https://www.appinn.com"/>
+      <outline type="rss" text="IT之家" title="IT之家" xmlUrl="https://www.ithome.com/rss/" htmlUrl="https://www.ithome.com"/>
+      <outline type="rss" text="极客公园" title="极客公园" xmlUrl="https://www.geekpark.net/rss" htmlUrl="https://www.geekpark.net"/>
+      <outline type="rss" text="Solidot 奇客的资讯" title="Solidot 奇客的资讯" xmlUrl="https://www.solidot.org/index.rss" htmlUrl="https://www.solidot.org"/>
+    </outline>
+    <outline text="技术 · 中文" title="技术 · 中文">
+      <outline type="rss" text="阮一峰的网络日志" title="阮一峰的网络日志" xmlUrl="https://www.ruanyifeng.com/blog/atom.xml" htmlUrl="https://www.ruanyifeng.com/blog/"/>
+      <outline type="rss" text="酷壳 CoolShell" title="酷壳 CoolShell" xmlUrl="https://coolshell.cn/feed" htmlUrl="https://coolshell.cn"/>
+      <outline type="rss" text="V2EX" title="V2EX" xmlUrl="https://www.v2ex.com/index.xml" htmlUrl="https://www.v2ex.com"/>
+    </outline>
+    <outline text="科技 · 英文" title="科技 · 英文">
+      <outline type="rss" text="The Verge" title="The Verge" xmlUrl="https://www.theverge.com/rss/index.xml" htmlUrl="https://www.theverge.com"/>
+      <outline type="rss" text="Ars Technica" title="Ars Technica" xmlUrl="https://feeds.arstechnica.com/arstechnica/index" htmlUrl="https://arstechnica.com"/>
+      <outline type="rss" text="TechCrunch" title="TechCrunch" xmlUrl="https://techcrunch.com/feed/" htmlUrl="https://techcrunch.com"/>
+      <outline type="rss" text="Engadget" title="Engadget" xmlUrl="https://www.engadget.com/rss.xml" htmlUrl="https://www.engadget.com"/>
+      <outline type="rss" text="Hacker News" title="Hacker News" xmlUrl="https://hnrss.org/frontpage" htmlUrl="https://news.ycombinator.com"/>
+      <outline type="rss" text="9to5Mac" title="9to5Mac" xmlUrl="https://9to5mac.com/feed/" htmlUrl="https://9to5mac.com"/>
+      <outline type="rss" text="MacRumors" title="MacRumors" xmlUrl="https://feeds.macrumors.com/MacRumors-All" htmlUrl="https://www.macrumors.com"/>
+      <outline type="rss" text="Android Authority" title="Android Authority" xmlUrl="https://www.androidauthority.com/feed/" htmlUrl="https://www.androidauthority.com"/>
+      <outline type="rss" text="LWN.net" title="LWN.net" xmlUrl="https://lwn.net/headlines/rss" htmlUrl="https://lwn.net"/>
+      <outline type="rss" text="Phoronix" title="Phoronix" xmlUrl="https://www.phoronix.com/rss.php" htmlUrl="https://www.phoronix.com"/>
+      <outline type="rss" text="Polygon" title="Polygon" xmlUrl="https://www.polygon.com/rss/index.xml" htmlUrl="https://www.polygon.com"/>
+    </outline>
+    <outline text="新闻 · 英文" title="新闻 · 英文">
+      <outline type="rss" text="BBC News" title="BBC News" xmlUrl="https://feeds.bbci.co.uk/news/rss.xml" htmlUrl="https://www.bbc.com/news"/>
+      <outline type="rss" text="NPR News" title="NPR News" xmlUrl="https://feeds.npr.org/1001/rss.xml" htmlUrl="https://www.npr.org"/>
+      <outline type="rss" text="The Guardian" title="The Guardian" xmlUrl="https://www.theguardian.com/world/rss" htmlUrl="https://www.theguardian.com"/>
+      <outline type="rss" text="NY Times" title="NY Times" xmlUrl="https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" htmlUrl="https://www.nytimes.com"/>
+      <outline type="rss" text="CNN" title="CNN" xmlUrl="http://rss.cnn.com/rss/cnn_topstories.rss" htmlUrl="https://www.cnn.com"/>
+    </outline>
+    <outline text="阅读 · 科学" title="阅读 · 科学">
+      <outline type="rss" text="The Atlantic" title="The Atlantic" xmlUrl="https://www.theatlantic.com/feed/all/" htmlUrl="https://www.theatlantic.com"/>
+      <outline type="rss" text="Quanta Magazine" title="Quanta Magazine" xmlUrl="https://api.quantamagazine.org/feed/" htmlUrl="https://www.quantamagazine.org"/>
+      <outline type="rss" text="xkcd" title="xkcd" xmlUrl="https://xkcd.com/atom.xml" htmlUrl="https://xkcd.com"/>
+    </outline>
+  </body>
+</opml>

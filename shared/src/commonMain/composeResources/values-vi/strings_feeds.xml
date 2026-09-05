@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">Kéo xuống để đồng bộ tất cả nguồn cấp</string>
     <string name="release_to_sync_all_feeds">Thả để đồng bộ tất cả nguồn cấp</string>
     <string name="synced">Đã đồng bộ</string>
+    <string name="feed_catalog">Danh mục nguồn cấp</string>
+    <string name="category_tech_cn">Công nghệ (Trung)</string>
+    <string name="category_dev_cn">Lập trình (Trung)</string>
+    <string name="category_tech_en">Công nghệ (Anh)</string>
+    <string name="category_news_en">Tin tức (Anh)</string>
+    <string name="category_reads">Đọc &amp; khoa học</string>
+    <string name="subscribe_n">Đăng ký (%1$s)</string>
+    <string name="already_subscribed">Đã đăng ký</string>
+    <string name="added_n_subscriptions">Đã thêm %1$s đăng ký</string>
+    <string name="add_rss_manually">Thêm RSS thủ công</string>
+    <string name="font_size">Cỡ chữ</string>
+    <string name="font_size_small">Nhỏ</string>
+    <string name="font_size_standard">Chuẩn</string>
+    <string name="font_size_large">Lớn</string>
+    <string name="font_size_xlarge">Rất lớn</string>
+    <string name="font_size_xxlarge">To nhất</string>
 </resources>

@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">Tüm beslemeleri senkronize etmek için aşağı çekin</string>
     <string name="release_to_sync_all_feeds">Tüm beslemeleri senkronize etmek için bırakın</string>
     <string name="synced">Senkronize edildi</string>
+    <string name="feed_catalog">Akış kataloğu</string>
+    <string name="category_tech_cn">Teknoloji (Çince)</string>
+    <string name="category_dev_cn">Geliştirme (Çince)</string>
+    <string name="category_tech_en">Teknoloji (İngilizce)</string>
+    <string name="category_news_en">Haberler (İngilizce)</string>
+    <string name="category_reads">Okuma ve bilim</string>
+    <string name="subscribe_n">Abone ol (%1$s)</string>
+    <string name="already_subscribed">Abone olundu</string>
+    <string name="added_n_subscriptions">%1$s abonelik eklendi</string>
+    <string name="add_rss_manually">RSS'yi elle ekle</string>
+    <string name="font_size">Yazı boyutu</string>
+    <string name="font_size_small">Küçük</string>
+    <string name="font_size_standard">Standart</string>
+    <string name="font_size_large">Büyük</string>
+    <string name="font_size_xlarge">Çok büyük</string>
+    <string name="font_size_xxlarge">En büyük</string>
 </resources>

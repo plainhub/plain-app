@@ -33,6 +33,19 @@ object CorsPolicy {
     const val maxAgeSeconds: String = "86400"
 
     /**
+     * Cross-origin isolation headers appended to every HTTP response. Chromium
+     * needs a cross-origin isolated document (`crossOriginIsolated`) for the
+     * hardware-accelerated WebCodecs paths used by screen mirror; Safari does
+     * not support `credentialless` COEP and simply stays non-isolated.
+     * `credentialless` is preferred over `require-corp` because it does not
+     * block cross-origin subresources (feed images, avatars). Only top-level
+     * document responses consume these headers — appending them to API and
+     * asset responses is harmless and mirrors the desktop dev server.
+     */
+    const val crossOriginOpenerPolicy: String = "same-origin"
+    const val crossOriginEmbedderPolicy: String = "credentialless"
+
+    /**
      * Filter the comma-separated `Access-Control-Request-Headers` value to
      * only the names this policy permits (default headers plus any matching
      * [allowedHeaderPrefixes]). Returns null when [requestHeaders] is absent

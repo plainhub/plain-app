@@ -781,6 +781,30 @@ fun String.pathToAceMode(): String {
 }
 
 
+private val NUMERIC_CHAR_REF = Regex("&#([0-9]+);|&#[xX]([0-9a-fA-F]+);")
+
+/**
+ * Resolves numeric character references (&#8217;, &#x2019;) to their characters.
+ * Feeds commonly ship titles with these unresolved inside CDATA blocks or
+ * lenient text nodes, where a plain text substitution pass never reaches them.
+ */
+internal fun String.decodeNumericCharRefs(): String {
+    if (!contains("&#")) return this
+    return NUMERIC_CHAR_REF.replace(this) { m ->
+        val code =
+            if (m.groupValues[1].isNotEmpty()) m.groupValues[1].toIntOrNull()
+            else m.groupValues[2].toIntOrNull(16)
+        code?.codePointToString() ?: m.value
+    }
+}
+
+private fun Int.codePointToString(): String? {
+    if (this < 1 || this > 0x10FFFF || this in 0xD800..0xDFFF) return null
+    if (this <= 0xFFFF) return this.toChar().toString()
+    val v = this - 0x10000
+    return charArrayOf(((v shr 10) + 0xD800).toChar(), ((v and 0x3FF) + 0xDC00).toChar()).concatToString()
+}
+
 fun String.htmlToPlainText(): String {
     return this
         .replace(Regex("(?i)<br\\s*/?>"), "\n")
@@ -788,6 +812,7 @@ fun String.htmlToPlainText(): String {
         .replace(Regex("(?i)</div>"), "\n")
         .replace(Regex("(?i)</li>"), "\n")
         .replace(Regex("<[^>]+>"), "")
+        .decodeNumericCharRefs()
         .replace("&nbsp;", " ")
         .replace("&amp;", "&")
         .replace("&lt;", "<")

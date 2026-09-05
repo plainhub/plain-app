@@ -27,6 +27,7 @@ import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -50,6 +51,7 @@ fun Main(
     channelVM: ChannelViewModel,
     notesVM: NotesViewModel = viewModel(key = "notesVM") { NotesViewModel() },
     feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM") { TagsViewModel() },
+    feedEntryPagerVM: FeedEntryPagerViewModel = viewModel(key = "feedEntryPagerVM") { FeedEntryPagerViewModel() },
     noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM") { TagsViewModel() },
 ) {
     val scope = rememberCoroutineScope()
@@ -88,7 +90,7 @@ fun Main(
     }
 
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
-        MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, noteTagsVM, pomodoroVM)
+        MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM)
 
         DlnaReceiverOverlay()
         MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })

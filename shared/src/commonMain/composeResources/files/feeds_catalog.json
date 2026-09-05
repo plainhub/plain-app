@@ -1,0 +1,167 @@
+[
+  {
+    "id": "tech_cn",
+    "feeds": [
+      {
+        "name": "少数派",
+        "url": "https://sspai.com/feed",
+        "site": "sspai.com"
+      },
+      {
+        "name": "爱范儿",
+        "url": "https://www.ifanr.com/feed",
+        "site": "ifanr.com"
+      },
+      {
+        "name": "小众软件",
+        "url": "https://www.appinn.com/feed/",
+        "site": "appinn.com"
+      },
+      {
+        "name": "IT之家",
+        "url": "https://www.ithome.com/rss/",
+        "site": "ithome.com"
+      },
+      {
+        "name": "极客公园",
+        "url": "https://www.geekpark.net/rss",
+        "site": "geekpark.net"
+      },
+      {
+        "name": "Solidot 奇客的资讯",
+        "url": "https://www.solidot.org/index.rss",
+        "site": "solidot.org"
+      }
+    ]
+  },
+  {
+    "id": "dev_cn",
+    "feeds": [
+      {
+        "name": "阮一峰的网络日志",
+        "url": "https://www.ruanyifeng.com/blog/atom.xml",
+        "site": "ruanyifeng.com"
+      },
+      {
+        "name": "酷壳 CoolShell",
+        "url": "https://coolshell.cn/feed",
+        "site": "coolshell.cn"
+      },
+      {
+        "name": "V2EX",
+        "url": "https://www.v2ex.com/index.xml",
+        "site": "v2ex.com"
+      }
+    ]
+  },
+  {
+    "id": "tech_en",
+    "feeds": [
+      {
+        "name": "The Verge",
+        "url": "https://www.theverge.com/rss/index.xml",
+        "site": "theverge.com"
+      },
+      {
+        "name": "Ars Technica",
+        "url": "https://feeds.arstechnica.com/arstechnica/index",
+        "site": "arstechnica.com"
+      },
+      {
+        "name": "TechCrunch",
+        "url": "https://techcrunch.com/feed/",
+        "site": "techcrunch.com"
+      },
+      {
+        "name": "Engadget",
+        "url": "https://www.engadget.com/rss.xml",
+        "site": "engadget.com"
+      },
+      {
+        "name": "Hacker News",
+        "url": "https://hnrss.org/frontpage",
+        "site": "news.ycombinator.com"
+      },
+      {
+        "name": "9to5Mac",
+        "url": "https://9to5mac.com/feed/",
+        "site": "9to5mac.com"
+      },
+      {
+        "name": "MacRumors",
+        "url": "https://feeds.macrumors.com/MacRumors-All",
+        "site": "macrumors.com"
+      },
+      {
+        "name": "Android Authority",
+        "url": "https://www.androidauthority.com/feed/",
+        "site": "androidauthority.com"
+      },
+      {
+        "name": "LWN.net",
+        "url": "https://lwn.net/headlines/rss",
+        "site": "lwn.net"
+      },
+      {
+        "name": "Phoronix",
+        "url": "https://www.phoronix.com/rss.php",
+        "site": "phoronix.com"
+      },
+      {
+        "name": "Polygon",
+        "url": "https://www.polygon.com/rss/index.xml",
+        "site": "polygon.com"
+      }
+    ]
+  },
+  {
+    "id": "news_en",
+    "feeds": [
+      {
+        "name": "BBC News",
+        "url": "https://feeds.bbci.co.uk/news/rss.xml",
+        "site": "bbc.com"
+      },
+      {
+        "name": "NPR News",
+        "url": "https://feeds.npr.org/1001/rss.xml",
+        "site": "npr.org"
+      },
+      {
+        "name": "The Guardian",
+        "url": "https://www.theguardian.com/world/rss",
+        "site": "theguardian.com"
+      },
+      {
+        "name": "NY Times",
+        "url": "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+        "site": "nytimes.com"
+      },
+      {
+        "name": "CNN",
+        "url": "http://rss.cnn.com/rss/cnn_topstories.rss",
+        "site": "cnn.com"
+      }
+    ]
+  },
+  {
+    "id": "reads",
+    "feeds": [
+      {
+        "name": "The Atlantic",
+        "url": "https://www.theatlantic.com/feed/all/",
+        "site": "theatlantic.com"
+      },
+      {
+        "name": "Quanta Magazine",
+        "url": "https://api.quantamagazine.org/feed/",
+        "site": "quantamagazine.org"
+      },
+      {
+        "name": "xkcd",
+        "url": "https://xkcd.com/atom.xml",
+        "site": "xkcd.com"
+      }
+    ]
+  }
+]

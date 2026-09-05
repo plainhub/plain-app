@@ -23,6 +23,7 @@ import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -58,6 +59,7 @@ import com.ismartcoding.plain.ui.page.dlna.DlnaCastHistoryPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
 import com.ismartcoding.plain.ui.page.tools.ToolsPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
+import com.ismartcoding.plain.ui.page.feeds.FeedCatalogPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
@@ -110,6 +112,7 @@ fun MainNavGraph(
     channelVM: ChannelViewModel,
     notesVM: NotesViewModel,
     feedTagsVM: TagsViewModel,
+    feedEntryPagerVM: FeedEntryPagerViewModel,
     noteTagsVM: TagsViewModel,
     pomodoroVM: PomodoroViewModel,
 ) {
@@ -189,6 +192,7 @@ fun MainNavGraph(
         composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
         composable<Routing.Scan> { ScanPage(navController) }
         composable<Routing.FeedSettings> { FeedSettingsPage(navController) }
+        composable<Routing.FeedCatalog> { FeedCatalogPage(navController) }
         composable<Routing.HowToUse> {
             val webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }
             HowToUsePage(navController, onRunDiagnostics = { webVM.dig() })
@@ -199,11 +203,11 @@ fun MainNavGraph(
         }
         composable<Routing.FeedEntries> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.FeedEntries>()
-            FeedEntriesPage(navController, r.feedId, tagsVM = feedTagsVM)
+            FeedEntriesPage(navController, r.feedId, tagsVM = feedTagsVM, pagerVM = feedEntryPagerVM)
         }
         composable<Routing.FeedEntry> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.FeedEntry>()
-            FeedEntryPage(navController, r.id, tagsVM = feedTagsVM)
+            FeedEntryPage(navController, r.id, tagsVM = feedTagsVM, pagerVM = feedEntryPagerVM)
         }
         composable<Routing.NotesCreate> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.NotesCreate>()

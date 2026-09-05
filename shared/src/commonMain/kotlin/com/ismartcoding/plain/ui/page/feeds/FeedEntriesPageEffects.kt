@@ -31,7 +31,10 @@ internal fun FeedEntriesPageEffects(
 ) {
     LaunchedEffect(Unit) {
         tagsVM.dataType.value = feedEntriesVM.dataType
-        feedEntriesVM.feedId.value = feedId
+        if (!feedEntriesVM.routeFeedIdApplied) {
+            feedEntriesVM.routeFeedIdApplied = true
+            feedEntriesVM.feedId.value = feedId
+        }
         feedsVM.loadAsync(withCount = true)
         scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
     }

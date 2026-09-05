@@ -66,6 +66,7 @@ import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
+import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
@@ -85,6 +86,7 @@ import kotlin.math.abs
 @Composable
 fun FeedEntriesPage(
     navController: NavHostController, feedId: String, tagsVM: TagsViewModel,
+    pagerVM: FeedEntryPagerViewModel,
     feedEntriesVM: FeedEntriesViewModel = viewModel { FeedEntriesViewModel() }, feedsVM: FeedsViewModel = viewModel { FeedsViewModel() },
 ) {
     val feedsState by feedsVM.itemsFlow.collectAsState()
@@ -139,7 +141,10 @@ fun FeedEntriesPage(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                FeedEntriesDrawerContent(feedEntriesVM, feedsVM, feedsState, tagsState, drawerState, onSelectDrawerItem)
+                FeedEntriesDrawerContent(feedEntriesVM, feedsVM, feedsState, tagsState, drawerState, onSelectDrawerItem, onOpenCatalog = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Routing.FeedCatalog)
+                })
             }
         },
     ) {
@@ -210,7 +215,7 @@ fun FeedEntriesPage(
                                         val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
                                         FeedEntryListItem(
                                             feedEntriesVM, idx, m, feedsMap.value[m.feedId], tagsState.filter { tagIds.contains(it.id) },
-                                            onClick = { if (feedEntriesVM.selectMode.value) feedEntriesVM.select(m.id) else navController.navigate(Routing.FeedEntry(m.id)) },
+                                            onClick = { if (feedEntriesVM.selectMode.value) feedEntriesVM.select(m.id) else { pagerVM.setup(itemsState.map { it.id }); navController.navigate(Routing.FeedEntry(m.id)) } },
                                             onLongClick = { if (!feedEntriesVM.selectMode.value) feedEntriesVM.selectedItem.value = m },
                                             onClickTag = { tag -> if (!feedEntriesVM.selectMode.value) applyFilter("", FeedEntryFilterType.DEFAULT, tag) }
                                         )
@@ -248,6 +253,7 @@ private fun FeedEntriesDrawerContent(
     tagsState: List<DTag>,
     drawerState: DrawerState,
     onSelect: (feedId: String, filterType: FeedEntryFilterType, tag: DTag?) -> Unit,
+    onOpenCatalog: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -284,7 +290,7 @@ private fun FeedEntriesDrawerContent(
             title = stringResource(Res.string.feeds),
             isExpanded = feedsExpanded,
             onToggle = { feedsExpanded = !feedsExpanded },
-            onAction = { feedsVM.showAddDialog() },
+            onAction = onOpenCatalog,
             actionIcon = Res.drawable.plus
         )
         if (feedsExpanded) {

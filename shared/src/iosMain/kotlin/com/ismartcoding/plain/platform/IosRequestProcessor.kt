@@ -48,6 +48,8 @@ object IosRequestProcessor {
      */
     suspend fun processHttpRequest(ctx: IosRequestContext) {
         try {
+            ctx.setResponseHeader("Cross-Origin-Opener-Policy", CorsPolicy.crossOriginOpenerPolicy)
+            ctx.setResponseHeader("Cross-Origin-Embedder-Policy", CorsPolicy.crossOriginEmbedderPolicy)
             // Apply the shared CORS policy before anything else so preflight
             // requests succeed even when web is disabled, mirroring the
             // Ktor CORS plugin on Android. Without this the browser blocks

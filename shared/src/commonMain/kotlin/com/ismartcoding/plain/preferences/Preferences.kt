@@ -398,6 +398,11 @@ object FeedAutoRefreshOnlyWifiPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("feed_auto_refresh_only_wifi")
 }
 
+object FeedFontScalePreference : BasePreference<Int>() {
+    override val default = 1
+    override val key = intPreferencesKey("feed_font_scale")
+}
+
 object EditorWrapContentPreference : BasePreference<Boolean>() {
     override val default = true
     override val key = booleanPreferencesKey("editor_wrap_content")

@@ -125,3 +125,5 @@ tmp_pc_fetch.sh
 *.dm
 .ai
 AGENTS.md
+design/
+test-reports/

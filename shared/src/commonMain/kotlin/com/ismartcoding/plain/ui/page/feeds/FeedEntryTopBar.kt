@@ -2,6 +2,8 @@ package com.ismartcoding.plain.ui.page.feeds
 
 import com.ismartcoding.plain.i18n.*
 
+import com.ismartcoding.plain.features.feed.FeedFontScale
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -10,6 +12,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -23,6 +29,8 @@ import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.RadioDialog
+import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedEntryViewModel
 import com.ismartcoding.plain.platform.setClipboardText
@@ -36,6 +44,7 @@ internal fun FeedEntryTopBar(
     scrollBehavior: TopAppBarScrollBehavior, scope: CoroutineScope,
     onScrollToTop: () -> Unit,
 ) {
+    var showFontSizeDialog by remember { mutableStateOf(false) }
     PTopAppBar(
         modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { onScrollToTop() }),
         navController = navController, title = "", scrollBehavior = scrollBehavior,
@@ -69,7 +78,37 @@ internal fun FeedEntryTopBar(
                         setClipboardText("link", m.url)
                         DialogHelper.showTextCopiedMessage(m.url)
                     })
+                PDropdownMenuItem(text = { Text(stringResource(Res.string.font_size)) },
+                    leadingIcon = { Icon(painter = painterResource(Res.drawable.type), contentDescription = stringResource(Res.string.font_size)) },
+                    onClick = { dismiss(); showFontSizeDialog = true })
             }
         },
     )
+
+    if (showFontSizeDialog) {
+        RadioDialog(
+            title = stringResource(Res.string.font_size),
+            options = FeedFontScale.values.indices.map { index ->
+                RadioDialogOption(
+                    text = fontSizeLabel(index),
+                    selected = feedEntryVM.fontScaleIndex.intValue == index,
+                ) {
+                    feedEntryVM.setFontScaleIndex(index)
+                }
+            },
+        ) {
+            showFontSizeDialog = false
+        }
+    }
 }
+
+@Composable
+private fun fontSizeLabel(index: Int): String = stringResource(
+    when (index) {
+        0 -> Res.string.font_size_small
+        2 -> Res.string.font_size_large
+        3 -> Res.string.font_size_xlarge
+        4 -> Res.string.font_size_xxlarge
+        else -> Res.string.font_size_standard
+    }
+)

@@ -36,4 +36,20 @@
     <string name="pull_down_to_sync_all_feeds">すべてのフィードを同期するには下に引っ張ります</string>
     <string name="release_to_sync_all_feeds">すべてのフィードを同期するにはリリースします</string>
     <string name="synced">同期済み</string>
+    <string name="feed_catalog">購読カタログ</string>
+    <string name="category_tech_cn">テック（中国語）</string>
+    <string name="category_dev_cn">開発（中国語）</string>
+    <string name="category_tech_en">テック（英語）</string>
+    <string name="category_news_en">ニュース（英語）</string>
+    <string name="category_reads">読み物・科学</string>
+    <string name="subscribe_n">購読 (%1$s)</string>
+    <string name="already_subscribed">購読済み</string>
+    <string name="added_n_subscriptions">%1$s件の購読を追加しました</string>
+    <string name="add_rss_manually">RSSを手動で追加</string>
+    <string name="font_size">文字サイズ</string>
+    <string name="font_size_small">小</string>
+    <string name="font_size_standard">標準</string>
+    <string name="font_size_large">大</string>
+    <string name="font_size_xlarge">特大</string>
+    <string name="font_size_xxlarge">最大</string>
 </resources>
