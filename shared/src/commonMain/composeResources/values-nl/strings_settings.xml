@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">Upgrade nu, ervaar nieuwe functies!</string>
     <string name="skip_this_version">Deze versie overslaan</string>
     <string name="attention">Aandacht</string>
-    <string name="recommendation">Aanbeveling</string>
-    <string name="usb_connect_recommendation">Door de USB-oplaadkabel aan te sluiten, blijft de telefoon wakker, waardoor eventuele onderschepping of beperking van de functies door het systeem wordt vermeden.</string>
     <string name="performance">Prestatie</string>
     <string name="disable_battery_optimization">Batterijoptimalisatie uitschakelen</string>
     <string name="battery_optimization_disabled">Batterijoptimalisatie is uitgeschakeld</string>

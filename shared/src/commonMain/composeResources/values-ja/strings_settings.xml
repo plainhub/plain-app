@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">今すぐアップグレードして、新機能を体験しましょう！</string>
     <string name="skip_this_version">このバージョンをスキップ</string>
     <string name="attention">注意</string>
-    <string name="recommendation">推奨</string>
-    <string name="usb_connect_recommendation">USB充電ケーブルを接続することで、電話が起動し続けるため、システムによる機能の妨害や制限を回避します。</string>
     <string name="performance">パフォーマンス</string>
     <string name="disable_battery_optimization">バッテリーの最適化を無効にする</string>
     <string name="battery_optimization_disabled">バッテリーの最適化が無効になっています</string>

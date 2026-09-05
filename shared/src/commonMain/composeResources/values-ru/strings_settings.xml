@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">Обновите сейчас, испытайте новые функции!</string>
     <string name="skip_this_version">Пропустить эту версию</string>
     <string name="attention">Внимание</string>
-    <string name="recommendation">Рекомендация</string>
-    <string name="usb_connect_recommendation">Подключение USB-кабеля для зарядки гарантирует, что телефон остается активным, тем самым избегая любого перехвата или ограничения его функций системой.</string>
     <string name="performance">Производительность</string>
     <string name="disable_battery_optimization">Отключить оптимизацию батареи</string>
     <string name="battery_optimization_disabled">Оптимизация батареи отключена</string>

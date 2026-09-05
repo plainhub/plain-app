@@ -4,18 +4,17 @@ import com.ismartcoding.plain.ble.client.BleScanner
 import com.ismartcoding.plain.ble.client.IosBleScanner
 import com.ismartcoding.plain.ble.server.BleGattServer
 import com.ismartcoding.plain.ble.server.IosBleGattServer
+import kotlinx.coroutines.flow.StateFlow
 
-actual fun isBluetoothEnabled(): Boolean = true
+actual fun bleAvailability(): BleAvailability = IosBluetoothMonitor.availability.value
 
-actual fun isBluetoothSupported(): Boolean = true
+actual val bleAvailabilityFlow: StateFlow<BleAvailability> = IosBluetoothMonitor.availability
 
-actual fun isBleReady(): Boolean = false
-
-actual fun isBluetoothReadyToUse(): Boolean = false
-
-actual suspend fun ensureBlePermissionAsync(): Boolean = false
-
-actual fun isBluetoothAdvertiseReady(): Boolean = false
+/**
+ * Creating the central manager for the first time shows the one-time system
+ * Bluetooth prompt; the returned state resolves once the user answers.
+ */
+actual suspend fun ensureBlePermissionAsync(): Boolean = IosBleScanner.ensurePermission()
 
 actual fun setBluetoothCanContinue(value: Boolean) {}
 

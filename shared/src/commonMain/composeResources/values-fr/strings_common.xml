@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">Votre lanceur ne prend pas en charge les raccourcis</string>
     <string name="shortcut_label_hint">Remarque : Certains lanceurs (p. ex. MIUI) pourraient ne pas ajouter les raccourcis avec succès.</string>
     <string name="help">Aide</string>
+    <string name="bluetooth_permission_denied">L\'autorisation Bluetooth a été refusée. Activez le Bluetooth pour PlainApp dans les réglages.</string>
+    <string name="bluetooth_off">Le Bluetooth est désactivé. Activez-le dans le centre de contrôle ou dans les réglages.</string>
+    <string name="open_settings">Ouvrir les réglages</string>
 </resources>

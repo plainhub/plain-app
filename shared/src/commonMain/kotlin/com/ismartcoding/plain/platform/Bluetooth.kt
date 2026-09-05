@@ -2,42 +2,58 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.ble.client.BleScanner
 import com.ismartcoding.plain.ble.server.BleGattServer
+import kotlinx.coroutines.flow.StateFlow
 
 /**
- * Whether Bluetooth is currently powered on.
+ * Coarse-grained BLE availability for UI gating. Single source of truth on
+ * both platforms; the boolean helpers below derive from it.
  */
-expect fun isBluetoothEnabled(): Boolean
+enum class BleAvailability {
+    /** Not resolved yet (iOS: central manager not created / state resetting). */
+    UNKNOWN,
+
+    /** All required BLE permissions granted and Bluetooth is powered on. */
+    READY,
+
+    /** Bluetooth adapter is powered off (user must enable it in system UI). */
+    BLUETOOTH_OFF,
+
+    /** Required BLE permissions were denied by the user. */
+    PERMISSION_DENIED,
+
+    /** The device has no Bluetooth support at all. */
+    UNSUPPORTED,
+}
+
+expect fun bleAvailability(): BleAvailability
 
 /**
- * Whether the device has a Bluetooth adapter at all.
+ * Observable availability. Android refreshes it on permission results and
+ * adapter state changes; iOS is driven by centralManagerDidUpdateState.
  */
-expect fun isBluetoothSupported(): Boolean
+expect val bleAvailabilityFlow: StateFlow<BleAvailability>
+
+fun isBluetoothEnabled(): Boolean = bleAvailability() == BleAvailability.READY
+
+fun isBluetoothSupported(): Boolean = bleAvailability() != BleAvailability.UNSUPPORTED
+
+fun isBleReady(): Boolean = bleAvailability() == BleAvailability.READY
+
+fun isBluetoothReadyToUse(): Boolean = bleAvailability() == BleAvailability.READY
+
+fun isBluetoothAdvertiseReady(): Boolean = bleAvailability() == BleAvailability.READY
 
 /**
- * Returns true if Bluetooth LE permission is granted and BLE is ready for use.
- */
-expect fun isBleReady(): Boolean
-
-/**
- * Returns true if Bluetooth is enabled and all required BLE permissions are granted.
- */
-expect fun isBluetoothReadyToUse(): Boolean
-
-/**
- * Requests BLE permissions if needed and waits for the user's response.
- * Returns true if permissions were granted and Bluetooth is ready.
+ * Runs the platform permission flow and suspends until the user responds.
+ * On iOS this creates the central manager, which shows the one-time system
+ * Bluetooth prompt; it never re-prompts after a denial.
  */
 expect suspend fun ensureBlePermissionAsync(): Boolean
 
 /**
- * Returns true if Bluetooth advertising is ready to start (permission + adapter).
- */
-expect fun isBluetoothAdvertiseReady(): Boolean
-
-/**
- * Sets the `canContinue` flag used by the BLE permission flow. When the user
- * grants BLE permission, this is set to true so pending BLE operations can
- * resume. No-op on platforms without a Bluetooth permission flow (iOS).
+ * Sets the `canContinue` flag used by the Android BLE permission flow. When
+ * the user grants BLE permission, this is set to true so pending BLE
+ * operations can resume. No-op on iOS.
  */
 expect fun setBluetoothCanContinue(value: Boolean)
 

@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">您的桌面不支援添加捷徑</string>
     <string name="shortcut_label_hint">注意：部分手機（如 MIUI）可能無法成功添加捷徑到主螢幕。</string>
     <string name="help">說明</string>
+    <string name="bluetooth_permission_denied">藍牙權限已被拒絕，請在系統設定中允許 PlainApp 使用藍牙。</string>
+    <string name="bluetooth_off">藍牙已關閉，請在控制中心或系統設定中開啟藍牙。</string>
+    <string name="open_settings">開啟設定</string>
 </resources>

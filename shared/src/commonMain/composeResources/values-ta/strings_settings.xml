@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">இப்போது மேம்படுத்தவும், புதிய அம்சங்களை அனுபவிக்கவும்!</string>
     <string name="skip_this_version">இந்த பதிப்பை பாருங்கள்</string>
     <string name="attention">கவனத்தை</string>
-    <string name="recommendation">பரிந்துரை</string>
-    <string name="usb_connect_recommendation">USB சார்ஜ் கேபிளை இணைக்கும்போது தொலைபேசியின் மேம்பட்டதை உள்ளிட்டுத் தூண்டுவது, அதன் செயல்களை அரசாங்கம் மூலம் தடுக்காமல் அல்லது கட்டுப்படுத்தலால் எதிர்காலத்திற்கு உட்படுத்தப்பட்டுள்ளதை உறுதிசெய்கின்றது.</string>
     <string name="performance">செயல்பாடு</string>
     <string name="disable_battery_optimization">பேட்டரி ஒப்டிமைசேஷனை முடக்கு</string>
     <string name="battery_optimization_disabled">பேட்டரி ஒப்டிமைசேஷன் முடக்கப்பட்டுள்ளது</string>

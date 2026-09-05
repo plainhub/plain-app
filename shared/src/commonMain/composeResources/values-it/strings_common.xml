@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">Il launcher non supporta i collegamenti</string>
     <string name="shortcut_label_hint">Nota: alcuni launcher (es. MIUI) potrebbero non aggiungere correttamente i collegamenti.</string>
     <string name="help">Guida</string>
+    <string name="bluetooth_permission_denied">Permesso Bluetooth negato. Attiva il Bluetooth per PlainApp nelle Impostazioni.</string>
+    <string name="bluetooth_off">Il Bluetooth è spento. Attivalo dal Centro di Controllo o dalle Impostazioni.</string>
+    <string name="open_settings">Apri impostazioni</string>
 </resources>

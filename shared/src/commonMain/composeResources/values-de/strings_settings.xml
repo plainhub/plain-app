@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">Jetzt aktualisieren, neue Funktionen erleben!</string>
     <string name="skip_this_version">Diese Version überspringen</string>
     <string name="attention">Achtung</string>
-    <string name="recommendation">Empfehlung</string>
-    <string name="usb_connect_recommendation">Das Anschließen des USB-Ladekabels stellt sicher, dass das Telefon wach bleibt und somit eine Unterbrechung oder Einschränkung seiner Funktionen durch das System vermieden wird.</string>
     <string name="performance">Leistung</string>
     <string name="disable_battery_optimization">Akkuoptimierung deaktivieren</string>
     <string name="battery_optimization_disabled">Akkuoptimierung ist deaktiviert</string>

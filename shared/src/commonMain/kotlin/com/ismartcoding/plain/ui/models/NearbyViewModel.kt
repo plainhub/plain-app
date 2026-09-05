@@ -37,9 +37,7 @@ object NearbyViewModel {
     val itemStatus = mutableStateMapOf<String, NearbyItemStatus>()
 
     var isBleScanning = mutableStateOf(false)
-    var blePermissionReady = mutableStateOf(isBluetoothReadyToUse())
 
-    internal var eventJob: Job? = null
     private var cleanupJob: Job? = null
     private var bleJob: Job? = null
     private var blePermissionJob: Job? = null
@@ -92,9 +90,7 @@ object NearbyViewModel {
                 LogCat.e("BLE permission error: ${it.message}", it)
             },
             block = {
-                val granted = ensureBlePermissionAsync()
-                blePermissionReady.value = granted
-                if (granted) {
+                if (ensureBlePermissionAsync()) {
                     startBleScanning()
                 }
             }

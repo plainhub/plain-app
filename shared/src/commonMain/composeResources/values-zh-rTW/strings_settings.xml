@@ -19,8 +19,6 @@
     <string name="get_new_updates_desc">立即升級，體驗新功能！</string>
     <string name="skip_this_version">跳過此版本</string>
     <string name="attention">注意</string>
-    <string name="recommendation">建議</string>
-    <string name="usb_connect_recommendation">連接USB充電線確保手機保持喚醒狀態，從而避免系統攔截或限制其功能。</string>
     <string name="performance">性能</string>
     <string name="disable_battery_optimization">停用電池優化</string>
     <string name="battery_optimization_disabled">電池優化已停用</string>

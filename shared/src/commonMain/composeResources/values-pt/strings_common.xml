@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">Seu launcher não suporta adicionar atalhos</string>
     <string name="shortcut_label_hint">Nota: alguns launchers (ex. MIUI) podem não adicionar atalhos com êxito.</string>
     <string name="help">Ajuda</string>
+    <string name="bluetooth_permission_denied">Permissão do Bluetooth negada. Ative o Bluetooth para o PlainApp nos Ajustes.</string>
+    <string name="bluetooth_off">O Bluetooth está desligado. Ative-o na Central de Controle ou nos Ajustes.</string>
+    <string name="open_settings">Abrir ajustes</string>
 </resources>

@@ -30,7 +30,11 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.lib.extensions.toSortName
+import com.ismartcoding.plain.platform.BleAvailability
+import com.ismartcoding.plain.platform.bleAvailabilityFlow
 import com.ismartcoding.plain.platform.getBestIp
+import com.ismartcoding.plain.platform.isIOS
+import com.ismartcoding.plain.platform.openAppSettings
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -53,7 +57,7 @@ fun NearbyPage(
     val nearbyDevices by NearbyViewModel.nearbyDevices.collectAsState()
     val isDiscovering by NearbyViewModel.isDiscovering
     val isBleScanning by NearbyViewModel.isBleScanning
-    val blePermissionReady by NearbyViewModel.blePermissionReady
+    val bleAvailability by bleAvailabilityFlow.collectAsState()
     val isSearching = isDiscovering || isBleScanning
     val pairedPeers by PeerCacher.pairedPeers.collectAsState()
 
@@ -61,7 +65,9 @@ fun NearbyPage(
         if (!isDiscovering) {
             NearbyViewModel.startDiscovering()
         }
-        if (blePermissionReady && !isBleScanning) {
+    }
+    LaunchedEffect(bleAvailability) {
+        if (bleAvailability == BleAvailability.READY && !isBleScanning) {
             NearbyViewModel.startBleScanning()
         }
     }
@@ -90,16 +96,38 @@ fun NearbyPage(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            if (!blePermissionReady) {
+            if (bleAvailability != BleAvailability.READY && bleAvailability != BleAvailability.UNSUPPORTED) {
                 item {
+                    val description = when {
+                        bleAvailability == BleAvailability.BLUETOOTH_OFF -> stringResource(Res.string.bluetooth_off)
+                        isIOS() && bleAvailability == BleAvailability.PERMISSION_DENIED ->
+                            stringResource(Res.string.bluetooth_permission_denied)
+                        else -> stringResource(Res.string.bluetooth_permission_required_for_nearby)
+                    }
+                    // iOS has no in-app permission request or Bluetooth toggle:
+                    // once denied/off, the only recovery is the system Settings
+                    // app. Android keeps launching its own request dialogs.
+                    val openSettings = isIOS() && bleAvailability != BleAvailability.UNKNOWN
                     PAlert(
-                        description = stringResource(Res.string.bluetooth_permission_required_for_nearby),
+                        description = description,
                         AlertType.WARNING,
                     ) {
                         PFilledButton(
-                            text = stringResource(Res.string.grant_permission),
+                            text = stringResource(
+                                when {
+                                    openSettings -> Res.string.open_settings
+                                    bleAvailability == BleAvailability.BLUETOOTH_OFF -> Res.string.enable
+                                    else -> Res.string.grant_permission
+                                }
+                            ),
                             buttonSize = ButtonSize.SMALL,
-                            onClick = { NearbyViewModel.requestBlePermission() },
+                            onClick = {
+                                if (openSettings) {
+                                    openAppSettings()
+                                } else {
+                                    NearbyViewModel.requestBlePermission()
+                                }
+                            },
                         )
                     }
                 }

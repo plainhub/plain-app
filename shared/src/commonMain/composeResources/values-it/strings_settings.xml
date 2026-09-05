@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">Aggiorna ora, sperimenta nuove funzionalità!</string>
     <string name="skip_this_version">Salta questa versione</string>
     <string name="attention">Attenzione</string>
-    <string name="recommendation">Raccomandazione</string>
-    <string name="usb_connect_recommendation">Collegando il cavo di ricarica USB ci si assicura che il telefono rimanga attivo, evitando così qualsiasi intercettazione o restrizione delle sue funzioni da parte del sistema.</string>
     <string name="performance">Prestazioni</string>
     <string name="disable_battery_optimization">Disattiva ottimizzazione batteria</string>
     <string name="battery_optimization_disabled">L'ottimizzazione della batteria è disattivata</string>

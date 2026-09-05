@@ -6,9 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,8 +29,12 @@ import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermissionResultEvent
-import com.ismartcoding.plain.features.bluetooth.client.RequestScanConnectBluetoothEvent
+import com.ismartcoding.plain.platform.BleAvailability
+import com.ismartcoding.plain.platform.bleAvailabilityFlow
+import com.ismartcoding.plain.platform.ensureBlePermissionAsync
 import com.ismartcoding.plain.platform.isGranted
+import com.ismartcoding.plain.platform.isIOS
+import com.ismartcoding.plain.platform.openAppSettings
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.bot
 import com.ismartcoding.plain.i18n.channels
@@ -43,7 +49,6 @@ import com.ismartcoding.plain.i18n.plainapp_service_required_for_chat
 import com.ismartcoding.plain.i18n.start_service
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.isSPlus
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -67,6 +72,7 @@ import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -90,15 +96,16 @@ fun ChatListPage(
 
     val awarePermission = remember { if (isTPlus()) Permission.NEARBY_WIFI_DEVICES else Permission.ACCESS_FINE_LOCATION }
     var awareReady by remember { mutableStateOf(awarePermission.isGranted()) }
-    var bleReady by remember { mutableStateOf(isBleReady()) }
+    val bleAvailability by bleAvailabilityFlow.collectAsState()
+    val bleReady = bleAvailability == BleAvailability.READY
     var pendingNearbyRequest by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         Channel.sharedFlow.collect { event ->
             when (event) {
                 is BluetoothPermissionResultEvent -> {
-                    bleReady = isBleReady()
-                    if (bleReady) {
+                    if (isBleReady()) {
                         sendEvent(StartNearbyServiceEvent())
                     }
                     if (pendingNearbyRequest && !awareReady) {
@@ -112,9 +119,6 @@ fun ChatListPage(
                     if (!event.map.containsKey(key)) return@collect
                     val granted = awarePermission.isGranted()
                     awareReady = granted
-                    if (!isSPlus()) {
-                        bleReady = isBleReady()
-                    }
                     if (granted) {
                         PeerStatusManager.ensureAwareStarted()
                         sendEvent(StartNearbyServiceEvent())
@@ -126,7 +130,9 @@ fun ChatListPage(
 
     PScaffold(
         topBar = { TopBarChat(navController, onCreateChannel = { channelVM.showCreateChannelDialog.value = true }) },
-        bottomBar = if (onTabSelected != null) { { MainBottomBar(selectedIndex = 1, onTabSelected = onTabSelected) } } else null,
+        bottomBar = if (onTabSelected != null) {
+            { MainBottomBar(selectedIndex = 1, onTabSelected = onTabSelected) }
+        } else null,
     ) { paddingValues ->
         PullToRefresh(
             modifier = Modifier
@@ -137,7 +143,7 @@ fun ChatListPage(
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item { TopSpace() }
                 item {
-                    if (!serviceEnabled){
+                    if (!serviceEnabled) {
                         PAlert(
                             description = stringResource(Res.string.plainapp_service_required_for_chat),
                             AlertType.WARNING
@@ -160,11 +166,24 @@ fun ChatListPage(
                             text = stringResource(Res.string.grant_permission),
                             buttonSize = ButtonSize.SMALL,
                             onClick = {
-                                if (!bleReady && isSPlus()) {
-                                    pendingNearbyRequest = !awareReady
-                                    sendEvent(RequestScanConnectBluetoothEvent())
-                                } else {
-                                    sendEvent(RequestPermissionsEvent(awarePermission))
+                                when {
+                                    isIOS() && !bleReady -> {
+                                        // iOS cannot re-show the one-time system
+                                        // prompt once denied; recovery is Settings.
+                                        if (bleAvailability != BleAvailability.UNKNOWN) {
+                                            openAppSettings()
+                                        } else {
+                                            scope.launch { ensureBlePermissionAsync() }
+                                        }
+                                        if (!awareReady) sendEvent(RequestPermissionsEvent(awarePermission))
+                                    }
+                                    !bleReady -> {
+                                        // Permission/adapter recovery only; scanning
+                                        // is not started from this page.
+                                        pendingNearbyRequest = !awareReady
+                                        scope.launch { ensureBlePermissionAsync() }
+                                    }
+                                    else -> sendEvent(RequestPermissionsEvent(awarePermission))
                                 }
                             },
                         )
@@ -181,8 +200,7 @@ fun ChatListPage(
                 }
                 if (channels.isNotEmpty()) {
                     item {
-                        VerticalSpace(dp = 16.dp)
-                        Subtitle(stringResource(Res.string.channels))
+                        VerticalSpace(16.dp)
                     }
                     itemsIndexed(items = channels.toList(), key = { _, i -> i.id }) { index, channel ->
                         PeerListItem(
@@ -200,8 +218,7 @@ fun ChatListPage(
                 val allPeers = pairedPeers + unpairedPeers
                 if (allPeers.isNotEmpty()) {
                     item {
-                        VerticalSpace(dp = 16.dp)
-                        Subtitle(stringResource(Res.string.devices))
+                        VerticalSpace(16.dp)
                     }
                     itemsIndexed(items = allPeers, key = { _, i -> i.id }) { index, peer ->
                         PeerListItem(

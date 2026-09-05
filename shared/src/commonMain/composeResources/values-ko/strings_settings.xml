@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">지금 업그레이드하고 새로운 기능을 경험하세요!</string>
     <string name="skip_this_version">이 버전 건너뛰기</string>
     <string name="attention">주의</string>
-    <string name="recommendation">추천</string>
-    <string name="usb_connect_recommendation">USB 충전 케이블을 연결하면 전화기가 계속해서 깨어 있게되어 시스템에 의한 기능의 차단이나 제한을 피할 수 있습니다.</string>
     <string name="performance">성능</string>
     <string name="disable_battery_optimization">배터리 최적화 비활성화</string>
     <string name="battery_optimization_disabled">배터리 최적화가 비활성화되었습니다</string>

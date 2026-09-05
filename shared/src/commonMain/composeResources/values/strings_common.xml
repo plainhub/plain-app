@@ -155,4 +155,7 @@
     <string name="stay_online_tap_to_exit">Tap anywhere to exit</string>
     <string name="help">Help</string>
     <string name="markdown_guide">Markdown guide</string>
+    <string name="bluetooth_permission_denied">Bluetooth permission was denied. Enable Bluetooth for PlainApp in Settings.</string>
+    <string name="bluetooth_off">Bluetooth is turned off. Turn it on in Control Center or Settings.</string>
+    <string name="open_settings">Open Settings</string>
 </resources>

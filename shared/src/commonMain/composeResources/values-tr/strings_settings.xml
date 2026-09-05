@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">Şimdi yükseltin, yeni özellikleri deneyimleyin!</string>
     <string name="skip_this_version">Bu Sürümü Atla</string>
     <string name="attention">Dikkat</string>
-    <string name="recommendation">Öneri</string>
-    <string name="usb_connect_recommendation">USB şarj kablosunun bağlanması, telefonun uyanık kalmasını sağlar, böylece sistem tarafından işlevlerinin engellenmesi veya kısıtlanması önlenir.</string>
     <string name="performance">Performans</string>
     <string name="disable_battery_optimization">Pil optimizasyonunu devre dışı bırak</string>
     <string name="battery_optimization_disabled">Pil optimizasyonu devre dışı bırakıldı</string>

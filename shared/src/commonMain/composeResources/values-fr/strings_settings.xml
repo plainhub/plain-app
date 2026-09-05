@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">Mettez à jour maintenant, découvrez de nouvelles fonctionnalités !</string>
     <string name="skip_this_version">Ignorer cette version</string>
     <string name="attention">Attention</string>
-    <string name="recommendation">Recommandation</string>
-    <string name="usb_connect_recommendation">Connecter le câble de chargement USB assure que le téléphone reste éveillé, évitant ainsi toute interception ou restriction de ses fonctions par le système.</string>
     <string name="performance">Performance</string>
     <string name="disable_battery_optimization">Désactiver l'optimisation de la batterie</string>
     <string name="battery_optimization_disabled">L'optimisation de la batterie est désactivée</string>

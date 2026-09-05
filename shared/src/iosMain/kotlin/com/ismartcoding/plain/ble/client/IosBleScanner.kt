@@ -4,6 +4,7 @@ import com.ismartcoding.plain.ble.BleServiceData
 import com.ismartcoding.plain.ble.BleUuids
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.platform.IosBluetoothMonitor
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -78,7 +79,8 @@ object IosBleScanner : BleScanner {
                 deferred.complete(false)
             }
         }
-        return withTimeoutOrNull(10_000L.milliseconds) { deferred.await() } ?: false
+        // Long enough for the user to answer the one-time system prompt.
+        return withTimeoutOrNull(60_000L.milliseconds) { deferred.await() } ?: false
     }
 
     override fun scan(serviceUuid: String): Flow<BleGattClient> = callbackFlow {
@@ -242,6 +244,7 @@ object IosBleScanner : BleScanner {
 private class CentralDelegate : NSObject(), CBCentralManagerDelegateProtocol {
     override fun centralManagerDidUpdateState(central: CBCentralManager) {
         LogCat.d("BLE central manager state: ${central.state}")
+        IosBluetoothMonitor.update(central.state)
         IosBleScanner.onStateChanged()
     }
 

@@ -30,8 +30,6 @@
     <string name="update_downloaded">Update downloaded!</string>
     <string name="install_update">Install Update</string>
     <string name="attention">Attention</string>
-    <string name="recommendation">Recommendation</string>
-    <string name="usb_connect_recommendation">Connecting the USB charging cable ensures that the phone remains awake, thus avoiding any interception or restriction of its functions by the system.</string>
     <string name="performance">Performance</string>
     <string name="disable_battery_optimization">Disable battery optimization</string>
     <string name="battery_optimization_disabled">Battery optimization is disabled</string>

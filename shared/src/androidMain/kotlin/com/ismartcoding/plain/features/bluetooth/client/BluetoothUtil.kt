@@ -27,6 +27,10 @@ object BluetoothUtil {
                 requestScanConnectBluetooth()
                 return false
             }
+            if (!isBluetoothEnabled()) {
+                requestEnableBluetooth()
+                return false
+            }
         } else {
             if (!isBluetoothEnabled()) {
                 requestEnableBluetooth()

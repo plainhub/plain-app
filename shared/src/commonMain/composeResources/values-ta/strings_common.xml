@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">உங்கள் தொடக்கி குறுக்குவழிகளை சேர்க்க ஆதரிக்கவில்லை</string>
     <string name="shortcut_label_hint">குறிப்பு: சில தொடக்கிகள் (எ.கா. MIUI) முகப்புத் திரையில் குறுக்குவழிகளை சேர்க்க முடியாமல் போகலாம்.</string>
     <string name="help">உதவி</string>
+    <string name="bluetooth_permission_denied">புளூடூத் அனுமதி மறுக்கப்பட்டது. அமைப்புகளில் PlainApp-க்கு புளூடூத்தை இயக்கவும்.</string>
+    <string name="bluetooth_off">புளூடூத் முடக்கப்பட்டுள்ளது. கட்டுப்பாட்டு மையம் அல்லது அமைப்புகளில் இயக்கவும்.</string>
+    <string name="open_settings">அமைப்புகளைத் திறக்கவும்</string>
 </resources>

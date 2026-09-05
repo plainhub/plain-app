@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">Tu lanzador no admite añadir accesos directos</string>
     <string name="shortcut_label_hint">Nota: Algunos lanzadores (p. ej. MIUI) podrían no añadir accesos directos correctamente.</string>
     <string name="help">Ayuda</string>
+    <string name="bluetooth_permission_denied">Se denegó el permiso de Bluetooth. Activa el Bluetooth para PlainApp en Ajustes.</string>
+    <string name="bluetooth_off">El Bluetooth está apagado. Actívalo en el Centro de control o en Ajustes.</string>
+    <string name="open_settings">Abrir ajustes</string>
 </resources>

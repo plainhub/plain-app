@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">ランチャーがショートカットの追加をサポートしていません</string>
     <string name="shortcut_label_hint">注意：一部のランチャー（MIUIなど）ではホーム画面へのショートカット追加が失敗する場合があります。</string>
     <string name="help">ヘルプ</string>
+    <string name="bluetooth_permission_denied">Bluetooth権限が拒否されました。設定でPlainAppのBluetoothを許可してください。</string>
+    <string name="bluetooth_off">Bluetoothがオフになっています。コントロールセンターまたは設定でオンにしてください。</string>
+    <string name="open_settings">設定を開く</string>
 </resources>

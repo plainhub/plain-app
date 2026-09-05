@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">Ihr Launcher unterstützt keine Verknüpfungen</string>
     <string name="shortcut_label_hint">Hinweis: Einige Launcher (z. B. MIUI) unterstützen möglicherweise das Hinzufügen von Verknüpfungen nicht.</string>
     <string name="help">Hilfe</string>
+    <string name="bluetooth_permission_denied">Bluetooth-Berechtigung wurde verweigert. Aktivieren Sie Bluetooth für PlainApp in den Einstellungen.</string>
+    <string name="bluetooth_off">Bluetooth ist ausgeschaltet. Aktivieren Sie es im Kontrollzentrum oder in den Einstellungen.</string>
+    <string name="open_settings">Einstellungen öffnen</string>
 </resources>

@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">Uw launcher ondersteunt geen snelkoppelingen</string>
     <string name="shortcut_label_hint">Opmerking: sommige launchers (bijv. MIUI) ondersteunen mogelijk geen snelkoppelingen.</string>
     <string name="help">Help</string>
+    <string name="bluetooth_permission_denied">Bluetooth-toestemming geweigerd. Schakel Bluetooth voor PlainApp in bij Instellingen.</string>
+    <string name="bluetooth_off">Bluetooth is uitgeschakeld. Zet het aan in het Bedieningscentrum of in Instellingen.</string>
+    <string name="open_settings">Instellingen openen</string>
 </resources>

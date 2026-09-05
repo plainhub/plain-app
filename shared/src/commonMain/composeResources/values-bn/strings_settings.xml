@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">এখন আপগ্রেড করুন, নতুন বৈশিষ্ট্য অভিজ্ঞ করুন!</string>
     <string name="skip_this_version">এই সংস্করণ অগ্রাহ্য করুন</string>
     <string name="attention">মনোযোগ</string>
-    <string name="recommendation">সুপারিশ</string>
-    <string name="usb_connect_recommendation">ইউএসবি চার্জিং কেবল সংযোগ করা নিশ্চিত করে যে ফোনটি জাগ্রত থাকে, অতএব যে কোনও আইনতন বা ব্যবহারের সিস্টেম দ্বারা এর কার্য সীমাবদ্ধ না হওয়ার জন্য।</string>
     <string name="performance">কার্যক্ষমতা</string>
     <string name="disable_battery_optimization">ব্যাটারি অপ্টিমাইজেশন নিষ্ক্রিয় করুন</string>
     <string name="battery_optimization_disabled">ব্যাটারি অপ্টিমাইজেশন নিষ্ক্রিয় করা হয়েছে</string>

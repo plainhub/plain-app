@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">आपका लॉन्चर शॉर्टकट जोड़ने का समर्थन नहीं करता</string>
     <string name="shortcut_label_hint">नोट: कुछ लॉन्चर (जैसे MIUI) होम स्क्रीन पर शॉर्टकट जोड़ने में विफल हो सकते हैं।</string>
     <string name="help">सहायता</string>
+    <string name="bluetooth_permission_denied">ब्लूटूथ अनुमति अस्वीकार कर दी गई थी। सेटिंग में PlainApp के लिए ब्लूटूथ चालू करें।</string>
+    <string name="bluetooth_off">ब्लूटूथ बंद है। इसे कंट्रोल सेंटर या सेटिंग में चालू करें।</string>
+    <string name="open_settings">सेटिंग खोलें</string>
 </resources>

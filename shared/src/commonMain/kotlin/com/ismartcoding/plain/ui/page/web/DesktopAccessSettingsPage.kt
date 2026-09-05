@@ -78,10 +78,6 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                             modifier = Modifier.clickable { navController.navigate(Routing.HowToUse) },
                             icon = Res.drawable.info, title = stringResource(Res.string.how_to_use), showMore = true
                         )
-                        PListItem(
-                            modifier = Modifier.clickable { WebHelper.open("https://plainapp.app/troubleshooting") },
-                            icon = Res.drawable.troubleshoot, title = stringResource(Res.string.troubleshoot), showMore = true
-                        )
                     }
                     VerticalSpace(dp = 16.dp)
                 }

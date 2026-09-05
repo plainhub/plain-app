@@ -17,8 +17,6 @@
     <string name="get_new_updates_desc">Nâng cấp ngay bây giờ, trải nghiệm các tính năng mới!</string>
     <string name="skip_this_version">Bỏ qua Phiên bản Này</string>
     <string name="attention">Chú ý</string>
-    <string name="recommendation">Đề xuất</string>
-    <string name="usb_connect_recommendation">Kết nối cáp sạc USB đảm bảo rằng điện thoại luôn hoạt động, do đó tránh bất kỳ sự chặn hoặc hạn chế chức năng nào của nó bởi hệ thống.</string>
     <string name="performance">Hiệu suất</string>
     <string name="disable_battery_optimization">Vô hiệu hóa tối ưu hóa pin</string>
     <string name="battery_optimization_disabled">Tối ưu hóa pin đã được vô hiệu hóa</string>

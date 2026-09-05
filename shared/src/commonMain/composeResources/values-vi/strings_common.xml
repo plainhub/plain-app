@@ -155,4 +155,7 @@
     <string name="shortcut_not_supported">Trình khởi chạy của bạn không hỗ trợ thêm lối tắt</string>
     <string name="shortcut_label_hint">Lưu ý: Một số trình khởi chạy (như MIUI) có thể không thêm lối tắt vào màn hình chính thành công.</string>
     <string name="help">Trợ giúp</string>
+    <string name="bluetooth_permission_denied">Quyền Bluetooth bị từ chối. Hãy bật Bluetooth cho PlainApp trong Cài đặt.</string>
+    <string name="bluetooth_off">Bluetooth đang tắt. Hãy bật trong Trung tâm điều khiển hoặc Cài đặt.</string>
+    <string name="open_settings">Mở Cài đặt</string>
 </resources>
