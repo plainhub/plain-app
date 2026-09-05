@@ -14,6 +14,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.ensureNotificationPermissionAsync
 import com.ismartcoding.plain.platform.isAppForegrounded
@@ -47,8 +48,9 @@ class MainViewModel : ViewModel() {
                 if (!httpServerState.value.isProcessing() && httpServerState.value != HttpServerState.ON) {
                     httpServerState.value = HttpServerState.STARTING
                 }
+                // iOS has no foreground service, so no notification permission is needed.
                 val permission = Permission.POST_NOTIFICATIONS
-                if (permission.isGranted()) {
+                if (!isAndroidOnly() || permission.isGranted()) {
                     sendEvent(StartHttpServerEvent())
                 } else {
                     DialogHelper.showConfirmDialog(
