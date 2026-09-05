@@ -11,7 +11,6 @@ import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.ExportFileType
-import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.BookmarkHelper
@@ -67,7 +66,6 @@ class FolderKanbanSelectEvent(val data: FolderOption) : ChannelEvent()
 
 class StartHttpServerEvent : ChannelEvent()
 
-class HttpServerStateChangedEvent(val state: HttpServerState) : ChannelEvent()
 
 class RestartAppEvent : ChannelEvent()
 

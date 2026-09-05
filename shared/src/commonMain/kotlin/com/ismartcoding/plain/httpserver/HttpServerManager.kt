@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateSetOf
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.SessionClientTsUpdate
+import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.JsonHelper
@@ -78,8 +79,20 @@ object HttpServerManager {
     /** Last API request timestamp per client id, used to drive session activity updates. */
     val clientRequestTs = mutableStateMapOf<String, Long>()
 
+    /**
+     * Single source of truth for the embedded server's lifecycle state.
+     *
+     * Written only by the start/stop orchestrators in `platform/HttpServer.kt`
+     * (plus the start-command dispatch and health-sync reconciliation in
+     * MainViewModel). Everyone else — UI, Android service, QS tile — collects
+     * this flow and never keeps a local copy: a StateFlow replays the current
+     * value to every new collector, so late subscribers (Activity recreation,
+     * process restart of the UI layer) can never miss a transition.
+     */
+    val serverState = MutableStateFlow(HttpServerState.OFF)
+
     /** Last server start error message, empty when the server is healthy. */
-    var httpServerError: String = ""
+    val httpServerError = MutableStateFlow("")
 
     /**
      * Ports that failed to bind on the last start attempt.

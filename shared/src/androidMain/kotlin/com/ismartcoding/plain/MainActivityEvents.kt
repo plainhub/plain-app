@@ -19,8 +19,8 @@ import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.dlna.DlnaCastRequestEvent
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.events.ExportFileEvent
-import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.PairingCanceledEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
@@ -50,16 +50,6 @@ internal fun MainActivity.initEvents() {
             if (isDestroyed || isFinishing) return@collect
 
             when (event) {
-                is HttpServerStateChangedEvent -> {
-                    // State + error are updated in commonMain's MainEventCollector.
-                    // Here we only handle the Android-specific storage permission prompt.
-                    if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.isGranted()) {
-                        DialogHelper.showConfirmDialog(LocaleHelper.getStringAsync(Res.string.confirm), LocaleHelper.getStringAsync(Res.string.storage_permission_confirm)) {
-                            coIO { ApiPermissionsPreference.putAsync(Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }
-                        }
-                    }
-                }
-
                 is PermissionsResultEvent -> {
                     // handled by individual feature flows
                 }
@@ -191,6 +181,24 @@ internal fun MainActivity.initEvents() {
 
                 is PairingSuccessEvent -> {
                     PeerStatusManager.reconnectNow("post_pairing")
+                }
+            }
+        }
+    }
+
+    // Android-specific storage permission prompt keyed off the server-state
+    // source of truth. Only transitions into ON observed while this collector
+    // is alive trigger it (the flow's initial replay is skipped), matching the
+    // old HttpServerStateChangedEvent semantics.
+    lifecycleScope.launch {
+        var previous: HttpServerState? = null
+        HttpServerManager.serverState.collect { state ->
+            val justTurnedOn = previous != null && previous != HttpServerState.ON && state == HttpServerState.ON
+            previous = state
+            if (!justTurnedOn || isDestroyed || isFinishing) return@collect
+            if (!Permission.WRITE_EXTERNAL_STORAGE.isGranted()) {
+                DialogHelper.showConfirmDialog(LocaleHelper.getStringAsync(Res.string.confirm), LocaleHelper.getStringAsync(Res.string.storage_permission_confirm)) {
+                    coIO { ApiPermissionsPreference.putAsync(Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }
                 }
             }
         }

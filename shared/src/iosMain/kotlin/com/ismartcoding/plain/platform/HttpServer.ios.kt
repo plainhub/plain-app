@@ -79,8 +79,8 @@ private fun readFileText(uriStr: String): String {
 actual suspend fun startHttpEngineAsync(): Boolean = withIO {
     val bridge = IosPlatformRegistry.httpServerBridge()
     if (bridge == null) {
-        HttpServerManager.httpServerError = "iOS HTTP server bridge not registered — Swift PlainHttpServer missing"
-        LogCat.e(HttpServerManager.httpServerError)
+        HttpServerManager.httpServerError.value = "iOS HTTP server bridge not registered — Swift PlainHttpServer missing"
+        LogCat.e(HttpServerManager.httpServerError.value)
         return@withIO false
     }
     val httpPort = TempData.httpPort.value
@@ -88,14 +88,14 @@ actual suspend fun startHttpEngineAsync(): Boolean = withIO {
     val ok = try {
         bridge.start(httpPort, httpsPort)
     } catch (ex: Exception) {
-        HttpServerManager.httpServerError = ex.message ?: "Failed to start HTTP server"
+        HttpServerManager.httpServerError.value = ex.message ?: "Failed to start HTTP server"
         LogCat.e("startHttpEngineAsync failed: ${ex.message}")
         false
     }
     if (ok) {
-        HttpServerManager.httpServerError = ""
-    } else if (HttpServerManager.httpServerError.isEmpty()) {
-        HttpServerManager.httpServerError = "Failed to start HTTP server"
+        HttpServerManager.httpServerError.value = ""
+    } else if (HttpServerManager.httpServerError.value.isEmpty()) {
+        HttpServerManager.httpServerError.value = "Failed to start HTTP server"
     }
     ok
 }

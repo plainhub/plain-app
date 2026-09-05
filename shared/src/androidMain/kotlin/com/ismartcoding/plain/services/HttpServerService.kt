@@ -12,12 +12,10 @@ import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.features.sms.SmsProviderObserver
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.plainapp_service_is_running
@@ -34,10 +32,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 class HttpServerService : LifecycleService() {
-    // Written from the start/stop coroutines (IO), read on main in
-    // ensureServerRunning() — volatile for cross-thread visibility.
-    @Volatile
-    private var serverState: HttpServerState = HttpServerState.OFF
+    // Server lifecycle state lives in HttpServerManager.serverState (single
+    // source of truth); this service keeps no local copy.
     var mdnsRegister: MdnsRegister? = null
     private var serverJob: Job? = null
     private var lockManager: HttpServerLockManager? = null
@@ -53,7 +49,7 @@ class HttpServerService : LifecycleService() {
         lockManager = HttpServerLockManager(this)
         mdnsRegister = MdnsRegister(
             context = this,
-            isActive = { serverState == HttpServerState.ON },
+            isActive = { HttpServerManager.serverState.value == HttpServerState.ON },
             hostnameProvider = { TempData.mdnsHostname },
             httpPortProvider = { TempData.httpPort.value },
             httpsPortProvider = { TempData.httpsPort.value },
@@ -137,7 +133,7 @@ class HttpServerService : LifecycleService() {
      * stuck in STARTING after a failed start.
      */
     private fun ensureServerRunning() {
-        if (serverState == HttpServerState.ON || serverJob?.isActive == true) return
+        if (HttpServerManager.serverState.value == HttpServerState.ON || serverJob?.isActive == true) return
         serverJob = coIO {
             if (isStickyRestart) {
                 // Give previous Ktor instance time to release its TCP ports
@@ -154,13 +150,12 @@ class HttpServerService : LifecycleService() {
 
     private suspend fun startServer() {
         try {
-            startHttpServerAsync { serverState = it }
+            startHttpServerAsync()
         } catch (ex: Exception) {
             // Ensure a terminal state even if the orchestrator throws before
-            // emitting its own ERROR event.
+            // recording its own ERROR state.
             LogCat.e("Server start failed unexpectedly: ${ex.message}")
-            serverState = HttpServerState.ERROR
-            sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))
+            HttpServerManager.serverState.value = HttpServerState.ERROR
         }
     }
 
@@ -203,14 +198,22 @@ class HttpServerService : LifecycleService() {
         }
         httpServer = null
         stopForeground(STOP_FOREGROUND_REMOVE)
+        // The engine is stopped and this instance's start job was cancelled
+        // above; a state still mid-transition can never complete (a queued
+        // restart arrives as a fresh service instance with its own
+        // orchestration). Record the terminal state so collectors are not
+        // stranded in STARTING/STOPPING. Terminal states (ON with the engine
+        // just stopped by onTaskRemoved, ERROR) are left to the health sync.
+        if (HttpServerManager.serverState.value.isProcessing()) {
+            HttpServerManager.serverState.value = HttpServerState.OFF
+        }
     }
 
     private suspend fun stopHttpServerAsync() = withIO {
         LogCat.d("stopHttpServer")
         // Shared stop body handles /shutdown, engine stop, mDNS/peer-status/
-        // notification-listener side effects, state clear and OFF event.
+        // notification-listener side effects, state clear and the OFF record.
         stopHttpServerCoreAsync()
-        serverState = HttpServerState.OFF
     }
 
     companion object {

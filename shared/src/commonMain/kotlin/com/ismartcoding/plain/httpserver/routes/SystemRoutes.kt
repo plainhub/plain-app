@@ -5,14 +5,16 @@ import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.getOwnPackageName
-import com.ismartcoding.plain.platform.stopHttpEngineAsync
+import com.ismartcoding.plain.platform.finishHttpServerStopAsync
 import com.ismartcoding.plain.preferences.PasswordTypePreference
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.httpserver.http.respondJson
 import com.ismartcoding.plain.httpserver.setOnlineClientIds
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -41,9 +43,12 @@ fun HttpRouter.addSystemRoutes() {
         setOnlineClientIds(emptySet())
         call.respondNoBody(HttpStatus.GONE)
         // Give the response a moment to flush before the engine tears down the
-        // connection that is still writing it.
-        delay(100)
-        stopHttpEngineAsync()
+        // connection that is still writing it. Beyond cancellation: a client
+        // disconnect after the response must not abort the teardown.
+        withContext(NonCancellable) {
+            delay(100)
+            finishHttpServerStopAsync()
+        }
     }
 
     post("/init") { call ->

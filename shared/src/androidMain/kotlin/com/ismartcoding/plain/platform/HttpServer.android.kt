@@ -23,7 +23,9 @@ import com.ismartcoding.plain.httpserver.getSslSignatureBytes
 import com.ismartcoding.plain.httpserver.httpServer
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreBytes
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreFromPem
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -74,13 +76,13 @@ actual suspend fun startHttpEngineAsync(): Boolean = withIO {
     try {
         newServer.start(wait = false)
         httpServer = newServer
-        HttpServerManager.httpServerError = ""
+        HttpServerManager.httpServerError.value = ""
         true
     } catch (ex: Exception) {
         // The engine may have partially started (thread pools created) before
         // throwing — always stop it to prevent thread/memory leaks.
         try { newServer.stop(0, 0) } catch (_: Exception) {}
-        HttpServerManager.httpServerError = ex.message ?: ""
+        HttpServerManager.httpServerError.value = ex.message ?: ""
         LogCat.e("startHttpEngineAsync failed: ${ex.message}")
         false
     }
@@ -144,8 +146,13 @@ actual fun startHttpServerService() {
  * Android external stop: run the shared stop body, then tear down the
  * foreground service. The service's own lifecycle stop calls
  * [stopHttpServerCoreAsync] directly (without stopping itself again).
+ * Beyond cancellation: a stop whose caller's scope dies midway (ViewModel
+ * cleared, QS tile destroyed) must not leave the service alive with the
+ * engine already stopped.
  */
 actual suspend fun stopHttpServiceAsync(): Unit = withIO {
-    stopHttpServerCoreAsync()
-    appContext.stopService(Intent(appContext, HttpServerService::class.java))
+    withContext(NonCancellable) {
+        stopHttpServerCoreAsync()
+        appContext.stopService(Intent(appContext, HttpServerService::class.java))
+    }
 }

@@ -23,14 +23,19 @@ import com.ismartcoding.plain.platform.stopHttpServiceAsync
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
-    var httpServerError = mutableStateOf("")
-    var httpServerState = mutableStateOf(HttpServerState.OFF)
+    // Server lifecycle state and error are owned by HttpServerManager (single
+    // source of truth); this ViewModel only delegates the flows so pages can
+    // keep referencing mainVM. No copy is kept here — a copy would go stale
+    // whenever the writer emits while this ViewModel's collector is gone.
+    val httpServerState = HttpServerManager.serverState
+    val httpServerError = HttpServerManager.httpServerError
     var isVPNConnected = mutableStateOf(false)
     var currentRootTab = mutableIntStateOf(0)
     var pendingLoginEvent = mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
@@ -44,14 +49,11 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch {
             ServicePreference.putAsync(enable)
             if (enable) {
-                httpServerError.value = ""
-                if (!httpServerState.value.isProcessing() && httpServerState.value != HttpServerState.ON) {
-                    httpServerState.value = HttpServerState.STARTING
-                }
+                HttpServerManager.httpServerError.value = ""
                 // iOS has no foreground service, so no notification permission is needed.
                 val permission = Permission.POST_NOTIFICATIONS
                 if (!isAndroidOnly() || permission.isGranted()) {
-                    sendEvent(StartHttpServerEvent())
+                    dispatchStartHttpServer()
                 } else {
                     DialogHelper.showConfirmDialog(
                         LocaleHelper.getStringAsync(Res.string.confirm),
@@ -63,7 +65,7 @@ class MainViewModel : ViewModel() {
                                 LogCat.d("Waiting for foreground")
                                 delay(800)
                             }
-                            sendEvent(StartHttpServerEvent())
+                            dispatchStartHttpServer()
                         }
                     }
                 }
@@ -73,30 +75,36 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    // Record the STARTING transition only when the start command is actually
+    // dispatched, so a dismissed permission dialog never strands the state.
+    private fun dispatchStartHttpServer() {
+        HttpServerManager.serverState.value = HttpServerState.STARTING
+        sendEvent(StartHttpServerEvent())
+    }
+
     fun syncHttpServerState() {
         viewModelScope.launch {
             val serviceEnabled = ServicePreference.getAsync()
             if (!serviceEnabled) {
-                if (!httpServerState.value.isProcessing()) {
-                    httpServerState.value = HttpServerState.OFF
+                if (!HttpServerManager.serverState.value.isProcessing()) {
+                    HttpServerManager.serverState.value = HttpServerState.OFF
                 }
                 return@launch
             }
 
-            when (httpServerState.value) {
+            when (HttpServerManager.serverState.value) {
                 HttpServerState.ERROR -> return@launch
-                // A start/stop orchestration is in flight and its state event is
-                // authoritative; running a parallel health check here raced with
-                // the service-side check and could leave the UI ON on a dead server.
+                // A start/stop orchestration is in flight in this process and
+                // will write the terminal state itself; a parallel health check
+                // here raced with it and could overwrite a fresh verdict.
                 HttpServerState.STARTING, HttpServerState.STOPPING -> return@launch
                 HttpServerState.OFF -> {
-                    httpServerState.value = HttpServerState.STARTING
                     val serverUp = checkHttpServerAsync()
-                    // Apply the verdict only if no server event changed the state meanwhile.
-                    if (httpServerState.value == HttpServerState.STARTING) {
+                    // Apply the verdict only if no writer changed the state meanwhile.
+                    if (HttpServerManager.serverState.value == HttpServerState.OFF) {
                         if (serverUp) {
-                            httpServerError.value = ""
-                            httpServerState.value = HttpServerState.ON
+                            HttpServerManager.httpServerError.value = ""
+                            HttpServerManager.serverState.value = HttpServerState.ON
                         } else {
                             enableHttpServer(true)
                         }
@@ -104,8 +112,8 @@ class MainViewModel : ViewModel() {
                 }
                 HttpServerState.ON -> {
                     val serverUp = checkHttpServerAsync()
-                    if (!serverUp && httpServerState.value == HttpServerState.ON) {
-                        httpServerState.value = HttpServerState.ERROR
+                    if (!serverUp && HttpServerManager.serverState.value == HttpServerState.ON) {
+                        HttpServerManager.serverState.value = HttpServerState.ERROR
                     }
                 }
             }

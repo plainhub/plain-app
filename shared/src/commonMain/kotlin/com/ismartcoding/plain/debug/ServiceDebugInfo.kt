@@ -47,7 +47,7 @@ fun getServiceDebugInfo(): ServiceDebugInfo {
         httpPort = TempData.httpPort.value,
         httpsPort = TempData.httpsPort.value,
         wsSessionCount = onlineClientIds.value.size,
-        httpServerError = HttpServerManager.httpServerError,
+        httpServerError = HttpServerManager.httpServerError.value,
 
         mdnsRunning = isMdnsRunning(),
         mdnsHostname = TempData.mdnsHostname,

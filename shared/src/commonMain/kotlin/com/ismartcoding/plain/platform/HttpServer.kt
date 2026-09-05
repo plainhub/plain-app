@@ -2,25 +2,19 @@ package com.ismartcoding.plain.platform
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.logcat.LogCat
-import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.HttpServerManager
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-
-/**
- * Set of HTTP/HTTPS ports that failed to bind on the current platform.
- * Empty when no port conflicts exist.
- */
-fun httpServerPortsInUse(): Set<Int> = HttpServerManager.portsInUse.value
 
 /**
  * SSL certificate signature bytes for the current HTTPS keystore.
@@ -174,30 +168,36 @@ suspend fun checkHttpServerAsync(): Boolean = withIO {
     } ?: false
 }
 
-// Serializes start orchestrations so two concurrent runs cannot interleave
-// their engine stop/start calls and emit contradictory state events.
-private val startMutex = Mutex()
+/**
+ * Serializes the whole engine lifecycle (start orchestrator, stop teardown).
+ * Stops used to run unserialized next to a mutex-guarded start, so a quick
+ * disable→enable could interleave engine stop/start calls and write terminal
+ * states out of order (stop's OFF landing after start's ON). With one lock,
+ * engine operations and state writes are totally ordered; the pre-lock
+ * STARTING/STOPPING markers record intent immediately and the last lock owner
+ * decides the final state.
+ */
+private val lifecycleMutex = Mutex()
 
 /**
- * Shared start orchestration: emits state transitions, clears stale state,
- * stops any previous engine, handles port-conflict retries, starts the engine,
- * probes health, and invokes platform side-effect hooks.
+ * Shared start orchestration: records state transitions in
+ * [HttpServerManager.serverState] (the single source of truth — collectors
+ * read the flow, no event copies), clears stale state, stops any previous
+ * engine, handles port-conflict retries, starts the engine, probes health,
+ * and invokes platform side-effect hooks.
  *
  * On Android this is invoked from the foreground service's coroutine; on iOS
- * it is invoked directly by [startHttpServerService]. The optional
- * [onStateChanged] callback mirrors the emitted [HttpServerStateChangedEvent]
- * for callers (the Android service) that need synchronous local state.
+ * it is invoked directly by [startHttpServerService].
  */
-suspend fun startHttpServerAsync(onStateChanged: (HttpServerState) -> Unit = {}) = withIO {
-    startMutex.withLock { startHttpServerAsyncLocked(onStateChanged) }
+suspend fun startHttpServerAsync() = withIO {
+    lifecycleMutex.withLock { startHttpServerAsyncLocked() }
 }
 
-private suspend fun startHttpServerAsyncLocked(onStateChanged: (HttpServerState) -> Unit) = withIO {
+private suspend fun startHttpServerAsyncLocked() = withIO {
     LogCat.d("startHttpServer")
-    onStateChanged(HttpServerState.STARTING)
-    sendEvent(HttpServerStateChangedEvent(HttpServerState.STARTING))
+    HttpServerManager.serverState.value = HttpServerState.STARTING
     HttpServerManager.portsInUse.value = emptySet()
-    HttpServerManager.httpServerError = ""
+    HttpServerManager.httpServerError.value = ""
 
     val httpPort = TempData.httpPort.value
     val httpsPort = TempData.httpsPort.value
@@ -234,11 +234,10 @@ private suspend fun startHttpServerAsyncLocked(onStateChanged: (HttpServerState)
         healthy = checkHttpServerOnce()
     }
     if (healthy) {
-        HttpServerManager.httpServerError = ""
+        HttpServerManager.httpServerError.value = ""
         HttpServerManager.portsInUse.value = emptySet()
         onHttpServerStarted()
-        onStateChanged(HttpServerState.ON)
-        sendEvent(HttpServerStateChangedEvent(HttpServerState.ON))
+        HttpServerManager.serverState.value = HttpServerState.ON
         LogCat.d("HTTP server started on port $httpPort")
         return@withIO
     }
@@ -252,40 +251,70 @@ private suspend fun startHttpServerAsyncLocked(onStateChanged: (HttpServerState)
         if (isPortInUse(httpsPort)) HttpServerManager.portsInUse.value += httpsPort
     }
     val portsInUse = HttpServerManager.portsInUse.value
-    HttpServerManager.httpServerError = when {
+    val engineError = HttpServerManager.httpServerError.value
+    HttpServerManager.httpServerError.value = when {
         portsInUse.isNotEmpty() -> LocaleHelper.getStringFAsync(
             if (portsInUse.size > 1) Res.string.http_port_conflict_errors
             else Res.string.http_port_conflict_error,
             portsInUse.joinToString(", "),
         )
         started -> LocaleHelper.getStringAsync(Res.string.http_server_health_check_failed)
-        HttpServerManager.httpServerError.isNotEmpty() ->
-            LocaleHelper.getStringAsync(Res.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
+        engineError.isNotEmpty() ->
+            LocaleHelper.getStringAsync(Res.string.http_server_failed) + " ($engineError)"
         else -> LocaleHelper.getStringAsync(Res.string.http_server_failed)
     }
     onHttpServerStopped()
-    onStateChanged(HttpServerState.ERROR)
-    sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))
+    HttpServerManager.serverState.value = HttpServerState.ERROR
 }
 
 /**
- * Shared stop body: emits STOPPING, attempts graceful `/shutdown`, stops the
- * engine, runs side-effect hooks, clears state, and emits OFF. Called by the
- * platform [stopHttpServiceAsync] actuals and by the Android service's own
- * lifecycle stop. Does NOT stop the Android foreground service.
+ * Engine teardown shared by the stop orchestrator and the `/shutdown` route:
+ * stop the engine, run stop side-effect hooks, clear error/port state, and
+ * record the terminal OFF state. Safe to call repeatedly (the stop
+ * orchestrator's own `/shutdown` GET triggers this once from the route and
+ * once directly).
+ *
+ * Runs under [lifecycleMutex] inside [NonCancellable]: once a stop has begun
+ * it must run to completion — a cancelled caller (ViewModel cleared, QS tile
+ * service destroyed) must not strand the state in STOPPING with a half-torn
+ * engine.
+ */
+internal suspend fun finishHttpServerStopAsync() = withIO {
+    withContext(NonCancellable) {
+        lifecycleMutex.withLock {
+            stopHttpEngineAsync()
+            onHttpServerStopped()
+            HttpServerManager.httpServerError.value = ""
+            HttpServerManager.portsInUse.value = emptySet()
+            HttpServerManager.serverState.value = HttpServerState.OFF
+        }
+    }
+}
+
+/**
+ * Shared stop body: records STOPPING (intent marker, before the lock so the
+ * UI reacts immediately), attempts graceful `/shutdown`, then tears the engine
+ * down via [finishHttpServerStopAsync] (which serializes on [lifecycleMutex]
+ * and records OFF). Called by the platform [stopHttpServiceAsync] actuals and
+ * by the Android service's own lifecycle stop. Does NOT stop the Android
+ * foreground service.
+ *
+ * Beyond cancellation for its whole body: a stop whose caller's scope dies
+ * mid-way (ViewModel cleared, QS tile destroyed) must not strand the state in
+ * STOPPING with a half-torn engine.
  */
 suspend fun stopHttpServerCoreAsync() = withIO {
-    sendEvent(HttpServerStateChangedEvent(HttpServerState.STOPPING))
-    try {
-        // Best-effort graceful shutdown via /shutdown endpoint.
-        val client = createHttpClient()
-        client.get(UrlHelper.getShutdownUrl()).close()
-    } catch (_: Exception) {}
-    stopHttpEngineAsync()
-    onHttpServerStopped()
-    HttpServerManager.httpServerError = ""
-    HttpServerManager.portsInUse.value = emptySet()
-    sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
+    withContext(NonCancellable) {
+        HttpServerManager.serverState.value = HttpServerState.STOPPING
+        try {
+            // Best-effort graceful shutdown via /shutdown endpoint. Done outside
+            // the lock: the route re-enters finishHttpServerStopAsync, which
+            // would deadlock against a lock held here.
+            val client = createHttpClient()
+            client.get(UrlHelper.getShutdownUrl()).close()
+        } catch (_: Exception) {}
+        finishHttpServerStopAsync()
+    }
 }
 
 fun restartServer() {

@@ -43,7 +43,6 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.getDeviceIP4s
-import com.ismartcoding.plain.platform.httpServerPortsInUse
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isVPNConnected
 import com.ismartcoding.plain.platform.relaunchApp
@@ -67,6 +66,7 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.httpPorts
 import com.ismartcoding.plain.httpserver.httpsPorts
 import kotlinx.coroutines.launch
@@ -93,7 +93,9 @@ fun HomePage(
         setRefreshState(RefreshContentState.Finished)
     }
     val scope = rememberCoroutineScope()
-    val state = mainVM.httpServerState.value
+    val state = mainVM.httpServerState.collectAsStateValue()
+    val serverError = mainVM.httpServerError.collectAsStateValue()
+    val portsInUse = HttpServerManager.portsInUse.collectAsStateValue()
     var showStayOnlineOverlay by remember { mutableStateOf(false) }
 
     LaunchedEffect(serviceEnabled) {
@@ -106,8 +108,7 @@ fun HomePage(
     val showSuccess = serviceEnabled && state == HttpServerState.ON
     val showLoading = state.isProcessing() || (serviceEnabled && state == HttpServerState.OFF)
     val showError = state == HttpServerState.ERROR
-    val errorMessage = buildHomeWebErrorMessage(mainVM)
-    val portsInUse = httpServerPortsInUse()
+    val errorMessage = buildHomeWebErrorMessage(serverError, portsInUse)
 
     val onRestartFix: () -> Unit = {
         scope.launch {
@@ -243,14 +244,13 @@ fun HomePage(
     }
 }
 
-private fun buildHomeWebErrorMessage(mainVM: MainViewModel): String {
-    val portsInUse = httpServerPortsInUse()
+private fun buildHomeWebErrorMessage(serverError: String, portsInUse: Set<Int>): String {
     return if (portsInUse.isNotEmpty()) {
         LocaleHelper.getStringF(
             if (portsInUse.size > 1) Res.string.http_port_conflict_errors else Res.string.http_port_conflict_error,
             portsInUse.joinToString(", "),
         )
     } else {
-        mainVM.httpServerError.value.ifEmpty { LocaleHelper.getString(Res.string.http_server_failed) }
+        serverError.ifEmpty { LocaleHelper.getString(Res.string.http_server_failed) }
     }
 }

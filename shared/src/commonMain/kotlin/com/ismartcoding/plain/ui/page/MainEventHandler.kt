@@ -16,7 +16,6 @@ import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
-import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.HDownloadTaskDoneEvent
@@ -33,7 +32,6 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.models.toModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,10 +61,6 @@ fun MainEventCollector(
             when (event) {
                 is ConfirmDialogEvent -> onConfirmDialog(event)
                 is LoadingDialogEvent -> onLoadingDialog(event)
-                is HttpServerStateChangedEvent -> {
-                    mainVM.httpServerError.value = HttpServerManager.httpServerError
-                    mainVM.httpServerState.value = event.state
-                }
                 is ToastEvent -> {
                     onToast(event)
                     dismissToastJob?.cancel()
