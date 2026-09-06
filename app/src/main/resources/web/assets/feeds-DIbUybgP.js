@@ -1,0 +1,1 @@
+import{b as e}from"./file-DMVyI72U.js";import{dr as t,n}from"./index-gp-GXSgs.js";var r=r=>({viewAll:()=>{n(r,`/feeds`)},viewFeed:i=>{n(r,`/feeds?q=${e(t([{name:`feed_id`,op:``,value:i.id}]))}`)},viewToday:()=>{n(r,`/feeds?q=${e(t([{name:`today`,op:``,value:`true`}]))}`)}});export{r as t};
