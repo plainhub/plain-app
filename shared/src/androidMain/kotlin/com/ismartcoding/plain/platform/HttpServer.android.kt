@@ -72,11 +72,14 @@ private fun readUriText(uriStr: String): String = readUriBytes(uriStr).toString(
  * [HttpServerManager.httpServerError] for the common orchestrator to surface.
  */
 actual suspend fun startHttpEngineAsync(): Boolean = withIO {
+    val tCreate = System.currentTimeMillis()
     val newServer = createHttpServerAsync(appContext)
+    val tCreated = System.currentTimeMillis()
     try {
         newServer.start(wait = false)
         httpServer = newServer
         HttpServerManager.httpServerError.value = ""
+        LogCat.d("engine create=${tCreated - tCreate}ms start=${System.currentTimeMillis() - tCreated}ms")
         true
     } catch (ex: Exception) {
         // The engine may have partially started (thread pools created) before
@@ -94,6 +97,14 @@ actual suspend fun stopHttpEngineAsync() = withIO {
     httpServer = null
 }
 
+// The SMS/MMS hooks below serve the web desktop bridge, whose only clients are
+// connected web sessions — so they live exactly as long as the server:
+// - SmsProviderObserver pushes a debounced WS event when the phone's SMS
+//   database changes, so connected desktops refresh;
+// - SmsHelper.restoreSmsSendTracking re-arms the in-memory timeout/cleanup
+//   jobs for sends that were in flight before this (re)start; their terminal
+//   receipts are persisted in SmsSendResultTracker and replayed to a browser
+//   on reconnect (see onWebSocketSessionStarted).
 actual suspend fun onHttpServerStarted() {
     val service = HttpServerService.instance ?: return
     NsdHelper.registerServices(TempData.httpPort.value, TempData.httpsPort.value)

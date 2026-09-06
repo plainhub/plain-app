@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
@@ -47,30 +48,53 @@ class MainViewModel : ViewModel() {
 
     fun enableHttpServer(enable: Boolean) {
         viewModelScope.launch {
+            val t0 = TimeHelper.nowMillis()
             ServicePreference.putAsync(enable)
+            LogCat.d("enableHttpServer($enable): pref write ${TimeHelper.nowMillis() - t0}ms")
             if (enable) {
-                HttpServerManager.httpServerError.value = ""
-                // iOS has no foreground service, so no notification permission is needed.
-                val permission = Permission.POST_NOTIFICATIONS
-                if (!isAndroidOnly() || permission.isGranted()) {
-                    dispatchStartHttpServer()
-                } else {
-                    DialogHelper.showConfirmDialog(
-                        LocaleHelper.getStringAsync(Res.string.confirm),
-                        LocaleHelper.getStringAsync(Res.string.foreground_service_notification_prompt)
-                    ) {
-                        coIO {
-                            ensureNotificationPermissionAsync()
-                            while (!isAppForegrounded()) {
-                                LogCat.d("Waiting for foreground")
-                                delay(800)
-                            }
-                            dispatchStartHttpServer()
-                        }
-                    }
-                }
+                startHttpServerWithPermissionFlow()
             } else {
                 stopHttpServiceAsync()
+            }
+        }
+    }
+
+    /**
+     * App-open auto-restore: the service preference is already true (the caller
+     * checked), so skip the preference write — the first DataStore write of a
+     * cold launch costs 600ms+ on the main thread.
+     */
+    fun restoreHttpServerOnAppOpen() {
+        viewModelScope.launch {
+            startHttpServerWithPermissionFlow()
+        }
+    }
+
+    /**
+     * Start the server from a context where the service preference is already
+     * true (UI toggle path and the app-open auto-restore in
+     * [syncHttpServerState]). Skips the redundant preference write, which
+     * costs 600ms+ on a cold DataStore and stalls the main thread.
+     */
+    private suspend fun startHttpServerWithPermissionFlow() {
+        HttpServerManager.httpServerError.value = ""
+        // iOS has no foreground service, so no notification permission is needed.
+        val permission = Permission.POST_NOTIFICATIONS
+        if (!isAndroidOnly() || permission.isGranted()) {
+            dispatchStartHttpServer()
+        } else {
+            DialogHelper.showConfirmDialog(
+                LocaleHelper.getStringAsync(Res.string.confirm),
+                LocaleHelper.getStringAsync(Res.string.foreground_service_notification_prompt)
+            ) {
+                coIO {
+                    ensureNotificationPermissionAsync()
+                    while (!isAppForegrounded()) {
+                        LogCat.d("Waiting for foreground")
+                        delay(800)
+                    }
+                    dispatchStartHttpServer()
+                }
             }
         }
     }
@@ -78,6 +102,7 @@ class MainViewModel : ViewModel() {
     // Record the STARTING transition only when the start command is actually
     // dispatched, so a dismissed permission dialog never strands the state.
     private fun dispatchStartHttpServer() {
+        LogCat.d("dispatchStartHttpServer")
         HttpServerManager.serverState.value = HttpServerState.STARTING
         sendEvent(StartHttpServerEvent())
     }
@@ -106,7 +131,8 @@ class MainViewModel : ViewModel() {
                             HttpServerManager.httpServerError.value = ""
                             HttpServerManager.serverState.value = HttpServerState.ON
                         } else {
-                            enableHttpServer(true)
+                            // Preference is already true here — no rewrite needed.
+                            startHttpServerWithPermissionFlow()
                         }
                     }
                 }

@@ -78,6 +78,7 @@ class HttpServerService : LifecycleService() {
 
     @SuppressLint("InlinedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val t0 = System.currentTimeMillis()
         // intent == null means the system restarted this service via START_STICKY after killing it.
         // In that case we flag it so the startup coroutine can delay before binding ports.
         if (intent == null) isStickyRestart = true
@@ -120,6 +121,7 @@ class HttpServerService : LifecycleService() {
         }
 
         ensureServerRunning()
+        LogCat.d("HttpServerService.onStartCommand: foreground ready ${System.currentTimeMillis() - t0}ms")
 
         return START_STICKY
     }

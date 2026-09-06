@@ -209,7 +209,9 @@ class MainActivity : AppCompatActivity() {
         coIO {
             try {
                 if (ServicePreference.getAsync()) {
-                    mainVM.enableHttpServer(true)
+                    // Preference is already true — restore without rewriting it
+                    // (the first DataStore write of a cold launch stalls ~600ms).
+                    mainVM.restoreHttpServerOnAppOpen()
                 }
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())

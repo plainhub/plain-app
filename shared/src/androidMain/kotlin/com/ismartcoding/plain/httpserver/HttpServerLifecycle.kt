@@ -3,11 +3,14 @@ package com.ismartcoding.plain.httpserver
 import android.content.Context
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.lib.apk.cert.x509.X509SelfSignedGenerator
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.platform.createHttpClient
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
+import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
 import com.ismartcoding.plain.lib.ktorserver.core.engine.applicationEnvironment
 import com.ismartcoding.plain.lib.ktorserver.core.engine.connector
@@ -39,11 +42,41 @@ var httpServer: EmbeddedServer<*, *>? = null
 private val SSL_KEY_ALIAS = Constants.SSL_NAME
 
 /**
- * Start a throwaway Netty engine to preload classes/JIT on app launch so the
- * first real server start is fast.
+ * Preload at app launch everything the first real server start would otherwise
+ * pay for on the tap: the shared route registry + GraphQL schemas (process-wide
+ * singletons reused by the real server), the HTTPS keystore and its crypto
+ * classes, and an HTTP client. The empty Netty engine start only covers Netty
+ * itself — without this the first start cost >2s on a mid-range phone.
  */
-fun warmUpNetty() {
+fun warmUpHttpServer() {
     coIO {
+        try {
+            // Always parse the keystore once per process: the result is cached
+            // and the cold parse costs seconds, so whichever start comes first
+            // (auto-restore or user tap) must not pay it on the critical path.
+            getSslKeyStore(appContext, KeyStorePasswordPreference.getAsync())
+            LogCat.d("SSL keystore warm-up complete")
+        } catch (ex: Exception) {
+            LogCat.e("SSL keystore warm-up failed: ${ex.message}")
+        }
+        // When the service is enabled it auto-starts within ~100ms of launch;
+        // warming the route registry / Netty in parallel would just fight the
+        // start for JIT-cold classes (measured: racing the warmup nearly
+        // doubled the engine-create phase).
+        if (ServicePreference.getAsync()) return@coIO
+        try {
+            HttpRouteRegistry.mainGraphQL
+            HttpRouteRegistry.peerGraphQL
+            HttpRouteRegistry.guestGraphQL
+            HttpRouteRegistry.router
+            LogCat.d("Route registry warm-up complete")
+        } catch (ex: Exception) {
+            LogCat.e("Route registry warm-up failed: ${ex.message}")
+        }
+        try {
+            createHttpClient().close()
+        } catch (_: Exception) {
+        }
         try {
             val s = embeddedServer(Netty, port = 0) {}
             s.start(wait = false)
@@ -58,6 +91,7 @@ fun warmUpNetty() {
  * Generate a fresh PKCS#12 keystore file and atomically replace [file].
  */
 fun generateSslKeyStoreFile(file: File, password: String) {
+    cachedKeyStore = null
     val keyStore = X509SelfSignedGenerator.newSelfSignedKeyStore(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
     // Write to a temp file first, then atomically rename to the target.
     // This prevents a partially-written (corrupted) keystore if the process
@@ -116,6 +150,7 @@ fun replaceSslKeyStoreFromPem(file: File, certPem: String, keyPem: String, keyst
  * signature bytes.
  */
 private fun storeSslKeyStore(file: File, key: PrivateKey, chain: Array<Certificate>, keystorePassword: String): ByteArray {
+    cachedKeyStore = null
     val keystore = KeyStore.getInstance("PKCS12").apply { load(null, null) }
     keystore.setKeyEntry(SSL_KEY_ALIAS, key, keystorePassword.toCharArray(), chain)
     val tmp = File(file.parent, "${file.name}.tmp")
@@ -158,16 +193,28 @@ private fun parsePemPrivateKey(pem: String): PrivateKey {
     return keyFactory.generatePrivate(PKCS8EncodedKeySpec(der))
 }
 
+/** Last keystore parsed by [getSslKeyStore], with the password it was opened with. */
+@Volatile
+private var cachedKeyStore: Pair<String, KeyStore>? = null
+
 /**
- * Load (or regenerate on corruption) the platform PKCS#12 keystore used by the HTTPS connector.
+ * Load (or regenerate on corruption) the platform PKCS#12 keystore used by the
+ * HTTPS connector. Results are cached per password: the Android PKCS#12
+ * implementation costs ~0.5s (cold: seconds) to parse + verify the MAC, and the
+ * file is only ever replaced by [generateSslKeyStoreFile] /
+ * [storeSslKeyStore] below, which drop the cache.
  */
+@Synchronized
 private fun getSslKeyStore(context: Context, password: String): KeyStore {
+    cachedKeyStore?.let { (cachedPassword, keyStore) ->
+        if (cachedPassword == password) return keyStore
+    }
     val file = File(context.filesDir, Constants.KEY_STORE_FILE_NAME)
     if (!file.exists()) {
         generateSslKeyStoreFile(file, password)
     }
 
-    return KeyStore.getInstance("PKCS12").apply {
+    val keyStore = KeyStore.getInstance("PKCS12").apply {
         try {
             file.inputStream().use {
                 load(it, password.toCharArray())
@@ -192,6 +239,8 @@ private fun getSslKeyStore(context: Context, password: String): KeyStore {
             }
         }
     }
+    cachedKeyStore = password to keyStore
+    return keyStore
 }
 
 /**
@@ -199,11 +248,15 @@ private fun getSslKeyStore(context: Context, password: String): KeyStore {
  * Does not start the server; caller is responsible for calling `start(wait = false)`.
  */
 suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
+    val t0 = System.currentTimeMillis()
     val password = KeyStorePasswordPreference.getAsync()
     return withIO {
+        val t1 = System.currentTimeMillis()
         val passwordArray = password.toCharArray()
         val httpPort = TempData.httpPort.value
         val httpsPort = TempData.httpsPort.value
+        val keyStore = getSslKeyStore(context, password)
+        val t2 = System.currentTimeMillis()
         val environment = applicationEnvironment {
             log = LoggerFactory.getLogger("ktor.application")
         }
@@ -222,7 +275,7 @@ suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplica
                 port = httpPort
             }
             sslConnector(
-                keyStore = getSslKeyStore(context, password),
+                keyStore = keyStore,
                 keyAlias = SSL_KEY_ALIAS,
                 keyStorePassword = { passwordArray },
                 privateKeyPassword = { passwordArray },
@@ -230,6 +283,7 @@ suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplica
                 port = httpsPort
             }
         }, HttpModule.module)
+        .also { LogCat.d("createHttpServer: pref=${t1 - t0}ms keystore=${t2 - t1}ms server=${System.currentTimeMillis() - t2}ms") }
     }
 }
 

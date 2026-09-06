@@ -3,18 +3,17 @@ package com.ismartcoding.plain.httpserver.routes
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.helpers.SignatureHelper
+import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.chaCha20Decrypt
-import com.ismartcoding.plain.platform.getOwnPackageName
 import com.ismartcoding.plain.platform.finishHttpServerStopAsync
+import com.ismartcoding.plain.platform.getOwnPackageName
 import com.ismartcoding.plain.preferences.PasswordTypePreference
 import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.closeAllWsSessions
 import com.ismartcoding.plain.httpserver.http.HttpRouter
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.httpserver.http.respondJson
-import com.ismartcoding.plain.httpserver.setOnlineClientIds
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -22,6 +21,12 @@ data class InitResponse(
     val signaturePublicKey: String,
     val password: String = "",
 )
+
+/** Grace period for the 410 response to flush before the engine teardown kills its connection. */
+private const val SHUTDOWN_RESPONSE_FLUSH_MS = 100L
+
+/** Loopback source addresses accepted for `/shutdown`; anything else is rejected with 403. */
+private val SHUTDOWN_ALLOWED_HOSTS = setOf("localhost", "127.0.0.1", "::1")
 
 /**
  * `/health`, `/shutdown`, `/init` — simple system endpoints shared between
@@ -34,19 +39,19 @@ fun HttpRouter.addSystemRoutes() {
     }
 
     get("/shutdown") { call ->
-        if (call.remoteHost != "localhost") {
+        if (call.remoteHost !in SHUTDOWN_ALLOWED_HOSTS) {
             call.respondNoBody(HttpStatus.FORBIDDEN)
             return@get
         }
-        HttpServerManager.wsSessions.toList().forEach { it.close() }
-        HttpServerManager.wsSessions.clear()
-        setOnlineClientIds(emptySet())
+        closeAllWsSessions()
         call.respondNoBody(HttpStatus.GONE)
-        // Give the response a moment to flush before the engine tears down the
-        // connection that is still writing it. Beyond cancellation: a client
-        // disconnect after the response must not abort the teardown.
-        withContext(NonCancellable) {
-            delay(100)
+        // Teardown must NOT run inside this call coroutine: the engine stop
+        // joins all call coroutines, so an in-handler stop would wait on
+        // itself until the 5s shutdown timeout. Fire-and-forget in an
+        // independent scope instead; finishHttpServerStopAsync is idempotent
+        // and serialized on the lifecycle mutex with the in-process stopper.
+        coIO {
+            delay(SHUTDOWN_RESPONSE_FLUSH_MS)
             finishHttpServerStopAsync()
         }
     }

@@ -3,8 +3,6 @@ package com.ismartcoding.plain.features.sms
 import android.content.Context
 import android.database.ContentObserver
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.provider.Telephony
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.SmsProviderChangedData
@@ -12,33 +10,33 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 object SmsProviderObserver {
     private const val DEBOUNCE_MILLIS = 500L
 
-    private val handler = Handler(Looper.getMainLooper())
+    // Nothing here touches the UI, and the flush (JSON encode + WebSocket
+    // broadcast) must stay off the main thread even during SMS restore storms.
+    // A plain Default scope also keeps this object free of looper/framework
+    // dependencies, so server stop hooks can touch it in any environment.
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val changes = SmsProviderChangeBuffer()
     private var observer: ContentObserver? = null
     private var context: Context? = null
-
-    private val flushChanges = Runnable {
-        val uris = synchronized(this) {
-            if (observer == null) return@Runnable
-            changes.drain().ifEmpty { return@Runnable }
-        }
-        sendEvent(
-            WebSocketEvent(
-                EventType.SMS_PROVIDER_CHANGED,
-                JsonHelper.jsonEncode(SmsProviderChangedData(uris)),
-            ),
-        )
-    }
+    private var flushJob: Job? = null
 
     @Synchronized
     fun start(context: Context) {
         if (observer != null) return
 
-        val contentObserver = object : ContentObserver(handler) {
+        // A null handler dispatches onChange on the calling binder thread; the
+        // body only buffers and re-arms the debounce, both under [this] monitor.
+        val contentObserver = object : ContentObserver(null) {
             override fun onChange(selfChange: Boolean, uri: Uri?) {
                 scheduleChange(uri)
             }
@@ -67,9 +65,10 @@ object SmsProviderObserver {
 
     @Synchronized
     fun stop() {
-        handler.removeCallbacks(flushChanges)
-        changes.stop()
         val contentObserver = observer ?: return
+        flushJob?.cancel()
+        flushJob = null
+        changes.stop()
         observer = null
         context?.contentResolver?.let { resolver ->
             runCatching { resolver.unregisterContentObserver(contentObserver) }
@@ -82,8 +81,21 @@ object SmsProviderObserver {
         synchronized(this) {
             if (observer == null) return
             if (!changes.add(uri?.toString() ?: "content://mms-sms")) return
-            handler.removeCallbacks(flushChanges)
-            handler.postDelayed(flushChanges, DEBOUNCE_MILLIS)
+            // Debounce: every change in a burst resets the pending flush.
+            flushJob?.cancel()
+            flushJob = scope.launch {
+                delay(DEBOUNCE_MILLIS)
+                val uris = synchronized(this@SmsProviderObserver) {
+                    if (observer == null) return@launch
+                    changes.drain().ifEmpty { return@launch }
+                }
+                sendEvent(
+                    WebSocketEvent(
+                        EventType.SMS_PROVIDER_CHANGED,
+                        JsonHelper.jsonEncode(SmsProviderChangedData(uris)),
+                    ),
+                )
+            }
         }
     }
 }

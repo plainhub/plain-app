@@ -45,9 +45,11 @@ import java.util.concurrent.ConcurrentHashMap
 
 object SmsHelper {
     private const val SMS_SEND_TIMEOUT_MILLIS = 5 * 60 * 1000L
-    private val smsUri = Telephony.Sms.CONTENT_URI
-    private val mmsUri = Telephony.Mms.CONTENT_URI
-    private val mmsPartUri = "content://mms/part".toUri()
+    // Lazy so merely touching this object (e.g. from the server stop hooks or
+    // JVM host tests) never initializes the Telephony provider classes.
+    private val smsUri by lazy { Telephony.Sms.CONTENT_URI }
+    private val mmsUri by lazy { Telephony.Mms.CONTENT_URI }
+    private val mmsPartUri by lazy { "content://mms/part".toUri() }
 
     private const val MMS_ADDR_TYPE_FROM = 137
     private const val MMS_ADDR_TYPE_TO = 151

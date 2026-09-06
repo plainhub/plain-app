@@ -9,6 +9,7 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.closeAllWsSessions
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
@@ -194,6 +195,7 @@ suspend fun startHttpServerAsync() = withIO {
 }
 
 private suspend fun startHttpServerAsyncLocked() = withIO {
+    val t0 = TimeHelper.nowMillis()
     LogCat.d("startHttpServer")
     HttpServerManager.serverState.value = HttpServerState.STARTING
     HttpServerManager.portsInUse.value = emptySet()
@@ -215,8 +217,10 @@ private suspend fun startHttpServerAsyncLocked() = withIO {
 
     var started = false
     for (attempt in 1..maxRetries) {
+        val tEngine = TimeHelper.nowMillis()
         if (startHttpEngineAsync()) {
             started = true
+            LogCat.d("start engine took ${TimeHelper.nowMillis() - tEngine}ms (attempt $attempt)")
             break
         }
         LogCat.e("Server start attempt $attempt/$maxRetries failed")
@@ -226,6 +230,7 @@ private suspend fun startHttpServerAsyncLocked() = withIO {
         }
     }
 
+    val tHealth = TimeHelper.nowMillis()
     var healthy = started && checkHttpServerAsync()
     if (!healthy && started) {
         // A concurrent probe (e.g. UI state sync) may have seen the engine
@@ -233,12 +238,15 @@ private suspend fun startHttpServerAsyncLocked() = withIO {
         // tearing down a possibly-healthy engine.
         healthy = checkHttpServerOnce()
     }
+    LogCat.d("health check took ${TimeHelper.nowMillis() - tHealth}ms: $healthy")
     if (healthy) {
         HttpServerManager.httpServerError.value = ""
         HttpServerManager.portsInUse.value = emptySet()
+        val tHooks = TimeHelper.nowMillis()
         onHttpServerStarted()
+        LogCat.d("onHttpServerStarted took ${TimeHelper.nowMillis() - tHooks}ms")
         HttpServerManager.serverState.value = HttpServerState.ON
-        LogCat.d("HTTP server started on port $httpPort")
+        LogCat.d("HTTP server started on port $httpPort, total ${TimeHelper.nowMillis() - t0}ms")
         return@withIO
     }
 
@@ -282,11 +290,15 @@ private suspend fun startHttpServerAsyncLocked() = withIO {
 internal suspend fun finishHttpServerStopAsync() = withIO {
     withContext(NonCancellable) {
         lifecycleMutex.withLock {
+            val t0 = TimeHelper.nowMillis()
             stopHttpEngineAsync()
+            val tEngine = TimeHelper.nowMillis()
             onHttpServerStopped()
+            val tHooks = TimeHelper.nowMillis()
             HttpServerManager.httpServerError.value = ""
             HttpServerManager.portsInUse.value = emptySet()
             HttpServerManager.serverState.value = HttpServerState.OFF
+            LogCat.d("finishStop: engine=${tEngine - t0}ms hooks=${tHooks - tEngine}ms total=${tHooks - t0}ms")
         }
     }
 }
@@ -305,15 +317,15 @@ internal suspend fun finishHttpServerStopAsync() = withIO {
  */
 suspend fun stopHttpServerCoreAsync() = withIO {
     withContext(NonCancellable) {
+        val t0 = TimeHelper.nowMillis()
         HttpServerManager.serverState.value = HttpServerState.STOPPING
-        try {
-            // Best-effort graceful shutdown via /shutdown endpoint. Done outside
-            // the lock: the route re-enters finishHttpServerStopAsync, which
-            // would deadlock against a lock held here.
-            val client = createHttpClient()
-            client.get(UrlHelper.getShutdownUrl()).close()
-        } catch (_: Exception) {}
+        // Close WebSocket sessions directly instead of GETting /shutdown: the
+        // old roundtrip ran the teardown inside a route call coroutine, so the
+        // engine stop's disposeAndJoin waited on the very coroutine performing
+        // the stop and always burned the full 5s shutdown timeout.
+        closeAllWsSessions()
         finishHttpServerStopAsync()
+        LogCat.d("stopHttpServerCore total ${TimeHelper.nowMillis() - t0}ms")
     }
 }
 
