@@ -61,10 +61,14 @@ fun SchemaBuilder.addPeerSchemaTypes() {
     enum<ChatStatus>()
     enum<ChannelSystemMessageType>()
     stringScalar<ID> {
+        // Scalar names must be compile-time fixed: the DSL defaults to
+        // KClass.simpleName, which R8 renames in release builds (e.g. "p94").
+        name = "ID"
         deserialize = { it: String -> ID(it) }
         serialize = { it: ID -> it.toString() }
     }
     stringScalar<Instant> {
+        name = "Instant"
         deserialize = { value: String -> Instant.parse(value) }
         serialize = Instant::toString
     }

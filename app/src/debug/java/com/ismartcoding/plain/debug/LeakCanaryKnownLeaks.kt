@@ -6,7 +6,7 @@ import android.database.Cursor
 import android.net.Uri
 import leakcanary.LeakCanary
 import shark.AndroidReferenceMatchers
-import shark.LibraryLeakReferenceMatcher
+import shark.IgnoredReferenceMatcher
 import shark.ReferencePattern
 
 /**
@@ -52,16 +52,13 @@ internal class LeakCanaryKnownLeaks : ContentProvider() {
          *
          * See: https://cs.android.com/android/platform/superproject/+/main:frameworks/base/core/java/android/service/notification/NotificationListenerService.java
          */
+        // Ignored (not just categorized as library leak) so LeakCanary stops notifying about it.
         private val knownLeaks = listOf(
-            LibraryLeakReferenceMatcher(
+            IgnoredReferenceMatcher(
                 pattern = ReferencePattern.InstanceFieldPattern(
                     className = "android.service.notification.NotificationListenerService\$NotificationListenerWrapper",
                     fieldName = "this\$0"
-                ),
-                description = "NotificationListenerWrapper is a non-static inner class of " +
-                    "NotificationListenerService. The Android Binder system keeps the wrapper " +
-                    "alive as a global JNI reference after onDestroy(), preventing GC of the " +
-                    "outer service. This is an Android framework limitation."
+                )
             )
         )
     }
