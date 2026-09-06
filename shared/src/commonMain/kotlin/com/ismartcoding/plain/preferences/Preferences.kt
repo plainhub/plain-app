@@ -779,6 +779,11 @@ object HomeFeaturesPreference : BasePreference<String>() {
     fun formatList(list: List<String>): String = list.joinToString(SEPARATOR)
 }
 
+object QuickNoteDraftPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("quick_note_draft")
+}
+
 object HomeSectionCollapsedPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("home_section_collapsed")

@@ -67,6 +67,8 @@
     <string name="all">Tümü</string>
     <string name="all_entries">Tüm Girişler</string>
     <string name="notes">Notlar</string>
+    <string name="quick_note_hint">Hızlı not al…</string>
+    <string name="note_saved">Notlara kaydedildi</string>
     <string name="value">Değer</string>
     <string name="done">Tamam</string>
     <string name="type">Tür</string>

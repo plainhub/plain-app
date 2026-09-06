@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,6 +46,8 @@ enum class ToastType {
 fun PToast(
     message: String,
     type: ToastType = ToastType.INFO,
+    actionLabel: String? = null,
+    onAction: () -> Unit = {},
     onDismiss: () -> Unit = {}
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -52,6 +55,7 @@ fun PToast(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
             .padding(bottom = 32.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
@@ -106,6 +110,22 @@ fun PToast(
                         textAlign = TextAlign.Start,
                         modifier = Modifier.weight(1f)
                     )
+                    if (actionLabel != null) {
+                        Text(
+                            text = actionLabel,
+                            color = MaterialTheme.colorScheme.inversePrimary,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                                .clickable(
+                                    interactionSource = interactionSource,
+                                    indication = null
+                                ) {
+                                    onAction()
+                                }
+                                .padding(start = 8.dp).padding(vertical = 8.dp)
+                        )
+                    }
                 }
             }
         }

@@ -66,6 +66,8 @@
     <string name="all">Todo</string>
     <string name="all_entries">Todas las entradas</string>
     <string name="notes">Notas</string>
+    <string name="quick_note_hint">Escribe una nota rápida…</string>
+    <string name="note_saved">Guardado en notas</string>
     <string name="value">Valor</string>
     <string name="done">Listo</string>
     <string name="type">Tipo</string>

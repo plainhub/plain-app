@@ -67,6 +67,8 @@
     <string name="all">Tất cả</string>
     <string name="all_entries">Tất cả các mục</string>
     <string name="notes">Ghi chú</string>
+    <string name="quick_note_hint">Ghi chú nhanh…</string>
+    <string name="note_saved">Đã lưu vào ghi chú</string>
     <string name="value">Giá trị</string>
     <string name="done">Hoàn tất</string>
     <string name="type">Loại</string>

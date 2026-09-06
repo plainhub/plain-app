@@ -67,6 +67,8 @@
     <string name="all">Alles</string>
     <string name="all_entries">Alle items</string>
     <string name="notes">Notities</string>
+    <string name="quick_note_hint">Snelle notitie…</string>
+    <string name="note_saved">Opgeslagen in notities</string>
     <string name="value">Waarde</string>
     <string name="done">Klaar</string>
     <string name="type">Type</string>

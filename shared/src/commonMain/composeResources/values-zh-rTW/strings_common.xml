@@ -67,6 +67,8 @@
     <string name="all">全部</string>
     <string name="all_entries">全部文章</string>
     <string name="notes">筆記</string>
+    <string name="quick_note_hint">記一筆…</string>
+    <string name="note_saved">已儲存到筆記</string>
     <string name="value">值</string>
     <string name="done">完成</string>
     <string name="type">類型</string>

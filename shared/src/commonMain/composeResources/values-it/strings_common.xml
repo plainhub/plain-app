@@ -67,6 +67,8 @@
     <string name="all">Tutti</string>
     <string name="all_entries">Tutte le voci</string>
     <string name="notes">Note</string>
+    <string name="quick_note_hint">Scrivi una nota rapida…</string>
+    <string name="note_saved">Salvato nelle note</string>
     <string name="value">Valore</string>
     <string name="done">Fatto</string>
     <string name="type">Tipo</string>

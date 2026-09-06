@@ -66,6 +66,8 @@
     <string name="all">Все</string>
     <string name="all_entries">Все записи</string>
     <string name="notes">Примечания</string>
+    <string name="quick_note_hint">Быстрая заметка…</string>
+    <string name="note_saved">Сохранено в примечаниях</string>
     <string name="value">Значение</string>
     <string name="done">Готово</string>
     <string name="type">Тип</string>

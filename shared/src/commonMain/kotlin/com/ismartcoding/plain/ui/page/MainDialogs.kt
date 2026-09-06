@@ -68,6 +68,10 @@ fun MainDialogs(
         )
     }
     toastState?.let { event ->
-        PToast(message = event.message, type = event.type, onDismiss = onDismissToast)
+        PToast(
+            message = event.message, type = event.type, actionLabel = event.actionLabel,
+            onAction = { event.onAction?.invoke(); onDismissToast() },
+            onDismiss = onDismissToast,
+        )
     }
 }

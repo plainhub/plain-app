@@ -67,6 +67,8 @@
     <string name="all">সব</string>
     <string name="all_entries">সব এন্ট্রি</string>
     <string name="notes">নোটস</string>
+    <string name="quick_note_hint">দ্রুত একটি নোট লিখুন…</string>
+    <string name="note_saved">নোটে সংরক্ষিত হয়েছে</string>
     <string name="value">মান</string>
     <string name="done">সম্পন্ন</string>
     <string name="type">ধরণ</string>

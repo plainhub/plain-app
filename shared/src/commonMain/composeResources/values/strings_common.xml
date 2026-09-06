@@ -68,6 +68,8 @@
     <string name="all">All</string>
     <string name="all_entries">All entries</string>
     <string name="notes">Notes</string>
+    <string name="quick_note_hint">Take a quick note…</string>
+    <string name="note_saved">Saved to notes</string>
     <string name="value">Value</string>
     <string name="done">Done</string>
     <string name="type">Type</string>

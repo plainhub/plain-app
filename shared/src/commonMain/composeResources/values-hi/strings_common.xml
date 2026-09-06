@@ -67,6 +67,8 @@
     <string name="all">सब</string>
     <string name="all_entries">सभी प्रविष्टियाँ</string>
     <string name="notes">नोट्स</string>
+    <string name="quick_note_hint">झटपट नोट लिखें…</string>
+    <string name="note_saved">नोट्स में सहेजा गया</string>
     <string name="value">मूल्य</string>
     <string name="done">हो गया</string>
     <string name="type">प्रकार</string>

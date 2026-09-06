@@ -67,6 +67,8 @@
     <string name="all">அனைத்து</string>
     <string name="all_entries">அனைத்து உள்ளடக்கங்கள்</string>
     <string name="notes">குறிப்புகள்</string>
+    <string name="quick_note_hint">விரைவாகக் குறிப்பு எழுதுங்கள்…</string>
+    <string name="note_saved">குறிப்புகளில் சேமிக்கப்பட்டது</string>
     <string name="value">மதிப்பு</string>
     <string name="done">முடிந்தது</string>
     <string name="type">வகை</string>

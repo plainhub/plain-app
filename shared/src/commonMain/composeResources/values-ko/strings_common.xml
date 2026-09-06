@@ -67,6 +67,8 @@
     <string name="all">전체</string>
     <string name="all_entries">전체 항목</string>
     <string name="notes">참고</string>
+    <string name="quick_note_hint">참고를 빠르게 기록…</string>
+    <string name="note_saved">참고에 저장되었습니다</string>
     <string name="value">값</string>
     <string name="done">완료</string>
     <string name="type">유형</string>

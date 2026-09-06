@@ -66,6 +66,8 @@
     <string name="all">全て</string>
     <string name="all_entries">全エントリー</string>
     <string name="notes">ノート</string>
+    <string name="quick_note_hint">サッとメモ…</string>
+    <string name="note_saved">ノートに保存しました</string>
     <string name="value">値</string>
     <string name="done">完了</string>
     <string name="type">タイプ</string>
