@@ -17,12 +17,12 @@ data class DTagRelation(
     var tagId: String = "",
     var key: String = "",
     var type: Int = 0,
-) {
+
     @ColumnInfo(name = "created_at")
-    var createdAt: Instant = TimeHelper.now()
-    var size: Long = 0
-    var title: String = ""
-}
+    var createdAt: Instant = TimeHelper.now(),
+    var size: Long = 0,
+    var title: String = "",
+)
 
 @Dao
 interface TagRelationDao {

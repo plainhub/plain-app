@@ -23,5 +23,6 @@ actual fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase> {
         name = databaseFilePath(name),
     )
         .setDriver(BundledSQLiteDriver())
+        .setSingleConnectionPool()
         .addAllMigrations()
 }

@@ -3,6 +3,8 @@ package com.ismartcoding.plain.db
 import androidx.compose.runtime.Composable
 import androidx.room3.ColumnInfo
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
+import kotlin.time.Instant
 import androidx.room3.Entity
 import androidx.room3.Insert
 import androidx.room3.PrimaryKey
@@ -22,7 +24,10 @@ data class DPeer(
     @ColumnInfo(name = "status") var status: PeerStatus = PeerStatus.UNPAIRED,
     @ColumnInfo(name = "port") var port: Int = 0,
     @ColumnInfo(name = "device_type") var deviceType: DeviceType = DeviceType.PHONE,
-) : DEntityBase() {
+
+    @ColumnInfo(name = "created_at") var createdAt: Instant = TimeHelper.now(),
+    @ColumnInfo(name = "updated_at") var updatedAt: Instant = TimeHelper.now(),
+) {
     fun isPaired(): Boolean = status == PeerStatus.PAIRED
     fun getIpList(): List<String> {
         return ip.split(",").map { it.trim() }.filter { it.isNotEmpty() }

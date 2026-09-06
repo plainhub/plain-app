@@ -2,6 +2,8 @@ package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
+import kotlin.time.Instant
 import androidx.room3.Entity
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
@@ -11,22 +13,28 @@ import androidx.room3.Query
 @Entity(tableName = "image_editor_projects")
 data class DImageEditorProject(
     @PrimaryKey val id: String,
-) : DEntityBase() {
+
     @ColumnInfo(name = "state_b64")
-    var stateB64: String = ""
+    var stateB64: String = "",
 
     @ColumnInfo(name = "thumbnail")
-    var thumbnail: String? = null
+    var thumbnail: String? = null,
 
     @ColumnInfo(name = "canvas_width")
-    var canvasWidth: Int = 0
+    var canvasWidth: Int = 0,
 
     @ColumnInfo(name = "canvas_height")
-    var canvasHeight: Int = 0
+    var canvasHeight: Int = 0,
 
     @ColumnInfo(name = "layer_count")
-    var layerCount: Int = 0
-}
+    var layerCount: Int = 0,
+
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+)
 
 @Dao
 interface ImageEditorProjectDao {

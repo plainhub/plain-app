@@ -2,6 +2,7 @@ package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
 import androidx.room3.Entity
 import androidx.room3.Insert
 import androidx.room3.PrimaryKey
@@ -15,14 +16,19 @@ import kotlin.time.Instant
 @Entity(tableName = "notes")
 data class DNote(
     @PrimaryKey override var id: String = generateId(),
-) : IData, DEntityBase() {
-    var title: String = ""
+    var title: String = "",
 
     @ColumnInfo(name = "deleted_at")
-    var deletedAt: Instant? = null
+    var deletedAt: Instant? = null,
 
-    var content: String = ""
+    var content: String = "",
 
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) : IData {
     fun getSummary(): String {
         return content.replace("\n", "").replaceFirst("^\\s*".toRegex(), "")
     }

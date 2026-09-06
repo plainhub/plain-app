@@ -2,6 +2,8 @@ package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
+import kotlin.time.Instant
 import androidx.room3.Entity
 import androidx.room3.Index
 import androidx.room3.Insert
@@ -31,22 +33,28 @@ import androidx.room3.Update
 )
 data class DAppFile(
     @PrimaryKey val id: String,          // full SHA-256 hex (64 chars)
-) : DEntityBase() {
+
     @ColumnInfo(name = "size")
-    var size: Long = 0L
+    var size: Long = 0L,
 
     @ColumnInfo(name = "mime_type")
-    var mimeType: String = ""
+    var mimeType: String = "",
 
     @ColumnInfo(name = "real_path")
-    var realPath: String = ""
+    var realPath: String = "",
 
     @ColumnInfo(name = "ref_count")
-    var refCount: Int = 1
+    var refCount: Int = 1,
 
     @ColumnInfo(name = "weak_hash")
-    var weakHash: String = ""
+    var weakHash: String = "",
 
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) {
     fun getFidUri(): String {
         val fileName = realPath.substringAfterLast('/', "")
         return "fid:$fileName"

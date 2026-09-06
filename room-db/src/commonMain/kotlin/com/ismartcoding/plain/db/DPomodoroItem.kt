@@ -2,6 +2,8 @@ package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
+import kotlin.time.Instant
 import androidx.room3.Entity
 import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
@@ -13,18 +15,24 @@ import com.ismartcoding.plain.lib.generateId
 @Entity(tableName = "pomodoro_items")
 data class DPomodoroItem(
     @PrimaryKey override var id: String = generateId(),
-) : IData, DEntityBase() {
-    var date: String = "" // YYYY-MM-DD format
+
+    var date: String = "", // YYYY-MM-DD format
 
     @ColumnInfo(name = "completed_count")
-    var completedCount: Int = 0
+    var completedCount: Int = 0,
 
     @ColumnInfo(name = "total_work_seconds")
-    var totalWorkSeconds: Int = 0
+    var totalWorkSeconds: Int = 0,
 
     @ColumnInfo(name = "total_break_seconds")
-    var totalBreakSeconds: Int = 0
-}
+    var totalBreakSeconds: Int = 0,
+
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) : IData
 
 @Dao
 interface PomodoroItemDao {

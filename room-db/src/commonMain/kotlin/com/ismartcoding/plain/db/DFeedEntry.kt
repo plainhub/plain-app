@@ -21,26 +21,31 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DFeedEntry(
     @PrimaryKey override var id: String = generateId(),
-) : IData, DEntityBase() {
-    var title: String = ""
-    var url: String = ""
-    var image: String = ""
-    var description: String = ""
-    var author: String = ""
-    var content: String = ""
+    var title: String = "",
+    var url: String = "",
+    var image: String = "",
+    var description: String = "",
+    var author: String = "",
+    var content: String = "",
 
     @ColumnInfo(name = "feed_id", index = true)
-    var feedId: String = ""
+    var feedId: String = "",
 
     @ColumnInfo(name = "raw_id", index = true)
-    var rawId: String = ""
+    var rawId: String = "",
 
     @ColumnInfo(name = "published_at")
-    var publishedAt: Instant = TimeHelper.now()
+    var publishedAt: Instant = TimeHelper.now(),
 
     @ColumnInfo(name = "read")
-    var read: Boolean = false
+    var read: Boolean = false,
 
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) : IData {
     fun getSummary(): String {
         val regex = Regex("!\\[.*?\\]\\(.*?\\)|!\\[.*?\\]\\[.*?\\]|<img.*?>", RegexOption.IGNORE_CASE)
         return description.replace(regex, "🖼").replace("\n", "").replaceFirst("^\\s*".toRegex(), "")

@@ -2,6 +2,8 @@ package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
+import kotlin.time.Instant
 import androidx.room3.Entity
 import androidx.room3.Insert
 import androidx.room3.PrimaryKey
@@ -40,7 +42,10 @@ data class DChatChannel(
      *  Receivers ignore updates whose version ≤ their local version. */
     @ColumnInfo(name = "version", defaultValue = "0") var version: Long = 0,
     @ColumnInfo(name = "status", defaultValue = "JOINED") var status: ChatChannelStatus = ChatChannelStatus.JOINED,
-) : DEntityBase() {
+
+    @ColumnInfo(name = "created_at") var createdAt: Instant = TimeHelper.now(),
+    @ColumnInfo(name = "updated_at") var updatedAt: Instant = TimeHelper.now(),
+) {
 
     // ── Helpers ─────────────────────────────────────────────────────
 

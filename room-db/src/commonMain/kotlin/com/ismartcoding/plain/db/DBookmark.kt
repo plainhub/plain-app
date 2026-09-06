@@ -2,6 +2,7 @@ package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
 import androidx.room3.Entity
 import androidx.room3.Index
 import androidx.room3.Insert
@@ -19,27 +20,32 @@ import kotlin.time.Instant
 )
 data class DBookmark(
     @PrimaryKey override var id: String = generateId(),
-) : IData, DEntityBase() {
-    var url: String = ""
-    var title: String = ""
+    var url: String = "",
+    var title: String = "",
 
     @ColumnInfo(name = "favicon_path")
-    var faviconPath: String = ""
+    var faviconPath: String = "",
 
     @ColumnInfo(name = "group_id")
-    var groupId: String = ""
+    var groupId: String = "",
 
-    var pinned: Boolean = false
+    var pinned: Boolean = false,
 
     @ColumnInfo(name = "click_count")
-    var clickCount: Int = 0
+    var clickCount: Int = 0,
 
     @ColumnInfo(name = "last_clicked_at")
-    var lastClickedAt: Instant? = null
+    var lastClickedAt: Instant? = null,
 
     @ColumnInfo(name = "sort_order")
-    var sortOrder: Int = 0
-}
+    var sortOrder: Int = 0,
+
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) : IData
 
 @Dao
 interface BookmarkDao {
@@ -74,13 +80,18 @@ interface BookmarkDao {
 @Entity(tableName = "bookmark_groups")
 data class DBookmarkGroup(
     @PrimaryKey override var id: String = generateId(),
-) : IData, DEntityBase() {
-    var name: String = ""
-    var collapsed: Boolean = false
+    var name: String = "",
+    var collapsed: Boolean = false,
 
     @ColumnInfo(name = "sort_order")
-    var sortOrder: Int = 0
-}
+    var sortOrder: Int = 0,
+
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) : IData
 
 @Dao
 interface BookmarkGroupDao {

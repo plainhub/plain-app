@@ -55,13 +55,17 @@ internal fun NotePageEffects(
                 if (noteVM.content.value == t) return@collectLatest
                 scope.launch(Dispatchers.Default) {
                     val newItem = NoteHelper.addOrUpdateAsync(id.value) {
-                        title = t.getMarkdownTitle(); content = t; noteVM.content.value = t
+                        title = t.getMarkdownTitle()
+                        content = t
+                        noteVM.content.value = t
                     }
                     id.value = newItem.id
                     if (isNew && tagId.isNotEmpty()) {
                         TagHelper.addTagRelations(arrayListOf(TagRelationStub(id.value).toTagRelation(tagId, DataType.NOTE)))
                     }
-                    if (isNew) tagsVM.loadAsync(setOf(id.value))
+                    if (isNew) {
+                        tagsVM.loadAsync(setOf(id.value))
+                    }
                     NotesViewModel.updateItem(newItem)
                 }
             }

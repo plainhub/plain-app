@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.db
 
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
+import kotlin.time.Instant
+import androidx.room3.ColumnInfo
 import androidx.room3.Entity
 import androidx.room3.Ignore
 import androidx.room3.Index
@@ -18,16 +21,21 @@ import com.ismartcoding.plain.lib.generateId
 )
 data class DFeed(
     @PrimaryKey override var id: String = generateId(),
-) : IData, DEntityBase() {
-    var name: String = ""
-    var url: String = ""
+    var name: String = "",
+    var url: String = "",
 
     @androidx.room3.ColumnInfo(name = "fetch_content")
-    var fetchContent: Boolean = false
+    var fetchContent: Boolean = false,
 
     @Ignore
-    var count: Int = 0
-}
+    var count: Int = 0,
+
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) : IData
 
 @Dao
 interface FeedDao {

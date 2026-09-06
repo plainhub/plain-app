@@ -16,34 +16,40 @@ data class DSession(
     @PrimaryKey
     @ColumnInfo(name = "client_id")
     var clientId: String = "",
-) : DEntityBase() {
+
     @ColumnInfo(name = "name", defaultValue = "")
-    var name: String = ""
+    var name: String = "",
 
     @ColumnInfo(name = "type", defaultValue = "WEB")
-    var type: SessionType = SessionType.WEB
+    var type: SessionType = SessionType.WEB,
 
     @ColumnInfo(name = "client_ip")
-    var clientIP: String = ""
+    var clientIP: String = "",
 
     @ColumnInfo(name = "os_name")
-    var osName: String = ""
+    var osName: String = "",
 
     @ColumnInfo(name = "os_version")
-    var osVersion: String = ""
+    var osVersion: String = "",
 
     @ColumnInfo(name = "browser_name")
-    var browserName: String = ""
+    var browserName: String = "",
 
     @ColumnInfo(name = "browser_version")
-    var browserVersion: String = ""
+    var browserVersion: String = "",
 
     @ColumnInfo(name = "token")
-    var token: String = ""
+    var token: String = "",
 
     @ColumnInfo(name = "last_active_at")
-    var lastActiveAt: Instant? = null
-}
+    var lastActiveAt: Instant? = null,
+
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+)
 
 data class SessionClientTsUpdate(
     @ColumnInfo(name = "client_id")

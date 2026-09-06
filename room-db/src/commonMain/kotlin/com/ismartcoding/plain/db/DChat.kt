@@ -154,29 +154,35 @@ data class DLinkPreview(
 @Entity(tableName = "chats")
 data class DChat(
     @PrimaryKey var id: String = generateId(),
-) : DEntityBase() {
+
     @ColumnInfo(name = "from_id", index = true)
-    var fromId: String = "" // me|local|peer_id
+    var fromId: String = "", // me|local|peer_id
 
     @ColumnInfo(name = "to_id", index = true)
-    var toId: String = "" // me|local|peer_id
+    var toId: String = "", // me|local|peer_id
 
     @ColumnInfo(name = "channel_id", index = true)
-    var channelId: String = "" // chat channel id, empty if not a channel chat
+    var channelId: String = "", // chat channel id, empty if not a channel chat
 
     @ColumnInfo(name = "status", defaultValue = "PENDING")
-    var status: ChatStatus = ChatStatus.PENDING
+    var status: ChatStatus = ChatStatus.PENDING,
 
     /**
      * JSON-encoded [DMessageStatusData], populated for channel broadcast messages.
      * Empty string means no per-member data is available.
      */
     @ColumnInfo(name = "status_data", defaultValue = "")
-    var statusData: String = ""
+    var statusData: String = "",
 
     @ColumnInfo(name = "content")
-    lateinit var content: DMessageContent
+    var content: DMessageContent = DMessageContent(MessageType.TEXT),
 
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) {
     fun parseStatusData(): DMessageStatusData? = DMessageStatusData.fromJson(statusData)
 
     companion object {

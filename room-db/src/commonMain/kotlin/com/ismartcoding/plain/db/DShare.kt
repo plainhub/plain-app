@@ -19,28 +19,34 @@ import kotlin.time.Instant
 @Entity(tableName = "shares")
 data class DShare(
     @PrimaryKey @ColumnInfo(name = "id") var id: String, // = shared_id
-) : DEntityBase() {
+
     @ColumnInfo(name = "name")
-    var name: String = ""
+    var name: String = "",
 
     /** Reserved for a future password feature; unused this release. Stored in plaintext. */
     @ColumnInfo(name = "password")
-    var password: String = ""
+    var password: String = "",
 
     @ColumnInfo(name = "url_token")
-    var urlToken: String = ""
+    var urlToken: String = "",
 
     /** Valid until this instant; null = never expires. */
     @ColumnInfo(name = "expires_at")
-    var expiresAt: Instant? = null
+    var expiresAt: Instant? = null,
 
     @ColumnInfo(name = "read_only")
-    var readOnly: Boolean = true
+    var readOnly: Boolean = true,
 
     /** Whitelisted roots of this share, stored as JSON. */
     @ColumnInfo(name = "data")
-    var data: List<ShareRoot> = emptyList()
+    var data: List<ShareRoot> = emptyList(),
 
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) {
     val isExpired: Boolean
         get() = expiresAt?.let { it <= TimeHelper.now() } ?: false
 

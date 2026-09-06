@@ -2,6 +2,8 @@ package com.ismartcoding.plain.db
 
 import androidx.room3.ColumnInfo
 import androidx.room3.Dao
+import com.ismartcoding.plain.lib.TimeHelper
+import kotlin.time.Instant
 import androidx.room3.Entity
 import androidx.room3.Insert
 import androidx.room3.PrimaryKey
@@ -14,20 +16,25 @@ import com.ismartcoding.plain.lib.generateId
 @Entity(tableName = "book_chapters")
 data class DBookChapter(
     @PrimaryKey override var id: String = generateId(),
-) : IData, DEntityBase() {
-    var name: String = ""
+    var name: String = "",
 
     @ColumnInfo(name = "book_id")
-    var bookId: String = ""
+    var bookId: String = "",
 
     @ColumnInfo(name = "parent_id")
-    var parentId: String = ""
+    var parentId: String = "",
 
-    var content: String = ""
+    var content: String = "",
 
     @ColumnInfo(name = "display_order")
-    var displayOrder: Int = 0
-}
+    var displayOrder: Int = 0,
+
+    @ColumnInfo(name = "created_at")
+    var createdAt: Instant = TimeHelper.now(),
+
+    @ColumnInfo(name = "updated_at")
+    var updatedAt: Instant = TimeHelper.now(),
+) : IData
 
 @Dao
 interface BookChapterDao {

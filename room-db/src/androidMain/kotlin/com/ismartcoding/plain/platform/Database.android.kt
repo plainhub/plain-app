@@ -15,5 +15,11 @@ import com.ismartcoding.plain.appContext
 actual fun buildAppDatabase(name: String): RoomDatabase.Builder<AppDatabase> {
     return Room.databaseBuilder<AppDatabase>(appContext, name)
         .setDriver(BundledSQLiteDriver())
+        // Room 3's default WAL pool (4 readers + 1 writer) can serve stale rows
+        // forever from a reader whose per-SQL cached prepared statement gets a
+        // pinned snapshot after concurrent/cancelled iterations (verified on
+        // device 2026-09-06). One connection serializes reads/writes and makes
+        // read-your-own-writes unconditional.
+        .setSingleConnectionPool()
         .addAllMigrations()
 }
