@@ -36,20 +36,29 @@ internal data class FileResponsePlan(
     val useBufferedResponse: Boolean,
 )
 
+private fun String?.isMediaType(): Boolean {
+    if (isNullOrBlank()) return false
+    return startsWith("video/", ignoreCase = true) || startsWith("audio/", ignoreCase = true)
+}
+
 /**
  * HTML media elements support incremental range requests. Bound each requested
  * video/audio range so Ktor can hand Netty one ByteArray-backed message instead
  * of converting thousands of channel segments on affected Android runtimes.
  * Ordinary downloads and requests without a Range header keep streaming.
+ * Media elements are detected via Sec-Fetch-Dest, with the response content
+ * type as fallback for WebKit clients (Safari/WKWebView) that never send it.
  */
 internal fun resolveFileResponsePlan(
     rangeHeader: String?,
     fileLength: Long,
     fetchDestination: String?,
+    contentType: String? = null,
 ): FileResponsePlan? {
     val requested = resolveSingleByteRange(rangeHeader, fileLength) ?: return null
     val isMediaElement = fetchDestination.equals("video", ignoreCase = true) ||
-        fetchDestination.equals("audio", ignoreCase = true)
+        fetchDestination.equals("audio", ignoreCase = true) ||
+        contentType.isMediaType()
     if (!isMediaElement || !requested.isPartial) {
         return FileResponsePlan(requested, useBufferedResponse = false)
     }

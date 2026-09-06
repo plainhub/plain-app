@@ -135,6 +135,7 @@ class KtorHttpCall(
             rangeHeader = applicationCall.request.headers["Range"],
             fileLength = fileLength,
             fetchDestination = applicationCall.request.headers["Sec-Fetch-Dest"],
+            contentType = contentType,
         )
         if (plan == null) {
             applicationCall.response.run {

@@ -233,4 +233,58 @@ class ResolveSingleByteRangeTest {
     fun unsatisfiableMediaRange_returns416() {
         assertNull(resolveFileResponsePlan("bytes=100-", 100, "video"))
     }
+
+    @Test
+    fun mediaContentTypeWithoutFetchDest_isBoundedAndBuffered() {
+        val fileLength = BROWSER_MEDIA_RANGE_BYTES * 10
+        val plan = resolveFileResponsePlan("bytes=0-", fileLength, null, "video/mp4")!!
+
+        assertTrue(plan.useBufferedResponse)
+        assertEquals(ResolvedFileRange(0, BROWSER_MEDIA_RANGE_BYTES - 1, true), plan.range)
+    }
+
+    @Test
+    fun audioContentTypeWithoutFetchDest_isBoundedAndBuffered() {
+        val fileLength = BROWSER_MEDIA_RANGE_BYTES * 2
+        val plan = resolveFileResponsePlan("bytes=0-", fileLength, null, "audio/mpeg")!!
+
+        assertTrue(plan.useBufferedResponse)
+        assertEquals(BROWSER_MEDIA_RANGE_BYTES, plan.range.length)
+    }
+
+    @Test
+    fun mediaContentType_isCaseInsensitive() {
+        val fileLength = BROWSER_MEDIA_RANGE_BYTES * 10
+        val plan = resolveFileResponsePlan("bytes=0-", fileLength, null, "VIDEO/MP4")!!
+
+        assertTrue(plan.useBufferedResponse)
+        assertEquals(BROWSER_MEDIA_RANGE_BYTES, plan.range.length)
+    }
+
+    @Test
+    fun nonMediaContentTypeWithoutFetchDest_keepsStreaming() {
+        val fileLength = BROWSER_MEDIA_RANGE_BYTES * 10
+        val plan = resolveFileResponsePlan("bytes=0-", fileLength, null, "application/zip")!!
+
+        assertFalse(plan.useBufferedResponse)
+        assertEquals(ResolvedFileRange(0, fileLength - 1, true), plan.range)
+    }
+
+    @Test
+    fun blankContentType_fallsBackToFetchDest() {
+        val fileLength = BROWSER_MEDIA_RANGE_BYTES * 10
+        val plan = resolveFileResponsePlan("bytes=0-", fileLength, "video", "")!!
+
+        assertTrue(plan.useBufferedResponse)
+        assertEquals(BROWSER_MEDIA_RANGE_BYTES, plan.range.length)
+    }
+
+    @Test
+    fun mediaContentTypeWithoutRange_keepsStreamingFullFile() {
+        val fileLength = BROWSER_MEDIA_RANGE_BYTES * 10
+        val plan = resolveFileResponsePlan(null, fileLength, null, "video/mp4")!!
+
+        assertFalse(plan.useBufferedResponse)
+        assertEquals(ResolvedFileRange(0, fileLength - 1, false), plan.range)
+    }
 }

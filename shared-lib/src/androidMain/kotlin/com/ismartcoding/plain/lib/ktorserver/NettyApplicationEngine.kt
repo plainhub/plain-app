@@ -212,6 +212,10 @@ public class NettyApplicationEngine(
             )
             // Send small responses immediately instead of waiting for Nagle
             childOption(ChannelOption.TCP_NODELAY, true)
+            // Deep send buffer so large media responses can fill the WiFi bandwidth-delay
+            // product; the kernel doubles this value and clamps it to net.core.wmem_max,
+            // so over-requesting only loses the excess.
+            childOption(ChannelOption.SO_SNDBUF, 1024 * 1024)
             if (configuration.tcpKeepAlive) {
                 childOption(ChannelOption.SO_KEEPALIVE, true)
             }
