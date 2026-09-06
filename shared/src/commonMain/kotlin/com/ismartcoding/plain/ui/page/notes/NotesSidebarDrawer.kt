@@ -41,7 +41,6 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotesSidebarDrawer(
-    notesVM: NotesViewModel,
     tagsVM: TagsViewModel,
     drawerState: DrawerState,
 ) {
@@ -67,26 +66,26 @@ fun NotesSidebarDrawer(
         SidebarItem(
             label = stringResource(Res.string.all),
             icon = Res.drawable.layout_grid,
-            isSelected = !notesVM.trash.value && notesVM.tag.value == null,
+            isSelected = !NotesViewModel.trash.value && NotesViewModel.tag.value == null,
             onClick = {
-                notesVM.trash.value = false
-                notesVM.tag.value = null
+                NotesViewModel.trash.value = false
+                NotesViewModel.tag.value = null
                 scope.launch { drawerState.close() }
             },
-            badge = notesVM.total.intValue.toString()
+            badge = NotesViewModel.total.intValue.toString()
         )
 
         // Trash
         SidebarItem(
             label = stringResource(Res.string.trash),
             icon = Res.drawable.trash_2,
-            isSelected = notesVM.trash.value,
+            isSelected = NotesViewModel.trash.value,
             onClick = {
-                notesVM.trash.value = true
-                notesVM.tag.value = null
+                NotesViewModel.trash.value = true
+                NotesViewModel.tag.value = null
                 scope.launch { drawerState.close() }
             },
-            badge = notesVM.totalTrash.intValue.toString()
+            badge = NotesViewModel.totalTrash.intValue.toString()
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -104,7 +103,7 @@ fun NotesSidebarDrawer(
             tags.forEach { tag ->
                 MediaSidebarTagItem(
                     tag = tag,
-                    isSelected = !notesVM.trash.value && notesVM.tag.value?.id == tag.id,
+                    isSelected = !NotesViewModel.trash.value && NotesViewModel.tag.value?.id == tag.id,
                     onEdit = { tagsVM.showEditDialog(tag) },
                     onDelete = {
                         DialogHelper.confirmToDelete {
@@ -112,8 +111,8 @@ fun NotesSidebarDrawer(
                         }
                     },
                     onClick = {
-                        notesVM.trash.value = false
-                        notesVM.tag.value = tag
+                        NotesViewModel.trash.value = false
+                        NotesViewModel.tag.value = tag
                         scope.launch { drawerState.close() }
                     }
                 )

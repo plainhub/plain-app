@@ -15,6 +15,7 @@ import com.ismartcoding.plain.httpserver.models.Note
 import com.ismartcoding.plain.httpserver.models.NoteInput
 import com.ismartcoding.plain.httpserver.models.toExportModel
 import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.ui.models.NotesViewModel
 
 @GraphQLQuery
 suspend fun noteCount(query: String): Int {
@@ -34,6 +35,7 @@ suspend fun saveNote(id: ID, input: NoteInput): Note? {
             title = input.title
             content = input.content
         }
+    NotesViewModel.reloadAsync()
     return NoteHelper.getById(item.id)?.toModel()
 }
 
@@ -49,6 +51,7 @@ suspend fun saveFeedEntriesToNotes(query: String): List<String> {
         }
         ids.add(m.id)
     }
+    NotesViewModel.reloadAsync()
     return ids
 }
 
@@ -57,6 +60,7 @@ suspend fun trashNotes(query: String): String {
     val ids = NoteHelper.getIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
     NoteHelper.trashAsync(ids)
+    NotesViewModel.reloadAsync()
     return query
 }
 
@@ -64,6 +68,7 @@ suspend fun trashNotes(query: String): String {
 suspend fun restoreNotes(query: String): String {
     val ids = NoteHelper.getTrashedIdsAsync(query)
     NoteHelper.restoreAsync(ids)
+    NotesViewModel.reloadAsync()
     return query
 }
 
@@ -72,6 +77,7 @@ suspend fun deleteNotes(query: String): String {
     val ids = NoteHelper.getTrashedIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
     NoteHelper.deleteAsync(ids)
+    NotesViewModel.reloadAsync()
     return query
 }
 

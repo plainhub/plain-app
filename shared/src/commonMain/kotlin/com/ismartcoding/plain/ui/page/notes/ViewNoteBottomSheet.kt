@@ -36,14 +36,13 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ViewNoteBottomSheet(
-    notesVM: NotesViewModel,
     tagsVM: TagsViewModel,
     tagsMap: Map<String, List<DTagRelation>>,
     tagsState: List<DTag>,
 ) {
-    val m = notesVM.selectedItem.value ?: return
+    val m = NotesViewModel.selectedItem.value ?: return
     val onDismiss = {
-        notesVM.selectedItem.value = null
+        NotesViewModel.selectedItem.value = null
     }
     val scope = rememberCoroutineScope()
 
@@ -58,31 +57,31 @@ fun ViewNoteBottomSheet(
             }
             item {
                 ActionButtons {
-                    if (!notesVM.showSearchBar.value) {
+                    if (!NotesViewModel.showSearchBar.value) {
                         IconTextSelectButton {
-                            notesVM.enterSelectMode()
-                            notesVM.select(m.id)
+                            NotesViewModel.enterSelectMode()
+                            NotesViewModel.select(m.id)
                             onDismiss()
                         }
                     }
-                    if (notesVM.trash.value) {
+                    if (NotesViewModel.trash.value) {
                         IconTextRestoreButton {
-                            notesVM.restore(tagsVM, setOf(m.id))
+                            NotesViewModel.restore(tagsVM, setOf(m.id))
                             onDismiss()
                         }
                         IconTextDeleteButton {
-                            notesVM.delete(tagsVM, setOf(m.id))
+                            NotesViewModel.delete(tagsVM, setOf(m.id))
                             onDismiss()
                         }
                     } else {
                         IconTextTrashButton {
-                            notesVM.trash(tagsVM, setOf(m.id))
+                            NotesViewModel.trash(tagsVM, setOf(m.id))
                             onDismiss()
                         }
                     }
                 }
             }
-            if (!notesVM.trash.value) {
+            if (!NotesViewModel.trash.value) {
                 item {
                     VerticalSpace(dp = 16.dp)
                     Subtitle(text = stringResource(Res.string.tags))
@@ -92,7 +91,7 @@ fun ViewNoteBottomSheet(
                         tagsMap = tagsMap,
                         tagsState = tagsState,
                         onChangedAsync = {
-                            notesVM.loadAsync(tagsVM)
+                            NotesViewModel.loadAsync(tagsVM)
                         }
                     )
                 }

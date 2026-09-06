@@ -33,7 +33,7 @@ import androidx.compose.runtime.MutableState
 @Composable
 internal fun NotePageEffects(
     id: MutableState<String>, tagId: String, noteVM: NoteViewModel,
-    notesVM: NotesViewModel, tagsVM: TagsViewModel, mdEditorVM: MdEditorViewModel,
+    tagsVM: TagsViewModel, mdEditorVM: MdEditorViewModel,
     previewerState: MediaPreviewerState,
 ) {
     val scope = rememberCoroutineScope()
@@ -62,7 +62,7 @@ internal fun NotePageEffects(
                         TagHelper.addTagRelations(arrayListOf(TagRelationStub(id.value).toTagRelation(tagId, DataType.NOTE)))
                     }
                     if (isNew) tagsVM.loadAsync(setOf(id.value))
-                    notesVM.updateItem(newItem)
+                    NotesViewModel.updateItem(newItem)
                 }
             }
         }

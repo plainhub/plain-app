@@ -35,7 +35,7 @@ navigationCompose="2.9.2"
 navigationComposeVersion = "2.10.0"
 material3Version = "1.4.0"
 okhttpVersion="5.5.0"
-room = "2.8.4"
+room = "3.0.0"
 runtimeVersion="1.12.0"
 sqlite = "2.7.0"
 transitionVersion="1.7.1"
@@ -152,9 +152,9 @@ latex-parser = { module = "io.github.huarangmeng:latex-parser", version.ref = "l
 latex-renderer = { module = "io.github.huarangmeng:latex-renderer", version.ref = "latex" }
 
 # room
-room-gradle = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-gradle = { module = "androidx.room3:room3-gradle-plugin", version.ref = "room" }
+room-runtime = { module = "androidx.room3:room3-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room3:room3-compiler", version.ref = "room" }
 # KSP2 API for the :kgraphql-ksp annotation processor
 ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "devtoolsKspVersion" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }

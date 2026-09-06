@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.platform
 
+import androidx.room3.useReaderConnection
+import androidx.room3.useWriterConnection
+import com.ismartcoding.plain.Constants
+import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.httpserver.models.DbTableInfo
 import org.json.JSONObject
 
@@ -9,83 +13,86 @@ private fun requireSafeName(name: String) {
     require(ALLOWED_NAME_REGEX.matches(name)) { "Invalid identifier: $name" }
 }
 
-private fun getValidatedTableName(table: String): String {
+private suspend fun getValidatedTableName(table: String): String {
     requireSafeName(table)
-    val db = AppDatabase.instance.openHelper.readableDatabase
-    val cursor = db.query("SELECT name FROM sqlite_master WHERE type='table' AND name=?", arrayOf(table))
-    val exists = cursor.use { it.moveToFirst() }
+    val exists = AppDatabase.instance.useReaderConnection { c ->
+        c.usePrepared("SELECT name FROM sqlite_master WHERE type='table' AND name=?") {
+            it.bindText(1, table)
+            it.step()
+        }
+    }
     require(exists) { "Table not found: $table" }
     return table
 }
 
-private fun primaryKeyColumn(table: String): String {
+private suspend fun primaryKeyColumn(table: String): String {
     val safeName = getValidatedTableName(table)
-    val db = AppDatabase.instance.openHelper.readableDatabase
-    val cursor = db.query("PRAGMA table_info(`$safeName`)", emptyArray())
-    cursor.use { c ->
-        while (c.moveToNext()) {
-            if (c.getInt(5) > 0) {
-                val colName = c.getString(1)
-                requireSafeName(colName)
-                return colName
+    return AppDatabase.instance.useReaderConnection { c ->
+        c.usePrepared("PRAGMA table_info(`$safeName`)") { stmt ->
+            var result = "id"
+            while (stmt.step()) {
+                if (stmt.getLong(5) > 0) {
+                    val colName = stmt.getText(1)
+                    requireSafeName(colName)
+                    result = colName
+                    break
+                }
             }
+            result
         }
     }
-    return "id"
 }
 
 actual fun getDbPath(): String =
-    AppDatabase.instance.openHelper.readableDatabase.path ?: ""
+    appContext.getDatabasePath(Constants.DATABASE_NAME).absolutePath
 
-actual fun getDbTableNames(): List<String> {
-    val db = AppDatabase.instance.openHelper.readableDatabase
-    val cursor = db.query(
+actual suspend fun getDbTableNames(): List<String> = AppDatabase.instance.useReaderConnection { c ->
+    c.usePrepared(
         "SELECT name FROM sqlite_master WHERE type='table'" +
             " AND name NOT LIKE 'android_%' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'room_%'" +
             " ORDER BY name",
-        emptyArray(),
-    )
-    val names = mutableListOf<String>()
-    cursor.use { c ->
-        while (c.moveToNext()) {
-            names.add(c.getString(0))
+    ) { stmt ->
+        val names = mutableListOf<String>()
+        while (stmt.step()) {
+            names.add(stmt.getText(0))
+        }
+        names
+    }
+}
+
+actual suspend fun getDbTableRowCount(table: String): Long {
+    val safeName = getValidatedTableName(table)
+    return AppDatabase.instance.useReaderConnection { c ->
+        c.usePrepared("SELECT COUNT(*) FROM `$safeName`") { stmt ->
+            if (stmt.step()) stmt.getLong(0) else 0L
         }
     }
-    return names
 }
 
-actual fun getDbTableRowCount(table: String): Long {
+actual suspend fun getDbTableRows(table: String, offset: Int, limit: Int): List<String> {
     val safeName = getValidatedTableName(table)
-    val db = AppDatabase.instance.openHelper.readableDatabase
-    val cursor = db.query("SELECT COUNT(*) FROM `$safeName`", emptyArray())
-    return cursor.use { c -> if (c.moveToFirst()) c.getLong(0) else 0L }
-}
-
-actual fun getDbTableRows(table: String, offset: Int, limit: Int): List<String> {
-    val safeName = getValidatedTableName(table)
-    val db = AppDatabase.instance.openHelper.readableDatabase
-    val cursor = db.query(
-        "SELECT * FROM `$safeName` LIMIT ? OFFSET ?",
-        arrayOf(limit.toString(), offset.toString()),
-    )
-    val rows = mutableListOf<String>()
-    cursor.use { c ->
-        while (c.moveToNext()) {
-            val obj = JSONObject()
-            for (i in 0 until c.columnCount) {
-                val col = c.getColumnName(i)
-                if (c.isNull(i)) obj.put(col, JSONObject.NULL) else obj.put(col, c.getString(i))
+    return AppDatabase.instance.useReaderConnection { c ->
+        c.usePrepared("SELECT * FROM `$safeName` LIMIT ? OFFSET ?") { stmt ->
+            stmt.bindText(1, limit.toString())
+            stmt.bindText(2, offset.toString())
+            val rows = mutableListOf<String>()
+            while (stmt.step()) {
+                val obj = JSONObject()
+                for (i in 0 until stmt.getColumnCount()) {
+                    val col = stmt.getColumnName(i)
+                    if (stmt.isNull(i)) obj.put(col, JSONObject.NULL) else obj.put(col, stmt.getText(i))
+                }
+                rows.add(obj.toString())
             }
-            rows.add(obj.toString())
+            rows
         }
     }
-    return rows
 }
 
-actual fun getDbTableInfo(table: String): DbTableInfo =
+actual suspend fun getDbTableInfo(table: String): DbTableInfo =
     DbTableInfo(idKey = primaryKeyColumn(table))
 
-actual fun createDbTableRow(table: String, rowJson: String): Boolean {
+actual suspend fun createDbTableRow(table: String, rowJson: String): Boolean {
     val safeName = getValidatedTableName(table)
     val json = JSONObject(rowJson)
     val keys = json.keys().asSequence().toList()
@@ -93,18 +100,25 @@ actual fun createDbTableRow(table: String, rowJson: String): Boolean {
     keys.forEach { requireSafeName(it) }
     val columns = keys.joinToString(", ") { "`$it`" }
     val placeholders = keys.joinToString(", ") { "?" }
-    val args = keys.map { json.get(it)?.toString() ?: "" }.toTypedArray()
-    val db = AppDatabase.instance.openHelper.writableDatabase
-    db.execSQL("INSERT INTO `$safeName` ($columns) VALUES ($placeholders)", args)
+    AppDatabase.instance.useWriterConnection { c ->
+        c.usePrepared("INSERT INTO `$safeName` ($columns) VALUES ($placeholders)") { stmt ->
+            keys.forEachIndexed { i, k -> stmt.bindText(i + 1, json.get(k)?.toString() ?: "") }
+            stmt.step()
+        }
+    }
     return true
 }
 
-actual fun deleteDbTableRows(table: String, ids: List<String>): Boolean {
+actual suspend fun deleteDbTableRows(table: String, ids: List<String>): Boolean {
     require(ids.isNotEmpty()) { "ids must not be empty" }
     val safeName = getValidatedTableName(table)
     val idKey = primaryKeyColumn(safeName)
     val placeholders = ids.joinToString(", ") { "?" }
-    val db = AppDatabase.instance.openHelper.writableDatabase
-    db.execSQL("DELETE FROM `$safeName` WHERE `$idKey` IN ($placeholders)", ids.toTypedArray())
+    AppDatabase.instance.useWriterConnection { c ->
+        c.usePrepared("DELETE FROM `$safeName` WHERE `$idKey` IN ($placeholders)") { stmt ->
+            ids.forEachIndexed { i, id -> stmt.bindText(i + 1, id) }
+            stmt.step()
+        }
+    }
     return true
 }

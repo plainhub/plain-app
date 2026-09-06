@@ -110,7 +110,6 @@ fun MainNavGraph(
     chatVM: ChatViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
-    notesVM: NotesViewModel,
     feedTagsVM: TagsViewModel,
     feedEntryPagerVM: FeedEntryPagerViewModel,
     noteTagsVM: TagsViewModel,
@@ -140,7 +139,7 @@ fun MainNavGraph(
         composable<Routing.Audio> { AudioPage(navController, audioPlaylistVM) }
         composable<Routing.Apps> { AppsPage(navController) }
         composable<Routing.Docs> { DocsPage(navController) }
-        composable<Routing.Notes> { NotesPage(navController, notesVM = notesVM, tagsVM = noteTagsVM) }
+        composable<Routing.Notes> { NotesPage(navController, tagsVM = noteTagsVM) }
         composable<Routing.SoundMeter> { SoundMeterPage(navController) }
         composable<Routing.PomodoroTimer> {
             PomodoroPage(
@@ -211,11 +210,11 @@ fun MainNavGraph(
         }
         composable<Routing.NotesCreate> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.NotesCreate>()
-            NotePage(navController, "", r.tagId, notesVM = notesVM, tagsVM = noteTagsVM)
+            NotePage(navController, "", r.tagId, tagsVM = noteTagsVM)
         }
         composable<Routing.NoteDetail> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.NoteDetail>()
-            NotePage(navController, r.id, "", notesVM = notesVM, tagsVM = noteTagsVM)
+            NotePage(navController, r.id, "", tagsVM = noteTagsVM)
         }
         composable<Routing.ImageEditor> {
             ImageEditorListPage(navController)

@@ -68,7 +68,6 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.datastore.preferences.core)
             api(libs.room.runtime)
-            implementation(libs.sqlite.bundled)
             // ktor-io only (ByteReadChannel streaming) — no HTTP client dependency from ktor
             implementation(libs.ktor.io)
             implementation(libs.coil.compose)
@@ -139,8 +138,6 @@ kotlin {
             compileOnly(project(":litert-stubs"))
         }
         iosMain.dependencies {
-            implementation(libs.sqlite.bundled)
-
             implementation(libs.coil)
             implementation(libs.coil.network.core)
         }

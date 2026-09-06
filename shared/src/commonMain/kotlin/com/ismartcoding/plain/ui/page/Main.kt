@@ -49,7 +49,6 @@ fun Main(
     chatVM: ChatViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
-    notesVM: NotesViewModel = viewModel(key = "notesVM") { NotesViewModel() },
     feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM") { TagsViewModel() },
     feedEntryPagerVM: FeedEntryPagerViewModel = viewModel(key = "feedEntryPagerVM") { FeedEntryPagerViewModel() },
     noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM") { TagsViewModel() },
@@ -90,7 +89,7 @@ fun Main(
     }
 
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
-        MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM)
+        MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM)
 
         DlnaReceiverOverlay()
         MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })

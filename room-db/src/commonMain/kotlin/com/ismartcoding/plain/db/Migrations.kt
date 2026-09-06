@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.migration.Migration
+import androidx.room3.migration.Migration
 import androidx.sqlite.SQLiteConnection
 import androidx.sqlite.execSQL
 
@@ -14,7 +14,7 @@ import androidx.sqlite.execSQL
  */
 object Migrations {
     val MIGRATION_5_6 = object : Migration(5, 6) {
-        override fun migrate(connection: SQLiteConnection) {
+        override suspend fun migrate(connection: SQLiteConnection) {
             // Ensure pomodoro_items exists in case it was missing from a prior incomplete migration
             connection.execSQL("""
                 CREATE TABLE IF NOT EXISTS `pomodoro_items` (
@@ -94,14 +94,14 @@ object Migrations {
     }
 
     val MIGRATION_18_19 = object : Migration(18, 19) {
-        override fun migrate(connection: SQLiteConnection) {
+        override suspend fun migrate(connection: SQLiteConnection) {
             connection.execSQL("UPDATE peers SET status = UPPER(status) WHERE status != ''")
             connection.execSQL("UPDATE peers SET device_type = UPPER(device_type) WHERE device_type != ''")
         }
     }
 
     val MIGRATION_19_20 = object : Migration(19, 20) {
-        override fun migrate(connection: SQLiteConnection) {
+        override suspend fun migrate(connection: SQLiteConnection) {
             connection.execSQL("UPDATE chat_channels SET status = UPPER(status) WHERE status != ''")
             connection.execSQL("UPDATE chats SET status = UPPER(status) WHERE status != ''")
             connection.execSQL("UPDATE sessions SET type = UPPER(type) WHERE type != ''")
@@ -119,7 +119,7 @@ object Migrations {
     }
 
     val MIGRATION_20_21 = object : Migration(20, 21) {
-        override fun migrate(connection: SQLiteConnection) {
+        override suspend fun migrate(connection: SQLiteConnection) {
             connection.execSQL(
                 """
                 UPDATE chats
@@ -134,7 +134,7 @@ object Migrations {
     }
 
     val MIGRATION_21_22 = object : Migration(21, 22) {
-        override fun migrate(connection: SQLiteConnection) {
+        override suspend fun migrate(connection: SQLiteConnection) {
             // Clean up invalid data that could cause Enum parsing crashes
             connection.execSQL("UPDATE chats SET status = 'PENDING' WHERE status = '' OR status IS NULL")
             connection.execSQL("UPDATE sessions SET type = 'WEB' WHERE type = '' OR type IS NULL")
@@ -232,7 +232,7 @@ object Migrations {
     }
 
     val MIGRATION_22_23 = object : Migration(22, 23) {
-        override fun migrate(connection: SQLiteConnection) {
+        override suspend fun migrate(connection: SQLiteConnection) {
             connection.execSQL(
                 """
                 CREATE TABLE IF NOT EXISTS `shares` (

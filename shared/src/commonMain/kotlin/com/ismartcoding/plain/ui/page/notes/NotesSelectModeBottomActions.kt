@@ -24,7 +24,6 @@ import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NotesSelectModeBottomActions(
-    notesVM: NotesViewModel,
     tagsVM: TagsViewModel,
     tagsState: List<DTag>,
 ) {
@@ -36,22 +35,22 @@ fun NotesSelectModeBottomActions(
     }
 
     if (showSelectTagsDialog) {
-        BatchSelectTagsDialog(tagsVM, tagsState, notesVM.getSelectedItems(), removeFromTags) {
+        BatchSelectTagsDialog(tagsVM, tagsState, NotesViewModel.getSelectedItems(), removeFromTags) {
             showSelectTagsDialog = false
-            notesVM.exitSelectMode()
+            NotesViewModel.exitSelectMode()
         }
     }
 
     PBottomAppBar {
         BottomActionButtons {
-            if (notesVM.trash.value) {
+            if (NotesViewModel.trash.value) {
                 IconTextSmallButtonRestore {
-                    notesVM.restore(tagsVM, notesVM.selectedIds.toSet())
-                    notesVM.exitSelectMode()
+                    NotesViewModel.restore(tagsVM, NotesViewModel.selectedIds.toSet())
+                    NotesViewModel.exitSelectMode()
                 }
                 IconTextSmallButtonDelete {
-                    notesVM.delete(tagsVM, notesVM.selectedIds.toSet())
-                    notesVM.exitSelectMode()
+                    NotesViewModel.delete(tagsVM, NotesViewModel.selectedIds.toSet())
+                    NotesViewModel.exitSelectMode()
                 }
             } else {
                 IconTextSmallButtonLabel {
@@ -63,8 +62,8 @@ fun NotesSelectModeBottomActions(
                     removeFromTags = true
                 }
                 IconTrashButton {
-                    notesVM.trash(tagsVM, notesVM.selectedIds.toSet())
-                    notesVM.exitSelectMode()
+                    NotesViewModel.trash(tagsVM, NotesViewModel.selectedIds.toSet())
+                    NotesViewModel.exitSelectMode()
                 }
             }
         }

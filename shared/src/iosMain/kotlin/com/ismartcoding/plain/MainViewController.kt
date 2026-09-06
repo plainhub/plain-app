@@ -8,7 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavHostController
-import androidx.room.RoomDatabase
+import androidx.room3.RoomDatabase
 import androidx.sqlite.SQLiteConnection
 import com.ismartcoding.plain.db.DataInitializer
 import com.ismartcoding.plain.enums.DarkTheme
@@ -25,7 +25,6 @@ import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -66,7 +65,7 @@ fun initIosApp() {
     initDatabase(
         buildAppDatabase(Constants.DATABASE_NAME)
             .addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(connection: SQLiteConnection) {
+                override suspend fun onCreate(connection: SQLiteConnection) {
                     DataInitializer(connection).apply {
                         insertWelcome()
                         insertTags()
@@ -127,7 +126,6 @@ fun MainViewController(): UIViewController {
                     initializer { ChatViewModel() }
                     initializer { PeerViewModel() }
                     initializer { ChannelViewModel() }
-                    initializer { NotesViewModel() }
                     initializer { TagsViewModel() }
                 }
                 val mainVM: MainViewModel = viewModel(factory = factory)

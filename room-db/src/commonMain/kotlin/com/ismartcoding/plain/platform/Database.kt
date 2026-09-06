@@ -1,15 +1,15 @@
 package com.ismartcoding.plain.platform
 
-import androidx.room.AutoMigration
-import androidx.room.ConstructedBy
-import androidx.room.Database
-import androidx.room.DeleteTable
-import androidx.room.RenameColumn
-import androidx.room.RenameTable
-import androidx.room.RoomDatabase
-import androidx.room.RoomDatabaseConstructor
-import androidx.room.TypeConverters
-import androidx.room.migration.AutoMigrationSpec
+import androidx.room3.AutoMigration
+import androidx.room3.ConstructedBy
+import androidx.room3.Database
+import androidx.room3.DeleteTable
+import androidx.room3.RenameColumn
+import androidx.room3.RenameTable
+import androidx.room3.RoomDatabase
+import androidx.room3.RoomDatabaseConstructor
+import androidx.room3.ColumnTypeConverters
+import androidx.room3.migration.AutoMigrationSpec
 import com.ismartcoding.plain.db.*
 
 /**
@@ -67,7 +67,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
     exportSchema = true,
 )
 @ConstructedBy(AppDatabaseConstructor::class)
-@TypeConverters(
+@ColumnTypeConverters(
     DateConverter::class,
     ChannelMemberListConverter::class,
     ChatItemContentConverter::class,

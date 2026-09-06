@@ -61,7 +61,6 @@ import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import com.ismartcoding.plain.ui.models.NoteViewModel
-import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -71,7 +70,7 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 @Composable
 fun NotePage(
     navController: NavHostController, initId: String, tagId: String,
-    notesVM: NotesViewModel, tagsVM: TagsViewModel,
+    tagsVM: TagsViewModel,
     noteVM: NoteViewModel = viewModel { NoteViewModel() }, mdEditorVM: MdEditorViewModel = viewModel { MdEditorViewModel() },
 ) {
     val id = remember { mutableStateOf(initId) }
@@ -84,7 +83,7 @@ fun NotePage(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { !noteVM.editMode.value })
     val tagIds = tagsMapState[id.value]?.map { it.tagId } ?: emptyList()
 
-    NotePageEffects(id, tagId, noteVM, notesVM, tagsVM, mdEditorVM, previewerState)
+    NotePageEffects(id, tagId, noteVM, tagsVM, mdEditorVM, previewerState)
 
     if (noteVM.showSelectTagsDialog.value) {
         val m = noteVM.item.value

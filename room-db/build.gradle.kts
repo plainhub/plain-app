@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.devtools.ksp)
     // Resolved from the root project's buildscript classpath (libs.room.gradle).
-    id("androidx.room")
+    id("androidx.room3")
 }
 
 // Dev-only single-target mode: pass -PenableDeviceTarget=false to skip
@@ -40,6 +40,9 @@ kotlin {
         }
         androidMain.dependencies {
             api(project(":shared-lib"))
+            // BundledSQLiteDriver used by the Android buildAppDatabase actual (Room 3
+            // has no SupportSQLite fallback; both platforms run the same bundled driver).
+            implementation(libs.sqlite.bundled)
         }
         iosMain.dependencies {
             // BundledSQLiteDriver used by the iOS buildAppDatabase actual.
@@ -51,7 +54,7 @@ kotlin {
     }
 }
 
-room {
+room3 {
     // Room writes the schema history here; the @Database uses exportSchema = true.
     schemaDirectory("$projectDir/schemas")
 }

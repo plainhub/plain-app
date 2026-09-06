@@ -4,7 +4,7 @@ import android.app.Application
 import android.media.AudioAttributes
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextClassifier
-import androidx.room.RoomDatabase
+import androidx.room3.RoomDatabase
 import androidx.sqlite.SQLiteConnection
 import coil3.SingletonImageLoader
 import com.ismartcoding.plain.ai.ImageSearchManager
@@ -49,7 +49,7 @@ object MainAppHelper {
         initDatabase(
             buildAppDatabase(Constants.DATABASE_NAME)
                 .addCallback(object : RoomDatabase.Callback() {
-                    override fun onCreate(connection: SQLiteConnection) {
+                    override suspend fun onCreate(connection: SQLiteConnection) {
                         DataInitializer(connection).apply {
                             insertWelcome()
                             insertTags()

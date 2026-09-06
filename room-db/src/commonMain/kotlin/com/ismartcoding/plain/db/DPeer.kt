@@ -1,14 +1,14 @@
 package com.ismartcoding.plain.db
 
 import androidx.compose.runtime.Composable
-import androidx.room.ColumnInfo
-import androidx.room.Dao
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.PrimaryKey
-import androidx.room.Query
-import androidx.room.Update
-import androidx.room.Upsert
+import androidx.room3.ColumnInfo
+import androidx.room3.Dao
+import androidx.room3.Entity
+import androidx.room3.Insert
+import androidx.room3.PrimaryKey
+import androidx.room3.Query
+import androidx.room3.Update
+import androidx.room3.Upsert
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.PeerStatus
 

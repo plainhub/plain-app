@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.ColumnInfo
+import androidx.room3.ColumnInfo
 import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
 

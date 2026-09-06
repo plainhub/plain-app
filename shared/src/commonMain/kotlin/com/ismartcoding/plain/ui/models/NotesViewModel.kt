@@ -3,19 +3,25 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>, ViewModel() {
+// App-lifetime singleton so the HTTP server (GraphQL mutations) and the UI share
+// one notes list state: server writes call [reloadAsync]/[updateItem] and every
+// collector sees the change without event passing.
+object NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote> {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     private val _itemsFlow = MutableStateFlow<List<DNote>>(emptyList())
     override val itemsFlow: StateFlow<List<DNote>> = _itemsFlow
     var showLoading = mutableStateOf(true)
@@ -46,19 +52,24 @@ class NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>,
         noMore.value = items.size < limit.intValue
     }
 
-    suspend fun loadAsync(tagsVM: TagsViewModel) = withIO {
+    // Re-queries the notes list from the DB. Called by the UI and by GraphQL
+    // mutations so both write paths converge on this single state.
+    suspend fun reloadAsync() = withIO {
         offset.intValue = 0
-        val query = getQuery()
-        _itemsFlow.value = NoteHelper.search(query, limit.intValue, offset.value)
-        tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
+        _itemsFlow.value = NoteHelper.search(getQuery(), limit.intValue, offset.intValue)
         total.intValue = NoteHelper.count(getTotalQuery())
         totalTrash.intValue = NoteHelper.count(getTrashQuery())
         noMore.value = _itemsFlow.value.size < limit.intValue
         showLoading.value = false
     }
 
+    suspend fun loadAsync(tagsVM: TagsViewModel) {
+        reloadAsync()
+        tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
+    }
+
     fun trash(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe {
+        scope.launchSafe {
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.trashAsync(ids)
             loadAsync(tagsVM)
@@ -77,7 +88,7 @@ class NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>,
     }
 
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe {
+        scope.launchSafe {
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.restoreAsync(ids)
             loadAsync(tagsVM)
@@ -85,7 +96,7 @@ class NotesViewModel : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>,
     }
 
     fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
-        viewModelScope.launchSafe {
+        scope.launchSafe {
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             NoteHelper.deleteAsync(ids)
             loadAsync(tagsVM)

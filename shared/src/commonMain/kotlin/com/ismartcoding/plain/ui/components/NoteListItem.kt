@@ -35,7 +35,6 @@ import com.ismartcoding.plain.ui.theme.listItemTag
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun NoteListItem(
-    notesVM: NotesViewModel,
     m: DNote,
     tags: List<DTag>,
     onClick: () -> Unit,
@@ -43,17 +42,17 @@ fun NoteListItem(
     onClickTag: (DTag) -> Unit
 ) {
     Row {
-        if (notesVM.selectMode.value) {
+        if (NotesViewModel.selectMode.value) {
             HorizontalSpace(dp = 16.dp)
-            Checkbox(checked = notesVM.selectedIds.contains(m.id), onCheckedChange = {
-                notesVM.select(m.id)
+            Checkbox(checked = NotesViewModel.selectedIds.contains(m.id), onCheckedChange = {
+                NotesViewModel.select(m.id)
             })
         }
 
         Surface(
             modifier =
             PlainTheme
-                .getCardModifier(selected = notesVM.selectedItem.value?.id == m.id || notesVM.selectedIds.contains(m.id))
+                .getCardModifier(selected = NotesViewModel.selectedItem.value?.id == m.id || NotesViewModel.selectedIds.contains(m.id))
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick,
