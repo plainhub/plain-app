@@ -313,6 +313,23 @@ expect suspend fun convert3gpToMp4(uri: String): ByteArray?
 expect suspend fun remuxMp4ForBrowser(path: String): String?
 
 /**
+ * fourcc of the first video track's stsd sample entry (e.g. "hvc1", "avc1"),
+ * or "" when the file has no parsable video track. Cheap box-level probe used
+ * by the `/fs` `probe=1` mode so the browser can decide whether it can decode
+ * the file before committing to a playback URL.
+ */
+expect suspend fun probeVideoCodec(path: String): String
+
+/**
+ * Returns an H.264-transcoded variant of the HEVC video at [path] for
+ * browsers without an HEVC decoder (audio stream-copied, cached on the
+ * platform side). Returns null when the file is not HEVC, is too long, or
+ * the pipeline fails. Only run when the client explicitly opted in (`tr=1`)
+ * — transcoding is far more expensive than a remux.
+ */
+expect suspend fun transcodeMp4ForBrowser(path: String): String?
+
+/**
  * Returns the package icon PNG bytes for the given [packageName], or null if
  * the package is not installed or the icon cannot be encoded.
  */

@@ -27,13 +27,15 @@ class MarkdownLivePreviewTransformationTest {
     private fun transformation() = MarkdownLivePreviewTransformation(styles)
 
     // Simulates applying the planned edits to a buffer, mimicking TextFieldBuffer.replace.
+    // Uses String.replaceRange (pure, cross-platform): StringBuilder.replace(Int,Int,String)
+    // does not exist on Kotlin/Native, and CharSequence.replaceRange returns a new value
+    // without mutating the builder (silent no-op when the result is discarded).
     private fun output(text: String, selectionStart: Int, selectionEnd: Int = selectionStart): String {
-        val sb = StringBuilder(text)
-        val sourceLines = computeSourceLines(text, selectionStart, selectionEnd)
-        for (e in transformation().planEdits(text, sourceLines)) {
-            sb.replace(e.start, e.start + e.origLen, e.text)
+        var result = text
+        for (e in transformation().planEdits(text, computeSourceLines(text, selectionStart, selectionEnd))) {
+            result = result.replaceRange(e.start, e.start + e.origLen, e.text)
         }
-        return sb.toString()
+        return result
     }
 
     // Puts the caret on a trailing dummy line so every markdown line renders.

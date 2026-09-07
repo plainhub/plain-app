@@ -289,6 +289,14 @@ actual suspend fun remuxMp4ForBrowser(path: String): String? = withIO {
     Mp4Helper.remuxForBrowser(appContext, path)
 }
 
+actual suspend fun probeVideoCodec(path: String): String = withIO {
+    Mp4Helper.firstVideoSampleEntry(path) ?: ""
+}
+
+actual suspend fun transcodeMp4ForBrowser(path: String): String? = withIO {
+    Mp4Helper.transcodeForBrowser(appContext, path)
+}
+
 actual suspend fun getPackageIconBytes(packageName: String): ByteArray? = withIO {
     val bitmap = PackageHelper.getIcon(packageName)
     ByteArrayOutputStream().use {

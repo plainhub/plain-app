@@ -43,10 +43,17 @@ kotlin {
     val iosTargets = mutableListOf<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
     if (enableDeviceTarget) iosTargets.add(iosArm64())
     iosTargets.add(iosSimulatorArm64())
+    // Skip DWARF debug-info generation: measured ~50% faster incremental iOS
+    // dev cycles (2m17s -> 1m10s for a single-line change; the K/N backend
+    // emits debug info at link time). Trade-off: no source-level Kotlin
+    // debugging in lldb and no line numbers in debug-build crash traces.
+    // Restore with -PkotlinDebuggable=true when you need to debug Kotlin.
+    val kotlinDebuggable = (findProperty("kotlinDebuggable") as? String)?.toBoolean() ?: false
     iosTargets.forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "PlainShared"
             isStatic = true
+            debuggable = kotlinDebuggable
         }
     }
 

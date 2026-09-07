@@ -11,8 +11,10 @@ import com.ismartcoding.plain.platform.getPackageIconBytes
 import com.ismartcoding.plain.platform.getThumbnailBytes
 import com.ismartcoding.plain.platform.isAnimatedImageOrSvg
 import com.ismartcoding.plain.platform.isContentUri
+import com.ismartcoding.plain.platform.probeVideoCodec
 import com.ismartcoding.plain.platform.readFileRange
 import com.ismartcoding.plain.platform.remuxMp4ForBrowser
+import com.ismartcoding.plain.platform.transcodeMp4ForBrowser
 import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.platform.streamContentUri
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
@@ -46,6 +48,8 @@ object FileServer {
         jsonName: String = "",
     ) {
         val isDownload = call.queryParam("dl") == "1"
+        val isProbe = call.queryParam("probe") == "1"
+        val wantsTranscode = call.queryParam("tr") == "1"
         val widthParam = call.queryParam("w")?.toIntOrNull()
         val heightParam = call.queryParam("h")?.toIntOrNull()
         // `cc` defaults to true (matches the original `!= false` behavior).
@@ -109,6 +113,8 @@ object FileServer {
                 jsonName = jsonName,
                 mediaId = mediaId,
                 isDownload = isDownload,
+                isProbe = isProbe,
+                wantsTranscode = wantsTranscode,
                 widthParam = widthParam,
                 heightParam = heightParam,
                 centerCrop = centerCrop,
@@ -174,6 +180,8 @@ object FileServer {
         jsonName: String,
         mediaId: String,
         isDownload: Boolean,
+        isProbe: Boolean,
+        wantsTranscode: Boolean,
         widthParam: Int?,
         heightParam: Int?,
         centerCrop: Boolean,
@@ -190,6 +198,15 @@ object FileServer {
 
         val fileName = (jsonName.ifEmpty { path.substringAfterLast('/') }).urlEncode()
         call.responseHeader("Access-Control-Expose-Headers", "Content-Disposition")
+
+        // Codec probe (`probe=1`): let the web client learn the video codec
+        // before committing to a playback URL — HEVC files get a `tr=1`
+        // transcoded URL on browsers without an HEVC decoder.
+        if (isProbe) {
+            val codec = probeVideoCodec(path).filter { it.isLetterOrDigit() }
+            call.respondText("{\"codec\":\"$codec\"}", contentType = "application/json")
+            return
+        }
 
         if (isDownload) {
             val contentDisposition =
@@ -242,6 +259,32 @@ object FileServer {
 
         // Default: serve the file as-is with content type sniffed from extension.
         val contentType = getContentTypeForPath(path) ?: "application/octet-stream"
+        // Client explicitly asked for a browser-playable transcode (it probed
+        // HEVC as unsupported). HEVC→H.264 is expensive, so this only runs on
+        // opt-in; failures surface as 415 so the client can fall back to the
+        // download hint instead of silently playing audio-only.
+        if (wantsTranscode && contentType == "video/mp4") {
+            val codec = probeVideoCodec(path)
+            if (codec == "hvc1" || codec == "hev1") {
+                // Platform failures (missing context, codec init, OOM) must
+                // surface as 415, never crash the route.
+                val transcodedPath = try {
+                    transcodeMp4ForBrowser(path)
+                } catch (_: Exception) {
+                    null
+                }
+                if (transcodedPath != null) {
+                    call.respondFile(transcodedPath, contentType = contentType)
+                } else {
+                    call.respondText(
+                        "video transcoding is not available for this file",
+                        status = HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                    )
+                }
+                return
+            }
+            // Not HEVC: every browser can decode it — fall through.
+        }
         // Chromium cannot demux MP4s embedding camera metadata tracks it cannot
         // identify (e.g. the Pixel "mebx" motion track): it refuses the whole
         // file. Serve an audio+video-only stream-copy remux instead; `dl=1`
