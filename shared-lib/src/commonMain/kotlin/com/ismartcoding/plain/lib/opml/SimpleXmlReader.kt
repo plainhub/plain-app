@@ -52,7 +52,7 @@ internal class SimpleXmlReader(private val xml: String) {
         while (pos < xml.length) {
             when {
                 xml.startsWith("<!--", pos) -> skipUntil("-->")
-                xml.startsWith("<![CDATA[", pos) -> return parseCData()
+                xml.startsWith("<![CDATA[", pos) -> break
                 xml.startsWith("<?", pos) -> skipUntil("?>")
                 xml.startsWith("<!", pos) -> skipUntil(">")
                 else -> break
@@ -66,8 +66,8 @@ internal class SimpleXmlReader(private val xml: String) {
 
         return when {
             xml.startsWith("</", pos) -> parseEndTag()
-            xml[pos] == '<' -> parseStartTag()
-            else -> parseText()
+            xml.startsWith("<![CDATA[", pos) || xml[pos] != '<' -> parseText()
+            else -> parseStartTag()
         }
     }
 
@@ -133,27 +133,40 @@ internal class SimpleXmlReader(private val xml: String) {
     }
 
     private fun parseText(): Int {
-        val textEnd = xml.indexOf('<', pos)
-        val end = if (textEnd < 0) xml.length else textEnd
-        text = decodeEntities(xml.substring(pos, end))
-        pos = end
+        // Per the XML spec, character data, CDATA sections, comments and
+        // processing instructions interleave freely; everything up to the next
+        // real tag is one logical text node. Only plain text gets entity
+        // decoding — CDATA content stays raw.
+        val sb = StringBuilder()
+        while (pos < xml.length) {
+            when {
+                xml.startsWith("<![CDATA[", pos) -> sb.append(readCData())
+                xml.startsWith("<!--", pos) -> skipUntil("-->")
+                xml.startsWith("<?", pos) -> skipUntil("?>")
+                xml[pos] == '<' -> break
+                else -> {
+                    val tagStart = xml.indexOf('<', pos)
+                    val end = if (tagStart < 0) xml.length else tagStart
+                    sb.append(decodeEntities(xml.substring(pos, end)))
+                    pos = end
+                }
+            }
+        }
+        text = sb.toString()
 
         name = "" // Clear name on TEXT events (matches XmlPullParser behavior)
         eventType = TEXT
         return eventType
     }
 
-    private fun parseCData(): Int {
+    private fun readCData(): String {
         pos += 9 // skip "<![CDATA["
         val end = xml.indexOf("]]>", pos)
-        text = if (end < 0) {
+        return if (end < 0) {
             xml.substring(pos).also { pos = xml.length }
         } else {
             xml.substring(pos, end).also { pos = end + 3 }
         }
-        name = ""
-        eventType = TEXT
-        return eventType
     }
 
     private fun skipUntil(marker: String) {
