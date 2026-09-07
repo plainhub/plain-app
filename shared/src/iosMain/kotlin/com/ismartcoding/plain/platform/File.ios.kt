@@ -318,6 +318,8 @@ actual suspend fun streamContentUri(uri: String, sink: StreamSink): String? = nu
 
 actual suspend fun convert3gpToMp4(uri: String): ByteArray? = null
 
+actual suspend fun remuxMp4ForBrowser(path: String): String? = null
+
 actual suspend fun getPackageIconBytes(packageName: String): ByteArray? = null
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)

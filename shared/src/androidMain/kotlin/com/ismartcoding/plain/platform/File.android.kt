@@ -283,6 +283,12 @@ actual suspend fun convert3gpToMp4(uri: String): ByteArray? = withIO {
     }
 }
 
+actual suspend fun remuxMp4ForBrowser(path: String): String? = withIO {
+    // Box-level probe first: skips the extractor entirely for normal files.
+    if (!Mp4Helper.hasBrowserIncompatibleTrack(path)) return@withIO null
+    Mp4Helper.remuxForBrowser(appContext, path)
+}
+
 actual suspend fun getPackageIconBytes(packageName: String): ByteArray? = withIO {
     val bitmap = PackageHelper.getIcon(packageName)
     ByteArrayOutputStream().use {

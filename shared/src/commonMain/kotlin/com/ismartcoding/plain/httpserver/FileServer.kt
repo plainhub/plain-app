@@ -12,6 +12,7 @@ import com.ismartcoding.plain.platform.getThumbnailBytes
 import com.ismartcoding.plain.platform.isAnimatedImageOrSvg
 import com.ismartcoding.plain.platform.isContentUri
 import com.ismartcoding.plain.platform.readFileRange
+import com.ismartcoding.plain.platform.remuxMp4ForBrowser
 import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.platform.streamContentUri
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
@@ -29,6 +30,7 @@ import com.ismartcoding.plain.httpserver.http.HttpStatus
  * - package icons
  * - thumbnails (`w`/`h`/`cc` query params)
  * - HEIF→PNG conversion for browsers without native HEIF support
+ * - MP4 remux (metadata tracks dropped) for files Chromium cannot demux
  * - download mode (`dl=1`) with Content-Disposition
  *
  * The route handlers only differ in how they authenticate + resolve the path
@@ -240,6 +242,17 @@ object FileServer {
 
         // Default: serve the file as-is with content type sniffed from extension.
         val contentType = getContentTypeForPath(path) ?: "application/octet-stream"
+        // Chromium cannot demux MP4s embedding camera metadata tracks it cannot
+        // identify (e.g. the Pixel "mebx" motion track): it refuses the whole
+        // file. Serve an audio+video-only stream-copy remux instead; `dl=1`
+        // downloads above still get the original bytes.
+        if (contentType == "video/mp4") {
+            val browserPlayablePath = remuxMp4ForBrowser(path)
+            if (browserPlayablePath != null) {
+                call.respondFile(browserPlayablePath, contentType = contentType)
+                return
+            }
+        }
         call.respondFile(path, contentType = contentType)
     }
 }

@@ -304,6 +304,15 @@ expect suspend fun streamContentUri(uri: String, sink: StreamSink): String?
 expect suspend fun convert3gpToMp4(uri: String): ByteArray?
 
 /**
+ * Returns a browser-playable variant of [path] for MP4 files that embed
+ * metadata tracks Chromium cannot demux (e.g. the Pixel camera "mebx" motion
+ * track): an audio+video-only stream-copy remux, cached on the platform side.
+ * Returns null when no conversion is needed or the platform has no remux
+ * support.
+ */
+expect suspend fun remuxMp4ForBrowser(path: String): String?
+
+/**
  * Returns the package icon PNG bytes for the given [packageName], or null if
  * the package is not installed or the icon cannot be encoded.
  */

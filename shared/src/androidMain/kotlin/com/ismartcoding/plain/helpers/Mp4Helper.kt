@@ -22,6 +22,12 @@ import java.nio.ByteBuffer
  */
 object Mp4Helper {
 
+    // Sample-entry fourccs Chromium's MP4 demuxer cannot identify: it fails the
+    // whole file with DEMUXER_ERROR_COULD_NOT_OPEN instead of skipping the
+    // track. "mebx" is the motion track Pixel cameras embed. Extend as new
+    // offenders show up.
+    private val BROWSER_INCOMPATIBLE_SAMPLE_ENTRIES = setOf("mebx")
+
     private class EncodedSample(
         val data: ByteArray,
         val presentationTimeUs: Long,
@@ -661,5 +667,185 @@ object Mp4Helper {
 
         LogCat.d("Mp4Helper: AAC transcode done, ${samples.size} frames, format=$outputFormat")
         return TrackData(outputFormat ?: aacFormat, samples)
+    }
+
+    // ── Browser-compat remux: drop undecodable metadata tracks ───────────
+
+    /**
+     * True when the MP4's moov declares a track whose stsd sample entry is one
+     * browsers refuse to demux ([BROWSER_INCOMPATIBLE_SAMPLE_ENTRIES]). Box-level
+     * probe only — no MediaExtractor, safe to call on the request path.
+     */
+    fun hasBrowserIncompatibleTrack(path: String): Boolean {
+        val file = File(path)
+        if (file.length() < 32) return false
+        return try {
+            RandomAccessFile(path, "r").use { raf ->
+                val length = file.length()
+                var offset = 0L
+                while (offset < length) {
+                    val box = readBoxHeader(raf, offset, length) ?: return@use false
+                    if (box.type == "moov") {
+                        return@use moovHasIncompatibleTrack(raf, box)
+                    }
+                    offset += box.size
+                }
+                false
+            }
+        } catch (e: Exception) {
+            LogCat.e("hasBrowserIncompatibleTrack failed: ${e.message}")
+            false
+        }
+    }
+
+    private fun moovHasIncompatibleTrack(raf: RandomAccessFile, moov: BoxRef): Boolean {
+        var offset = moov.childrenStart
+        while (offset < moov.end) {
+            val box = readBoxHeader(raf, offset, moov.end) ?: return false
+            if (box.type == "trak") {
+                val entry = firstSampleEntry(raf, box)
+                if (entry != null && entry in BROWSER_INCOMPATIBLE_SAMPLE_ENTRIES) return true
+            }
+            offset += box.size
+        }
+        return false
+    }
+
+    /** fourcc of the first stsd sample entry inside [trak], or null. */
+    private fun firstSampleEntry(raf: RandomAccessFile, trak: BoxRef): String? {
+        val mdia = findChildBox(raf, trak, "mdia") ?: return null
+        val minf = findChildBox(raf, mdia, "minf") ?: return null
+        val stbl = findChildBox(raf, minf, "stbl") ?: return null
+        val stsd = findChildBox(raf, stbl, "stsd") ?: return null
+        // stsd payload: version+flags (4) + entry_count (4), then sample entries.
+        if (stsd.end - stsd.childrenStart < 16) return null
+        raf.seek(stsd.childrenStart + 8)
+        val entrySize = raf.readInt().toLong() and 0xFFFFFFFFL
+        if (entrySize < 8) return null
+        return readBoxType(raf)
+    }
+
+    private fun findChildBox(raf: RandomAccessFile, parent: BoxRef, type: String): BoxRef? {
+        var offset = parent.childrenStart
+        while (offset < parent.end) {
+            val box = readBoxHeader(raf, offset, parent.end) ?: return null
+            if (box.type == type) return box
+            offset += box.size
+        }
+        return null
+    }
+
+    private fun readBoxHeader(raf: RandomAccessFile, offset: Long, limit: Long): BoxRef? {
+        if (offset + 8 > limit) return null
+        raf.seek(offset)
+        var size = raf.readInt().toLong() and 0xFFFFFFFFL
+        val type = readBoxType(raf)
+        var headerLen = 8
+        if (size == 1L) {
+            if (offset + 16 > limit) return null
+            size = raf.readLong()
+            headerLen = 16
+        } else if (size == 0L) {
+            size = limit - offset
+        }
+        if (size < headerLen || offset + size > limit) return null
+        return BoxRef(type, offset, size, headerLen)
+    }
+
+    private class BoxRef(val type: String, val start: Long, val size: Long, val headerLen: Int) {
+        val childrenStart: Long get() = start + headerLen
+        val end: Long get() = start + size
+    }
+
+    /**
+     * Stream-copy remux that keeps video/audio tracks only and drops
+     * undecodable metadata tracks, so Chromium-based browsers can demux the
+     * file. Result is cached under cacheDir/remux keyed by path+size+mtime.
+     * Returns the cached file path, or null when nothing needs stripping /
+     * the remux fails (caller should serve the original bytes).
+     */
+    fun remuxForBrowser(context: Context, path: String): String? {
+        val src = File(path)
+        if (!src.exists() || src.length() == 0L) return null
+        val cacheDir = File(context.cacheDir, "remux").apply { mkdirs() }
+        val cacheFile = File(
+            cacheDir,
+            "web_${src.absolutePath.hashCode().toUInt()}_${src.length()}_${src.lastModified()}.mp4",
+        )
+        if (cacheFile.exists() && cacheFile.length() > 0) return cacheFile.absolutePath
+
+        val tmpFile = File(cacheDir, "tmp_${System.nanoTime()}.mp4")
+        try {
+            val extractor = MediaExtractor()
+            try {
+                extractor.setDataSource(path)
+                val outTracks = HashMap<Int, Int>()
+                var rotationDegrees = 0
+                for (i in 0 until extractor.trackCount) {
+                    val format = extractor.getTrackFormat(i)
+                    val mime = format.getString(MediaFormat.KEY_MIME)
+                    val isMedia = mime != null &&
+                        (mime.startsWith("video/") || mime.startsWith("audio/"))
+                    if (!isMedia) continue
+                    if (mime!!.startsWith("video/") &&
+                        format.containsKey(MediaFormat.KEY_ROTATION)
+                    ) {
+                        rotationDegrees = format.getInteger(MediaFormat.KEY_ROTATION)
+                    }
+                    outTracks[i] = 0
+                }
+                // Extractor exposes media tracks only — no stripping possible.
+                if (outTracks.isEmpty() || outTracks.size == extractor.trackCount) return null
+
+                val muxer = MediaMuxer(tmpFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+                var started = false
+                try {
+                    if (rotationDegrees != 0) muxer.setOrientationHint(rotationDegrees)
+                    for (i in outTracks.keys) {
+                        outTracks[i] = muxer.addTrack(extractor.getTrackFormat(i))
+                    }
+                    for (i in outTracks.keys) extractor.selectTrack(i)
+                    muxer.start()
+                    started = true
+                    // readSampleData() advances selected tracks in pts order,
+                    // so samples interleave naturally with O(1) memory.
+                    val buffer = ByteBuffer.allocate(4 * 1024 * 1024)
+                    val info = MediaCodec.BufferInfo()
+                    while (true) {
+                        buffer.clear()
+                        val size = extractor.readSampleData(buffer, 0)
+                        if (size < 0) break
+                        val target = outTracks[extractor.sampleTrackIndex]
+                        if (target != null) {
+                            info.set(0, size, extractor.sampleTime, extractor.sampleFlags)
+                            muxer.writeSampleData(target, buffer, info)
+                        }
+                        extractor.advance()
+                    }
+                    muxer.stop()
+                    started = false
+                } finally {
+                    if (started) {
+                        try { muxer.stop() } catch (_: Exception) {}
+                    }
+                    muxer.release()
+                }
+            } finally {
+                try { extractor.release() } catch (_: Exception) {}
+            }
+
+            if (!tmpFile.renameTo(cacheFile) || cacheFile.length() == 0L) {
+                LogCat.e("Mp4Helper: remuxForBrowser produced no output")
+                return null
+            }
+            LogCat.d("Mp4Helper: remuxForBrowser $path -> ${cacheFile.name}")
+            return cacheFile.absolutePath
+        } catch (e: Exception) {
+            e.printStackTrace()
+            LogCat.e(e)
+            return null
+        } finally {
+            tmpFile.delete()
+        }
     }
 }
