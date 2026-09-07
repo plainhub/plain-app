@@ -111,8 +111,8 @@ fun MdEditorBottomAppBar(
                     activeKey = if (activeKey == category.key) null else category.key
                 }
             }
-            CategoryButton(
-                category = MdToolbarCategory("help", stringResource(Res.string.help), icon = Res.drawable.circle_help, items = emptyList()),
+                CategoryButton(
+                    category = MdToolbarCategory("help", Res.string.help, icon = Res.drawable.circle_help, items = emptyList()),
                 active = false,
                 modifier = Modifier
                     .weight(1f)
@@ -160,12 +160,12 @@ private fun CategoryButton(
         ) {
             Icon(
                 painter = painterResource(category.icon ?: Res.drawable.circle_help),
-                contentDescription = category.tip,
+                contentDescription = stringResource(category.tip),
                 tint = contentColor,
             )
         }
         Text(
-            category.tip,
+            stringResource(category.tip),
             fontSize = 9.sp,
             lineHeight = 10.sp,
             color = contentColor,
@@ -191,13 +191,13 @@ private fun SubToolbarButton(
     ) {
         Icon(
             painter = painterResource(item.icon ?: Res.drawable.circle_help),
-            contentDescription = item.tip,
+            contentDescription = stringResource(item.tip),
             tint = contentColor,
             modifier = Modifier.size(20.dp),
         )
         if (item.caption != null) {
             Text(
-                item.caption,
+                stringResource(item.caption),
                 fontSize = 9.sp,
                 lineHeight = 11.sp,
                 color = contentColor,
