@@ -111,7 +111,7 @@ type Mutation {
   sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
   requestScreenMirrorKeyFrame: Boolean!
   deleteChunks(fileId: String!): Boolean!
-  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, isAppFile: Boolean!): String!
+  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, isAppFile: Boolean!, totalSize: Long!): String!
   deleteFiles(paths: [String!]!): Boolean!
   createDir(path: String!): File!
   renameFile(path: String!, name: String!): Boolean!

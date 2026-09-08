@@ -18,8 +18,8 @@ suspend fun deleteChunks(fileId: String): Boolean {
 }
 
 @GraphQLMutation
-suspend fun mergeChunks(fileId: String, totalChunks: Int, path: String, replace: Boolean, isAppFile: Boolean): String {
-    return mergeUploadedChunks(fileId, totalChunks, path, replace, isAppFile)
+suspend fun mergeChunks(fileId: String, totalChunks: Int, path: String, replace: Boolean, isAppFile: Boolean, totalSize: Long): String {
+    return mergeUploadedChunks(fileId, totalChunks, path, replace, isAppFile, totalSize)
 }
 
 fun SchemaBuilder.addFileUploadSchema() {

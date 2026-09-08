@@ -176,14 +176,17 @@ fun saveUploadChunk(fileId: String, chunkIndex: Int, data: ByteArray): String {
 
 /**
  * Merge the uploaded chunks for [fileId] (expected [totalChunks] parts) into
- * the file at [path]. When [replace] is false and the destination already exists,
- * a new sibling path is used. When [isAppFile] is true, the merged file is imported
- * into the content-addressable AppFileStore and the returned string is
- * "{fidSuffix}:{mergedSize}"; otherwise the merged file is scanned via the media
- * scanner and the returned string is "{baseFileName}:{mergedSize}".
+ * the file at [path]. [totalSize] is the client-known file size; the summed
+ * chunk sizes must match it before anything is written, so mixed or stale
+ * chunk sets never produce a corrupt destination file. When [replace] is
+ * false and the destination already exists, a new sibling path is used. When
+ * [isAppFile] is true, the merged file is imported into the content-addressable
+ * AppFileStore and the returned string is "{fidSuffix}:{mergedSize}";
+ * otherwise the merged file is scanned via the media scanner and the returned
+ * string is "{baseFileName}:{mergedSize}".
  *
- * Throws [com.ismartcoding.plain.lib.kgraphql.GraphQLError] on missing chunks or
- * integrity check failure.
+ * Throws [com.ismartcoding.plain.lib.kgraphql.GraphQLError] on missing chunks
+ * or integrity check failure.
  */
 suspend fun mergeUploadedChunks(
     fileId: String,
@@ -191,6 +194,7 @@ suspend fun mergeUploadedChunks(
     path: String,
     replace: Boolean,
     isAppFile: Boolean,
+    totalSize: Long,
 ): String = withIO {
     val dir = chunkDir(fileId)
     if (!fileExists(dir)) throw GraphQLError("No chunks found for $fileId")
@@ -200,6 +204,13 @@ suspend fun mergeUploadedChunks(
         val chunkPath = "$dir/chunk_$i"
         if (!fileExists(chunkPath)) throw GraphQLError("Missing chunk $i")
         expectedSize += fileSize(chunkPath)
+    }
+
+    if (expectedSize != totalSize) {
+        // The chunk set does not belong to this file — discard it so a retry
+        // starts from a clean state instead of reusing the wrong chunks.
+        deleteUploadedChunks(fileId)
+        throw GraphQLError("Chunk total size $expectedSize != file size $totalSize")
     }
 
     val mergeDir = getUploadCacheMergeDirPath()
