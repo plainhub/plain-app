@@ -25,7 +25,12 @@ data class InitResponse(
 /** Grace period for the 410 response to flush before the engine teardown kills its connection. */
 private const val SHUTDOWN_RESPONSE_FLUSH_MS = 100L
 
-/** Loopback source addresses accepted for `/shutdown`; anything else is rejected with 403. */
+/**
+ * Loopback source addresses accepted for `/shutdown`; anything else is rejected with 403.
+ * This keys on the socket peer address — never derive it from Forwarded/X-Forwarded-*
+ * headers here: no reverse proxy sits in front of this server, so those headers are
+ * client-controlled (a forged `for=127.0.0.1` used to shut the server down remotely).
+ */
 private val SHUTDOWN_ALLOWED_HOSTS = setOf("localhost", "127.0.0.1", "::1")
 
 /**

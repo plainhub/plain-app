@@ -15,7 +15,9 @@ import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
 import com.ismartcoding.plain.platform.stopHttpServerCoreAsync
 import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
+import java.net.Inet4Address
 import java.net.InetSocketAddress
+import java.net.NetworkInterface
 import java.net.Socket
 import java.net.URI
 import java.net.http.HttpClient
@@ -32,13 +34,18 @@ import kotlin.test.assertTrue
  * /shutdown and run the engine teardown inside the route's call coroutine, so
  * the engine's disposeAndJoin waited on the very handler performing the stop —
  * every stop burned the full 5s engine shutdown timeout (5.1s measured on
- * device). These tests pin the two design invariants against a real Netty
+ * device). These tests pin the design invariants against a real Netty
  * engine:
  *
  * 1. The in-process stop orchestration must not depend on the server it stops
  *    (no self HTTP round-trip) and must finish well under the 5s timeout.
  * 2. The /shutdown route must answer immediately and complete its teardown
  *    outside the call coroutine (OFF within the deadline, not after 5s).
+ * 3. The /shutdown loopback guard must key on the socket source address, not
+ *    on client-controlled headers: a non-loopback peer sending a forged
+ *    `Forwarded: for=127.0.0.1` header must get 403 and must NOT stop the
+ *    server. (ForwardedHeaders used to be installed and rewrote remoteHost
+ *    from that header, letting any LAN peer shut the server down.)
  */
 class HttpServerStopLifecycleTest {
     private var engine: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
@@ -97,14 +104,40 @@ class HttpServerStopLifecycleTest {
         assertTrue(isPortClosed(), "port $port still accepts connections after /shutdown")
     }
 
-    private fun startServer(module: com.ismartcoding.plain.lib.ktorserver.core.application.Application.() -> Unit) {
+    @Test
+    fun shutdownRoute_rejectsForgedForwardedHeader_fromNonLoopbackSource() {
+        val lan = nonLoopbackIpv4() ?: return // no LAN interface in this environment: nothing to prove
+        startServer(host = "0.0.0.0") { registerCommonRoutes(HttpRouter().apply { addSystemRoutes() }) }
+
+        val client = HttpClient.newHttpClient()
+        val response = client.send(
+            HttpRequest.newBuilder(URI("http://${lan.hostAddress}:$port/shutdown"))
+                .header("Forwarded", "for=127.0.0.1")
+                .GET()
+                .build(),
+            HttpResponse.BodyHandlers.ofString(),
+        )
+
+        assertEquals(
+            403,
+            response.statusCode(),
+            "non-loopback peer passed the /shutdown guard — is a Forwarded-header plugin rewriting remoteHost from client input again?",
+        )
+        assertEquals(HttpServerState.ON, HttpServerManager.serverState.value, "a forged Forwarded header must not tear the server down")
+        assertTrue(!isPortClosed(), "port $port was closed by a forged Forwarded /shutdown request")
+    }
+
+    private fun startServer(
+        host: String = "127.0.0.1",
+        module: com.ismartcoding.plain.lib.ktorserver.core.application.Application.() -> Unit,
+    ) {
         val server = embeddedServer(
             Netty,
             applicationEnvironment { log = LoggerFactory.getLogger("stop-lifecycle-test") },
             configure = {
                 connector {
                     port = 0
-                    host = "127.0.0.1"
+                    this.host = host
                 }
             },
             module = module,
@@ -115,6 +148,13 @@ class HttpServerStopLifecycleTest {
         port = runBlocking { server.engine.resolvedConnectors().first().port }
         HttpServerManager.serverState.value = HttpServerState.ON
     }
+
+    private fun nonLoopbackIpv4(): Inet4Address? =
+        NetworkInterface.getNetworkInterfaces().asSequence()
+            .filter { it.isUp && !it.isLoopback }
+            .flatMap { it.inetAddresses.asSequence() }
+            .filterIsInstance<Inet4Address>()
+            .firstOrNull { it.isSiteLocalAddress }
 
     private fun isPortClosed(): Boolean {
         val deadline = System.currentTimeMillis() + 2000

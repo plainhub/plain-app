@@ -23,7 +23,6 @@ import com.ismartcoding.plain.lib.ktorserver.ConditionalHeaders
 import com.ismartcoding.plain.lib.ktorserver.ContentNegotiation
 import com.ismartcoding.plain.lib.ktorserver.PartialContent
 import com.ismartcoding.plain.lib.ktorserver.CORS
-import com.ismartcoding.plain.lib.ktorserver.ForwardedHeaders
 import com.ismartcoding.plain.lib.ktorserver.core.request.path
 import com.ismartcoding.plain.lib.ktorserver.core.response.respond
 import com.ismartcoding.plain.lib.ktorserver.core.response.respondText
@@ -59,7 +58,6 @@ object HttpModule {
 
         install(ConditionalHeaders)
         install(WebSockets)
-        install(ForwardedHeaders)
         install(PartialContent)
         install(AutoHeadResponse)
         install(ContentNegotiation) {
