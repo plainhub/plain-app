@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.features.feed.CatalogCategory
+import com.ismartcoding.plain.features.feed.CatalogFeed
 import com.ismartcoding.plain.features.feed.FeedsCatalog
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.helpers.launchSafe
@@ -14,8 +15,7 @@ class FeedCatalogViewModel : ViewModel() {
     val categories = mutableStateOf<List<CatalogCategory>>(emptyList())
     val loading = mutableStateOf(true)
     val loadFailed = mutableStateOf(false)
-    val subscribing = mutableStateOf(false)
-    val selectedUrls = mutableStateListOf<String>()
+    val busyUrls = mutableStateListOf<String>()
 
     suspend fun loadAsync() = withIO {
         loading.value = true
@@ -28,41 +28,28 @@ class FeedCatalogViewModel : ViewModel() {
         loading.value = false
     }
 
-    fun toggle(url: String) {
-        if (selectedUrls.contains(url)) selectedUrls.remove(url) else selectedUrls.add(url)
-    }
-
-    fun selectAll(urls: List<String>) {
-        selectedUrls.clear()
-        selectedUrls.addAll(urls)
-    }
-
-    fun clearSelection() = selectedUrls.clear()
-
-    // Adds each selected catalog feed that is not already subscribed, kicks a
-    // one-time sync per added feed, then reloads feedsVM so callers see the
-    // updated subscribed set. Reports how many feeds were actually added.
-    fun subscribeAsync(feedsVM: FeedsViewModel, onDone: (Int) -> Unit) {
-        if (subscribing.value) return
-        subscribing.value = true
+    // Subscribes to a single catalog feed (one-time sync kicked off) or
+    // unsubscribes the feed with the same URL, then reloads feedsVM so callers
+    // see the updated subscribed set.
+    fun toggleSubscribeAsync(feed: CatalogFeed, feedsVM: FeedsViewModel) {
+        if (busyUrls.contains(feed.url)) return
+        busyUrls.add(feed.url)
         viewModelScope.launchSafe {
-            val all = categories.value.flatMap { it.feeds }.associateBy { it.url }
-            var added = 0
-            selectedUrls.toList().forEach { url ->
-                if (FeedHelper.getByUrl(url) == null) {
-                    val feed = all[url] ?: return@forEach
+            try {
+                val existing = FeedHelper.getByUrl(feed.url)
+                if (existing == null) {
                     val id = FeedHelper.addAsync {
                         this.url = feed.url
                         this.name = feed.name
                     }
                     FeedHelper.fetchOneTime(id)
-                    added++
+                } else {
+                    feedsVM.deleteAsync(setOf(existing.id))
                 }
+                feedsVM.loadAsync(withCount = true)
+            } finally {
+                busyUrls.remove(feed.url)
             }
-            feedsVM.loadAsync(withCount = true)
-            selectedUrls.clear()
-            subscribing.value = false
-            onDone(added)
         }
     }
 }

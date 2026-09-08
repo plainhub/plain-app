@@ -42,9 +42,9 @@
     <string name="category_tech_en">Teknoloji (İngilizce)</string>
     <string name="category_news_en">Haberler (İngilizce)</string>
     <string name="category_reads">Okuma ve bilim</string>
-    <string name="subscribe_n">Abone ol (%1$s)</string>
     <string name="already_subscribed">Abone olundu</string>
-    <string name="added_n_subscriptions">%1$s abonelik eklendi</string>
+    <string name="subscribe">Abone ol</string>
+    <string name="unsubscribe">Abonelikten çık</string>
     <string name="add_rss_manually">RSS'yi elle ekle</string>
     <string name="font_size">Yazı boyutu</string>
     <string name="font_size_small">Küçük</string>

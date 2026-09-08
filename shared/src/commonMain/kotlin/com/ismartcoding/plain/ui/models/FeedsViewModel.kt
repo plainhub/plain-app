@@ -62,15 +62,17 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
     }
 
     fun delete(ids: Set<String>) {
-        viewModelScope.launchSafe {
-            val entryIds = FeedEntryHelper.feedEntryDao.getIds(ids)
-            if (entryIds.isNotEmpty()) {
-                TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
-                FeedEntryHelper.deleteByFeedIdsAsync(ids)
-            }
-            FeedHelper.deleteAsync(ids)
-            _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
+        viewModelScope.launchSafe { deleteAsync(ids) }
+    }
+
+    suspend fun deleteAsync(ids: Set<String>) {
+        val entryIds = FeedEntryHelper.feedEntryDao.getIds(ids)
+        if (entryIds.isNotEmpty()) {
+            TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
+            FeedEntryHelper.deleteByFeedIdsAsync(ids)
         }
+        FeedHelper.deleteAsync(ids)
+        _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
     }
 
     fun add() {

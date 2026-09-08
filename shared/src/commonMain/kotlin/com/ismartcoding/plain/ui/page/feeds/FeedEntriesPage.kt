@@ -66,6 +66,7 @@ import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
+import com.ismartcoding.plain.ui.models.FeedCatalogViewModel
 import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -88,6 +89,7 @@ fun FeedEntriesPage(
     navController: NavHostController, feedId: String, tagsVM: TagsViewModel,
     pagerVM: FeedEntryPagerViewModel,
     feedEntriesVM: FeedEntriesViewModel = viewModel { FeedEntriesViewModel() }, feedsVM: FeedsViewModel = viewModel { FeedsViewModel() },
+    catalogVM: FeedCatalogViewModel = viewModel { FeedCatalogViewModel() },
 ) {
     val feedsState by feedsVM.itemsFlow.collectAsState()
     val feedsMap = remember(feedsState) { derivedStateOf { feedsState.associateBy { it.id } } }
@@ -120,6 +122,11 @@ fun FeedEntriesPage(
         scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
     }
     FeedsPageEffects(feedsVM)
+
+    // Nothing subscribed yet: preload the catalog shown as the empty state.
+    LaunchedEffect(feedsState.isEmpty()) {
+        if (feedsState.isEmpty()) catalogVM.loadAsync()
+    }
 
     LaunchedEffect(feedEntriesVM.selectMode.value) {
         if (feedEntriesVM.selectMode.value) scrollBehavior.reset()
@@ -230,6 +237,9 @@ fun FeedEntriesPage(
                                     }
                                 }
                             }
+                        } else if (feedsState.isEmpty() && !feedsVM.showLoading.value) {
+                            // Fresh start with no subscriptions: show the feed catalog in place of "no data".
+                            FeedCatalogContent(feedsVM, catalogVM, feedsState, paddingValues)
                         } else {
                             NoDataColumn(loading = feedEntriesVM.showLoading.value, search = feedEntriesVM.showSearchBar.value)
                         }

@@ -42,9 +42,9 @@
     <string name="category_tech_en">Технологии (англ.)</string>
     <string name="category_news_en">Новости (англ.)</string>
     <string name="category_reads">Чтение и наука</string>
-    <string name="subscribe_n">Подписаться (%1$s)</string>
     <string name="already_subscribed">Подписка оформлена</string>
-    <string name="added_n_subscriptions">Добавлено подписок: %1$s</string>
+    <string name="subscribe">Подписаться</string>
+    <string name="unsubscribe">Отписаться</string>
     <string name="add_rss_manually">Добавить RSS вручную</string>
     <string name="font_size">Размер шрифта</string>
     <string name="font_size_small">Мелкий</string>

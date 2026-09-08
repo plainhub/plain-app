@@ -42,9 +42,9 @@
     <string name="category_tech_en">테크(영어)</string>
     <string name="category_news_en">뉴스(영어)</string>
     <string name="category_reads">읽거리·과학</string>
-    <string name="subscribe_n">구독 (%1$s)</string>
     <string name="already_subscribed">구독됨</string>
-    <string name="added_n_subscriptions">구독 %1$s개 추가됨</string>
+    <string name="subscribe">구독</string>
+    <string name="unsubscribe">구독 취소</string>
     <string name="add_rss_manually">RSS 직접 추가</string>
     <string name="font_size">글자 크기</string>
     <string name="font_size_small">작게</string>

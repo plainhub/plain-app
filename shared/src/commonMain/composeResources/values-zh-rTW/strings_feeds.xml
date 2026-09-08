@@ -42,9 +42,9 @@
     <string name="category_tech_en">科技 · 英文</string>
     <string name="category_news_en">新聞 · 英文</string>
     <string name="category_reads">閱讀 · 科學</string>
-    <string name="subscribe_n">訂閱 (%1$s)</string>
     <string name="already_subscribed">已訂閱</string>
-    <string name="added_n_subscriptions">已添加 %1$s 個訂閱源</string>
+    <string name="subscribe">訂閱</string>
+    <string name="unsubscribe">取消訂閱</string>
     <string name="add_rss_manually">手動添加 RSS 地址</string>
     <string name="font_size">字體大小</string>
     <string name="font_size_small">小</string>

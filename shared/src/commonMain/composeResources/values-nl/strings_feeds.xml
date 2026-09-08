@@ -42,9 +42,9 @@
     <string name="category_tech_en">Tech (Engels)</string>
     <string name="category_news_en">Nieuws (Engels)</string>
     <string name="category_reads">Lezen &amp; wetenschap</string>
-    <string name="subscribe_n">Abonneren (%1$s)</string>
     <string name="already_subscribed">Géabonneerd</string>
-    <string name="added_n_subscriptions">%1$s abonnementen toegevoegd</string>
+    <string name="subscribe">Abonneren</string>
+    <string name="unsubscribe">Opzeggen</string>
     <string name="add_rss_manually">RSS handmatig toevoegen</string>
     <string name="font_size">Tekstgrootte</string>
     <string name="font_size_small">Klein</string>

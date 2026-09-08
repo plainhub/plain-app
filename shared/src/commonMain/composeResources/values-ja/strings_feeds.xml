@@ -42,9 +42,9 @@
     <string name="category_tech_en">テック（英語）</string>
     <string name="category_news_en">ニュース（英語）</string>
     <string name="category_reads">読み物・科学</string>
-    <string name="subscribe_n">購読 (%1$s)</string>
     <string name="already_subscribed">購読済み</string>
-    <string name="added_n_subscriptions">%1$s件の購読を追加しました</string>
+    <string name="subscribe">購読</string>
+    <string name="unsubscribe">購読解除</string>
     <string name="add_rss_manually">RSSを手動で追加</string>
     <string name="font_size">文字サイズ</string>
     <string name="font_size_small">小</string>

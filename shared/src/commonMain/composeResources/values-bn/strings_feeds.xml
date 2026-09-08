@@ -42,9 +42,9 @@
     <string name="category_tech_en">টেক (ইংরেজি)</string>
     <string name="category_news_en">সংবাদ (ইংরেজি)</string>
     <string name="category_reads">পড়া ও বিজ্ঞান</string>
-    <string name="subscribe_n">সাবস্ক্রাইব (%1$s)</string>
     <string name="already_subscribed">সাবস্ক্রাইব করা হয়েছে</string>
-    <string name="added_n_subscriptions">%1$sটি সাবস্ক্রিপশন যোগ হয়েছে</string>
+    <string name="subscribe">সাবস্ক্রাইব</string>
+    <string name="unsubscribe">সাবস্ক্রাইব বাতিল</string>
     <string name="add_rss_manually">RSS ম্যানুয়ালি যোগ করুন</string>
     <string name="font_size">ফন্ট সাইজ</string>
     <string name="font_size_small">ছোট</string>

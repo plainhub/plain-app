@@ -42,9 +42,9 @@
     <string name="category_tech_en">டெக் (ஆங்கிலம்)</string>
     <string name="category_news_en">செய்திகள் (ஆங்கிலம்)</string>
     <string name="category_reads">வாசிப்பு &amp; அறிவியல்</string>
-    <string name="subscribe_n">சந்தா (%1$s)</string>
     <string name="already_subscribed">சந்தா செய்யப்பட்டது</string>
-    <string name="added_n_subscriptions">%1$s சந்தாக்கள் சேர்க்கப்பட்டன</string>
+    <string name="subscribe">சந்தா</string>
+    <string name="unsubscribe">சந்தா நீக்கு</string>
     <string name="add_rss_manually">RSS ஐ கைமுறையாகச் சேர்</string>
     <string name="font_size">எழுத்து அளவு</string>
     <string name="font_size_small">சிறியது</string>

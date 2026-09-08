@@ -42,9 +42,9 @@
     <string name="category_tech_en">टेक (अंग्रेज़ी)</string>
     <string name="category_news_en">समाचार (अंग्रेज़ी)</string>
     <string name="category_reads">पढ़ना और विज्ञान</string>
-    <string name="subscribe_n">सदस्यता लें (%1$s)</string>
     <string name="already_subscribed">सदस्यता ली गई</string>
-    <string name="added_n_subscriptions">%1$s सदस्यताएँ जोड़ी गईं</string>
+    <string name="subscribe">सदस्यता लें</string>
+    <string name="unsubscribe">सदस्यता रद्द करें</string>
     <string name="add_rss_manually">RSS मैन्युअली जोड़ें</string>
     <string name="font_size">फ़ॉन्ट आकार</string>
     <string name="font_size_small">छोटा</string>

@@ -42,9 +42,9 @@
     <string name="category_tech_en">Tecnologia (inglese)</string>
     <string name="category_news_en">Notizie (inglese)</string>
     <string name="category_reads">Lettura e scienza</string>
-    <string name="subscribe_n">Iscriviti (%1$s)</string>
     <string name="already_subscribed">Iscritto</string>
-    <string name="added_n_subscriptions">Aggiunte %1$s iscrizioni</string>
+    <string name="subscribe">Iscriviti</string>
+    <string name="unsubscribe">Annulla iscrizione</string>
     <string name="add_rss_manually">Aggiungi RSS manualmente</string>
     <string name="font_size">Dimensione testo</string>
     <string name="font_size_small">Piccolo</string>
