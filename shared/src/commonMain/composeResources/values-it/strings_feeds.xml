@@ -45,6 +45,13 @@
     <string name="already_subscribed">Iscritto</string>
     <string name="subscribe">Iscriviti</string>
     <string name="unsubscribe">Annulla iscrizione</string>
+    <string name="discover_feeds_title">Iscriviti ai feed RSS</string>
+    <string name="discover_feeds_desc">Scegli i feed dal catalogo qui sotto o aggiungi un indirizzo RSS manualmente. Gli articoli verranno sincronizzati qui automaticamente.</string>
+    <string name="subscribed_n_syncing">%1$d feed iscritti, sincronizzazione articoli in background</string>
+    <string name="subscribed_n_feeds">%1$d feed iscritti</string>
+    <string name="start_reading">Inizia a leggere</string>
+    <string name="no_articles">Ancora nessun articolo</string>
+    <string name="no_articles_hint">Trascina verso il basso per aggiornare o aggiungi altri feed dalla barra laterale.</string>
     <string name="add_rss_manually">Aggiungi RSS manualmente</string>
     <string name="font_size">Dimensione testo</string>
     <string name="font_size_small">Piccolo</string>

@@ -45,6 +45,13 @@
     <string name="already_subscribed">已訂閱</string>
     <string name="subscribe">訂閱</string>
     <string name="unsubscribe">取消訂閱</string>
+    <string name="discover_feeds_title">訂閱你喜歡的 RSS 源</string>
+    <string name="discover_feeds_desc">從下方精選目錄挑選，或手動新增 RSS 位址。訂閱後，文章會自動同步到這裡。</string>
+    <string name="subscribed_n_syncing">已訂閱 %1$d 個源，文章背景同步中</string>
+    <string name="subscribed_n_feeds">已訂閱 %1$d 個源</string>
+    <string name="start_reading">開始閱讀</string>
+    <string name="no_articles">暫無文章</string>
+    <string name="no_articles_hint">下拉重新取得最新文章，或從側邊欄「＋」新增更多訂閱源。</string>
     <string name="add_rss_manually">手動添加 RSS 地址</string>
     <string name="font_size">字體大小</string>
     <string name="font_size_small">小</string>

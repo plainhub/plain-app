@@ -45,6 +45,13 @@
     <string name="already_subscribed">Suscrito</string>
     <string name="subscribe">Suscribirse</string>
     <string name="unsubscribe">Cancelar suscripción</string>
+    <string name="discover_feeds_title">Suscríbete a tus fuentes RSS</string>
+    <string name="discover_feeds_desc">Elige fuentes del catálogo de abajo o añade una dirección RSS manualmente. Los artículos se sincronizarán aquí automáticamente.</string>
+    <string name="subscribed_n_syncing">%1$d fuentes suscritas, sincronizando artículos en segundo plano</string>
+    <string name="subscribed_n_feeds">%1$d fuentes suscritas</string>
+    <string name="start_reading">Empezar a leer</string>
+    <string name="no_articles">Aún no hay artículos</string>
+    <string name="no_articles_hint">Desliza hacia abajo para actualizar o añade más fuentes desde el menú lateral.</string>
     <string name="add_rss_manually">Agregar RSS manualmente</string>
     <string name="font_size">Tamaño de fuente</string>
     <string name="font_size_small">Pequeño</string>

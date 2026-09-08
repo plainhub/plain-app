@@ -45,6 +45,13 @@
     <string name="already_subscribed">सदस्यता ली गई</string>
     <string name="subscribe">सदस्यता लें</string>
     <string name="unsubscribe">सदस्यता रद्द करें</string>
+    <string name="discover_feeds_title">अपने पसंदीदा RSS फ़ीड सब्सक्राइब करें</string>
+    <string name="discover_feeds_desc">नीचे चुने हुए कैटलॉग में से चुनें या RSS पता मैन्युअली जोड़ें। सब्सक्राइब करने के बाद, लेख यहाँ अपने आप सिंक हो जाएँगे।</string>
+    <string name="subscribed_n_syncing">%1$d फ़ीड सब्सक्राइब किए, लेख बैकग्राउंड में सिंक हो रहे हैं</string>
+    <string name="subscribed_n_feeds">%1$d फ़ीड सब्सक्राइब किए</string>
+    <string name="start_reading">पढ़ना शुरू करें</string>
+    <string name="no_articles">अभी कोई लेख नहीं</string>
+    <string name="no_articles_hint">रिफ्रेश के लिए नीचे खींचें, या साइडबार से और फ़ीड जोड़ें।</string>
     <string name="add_rss_manually">RSS मैन्युअली जोड़ें</string>
     <string name="font_size">फ़ॉन्ट आकार</string>
     <string name="font_size_small">छोटा</string>

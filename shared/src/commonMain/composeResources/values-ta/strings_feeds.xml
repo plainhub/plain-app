@@ -45,6 +45,13 @@
     <string name="already_subscribed">சந்தா செய்யப்பட்டது</string>
     <string name="subscribe">சந்தா</string>
     <string name="unsubscribe">சந்தா நீக்கு</string>
+    <string name="discover_feeds_title">உங்களுக்கு பிடித்த RSS ஃபீட்களை சந்தா செய்யுங்கள்</string>
+    <string name="discover_feeds_desc">கீழே உள்ள தொகுக்கப்பட்ட பட்டியலில் இருந்து தேர்வு செய்யவும் அல்லது RSS முகவரியை கைமுறையாக சேர்க்கவும். சந்தா செய்த பிறகு கட்டுரைகள் தானாக இங்கே ஒத்திசைக்கப்படும்.</string>
+    <string name="subscribed_n_syncing">%1$d ஃபீட்கள் சந்தா செய்யப்பட்டன, கட்டுரைகள் பின்னணியில் ஒத்திசைக்கப்படுகின்றன</string>
+    <string name="subscribed_n_feeds">%1$d ஃபீட்கள் சந்தா செய்யப்பட்டன</string>
+    <string name="start_reading">படிக்க தொடங்கு</string>
+    <string name="no_articles">இன்னும் கட்டுரைகள் இல்லை</string>
+    <string name="no_articles_hint">புதுப்பிக்க கீழே இழுக்கவும் அல்லது பக்கப் பட்டியலில் இருந்து மேலும் ஃபீட்களை சேர்க்கவும்.</string>
     <string name="add_rss_manually">RSS ஐ கைமுறையாகச் சேர்</string>
     <string name="font_size">எழுத்து அளவு</string>
     <string name="font_size_small">சிறியது</string>

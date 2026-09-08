@@ -53,6 +53,7 @@ fun FeedCatalogContent(
     catalogVM: FeedCatalogViewModel,
     feedsState: List<DFeed>,
     paddingValues: PaddingValues,
+    header: (@Composable () -> Unit)? = null,
 ) {
     val categoriesState by catalogVM.categories
     val scope = rememberCoroutineScope()
@@ -77,6 +78,9 @@ fun FeedCatalogContent(
             LazyColumn(
                 modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()),
             ) {
+                if (header != null) {
+                    item(key = "header") { header() }
+                }
                 item(key = "top") { TopSpace() }
                 item(key = "manual") {
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {

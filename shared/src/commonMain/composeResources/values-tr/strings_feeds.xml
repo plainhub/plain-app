@@ -45,6 +45,13 @@
     <string name="already_subscribed">Abone olundu</string>
     <string name="subscribe">Abone ol</string>
     <string name="unsubscribe">Abonelikten çık</string>
+    <string name="discover_feeds_title">RSS akışlarına abone ol</string>
+    <string name="discover_feeds_desc">Aşağıdaki seçkiden akış seç veya bir RSS adresini elle ekle. Abone olduktan sonra yazılar buraya otomatik olarak eşitlenir.</string>
+    <string name="subscribed_n_syncing">%1$d akışa abone olundu, yazılar arka planda eşitleniyor</string>
+    <string name="subscribed_n_feeds">%1$d akışa abone olundu</string>
+    <string name="start_reading">Okumaya başla</string>
+    <string name="no_articles">Henüz yazı yok</string>
+    <string name="no_articles_hint">Yenilemek için aşağı çek veya kenar çubuğundan daha fazla akış ekle.</string>
     <string name="add_rss_manually">RSS'yi elle ekle</string>
     <string name="font_size">Yazı boyutu</string>
     <string name="font_size_small">Küçük</string>

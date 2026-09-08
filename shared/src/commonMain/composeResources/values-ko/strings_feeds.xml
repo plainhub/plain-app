@@ -45,6 +45,13 @@
     <string name="already_subscribed">구독됨</string>
     <string name="subscribe">구독</string>
     <string name="unsubscribe">구독 취소</string>
+    <string name="discover_feeds_title">원하는 RSS 피드 구독하기</string>
+    <string name="discover_feeds_desc">아래 추천 카탈로그에서 선택하거나 RSS 주소를 직접 추가하세요. 구독하면 글이 자동으로 여기에 동기화됩니다.</string>
+    <string name="subscribed_n_syncing">피드 %1$d개 구독 완료, 글을 백그라운드에서 동기화 중</string>
+    <string name="subscribed_n_feeds">피드 %1$d개 구독됨</string>
+    <string name="start_reading">읽기 시작</string>
+    <string name="no_articles">아직 글이 없습니다</string>
+    <string name="no_articles_hint">아래로 당겨 새로고침하거나 사이드바에서 피드를 더 추가하세요.</string>
     <string name="add_rss_manually">RSS 직접 추가</string>
     <string name="font_size">글자 크기</string>
     <string name="font_size_small">작게</string>

@@ -45,6 +45,13 @@
     <string name="already_subscribed">Subscribed</string>
     <string name="subscribe">Subscribe</string>
     <string name="unsubscribe">Unsubscribe</string>
+    <string name="discover_feeds_title">Subscribe to RSS feeds</string>
+    <string name="discover_feeds_desc">Pick feeds from the curated catalog below, or add an RSS URL manually. Articles sync here automatically once subscribed.</string>
+    <string name="subscribed_n_syncing">Subscribed %1$d feeds, syncing articles in the background</string>
+    <string name="subscribed_n_feeds">Subscribed %1$d feeds</string>
+    <string name="start_reading">Start reading</string>
+    <string name="no_articles">No articles yet</string>
+    <string name="no_articles_hint">Pull down to refresh, or add more feeds from the sidebar.</string>
     <string name="add_rss_manually">Add RSS manually</string>
     <string name="font_size">Font size</string>
     <string name="font_size_small">Small</string>

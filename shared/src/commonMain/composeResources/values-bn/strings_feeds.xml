@@ -45,6 +45,13 @@
     <string name="already_subscribed">সাবস্ক্রাইব করা হয়েছে</string>
     <string name="subscribe">সাবস্ক্রাইব</string>
     <string name="unsubscribe">সাবস্ক্রাইব বাতিল</string>
+    <string name="discover_feeds_title">আপনার পছন্দের RSS ফিড সাবস্ক্রাইব করুন</string>
+    <string name="discover_feeds_desc">নিচের কিউরেটেড ক্যাটালগ থেকে বেছে নিন বা ম্যানুয়ালি RSS ঠিকানা যোগ করুন। সাবস্ক্রাইব করলে নিবন্ধগুলো এখানে স্বয়ংক্রিয়ভাবে সিঙ্ক হবে।</string>
+    <string name="subscribed_n_syncing">%1$dটি ফিড সাবস্ক্রাইব হয়েছে, নিবন্ধ ব্যাকগ্রাউন্ডে সিঙ্ক হচ্ছে</string>
+    <string name="subscribed_n_feeds">%1$dটি ফিড সাবস্ক্রাইব করা হয়েছে</string>
+    <string name="start_reading">পড়া শুরু করুন</string>
+    <string name="no_articles">এখনও কোনো নিবন্ধ নেই</string>
+    <string name="no_articles_hint">রিফ্রেশ করতে নিচে টানুন, বা সাইডবার থেকে আরও ফিড যোগ করুন।</string>
     <string name="add_rss_manually">RSS ম্যানুয়ালি যোগ করুন</string>
     <string name="font_size">ফন্ট সাইজ</string>
     <string name="font_size_small">ছোট</string>

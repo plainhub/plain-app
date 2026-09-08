@@ -45,6 +45,13 @@
     <string name="already_subscribed">Подписка оформлена</string>
     <string name="subscribe">Подписаться</string>
     <string name="unsubscribe">Отписаться</string>
+    <string name="discover_feeds_title">Подпишитесь на RSS-ленты</string>
+    <string name="discover_feeds_desc">Выберите ленты из подборки ниже или добавьте RSS-адрес вручную. Статьи будут автоматически синхронизироваться здесь.</string>
+    <string name="subscribed_n_syncing">Подписок: %1$d. Статьи синхронизируются в фоне</string>
+    <string name="subscribed_n_feeds">Подписок: %1$d</string>
+    <string name="start_reading">Начать чтение</string>
+    <string name="no_articles">Статей пока нет</string>
+    <string name="no_articles_hint">Потяните вниз для обновления или добавьте ленты через боковое меню.</string>
     <string name="add_rss_manually">Добавить RSS вручную</string>
     <string name="font_size">Размер шрифта</string>
     <string name="font_size_small">Мелкий</string>

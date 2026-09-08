@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,14 +32,17 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
+import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.models.select
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ViewFeedBottomSheet(
     feedsVM: FeedsViewModel,
+    onDelete: (String) -> Unit = {},
 ) {
     val m = feedsVM.selectedItem.value ?: return
+    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         feedsVM.editFetchContent.value = m.fetchContent
     }
@@ -64,8 +68,14 @@ fun ViewFeedBottomSheet(
                 onDismiss()
             }
             IconTextDeleteButton {
-                feedsVM.delete(setOf(m.id))
-                onDismiss()
+                val id = m.id
+                // Await the delete so the caller reloads the entry list after
+                // the rows are actually gone, not mid-deletion.
+                scope.launchSafe {
+                    feedsVM.deleteAsync(setOf(id))
+                    onDelete(id)
+                    onDismiss()
+                }
             }
         }
         VerticalSpace(dp = 24.dp)

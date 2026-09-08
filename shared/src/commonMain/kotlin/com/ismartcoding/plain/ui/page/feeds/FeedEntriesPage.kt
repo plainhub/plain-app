@@ -60,6 +60,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
+import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.FeedEntryListItem
 import com.ismartcoding.plain.ui.components.SidebarItem
@@ -128,6 +129,14 @@ fun FeedEntriesPage(
         if (feedsState.isEmpty()) catalogVM.loadAsync()
     }
 
+    // First-run discovery mode: resolved once when the feed list finishes
+    // loading. Subscribing must not flip the page back to the list — leaving
+    // discovery only happens explicitly via "start reading".
+    var discoveryMode by remember { mutableStateOf<Boolean?>(null) }
+    LaunchedEffect(feedsVM.showLoading.value) {
+        if (discoveryMode == null && !feedsVM.showLoading.value) discoveryMode = feedsState.isEmpty()
+    }
+
     LaunchedEffect(feedEntriesVM.selectMode.value) {
         if (feedEntriesVM.selectMode.value) scrollBehavior.reset()
     }
@@ -142,7 +151,19 @@ fun FeedEntriesPage(
     if (feedEntriesVM.showTagsDialog.value) {
         TagsBottomSheet(tagsVM) { feedEntriesVM.showTagsDialog.value = false }
     }
-    AddFeedDialog(feedsVM); EditFeedDialog(feedsVM); ViewFeedBottomSheet(feedsVM)
+    AddFeedDialog(feedsVM); EditFeedDialog(feedsVM)
+    ViewFeedBottomSheet(feedsVM, onDelete = { deletedFeedId ->
+        // Feed deleted from the drawer: drop a now-dangling feed filter and
+        // reload so the removed feed's articles leave the list immediately.
+        if (feedEntriesVM.feedId.value == deletedFeedId) {
+            feedEntriesVM.feedId.value = ""
+            feedEntriesVM.filterType.value = FeedEntryFilterType.DEFAULT
+        }
+        // Deleted the last subscription: return to the first-run discovery
+        // view instead of showing an empty "no data" list.
+        if (feedsState.isEmpty()) discoveryMode = true
+        scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
+    })
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -195,6 +216,10 @@ fun FeedEntriesPage(
         }) { paddingValues ->
             Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 PullToRefresh(
+                    // No subscriptions yet: the sync worker would finish without
+                    // emitting a completion event, leaving the spinner stuck, so
+                    // the pull gesture stays disabled until a feed exists.
+                    userEnable = feedsState.isNotEmpty(),
                     refreshLayoutState = topRefreshLayoutState,
                     refreshContent = remember {
                         {
@@ -214,7 +239,15 @@ fun FeedEntriesPage(
                     },
                 ) {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        if (itemsState.isNotEmpty()) {
+                        if (discoveryMode == true) {
+                            // Discovery must win over the entries list: articles arriving
+                            // from a just-subscribed feed must not flip the page — leaving
+                            // discovery is explicit ("start reading") only.
+                            FeedDiscoveryContent(feedsVM, catalogVM, feedsState, onStartReading = {
+                                discoveryMode = false
+                                topRefreshLayoutState.setRefreshState(RefreshContentState.Refreshing)
+                            })
+                        } else if (itemsState.isNotEmpty()) {
                             LazyColumnScrollbar(state = scrollState) {
                                 LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection), state = scrollState) {
                                     item(key = "top") { TopSpace() }
@@ -237,9 +270,13 @@ fun FeedEntriesPage(
                                     }
                                 }
                             }
-                        } else if (feedsState.isEmpty() && !feedsVM.showLoading.value) {
-                            // Fresh start with no subscriptions: show the feed catalog in place of "no data".
-                            FeedCatalogContent(feedsVM, catalogVM, feedsState, paddingValues)
+                        } else if (feedsState.isNotEmpty() && !feedEntriesVM.showSearchBar.value &&
+                            feedEntriesVM.feedId.value.isEmpty() && feedEntriesVM.tag.value == null &&
+                            feedEntriesVM.filterType.value == FeedEntryFilterType.DEFAULT
+                        ) {
+                            // Feeds exist but no articles in the "all" view (e.g. first sync
+                            // still running): dedicated empty state, never the catalog.
+                            EmptyArticlesState(Modifier.padding(bottom = paddingValues.calculateBottomPadding()))
                         } else {
                             NoDataColumn(loading = feedEntriesVM.showLoading.value, search = feedEntriesVM.showSearchBar.value)
                         }
