@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.httpserver
 
 import com.ismartcoding.plain.api.OkHttpClientFactory
+import com.ismartcoding.plain.lib.extensions.getContentType
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpMethod
@@ -123,6 +124,16 @@ class KtorHttpCall(
         contentDisposition: String?,
     ) {
         contentDisposition?.let { applicationCall.response.header("Content-Disposition", it) }
+        applicationCall.response.header("X-Content-Type-Options", "nosniff")
+        if (contentType != null && isScriptableDocument(contentType)) {
+            // SVG/HTML/XHTML served from user files must not run scripts in this
+            // server's origin (stored XSS, reachable via guest share links and the
+            // file manager). Bare `sandbox` traps the document in an opaque origin
+            // with scripts/forms dead while the visual preview still renders; it is
+            // ignored for <img>/<video> embedding, so normal media loading is
+            // unaffected.
+            applicationCall.response.header("Content-Security-Policy", "sandbox")
+        }
         val file = File(path)
         if (!file.exists() || !file.isFile) {
             applicationCall.response.status(HttpStatusCode.NotFound)
@@ -212,6 +223,9 @@ class KtorHttpCall(
                 "Server",
                 "DLNADOC/1.50 UPnP/1.0 Plain/1.0 Android/${android.os.Build.VERSION.RELEASE}",
             )
+            if (isScriptableDocument(file.name.getContentType().toString())) {
+                header("Content-Security-Policy", "sandbox")
+            }
             io.ktor.http.content.EntityTagVersion(file.lastModified().hashCode().toString())
             io.ktor.http.content.LastModifiedVersion(java.util.Date(file.lastModified()))
             status(HttpStatusCode.PartialContent) // some TV OS only accept 206
@@ -219,6 +233,13 @@ class KtorHttpCall(
         applicationCall.respond(com.ismartcoding.plain.lib.ktorserver.core.http.content.LocalFileContent(file))
         return true
     }
+}
+
+/** Document types a browser executes script in when navigated to as a top-level document. */
+private fun isScriptableDocument(contentType: String): Boolean {
+    val t = contentType.substringBefore(';').trim().lowercase()
+    return t == "image/svg+xml" || t == "text/html" || t == "application/xhtml+xml" ||
+        t.endsWith("+xml") || t.endsWith("/xml")
 }
 
 private suspend fun readBufferedFileRange(file: File, range: ResolvedFileRange): ByteArray = withIO {
