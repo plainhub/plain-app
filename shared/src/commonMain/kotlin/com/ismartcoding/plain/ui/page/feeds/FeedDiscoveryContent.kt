@@ -50,11 +50,17 @@ fun FeedDiscoveryContent(
     feedsVM: FeedsViewModel,
     catalogVM: FeedCatalogViewModel,
     feedsState: List<DFeed>,
+    paddingValues: PaddingValues,
     onStartReading: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Box(modifier = Modifier.weight(1f)) {
-            FeedCatalogContent(feedsVM, catalogVM, feedsState, PaddingValues(0.dp)) {
+            // Top is already applied by the page-level Column; keep only the
+            // bottom inset so BottomSpace clears the system navigation bar.
+            FeedCatalogContent(
+                feedsVM, catalogVM, feedsState,
+                PaddingValues(top = 0.dp, bottom = paddingValues.calculateBottomPadding()),
+            ) {
                 DiscoveryHeader(feedsState)
             }
         }

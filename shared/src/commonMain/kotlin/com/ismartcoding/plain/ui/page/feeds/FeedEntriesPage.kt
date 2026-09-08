@@ -129,12 +129,12 @@ fun FeedEntriesPage(
         if (feedsState.isEmpty()) catalogVM.loadAsync()
     }
 
-    // First-run discovery mode: resolved once when the feed list finishes
-    // loading. Subscribing must not flip the page back to the list — leaving
-    // discovery only happens explicitly via "start reading".
-    var discoveryMode by remember { mutableStateOf<Boolean?>(null) }
-    LaunchedEffect(feedsVM.showLoading.value) {
-        if (discoveryMode == null && !feedsVM.showLoading.value) discoveryMode = feedsState.isEmpty()
+    // Discovery mode lives in the VM; resolved once when the feed list
+    // finishes loading, and re-entered whenever the subscription count drops
+    // back to zero so the page never falls through to the "no data" label.
+    LaunchedEffect(feedsVM.showLoading.value, feedsState.isEmpty()) {
+        if (!feedsVM.showLoading.value && feedsState.isEmpty()) feedEntriesVM.discoveryMode.value = true
+        else if (feedEntriesVM.discoveryMode.value == null && !feedsVM.showLoading.value) feedEntriesVM.discoveryMode.value = false
     }
 
     LaunchedEffect(feedEntriesVM.selectMode.value) {
@@ -159,9 +159,6 @@ fun FeedEntriesPage(
             feedEntriesVM.feedId.value = ""
             feedEntriesVM.filterType.value = FeedEntryFilterType.DEFAULT
         }
-        // Deleted the last subscription: return to the first-run discovery
-        // view instead of showing an empty "no data" list.
-        if (feedsState.isEmpty()) discoveryMode = true
         scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
     })
 
@@ -239,12 +236,11 @@ fun FeedEntriesPage(
                     },
                 ) {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        if (discoveryMode == true) {
-                            // Discovery must win over the entries list: articles arriving
-                            // from a just-subscribed feed must not flip the page — leaving
-                            // discovery is explicit ("start reading") only.
-                            FeedDiscoveryContent(feedsVM, catalogVM, feedsState, onStartReading = {
-                                discoveryMode = false
+                        if (feedEntriesVM.discoveryMode.value == true) {
+                            // Discovery wins over the entries list: articles arriving from
+                            // a just-subscribed feed must not flip the page.
+                            FeedDiscoveryContent(feedsVM, catalogVM, feedsState, paddingValues, onStartReading = {
+                                feedEntriesVM.discoveryMode.value = false
                                 topRefreshLayoutState.setRefreshState(RefreshContentState.Refreshing)
                             })
                         } else if (itemsState.isNotEmpty()) {

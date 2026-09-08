@@ -50,7 +50,14 @@ data class DFeedEntry(
         val regex = Regex("!\\[.*?\\]\\(.*?\\)|!\\[.*?\\]\\[.*?\\]|<img.*?>", RegexOption.IGNORE_CASE)
         return description.replace(regex, "🖼").replace("\n", "").replaceFirst("^\\s*".toRegex(), "")
     }
+
+    // Heuristic: feeds that ship full articles (content:encoded merged into
+    // description) produce long bodies; summary feeds stay short. No web fetch needed.
+    val isFullContent: Boolean
+        get() = description.length >= FULL_CONTENT_MIN_LENGTH
 }
+
+private const val FULL_CONTENT_MIN_LENGTH = 500
 
 @Dao
 interface FeedEntryDao {

@@ -36,6 +36,13 @@ class FeedEntriesViewModel :
     var selectedItem = mutableStateOf<DFeedEntry?>(null)
     val showTagsDialog = mutableStateOf(false)
 
+    // Discovery (first-run catalog) page state: null until the feed list has
+    // loaded once, then true = show the catalog, false = normal list. The page
+    // sets it back to true whenever the subscription count drops to zero, and
+    // to false only when the user explicitly taps "start reading" — data
+    // changes like articles syncing in must never flip the page.
+    var discoveryMode = mutableStateOf<Boolean?>(null)
+
     // The feed filter coming from the navigation route must be applied exactly
     // once per VM lifetime; LaunchedEffect(Unit) reruns whenever the page
     // re-enters composition (e.g. back from FeedEntryPage) and must not reset

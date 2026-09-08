@@ -107,7 +107,13 @@ fun FeedEntryPage(
     val pagerState = rememberPagerState(initialPage = pagerIds.indexOf(id).coerceAtLeast(0), pageCount = { pagerIds.size })
     val scrollStates = remember(pagerIds) { List(pagerIds.size) { LazyListState() } }
     val scrollState = scrollStates[pagerState.currentPage]
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { scrollStates[pagerState.currentPage].firstVisibleItemIndex > 0 })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
+        val s = scrollStates[pagerState.currentPage]
+        // canScrollForward keeps the bar responsive on a fresh pager page sitting
+        // at the top, where firstVisibleItemIndex == 0 would leave a collapsed
+        // top bar stuck after switching pages.
+        s.canScrollForward || s.canScrollBackward
+    })
 
     // Article text scale, set manually from the top bar menu and persisted.
     val fontScale = FeedFontScale.value(feedEntryVM.fontScaleIndex.intValue)
@@ -227,7 +233,7 @@ private fun FeedEntryArticle(
                     MarkdownText(text = content, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), previewerState = previewerState)
                 }
             }
-            if (isCurrent && feedEntryVM.content.value.isEmpty() && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
+            if (isCurrent && feedEntryVM.content.value.isEmpty() && !m.isFullContent && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
                 item {
                     // Keep the button on the article's base density so its label
                     // never truncates when the user scales the text up.
