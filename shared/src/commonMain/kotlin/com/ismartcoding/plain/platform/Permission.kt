@@ -80,6 +80,13 @@ enum class Permission {
 expect fun Permission.isGranted(): Boolean
 
 /**
+ * True when the user denied this permission before but the runtime dialog can
+ * still be shown (i.e., not a permanent "don't ask again" denial). Only
+ * meaningful after an actual denial; false on platforms without the concept.
+ */
+expect fun Permission.shouldShowRationale(): Boolean
+
+/**
  * Ensure the POST_NOTIFICATIONS runtime permission is granted, prompting the
  * user if necessary. Returns true once the permission is granted (or already
  * was), false if the user denied it. No-op (always returns true) on platforms

@@ -2,8 +2,6 @@ package com.ismartcoding.plain
 
 import android.Manifest
 
-import com.ismartcoding.plain.i18n.*
-
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
@@ -11,23 +9,22 @@ import android.provider.Settings
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.plain.lib.Channel
-import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
-import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ChannelInviteCanceledEvent
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.dlna.DlnaCastRequestEvent
-import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
+import com.ismartcoding.plain.events.OpenNotificationSettingsEvent
 import com.ismartcoding.plain.events.PairingCanceledEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
-import com.ismartcoding.plain.events.RequestPermissionsEvent
+import com.ismartcoding.plain.events.RequestNotificationPermissionEvent
 import com.ismartcoding.plain.events.HRequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.events.HStartScreenMirrorEvent
@@ -36,10 +33,6 @@ import com.ismartcoding.plain.events.HOpenWebSettingsEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.helpers.AppHelper
-import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.preferences.ApiPermissionsPreference
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.launch
 
@@ -82,6 +75,26 @@ internal fun MainActivity.initEvents() {
                         })
                     } catch (e: IllegalStateException) {
                         LogCat.e("Error launching battery optimization: ${e.message}")
+                    }
+                }
+
+                is OpenNotificationSettingsEvent -> {
+                    try {
+                        Permissions.launchNotificationSettings()
+                    } catch (e: Exception) {
+                        LogCat.e("Error opening notification settings: ${e.message}")
+                    }
+                }
+
+                is RequestNotificationPermissionEvent -> {
+                    try {
+                        // Runtime dialog first; only pre-T devices (no runtime
+                        // notification permission) fall back to the settings page.
+                        if (!Permissions.launchNotificationDialog()) {
+                            Permissions.launchNotificationSettings()
+                        }
+                    } catch (e: Exception) {
+                        LogCat.e("Error requesting notification permission: ${e.message}")
                     }
                 }
 
@@ -181,24 +194,6 @@ internal fun MainActivity.initEvents() {
 
                 is PairingSuccessEvent -> {
                     PeerStatusManager.reconnectNow("post_pairing")
-                }
-            }
-        }
-    }
-
-    // Android-specific storage permission prompt keyed off the server-state
-    // source of truth. Only transitions into ON observed while this collector
-    // is alive trigger it (the flow's initial replay is skipped), matching the
-    // old HttpServerStateChangedEvent semantics.
-    lifecycleScope.launch {
-        var previous: HttpServerState? = null
-        HttpServerManager.serverState.collect { state ->
-            val justTurnedOn = previous != null && previous != HttpServerState.ON && state == HttpServerState.ON
-            previous = state
-            if (!justTurnedOn || isDestroyed || isFinishing) return@collect
-            if (!Permission.WRITE_EXTERNAL_STORAGE.isGranted()) {
-                DialogHelper.showConfirmDialog(LocaleHelper.getStringAsync(Res.string.confirm), LocaleHelper.getStringAsync(Res.string.storage_permission_confirm)) {
-                    coIO { ApiPermissionsPreference.putAsync(Permission.WRITE_EXTERNAL_STORAGE, true); sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE)) }
                 }
             }
         }

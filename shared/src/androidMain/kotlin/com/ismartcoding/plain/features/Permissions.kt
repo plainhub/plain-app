@@ -239,6 +239,36 @@ object Permissions {
         }
     }
 
+    // Jumps straight to the app's notification settings screen through the
+    // registered intent launcher so a PermissionsResultEvent is emitted on
+    // return. RequestPermissionsEvent(POST_NOTIFICATIONS) can't be used here:
+    // once the user picked "don't ask again", it re-launches the runtime
+    // dialog which the system instantly denies.
+    fun launchNotificationSettings() {
+        val intent = getPermissionEnableNotificationIntent(appContext)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        val launcher = intentLauncherMap[Permission.POST_NOTIFICATIONS]
+        if (launcher != null && intent.resolveActivity(packageManager) != null) {
+            launcher.launch(intent)
+        } else {
+            DialogHelper.showMessage(
+                "ActivityNotFoundException: No Activity found to handle act=android.settings.ACTION_APP_NOTIFICATION_SETTINGS",
+            )
+        }
+    }
+
+    // Launches the POST_NOTIFICATIONS runtime dialog directly, bypassing
+    // Permission.request()'s heuristic that jumps to the settings page after
+    // any prior denial. Returns false when the dialog cannot exist (pre-T
+    // devices have no runtime notification permission) so the caller can fall
+    // back to the settings page.
+    fun launchNotificationDialog(): Boolean {
+        if (!isTPlus()) return false
+        val launcher = launcherMap[Permission.POST_NOTIFICATIONS] ?: return false
+        launcher.launch(Permission.POST_NOTIFICATIONS.toSysPermission())
+        return true
+    }
+
     fun release() {
         events.forEach {
             it.cancel()

@@ -1,14 +1,11 @@
 package com.ismartcoding.plain.ui.models
 
-import com.ismartcoding.plain.i18n.*
-
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -17,17 +14,12 @@ import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.platform.isGranted
-import com.ismartcoding.plain.platform.ensureNotificationPermissionAsync
-import com.ismartcoding.plain.platform.isAppForegrounded
 import com.ismartcoding.plain.platform.checkHttpServerAsync
 import com.ismartcoding.plain.platform.stopHttpServiceAsync
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.preferences.ServicePreference
-import com.ismartcoding.plain.ui.helpers.DialogHelper
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -45,6 +37,10 @@ class MainViewModel : ViewModel() {
     // ChannelInviteCanceledEvent handling to pop the right page. Not saved across
     // process death — a fresh invite will re-fire ChannelInviteReceivedEvent.
     var pendingChannelInvite = mutableStateOf<ChannelInviteReceivedEvent?>(null)
+    // True while the first-run service permission wizard (ServiceOnboardingWizard)
+    // is on screen. Only an explicit user action (the start button) opens it;
+    // auto-restore never nags and starts without the prompt instead.
+    var showPermissionWizard = mutableStateOf(false)
 
     fun enableHttpServer(enable: Boolean) {
         viewModelScope.launch {
@@ -52,7 +48,7 @@ class MainViewModel : ViewModel() {
             ServicePreference.putAsync(enable)
             LogCat.d("enableHttpServer($enable): pref write ${TimeHelper.nowMillis() - t0}ms")
             if (enable) {
-                startHttpServerWithPermissionFlow()
+                startHttpServerWithPermissionFlow(fromUi = true)
             } else {
                 stopHttpServiceAsync()
             }
@@ -66,7 +62,7 @@ class MainViewModel : ViewModel() {
      */
     fun restoreHttpServerOnAppOpen() {
         viewModelScope.launch {
-            startHttpServerWithPermissionFlow()
+            startHttpServerWithPermissionFlow(fromUi = false)
         }
     }
 
@@ -76,27 +72,31 @@ class MainViewModel : ViewModel() {
      * [syncHttpServerState]). Skips the redundant preference write, which
      * costs 600ms+ on a cold DataStore and stalls the main thread.
      */
-    private suspend fun startHttpServerWithPermissionFlow() {
+    private suspend fun startHttpServerWithPermissionFlow(fromUi: Boolean) {
         HttpServerManager.httpServerError.value = ""
         // iOS has no foreground service, so no notification permission is needed.
-        val permission = Permission.POST_NOTIFICATIONS
-        if (!isAndroidOnly() || permission.isGranted()) {
+        if (!isAndroidOnly() || Permission.POST_NOTIFICATIONS.isGranted()) {
             dispatchStartHttpServer()
-        } else {
-            DialogHelper.showConfirmDialog(
-                LocaleHelper.getStringAsync(Res.string.confirm),
-                LocaleHelper.getStringAsync(Res.string.foreground_service_notification_prompt)
-            ) {
-                coIO {
-                    ensureNotificationPermissionAsync()
-                    while (!isAppForegrounded()) {
-                        LogCat.d("Waiting for foreground")
-                        delay(800)
-                    }
-                    dispatchStartHttpServer()
-                }
-            }
+            return
         }
+        if (fromUi) {
+            // First run: pace the permission prompts through the wizard instead
+            // of firing system dialogs back-to-back.
+            showPermissionWizard.value = true
+        }
+        // Auto-restore with notifications blocked: stay OFF. A foreground
+        // service without its notification is invisible and easily killed;
+        // the wizard runs on the next explicit tap of the start button.
+    }
+
+    // Called by the wizard when the user reaches the final step; permissions
+    // are resolved (or explicitly skipped) at that point.
+    fun startServiceAfterWizard() {
+        dispatchStartHttpServer()
+    }
+
+    fun closePermissionWizard() {
+        showPermissionWizard.value = false
     }
 
     // Record the STARTING transition only when the start command is actually
@@ -124,6 +124,12 @@ class MainViewModel : ViewModel() {
                 // here raced with it and could overwrite a fresh verdict.
                 HttpServerState.STARTING, HttpServerState.STOPPING -> return@launch
                 HttpServerState.OFF -> {
+                    if (showPermissionWizard.value) {
+                        // The wizard owns the start decision while it is on
+                        // screen; auto-starting here would run the service
+                        // behind the wizard's back.
+                        return@launch
+                    }
                     val serverUp = checkHttpServerAsync()
                     // Apply the verdict only if no writer changed the state meanwhile.
                     if (HttpServerManager.serverState.value == HttpServerState.OFF) {
@@ -132,7 +138,7 @@ class MainViewModel : ViewModel() {
                             HttpServerManager.serverState.value = HttpServerState.ON
                         } else {
                             // Preference is already true here — no rewrite needed.
-                            startHttpServerWithPermissionFlow()
+                            startHttpServerWithPermissionFlow(fromUi = false)
                         }
                     }
                 }

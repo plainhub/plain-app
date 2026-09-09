@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">अब बस एक कदम दूरी पर है! वेब के माध्यम से अपने फ़ोन फ़ाइलों को आसानी से प्रबंधित करने के लिए कृपया स्टोरेज अनुमति सक्षम करें।</string>
+    <string name="perm_wizard_title">सेवा शुरू करने से पहले अनुमतियाँ सेट करें</string>
+    <string name="perm_wizard_subtitle">एक बार का सेटअप, लगभग 30 सेकंड। दोबारा नहीं दिखेगा।</string>
+    <string name="perm_wizard_start">शुरू करें</string>
+    <string name="perm_wizard_skip_optional">वैकल्पिक अनुमतियाँ छोड़कर शुरू करें</string>
+    <string name="perm_wizard_required">आवश्यक</string>
+    <string name="perm_wizard_optional">वैकल्पिक</string>
+    <string name="perm_wizard_notif_name">सूचनाएँ</string>
+    <string name="perm_wizard_notif_desc">सेवा को बैकग्राउंड में चालू रखती है और सूचना में कंप्यूटर का पता दिखाती है</string>
+    <string name="perm_wizard_storage_name">सभी फ़ाइलों तक पहुँच</string>
+    <string name="perm_wizard_storage_desc">कंप्यूटर के ब्राउज़र से फ़ोन की फ़ाइलें प्रबंधित करें (देखें, अपलोड, डाउनलोड)</string>
+    <string name="perm_wizard_step_of">चरण %1$d / %2$d</string>
+    <string name="perm_wizard_notif_title">सूचनाएँ अनुमति दें</string>
+    <string name="perm_wizard_notif_body">बैकग्राउंड में सेवा चालू रखने के लिए एक स्थायी सूचना ज़रूरी है। सूचना में कंप्यूटर का पता भी दिखता है।</string>
+    <string name="perm_wizard_notif_denied_title">सूचनाएँ अवरुद्ध हैं</string>
+    <string name="perm_wizard_notif_denied_body">सेवा फिर भी शुरू होगी, लेकिन सूचना के बिना Android इसे बैकग्राउंड में सुला सकता है और कंप्यूटर का कनेक्शन बार-बार टूटेगा।</string>
+    <string name="perm_wizard_open_notification_settings">अनुमति देने के लिए सेटिंग खोलें</string>
+    <string name="perm_wizard_continue">फिर भी जारी रखें</string>
+    <string name="perm_wizard_storage_title">सभी फ़ाइलों तक पहुँच की अनुमति दें</string>
+    <string name="perm_wizard_storage_body">कंप्यूटर का ब्राउज़र इस फ़ोन की फ़ाइलें देख, अपलोड और डाउनलोड कर सकेगा।\nआप कुछ देर के लिए सिस्टम सेटिंग में जाएँगे — स्विच चालू करके वापस आएँ।</string>
+    <string name="perm_wizard_storage_open_settings">सिस्टम सेटिंग खोलें</string>
+    <string name="perm_wizard_storage_skip">अभी के लिए छोड़ें</string>
+    <string name="perm_wizard_done_title">सेवा चालू है</string>
+    <string name="perm_wizard_done_subtitle">बैकग्राउंड में चल रही है — कंप्यूटर अब कनेक्ट हो सकता है</string>
+    <string name="perm_wizard_allowed">अनुमति प्राप्त</string>
+    <string name="perm_wizard_skipped">छोड़ा गया</string>
+    <string name="perm_wizard_not_on">चालू नहीं</string>
     <string name="system_alert_window_warning">कृपया "अन्य ऐप्स के ऊपर दिखाएं" की अनुमति दें ताकि ऐप के पृष्ठभूमि में चलते समय आप अनइंस्टॉल पुष्टि जैसे ज़रूरी सिस्टम पॉप-अप न मिस करें।</string>
     <string name="permissions">अनुमतियाँ</string>
     <string name="show_notification">सूचना दिखाएं</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">पहुँच प्रदान करें</string>
     <string name="scan_needs_camera_warning">स्कैनर को कैमरा अनुमति की आवश्यकता है!</string>
     <string name="audio_notification_prompt">नोटिफिकेशन सेंटर में मीडिया नियंत्रण दिखाने के लिए, कृपया ऐप से पुश नोटिफिकेशन प्राप्त करने की अनुमति दें।</string>
-    <string name="foreground_service_notification_prompt">कृपया इस ऐप को पृष्ठभूमि में चलने और महत्वपूर्ण फ़ंक्शन या सेवाओं की पेशेवरता के लिए सूचनाएँ दिखाने की अनुमति दें।</string>
     <string name="call_phone_permission_required">ऐप के माध्यम से फोन कॉल करने के लिए, कृपया फोन उपयोग की अनुमति दें।</string>
     <string name="accessibility_service_description">PlainApp स्क्रीन मिररिंग के दौरान रिमोट नियंत्रण सक्षम करने के लिए इस एक्सेसिबिलिटी सेवा का उपयोग करता है। यह वेब इंटरफ़ेस से भेजे गए टच इवेंट (टैप, स्वाइप, स्क्रॉल) और नेविगेशन क्रियाएँ (वापस, होम, हाल के ऐप्स) इंजेक्ट करता है।</string>
     <string name="accessibility_service_label">PlainApp रिमोट नियंत्रण</string>

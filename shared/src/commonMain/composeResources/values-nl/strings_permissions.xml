@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">Bijna klaar! Schakel alstublieft de opslagtoestemming in om uw telefoonbestanden eenvoudig via het web te beheren.</string>
+    <string name="perm_wizard_title">Stel machtigingen in voordat je de service start</string>
+    <string name="perm_wizard_subtitle">Eenmalige installatie, ongeveer 30 seconden. Komt niet meer terug.</string>
+    <string name="perm_wizard_start">Beginnen</string>
+    <string name="perm_wizard_skip_optional">Optionele machtigingen overslaan en starten</string>
+    <string name="perm_wizard_required">Verplicht</string>
+    <string name="perm_wizard_optional">Optioneel</string>
+    <string name="perm_wizard_notif_name">Meldingen</string>
+    <string name="perm_wizard_notif_desc">Houdt de service op de achtergrond actief en toont het computeradres in de meldingsbalk</string>
+    <string name="perm_wizard_storage_name">Toegang tot alle bestanden</string>
+    <string name="perm_wizard_storage_desc">Beheer telefoonbestanden vanuit de computerbrowser (bekijken, uploaden, downloaden)</string>
+    <string name="perm_wizard_step_of">Stap %1$d van %2$d</string>
+    <string name="perm_wizard_notif_title">Meldingen toestaan</string>
+    <string name="perm_wizard_notif_body">De service heeft een permanente melding nodig om op de achtergrond te draaien. De melding toont ook het computeradres.</string>
+    <string name="perm_wizard_notif_denied_title">Meldingen zijn geblokkeerd</string>
+    <string name="perm_wizard_notif_denied_body">De service kan alsnog starten, maar Android kan hem op de achtergrond in slaapstand zetten en de verbinding met de computer valt vaak weg.</string>
+    <string name="perm_wizard_open_notification_settings">Open instellingen om toe te staan</string>
+    <string name="perm_wizard_continue">Toch doorgaan</string>
+    <string name="perm_wizard_storage_title">Toegang tot alle bestanden toestaan</string>
+    <string name="perm_wizard_storage_body">De computerbrowser kan bestanden op deze telefoon bekijken, uploaden en downloaden.\nJe verlaat de app kort voor de systeeminstellingen: zet de schakelaar aan en kom terug.</string>
+    <string name="perm_wizard_storage_open_settings">Systeeminstellingen openen</string>
+    <string name="perm_wizard_storage_skip">Voorlopig overslaan</string>
+    <string name="perm_wizard_done_title">Service is ingeschakeld</string>
+    <string name="perm_wizard_done_subtitle">Actief op de achtergrond — de computer kan nu verbinden</string>
+    <string name="perm_wizard_allowed">Toegestaan</string>
+    <string name="perm_wizard_skipped">Overgeslagen</string>
+    <string name="perm_wizard_not_on">Niet ingeschakeld</string>
     <string name="system_alert_window_warning">Sta “Weergeven boven andere apps” toe zodat je geen belangrijke systeemmeldingen mist, zoals bevestigingen voor verwijderen, wanneer de app op de achtergrond draait.</string>
     <string name="permissions">Toestemmingen</string>
     <string name="show_notification">Melding tonen</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">Toegang verlenen</string>
     <string name="scan_needs_camera_warning">Scanner heeft cameratoestemming nodig!</string>
     <string name="audio_notification_prompt">Om mediacontrols in het meldingencentrum te bekijken, verleen vriendelijk toestemming om pushmeldingen van de app te ontvangen.</string>
-    <string name="foreground_service_notification_prompt">Sta deze app toe om op de achtergrond uit te voeren en meldingen weer te geven om essentiële functionaliteit of services te bieden.</string>
     <string name="call_phone_permission_required">Om telefoongesprekken via de app te maken, geef alsjeblieft toegang tot je telefoon.</string>
     <string name="accessibility_service_description">PlainApp gebruikt deze toegankelijkheidsservice om afstandsbediening tijdens schermspiegeling mogelijk te maken. Het injecteert aanraakgebeurtenissen (tikken, vegen, scrollen) en navigatieacties (Terug, Start, Recent) die vanuit de webinterface worden verzonden.</string>
     <string name="accessibility_service_label">PlainApp Afstandsbediening</string>

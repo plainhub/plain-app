@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">அருமையாகும்! உங்கள் தொலைபேசி கோப்புகளை இணையத்தில் எளிதாக நிர்வகிக்க சூழல் அனுமதியை செயல்படுத்துக.</string>
+    <string name="perm_wizard_title">சேவையைத் தொடங்குவதற்கு முன் அனுமதிகளை அமைக்கவும்</string>
+    <string name="perm_wizard_subtitle">ஒருமுறை மட்டும், சுமார் 30 வினாடிகள். மீண்டும் தோன்றாது.</string>
+    <string name="perm_wizard_start">தொடங்கு</string>
+    <string name="perm_wizard_skip_optional">விருப்ப அனுமதிகளைத் தாண்கி தொடங்கு</string>
+    <string name="perm_wizard_required">தேவையானது</string>
+    <string name="perm_wizard_optional">விருப்பத்தேர்வு</string>
+    <string name="perm_wizard_notif_name">அறிவிப்புகள்</string>
+    <string name="perm_wizard_notif_desc">சேவையை பின்னணியில் இயங்க வைத்து, அறிவிப்பில் கணினியின் முகவரியைக் காட்டுகிறது</string>
+    <string name="perm_wizard_storage_name">அனைத்து கோப்புகளுக்கும் அணுகல்</string>
+    <string name="perm_wizard_storage_desc">கணினி உலாவியிலிருந்து ஃபோன் கோப்புகளை நிர்வகிக்கவும் (பார்க்க, பதிவேற்ற, பதிவிறக்க)</string>
+    <string name="perm_wizard_step_of">படி %1$d / %2$d</string>
+    <string name="perm_wizard_notif_title">அறிவிப்புகளை அனுமதிக்கவும்</string>
+    <string name="perm_wizard_notif_body">சேவை பின்னணியில் இயங்க நிரந்தர அறிவிப்பு தேவை. அறிவிப்பில் கணினியின் முகவரியும் காட்டப்படும்.</string>
+    <string name="perm_wizard_notif_denied_title">அறிவிப்புகள் தடுக்கப்பட்டுள்ளன</string>
+    <string name="perm_wizard_notif_denied_body">சேவை இன்னும் தொடங்கும், ஆனால் அறிவிப்பு இல்லாததால் Android அதை பின்னணியில் உறக்கப்படுத்தலாம், கணினி இணைப்பு அடிக்கடி துண்டிக்கப்படும்.</string>
+    <string name="perm_wizard_open_notification_settings">அனுமதிக்க அமைப்புகளைத் திற</string>
+    <string name="perm_wizard_continue">இருந்தபோதிலும் தொடரவும்</string>
+    <string name="perm_wizard_storage_title">அனைத்து கோப்புகளுக்கும் அணுகலை அனுமதிக்கவும்</string>
+    <string name="perm_wizard_storage_body">கணினி உலாவியில் இந்த ஃபோனின் கோப்புகளைப் பார்க்கவும், பதிவேற்றவும், பதிவிறக்கவும் முடியும்.\nசிறிது நேரம் சிஸ்டம் அமைப்புகளுக்குச் செல்லுவீர்கள் — ஸ்விட்சை இயக்கி திரும்பவும்.</string>
+    <string name="perm_wizard_storage_open_settings">சிஸ்டம் அமைப்புகளைத் திற</string>
+    <string name="perm_wizard_storage_skip">இப்போது தாண்கிவிடு</string>
+    <string name="perm_wizard_done_title">சேவை இயக்கப்பட்டது</string>
+    <string name="perm_wizard_done_subtitle">பின்னணியில் இயங்குகிறது — கணினி இப்போது இணைக்கலாம்</string>
+    <string name="perm_wizard_allowed">அனுமதிக்கப்பட்டது</string>
+    <string name="perm_wizard_skipped">தாண்கப்பட்டது</string>
+    <string name="perm_wizard_not_on">இயக்கப்படவில்லை</string>
     <string name="system_alert_window_warning">பின்நிலையில் செயல்படும் போது நீக்கத்தின் உறுதிப்படுத்தல் போன்ற முக்கியமான அமைப்பு உரையைக் காண தவற விடாமல், “மற்றப் பயன்பாடுகளுக்கு மேல் காட்டு” அனுமதியை வழங்கவும்.</string>
     <string name="permissions">அனுமதிகள்</string>
     <string name="show_notification">அறிவிப்புகளை காட்டு</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">அனுமதி அளிக்க</string>
     <string name="scan_needs_camera_warning">ஸ்கேன்னருக்கு கேமரா அனுமதி தேவை!</string>
     <string name="audio_notification_prompt">அலைகள் மேலும் கட்டளைகளை பெற அனுமதியை கொடுங்கள், எனவே தயவுசெய்து அப்பில் இருந்து புஷ் அறிவிக்க அனுமதியை அளிக்க வேண்டும்.</string>
-    <string name="foreground_service_notification_prompt">இந்த ஆப்ஸ் பின்னியின் இயல்புநிலையில் ஓடுவதும் அறிவிக்குவதும் பெற அனுமதிக்குத் தயவுசெய்து அனுமதியை கொடுங்கள்.</string>
     <string name="call_phone_permission_required">அப்லிகேஷனுடன் தொலைபேசி பரிசோதனைகளை செய்ய உங்கள் போனிக்கு அனுமதிக்குமாறு, தொலைபேசி அணுகவும் என்று உறுதிப்படுத்தவும்.</string>
     <string name="accessibility_service_description">திரை பிரதிபலிப்பின் போது தொலை கட்டுப்பாட்டை இயக்க PlainApp இந்த அணுகல்திறன் சேவையை பயன்படுத்துகிறது. இது வலை இடைமுகத்திலிருந்து அனுப்பப்படும் தொடுதல் நிகழ்வுகள் (தட்டுதல், ஸ்வைப், ஸ்க்ரோல்) மற்றும் வழிசெலுத்தல் செயல்கள் (பின்னால், முகப்பு, சமீபத்தியவை) ஆகியவற்றை செலுத்துகிறது.</string>
     <string name="accessibility_service_label">PlainApp தொலை கட்டுப்பாடு</string>

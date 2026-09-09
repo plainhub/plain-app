@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">Почти готово! Пожалуйста, включите разрешение на хранение, чтобы легко управлять файлами телефона через веб.</string>
+    <string name="perm_wizard_title">Настройте разрешения перед запуском службы</string>
+    <string name="perm_wizard_subtitle">Разовая настройка, около 30 секунд. Больше не появится.</string>
+    <string name="perm_wizard_start">Начать</string>
+    <string name="perm_wizard_skip_optional">Пропустить необязательные и запустить</string>
+    <string name="perm_wizard_required">Обязательно</string>
+    <string name="perm_wizard_optional">Необязательно</string>
+    <string name="perm_wizard_notif_name">Уведомления</string>
+    <string name="perm_wizard_notif_desc">Держит службу работающей в фоне и показывает адрес компьютера в панели уведомлений</string>
+    <string name="perm_wizard_storage_name">Доступ ко всем файлам</string>
+    <string name="perm_wizard_storage_desc">Управляйте файлами телефона из браузера компьютера (просмотр, загрузка, скачивание)</string>
+    <string name="perm_wizard_step_of">Шаг %1$d из %2$d</string>
+    <string name="perm_wizard_notif_title">Разрешить уведомления</string>
+    <string name="perm_wizard_notif_body">Чтобы служба работала в фоне, нужно постоянное уведомление. В нём также показан адрес компьютера.</string>
+    <string name="perm_wizard_notif_denied_title">Уведомления отключены</string>
+    <string name="perm_wizard_notif_denied_body">Служба всё равно запустится, но без уведомления Android может усыплять её в фоне, и соединение с компьютером будет часто обрываться.</string>
+    <string name="perm_wizard_open_notification_settings">Открыть настройки для разрешения</string>
+    <string name="perm_wizard_continue">Всё равно продолжить</string>
+    <string name="perm_wizard_storage_title">Разрешить доступ ко всем файлам</string>
+    <string name="perm_wizard_storage_body">Браузер на компьютере сможет просматривать, загружать и скачивать файлы этого телефона.\nВы ненадолго перейдёте в настройки системы — включите переключатель и вернитесь.</string>
+    <string name="perm_wizard_storage_open_settings">Открыть настройки системы</string>
+    <string name="perm_wizard_storage_skip">Пока пропустить</string>
+    <string name="perm_wizard_done_title">Служба запущена</string>
+    <string name="perm_wizard_done_subtitle">Служба работает в фоне — компьютер может подключиться прямо сейчас</string>
+    <string name="perm_wizard_allowed">Разрешено</string>
+    <string name="perm_wizard_skipped">Пропущено</string>
+    <string name="perm_wizard_not_on">Отключено</string>
     <string name="system_alert_window_warning">Разрешите «Отображение поверх других приложений», чтобы не пропустить важные системные уведомления, такие как подтверждение удаления, когда приложение работает в фоновом режиме.</string>
     <string name="permissions">Разрешения</string>
     <string name="show_notification">Показать уведомление</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">Предоставить доступ</string>
     <string name="scan_needs_camera_warning">Сканер требует разрешение на использование камеры!</string>
     <string name="audio_notification_prompt">Чтобы увидеть элементы управления мультимедийным воспроизведением в центре уведомлений, предоставьте разрешение на получение уведомлений от приложения.</string>
-    <string name="foreground_service_notification_prompt">Пожалуйста, разрешите этому приложению работать в фоновом режиме и отображать уведомления для обеспечения важных функций или услуг.</string>
     <string name="call_phone_permission_required">Для совершения телефонных звонков через приложение, разрешите доступ к телефону.</string>
     <string name="accessibility_service_description">PlainApp использует эту службу специальных возможностей, чтобы включить удалённое управление во время трансляции экрана. Она внедряет касания (нажатие, свайп, прокрутка) и действия навигации (Назад, Домой, Недавние), отправленные из веб‑интерфейса.</string>
     <string name="accessibility_service_label">Удалённое управление PlainApp</string>

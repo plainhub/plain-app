@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">Fast geschafft! Bitte aktivieren Sie die Speicherberechtigung, um Ihre Telefondateien über das Web einfach verwalten zu können.</string>
+    <string name="perm_wizard_title">Berechtigungen vor dem Start des Dienstes einrichten</string>
+    <string name="perm_wizard_subtitle">Einmalige Einrichtung, etwa 30 Sekunden. Wird nicht erneut angezeigt.</string>
+    <string name="perm_wizard_start">Jetzt starten</string>
+    <string name="perm_wizard_skip_optional">Optionale Berechtigungen überspringen und starten</string>
+    <string name="perm_wizard_required">Erforderlich</string>
+    <string name="perm_wizard_optional">Optional</string>
+    <string name="perm_wizard_notif_name">Benachrichtigungen</string>
+    <string name="perm_wizard_notif_desc">Hält den Dienst im Hintergrund am Laufen und zeigt die Computer-Adresse in der Benachrichtigungsleiste</string>
+    <string name="perm_wizard_storage_name">Zugriff auf alle Dateien</string>
+    <string name="perm_wizard_storage_desc">Verwalte Telefondateien im Browser des Computers (Ansehen, Hochladen, Herunterladen)</string>
+    <string name="perm_wizard_step_of">Schritt %1$d von %2$d</string>
+    <string name="perm_wizard_notif_title">Benachrichtigungen erlauben</string>
+    <string name="perm_wizard_notif_body">Der Dienst braucht eine Dauerbenachrichtigung, um im Hintergrund zu laufen. Sie zeigt auch die Computer-Adresse.</string>
+    <string name="perm_wizard_notif_denied_title">Benachrichtigungen sind blockiert</string>
+    <string name="perm_wizard_notif_denied_body">Der Dienst kann trotzdem starten, aber Android kann ihn im Hintergrund in den Ruhezustand versetzen und die Verbindung zum Computer bricht häufig ab.</string>
+    <string name="perm_wizard_open_notification_settings">In Einstellungen erlauben</string>
+    <string name="perm_wizard_continue">Trotzdem fortfahren</string>
+    <string name="perm_wizard_storage_title">Zugriff auf alle Dateien erlauben</string>
+    <string name="perm_wizard_storage_body">Der Browser am Computer kann Dateien auf diesem Telefon sehen, hoch- und herunterladen.\nDu verlässt die App kurz für die Systemeinstellungen — schalte den Schalter ein und komm zurück.</string>
+    <string name="perm_wizard_storage_open_settings">Systemeinstellungen öffnen</string>
+    <string name="perm_wizard_storage_skip">Vorerst überspringen</string>
+    <string name="perm_wizard_done_title">Dienst ist aktiv</string>
+    <string name="perm_wizard_done_subtitle">Läuft im Hintergrund — der Computer kann sich jetzt verbinden</string>
+    <string name="perm_wizard_allowed">Erlaubt</string>
+    <string name="perm_wizard_skipped">Übersprungen</string>
+    <string name="perm_wizard_not_on">Nicht aktiviert</string>
     <string name="system_alert_window_warning">Bitte erlauben Sie „Über anderen Apps anzeigen“, damit Sie wichtige System-Popups wie Deinstallationsbestätigungen im Hintergrund nicht verpassen.</string>
     <string name="permissions">Berechtigungen</string>
     <string name="show_notification">Benachrichtigung anzeigen</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">Zugriff gewähren</string>
     <string name="scan_needs_camera_warning">Der Scanner benötigt die Kameraberechtigung!</string>
     <string name="audio_notification_prompt">Um die Mediasteuerungen im Benachrichtigungscenter anzuzeigen, gewähren Sie bitte die Berechtigung zum Empfang von Push-Benachrichtigungen von der App.</string>
-    <string name="foreground_service_notification_prompt">Bitte erlauben Sie dieser App, im Hintergrund ausgeführt zu werden und Benachrichtigungen anzuzeigen, um wesentliche Funktionen oder Dienste bereitzustellen.</string>
     <string name="call_phone_permission_required">Um Telefonanrufe über die App zu tätigen, gewähren Sie bitte den Zugriff auf das Telefon.</string>
     <string name="accessibility_service_description">PlainApp verwendet diesen Bedienungshilfen-/Accessibility-Dienst, um während der Bildschirmspiegelung die Fernsteuerung zu ermöglichen. Er injiziert Touch-Ereignisse (Tippen, Wischen, Scrollen) und Navigationsaktionen (Zurück, Home, Zuletzt verwendet), die von der Weboberfläche gesendet werden.</string>
     <string name="accessibility_service_label">PlainApp Fernsteuerung</string>

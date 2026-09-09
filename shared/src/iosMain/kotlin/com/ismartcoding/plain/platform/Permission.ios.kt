@@ -23,6 +23,8 @@ actual fun Permission.isGranted(): Boolean = when (this) {
     else -> true
 }
 
+actual fun Permission.shouldShowRationale(): Boolean = false
+
 actual suspend fun ensureNotificationPermissionAsync(): Boolean {
     if (IosPlatformRegistry.isPermissionGranted(Permission.POST_NOTIFICATIONS.name)) {
         return true

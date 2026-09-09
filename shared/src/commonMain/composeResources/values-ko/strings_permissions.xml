@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">거의 다 왔어요! 웹을 통해 휴대폰 파일을 쉽게 관리하려면 저장소 권한을 허용해주세요.</string>
+    <string name="perm_wizard_title">서비스를 시작하기 전에 권한을 설정하세요</string>
+    <string name="perm_wizard_subtitle">최초 1회 설정이며 약 30초 정도 걸립니다. 다시 표시되지 않습니다</string>
+    <string name="perm_wizard_start">설정 시작</string>
+    <string name="perm_wizard_skip_optional">선택 권한 건너뛰고 시작</string>
+    <string name="perm_wizard_required">필수</string>
+    <string name="perm_wizard_optional">선택</string>
+    <string name="perm_wizard_notif_name">알림</string>
+    <string name="perm_wizard_notif_desc">백그라운드에서 서비스를 유지하고 알림에 PC 접속 주소를 표시합니다</string>
+    <string name="perm_wizard_storage_name">모든 파일 접근</string>
+    <string name="perm_wizard_storage_desc">PC 브라우저에서 휴대폰 파일 관리 (탐색/업로드/다운로드)</string>
+    <string name="perm_wizard_step_of">총 %2$d단계 중 %1$d단계</string>
+    <string name="perm_wizard_notif_title">알림 허용</string>
+    <string name="perm_wizard_notif_body">백그라운드에서 서비스를 유지하려면 상시 알림이 필요합니다. 알림에는 PC 접속 주소가 표시됩니다.</string>
+    <string name="perm_wizard_notif_denied_title">알림이 거부되었습니다</string>
+    <string name="perm_wizard_notif_denied_body">서비스는 시작할 수 있지만, 알림 유지가 없으면 백그라운드에서 시스템이 절전 모드로 전환할 수 있어 PC 연결이 자주 끊깁니다.</string>
+    <string name="perm_wizard_open_notification_settings">설정에서 허용</string>
+    <string name="perm_wizard_continue">그래도 계속</string>
+    <string name="perm_wizard_storage_title">모든 파일 접근 허용</string>
+    <string name="perm_wizard_storage_body">PC 브라우저에서 휴대폰 파일을 직접 탐색, 업로드, 다운로드할 수 있습니다.\n잠시 시스템 설정으로 이동하니 스위치를 켜고 돌아오면 됩니다.</string>
+    <string name="perm_wizard_storage_open_settings">시스템 설정 열기</string>
+    <string name="perm_wizard_storage_skip">지금은 건너뛰기</string>
+    <string name="perm_wizard_done_title">서비스가 켜졌습니다</string>
+    <string name="perm_wizard_done_subtitle">백그라운드에서 실행 중입니다. 지금 PC에서 연결할 수 있습니다</string>
+    <string name="perm_wizard_allowed">허용됨</string>
+    <string name="perm_wizard_skipped">건너뜀</string>
+    <string name="perm_wizard_not_on">사용 안 함</string>
     <string name="system_alert_window_warning">앱이 백그라운드에서 실행 중일 때 삭제 확인과 같은 중요한 시스템 팝업을 놓치지 않으려면 "다른 앱 위에 표시" 권한을 허용하세요.</string>
     <string name="permissions">권한</string>
     <string name="show_notification">알림 표시</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">액세스 허용</string>
     <string name="scan_needs_camera_warning">스캐너는 카메라 권한이 필요합니다!</string>
     <string name="audio_notification_prompt">앱에서 미디어 컨트롤을 확인하려면 푸시 알림 수신에 대한 권한을 허용해주세요.</string>
-    <string name="foreground_service_notification_prompt">백그라운드에서 실행되고 필수 기능 또는 서비스를 제공하기 위해 알림을 표시하려면 이 앱에 허용해주세요.</string>
     <string name="call_phone_permission_required">앱을 통해 전화를 걸려면 전화 액세스를 허용하세요.</string>
     <string name="accessibility_service_description">PlainApp은 화면 미러링 중 원격 제어를 활성화하기 위해 이 접근성 서비스를 사용합니다. 웹 인터페이스에서 전송된 터치 이벤트(탭, 스와이프, 스크롤)와 내비게이션 동작(뒤로, 홈, 최근 앱)을 주입합니다.</string>
     <string name="accessibility_service_label">PlainApp 원격 제어</string>

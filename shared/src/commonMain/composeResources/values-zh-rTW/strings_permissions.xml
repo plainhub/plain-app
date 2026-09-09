@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">再一步就完成了！請開啟存儲權限，以便您透過網頁輕鬆管理手機檔案。</string>
+    <string name="perm_wizard_title">開啟服務前，先設定權限</string>
+    <string name="perm_wizard_subtitle">首次設定，約 30 秒，之後不會再出現</string>
+    <string name="perm_wizard_start">開始設定</string>
+    <string name="perm_wizard_skip_optional">略過選用權限，直接開啟</string>
+    <string name="perm_wizard_required">必需</string>
+    <string name="perm_wizard_optional">選用</string>
+    <string name="perm_wizard_notif_name">通知</string>
+    <string name="perm_wizard_notif_desc">保持服務在背景執行，並在通知列顯示電腦存取位址</string>
+    <string name="perm_wizard_storage_name">所有檔案存取權</string>
+    <string name="perm_wizard_storage_desc">在電腦瀏覽器管理手機檔案（瀏覽/上傳/下載）</string>
+    <string name="perm_wizard_step_of">第 %1$d 步 / 共 %2$d 步</string>
+    <string name="perm_wizard_notif_title">允許傳送通知</string>
+    <string name="perm_wizard_notif_body">服務需要常駐通知才能在背景保持執行，通知會顯示電腦存取位址。</string>
+    <string name="perm_wizard_notif_denied_title">通知權限遭拒絕</string>
+    <string name="perm_wizard_notif_denied_body">服務仍會啟動，但失去通知保活後，背景可能被系統休眠，電腦會頻繁斷線。</string>
+    <string name="perm_wizard_open_notification_settings">前往系統設定開啟</string>
+    <string name="perm_wizard_continue">仍要繼續</string>
+    <string name="perm_wizard_storage_title">允許所有檔案存取</string>
+    <string name="perm_wizard_storage_body">開啟後，電腦瀏覽器可以直接瀏覽、上傳和下載手機檔案。\n接下來會跳到系統設定，開啟開關返回即可。</string>
+    <string name="perm_wizard_storage_open_settings">前往系統設定</string>
+    <string name="perm_wizard_storage_skip">暫時略過</string>
+    <string name="perm_wizard_done_title">服務已開啟</string>
+    <string name="perm_wizard_done_subtitle">服務正在背景執行，電腦現在就可以連線</string>
+    <string name="perm_wizard_allowed">已允許</string>
+    <string name="perm_wizard_skipped">已略過</string>
+    <string name="perm_wizard_not_on">未開啟</string>
     <string name="system_alert_window_warning">請允許「顯示在其他應用程式上層」，避免應用程式在背景執行時錯過重要的系統彈窗，例如解除安裝確認。</string>
     <string name="permissions">訪問權限</string>
     <string name="show_notification">顯示通知</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">允許訪問</string>
     <string name="scan_needs_camera_warning">掃描需要攝像頭權限！</string>
     <string name="audio_notification_prompt">為了在通知中心查看媒體控制，請允許該應用接收推送通知。</string>
-    <string name="foreground_service_notification_prompt">請允許此應用在後台運行並顯示通知，以便提供必要的功能或服務。</string>
     <string name="call_phone_permission_required">為了通過應用程序進行電話通話，請允許訪問電話。</string>
     <string name="accessibility_service_description">PlainApp 使用此無障礙服務以在螢幕鏡像時啟用遠端控制。它會注入來自網頁介面的觸控事件（點擊、滑動、捲動）以及導覽操作（返回、主畫面、最近任務）。</string>
     <string name="accessibility_service_label">PlainApp 遠端控制</string>

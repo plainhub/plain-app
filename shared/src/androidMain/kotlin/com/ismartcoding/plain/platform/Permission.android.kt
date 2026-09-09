@@ -3,9 +3,11 @@ package com.ismartcoding.plain.platform
 import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.provider.Settings
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.mainActivity
 import com.ismartcoding.plain.appContextValue
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.helpers.FileHelper
@@ -35,6 +37,14 @@ actual fun Permission.isGranted(): Boolean = when {
         enabledListeners?.contains(componentName.flattenToString()) == true
     }
     else -> appContext.hasPermission(this.toSysPermission())
+}
+
+// A true value means "denied once, dialog still possible". False after a
+// permanent ("don't ask again") denial — but also false when never asked, so
+// only consult it after an actual denial.
+actual fun Permission.shouldShowRationale(): Boolean {
+    val activity = mainActivity ?: return false
+    return ActivityCompat.shouldShowRequestPermissionRationale(activity, this.toSysPermission())
 }
 
 actual suspend fun ensureNotificationPermissionAsync(): Boolean =

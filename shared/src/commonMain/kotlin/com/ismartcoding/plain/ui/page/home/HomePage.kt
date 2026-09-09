@@ -43,6 +43,7 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.getDeviceIP4s
+import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isVPNConnected
 import com.ismartcoding.plain.platform.relaunchApp
@@ -106,7 +107,11 @@ fun HomePage(
 
 
     val showSuccess = serviceEnabled && state == HttpServerState.ON
-    val showLoading = state.isProcessing() || (serviceEnabled && state == HttpServerState.OFF)
+    // Treat OFF as "restore in progress" only when a start is actually possible:
+    // with notifications blocked the service intentionally stays OFF (the user
+    // must finish the permission wizard first), so spinning here would never end.
+    val canAutoStart = !isAndroidOnly() || Permission.POST_NOTIFICATIONS.isGranted()
+    val showLoading = state.isProcessing() || (serviceEnabled && state == HttpServerState.OFF && canAutoStart)
     val showError = state == HttpServerState.ERROR
     val errorMessage = buildHomeWebErrorMessage(serverError, portsInUse)
 

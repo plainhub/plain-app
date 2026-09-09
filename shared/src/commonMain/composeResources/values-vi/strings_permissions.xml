@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">Gần xong! Vui lòng kích hoạt quyền lưu trữ để dễ dàng quản lý các tập tin điện thoại của bạn thông qua web.</string>
+    <string name="perm_wizard_title">Thiết lập quyền trước khi khởi động dịch vụ</string>
+    <string name="perm_wizard_subtitle">Thiết lập một lần, khoảng 30 giây. Sẽ không hiện lại.</string>
+    <string name="perm_wizard_start">Bắt đầu</string>
+    <string name="perm_wizard_skip_optional">Bỏ qua quyền không bắt buộc và khởi động</string>
+    <string name="perm_wizard_required">Bắt buộc</string>
+    <string name="perm_wizard_optional">Không bắt buộc</string>
+    <string name="perm_wizard_notif_name">Thông báo</string>
+    <string name="perm_wizard_notif_desc">Giữ dịch vụ chạy nền và hiển thị địa chỉ máy tính trên thanh thông báo</string>
+    <string name="perm_wizard_storage_name">Truy cập mọi tệp</string>
+    <string name="perm_wizard_storage_desc">Quản lý tệp điện thoại từ trình duyệt máy tính (xem, tải lên, tải xuống)</string>
+    <string name="perm_wizard_step_of">Bước %1$d / %2$d</string>
+    <string name="perm_wizard_notif_title">Cho phép thông báo</string>
+    <string name="perm_wizard_notif_body">Dịch vụ cần thông báo thường trực để chạy nền. Thông báo cũng hiển thị địa chỉ máy tính.</string>
+    <string name="perm_wizard_notif_denied_title">Thông báo bị từ chối</string>
+    <string name="perm_wizard_notif_denied_body">Dịch vụ vẫn khởi động được, nhưng không có thông báo giữ sống thì Android có thể đưa dịch vụ ở nền vào chế độ ngủ và kết nối máy tính sẽ thường xuyên đứt.</string>
+    <string name="perm_wizard_open_notification_settings">Mở cài đặt để cấp quyền</string>
+    <string name="perm_wizard_continue">Vẫn tiếp tục</string>
+    <string name="perm_wizard_storage_title">Cho phép truy cập mọi tệp</string>
+    <string name="perm_wizard_storage_body">Trình duyệt máy tính có thể xem, tải lên và tải xuống tệp trên điện thoại này.\nBạn sẽ rời ứng dụng trong giây lát tới cài đặt hệ thống: bật công tắc rồi quay lại.</string>
+    <string name="perm_wizard_storage_open_settings">Mở cài đặt hệ thống</string>
+    <string name="perm_wizard_storage_skip">Bỏ qua lúc này</string>
+    <string name="perm_wizard_done_title">Đã bật dịch vụ</string>
+    <string name="perm_wizard_done_subtitle">Đang chạy nền — máy tính có thể kết nối ngay bây giờ</string>
+    <string name="perm_wizard_allowed">Đã cho phép</string>
+    <string name="perm_wizard_skipped">Đã bỏ qua</string>
+    <string name="perm_wizard_not_on">Chưa bật</string>
     <string name="system_alert_window_warning">Vui lòng cho phép “Hiển thị trên các ứng dụng khác” để không bỏ lỡ các thông báo hệ thống quan trọng như xác nhận gỡ cài đặt khi ứng dụng chạy nền.</string>
     <string name="permissions">Quyền</string>
     <string name="show_notification">Hiển thị thông báo</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">Cấp quyền truy cập</string>
     <string name="scan_needs_camera_warning">Bộ quét cần quyền truy cập vào máy ảnh!</string>
     <string name="audio_notification_prompt">Để xem điều khiển phương tiện trong trung tâm thông báo, vui lòng cấp quyền nhận thông báo đẩy từ ứng dụng.</string>
-    <string name="foreground_service_notification_prompt">Vui lòng cho phép ứng dụng này chạy trong nền và hiển thị thông báo để cung cấp chức năng hoặc dịch vụ cần thiết.</string>
     <string name="call_phone_permission_required">Để thực hiện cuộc gọi điện thoại qua ứng dụng, vui lòng cho phép truy cập điện thoại.</string>
     <string name="accessibility_service_description">PlainApp sử dụng dịch vụ hỗ trợ tiếp cận này để bật điều khiển từ xa khi phản chiếu màn hình. Nó chèn các sự kiện chạm (chạm, vuốt, cuộn) và các thao tác điều hướng (Quay lại, Trang chủ, Gần đây) được gửi từ giao diện web.</string>
     <string name="accessibility_service_label">Điều khiển từ xa PlainApp</string>

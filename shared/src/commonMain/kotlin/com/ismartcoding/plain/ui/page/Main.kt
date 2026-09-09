@@ -35,6 +35,7 @@ import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverOverlay
+import com.ismartcoding.plain.ui.page.home.ServiceOnboardingWizard
 import com.ismartcoding.plain.ui.theme.backgroundNormal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,5 +94,11 @@ fun Main(
 
         DlnaReceiverOverlay()
         MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })
+        if (mainVM.showPermissionWizard.value) {
+            ServiceOnboardingWizard(
+                onStartService = { mainVM.startServiceAfterWizard() },
+                onClose = { mainVM.closePermissionWizard() },
+            )
+        }
     }
 }

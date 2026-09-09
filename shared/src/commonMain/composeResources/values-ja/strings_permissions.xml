@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">もう少しで完了です！ウェブを介して簡単に携帯電話のファイルを管理するために、ストレージ許可を有効にしてください。</string>
+    <string name="perm_wizard_title">サービスを開始する前に権限を設定してください</string>
+    <string name="perm_wizard_subtitle">初回のみの設定です。約30秒、今後は表示されません</string>
+    <string name="perm_wizard_start">設定を開始</string>
+    <string name="perm_wizard_skip_optional">任意の権限をスキップして開始</string>
+    <string name="perm_wizard_required">必須</string>
+    <string name="perm_wizard_optional">任意</string>
+    <string name="perm_wizard_notif_name">通知</string>
+    <string name="perm_wizard_notif_desc">サービスをバックグラウンドで動かし続け、通知にパソコンのアドレスを表示します</string>
+    <string name="perm_wizard_storage_name">すべてのファイルへのアクセス</string>
+    <string name="perm_wizard_storage_desc">パソコンのブラウザーでスマホのファイルを管理（閲覧/アップロード/ダウンロード）</string>
+    <string name="perm_wizard_step_of">ステップ %1$d / %2$d</string>
+    <string name="perm_wizard_notif_title">通知を許可</string>
+    <string name="perm_wizard_notif_body">バックグラウンドでサービスを動かし続けるには、常設通知が必要です。通知にはパソコンのアドレスも表示されます。</string>
+    <string name="perm_wizard_notif_denied_title">通知が許可されていません</string>
+    <string name="perm_wizard_notif_denied_body">サービスは起動できますが、通知による維持がないため、バックグラウンドでシステムに休止されやすく、パソコンとの接続が頻繁に切れます。</string>
+    <string name="perm_wizard_open_notification_settings">設定で許可する</string>
+    <string name="perm_wizard_continue">それでも続行</string>
+    <string name="perm_wizard_storage_title">すべてのファイルへのアクセスを許可</string>
+    <string name="perm_wizard_storage_body">パソコンのブラウザーでスマホのファイルを直接閲覧・アップロード・ダウンロードできます。\nこの後システム設定に移るので、スイッチをオンにして戻ってください。</string>
+    <string name="perm_wizard_storage_open_settings">システム設定を開く</string>
+    <string name="perm_wizard_storage_skip">今はスキップ</string>
+    <string name="perm_wizard_done_title">サービスが有効になりました</string>
+    <string name="perm_wizard_done_subtitle">サービスがバックグラウンドで実行中です。パソコンから今すぐ接続できます</string>
+    <string name="perm_wizard_allowed">許可済み</string>
+    <string name="perm_wizard_skipped">スキップ済み</string>
+    <string name="perm_wizard_not_on">無効</string>
     <string name="system_alert_window_warning">アプリがバックグラウンドで動作中に、アンインストール確認などの重要なシステムポップアップを見逃さないように、「他のアプリの上に表示」を許可してください。</string>
     <string name="permissions">権限</string>
     <string name="show_notification">通知を表示</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">アクセスを許可</string>
     <string name="scan_needs_camera_warning">スキャナーにはカメラの許可が必要です！</string>
     <string name="audio_notification_prompt">通知センターでメディアコントロールを表示するには、アプリからプッシュ通知を受信する許可をお願いします。</string>
-    <string name="foreground_service_notification_prompt">本アプリをバックグラウンドで実行し、重要な機能やサービスを提供するために通知を表示する許可をお願いします。</string>
     <string name="call_phone_permission_required">アプリから電話をかけるためには、電話へのアクセスを許可してください。</string>
     <string name="accessibility_service_description">PlainApp は画面ミラーリング中のリモート操作を有効にするために、このユーザー補助サービスを使用します。Web インターフェースから送信されたタッチ操作（タップ、スワイプ、スクロール）およびナビゲーション操作（戻る、ホーム、最近のアプリ）を注入します。</string>
     <string name="accessibility_service_label">PlainApp リモート操作</string>

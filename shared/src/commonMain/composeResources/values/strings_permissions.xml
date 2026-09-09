@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">Almost there! Please enable storage permission to easily manage your phone files via the web.</string>
+    <string name="perm_wizard_title">Set up permissions before starting the service</string>
+    <string name="perm_wizard_subtitle">One-time setup, about 30 seconds. You won't be asked again.</string>
+    <string name="perm_wizard_start">Get started</string>
+    <string name="perm_wizard_skip_optional">Skip optional permissions and start</string>
+    <string name="perm_wizard_required">Required</string>
+    <string name="perm_wizard_optional">Optional</string>
+    <string name="perm_wizard_notif_name">Notifications</string>
+    <string name="perm_wizard_notif_desc">Keeps the service running in the background and shows the desktop address in the notification shade.</string>
+    <string name="perm_wizard_storage_name">All files access</string>
+    <string name="perm_wizard_storage_desc">Manage phone files from the desktop browser (browse, upload, download).</string>
+    <string name="perm_wizard_step_of">Step %1$d of %2$d</string>
+    <string name="perm_wizard_notif_title">Allow notifications</string>
+    <string name="perm_wizard_notif_body">The service needs a persistent notification to keep running in the background. It also shows the desktop address.</string>
+    <string name="perm_wizard_notif_denied_title">Notifications are blocked</string>
+    <string name="perm_wizard_notif_denied_body">The service can still start, but Android may put it to sleep in the background and the desktop connection will keep dropping.</string>
+    <string name="perm_wizard_open_notification_settings">Open settings to allow</string>
+    <string name="perm_wizard_continue">Continue anyway</string>
+    <string name="perm_wizard_storage_title">Allow all files access</string>
+    <string name="perm_wizard_storage_body">Lets the desktop browser browse, upload and download files on this phone.\nYou will briefly leave the app to turn it on in system settings; the wizard continues when you return.</string>
+    <string name="perm_wizard_storage_open_settings">Open system settings</string>
+    <string name="perm_wizard_storage_skip">Skip for now</string>
+    <string name="perm_wizard_done_title">Service is on</string>
+    <string name="perm_wizard_done_subtitle">Running in the background — your computer can connect now.</string>
+    <string name="perm_wizard_allowed">Allowed</string>
+    <string name="perm_wizard_skipped">Skipped</string>
+    <string name="perm_wizard_not_on">Not enabled</string>
     <string name="system_alert_window_warning">Please allow “Display over other apps” so you don’t miss important system pop-ups like uninstall confirmations when the app runs in the background.</string>
     <string name="permissions">Permissions</string>
     <string name="show_notification">Show notification</string>
@@ -34,7 +59,6 @@
     <string name="grant_access">Grant access</string>
     <string name="scan_needs_camera_warning">Scanner needs camera permission!</string>
     <string name="audio_notification_prompt">To view media controls in the notifications center, kindly grant permission to receive push notifications from the app.</string>
-    <string name="foreground_service_notification_prompt">Please allow this app to run in the background and show notifications to provide essential functionality or services.</string>
     <string name="location_required_for_aware_chat">On some Android devices, Location permission is required for nearby device communication. PlainApp does not use your location to track you.</string>
     <string name="call_phone_permission_required">In order to make phone calls through the app, please allow phone access.</string>
     <string name="permission_denied_message">Permission was denied. Please enable it in Settings to use this feature.</string>

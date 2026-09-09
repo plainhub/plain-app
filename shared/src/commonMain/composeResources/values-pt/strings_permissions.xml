@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">Quase lá! Por favor, habilite a permissão de armazenamento para gerenciar facilmente seus arquivos de telefone através da web.</string>
+    <string name="perm_wizard_title">Configure as permissões antes de iniciar o serviço</string>
+    <string name="perm_wizard_subtitle">Configuração única, cerca de 30 segundos. Não aparecerá novamente.</string>
+    <string name="perm_wizard_start">Começar</string>
+    <string name="perm_wizard_skip_optional">Pular permissões opcionais e iniciar</string>
+    <string name="perm_wizard_required">Obrigatória</string>
+    <string name="perm_wizard_optional">Opcional</string>
+    <string name="perm_wizard_notif_name">Notificações</string>
+    <string name="perm_wizard_notif_desc">Mantém o serviço em execução em segundo plano e mostra o endereço do computador na barra de notificações</string>
+    <string name="perm_wizard_storage_name">Acesso a todos os arquivos</string>
+    <string name="perm_wizard_storage_desc">Gerencie os arquivos do telefone pelo navegador do computador (ver, enviar, baixar)</string>
+    <string name="perm_wizard_step_of">Etapa %1$d de %2$d</string>
+    <string name="perm_wizard_notif_title">Permitir notificações</string>
+    <string name="perm_wizard_notif_body">O serviço precisa de uma notificação permanente para continuar em segundo plano. Ela também mostra o endereço do computador.</string>
+    <string name="perm_wizard_notif_denied_title">Notificações bloqueadas</string>
+    <string name="perm_wizard_notif_denied_body">O serviço ainda pode iniciar, mas o Android pode colocá-lo em suspensão em segundo plano e a conexão com o computador cairá com frequência.</string>
+    <string name="perm_wizard_open_notification_settings">Abrir configurações para permitir</string>
+    <string name="perm_wizard_continue">Continuar mesmo assim</string>
+    <string name="perm_wizard_storage_title">Permitir acesso a todos os arquivos</string>
+    <string name="perm_wizard_storage_body">Permite ao navegador do computador ver, enviar e baixar arquivos deste telefone.\nVocê sairá por um momento para as configurações do sistema: ative a chave e volte.</string>
+    <string name="perm_wizard_storage_open_settings">Abrir configurações do sistema</string>
+    <string name="perm_wizard_storage_skip">Pular por enquanto</string>
+    <string name="perm_wizard_done_title">Serviço ativado</string>
+    <string name="perm_wizard_done_subtitle">Em execução em segundo plano — o computador já pode se conectar</string>
+    <string name="perm_wizard_allowed">Permitida</string>
+    <string name="perm_wizard_skipped">Pulada</string>
+    <string name="perm_wizard_not_on">Não ativada</string>
     <string name="system_alert_window_warning">Permita “Exibir sobre outros apps” para não perder pop-ups importantes do sistema, como a confirmação de desinstalação, quando o app estiver em segundo plano.</string>
     <string name="permissions">Permissões</string>
     <string name="show_notification">Mostrar notificação</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">Conceder acesso</string>
     <string name="scan_needs_camera_warning">O scanner precisa de permissão de câmera!</string>
     <string name="audio_notification_prompt">Para ver os controles de mídia no centro de notificações, por favor conceda permissão para receber notificações push do aplicativo.</string>
-    <string name="foreground_service_notification_prompt">Por favor, permita que este aplicativo seja executado em segundo plano e mostre notificações para fornecer funcionalidade ou serviços essenciais.</string>
     <string name="call_phone_permission_required">Para fazer chamadas telefônicas pelo aplicativo, por favor, permita o acesso ao telefone.</string>
     <string name="accessibility_service_description">O PlainApp usa este serviço de acessibilidade para permitir o controle remoto durante o espelhamento de tela. Ele injeta eventos de toque (toque, deslizar, rolar) e ações de navegação (Voltar, Início, Recentes) enviados pela interface web.</string>
     <string name="accessibility_service_label">Controle remoto do PlainApp</string>

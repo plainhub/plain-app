@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">Neredeyse hazır! Lütfen telefon dosyalarınızı web üzerinden kolayca yönetmek için depolama iznini etkinleştirin.</string>
+    <string name="perm_wizard_title">Servisi başlatmadan önce izinleri ayarlayın</string>
+    <string name="perm_wizard_subtitle">Tek seferlik kurulum, yaklaşık 30 saniye. Bir daha gösterilmeyecek.</string>
+    <string name="perm_wizard_start">Başla</string>
+    <string name="perm_wizard_skip_optional">İsteğe bağlı izinleri atla ve başlat</string>
+    <string name="perm_wizard_required">Zorunlu</string>
+    <string name="perm_wizard_optional">İsteğe bağlı</string>
+    <string name="perm_wizard_notif_name">Bildirimler</string>
+    <string name="perm_wizard_notif_desc">Servisin arka planda çalışmasını sağlar ve bildirimde bilgisayar adresini gösterir</string>
+    <string name="perm_wizard_storage_name">Tüm dosyalara erişim</string>
+    <string name="perm_wizard_storage_desc">Telefon dosyalarını bilgisayar tarayıcısından yönetin (görüntüle, yükle, indir)</string>
+    <string name="perm_wizard_step_of">Adım %1$d / %2$d</string>
+    <string name="perm_wizard_notif_title">Bildirimlere izin ver</string>
+    <string name="perm_wizard_notif_body">Servisin arka planda çalışması için kalıcı bir bildirim gerekir. Bildirimde bilgisayar adresi de gösterilir.</string>
+    <string name="perm_wizard_notif_denied_title">Bildirimler engellendi</string>
+    <string name="perm_wizard_notif_denied_body">Servis yine de başlar, ancak bildirim koruması olmadan Android servisi arka planda uyku moduna alabilir ve bilgisayar bağlantısı sık sık kopar.</string>
+    <string name="perm_wizard_open_notification_settings">İzin vermek için ayarları aç</string>
+    <string name="perm_wizard_continue">Yine de devam et</string>
+    <string name="perm_wizard_storage_title">Tüm dosyalara erişime izin ver</string>
+    <string name="perm_wizard_storage_body">Bilgisayar tarayıcısı bu telefondaki dosyaları görüntüleyebilir, yükleyebilir ve indirebilir.\nKısa süreliğine sistem ayarlarına gideceksiniz: anahtarı açıp geri dönün.</string>
+    <string name="perm_wizard_storage_open_settings">Sistem ayarlarını aç</string>
+    <string name="perm_wizard_storage_skip">Şimdilik atla</string>
+    <string name="perm_wizard_done_title">Servis açıldı</string>
+    <string name="perm_wizard_done_subtitle">Arka planda çalışıyor — bilgisayar şu anda bağlanabilir</string>
+    <string name="perm_wizard_allowed">İzin verildi</string>
+    <string name="perm_wizard_skipped">Atlandı</string>
+    <string name="perm_wizard_not_on">Kapalı</string>
     <string name="system_alert_window_warning">Uygulama arka planda çalışırken kaldırma onayı gibi önemli sistem uyarılarını kaçırmamak için “Diğer uygulamaların üzerinde göster” iznini verin.</string>
     <string name="permissions">İzinler</string>
     <string name="show_notification">Bildirim göster</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">Erişim izni ver</string>
     <string name="scan_needs_camera_warning">Tarayıcı kamera izni gerektirir!</string>
     <string name="audio_notification_prompt">Bildirim merkezinde medya kontrollerini görüntülemek için, lütfen uygulamadan anlık bildirim alma izni verin.</string>
-    <string name="foreground_service_notification_prompt">Lütfen bu uygulamanın arka planda çalışmasına ve temel işlevsellik veya hizmetleri sağlamak için bildirimler göstermesine izin verin.</string>
     <string name="call_phone_permission_required">Uygulama üzerinden telefon aramaları yapabilmek için lütfen telefon erişimine izin verin.</string>
     <string name="accessibility_service_description">PlainApp, ekran yansıtma sırasında uzaktan kontrolü etkinleştirmek için bu erişilebilirlik hizmetini kullanır. Web arayüzünden gönderilen dokunma olaylarını (dokunma, kaydırma, kaydırarak gezinme) ve gezinme eylemlerini (Geri, Ana ekran, Son kullanılanlar) enjekte eder.</string>
     <string name="accessibility_service_label">PlainApp Uzaktan Kontrol</string>

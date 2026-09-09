@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="storage_permission_confirm">প্রায় সমাপ্ত! ওয়েব মাধ্যমে সহজেই ফোন ফাইলগুলি ব্যবস্থাপনা করতে আপনার স্টোরেজ অনুমতি সক্রিয় করুন।</string>
+    <string name="perm_wizard_title">পরিষেবা শুরু করার আগে অনুমতিগুলি সেট আপ করুন</string>
+    <string name="perm_wizard_subtitle">একবারের সেটআপ, প্রায় ৩০ সেকেন্ড। আর দেখা যাবে না।</string>
+    <string name="perm_wizard_start">শুরু করুন</string>
+    <string name="perm_wizard_skip_optional">ঐচ্ছিক অনুমতি এড়িয়ে শুরু করুন</string>
+    <string name="perm_wizard_required">আবশ্যক</string>
+    <string name="perm_wizard_optional">ঐচ্ছিক</string>
+    <string name="perm_wizard_notif_name">বিজ্ঞপ্তি</string>
+    <string name="perm_wizard_notif_desc">পরিষেবাটিকে ব্যাকগ্রাউন্ডে চালু রাখে এবং বিজ্ঞপ্তিতে কম্পিউটারের ঠিকানা দেখায়</string>
+    <string name="perm_wizard_storage_name">সব ফাইলে অ্যাক্সেস</string>
+    <string name="perm_wizard_storage_desc">কম্পিউটারের ব্রাউজার থেকে ফোনের ফাইল পরিচালনা করুন (দেখা, আপলোড, ডাউনলোড)</string>
+    <string name="perm_wizard_step_of">ধাপ %1$d / %2$d</string>
+    <string name="perm_wizard_notif_title">বিজ্ঞপ্তির অনুমতি দিন</string>
+    <string name="perm_wizard_notif_body">ব্যাকগ্রাউন্ডে পরিষেবা চালু রাখতে একটি স্থায়ী বিজ্ঞপ্তি প্রয়োজন। বিজ্ঞপ্তিতে কম্পিউটারের ঠিকানাও দেখায়।</string>
+    <string name="perm_wizard_notif_denied_title">বিজ্ঞপ্তি ব্লক করা আছে</string>
+    <string name="perm_wizard_notif_denied_body">পরিষেবা তবুও শুরু হবে, তবে বিজ্ঞপ্তি ছাড়া Android ব্যাকগ্রাউন্ডে এটিকে ঘুমিয়ে ফেলতে পারে এবং কম্পিউটারের সংযোগ ঘন ঘন বিচ্ছিন্ন হবে।</string>
+    <string name="perm_wizard_open_notification_settings">অনুমতি দিতে সেটিংস খুলুন</string>
+    <string name="perm_wizard_continue">তবুও চালিয়ে যান</string>
+    <string name="perm_wizard_storage_title">সব ফাইলে অ্যাক্সেসের অনুমতি দিন</string>
+    <string name="perm_wizard_storage_body">কম্পিউটারের ব্রাউজার থেকে এই ফোনের ফাইল দেখা, আপলোড ও ডাউনলোড করা যাবে।\nঅল্প সময়ের জন্য সিস্টেম সেটিংসে যাবেন — সুইচ চালু করে ফিরে আসুন।</string>
+    <string name="perm_wizard_storage_open_settings">সিস্টেম সেটিংস খুলুন</string>
+    <string name="perm_wizard_storage_skip">আপাতত এড়িয়ে যান</string>
+    <string name="perm_wizard_done_title">পরিষেবা চালু হয়েছে</string>
+    <string name="perm_wizard_done_subtitle">ব্যাকগ্রাউন্ডে চলছে — কম্পিউটার এখনই সংযোগ করতে পারে</string>
+    <string name="perm_wizard_allowed">অনুমতি দেওয়া হয়েছে</string>
+    <string name="perm_wizard_skipped">এড়ানো হয়েছে</string>
+    <string name="perm_wizard_not_on">চালু নেই</string>
     <string name="system_alert_window_warning">অ্যাপটি পেছনে চলাকালীন গুরুত্বপূর্ণ সিস্টেম পপ-আপ যেমন আনইনস্টল নিশ্চিতকরণ মিস না করতে “অন্যান্য অ্যাপের উপরে প্রদর্শন” অনুমতি দিন।</string>
     <string name="permissions">অনুমতিসমূহ</string>
     <string name="show_notification">বিজ্ঞপ্তি দেখান</string>
@@ -32,7 +57,6 @@
     <string name="grant_access">অ্যাক্সেস দিন</string>
     <string name="scan_needs_camera_warning">স্ক্যানারের ক্যামেরা অনুমতি প্রয়োজন!</string>
     <string name="audio_notification_prompt">নোটিফিকেশন সেন্টারে মিডিয়া নিয়ন্ত্রণ দেখতে, দয়া করে অ্যাপটি থেকে পুশ নোটিফিকেশন প্রাপ্ত করার অনুমতি দিন।</string>
-    <string name="foreground_service_notification_prompt">প্রাথমিক কাজ বা সেবা প্রদান করতে এই অ্যাপটি ব্যাকগ্রাউন্ডে চালান এবং বিশেষ মাধ্যমে বিজ্ঞপ্তি দেখাতে এই অ্যাপটির অনুমতি দিন।</string>
     <string name="call_phone_permission_required">অ্যাপে ফোনে কল করতে, দয়া করে ফোন অ্যাক্সেস দেওয়া হবে।</string>
     <string name="accessibility_service_description">স্ক্রিন মিররিং চলাকালীন দূরবর্তী নিয়ন্ত্রণ সক্ষম করতে PlainApp এই অ্যাক্সেসিবিলিটি সার্ভিস ব্যবহার করে। এটি ওয়েব ইন্টারফেস থেকে পাঠানো টাচ ইভেন্ট (ট্যাপ, সোয়াইপ, স্ক্রল) এবং ন্যাভিগেশন অ্যাকশন (পেছনে, হোম, সাম্প্রতিক) ইনজেক্ট করে।</string>
     <string name="accessibility_service_label">PlainApp দূরবর্তী নিয়ন্ত্রণ</string>
