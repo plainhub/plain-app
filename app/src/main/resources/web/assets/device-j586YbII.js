@@ -1,0 +1,1 @@
+import{vn as e}from"./runtime-core.esm-bundler-DrnlzXx3.js";var t=e(window.innerWidth<=480),n=e(window.innerWidth<=768);function r(){t.value=window.innerWidth<=480,n.value=window.innerWidth<=768}window.addEventListener(`resize`,r);function i(){return n}function a(){return t}export{i as n,a as t};

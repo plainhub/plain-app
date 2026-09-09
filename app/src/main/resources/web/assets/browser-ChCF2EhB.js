@@ -1,0 +1,1 @@
+async function e(e){window.open(e,`_blank`)}export{e as t};

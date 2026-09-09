@@ -1,0 +1,1 @@
+import{On as e,k as t,mt as n,v as r}from"./runtime-core.esm-bundler-DrnlzXx3.js";import{l as i}from"./pause-rounded-a5F4SYMy.js";import{s as a}from"./query-BQa52YWn.js";import{t as o}from"./MediaSidebar-BRMH4CTm.js";var s=t({__name:`AudiosSidebar`,setup(t){return(t,s)=>{let c=o;return n(),r(c,{type:e(i).AUDIO,gql:e(a)},null,8,[`type`,`gql`])}}});export{s as default};
