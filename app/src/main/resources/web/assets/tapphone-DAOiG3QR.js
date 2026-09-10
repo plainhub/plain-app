@@ -1,0 +1,1 @@
+import{s as e}from"./temp-BxyXOeiJ.js";var t=t=>{e.emit(`tap_phone`,t)};export{t};

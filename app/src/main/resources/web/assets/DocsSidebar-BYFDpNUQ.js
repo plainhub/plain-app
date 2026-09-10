@@ -1,1 +1,0 @@
-import{On as e,k as t,mt as n,v as r}from"./runtime-core.esm-bundler-DrnlzXx3.js";import{l as i}from"./pause-rounded-a5F4SYMy.js";import{D as a}from"./query-BQa52YWn.js";import{t as o}from"./MediaSidebar-BRMH4CTm.js";var s=t({__name:`DocsSidebar`,setup(t){return(t,s)=>{let c=o;return n(),r(c,{type:e(i).DOC,gql:e(a)},null,8,[`type`,`gql`])}}});export{s as default};

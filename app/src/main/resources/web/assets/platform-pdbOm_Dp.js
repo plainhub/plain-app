@@ -1,0 +1,1 @@
+var e=/Mac|iPhone|iPad|iPod/,t=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;function n(){return typeof navigator<`u`&&e.test(navigator.userAgent)}function r(){return typeof navigator<`u`&&t.test(navigator.userAgent)}export{r as n,n as t};
