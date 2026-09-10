@@ -59,4 +59,20 @@
     <string name="font_size_large">Крупный</string>
     <string name="font_size_xlarge">Очень крупный</string>
     <string name="font_size_xxlarge">Огромный</string>
+    <string name="feeds_sync_failed_n">Синхронизация завершена, не удалось синхронизировать каналы: %1$d</string>
+    <string name="feeds_sync_failed_single">Не удалось синхронизировать этот канал: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Ошибка · %1$s</string>
+    <string name="feeds_sync_retry">Повторить</string>
+    <string name="feeds_sync_retry_all">Повторить все</string>
+    <string name="feeds_sync_last_synced">Последняя синхронизация</string>
+    <string name="feeds_sync_result">Результат синхронизации</string>
+    <string name="feeds_sync_success">Успешно</string>
+    <string name="feeds_sync_raw_error">Исходная ошибка</string>
+    <string name="feeds_sync_now">Синхронизировать сейчас</string>
+    <string name="feed_err_no_network">Нет сети</string>
+    <string name="feed_err_dns">Не удалось разрешить домен</string>
+    <string name="feed_err_timeout">Истекло время ожидания соединения</string>
+    <string name="feed_err_server">Ошибка сервера</string>
+    <string name="feed_err_ssl">Ошибка сертификата</string>
+    <string name="feed_err_parse">Не удалось разобрать формат канала</string>
 </resources>

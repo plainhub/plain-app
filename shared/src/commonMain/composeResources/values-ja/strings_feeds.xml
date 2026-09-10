@@ -59,4 +59,20 @@
     <string name="font_size_large">大</string>
     <string name="font_size_xlarge">特大</string>
     <string name="font_size_xxlarge">最大</string>
+    <string name="feeds_sync_failed_n">同期完了、%1$d 件のフィードの同期に失敗しました</string>
+    <string name="feeds_sync_failed_single">このフィードの前回同期に失敗：%1$s</string>
+    <string name="feeds_sync_failed_with_reason">失敗 · %1$s</string>
+    <string name="feeds_sync_retry">再試行</string>
+    <string name="feeds_sync_retry_all">すべて再試行</string>
+    <string name="feeds_sync_last_synced">最終同期</string>
+    <string name="feeds_sync_result">同期結果</string>
+    <string name="feeds_sync_success">成功</string>
+    <string name="feeds_sync_raw_error">エラー詳細</string>
+    <string name="feeds_sync_now">今すぐ同期</string>
+    <string name="feed_err_no_network">ネットワークなし</string>
+    <string name="feed_err_dns">ドメイン解決に失敗</string>
+    <string name="feed_err_timeout">接続がタイムアウト</string>
+    <string name="feed_err_server">サーバーエラー</string>
+    <string name="feed_err_ssl">証明書エラー</string>
+    <string name="feed_err_parse">フィード形式を解析できません</string>
 </resources>

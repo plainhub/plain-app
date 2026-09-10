@@ -61,6 +61,18 @@ class ChatItemContentConverter {
     }
 }
 
+class FeedErrorConverter {
+    @ColumnTypeConverter
+    fun stringTo(json: String): DFeedError {
+        return parseFeedError(json)
+    }
+
+    @ColumnTypeConverter
+    fun dataToString(data: DFeedError): String {
+        return data.toJSONString()
+    }
+}
+
 class PeerStatusConverter {
     @ColumnTypeConverter
     fun toDB(value: PeerStatus): String = value.name

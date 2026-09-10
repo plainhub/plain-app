@@ -48,6 +48,7 @@ import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.PickFileEvent
+import com.ismartcoding.plain.features.feed.FeedFetcher
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.FeedsPageEffects
@@ -212,6 +213,20 @@ fun FeedEntriesPage(
             }
         }) { paddingValues ->
             Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+                // State-driven sync failure banner: persisted errors on DFeed,
+                // scoped to the current feed filter, retries go through FeedFetcher.
+                val failingFeeds = feedsState.filter {
+                    it.hasSyncError &&
+                        (feedEntriesVM.feedId.value.isEmpty() || it.id == feedEntriesVM.feedId.value)
+                }
+                if (failingFeeds.isNotEmpty()) {
+                    FeedSyncBanner(
+                        failedFeeds = failingFeeds,
+                        singleFeed = feedEntriesVM.feedId.value.isNotEmpty(),
+                        onRetry = { id -> scope.launch(IODispatcher) { FeedFetcher.fetchOne(id) } },
+                        onRetryAll = { failingFeeds.forEach { f -> scope.launch(IODispatcher) { FeedFetcher.fetchOne(f.id) } } },
+                    )
+                }
                 PullToRefresh(
                     // No subscriptions yet: the sync worker would finish without
                     // emitting a completion event, leaving the spinner stuck, so
@@ -344,7 +359,9 @@ private fun FeedEntriesDrawerContent(
                     isSelected = feedEntriesVM.feedId.value == feed.id,
                     onClick = { onSelect(feed.id, FeedEntryFilterType.DEFAULT, null) },
                     onLongClick = { feedsVM.selectedItem.value = feed },
-                    badge = feed.count.toString()
+                    badge = feed.count.toString(),
+                    // Persisted sync failure: keep the broken feed visible at a glance.
+                    showErrorDot = feed.hasSyncError,
                 )
             }
         }

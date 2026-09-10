@@ -59,4 +59,20 @@
     <string name="font_size_large">Büyük</string>
     <string name="font_size_xlarge">Çok büyük</string>
     <string name="font_size_xxlarge">En büyük</string>
+    <string name="feeds_sync_failed_n">Eşitleme tamamlandı, %1$d akış eşitlenemedi</string>
+    <string name="feeds_sync_failed_single">Bu akışın son eşitlemesi başarısız oldu: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Başarısız · %1$s</string>
+    <string name="feeds_sync_retry">Yeniden dene</string>
+    <string name="feeds_sync_retry_all">Tümünü yeniden dene</string>
+    <string name="feeds_sync_last_synced">Son eşitleme</string>
+    <string name="feeds_sync_result">Eşitleme sonucu</string>
+    <string name="feeds_sync_success">Başarılı</string>
+    <string name="feeds_sync_raw_error">Orijinal hata</string>
+    <string name="feeds_sync_now">Şimdi eşitle</string>
+    <string name="feed_err_no_network">Ağ yok</string>
+    <string name="feed_err_dns">Alan adı çözümlenemedi</string>
+    <string name="feed_err_timeout">Bağlantı zaman aşımı</string>
+    <string name="feed_err_server">Sunucu hatası</string>
+    <string name="feed_err_ssl">Sertifika hatası</string>
+    <string name="feed_err_parse">Akış biçimi çözümlenemedi</string>
 </resources>

@@ -45,7 +45,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DMediaItem::class,
         DShare::class,
     ],
-    version = 23,
+    version = 24,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -78,6 +78,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
     ChatStatusConverter::class,
     SessionTypeConverter::class,
     ShareRootListConverter::class,
+    FeedErrorConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao

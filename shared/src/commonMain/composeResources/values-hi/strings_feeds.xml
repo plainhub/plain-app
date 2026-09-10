@@ -59,4 +59,20 @@
     <string name="font_size_large">बड़ा</string>
     <string name="font_size_xlarge">बहुत बड़ा</string>
     <string name="font_size_xxlarge">सबसे बड़ा</string>
+    <string name="feeds_sync_failed_n">सिंक पूरा हुआ, %1$d फ़ीड सिंक नहीं हो सके</string>
+    <string name="feeds_sync_failed_single">इस फ़ीड की अंतिम सिंक विफल हुई: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">विफल · %1$s</string>
+    <string name="feeds_sync_retry">पुनः प्रयास करें</string>
+    <string name="feeds_sync_retry_all">सभी का पुनः प्रयास करें</string>
+    <string name="feeds_sync_last_synced">अंतिम सिंक</string>
+    <string name="feeds_sync_result">सिंक परिणाम</string>
+    <string name="feeds_sync_success">सफल</string>
+    <string name="feeds_sync_raw_error">मूल त्रुटि</string>
+    <string name="feeds_sync_now">अभी सिंक करें</string>
+    <string name="feed_err_no_network">नेटवर्क नहीं</string>
+    <string name="feed_err_dns">डोमेन हल करना विफल</string>
+    <string name="feed_err_timeout">कनेक्शन का समय समाप्त</string>
+    <string name="feed_err_server">सर्वर त्रुटि</string>
+    <string name="feed_err_ssl">प्रमाणपत्र त्रुटि</string>
+    <string name="feed_err_parse">फ़ीड प्रारूप अमान्य</string>
 </resources>

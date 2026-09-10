@@ -4,9 +4,11 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedCount
+import com.ismartcoding.plain.db.DFeedError
 import com.ismartcoding.plain.db.FeedDao
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.feedWorkerOneTimeRequest
+import kotlin.time.Instant
 
 object FeedHelper {
     private val feedDao: FeedDao by lazy {
@@ -50,6 +52,23 @@ object FeedHelper {
     suspend fun deleteAsync(ids: Set<String>) = withIO {
         ids.forEach { FeedWorkerState.clear(it) }
         feedDao.delete(ids)
+    }
+
+    /**
+     * Persists the outcome of one sync attempt. Success stores an empty code
+     * (never "NONE") so "code non-empty" means "failing" everywhere.
+     */
+    suspend fun updateSyncStatusAsync(
+        id: String,
+        at: Instant,
+        code: FeedSyncErrorCode,
+        detail: String,
+    ) = withIO {
+        val error = DFeedError(
+            code = if (code == FeedSyncErrorCode.NONE) "" else code.name,
+            detail = detail,
+        )
+        feedDao.updateSyncStatus(id, at, error)
     }
 
     fun fetchOneTime(feedId: String) {

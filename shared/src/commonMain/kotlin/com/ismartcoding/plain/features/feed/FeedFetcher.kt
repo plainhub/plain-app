@@ -5,6 +5,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FeedStatusEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.pmap
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -14,6 +15,7 @@ import com.ismartcoding.plain.platform.fetchContentAsync
 import com.ismartcoding.plain.platform.fetchRssChannel
 import com.ismartcoding.plain.platform.getNetworkType
 import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
@@ -79,6 +81,7 @@ object FeedFetcher {
 
     private suspend fun syncFeedAsync(feed: DFeed) = withIO {
         setStatusMap(feed.id, FeedWorkerStatus.PENDING)
+        val syncedAt = TimeHelper.now()
         try {
             LogCat.d("Syncing feed: ${feed.id}, ${feed.name}, ${feed.url}")
             val syndFeed = fetchRssChannel(feed.url)
@@ -90,10 +93,16 @@ object FeedFetcher {
                 }
             }
             FeedWorkerState.errorMap.remove(feed.id)
+            // Persist before the status event: event listeners reload from the DB.
+            FeedHelper.updateSyncStatusAsync(feed.id, syncedAt, FeedSyncErrorCode.NONE, "")
             setStatusMap(feed.id, FeedWorkerStatus.COMPLETED)
+        } catch (ex: CancellationException) {
+            throw ex
         } catch (ex: Throwable) {
             LogCat.e(ex)
+            val code = FeedSyncErrorClassifier.classify(ex, getNetworkType())
             FeedWorkerState.errorMap[feed.id] = ex.toString()
+            FeedHelper.updateSyncStatusAsync(feed.id, syncedAt, code, ex.toString())
             setStatusMap(feed.id, FeedWorkerStatus.ERROR)
         }
     }

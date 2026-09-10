@@ -6,13 +6,11 @@ import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.events.FeedStatusEvent
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
-import com.ismartcoding.plain.features.feed.FeedWorkerState
 import com.ismartcoding.plain.platform.IODispatcher
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshLayoutState
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -42,19 +40,15 @@ internal fun FeedEntriesPageEffects(
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
             if (event is FeedStatusEvent) {
-                if (event.status == FeedWorkerStatus.COMPLETED) {
+                if (event.status == FeedWorkerStatus.COMPLETED || event.status == FeedWorkerStatus.ERROR) {
+                    topRefreshLayoutState.setRefreshState(
+                        if (event.status == FeedWorkerStatus.ERROR) RefreshContentState.Failed else RefreshContentState.Finished,
+                    )
+                    // Sync outcomes are persisted on DFeed by FeedFetcher; reload so the
+                    // banner, drawer dots and the open feed sheet reflect the new state.
                     feedsVM.loadAsync(withCount = true)
+                    feedsVM.refreshSelectedItemAsync()
                     scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
-                    topRefreshLayoutState.setRefreshState(RefreshContentState.Finished)
-                } else if (event.status == FeedWorkerStatus.ERROR) {
-                    topRefreshLayoutState.setRefreshState(RefreshContentState.Failed)
-                    if (feedId.isNotEmpty()) {
-                        if (FeedWorkerState.statusMap[feedId] == FeedWorkerStatus.ERROR) {
-                            DialogHelper.showErrorDialog(FeedWorkerState.errorMap[feedId] ?: "")
-                        }
-                    } else {
-                        DialogHelper.showErrorDialog(FeedWorkerState.errorMap.values.joinToString("\n"))
-                    }
                 }
             }
         }

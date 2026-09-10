@@ -59,4 +59,20 @@
     <string name="font_size_large">Groß</string>
     <string name="font_size_xlarge">Sehr groß</string>
     <string name="font_size_xxlarge">Maximal</string>
+    <string name="feeds_sync_failed_n">Synchronisierung abgeschlossen, %1$d Feeds konnten nicht synchronisiert werden</string>
+    <string name="feeds_sync_failed_single">Dieser Feed konnte zuletzt nicht synchronisiert werden: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Fehlgeschlagen · %1$s</string>
+    <string name="feeds_sync_retry">Erneut versuchen</string>
+    <string name="feeds_sync_retry_all">Alle wiederholen</string>
+    <string name="feeds_sync_last_synced">Zuletzt synchronisiert</string>
+    <string name="feeds_sync_result">Synchronisierungsergebnis</string>
+    <string name="feeds_sync_success">Erfolgreich</string>
+    <string name="feeds_sync_raw_error">Originalfehler</string>
+    <string name="feeds_sync_now">Jetzt synchronisieren</string>
+    <string name="feed_err_no_network">Kein Netzwerk</string>
+    <string name="feed_err_dns">DNS-Auflösung fehlgeschlagen</string>
+    <string name="feed_err_timeout">Verbindungstimeout</string>
+    <string name="feed_err_server">Serverfehler</string>
+    <string name="feed_err_ssl">Zertifikatsfehler</string>
+    <string name="feed_err_parse">Feed-Format konnte nicht gelesen werden</string>
 </resources>

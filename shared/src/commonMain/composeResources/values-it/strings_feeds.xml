@@ -59,4 +59,20 @@
     <string name="font_size_large">Grande</string>
     <string name="font_size_xlarge">Molto grande</string>
     <string name="font_size_xxlarge">Enorme</string>
+    <string name="feeds_sync_failed_n">Sincronizzazione completata, %1$d feed non sincronizzati</string>
+    <string name="feeds_sync_failed_single">Ultima sincronizzazione non riuscita per questo feed: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Non riuscito · %1$s</string>
+    <string name="feeds_sync_retry">Riprova</string>
+    <string name="feeds_sync_retry_all">Riprova tutti</string>
+    <string name="feeds_sync_last_synced">Ultima sincronizzazione</string>
+    <string name="feeds_sync_result">Esito della sincronizzazione</string>
+    <string name="feeds_sync_success">Riuscito</string>
+    <string name="feeds_sync_raw_error">Errore originale</string>
+    <string name="feeds_sync_now">Sincronizza ora</string>
+    <string name="feed_err_no_network">Nessuna rete</string>
+    <string name="feed_err_dns">Risoluzione DNS non riuscita</string>
+    <string name="feed_err_timeout">Connessione scaduta</string>
+    <string name="feed_err_server">Errore del server</string>
+    <string name="feed_err_ssl">Errore di certificato</string>
+    <string name="feed_err_parse">Formato del feed non valido</string>
 </resources>

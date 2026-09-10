@@ -59,4 +59,20 @@
     <string name="font_size_large">大</string>
     <string name="font_size_xlarge">特大</string>
     <string name="font_size_xxlarge">超大</string>
+    <string name="feeds_sync_failed_n">同步完成，%1$d 個訂閱同步失敗</string>
+    <string name="feeds_sync_failed_single">該訂閱上次同步失敗：%1$s</string>
+    <string name="feeds_sync_failed_with_reason">失敗 · %1$s</string>
+    <string name="feeds_sync_retry">重試</string>
+    <string name="feeds_sync_retry_all">全部重試</string>
+    <string name="feeds_sync_last_synced">上次同步</string>
+    <string name="feeds_sync_result">同步結果</string>
+    <string name="feeds_sync_success">成功</string>
+    <string name="feeds_sync_raw_error">原始錯誤</string>
+    <string name="feeds_sync_now">立即同步</string>
+    <string name="feed_err_no_network">無網路</string>
+    <string name="feed_err_dns">網域解析失敗</string>
+    <string name="feed_err_timeout">連線逾時</string>
+    <string name="feed_err_server">伺服器錯誤</string>
+    <string name="feed_err_ssl">憑證錯誤</string>
+    <string name="feed_err_parse">訂閱格式無法解析</string>
 </resources>

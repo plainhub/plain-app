@@ -6,13 +6,20 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.extensions.timeAgo
+import com.ismartcoding.plain.features.feed.FeedFetcher
+import com.ismartcoding.plain.features.feed.FeedWorkerState
+import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.ui.base.ActionButtons
@@ -25,6 +32,7 @@ import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
@@ -34,6 +42,10 @@ import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.models.select
+import com.ismartcoding.plain.ui.theme.green
+import com.ismartcoding.plain.ui.theme.listItemValue
+import com.ismartcoding.plain.ui.theme.red
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -80,6 +92,34 @@ fun ViewFeedBottomSheet(
         }
         VerticalSpace(dp = 24.dp)
         Subtitle(text = m.name)
+        // Sync status card: state persisted by FeedFetcher on DFeed, refreshed
+        // in place when a sync finishes while the sheet is open.
+        val reason = feedSyncErrorReason(m.lastError.code)
+        val syncBusy = FeedWorkerState.statusMap[m.id] == FeedWorkerStatus.PENDING
+        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+            PListItem(title = stringResource(Res.string.feeds_sync_last_synced), value = m.lastSyncAt?.timeAgo() ?: "—")
+            PListItem(title = stringResource(Res.string.feeds_sync_result),
+                subtitle = m.lastError.detail,
+                action = {
+                Text(
+                    text = if (reason != null) stringResource(Res.string.feeds_sync_failed_with_reason, reason)
+                    else stringResource(Res.string.feeds_sync_success),
+                    style = MaterialTheme.typography.listItemValue(),
+                    color = if (reason != null) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.green,
+                )
+            })
+        }
+        VerticalSpace(dp = 12.dp)
+        POutlinedButton(
+            text = if (syncBusy) stringResource(Res.string.syncing) else stringResource(Res.string.feeds_sync_now),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+            isLoading = syncBusy,
+            enabled = !syncBusy,
+            onClick = { scope.launch { FeedFetcher.fetchOne(m.id) } },
+        )
+        VerticalSpace(dp = 16.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             PListItem(modifier = Modifier.clickable {
                 try { launchUrl(m.url) } catch (_: Exception) { DialogHelper.showMessage(Res.string.no_browser_error) }

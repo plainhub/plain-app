@@ -5,11 +5,13 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +26,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
+import com.ismartcoding.plain.ui.theme.red
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -42,6 +45,7 @@ fun SidebarItem(
     leading: (@Composable () -> Unit)? = null,
     subtitle: String? = null,
     badge: String? = null,
+    showErrorDot: Boolean = false,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
 ) {
@@ -80,6 +84,14 @@ fun SidebarItem(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+        }
+        if (showErrorDot) {
+            HorizontalSpace(8.dp)
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .background(MaterialTheme.colorScheme.red, CircleShape),
+            )
         }
         if (badge != null) {
             HorizontalSpace(8.dp)

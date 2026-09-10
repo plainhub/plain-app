@@ -59,4 +59,20 @@
     <string name="font_size_large">Lớn</string>
     <string name="font_size_xlarge">Rất lớn</string>
     <string name="font_size_xxlarge">To nhất</string>
+    <string name="feeds_sync_failed_n">Đồng bộ hoàn tất, %1$d nguồn đồng bộ thất bại</string>
+    <string name="feeds_sync_failed_single">Nguồn này đồng bộ lần trước thất bại: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Thất bại · %1$s</string>
+    <string name="feeds_sync_retry">Thử lại</string>
+    <string name="feeds_sync_retry_all">Thử lại tất cả</string>
+    <string name="feeds_sync_last_synced">Đồng bộ lần cuối</string>
+    <string name="feeds_sync_result">Kết quả đồng bộ</string>
+    <string name="feeds_sync_success">Thành công</string>
+    <string name="feeds_sync_raw_error">Lỗi gốc</string>
+    <string name="feeds_sync_now">Đồng bộ ngay</string>
+    <string name="feed_err_no_network">Không có mạng</string>
+    <string name="feed_err_dns">Không phân giải được tên miền</string>
+    <string name="feed_err_timeout">Kết nối quá thời gian chờ</string>
+    <string name="feed_err_server">Lỗi máy chủ</string>
+    <string name="feed_err_ssl">Lỗi chứng chỉ</string>
+    <string name="feed_err_parse">Định dạng nguồn không hợp lệ</string>
 </resources>

@@ -59,4 +59,20 @@
     <string name="font_size_large">Grande</string>
     <string name="font_size_xlarge">Très grande</string>
     <string name="font_size_xxlarge">Énorme</string>
+    <string name="feeds_sync_failed_n">Synchronisation terminée, %1$d flux n'ont pas pu être synchronisés</string>
+    <string name="feeds_sync_failed_single">Échec de la dernière synchronisation de ce flux : %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Échec · %1$s</string>
+    <string name="feeds_sync_retry">Réessayer</string>
+    <string name="feeds_sync_retry_all">Tout réessayer</string>
+    <string name="feeds_sync_last_synced">Dernière synchronisation</string>
+    <string name="feeds_sync_result">Résultat de la synchronisation</string>
+    <string name="feeds_sync_success">Succès</string>
+    <string name="feeds_sync_raw_error">Erreur d'origine</string>
+    <string name="feeds_sync_now">Synchroniser maintenant</string>
+    <string name="feed_err_no_network">Aucun réseau</string>
+    <string name="feed_err_dns">Échec de la résolution du domaine</string>
+    <string name="feed_err_timeout">Délai de connexion dépassé</string>
+    <string name="feed_err_server">Erreur du serveur</string>
+    <string name="feed_err_ssl">Erreur de certificat</string>
+    <string name="feed_err_parse">Format de flux non valide</string>
 </resources>

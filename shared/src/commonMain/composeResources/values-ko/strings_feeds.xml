@@ -59,4 +59,20 @@
     <string name="font_size_large">크게</string>
     <string name="font_size_xlarge">아주 크게</string>
     <string name="font_size_xxlarge">최대</string>
+    <string name="feeds_sync_failed_n">동기화 완료, %1$d개 피드 동기화 실패</string>
+    <string name="feeds_sync_failed_single">이 피드의 마지막 동기화 실패: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">실패 · %1$s</string>
+    <string name="feeds_sync_retry">재시도</string>
+    <string name="feeds_sync_retry_all">모두 재시도</string>
+    <string name="feeds_sync_last_synced">마지막 동기화</string>
+    <string name="feeds_sync_result">동기화 결과</string>
+    <string name="feeds_sync_success">성공</string>
+    <string name="feeds_sync_raw_error">원본 오류</string>
+    <string name="feeds_sync_now">지금 동기화</string>
+    <string name="feed_err_no_network">네트워크 없음</string>
+    <string name="feed_err_dns">도메인 확인 실패</string>
+    <string name="feed_err_timeout">연결 시간 초과</string>
+    <string name="feed_err_server">서버 오류</string>
+    <string name="feed_err_ssl">인증서 오류</string>
+    <string name="feed_err_parse">피드 형식을 해석할 수 없음</string>
 </resources>

@@ -14,6 +14,9 @@ import androidx.room3.RawQuery
 import androidx.room3.RoomRawQuery
 import androidx.room3.Update
 import com.ismartcoding.plain.lib.generateId
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Entity(
     tableName = "feeds",
@@ -30,12 +33,43 @@ data class DFeed(
     @Ignore
     var count: Int = 0,
 
+    // Last sync attempt state, written by FeedFetcher after every sync;
+    // the UI (banner, drawer dot, sheet status card) derives from it.
+    @ColumnInfo(name = "last_sync_at")
+    var lastSyncAt: Instant? = null,
+
+    // Error payload of the last attempt, JSON-encoded via FeedErrorConverter.
+    // Empty code = success.
+    @ColumnInfo(name = "last_error", defaultValue = "")
+    var lastError: DFeedError = DFeedError(),
+
     @ColumnInfo(name = "created_at")
     var createdAt: Instant = TimeHelper.now(),
 
     @ColumnInfo(name = "updated_at")
     var updatedAt: Instant = TimeHelper.now(),
-) : IData
+) : IData {
+    /** True when the last sync attempt failed. */
+    val hasSyncError: Boolean
+        get() = lastError.code.isNotEmpty()
+}
+
+@Serializable
+data class DFeedError(
+    val code: String = "",
+    val detail: String = "",
+)
+
+private val feedErrorJson = Json { ignoreUnknownKeys = true }
+
+fun DFeedError.toJSONString(): String = feedErrorJson.encodeToString(DFeedError.serializer(), this)
+
+fun parseFeedError(json: String): DFeedError =
+    try {
+        feedErrorJson.decodeFromString(DFeedError.serializer(), json)
+    } catch (_: Exception) {
+        DFeedError()
+    }
 
 @Dao
 interface FeedDao {
@@ -62,6 +96,9 @@ interface FeedDao {
 
     @Query("DELETE FROM feeds WHERE id in (:ids)")
     suspend fun delete(ids: Set<String>)
+
+    @Query("UPDATE feeds SET last_sync_at=:at, last_error=:error WHERE id=:id")
+    suspend fun updateSyncStatus(id: String, at: Instant, error: DFeedError)
 
     @Query(
         "SELECT feed_entries.feed_id AS id, count(feed_entries.feed_id) AS count FROM feed_entries GROUP BY feed_entries.feed_id",

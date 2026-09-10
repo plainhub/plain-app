@@ -59,4 +59,20 @@
     <string name="font_size_large">Grande</string>
     <string name="font_size_xlarge">Muy grande</string>
     <string name="font_size_xxlarge">Enorme</string>
+    <string name="feeds_sync_failed_n">Sincronización completada, %1$d fuentes no se pudieron sincronizar</string>
+    <string name="feeds_sync_failed_single">Esta fuente falló en la última sincronización: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Error · %1$s</string>
+    <string name="feeds_sync_retry">Reintentar</string>
+    <string name="feeds_sync_retry_all">Reintentar todo</string>
+    <string name="feeds_sync_last_synced">Última sincronización</string>
+    <string name="feeds_sync_result">Resultado de la sincronización</string>
+    <string name="feeds_sync_success">Correcto</string>
+    <string name="feeds_sync_raw_error">Error original</string>
+    <string name="feeds_sync_now">Sincronizar ahora</string>
+    <string name="feed_err_no_network">Sin red</string>
+    <string name="feed_err_dns">No se pudo resolver el dominio</string>
+    <string name="feed_err_timeout">Tiempo de conexión agotado</string>
+    <string name="feed_err_server">Error del servidor</string>
+    <string name="feed_err_ssl">Error de certificado</string>
+    <string name="feed_err_parse">Formato de fuente no válido</string>
 </resources>

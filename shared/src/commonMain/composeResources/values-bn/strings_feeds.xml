@@ -59,4 +59,20 @@
     <string name="font_size_large">বড়</string>
     <string name="font_size_xlarge">আরও বড়</string>
     <string name="font_size_xxlarge">সবচেয়ে বড়</string>
+    <string name="feeds_sync_failed_n">সিঙ্ক সম্পন্ন হয়েছে, %1$dটি ফিড সিঙ্ক করা যায়নি</string>
+    <string name="feeds_sync_failed_single">এই ফিডের শেষ সিঙ্ক ব্যর্থ হয়েছে: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">ব্যর্থ · %1$s</string>
+    <string name="feeds_sync_retry">আবার চেষ্টা করুন</string>
+    <string name="feeds_sync_retry_all">সব আবার চেষ্টা করুন</string>
+    <string name="feeds_sync_last_synced">শেষ সিঙ্ক</string>
+    <string name="feeds_sync_result">সিঙ্কের ফলাফল</string>
+    <string name="feeds_sync_success">সফল</string>
+    <string name="feeds_sync_raw_error">মূল ত্রুটি</string>
+    <string name="feeds_sync_now">এখনই সিঙ্ক করুন</string>
+    <string name="feed_err_no_network">নেটওয়ার্ক নেই</string>
+    <string name="feed_err_dns">ডোমেন রেজলভ করা যায়নি</string>
+    <string name="feed_err_timeout">সংযোগের সময় শেষ</string>
+    <string name="feed_err_server">সার্ভার ত্রুটি</string>
+    <string name="feed_err_ssl">সার্টিফিকেট ত্রুটি</string>
+    <string name="feed_err_parse">ফিড ফরম্যাট অবৈধ</string>
 </resources>

@@ -59,4 +59,20 @@
     <string name="font_size_large">Large</string>
     <string name="font_size_xlarge">Extra large</string>
     <string name="font_size_xxlarge">Huge</string>
+    <string name="feeds_sync_failed_n">Sync finished, %1$d feeds failed to sync</string>
+    <string name="feeds_sync_failed_single">This feed failed to sync: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Failed · %1$s</string>
+    <string name="feeds_sync_retry">Retry</string>
+    <string name="feeds_sync_retry_all">Retry all</string>
+    <string name="feeds_sync_last_synced">Last synced</string>
+    <string name="feeds_sync_result">Sync result</string>
+    <string name="feeds_sync_success">Success</string>
+    <string name="feeds_sync_raw_error">Raw error</string>
+    <string name="feeds_sync_now">Sync now</string>
+    <string name="feed_err_no_network">No network</string>
+    <string name="feed_err_dns">DNS lookup failed</string>
+    <string name="feed_err_timeout">Connection timed out</string>
+    <string name="feed_err_server">Server error</string>
+    <string name="feed_err_ssl">Certificate error</string>
+    <string name="feed_err_parse">Invalid feed format</string>
 </resources>

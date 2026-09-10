@@ -59,4 +59,20 @@
     <string name="font_size_large">Groot</string>
     <string name="font_size_xlarge">Zeer groot</string>
     <string name="font_size_xxlarge">Maximaal</string>
+    <string name="feeds_sync_failed_n">Synchronisatie voltooid, %1$d feeds niet gesynchroniseerd</string>
+    <string name="feeds_sync_failed_single">Laatste synchronisatie van deze feed mislukt: %1$s</string>
+    <string name="feeds_sync_failed_with_reason">Mislukt · %1$s</string>
+    <string name="feeds_sync_retry">Opnieuw proberen</string>
+    <string name="feeds_sync_retry_all">Alles opnieuw proberen</string>
+    <string name="feeds_sync_last_synced">Laatst gesynchroniseerd</string>
+    <string name="feeds_sync_result">Synchronisatieresultaat</string>
+    <string name="feeds_sync_success">Geslaagd</string>
+    <string name="feeds_sync_raw_error">Originele fout</string>
+    <string name="feeds_sync_now">Nu synchroniseren</string>
+    <string name="feed_err_no_network">Geen netwerk</string>
+    <string name="feed_err_dns">DNS-lookup mislukt</string>
+    <string name="feed_err_timeout">Verbindingstimeout</string>
+    <string name="feed_err_server">Serverfout</string>
+    <string name="feed_err_ssl">Certificaatfout</string>
+    <string name="feed_err_parse">Ongeldig feedformaat</string>
 </resources>

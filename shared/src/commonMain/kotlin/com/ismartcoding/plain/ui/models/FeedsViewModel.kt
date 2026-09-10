@@ -61,6 +61,16 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
         }
     }
 
+    /** Reloads the feed shown in ViewFeedBottomSheet so its sync status card stays fresh. */
+    fun refreshSelectedItemAsync() {
+        val id = selectedItem.value?.id ?: return
+        viewModelScope.launchSafe {
+            val fresh = FeedHelper.getById(id) ?: return@launchSafe
+            fresh.count = selectedItem.value?.count ?: 0
+            selectedItem.value = fresh
+        }
+    }
+
     fun delete(ids: Set<String>) {
         viewModelScope.launchSafe { deleteAsync(ids) }
     }
