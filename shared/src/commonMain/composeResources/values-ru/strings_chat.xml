@@ -21,6 +21,7 @@
     <string name="pair_via_qr_desc">Откройте PlainApp на другом устройстве, нажмите кнопку сканирования и отсканируйте этот QR-код для сопряжения.</string>
     <string name="pair_with_device">Сопряжение с %s</string>
     <string name="confirm_pair_with_device">Вы хотите выполнить сопряжение с %s?</string>
+    <string name="qr_pair_request_sent">Запрос на сопряжение отправлен. Подтвердите его на компьютере.</string>
     <string name="last_seen">Последний раз в сети</string>
     <string name="device_discovered">Устройство обнаружено</string>
     <string name="link_preview_image">Изображение предварительного просмотра ссылки</string>

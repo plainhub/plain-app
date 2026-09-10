@@ -21,6 +21,7 @@
     <string name="pair_via_qr_desc">অন্য ডিভাইসে PlainApp খুলুন, স্ক্যান বোতামে ট্যাপ করুন এবং জোড়া লাগাতে এই QR কোড স্ক্যান করুন।</string>
     <string name="pair_with_device">%s-এর সঙ্গে জোড়া লাগান</string>
     <string name="confirm_pair_with_device">আপনি কি %s-এর সঙ্গে জোড়া লাগাতে চান?</string>
+    <string name="qr_pair_request_sent">পেয়ারিং অনুরোধ পাঠানো হয়েছে। আপনার কম্পিউটারে নিশ্চিত করুন।</string>
     <string name="last_seen">সর্বশেষ দেখা</string>
     <string name="device_discovered">ডিভাইস আবিষ্কৃত</string>
     <string name="link_preview_image">লিঙ্ক প্রিভিউ ছবি</string>

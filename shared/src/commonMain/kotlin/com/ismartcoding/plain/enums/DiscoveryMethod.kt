@@ -6,4 +6,5 @@ import kotlinx.serialization.Serializable
 enum class DiscoveryMethod {
     LAN,
     BLE,
+    QR,
 }

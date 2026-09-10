@@ -571,6 +571,7 @@ enum DeviceType {
 enum DiscoveryMethod {
   LAN
   BLE
+  QR
 }
 
 type DisplayInfo {

@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.discover.PairingInitiator
+import com.ismartcoding.plain.discover.QrPairPayload
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.platform.Permission
@@ -77,7 +79,30 @@ fun ScanPage(navController: NavHostController) {
     var showScanResultSheet by remember { mutableStateOf(false) }
     var scanResult by remember { mutableStateOf("") }
 
+    fun startQrPairing(payload: QrPairPayload) {
+        scope.launch {
+            val title = LocaleHelper.getStringFAsync(Res.string.pair_with_device, payload.name)
+            val message = LocaleHelper.getStringFAsync(Res.string.confirm_pair_with_device, payload.name)
+            DialogHelper.showConfirmDialog(
+                title = title,
+                message = message,
+                confirmButton = Pair(LocaleHelper.getStringAsync(Res.string.confirm)) {
+                    coIO {
+                        PairingInitiator.start(payload.toDevice())
+                        DialogHelper.showSuccess(Res.string.qr_pair_request_sent)
+                    }
+                },
+                dismissButton = Pair(LocaleHelper.getStringAsync(Res.string.cancel)) {},
+            )
+        }
+    }
+
     fun handleScanResult(text: String) {
+        val qrPairPayload = QrPairPayload.parse(text)
+        if (qrPairPayload != null) {
+            startQrPairing(qrPairPayload)
+            return
+        }
         scanResult = text
         addScanResult(scope, text)
         showScanResultSheet = true

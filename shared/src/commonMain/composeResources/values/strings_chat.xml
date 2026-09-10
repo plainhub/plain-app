@@ -21,6 +21,7 @@
     <string name="pair_via_qr_desc">Open PlainApp on another device, tap the scan button, and scan this QR code to pair.</string>
     <string name="pair_with_device">Pair with %s</string>
     <string name="confirm_pair_with_device">Do you want to pair with %s?</string>
+    <string name="qr_pair_request_sent">Pairing request sent. Confirm it on your computer.</string>
     <string name="last_seen">Last seen</string>
     <string name="device_discovered">Device discovered</string>
     <string name="link_preview_image">Link preview image</string>
