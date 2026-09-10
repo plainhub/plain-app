@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.READ_LOGS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
@@ -215,6 +216,12 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
+        <activity
+            android:name="com.ismartcoding.plain.features.ClipboardFloatingActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <service
             android:name=".services.PNotificationListenerService"
             android:exported="true"
@@ -224,6 +231,17 @@
             </intent-filter>
         </service>
 
+
+        <service
+            android:name="com.ismartcoding.plain.features.ClipboardTileService"
+            android:exported="true"
+            android:icon="@drawable/app_icon"
+            android:label="@string/clipboard_sync_tile"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
 
         <service
             android:name=".services.QSTileService"

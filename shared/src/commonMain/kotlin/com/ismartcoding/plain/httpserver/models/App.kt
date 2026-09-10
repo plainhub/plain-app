@@ -29,6 +29,7 @@ data class App(
     val internalStoragePath: String,
     val downloadsDir: String,
     val developerMode: Boolean,
+    val clipboardSync: Boolean,
     val favoriteFolders: List<FavoriteFolder>,
     val debug: Boolean,
 )

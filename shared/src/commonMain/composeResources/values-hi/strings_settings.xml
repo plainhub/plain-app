@@ -152,4 +152,9 @@
     <string name="service_debug">सेवा डीबग</string>
     <string name="service_running">चल रहा है</string>
     <string name="ws_session_count">WebSocket सत्र</string>
+    <string name="clipboard_sync">क्लिपबोर्ड सिंक</string>
+    <string name="clipboard_sync_tips">चालू होने पर, इस फ़ोन पर कॉपी किया गया टेक्स्ट आपके डेस्कटॉप पर सिंक होगा, और डेस्कटॉप पर कॉपी किया गया टेक्स्ट इस फ़ोन पर भेजा जाएगा।</string>
+    <string name="clipboard_history">क्लिपबोर्ड इतिहास</string>
+    <string name="clipboard_source_local">यह डिवाइस</string>
+    <string name="clipboard_sync_tips_dir">हर डेस्कटॉप क्या सिंक करे, यह डेस्कटॉप सेटिंग्स में चुनें।</string>
 </resources>

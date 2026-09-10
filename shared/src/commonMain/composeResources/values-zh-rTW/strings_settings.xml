@@ -151,4 +151,9 @@
     <string name="service_debug">服務除錯</string>
     <string name="service_running">執行中</string>
     <string name="ws_session_count">WebSocket 連線</string>
+    <string name="clipboard_sync">剪貼簿同步</string>
+    <string name="clipboard_sync_tips">開啟後，手機複製的文字會自動同步到電腦；電腦複製的文字也會發到手機剪貼簿。</string>
+    <string name="clipboard_history">剪貼簿歷史</string>
+    <string name="clipboard_source_local">本機</string>
+    <string name="clipboard_sync_tips_dir">每台電腦同步哪些內容，在電腦端設定裡選。</string>
 </resources>

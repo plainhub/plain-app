@@ -151,4 +151,9 @@
     <string name="service_debug">Service-debug</string>
     <string name="service_running">Actief</string>
     <string name="ws_session_count">WebSocket-sessies</string>
+    <string name="clipboard_sync">Klembord synchronisatie</string>
+    <string name="clipboard_sync_tips">Eenmaal aan: tekst die je op dit telefoontoestel kopieert, wordt gesynchroniseerd met je desktops, en tekst die op desktops wordt gekopieerd, wordt naar dit toestel gestuurd.</string>
+    <string name="clipboard_history">Klembordgeschiedenis</string>
+    <string name="clipboard_source_local">Dit apparaat</string>
+    <string name="clipboard_sync_tips_dir">Kies wat elke desktop synchroniseert in de desktopinstellingen.</string>
 </resources>

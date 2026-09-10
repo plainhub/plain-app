@@ -151,4 +151,9 @@
     <string name="service_debug">Dienst-Debug</string>
     <string name="service_running">Läuft</string>
     <string name="ws_session_count">WebSocket-Sitzungen</string>
+    <string name="clipboard_sync">Zwischenablage-Sync</string>
+    <string name="clipboard_sync_tips">Nach dem Aktivieren: Kopierter Text wird automatisch an deine Desktops übertragen, und kopierter Desktop-Text wird an dieses Handy gesendet.</string>
+    <string name="clipboard_history">Zwischenablage-Verlauf</string>
+    <string name="clipboard_source_local">Dieses Gerät</string>
+    <string name="clipboard_sync_tips_dir">Was jeder Desktop synchronisiert, wählst du in den Desktop-Einstellungen.</string>
 </resources>

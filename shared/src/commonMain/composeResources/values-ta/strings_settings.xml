@@ -151,4 +151,9 @@
     <string name="service_debug">சேவை டீபக்</string>
     <string name="service_running">இயங்குகிறது</string>
     <string name="ws_session_count">WebSocket அமர்வுகள்</string>
+    <string name="clipboard_sync">கிளிப்போர்டு ஒத்திசைவு</string>
+    <string name="clipboard_sync_tips">இயக்கியதும், இந்த ஃபோனில் நகலெடுக்கும் உரை உங்கள் டெஸ்க்டாப்களுக்கு ஒத்திசைக்கப்படும், டெஸ்க்டாப்பில் நகலெடுக்கப்படும் உரையும் இந்த ஃபோனுக்கு அனுப்பப்படும்.</string>
+    <string name="clipboard_history">கிளிப்போர்டு வரலாறு</string>
+    <string name="clipboard_source_local">இந்த சாதனம்</string>
+    <string name="clipboard_sync_tips_dir">ஒவ்வொரு டெஸ்க்டாப் எதை ஒத்திசைக்கும் என்பதை டெஸ்க்டாப் அமைப்புகளில் தேர்ந்தெடுக்கவும்.</string>
 </resources>

@@ -151,4 +151,9 @@
     <string name="service_debug">Gỡ lỗi dịch vụ</string>
     <string name="service_running">Đang chạy</string>
     <string name="ws_session_count">Phiên WebSocket</string>
+    <string name="clipboard_sync">Đồng bộ clipboard</string>
+    <string name="clipboard_sync_tips">Khi bật, văn bản bạn sao chép trên điện thoại sẽ tự động đồng bộ với các desktop, và văn bản sao chép trên desktop cũng được gửi về điện thoại này.</string>
+    <string name="clipboard_history">Lịch sử clipboard</string>
+    <string name="clipboard_source_local">Thiết bị này</string>
+    <string name="clipboard_sync_tips_dir">Chọn mỗi desktop đồng bộ nội dung gì trong phần cài đặt phía desktop.</string>
 </resources>

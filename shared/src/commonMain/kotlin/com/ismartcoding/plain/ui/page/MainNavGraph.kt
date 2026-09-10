@@ -97,6 +97,7 @@ import com.ismartcoding.plain.ui.page.shares.EditSharePage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.web.HowToUsePage
+import com.ismartcoding.plain.ui.page.web.ClipboardHistoryPage
 import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
 import com.ismartcoding.plain.ui.page.web.ReplaceSslCertificatePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
@@ -164,6 +165,7 @@ fun MainNavGraph(
         composable<Routing.DesktopAccessSettings> { DesktopAccessSettingsPage(navController) }
         composable<Routing.CustomFeatures> { HomeFeaturesSelectionPage(navController) }
         composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }
+        composable<Routing.ClipboardHistory> { ClipboardHistoryPage(navController) }
         composable<Routing.Connections> { ConnectionsPage(navController) }
         composable<Routing.ApiTokenTips> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.ApiTokenTips>()

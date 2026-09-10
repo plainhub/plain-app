@@ -31,6 +31,9 @@ class Routing {
     object NotificationSettings
 
     @Serializable
+    object ClipboardHistory
+
+    @Serializable
     object WebSecurity
 
     @Serializable

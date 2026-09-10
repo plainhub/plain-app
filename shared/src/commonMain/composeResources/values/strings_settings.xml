@@ -152,4 +152,9 @@
     <string name="aware_service">Aware Service</string>
     <string name="aware_attach_status">Attach Status</string>
     <string name="aware_discovered_peer_count">Discovered Peers</string>
+    <string name="clipboard_sync">Clipboard sync</string>
+    <string name="clipboard_sync_tips">Once on, text you copy on this phone syncs to your desktops, and text copied on desktops is sent to this phone.</string>
+    <string name="clipboard_history">Clipboard history</string>
+    <string name="clipboard_source_local">This device</string>
+    <string name="clipboard_sync_tips_dir">Choose what each desktop syncs in the desktop settings.</string>
 </resources>

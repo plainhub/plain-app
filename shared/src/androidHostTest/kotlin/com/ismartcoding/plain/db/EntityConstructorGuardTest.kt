@@ -27,10 +27,10 @@ class EntityConstructorGuardTest {
     private val entities: List<KClass<*>> = listOf(
         DAppFile::class, DArchivedConversation::class, DBook::class, DBookChapter::class,
         DBookmark::class, DBookmarkGroup::class, DChat::class, DChatChannel::class,
-        DFeed::class, DFeedEntry::class, DImageEditorProject::class, DImageEmbedding::class,
-        DMediaItem::class, DNote::class, DPeer::class, DPomodoroItem::class,
-        DSession::class, DShare::class, DTag::class, DTagRelation::class,
-        DVideoPlayProgress::class,
+        DClipboard::class, DFeed::class, DFeedEntry::class, DImageEditorProject::class,
+        DImageEmbedding::class, DMediaItem::class, DNote::class, DPeer::class,
+        DPomodoroItem::class, DSession::class, DShare::class, DTag::class,
+        DTagRelation::class, DVideoPlayProgress::class,
     )
 
     @Test

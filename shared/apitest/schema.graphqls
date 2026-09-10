@@ -67,6 +67,8 @@ type Query {
   dbTableInfo(table: String!): DbTableInfo!
   videoCount(query: String!): Int!
   videos(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Video!]!
+  clipboard(offset: Int!, limit: Int!, query: String!): [Clipboard!]!
+  clipboardCount(query: String!): Int!
   bookmarks: [Bookmark!]!
   bookmarkGroups: [BookmarkGroup!]!
   mounts: [StorageMount!]!
@@ -186,6 +188,8 @@ type Mutation {
   installPackage(path: String!): PackageInstallPending!
   createDbTableRow(table: String!, row: String!): Boolean!
   deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
+  setClipboard(text: String!): Boolean!
+  cancelClipboard(ids: [ID!]!): Boolean!
   addBookmarks(urls: [String!]!, groupId: String!): [Bookmark!]!
   updateBookmark(id: ID!, input: BookmarkInput!): Bookmark
   deleteBookmarks(ids: [ID!]!): Boolean!
@@ -243,6 +247,7 @@ type App {
   internalStoragePath: String!
   downloadsDir: String!
   developerMode: Boolean!
+  clipboardSync: Boolean!
   favoriteFolders: [FavoriteFolder!]!
   debug: Boolean!
 }
@@ -427,6 +432,15 @@ enum ChatStatus {
   PARTIAL
   FAILED
   PENDING
+}
+
+type Clipboard {
+  id: ID!
+  text: String!
+  source: String!
+  label: String!
+  sensitive: Boolean!
+  createdAt: Instant!
 }
 
 type Contact {

@@ -113,6 +113,8 @@ class PowerDisconnectedEvent : ChannelEvent()
 class WebRequestReceivedEvent : ChannelEvent()
 data class KeepAwakeChangedEvent(val enabled: Boolean) : ChannelEvent()
 
+data class ClipboardSyncChangedEvent(val enabled: Boolean) : ChannelEvent()
+
 class IgnoreBatteryOptimizationResultEvent : ChannelEvent()
 
 class ClearAudioPlaylistEvent : ChannelEvent()

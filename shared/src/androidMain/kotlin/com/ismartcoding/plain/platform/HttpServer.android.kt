@@ -7,6 +7,7 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
+import com.ismartcoding.plain.features.ClipboardWatcher
 import com.ismartcoding.plain.features.sms.SmsProviderObserver
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.lib.coIO
@@ -110,6 +111,7 @@ actual suspend fun onHttpServerStarted() {
     NsdHelper.registerServices(TempData.httpPort.value, TempData.httpsPort.value)
     PNotificationListenerService.toggle(service, Permission.NOTIFICATION_LISTENER.isEnabledAsync())
     SmsProviderObserver.start(service)
+    ClipboardWatcher.start()
     SmsHelper.restoreSmsSendTracking()
     PeerStatusManager.start()
 }
@@ -123,6 +125,7 @@ actual suspend fun onHttpServerStopped() {
     NsdHelper.unregisterService()
     PeerStatusManager.stop()
     SmsProviderObserver.stop()
+    ClipboardWatcher.stop()
     SmsHelper.stopSmsSendTracking()
     cancelMmsPolling()
     HttpServerService.instance?.let { PNotificationListenerService.toggle(it, false) }

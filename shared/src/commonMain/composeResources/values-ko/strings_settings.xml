@@ -151,4 +151,9 @@
     <string name="service_debug">서비스 디버그</string>
     <string name="service_running">실행 중</string>
     <string name="ws_session_count">WebSocket 세션</string>
+    <string name="clipboard_sync">클립보드 동기화</string>
+    <string name="clipboard_sync_tips">켜면 이 휴대전화에서 복사한 텍스트가 데스크톱에 자동 동기화되고, 데스크톱에서 복사한 텍스트도 이 휴대전화로 전송됩니다.</string>
+    <string name="clipboard_history">클립보드 기록</string>
+    <string name="clipboard_source_local">이 기기</string>
+    <string name="clipboard_sync_tips_dir">각 데스크톱이 무엇을 동기화할지는 데스크톱 설정에서 선택하세요.</string>
 </resources>

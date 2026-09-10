@@ -14,6 +14,7 @@ data class WebSettings(
     val authDevToken: String,
     val adbToken: String,
     val keepAwake: Boolean,
+    val clipboardSync: Boolean,
     val apiPermissions: Set<String>,
     val rotateUrlTokenOnRestart: Boolean,
 )
@@ -25,6 +26,7 @@ val LocalApiPermissions = compositionLocalOf { ApiPermissionsPreference.default 
 val LocalAuthDevToken = compositionLocalOf { AuthDevTokenPreference.default }
 val LocalAdbToken = compositionLocalOf { AdbTokenPreference.default }
 val LocalKeepAwake = compositionLocalOf { KeepAwakePreference.default }
+val LocalClipboardSync = compositionLocalOf { ClipboardSyncPreference.default }
 val LocalRotateUrlTokenOnRestart = compositionLocalOf { RotateUrlTokenOnRestartPreference.default }
 
 @Composable
@@ -37,6 +39,7 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
             authDevToken = AuthDevTokenPreference.default,
             adbToken = AdbTokenPreference.default,
             keepAwake = KeepAwakePreference.default,
+            clipboardSync = ClipboardSyncPreference.default,
             apiPermissions = ApiPermissionsPreference.default,
             rotateUrlTokenOnRestart = RotateUrlTokenOnRestartPreference.default,
         )
@@ -50,6 +53,7 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
                     authDevToken = AuthDevTokenPreference.get(it),
                     adbToken = AdbTokenPreference.get(it),
                     keepAwake = KeepAwakePreference.get(it),
+                    clipboardSync = ClipboardSyncPreference.get(it),
                     apiPermissions = ApiPermissionsPreference.get(it),
                     rotateUrlTokenOnRestart = RotateUrlTokenOnRestartPreference.get(it),
                 )
@@ -65,6 +69,7 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
         LocalAuthDevToken provides settings.authDevToken,
         LocalAdbToken provides settings.adbToken,
         LocalKeepAwake provides settings.keepAwake,
+        LocalClipboardSync provides settings.clipboardSync,
         LocalApiPermissions provides settings.apiPermissions,
         LocalRotateUrlTokenOnRestart provides settings.rotateUrlTokenOnRestart,
     ) {

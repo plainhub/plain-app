@@ -151,4 +151,9 @@
     <string name="service_debug">Depuración de servicios</string>
     <string name="service_running">En ejecución</string>
     <string name="ws_session_count">Sesiones WebSocket</string>
+    <string name="clipboard_sync">Sincronización del portapapeles</string>
+    <string name="clipboard_sync_tips">Una vez activado, el texto que copies en este teléfono se sincroniza con tus escritorios, y el texto copiado en los escritorios se envía a este teléfono.</string>
+    <string name="clipboard_history">Historial del portapapeles</string>
+    <string name="clipboard_source_local">Este dispositivo</string>
+    <string name="clipboard_sync_tips_dir">Elige qué sincroniza cada escritorio en los ajustes del escritorio.</string>
 </resources>

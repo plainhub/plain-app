@@ -6,11 +6,13 @@ import com.ismartcoding.plain.i18n.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
+import com.ismartcoding.plain.events.ClipboardSyncChangedEvent
 import com.ismartcoding.plain.events.KeepAwakeChangedEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.checkHttpServerAsync
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.relaunchApp
+import com.ismartcoding.plain.preferences.ClipboardSyncPreference
 import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
@@ -45,6 +47,13 @@ class DesktopAccessSettingsViewModel : ViewModel() {
         viewModelScope.launchSafe {
             KeepAwakePreference.putAsync(enable)
             sendEvent(KeepAwakeChangedEvent(enable))
+        }
+    }
+
+    fun enableClipboardSync(enable: Boolean) {
+        viewModelScope.launchSafe {
+            ClipboardSyncPreference.putAsync(enable)
+            sendEvent(ClipboardSyncChangedEvent(enable))
         }
     }
 }

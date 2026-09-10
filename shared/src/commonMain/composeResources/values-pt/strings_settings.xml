@@ -151,4 +151,9 @@
     <string name="service_debug">Depuração de serviços</string>
     <string name="service_running">Em execução</string>
     <string name="ws_session_count">Sessões WebSocket</string>
+    <string name="clipboard_sync">Sincronização da área de transferência</string>
+    <string name="clipboard_sync_tips">Depois de ativar, o texto copiado neste celular será sincronizado com seus desktops, e o texto copiado nos desktops será enviado para este celular.</string>
+    <string name="clipboard_history">Histórico da área de transferência</string>
+    <string name="clipboard_source_local">Este dispositivo</string>
+    <string name="clipboard_sync_tips_dir">Escolha o que cada desktop sincroniza nas configurações do desktop.</string>
 </resources>

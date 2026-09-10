@@ -151,4 +151,9 @@
     <string name="service_debug">Débogage des services</string>
     <string name="service_running">En cours d'exécution</string>
     <string name="ws_session_count">Sessions WebSocket</string>
+    <string name="clipboard_sync">Synchro du presse-papiers</string>
+    <string name="clipboard_sync_tips">Une fois activé, le texte copié sur ce téléphone est synchronisé avec vos bureaux, et le texte copié sur les bureaux est envoyé vers ce téléphone.</string>
+    <string name="clipboard_history">Historique du presse-papiers</string>
+    <string name="clipboard_source_local">Cet appareil</string>
+    <string name="clipboard_sync_tips_dir">Choisissez ce que chaque bureau synchronise dans les réglages du bureau.</string>
 </resources>

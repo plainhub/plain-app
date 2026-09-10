@@ -27,6 +27,7 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.openBatteryOptimizationSettings
 import com.ismartcoding.plain.preferences.LocalApiPermissions
+import com.ismartcoding.plain.preferences.LocalClipboardSync
 import com.ismartcoding.plain.preferences.LocalKeepAwake
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -50,6 +51,7 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }) {
         WebSettingsProvider {
             val keepAwake = LocalKeepAwake.current
+            val clipboardSync = LocalClipboardSync.current
         val scope = rememberCoroutineScope()
         val enabledPermissions = LocalApiPermissions.current
         val permissionList = remember { mutableStateOf(getWebList()) }
@@ -120,6 +122,22 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                                 )
                             }
                         }
+                    }
+                }
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                        PListItem(
+                            modifier = Modifier.clickable { navController.navigate(Routing.ClipboardHistory) },
+                            icon = Res.drawable.content_paste, title = stringResource(Res.string.clipboard_sync),
+                            separatedActions = true
+                        ) {
+                            PSwitch(activated = clipboardSync) { enable -> webVM.enableClipboardSync(enable) }
+                            HorizontalSpace(8.dp)
+                        }
+                    }
+                    if (clipboardSync) {
+                        Tips(stringResource(Res.string.clipboard_sync_tips))
                     }
                 }
                 item {

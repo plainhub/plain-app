@@ -25,6 +25,7 @@ fun SchemaBuilder.applyMainSchema() {
     addContactSchema()
     addCallSchema()
     addPackageSchema()
+    addClipboardSchema()
     addFileQuerySchema()
     addFileUploadSchema()
     addFileMutationSchema()

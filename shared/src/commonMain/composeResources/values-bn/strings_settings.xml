@@ -151,4 +151,9 @@
     <string name="service_debug">পরিষেবা ডিবাগ</string>
     <string name="service_running">চলছে</string>
     <string name="ws_session_count">WebSocket সেশন</string>
+    <string name="clipboard_sync">ক্লিপবোর্ড সিঙ্ক</string>
+    <string name="clipboard_sync_tips">চালু করলে, এই ফোনে কপি করা টেক্সট আপনার ডেস্কটপে স্বয়ংক্রিয়ভাবে সিঙ্ক হবে, এবং ডেস্কটপে কপি করা টেক্সটও এই ফোনে পাঠানো হবে।</string>
+    <string name="clipboard_history">ক্লিপবোর্ড ইতিহাস</string>
+    <string name="clipboard_source_local">এই ডিভাইস</string>
+    <string name="clipboard_sync_tips_dir">কোন ডেস্কটপ কী সিঙ্ক করবে তা ডেস্কটপের সেটিংসে বেছে নিন।</string>
 </resources>

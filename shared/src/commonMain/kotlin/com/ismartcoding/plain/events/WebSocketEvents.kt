@@ -68,6 +68,7 @@ enum class EventType(val value: Int) {
     SMS_SEND_RESULT(36),
     MMS_SEND_RESULT(37),
     UPLOAD_MERGE_RESULT(38),
+    CLIPBOARD_CHANGED(39),
 }
 
 
@@ -82,6 +83,14 @@ data class PomodoroActionData(
 data class PeerStatusData(
     val id: String,
     val online: Boolean,
+)
+
+// Payload of CLIPBOARD_CHANGED — docs/clipboard-sync.md (plain-desktop).
+@Serializable
+data class ClipboardChangedData(
+    val text: String,
+    val sensitive: Boolean,
+    val time: Long,
 )
 
 // Payload of UPLOAD_MERGE_RESULT — mirrors the desktop local server contract

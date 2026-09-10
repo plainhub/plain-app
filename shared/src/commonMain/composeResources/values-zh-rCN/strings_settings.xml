@@ -151,4 +151,9 @@
     <string name="aware_service">Aware 服务</string>
     <string name="aware_attach_status">Attach 状态</string>
     <string name="aware_discovered_peer_count">已发现对端数</string>
+    <string name="clipboard_sync">剪贴板同步</string>
+    <string name="clipboard_sync_tips">开启后，手机复制的文字会自动同步到电脑；电脑复制的文字也会发到手机剪贴板。</string>
+    <string name="clipboard_history">剪贴板历史</string>
+    <string name="clipboard_source_local">本机</string>
+    <string name="clipboard_sync_tips_dir">每台电脑同步哪些内容，在电脑端设置里选。</string>
 </resources>

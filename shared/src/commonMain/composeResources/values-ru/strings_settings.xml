@@ -151,4 +151,9 @@
     <string name="service_debug">Отладка служб</string>
     <string name="service_running">Работает</string>
     <string name="ws_session_count">Сессии WebSocket</string>
+    <string name="clipboard_sync">Синхронизация буфера обмена</string>
+    <string name="clipboard_sync_tips">После включения текст, скопированный на этом телефоне, автоматически синхронизируется с вашими десктопами, а текст, скопированный на десктопах, отправляется на этот телефон.</string>
+    <string name="clipboard_history">История буфера обмена</string>
+    <string name="clipboard_source_local">Это устройство</string>
+    <string name="clipboard_sync_tips_dir">Что синхронизирует каждый десктоп, выбирается в его настройках.</string>
 </resources>

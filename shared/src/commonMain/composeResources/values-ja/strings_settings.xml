@@ -151,4 +151,9 @@
     <string name="service_debug">サービスデバッグ</string>
     <string name="service_running">実行中</string>
     <string name="ws_session_count">WebSocket セッション</string>
+    <string name="clipboard_sync">クリップボード同期</string>
+    <string name="clipboard_sync_tips">オンにすると、この端末でコピーしたテキストはデスクトップに自動同期され、デスクトップでコピーしたテキストもこの端末に送られます。</string>
+    <string name="clipboard_history">クリップボード履歴</string>
+    <string name="clipboard_source_local">この端末</string>
+    <string name="clipboard_sync_tips_dir">各デスクトップが同期する内容は、デスクトップ側の設定で選べます。</string>
 </resources>

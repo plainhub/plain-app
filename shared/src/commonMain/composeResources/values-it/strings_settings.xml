@@ -151,4 +151,9 @@
     <string name="service_debug">Debug servizi</string>
     <string name="service_running">In esecuzione</string>
     <string name="ws_session_count">Sessioni WebSocket</string>
+    <string name="clipboard_sync">Sincronizzazione appunti</string>
+    <string name="clipboard_sync_tips">Una volta attivo, il testo copiato su questo telefono si sincronizza con i tuoi desktop, e il testo copiato sui desktop viene inviato a questo telefono.</string>
+    <string name="clipboard_history">Cronologia appunti</string>
+    <string name="clipboard_source_local">Questo dispositivo</string>
+    <string name="clipboard_sync_tips_dir">Scegli cosa sincronizza ogni desktop nelle impostazioni del desktop.</string>
 </resources>
