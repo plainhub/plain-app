@@ -1,1 +1,0 @@
-import{On as e,k as t,mt as n,v as r}from"./runtime-core.esm-bundler-DrnlzXx3.js";import{l as i}from"./pause-rounded-DL9fujWC.js";import{L as a}from"./query-3j5Qtb97.js";import{t as o}from"./MediaSidebar-COmv8t6U.js";var s=t({__name:`ImagesSidebar`,setup(t){return(t,s)=>{let c=o;return n(),r(c,{type:e(i).IMAGE,gql:e(a)},null,8,[`type`,`gql`])}}});export{s as default};

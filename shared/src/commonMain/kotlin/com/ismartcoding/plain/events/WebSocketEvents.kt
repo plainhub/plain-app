@@ -67,6 +67,7 @@ enum class EventType(val value: Int) {
     SMS_PROVIDER_CHANGED(35),
     SMS_SEND_RESULT(36),
     MMS_SEND_RESULT(37),
+    UPLOAD_MERGE_RESULT(38),
 }
 
 
@@ -81,6 +82,17 @@ data class PomodoroActionData(
 data class PeerStatusData(
     val id: String,
     val online: Boolean,
+)
+
+// Payload of UPLOAD_MERGE_RESULT — mirrors the desktop local server contract
+// (docs/upload-async-merge.md in plain-desktop).
+@Serializable
+data class UploadMergeResultData(
+    val fileId: String,
+    val ok: Boolean,
+    val value: String? = null,
+    val mergedSize: Long? = null,
+    val error: String? = null,
 )
 
 @Serializable

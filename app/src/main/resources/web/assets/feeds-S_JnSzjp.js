@@ -1,1 +1,0 @@
-import{t as e}from"./router-BNjF3xOE.js";import{s as t}from"./strutil-6bdgY2kj.js";import{t as n}from"./search-CXiIZQzz.js";var r=r=>({viewAll:()=>{e(r,`/feeds`)},viewFeed:i=>{e(r,`/feeds?q=${t(n([{name:`feed_id`,op:``,value:i.id}]))}`)},viewToday:()=>{e(r,`/feeds?q=${t(n([{name:`today`,op:``,value:`true`}]))}`)}});export{r as t};
