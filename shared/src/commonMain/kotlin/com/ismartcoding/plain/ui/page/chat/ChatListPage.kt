@@ -53,7 +53,7 @@ import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -148,7 +148,7 @@ fun ChatListPage(
                             description = stringResource(Res.string.plainapp_service_required_for_chat),
                             AlertType.WARNING
                         ) {
-                            PFilledButton(
+                            PTextButton(
                                 text = stringResource(Res.string.start_service),
                                 buttonSize = ButtonSize.SMALL,
                                 onClick = {
@@ -162,7 +162,7 @@ fun ChatListPage(
                         description = stringResource(Res.string.nearby_wifi_devices_required_for_chat),
                         type = AlertType.WARNING,
                     ) {
-                        PFilledButton(
+                        PTextButton(
                             text = stringResource(Res.string.grant_permission),
                             buttonSize = ButtonSize.SMALL,
                             onClick = {

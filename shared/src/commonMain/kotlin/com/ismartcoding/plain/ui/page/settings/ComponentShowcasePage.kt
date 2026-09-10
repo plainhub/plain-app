@@ -29,6 +29,7 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -70,8 +71,10 @@ private fun ShowcaseAlerts() {
     VerticalSpace(8.dp)
     PAlert(description = "This is an error alert.", type = AlertType.ERROR)
     VerticalSpace(8.dp)
+    PAlert(description = "This is an info alert.", type = AlertType.INFO)
+    VerticalSpace(8.dp)
     PAlert(description = "Alert with action.", type = AlertType.WARNING) {
-        POutlinedButton(text = "Fix Now", buttonSize = ButtonSize.SMALL, onClick = {})
+        PTextButton(text = "Fix Now", buttonSize = ButtonSize.SMALL, onClick = {})
     }
     VerticalSpace(16.dp)
 }

@@ -52,7 +52,7 @@ import com.ismartcoding.plain.preferences.HttpsPortPreference
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -191,7 +191,7 @@ fun HomePage(
                                 description = stringResource(Res.string.system_alert_window_warning),
                                 AlertType.WARNING,
                             ) {
-                                PFilledButton(
+                                PTextButton(
                                     text = stringResource(Res.string.grant_permission),
                                     buttonSize = ButtonSize.SMALL,
                                     onClick = {

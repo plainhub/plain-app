@@ -32,6 +32,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -73,7 +74,7 @@ fun DlnaReceiverPage(navController: NavHostController) {
                         description = startError,
                         type = AlertType.ERROR,
                         actions = {
-                            PFilledButton(
+                            PTextButton(
                                 stringResource(Res.string.retry),
                                 buttonSize = ButtonSize.SMALL,
                                 isLoading = isRetrying,

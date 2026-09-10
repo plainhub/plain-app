@@ -40,7 +40,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -112,7 +112,7 @@ fun NearbyPage(
                         description = description,
                         AlertType.WARNING,
                     ) {
-                        PFilledButton(
+                        PTextButton(
                             text = stringResource(
                                 when {
                                     openSettings -> Res.string.open_settings
