@@ -11,23 +11,24 @@ import android.media.AudioRecord
 import android.media.MediaCodec
 import android.media.MediaFormat
 import android.media.projection.MediaProjection
-import android.os.Build
 import android.util.Log
 import com.ismartcoding.plain.platform.isQPlus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.nio.ByteBuffer
 
 /**
  * System audio (playback-capture). PCM frames are fed into MediaCodec Opus
  * encoder; onEncoded delivers opus packets.
  *
- * Replaces AudioPlaybackCapture (the WebRTC-internal AudioRecord swap hack).
+ * Threading contract: [codec] and [record] are owned exclusively by the single
+ * [loop] coroutine — the only place they are ever touched. stop() only cancels
+ * the scope; actual release happens in the scope's completion handler, which
+ * kotlinx.coroutines runs strictly after the loop has exited. No concurrent
+ * codec access is possible, so teardown needs no join, timeout or retry.
  */
 class MediaCodecAudioEncoder(
     private val context: Context,
@@ -38,16 +39,20 @@ class MediaCodecAudioEncoder(
 ) {
     companion object {
         private const val TAG = "MirrorAudio"
-        const val MIME = "audio/opus"
+        private const val MIME = "audio/opus"
+        private const val IDLE_POLL_MS = 10L
     }
 
+    private val scopeJob = SupervisorJob()
+    private val scope = CoroutineScope(scopeJob + Dispatchers.IO)
     private var codec: MediaCodec? = null
     private var record: AudioRecord? = null
-    private var inputThread: Job? = null
-    private var outputThread: Job? = null
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     var onEncoded: ((opusBytes: ByteArray, pts: Long) -> Unit)? = null
+
+    init {
+        scopeJob.invokeOnCompletion { releaseResources() }
+    }
 
     @SuppressLint("MissingPermission")
     fun start() {
@@ -84,7 +89,6 @@ class MediaCodecAudioEncoder(
             ar.release()
             return
         }
-        record = ar
 
         val format = MediaFormat.createAudioFormat(MIME, sampleRate, channelCount).apply {
             setInteger(MediaFormat.KEY_BIT_RATE, bitrateBps)
@@ -95,100 +99,95 @@ class MediaCodecAudioEncoder(
         } catch (e: Exception) {
             Log.e(TAG, "Opus encoder not available: ${e.message}")
             ar.release()
-            record = null
             return
         }
         c.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         c.start()
+        if (scopeJob.isCancelled) {
+            // stop() raced start(); publish then let the idempotent release clean up
+            codec = c
+            record = ar
+            releaseResources()
+            return
+        }
+        record = ar
         codec = c
         ar.startRecording()
         Log.d(TAG, "started ${sampleRate}Hz ${channelCount}ch ${bitrateBps / 1000}kbps opus")
-        inputThread = scope.launch { feedLoop(ar, bufferSize) }
-        outputThread = scope.launch { drainLoop() }
+        scope.launch { loop(ar, c, bufferSize) }
     }
 
     fun stop() {
-        inputThread?.cancel(); inputThread = null
-        outputThread?.cancel(); outputThread = null
+        scopeJob.cancel()
+        Log.d(TAG, "stopped")
+    }
+
+    /**
+     * Sole owner of [ar] and [c]. Greedy non-blocking feed + drain in one
+     * thread (same shape as the Mp4Helper transcode loop). All blocking waits
+     * are bounded: [AudioRecord.READ_NON_BLOCKING] returns immediately, codec
+     * dequeues use 0us timeouts, and idle backoff is [IDLE_POLL_MS] — so the
+     * coroutine observes cancellation within one poll cycle and exits.
+     */
+    private suspend fun loop(ar: AudioRecord, c: MediaCodec, bufferSize: Int) {
+        val pcm = ByteArray(bufferSize)
+        val info = MediaCodec.BufferInfo()
+        val bytesPerSecond = sampleRate * channelCount * 2L
+        var offset = 0
+        var pending = 0
+        var fedBytes = 0L
+        while (scope.isActive) {
+            try {
+                var progressed = false
+                if (pending == 0) {
+                    val read = ar.read(pcm, 0, pcm.size, AudioRecord.READ_NON_BLOCKING)
+                    if (read < 0) return
+                    offset = 0
+                    pending = read
+                }
+                while (pending > 0) {
+                    val idx = c.dequeueInputBuffer(0)
+                    if (idx < 0) break
+                    val inBuf = c.getInputBuffer(idx) ?: break
+                    val chunk = minOf(pending, inBuf.remaining())
+                    inBuf.put(pcm, offset, chunk)
+                    c.queueInputBuffer(idx, 0, chunk, fedBytes * 1_000_000L / bytesPerSecond, 0)
+                    fedBytes += chunk
+                    offset += chunk
+                    pending -= chunk
+                    progressed = true
+                }
+                while (true) {
+                    val idx = c.dequeueOutputBuffer(info, 0)
+                    when {
+                        idx == MediaCodec.INFO_TRY_AGAIN_LATER -> break
+                        idx == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> progressed = true
+                        idx >= 0 -> {
+                            val buf = c.getOutputBuffer(idx)
+                            if (buf != null && info.size > 0 && info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0) {
+                                val data = ByteArray(info.size)
+                                buf.position(info.offset)
+                                buf.get(data, 0, info.size)
+                                onEncoded?.invoke(data, info.presentationTimeUs)
+                            }
+                            c.releaseOutputBuffer(idx, false)
+                            if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return
+                            progressed = true
+                        }
+                    }
+                }
+                if (!progressed) delay(IDLE_POLL_MS)
+            } catch (e: IllegalStateException) {
+                // codec or record failed internally; exit and let release happen via scope completion
+                return
+            }
+        }
+    }
+
+    private fun releaseResources() {
         try { codec?.release() } catch (_: Exception) {}
         codec = null
         try { record?.release() } catch (_: Exception) {}
         record = null
-        scope.cancel()
-        Log.d(TAG, "stopped")
-    }
-
-    private suspend fun feedLoop(ar: AudioRecord, bufferSize: Int) {
-        val pcm = ByteArray(bufferSize)
-        var pts = 0L
-        val frameUs = (bufferSize * 1_000_000L) / (sampleRate * channelCount * 2)
-        while (scope.isActive) {
-            val c = codec ?: return
-            val read = try {
-                ar.read(pcm, 0, pcm.size)
-            } catch (e: IllegalStateException) {
-                return
-            }
-            if (read <= 0) return
-            var offset = 0
-            while (offset < read) {
-                val idx = try {
-                    c.dequeueInputBuffer(10_000)
-                } catch (e: IllegalStateException) {
-                    return
-                }
-                if (idx < 0) break
-                val inBuf: ByteBuffer = c.getInputBuffer(idx) ?: break
-                val chunk = minOf(read - offset, inBuf.remaining())
-                inBuf.put(pcm, offset, chunk)
-                try {
-                    c.queueInputBuffer(idx, 0, chunk, pts, 0)
-                } catch (e: IllegalStateException) {
-                    return
-                }
-                offset += chunk
-                pts += frameUs
-            }
-        }
-    }
-
-    private suspend fun drainLoop() {
-        val info = MediaCodec.BufferInfo()
-        while (scope.isActive) {
-            val c = codec ?: return
-            val idx = try {
-                c.dequeueOutputBuffer(info, 10_000)
-            } catch (e: IllegalStateException) {
-                return
-            } catch (e: Exception) {
-                Log.e(TAG, "drain failed: ${e.message}")
-                return
-            }
-            when {
-                idx == MediaCodec.INFO_TRY_AGAIN_LATER -> Unit
-                idx == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
-                    Log.d(TAG, "output format changed: ${c.outputFormat}")
-                }
-                idx >= 0 -> {
-                    val buf = try {
-                        c.getOutputBuffer(idx)
-                    } catch (e: IllegalStateException) {
-                        return
-                    } ?: continue
-                    if (info.size > 0 && info.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG == 0) {
-                        val data = ByteArray(info.size)
-                        buf.position(info.offset)
-                        buf.get(data, 0, info.size)
-                        onEncoded?.invoke(data, info.presentationTimeUs)
-                    }
-                    try {
-                        c.releaseOutputBuffer(idx, false)
-                    } catch (e: IllegalStateException) {
-                        return
-                    }
-                    if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) return
-                }
-            }
-        }
     }
 }
