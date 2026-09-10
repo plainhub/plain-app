@@ -157,6 +157,16 @@ actual suspend fun deleteMedia(dataType: DataType, ids: Set<String>, fromTrash: 
     }
 }
 
+actual suspend fun moveMedia(dataType: DataType, ids: Set<String>, destDir: String): Boolean {
+    return when (dataType) {
+        DataType.AUDIO -> AudioMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
+        DataType.DOC -> DocMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
+        DataType.IMAGE -> ImageMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
+        DataType.VIDEO -> VideoMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
+        else -> false
+    }
+}
+
 actual suspend fun getDocExtGroups(query: String): List<Pair<String, Int>> =
     DocMediaStoreHelper.getDocExtGroupsAsync(appContext, query)
 

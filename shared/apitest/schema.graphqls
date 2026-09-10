@@ -158,6 +158,7 @@ type Mutation {
   deleteMediaItems(type: DataType!, query: String!): ActionResult!
   trashMediaItems(type: DataType!, query: String!): ActionResult!
   restoreMediaItems(type: DataType!, query: String!): ActionResult!
+  moveMediaItems(type: DataType!, query: String!, destDir: String!): ActionResult!
   setTempValue(key: String!, value: String!): TempValue!
   relaunchApp: Boolean!
   openAccessibilitySettings: Boolean!

@@ -8,6 +8,7 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.deleteMedia
@@ -18,6 +19,8 @@ import com.ismartcoding.plain.platform.getTrashedMediaIds
 import com.ismartcoding.plain.platform.restoreMedia
 import com.ismartcoding.plain.platform.trashMedia
 import com.ismartcoding.plain.platform.enqueueRemoveImageIndex
+import com.ismartcoding.plain.platform.moveMedia
+import com.ismartcoding.plain.helpers.FilePathValidator
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.preferences.VideoPlaylistPreference
 import com.ismartcoding.plain.httpserver.models.ActionResult
@@ -90,6 +93,21 @@ suspend fun restoreMediaItems(type: DataType, query: String): ActionResult {
         enqueueRemoveImageIndex(ids)
     }
     restoreMedia(type, ids)
+    return ActionResult(type, query)
+}
+
+@GraphQLMutation
+suspend fun moveMediaItems(type: DataType, query: String, destDir: String): ActionResult {
+    Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
+    FilePathValidator.requireAllSafe(listOf(destDir))
+    val ids = getMediaIds(type, query)
+    if (ids.isEmpty()) {
+        return ActionResult(type, query)
+    }
+    if (type == DataType.IMAGE) {
+        enqueueRemoveImageIndex(ids)
+    }
+    moveMedia(type, ids, destDir)
     return ActionResult(type, query)
 }
 

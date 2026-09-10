@@ -17,10 +17,13 @@ import com.ismartcoding.plain.lib.extensions.getPagingCursor
 import com.ismartcoding.plain.lib.extensions.getSearchCursor
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.map
+import com.ismartcoding.plain.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.lib.extensions.toSortName
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.platform.getNewPath
+import com.ismartcoding.plain.platform.moveFileOrDir
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.helpers.QueryHelper
@@ -173,6 +176,48 @@ abstract class BaseMediaContentHelper {
         }
 
         return paths
+    }
+
+    /**
+     * Move media files identified by [ids] into the directory [destDir].
+     * The destination directory is created if missing; files already in [destDir]
+     * are skipped. After each successful move, the old and new paths are scanned
+     * so MediaStore picks up the change. Returns true when all items moved.
+     */
+    suspend fun moveByIdsAsync(
+        context: Context,
+        ids: Set<String>,
+        destDir: String,
+    ): Boolean = withIO {
+        val dest = File(destDir)
+        if (!dest.isDirectory && !dest.mkdirs()) {
+            LogCat.w("Failed to create destination directory: $destDir")
+            return@withIO false
+        }
+        var allOk = true
+        val projection = arrayOf(BaseColumns._ID, MediaStore.MediaColumns.DATA)
+        ids.chunked(500).forEach { chunk ->
+            val where = ContentWhere()
+            where.addIn(BaseColumns._ID, chunk)
+            context.contentResolver.getSearchCursor(uriExternal, projection, where)?.forEach { cursor, cache ->
+                val id = cursor.getStringValue(BaseColumns._ID, cache)
+                val path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache)
+                val src = File(path)
+                if (!src.isFile || src.parentFile == dest) {
+                    return@forEach
+                }
+                val target = File(dest, src.name)
+                val finalPath = if (target.exists()) getNewPath(target.absolutePath) else target.absolutePath
+                if (moveFileOrDir(src.absolutePath, finalPath)) {
+                    context.scanFileByConnection(path)
+                    context.scanFileByConnection(finalPath)
+                } else {
+                    allOk = false
+                    LogCat.w("Failed to move media id=$id to $destDir")
+                }
+            } ?: run { allOk = false }
+        }
+        allOk
     }
 
     @RequiresApi(Build.VERSION_CODES.R)
