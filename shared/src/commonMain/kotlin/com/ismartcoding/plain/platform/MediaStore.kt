@@ -47,6 +47,13 @@ expect suspend fun restoreMedia(dataType: DataType, ids: Set<String>)
 expect suspend fun deleteMedia(dataType: DataType, ids: Set<String>, fromTrash: Boolean)
 
 /**
+ * Move media files of [dataType] identified by [ids] into the directory [destDir].
+ * Returns true when all items were moved successfully. Returns false on
+ * platforms without a media store (iOS).
+ */
+expect suspend fun moveMedia(dataType: DataType, ids: Set<String>, destDir: String): Boolean
+
+/**
  * Returns file-extension groups for documents matching [query].
  * Each pair is (extension, count). Returns an empty list on unsupported platforms.
  */

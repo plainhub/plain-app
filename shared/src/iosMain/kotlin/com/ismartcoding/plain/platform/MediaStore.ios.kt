@@ -27,6 +27,8 @@ actual suspend fun restoreMedia(dataType: DataType, ids: Set<String>) {}
 
 actual suspend fun deleteMedia(dataType: DataType, ids: Set<String>, fromTrash: Boolean) {}
 
+actual suspend fun moveMedia(dataType: DataType, ids: Set<String>, destDir: String): Boolean = false
+
 actual suspend fun getDocExtGroups(query: String): List<Pair<String, Int>> = emptyList()
 
 actual suspend fun searchImagesCombined(
