@@ -19,8 +19,8 @@
     <string name="show_qr_code">QR-code tonen</string>
     <string name="pair_via_qr_title">Koppelen via QR-code</string>
     <string name="pair_via_qr_desc">Open PlainApp op een ander apparaat, tik op de scanknop en scan deze QR-code om te koppelen.</string>
-    <string name="pair_with_device">Koppelen met %s</string>
-    <string name="confirm_pair_with_device">Wil je koppelen met %s?</string>
+    <string name="pair_with_device">Koppelen met %1$s</string>
+    <string name="confirm_pair_with_device">Wil je koppelen met %1$s?</string>
     <string name="qr_pair_request_sent">Koppelingsverzoek verzonden. Bevestig het op je computer.</string>
     <string name="last_seen">Laatst gezien</string>
     <string name="device_discovered">Apparaat ontdekt</string>

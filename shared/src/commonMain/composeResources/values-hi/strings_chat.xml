@@ -19,8 +19,8 @@
     <string name="show_qr_code">QR कोड दिखाएँ</string>
     <string name="pair_via_qr_title">QR कोड से पेयर करें</string>
     <string name="pair_via_qr_desc">दूसरे डिवाइस पर PlainApp खोलें, स्कैन बटन पर टैप करें और पेयर करने के लिए इस QR कोड को स्कैन करें।</string>
-    <string name="pair_with_device">%s के साथ पेयर करें</string>
-    <string name="confirm_pair_with_device">क्या आप %s के साथ पेयर करना चाहते हैं?</string>
+    <string name="pair_with_device">%1$s के साथ पेयर करें</string>
+    <string name="confirm_pair_with_device">क्या आप %1$s के साथ पेयर करना चाहते हैं?</string>
     <string name="qr_pair_request_sent">पेयरिंग अनुरोध भेजा गया। कृपया अपने कंप्यूटर पर पुष्टि करें।</string>
     <string name="last_seen">अंतिम बार देखा गया</string>
     <string name="device_discovered">डिवाइस खोजा गया</string>

@@ -19,8 +19,8 @@
     <string name="show_qr_code">QRコードを表示</string>
     <string name="pair_via_qr_title">QRコードでペア設定</string>
     <string name="pair_via_qr_desc">別のデバイスで PlainApp を開き、スキャンボタンをタップして、このQRコードをスキャンしてペア設定してください。</string>
-    <string name="pair_with_device">%s とペア設定</string>
-    <string name="confirm_pair_with_device">%s とペア設定しますか？</string>
+    <string name="pair_with_device">%1$s とペア設定</string>
+    <string name="confirm_pair_with_device">%1$s とペア設定しますか？</string>
     <string name="qr_pair_request_sent">ペアリングリクエストを送信しました。PCで確認してください。</string>
     <string name="last_seen">最終確認</string>
     <string name="device_discovered">デバイスが見つかりました</string>

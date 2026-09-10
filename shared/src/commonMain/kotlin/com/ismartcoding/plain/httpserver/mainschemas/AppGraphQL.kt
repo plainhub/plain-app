@@ -22,7 +22,7 @@ import com.ismartcoding.plain.platform.getSDCardPath
 import com.ismartcoding.plain.platform.getUsbDiskPaths
 import com.ismartcoding.plain.platform.isUsbConnected
 import com.ismartcoding.plain.platform.isDebugBuild
-import com.ismartcoding.plain.platform.getAppVersionCode
+import com.ismartcoding.plain.platform.getAppVersionName
 import com.ismartcoding.plain.platform.getSdkInt
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
@@ -69,7 +69,7 @@ suspend fun app(): App {
         deviceName = TempData.deviceName.value,
         deviceType = getDeviceType(),
         getBattery().level,
-        getAppVersionCode().toInt(),
+        getAppVersionName(),
         getSdkInt(),
         AppChannelType.fromString(buildChannel),
         grantedPermissions,

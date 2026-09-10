@@ -19,8 +19,8 @@
     <string name="show_qr_code">QR kodunu göster</string>
     <string name="pair_via_qr_title">QR koduyla eşleştir</string>
     <string name="pair_via_qr_desc">Başka bir cihazda PlainApp'i açın, tarama düğmesine dokunun ve eşleştirmek için bu QR kodunu tarayın.</string>
-    <string name="pair_with_device">%s ile eşleştir</string>
-    <string name="confirm_pair_with_device">%s ile eşleştirmek istiyor musunuz?</string>
+    <string name="pair_with_device">%1$s ile eşleştir</string>
+    <string name="confirm_pair_with_device">%1$s ile eşleştirmek istiyor musunuz?</string>
     <string name="qr_pair_request_sent">Eşleştirme isteği gönderildi. Bilgisayarınızda onaylayın.</string>
     <string name="last_seen">Son görülme</string>
     <string name="device_discovered">Cihaz keşfedildi</string>

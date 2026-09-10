@@ -228,7 +228,7 @@ type App {
   deviceName: String!
   deviceType: DeviceType!
   battery: Int!
-  appVersion: Int!
+  appVersion: String!
   osVersion: Int!
   channel: AppChannelType!
   permissions: [Permission!]!

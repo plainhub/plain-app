@@ -19,8 +19,8 @@
     <string name="show_qr_code">Hiển thị mã QR</string>
     <string name="pair_via_qr_title">Ghép đôi qua mã QR</string>
     <string name="pair_via_qr_desc">Mở PlainApp trên thiết bị khác, nhấn nút quét và quét mã QR này để ghép đôi.</string>
-    <string name="pair_with_device">Ghép đôi với %s</string>
-    <string name="confirm_pair_with_device">Bạn có muốn ghép đôi với %s không?</string>
+    <string name="pair_with_device">Ghép đôi với %1$s</string>
+    <string name="confirm_pair_with_device">Bạn có muốn ghép đôi với %1$s không?</string>
     <string name="qr_pair_request_sent">Đã gửi yêu cầu ghép nối. Vui lòng xác nhận trên máy tính.</string>
     <string name="last_seen">Lần cuối thấy</string>
     <string name="device_discovered">Đã phát hiện thiết bị</string>

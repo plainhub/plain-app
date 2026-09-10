@@ -19,8 +19,8 @@
     <string name="show_qr_code">显示二维码</string>
     <string name="pair_via_qr_title">通过二维码配对</string>
     <string name="pair_via_qr_desc">在另一台设备上打开 PlainApp，点击扫描按钮，然后扫描此二维码进行配对。</string>
-    <string name="pair_with_device">与 %s 配对</string>
-    <string name="confirm_pair_with_device">你要与 %s 配对吗？</string>
+    <string name="pair_with_device">与 %1$s 配对</string>
+    <string name="confirm_pair_with_device">你要与 %1$s 配对吗？</string>
     <string name="qr_pair_request_sent">配对请求已发送，请在电脑上确认。</string>
     <string name="last_seen">最后在线</string>
     <string name="device_discovered">发现设备</string>

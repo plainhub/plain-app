@@ -19,8 +19,8 @@
     <string name="show_qr_code">Afficher le code QR</string>
     <string name="pair_via_qr_title">Associer via un code QR</string>
     <string name="pair_via_qr_desc">Ouvrez PlainApp sur un autre appareil, appuyez sur le bouton de scan, puis scannez ce code QR pour associer les appareils.</string>
-    <string name="pair_with_device">Associer avec %s</string>
-    <string name="confirm_pair_with_device">Voulez-vous vous associer avec %s ?</string>
+    <string name="pair_with_device">Associer avec %1$s</string>
+    <string name="confirm_pair_with_device">Voulez-vous vous associer avec %1$s ?</string>
     <string name="qr_pair_request_sent">Demande de jumelage envoyée. Confirmez-la sur votre ordinateur.</string>
     <string name="last_seen">Dernière connexion</string>
     <string name="device_discovered">Appareil découvert</string>

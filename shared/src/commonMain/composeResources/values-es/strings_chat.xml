@@ -19,8 +19,8 @@
     <string name="show_qr_code">Mostrar código QR</string>
     <string name="pair_via_qr_title">Emparejar mediante código QR</string>
     <string name="pair_via_qr_desc">Abre PlainApp en otro dispositivo, toca el botón de escaneo y escanea este código QR para emparejar.</string>
-    <string name="pair_with_device">Emparejar con %s</string>
-    <string name="confirm_pair_with_device">¿Quieres emparejar con %s?</string>
+    <string name="pair_with_device">Emparejar con %1$s</string>
+    <string name="confirm_pair_with_device">¿Quieres emparejar con %1$s?</string>
     <string name="qr_pair_request_sent">Solicitud de emparejamiento enviada. Confírmala en tu ordenador.</string>
     <string name="last_seen">Última conexión</string>
     <string name="device_discovered">Dispositivo descubierto</string>

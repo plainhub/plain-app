@@ -19,8 +19,8 @@
     <string name="show_qr_code">顯示 QR 碼</string>
     <string name="pair_via_qr_title">透過 QR 碼配對</string>
     <string name="pair_via_qr_desc">在另一台裝置上開啟 PlainApp，點擊掃描按鈕，然後掃描此 QR 碼進行配對。</string>
-    <string name="pair_with_device">與 %s 配對</string>
-    <string name="confirm_pair_with_device">你要與 %s 配對嗎？</string>
+    <string name="pair_with_device">與 %1$s 配對</string>
+    <string name="confirm_pair_with_device">你要與 %1$s 配對嗎？</string>
     <string name="qr_pair_request_sent">配對請求已傳送，請在電腦上確認。</string>
     <string name="last_seen">最後上線</string>
     <string name="device_discovered">發現裝置</string>

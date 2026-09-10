@@ -19,8 +19,8 @@
     <string name="show_qr_code">QR 코드 표시</string>
     <string name="pair_via_qr_title">QR 코드로 페어링</string>
     <string name="pair_via_qr_desc">다른 기기에서 PlainApp을 열고 스캔 버튼을 탭한 다음, 이 QR 코드를 스캔하여 페어링하세요.</string>
-    <string name="pair_with_device">%s와 페어링</string>
-    <string name="confirm_pair_with_device">%s와 페어링하시겠습니까?</string>
+    <string name="pair_with_device">%1$s와 페어링</string>
+    <string name="confirm_pair_with_device">%1$s와 페어링하시겠습니까?</string>
     <string name="qr_pair_request_sent">페어링 요청을 보냈습니다. PC에서 확인해 주세요.</string>
     <string name="last_seen">마지막 확인</string>
     <string name="device_discovered">기기 발견됨</string>
