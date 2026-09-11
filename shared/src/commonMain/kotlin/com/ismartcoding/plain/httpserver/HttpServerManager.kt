@@ -19,7 +19,6 @@ import com.ismartcoding.plain.platform.computeECDHSharedKey
 import com.ismartcoding.plain.platform.generateECDHKeyPair
 import com.ismartcoding.plain.platform.generateNotificationId
 import com.ismartcoding.plain.platform.chaCha20Encrypt
-import com.ismartcoding.plain.platform.isPortInUse
 import com.ismartcoding.plain.platform.randomPassword
 import com.ismartcoding.plain.platform.sendWebLoginNotification
 import com.ismartcoding.plain.platform.sha512
@@ -218,27 +217,6 @@ object HttpServerManager {
                 }
             }
         }
-    }
-
-    /**
-     * Wait for [httpPort] and [httpsPort] to become free after stopping a
-     * previous server. Returns true when both ports are free within [maxWaitMs].
-     */
-    suspend fun waitForPortsAvailable(httpPort: Int, httpsPort: Int, maxWaitMs: Long = 3000): Boolean = withIO {
-        val interval = 200L
-        var elapsed = 0L
-        while (elapsed < maxWaitMs) {
-            val httpFree = !isPortInUse(httpPort)
-            val httpsFree = !isPortInUse(httpsPort)
-            if (httpFree && httpsFree) {
-                LogCat.d("Ports $httpPort and $httpsPort are free after ${elapsed}ms")
-                return@withIO true
-            }
-            delay(interval)
-            elapsed += interval
-        }
-        LogCat.e("Ports still in use after ${maxWaitMs}ms - http:${isPortInUse(httpPort)}, https:${isPortInUse(httpsPort)}")
-        false
     }
 
     /**

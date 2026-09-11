@@ -10,12 +10,15 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.httpserver.closeAllWsSessions
+import com.ismartcoding.plain.httpserver.httpPorts
+import com.ismartcoding.plain.httpserver.httpsPorts
+import com.ismartcoding.plain.preferences.HttpPortPreference
+import com.ismartcoding.plain.preferences.HttpsPortPreference
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * SSL certificate signature bytes for the current HTTPS keystore.
@@ -127,46 +130,31 @@ expect suspend fun stopHttpServiceAsync()
 // ----------------------------------------------------------------------------------
 
 /**
- * Single-shot probe of the embedded HTTP server's `/health` endpoint.
- * @return `true` when the server responds 200 with our own package name.
+ * Single `/health` probe against the embedded server: HTTP 200 with our own
+ * package name in the body.
  */
-suspend fun checkHttpServerOnce(): Boolean = withIO {
-    try {
-        val response = createHttpClient().get(UrlHelper.getHealthCheckUrl())
-        response.use { it.isOk() && it.bodyAsText() == getOwnPackageName() }
-    } catch (ex: Exception) {
-        false
-    }
+private suspend fun PlainHttpClient.probeHealthOnce(): Boolean = try {
+    get(UrlHelper.getHealthCheckUrl()).use { it.isOk() && it.bodyAsText() == getOwnPackageName() }
+} catch (_: Exception) {
+    false
 }
 
 /**
- * Probe the embedded HTTP server's `/health` endpoint with a bounded retry
- * loop. Shared by Android and iOS — previously each platform duplicated this
- * loop (Android `checkServerHealthAsync`, iOS `checkHttpServerAsync`).
+ * Probe the embedded HTTP server's `/health` endpoint until it answers, with a
+ * bounded retry loop. A final probe after the deadline covers a server that
+ * came up right as the deadline expired.
  *
- * @return `true` if the server responds with HTTP 200 within the deadline.
+ * @return `true` if the server responds with HTTP 200 within [timeoutMs].
  */
-suspend fun checkHttpServerAsync(): Boolean = withIO {
-    withTimeoutOrNull(9_000) {
-        val client = createHttpClient()
-        val deadline = TimeHelper.nowMillis() + 8_500L
-        var healthy = false
-        while (!healthy && TimeHelper.nowMillis() < deadline) {
-            try {
-                val response = client.get(UrlHelper.getHealthCheckUrl())
-                response.use {
-                    if (it.isOk() && it.bodyAsText() == getOwnPackageName()) {
-                        healthy = true
-                    }
-                }
-            } catch (ex: Exception) {
-                LogCat.e("HTTP server check failed: ${ex.message}")
-            }
-            if (!healthy) delay(300)
+suspend fun checkHttpServerAsync(timeoutMs: Long = 8_500): Boolean = withIO {
+    createHttpClient().use { client ->
+        val deadline = TimeHelper.nowMillis() + timeoutMs
+        while (TimeHelper.nowMillis() < deadline) {
+            if (client.probeHealthOnce()) return@withIO true
+            delay(300)
         }
-        LogCat.d("HTTP server check healthy: $healthy")
-        healthy
-    } ?: false
+        client.probeHealthOnce()
+    }
 }
 
 /**
@@ -181,11 +169,25 @@ suspend fun checkHttpServerAsync(): Boolean = withIO {
 private val lifecycleMutex = Mutex()
 
 /**
+ * The configured port when it is free, otherwise the next free port from the
+ * standard candidate list (deterministic insertion order). `null` when every
+ * candidate is occupied. The predicate is injectable for tests.
+ */
+internal fun nextFreePort(
+    current: Int,
+    candidates: Set<Int>,
+    isInUse: (Int) -> Boolean = ::isPortInUse,
+): Int? {
+    if (!isInUse(current)) return current
+    return (candidates - current).firstOrNull { !isInUse(it) }
+}
+
+/**
  * Shared start orchestration: records state transitions in
  * [HttpServerManager.serverState] (the single source of truth — collectors
  * read the flow, no event copies), clears stale state, stops any previous
- * engine, handles port-conflict retries, starts the engine, probes health,
- * and invokes platform side-effect hooks.
+ * engine, falls back to free ports when the configured ones are occupied,
+ * starts the engine, probes health, and invokes platform side-effect hooks.
  *
  * On Android this is invoked from the foreground service's coroutine; on iOS
  * it is invoked directly by [startHttpServerService].
@@ -201,43 +203,38 @@ private suspend fun startHttpServerAsyncLocked() = withIO {
     HttpServerManager.portsInUse.value = emptySet()
     HttpServerManager.httpServerError.value = ""
 
-    val httpPort = TempData.httpPort.value
-    val httpsPort = TempData.httpsPort.value
-
-    // Stop any previous instance so the ports are free.
+    // Stop any previous instance. Engine stop closes its listen sockets
+    // synchronously, so a port still occupied afterwards is held by a foreign
+    // process — waiting for it never helps; fall back to another port instead.
     stopHttpEngineAsync()
-    val portsWereInUse = isPortInUse(httpPort) || isPortInUse(httpsPort)
-    if (portsWereInUse) {
-        LogCat.d("Ports still in use after stopping previous server, waiting...")
-        HttpServerManager.waitForPortsAvailable(httpPort, httpsPort)
-    }
-    // If ports were occupied we only get one fresh attempt; otherwise allow a
-    // second try to tolerate a transient bind failure.
-    val maxRetries = if (portsWereInUse) 1 else 2
 
     var started = false
-    for (attempt in 1..maxRetries) {
-        val tEngine = TimeHelper.nowMillis()
-        if (startHttpEngineAsync()) {
-            started = true
-            LogCat.d("start engine took ${TimeHelper.nowMillis() - tEngine}ms (attempt $attempt)")
+    while (!started) {
+        val httpPort = nextFreePort(TempData.httpPort.value, httpPorts)
+        val httpsPort = nextFreePort(TempData.httpsPort.value, httpsPorts)
+        if (httpPort == null || httpsPort == null) {
+            HttpServerManager.portsInUse.value =
+                listOf(TempData.httpPort.value, TempData.httpsPort.value).filter { isPortInUse(it) }.toSet()
             break
         }
-        LogCat.e("Server start attempt $attempt/$maxRetries failed")
-        if (attempt < maxRetries) {
-            stopHttpEngineAsync()
-            HttpServerManager.waitForPortsAvailable(httpPort, httpsPort, maxWaitMs = 3_000)
+        if (httpPort != TempData.httpPort.value) {
+            LogCat.d("HTTP port ${TempData.httpPort.value} in use, falling back to $httpPort")
+            HttpPortPreference.putAsync(httpPort)
+        }
+        if (httpsPort != TempData.httpsPort.value) {
+            LogCat.d("HTTPS port ${TempData.httpsPort.value} in use, falling back to $httpsPort")
+            HttpsPortPreference.putAsync(httpsPort)
+        }
+        started = startHttpEngineAsync()
+        // A failed bind with both ports free is not a port conflict (keystore,
+        // engine error…): retrying other ports cannot fix it.
+        if (!started && !isPortInUse(TempData.httpPort.value) && !isPortInUse(TempData.httpsPort.value)) {
+            break
         }
     }
 
     val tHealth = TimeHelper.nowMillis()
-    var healthy = started && checkHttpServerAsync()
-    if (!healthy && started) {
-        // A concurrent probe (e.g. UI state sync) may have seen the engine
-        // healthy right after our deadline expired; re-probe once before
-        // tearing down a possibly-healthy engine.
-        healthy = checkHttpServerOnce()
-    }
+    val healthy = started && checkHttpServerAsync()
     LogCat.d("health check took ${TimeHelper.nowMillis() - tHealth}ms: $healthy")
     if (healthy) {
         HttpServerManager.httpServerError.value = ""
@@ -246,17 +243,14 @@ private suspend fun startHttpServerAsyncLocked() = withIO {
         onHttpServerStarted()
         LogCat.d("onHttpServerStarted took ${TimeHelper.nowMillis() - tHooks}ms")
         HttpServerManager.serverState.value = HttpServerState.ON
-        LogCat.d("HTTP server started on port $httpPort, total ${TimeHelper.nowMillis() - t0}ms")
+        LogCat.d("HTTP server started on ports ${TempData.httpPort.value}/${TempData.httpsPort.value}, total ${TimeHelper.nowMillis() - t0}ms")
         return@withIO
     }
 
-    // Failure: stop whatever engine may have started, then re-check ports so we
-    // can distinguish a port conflict from a health-check failure.
+    // Failure: stop whatever engine may have started. A port conflict that
+    // survived the fallback loop above has already been recorded in portsInUse.
     if (started) {
         stopHttpEngineAsync()
-    } else {
-        if (isPortInUse(httpPort)) HttpServerManager.portsInUse.value += httpPort
-        if (isPortInUse(httpsPort)) HttpServerManager.portsInUse.value += httpsPort
     }
     val portsInUse = HttpServerManager.portsInUse.value
     val engineError = HttpServerManager.httpServerError.value

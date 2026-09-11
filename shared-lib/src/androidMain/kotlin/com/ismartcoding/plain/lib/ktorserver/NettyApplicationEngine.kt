@@ -212,6 +212,10 @@ public class NettyApplicationEngine(
             )
             // Send small responses immediately instead of waiting for Nagle
             childOption(ChannelOption.TCP_NODELAY, true)
+            // Rebind immediately after stop even when accepted sockets linger in
+            // TIME_WAIT (a web session closed just before a restart would
+            // otherwise block the bind for the full TIME_WAIT duration).
+            option(ChannelOption.SO_REUSEADDR, true)
             // Deep send buffer so large media responses can fill the WiFi bandwidth-delay
             // product; the kernel doubles this value and clamps it to net.core.wmem_max,
             // so over-requesting only loses the excess.
@@ -235,14 +239,22 @@ public class NettyApplicationEngine(
     }
 
     override fun start(wait: Boolean): NettyApplicationEngine {
+        // Bind one connector at a time and track what bound: if a later
+        // connector fails (e.g. its port is in use), the earlier channels must
+        // be closed here — the `channels` assignment below never happens, so
+        // nobody else holds a reference and the socket would stay open until
+        // process death, making every later start report the port as occupied.
+        val bound = mutableListOf<Channel>()
         try {
-            channels = bootstraps.zip(configuration.connectors)
-                .map { it.first.bind(it.second.host, it.second.port) }
-                .map { it.sync().channel() }
-            val connectors = channels!!.zip(configuration.connectors)
+            for ((bootstrap, connector) in bootstraps.zip(configuration.connectors)) {
+                bound += bootstrap.bind(connector.host, connector.port).sync().channel()
+            }
+            channels = bound
+            val connectors = bound.zip(configuration.connectors)
                 .map { it.second.withPort(it.first.localAddress().port) }
             resolvedConnectorsDeferred.complete(connectors)
         } catch (cause: Throwable) {
+            bound.forEach { withStopException { it.close().sync() } }
             terminate()
             throw cause
         }
@@ -263,11 +275,15 @@ public class NettyApplicationEngine(
     }
 
     private fun terminate() {
+        // Startup failed (e.g. port already in use): no connection was ever
+        // accepted, so there is nothing to drain. The no-arg shutdownGracefully()
+        // uses Netty's default 2s quiet period per group (~4s here) which stalled
+        // the UI's ERROR state on every port conflict — shut down immediately.
         withStopException {
-            connectionEventGroup.shutdownGracefully().sync()
+            connectionEventGroup.shutdownGracefully(0, 1, TimeUnit.SECONDS).sync()
         }
         withStopException {
-            callEventGroup.shutdownGracefully().sync()
+            callEventGroup.shutdownGracefully(0, 1, TimeUnit.SECONDS).sync()
         }
     }
 

@@ -30,7 +30,6 @@ import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
-import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.grant_permission
 import com.ismartcoding.plain.i18n.http_port_conflict_error
@@ -47,8 +46,6 @@ import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isVPNConnected
 import com.ismartcoding.plain.platform.relaunchApp
-import com.ismartcoding.plain.preferences.HttpPortPreference
-import com.ismartcoding.plain.preferences.HttpsPortPreference
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
@@ -68,8 +65,6 @@ import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 import com.ismartcoding.plain.httpserver.HttpServerManager
-import com.ismartcoding.plain.httpserver.httpPorts
-import com.ismartcoding.plain.httpserver.httpsPorts
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -115,22 +110,10 @@ fun HomePage(
     val showError = state == HttpServerState.ERROR
     val errorMessage = buildHomeWebErrorMessage(serverError, portsInUse)
 
+    // Port conflicts are already resolved by the start orchestrator's free-port
+    // fallback; relaunching only recovers from a genuinely wedged state.
     val onRestartFix: () -> Unit = {
-        scope.launch {
-            withIO {
-                if (portsInUse.contains(TempData.httpPort.value)) {
-                    val nextHttp =
-                        httpPorts.filter { it != TempData.httpPort.value }.random()
-                    HttpPortPreference.putAsync(nextHttp)
-                }
-                if (portsInUse.contains(TempData.httpsPort.value)) {
-                    val nextHttps =
-                        httpsPorts.filter { it != TempData.httpsPort.value }.random()
-                    HttpsPortPreference.putAsync(nextHttps)
-                }
-            }
-            relaunchApp()
-        }
+        scope.launch { relaunchApp() }
     }
 
     val httpServiceState = when {
