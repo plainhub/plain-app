@@ -70,6 +70,22 @@ import org.jetbrains.compose.resources.stringResource
 
 enum class HttpServiceState { OFF, ERROR, ON }
 
+/**
+ * Whether the home service card shows the loading spinner. Pure so the exact
+ * semantics can be regression-tested:
+ * - a processing state (STARTING/STOPPING) — owned by a running orchestration
+ *   since 2026-09, so it always resolves;
+ * - service preference on + OFF: the auto-restore window between the tap and
+ *   the service spawning — but only when a start is actually possible
+ *   (notifications blocked ⇒ the wizard owns the start and spinning would
+ *   never end).
+ */
+internal fun httpServerShowLoading(
+    state: HttpServerState,
+    serviceEnabled: Boolean,
+    canAutoStart: Boolean,
+): Boolean = state.isProcessing() || (serviceEnabled && state == HttpServerState.OFF && canAutoStart)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(
@@ -89,14 +105,14 @@ fun HomePage(
         setRefreshState(RefreshContentState.Finished)
     }
     val scope = rememberCoroutineScope()
-    val state = mainVM.httpServerState.collectAsStateValue()
-    val serverError = mainVM.httpServerError.collectAsStateValue()
+    val state = HttpServerManager.serverState.collectAsStateValue()
+    val serverError = HttpServerManager.httpServerError.collectAsStateValue()
     val portsInUse = HttpServerManager.portsInUse.collectAsStateValue()
     var showStayOnlineOverlay by remember { mutableStateOf(false) }
 
     LaunchedEffect(serviceEnabled) {
         if (serviceEnabled) {
-            mainVM.syncHttpServerState()
+            HttpServerManager.ensureStarted()
         }
     }
 
@@ -106,7 +122,7 @@ fun HomePage(
     // with notifications blocked the service intentionally stays OFF (the user
     // must finish the permission wizard first), so spinning here would never end.
     val canAutoStart = !isAndroidOnly() || Permission.POST_NOTIFICATIONS.isGranted()
-    val showLoading = state.isProcessing() || (serviceEnabled && state == HttpServerState.OFF && canAutoStart)
+    val showLoading = httpServerShowLoading(state, serviceEnabled, canAutoStart)
     val showError = state == HttpServerState.ERROR
     val errorMessage = buildHomeWebErrorMessage(serverError, portsInUse)
 
@@ -138,6 +154,14 @@ fun HomePage(
                     val ips = getDeviceIP4s().filter { it.isNotEmpty() }
                     TempData.ip4s.value = ips
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.isGranted()
+                    // Regaining focus is the only reliable "user came back"
+                    // signal when the activity survived in the background
+                    // (LaunchedEffect(serviceEnabled) won't refire) — restart
+                    // the server if the preference is on but it went down
+                    // while away.
+                    if (event.hasFocus && TempData.serviceEnabled.value) {
+                        HttpServerManager.ensureStarted()
+                    }
                 }
             }
         }
@@ -202,12 +226,11 @@ fun HomePage(
                         Column {
                             PlainAppServiceSection(
                                 navController = navController,
-                                mainVM = mainVM,
                                 httpServiceState = target,
                                 isLoading = showLoading,
                                 onRun = {
                                     if (!state.isProcessing() && state != HttpServerState.ON) {
-                                        mainVM.enableHttpServer(true)
+                                        HttpServerManager.setServiceEnabled(true)
                                     }
                                 },
                                 errorMessage = errorMessage,

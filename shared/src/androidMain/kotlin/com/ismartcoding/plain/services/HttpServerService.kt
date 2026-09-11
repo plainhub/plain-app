@@ -4,9 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import androidx.core.app.ServiceCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.TempData
@@ -16,7 +13,6 @@ import com.ismartcoding.plain.features.sms.SmsProviderObserver
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.lib.coIO
-import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.plainapp_service_is_running
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -46,7 +42,7 @@ class HttpServerService : LifecycleService() {
         instance = this
         NotificationHelper.ensureDefaultChannel()
 
-        lockManager = HttpServerLockManager(this)
+        lockManager = HttpServerLockManager(this).also { it.start() }
         mdnsRegister = MdnsRegister(
             context = this,
             isActive = { HttpServerManager.serverState.value == HttpServerState.ON },
@@ -54,26 +50,6 @@ class HttpServerService : LifecycleService() {
             httpPortProvider = { TempData.httpPort.value },
             httpsPortProvider = { TempData.httpsPort.value },
         ).also { it.start() }
-
-        lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                when (event) {
-                    Lifecycle.Event.ON_START -> {
-                        lockManager?.start()
-                    }
-
-                    Lifecycle.Event.ON_STOP -> {
-                        lockManager?.stop()
-                        serverJob?.cancel()
-                        serverJob = coIO {
-                            stopHttpServerAsync()
-                        }
-                    }
-
-                    else -> Unit
-                }
-            }
-        })
     }
 
     @SuppressLint("InlinedApi")
@@ -146,18 +122,10 @@ class HttpServerService : LifecycleService() {
                 delay(5_000)
                 isStickyRestart = false
             }
-            startServer()
-        }
-    }
-
-    private suspend fun startServer() {
-        try {
+            // The orchestrator records its own terminal state (ERROR on
+            // unexpected failure); a cancelled job is cancelled — the destroy
+            // path lands OFF.
             startHttpServerAsync()
-        } catch (ex: Exception) {
-            // Ensure a terminal state even if the orchestrator throws before
-            // recording its own ERROR state.
-            LogCat.e("Server start failed unexpectedly: ${ex.message}")
-            HttpServerManager.serverState.value = HttpServerState.ERROR
         }
     }
 
@@ -200,22 +168,11 @@ class HttpServerService : LifecycleService() {
         }
         httpServer = null
         stopForeground(STOP_FOREGROUND_REMOVE)
-        // The engine is stopped and this instance's start job was cancelled
-        // above; a state still mid-transition can never complete (a queued
-        // restart arrives as a fresh service instance with its own
-        // orchestration). Record the terminal state so collectors are not
-        // stranded in STARTING/STOPPING. Terminal states (ON with the engine
-        // just stopped by onTaskRemoved, ERROR) are left to the health sync.
-        if (HttpServerManager.serverState.value.isProcessing()) {
-            HttpServerManager.serverState.value = HttpServerState.OFF
-        }
-    }
-
-    private suspend fun stopHttpServerAsync() = withIO {
-        LogCat.d("stopHttpServer")
-        // Shared stop body handles /shutdown, engine stop, mDNS/peer-status/
-        // notification-listener side effects, state clear and the OFF record.
-        stopHttpServerCoreAsync()
+        // Run the shared stop body (stop side-effect hooks — clipboard watcher,
+        // notification listener — engine teardown again, terminal OFF) on the
+        // global scope so it completes even though this service object dies;
+        // every step is idempotent with the direct cleanup above.
+        coIO { stopHttpServerCoreAsync() }
     }
 
     companion object {

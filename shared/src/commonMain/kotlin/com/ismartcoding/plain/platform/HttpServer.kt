@@ -193,7 +193,21 @@ internal fun nextFreePort(
  * it is invoked directly by [startHttpServerService].
  */
 suspend fun startHttpServerAsync() = withIO {
-    lifecycleMutex.withLock { startHttpServerAsyncLocked() }
+    lifecycleMutex.withLock {
+        try {
+            startHttpServerAsyncLocked()
+        } catch (ex: kotlinx.coroutines.CancellationException) {
+            throw ex
+        } catch (ex: Exception) {
+            // The orchestrator owns its terminal state: an unexpected failure
+            // (engine create crash, keystore fatal, …) must land in ERROR,
+            // never strand callers — and the UI loading spinner — in STARTING.
+            // The Android service used to catch this; iOS had no backstop.
+            LogCat.e("startHttpServerAsync failed unexpectedly: ${ex.message}")
+            HttpServerManager.httpServerError.value = ex.message ?: (ex::class.simpleName ?: "error")
+            HttpServerManager.serverState.value = HttpServerState.ERROR
+        }
+    }
 }
 
 private suspend fun startHttpServerAsyncLocked() = withIO {

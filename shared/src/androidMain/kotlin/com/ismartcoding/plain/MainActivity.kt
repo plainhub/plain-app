@@ -23,7 +23,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.ExportFileType
@@ -54,7 +54,6 @@ import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.preferences.ServicePreference
 import com.ismartcoding.plain.ui.page.CrashReportDialog
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.Main
@@ -206,17 +205,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         AudioPlayer.ensurePlayer(this)
-        coIO {
-            try {
-                if (ServicePreference.getAsync()) {
-                    // Preference is already true — restore without rewriting it
-                    // (the first DataStore write of a cold launch stalls ~600ms).
-                    mainVM.restoreHttpServerOnAppOpen()
-                }
-            } catch (ex: Exception) {
-                LogCat.e(ex.toString())
-            }
-        }
+        HttpServerManager.ensureStarted()
     }
 
     override fun onDestroy() {

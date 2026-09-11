@@ -6,23 +6,31 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.ShowPermissionWizardEvent
+import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.helpers.Base64Lenient
 import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.computeECDHSharedKey
 import com.ismartcoding.plain.platform.generateECDHKeyPair
 import com.ismartcoding.plain.platform.generateNotificationId
 import com.ismartcoding.plain.platform.chaCha20Encrypt
+import com.ismartcoding.plain.platform.isAndroidOnly
+import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.randomPassword
 import com.ismartcoding.plain.platform.sendWebLoginNotification
 import com.ismartcoding.plain.platform.sha512
+import com.ismartcoding.plain.platform.stopHttpServiceAsync
 import com.ismartcoding.plain.preferences.PasswordPreference
+import com.ismartcoding.plain.preferences.ServicePreference
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -161,6 +169,60 @@ object HttpServerManager {
         val password = randomPassword(6)
         PasswordPreference.putAsync(password)
         return password
+    }
+
+    // ----------------------------------------------------------------------------------
+    // Service lifecycle intent. All serverState writes stay inside the start
+    // orchestrator and the NonCancellable stop body (single-owner state);
+    // these entry points only dispatch commands and gate on permissions.
+    // ----------------------------------------------------------------------------------
+
+    /** Dispatch the start command (idempotent — the service dedupes). */
+    fun dispatchStart() {
+        LogCat.d("dispatchStartHttpServer")
+        coIO { sendEvent(StartHttpServerEvent()) }
+    }
+
+    /**
+     * Start gated on the notification permission: dispatch directly when a
+     * foreground-service start is allowed; a UI-initiated start opens the
+     * first-run permission wizard instead, auto paths stay silent (a
+     * foreground service without its notification is invisible and easily
+     * killed).
+     */
+    fun requestStart(fromUi: Boolean) {
+        if (!isAndroidOnly() || Permission.POST_NOTIFICATIONS.isGranted()) {
+            dispatchStart()
+            return
+        }
+        if (fromUi) {
+            sendEvent(ShowPermissionWizardEvent())
+        }
+    }
+
+    /** User intent: persist the service preference and dispatch start/stop. */
+    fun setServiceEnabled(enable: Boolean) {
+        coIO {
+            ServicePreference.putAsync(enable)
+            if (enable) requestStart(fromUi = true) else stopHttpServiceAsync()
+        }
+    }
+
+    /**
+     * Auto-restore / reconcile: start when the preference is on but the server
+     * is OFF. No health probing — serverState is written only by the running
+     * orchestrations in this process, so OFF already means the engine is down
+     * (process death kills engine and state together and a fresh process
+     * restores through here).
+     */
+    fun ensureStarted() {
+        coIO {
+            runCatching {
+                if (ServicePreference.getAsync() && serverState.value == HttpServerState.OFF) {
+                    requestStart(fromUi = false)
+                }
+            }.onFailure { LogCat.e("ensureStarted failed: ${it.message}") }
+        }
     }
 
     /** Derive the ChaCha20 token (first 32 bytes of the SHA-512 of the password). */

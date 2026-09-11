@@ -36,7 +36,7 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.WebHelper
-import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.blue
@@ -46,7 +46,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun PlainAppServiceSection(
     navController: NavHostController,
-    mainVM: MainViewModel,
     httpServiceState: HttpServiceState,
     errorMessage: String = "",
     onRestartFix: () -> Unit = {},
@@ -153,7 +152,7 @@ fun PlainAppServiceSection(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.stop_service),
                                 onClick = {
-                                    mainVM.enableHttpServer(false)
+                                    HttpServerManager.setServiceEnabled(false)
                                 },
                                 type = ButtonType.DANGER,
                                 buttonSize = ButtonSize.MEDIUM,

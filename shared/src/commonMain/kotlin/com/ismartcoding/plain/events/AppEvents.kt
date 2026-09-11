@@ -66,6 +66,9 @@ class FolderKanbanSelectEvent(val data: FolderOption) : ChannelEvent()
 
 class StartHttpServerEvent : ChannelEvent()
 
+/** Open the first-run service permission wizard (raised when a UI-initiated start is blocked on permissions). */
+class ShowPermissionWizardEvent : ChannelEvent()
+
 
 class RestartAppEvent : ChannelEvent()
 

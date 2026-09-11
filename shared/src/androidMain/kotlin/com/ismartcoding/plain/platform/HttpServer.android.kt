@@ -7,6 +7,7 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
+import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.features.ClipboardWatcher
 import com.ismartcoding.plain.features.sms.SmsProviderObserver
 import com.ismartcoding.plain.features.sms.SmsHelper
@@ -134,11 +135,15 @@ actual suspend fun onHttpServerStopped() {
 /**
  * Android entry: start the foreground service, which runs the shared
  * [startHttpServerAsync] orchestrator from its lifecycle coroutine. Retried a
- * few times in case the service can't be started immediately.
+ * few times in case the service can't be started immediately. If every retry
+ * fails (e.g. an OEM background restriction hit while the app had just gone
+ * to background), the STARTING state recorded by the dispatcher has no writer
+ * left — record ERROR so the UI shows the failure instead of spinning forever.
  */
 actual fun startHttpServerService() {
     coIO {
         var retry = 3
+        var lastError: Exception? = null
         val context = appContext
         while (retry > 0) {
             try {
@@ -146,13 +151,16 @@ actual fun startHttpServerService() {
                     context,
                     Intent(context, HttpServerService::class.java),
                 )
-                break
+                return@coIO
             } catch (ex: Exception) {
+                lastError = ex
                 LogCat.e(ex.toString())
                 delay(500.milliseconds)
                 retry--
             }
         }
+        HttpServerManager.httpServerError.value = "startForegroundService failed: ${lastError?.message}"
+        HttpServerManager.serverState.value = HttpServerState.ERROR
     }
 }
 

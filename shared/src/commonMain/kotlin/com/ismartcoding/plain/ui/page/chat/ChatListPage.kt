@@ -64,8 +64,8 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.platform.isBleReady
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.nav.Routing
@@ -78,7 +78,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ChatListPage(
     navController: NavHostController,
-    mainVM: MainViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
     onTabSelected: ((Int) -> Unit)? = null,
@@ -152,7 +151,7 @@ fun ChatListPage(
                                 text = stringResource(Res.string.start_service),
                                 buttonSize = ButtonSize.SMALL,
                                 onClick = {
-                                    mainVM.enableHttpServer(true)
+                                    HttpServerManager.setServiceEnabled(true)
                                 })
                         }
                     }

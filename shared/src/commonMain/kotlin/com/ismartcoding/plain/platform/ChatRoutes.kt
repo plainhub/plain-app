@@ -5,17 +5,15 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.page.chat.ChatListPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
 
 @Composable
 fun ChatListPageRoute(navController: NavHostController) {
-    val mainVM = rememberViewModel(MainViewModel::class) { MainViewModel() }
     val peerVM = rememberViewModel(PeerViewModel::class) { PeerViewModel() }
     val channelVM = rememberViewModel(ChannelViewModel::class) { ChannelViewModel() }
-    ChatListPage(navController, mainVM, peerVM, channelVM)
+    ChatListPage(navController, peerVM, channelVM)
 }
 
 @Composable

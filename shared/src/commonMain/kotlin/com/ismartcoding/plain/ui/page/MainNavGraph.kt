@@ -131,7 +131,7 @@ fun MainNavGraph(
             val onTabSelected: (Int) -> Unit = { mainVM.currentRootTab.value = it }
             when (selectedTab) {
                 0 -> HomePage(navController, mainVM, updateVM, peerVM, channelVM, onTabSelected = onTabSelected)
-                1 -> ChatListPage(navController, mainVM, peerVM = peerVM, channelVM = channelVM, onTabSelected = onTabSelected)
+                1 -> ChatListPage(navController, peerVM = peerVM, channelVM = channelVM, onTabSelected = onTabSelected)
                 2 -> ToolsPage(navController, onTabSelected = onTabSelected)
             }
         }

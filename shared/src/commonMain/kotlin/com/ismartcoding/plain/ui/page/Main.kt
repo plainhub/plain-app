@@ -24,6 +24,9 @@ import com.ismartcoding.plain.platform.keepScreenOn
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
+import com.ismartcoding.plain.events.ShowPermissionWizardEvent
+import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.DebugCornerBadge
 import com.ismartcoding.plain.ui.base.ToastEvent
@@ -65,9 +68,18 @@ fun Main(
     var confirmDialogEvent by remember { mutableStateOf<ConfirmDialogEvent?>(null) }
     var loadingDialogEvent by remember { mutableStateOf<LoadingDialogEvent?>(null) }
     var toastState by remember { mutableStateOf<ToastEvent?>(null) }
+    var showPermissionWizard by remember { mutableStateOf(false) }
 
     LaunchedEffect(loadingDialogEvent) {
         keepScreenOn(loadingDialogEvent != null)
+    }
+
+    LaunchedEffect(Channel.sharedFlow) {
+        Channel.sharedFlow.collect { event ->
+            if (event is ShowPermissionWizardEvent) {
+                showPermissionWizard = true
+            }
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -97,10 +109,15 @@ fun Main(
 
         DlnaReceiverOverlay()
         MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })
-        if (mainVM.showPermissionWizard.value) {
+        if (showPermissionWizard) {
             ServiceOnboardingWizard(
-                onStartService = { mainVM.startServiceAfterWizard() },
-                onClose = { mainVM.closePermissionWizard() },
+                // Permissions are resolved (or explicitly skipped) at the
+                // final step — dispatch the start unconditionally.
+                onStartService = {
+                    showPermissionWizard = false
+                    HttpServerManager.dispatchStart()
+                },
+                onClose = { showPermissionWizard = false },
             )
         }
         if (isDebugBuild()) {
