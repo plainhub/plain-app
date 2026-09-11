@@ -42,7 +42,7 @@ fun FileListContent(
         }
     } else if (files.isEmpty()) {
         NoDataView(
-            icon = Res.drawable.package_open,
+            icon = null,
             message = stringResource(Res.string.no_data),
             showRefreshButton = true,
             onRefresh = { loadFiles(emptyList(), true) }

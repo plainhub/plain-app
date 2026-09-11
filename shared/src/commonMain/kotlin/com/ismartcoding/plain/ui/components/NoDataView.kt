@@ -25,7 +25,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 fun NoDataView(
     modifier: Modifier = Modifier,
     message: String = stringResource(Res.string.no_data),
-    icon: DrawableResource = Res.drawable.files,
+    icon: DrawableResource? = Res.drawable.files,
     showRefreshButton: Boolean = false,
     onRefresh: () -> Unit = {}
 ) {
@@ -36,15 +36,17 @@ fun NoDataView(
             .fillMaxSize()
             .padding(32.dp)
     ) {
-        Image(
-            painter = painterResource(icon),
-            contentDescription = null,
-            modifier = Modifier
-                .size(112.dp),
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary.copy(alpha = 0.85f))
-        )
+        icon?.let {
+            Image(
+                painter = painterResource(it),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(112.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary.copy(alpha = 0.85f))
+            )
 
-        VerticalSpace(20.dp)
+            VerticalSpace(20.dp)
+        }
 
         Text(
             text = message,
