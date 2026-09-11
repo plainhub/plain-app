@@ -31,6 +31,8 @@ import com.ismartcoding.plain.httpserver.websocket.WebSocketHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.days
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -174,10 +176,7 @@ private suspend fun getTrashedMessageIds(): Set<String> =
 actual suspend fun trashSms(query: String): Int {
     val ids = SmsHelper.getIdsAsync(appContext, query)
     if (ids.isEmpty()) return 0
-    val dao = AppDatabase.instance.trashedMessageDao()
-    // opportunistically drop shadow entries older than 30 days
-    dao.deleteOlderThan(System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000)
-    val now = System.currentTimeMillis()
+    val now = Clock.System.now()
     val newIds = ids - getTrashedMessageIds()
     dao.insertAll(newIds.map { DTrashedMessage(messageId = it, isMms = it.startsWith("mms_"), trashedAt = now) })
     return newIds.size

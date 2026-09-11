@@ -7,6 +7,7 @@ import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.PrimaryKey
 import androidx.room3.Query
+import kotlin.time.Instant
 
 @Entity(tableName = "trashed_messages")
 data class DTrashedMessage(
@@ -16,7 +17,7 @@ data class DTrashedMessage(
     @ColumnInfo(name = "is_mms")
     val isMms: Boolean,
     @ColumnInfo(name = "trashed_at")
-    val trashedAt: Long, // epoch millis; used for the 30-day retention cleanup
+    val trashedAt: Instant, // used for the 30-day retention cleanup
 )
 
 @Dao
@@ -30,6 +31,6 @@ interface TrashedMessageDao {
     @Query("DELETE FROM trashed_messages WHERE message_id IN (:messageIds)")
     suspend fun deleteByMessageIds(messageIds: List<String>)
 
-    @Query("DELETE FROM trashed_messages WHERE trashed_at < :beforeMillis")
-    suspend fun deleteOlderThan(beforeMillis: Long)
+    @Query("DELETE FROM trashed_messages WHERE trashed_at < :before")
+    suspend fun deleteOlderThan(before: Instant)
 }

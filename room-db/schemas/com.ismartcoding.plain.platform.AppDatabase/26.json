@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 26,
-    "identityHash": "5e13bbcc017fadad43cb980a54434e51",
+    "identityHash": "ee522fb25e27884082530aec084efb2f",
     "entities": [
       {
         "tableName": "chats",
@@ -1097,7 +1097,7 @@
       },
       {
         "tableName": "trashed_messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`message_id` TEXT NOT NULL, `is_mms` INTEGER NOT NULL, `trashed_at` INTEGER NOT NULL, PRIMARY KEY(`message_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`message_id` TEXT NOT NULL, `is_mms` INTEGER NOT NULL, `trashed_at` TEXT NOT NULL, PRIMARY KEY(`message_id`))",
         "fields": [
           {
             "fieldPath": "messageId",
@@ -1114,7 +1114,7 @@
           {
             "fieldPath": "trashedAt",
             "columnName": "trashed_at",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -1383,7 +1383,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5e13bbcc017fadad43cb980a54434e51')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ee522fb25e27884082530aec084efb2f')"
     ]
   }
 }
