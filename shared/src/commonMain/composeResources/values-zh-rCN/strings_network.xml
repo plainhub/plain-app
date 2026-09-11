@@ -97,10 +97,6 @@
     <string name="faq_https_demo_proceed">继续前往 %1$s（不安全）</string>
     <string name="faq_https_demo_connected">已连接</string>
     <string name="faq_https_warning_q">看到“您的连接不是私密连接”？</string>
-    <string name="faq_port_conflict_q">端口被占用？</string>
-    <string name="faq_port_conflict_a">在提示中点“重启应用”，应用会自动重启并换一个可用端口。</string>
-    <string name="faq_slow_q">网页加载慢或视频卡顿？</string>
-    <string name="faq_slow_a">将手机插上 USB 数据线并在访问设置中开启“保持唤醒”，以获得最佳性能。</string>
     <string name="faq_stay_online_q">息屏后连接会断开？</string>
     <string name="faq_stay_online_a">息屏后系统可能暂停应用或断开网络，导致电脑失去连接。服务运行时，在首页点“保持在线”：应用保持前台运行、屏幕保持常亮（可以全黑显示），连接就不会中断。</string>
     <string name="more_help">更多帮助</string>

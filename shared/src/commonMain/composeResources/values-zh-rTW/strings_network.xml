@@ -97,10 +97,6 @@
     <string name="faq_https_demo_proceed">繼續前往 %1$s（不安全）</string>
     <string name="faq_https_demo_connected">已連線</string>
     <string name="faq_https_warning_q">看到「您的連線不是私人連線」？</string>
-    <string name="faq_port_conflict_q">連接埠被占用？</string>
-    <string name="faq_port_conflict_a">在提示中點「重啟應用」，應用會自動重啟並更換可用連接埠。</string>
-    <string name="faq_slow_q">網頁載入慢或影片卡頓？</string>
-    <string name="faq_slow_a">將手機插上 USB 傳輸線並在存取設定中開啟「保持喚醒」，以獲得最佳效能。</string>
     <string name="faq_stay_online_q">螢幕關閉後連線會中斷？</string>
     <string name="faq_stay_online_a">螢幕關閉後，系統可能暫停應用或斷開網路，導致電腦失去連線。服務執行時，在首頁點「保持在線」：應用持續在前景執行、螢幕保持恆亮（可以全黑顯示），連線就不會中斷。</string>
     <string name="more_help">更多說明</string>

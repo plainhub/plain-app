@@ -97,10 +97,6 @@
     <string name="faq_https_demo_proceed">Weiter zu %1$s (nicht sicher)</string>
     <string name="faq_https_demo_connected">Verbunden</string>
     <string name="faq_https_warning_q">Wird „Ihre Verbindung ist nicht privat“ angezeigt?</string>
-    <string name="faq_port_conflict_q">Port belegt?</string>
-    <string name="faq_port_conflict_a">Tippe im Dialog auf „App neu starten“ – die App startet neu und wählt automatisch einen freien Port.</string>
-    <string name="faq_slow_q">Seite lädt langsam oder Video ruckelt?</string>
-    <string name="faq_slow_a">Für die beste Leistung das Telefon an ein USB-Kabel anschließen und in den Zugriffseinstellungen „Wach halten“ aktivieren.</string>
     <string name="faq_stay_online_q">Verbindung bricht ab, wenn der Bildschirm ausgeht?</string>
     <string name="faq_stay_online_a">Wenn der Bildschirm ausgeht, pausiert Android eventuell die App oder trennt den Netzwerkzugriff, und der Computer verliert die Verbindung. Tippen Sie bei laufendem Dienst auf dem Startbildschirm auf „Online bleiben“: Die App bleibt im Vordergrund, der Bildschirm bleibt an (er darf komplett schwarz sein) – so bleibt die Verbindung bestehen.</string>
     <string name="more_help">Weitere Hilfe</string>

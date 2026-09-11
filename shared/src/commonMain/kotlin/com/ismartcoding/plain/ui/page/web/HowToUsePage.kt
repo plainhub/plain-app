@@ -48,7 +48,6 @@ import com.ismartcoding.plain.ui.components.WebAddressBar
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.grey
 import com.ismartcoding.plain.ui.theme.orange
@@ -183,18 +182,6 @@ fun HowToUsePage(
                                 answer = stringResource(Res.string.faq_stay_online_a),
                                 answerFooter = { FaqStayOnlineDemo() },
                                 answerFooterFullWidth = true,
-                            )
-                            FaqItem(
-                                icon = Res.drawable.timer,
-                                tint = MaterialTheme.colorScheme.blue,
-                                question = stringResource(Res.string.faq_port_conflict_q),
-                                answer = stringResource(Res.string.faq_port_conflict_a),
-                            )
-                            FaqItem(
-                                icon = Res.drawable.wifi,
-                                tint = MaterialTheme.colorScheme.green,
-                                question = stringResource(Res.string.faq_slow_q),
-                                answer = stringResource(Res.string.faq_slow_a),
                             )
                         }
                         VerticalSpace(dp = 16.dp)

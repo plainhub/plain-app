@@ -97,10 +97,6 @@
     <string name="faq_https_demo_proceed">%1$s sitesine ilerle (güvenli değil)</string>
     <string name="faq_https_demo_connected">Bağlandı</string>
     <string name="faq_https_warning_q">"Bağlantınız gizli değil" uyarısı mı görüyorsunuz?</string>
-    <string name="faq_port_conflict_q">Port meşgul mü?</string>
-    <string name="faq_port_conflict_a">İstemde "UYGULAMAYI Yeniden Başlat" seçeneğine dokunun; uygulama yeniden başlar ve boş bir porta otomatik geçer.</string>
-    <string name="faq_slow_q">Sayfa yavaş yükleniyor veya video takılıyor mu?</string>
-    <string name="faq_slow_a">En iyi performans için telefonu USB kablosuna bağlı tutun ve erişim ayarlarından "Uyanık tut" özelliğini açın.</string>
     <string name="faq_stay_online_q">Ekran kapanınca bağlantı kesiliyor?</string>
     <string name="faq_stay_online_a">Ekran kapandığında Android uygulamayı duraklatabilir veya ağ erişimini kesebilir; bilgisayar bağlantıyı kaybeder. Servis çalışırken ana ekranda "Çevrimiçi kal" düğmesine dokunun: uygulama ön planda çalışmaya devam eder ve ekran açık kalır (tamamen siyah görüntülenebilir), böylece bağlantı kesilmez.</string>
     <string name="more_help">Daha fazla yardım</string>

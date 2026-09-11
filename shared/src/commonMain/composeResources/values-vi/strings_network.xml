@@ -97,10 +97,6 @@
     <string name="faq_https_demo_proceed">Tiếp tục đến %1$s (không an toàn)</string>
     <string name="faq_https_demo_connected">Đã kết nối</string>
     <string name="faq_https_warning_q">Thấy cảnh báo "Kết nối của bạn không phải là kết nối riêng tư"?</string>
-    <string name="faq_port_conflict_q">Cổng bị chiếm dụng?</string>
-    <string name="faq_port_conflict_a">Chạm "Khởi chạy lại ứng dụng" trong hộp thoại; ứng dụng sẽ tự khởi động lại với một cổng trống.</string>
-    <string name="faq_slow_q">Trang tải chậm hoặc video bị giật?</string>
-    <string name="faq_slow_a">Để có hiệu suất tốt nhất, hãy cắm điện thoại vào cáp USB và bật "Giữ tỉnh táo" trong cài đặt truy cập.</string>
     <string name="faq_stay_online_q">Mất kết nối khi màn hình tắt?</string>
     <string name="faq_stay_online_a">Khi màn hình tắt, Android có thể tạm dừng ứng dụng hoặc ngắt kết nối mạng, khiến máy tính mất kết nối. Khi dịch vụ đang chạy, chạm "Giữ trực tuyến" trên màn hình chính: ứng dụng chạy liên tục ở nền trước và màn hình luôn bật (có thể hiển thị toàn đen), giúp duy trì kết nối.</string>
     <string name="more_help">Trợ giúp thêm</string>
