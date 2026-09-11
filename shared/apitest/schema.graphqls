@@ -93,6 +93,8 @@ type Mutation {
   unarchiveConversation(id: String!): Boolean!
   sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
   archiveConversation(id: String!, date: Long!): Boolean!
+  trashSms(query: String!): Boolean!
+  restoreSms(query: String!): Boolean!
   sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: String!): String!
   createTag(type: DataType!, name: String!): Tag
   updateTag(id: ID!, name: String!): Tag

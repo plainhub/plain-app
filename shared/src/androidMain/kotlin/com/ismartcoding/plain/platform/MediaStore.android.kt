@@ -6,6 +6,7 @@ import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.db.DTrashedMessage
 import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.docs.DocMediaStoreHelper
@@ -165,6 +166,31 @@ actual suspend fun moveMedia(dataType: DataType, ids: Set<String>, destDir: Stri
         DataType.VIDEO -> VideoMediaStoreHelper.moveByIdsAsync(appContext, ids, destDir)
         else -> false
     }
+}
+
+private suspend fun getTrashedMessageIds(): Set<String> =
+    AppDatabase.instance.trashedMessageDao().getAllIds().toSet()
+
+actual suspend fun trashSms(query: String): Int {
+    val ids = SmsHelper.getIdsAsync(appContext, query)
+    if (ids.isEmpty()) return 0
+    val dao = AppDatabase.instance.trashedMessageDao()
+    // opportunistically drop shadow entries older than 30 days
+    dao.deleteOlderThan(System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000)
+    val now = System.currentTimeMillis()
+    val newIds = ids - getTrashedMessageIds()
+    dao.insertAll(newIds.map { DTrashedMessage(messageId = it, isMms = it.startsWith("mms_"), trashedAt = now) })
+    return newIds.size
+}
+
+actual suspend fun restoreSms(query: String): Int {
+    val ids = SmsHelper.getIdsAsync(appContext, query)
+    if (ids.isEmpty()) return 0
+    val dao = AppDatabase.instance.trashedMessageDao()
+    val trashed = getTrashedMessageIds()
+    val restorable = ids.filter { it in trashed }
+    dao.deleteByMessageIds(restorable)
+    return restorable.size
 }
 
 actual suspend fun getDocExtGroups(query: String): List<Pair<String, Int>> =

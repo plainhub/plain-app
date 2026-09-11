@@ -85,6 +85,10 @@ actual suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.fe
 
 actual suspend fun getSmsAllCounts(): DSmsCounts = DSmsCounts(0, 0, 0, 0)
 
+actual suspend fun trashSms(query: String): Int = 0
+
+actual suspend fun restoreSms(query: String): Int = 0
+
 actual fun sendSmsText(
     number: String,
     body: String,

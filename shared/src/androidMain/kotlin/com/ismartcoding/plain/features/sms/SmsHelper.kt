@@ -192,6 +192,7 @@ object SmsHelper {
     private fun buildWhere(
         conditions: List<FilterField>,
         archivedRecords: List<DArchivedConversation>,
+        trashedIds: Set<String> = emptySet(),
     ): ContentWhere {
         val where = ContentWhere()
         conditions.forEach {
@@ -205,6 +206,20 @@ object SmsHelper {
                 "type" -> where.add("${Telephony.Sms.TYPE} = ?", it.value)
                 "thread_id" -> where.add("${Telephony.Sms.THREAD_ID} = ?", it.value)
             }
+        }
+
+        // trashed:1 → only show app-side trashed messages; otherwise exclude them
+        val showTrashed = conditions.any { it.name == "trashed" && it.value == "1" }
+        val smsTrashedIds = trashedIds.filterNot { it.startsWith("mms_") }
+        if (showTrashed) {
+            val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, smsTrashedIds)
+            if (predicate != null) {
+                where.add(predicate)
+            } else {
+                where.add("${BaseColumns._ID} = ?", "-1")
+            }
+        } else {
+            where.addNotIn(BaseColumns._ID, smsTrashedIds)
         }
 
         val threadIdCondition = conditions.firstOrNull { it.name == "thread_id" }
@@ -227,6 +242,7 @@ object SmsHelper {
         conditions: List<FilterField>,
         archivedRecords: List<DArchivedConversation>,
         textMatchedMmsIds: Set<String>? = null,
+        trashedIds: Set<String> = emptySet(),
     ): ContentWhere? {
         val where = ContentWhere()
         if (conditions.any { it.name == "text" }) {
@@ -248,6 +264,20 @@ object SmsHelper {
             }
         }
         where.add(SmsProviderContract.MMS_CONTENT_FILTER)
+
+        // trashed:1 → only show app-side trashed MMS; otherwise exclude them
+        val showTrashed = conditions.any { it.name == "trashed" && it.value == "1" }
+        val mmsTrashedIds = trashedIds.filter { it.startsWith("mms_") }.map { it.removePrefix("mms_") }
+        if (showTrashed) {
+            val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, mmsTrashedIds)
+            if (predicate != null) {
+                where.add(predicate)
+            } else {
+                where.add("${BaseColumns._ID} = ?", "-1")
+            }
+        } else {
+            where.addNotIn(BaseColumns._ID, mmsTrashedIds)
+        }
 
         val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value
         val archivedConversation = archivedRecords.firstOrNull { it.conversationId == threadId }
@@ -286,6 +316,9 @@ object SmsHelper {
         return count
     }
 
+    private suspend fun getTrashedMessageIds(): Set<String> =
+        AppDatabase.instance.trashedMessageDao().getAllIds().toSet()
+
     suspend fun searchAsync(
         context: Context,
         query: String,
@@ -294,12 +327,13 @@ object SmsHelper {
     ): List<DMessage> = withIO {
         val conditions = QueryHelper.parseAsync(query)
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val trashedIds = getTrashedMessageIds()
         val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
         if (threadId.isNotEmpty()) {
-            return@withIO searchByThreadAsync(context, threadId, conditions, archivedRecords, limit, offset)
+            return@withIO searchByThreadAsync(context, threadId, conditions, archivedRecords, trashedIds, limit, offset)
         }
 
-        val where = buildWhere(conditions, archivedRecords)
+        val where = buildWhere(conditions, archivedRecords, trashedIds)
         val fetchCap = offset + limit
         val textMatchedMmsIds = findMmsIdsMatchingText(
             context,
@@ -312,7 +346,7 @@ object SmsHelper {
             cursorToSmsMessage(cursor, cache)
         } ?: emptyList()
 
-        val mmsItems = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds)?.let { mmsWhere ->
+        val mmsItems = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds, trashedIds)?.let { mmsWhere ->
             context.contentResolver.queryCursor(
                 mmsUri,
                 arrayOf(
@@ -356,17 +390,18 @@ object SmsHelper {
         threadId: String,
         conditions: List<FilterField>,
         archivedRecords: List<DArchivedConversation>,
+        trashedIds: Set<String>,
         limit: Int,
         offset: Int,
     ): List<DMessage> {
         val fetchCap = offset + limit
 
-        val smsWhere = buildWhere(conditions, archivedRecords)
+        val smsWhere = buildWhere(conditions, archivedRecords, trashedIds)
         val textMatchedMmsIds = findMmsIdsMatchingText(
             context,
             conditions.filter { it.name == "text" }.map { it.value },
         )
-        val mmsWhere = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds)
+        val mmsWhere = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds, trashedIds)
 
         // Query SMS and MMS separately — this is reliable across all devices.
         val smsItems = context.contentResolver.queryCursor(
@@ -593,6 +628,7 @@ object SmsHelper {
     suspend fun countAsync(context: Context, query: String): Int = withIO {
         val conditions = QueryHelper.parseAsync(query)
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val trashedIds = getTrashedMessageIds()
         val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
         val textMatchedMmsIds = findMmsIdsMatchingText(
             context,
@@ -600,15 +636,15 @@ object SmsHelper {
         )
 
         if (threadId.isNotEmpty()) {
-            return@withIO countByThread(context, conditions, archivedRecords, textMatchedMmsIds)
+            return@withIO countByThread(context, conditions, archivedRecords, textMatchedMmsIds, trashedIds)
         }
 
-        val where = buildWhere(conditions, archivedRecords)
+        val where = buildWhere(conditions, archivedRecords, trashedIds)
 
         // Count SMS (date filter for archived conversations applied in buildWhereAsync)
         val smsCount = queryCount(context, smsUri, where.toSelection(), where.args.toTypedArray())
 
-        val mmsCount = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds)?.let { mmsWhere ->
+        val mmsCount = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds, trashedIds)?.let { mmsWhere ->
             queryCount(context, mmsUri, mmsWhere.toSelection(), mmsWhere.args.toTypedArray())
         } ?: 0
 
@@ -620,10 +656,11 @@ object SmsHelper {
         conditions: List<FilterField>,
         archivedRecords: List<DArchivedConversation>,
         textMatchedMmsIds: Set<String>?,
+        trashedIds: Set<String>,
     ): Int {
-        val smsWhere = buildWhere(conditions, archivedRecords)
+        val smsWhere = buildWhere(conditions, archivedRecords, trashedIds)
         val smsCount = queryCount(context, smsUri, smsWhere.toSelection(), smsWhere.args.toTypedArray())
-        val mmsCount = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds)?.let { mmsWhere ->
+        val mmsCount = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds, trashedIds)?.let { mmsWhere ->
             queryCount(context, mmsUri, mmsWhere.toSelection(), mmsWhere.args.toTypedArray())
         } ?: 0
         return smsCount + mmsCount
@@ -632,7 +669,8 @@ object SmsHelper {
     suspend fun getIdsAsync(context: Context, query: String): Set<String> = withIO {
         val conditions = QueryHelper.parseAsync(query)
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
-        val where = buildWhere(conditions, archivedRecords)
+        val trashedIds = getTrashedMessageIds()
+        val where = buildWhere(conditions, archivedRecords, trashedIds)
         val textMatchedMmsIds = findMmsIdsMatchingText(
             context,
             conditions.filter { it.name == "text" }.map { it.value },
@@ -646,7 +684,7 @@ object SmsHelper {
         )?.map { cursor, cache ->
             cursor.getStringValue(BaseColumns._ID, cache)
         }.orEmpty()
-        val mmsIds = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds)?.let { mmsWhere ->
+        val mmsIds = buildMmsWhere(conditions, archivedRecords, textMatchedMmsIds, trashedIds)?.let { mmsWhere ->
             context.contentResolver.queryCursor(
                 mmsUri,
                 arrayOf(BaseColumns._ID),

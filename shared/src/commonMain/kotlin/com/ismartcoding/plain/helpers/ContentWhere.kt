@@ -12,6 +12,13 @@ data class ContentWhere(
         }
     }
 
+    fun addNotIn(field: String, values: List<String>) {
+        if (values.isNotEmpty()) {
+            selections.add("$field NOT IN (${CharArray(values.size) { '?' }.joinToString(",")})")
+            args.addAll(values)
+        }
+    }
+
     fun add(selection: String, value: String? = null) {
         selections.add(selection)
         if (value != null) {
