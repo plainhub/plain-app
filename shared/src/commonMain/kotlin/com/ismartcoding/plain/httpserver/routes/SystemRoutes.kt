@@ -30,8 +30,12 @@ private const val SHUTDOWN_RESPONSE_FLUSH_MS = 100L
  * This keys on the socket peer address — never derive it from Forwarded/X-Forwarded-*
  * headers here: no reverse proxy sits in front of this server, so those headers are
  * client-controlled (a forged `for=127.0.0.1` used to shut the server down remotely).
+ * Entries are literal IPs because remoteHost never does reverse DNS (that lookup used
+ * to stall /init for seconds); the IPv6 loopback literal is the full form returned by
+ * InetSocketAddress.getHostString().
  */
-private val SHUTDOWN_ALLOWED_HOSTS = setOf("localhost", "127.0.0.1", "::1")
+private val SHUTDOWN_ALLOWED_HOSTS =
+    setOf("localhost", "127.0.0.1", "::1", "0:0:0:0:0:0:0:1")
 
 /**
  * `/health`, `/shutdown`, `/init` — simple system endpoints shared between

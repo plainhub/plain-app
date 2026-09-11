@@ -52,7 +52,7 @@ internal class NettyConnectionPoint(
         get() = (context.channel().localAddress() as? InetSocketAddress)?.port ?: DEFAULT_PORT
 
     override val localHost: String
-        get() = (context.channel().localAddress() as? InetSocketAddress)?.let { it.hostName ?: it.hostString }
+        get() = (context.channel().localAddress() as? InetSocketAddress)?.hostString
             ?: "localhost"
 
     override val serverHost: String
@@ -72,9 +72,7 @@ internal class NettyConnectionPoint(
             ?: localPort
 
     override val remoteHost: String
-        get() = (context.channel().remoteAddress() as? InetSocketAddress)?.let {
-            it.hostName ?: it.address.hostAddress
-        } ?: "unknown"
+        get() = (context.channel().remoteAddress() as? InetSocketAddress)?.hostString ?: "unknown"
 
     override val remotePort: Int
         get() = (context.channel().remoteAddress() as? InetSocketAddress)?.port ?: 0

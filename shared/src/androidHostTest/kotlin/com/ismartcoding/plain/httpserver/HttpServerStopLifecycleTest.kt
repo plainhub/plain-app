@@ -9,6 +9,7 @@ import com.ismartcoding.plain.lib.ktorserver.core.engine.EmbeddedServer
 import com.ismartcoding.plain.lib.ktorserver.core.engine.applicationEnvironment
 import com.ismartcoding.plain.lib.ktorserver.core.engine.connector
 import com.ismartcoding.plain.lib.ktorserver.core.engine.embeddedServer
+import com.ismartcoding.plain.lib.ktorserver.core.plugins.origin
 import com.ismartcoding.plain.lib.ktorserver.core.response.respondText
 import com.ismartcoding.plain.lib.ktorserver.core.routing.get
 import com.ismartcoding.plain.lib.ktorserver.core.routing.routing
@@ -125,6 +126,50 @@ class HttpServerStopLifecycleTest {
         )
         assertEquals(HttpServerState.ON, HttpServerManager.serverState.value, "a forged Forwarded header must not tear the server down")
         assertTrue(!isPortClosed(), "port $port was closed by a forged Forwarded /shutdown request")
+    }
+
+    @Test
+    fun remoteHost_isLiteralSourceAddress_neverReverseDns() {
+        startServer {
+            routing {
+                get("/whoami") { call.respondText(call.request.origin.remoteHost) }
+            }
+        }
+
+        val client = HttpClient.newHttpClient()
+        val response = client.send(
+            HttpRequest.newBuilder(URI("http://127.0.0.1:$port/whoami")).GET().build(),
+            HttpResponse.BodyHandlers.ofString(),
+        )
+
+        assertEquals(
+            "127.0.0.1",
+            response.body().trim(),
+            "remoteHost must be the literal peer IP. InetSocketAddress.hostName reverse-resolves and blocks /init (login-button latency) for the DNS timeout on LAN IPs with no PTR record.",
+        )
+    }
+
+    @Test
+    fun shutdownRoute_acceptsIpv6LoopbackFullFormLiteral() {
+        startServer(host = "::") { registerCommonRoutes(HttpRouter().apply { addSystemRoutes() }) }
+
+        val client = HttpClient.newHttpClient()
+        val response = client.send(
+            HttpRequest.newBuilder(URI("http://[::1]:$port/shutdown")).GET().build(),
+            HttpResponse.BodyHandlers.ofString(),
+        )
+
+        assertEquals(
+            410,
+            response.statusCode(),
+            "IPv6 loopback /shutdown must be accepted. getHostString() yields the full form 0:0:0:0:0:0:0:1 (not ::1) now that remoteHost never reverse-resolves.",
+        )
+        val deadline = System.currentTimeMillis() + 3000
+        while (HttpServerManager.serverState.value != HttpServerState.OFF && System.currentTimeMillis() < deadline) {
+            Thread.sleep(50)
+        }
+        assertEquals(HttpServerState.OFF, HttpServerManager.serverState.value)
+        assertTrue(isPortClosed(), "port $port still accepts connections after /shutdown")
     }
 
     private fun startServer(
