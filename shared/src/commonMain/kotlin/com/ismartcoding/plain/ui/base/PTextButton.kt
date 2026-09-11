@@ -31,15 +31,13 @@ fun PTextButton(
     enabled: Boolean = true,
     contentColor: Color = MaterialTheme.colorScheme.primary,
 ) {
-    val padding = if (buttonSize == ButtonSize.SMALL) PaddingValues(horizontal = 12.dp) else ButtonDefaults.ContentPadding
-
     TextButton(
         onClick = onClick,
         modifier = modifier
             .height(buttonSize.height),
         shape = RoundedCornerShape(buttonSize.cornerRadius),
         colors = ButtonDefaults.textButtonColors(contentColor = contentColor),
-        contentPadding = padding,
+        contentPadding = buttonSize.getPaddingValues(),
         enabled = enabled && !isLoading,
     ) {
         Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {

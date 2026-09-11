@@ -50,8 +50,6 @@ fun PFilledButton(
         ButtonType.DANGER -> MaterialTheme.colorScheme.filledButtonContent
         ButtonType.TERTIARY -> MaterialTheme.colorScheme.onTertiary
     }
-    val padding = if (buttonSize == ButtonSize.SMALL) PaddingValues(horizontal = 12.dp) else ButtonDefaults.ContentPadding
-
     Button(
         onClick = onClick,
         modifier = modifier
@@ -64,7 +62,7 @@ fun PFilledButton(
             disabledContainerColor = if (isLoading) containerColor.copy(alpha = 0.8f) else containerColor.copy(alpha = 0.12f),
             disabledContentColor = if (isLoading) contentColor else contentColor.copy(alpha = 0.38f),
         ),
-        contentPadding = padding,
+        contentPadding = buttonSize.getPaddingValues(),
         enabled = enabled && !isLoading,
     ) {
         AnimatedContent(

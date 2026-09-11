@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.enums
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -26,6 +27,10 @@ enum class ButtonSize(val height: Dp, val cornerRadius: Dp) {
         MEDIUM -> FontWeight.Medium
         LARGE -> FontWeight.SemiBold
         EXTRA_LARGE -> FontWeight.SemiBold
+    }
+
+    fun getPaddingValues(): PaddingValues {
+        return PaddingValues(horizontal = if (this == ButtonSize.SMALL) 12.dp else 16.dp)
     }
 
     @Composable

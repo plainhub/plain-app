@@ -13,16 +13,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ismartcoding.plain.platform.applySystemBarAppearanceForDarkTheme
+import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.platform.keepScreenOn
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.preferences.LocalDarkTheme
+import com.ismartcoding.plain.ui.base.DebugCornerBadge
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
@@ -99,6 +102,9 @@ fun Main(
                 onStartService = { mainVM.startServiceAfterWizard() },
                 onClose = { mainVM.closePermissionWizard() },
             )
+        }
+        if (isDebugBuild()) {
+            DebugCornerBadge(Modifier.align(Alignment.TopStart))
         }
     }
 }

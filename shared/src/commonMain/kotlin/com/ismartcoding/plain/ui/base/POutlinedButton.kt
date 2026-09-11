@@ -44,7 +44,6 @@ fun POutlinedButton(
         ButtonType.DANGER -> MaterialTheme.colorScheme.red
     }
     val borderColor = resolvedColor.copy(alpha = 0.5f)
-    val padding = if (buttonSize == ButtonSize.SMALL) PaddingValues(horizontal = 12.dp) else ButtonDefaults.ContentPadding
 
     OutlinedButton(
         onClick = onClick,
@@ -53,7 +52,7 @@ fun POutlinedButton(
         shape = RoundedCornerShape(buttonSize.cornerRadius),
         colors = ButtonDefaults.outlinedButtonColors(contentColor = resolvedColor),
         border = BorderStroke(1.dp, borderColor),
-        contentPadding = padding,
+        contentPadding = buttonSize.getPaddingValues(),
         enabled = enabled && !isLoading,
     ) {
         Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
