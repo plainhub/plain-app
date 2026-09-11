@@ -23,6 +23,8 @@ import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.getArchivedSmsConversations
 import com.ismartcoding.plain.platform.getSmsAllCounts
+import com.ismartcoding.plain.platform.trashSms as trashSmsInternal
+import com.ismartcoding.plain.platform.restoreSms as restoreSmsInternal
 import com.ismartcoding.plain.platform.getLatestSentMmsId
 import com.ismartcoding.plain.platform.launchDefaultSmsApp
 import com.ismartcoding.plain.platform.mimeTypeFromExtension
@@ -123,6 +125,18 @@ suspend fun archivedConversations(): List<MessageConversation> {
 @GraphQLMutation
 suspend fun archiveConversation(id: String, date: Long): Boolean {
     AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id, conversationDate = date))
+    return true
+}
+
+@GraphQLMutation
+suspend fun trashSms(query: String): Boolean {
+    trashSmsInternal(query)
+    return true
+}
+
+@GraphQLMutation
+suspend fun restoreSms(query: String): Boolean {
+    restoreSmsInternal(query)
     return true
 }
 

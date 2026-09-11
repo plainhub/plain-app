@@ -168,6 +168,19 @@ expect suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.fe
 expect suspend fun getSmsAllCounts(): DSmsCounts
 
 /**
+ * App-side trash for SMS/MMS: records message ids in a Room shadow table
+ * without touching the system provider (no permissions required).
+ * Returns the number of messages marked as trashed.
+ */
+expect suspend fun trashSms(query: String): Int
+
+/**
+ * Revert [trashSms] for the messages matching [query].
+ * Returns the number of messages restored.
+ */
+expect suspend fun restoreSms(query: String): Int
+
+/**
  * Send an SMS text message to [number] with body [body].
  * @param subscriptionId SIM subscription id, or null for default.
  * @param clientId web client identity derived from the authenticated request headers.
