@@ -58,9 +58,14 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     val needsUpdate = newVersion.whetherNeedUpdate(currentVersion, skipVersion)
 
     LaunchedEffect(Unit) {
-        val path = UpdateInfoPreference.getValueAsync().downloadedApkPath
+        // Read version info from the persisted snapshot: composition-time LocalNewVersion is
+        // still the default "" on cold start, which would wrongly wipe the downloaded path.
+        val info = UpdateInfoPreference.getValueAsync()
+        val path = info.downloadedApkPath
         if (path.isNotEmpty()) {
-            if (fileExists(path) && newVersion.whetherNeedUpdate(currentVersion, skipVersion)
+            val downloadedVersionNeedsUpdate =
+                info.newVersion.toVersion().whetherNeedUpdate(currentVersion, info.skipVersion.toVersion())
+            if (fileExists(path) && downloadedVersionNeedsUpdate
                 && !updateVM.isDownloading.value && !updateVM.isDownloadComplete.value
             ) {
                 updateVM.onDownloadComplete(path)
