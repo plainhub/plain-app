@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">Telefon numaralarını oku</string>
     <string name="feature_QUERY_ALL_PACKAGES">Uygulamaları yönet</string>
     <string name="notification_filter_settings">Bildirim filtre ayarları</string>
-    <string name="notification_filter_settings_desc">Bildirimlerin PC'ye nasıl gönderileceğini seçin</string>
     <string name="filter_mode">Filtre modu</string>
     <string name="notification_filter_mode_desc">İzin verilen liste (seçilen uygulamalar yalnızca) veya engellenen liste (seçilen uygulamalar hariç) modunu seçin</string>
     <string name="allowlist_mode">İzin verilen liste</string>

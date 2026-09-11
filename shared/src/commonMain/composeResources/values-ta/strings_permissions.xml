@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">போன் எண்களை படிக்கவும்</string>
     <string name="feature_QUERY_ALL_PACKAGES">பயன்பாடுகளை நிர்வகிக்கவும்</string>
     <string name="notification_filter_settings">அறிவிப்பு வடிகட்டி அமைப்புகள்</string>
-    <string name="notification_filter_settings_desc">உங்கள் கணக்கு அனுமதிகளை எவ்வாறு பயன்படுத்தலாம் என்பதை தேர்ந்தெடுக்கவும்</string>
     <string name="filter_mode">வடிகட்டி முறை</string>
     <string name="notification_filter_mode_desc">அனுமதிக்கப்பட்ட பட்டியல் (தேர்ந்தெடுக்கப்பட்ட பயன்பாடுகள் மட்டும்) அல்லது தடுக்கப்பட்ட பட்டியல் (தேர்ந்தெடுக்கப்பட்ட பயன்பாடுகள் தவிர) முறையை தேர்ந்தெடுக்கவும்</string>
     <string name="allowlist_mode">அனுமதிக்கப்பட்ட பட்டியல்</string>

@@ -107,19 +107,13 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                             val permission = m.permission
                             val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
                             PListItem(
-                                modifier = Modifier.clickable { togglePermission(scope, m, !enabled) },
+                                modifier = Modifier.clickable { navController.navigate(Routing.NotificationSettings) },
                                 icon = m.icon, title = permission.getText(),
-                                subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
+                                subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted),
+                                separatedActions = true
                             ) {
                                 PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
                                 HorizontalSpace(8.dp)
-                            }
-                            if (enabled) {
-                                PListItem(
-                                    modifier = Modifier.clickable { navController.navigate(Routing.NotificationSettings) },
-                                    icon = Res.drawable.settings, title = stringResource(Res.string.notification_filter_settings),
-                                    subtitle = stringResource(Res.string.notification_filter_settings_desc), showMore = true
-                                )
                             }
                         }
                     }

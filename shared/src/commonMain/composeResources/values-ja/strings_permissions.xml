@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">電話番号の読み取り</string>
     <string name="feature_QUERY_ALL_PACKAGES">アプリの管理</string>
     <string name="notification_filter_settings">通知フィルター設定</string>
-    <string name="notification_filter_settings_desc">PCに通知を送信する方法を選択してください</string>
     <string name="filter_mode">フィルターモード</string>
     <string name="notification_filter_mode_desc">許可リスト（選択したアプリのみ）またはブロックリスト（選択したアプリのみを除外）モードを選択してください</string>
     <string name="allowlist_mode">許可リスト</string>

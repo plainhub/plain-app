@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">Read phone numbers</string>
     <string name="feature_QUERY_ALL_PACKAGES">Manage apps</string>
     <string name="notification_filter_settings">Notification filter settings</string>
-    <string name="notification_filter_settings_desc">Choose which apps can send notifications to PC</string>
     <string name="filter_mode">Filter mode</string>
     <string name="notification_filter_mode_desc">Choose between allowlist (only selected apps) or blacklist (exclude selected apps) mode</string>
     <string name="allowlist_mode">Allowlist</string>

@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">Telefonnummern lesen</string>
     <string name="feature_QUERY_ALL_PACKAGES">Apps verwalten</string>
     <string name="notification_filter_settings">Benachrichtigungsfilter-Einstellungen</string>
-    <string name="notification_filter_settings_desc">Wähle aus, wie Benachrichtigungen an dein PC gesendet werden sollen</string>
     <string name="filter_mode">Filtermodus</string>
     <string name="notification_filter_mode_desc">Wähle zwischen Zulassungsliste (nur ausgewählte Apps) oder Sperrliste (ausschließlich ausgewählte Apps) Modus</string>
     <string name="allowlist_mode">Zulassungsliste</string>

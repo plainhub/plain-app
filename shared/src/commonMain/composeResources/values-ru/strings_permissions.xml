@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">Чтение телефонных номеров</string>
     <string name="feature_QUERY_ALL_PACKAGES">Управление приложениями</string>
     <string name="notification_filter_settings">Настройки фильтра уведомлений</string>
-    <string name="notification_filter_settings_desc">Выберите, как уведомления должны быть отправлены на ваш компьютер</string>
     <string name="filter_mode">Режим фильтра</string>
     <string name="notification_filter_mode_desc">Выберите режим списка разрешенных (только выбранные приложения) или списка запрещенных (исключая выбранные приложения)</string>
     <string name="allowlist_mode">Список разрешенных</string>

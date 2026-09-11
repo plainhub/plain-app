@@ -37,7 +37,6 @@
     <string name="feature_WRITE_CONTACTS">管理联系人</string>
     <string name="feature_NOTIFICATION_LISTENER">管理通知</string>
     <string name="notification_filter_settings">通知过滤设置</string>
-    <string name="notification_filter_settings_desc">选择哪些应用可以向PC发送通知</string>
     <string name="filter_mode">过滤模式</string>
     <string name="notification_filter_mode_desc">选择白名单（仅选中的应用）或黑名单（排除选中的应用）模式</string>
     <string name="allowlist_mode">白名单</string>

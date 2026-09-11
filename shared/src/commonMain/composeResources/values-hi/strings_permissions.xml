@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">फ़ोन नंबर पढ़ें</string>
     <string name="feature_QUERY_ALL_PACKAGES">ऐप्स प्रबंधित करें</string>
     <string name="notification_filter_settings">सूचना फ़िल्टर सेटिंग्स</string>
-    <string name="notification_filter_settings_desc">आपके कंप्यूटर को सूचना कैसे भेजा जाए उसे चुनें</string>
     <string name="filter_mode">फ़िल्टर मोड</string>
     <string name="notification_filter_mode_desc">अनुमति दें या दें नहीं दें चुनें</string>
     <string name="allowlist_mode">अनुमति दें</string>

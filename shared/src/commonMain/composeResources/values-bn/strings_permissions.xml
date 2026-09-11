@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">ফোন নম্বর পড়ুন</string>
     <string name="feature_QUERY_ALL_PACKAGES">অ্যাপ্স পরিচালনা করুন</string>
     <string name="notification_filter_settings">বিজ্ঞপ্তি ফিল্টার সেটিংস</string>
-    <string name="notification_filter_settings_desc">কিভাবে পিসি এ বিজ্ঞপ্তি প্রেরণ করবে তা নির্বাচন করুন</string>
     <string name="filter_mode">ফিল্টার মোড</string>
     <string name="notification_filter_mode_desc">অনুমতি দেওয়া হয়েছে বা দেওয়া হয়নি তা নির্বাচন করুন</string>
     <string name="allowlist_mode">অনুমতি দেওয়া হয়েছে</string>

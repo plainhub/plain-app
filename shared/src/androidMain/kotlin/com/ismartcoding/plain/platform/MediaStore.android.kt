@@ -176,6 +176,7 @@ private suspend fun getTrashedMessageIds(): Set<String> =
 actual suspend fun trashSms(query: String): Int {
     val ids = SmsHelper.getIdsAsync(appContext, query)
     if (ids.isEmpty()) return 0
+    val dao = AppDatabase.instance.trashedMessageDao()
     val now = Clock.System.now()
     val newIds = ids - getTrashedMessageIds()
     dao.insertAll(newIds.map { DTrashedMessage(messageId = it, isMms = it.startsWith("mms_"), trashedAt = now) })

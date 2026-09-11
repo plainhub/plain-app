@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">讀取電話號碼</string>
     <string name="feature_QUERY_ALL_PACKAGES">管理應用程式</string>
     <string name="notification_filter_settings">通知過濾設置</string>
-    <string name="notification_filter_settings_desc">選擇通知如何發送到您的PC</string>
     <string name="filter_mode">過濾模式</string>
     <string name="notification_filter_mode_desc">選擇允許列表（僅選定的應用程序）或阻止列表（排除選定的應用程序）模式</string>
     <string name="allowlist_mode">允許列表</string>

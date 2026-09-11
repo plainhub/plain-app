@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">Lire les numéros de téléphone</string>
     <string name="feature_QUERY_ALL_PACKAGES">Gérer les applications</string>
     <string name="notification_filter_settings">Paramètres de filtrage des notifications</string>
-    <string name="notification_filter_settings_desc">Choisissez comment les notifications doivent être envoyées à votre PC</string>
     <string name="filter_mode">Mode de filtrage</string>
     <string name="notification_filter_mode_desc">Choisissez entre liste autorisée (seules les applications sélectionnées) ou liste bloquée (exclut les applications sélectionnées) mode</string>
     <string name="allowlist_mode">Liste autorisée</string>

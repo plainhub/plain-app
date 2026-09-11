@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">전화 번호 읽기</string>
     <string name="feature_QUERY_ALL_PACKAGES">앱 관리</string>
     <string name="notification_filter_settings">알림 필터 설정</string>
-    <string name="notification_filter_settings_desc">PC에 알림을 보내는 방법을 선택하세요</string>
     <string name="filter_mode">필터 모드</string>
     <string name="notification_filter_mode_desc">허용 목록(선택된 앱만) 또는 차단 목록(선택된 앱 제외) 모드를 선택하세요</string>
     <string name="allowlist_mode">허용 목록</string>

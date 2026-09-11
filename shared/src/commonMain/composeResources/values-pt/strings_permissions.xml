@@ -39,7 +39,6 @@
     <string name="feature_READ_PHONE_NUMBERS">Ler números de telefone</string>
     <string name="feature_QUERY_ALL_PACKAGES">Gerenciar apps</string>
     <string name="notification_filter_settings">Configurações de filtro de notificação</string>
-    <string name="notification_filter_settings_desc">Escolha como as notificações devem ser enviadas para o seu PC</string>
     <string name="filter_mode">Modo de filtro</string>
     <string name="notification_filter_mode_desc">Escolha entre lista de permissões (apenas aplicativos selecionados) ou lista de bloqueio (exclui aplicativos selecionados) modo</string>
     <string name="allowlist_mode">Lista de permissões</string>
