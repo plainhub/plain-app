@@ -152,6 +152,7 @@
     <string name="stay_online_screen_black_countdown">屏幕将在 %1$d 秒后变黑。</string>
     <string name="stay_online_keep_running">部分手机会在息屏或离开应用后断开连接。保持此页面打开，PlainApp 将继续在后台运行，避免桌面访问中断。</string>
     <string name="stay_online_tap_to_exit">点击任意位置退出</string>
+    <string name="stay_online_go_dark_now">立即变黑</string>
     <string name="add_to_home">添加到主屏幕</string>
     <string name="shortcut_added_to_home">快捷方式已添加到主屏幕</string>
     <string name="shortcut_not_supported">您的桌面不支持添加快捷方式</string>

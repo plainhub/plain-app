@@ -152,6 +152,7 @@
     <string name="stay_online_screen_black_countdown">%1$d விநாடிகளில் திரை கருப்பாகும்.</string>
     <string name="stay_online_keep_running">சில சாதனங்கள் திரை அணைந்திருக்கும்போது அல்லது செயலி பின்னணியில் இருக்கும்போது துண்டிக்கப்படலாம். PlainApp ஐ இயக்க வைத்திருக்கவும் மற்றும் டெஸ்க்டாப் அணுகலை பராமரிக்கவும் இந்த பக்கத்தை திறந்து வைத்திருக்கவும்.</string>
     <string name="stay_online_tap_to_exit">வெளியேற எங்கும் தட்டவும்</string>
+    <string name="stay_online_go_dark_now">இப்போது இருட்டாக்கு</string>
     <string name="add_to_home">முகப்புத் திரையில் சேர்க்கவும்</string>
     <string name="shortcut_added_to_home">முகப்புத் திரையில் குறுக்குவழி சேர்க்கப்பட்டது</string>
     <string name="shortcut_not_supported">உங்கள் தொடக்கி குறுக்குவழிகளை சேர்க்க ஆதரிக்கவில்லை</string>

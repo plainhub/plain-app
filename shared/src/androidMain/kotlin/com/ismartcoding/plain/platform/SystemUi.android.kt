@@ -24,8 +24,7 @@ actual fun isGestureInteractionMode(): Boolean {
 }
 
 actual fun keepScreenOn(enabled: Boolean) {
-    val context = com.ismartcoding.plain.appContextValue ?: return
-    val activity = context as? Activity ?: return
+    val activity = com.ismartcoding.plain.mainActivity ?: return
     if (enabled) {
         activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     } else {
@@ -54,9 +53,16 @@ actual fun setImmersiveFullscreen() {
     val view = LocalView.current
     val activity = LocalActivity.current
     SideEffect {
-        val window = (view.parent as? DialogWindowProvider)?.window
-            ?: (activity as? Activity)?.window
-            ?: return@SideEffect
+        val dialogWindow = (view.parent as? DialogWindowProvider)?.window
+        val window = dialogWindow ?: (activity as? Activity)?.window ?: return@SideEffect
+        if (dialogWindow != null) {
+            // Force the dialog to fill the screen, otherwise some OEMs (e.g.
+            // Samsung) leave a grey letterbox strip at the status/nav bar area.
+            dialogWindow.setLayout(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+            )
+        }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, view).apply {
             hide(WindowInsetsCompat.Type.systemBars())

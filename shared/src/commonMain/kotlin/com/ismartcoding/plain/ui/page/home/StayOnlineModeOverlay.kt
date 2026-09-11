@@ -2,8 +2,6 @@ package com.ismartcoding.plain.ui.page.home
 
 import com.ismartcoding.plain.i18n.*
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,15 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,31 +31,12 @@ import androidx.compose.ui.window.DialogProperties
 import com.ismartcoding.plain.platform.exitImmersiveFullscreen
 import com.ismartcoding.plain.platform.keepScreenOn
 import com.ismartcoding.plain.platform.setImmersiveFullscreen
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.ismartcoding.plain.ui.base.POutlinedButton
 
 @Composable
 fun StayOnlineModeOverlay(onExit: () -> Unit) {
-    val scope = rememberCoroutineScope()
-
     // true = pure black screen; false = text visible
-    val totalSeconds = 30
     var sleeping by remember { mutableStateOf(false) }
-    var remainingSeconds by remember { mutableStateOf(totalSeconds) }
-    var sleepJob by remember { mutableStateOf<Job?>(null) }
-
-    fun scheduleSleep(seconds: Int) {
-        sleepJob?.cancel()
-        remainingSeconds = seconds
-        sleepJob = scope.launch {
-            while (remainingSeconds > 0) {
-                delay(1_000)
-                remainingSeconds -= 1
-            }
-            sleeping = true
-        }
-    }
 
     DisposableEffect(Unit) {
         keepScreenOn(true)
@@ -69,15 +45,6 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
             exitImmersiveFullscreen()
         }
     }
-
-    // Initial display: countdown 30s then sleep
-    LaunchedEffect(Unit) { scheduleSleep(totalSeconds) }
-
-    val textAlpha by animateFloatAsState(
-        targetValue = if (sleeping) 0f else 1f,
-        animationSpec = tween(durationMillis = 1500),
-        label = "textAlpha",
-    )
 
     Dialog(
         onDismissRequest = onExit,
@@ -98,8 +65,8 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
                     interactionSource = remember { MutableInteractionSource() },
                 ) {
                     if (sleeping) {
+                        // Wake on tap so the user can reach the controls again.
                         sleeping = false
-                        scheduleSleep(totalSeconds)
                     } else {
                         onExit()
                     }
@@ -107,28 +74,27 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
             contentAlignment = Alignment.Center,
         ) {
             if (!sleeping) {
+                val softWhite = Color.White.copy(alpha = 0.7f)
                 Column(
-                    modifier = Modifier
-                        .alpha(textAlpha)
-                        .padding(horizontal = 40.dp),
+                    modifier = Modifier.padding(horizontal = 40.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = stringResource(Res.string.stay_online_keep_running),
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = softWhite,
                         fontSize = 20.sp,
                     )
                     Spacer(modifier = Modifier.height(40.dp))
-                    Text(
-                        text = stringResource(Res.string.stay_online_screen_black_countdown, remainingSeconds),
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 20.sp,
+                    POutlinedButton(
+                        text = stringResource(Res.string.stay_online_go_dark_now),
+                        onClick = { sleeping = true },
+                        contentColor = softWhite,
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
                         text = stringResource(Res.string.stay_online_tap_to_exit),
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = softWhite,
                         fontSize = 20.sp,
                     )
                 }

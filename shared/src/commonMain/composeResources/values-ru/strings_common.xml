@@ -152,6 +152,7 @@
     <string name="stay_online_screen_black_countdown">Экран станет чёрным через %1$d секунд.</string>
     <string name="stay_online_keep_running">Некоторые устройства могут отключаться, когда экран выключен или когда приложение находится в фоновом режиме. Держите эту страницу открытой, чтобы PlainApp продолжал работать, и поддерживайте доступ к рабочему столу.</string>
     <string name="stay_online_tap_to_exit">Нажмите в любом месте для выхода</string>
+    <string name="stay_online_go_dark_now">Затемнить сейчас</string>
     <string name="add_to_home">Добавить на главный экран</string>
     <string name="shortcut_added_to_home">Ярлык добавлен на главный экран</string>
     <string name="shortcut_not_supported">Ваш лаунчер не поддерживает добавление ярлыков</string>

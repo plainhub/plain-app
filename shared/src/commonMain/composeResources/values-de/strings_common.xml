@@ -152,6 +152,7 @@
     <string name="stay_online_screen_black_countdown">Der Bildschirm wird nach %1$d Sekunden schwarz.</string>
     <string name="stay_online_keep_running">Einige Geräte können die Verbindung trennen, wenn der Bildschirm ausgeschaltet ist oder wenn die App im Hintergrund läuft. Halten Sie diese Seite geöffnet, damit PlainApp weiterläuft und der Desktop-Zugriff aufrechterhalten bleibt.</string>
     <string name="stay_online_tap_to_exit">Tippen Sie zum Beenden</string>
+    <string name="stay_online_go_dark_now">Jetzt abdunkeln</string>
     <string name="add_to_home">Zum Startbildschirm hinzufügen</string>
     <string name="shortcut_added_to_home">Verknüpfung zum Startbildschirm hinzugefügt</string>
     <string name="shortcut_not_supported">Ihr Launcher unterstützt keine Verknüpfungen</string>

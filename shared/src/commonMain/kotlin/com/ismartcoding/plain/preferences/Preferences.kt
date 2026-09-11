@@ -168,7 +168,7 @@ object ApiPermissionsPreference : BasePreference<Set<String>>() {
 }
 
 object HttpPortPreference : BasePreference<Int>() {
-    override val default = 80
+    override val default = 8080
     override val key = intPreferencesKey("http_port")
 
     override suspend fun putAsync(value: Int) {
@@ -178,7 +178,7 @@ object HttpPortPreference : BasePreference<Int>() {
 }
 
 object HttpsPortPreference : BasePreference<Int>() {
-    override val default = 443
+    override val default = 8443
     override val key = intPreferencesKey("https_port")
 
     override suspend fun putAsync(value: Int) {

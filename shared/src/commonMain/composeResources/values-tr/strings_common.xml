@@ -152,6 +152,7 @@
     <string name="stay_online_screen_black_countdown">Ekran %1$d saniye sonra siyah olacak.</string>
     <string name="stay_online_keep_running">Bazı cihazlar ekran kapalıyken veya uygulama arka planda olduğunda bağlantıyı kesebilir. PlainApp'in çalışmaya devam etmesi ve masaüstü erişiminin korunması için bu sayfayı açık tutun.</string>
     <string name="stay_online_tap_to_exit">Çıkmak için dokunun</string>
+    <string name="stay_online_go_dark_now">Şimdi karart</string>
     <string name="add_to_home">Ana ekrana ekle</string>
     <string name="shortcut_added_to_home">Kısayol ana ekrana eklendi</string>
     <string name="shortcut_not_supported">Başlatıcınız kısayol eklemeyi desteklemiyor</string>
