@@ -40,6 +40,7 @@ fun FaqItem(
     tint: Color,
     question: String,
     answer: String,
+    answerFooterFullWidth: Boolean = false,
     answerFooter: (@Composable () -> Unit)? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -83,14 +84,27 @@ fun FaqItem(
             enter = expandVertically() + fadeIn(),
             exit = shrinkVertically() + fadeOut(),
         ) {
-            Column(modifier = Modifier.padding(start = 72.dp, end = 16.dp, bottom = 16.dp)) {
-                Text(
-                    text = answer,
-                    style = MaterialTheme.typography.listItemSubtitle(),
-                )
-                if (answerFooter != null) {
-                    VerticalSpace(dp = 8.dp)
-                    answerFooter()
+            if (answerFooterFullWidth) {
+                Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                    Text(
+                        text = answer,
+                        style = MaterialTheme.typography.listItemSubtitle(),
+                    )
+                    if (answerFooter != null) {
+                        VerticalSpace(dp = 8.dp)
+                        answerFooter()
+                    }
+                }
+            } else {
+                Column(modifier = Modifier.padding(start = 72.dp, end = 16.dp, bottom = 16.dp)) {
+                    Text(
+                        text = answer,
+                        style = MaterialTheme.typography.listItemSubtitle(),
+                    )
+                    if (answerFooter != null) {
+                        VerticalSpace(dp = 8.dp)
+                        answerFooter()
+                    }
                 }
             }
         }

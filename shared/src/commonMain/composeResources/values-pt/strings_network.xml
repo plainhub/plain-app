@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Executar diagnóstico</string>
     <string name="faq_cannot_open_q">Não consegue abrir a página web?</string>
     <string name="faq_cannot_open_a">Verifique se o celular e o computador estão na mesma rede (mesmo Wi-Fi ou hotspot do celular) e se o status do serviço acima mostra "em execução". Se ainda não funcionar, execute o diagnóstico abaixo. Se o serviço estiver com falha, reinicie o aplicativo.</string>
+    <string name="faq_https_demo_title">Sua conexão não é particular</string>
+    <string name="faq_https_demo_desc">Invasores podem estar tentando roubar suas informações de %1$s (por exemplo, senhas, mensagens ou cartões de crédito).</string>
+    <string name="faq_https_demo_reason">O certificado de segurança de %1$s é autoassinado, então seu dispositivo ainda não confia nele. Isso é normal em uma rede local.</string>
+    <string name="faq_https_demo_advanced">Avançado</string>
+    <string name="faq_https_demo_proceed">Ir para %1$s (não seguro)</string>
+    <string name="faq_https_demo_connected">Conectado</string>
     <string name="faq_https_warning_q">Vê a mensagem "Sua conexão não é particular"?</string>
     <string name="faq_port_conflict_q">Porta ocupada?</string>
     <string name="faq_port_conflict_a">Toque em "Reiniciar aplicativo" no aviso: o aplicativo será reiniciado automaticamente em uma porta livre.</string>

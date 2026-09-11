@@ -164,6 +164,8 @@ fun HowToUsePage(
                                 tint = MaterialTheme.colorScheme.orange,
                                 question = stringResource(Res.string.faq_https_warning_q),
                                 answer = stringResource(Res.string.browser_https_error_tips),
+                                answerFooter = { FaqCertDemo() },
+                                answerFooterFullWidth = true,
                             )
                             FaqItem(
                                 icon = Res.drawable.timer,

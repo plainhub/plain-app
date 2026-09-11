@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Diagnose ausführen</string>
     <string name="faq_cannot_open_q">Lässt sich die Webseite nicht öffnen?</string>
     <string name="faq_cannot_open_a">Stelle sicher, dass Telefon und Computer im selben Netzwerk sind (dasselbe WLAN oder der Hotspot des Telefons) und der Dienststatus oben „läuft“ anzeigt. Wenn es weiterhin nicht funktioniert, führe die Diagnose unten aus. Falls der Dienst fehlerhaft ist, starte die App neu.</string>
+    <string name="faq_https_demo_title">Ihre Verbindung ist nicht privat</string>
+    <string name="faq_https_demo_desc">Angreifer versuchen möglicherweise, deine Informationen von %1$s zu stehlen (z. B. Passwörter, Nachrichten oder Kreditkarten).</string>
+    <string name="faq_https_demo_reason">Das Sicherheitszertifikat von %1$s ist selbstsigniert, daher vertraut dein Gerät ihm noch nicht. Das ist in einem lokalen Netzwerk normal.</string>
+    <string name="faq_https_demo_advanced">Erweitert</string>
+    <string name="faq_https_demo_proceed">Weiter zu %1$s (nicht sicher)</string>
+    <string name="faq_https_demo_connected">Verbunden</string>
     <string name="faq_https_warning_q">Wird „Ihre Verbindung ist nicht privat“ angezeigt?</string>
     <string name="faq_port_conflict_q">Port belegt?</string>
     <string name="faq_port_conflict_a">Tippe im Dialog auf „App neu starten“ – die App startet neu und wählt automatisch einen freien Port.</string>

@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Tanılamayı çalıştır</string>
     <string name="faq_cannot_open_q">Web sayfası açılmıyor mu?</string>
     <string name="faq_cannot_open_a">Telefon ve bilgisayarın aynı ağda (aynı Wi-Fi veya telefon hotspot'u) olduğundan ve yukarıdaki servis durumunun "çalışıyor" göründüğünden emin olun. Hâlâ erişilemiyorsa aşağıdaki tanılamayı çalıştırın. Serviste sorun varsa uygulamayı yeniden başlatın.</string>
+    <string name="faq_https_demo_title">Bağlantınız gizli değil</string>
+    <string name="faq_https_demo_desc">Saldırganlar %1$s üzerinden bilgilerinizi çalmaya çalışıyor olabilir (örneğin şifreler, mesajlar veya kredi kartları).</string>
+    <string name="faq_https_demo_reason">%1$s güvenlik sertifikası kendinden imzalıdır, bu yüzden cihazınız henüz güvenmiyor. Yerel ağda bu normaldir.</string>
+    <string name="faq_https_demo_advanced">Gelişmiş</string>
+    <string name="faq_https_demo_proceed">%1$s sitesine ilerle (güvenli değil)</string>
+    <string name="faq_https_demo_connected">Bağlandı</string>
     <string name="faq_https_warning_q">"Bağlantınız gizli değil" uyarısı mı görüyorsunuz?</string>
     <string name="faq_port_conflict_q">Port meşgul mü?</string>
     <string name="faq_port_conflict_a">İstemde "UYGULAMAYI Yeniden Başlat" seçeneğine dokunun; uygulama yeniden başlar ve boş bir porta otomatik geçer.</string>

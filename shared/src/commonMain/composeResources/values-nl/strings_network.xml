@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Diagnose uitvoeren</string>
     <string name="faq_cannot_open_q">Webpagina opent niet?</string>
     <string name="faq_cannot_open_a">Zorg dat telefoon en computer in hetzelfde netwerk zitten (hetzelfde wifi of de hotspot van de telefoon) en dat de servicestatus hierboven 'draait' toont. Werkt het nog steeds niet, voer dan de diagnose hieronder uit. Bij een defecte service: start de app opnieuw.</string>
+    <string name="faq_https_demo_title">Uw verbinding is niet privé</string>
+    <string name="faq_https_demo_desc">Aanvallers proberen mogelijk uw informatie te stelen vanaf %1$s (bijvoorbeeld wachtwoorden, berichten of creditcards).</string>
+    <string name="faq_https_demo_reason">Het beveiligingscertificaat van %1$s is zelfondertekend, dus uw apparaat vertrouwt het nog niet. Dit is normaal op een lokaal netwerk.</string>
+    <string name="faq_https_demo_advanced">Geavanceerd</string>
+    <string name="faq_https_demo_proceed">Doorgaan naar %1$s (onveilig)</string>
+    <string name="faq_https_demo_connected">Verbonden</string>
     <string name="faq_https_warning_q">Zie je 'Uw verbinding is niet privé'?</string>
     <string name="faq_port_conflict_q">Poort in gebruik?</string>
     <string name="faq_port_conflict_a">Tik in de melding op 'App opnieuw starten' — de app start opnieuw en kiest automatisch een vrije poort.</string>

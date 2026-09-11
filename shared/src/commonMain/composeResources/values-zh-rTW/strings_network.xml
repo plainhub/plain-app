@@ -90,6 +90,12 @@
     <string name="run_diagnostics">執行診斷</string>
     <string name="faq_cannot_open_q">電腦無法開啟網頁？</string>
     <string name="faq_cannot_open_a">請確認手機與電腦在同一個網路（同一 Wi-Fi 或手機熱點），且上方服務狀態為「執行中」。仍無法存取時，請執行下方診斷；若服務異常，請重啟應用。</string>
+    <string name="faq_https_demo_title">您的連線不是私人連線</string>
+    <string name="faq_https_demo_desc">攻擊者可能會試圖從 %1$s 竊取您的資訊（例如密碼、訊息或信用卡資料）。</string>
+    <string name="faq_https_demo_reason">%1$s 的安全憑證是自我簽署的，因此您的裝置暫時不信任它。區域網路出現此提示屬正常現象。</string>
+    <string name="faq_https_demo_advanced">進階</string>
+    <string name="faq_https_demo_proceed">繼續前往 %1$s（不安全）</string>
+    <string name="faq_https_demo_connected">已連線</string>
     <string name="faq_https_warning_q">看到「您的連線不是私人連線」？</string>
     <string name="faq_port_conflict_q">連接埠被占用？</string>
     <string name="faq_port_conflict_a">在提示中點「重啟應用」，應用會自動重啟並更換可用連接埠。</string>

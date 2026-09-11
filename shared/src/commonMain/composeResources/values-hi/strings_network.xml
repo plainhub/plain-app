@@ -90,6 +90,12 @@
     <string name="run_diagnostics">निदान चलाएँ</string>
     <string name="faq_cannot_open_q">वेब पेज नहीं खुल रहा है?</string>
     <string name="faq_cannot_open_a">सुनिश्चित करें कि फ़ोन और कंप्यूटर एक ही नेटवर्क (एक ही Wi-Fi या फ़ोन का हॉटस्पॉट) पर हैं और ऊपर सेवा की स्थिति "चल रही है" दिखा रही है। फिर भी काम न करे तो नीचे निदान चलाएँ। सेवा में समस्या हो तो ऐप फिर से चालू करें।</string>
+    <string name="faq_https_demo_title">आपका कनेक्शन निजी नहीं है</string>
+    <string name="faq_https_demo_desc">हमलावर %1$s से आपकी जानकारी (जैसे पासवर्ड, मैसेज या क्रेडिट कार्ड) चुराने की कोशिश कर रहे हो सकते हैं।</string>
+    <string name="faq_https_demo_reason">%1$s का सुरक्षा सर्टिफिकेट सेल्फ-साइंड है, इसलिए आपका डिवाइस अभी इस पर भरोसा नहीं करता। लोकल नेटवर्क पर यह सामान्य है।</string>
+    <string name="faq_https_demo_advanced">एडवांस्ड</string>
+    <string name="faq_https_demo_proceed">%1$s पर आगे बढ़ें (असुरक्षित)</string>
+    <string name="faq_https_demo_connected">कनेक्टेड</string>
     <string name="faq_https_warning_q">"आपका कनेक्शन निजी नहीं है" दिख रहा है?</string>
     <string name="faq_port_conflict_q">पोर्ट उपयोग में है?</string>
     <string name="faq_port_conflict_a">संकेत में "ऐप फिर से चालू करें" दबाएँ — ऐप अपने आप पुनः शुरू होकर खाली पोर्ट पर चला जाएगा।</string>

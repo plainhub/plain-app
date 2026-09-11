@@ -39,6 +39,12 @@
     <string name="run_diagnostics">Run diagnostics</string>
     <string name="faq_cannot_open_q">Can't open the web page?</string>
     <string name="faq_cannot_open_a">Make sure your phone and computer are on the same network (same Wi-Fi or phone hotspot) and the service status above shows Running. If it still doesn't work, run the diagnostic below. If the service is faulty, restart the app.</string>
+    <string name="faq_https_demo_title">Your connection is not private</string>
+    <string name="faq_https_demo_desc">Attackers might be trying to steal your information from %1$s (for example, passwords, messages or credit cards).</string>
+    <string name="faq_https_demo_reason">%1$s's security certificate is self-signed, so your device doesn't trust it yet. This is expected on a local network.</string>
+    <string name="faq_https_demo_advanced">Advanced</string>
+    <string name="faq_https_demo_proceed">Proceed to %1$s (unsafe)</string>
+    <string name="faq_https_demo_connected">Connected</string>
     <string name="faq_https_warning_q">Seeing "Your connection is not private"?</string>
     <string name="faq_port_conflict_q">Port occupied?</string>
     <string name="faq_port_conflict_a">Tap "Restart App" in the prompt and the app will restart with a free port automatically.</string>

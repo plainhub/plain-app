@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Запустить диагностику</string>
     <string name="faq_cannot_open_q">Не открывается веб-страница?</string>
     <string name="faq_cannot_open_a">Убедитесь, что телефон и компьютер в одной сети (один Wi-Fi или точка доступа телефона), а статус службы выше — «запущена». Если доступ по-прежнему не работает, запустите диагностику ниже. Если служба неисправна, перезапустите приложение.</string>
+    <string name="faq_https_demo_title">Ваше подключение не защищено</string>
+    <string name="faq_https_demo_desc">Злоумышленники могут пытаться похитить ваши данные с %1$s (например, пароли, сообщения или номера карт).</string>
+    <string name="faq_https_demo_reason">Сертификат безопасности %1$s самоподписанный, поэтому устройство ему пока не доверяет. Для локальной сети это нормально.</string>
+    <string name="faq_https_demo_advanced">Дополнительно</string>
+    <string name="faq_https_demo_proceed">Перейти на %1$s (небезопасно)</string>
+    <string name="faq_https_demo_connected">Подключено</string>
     <string name="faq_https_warning_q">Видите сообщение «Подключение не защищено»?</string>
     <string name="faq_port_conflict_q">Порт занят?</string>
     <string name="faq_port_conflict_a">Нажмите «Перезапустите приложение» в диалоге — приложение перезапустится и автоматически выберет свободный порт.</string>

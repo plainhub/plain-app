@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Chạy chẩn đoán</string>
     <string name="faq_cannot_open_q">Không mở được trang web?</string>
     <string name="faq_cannot_open_a">Đảm bảo điện thoại và máy tính cùng một mạng (cùng Wi-Fi hoặc điểm truy cập của điện thoại) và trạng thái dịch vụ phía trên đang "đang chạy". Nếu vẫn không truy cập được, hãy chạy chẩn đoán bên dưới. Nếu dịch vụ gặp lỗi, hãy khởi chạy lại ứng dụng.</string>
+    <string name="faq_https_demo_title">Kết nối của bạn không phải là kết nối riêng tư</string>
+    <string name="faq_https_demo_desc">Kẻ tấn công có thể đang cố đánh cắp thông tin của bạn từ %1$s (ví dụ: mật khẩu, tin nhắn hoặc thẻ tín dụng).</string>
+    <string name="faq_https_demo_reason">Chứng chỉ bảo mật của %1$s là tự ký nên thiết bị của bạn chưa tin tưởng nó. Điều này là bình thường trong mạng cục bộ.</string>
+    <string name="faq_https_demo_advanced">Nâng cao</string>
+    <string name="faq_https_demo_proceed">Tiếp tục đến %1$s (không an toàn)</string>
+    <string name="faq_https_demo_connected">Đã kết nối</string>
     <string name="faq_https_warning_q">Thấy cảnh báo "Kết nối của bạn không phải là kết nối riêng tư"?</string>
     <string name="faq_port_conflict_q">Cổng bị chiếm dụng?</string>
     <string name="faq_port_conflict_a">Chạm "Khởi chạy lại ứng dụng" trong hộp thoại; ứng dụng sẽ tự khởi động lại với một cổng trống.</string>

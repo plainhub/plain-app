@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Lancer le diagnostic</string>
     <string name="faq_cannot_open_q">La page Web ne s'ouvre pas ?</string>
     <string name="faq_cannot_open_a">Assurez-vous que le téléphone et l'ordinateur sont sur le même réseau (même Wi-Fi ou point d'accès mobile du téléphone) et que l'état du service ci-dessus indique « en cours d'exécution ». Si l'accès échoue toujours, lancez le diagnostic ci-dessous. Si le service est défectueux, redémarrez l'application.</string>
+    <string name="faq_https_demo_title">Votre connexion n'est pas privée</string>
+    <string name="faq_https_demo_desc">Des pirates tentent peut-être de voler vos informations depuis %1$s (par exemple, mots de passe, messages ou cartes bancaires).</string>
+    <string name="faq_https_demo_reason">Le certificat de sécurité de %1$s est auto-signé, votre appareil ne lui fait donc pas encore confiance. C'est normal sur un réseau local.</string>
+    <string name="faq_https_demo_advanced">Avancé</string>
+    <string name="faq_https_demo_proceed">Continuer vers %1$s (non sécurisé)</string>
+    <string name="faq_https_demo_connected">Connecté</string>
     <string name="faq_https_warning_q">Le message « Votre connexion n'est pas privée » s'affiche ?</string>
     <string name="faq_port_conflict_q">Port occupé ?</string>
     <string name="faq_port_conflict_a">Touchez « Relancer l'application » dans l'invite : l'application redémarrera automatiquement sur un port libre.</string>

@@ -90,6 +90,12 @@
     <string name="run_diagnostics">运行诊断</string>
     <string name="faq_cannot_open_q">电脑打不开网页？</string>
     <string name="faq_cannot_open_a">请确认手机与电脑在同一网络（同一 Wi-Fi 或手机热点），且上方服务状态为“运行中”。仍无法访问时，请运行下方诊断；若服务异常，请重启应用。</string>
+    <string name="faq_https_demo_title">您的连接不是私密连接</string>
+    <string name="faq_https_demo_desc">攻击者可能会试图从 %1$s 窃取您的信息（例如密码、通讯消息或银行卡信息）。</string>
+    <string name="faq_https_demo_reason">%1$s 的安全证书是自签名的，因此您的设备暂时不信任它。本地网络出现此提示属于正常现象。</string>
+    <string name="faq_https_demo_advanced">高级</string>
+    <string name="faq_https_demo_proceed">继续前往 %1$s（不安全）</string>
+    <string name="faq_https_demo_connected">已连接</string>
     <string name="faq_https_warning_q">看到“您的连接不是私密连接”？</string>
     <string name="faq_port_conflict_q">端口被占用？</string>
     <string name="faq_port_conflict_a">在提示中点“重启应用”，应用会自动重启并换一个可用端口。</string>

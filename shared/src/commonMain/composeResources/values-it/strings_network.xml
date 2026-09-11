@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Esegui diagnostica</string>
     <string name="faq_cannot_open_q">Non riesci ad aprire la pagina web?</string>
     <string name="faq_cannot_open_a">Assicurati che telefono e computer siano sulla stessa rete (stesso Wi-Fi o hotspot del telefono) e che lo stato del servizio sopra sia «in esecuzione». Se non funziona ancora, esegui la diagnostica qui sotto. Se il servizio è guasto, riavvia l'app.</string>
+    <string name="faq_https_demo_title">La connessione non è privata</string>
+    <string name="faq_https_demo_desc">Malintenzionati potrebbero provare a rubare le tue informazioni da %1$s (ad esempio password, messaggi o carte di credito).</string>
+    <string name="faq_https_demo_reason">Il certificato di sicurezza di %1$s è autofirmato, quindi il tuo dispositivo non lo considera ancora attendibile. È normale in una rete locale.</string>
+    <string name="faq_https_demo_advanced">Avanzate</string>
+    <string name="faq_https_demo_proceed">Prosegui verso %1$s (non sicuro)</string>
+    <string name="faq_https_demo_connected">Connesso</string>
     <string name="faq_https_warning_q">Vedi il messaggio «La tua connessione non è privata»?</string>
     <string name="faq_port_conflict_q">Porta occupata?</string>
     <string name="faq_port_conflict_a">Tocca «Rilancia l'app» nell'avviso: l'app si riavvierà automaticamente su una porta libera.</string>

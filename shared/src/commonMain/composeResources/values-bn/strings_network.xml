@@ -88,6 +88,12 @@
     <string name="run_diagnostics">ডায়াগনস্টিক চালান</string>
     <string name="faq_cannot_open_q">ওয়েব পেজ খুলছে না?</string>
     <string name="faq_cannot_open_a">নিশ্চিত করুন ফোন ও কম্পিউটার একই নেটওয়ার্কে (একই Wi-Fi বা ফোনের হটস্পট) আছে এবং উপরের সেবার অবস্থা "চলছে" দেখাচ্ছে। তবুও কাজ না করলে নিচের ডায়াগনস্টিক চালান। সেবায় সমস্যা থাকলে অ্যাপ পুনরায় চালু করুন।</string>
+    <string name="faq_https_demo_title">আপনার সংযোগ ব্যক্তিগত নয়</string>
+    <string name="faq_https_demo_desc">আক্রমণকারীরা %1$s থেকে আপনার তথ্য (যেমন পাসওয়ার্ড, মেসেজ বা ক্রেডিট কার্ড) চুরি করার চেষ্টা করতে পারে।</string>
+    <string name="faq_https_demo_reason">%1$s এর নিরাপত্তা সার্টিফিকেট স্ব-স্বাক্ষরিত, তাই আপনার ডিভাইস এখনও এটিতে বিশ্বাস করে না। লোকাল নেটওয়ার্কে এটাই স্বাভাবিক।</string>
+    <string name="faq_https_demo_advanced">উন্নত</string>
+    <string name="faq_https_demo_proceed">%1$s এ এগিয়ে যান (অনিরাপদ)</string>
+    <string name="faq_https_demo_connected">সংযুক্ত</string>
     <string name="faq_https_warning_q">"আপনার সংযোগ প্রাইভেট নয়" দেখাচ্ছে?</string>
     <string name="faq_port_conflict_q">পোর্ট ব্যস্ত?</string>
     <string name="faq_port_conflict_a">প্রম্পটে "পুনরায় চালু করুন" চাপ দিন — অ্যাপ স্বয়ংক্রিয়ভাবে পুনরায় চালু হয়ে একটি ফাঁকা পোর্টে চলে যাবে।</string>

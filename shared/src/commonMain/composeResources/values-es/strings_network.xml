@@ -90,6 +90,12 @@
     <string name="run_diagnostics">Ejecutar diagnóstico</string>
     <string name="faq_cannot_open_q">¿No se abre la página web?</string>
     <string name="faq_cannot_open_a">Asegúrate de que el teléfono y el ordenador estén en la misma red (la misma red Wi-Fi o el punto de acceso del teléfono) y de que el estado del servicio de arriba muestre «en ejecución». Si aún no funciona, ejecuta el diagnóstico de abajo. Si el servicio falla, reinicia la aplicación.</string>
+    <string name="faq_https_demo_title">Tu conexión no es privada</string>
+    <string name="faq_https_demo_desc">Es posible que atacantes intenten robar tu información desde %1$s (por ejemplo, contraseñas, mensajes o tarjetas de crédito).</string>
+    <string name="faq_https_demo_reason">El certificado de seguridad de %1$s es autofirmado, así que tu dispositivo aún no confía en él. Esto es lo esperado en una red local.</string>
+    <string name="faq_https_demo_advanced">Avanzado</string>
+    <string name="faq_https_demo_proceed">Ir a %1$s (no seguro)</string>
+    <string name="faq_https_demo_connected">Conectado</string>
     <string name="faq_https_warning_q">¿Ves el mensaje «Tu conexión no es privada»?</string>
     <string name="faq_port_conflict_q">¿Puerto ocupado?</string>
     <string name="faq_port_conflict_a">Toca «Vuelve a abrir PlainApp» en el aviso y la aplicación se reiniciará automáticamente con un puerto libre.</string>

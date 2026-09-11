@@ -90,6 +90,12 @@
     <string name="run_diagnostics">診断を実行</string>
     <string name="faq_cannot_open_q">ウェブページが開けませんか？</string>
     <string name="faq_cannot_open_a">スマホとパソコンが同じネットワーク（同じ Wi-Fi またはスマホのアクセスポイント）に接続され、上記のサービス状態が「実行中」になっていることを確認してください。それでもアクセスできない場合は、下の診断を実行してください。サービスに異常がある場合は、アプリを再起動してください。</string>
+    <string name="faq_https_demo_title">この接続ではプライバシーが保護されません</string>
+    <string name="faq_https_demo_desc">攻撃者が %1$s からあなたの情報（パスワード、メッセージ、クレジットカードなど）を盗もうとしている可能性があります。</string>
+    <string name="faq_https_demo_reason">%1$s のセキュリティ証明書は自己署名のため、デバイスはまだ信頼していません。ローカルネットワークでは正常な動作です。</string>
+    <string name="faq_https_demo_advanced">詳細設定</string>
+    <string name="faq_https_demo_proceed">%1$s にアクセスする（安全でない）</string>
+    <string name="faq_https_demo_connected">接続済み</string>
     <string name="faq_https_warning_q">「接続がプライベートではありません」と表示される？</string>
     <string name="faq_port_conflict_q">ポートが使用中？</string>
     <string name="faq_port_conflict_a">ダイアログの「アプリを再起動」をタップすると、アプリが自動的に再起動して空いているポートに切り替わります。</string>
