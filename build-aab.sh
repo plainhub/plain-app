@@ -42,7 +42,9 @@ cat > ./app/play-config.json <<EOF
 $PLAY_STORE_CONFIG_JSON
 EOF
 
-./gradlew :app:bundleRelease || err_and_exit "build failed"
+# Only the googleRelease bundle is needed; bundleRelease would also build
+# the unused github flavor.
+./gradlew :app:bundleGoogleRelease || err_and_exit "build failed"
 
 BUILD_FILE="PlainApp-$(getVersionName)-Google-Play.aab"
 mv ./app/build/outputs/bundle/googleRelease/app-google-release.aab $BUILD_FILE

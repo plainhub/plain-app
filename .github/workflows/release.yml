@@ -7,14 +7,17 @@ permissions:
   contents: read   # jobs that need more declare it at job level
 
 jobs:
-  build:
+  # Builds the two GitHub-release APKs, hashes them for provenance, uploads
+  # the shared artifact and pushes the recommended APK to Cloudflare R2.
+  # Runs in parallel with the play job on a separate runner.
+  apk:
+    name: Build APKs (GitHub release)
     runs-on: ubuntu-latest
     permissions:
       contents: read
     env:
       ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-      PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
     outputs:
       version_name: ${{ steps.meta.outputs.version_name }}
       hashes: ${{ steps.hashes.outputs.hashes }}
@@ -38,21 +41,11 @@ jobs:
       - name: Restore keystore
         run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > ./app/release.jks
 
-      # APK build must run first: build-aab.sh strips Play Store restricted
-      # permissions from AndroidManifest.xml, which must not affect APK output.
       - name: Build APKs (arm64-v8a + armeabi-v7a)
         run: bash build-apk.sh
 
       - name: Save mapping.txt (githubRelease)
         run: cp app/build/outputs/mapping/githubRelease/mapping.txt mapping-github-release.txt
-
-      # build-aab.sh patches the manifest, builds the AAB, and writes play-config.json.
-      # publishGoogleReleaseBundle uploads the AAB to Play Store internal track.
-      - name: Build AAB and publish to Play Store
-        run: bash build-aab.sh && ./gradlew publishGoogleReleaseBundle
-
-      - name: Save mapping.txt (googleRelease)
-        run: cp app/build/outputs/mapping/googleRelease/mapping.txt mapping-google-release.txt
 
       - name: Compute SHA-256 hashes
         id: hashes
@@ -61,7 +54,6 @@ jobs:
           echo "hashes=$(sha256sum \
             "PlainApp-${VERSION}-64bit-Recommended.apk" \
             "PlainApp-${VERSION}-Old-32bit.apk" \
-            "PlainApp-${VERSION}-Google-Play.aab" \
             | base64 -w0)" >> $GITHUB_OUTPUT
 
       - name: Upload release artifacts
@@ -71,36 +63,153 @@ jobs:
           path: |
             PlainApp-${{ steps.meta.outputs.version_name }}-64bit-Recommended.apk
             PlainApp-${{ steps.meta.outputs.version_name }}-Old-32bit.apk
-            PlainApp-${{ steps.meta.outputs.version_name }}-Google-Play.aab
             mapping-github-release.txt
-            mapping-google-release.txt
           if-no-files-found: error
           retention-days: 30
 
-  # SLSA Level 3 provenance covers all three release artifacts.
+      # R2 must not block the GitHub release, so failures here are non-fatal
+      # (same semantics as when this was a standalone job).
+      - name: Validate R2 configuration
+        continue-on-error: true
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_ENDPOINT_URL: ${{ vars.R2_ENDPOINT_URL }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          missing=0
+          for name in R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT_URL R2_BUCKET; do
+            if [ -z "${!name:-}" ]; then
+              echo "::error::Missing R2 configuration: ${name}"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Upload Recommended APK to Cloudflare R2
+        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT_URL }}
+          AWS_DEFAULT_REGION: auto
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          R2_PREFIX: ${{ vars.R2_PREFIX }}
+          VERSION: ${{ steps.meta.outputs.version_name }}
+        run: |
+          set -euo pipefail
+          file="PlainApp-${VERSION}-64bit-Recommended.apk"
+          dest="s3://${R2_BUCKET}/${R2_PREFIX}"
+          [[ "$dest" != */ ]] && dest="${dest}/"
+          aws --version
+          aws s3 cp "$file" "$dest" --cache-control "public, max-age=31536000, immutable"
+
+  # Builds the googleRelease AAB and uploads it straight to the Play Store
+  # internal track. The AAB is Play-Store-only: it never becomes a GitHub
+  # release asset. Runs in parallel with the apk job on a separate runner.
+  play:
+    name: Build AAB and publish to Play Store
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - run: chmod +x ./gradlew
+
+      - name: Restore keystore
+        run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > ./app/release.jks
+
+      # build-aab.sh patches the manifest (strips Play-restricted permissions),
+      # builds the AAB, and writes play-config.json for the publisher.
+      - name: Build AAB and publish to Play Store
+        run: bash build-aab.sh && ./gradlew publishGoogleReleaseBundle
+
+      # Kept as an internal artifact only (for Play Console deobfuscation);
+      # it is not attached to the GitHub release.
+      - name: Save mapping.txt (googleRelease)
+        run: cp app/build/outputs/mapping/googleRelease/mapping.txt mapping-google-release.txt
+
+      - name: Upload Play mapping artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mapping-google-release
+          path: mapping-google-release.txt
+          if-no-files-found: error
+          retention-days: 30
+
+  # SLSA Level 3 provenance covers the two release APKs.
   provenance:
-    needs: build
+    needs: apk
     permissions:
       actions: read
       id-token: write
       contents: write
     uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
     with:
-      base64-subjects: ${{ needs.build.outputs.hashes }}
+      base64-subjects: ${{ needs.apk.outputs.hashes }}
       upload-assets: false
 
-  # Scans all three artifacts concurrently to minimise wall-clock time.
-  virustotal:
-    needs: build
+  # Creates the draft release as soon as provenance is done — it does NOT
+  # wait for the VirusTotal scans, which append their table afterwards.
+  release:
+    needs: [apk, provenance]
     runs-on: ubuntu-latest
-    permissions: {}
-    outputs:
-      default_report: ${{ steps.scan.outputs.default_report }}
-      default_status: ${{ steps.scan.outputs.default_status }}
-      armv7_report:   ${{ steps.scan.outputs.armv7_report }}
-      armv7_status:   ${{ steps.scan.outputs.armv7_status }}
-      aab_report:     ${{ steps.scan.outputs.aab_report }}
-      aab_status:     ${{ steps.scan.outputs.aab_status }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.provenance.outputs.provenance-name }}
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.apk.outputs.version_name }}
+          name: Release ${{ needs.apk.outputs.version_name }}
+          body: |
+            ## What's Changed
+
+            ## Security
+
+            ### SLSA Provenance (Level 3)
+            The `.intoto.jsonl` file is a signed SLSA provenance document covering the release APKs.
+            Verify with [slsa-verifier](https://github.com/slsa-framework/slsa-verifier):
+            ```sh
+            slsa-verifier verify-artifact PlainApp-${{ needs.apk.outputs.version_name }}-64bit-Recommended.apk \
+              --provenance-path ${{ needs.provenance.outputs.provenance-name }} \
+              --source-uri github.com/${{ github.repository }}
+            ```
+
+            > VirusTotal scans are running; the results table is appended here automatically. <!-- VT-PENDING -->
+          draft: true
+          prerelease: false
+          artifacts: "PlainApp-${{ needs.apk.outputs.version_name }}-64bit-Recommended.apk,PlainApp-${{ needs.apk.outputs.version_name }}-Old-32bit.apk,${{ needs.provenance.outputs.provenance-name }},mapping-github-release.txt"
+
+  # Scans both release APKs concurrently and appends the VirusTotal table to
+  # the release body once done. The AAB is not scanned: it is only
+  # distributed via Play Store.
+  virustotal:
+    name: VirusTotal scan (async)
+    needs: [apk, release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # edits the release body to append the scan table
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -110,7 +219,7 @@ jobs:
         id: scan
         env:
           VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
-          VERSION: ${{ needs.build.outputs.version_name }}
+          VERSION: ${{ needs.apk.outputs.version_name }}
         run: |
           upload_and_poll() {
             local file="$1" outprefix="$2"
@@ -159,105 +268,31 @@ jobs:
             printf '%s' "https://www.virustotal.com/gui/file/$sha256/detection" > "${outprefix}.url"
             printf '%s' "$result_status" > "${outprefix}.status"
           }
-          upload_and_poll "PlainApp-${VERSION}-64bit-Recommended.apk"     /tmp/vt_default &
-          upload_and_poll "PlainApp-${VERSION}-Old-32bit.apk" /tmp/vt_armv7   &
-          upload_and_poll "PlainApp-${VERSION}-Google-Play.aab"              /tmp/vt_aab     &
+          upload_and_poll "PlainApp-${VERSION}-64bit-Recommended.apk" /tmp/vt_default &
+          upload_and_poll "PlainApp-${VERSION}-Old-32bit.apk"         /tmp/vt_armv7   &
           wait
           {
             echo "default_report=$(cat /tmp/vt_default.url)"
             echo "default_status=$(cat /tmp/vt_default.status)"
             echo "armv7_report=$(cat /tmp/vt_armv7.url)"
             echo "armv7_status=$(cat /tmp/vt_armv7.status)"
-            echo "aab_report=$(cat /tmp/vt_aab.url)"
-            echo "aab_status=$(cat /tmp/vt_aab.status)"
           } >> $GITHUB_OUTPUT
 
-  r2-upload:
-    name: Upload Recommended APK to Cloudflare R2
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-      AWS_ENDPOINT_URL_S3: ${{ vars.R2_ENDPOINT_URL }}
-      AWS_DEFAULT_REGION: auto
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-artifacts
-          path: release-artifacts
-
-      - name: Validate R2 configuration
+      - name: Append scan results to the release
         env:
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_ENDPOINT_URL: ${{ vars.R2_ENDPOINT_URL }}
-          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.apk.outputs.version_name }}
         run: |
-          set -euo pipefail
-          missing=0
-          for name in R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT_URL R2_BUCKET; do
-            if [ -z "${!name:-}" ]; then
-              echo "::error::Missing R2 configuration: ${name}"
-              missing=1
-            fi
-          done
-          exit "$missing"
-
-      - name: Upload Recommended APK to R2
-        env:
-          R2_BUCKET: ${{ vars.R2_BUCKET }}
-          R2_PREFIX: ${{ vars.R2_PREFIX }}
-          VERSION: ${{ needs.build.outputs.version_name }}
-        run: |
-          set -euo pipefail
-          file="PlainApp-${VERSION}-64bit-Recommended.apk"
-          dest="s3://${R2_BUCKET}/${R2_PREFIX}"
-          [[ "$dest" != */ ]] && dest="${dest}/"
-          aws --version
-          aws s3 cp "release-artifacts/$file" "$dest" --cache-control "public, max-age=31536000, immutable"
-
-  release:
-    needs: [build, provenance, virustotal]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-artifacts
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.provenance.outputs.provenance-name }}
-
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v${{ needs.build.outputs.version_name }}
-          name: Release ${{ needs.build.outputs.version_name }}
-          body: |
-            ## What's Changed
-
-            ## Security
-
-            ### VirusTotal Scan
-            | File | Status | Scan Report |
-            |------|--------|-------------|
-            | `PlainApp-${{ needs.build.outputs.version_name }}-64bit-Recommended.apk` | ${{ needs.virustotal.outputs.default_status }} | [View Report](${{ needs.virustotal.outputs.default_report }}) |
-            | `PlainApp-${{ needs.build.outputs.version_name }}-Old-32bit.apk` | ${{ needs.virustotal.outputs.armv7_status }} | [View Report](${{ needs.virustotal.outputs.armv7_report }}) |
-            | `PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab` | ${{ needs.virustotal.outputs.aab_status }} | [View Report](${{ needs.virustotal.outputs.aab_report }}) |
-
-            ### SLSA Provenance (Level 3)
-            The `.intoto.jsonl` file is a signed SLSA provenance document covering all release artifacts (APKs + AAB).
-            Verify with [slsa-verifier](https://github.com/slsa-framework/slsa-verifier):
-            ```sh
-            slsa-verifier verify-artifact PlainApp-${{ needs.build.outputs.version_name }}-64bit-Recommended.apk \
-              --provenance-path ${{ needs.provenance.outputs.provenance-name }} \
-              --source-uri github.com/${{ github.repository }}
-            ```
-          draft: true
-          prerelease: false
-          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-64bit-Recommended.apk,PlainApp-${{ needs.build.outputs.version_name }}-Old-32bit.apk,PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab,${{ needs.provenance.outputs.provenance-name }},mapping-github-release.txt,mapping-google-release.txt"
+          gh release view "v${VERSION}" --json body -q .body > body.md
+          # Replace the "scans running" placeholder with the results table.
+          sed -i '/VT-PENDING/d' body.md
+          {
+            cat body.md
+            echo ''
+            echo '### VirusTotal Scan'
+            echo '| File | Status | Scan Report |'
+            echo '|------|--------|-------------|'
+            echo "| \`PlainApp-${VERSION}-64bit-Recommended.apk\` | ${{ steps.scan.outputs.default_status }} | [View Report](${{ steps.scan.outputs.default_report }}) |"
+            echo "| \`PlainApp-${VERSION}-Old-32bit.apk\` | ${{ steps.scan.outputs.armv7_status }} | [View Report](${{ steps.scan.outputs.armv7_report }}) |"
+          } > new-body.md
+          gh release edit "v${VERSION}" --notes-file new-body.md
