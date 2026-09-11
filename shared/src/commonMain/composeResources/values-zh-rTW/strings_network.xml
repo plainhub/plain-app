@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp 服務運行中</string>
     <string name="screen_mirror_service_is_running">螢幕鏡像服務運行中</string>
     <string name="screen_mirror_audio_permission_settings_message">麥克風權限已被停用，請到設定中開啟後才能鏡像系統音訊。</string>
-    <string name="enter_this_address_tips">在電腦瀏覽器中輸入上述地址，請確保您的手機和電腦位於同一局域網中。</string>
     <string name="mdns_hostname">mDNS主機名</string>
     <string name="mdns_hostname_invalid">主機名必須以.local結尾</string>
     <string name="restart_app_title">重啟應用</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">服務未執行</string>
     <string name="quick_start">快速開始</string>
     <string name="step_connect_network_title">連線到相同網路</string>
+    <string name="demo_same_network">同一網路</string>
     <string name="step_connect_network_desc">讓電腦與手機連線到同一個 Wi-Fi 網路，或開啟手機熱點並讓電腦加入。</string>
     <string name="step_open_url_title">在電腦上開啟該位址</string>
     <string name="troubleshooting">排除問題</string>

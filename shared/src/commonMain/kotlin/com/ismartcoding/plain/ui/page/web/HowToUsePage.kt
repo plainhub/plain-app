@@ -142,8 +142,17 @@ fun HowToUsePage(
                         Subtitle(text = stringResource(Res.string.quick_start))
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                                StepItem(index = 1, title = stringResource(Res.string.step_connect_network_title), desc = stringResource(Res.string.step_connect_network_desc))
-                                StepItem(index = 2, title = stringResource(Res.string.step_open_url_title), desc = stringResource(Res.string.enter_this_address_tips))
+                                StepItem(index = 1, title = stringResource(Res.string.step_connect_network_title))
+                                VerticalSpace(dp = 8.dp)
+                                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                    SameNetworkDemo()
+                                }
+                                VerticalSpace(dp = 16.dp)
+                                StepItem(index = 2, title = stringResource(Res.string.step_open_url_title))
+                                VerticalSpace(dp = 8.dp)
+                                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                    OpenAddressDemo()
+                                }
                             }
                         }
                         VerticalSpace(dp = 16.dp)

@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp 서비스 실행 중</string>
     <string name="screen_mirror_service_is_running">화면 미러 서비스가 실행 중입니다</string>
     <string name="screen_mirror_audio_permission_settings_message">마이크 권한이 비활성화되어 있습니다. 시스템 오디오를 미러링하려면 설정에서 활성화해 주세요.</string>
-    <string name="enter_this_address_tips">컴퓨터 브라우저에서 위의 주소를 입력하고 휴대전화와 컴퓨터가 동일한 로컬 네트워크에 있는지 확인하십시오.</string>
     <string name="mdns_hostname">mDNS 호스트명</string>
     <string name="mdns_hostname_invalid">호스트명은 .local로 끝나야 합니다</string>
     <string name="restart_app_title">앱 다시 시작</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">서비스가 실행 중이 아닙니다</string>
     <string name="quick_start">빠른 시작</string>
     <string name="step_connect_network_title">같은 네트워크에 연결</string>
+    <string name="demo_same_network">같은 네트워크</string>
     <string name="step_connect_network_desc">컴퓨터와 휴대폰을 같은 Wi-Fi 네트워크에 연결하거나, 휴대폰 핫스팟을 켜고 컴퓨터를 연결하세요.</string>
     <string name="step_open_url_title">컴퓨터에서 주소 열기</string>
     <string name="troubleshooting">문제 해결</string>

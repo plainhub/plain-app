@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp Dienst läuft</string>
     <string name="screen_mirror_service_is_running">Der Bildschirmspiegelungsdienst läuft</string>
     <string name="screen_mirror_audio_permission_settings_message">Die Mikrofonberechtigung ist deaktiviert. Bitte aktivieren Sie sie in den Einstellungen, um Systemaudio zu spiegeln.</string>
-    <string name="enter_this_address_tips">Geben Sie die obige Adresse in den Browser Ihres Computers ein und stellen Sie sicher, dass Ihr Telefon und Ihr Computer im selben lokalen Netzwerk sind.</string>
     <string name="mdns_hostname">mDNS-Hostname</string>
     <string name="mdns_hostname_invalid">Hostname muss mit .local enden</string>
     <string name="restart_app_title">App neu starten</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">Dienst läuft nicht</string>
     <string name="quick_start">Schnellstart</string>
     <string name="step_connect_network_title">Mit demselben Netzwerk verbinden</string>
+    <string name="demo_same_network">Gleiches Netzwerk</string>
     <string name="step_connect_network_desc">Verbinde Computer und Telefon mit demselben WLAN oder aktiviere den Hotspot auf deinem Telefon und verbinde den Computer damit.</string>
     <string name="step_open_url_title">Adresse auf dem Computer öffnen</string>
     <string name="troubleshooting">Fehlerbehebung</string>

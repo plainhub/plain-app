@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp Служба запущен</string>
     <string name="screen_mirror_service_is_running">Служба зеркального отображения экрана запущена</string>
     <string name="screen_mirror_audio_permission_settings_message">Разрешение на микрофон отключено. Включите его в настройках, чтобы зеркалировать системный звук.</string>
-    <string name="enter_this_address_tips">Введите вышеуказанный адрес в браузер вашего компьютера, убедившись, что ваш телефон и компьютер находятся в одной локальной сети.</string>
     <string name="mdns_hostname">Имя хоста mDNS</string>
     <string name="mdns_hostname_invalid">Имя хоста должно заканчиваться на .local</string>
     <string name="restart_app_title">Перезапустить приложение</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">Служба не запущена</string>
     <string name="quick_start">Быстрый старт</string>
     <string name="step_connect_network_title">Подключитесь к одной сети</string>
+    <string name="demo_same_network">Одна сеть</string>
     <string name="step_connect_network_desc">Подключите компьютер и телефон к одной сети Wi-Fi или включите точку доступа на телефоне и подключите к ней компьютер.</string>
     <string name="step_open_url_title">Откройте адрес на компьютере</string>
     <string name="troubleshooting">Устранение неполадок</string>

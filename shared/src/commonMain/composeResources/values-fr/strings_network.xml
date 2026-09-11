@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp Service est en cours d'exécution</string>
     <string name="screen_mirror_service_is_running">Le service de mise en miroir de l'écran est en cours d'exécution</string>
     <string name="screen_mirror_audio_permission_settings_message">L'autorisation du microphone est désactivée. Veuillez l'activer dans les paramètres pour refléter l'audio système.</string>
-    <string name="enter_this_address_tips">Entrez l'adresse ci-dessus dans le navigateur de votre ordinateur, en vous assurant que votre téléphone et votre ordinateur sont sur le même réseau local.</string>
     <string name="mdns_hostname">Nom d'hôte mDNS</string>
     <string name="mdns_hostname_invalid">Le nom d'hôte doit se terminer par .local</string>
     <string name="restart_app_title">Redémarrer l'application</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">Le service n'est pas en cours d'exécution</string>
     <string name="quick_start">Démarrage rapide</string>
     <string name="step_connect_network_title">Se connecter au même réseau</string>
+    <string name="demo_same_network">Même réseau</string>
     <string name="step_connect_network_desc">Connectez l'ordinateur et le téléphone au même réseau Wi-Fi, ou activez le point d'accès mobile du téléphone et connectez-y l'ordinateur.</string>
     <string name="step_open_url_title">Ouvrir l'adresse sur l'ordinateur</string>
     <string name="troubleshooting">Dépannage</string>

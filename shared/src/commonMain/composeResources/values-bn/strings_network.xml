@@ -53,7 +53,6 @@
     <string name="plainapp_service_is_running">PlainApp সেবা চলছে</string>
     <string name="screen_mirror_service_is_running">স্ক্রিন মিরর সেবা চলছে</string>
     <string name="screen_mirror_audio_permission_settings_message">মাইক্রোফোন অনুমতি নিষ্ক্রিয় আছে। সিস্টেম অডিও মিরর করতে সেটিংসে এটি চালু করুন।</string>
-    <string name="enter_this_address_tips">আপনার কম্পিউটারের ব্রাউজারে উপরের ঠিকানা লিখুন, নিশ্চিত করুন যে আপনার ফোন এবং কম্পিউটারটি একই স্থানীয় নেটওয়ার্কে আছে।</string>
     <string name="mdns_hostname">mDNS হোস্টনেম</string>
     <string name="mdns_hostname_invalid">হোস্টনেম অবশ্যই .local দিয়ে শেষ হতে হবে</string>
     <string name="restart_app_title">অ্যাপ পুনরায় চালু করুন</string>
@@ -81,6 +80,7 @@
     <string name="service_not_running">সেবা চলছে না</string>
     <string name="quick_start">দ্রুত শুরু</string>
     <string name="step_connect_network_title">একই নেটওয়ার্কে সংযোগ করুন</string>
+    <string name="demo_same_network">একই নেটওয়ার্ক</string>
     <string name="step_connect_network_desc">কম্পিউটার ও ফোন একই Wi-Fi নেটওয়ার্কে সংযোগ করুন, অথবা ফোনের হটস্পট চালু করে কম্পিউটার সেখানে সংযোগ করুন।</string>
     <string name="step_open_url_title">কম্পিউটার থেকে ঠিকানাটি খুলুন</string>
     <string name="troubleshooting">সমস্যা সমাধান</string>

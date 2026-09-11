@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp Servizio in esecuzione</string>
     <string name="screen_mirror_service_is_running">Il servizio di duplicazione dello schermo è in esecuzione</string>
     <string name="screen_mirror_audio_permission_settings_message">L'autorizzazione del microfono è disattivata. Abilitala nelle Impostazioni per specchiare l'audio di sistema.</string>
-    <string name="enter_this_address_tips">Inserisci l'indirizzo sopra nel browser del tuo computer, assicurandoti che il telefono e il computer siano sulla stessa rete locale.</string>
     <string name="mdns_hostname">Nome host mDNS</string>
     <string name="mdns_hostname_invalid">Il nome host deve terminare con .local</string>
     <string name="restart_app_title">Riavvia app</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">Servizio non in esecuzione</string>
     <string name="quick_start">Avvio rapido</string>
     <string name="step_connect_network_title">Connettiti alla stessa rete</string>
+    <string name="demo_same_network">Stessa rete</string>
     <string name="step_connect_network_desc">Connetti computer e telefono alla stessa rete Wi-Fi, oppure attiva l'hotspot del telefono e connetti il computer a esso.</string>
     <string name="step_open_url_title">Apri l'indirizzo sul computer</string>
     <string name="troubleshooting">Risoluzione dei problemi</string>

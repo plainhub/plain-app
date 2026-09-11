@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp 服务运行中</string>
     <string name="screen_mirror_service_is_running">屏幕镜像服务运行中</string>
     <string name="screen_mirror_audio_permission_settings_message">麦克风权限被禁用，请到设置里开启后才能镜像系统音频。</string>
-    <string name="enter_this_address_tips">在电脑浏览器中输入以上地址，需确保手机和电脑在同一局域网中。</string>
     <string name="mdns_hostname">mDNS主机名</string>
     <string name="mdns_hostname_invalid">主机名必须以.local结尾</string>
     <string name="restart_app_title">重启应用</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">服务未运行</string>
     <string name="quick_start">快速开始</string>
     <string name="step_connect_network_title">连接到同一网络</string>
+    <string name="demo_same_network">同一网络</string>
     <string name="step_connect_network_desc">让电脑与手机连接同一个 Wi-Fi 网络，或开启手机热点并让电脑接入。</string>
     <string name="step_open_url_title">在电脑上打开该地址</string>
     <string name="troubleshooting">排查问题</string>

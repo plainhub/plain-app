@@ -32,6 +32,7 @@
     <string name="service_not_running">Service not running</string>
     <string name="quick_start">Quick start</string>
     <string name="step_connect_network_title">Connect to the same network</string>
+    <string name="demo_same_network">Same network</string>
     <string name="step_connect_network_desc">Connect your computer and phone to the same Wi-Fi network, or turn on your phone's hotspot and connect your computer to it.</string>
     <string name="step_open_url_title">Open the address on your computer</string>
     <string name="troubleshooting">Troubleshooting</string>
@@ -101,7 +102,6 @@
     <string name="plainapp_service_is_running">PlainApp Service is running</string>
     <string name="screen_mirror_service_is_running">Screen Mirror Service is running</string>
     <string name="screen_mirror_audio_permission_settings_message">Microphone permission is disabled. Please enable it in Settings to mirror system audio.</string>
-    <string name="enter_this_address_tips">Enter the above address in your computer's browser, ensuring that your phone and computer are on the same local network.</string>
     <string name="mdns_hostname">mDNS Hostname</string>
     <string name="mdns_hostname_invalid">Hostname must end with .local</string>
     <string name="last_active">Last active: %1$s</string>

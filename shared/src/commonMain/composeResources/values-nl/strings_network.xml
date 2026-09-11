@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp Dienst wordt uitgevoerd</string>
     <string name="screen_mirror_service_is_running">Schermspiegelservice is actief</string>
     <string name="screen_mirror_audio_permission_settings_message">Microfoontoestemming is uitgeschakeld. Schakel deze in bij Instellingen om systeemaudio te spiegelen.</string>
-    <string name="enter_this_address_tips">Voer het bovenstaande adres in uw computerbrowser in en zorg ervoor dat uw telefoon en computer zich in hetzelfde lokale netwerk bevinden.</string>
     <string name="mdns_hostname">mDNS-hostnaam</string>
     <string name="mdns_hostname_invalid">Hostnaam moet eindigen met .local</string>
     <string name="restart_app_title">App herstarten</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">Service draait niet</string>
     <string name="quick_start">Snelstart</string>
     <string name="step_connect_network_title">Maak verbinding met hetzelfde netwerk</string>
+    <string name="demo_same_network">Zelfde netwerk</string>
     <string name="step_connect_network_desc">Verbind de computer en telefoon met hetzelfde wifi-netwerk, of zet de hotspot van de telefoon aan en verbind de computer daarmee.</string>
     <string name="step_open_url_title">Open het adres op de computer</string>
     <string name="troubleshooting">Problemen oplossen</string>

@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp सेवा चल रहा है</string>
     <string name="screen_mirror_service_is_running">स्क्रीन मिरर सेवा चल रही है</string>
     <string name="screen_mirror_audio_permission_settings_message">माइक्रोफोन अनुमति बंद है। सिस्टम ऑडियो मिरर करने के लिए इसे सेटिंग्स में चालू करें।</string>
-    <string name="enter_this_address_tips">अपने कंप्यूटर के ब्राउज़र में ऊपर दिए गए पते को डालें, यह सुनिश्चित करें कि आपका फोन और कंप्यूटर एक ही स्थानीय नेटवर्क में हैं।</string>
     <string name="mdns_hostname">mDNS होस्टनाम</string>
     <string name="mdns_hostname_invalid">होस्टनाम का अंत .local से होना चाहिए</string>
     <string name="restart_app_title">ऐप पुनः शुरू करें</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">सेवा नहीं चल रही है</string>
     <string name="quick_start">त्वरित प्रारंभ</string>
     <string name="step_connect_network_title">उसी नेटवर्क से कनेक्ट करें</string>
+    <string name="demo_same_network">वही नेटवर्क</string>
     <string name="step_connect_network_desc">कंप्यूटर और फ़ोन को उसी Wi-Fi नेटवर्क से कनेक्ट करें, या फ़ोन का हॉटस्पॉट चालू करके कंप्यूटर को उससे कनेक्ट करें।</string>
     <string name="step_open_url_title">कंप्यूटर पर पता खोलें</string>
     <string name="troubleshooting">समस्या समाधान</string>

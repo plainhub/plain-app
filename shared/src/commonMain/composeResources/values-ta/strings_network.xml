@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp சேவை இயங்குகிறது</string>
     <string name="screen_mirror_service_is_running">திரை மிரர் சேவை செயல்படுகின்றது</string>
     <string name="screen_mirror_audio_permission_settings_message">மைக்ரோஃபோன் அனுமதி முடக்கப்பட்டுள்ளது. அமைப்புகளில் இயக்கி, சிஸ்டம் ஆடியோவை பிரதிமைப்படுத்தவும்.</string>
-    <string name="enter_this_address_tips">உங்கள் கணினியின் உலாவியில் மேலே குறிப்பிட்ட முகவரியை உள்ளிடுக, உங்கள் போன் மற்றும் கணினியை ஒரே உள்ளாக்க வலிமையானதாக உறுதிப்படுத்துங்கள்.</string>
     <string name="mdns_hostname">mDNS ஹோஸ்ட்நேம்</string>
     <string name="mdns_hostname_invalid">ஹோஸ்ட்நேம் .local உடன் முடிவடைய வேண்டும்</string>
     <string name="restart_app_title">ஆப்லிகேஷனை மீளமை</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">சேவை இயங்கவில்லை</string>
     <string name="quick_start">விரைவுத் தொடக்கம்</string>
     <string name="step_connect_network_title">அதே நெட்வொர்க்கில் இணைக்கவும்</string>
+    <string name="demo_same_network">ஒரே நெட்வொர்க்</string>
     <string name="step_connect_network_desc">கணினியையும் ஃபோனையும் அதே Wi-Fi நெட்வொர்க்கில் இணைக்கவும், அல்லது ஃபோனின் ஹாட்ஸ்பாட்டை இயக்கி கணினியை அதில் இணைக்கவும்.</string>
     <string name="step_open_url_title">கணினியில் முகவரியைத் திறக்கவும்</string>
     <string name="troubleshooting">சிக்கல் தீர்வு</string>

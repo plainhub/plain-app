@@ -17,7 +17,7 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 // wrong once the description wraps to multiple lines. When stacked in a PCard,
 // wrap them in a Column with padding(vertical = 8.dp) so card edges are 16dp.
 @Composable
-fun StepItem(index: Int, title: String, desc: String, modifier: Modifier = Modifier) {
+fun StepItem(index: Int, title: String, desc: String = "", modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -27,8 +27,10 @@ fun StepItem(index: Int, title: String, desc: String, modifier: Modifier = Modif
         StepNumber(index)
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, style = MaterialTheme.typography.listItemTitle())
-            VerticalSpace(dp = 8.dp)
-            Text(text = desc, style = MaterialTheme.typography.listItemSubtitle())
+            if (desc.isNotEmpty()) {
+                VerticalSpace(dp = 8.dp)
+                Text(text = desc, style = MaterialTheme.typography.listItemSubtitle())
+            }
         }
     }
 }

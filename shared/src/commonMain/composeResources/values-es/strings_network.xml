@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp Servicio en ejecución</string>
     <string name="screen_mirror_service_is_running">El servicio de espejo de pantalla está en ejecución</string>
     <string name="screen_mirror_audio_permission_settings_message">El permiso del micrófono está desactivado. Actívelo en Ajustes para reflejar el audio del sistema.</string>
-    <string name="enter_this_address_tips">Ingrese la dirección anterior en el navegador de su computadora, asegurándose de que su teléfono y su computadora estén en la misma red local.</string>
     <string name="mdns_hostname">Nombre de host mDNS</string>
     <string name="mdns_hostname_invalid">El nombre de host debe terminar con .local</string>
     <string name="restart_app_title">Reiniciar la aplicación</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">El servicio no está en ejecución</string>
     <string name="quick_start">Inicio rápido</string>
     <string name="step_connect_network_title">Conéctate a la misma red</string>
+    <string name="demo_same_network">Misma red</string>
     <string name="step_connect_network_desc">Conecta el ordenador y el teléfono a la misma red Wi-Fi, o activa el punto de acceso del teléfono y conecta el ordenador a él.</string>
     <string name="step_open_url_title">Abre la dirección en tu ordenador</string>
     <string name="troubleshooting">Solucionar problemas</string>

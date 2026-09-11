@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp Servis çalışıyor</string>
     <string name="screen_mirror_service_is_running">Ekran yansıtma hizmeti çalışıyor</string>
     <string name="screen_mirror_audio_permission_settings_message">Mikrofon izni devre dışı. Sistem sesini yansıtmak için Ayarlar bölümünden etkinleştirin.</string>
-    <string name="enter_this_address_tips">Yukarıdaki adresi bilgisayarınızın tarayıcısına girin, telefonunuzun ve bilgisayarınızın aynı yerel ağda olduğundan emin olun.</string>
     <string name="mdns_hostname">mDNS ana bilgisayar adı</string>
     <string name="mdns_hostname_invalid">Ana bilgisayar adı .local ile bitmelidir</string>
     <string name="restart_app_title">Uygulamayı yeniden başlat</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">Hizmet çalışmıyor</string>
     <string name="quick_start">Hızlı başlangıç</string>
     <string name="step_connect_network_title">Aynı ağa bağlanın</string>
+    <string name="demo_same_network">Aynı ağ</string>
     <string name="step_connect_network_desc">Bilgisayarı ve telefonu aynı Wi-Fi ağına bağlayın ya da telefonun hotspot'unu açıp bilgisayarı ona bağlayın.</string>
     <string name="step_open_url_title">Adresi bilgisayarda açın</string>
     <string name="troubleshooting">Sorun giderme</string>

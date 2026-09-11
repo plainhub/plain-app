@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp Dịch vụ đang chạy</string>
     <string name="screen_mirror_service_is_running">Dịch vụ phản chiếu màn hình đang chạy</string>
     <string name="screen_mirror_audio_permission_settings_message">Quyền micro đang bị tắt. Hãy bật trong Cài đặt để phản chiếu âm thanh hệ thống.</string>
-    <string name="enter_this_address_tips">Nhập địa chỉ trên vào trình duyệt của máy tính của bạn, đảm bảo rằng điện thoại và máy tính của bạn đang kết nối với cùng một mạng cục bộ.</string>
     <string name="mdns_hostname">Tên máy chủ mDNS</string>
     <string name="mdns_hostname_invalid">Tên máy chủ phải kết thúc bằng .local</string>
     <string name="restart_app_title">Khởi động lại ứng dụng</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">Dịch vụ không chạy</string>
     <string name="quick_start">Bắt đầu nhanh</string>
     <string name="step_connect_network_title">Kết nối cùng một mạng</string>
+    <string name="demo_same_network">Cùng mạng</string>
     <string name="step_connect_network_desc">Kết nối máy tính và điện thoại vào cùng một mạng Wi-Fi, hoặc bật điểm truy cập trên điện thoại và kết nối máy tính vào đó.</string>
     <string name="step_open_url_title">Mở địa chỉ trên máy tính</string>
     <string name="troubleshooting">Khắc phục sự cố</string>

@@ -55,7 +55,6 @@
     <string name="plainapp_service_is_running">PlainApp サービスを実行中</string>
     <string name="screen_mirror_service_is_running">スクリーンミラーサービスが実行されています</string>
     <string name="screen_mirror_audio_permission_settings_message">マイクの権限が無効です。システムオーディオをミラーリングするには、設定で有効にしてください。</string>
-    <string name="enter_this_address_tips">上記のアドレスをコンピューターのブラウザに入力して、電話とコンピューターが同じローカルネットワークにあることを確認してください。</string>
     <string name="mdns_hostname">mDNSホスト名</string>
     <string name="mdns_hostname_invalid">ホスト名は.localで終わる必要があります</string>
     <string name="restart_app_title">アプリを再起動</string>
@@ -83,6 +82,7 @@
     <string name="service_not_running">サービスが実行されていません</string>
     <string name="quick_start">クイックスタート</string>
     <string name="step_connect_network_title">同じネットワークに接続</string>
+    <string name="demo_same_network">同じネットワーク</string>
     <string name="step_connect_network_desc">パソコンとスマートフォンを同じ Wi-Fi ネットワークに接続するか、スマホのアクセスポイントをオンにしてパソコンを接続してください。</string>
     <string name="step_open_url_title">パソコンでアドレスを開く</string>
     <string name="troubleshooting">トラブルシューティング</string>
