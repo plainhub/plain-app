@@ -80,7 +80,8 @@
     <string name="service_not_running">সেবা চলছে না</string>
     <string name="quick_start">দ্রুত শুরু</string>
     <string name="step_connect_network_title">একই নেটওয়ার্কে সংযোগ করুন</string>
-    <string name="demo_same_network">একই নেটওয়ার্ক</string>
+    <string name="step_choose_ip_title">একটি IP ঠিকানা বেছে নিন</string>
+    <string name="demo_same_wifi">একই Wi-Fi</string>
     <string name="step_connect_network_desc">কম্পিউটার ও ফোন একই Wi-Fi নেটওয়ার্কে সংযোগ করুন, অথবা ফোনের হটস্পট চালু করে কম্পিউটার সেখানে সংযোগ করুন।</string>
     <string name="step_open_url_title">কম্পিউটার থেকে ঠিকানাটি খুলুন</string>
     <string name="troubleshooting">সমস্যা সমাধান</string>

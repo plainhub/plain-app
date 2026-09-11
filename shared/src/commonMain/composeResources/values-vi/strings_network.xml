@@ -82,7 +82,8 @@
     <string name="service_not_running">Dịch vụ không chạy</string>
     <string name="quick_start">Bắt đầu nhanh</string>
     <string name="step_connect_network_title">Kết nối cùng một mạng</string>
-    <string name="demo_same_network">Cùng mạng</string>
+    <string name="step_choose_ip_title">Chọn một địa chỉ IP</string>
+    <string name="demo_same_wifi">Cùng Wi-Fi</string>
     <string name="step_connect_network_desc">Kết nối máy tính và điện thoại vào cùng một mạng Wi-Fi, hoặc bật điểm truy cập trên điện thoại và kết nối máy tính vào đó.</string>
     <string name="step_open_url_title">Mở địa chỉ trên máy tính</string>
     <string name="troubleshooting">Khắc phục sự cố</string>

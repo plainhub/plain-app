@@ -82,7 +82,8 @@
     <string name="service_not_running">서비스가 실행 중이 아닙니다</string>
     <string name="quick_start">빠른 시작</string>
     <string name="step_connect_network_title">같은 네트워크에 연결</string>
-    <string name="demo_same_network">같은 네트워크</string>
+    <string name="step_choose_ip_title">IP 주소 선택</string>
+    <string name="demo_same_wifi">같은 Wi-Fi</string>
     <string name="step_connect_network_desc">컴퓨터와 휴대폰을 같은 Wi-Fi 네트워크에 연결하거나, 휴대폰 핫스팟을 켜고 컴퓨터를 연결하세요.</string>
     <string name="step_open_url_title">컴퓨터에서 주소 열기</string>
     <string name="troubleshooting">문제 해결</string>

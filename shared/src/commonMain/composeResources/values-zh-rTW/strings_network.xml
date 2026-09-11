@@ -82,7 +82,8 @@
     <string name="service_not_running">服務未執行</string>
     <string name="quick_start">快速開始</string>
     <string name="step_connect_network_title">連線到相同網路</string>
-    <string name="demo_same_network">同一網路</string>
+    <string name="step_choose_ip_title">選擇一個 IP 位址</string>
+    <string name="demo_same_wifi">同一 Wi-Fi</string>
     <string name="step_connect_network_desc">讓電腦與手機連線到同一個 Wi-Fi 網路，或開啟手機熱點並讓電腦加入。</string>
     <string name="step_open_url_title">在電腦上開啟該位址</string>
     <string name="troubleshooting">排除問題</string>

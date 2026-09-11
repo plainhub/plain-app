@@ -82,7 +82,8 @@
     <string name="service_not_running">सेवा नहीं चल रही है</string>
     <string name="quick_start">त्वरित प्रारंभ</string>
     <string name="step_connect_network_title">उसी नेटवर्क से कनेक्ट करें</string>
-    <string name="demo_same_network">वही नेटवर्क</string>
+    <string name="step_choose_ip_title">एक IP पता चुनें</string>
+    <string name="demo_same_wifi">वही Wi-Fi</string>
     <string name="step_connect_network_desc">कंप्यूटर और फ़ोन को उसी Wi-Fi नेटवर्क से कनेक्ट करें, या फ़ोन का हॉटस्पॉट चालू करके कंप्यूटर को उससे कनेक्ट करें।</string>
     <string name="step_open_url_title">कंप्यूटर पर पता खोलें</string>
     <string name="troubleshooting">समस्या समाधान</string>

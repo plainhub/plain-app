@@ -82,7 +82,8 @@
     <string name="service_not_running">Le service n'est pas en cours d'exécution</string>
     <string name="quick_start">Démarrage rapide</string>
     <string name="step_connect_network_title">Se connecter au même réseau</string>
-    <string name="demo_same_network">Même réseau</string>
+    <string name="step_choose_ip_title">Choisissez une adresse IP</string>
+    <string name="demo_same_wifi">Même Wi-Fi</string>
     <string name="step_connect_network_desc">Connectez l'ordinateur et le téléphone au même réseau Wi-Fi, ou activez le point d'accès mobile du téléphone et connectez-y l'ordinateur.</string>
     <string name="step_open_url_title">Ouvrir l'adresse sur l'ordinateur</string>
     <string name="troubleshooting">Dépannage</string>

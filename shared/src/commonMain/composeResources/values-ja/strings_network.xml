@@ -82,7 +82,8 @@
     <string name="service_not_running">サービスが実行されていません</string>
     <string name="quick_start">クイックスタート</string>
     <string name="step_connect_network_title">同じネットワークに接続</string>
-    <string name="demo_same_network">同じネットワーク</string>
+    <string name="step_choose_ip_title">IPアドレスを選択</string>
+    <string name="demo_same_wifi">同じWi-Fi</string>
     <string name="step_connect_network_desc">パソコンとスマートフォンを同じ Wi-Fi ネットワークに接続するか、スマホのアクセスポイントをオンにしてパソコンを接続してください。</string>
     <string name="step_open_url_title">パソコンでアドレスを開く</string>
     <string name="troubleshooting">トラブルシューティング</string>

@@ -82,7 +82,8 @@
     <string name="service_not_running">சேவை இயங்கவில்லை</string>
     <string name="quick_start">விரைவுத் தொடக்கம்</string>
     <string name="step_connect_network_title">அதே நெட்வொர்க்கில் இணைக்கவும்</string>
-    <string name="demo_same_network">ஒரே நெட்வொர்க்</string>
+    <string name="step_choose_ip_title">ஒரு IP முகவரியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="demo_same_wifi">ஒரே Wi-Fi</string>
     <string name="step_connect_network_desc">கணினியையும் ஃபோனையும் அதே Wi-Fi நெட்வொர்க்கில் இணைக்கவும், அல்லது ஃபோனின் ஹாட்ஸ்பாட்டை இயக்கி கணினியை அதில் இணைக்கவும்.</string>
     <string name="step_open_url_title">கணினியில் முகவரியைத் திறக்கவும்</string>
     <string name="troubleshooting">சிக்கல் தீர்வு</string>

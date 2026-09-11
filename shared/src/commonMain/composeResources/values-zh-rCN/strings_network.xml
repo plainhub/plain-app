@@ -82,7 +82,8 @@
     <string name="service_not_running">服务未运行</string>
     <string name="quick_start">快速开始</string>
     <string name="step_connect_network_title">连接到同一网络</string>
-    <string name="demo_same_network">同一网络</string>
+    <string name="step_choose_ip_title">选择一个 IP 地址</string>
+    <string name="demo_same_wifi">同一 Wi-Fi</string>
     <string name="step_connect_network_desc">让电脑与手机连接同一个 Wi-Fi 网络，或开启手机热点并让电脑接入。</string>
     <string name="step_open_url_title">在电脑上打开该地址</string>
     <string name="troubleshooting">排查问题</string>

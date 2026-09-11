@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,11 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.preferences.HttpsPreference
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.FaqItem
@@ -44,7 +36,7 @@ import com.ismartcoding.plain.ui.base.StepItem
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.WebAddressBar
+import com.ismartcoding.plain.ui.components.WebAddressPager
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -52,7 +44,6 @@ import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.grey
 import com.ismartcoding.plain.ui.theme.orange
 import com.ismartcoding.plain.ui.theme.red
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -66,21 +57,6 @@ fun HowToUsePage(
 ) {
     WebSettingsProvider {
         val serviceEnabled = TempData.serviceEnabled.collectAsStateValue()
-        val isHttps = TempData.webHttps.collectAsState()
-        val scope = rememberCoroutineScope()
-        val pagerState = rememberPagerState(
-            initialPage = if (isHttps.value) 1 else 0,
-            pageCount = { 2 },
-        )
-
-        LaunchedEffect(pagerState) {
-            snapshotFlow { pagerState.currentPage }.collect { page ->
-                val https = page == 1
-                if (isHttps.value != https) {
-                    scope.launch { HttpsPreference.putAsync(https) }
-                }
-            }
-        }
 
         PScaffold(
             topBar = {
@@ -90,54 +66,6 @@ fun HowToUsePage(
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item {
                         TopSpace()
-                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 16.dp, end = 16.dp, top = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .clip(CircleShape)
-                                        .background(if (serviceEnabled) MaterialTheme.colorScheme.green else MaterialTheme.colorScheme.grey),
-                                )
-                                HorizontalSpace(dp = 8.dp)
-                                Text(
-                                    text = stringResource(if (serviceEnabled) Res.string.http_server_state_on else Res.string.service_not_running),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                            }
-                            HorizontalPager(
-                                state = pagerState,
-                                modifier = Modifier.fillMaxWidth(),
-                            ) { page ->
-                                WebAddressBar(isHttps = page == 1)
-                            }
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                            ) {
-                                repeat(2) { index ->
-                                    val selected = pagerState.currentPage == index
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(horizontal = 2.dp)
-                                            .size(6.dp)
-                                            .clip(CircleShape)
-                                            .background(
-                                                if (selected) MaterialTheme.colorScheme.primary
-                                                else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-                                            ),
-                                    )
-                                }
-                            }
-                            VerticalSpace(dp = 12.dp)
-                        }
-                        VerticalSpace(dp = 16.dp)
-                    }
-                    item {
                         Subtitle(text = stringResource(Res.string.quick_start))
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -147,7 +75,13 @@ fun HowToUsePage(
                                     SameNetworkDemo()
                                 }
                                 VerticalSpace(dp = 16.dp)
-                                StepItem(index = 2, title = stringResource(Res.string.step_open_url_title))
+                                StepItem(index = 2, title = stringResource(Res.string.step_choose_ip_title))
+                                VerticalSpace(dp = 8.dp)
+                                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                    WebAddressPager()
+                                }
+                                VerticalSpace(dp = 16.dp)
+                                StepItem(index = 3, title = stringResource(Res.string.step_open_url_title))
                                 VerticalSpace(dp = 8.dp)
                                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                                     OpenAddressDemo()

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -42,13 +43,56 @@ import com.ismartcoding.plain.ui.theme.green
  * Shared browser-chrome mock and loaded-page frame for the demo "videos".
  */
 
-/** Window dots + address pill; optional status icon and blinking caret while "typing". */
+// plain-desktop light theme (src/styles/_base.scss)
+internal val DemoLoginBg = Color(0xFFFBF8FF) // --md-sys-color-background
+private val DemoLoginCard = Color(0xFFE2E0F7) // --md-sys-color-surface-variant
+private val DemoLoginPrimary = Color(0xFF3F51B5) // --md-sys-color-primary
+private val DemoLoginOnSurface = Color(0xFF1A1B26)
+
+// DemoChromeBg/DemoTrack/DemoDot/DemoUrlPill/DemoUrlText live in DemoPlayer.kt (internal).
+
+/**
+ * Unified browser mock: dark chrome (window dots + address pill) above an
+ * inset rounded page area. All demo "videos" that show a browser use this.
+ */
 @Composable
-internal fun DemoBrowserChrome(
+internal fun DemoBrowserFrame(
     url: String,
     icon: DrawableResource? = null,
     iconTint: Color = Color.Unspecified,
     caret: Boolean = false,
+    pageBackground: Color = MaterialTheme.colorScheme.background,
+    pageContent: @Composable () -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        DemoBrowserChrome(url = url, icon = icon, iconTint = iconTint, caret = caret)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(pageBackground)
+                    .animateContentSize()
+                    .heightIn(min = 208.dp),
+                contentAlignment = Alignment.TopCenter,
+            ) {
+                pageContent()
+            }
+        }
+    }
+}
+
+/** Window dots + address pill; optional status icon and blinking caret while "typing". */
+@Composable
+private fun DemoBrowserChrome(
+    url: String,
+    icon: DrawableResource?,
+    iconTint: Color,
+    caret: Boolean,
 ) {
     Row(
         modifier = Modifier
@@ -127,49 +171,50 @@ internal fun DemoSwitchOn() {
     }
 }
 
-/** Successful end frame shared by the demos: app logo, name and a green "connected" row. */
+/**
+ * plain-desktop LoginView end frame: PlainApp title + card with the Log in
+ * button (colors from src/styles/_base.scss light theme).
+ */
 @Composable
-internal fun DemoLoadedPage(minHeight: Dp) {
+internal fun DemoLoginPage() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = minHeight)
-            .padding(16.dp),
+            .heightIn(min = 208.dp)
+            .background(DemoLoginBg)
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(12.dp)),
-        ) {
-            Icon(
-                painter = painterResource(Res.drawable.app_logo),
-                contentDescription = null,
-                modifier = Modifier.matchParentSize(),
-                tint = Color.Unspecified,
-            )
-        }
-        Spacer(Modifier.height(8.dp))
         Text(
-            text = stringResource(Res.string.app_name),
-            style = MaterialTheme.typography.titleMedium,
+            text = "PlainApp",
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = DemoLoginOnSurface,
         )
-        Spacer(Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Spacer(Modifier.height(20.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(DemoLoginCard)
+                .padding(20.dp),
+        ) {
             Box(
-                Modifier
-                    .size(8.dp)
-                    .background(MaterialTheme.colorScheme.green, CircleShape),
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(
-                text = stringResource(Res.string.faq_https_demo_connected),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(50))
+                    .background(DemoLoginPrimary)
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "Log in",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White,
+                )
+            }
         }
     }
 }

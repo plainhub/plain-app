@@ -82,7 +82,8 @@
     <string name="service_not_running">Service draait niet</string>
     <string name="quick_start">Snelstart</string>
     <string name="step_connect_network_title">Maak verbinding met hetzelfde netwerk</string>
-    <string name="demo_same_network">Zelfde netwerk</string>
+    <string name="step_choose_ip_title">Kies een IP-adres</string>
+    <string name="demo_same_wifi">Zelfde wifi</string>
     <string name="step_connect_network_desc">Verbind de computer en telefoon met hetzelfde wifi-netwerk, of zet de hotspot van de telefoon aan en verbind de computer daarmee.</string>
     <string name="step_open_url_title">Open het adres op de computer</string>
     <string name="troubleshooting">Problemen oplossen</string>

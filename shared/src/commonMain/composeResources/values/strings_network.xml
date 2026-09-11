@@ -32,7 +32,8 @@
     <string name="service_not_running">Service not running</string>
     <string name="quick_start">Quick start</string>
     <string name="step_connect_network_title">Connect to the same network</string>
-    <string name="demo_same_network">Same network</string>
+    <string name="step_choose_ip_title">Choose an IP address</string>
+    <string name="demo_same_wifi">Same Wi-Fi</string>
     <string name="step_connect_network_desc">Connect your computer and phone to the same Wi-Fi network, or turn on your phone's hotspot and connect your computer to it.</string>
     <string name="step_open_url_title">Open the address on your computer</string>
     <string name="troubleshooting">Troubleshooting</string>

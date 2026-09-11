@@ -82,7 +82,8 @@
     <string name="service_not_running">Servizio non in esecuzione</string>
     <string name="quick_start">Avvio rapido</string>
     <string name="step_connect_network_title">Connettiti alla stessa rete</string>
-    <string name="demo_same_network">Stessa rete</string>
+    <string name="step_choose_ip_title">Scegli un indirizzo IP</string>
+    <string name="demo_same_wifi">Stesso Wi-Fi</string>
     <string name="step_connect_network_desc">Connetti computer e telefono alla stessa rete Wi-Fi, oppure attiva l'hotspot del telefono e connetti il computer a esso.</string>
     <string name="step_open_url_title">Apri l'indirizzo sul computer</string>
     <string name="troubleshooting">Risoluzione dei problemi</string>

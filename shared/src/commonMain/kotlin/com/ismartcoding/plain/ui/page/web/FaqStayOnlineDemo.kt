@@ -112,7 +112,12 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .demoTapRing(ring),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -128,7 +133,6 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                             color = MaterialTheme.colorScheme.blue,
                         )
                     }
-                    if (ring) DemoTapRing()
                 }
                 Box(
                     modifier = Modifier.weight(1f),
@@ -139,7 +143,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                             .fillMaxWidth()
                             .clip(DemoPillShape)
                             .background(MaterialTheme.colorScheme.red)
-                            .padding(vertical = 7.dp),
+                            .padding(vertical = 8.dp),
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         Text(
@@ -247,7 +251,10 @@ private fun DemoStayOnlineOverlay(ring: Boolean) {
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(16.dp))
-        Box(contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier.demoTapRing(ring),
+            contentAlignment = Alignment.Center,
+        ) {
             Row(
                 modifier = Modifier
                     .clip(DemoPillShape)
@@ -261,7 +268,6 @@ private fun DemoStayOnlineOverlay(ring: Boolean) {
                     color = Color.White.copy(alpha = 0.85f),
                 )
             }
-            if (ring) DemoTapRing()
         }
         Spacer(Modifier.height(12.dp))
         Text(

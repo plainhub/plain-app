@@ -82,7 +82,8 @@
     <string name="service_not_running">Hizmet çalışmıyor</string>
     <string name="quick_start">Hızlı başlangıç</string>
     <string name="step_connect_network_title">Aynı ağa bağlanın</string>
-    <string name="demo_same_network">Aynı ağ</string>
+    <string name="step_choose_ip_title">Bir IP adresi seçin</string>
+    <string name="demo_same_wifi">Aynı Wi-Fi</string>
     <string name="step_connect_network_desc">Bilgisayarı ve telefonu aynı Wi-Fi ağına bağlayın ya da telefonun hotspot'unu açıp bilgisayarı ona bağlayın.</string>
     <string name="step_open_url_title">Adresi bilgisayarda açın</string>
     <string name="troubleshooting">Sorun giderme</string>

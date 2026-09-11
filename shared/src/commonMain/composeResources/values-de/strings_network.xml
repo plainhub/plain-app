@@ -82,7 +82,8 @@
     <string name="service_not_running">Dienst läuft nicht</string>
     <string name="quick_start">Schnellstart</string>
     <string name="step_connect_network_title">Mit demselben Netzwerk verbinden</string>
-    <string name="demo_same_network">Gleiches Netzwerk</string>
+    <string name="step_choose_ip_title">IP-Adresse auswählen</string>
+    <string name="demo_same_wifi">Gleiches WLAN</string>
     <string name="step_connect_network_desc">Verbinde Computer und Telefon mit demselben WLAN oder aktiviere den Hotspot auf deinem Telefon und verbinde den Computer damit.</string>
     <string name="step_open_url_title">Adresse auf dem Computer öffnen</string>
     <string name="troubleshooting">Fehlerbehebung</string>

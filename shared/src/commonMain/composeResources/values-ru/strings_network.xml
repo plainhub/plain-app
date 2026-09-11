@@ -82,7 +82,8 @@
     <string name="service_not_running">Служба не запущена</string>
     <string name="quick_start">Быстрый старт</string>
     <string name="step_connect_network_title">Подключитесь к одной сети</string>
-    <string name="demo_same_network">Одна сеть</string>
+    <string name="step_choose_ip_title">Выберите IP-адрес</string>
+    <string name="demo_same_wifi">Тот же Wi-Fi</string>
     <string name="step_connect_network_desc">Подключите компьютер и телефон к одной сети Wi-Fi или включите точку доступа на телефоне и подключите к ней компьютер.</string>
     <string name="step_open_url_title">Откройте адрес на компьютере</string>
     <string name="troubleshooting">Устранение неполадок</string>
