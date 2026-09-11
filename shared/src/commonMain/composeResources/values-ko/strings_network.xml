@@ -101,6 +101,8 @@
     <string name="faq_port_conflict_a">안내에서 "앱 다시 시작"을 누르면 앱이 자동으로 다시 시작되어 사용 가능한 포트로 전환됩니다.</string>
     <string name="faq_slow_q">페이지가 느리게 로드되거나 동영상이 끊기나요?</string>
     <string name="faq_slow_a">최상의 성능을 위해 휴대폰을 USB 케이블에 연결하고 액세스 설정에서 "깨어 있게 유지"를 켜세요.</string>
+    <string name="faq_stay_online_q">화면이 꺼지면 연결이 끊기나요?</string>
+    <string name="faq_stay_online_a">화면이 꺼지면 Android가 앱을 일시 중지하거나 네트워크를 끊어 컴퓨터와의 연결이 끊길 수 있습니다. 서비스 실행 중에 홈 화면에서 "온라인 유지"를 누르세요: 앱이 계속 실행되고 화면이 켜진 상태로 유지되며(완전히 검게 표시할 수도 있음) 연결이 유지됩니다.</string>
     <string name="more_help">도움말 더 보기</string>
     <string name="developer_options">개발자 옵션</string>
     <string name="adb_automation">ADB 자동화</string>

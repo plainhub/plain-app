@@ -101,6 +101,8 @@
     <string name="faq_port_conflict_a">Toca «Vuelve a abrir PlainApp» en el aviso y la aplicación se reiniciará automáticamente con un puerto libre.</string>
     <string name="faq_slow_q">¿La página carga lenta o el vídeo se entrecorta?</string>
     <string name="faq_slow_a">Para el mejor rendimiento, mantén el teléfono conectado a un cable USB y activa «Mantener despierto» en los ajustes de acceso.</string>
+    <string name="faq_stay_online_q">¿Se corta la conexión cuando la pantalla se apaga?</string>
+    <string name="faq_stay_online_a">Cuando la pantalla se apaga, Android puede pausar la aplicación o cortar su acceso a la red, y el ordenador pierde la conexión. Toca «Permanecer en línea» en la pantalla de inicio con el servicio activo: la aplicación sigue en primer plano y la pantalla permanece encendida (puede mostrarse toda en negro), así la conexión no se interrumpe.</string>
     <string name="more_help">Más ayuda</string>
     <string name="developer_options">Opciones de desarrollador</string>
     <string name="adb_automation">Automatización ADB</string>

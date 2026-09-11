@@ -101,6 +101,8 @@
     <string name="faq_port_conflict_a">संकेत में "ऐप फिर से चालू करें" दबाएँ — ऐप अपने आप पुनः शुरू होकर खाली पोर्ट पर चला जाएगा।</string>
     <string name="faq_slow_q">पेज धीरे लोड हो रहा है या वीडियो अटक रहा है?</string>
     <string name="faq_slow_a">सबसे अच्छे प्रदर्शन के लिए फ़ोन को USB केबल से जोड़े रखें और एक्सेस सेटिंग्स में "जागरूक रखें" चालू करें।</string>
+    <string name="faq_stay_online_q">स्क्रीन बंद होने पर कनेक्शन टूट जाता है?</string>
+    <string name="faq_stay_online_a">स्क्रीन बंद होने पर Android ऐप को रोक सकता है या नेटवर्क बंद कर सकता है, जिससे कंप्यूटर का कनेक्शन टूट जाता है। सेवा चालू होने पर होम स्क्रीन पर "ऑनलाइन रहें" दबाएँ — ऐप चलता रहेगा और स्क्रीन चालू रहेगी (पूरी काली भी चल सकती है), जिससे कनेक्शन बना रहता है।</string>
     <string name="more_help">अधिक सहायता</string>
     <string name="developer_options">डेवलपर विकल्प</string>
     <string name="adb_automation">ADB ऑटोमेशन</string>

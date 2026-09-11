@@ -101,6 +101,8 @@
     <string name="faq_port_conflict_a">Touchez « Relancer l'application » dans l'invite : l'application redémarrera automatiquement sur un port libre.</string>
     <string name="faq_slow_q">La page se charge lentement ou la vidéo saccade ?</string>
     <string name="faq_slow_a">Pour de meilleures performances, gardez le téléphone branché en USB et activez « Garder éveillé » dans les paramètres d'accès.</string>
+    <string name="faq_stay_online_q">La connexion se coupe quand l'écran s'éteint ?</string>
+    <string name="faq_stay_online_a">Quand l'écran s'éteint, Android peut mettre l'application en pause ou couper son accès réseau, et l'ordinateur perd la connexion. Touchez « Rester en ligne » sur l'écran d'accueil pendant que le service tourne : l'application reste au premier plan et l'écran reste allumé (il peut être tout noir), la connexion est maintenue.</string>
     <string name="more_help">Plus d'aide</string>
     <string name="developer_options">Options développeur</string>
     <string name="adb_automation">Automatisation ADB</string>

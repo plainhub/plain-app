@@ -168,6 +168,14 @@ fun HowToUsePage(
                                 answerFooterFullWidth = true,
                             )
                             FaqItem(
+                                icon = Res.drawable.smartphone,
+                                tint = MaterialTheme.colorScheme.orange,
+                                question = stringResource(Res.string.faq_stay_online_q),
+                                answer = stringResource(Res.string.faq_stay_online_a),
+                                answerFooter = { FaqStayOnlineDemo() },
+                                answerFooterFullWidth = true,
+                            )
+                            FaqItem(
                                 icon = Res.drawable.timer,
                                 tint = MaterialTheme.colorScheme.blue,
                                 question = stringResource(Res.string.faq_port_conflict_q),

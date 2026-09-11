@@ -101,6 +101,8 @@
     <string name="faq_port_conflict_a">Toque em "Reiniciar aplicativo" no aviso: o aplicativo será reiniciado automaticamente em uma porta livre.</string>
     <string name="faq_slow_q">A página carrega devagar ou o vídeo trava?</string>
     <string name="faq_slow_a">Para o melhor desempenho, mantenha o celular conectado a um cabo USB e ative "Manter acordado" nas configurações de acesso.</string>
+    <string name="faq_stay_online_q">A conexão cai quando a tela apaga?</string>
+    <string name="faq_stay_online_a">Quando a tela apaga, o Android pode pausar o aplicativo ou cortar o acesso à rede, e o computador perde a conexão. Toque em "Manter online" na tela inicial com o serviço ativo: o aplicativo continua em primeiro plano e a tela permanece ligada (pode ficar totalmente preta), mantendo a conexão ativa.</string>
     <string name="more_help">Mais ajuda</string>
     <string name="developer_options">Opções do desenvolvedor</string>
     <string name="adb_automation">Automação ADB</string>

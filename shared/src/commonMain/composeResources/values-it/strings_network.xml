@@ -101,6 +101,8 @@
     <string name="faq_port_conflict_a">Tocca «Rilancia l'app» nell'avviso: l'app si riavvierà automaticamente su una porta libera.</string>
     <string name="faq_slow_q">La pagina si carica lentamente o il video si interrompe?</string>
     <string name="faq_slow_a">Per le migliori prestazioni, tieni il telefono collegato a un cavo USB e attiva «Mantieni sveglio» nelle impostazioni di accesso.</string>
+    <string name="faq_stay_online_q">La connessione si interrompe quando lo schermo si spegne?</string>
+    <string name="faq_stay_online_a">Quando lo schermo si spegne, Android può mettere in pausa l'app o interrompere l'accesso alla rete, e il computer perde la connessione. Tocca «Resta online» nella schermata Home a servizio attivo: l'app resta in primo piano e lo schermo rimane acceso (può essere tutto nero), così la connessione non si interrompe.</string>
     <string name="more_help">Maggiori informazioni</string>
     <string name="developer_options">Opzioni sviluppatore</string>
     <string name="adb_automation">Automazione ADB</string>

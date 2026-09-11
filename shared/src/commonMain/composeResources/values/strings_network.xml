@@ -50,6 +50,8 @@
     <string name="faq_port_conflict_a">Tap "Restart App" in the prompt and the app will restart with a free port automatically.</string>
     <string name="faq_slow_q">Page loads slowly or video stutters?</string>
     <string name="faq_slow_a">Keep the phone plugged into a USB cable and turn on Keep awake in access settings for the best performance.</string>
+    <string name="faq_stay_online_q">Connection drops when the screen turns off?</string>
+    <string name="faq_stay_online_a">When the screen turns off, Android may pause PlainApp or cut its network access, so your computer loses the connection. Tap "Stay Online" on the Home screen while the service is running: the app stays in the foreground and the screen stays on (it can go fully black), keeping the connection alive.</string>
     <string name="more_help">More help</string>
     <string name="http_server_state_on">Service is running</string>
     <string name="http_server_state_starting">Starting service…</string>

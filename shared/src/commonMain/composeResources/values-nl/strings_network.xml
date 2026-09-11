@@ -101,6 +101,8 @@
     <string name="faq_port_conflict_a">Tik in de melding op 'App opnieuw starten' — de app start opnieuw en kiest automatisch een vrije poort.</string>
     <string name="faq_slow_q">Pagina laadt traag of video hapert?</string>
     <string name="faq_slow_a">Voor de beste prestaties: houd de telefoon op een USB-kabel aangesloten en zet 'Wakker houden' aan in de toegangsinstellingen.</string>
+    <string name="faq_stay_online_q">Verbroken verbinding als het scherm uitgaat?</string>
+    <string name="faq_stay_online_a">Als het scherm uitgaat, kan Android de app pauzeren of de netwerktoegang verbreken, waardoor je computer de verbinding verliest. Tik op het startscherm op 'Online blijven' terwijl de service draait: de app blijft op de voorgrond en het scherm blijft aan (het mag volledig zwart zijn), zo blijft de verbinding behouden.</string>
     <string name="more_help">Meer hulp</string>
     <string name="developer_options">Ontwikkelaarsopties</string>
     <string name="adb_automation">ADB Automatisering</string>

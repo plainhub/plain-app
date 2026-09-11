@@ -101,6 +101,8 @@
     <string name="faq_port_conflict_a">ダイアログの「アプリを再起動」をタップすると、アプリが自動的に再起動して空いているポートに切り替わります。</string>
     <string name="faq_slow_q">ページの読み込みが遅い、または動画が止まる？</string>
     <string name="faq_slow_a">最高のパフォーマンスを得るには、スマホを USB ケーブルに接続し、アクセス設定で「起きている」をオンにしてください。</string>
+    <string name="faq_stay_online_q">画面がオフになると接続が切れる？</string>
+    <string name="faq_stay_online_a">画面がオフになると、システムがアプリやネットワーク接続を一時停止して、パソコンから接続できなくなることがあります。サービス実行中にホーム画面で「オンライン状態を維持」をタップすると、アプリが前面で動き続け、画面も点灯したまま（全黒表示も可能）になるため、接続が維持されます。</string>
     <string name="more_help">その他のヘルプ</string>
     <string name="developer_options">開発者オプション</string>
     <string name="adb_automation">ADB 自動化</string>

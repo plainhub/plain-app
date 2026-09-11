@@ -324,7 +324,7 @@ private fun DemoLoadedPage() {
 
 /** Pulsing circle drawn over the element being "tapped". */
 @Composable
-private fun DemoTapRing() {
+internal fun DemoTapRing() {
     val transition = rememberInfiniteTransition(label = "demoTapRing")
     val scale by transition.animateFloat(
         initialValue = 0.85f,
