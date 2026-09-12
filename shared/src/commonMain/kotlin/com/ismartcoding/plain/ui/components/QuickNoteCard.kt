@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.ui.components
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -95,6 +97,8 @@ fun QuickNoteCard(
     val savedText = stringResource(Res.string.note_saved)
     val undoText = stringResource(Res.string.undo)
     val canSave = text.isNotBlank()
+    // Compact when idle and empty; grow to reveal the action row on focus or with content.
+    val showActions = isFocused || canSave
 
     fun saveAsync(onSaved: (String) -> Unit) {
         scope.launch {
@@ -127,7 +131,11 @@ fun QuickNoteCard(
                 shape = RoundedCornerShape(PlainTheme.CARD_RADIUS),
             )
     ) {
-        Box(modifier = Modifier.padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)) {
+        Column(
+            modifier =
+                Modifier.padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp)
+                    .animateContentSize()
+        ) {
             BasicTextField(
                 value = text,
                 onValueChange = { text = it },
@@ -152,42 +160,44 @@ fun QuickNoteCard(
                     }
                 },
             )
-            Row(modifier = Modifier.align(Alignment.BottomEnd)) {
-            PIconButton(
-                icon = Res.drawable.maximize_2,
-                iconSize = 20.dp,
-                contentDescription = stringResource(Res.string.edit),
-                click = {
-                    if (canSave) {
-                        saveAsync(onSaved = { id -> onOpenNote(id) })
-                    } else {
-                        onEmptyExpand()
-                    }
-                },
-            )
-            if (canSave) {
-                PIconButton(
-                    icon = Res.drawable.check,
-                contentDescription = stringResource(Res.string.save),
-                tint = MaterialTheme.colorScheme.primary,
-                click = {
-                    val draft = text
-                    saveAsync(
-                        onSaved = { id ->
-                            ToastManager.showToast(
-                                savedText,
-                                type = ToastType.SUCCESS,
-                                duration = 4000L,
-                                actionLabel = undoText,
-                            ) {
-                                coIO { NoteHelper.trashAsync(setOf(id)) }
-                                text = draft
+            if (showActions) {
+                Row(modifier = Modifier.align(Alignment.End)) {
+                    PIconButton(
+                        icon = Res.drawable.maximize_2,
+                        iconSize = 20.dp,
+                        contentDescription = stringResource(Res.string.edit),
+                        click = {
+                            if (canSave) {
+                                saveAsync(onSaved = { id -> onOpenNote(id) })
+                            } else {
+                                onEmptyExpand()
                             }
                         },
                     )
-                },
-                )
-            }
+                    if (canSave) {
+                        PIconButton(
+                            icon = Res.drawable.check,
+                            contentDescription = stringResource(Res.string.save),
+                            tint = MaterialTheme.colorScheme.primary,
+                            click = {
+                                val draft = text
+                                saveAsync(
+                                    onSaved = { id ->
+                                        ToastManager.showToast(
+                                            savedText,
+                                            type = ToastType.SUCCESS,
+                                            duration = 4000L,
+                                            actionLabel = undoText,
+                                        ) {
+                                            coIO { NoteHelper.trashAsync(setOf(id)) }
+                                            text = draft
+                                        }
+                                    },
+                                )
+                            },
+                        )
+                    }
+                }
             }
         }
     }
