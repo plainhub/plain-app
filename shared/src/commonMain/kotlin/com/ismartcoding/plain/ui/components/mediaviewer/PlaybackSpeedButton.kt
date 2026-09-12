@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -46,7 +47,13 @@ fun PlaybackSpeedButton(
     fun apply(s: Float) { showMenu = false; onSpeedChange(s) }
 
     Box {
-        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+        // Non-focusable so the popup window doesn't pull the system bars
+        // back over the immersive audio player.
+        DropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+            properties = PopupProperties(focusable = false),
+        ) {
             PLAYBACK_SPEEDS.forEach { item ->
                 DropdownMenuItem(
                     modifier = Modifier.padding(end = 16.dp),

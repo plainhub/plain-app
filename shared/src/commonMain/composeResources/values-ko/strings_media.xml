@@ -31,6 +31,7 @@
     <string name="videos_title">비디오 (%1$s)</string>
     <string name="images_title">이미지 (%1$s)</string>
     <string name="sleep_timer">슬립 타이머</string>
+    <string name="no_lyrics">가사 없음</string>
     <string name="finish_last_audio">마지막 오디오 완료</string>
     <string name="start">시작</string>
     <string name="stop">정지</string>

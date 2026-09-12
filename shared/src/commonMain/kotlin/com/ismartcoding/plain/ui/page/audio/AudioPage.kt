@@ -44,7 +44,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VTabData
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.page.audio.components.AudioFilesSelectModeBottomActions
-import com.ismartcoding.plain.ui.page.audio.components.AudioPlayerBar
+import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
 import com.ismartcoding.plain.ui.page.cast.CastDialog

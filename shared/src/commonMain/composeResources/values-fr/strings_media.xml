@@ -31,6 +31,7 @@
     <string name="videos_title">Vidéos (%1$s)</string>
     <string name="images_title">Images (%1$s)</string>
     <string name="sleep_timer">Minuterie de mise en veille</string>
+    <string name="no_lyrics">Aucunes paroles</string>
     <string name="finish_last_audio">Terminer le dernier audio</string>
     <string name="start">Démarrer</string>
     <string name="stop">Arrêter</string>

@@ -31,6 +31,7 @@
     <string name="videos_title">Video's (%1$s)</string>
     <string name="images_title">Afbeeldingen (%1$s)</string>
     <string name="sleep_timer">Slaaptimer</string>
+    <string name="no_lyrics">Geen songtekst</string>
     <string name="finish_last_audio">Laatste audio afspelen</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>

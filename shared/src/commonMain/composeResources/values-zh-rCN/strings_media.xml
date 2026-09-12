@@ -32,6 +32,7 @@
     <string name="videos_title">视频 (%1$s)</string>
     <string name="images_title">图片 (%1$s)</string>
     <string name="sleep_timer">睡眠定时器</string>
+    <string name="no_lyrics">暂无歌词</string>
     <string name="finish_last_audio">播放完最后一个音频</string>
     <string name="start">开始</string>
     <string name="stop">停止</string>

@@ -14,7 +14,7 @@ private object ExoPlayerAudioPlayer : AudioPlayer {
     override val progress: Long
         get() = AndroidAudioPlayer.playerProgress
 
-    override fun seekTo(progress: Long) = AndroidAudioPlayer.seekTo(progress)
+    override fun seekTo(positionMs: Long) = AndroidAudioPlayer.seekTo(positionMs)
 
     override fun pause() = AndroidAudioPlayer.pause()
 

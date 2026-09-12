@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface AudioPlayer {
     val isPlayingFlow: StateFlow<Boolean>
     val progress: Long
-    fun seekTo(progress: Long)
+    fun seekTo(positionMs: Long)
     fun pause()
     fun play()
     fun restartIfPlaying()
@@ -28,7 +28,7 @@ fun audioIsPlayingFlow(): StateFlow<Boolean> = audioPlayer.isPlayingFlow
 
 fun audioPlayerProgress(): Long = audioPlayer.progress
 
-fun audioSeekTo(progress: Long) = audioPlayer.seekTo(progress)
+fun audioSeekTo(positionMs: Long) = audioPlayer.seekTo(positionMs)
 
 fun audioPause() = audioPlayer.pause()
 

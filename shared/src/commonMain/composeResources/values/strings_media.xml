@@ -34,6 +34,7 @@
     <string name="videos_title">Videos (%1$s)</string>
     <string name="images_title">Images (%1$s)</string>
     <string name="sleep_timer">Sleep timer</string>
+    <string name="no_lyrics">No lyrics</string>
     <string name="finish_last_audio">Finish last audio</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>

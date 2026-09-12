@@ -55,7 +55,7 @@ import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.platform.extractZipEntryToCache
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
+import com.ismartcoding.plain.ui.page.audioplayer.AudioPlayerPage
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

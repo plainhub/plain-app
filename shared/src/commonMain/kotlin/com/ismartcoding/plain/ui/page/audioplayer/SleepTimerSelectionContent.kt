@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.audio
+package com.ismartcoding.plain.ui.page.audioplayer
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
