@@ -164,24 +164,6 @@ fun ChatPage(
             if (target.type == ChatTargetType.PEER && target.toId != "local") {
                 PeerTransportPrewarmer.prewarm(target.toId)
             }
-            // Consume any pending forward payload from an external share.
-            // Must run after initializeTargetAsync so the message is sent to
-            // the selected peer/channel instead of the stale "local" default.
-            chatVM.pendingForwardFiles.value?.let { uris ->
-                chatVM.setPendingForwardFiles(null)
-                handleChatFileSelection(
-                    PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris),
-                    chatVM, peerVM, focusManager,
-                )
-            }
-            chatVM.pendingForwardContent.value?.let { content ->
-                chatVM.setPendingForwardContent(null)
-                chatVM.sendContent(content)
-            }
-            chatVM.pendingForwardText.value?.let { text ->
-                chatVM.setPendingForwardText(null)
-                chatVM.sendTextMessage(text, PeerCacher.getOnlinePeerIds())
-            }
         }
     }
 
@@ -363,8 +345,8 @@ fun ChatPage(
                     showForwardDialog = false
                     messageToForward = null
                 },
-                onTargetSelected = { target ->
-                    chatVM.forwardMessage(message.id, target, PeerCacher.getOnlinePeerIds())
+                onTargetsSelected = { targets ->
+                    targets.forEach { chatVM.forwardMessage(message.id, it, PeerCacher.getOnlinePeerIds()) }
                     showForwardDialog = false
                     messageToForward = null
                 },

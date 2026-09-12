@@ -17,7 +17,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DShare
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.share.ShareCrypto
@@ -56,9 +55,10 @@ import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.WebAddressBarQrDialog
-import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import com.ismartcoding.plain.chat.ShareSendHelper
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.i18n.sent
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -73,8 +73,6 @@ import org.jetbrains.compose.resources.stringResource
 fun CreateShareDialog(
     paths: List<String>,
     onDismiss: () -> Unit,
-    navController: NavHostController,
-    chatVM: ChatViewModel,
     onCreated: (DShare) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -95,11 +93,13 @@ fun CreateShareDialog(
     if (showForwardDialog) {
         ForwardTargetDialog(
             onDismiss = { showForwardDialog = false },
-            onTargetSelected = { target ->
-                chatVM.setPendingForwardText(link)
+            onTargetsSelected = { targets ->
                 showForwardDialog = false
                 onDismiss()
-                navController.navigate(Routing.Chat(target.encodedToId))
+                scope.launch {
+                    ShareSendHelper.sendAsync(targets, emptyList(), link, null)
+                    DialogHelper.showSuccess(Res.string.sent)
+                }
             },
         )
         return

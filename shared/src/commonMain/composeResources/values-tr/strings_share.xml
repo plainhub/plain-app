@@ -18,4 +18,14 @@
     <string name="share_name_placeholder">Ad</string>
     <string name="share_no_links">Paylaşılan bağlantı yok</string>
     <string name="share_read_only">Salt okunur</string>
+    <string name="send_to_chat">Sohbete gönder</string>
+    <string name="open">Aç</string>
+    <string name="open_as_text">Metin olarak aç</string>
+    <string name="save_to_files">Dosyalara kaydet</string>
+    <string name="save_as_note">Not olarak kaydet</string>
+    <string name="send_count">Gönder (%1$d)</string>
+    <string name="sent_to_n_targets">%1$d sohbete gönderildi</string>
+    <string name="saved_to_downloads">İndirilenler klasörüne kaydedildi</string>
+    <string name="cannot_get_content">Paylaşılan içeriğe erişilemedi</string>
+    <string name="files_with_size">%1$d dosya · %2$s</string>
 </resources>

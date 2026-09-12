@@ -19,4 +19,14 @@
     <string name="share_expired">Expired</string>
     <string name="share_no_links">No shared links</string>
     <string name="share_delete_desc">Deleting this share immediately revokes the link</string>
+    <string name="send_to_chat">Send to chat</string>
+    <string name="open">Open</string>
+    <string name="open_as_text">Open as text</string>
+    <string name="save_to_files">Save to files</string>
+    <string name="save_as_note">Save as note</string>
+    <string name="send_count">Send (%1$d)</string>
+    <string name="sent_to_n_targets">Sent to %1$d chats</string>
+    <string name="saved_to_downloads">Saved to Downloads</string>
+    <string name="cannot_get_content">Cannot access the shared content</string>
+    <string name="files_with_size">%1$d files · %2$s</string>
 </resources>

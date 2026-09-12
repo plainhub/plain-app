@@ -18,4 +18,14 @@
     <string name="share_name_placeholder">Tên</string>
     <string name="share_no_links">Không có liên kết chia sẻ</string>
     <string name="share_read_only">Chỉ đọc</string>
+    <string name="send_to_chat">Gửi vào chat</string>
+    <string name="open">Mở</string>
+    <string name="open_as_text">Mở dưới dạng văn bản</string>
+    <string name="save_to_files">Lưu vào tệp</string>
+    <string name="save_as_note">Lưu thành ghi chú</string>
+    <string name="send_count">Gửi (%1$d)</string>
+    <string name="sent_to_n_targets">Đã gửi tới %1$d chat</string>
+    <string name="saved_to_downloads">Đã lưu vào Tải xuống</string>
+    <string name="cannot_get_content">Không thể truy cập nội dung được chia sẻ</string>
+    <string name="files_with_size">%1$d tệp · %2$s</string>
 </resources>

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.database.CursorWindow
-import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -57,7 +56,6 @@ import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.page.CrashReportDialog
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.Main
-import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 import com.ismartcoding.plain.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -74,9 +72,6 @@ class MainActivity : AppCompatActivity() {
     internal val channelVM: ChannelViewModel by viewModels()
     internal val chatVM: ChatViewModel by viewModels()
     internal val navControllerState = mutableStateOf<NavHostController?>(null)
-    internal var showForwardTargetDialog by mutableStateOf(false)
-    internal var pendingFileUris by mutableStateOf<Set<Uri>?>(null)
-    internal var pendingForwardText by mutableStateOf<String?>(null)
     internal var pendingCrashReport by mutableStateOf<String?>(null)
 
     internal val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -181,23 +176,6 @@ class MainActivity : AppCompatActivity() {
                         chatVM = chatVM, peerVM = peerVM,
                         channelVM = channelVM
                     )
-                    if (showForwardTargetDialog) {
-                        ForwardTargetDialog(
-                            onDismiss = {
-                                showForwardTargetDialog = false
-                                pendingFileUris = null
-                                pendingForwardText = null
-                            },
-                            onTargetSelected = { target ->
-                                navControllerState.value?.navigate(Routing.Chat(target.encodedToId))
-                                // Stash the payload on chatVM; ChatPage consumes it after
-                                // initializing its target. Emitting PickFileResultEvent here
-                                // would race with ChatPage's shared-flow subscription and drop
-                                // the event, so the shared file never reached the chat.
-                                chatVM.setPendingForwardFiles(pendingFileUris?.map { it.toString() }?.toSet())
-                                chatVM.setPendingForwardText(pendingForwardText)
-                            })
-                    }
                     pendingCrashReport?.let { report ->
                         CrashReportDialog(crashReport = report, navController = navControllerState.value, onDismiss = { pendingCrashReport = null })
                     }

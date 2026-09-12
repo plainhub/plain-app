@@ -19,15 +19,20 @@ import androidx.compose.ui.unit.sp
 fun PBottomSheetTopAppBar(
     title: String = "",
     subtitle: String = "",
+    navigationIcon: (@Composable () -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, top = 8.dp)
+            .padding(start = 16.dp, end = 24.dp, top = 8.dp)
             .heightIn(min = 72.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        if (navigationIcon != null) {
+            navigationIcon()
+        }
+        HorizontalSpace(8.dp)
         if (subtitle.isEmpty()) {
             Text(
                 text = title,

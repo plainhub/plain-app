@@ -18,4 +18,14 @@
     <string name="share_name_placeholder">नाम</string>
     <string name="share_no_links">कोई शेयर लिंक नहीं</string>
     <string name="share_read_only">केवल पढ़ने के लिए</string>
+    <string name="send_to_chat">चैट पर भेजें</string>
+    <string name="open">खोलें</string>
+    <string name="open_as_text">टेक्स्ट के रूप में खोलें</string>
+    <string name="save_to_files">फ़ाइलों में सहेजें</string>
+    <string name="save_as_note">नोट के रूप में सहेजें</string>
+    <string name="send_count">भेजें (%1$d)</string>
+    <string name="sent_to_n_targets">%1$d चैट पर भेजा गया</string>
+    <string name="saved_to_downloads">डाउनलोड में सहेजा गया</string>
+    <string name="cannot_get_content">साझा की गई सामग्री तक पहुँच नहीं पा रहे हैं</string>
+    <string name="files_with_size">%1$d फ़ाइलें · %2$s</string>
 </resources>

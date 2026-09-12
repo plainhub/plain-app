@@ -19,4 +19,14 @@
     <string name="share_name_placeholder">名稱</string>
     <string name="share_no_links">尚無分享連結</string>
     <string name="share_read_only">唯讀</string>
+    <string name="send_to_chat">傳送到聊天</string>
+    <string name="open">開啟</string>
+    <string name="open_as_text">以文字開啟</string>
+    <string name="save_to_files">儲存到檔案</string>
+    <string name="save_as_note">儲存為筆記</string>
+    <string name="send_count">傳送（%1$d）</string>
+    <string name="sent_to_n_targets">已傳送至 %1$d 個聊天</string>
+    <string name="saved_to_downloads">已儲存到下載</string>
+    <string name="cannot_get_content">無法取得分享內容</string>
+    <string name="files_with_size">%1$d 個檔案 · %2$s</string>
 </resources>

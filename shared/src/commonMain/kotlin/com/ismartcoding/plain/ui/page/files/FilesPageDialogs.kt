@@ -13,9 +13,7 @@ import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
-import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +21,6 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun FilesPageDialogs(
     filesVM: FilesViewModel, scope: CoroutineScope,
-    navController: NavHostController, chatVM: ChatViewModel,
 ) {
     if (filesVM.showSortDialog.value) {
         FileSortDialog(filesVM.sortBy, onSelected = {
@@ -75,8 +72,6 @@ internal fun FilesPageDialogs(
         CreateShareDialog(
             paths = filesVM.sharePaths.toList(),
             onDismiss = { filesVM.showCreateShareDialog.value = false },
-            navController = navController,
-            chatVM = chatVM,
             onCreated = { filesVM.sharesVersion.value++ },
         )
     }

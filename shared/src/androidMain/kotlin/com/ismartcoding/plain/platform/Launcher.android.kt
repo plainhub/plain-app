@@ -49,7 +49,7 @@ actual fun shareFileAs(path: String, displayName: String) {
 actual fun shareFiles(paths: List<String>) {
     val ctx = appContextValue ?: return
     if (paths.isEmpty()) return
-    ShareHelper.shareFiles(ctx, paths.map { File(it) })
+    ShareHelper.shareFiles(ctx, paths)
 }
 
 actual fun openFileExternal(path: String) {

@@ -187,6 +187,9 @@ class Routing {
     data class PlayMedia(val path: String)
 
     @Serializable
+    data class ShareImage(val path: String, val name: String = "")
+
+    @Serializable
     object PairingRequest
 
     @Serializable

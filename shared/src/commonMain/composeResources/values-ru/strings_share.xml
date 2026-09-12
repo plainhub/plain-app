@@ -18,4 +18,14 @@
     <string name="share_name_placeholder">Название</string>
     <string name="share_no_links">Нет ссылок</string>
     <string name="share_read_only">Только чтение</string>
+    <string name="send_to_chat">Отправить в чат</string>
+    <string name="open">Открыть</string>
+    <string name="open_as_text">Открыть как текст</string>
+    <string name="save_to_files">Сохранить в файлы</string>
+    <string name="save_as_note">Сохранить как заметку</string>
+    <string name="send_count">Отправить (%1$d)</string>
+    <string name="sent_to_n_targets">Отправлено в %1$d чат(ов)</string>
+    <string name="saved_to_downloads">Сохранено в «Загрузки»</string>
+    <string name="cannot_get_content">Не удалось получить содержимое</string>
+    <string name="files_with_size">Файлов: %1$d · %2$s</string>
 </resources>

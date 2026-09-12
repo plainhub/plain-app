@@ -58,7 +58,6 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -76,7 +75,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FilesPage(
     navController: NavHostController, audioPlaylistVM: AudioPlaylistViewModel,
-    chatVM: ChatViewModel, folderPath: String = "", filesVM: FilesViewModel = viewModel { FilesViewModel() },
+    folderPath: String = "", filesVM: FilesViewModel = viewModel { FilesViewModel() },
 ) {
     val scope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -88,7 +87,7 @@ fun FilesPage(
     }
 
     FilesPageEffects(filesVM, scope, folderPath, previewerState, audioPlaylistVM)
-    FilesPageDialogs(filesVM, scope, navController, chatVM)
+    FilesPageDialogs(filesVM, scope)
 
     val drawerFolderTitle = filesVM.currentFolderTitleOverride()
     val title = when {

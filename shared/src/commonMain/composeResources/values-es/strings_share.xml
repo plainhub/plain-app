@@ -18,4 +18,14 @@
     <string name="share_name_placeholder">Nombre</string>
     <string name="share_no_links">No hay enlaces compartidos</string>
     <string name="share_read_only">Solo lectura</string>
+    <string name="send_to_chat">Enviar al chat</string>
+    <string name="open">Abrir</string>
+    <string name="open_as_text">Abrir como texto</string>
+    <string name="save_to_files">Guardar en archivos</string>
+    <string name="save_as_note">Guardar como nota</string>
+    <string name="send_count">Enviar (%1$d)</string>
+    <string name="sent_to_n_targets">Enviado a %1$d chats</string>
+    <string name="saved_to_downloads">Guardado en Descargas</string>
+    <string name="cannot_get_content">No se puede acceder al contenido compartido</string>
+    <string name="files_with_size">%1$d archivos · %2$s</string>
 </resources>

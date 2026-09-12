@@ -18,4 +18,14 @@
     <string name="share_name_placeholder">Name</string>
     <string name="share_no_links">Keine Freigabelinks</string>
     <string name="share_read_only">Schreibgeschützt</string>
+    <string name="send_to_chat">An Chat senden</string>
+    <string name="open">Öffnen</string>
+    <string name="open_as_text">Als Text öffnen</string>
+    <string name="save_to_files">In Dateien speichern</string>
+    <string name="save_as_note">Als Notiz speichern</string>
+    <string name="send_count">Senden (%1$d)</string>
+    <string name="sent_to_n_targets">An %1$d Chats gesendet</string>
+    <string name="saved_to_downloads">In Downloads gespeichert</string>
+    <string name="cannot_get_content">Freigabeinhalt konnte nicht abgerufen werden</string>
+    <string name="files_with_size">%1$d Dateien · %2$s</string>
 </resources>

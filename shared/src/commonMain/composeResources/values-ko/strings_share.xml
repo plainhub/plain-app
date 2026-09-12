@@ -18,4 +18,14 @@
     <string name="share_name_placeholder">이름</string>
     <string name="share_no_links">공유 링크가 없습니다</string>
     <string name="share_read_only">읽기 전용</string>
+    <string name="send_to_chat">채팅으로 보내기</string>
+    <string name="open">열기</string>
+    <string name="open_as_text">텍스트로 열기</string>
+    <string name="save_to_files">파일에 저장</string>
+    <string name="save_as_note">노트로 저장</string>
+    <string name="send_count">보내기(%1$d)</string>
+    <string name="sent_to_n_targets">%1$d개 채팅에 보냈습니다</string>
+    <string name="saved_to_downloads">다운로드에 저장됨</string>
+    <string name="cannot_get_content">공유 콘텐츠를 가져올 수 없습니다</string>
+    <string name="files_with_size">파일 %1$d개 · %2$s</string>
 </resources>

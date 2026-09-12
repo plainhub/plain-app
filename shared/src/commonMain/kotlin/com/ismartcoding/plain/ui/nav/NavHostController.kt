@@ -22,6 +22,10 @@ fun NavHostController.navigateChatText(content: String) {
     }
 }
 
+fun NavHostController.navigateShareImage(path: String, name: String = "") {
+    navigate(Routing.ShareImage(path, name))
+}
+
 fun NavHostController.navigatePdf(uriString: String, fileName: String = "") {
     navigate(Routing.PdfViewer(uriString, fileName)) {
         launchSingleTop = true

@@ -87,17 +87,6 @@ object ShareHelper {
         context.startActivity(chooserIntent)
     }
 
-    fun sharePaths(
-        context: Context,
-        paths: Set<String>,
-    ) {
-        if (paths.size == 1) {
-            shareFile(context, File(paths.first()))
-        } else {
-            shareFiles(context, paths.map { File(it) })
-        }
-    }
-
     private fun shareFileUris(
         context: Context,
         uris: List<Uri>,
@@ -215,15 +204,21 @@ object ShareHelper {
 
     fun shareFiles(
         context: Context,
-        files: List<File>,
+        paths: List<String>,
     ) {
-        val fileUris = arrayListOf<Uri>()
+        val uris = arrayListOf<Uri>()
         val inaccessibleFiles = mutableListOf<String>()
 
-        for (file in files) {
+        for (path in paths) {
+            // MediaStore item URIs are shared directly instead of going through FileProvider
+            if (path.startsWith("content://")) {
+                uris.add(Uri.parse(path))
+                continue
+            }
+            val file = File(path)
             if (isFileAccessibleByProvider(file)) {
                 try {
-                    fileUris.add(FileProvider.getUriForFile(context, AppIntents.AUTHORITY, file))
+                    uris.add(FileProvider.getUriForFile(context, AppIntents.AUTHORITY, file))
                 } catch (e: IllegalArgumentException) {
                     inaccessibleFiles.add(file.name)
                 }
@@ -232,7 +227,7 @@ object ShareHelper {
             }
         }
 
-        if (fileUris.isEmpty()) {
+        if (uris.isEmpty()) {
             DialogHelper.showErrorMessage(LocaleHelper.getString(Res.string.cannot_share_any_files))
             return
         }
@@ -242,15 +237,11 @@ object ShareHelper {
             DialogHelper.showErrorMessage(message)
         }
 
-        val intent = Intent(Intent.ACTION_SEND_MULTIPLE)
-        intent.type = "*/*"
-        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fileUris)
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        val chooserIntent = Intent.createChooser(intent, LocaleHelper.getString(Res.string.share))
-        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
-        // context may be the Application context, so FLAG_ACTIVITY_NEW_TASK is required
-        chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        context.startActivity(chooserIntent)
+        if (uris.size == 1) {
+            shareUri(context, uris[0])
+        } else {
+            shareFileUris(context, uris)
+        }
     }
 
     fun openPathWith(

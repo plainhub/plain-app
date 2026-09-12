@@ -24,7 +24,6 @@ import com.ismartcoding.plain.ui.components.NoDataView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VAppFile
 
 @Composable
@@ -35,7 +34,6 @@ fun AppFileListContent(
     noMore: Boolean,
     previewerState: MediaPreviewerState,
     audioPlaylistVM: AudioPlaylistViewModel,
-    chatVM: ChatViewModel,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
 ) {
@@ -44,8 +42,6 @@ fun AppFileListContent(
     if (selectedFile != null) {
         AppFileInfoBottomSheet(
             file = selectedFile!!,
-            chatVM = chatVM,
-            navController = navController,
             onDismiss = { selectedFile = null }
         )
     }

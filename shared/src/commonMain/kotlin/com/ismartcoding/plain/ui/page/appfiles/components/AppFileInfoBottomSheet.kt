@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
@@ -30,26 +30,26 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VAppFile
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import com.ismartcoding.plain.chat.ShareSendHelper
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppFileInfoBottomSheet(
     file: VAppFile,
-    chatVM: ChatViewModel,
-    navController: NavHostController,
     onDismiss: () -> Unit,
 ) {
     var showForwardDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     if (showForwardDialog) {
         ForwardTargetDialog(
             onDismiss = { showForwardDialog = false },
-            onTargetSelected = { target ->
+            onTargetsSelected = { targets ->
                 val dFile = DMessageFile(
                     uri = file.appFile.getFidUri(),
                     size = file.appFile.size,
@@ -64,10 +64,12 @@ fun AppFileInfoBottomSheet(
                 } else {
                     DMessageContent(MessageType.FILES, DMessageFiles(listOf(dFile)))
                 }
-                chatVM.setPendingForwardContent(content)
                 showForwardDialog = false
                 onDismiss()
-                navController.navigate(Routing.Chat(target.toId))
+                scope.launch {
+                    ShareSendHelper.sendContentAsync(targets, content)
+                    DialogHelper.showSuccess(Res.string.sent)
+                }
             }
         )
     }

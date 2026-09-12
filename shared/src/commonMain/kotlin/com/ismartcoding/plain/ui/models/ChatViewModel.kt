@@ -6,8 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.JsonHelper
-import com.ismartcoding.plain.platform.createLongTextFile
-import com.ismartcoding.plain.Constants
+import com.ismartcoding.plain.platform.textMessageContent
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
@@ -16,8 +15,6 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
@@ -47,30 +44,6 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     private val _scrollToLatest = Channel<String?>(Channel.BUFFERED)
     val scrollToLatest: Flow<String?> = _scrollToLatest.receiveAsFlow()
-
-    // Pending forward payload from an external share (file/text). Set by the
-    // forward-target dialog before navigating to ChatPage, consumed by ChatPage
-    // after its target is initialized. Using a holder instead of emitting
-    // PickFileResultEvent avoids a race where the event was emitted before
-    // ChatPage subscribed to the shared flow (dropping the shared file).
-    private val _pendingForwardFiles = MutableStateFlow<Set<String>?>(null)
-    val pendingForwardFiles: StateFlow<Set<String>?> = _pendingForwardFiles.asStateFlow()
-    private val _pendingForwardText = MutableStateFlow<String?>(null)
-    val pendingForwardText: StateFlow<String?> = _pendingForwardText.asStateFlow()
-    private val _pendingForwardContent = MutableStateFlow<DMessageContent?>(null)
-    val pendingForwardContent: StateFlow<DMessageContent?> = _pendingForwardContent.asStateFlow()
-
-    fun setPendingForwardFiles(uris: Set<String>?) {
-        _pendingForwardFiles.value = uris
-    }
-
-    fun setPendingForwardText(text: String?) {
-        _pendingForwardText.value = text
-    }
-
-    fun setPendingForwardContent(content: DMessageContent?) {
-        _pendingForwardContent.value = content
-    }
 
     suspend fun initializeTargetAsync(chatId: String) = withIO {
         _target.value = ChatTarget.parseId(chatId)
@@ -191,12 +164,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     fun sendTextMessage(text: String, onlinePeerIds: Set<String>, onResult: (Boolean) -> Unit = {}) {
         viewModelScope.launchSafe {
-            val content = if (text.length > Constants.MAX_MESSAGE_LENGTH) {
-                createLongTextFile(text)
-            } else {
-                DMessageContent(MessageType.TEXT, DMessageText(text))
-            }
-            onResult(doSendMessage(target.value, content, onlinePeerIds))
+            onResult(doSendMessage(target.value, textMessageContent(text), onlinePeerIds))
         }
     }
 

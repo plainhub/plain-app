@@ -54,9 +54,10 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.WebAddressBarQrDialog
-import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import com.ismartcoding.plain.chat.ShareSendHelper
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.i18n.sent
 import com.ismartcoding.plain.ui.page.files.label
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -70,7 +71,6 @@ import kotlin.math.abs
 @Composable
 fun EditSharePage(
     navController: NavHostController,
-    chatVM: ChatViewModel,
     shareId: String,
 ) {
     val scope = rememberCoroutineScope()
@@ -173,10 +173,12 @@ fun EditSharePage(
     if (showForwardDialog) {
         ForwardTargetDialog(
             onDismiss = { showForwardDialog = false },
-            onTargetSelected = { target ->
-                chatVM.setPendingForwardText(link)
+            onTargetsSelected = { targets ->
                 showForwardDialog = false
-                navController.navigate(Routing.Chat(target.encodedToId))
+                scope.launch {
+                    ShareSendHelper.sendAsync(targets, emptyList(), link, null)
+                    DialogHelper.showSuccess(Res.string.sent)
+                }
             },
         )
     }

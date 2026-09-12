@@ -68,6 +68,7 @@ import com.ismartcoding.plain.ui.page.files.ZipFilePage
 import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.home.HomePage
 import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorListPage
+import com.ismartcoding.plain.ui.page.share.ShareImagePage
 import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorPage
 import com.ismartcoding.plain.ui.page.images.ImagesPage
 import com.ismartcoding.plain.ui.page.media.PlayMediaPage
@@ -263,14 +264,14 @@ fun MainNavGraph(
         }
         composable<Routing.Files> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Files>()
-            FilesPage(navController, audioPlaylistVM, chatVM, r.folderPath)
+            FilesPage(navController, audioPlaylistVM, r.folderPath)
         }
         composable<Routing.AppFiles> {
-            AppFilesPage(navController, audioPlaylistVM, chatVM)
+            AppFilesPage(navController, audioPlaylistVM)
         }
         composable<Routing.EditShare> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.EditShare>()
-            EditSharePage(navController, chatVM, r.id)
+            EditSharePage(navController, r.id)
         }
         composable<Routing.Nearby> {
             NearbyPage(navController, peerVM = peerVM)
@@ -294,6 +295,10 @@ fun MainNavGraph(
         composable<Routing.PlayMedia> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlayMedia>()
             PlayMediaPage(navController, r.path, audioPlaylistVM)
+        }
+        composable<Routing.ShareImage> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.ShareImage>()
+            ShareImagePage(navController, r.path, r.name)
         }
         composableNoAnim<Routing.PairingRequest> {
             val request = mainVM.pendingPairingRequest.value

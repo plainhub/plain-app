@@ -12,4 +12,6 @@ object AppIntents {
 
 object IntentExtras {
     const val CHAT_TARGET_ID = "chat_target_id"
+    const val SHARE_IMAGE_PATH = "share_image_path"
+    const val SHARE_IMAGE_NAME = "share_image_name"
 }
