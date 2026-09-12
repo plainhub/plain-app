@@ -31,6 +31,7 @@
     <string name="videos_title">वीडियो (%1$s)</string>
     <string name="images_title">तस्वीरें (%1$s)</string>
     <string name="sleep_timer">स्लीप टाइमर</string>
+    <string name="no_lyrics">कोई बोल नहीं</string>
     <string name="finish_last_audio">आखिरी ऑडियो समाप्त करें</string>
     <string name="start">शुरू करें</string>
     <string name="stop">रोकें</string>

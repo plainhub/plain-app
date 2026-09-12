@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +28,7 @@ import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.ShowPermissionWizardEvent
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.lib.Channel
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.DebugCornerBadge
 import com.ismartcoding.plain.ui.base.ToastEvent
@@ -41,6 +43,7 @@ import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverOverlay
+import com.ismartcoding.plain.ui.page.audioplayer.AudioPlayerPage
 import com.ismartcoding.plain.ui.page.home.ServiceOnboardingWizard
 import com.ismartcoding.plain.ui.theme.backgroundNormal
 import kotlinx.coroutines.Dispatchers
@@ -106,6 +109,14 @@ fun Main(
 
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
         MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM)
+
+        // Global fullscreen audio player: hosted above all pages so playback
+        // keeps working across tabs, with the page beneath visible during the
+        // slide-up transition.
+        val audioPlayerVisible by TempData.audioPlayerVisible.collectAsState()
+        if (audioPlayerVisible) {
+            AudioPlayerPage(audioPlaylistVM) { TempData.audioPlayerVisible.value = false }
+        }
 
         DlnaReceiverOverlay()
         MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })

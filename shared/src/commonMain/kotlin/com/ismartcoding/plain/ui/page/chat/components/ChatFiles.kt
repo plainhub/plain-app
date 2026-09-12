@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
-import com.ismartcoding.plain.platform.AudioPlayerSheetContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -10,13 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DPeer
@@ -36,12 +33,11 @@ fun ChatFiles(
 ) {
     val fileItems = (m.value as DMessageFiles).items
     val currentPlayingPath = audioPlaylistVM.selectedPath
-    var showAudioPlayer by remember { mutableStateOf(false) }
     val downloadProgressMap by DownloadQueue.downloadProgress.collectAsState(mapOf())
 
     LaunchedEffect(currentPlayingPath.value) {
-        if (showAudioPlayer) {
-            showAudioPlayer = currentPlayingPath.value.isNotEmpty()
+        if (TempData.audioPlayerVisible.value) {
+            TempData.audioPlayerVisible.value = currentPlayingPath.value.isNotEmpty()
         }
     }
 
@@ -61,15 +57,9 @@ fun ChatFiles(
                 item = item,
                 index = index,
                 downloadProgressMap = downloadProgressMap,
-                onShowAudioPlayer = { showAudioPlayer = true },
+                onShowAudioPlayer = { TempData.audioPlayerVisible.value = true },
             )
         }
     }
 
-    if (showAudioPlayer) {
-        AudioPlayerSheetContent(
-            audioPlaylistVM,
-            onDismissRequest = { showAudioPlayer = false },
-        )
-    }
 }

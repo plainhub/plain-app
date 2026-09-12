@@ -31,6 +31,7 @@
     <string name="videos_title">ビデオ (%1$s)</string>
     <string name="images_title">画像 (%1$s)</string>
     <string name="sleep_timer">スリープタイマー</string>
+    <string name="no_lyrics">歌詞なし</string>
     <string name="finish_last_audio">最後のオーディオを終了</string>
     <string name="start">開始</string>
     <string name="stop">停止</string>

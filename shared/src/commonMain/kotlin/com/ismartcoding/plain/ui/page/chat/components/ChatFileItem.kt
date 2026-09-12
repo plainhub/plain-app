@@ -127,7 +127,7 @@ fun ChatFileItem(
                 },
                 onValueChangeFinished = { normalizedProgress ->
                     if (duration > 0f) {
-                        audioSeekTo((normalizedProgress * duration).toLong())
+                        audioSeekTo((normalizedProgress * duration * 1000).toLong())
                     }
                     isDraggingProgress = false
                 },

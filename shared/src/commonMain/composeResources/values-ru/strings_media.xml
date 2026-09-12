@@ -31,6 +31,7 @@
     <string name="videos_title">Видео (%1$s)</string>
     <string name="images_title">Изображения (%1$s)</string>
     <string name="sleep_timer">Таймер сна</string>
+    <string name="no_lyrics">Нет текста песни</string>
     <string name="finish_last_audio">Завершить последний аудиофайл</string>
     <string name="start">Начать</string>
     <string name="stop">Остановить</string>

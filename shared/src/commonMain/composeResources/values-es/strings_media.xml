@@ -31,6 +31,7 @@
     <string name="videos_title">Vídeos (%1$s)</string>
     <string name="images_title">Imágenes (%1$s)</string>
     <string name="sleep_timer">Temporizador de apagado</string>
+    <string name="no_lyrics">Sin letra</string>
     <string name="finish_last_audio">Finalizar último audio</string>
     <string name="start">Iniciar</string>
     <string name="stop">Detener</string>

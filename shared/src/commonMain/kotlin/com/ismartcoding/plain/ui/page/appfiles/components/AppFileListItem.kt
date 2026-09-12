@@ -51,7 +51,7 @@ import com.ismartcoding.plain.platform.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.VAppFile
-import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
+import com.ismartcoding.plain.ui.page.audioplayer.AudioPlayerPage
 import com.ismartcoding.plain.ui.page.files.components.FileListItemPlayer
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Job

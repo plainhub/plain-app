@@ -42,8 +42,8 @@ private object AVPlayerAudioPlayer : AudioPlayer {
             return avPlayerTimeMs(p as NSObject, "currentTime")
         }
 
-    override fun seekTo(progress: Long) {
-        val ms = progress * 1000
+    override fun seekTo(positionMs: Long) {
+        val ms = positionMs
         TempData.audioPlayPosition = ms
         scope.launch {
             val p = player ?: return@launch

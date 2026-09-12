@@ -31,6 +31,7 @@
     <string name="videos_title">காணொளிகள் (%1$s)</string>
     <string name="images_title">படங்கள் (%1$s)</string>
     <string name="sleep_timer">உறை கடிகாரம்</string>
+    <string name="no_lyrics">பாடல் வரிகள் இல்லை</string>
     <string name="finish_last_audio">கடைசி ஒலி முடிக்க</string>
     <string name="start">தொடங்கு</string>
     <string name="stop">நிறுத்து</string>

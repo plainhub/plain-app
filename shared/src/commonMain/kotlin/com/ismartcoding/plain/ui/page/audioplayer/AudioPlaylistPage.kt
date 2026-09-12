@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.audio
+package com.ismartcoding.plain.ui.page.audioplayer
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.*

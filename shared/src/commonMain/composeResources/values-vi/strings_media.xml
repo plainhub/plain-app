@@ -31,6 +31,7 @@
     <string name="videos_title">Video (%1$s)</string>
     <string name="images_title">Hình ảnh (%1$s)</string>
     <string name="sleep_timer">Hẹn giờ ngủ</string>
+    <string name="no_lyrics">Không có lời bài hát</string>
     <string name="finish_last_audio">Kết thúc âm thanh trước</string>
     <string name="start">Bắt đầu</string>
     <string name="stop">Dừng</string>

@@ -140,9 +140,9 @@ object AudioPlayer {
         return playlistAudio
     }
 
-    fun seekTo(progress: Long) {
+    fun seekTo(positionMs: Long) {
         coMain {
-            val seekPosition = progress * 1000
+            val seekPosition = positionMs
             TempData.audioPlayPosition = seekPosition
             val currentPlayer = player
             if (currentPlayer != null) {

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.audio.components
+package com.ismartcoding.plain.ui.page.audioplayer.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -23,9 +23,8 @@ import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
-import com.ismartcoding.plain.ui.page.audio.AudioPlaylistPage
-import com.ismartcoding.plain.ui.page.audio.SleepTimerPage
+import com.ismartcoding.plain.ui.page.audioplayer.AudioPlaylistPage
+import com.ismartcoding.plain.ui.page.audioplayer.SleepTimerPage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -39,7 +38,6 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
     var progress by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableFloatStateOf(1f) }
     val isPlaying by audioIsPlayingFlow().collectAsState()
-    val showPlayer by TempData.audioPlayerVisible.collectAsState()
     var showSleepTimer by remember { mutableStateOf(false) }
     var showPlaylist by remember { mutableStateOf(false) }
     val currentPlayingPath = audioPlaylistVM.selectedPath
@@ -78,7 +76,6 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
         )
     }
 
-    if (showPlayer) AudioPlayerPage(audioPlaylistVM, onDismissRequest = { TempData.audioPlayerVisible.value = false })
     if (showSleepTimer) SleepTimerPage(onDismissRequest = { showSleepTimer = false })
     if (showPlaylist) AudioPlaylistPage(audioPlaylistVM, onDismissRequest = { showPlaylist = false })
 }

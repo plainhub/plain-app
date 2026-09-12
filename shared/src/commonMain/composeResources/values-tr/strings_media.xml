@@ -31,6 +31,7 @@
     <string name="videos_title">Videolar (%1$s)</string>
     <string name="images_title">Görüntüler (%1$s)</string>
     <string name="sleep_timer">Uyku zamanlayıcısı</string>
+    <string name="no_lyrics">Şarkı sözü yok</string>
     <string name="finish_last_audio">Son sesi bitir</string>
     <string name="start">Başlat</string>
     <string name="stop">Durdur</string>

@@ -1,6 +1,8 @@
-package com.ismartcoding.plain.ui.page.audio.components
+package com.ismartcoding.plain.ui.page.audioplayer.components
 
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.enums.DarkTheme
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -47,6 +49,11 @@ fun AudioPlayerBarCard(
     onClickPlaylist: () -> Unit,
     onPlayPause: () -> Unit,
 ) {
+    // Dark list items use cardBackgroundNormal (#2C2C2E) which equals surfaceVariant,
+    // so lift the bar to surfaceContainerHighest to keep it visually apart.
+    val isDark = DarkTheme.isDarkTheme(LocalDarkTheme.current)
+    val containerColor =
+        if (isDark) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceVariant
     ElevatedCard(
         modifier = Modifier
             .navigationBarsPadding()
@@ -54,14 +61,14 @@ fun AudioPlayerBarCard(
             .fillMaxWidth(),
         shape = RoundedCornerShape(PlainTheme.CARD_RADIUS),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.elevatedCardColors(containerColor = containerColor)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             LinearProgressIndicator(
                 progress = { if (duration == 0f) 0f else progress / duration },
                 modifier = Modifier.fillMaxWidth().height(4.dp),
                 color = MaterialTheme.colorScheme.primary,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant
+                trackColor = containerColor
             )
             Row(
                 modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 8.dp),

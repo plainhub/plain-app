@@ -21,6 +21,9 @@ fun AppTheme(useDarkTheme: Boolean, content: @Composable () -> Unit) {
     )
 }
 
+/** Soft near-white for dark-theme text: #E5E5EA glared at large sizes (user, 2026-09-13). */
+private val DarkSoftOnSurface = Color(0xFFD1D1D6)
+
 @Composable
 private fun plainDarkColorScheme(): ColorScheme {
     val amoled = LocalAmoledDarkTheme.current
@@ -29,7 +32,7 @@ private fun plainDarkColorScheme(): ColorScheme {
     val surfaceVariant = if (amoled) Color(0xFF1C1C1E) else Color(0xFF2C2C2E)
     return darkColorScheme(
         primary = Color(0xFF0A84FF), onPrimary = Color(0xFFFFFFFF),
-        primaryContainer = Color(0xFF163B66), onPrimaryContainer = Color(0xFFE5E5EA),
+        primaryContainer = Color(0xFF163B66), onPrimaryContainer = DarkSoftOnSurface,
         inversePrimary = Color(0xFF007AFF),
         secondary = Color(0xFF0A84FF), onSecondary = Color(0xFFFFFFFF),
         secondaryContainer = Color(0xFF003380), onSecondaryContainer = Color(0xFFCCDFFF),
@@ -37,9 +40,9 @@ private fun plainDarkColorScheme(): ColorScheme {
         tertiaryContainer = Color(0xFF4A4458), onTertiaryContainer = Color(0xFFEADDFF),
         error = Color(0xFFFF453A), onError = Color(0xFFFFFFFF),
         errorContainer = Color(0xFF3A1C1C), onErrorContainer = Color(0xFFFFDAD6),
-        background = bg, onBackground = Color(0xFFE5E5EA),
-        surface = surface, onSurface = Color(0xFFE5E5EA),
-        surfaceVariant = surfaceVariant, onSurfaceVariant = Color(0xFFB8B8BE),
+        background = bg, onBackground = DarkSoftOnSurface,
+        surface = surface, onSurface = DarkSoftOnSurface,
+        surfaceVariant = surfaceVariant, onSurfaceVariant = Color(0xFF8D8D93),
         surfaceTint = Color(0xFF0A84FF).copy(alpha = 0.08f),
         inverseSurface = Color(0xFFF2F2F7), inverseOnSurface = Color(0xFF000000),
         outline = Color(0xFF38383A), outlineVariant = Color(0xFF48484A),
@@ -107,7 +110,7 @@ val ColorScheme.orange: Color
 // dark background, so use the app's soft white there instead.
 val ColorScheme.filledButtonContent: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFE5E5EA) else Color(0xFFFFFFFF)
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) DarkSoftOnSurface else Color(0xFFFFFFFF)
 
 val ColorScheme.backgroundNormal: Color
     @Composable @ReadOnlyComposable
