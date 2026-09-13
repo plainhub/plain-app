@@ -46,7 +46,6 @@ import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.AlertType
-import com.ismartcoding.plain.ui.theme.red
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -194,7 +193,7 @@ private fun FeedSyncBannerRow(
                 Text(
                     text = if (lastSyncedAt != null) "$reason · $lastSyncedAt" else reason,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.red,
+                    color = MaterialTheme.colorScheme.error,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

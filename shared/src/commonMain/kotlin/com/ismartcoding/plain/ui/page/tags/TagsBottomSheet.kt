@@ -31,7 +31,6 @@ import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.red
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -85,7 +84,7 @@ fun TagsBottomSheet(
                             action = {
                                 PIconButton(
                                     icon = Res.drawable.delete_forever,
-                                    tint = MaterialTheme.colorScheme.red,
+                                    tint = MaterialTheme.colorScheme.error,
                                     contentDescription = stringResource(Res.string.delete),
                                     click = {
                                         DialogHelper.confirmToDelete {

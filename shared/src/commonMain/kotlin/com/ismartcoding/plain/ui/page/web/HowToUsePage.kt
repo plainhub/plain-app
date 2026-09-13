@@ -43,7 +43,6 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.grey
 import com.ismartcoding.plain.ui.theme.orange
-import com.ismartcoding.plain.ui.theme.red
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -95,7 +94,7 @@ fun HowToUsePage(
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             FaqItem(
                                 icon = Res.drawable.circle_alert,
-                                tint = MaterialTheme.colorScheme.red,
+                                tint = MaterialTheme.colorScheme.error,
                                 question = stringResource(Res.string.faq_cannot_open_q),
                                 answer = stringResource(Res.string.faq_cannot_open_a),
                             ) {

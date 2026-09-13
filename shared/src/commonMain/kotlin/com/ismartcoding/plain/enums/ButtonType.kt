@@ -7,7 +7,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.theme.red
 
 
 enum class ButtonType {
@@ -24,7 +23,7 @@ enum class ButtonType {
 
             DANGER -> {
                 ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.red,
+                    containerColor = MaterialTheme.colorScheme.error,
                     contentColor = Color.White,
                 )
             }

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.access_settings
 import com.ismartcoding.plain.i18n.plainapp_service_failed
@@ -36,11 +37,8 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.WebHelper
-import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.blue
-import com.ismartcoding.plain.ui.theme.tipsText
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -85,7 +83,7 @@ fun PlainAppServiceSection(
                     PIconButton(
                         icon = Res.drawable.tune,
                         contentDescription = stringResource(Res.string.access_settings),
-                        tint = MaterialTheme.colorScheme.blue,
+                        tint = MaterialTheme.colorScheme.primary,
                         click = { navController.navigate(Routing.DesktopAccessSettings) })
                 }
             }

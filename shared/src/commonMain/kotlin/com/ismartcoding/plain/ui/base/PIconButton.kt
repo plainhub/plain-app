@@ -21,7 +21,6 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import com.ismartcoding.plain.platform.rememberClickFeedback
 import com.ismartcoding.plain.ui.theme.badgeBorderColor
-import com.ismartcoding.plain.ui.theme.red
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +62,7 @@ fun PIconButton(
                         Box(
                             modifier = Modifier
                                 .size(8.dp)
-                                .background(MaterialTheme.colorScheme.red, shape = CircleShape)
+                                .background(MaterialTheme.colorScheme.error, shape = CircleShape)
                         )
                     }
                 }

@@ -21,7 +21,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.theme.red
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,7 +63,7 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                 actions = {
                     if (audioPlaylistVM.playlistItems.value.isNotEmpty()) {
                         IconButton(onClick = { showClearConfirmDialog = true }) {
-                            Icon(painter = painterResource(Res.drawable.delete_forever), contentDescription = "Clear", tint = MaterialTheme.colorScheme.red)
+                            Icon(painter = painterResource(Res.drawable.delete_forever), contentDescription = "Clear", tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }

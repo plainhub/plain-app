@@ -59,7 +59,7 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
                 VerticalSpace(4.dp)
                 Text(text = audio.artist, style = MaterialTheme.typography.listItemSubtitle())
             }
-            PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.red,
+            PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.error,
                 contentDescription = stringResource(Res.string.remove_from_playlist),
                 click = { scope.launch(Dispatchers.Default) { audioPlaylistVM.removeAsync(audio.path) } })
         }

@@ -38,7 +38,6 @@ import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.green
 
 /**
@@ -148,7 +147,7 @@ private fun DemoErrorPage(host: String, expanded: Boolean, ringOnAdvanced: Boole
                     text = stringResource(Res.string.faq_https_demo_proceed, host),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.blue,
+                    color = MaterialTheme.colorScheme.primary,
                     textDecoration = TextDecoration.Underline,
                 )
             }
@@ -175,7 +174,7 @@ internal fun Modifier.demoTapRing(enabled: Boolean): Modifier {
         animationSpec = infiniteRepeatable(tween(650, easing = LinearEasing), RepeatMode.Restart),
         label = "alpha",
     )
-    val color = MaterialTheme.colorScheme.blue
+    val color = MaterialTheme.colorScheme.primary
     return this.drawBehind {
         drawCircle(
             color = color,

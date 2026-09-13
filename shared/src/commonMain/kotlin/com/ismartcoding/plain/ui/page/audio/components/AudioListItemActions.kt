@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.IMedia
 import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.theme.red
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -40,7 +39,7 @@ fun AudioListItemActions(
         }
         PIconButton(
             icon = if (isInCastQueue) Res.drawable.playlist_remove else Res.drawable.playlist_add,
-            tint = if (isInCastQueue) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.primary,
+            tint = if (isInCastQueue) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
             contentDescription = if (isInCastQueue) stringResource(Res.string.remove_from_cast_queue) else stringResource(Res.string.add_to_cast_queue),
             modifier = Modifier.rotate(rotation),
             click = {

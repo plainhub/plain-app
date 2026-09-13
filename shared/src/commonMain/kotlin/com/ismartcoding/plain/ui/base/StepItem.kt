@@ -13,9 +13,6 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 
-// Top-aligned step row: PListItem centers its start slot vertically, which looks
-// wrong once the description wraps to multiple lines. When stacked in a PCard,
-// wrap them in a Column with padding(vertical = 8.dp) so card edges are 16dp.
 @Composable
 fun StepItem(index: Int, title: String, desc: String = "", modifier: Modifier = Modifier) {
     Row(
@@ -26,6 +23,7 @@ fun StepItem(index: Int, title: String, desc: String = "", modifier: Modifier = 
     ) {
         StepNumber(index)
         Column(modifier = Modifier.weight(1f)) {
+            VerticalSpace(dp = 4.dp)
             Text(text = title, style = MaterialTheme.typography.listItemTitle())
             if (desc.isNotEmpty()) {
                 VerticalSpace(dp = 8.dp)

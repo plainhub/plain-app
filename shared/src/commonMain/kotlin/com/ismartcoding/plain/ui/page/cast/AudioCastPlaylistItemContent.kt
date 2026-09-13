@@ -32,7 +32,6 @@ import com.ismartcoding.plain.ui.components.PulsatingWave
 import com.ismartcoding.plain.ui.theme.circleBackground
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.theme.red
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
@@ -69,7 +68,7 @@ internal fun ReorderableCollectionItemScope.AudioCastPlaylistItemContent(
             VerticalSpace(4.dp)
             Text(text = artist, style = MaterialTheme.typography.listItemSubtitle())
         }
-        PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.red,
+        PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.error,
             contentDescription = stringResource(Res.string.remove_from_cast_queue), click = onRemove)
     }
 }

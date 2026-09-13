@@ -18,9 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.ismartcoding.plain.ui.theme.waveActiveColor
 import com.ismartcoding.plain.ui.theme.waveInactiveColor
-import com.ismartcoding.plain.ui.theme.waveThumbColor
 
 data class WaveOptions(
     val amplitude: Float = 6f,
@@ -43,9 +41,9 @@ fun WaveSlider(
     valueRange: ClosedFloatingPointRange<Float>,
     onValueChangeFinished: (() -> Unit)? = null,
     colors: WaveSliderColors = WaveSliderColors(
-        activeColor = MaterialTheme.colorScheme.waveActiveColor,
+        activeColor = MaterialTheme.colorScheme.primary,
         inactiveColor = MaterialTheme.colorScheme.waveInactiveColor,
-        thumbColor = MaterialTheme.colorScheme.waveThumbColor
+        thumbColor = MaterialTheme.colorScheme.primary
     ),
     waveOptions: WaveOptions = WaveOptions(),
     modifier: Modifier = Modifier,

@@ -33,7 +33,6 @@ import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NotificationSettingsViewModel
-import com.ismartcoding.plain.ui.theme.red
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -61,7 +60,7 @@ fun NotificationSettingsPage(
                             PDropdownMenuItem(
                                 leadingIcon = {
                                     Icon(painter = painterResource(Res.drawable.delete_forever),
-                                        tint = MaterialTheme.colorScheme.red,
+                                        tint = MaterialTheme.colorScheme.error,
                                         contentDescription = stringResource(Res.string.clear_all))
                                 },
                                 onClick = { dismiss(); scope.launch(Dispatchers.Default) { vm.clearAllAsync() } },

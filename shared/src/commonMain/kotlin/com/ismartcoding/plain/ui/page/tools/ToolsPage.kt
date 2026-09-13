@@ -37,8 +37,6 @@ import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.ui.components.QuickNoteCard
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.theme.primaryPill
-import com.ismartcoding.plain.ui.theme.primaryText
 import com.ismartcoding.plain.ui.page.MainBottomBar
 import com.ismartcoding.plain.ui.page.home.HomeFeatureItemsGrid
 import com.ismartcoding.plain.ui.theme.greenPill

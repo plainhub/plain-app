@@ -24,9 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.orange
-import com.ismartcoding.plain.ui.theme.red
 import org.jetbrains.compose.resources.painterResource
 
 enum class AlertType {
@@ -54,8 +52,8 @@ fun PAlert(
 ) {
     val accentColor = when (type) {
         AlertType.WARNING -> MaterialTheme.colorScheme.orange
-        AlertType.ERROR -> MaterialTheme.colorScheme.red
-        AlertType.INFO -> MaterialTheme.colorScheme.blue
+        AlertType.ERROR -> MaterialTheme.colorScheme.error
+        AlertType.INFO -> MaterialTheme.colorScheme.primary
     }
     val containerColor = when (type) {
         AlertType.WARNING -> accentColor.copy(alpha = 0.15f)

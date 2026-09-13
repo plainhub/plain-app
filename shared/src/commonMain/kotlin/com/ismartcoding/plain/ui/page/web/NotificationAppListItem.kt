@@ -27,7 +27,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.theme.red
 
 @Composable
 fun NotificationAppListItem(
@@ -55,7 +54,7 @@ fun NotificationAppListItem(
             Text(text = app.id, style = MaterialTheme.typography.listItemSubtitle())
         }
         TextButton(onClick = onRemove) {
-            Text(stringResource(Res.string.remove), color = MaterialTheme.colorScheme.red)
+            Text(stringResource(Res.string.remove), color = MaterialTheme.colorScheme.error)
         }
     }
     VerticalSpace(dp = 8.dp)

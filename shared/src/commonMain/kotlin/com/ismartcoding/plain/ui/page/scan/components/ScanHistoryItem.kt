@@ -33,7 +33,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.theme.red
 
 @Composable
 private fun ActionButton(
@@ -109,7 +108,7 @@ fun ScanHistoryItem(
                 ActionButton(
                     icon = Res.drawable.delete_forever,
                     text = stringResource(Res.string.delete),
-                    tint = MaterialTheme.colorScheme.red,
+                    tint = MaterialTheme.colorScheme.error,
                     onClick = onDelete,
                     modifier = Modifier.weight(1f)
                 )

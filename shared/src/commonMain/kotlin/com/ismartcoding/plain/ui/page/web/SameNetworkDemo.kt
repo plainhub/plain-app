@@ -27,10 +27,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.green
-import com.ismartcoding.plain.ui.theme.red
 
 /**
  * Compose-drawn "video" for Quick start step 1, replaying the real flow:
@@ -114,13 +112,13 @@ private fun MacMenuBar(highlight: Boolean) {
         Box(contentAlignment = Alignment.Center) {
             Box(
                 modifier = Modifier
-                    .demoTapOutline(highlight, MaterialTheme.colorScheme.red)
+                    .demoTapOutline(highlight, MaterialTheme.colorScheme.error)
                     .padding(3.dp),
             ) {
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
-                        .background(MaterialTheme.colorScheme.blue)
+                        .background(MaterialTheme.colorScheme.primary)
                         .padding(horizontal = 8.dp, vertical = 4.dp),
                 ) {
                     Icon(
@@ -227,7 +225,7 @@ private fun PhoneWifiList() {
 private fun WifiMenuRow(name: String, selected: Boolean, highlighted: Boolean = false) {
     Box(
         modifier = Modifier
-            .demoTapOutline(highlighted, MaterialTheme.colorScheme.red)
+            .demoTapOutline(highlighted, MaterialTheme.colorScheme.error)
             .padding(3.dp),
     ) {
         Row(
@@ -239,7 +237,7 @@ private fun WifiMenuRow(name: String, selected: Boolean, highlighted: Boolean = 
                 .size(28.dp)
                 .clip(CircleShape)
                 .background(
-                    if (selected) MaterialTheme.colorScheme.blue
+                    if (selected) MaterialTheme.colorScheme.primary
                     else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f),
                 ),
             contentAlignment = Alignment.Center,

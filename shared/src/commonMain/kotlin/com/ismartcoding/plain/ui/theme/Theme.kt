@@ -31,20 +31,28 @@ private fun plainDarkColorScheme(): ColorScheme {
     val surface = if (amoled) Color(0xFF000000) else Color(0xFF2C2C2E)
     val surfaceVariant = if (amoled) Color(0xFF1C1C1E) else Color(0xFF2C2C2E)
     return darkColorScheme(
-        primary = Color(0xFF0A84FF), onPrimary = Color(0xFFFFFFFF),
-        primaryContainer = Color(0xFF163B66), onPrimaryContainer = DarkSoftOnSurface,
-        inversePrimary = Color(0xFF007AFF),
-        secondary = Color(0xFF0A84FF), onSecondary = Color(0xFFFFFFFF),
-        secondaryContainer = Color(0xFF003380), onSecondaryContainer = Color(0xFFCCDFFF),
+        // Primary family per user-provided soft indigo pair (2026-09-14,
+        // replacing the iOS blue): pastel indigo fill with dark navy content.
+        primary = Color(0xFFB8C4FF), onPrimary = Color(0xFF1F2E61),
+        primaryContainer = Color(0xFF374777), onPrimaryContainer = Color(0xFFDDE2F9),
+        inversePrimary = Color(0xFF4F5F9E),
+        secondary = Color(0xFFB8C4FF), onSecondary = Color(0xFF1F2E61),
+        // Dark container synced from plain-desktop: muted indigo replaces the
+        // glaring saturated blue pill (#003380) and ice-blue text (#CCDFFF).
+        // Light keeps the pale pair — selected rows there carry onSurface
+        // black text, which would fail on the mid-tone desktop container.
+        secondaryContainer = Color(0xFF363CA2), onSecondaryContainer = Color(0xFFADB2FF),
         tertiary = Color(0xFFCCC2DC), onTertiary = Color(0xFF332D41),
         tertiaryContainer = Color(0xFF4A4458), onTertiaryContainer = Color(0xFFEADDFF),
-        // Matches the softened red above: full-brightness iOS red glared on dark.
-        error = Color(0xFFDB5A50), onError = Color(0xFFFFFFFF),
-        errorContainer = Color(0xFF3A1C1C), onErrorContainer = Color(0xFFFFDAD6),
+        // Error family synced from plain-desktop (M3 baseline, user 2026-09-14
+        // asked for a less bright red): pale salmon in dark, deep muted red in
+        // light. Content on the pale fill uses the dark onError.
+        error = Color(0xFFFFB4AB), onError = Color(0xFF690005),
+        errorContainer = Color(0xFF93000A), onErrorContainer = Color(0xFFFFDAD6),
         background = bg, onBackground = DarkSoftOnSurface,
         surface = surface, onSurface = DarkSoftOnSurface,
         surfaceVariant = surfaceVariant, onSurfaceVariant = Color(0xFF8D8D93),
-        surfaceTint = Color(0xFF0A84FF).copy(alpha = 0.08f),
+        surfaceTint = Color(0xFFB8C4FF).copy(alpha = 0.08f),
         inverseSurface = Color(0xFFF2F2F7), inverseOnSurface = Color(0xFF000000),
         outline = Color(0xFF38383A), outlineVariant = Color(0xFF48484A),
         scrim = Color(0xFF000000),
@@ -59,19 +67,20 @@ private fun plainDarkColorScheme(): ColorScheme {
 }
 
 private fun plainLightColorScheme(): ColorScheme = lightColorScheme(
-    primary = Color(0xFF007AFF), onPrimary = Color(0xFFFFFFFF),
-    primaryContainer = Color(0xFFE8F2FF), onPrimaryContainer = Color(0xFF001E3C),
-    inversePrimary = Color(0xFF4DA3FF),
-    secondary = Color(0xFF007AFF), onSecondary = Color(0xFFFFFFFF),
+    primary = Color(0xFF4F5F9E), onPrimary = Color(0xFFFFFFFF),
+    primaryContainer = Color(0xFFDDE2F9), onPrimaryContainer = Color(0xFF111A3A),
+    inversePrimary = Color(0xFFB8C4FF),
+    secondary = Color(0xFF4F5F9E), onSecondary = Color(0xFFFFFFFF),
     secondaryContainer = Color(0xFFE5F0FF), onSecondaryContainer = Color(0xFF001B47),
     tertiary = Color(0xFF625B71), onTertiary = Color(0xFFFFFFFF),
     tertiaryContainer = Color(0xFFE8DEF8), onTertiaryContainer = Color(0xFF1D192B),
-    error = Color(0xFFFF3B30), onError = Color(0xFFFFFFFF),
-    errorContainer = Color(0xFFFFEDEB), onErrorContainer = Color(0xFF410002),
+    // M3 baseline error, synced with plain-desktop (2026-09-14).
+    error = Color(0xFFBA1A1A), onError = Color(0xFFFFFFFF),
+    errorContainer = Color(0xFFFFDAD6), onErrorContainer = Color(0xFF410002),
     background = Color(0xFFFFFBFE), onBackground = Color(0xFF000000),
     surface = Color(0xFFFFFFFF), onSurface = Color(0xFF000000),
     surfaceVariant = Color(0xFFFFFFFF), onSurfaceVariant = Color(0xFF636366),
-    surfaceTint = Color(0xFF007AFF).copy(alpha = 0.05f),
+    surfaceTint = Color(0xFF4F5F9E).copy(alpha = 0.05f),
     inverseSurface = Color(0xFF1C1C1E), inverseOnSurface = Color(0xFFFFFFFF),
     outline = Color(0xFFC6C6C8), outlineVariant = Color(0xFFE5E5EA),
     scrim = Color(0xFF000000),
@@ -89,17 +98,6 @@ val ColorScheme.grey: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF636366) else Color(0xFF8E8E93)
 
-// Dark red is desaturated and dimmed (#DB5A50): full-brightness iOS red
-// glared on dark backgrounds (user, 2026-09-13), while text/icons still
-// keep >= 4.5:1 contrast.
-val ColorScheme.red: Color
-    @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFDB5A50) else Color(0xFFFF3B30)
-
-val ColorScheme.blue: Color
-    @Composable @ReadOnlyComposable
-    get() = MaterialTheme.colorScheme.primary
-
 val ColorScheme.yellow: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFFFD60A) else Color(0xFFFFCC00)
@@ -110,8 +108,9 @@ val ColorScheme.orange: Color
 
 // -------- App semantic colors --------
 
-// Filled button text/icon color: pure white glares against the pure black
-// dark background, so use the app's soft white there instead.
+// Soft content for filled surfaces that stay dark in dark mode (danger red,
+// unchecked switch track): soft white there, white in light. Content on the
+// pastel primary fill uses onPrimary (dark navy) instead.
 val ColorScheme.filledButtonContent: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) DarkSoftOnSurface else Color(0xFFFFFFFF)
@@ -147,34 +146,18 @@ val ColorScheme.greenPill: Color
 val ColorScheme.primaryPill: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
-        Color(0x330A84FF)
+        Color(0x33B8C4FF)
     } else {
-        Color(0xFFE5F1FF)
-    }
-
-val ColorScheme.primaryText: Color
-    @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
-        Color(0xFF64B5F6)
-    } else {
-        Color(0xFF0066CC)
+        Color(0xFFDDE2F9)
     }
 
 val ColorScheme.secondaryTextColor: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF8D8D93) else Color(0xFF8E8E93)
 
-val ColorScheme.waveActiveColor: Color
-    @Composable @ReadOnlyComposable
-    get() = MaterialTheme.colorScheme.primary
-
 val ColorScheme.waveInactiveColor: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF48484A) else Color(0xFFE5E5EA)
-
-val ColorScheme.waveThumbColor: Color
-    @Composable @ReadOnlyComposable
-    get() = MaterialTheme.colorScheme.primary
 
 val ColorScheme.badgeBorderColor: Color
     @Composable @ReadOnlyComposable

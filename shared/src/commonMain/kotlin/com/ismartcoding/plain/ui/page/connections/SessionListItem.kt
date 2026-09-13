@@ -37,7 +37,6 @@ import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.VSession
-import com.ismartcoding.plain.ui.theme.red
 import com.ismartcoding.plain.httpserver.onlineClientIds
 
 @Composable
@@ -120,7 +119,7 @@ internal fun SessionListItem(
             Text(
                 text = stringResource(if (m.isCustom) Res.string.revoke_api_token else Res.string.revoke_session),
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                color = MaterialTheme.colorScheme.red,
+                color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()

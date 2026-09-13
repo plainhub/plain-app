@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.theme.filledButtonContent
-import com.ismartcoding.plain.ui.theme.red
 
 
 @Composable
@@ -42,13 +41,21 @@ fun PFilledButton(
 ) {
     val containerColor = when (type) {
         ButtonType.PRIMARY -> MaterialTheme.colorScheme.primary
-        ButtonType.DANGER -> MaterialTheme.colorScheme.red
+        ButtonType.DANGER -> MaterialTheme.colorScheme.error
         ButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiary
     }
+    // Fills use their on-pair content: primary is the pastel accent in dark so
+    // its content is the dark onPrimary; danger is pale salmon in dark so its
+    // content is the dark onError. Disabled (non-loading) content sits on a
+    // translucent fill over the dark surface, so it stays soft white.
     val contentColor = when (type) {
-        ButtonType.PRIMARY -> MaterialTheme.colorScheme.filledButtonContent
-        ButtonType.DANGER -> MaterialTheme.colorScheme.filledButtonContent
+        ButtonType.PRIMARY -> MaterialTheme.colorScheme.onPrimary
+        ButtonType.DANGER -> MaterialTheme.colorScheme.onError
         ButtonType.TERTIARY -> MaterialTheme.colorScheme.onTertiary
+    }
+    val disabledContentColor = when (type) {
+        ButtonType.TERTIARY -> contentColor.copy(alpha = 0.38f)
+        else -> if (isLoading) contentColor else MaterialTheme.colorScheme.filledButtonContent.copy(alpha = 0.38f)
     }
     Button(
         onClick = onClick,
@@ -60,7 +67,7 @@ fun PFilledButton(
             containerColor = containerColor,
             contentColor = contentColor,
             disabledContainerColor = if (isLoading) containerColor.copy(alpha = 0.8f) else containerColor.copy(alpha = 0.12f),
-            disabledContentColor = if (isLoading) contentColor else contentColor.copy(alpha = 0.38f),
+            disabledContentColor = disabledContentColor,
         ),
         contentPadding = buttonSize.getPaddingValues(),
         enabled = enabled && !isLoading,

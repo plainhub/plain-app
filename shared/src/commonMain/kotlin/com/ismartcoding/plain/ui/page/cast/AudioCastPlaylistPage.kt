@@ -46,7 +46,6 @@ import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListSta
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.theme.cardBackgroundActive
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import com.ismartcoding.plain.ui.theme.red
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,7 +86,7 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
                 actions = {
                     if (castItems.isNotEmpty()) {
                         IconButton(onClick = { showClearConfirmDialog = true }) {
-                            Icon(painter = painterResource(Res.drawable.delete_forever), contentDescription = "Clear playlist", tint = MaterialTheme.colorScheme.red)
+                            Icon(painter = painterResource(Res.drawable.delete_forever), contentDescription = "Clear playlist", tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 })

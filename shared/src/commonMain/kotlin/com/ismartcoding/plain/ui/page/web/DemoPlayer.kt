@@ -37,7 +37,6 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.isLanAddress
 import org.jetbrains.compose.resources.painterResource
-import com.ismartcoding.plain.ui.theme.blue
 import kotlinx.coroutines.launch
 
 /** First LAN IPv4 known to the app, or a stable fallback for the demos. */
@@ -191,7 +190,7 @@ internal fun DemoPlayer(
                     .fillMaxWidth(progressValue.coerceIn(0f, 1f))
                     .height(4.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.blue),
+                    .background(MaterialTheme.colorScheme.primary),
             )
         }
         Spacer(Modifier.height(12.dp))

@@ -106,12 +106,14 @@ fun AudioPlayerControls(
         }
         IconButton(
             onClick = onPlayPause,
-            modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary),
+            modifier = Modifier.size(64.dp).clip(CircleShape)
+                .background(if (isPlaying) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primary),
         ) {
             Icon(
                 painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
                 contentDescription = if (isPlaying) "Pause" else "Play",
-                tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(40.dp),
+                tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(40.dp),
             )
         }
         IconButton(

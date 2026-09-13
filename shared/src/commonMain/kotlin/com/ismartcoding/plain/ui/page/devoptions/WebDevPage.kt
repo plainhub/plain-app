@@ -67,6 +67,7 @@ fun WebDevPage(
                         Subtitle(text = stringResource(Res.string.stop_service))
                         CornerCopyCard(
                             label = stringResource(Res.string.adb_cmd_stop),
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             text = "adb shell am broadcast -a $packageId.action.STOP_HTTP_SERVER -p $packageId --es token $adbToken",
                         )
                         Tips(text = stringResource(Res.string.adb_token_desc))

@@ -42,7 +42,6 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.theme.red
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -125,7 +124,7 @@ fun CastSessionPlaylistItem(
         }
         PIconButton(
             icon = Res.drawable.playlist_remove,
-            tint = MaterialTheme.colorScheme.red,
+            tint = MaterialTheme.colorScheme.error,
             contentDescription = stringResource(Res.string.remove_from_cast_queue),
             click = onRemove,
         )

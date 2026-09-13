@@ -34,7 +34,6 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTag
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.theme.red
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -59,7 +58,7 @@ fun AudioListItem(
         animationSpec = tween(durationMillis = 400), label = "icon_rotation"
     )
     val iconResource = if (isInPlaylist) Res.drawable.playlist_remove else Res.drawable.playlist_add
-    val iconColor = if (isInPlaylist) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.primary
+    val iconColor = if (isInPlaylist) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
 
     val selected = remember(item.id, dragSelectState.selectedIds, audioVM.selectedItem.value) {
         dragSelectState.isSelected(item.id) || audioVM.selectedItem.value?.id == item.id

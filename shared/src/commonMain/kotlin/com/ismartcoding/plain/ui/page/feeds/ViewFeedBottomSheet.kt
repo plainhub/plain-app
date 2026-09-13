@@ -44,7 +44,6 @@ import com.ismartcoding.plain.ui.models.launchSafe
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.listItemValue
-import com.ismartcoding.plain.ui.theme.red
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -105,7 +104,7 @@ fun ViewFeedBottomSheet(
                     text = if (reason != null) stringResource(Res.string.feeds_sync_failed_with_reason, reason)
                     else stringResource(Res.string.feeds_sync_success),
                     style = MaterialTheme.typography.listItemValue(),
-                    color = if (reason != null) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.green,
+                    color = if (reason != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.green,
                 )
             })
         }

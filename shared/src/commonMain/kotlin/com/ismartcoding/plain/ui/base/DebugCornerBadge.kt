@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.theme.red
 
 /**
  * Red diagonal stripe across the top-left corner, marking debug builds.
@@ -16,7 +15,7 @@ import com.ismartcoding.plain.ui.theme.red
  */
 @Composable
 fun DebugCornerBadge(modifier: Modifier = Modifier) {
-    val color = MaterialTheme.colorScheme.red
+    val color = MaterialTheme.colorScheme.error
     Canvas(modifier.size(48.dp)) {
         drawLine(
             color = color,

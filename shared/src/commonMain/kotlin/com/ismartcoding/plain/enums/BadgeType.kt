@@ -30,7 +30,7 @@ enum class BadgeType {
     @ReadOnlyComposable
     fun onContainer(): Color = when (this) {
         NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
-        ON -> MaterialTheme.colorScheme.onSecondaryContainer
+        ON -> MaterialTheme.colorScheme.primary
         WARN -> MaterialTheme.colorScheme.onTertiaryContainer
         DANGER -> MaterialTheme.colorScheme.onErrorContainer
         INFO -> MaterialTheme.colorScheme.onPrimaryContainer

@@ -37,7 +37,6 @@ import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.theme.filledButtonContent
 import com.ismartcoding.plain.ui.theme.green
 
 /**
@@ -47,7 +46,7 @@ import com.ismartcoding.plain.ui.theme.green
 // plain-desktop light theme (src/styles/_base.scss)
 internal val DemoLoginBg = Color(0xFFFBF8FF) // --md-sys-color-background
 private val DemoLoginCard = Color(0xFFE2E0F7) // --md-sys-color-surface-variant
-private val DemoLoginPrimary = Color(0xFF3F51B5) // --md-sys-color-primary
+private val DemoLoginPrimary = Color(0xFF4F5F9E) // --md-sys-color-primary
 private val DemoLoginOnSurface = Color(0xFF1A1B26)
 
 // DemoChromeBg/DemoTrack/DemoDot/DemoUrlPill/DemoUrlText live in DemoPlayer.kt (internal).
@@ -167,7 +166,7 @@ internal fun DemoSwitchOn() {
             modifier = Modifier
                 .padding(end = 2.dp)
                 .size(14.dp)
-                .background(MaterialTheme.colorScheme.filledButtonContent, CircleShape),
+                .background(MaterialTheme.colorScheme.onPrimary, CircleShape),
         )
     }
 }

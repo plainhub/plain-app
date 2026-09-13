@@ -43,7 +43,6 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.models.ClipboardHistoryViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.red
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -78,7 +77,7 @@ fun ClipboardHistoryPage(
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(Res.drawable.delete_forever),
-                                        tint = MaterialTheme.colorScheme.red,
+                                        tint = MaterialTheme.colorScheme.error,
                                         contentDescription = stringResource(Res.string.clear_all)
                                     )
                                 },
@@ -147,7 +146,7 @@ fun ClipboardHistoryListItem(entry: DClipboard, sourceName: String, onCopy: () -
             Icon(
                 painter = painterResource(Res.drawable.delete_forever),
                 contentDescription = stringResource(Res.string.delete),
-                tint = MaterialTheme.colorScheme.red,
+                tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.clickable { onDelete() }.padding(8.dp),
             )
         },

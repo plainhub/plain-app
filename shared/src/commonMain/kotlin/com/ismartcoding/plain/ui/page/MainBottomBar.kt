@@ -18,7 +18,6 @@ import com.ismartcoding.plain.i18n.tools
 import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.ui.theme.primaryPill
-import com.ismartcoding.plain.ui.theme.primaryText
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -29,8 +28,8 @@ fun MainBottomBar(
     modifier: Modifier = Modifier,
 ) {
     val itemColors = NavigationBarItemDefaults.colors(
-        selectedIconColor = MaterialTheme.colorScheme.primaryText,
-        selectedTextColor = MaterialTheme.colorScheme.primaryText,
+        selectedIconColor = MaterialTheme.colorScheme.primary,
+        selectedTextColor = MaterialTheme.colorScheme.primary,
         indicatorColor = MaterialTheme.colorScheme.primaryPill,
     )
     NavigationBar(

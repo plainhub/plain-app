@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.ui.theme.red
 
 @Composable
 fun POutlinedButton(
@@ -37,7 +36,7 @@ fun POutlinedButton(
     val resolvedColor = contentColor ?: when (type) {
         ButtonType.PRIMARY -> MaterialTheme.colorScheme.primary
         ButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiary
-        ButtonType.DANGER -> MaterialTheme.colorScheme.red
+        ButtonType.DANGER -> MaterialTheme.colorScheme.error
     }
     val borderColor = resolvedColor.copy(alpha = 0.5f)
 

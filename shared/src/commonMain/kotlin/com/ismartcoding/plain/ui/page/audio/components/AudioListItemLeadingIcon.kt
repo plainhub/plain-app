@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.PulsatingWave
-import com.ismartcoding.plain.ui.theme.blue
 
 @Composable
 fun AudioListItemLeadingIcon(
@@ -56,7 +55,7 @@ fun AudioListItemLeadingIcon(
                         modifier = Modifier.size(24.dp),
                         painter = painterResource(Res.drawable.cast),
                         contentDescription = stringResource(Res.string.cast),
-                        tint = MaterialTheme.colorScheme.blue
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }

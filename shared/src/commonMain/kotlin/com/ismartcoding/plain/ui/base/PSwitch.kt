@@ -18,15 +18,15 @@ fun PSwitch(
 ) {
     val isDark = DarkTheme.isDarkTheme(LocalDarkTheme.current)
 
-    val switchBlue = if (isDark) Color(0xFF0A84FF) else Color(0xFF007AFF)
+    val switchBlue = MaterialTheme.colorScheme.primary
     val iosLightTrackGray = Color(0xFFE9E9EA)
     val iosDarkTrackGray = Color(0xFF39393D)
     val iosTrackGray = if (isDark) iosDarkTrackGray else iosLightTrackGray
-    // Pure white thumb glares on dark tracks and backgrounds (user, 2026-09-13);
-    // filledButtonContent is the app's soft white in dark mode, white in light.
-    val thumbColor = MaterialTheme.colorScheme.filledButtonContent
+    // Checked track is the pastel primary in dark, so the thumb goes navy
+    // (onPrimary); the unchecked dark track keeps the soft white thumb.
+    val checkedThumbColor = MaterialTheme.colorScheme.onPrimary
+    val uncheckedThumbColor = MaterialTheme.colorScheme.filledButtonContent
 
-    val disabledThumbColor = thumbColor
     val disabledCheckedTrack = switchBlue.copy(alpha = 0.4f)
     val disabledUncheckedTrack = iosTrackGray.copy(alpha = if (isDark) 0.3f else 0.5f)
 
@@ -34,15 +34,15 @@ fun PSwitch(
         checked = activated,
         enabled = enabled,
         colors = SwitchDefaults.colors(
-            checkedThumbColor = thumbColor,
+            checkedThumbColor = checkedThumbColor,
             checkedTrackColor = switchBlue,
-            uncheckedThumbColor = thumbColor,
+            uncheckedThumbColor = uncheckedThumbColor,
             uncheckedTrackColor = iosTrackGray,
 
             // Disabled states
-            disabledCheckedThumbColor = disabledThumbColor,
+            disabledCheckedThumbColor = checkedThumbColor,
             disabledCheckedTrackColor = disabledCheckedTrack,
-            disabledUncheckedThumbColor = disabledThumbColor,
+            disabledUncheckedThumbColor = uncheckedThumbColor,
             disabledUncheckedTrackColor = disabledUncheckedTrack,
         ),
         onCheckedChange = {

@@ -29,16 +29,13 @@ fun ShowcaseColors() {
     ColorGrid(
         listOf(
             "green" to cs.green, "grey" to cs.grey,
-            "red" to cs.red, "blue" to cs.blue,
             "yellow" to cs.yellow, "orange" to cs.orange,
             "backgroundNormal" to cs.backgroundNormal,
             "cardBackgroundNormal" to cs.cardBackgroundNormal,
             "cardBackgroundActive" to cs.cardBackgroundActive,
             "circleBackground" to cs.circleBackground,
             "secondaryTextColor" to cs.secondaryTextColor,
-            "waveActiveColor" to cs.waveActiveColor,
             "waveInactiveColor" to cs.waveInactiveColor,
-            "waveThumbColor" to cs.waveThumbColor,
             "badgeBorderColor" to cs.badgeBorderColor,
             "lightMask" to cs.lightMask(),
             "darkMask" to cs.darkMask(),

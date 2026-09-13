@@ -32,9 +32,7 @@ import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import com.ismartcoding.plain.ui.theme.red
 
 /**
  * Compose-drawn "video" demo for the Stay Online FAQ, mirroring the real
@@ -121,7 +119,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(DemoPillShape)
-                            .border(1.dp, MaterialTheme.colorScheme.blue.copy(alpha = 0.5f), DemoPillShape)
+                            .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), DemoPillShape)
                             .padding(vertical = 7.dp),
                         horizontalArrangement = Arrangement.Center,
                     ) {
@@ -129,7 +127,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                             text = stringResource(Res.string.stay_online),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.blue,
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -141,7 +139,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(DemoPillShape)
-                            .border(1.dp, MaterialTheme.colorScheme.red.copy(alpha = 0.5f), DemoPillShape)
+                            .border(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f), DemoPillShape)
                             .padding(vertical = 7.dp),
                         horizontalArrangement = Arrangement.Center,
                     ) {
@@ -149,7 +147,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                             text = stringResource(Res.string.stop_service),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.red,
+                            color = MaterialTheme.colorScheme.error,
                         )
                     }
                 }
