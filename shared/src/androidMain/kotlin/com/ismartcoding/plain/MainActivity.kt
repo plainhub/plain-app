@@ -46,7 +46,6 @@ import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.platform.FilePickHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
@@ -70,7 +69,6 @@ class MainActivity : AppCompatActivity() {
     val pomodoroVM: PomodoroViewModel by viewModels()
     internal val peerVM: PeerViewModel by viewModels()
     internal val channelVM: ChannelViewModel by viewModels()
-    internal val chatVM: ChatViewModel by viewModels()
     internal val navControllerState = mutableStateOf<NavHostController?>(null)
     internal var pendingCrashReport by mutableStateOf<String?>(null)
 
@@ -173,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                     Main(
                         navControllerState, onLaunched = { handleIntent(intent) },
                         mainVM, audioPlaylistVM, pomodoroVM,
-                        chatVM = chatVM, peerVM = peerVM,
+                        peerVM = peerVM,
                         channelVM = channelVM
                     )
                     pendingCrashReport?.let { report ->

@@ -34,7 +34,7 @@ import com.ismartcoding.plain.ui.base.DebugCornerBadge
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
@@ -56,7 +56,6 @@ fun Main(
     mainVM: MainViewModel,
     audioPlaylistVM: AudioPlaylistViewModel,
     pomodoroVM: PomodoroViewModel,
-    chatVM: ChatViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
     feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM") { TagsViewModel() },
@@ -91,7 +90,7 @@ fun Main(
     }
 
     MainEventCollector(
-        scope, mainVM, chatVM, audioPlaylistVM, pomodoroVM, peerVM, navController,
+        scope, mainVM, ChatViewModel, audioPlaylistVM, pomodoroVM, peerVM, navController,
         onConfirmDialog = { confirmDialogEvent = it },
         onLoadingDialog = { loadingDialogEvent = if (it.show) it else null },
         onToast = { toastState = it },
@@ -108,7 +107,7 @@ fun Main(
     }
 
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
-        MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM)
+        MainNavGraph(navController, mainVM, audioPlaylistVM, peerVM, channelVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM)
 
         // Global fullscreen audio player: hosted above all pages so playback
         // keeps working across tabs, with the page beneath visible during the

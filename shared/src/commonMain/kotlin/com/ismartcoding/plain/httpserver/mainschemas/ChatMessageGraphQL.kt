@@ -5,15 +5,13 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.chat.ChatManager
+import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.enums.ChatStatus
-import com.ismartcoding.plain.events.HChatItemsDeletedEvent
-import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.HRetryChatItemEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.lib.sendEvent
@@ -45,7 +43,7 @@ suspend fun sendChatItem(toId: String, content: String): List<ChatItem> {
     ChatManager.sendMessage(item, target, emptySet())
     val model = item.toModel()
     sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-    sendEvent(HMessageCreatedEvent(target, arrayListOf(item)))
+    ChatViewModel.onMessagesCreated(target, listOf(item))
     return listOf(model)
 }
 
@@ -54,7 +52,7 @@ suspend fun deleteChatItem(id: ID): Boolean {
     val item = ChatManager.getChatItem(id.value)
     if (item != null) {
         ChatManager.deleteOne(item.id)
-        sendEvent(DeleteChatItemViewEvent(item.id))
+        ChatViewModel.onMessagesDeleted(setOf(item.id))
     }
     return true
 }
@@ -63,7 +61,7 @@ suspend fun deleteChatItem(id: ID): Boolean {
 suspend fun deleteChatItems(query: String): Boolean {
     val ids = ChatManager.getIdsAsync(query)
     ChatManager.deleteByIds(ids)
-    sendEvent(HChatItemsDeletedEvent(ids))
+    ChatViewModel.onMessagesDeleted(ids)
     sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode(query)))
     return true
 }

@@ -18,7 +18,6 @@ import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.ChatMessageNotificationEvent
-import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.platform.LocaleHelper
@@ -92,15 +91,13 @@ object ChatMessageReceiver {
             }
         }
 
-        sendEvent(
-            HMessageCreatedEvent(
-                target = if (fromChannelId.isNotEmpty()) {
-                    ChatTarget(fromChannelId, ChatTargetType.CHANNEL)
-                } else {
-                    ChatTarget(fromPeerId, ChatTargetType.PEER)
-                },
-                items = arrayListOf(item),
-            ),
+        ChatViewModel.onMessagesCreated(
+            target = if (fromChannelId.isNotEmpty()) {
+                ChatTarget(fromChannelId, ChatTargetType.CHANNEL)
+            } else {
+                ChatTarget(fromPeerId, ChatTargetType.PEER)
+            },
+            items = listOf(item),
         )
         ChatManager.refreshLatestChats()
         val model: ChatItem = dchatToModel(item)

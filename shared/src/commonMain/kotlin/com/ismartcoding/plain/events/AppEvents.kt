@@ -78,7 +78,6 @@ class FetchBookmarkMetadataEvent(val bookmarkId: String, val url: String) : Chan
 
 class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
 
-class DeleteChatItemViewEvent(val id: String) : ChannelEvent()
 
 /** Fired when a channel invite is received from a remote peer. UI shows accept/decline dialog. */
 data class ChannelInviteReceivedEvent(

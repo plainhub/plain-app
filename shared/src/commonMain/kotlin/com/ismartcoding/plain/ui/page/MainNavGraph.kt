@@ -22,7 +22,7 @@ import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
@@ -109,7 +109,6 @@ fun MainNavGraph(
     navController: NavHostController,
     mainVM: MainViewModel,
     audioPlaylistVM: AudioPlaylistViewModel,
-    chatVM: ChatViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
     feedTagsVM: TagsViewModel,
@@ -181,9 +180,10 @@ fun MainNavGraph(
         composable<Routing.ReplaceSslCertificate> { ReplaceSslCertificatePage(navController) }
         composable<Routing.Chat> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Chat>()
-            ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM, r.id)
+            ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = ChatViewModel, peerVM = peerVM, channelVM = channelVM, r.id)
         }
         composable<Routing.ChatInfo> {
+            val chatVM = ChatViewModel
             val chatTarget = chatVM.target.collectAsState()
             if (chatTarget.value.type == ChatTargetType.PEER) {
                 PeerInfoPage(navController, chatVM.target, { chatVM.clearAllMessages() }, peerVM)
@@ -246,7 +246,7 @@ fun MainNavGraph(
                 coIO {
                     val originalChat = ChatDbHelper.getChatItem(r.id) ?: return@coIO
                     updateChatMessageTextAsync(originalChat, text)
-                    chatVM.update(originalChat)
+                    ChatViewModel.update(originalChat)
                 }
             })
         }

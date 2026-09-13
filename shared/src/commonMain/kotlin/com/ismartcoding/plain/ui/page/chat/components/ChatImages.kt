@@ -16,7 +16,7 @@ import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
 
 @OptIn(ExperimentalLayoutApi::class)

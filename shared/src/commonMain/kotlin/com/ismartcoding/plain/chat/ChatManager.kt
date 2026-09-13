@@ -12,8 +12,11 @@ import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.enums.ChatStatus
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
-import com.ismartcoding.plain.events.HMessageUpdatedEvent
+import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.lib.sendEvent
 
 object ChatManager {
@@ -51,7 +54,8 @@ object ChatManager {
 
     suspend fun resendMessage(item: DChat) = withIO {
         ChatSender.send(item, item.target(), PeerCacher.getOnlinePeerIds())
-        sendEvent(HMessageUpdatedEvent(item.id))
+        ChatViewModel.onMessageUpdated(item.id)
+        sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
     }
 
     suspend fun sendToChannelMembers(item: DChat, channel: DChatChannel, peerIds: List<String>) = withIO {

@@ -14,7 +14,7 @@ data class VChat(
     val type: MessageType,
     val status: ChatStatus,
     val statusData: DMessageStatusData? = null,
-    var value: Any? = null,
+    val value: Any? = null,
 ) : IData {
     companion object {
         fun from(data: DChat, fromName: String = ""): VChat {

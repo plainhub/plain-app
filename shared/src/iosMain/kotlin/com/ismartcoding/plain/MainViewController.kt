@@ -23,7 +23,6 @@ import com.ismartcoding.plain.preferences.SettingsProvider
 import com.ismartcoding.plain.preferences.initDataStore
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
@@ -123,7 +122,6 @@ fun MainViewController(): UIViewController {
                     initializer { MainViewModel() }
                     initializer { AudioPlaylistViewModel() }
                     initializer { PomodoroViewModel() }
-                    initializer { ChatViewModel() }
                     initializer { PeerViewModel() }
                     initializer { ChannelViewModel() }
                     initializer { TagsViewModel() }
@@ -131,7 +129,6 @@ fun MainViewController(): UIViewController {
                 val mainVM: MainViewModel = viewModel(factory = factory)
                 val audioPlaylistVM: AudioPlaylistViewModel = viewModel(factory = factory)
                 val pomodoroVM: PomodoroViewModel = viewModel(factory = factory)
-                val chatVM: ChatViewModel = viewModel(factory = factory)
                 val peerVM: PeerViewModel = viewModel(factory = factory)
                 val channelVM: ChannelViewModel = viewModel(factory = factory)
                 Main(
@@ -143,7 +140,6 @@ fun MainViewController(): UIViewController {
                     mainVM = mainVM,
                     audioPlaylistVM = audioPlaylistVM,
                     pomodoroVM = pomodoroVM,
-                    chatVM = chatVM,
                     peerVM = peerVM,
                     channelVM = channelVM,
                 )

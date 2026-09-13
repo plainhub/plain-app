@@ -48,9 +48,6 @@ import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.events.DeleteChatItemViewEvent
-import com.ismartcoding.plain.events.HChatItemsDeletedEvent
-import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.lib.Channel
@@ -77,7 +74,7 @@ import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModelBase
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -170,14 +167,6 @@ fun ChatPage(
     LaunchedEffect(sharedFlow) {
         sharedFlow.collect { event ->
             when (event) {
-                is DeleteChatItemViewEvent -> chatVM.remove(event.id)
-                is HChatItemsDeletedEvent -> chatVM.removeIds(event.ids)
-                is HMessageCreatedEvent -> {
-                    if (chatVM.target.value == event.target) {
-                        chatVM.addAllAndScroll(event.items)
-                    }
-                }
-
                 is PickFileResultEvent -> {
                     if (event.tag != PickFileTag.SEND_MESSAGE) return@collect
                     handleChatFileSelection(event, chatVM, peerVM, focusManager)

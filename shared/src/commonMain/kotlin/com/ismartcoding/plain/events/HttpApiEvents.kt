@@ -1,13 +1,8 @@
 package com.ismartcoding.plain.events
 
-import com.ismartcoding.plain.chat.data.ChatTarget
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.lib.ChannelEvent
-
-class HMessageCreatedEvent(val target: ChatTarget, val items: List<DChat>) : ChannelEvent()
-
-class HMessageUpdatedEvent(val id: String) : ChannelEvent()
 
 // Pomodoro events
 class HPomodoroStartEvent(val timeLeft: Int) : ChannelEvent()
@@ -46,6 +41,5 @@ class HDisableImageSearchEvent : ChannelEvent()
 class HCancelImageModelDownloadEvent : ChannelEvent()
 
 class HCancelNotificationsEvent(val ids: Set<String>) : ChannelEvent()
-class HChatItemsDeletedEvent(val ids: Set<String>) : ChannelEvent()
 
 data class HDownloadTaskDoneEvent(val downloadTask: DownloadTask) : ChannelEvent()
