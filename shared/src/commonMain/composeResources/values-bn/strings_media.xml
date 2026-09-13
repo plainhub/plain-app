@@ -63,4 +63,27 @@
     <string name="exit_fullscreen">পূর্ণ স্ক্রিন থেকে প্রস্থান করুন</string>
     <string name="mute">নিঃশব্দ</string>
     <string name="unmute">শব্দ চালু করুন</string>
+    <string name="extract_lyrics">গানের কথা বের করুন</string>
+    <string name="extract_lyrics_hint">ডিভাইসে Whisper স্পিচ রিকগনিশন দিয়ে অডিও থেকে সিঙ্ক করা গানের কথা তৈরি করুন। সম্পূর্ণ অফলাইন — আপনার অডিও কখনো ফোনের বাইরে যায় না।</string>
+    <string name="choose_model">মডেল বেছে নিন</string>
+    <string name="model_not_downloaded">এখনো কোনো মডেল ডাউনলোড হয়নি</string>
+    <string name="model_download_hint">বের করার আগে একবার মডেল ডাউনলোড করুন (৭৫–৪৬৬ MB)</string>
+    <string name="model_ready">প্রস্তুত</string>
+    <string name="change_model">পরিবর্তন</string>
+    <string name="model_privacy_note">মডেল একবার ডাউনলোড হলেই পরে সম্পূর্ণ অফলাইনে চলে। শনাক্তকরণ আপনার ফোনেই হয়; অডিও ফাইল কখনো আপলোড হয় না।</string>
+    <string name="model_downloading">ডাউনলোড হচ্ছে</string>
+    <string name="model_download_failed">ডাউনলোড ব্যর্থ</string>
+    <string name="model_desc_tiny">দ্রুততম · কম নির্ভুলতা</string>
+    <string name="model_desc_base">গতি ও নির্ভুলতার ভারসাম্য</string>
+    <string name="model_desc_small">সবচেয়ে নির্ভুল · চীনা গানের জন্য সেরা</string>
+    <string name="recognized_language">শনাক্তকরণের ভাষা</string>
+    <string name="auto_detect">স্বয়ংক্রিয় শনাক্তকরণ</string>
+    <string name="current_song">বর্তমান গান</string>
+    <string name="songs_without_lyrics">গানের কথা ছাড়া %1$dটি গান</string>
+    <string name="extract_all">সব বের করুন</string>
+    <string name="extract">বের করুন</string>
+    <string name="waiting">অপেক্ষমাণ</string>
+    <string name="no_speech">কোনো কণ্ঠ নেই</string>
+    <string name="extract_failed">ব্যর্থ</string>
+    <string name="model_downloaded">ডাউনলোড হয়েছে</string>
 </resources>

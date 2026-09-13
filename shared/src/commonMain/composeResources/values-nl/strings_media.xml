@@ -63,4 +63,27 @@
     <string name="exit_fullscreen">Afsluiten volledig scherm</string>
     <string name="mute">Dempen</string>
     <string name="unmute">Ontdempen</string>
+    <string name="extract_lyrics">Songtekst extraheren</string>
+    <string name="extract_lyrics_hint">Transcribeer audio op het apparaat met Whisper voor gesynchroniseerde songteksten. Volledig offline — uw audio verlaat de telefoon nooit.</string>
+    <string name="choose_model">Model kiezen</string>
+    <string name="model_not_downloaded">Nog geen model gedownload</string>
+    <string name="model_download_hint">Download één keer een model vóór het extraheren (75–466 MB)</string>
+    <string name="model_ready">Gereed</string>
+    <string name="change_model">Wijzigen</string>
+    <string name="model_privacy_note">Modellen worden één keer gedownload en werken daarna volledig offline. Herkenning draait op uw telefoon; audiobestanden worden nooit geüpload.</string>
+    <string name="model_downloading">Downloaden</string>
+    <string name="model_download_failed">Download mislukt</string>
+    <string name="model_desc_tiny">Snelst · lagere nauwkeurigheid</string>
+    <string name="model_desc_base">Gebalanceerd in snelheid en nauwkeurigheid</string>
+    <string name="model_desc_small">Nauwkeurigst · ideaal voor Chinese nummers</string>
+    <string name="recognized_language">Taal voor herkenning</string>
+    <string name="auto_detect">Automatisch detecteren</string>
+    <string name="current_song">Huidig nummer</string>
+    <string name="songs_without_lyrics">%1$d nummers zonder songtekst</string>
+    <string name="extract_all">Alles extraheren</string>
+    <string name="extract">Extraheren</string>
+    <string name="waiting">Wachten</string>
+    <string name="no_speech">Geen zang</string>
+    <string name="extract_failed">Mislukt</string>
+    <string name="model_downloaded">Gedownload</string>
 </resources>

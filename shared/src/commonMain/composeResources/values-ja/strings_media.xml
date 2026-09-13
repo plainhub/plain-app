@@ -63,4 +63,27 @@
     <string name="exit_fullscreen">フルスクリーンを終了</string>
     <string name="mute">ミュート</string>
     <string name="unmute">ミュート解除</string>
+    <string name="extract_lyrics">歌詞を抽出</string>
+    <string name="extract_lyrics_hint">端末内の Whisper 音声認識で、音声から同期歌詞を生成します。完全オフラインで、音声ファイルは端末の外に出ません。</string>
+    <string name="choose_model">モデルを選択</string>
+    <string name="model_not_downloaded">モデル未ダウンロード</string>
+    <string name="model_download_hint">抽出の前にモデルを一度ダウンロードしてください（75〜466 MB）</string>
+    <string name="model_ready">準備完了</string>
+    <string name="change_model">変更</string>
+    <string name="model_privacy_note">モデルは一度だけダウンロードすれば、以後完全オフラインで使用できます。認識は端末内で実行され、音声ファイルがアップロードされることはありません。</string>
+    <string name="model_downloading">ダウンロード中</string>
+    <string name="model_download_failed">ダウンロードに失敗しました</string>
+    <string name="model_desc_tiny">最速 · 精度は低め</string>
+    <string name="model_desc_base">速度と精度のバランス</string>
+    <string name="model_desc_small">最も高精度 · 中国語の曲に最適</string>
+    <string name="recognized_language">認識言語</string>
+    <string name="auto_detect">自動検出</string>
+    <string name="current_song">再生中の曲</string>
+    <string name="songs_without_lyrics">歌詞がない曲 %1$d 件</string>
+    <string name="extract_all">すべて抽出</string>
+    <string name="extract">抽出</string>
+    <string name="waiting">待機中</string>
+    <string name="no_speech">ボーカルなし</string>
+    <string name="extract_failed">失敗</string>
+    <string name="model_downloaded">ダウンロード済み</string>
 </resources>

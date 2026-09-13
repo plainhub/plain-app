@@ -127,3 +127,6 @@ tmp_pc_fetch.sh
 AGENTS.md
 design/
 test-reports/
+
+# wrangler local cache (account selection), never commit
+.wrangler/

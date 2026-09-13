@@ -40,6 +40,7 @@ import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.audio.AudioPage
+import com.ismartcoding.plain.ui.page.lyricsextract.LyricsExtractPage
 import com.ismartcoding.plain.ui.page.cast.CastSessionPage
 import com.ismartcoding.plain.ui.page.chat.ChannelInfoPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
@@ -142,6 +143,8 @@ fun MainNavGraph(
         composable<Routing.Docs> { DocsPage(navController) }
         composable<Routing.Notes> { NotesPage(navController, tagsVM = noteTagsVM) }
         composable<Routing.SoundMeter> { SoundMeterPage(navController) }
+
+        composable<Routing.ExtractLyrics> { LyricsExtractPage(navController, audioPlaylistVM) }
         composable<Routing.PomodoroTimer> {
             PomodoroPage(
                 navController = navController,

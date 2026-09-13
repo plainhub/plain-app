@@ -139,6 +139,9 @@ class Routing {
     object AudioPlayer
 
     @Serializable
+    object ExtractLyrics
+
+    @Serializable
     data class TextFile(val path: String, val title: String = "", val mediaId: String = "", val type: String = "")
 
     @Serializable

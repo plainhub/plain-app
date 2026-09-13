@@ -64,6 +64,7 @@ internal fun AudioPlayerTrackPage(
     viewMode: PlayerView,
     onViewModeChange: (PlayerView) -> Unit,
     onSeek: (Long) -> Unit,
+    onNavigateToExtractLyrics: () -> Unit,
 ) {
     var lyrics by remember(item.path) { mutableStateOf<List<LrcParser.LrcLine>?>(null) }
     LaunchedEffect(item.path) {
@@ -193,7 +194,7 @@ internal fun AudioPlayerTrackPage(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    .background(MaterialTheme.colorScheme.surfaceContainer),
             ) {
                 Icon(
                     painter = painterResource(if (isPlaying) Res.drawable.pause else Res.drawable.play_arrow),
@@ -217,6 +218,7 @@ internal fun AudioPlayerTrackPage(
                     lines = lyrics,
                     progressMs = progressMs,
                     onSeek = onSeek,
+                    onNavigateToExtractLyrics = onNavigateToExtractLyrics,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

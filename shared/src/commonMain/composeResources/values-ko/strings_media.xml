@@ -63,4 +63,27 @@
     <string name="exit_fullscreen">전체 화면 나가기</string>
     <string name="mute">음소거</string>
     <string name="unmute">음소거 해제</string>
+    <string name="extract_lyrics">가사 추출</string>
+    <string name="extract_lyrics_hint">기기 내 Whisper 음성 인식으로 오디오에서 동기화된 가사를 생성합니다. 완전 오프라인이며 오디오는 기기 밖으로 나가지 않습니다.</string>
+    <string name="choose_model">모델 선택</string>
+    <string name="model_not_downloaded">모델이 아직 다운로드되지 않았습니다</string>
+    <string name="model_download_hint">추출 전에 모델을 한 번 다운로드해야 합니다 (75–466 MB)</string>
+    <string name="model_ready">준비됨</string>
+    <string name="change_model">변경</string>
+    <string name="model_privacy_note">모델은 한 번만 다운로드하면 이후 완전히 오프라인으로 사용할 수 있습니다. 인식은 기기에서 실행되며 오디오 파일은 업로드되지 않습니다.</string>
+    <string name="model_downloading">다운로드 중</string>
+    <string name="model_download_failed">다운로드 실패</string>
+    <string name="model_desc_tiny">가장 빠름 · 정확도 낮음</string>
+    <string name="model_desc_base">속도와 정확도의 균형</string>
+    <string name="model_desc_small">가장 정확 · 중국어 노래에 권장</string>
+    <string name="recognized_language">인식 언어</string>
+    <string name="auto_detect">자동 감지</string>
+    <string name="current_song">재생 중인 곡</string>
+    <string name="songs_without_lyrics">가사 없는 곡 %1$d곡</string>
+    <string name="extract_all">모두 추출</string>
+    <string name="extract">추출</string>
+    <string name="waiting">대기 중</string>
+    <string name="no_speech">보컬 없음</string>
+    <string name="extract_failed">실패</string>
+    <string name="model_downloaded">다운로드됨</string>
 </resources>

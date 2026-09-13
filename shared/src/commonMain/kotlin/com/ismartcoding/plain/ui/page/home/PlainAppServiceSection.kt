@@ -148,7 +148,7 @@ fun PlainAppServiceSection(
                                 onClick = { onStayOnline?.invoke() },
                                 buttonSize = ButtonSize.MEDIUM,
                             )
-                            PFilledButton(
+                            POutlinedButton(
                                 modifier = Modifier.weight(1f),
                                 text = stringResource(Res.string.stop_service),
                                 onClick = {

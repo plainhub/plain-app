@@ -63,4 +63,27 @@
     <string name="exit_fullscreen">Thoát chế độ toàn màn hình</string>
     <string name="mute">Tắt tiếng</string>
     <string name="unmute">Bật tiếng</string>
+    <string name="extract_lyrics">Trích lời bài hát</string>
+    <string name="extract_lyrics_hint">Nhận dạng giọng nói Whisper ngay trên thiết bị để tạo lời bài hát đồng bộ. Hoàn toàn ngoại tuyến — âm thanh không bao giờ rời khỏi điện thoại.</string>
+    <string name="choose_model">Chọn mô hình</string>
+    <string name="model_not_downloaded">Chưa tải mô hình nào</string>
+    <string name="model_download_hint">Hãy tải mô hình một lần trước khi trích (75–466 MB)</string>
+    <string name="model_ready">Sẵn sàng</string>
+    <string name="change_model">Thay đổi</string>
+    <string name="model_privacy_note">Mô hình chỉ cần tải một lần, sau đó dùng hoàn toàn ngoại tuyến. Nhận dạng chạy trên điện thoại; tệp âm thanh không bao giờ được tải lên.</string>
+    <string name="model_downloading">Đang tải</string>
+    <string name="model_download_failed">Tải xuống thất bại</string>
+    <string name="model_desc_tiny">Nhanh nhất · độ chính xác thấp</string>
+    <string name="model_desc_base">Cân bằng tốc độ và độ chính xác</string>
+    <string name="model_desc_small">Chính xác nhất · phù hợp bài hát tiếng Trung</string>
+    <string name="recognized_language">Ngôn ngữ nhận dạng</string>
+    <string name="auto_detect">Tự động phát hiện</string>
+    <string name="current_song">Bài đang phát</string>
+    <string name="songs_without_lyrics">%1$d bài chưa có lời</string>
+    <string name="extract_all">Trích tất cả</string>
+    <string name="extract">Trích</string>
+    <string name="waiting">Đang chờ</string>
+    <string name="no_speech">Không có giọng hát</string>
+    <string name="extract_failed">Thất bại</string>
+    <string name="model_downloaded">Đã tải xuống</string>
 </resources>

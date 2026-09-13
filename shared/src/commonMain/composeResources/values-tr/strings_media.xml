@@ -63,4 +63,27 @@
     <string name="exit_fullscreen">Tam ekrandan çık</string>
     <string name="mute">Sessiz</string>
     <string name="unmute">Sesi aç</string>
+    <string name="extract_lyrics">Şarkı sözü çıkar</string>
+    <string name="extract_lyrics_hint">Cihazda Whisper konuşma tanımayla senkronize şarkı sözleri oluşturun. Tamamen çevrimdışı — sesiniz asla telefonu terk etmez.</string>
+    <string name="choose_model">Model seç</string>
+    <string name="model_not_downloaded">Henüz model indirilmedi</string>
+    <string name="model_download_hint">Çıkarmadan önce bir kez model indirin (75–466 MB)</string>
+    <string name="model_ready">Hazır</string>
+    <string name="change_model">Değiştir</string>
+    <string name="model_privacy_note">Modeller bir kez indirilir, sonrasında tamamen çevrimdışı çalışır. Tanıma telefonunuzda çalışır; ses dosyaları asla yüklenmez.</string>
+    <string name="model_downloading">İndiriliyor</string>
+    <string name="model_download_failed">İndirme başarısız</string>
+    <string name="model_desc_tiny">En hızlı · düşük doğruluk</string>
+    <string name="model_desc_base">Hız ve doğruluk dengesi</string>
+    <string name="model_desc_small">En doğru · Çince şarkılar için önerilir</string>
+    <string name="recognized_language">Tanıma dili</string>
+    <string name="auto_detect">Otomatik algıla</string>
+    <string name="current_song">Çalan şarkı</string>
+    <string name="songs_without_lyrics">Sözü olmayan %1$d şarkı</string>
+    <string name="extract_all">Tümünü çıkar</string>
+    <string name="extract">Çıkar</string>
+    <string name="waiting">Bekliyor</string>
+    <string name="no_speech">Vokal yok</string>
+    <string name="extract_failed">Başarısız</string>
+    <string name="model_downloaded">İndirildi</string>
 </resources>

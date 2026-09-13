@@ -63,4 +63,27 @@
     <string name="exit_fullscreen">Esci da schermo intero</string>
     <string name="mute">Muto</string>
     <string name="unmute">Attiva audio</string>
+    <string name="extract_lyrics">Estrai testo</string>
+    <string name="extract_lyrics_hint">Trascrivi l'audio sul dispositivo con Whisper per ottenere testi sincronizzati. Completamente offline: l'audio non lascia mai il telefono.</string>
+    <string name="choose_model">Scegli modello</string>
+    <string name="model_not_downloaded">Nessun modello scaricato</string>
+    <string name="model_download_hint">Scarica un modello una volta prima di estrarre (75–466 MB)</string>
+    <string name="model_ready">Pronto</string>
+    <string name="change_model">Cambia</string>
+    <string name="model_privacy_note">I modelli si scaricano una sola volta e poi funzionano completamente offline. Il riconoscimento avviene sul telefono; i file audio non vengono mai caricati.</string>
+    <string name="model_downloading">Download in corso</string>
+    <string name="model_download_failed">Download non riuscito</string>
+    <string name="model_desc_tiny">Il più veloce · precisione inferiore</string>
+    <string name="model_desc_base">Equilibrio tra velocità e precisione</string>
+    <string name="model_desc_small">Il più preciso · ideale per canzoni cinesi</string>
+    <string name="recognized_language">Lingua di riconoscimento</string>
+    <string name="auto_detect">Rilevamento automatico</string>
+    <string name="current_song">Brano attuale</string>
+    <string name="songs_without_lyrics">%1$d brani senza testo</string>
+    <string name="extract_all">Estrai tutto</string>
+    <string name="extract">Estrai</string>
+    <string name="waiting">In attesa</string>
+    <string name="no_speech">Nessuna voce</string>
+    <string name="extract_failed">Non riuscito</string>
+    <string name="model_downloaded">Scaricato</string>
 </resources>

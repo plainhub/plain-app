@@ -56,7 +56,11 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: () -> Unit) {
+fun AudioPlayerPage(
+    audioPlaylistVM: AudioPlaylistViewModel,
+    onDismissRequest: () -> Unit,
+    onNavigateToExtractLyrics: () -> Unit = {},
+) {
     DisposableEffect(Unit) {
         onDispose { exitImmersiveFullscreen() }
     }
@@ -186,6 +190,7 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
                         progress = it / 1000f
                         audioSeekTo(it)
                     },
+                    onNavigateToExtractLyrics = onNavigateToExtractLyrics,
                 )
             }
 

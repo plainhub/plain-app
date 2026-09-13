@@ -63,4 +63,27 @@
     <string name="exit_fullscreen">退出全屏</string>
     <string name="mute">静音</string>
     <string name="unmute">取消静音</string>
+    <string name="extract_lyrics">提取歌词</string>
+    <string name="extract_lyrics_hint">用手机上的 Whisper 语音识别，从音频中提取同步歌词。全程离线，音频不会上传。</string>
+    <string name="choose_model">选择模型</string>
+    <string name="model_not_downloaded">尚未下载模型</string>
+    <string name="model_download_hint">提取歌词前需先下载一次模型（75–466 MB）</string>
+    <string name="model_ready">已就绪</string>
+    <string name="change_model">更换</string>
+    <string name="model_privacy_note">模型只需下载一次，之后完全离线可用。识别在手机本地运行，音频文件不会上传到任何服务器。</string>
+    <string name="model_downloading">下载中</string>
+    <string name="model_download_failed">下载失败</string>
+    <string name="model_desc_tiny">最快 · 精度较低</string>
+    <string name="model_desc_base">速度与精度均衡</string>
+    <string name="model_desc_small">最准确 · 中文歌推荐</string>
+    <string name="recognized_language">识别语言</string>
+    <string name="auto_detect">自动检测</string>
+    <string name="current_song">当前歌曲</string>
+    <string name="songs_without_lyrics">%1$d 首无歌词</string>
+    <string name="extract_all">提取全部</string>
+    <string name="extract">提取</string>
+    <string name="waiting">等待中</string>
+    <string name="no_speech">无歌声</string>
+    <string name="extract_failed">失败</string>
+    <string name="model_downloaded">已下载</string>
 </resources>

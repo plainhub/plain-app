@@ -114,7 +114,14 @@ fun Main(
         // slide-up transition.
         val audioPlayerVisible by TempData.audioPlayerVisible.collectAsState()
         if (audioPlayerVisible) {
-            AudioPlayerPage(audioPlaylistVM) { TempData.audioPlayerVisible.value = false }
+            AudioPlayerPage(
+                audioPlaylistVM,
+                onDismissRequest = { TempData.audioPlayerVisible.value = false },
+                onNavigateToExtractLyrics = {
+                    TempData.audioPlayerVisible.value = false
+                    navController.navigate(Routing.ExtractLyrics)
+                },
+            )
         }
 
         DlnaReceiverOverlay()

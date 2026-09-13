@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.audioplayer
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,12 +30,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.extract_lyrics
+import com.ismartcoding.plain.i18n.extract_lyrics_hint
 import com.ismartcoding.plain.i18n.music2
 import com.ismartcoding.plain.i18n.no_lyrics
+import com.ismartcoding.plain.i18n.sparkles
 import com.ismartcoding.plain.lib.LrcParser
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.getAudioLyrics
 import com.ismartcoding.plain.platform.readTextFile
+import com.ismartcoding.plain.ui.base.PFilledButton
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -58,17 +65,22 @@ suspend fun loadLyrics(audioPath: String): List<LrcParser.LrcLine> =
         LrcParser.parse(readTextFile(lyricsPathFor(audioPath)).ifEmpty { getAudioLyrics(audioPath) })
     }
 
+/** Sentinel default so the extraction CTA only appears when a handler is wired. */
+private val PlayerLyricsNoOp: () -> Unit = {}
+
 /**
  * Auto-scrolling lyrics view. [lines] is the parsed LRC content (null while
  * loading, empty when no lyrics exist); [progressMs] is the current playback
  * position. The active line is bold on-surface, the others on-surface-variant,
- * and tapping a line seeks to its timestamp.
+ * and tapping a line seeks to its timestamp. When lyrics are missing,
+ * [onNavigateToExtractLyrics] offers the on-device extraction flow.
  */
 @Composable
 fun AudioPlayerLyrics(
     lines: List<LrcParser.LrcLine>?,
     progressMs: Long,
     onSeek: (Long) -> Unit,
+    onNavigateToExtractLyrics: () -> Unit = PlayerLyricsNoOp,
     modifier: Modifier = Modifier,
 ) {
     val listState = remember(lines) { LazyListState() }
@@ -80,18 +92,41 @@ fun AudioPlayerLyrics(
     if (lines.isEmpty()) {
         Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    painter = painterResource(Res.drawable.music2),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    modifier = Modifier.size(56.dp),
-                )
+                Box(
+                    modifier = Modifier
+                        .size(96.dp)
+                        .clip(RoundedCornerShape(28.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.music2),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(44.dp),
+                    )
+                }
                 Text(
                     text = stringResource(Res.string.no_lyrics),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 16.dp),
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 20.dp),
                 )
+                Text(
+                    text = stringResource(Res.string.extract_lyrics_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 8.dp).padding(horizontal = 32.dp),
+                )
+                if (onNavigateToExtractLyrics !== PlayerLyricsNoOp) {
+                    PFilledButton(
+                        text = stringResource(Res.string.extract_lyrics),
+                        onClick = onNavigateToExtractLyrics,
+                        icon = painterResource(Res.drawable.sparkles),
+                        modifier = Modifier.padding(top = 24.dp),
+                    )
+                }
             }
         }
         return
