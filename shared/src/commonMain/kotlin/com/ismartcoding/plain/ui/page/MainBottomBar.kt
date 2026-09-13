@@ -17,6 +17,8 @@ import com.ismartcoding.plain.i18n.message_circle
 import com.ismartcoding.plain.i18n.tools
 import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.platform.isDebugBuild
+import com.ismartcoding.plain.ui.theme.primaryPill
+import com.ismartcoding.plain.ui.theme.primaryText
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -26,9 +28,14 @@ fun MainBottomBar(
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val itemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = MaterialTheme.colorScheme.primaryText,
+        selectedTextColor = MaterialTheme.colorScheme.primaryText,
+        indicatorColor = MaterialTheme.colorScheme.primaryPill,
+    )
     NavigationBar(
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.background,
     ) {
         NavigationBarItem(
             selected = selectedIndex == 0,
@@ -40,9 +47,7 @@ fun MainBottomBar(
                 )
             },
             label = { Text(stringResource(Res.string.home)) },
-            colors = NavigationBarItemDefaults.colors(
-                indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
+            colors = itemColors,
         )
         NavigationBarItem(
             selected = selectedIndex == 1,
@@ -54,11 +59,9 @@ fun MainBottomBar(
                 )
             },
             label = { Text(stringResource(Res.string.chat)) },
-            colors = NavigationBarItemDefaults.colors(
-                indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
+            colors = itemColors,
         )
-        if (isAndroidOnly() || isDebugBuild()) {
+        if (isAndroidOnly()) {
             NavigationBarItem(
                 selected = selectedIndex == 2,
                 onClick = { onTabSelected(2) },
@@ -69,9 +72,7 @@ fun MainBottomBar(
                     )
                 },
                 label = { Text(stringResource(Res.string.tools)) },
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-                ),
+                colors = itemColors,
             )
         }
     }

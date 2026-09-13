@@ -91,7 +91,7 @@ fun IconTextAddToHomeButton(click: () -> Unit) {
 
 @Composable
 fun IconTextForwardButton(click: () -> Unit) {
-    PIconTextActionButton(Res.drawable.double_arrow_right, text = stringResource(Res.string.forward), click = click)
+    PIconTextActionButton(Res.drawable.forward, text = stringResource(Res.string.forward), click = click)
 }
 
 @Composable
