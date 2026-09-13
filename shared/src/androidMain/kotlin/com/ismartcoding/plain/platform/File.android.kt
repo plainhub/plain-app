@@ -163,12 +163,13 @@ actual suspend fun copyPickedFileToAppStorage(uriStr: String, destRelativePath: 
 }
 
 actual fun writeFileText(path: String, content: String, overwrite: Boolean): DFile {
-    val file = File(path)
+    val filePath = if (path.startsWith("file://")) Uri.parse(path).path else path
+    val file = File(filePath ?: path)
     if (!overwrite && file.exists()) {
         throw com.ismartcoding.plain.lib.kgraphql.GraphQLError("File already exists")
     }
     file.writeText(content)
-    appContext.scanFileByConnection(path)
+    appContext.scanFileByConnection(file.absolutePath)
     return buildTextFile(file.absolutePath, file.length(), file.lastModified())
 }
 
@@ -519,7 +520,8 @@ actual suspend fun readTextFile(path: String): String = withIO {
                 inputStream.bufferedReader().readText()
             } ?: ""
         } else {
-            File(path).readText()
+            val filePath = if (path.startsWith("file://")) Uri.parse(path).path else path
+            File(filePath ?: path).readText()
         }
     } catch (e: Exception) {
         ""

@@ -5,6 +5,7 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.HMessageCreatedEvent
 import com.ismartcoding.plain.events.HMessageUpdatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -43,6 +44,7 @@ object ShareSendHelper {
         val messageIds = targets.map { target ->
             val item = ChatManager.insertFilesImmediate(target, placeholders.map { it.first }, isImageVideo)
             sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
+            sendEvent(HMessageCreatedEvent(target, listOf(item)))
             item.id
         }
         val finalItems = importPickedFiles(placeholders)
@@ -72,6 +74,7 @@ object ShareSendHelper {
             ChatManager.sendMessage(item, target, PeerCacher.getOnlinePeerIds())
         }
         sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
+        sendEvent(HMessageCreatedEvent(target, listOf(item)))
         item.status == ChatStatus.SENT
     }
 }
