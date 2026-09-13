@@ -37,6 +37,7 @@ import com.ismartcoding.plain.i18n.*
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.theme.filledButtonContent
 import com.ismartcoding.plain.ui.theme.green
 
 /**
@@ -166,7 +167,7 @@ internal fun DemoSwitchOn() {
             modifier = Modifier
                 .padding(end = 2.dp)
                 .size(14.dp)
-                .background(Color.White, CircleShape),
+                .background(MaterialTheme.colorScheme.filledButtonContent, CircleShape),
         )
     }
 }

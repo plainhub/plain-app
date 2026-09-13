@@ -38,7 +38,8 @@ private fun plainDarkColorScheme(): ColorScheme {
         secondaryContainer = Color(0xFF003380), onSecondaryContainer = Color(0xFFCCDFFF),
         tertiary = Color(0xFFCCC2DC), onTertiary = Color(0xFF332D41),
         tertiaryContainer = Color(0xFF4A4458), onTertiaryContainer = Color(0xFFEADDFF),
-        error = Color(0xFFFF453A), onError = Color(0xFFFFFFFF),
+        // Matches the softened red above: full-brightness iOS red glared on dark.
+        error = Color(0xFFDB5A50), onError = Color(0xFFFFFFFF),
         errorContainer = Color(0xFF3A1C1C), onErrorContainer = Color(0xFFFFDAD6),
         background = bg, onBackground = DarkSoftOnSurface,
         surface = surface, onSurface = DarkSoftOnSurface,
@@ -88,9 +89,12 @@ val ColorScheme.grey: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF636366) else Color(0xFF8E8E93)
 
+// Dark red is desaturated and dimmed (#DB5A50): full-brightness iOS red
+// glared on dark backgrounds (user, 2026-09-13), while text/icons still
+// keep >= 4.5:1 contrast.
 val ColorScheme.red: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFFF453A) else Color(0xFFFF3B30)
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFDB5A50) else Color(0xFFFF3B30)
 
 val ColorScheme.blue: Color
     @Composable @ReadOnlyComposable

@@ -1,12 +1,14 @@
 package com.ismartcoding.plain.ui.base
 import com.ismartcoding.plain.preferences.*
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.LocalDarkTheme
+import com.ismartcoding.plain.ui.theme.filledButtonContent
 
 @Composable
 fun PSwitch(
@@ -20,9 +22,11 @@ fun PSwitch(
     val iosLightTrackGray = Color(0xFFE9E9EA)
     val iosDarkTrackGray = Color(0xFF39393D)
     val iosTrackGray = if (isDark) iosDarkTrackGray else iosLightTrackGray
-    val iosThumbWhite = Color.White
+    // Pure white thumb glares on dark tracks and backgrounds (user, 2026-09-13);
+    // filledButtonContent is the app's soft white in dark mode, white in light.
+    val thumbColor = MaterialTheme.colorScheme.filledButtonContent
 
-    val disabledThumbColor = iosThumbWhite
+    val disabledThumbColor = thumbColor
     val disabledCheckedTrack = switchBlue.copy(alpha = 0.4f)
     val disabledUncheckedTrack = iosTrackGray.copy(alpha = if (isDark) 0.3f else 0.5f)
 
@@ -30,9 +34,9 @@ fun PSwitch(
         checked = activated,
         enabled = enabled,
         colors = SwitchDefaults.colors(
-            checkedThumbColor = iosThumbWhite,
+            checkedThumbColor = thumbColor,
             checkedTrackColor = switchBlue,
-            uncheckedThumbColor = iosThumbWhite,
+            uncheckedThumbColor = thumbColor,
             uncheckedTrackColor = iosTrackGray,
 
             // Disabled states

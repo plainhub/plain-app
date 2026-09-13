@@ -34,7 +34,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import com.ismartcoding.plain.ui.theme.filledButtonContent
 import com.ismartcoding.plain.ui.theme.red
 
 /**
@@ -142,15 +141,15 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(DemoPillShape)
-                            .background(MaterialTheme.colorScheme.red)
-                            .padding(vertical = 8.dp),
+                            .border(1.dp, MaterialTheme.colorScheme.red.copy(alpha = 0.5f), DemoPillShape)
+                            .padding(vertical = 7.dp),
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         Text(
                             text = stringResource(Res.string.stop_service),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.filledButtonContent,
+                            color = MaterialTheme.colorScheme.red,
                         )
                     }
                 }
