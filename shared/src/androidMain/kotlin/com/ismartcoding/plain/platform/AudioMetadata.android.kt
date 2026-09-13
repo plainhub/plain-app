@@ -8,10 +8,36 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.fromPath
 import com.ismartcoding.plain.audio.getAlbumUri
 import com.ismartcoding.plain.helpers.getFileId
+import com.ismartcoding.plain.lib.EmbeddedLyrics
+import com.ismartcoding.plain.lib.extensions.pathToUri
 
 actual suspend fun getAudioMetadata(path: String): Pair<String, String> {
     val audio = DPlaylistAudio.fromPath(appContext, path)
     return audio.title to audio.artist
+}
+
+actual suspend fun getAudioLyrics(path: String): String {
+    val stream =
+        if (path.startsWith("/")) {
+            runCatching { java.io.FileInputStream(path) }.getOrNull() ?: return ""
+        } else {
+            runCatching { appContext.contentResolver.openInputStream(path.pathToUri()) }.getOrNull() ?: return ""
+        }
+    return try {
+        EmbeddedLyrics.extract(
+            object : EmbeddedLyrics.Reader() {
+                override fun read(buffer: ByteArray, offset: Int, length: Int): Int = stream.read(buffer, offset, length)
+
+                override fun close() {
+                    stream.close()
+                }
+            },
+        )
+    } catch (e: Exception) {
+        ""
+    } finally {
+        runCatching { stream.close() }
+    }
 }
 
 actual fun playlistAudioFromPath(path: String): DPlaylistAudio {

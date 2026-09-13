@@ -33,6 +33,7 @@ import com.ismartcoding.plain.i18n.music2
 import com.ismartcoding.plain.i18n.no_lyrics
 import com.ismartcoding.plain.lib.LrcParser
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.platform.getAudioLyrics
 import com.ismartcoding.plain.platform.readTextFile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -42,8 +43,7 @@ import org.jetbrains.compose.resources.stringResource
 
 /**
  * Sibling .lrc file path for an audio file path. content:// URIs have no
- * sibling file, return them unchanged so the read fails softly and the empty
- * state shows.
+ * sibling file, return them unchanged so the read fails softly.
  */
 private fun lyricsPathFor(audioPath: String): String {
     if (audioPath.startsWith("content://")) return audioPath
@@ -52,8 +52,11 @@ private fun lyricsPathFor(audioPath: String): String {
     return if (dot > slash) audioPath.substring(0, dot) + ".lrc" else "$audioPath.lrc"
 }
 
+/** Sidecar .lrc file first, lyrics embedded in the audio metadata as fallback. */
 suspend fun loadLyrics(audioPath: String): List<LrcParser.LrcLine> =
-    withIO { LrcParser.parse(readTextFile(lyricsPathFor(audioPath))) }
+    withIO {
+        LrcParser.parse(readTextFile(lyricsPathFor(audioPath)).ifEmpty { getAudioLyrics(audioPath) })
+    }
 
 /**
  * Auto-scrolling lyrics view. [lines] is the parsed LRC content (null while

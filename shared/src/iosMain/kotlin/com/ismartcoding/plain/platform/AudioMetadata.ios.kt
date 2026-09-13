@@ -9,8 +9,11 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.logcat.LogCat
+import com.ismartcoding.plain.lib.EmbeddedLyrics
 import com.ismartcoding.plain.lib.toByteArray
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
 import platform.AVFoundation.AVURLAsset
@@ -22,6 +25,33 @@ import platform.objc.sel_registerName
 
 actual suspend fun getAudioMetadata(path: String): Pair<String, String> = withIO {
     extractMetadata(path)
+}
+
+@OptIn(ExperimentalForeignApi::class)
+actual suspend fun getAudioLyrics(path: String): String = withIO {
+    val fd = platform.posix.open(path, platform.posix.O_RDONLY, 0)
+    if (fd < 0) return@withIO ""
+    try {
+        EmbeddedLyrics.extract(
+            object : EmbeddedLyrics.Reader() {
+                override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+                    if (length <= 0) return 0
+                    return buffer.usePinned { pinned ->
+                        platform.posix.read(fd, pinned.addressOf(offset), length.toULong()).toInt()
+                    }
+                }
+
+                override fun close() {
+                    platform.posix.close(fd)
+                }
+            },
+        )
+    } catch (e: Exception) {
+        LogCat.e("getAudioLyrics: ${e.message}")
+        ""
+    } finally {
+        platform.posix.close(fd)
+    }
 }
 
 actual fun playlistAudioFromPath(path: String): DPlaylistAudio {

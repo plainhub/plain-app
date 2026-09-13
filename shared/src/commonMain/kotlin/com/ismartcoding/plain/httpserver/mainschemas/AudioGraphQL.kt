@@ -16,6 +16,7 @@ import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.countMedia
+import com.ismartcoding.plain.platform.getAudioLyrics
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
@@ -118,6 +119,12 @@ suspend fun audios(offset: Int, limit: Int, query: String, sortBy: FileSortBy): 
     return searchMedia(DataType.AUDIO, query, limit, offset, sortBy)
         .filterIsInstance<DAudio>()
         .map { it.toModel() }
+}
+
+@GraphQLQuery
+suspend fun audioLyrics(path: String): String {
+    Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
+    return getAudioLyrics(path)
 }
 
 fun SchemaBuilder.addAudioSchema() {

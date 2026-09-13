@@ -33,6 +33,7 @@ type Query {
   latestChatItems: [ChatItem!]!
   audioCount(query: String!): Int!
   audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
+  audioLyrics(path: String!): String!
   imageCount(query: String!): Int!
   imageSearchStatus: ImageSearchStatus!
   images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
