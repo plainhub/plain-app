@@ -36,6 +36,7 @@ import com.ismartcoding.plain.lib.extensions.capitalize
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import kotlinx.coroutines.launch
@@ -139,7 +140,7 @@ fun LoginRequestPage(
                     },
                 )
                 VerticalSpace(32.dp)
-                PFilledButton(
+                POutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.deny),
                     buttonSize = ButtonSize.LARGE,

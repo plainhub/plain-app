@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">Bluetooth üzerinden yakındaki cihazları keşfetmek için Bluetooth izni gereklidir.</string>
     <string name="nearby_wifi_devices_required_for_chat">Yakındaki cihazları keşfetmek için Bluetooth ve yakındaki cihazlar izinleri gereklidir.</string>
     <string name="pairing_request_expired">Eşleştirme isteğinin süresi doldu</string>
+    <string name="share_folder">Klasörü Paylaş</string>
+    <string name="share_this_folder">Bu Klasörü Paylaş</string>
+    <string name="folder_card_items">%1$d öğe</string>
+    <string name="select_items_hint">Kaydetmek için öğe seçmek üzere basılı tutun</string>
+    <string name="save_selected">Seçilenleri Kaydet (%1$d)</string>
+    <string name="download_all_zip">Tümünü ZIP İndir</string>
+    <string name="shared_folder_empty">Bu klasör boş</string>
+    <string name="cannot_load_share">Paylaşılan içerik yüklenemiyor</string>
+    <string name="saved_to_files">Dosyalar'a kaydedildi</string>
+    <string name="open_in_browser">Tarayıcıda Aç</string>
+    <string name="shared_folder">Paylaşılan klasör</string>
+    <string name="shared_items">Paylaşılan öğeler</string>
+    <string name="add_items">Öğe ekle</string>
 </resources>

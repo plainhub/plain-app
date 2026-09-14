@@ -28,6 +28,7 @@ fun DMessageContent.toJSONString(): String {
             MessageType.TEXT -> chatJson.encodeToJsonElement(DMessageText.serializer(), value as DMessageText)
             MessageType.IMAGES -> chatJson.encodeToJsonElement(DMessageImages.serializer(), value as DMessageImages)
             MessageType.FILES -> chatJson.encodeToJsonElement(DMessageFiles.serializer(), value as DMessageFiles)
+            MessageType.SHARE -> chatJson.encodeToJsonElement(DMessageShare.serializer(), value as DMessageShare)
         }
     } else {
         JsonObject(emptyMap())
@@ -44,6 +45,7 @@ enum class MessageType {
     TEXT,
     IMAGES,
     FILES,
+    SHARE,
 }
 
 @Serializable
@@ -84,6 +86,32 @@ class DMessageImages(val items: List<DMessageFile>)
 
 @Serializable
 class DMessageFiles(val items: List<DMessageFile>)
+
+/** Sender endpoint of a share card, so the card stays reachable when forwarded. */
+@Serializable
+class DSharePeerInfo(
+    val id: String,
+    val ip: String,
+    val port: Int,
+)
+
+/**
+ * A shared-folder/link card message. Carries the guest secret (`urlToken`)
+ * plus the sender endpoint instead of a baked URL, so receivers (and further
+ * forwards) can reconstruct `/s/<shareId>#<urlToken>` and re-resolve the IP
+ * via mDNS when it changes.
+ */
+@Serializable
+class DMessageShare(
+    val shareId: String,
+    val urlToken: String,
+    val peerInfo: DSharePeerInfo,
+    val name: String,
+    val itemCount: Int = 0,
+    val totalSize: Long = 0,
+    /** Null = never expires. */
+    val expiresAt: Instant? = null,
+)
 
 /**
  * Per-member delivery result for a single recipient.
@@ -187,21 +215,23 @@ data class DChat(
 
     companion object {
         fun parseContent(content: String): DMessageContent {
-            val obj = chatJson.parseToJsonElement(content).jsonObject
-            val typeStr = obj["type"]?.jsonPrimitive?.content ?: ""
-            val message = DMessageContent(MessageType.entries.firstOrNull { it.name == typeStr } ?: MessageType.TEXT)
-            val valueJson = obj["value"]?.takeIf { it !is JsonNull }?.toString() ?: ""
-            try {
+            return try {
+                val obj = chatJson.parseToJsonElement(content).jsonObject
+                val typeStr = obj["type"]?.jsonPrimitive?.content ?: ""
+                val message = DMessageContent(MessageType.entries.firstOrNull { it.name == typeStr } ?: MessageType.TEXT)
+                val valueJson = obj["value"]?.takeIf { it !is JsonNull }?.toString() ?: ""
                 when (message.type) {
                     MessageType.TEXT -> message.value = chatJson.decodeFromString<DMessageText>(valueJson)
                     MessageType.IMAGES -> message.value = chatJson.decodeFromString<DMessageImages>(valueJson)
                     MessageType.FILES -> message.value = chatJson.decodeFromString<DMessageFiles>(valueJson)
+                    MessageType.SHARE -> message.value = chatJson.decodeFromString<DMessageShare>(valueJson)
                 }
+                message
             } catch (_: Exception) {
-                // Show the full raw content (type + value) so the user can report the original data.
-                message.value = DMessageText(content)
+                // Legacy or unknown payload shapes: keep the type consistent
+                // with the fallback value and render the raw content as text.
+                DMessageContent(MessageType.TEXT, DMessageText(content))
             }
-            return message
         }
     }
 }

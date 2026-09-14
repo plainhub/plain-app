@@ -4,6 +4,10 @@ interface DownloadTempFileHandle {
     fun write(buffer: ByteArray, offset: Int, length: Int)
     fun close()
     fun delete()
+
+    /** Absolute path of the temp file when the platform exposes one; empty otherwise. */
+    val filePath: String
+        get() = ""
 }
 
 expect fun createDownloadTempFile(taskId: String): DownloadTempFileHandle

@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">Bluetooth-machtiging is vereist om apparaten in de buurt via Bluetooth te ontdekken.</string>
     <string name="nearby_wifi_devices_required_for_chat">Bluetooth- en apparaten in de buurt-machtigingen zijn vereist om apparaten in de buurt te ontdekken.</string>
     <string name="pairing_request_expired">Koppelingsverzoek verlopen</string>
+    <string name="share_folder">Map delen</string>
+    <string name="share_this_folder">Deze map delen</string>
+    <string name="folder_card_items">%1$d items</string>
+    <string name="select_items_hint">Houd ingedrukt om items te selecteren</string>
+    <string name="save_selected">Selectie opslaan (%1$d)</string>
+    <string name="download_all_zip">Alles als ZIP downloaden</string>
+    <string name="shared_folder_empty">Deze map is leeg</string>
+    <string name="cannot_load_share">Kan gedeelde inhoud niet laden</string>
+    <string name="saved_to_files">Opgeslagen in Bestanden</string>
+    <string name="open_in_browser">Openen in browser</string>
+    <string name="shared_folder">Gedeelde map</string>
+    <string name="shared_items">Gedeelde items</string>
+    <string name="add_items">Items toevoegen</string>
 </resources>

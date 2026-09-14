@@ -61,3 +61,15 @@ fun NavHostController.navigateAppFiles() {
         launchSingleTop = true
     }
 }
+
+fun NavHostController.navigateEditShare(id: String) {
+    navigate(Routing.EditShare(id)) {
+        launchSingleTop = true
+    }
+}
+
+fun NavHostController.navigateSharedFolder(messageId: String) {
+    navigate(Routing.SharedFolder(messageId)) {
+        launchSingleTop = true
+    }
+}

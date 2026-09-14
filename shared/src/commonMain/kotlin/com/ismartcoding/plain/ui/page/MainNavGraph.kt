@@ -69,6 +69,7 @@ import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.home.HomePage
 import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorListPage
 import com.ismartcoding.plain.ui.page.share.ShareImagePage
+import com.ismartcoding.plain.ui.page.sharedfolder.SharedFolderPage
 import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorPage
 import com.ismartcoding.plain.ui.page.images.ImagesPage
 import com.ismartcoding.plain.ui.page.media.PlayMediaPage
@@ -275,6 +276,10 @@ fun MainNavGraph(
         composable<Routing.EditShare> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.EditShare>()
             EditSharePage(navController, r.id)
+        }
+        composable<Routing.SharedFolder> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.SharedFolder>()
+            SharedFolderPage(navController, r.messageId)
         }
         composable<Routing.Nearby> {
             NearbyPage(navController, peerVM = peerVM)

@@ -10,6 +10,7 @@ import com.ismartcoding.plain.httpserver.ShareFileParams
 import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.platform.getCanonicalPath
+import com.ismartcoding.plain.platform.getDeviceIP4
 import com.ismartcoding.plain.platform.statFile
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -68,14 +69,7 @@ object ShareManager {
             this.urlToken = urlToken
             this.readOnly = readOnly
             this.expiresAt = expiresAt
-            this.data = realPaths.map { realPath ->
-                val stat = statFile(realPath)
-                ShareRoot(
-                    virtualPath = realPath.substringAfterLast('/') + (if (stat?.isDir == true) "/" else ""),
-                    realPath = realPath,
-                    isDir = stat?.isDir ?: false,
-                )
-            }
+            this.data = buildRoots(realPaths)
             createdAt = now
             updatedAt = now
         }
@@ -83,12 +77,30 @@ object ShareManager {
         return share
     }
 
-    /** Update the editable fields of a share (name / expiry). Returns null if the id is unknown. */
-    suspend fun updateShare(id: String, name: String, expiresAt: Instant?): DShare? {
+    /** Whitelisted roots derived from real paths (deduped). */
+    private fun buildRoots(realPaths: List<String>): List<ShareRoot> {
+        return realPaths.distinct().map { realPath ->
+            val stat = statFile(realPath)
+            ShareRoot(
+                virtualPath = realPath.substringAfterLast('/') + (if (stat?.isDir == true) "/" else ""),
+                realPath = realPath,
+                isDir = stat?.isDir ?: false,
+            )
+        }
+    }
+
+    /**
+     * Update the editable fields of a share (name / expiry / whitelisted
+     * roots). Returns null if the id is unknown.
+     */
+    suspend fun updateShare(id: String, name: String, expiresAt: Instant?, realPaths: List<String>? = null): DShare? {
         val dao = AppDatabase.instance.shareDao()
         val share = dao.getById(id) ?: return null
         share.name = name
         share.expiresAt = expiresAt
+        if (realPaths != null) {
+            share.data = buildRoots(realPaths)
+        }
         share.updatedAt = TimeHelper.now()
         dao.update(share)
         authCache.invalidate(id)
@@ -117,8 +129,12 @@ object ShareManager {
         return UrlHelper.buildUrl("https", host, TempData.httpsPort.value, "/s/${share.id}#$sharedToken")
     }
 
+    /**
+     * Share links must carry a plain LAN IP: mDNS hostnames are not
+     * resolvable by phone browsers or by guest clients on other devices.
+     */
     private fun getHost(): String {
-        return TempData.mdnsHostname
+        return getDeviceIP4()
     }
 
     /**

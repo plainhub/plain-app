@@ -139,4 +139,17 @@
     <string name="kick_member">踢出</string>
     <string name="kick_member_confirm">Remove this member from the channel? They will no longer receive messages.</string>
     <string name="delete_device">删除设备</string>
+    <string name="share_folder">分享文件夹</string>
+    <string name="share_this_folder">分享此文件夹</string>
+    <string name="folder_card_items">%1$d 项</string>
+    <string name="select_items_hint">长按进入多选，挑选要保存的项目</string>
+    <string name="save_selected">保存所选 (%1$d)</string>
+    <string name="download_all_zip">全部打包 ZIP</string>
+    <string name="shared_folder_empty">此文件夹为空</string>
+    <string name="cannot_load_share">无法加载共享内容</string>
+    <string name="saved_to_files">已保存到「文件」</string>
+    <string name="open_in_browser">在浏览器打开</string>
+    <string name="shared_folder">共享文件夹</string>
+    <string name="shared_items">共享内容</string>
+    <string name="add_items">添加内容</string>
 </resources>

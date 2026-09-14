@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">Bluetooth経由で近くのデバイスを検出するには、Bluetooth権限が必要です。</string>
     <string name="nearby_wifi_devices_required_for_chat">近くのデバイスを検出するには、Bluetoothと近くのデバイスの権限が必要です。</string>
     <string name="pairing_request_expired">ペアリングリクエストの有効期限が切れました</string>
+    <string name="share_folder">フォルダを共有</string>
+    <string name="share_this_folder">このフォルダを共有</string>
+    <string name="folder_card_items">%1$d個のアイテム</string>
+    <string name="select_items_hint">長押しで保存する項目を選択</string>
+    <string name="save_selected">選択を保存 (%1$d)</string>
+    <string name="download_all_zip">すべてZIPでダウンロード</string>
+    <string name="shared_folder_empty">このフォルダは空です</string>
+    <string name="cannot_load_share">共有コンテンツを読み込めません</string>
+    <string name="saved_to_files">「ファイル」に保存しました</string>
+    <string name="open_in_browser">ブラウザで開く</string>
+    <string name="shared_folder">共有フォルダ</string>
+    <string name="shared_items">共有アイテム</string>
+    <string name="add_items">アイテムを追加</string>
 </resources>

@@ -7,7 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import org.jetbrains.compose.resources.stringResource
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.db.DMessageShare
 import com.ismartcoding.plain.db.DMessageText
+import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.base.PDropdownMenu
@@ -15,6 +17,7 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.nav.navigateChatEditText
+import com.ismartcoding.plain.ui.nav.navigateEditShare
 
 @Composable
 fun ChatListItemContextMenu(
@@ -73,6 +76,16 @@ fun ChatListItemContextMenu(
                     },
                 )
             }
+        }
+        if (m.type == MessageType.SHARE && m.fromId == "me") {
+            PDropdownMenuItem(
+                text = { Text(stringResource(Res.string.edit)) },
+                onClick = {
+                    selectedItem.value = null
+                    showContextMenu.value = false
+                    navController.navigateEditShare((m.value as DMessageShare).shareId)
+                },
+            )
         }
         PDropdownMenuItem(
             text = { Text(stringResource(Res.string.delete)) },

@@ -37,6 +37,7 @@ fun ChatInput(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onSend: () -> Unit = {},
     onValueChange: (String) -> Unit = {},
+    onShareFolder: () -> Unit = {},
 ) {
     var hasFocus by remember { mutableStateOf(false) }
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -85,6 +86,13 @@ fun ChatInput(
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, multiple = true))
+                }
+                PIconButton(
+                    icon = Res.drawable.folders,
+                    contentDescription = stringResource(Res.string.share_folder),
+                    tint = MaterialTheme.colorScheme.primary,
+                ) {
+                    onShareFolder()
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 PIconButton(

@@ -1,8 +1,12 @@
 package com.ismartcoding.plain.ui.page.chat
 
 import com.ismartcoding.plain.platform.handleChatFileSelection
+import com.ismartcoding.plain.chat.ShareSendHelper
 import com.ismartcoding.plain.chat.peer.PeerTransportPrewarmer
+import com.ismartcoding.plain.features.share.ShareExpiry
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.ui.page.chat.components.FolderShareSheet
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -123,6 +127,7 @@ fun ChatPage(
     var inputValue by remember { mutableStateOf("") }
     var showForwardDialog by remember { mutableStateOf(false) }
     var messageToForward by remember { mutableStateOf<VChat?>(null) }
+    var showFolderShareSheet by remember { mutableStateOf(false) }
 
     val density = LocalDensity.current
     val windowInfo = LocalWindowInfo.current
@@ -320,12 +325,30 @@ fun ChatPage(
                             inputValue = ""
                             ChatInputTextPreference.putAsync("")
                         }
-                    })
+                    },
+                    onShareFolder = { showFolderShareSheet = true })
             }
         }
     }
 
     MediaPreviewer(state = previewerState)
+
+    if (showFolderShareSheet) {
+        FolderShareSheet(
+            onDismiss = { showFolderShareSheet = false },
+            onConfirm = { dirPath, name, expiry ->
+                showFolderShareSheet = false
+                scope.launch {
+                    ShareSendHelper.sendFolderShareAsync(
+                        targets = listOf(chatTarget.value),
+                        dirPath = dirPath,
+                        name = name,
+                        expiresAt = expiry.expiresAt(TimeHelper.now()),
+                    )
+                }
+            },
+        )
+    }
 
     if (showForwardDialog) {
         messageToForward?.let { message ->

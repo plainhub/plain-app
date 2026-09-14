@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">블루투스를 통해 근처 기기를 검색하려면 블루투스 권한이 필요합니다.</string>
     <string name="nearby_wifi_devices_required_for_chat">근처 기기를 검색하려면 블루투스 및 근처 기기 권한이 필요합니다.</string>
     <string name="pairing_request_expired">페어링 요청이 만료되었습니다</string>
+    <string name="share_folder">폴더 공유</string>
+    <string name="share_this_folder">이 폴더 공유</string>
+    <string name="folder_card_items">항목 %1$d개</string>
+    <string name="select_items_hint">길게 눌러 저장할 항목 선택</string>
+    <string name="save_selected">선택 항목 저장 (%1$d)</string>
+    <string name="download_all_zip">전체 ZIP 다운로드</string>
+    <string name="shared_folder_empty">이 폴더는 비어 있습니다</string>
+    <string name="cannot_load_share">공유 콘텐츠를 로드할 수 없습니다</string>
+    <string name="saved_to_files">파일에 저장됨</string>
+    <string name="open_in_browser">브라우저에서 열기</string>
+    <string name="shared_folder">공유 폴더</string>
+    <string name="shared_items">공유 항목</string>
+    <string name="add_items">항목 추가</string>
 </resources>

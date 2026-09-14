@@ -7,6 +7,7 @@ import com.ismartcoding.plain.i18n.files
 import com.ismartcoding.plain.i18n.image
 import com.ismartcoding.plain.i18n.images
 import com.ismartcoding.plain.i18n.message
+import com.ismartcoding.plain.i18n.shared_folder
 import com.ismartcoding.plain.i18n.video
 import com.ismartcoding.plain.i18n.videos
 
@@ -44,6 +45,8 @@ fun DChat.getMessagePreview(): String {
             val count = filesMessage?.items?.size ?: 0
             if (count > 1) "$count ${LocaleHelper.getString(Res.string.files)}" else LocaleHelper.getString(Res.string.file)
         }
+
+        MessageType.SHARE -> LocaleHelper.getString(Res.string.shared_folder)
 
         else -> LocaleHelper.getString(Res.string.message)
     }

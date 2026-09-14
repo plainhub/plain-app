@@ -12,7 +12,7 @@ import platform.UniformTypeIdentifiers.UTType
 
 @OptIn(ExperimentalForeignApi::class)
 private class IosDownloadTempFileHandle(
-    val filePath: String,
+    override val filePath: String,
 ) : DownloadTempFileHandle {
     private val chunks = mutableListOf<ByteArray>()
 

@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">Для обнаружения ближайших устройств через Bluetooth требуется разрешение на использование Bluetooth.</string>
     <string name="nearby_wifi_devices_required_for_chat">Для обнаружения ближайших устройств требуются разрешения на использование Bluetooth и доступ к ближайшим устройствам.</string>
     <string name="pairing_request_expired">Срок действия запроса на сопряжение истек</string>
+    <string name="share_folder">Поделиться папкой</string>
+    <string name="share_this_folder">Поделиться этой папкой</string>
+    <string name="folder_card_items">Элементов: %1$d</string>
+    <string name="select_items_hint">Удерживайте, чтобы выбрать элементы</string>
+    <string name="save_selected">Сохранить выбранное (%1$d)</string>
+    <string name="download_all_zip">Скачать всё ZIP</string>
+    <string name="shared_folder_empty">Эта папка пуста</string>
+    <string name="cannot_load_share">Не удалось загрузить общее содержимое</string>
+    <string name="saved_to_files">Сохранено в «Файлы»</string>
+    <string name="open_in_browser">Открыть в браузере</string>
+    <string name="shared_folder">Общая папка</string>
+    <string name="shared_items">Общие элементы</string>
+    <string name="add_items">Добавить элементы</string>
 </resources>

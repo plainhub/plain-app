@@ -4,30 +4,43 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DShare
+import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.share.ShareExpiry
 import com.ismartcoding.plain.features.share.ShareManager
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.edit_share_link
 import com.ismartcoding.plain.i18n.name
+import com.ismartcoding.plain.i18n.add_items
+import com.ismartcoding.plain.i18n.delete
+import com.ismartcoding.plain.i18n.file_text
+import com.ismartcoding.plain.i18n.folder
+import com.ismartcoding.plain.i18n.folder_plus
 import com.ismartcoding.plain.i18n.save
+import com.ismartcoding.plain.i18n.shared_items
+import com.ismartcoding.plain.i18n.x
 import com.ismartcoding.plain.i18n.share_expired
 import com.ismartcoding.plain.i18n.share_expires_on
 import com.ismartcoding.plain.i18n.share_expiry
@@ -36,9 +49,11 @@ import com.ismartcoding.plain.i18n.share_link
 import com.ismartcoding.plain.i18n.share_link_desc
 import com.ismartcoding.plain.i18n.share_name_placeholder
 import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.toBreakableUrl
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.formatDateTime
+import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.platform.shareText
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -48,6 +63,9 @@ import com.ismartcoding.plain.ui.base.IconTextQrCodeButton
 import com.ismartcoding.plain.ui.base.IconTextForwardButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.PFilterChip
+import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -60,6 +78,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.i18n.sent
 import com.ismartcoding.plain.ui.page.files.label
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
 
@@ -78,16 +97,26 @@ fun EditSharePage(
     var link by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var expiry by remember { mutableStateOf(ShareExpiry.NEVER) }
+    var paths by remember { mutableStateOf(listOf<String>()) }
     var isLoading by remember { mutableStateOf(false) }
     var showQr by remember { mutableStateOf(false) }
     var showForwardDialog by remember { mutableStateOf(false) }
+    var showItemsPicker by remember { mutableStateOf(false) }
+    val dirFlags = remember { mutableStateMapOf<String, Boolean>() }
 
     LaunchedEffect(shareId) {
         val s = withIO { ShareManager.getShare(shareId) } ?: return@LaunchedEffect
         share = s
         name = s.name
         expiry = s.toExpiryOption()
+        paths = s.data.map { it.realPath }
         link = ShareManager.buildLink(s)
+    }
+
+    LaunchedEffect(paths) {
+        withIO {
+            paths.forEach { p -> dirFlags.getOrPut(p) { statFile(p)?.isDir == true } }
+        }
     }
 
     val current = share
@@ -103,7 +132,7 @@ fun EditSharePage(
         scope.launch {
             isLoading = true
             val updated = withIO {
-                ShareManager.updateShare(current.id, name, expiry.expiresAt(TimeHelper.now()))
+                ShareManager.updateShare(current.id, name, expiry.expiresAt(TimeHelper.now()), realPaths = paths)
             }
             isLoading = false
             if (updated != null) navController.popBackStack()
@@ -142,6 +171,51 @@ fun EditSharePage(
                 onValueChange = { name = it },
             )
             VerticalSpace(16.dp)
+            Text(stringResource(Res.string.shared_items), style = MaterialTheme.typography.titleSmall)
+            VerticalSpace(8.dp)
+            paths.forEach { path ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(if (dirFlags[path] == true) Res.drawable.folder else Res.drawable.file_text),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(end = 12.dp),
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = path.getFilenameFromPath(),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            text = path,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    PIconButton(
+                        icon = Res.drawable.x,
+                        contentDescription = stringResource(Res.string.delete),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        enabled = paths.size > 1,
+                    ) {
+                        paths = paths - path
+                    }
+                }
+            }
+            VerticalSpace(8.dp)
+            POutlinedButton(
+                text = stringResource(Res.string.add_items),
+                icon = painterResource(Res.drawable.folder_plus),
+                onClick = { showItemsPicker = true },
+            )
+            VerticalSpace(16.dp)
             Text(stringResource(Res.string.share_expiry), style = MaterialTheme.typography.titleSmall)
             VerticalSpace(8.dp)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -162,6 +236,20 @@ fun EditSharePage(
                 IconTextShareButton { shareText(link) }
                 IconTextForwardButton { showForwardDialog = true }
             }
+            VerticalSpace(16.dp)
+            POutlinedButton(
+                text = stringResource(Res.string.delete),
+                type = ButtonType.DANGER,
+                onClick = {
+                    DialogHelper.confirmToDelete {
+                        scope.launch {
+                            withIO { ShareManager.deleteShare(current.id) }
+                            navController.popBackStack()
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
             BottomSpace(paddingValues)
         }
     }
@@ -170,13 +258,27 @@ fun EditSharePage(
         WebAddressBarQrDialog(url = link, onClose = { showQr = false })
     }
 
+    if (showItemsPicker) {
+        ShareItemsPickerSheet(
+            initialSelected = paths.toSet(),
+            onDismiss = { showItemsPicker = false },
+            onConfirm = { picked ->
+                paths = (paths + picked).distinct()
+                showItemsPicker = false
+            },
+        )
+    }
+
     if (showForwardDialog) {
         ForwardTargetDialog(
             onDismiss = { showForwardDialog = false },
             onTargetsSelected = { targets ->
                 showForwardDialog = false
                 scope.launch {
-                    ShareSendHelper.sendAsync(targets, emptyList(), link, null)
+                    ShareSendHelper.sendContentAsync(
+                        targets,
+                        ShareSendHelper.buildShareContent(current, current.data.map { it.realPath }),
+                    )
                     DialogHelper.showSuccess(Res.string.sent)
                 }
             },

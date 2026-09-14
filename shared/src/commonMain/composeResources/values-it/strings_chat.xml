@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">È necessaria l'autorizzazione Bluetooth per scoprire i dispositivi nelle vicinanze tramite Bluetooth.</string>
     <string name="nearby_wifi_devices_required_for_chat">Sono necessarie le autorizzazioni Bluetooth e dei dispositivi nelle vicinanze per scoprire i dispositivi nelle vicinanze.</string>
     <string name="pairing_request_expired">Richiesta di associazione scaduta</string>
+    <string name="share_folder">Condividi cartella</string>
+    <string name="share_this_folder">Condividi questa cartella</string>
+    <string name="folder_card_items">%1$d elementi</string>
+    <string name="select_items_hint">Tieni premuto per selezionare gli elementi</string>
+    <string name="save_selected">Salva selezionati (%1$d)</string>
+    <string name="download_all_zip">Scarica tutto in ZIP</string>
+    <string name="shared_folder_empty">Questa cartella è vuota</string>
+    <string name="cannot_load_share">Impossibile caricare il contenuto condiviso</string>
+    <string name="saved_to_files">Salvato in File</string>
+    <string name="open_in_browser">Apri nel browser</string>
+    <string name="shared_folder">Cartella condivisa</string>
+    <string name="shared_items">Elementi condivisi</string>
+    <string name="add_items">Aggiungi elementi</string>
 </resources>

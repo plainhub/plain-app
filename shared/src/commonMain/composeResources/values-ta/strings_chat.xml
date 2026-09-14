@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">புளூடூத் வழியாக அருகிலுள்ள சாதனங்களைக் கண்டறிய புளூடூத் அனுமதி தேவை.</string>
     <string name="nearby_wifi_devices_required_for_chat">அருகிலுள்ள சாதனங்களைக் கண்டறிய புளூடூத் மற்றும் அருகிலுள்ள சாதன அனுமதிகள் தேவை.</string>
     <string name="pairing_request_expired">இணைப்பு கோரிக்கை காலாவதியானது</string>
+    <string name="share_folder">கோப்புறையைப் பகிர்</string>
+    <string name="share_this_folder">இந்த கோப்புறையைப் பகிர்</string>
+    <string name="folder_card_items">%1$d பொருட்கள்</string>
+    <string name="select_items_hint">சேமிக்க பொருட்களைத் தேர்ந்தெடுக்க நீண்ட நேரம் அழுத்தவும்</string>
+    <string name="save_selected">தேர்ந்தெடுத்தவற்றைச் சேமி (%1$d)</string>
+    <string name="download_all_zip">அனைத்தையும் ZIP ஆகப் பதிவிறக்கவும்</string>
+    <string name="shared_folder_empty">இந்த கோப்புறை காலியாக உள்ளது</string>
+    <string name="cannot_load_share">பகிரப்பட்ட உள்ளடக்கத்தை ஏற்ற முடியவில்லை</string>
+    <string name="saved_to_files">கோப்புகளில் சேமிக்கப்பட்டது</string>
+    <string name="open_in_browser">உலாவியில் திற</string>
+    <string name="shared_folder">பகிரப்பட்ட கோப்புறை</string>
+    <string name="shared_items">பகிரப்பட்ட பொருட்கள்</string>
+    <string name="add_items">பொருட்களைச் சேர்</string>
 </resources>

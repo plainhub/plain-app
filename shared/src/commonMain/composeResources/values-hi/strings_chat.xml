@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">ब्लूटूथ के माध्यम से आसपास के डिवाइस खोजने के लिए ब्लूटूथ अनुमति आवश्यक है।</string>
     <string name="nearby_wifi_devices_required_for_chat">आसपास के डिवाइस खोजने के लिए ब्लूटूथ और आसपास के डिवाइस अनुमतियां आवश्यक हैं।</string>
     <string name="pairing_request_expired">पेयरिंग अनुरोध समाप्त</string>
+    <string name="share_folder">फ़ोल्डर साझा करें</string>
+    <string name="share_this_folder">इस फ़ोल्डर को साझा करें</string>
+    <string name="folder_card_items">%1$d आइटम</string>
+    <string name="select_items_hint">सहेजने के लिए आइटम चुनने हेतु दबाकर रखें</string>
+    <string name="save_selected">चयनित सहेजें (%1$d)</string>
+    <string name="download_all_zip">सभी ZIP में डाउनलोड करें</string>
+    <string name="shared_folder_empty">यह फ़ोल्डर खाली है</string>
+    <string name="cannot_load_share">साझा की गई सामग्री लोड नहीं हो सकी</string>
+    <string name="saved_to_files">फ़ाइलों में सहेजा गया</string>
+    <string name="open_in_browser">ब्राउज़र में खोलें</string>
+    <string name="shared_folder">साझा फ़ोल्डर</string>
+    <string name="shared_items">साझा की गई वस्तुएं</string>
+    <string name="add_items">आइटम जोड़ें</string>
 </resources>

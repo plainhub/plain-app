@@ -124,6 +124,10 @@ fun ChatListItem(
                             chatVM.selectedItem.value = m
                             showContextMenu.value = true
                         })
+                        MessageType.SHARE -> ChatShareItem(navController, m, isSelectMode = chatVM.selectMode.value, onSelect = { chatVM.select(it) }, onLongClick = {
+                            chatVM.selectedItem.value = m
+                            showContextMenu.value = true
+                        })
                     }
                     VerticalSpace(8.dp)
                 }

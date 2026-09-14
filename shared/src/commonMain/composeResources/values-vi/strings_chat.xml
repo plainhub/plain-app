@@ -139,4 +139,17 @@
     <string name="bluetooth_permission_required_for_nearby">Cần có quyền Bluetooth để khám phá các thiết bị gần đó qua Bluetooth.</string>
     <string name="nearby_wifi_devices_required_for_chat">Cần có quyền Bluetooth và thiết bị gần đó để khám phá các thiết bị gần đó.</string>
     <string name="pairing_request_expired">Yêu cầu ghép nối đã hết hạn</string>
+    <string name="share_folder">Chia sẻ thư mục</string>
+    <string name="share_this_folder">Chia sẻ thư mục này</string>
+    <string name="folder_card_items">%1$d mục</string>
+    <string name="select_items_hint">Nhấn giữ để chọn mục cần lưu</string>
+    <string name="save_selected">Lưu đã chọn (%1$d)</string>
+    <string name="download_all_zip">Tải tất cả ZIP</string>
+    <string name="shared_folder_empty">Thư mục này trống</string>
+    <string name="cannot_load_share">Không thể tải nội dung được chia sẻ</string>
+    <string name="saved_to_files">Đã lưu vào Tệp</string>
+    <string name="open_in_browser">Mở trong trình duyệt</string>
+    <string name="shared_folder">Thư mục được chia sẻ</string>
+    <string name="shared_items">Mục được chia sẻ</string>
+    <string name="add_items">Thêm mục</string>
 </resources>

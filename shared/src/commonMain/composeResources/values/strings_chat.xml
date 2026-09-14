@@ -139,4 +139,17 @@
     <string name="delivery_status">Delivery Status</string>
     <string name="delivery_status_summary">%1$d / %2$d delivered</string>
     <string name="resend_selected">Resend Selected</string>
+    <string name="share_folder">Share Folder</string>
+    <string name="share_this_folder">Share This Folder</string>
+    <string name="folder_card_items">%1$d items</string>
+    <string name="select_items_hint">Long-press to select items to save</string>
+    <string name="save_selected">Save Selected (%1$d)</string>
+    <string name="download_all_zip">Download All as ZIP</string>
+    <string name="shared_folder_empty">This folder is empty</string>
+    <string name="cannot_load_share">Cannot load shared content</string>
+    <string name="saved_to_files">Saved to Files</string>
+    <string name="open_in_browser">Open in Browser</string>
+    <string name="shared_folder">Shared folder</string>
+    <string name="shared_items">Shared items</string>
+    <string name="add_items">Add items</string>
 </resources>

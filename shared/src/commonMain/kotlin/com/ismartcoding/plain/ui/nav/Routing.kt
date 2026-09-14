@@ -156,6 +156,10 @@ class Routing {
     @Serializable
     data class EditShare(val id: String)
 
+    /** Native browser for the share card message with [SharedFolder.messageId]. */
+    @Serializable
+    data class SharedFolder(val messageId: String)
+
     @Serializable
     object Nearby
 

@@ -139,4 +139,17 @@
     <string name="delivery_status_summary">%1$d / %2$d 已送達</string>
     <string name="resend_selected">重新傳送選取</string>
     <string name="pairing_request_expired">配對請求已過期</string>
+    <string name="share_folder">分享資料夾</string>
+    <string name="share_this_folder">分享此資料夾</string>
+    <string name="folder_card_items">%1$d 項</string>
+    <string name="select_items_hint">長按進入多選，挑選要儲存的項目</string>
+    <string name="save_selected">儲存所選 (%1$d)</string>
+    <string name="download_all_zip">全部打包 ZIP</string>
+    <string name="shared_folder_empty">此資料夾為空</string>
+    <string name="cannot_load_share">無法載入共享內容</string>
+    <string name="saved_to_files">已儲存到「檔案」</string>
+    <string name="open_in_browser">在瀏覽器開啟</string>
+    <string name="shared_folder">共享資料夾</string>
+    <string name="shared_items">共享內容</string>
+    <string name="add_items">新增內容</string>
 </resources>

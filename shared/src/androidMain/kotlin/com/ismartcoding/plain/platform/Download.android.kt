@@ -13,6 +13,9 @@ private class AndroidDownloadTempFileHandle(
     val file: File,
     private val outputStream: FileOutputStream,
 ) : DownloadTempFileHandle {
+    override val filePath: String
+        get() = file.absolutePath
+
     override fun write(buffer: ByteArray, offset: Int, length: Int) {
         outputStream.write(buffer, offset, length)
     }

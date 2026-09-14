@@ -97,7 +97,10 @@ fun CreateShareDialog(
                 showForwardDialog = false
                 onDismiss()
                 scope.launch {
-                    ShareSendHelper.sendAsync(targets, emptyList(), link, null)
+                    ShareSendHelper.sendContentAsync(
+                        targets,
+                        ShareSendHelper.buildShareContent(share!!, paths),
+                    )
                     DialogHelper.showSuccess(Res.string.sent)
                 }
             },
