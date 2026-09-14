@@ -37,7 +37,7 @@ object PlainTheme {
             .padding(horizontal = PAGE_HORIZONTAL_MARGIN)
             .clip(shape)
             .background(
-                color = if (selected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.cardBackgroundNormal,
+                color = if (selected) MaterialTheme.colorScheme.cardBackgroundActive else MaterialTheme.colorScheme.cardBackgroundNormal,
                 shape = shape,
             )
     }

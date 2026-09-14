@@ -210,6 +210,7 @@ internal fun AudioPlayerTrackPage(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = headerHeight)
+                    .clip(RoundedCornerShape(12.dp))
                     .graphicsLayer { alpha = (p * 1.5f).coerceIn(0f, 1f) }
                     .then(if (p > 0.5f) Modifier.clickable { onViewModeChange(PlayerView.COVER) } else Modifier),
             ) {

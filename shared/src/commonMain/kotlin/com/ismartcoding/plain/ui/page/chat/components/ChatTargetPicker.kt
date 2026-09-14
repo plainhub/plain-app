@@ -58,7 +58,7 @@ fun ChatTargetPicker(
 
     LazyColumn(
         modifier = Modifier.fillMaxWidth().heightIn(max = 360.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item { TargetRow(localOption, selectedIds.contains(localOption.target.encodedToId), enabled, onToggle) }
         items(channelOptions, key = { it.target.encodedToId }) {
@@ -90,7 +90,7 @@ private fun TargetRow(option: ChatTargetOption, selected: Boolean, enabled: Bool
             .clip(RoundedCornerShape(12.dp))
             .background(if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f) else Color.Transparent)
             .clickable(enabled = enabled) { onToggle(id) }
-            .padding(horizontal = 8.dp, vertical = 6.dp),
+            .padding(86.dp),
     ) {
         Box(
             modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
