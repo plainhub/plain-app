@@ -26,7 +26,6 @@ import com.ismartcoding.plain.platform.formatTime
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
 fun ChatName(
@@ -54,7 +53,7 @@ fun ChatName(
 
         Text(
             text = m.createdAt.formatTime(),
-            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.secondaryTextColor),
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSurfaceVariant),
         )
 
         // Show status indicator based on message status (skip for local chat)

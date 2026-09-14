@@ -37,7 +37,6 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +82,7 @@ fun CastSessionPage(
                 Text(
                     text = stringResource(Res.string.no_active_cast),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondaryTextColor,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             return@PScaffold

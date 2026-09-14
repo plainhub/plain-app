@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">Recebi! A qualidade está ótima.</string>
     <string name="onboarding_3_share_hint">Compartilhar de outros apps → encaminhar para uma conversa com um toque</string>
     <string name="onboarding_4_title">Mais que transferência de arquivos</string>
-    <string name="onboarding_4_body">Fotos, músicas, notas e mais ferramentas úteis, tudo offline; a música suporta letras sincronizadas e extração de letras com IA no aparelho.</string>
+    <string name="onboarding_4_body">Fotos, músicas, notas e mais ferramentas úteis, tudo offline; a música suporta letras sincronizadas.</string>
     <string name="onboarding_4_photo_title">Fotos e vídeos</string>
     <string name="onboarding_4_photo_desc">Ver e organizar</string>
     <string name="onboarding_4_music_title">Música</string>
-    <string name="onboarding_4_music_desc">Letras sincronizadas · Extração com IA</string>
+    <string name="onboarding_4_music_desc">Letras sincronizadas</string>
     <string name="onboarding_4_notes_desc">Edição Markdown</string>
     <string name="onboarding_4_tools_desc">Escanear e mais</string>
     <string name="onboarding_5_title">Três passos para começar</string>

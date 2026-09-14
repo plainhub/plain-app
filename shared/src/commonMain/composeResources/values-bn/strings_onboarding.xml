@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">পেয়েছি, কোয়ালিটি দুর্দান্ত!</string>
     <string name="onboarding_3_share_hint">অন্য অ্যাপ থেকে শেয়ার → এক ট্যাপে চ্যাটে পাঠান</string>
     <string name="onboarding_4_title">শুধু ফাইল ট্রান্সফার নয়</string>
-    <string name="onboarding_4_body">ছবি, গান, নোট আরও দরকারি টুল — সবই অফলাইনে; গানে আছে সিঙ্ক করা লিরিক্স ও ডিভাইসে AI লিরিক্স বের করার সুবিধা।</string>
+    <string name="onboarding_4_body">ছবি, গান, নোট আরও দরকারি টুল — সবই অফলাইনে; গানে আছে সিঙ্ক করা লিরিক্স সুবিধা।</string>
     <string name="onboarding_4_photo_title">ছবি ও ভিডিও</string>
     <string name="onboarding_4_photo_desc">দেখা ও গুছিয়ে রাখা</string>
     <string name="onboarding_4_music_title">গান</string>
-    <string name="onboarding_4_music_desc">সিঙ্ক লিরিক্স · AI এক্সট্র্যাকশন</string>
+    <string name="onboarding_4_music_desc">সিঙ্ক লিরিক্স</string>
     <string name="onboarding_4_notes_desc">Markdown সম্পাদনা</string>
     <string name="onboarding_4_tools_desc">স্ক্যান ও আরও</string>
     <string name="onboarding_5_title">শুরু করার তিন ধাপ</string>

@@ -63,7 +63,7 @@ private fun plainDarkColorScheme(): ColorScheme {
         surfaceDim = if (amoled) Color(0xFF000000) else Color(0xFF12121D),
         surfaceContainer = Color(0xFF1E1F2A),
         surfaceContainerLowest = Color(0xFF0D0D18),
-        surfaceContainerLow = Color(0xFF1A1B26),
+        surfaceContainerLow = Color(0xFF2C2C2E),
         surfaceContainerHigh = Color(0xFF292935),
         surfaceContainerHighest = Color(0xFF333440),
     )
@@ -125,11 +125,12 @@ val ColorScheme.backgroundNormal: Color
 
 val ColorScheme.cardBackgroundNormal: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF2C2C2E) else Color(0xFFf5f2ff)
+    get() = this.surfaceContainerLow
 
+// Selected/playing cards, same treatment as plain-desktop .selectable-card.selected.
 val ColorScheme.cardBackgroundActive: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF2C2C2E) else Color(0xFFE5E5EA)
+    get() = this.surfaceContainerHighest
 
 val ColorScheme.circleBackground: Color
     @Composable @ReadOnlyComposable
@@ -154,10 +155,6 @@ val ColorScheme.primaryPill: Color
     } else {
         Color(0xFFDDE2F9)
     }
-
-val ColorScheme.secondaryTextColor: Color
-    @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF8D8D93) else Color(0xFF8E8E93)
 
 val ColorScheme.waveInactiveColor: Color
     @Composable @ReadOnlyComposable

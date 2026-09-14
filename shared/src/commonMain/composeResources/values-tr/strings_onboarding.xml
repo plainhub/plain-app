@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">Aldım, kalite harika!</string>
     <string name="onboarding_3_share_hint">Diğer uygulamalardan paylaş → tek dokunuşla sohbete ilet</string>
     <string name="onboarding_4_title">Dosya aktarımından fazlası</string>
-    <string name="onboarding_4_body">Fotoğraflar, müzik, notlar ve daha birçok araç — tamamen çevrimdışı; müzikte senkronize şarkı sözleri ve cihaz üzerinde AI söz çıkarma.</string>
+    <string name="onboarding_4_body">Fotoğraflar, müzik, notlar ve daha birçok araç — tamamen çevrimdışı; müzikte senkronize şarkı sözleri var.</string>
     <string name="onboarding_4_photo_title">Fotoğraflar ve videolar</string>
     <string name="onboarding_4_photo_desc">Gözat ve düzenle</string>
     <string name="onboarding_4_music_title">Müzik</string>
-    <string name="onboarding_4_music_desc">Senkronize sözler · AI çıkarma</string>
+    <string name="onboarding_4_music_desc">Senkronize sözler</string>
     <string name="onboarding_4_notes_desc">Markdown düzenleme</string>
     <string name="onboarding_4_tools_desc">Tarama ve dahası</string>
     <string name="onboarding_5_title">Başlamak için üç adım</string>

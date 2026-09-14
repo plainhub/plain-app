@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import kotlin.math.abs
 
 @Composable
@@ -46,7 +45,7 @@ fun RefreshLayoutState.PullToRefreshContent(
         Text(
             text = createText(refreshContentState),
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.secondaryTextColor,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

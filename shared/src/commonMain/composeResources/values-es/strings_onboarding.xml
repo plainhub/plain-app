@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">¡Recibidas! Qué calidad tan buena.</string>
     <string name="onboarding_3_share_hint">Compartir desde otras apps → reenviar a un chat con un toque</string>
     <string name="onboarding_4_title">Más que transferir archivos</string>
-    <string name="onboarding_4_body">Fotos, música, notas y más herramientas, todo sin conexión; la música admite letras sincronizadas y extracción de letras con IA en el dispositivo.</string>
+    <string name="onboarding_4_body">Fotos, música, notas y más herramientas, todo sin conexión; la música admite letras sincronizadas.</string>
     <string name="onboarding_4_photo_title">Fotos y vídeos</string>
     <string name="onboarding_4_photo_desc">Ver y organizar</string>
     <string name="onboarding_4_music_title">Música</string>
-    <string name="onboarding_4_music_desc">Letras sincronizadas · Extracción con IA</string>
+    <string name="onboarding_4_music_desc">Letras sincronizadas</string>
     <string name="onboarding_4_notes_desc">Edición Markdown</string>
     <string name="onboarding_4_tools_desc">Escanear y más</string>
     <string name="onboarding_5_title">Tres pasos para empezar</string>

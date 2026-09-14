@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.grey
 import com.ismartcoding.plain.ui.theme.orange
@@ -393,8 +394,7 @@ fun ChatIllustration() {
         modifier = Modifier
             .width(304.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.cardBackgroundNormal)
             .padding(horizontal = 14.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
@@ -403,8 +403,7 @@ fun ChatIllustration() {
             modifier = Modifier
                 .fillMaxWidth(0.86f)
                 .clip(RoundedCornerShape(14.dp))
-                .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 .padding(horizontal = 11.dp, vertical = 9.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -468,12 +467,7 @@ private fun ToolCard(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(18.dp))
-            .background(if (hero) scheme.primaryContainer else scheme.surface)
-            .border(
-                if (hero) 2.dp else 1.dp,
-                if (hero) scheme.primary else scheme.outlineVariant,
-                RoundedCornerShape(18.dp),
-            )
+            .background(if (hero) scheme.primaryContainer else scheme.cardBackgroundNormal)
             .padding(horizontal = 12.dp, vertical = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

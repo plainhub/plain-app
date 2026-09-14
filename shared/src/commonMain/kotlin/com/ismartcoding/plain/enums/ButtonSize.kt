@@ -11,22 +11,19 @@ import androidx.compose.ui.unit.dp
 enum class ButtonSize(val height: Dp, val cornerRadius: Dp) {
     SMALL(32.dp, 16.dp),
     MEDIUM(40.dp, 20.dp),
-    LARGE(48.dp, 24.dp),
-    EXTRA_LARGE(56.dp, 28.dp);
+    LARGE(48.dp, 24.dp);
 
     @Composable
     fun textStyle() = when (this) {
         SMALL -> MaterialTheme.typography.labelLarge
         MEDIUM -> MaterialTheme.typography.labelLarge
         LARGE -> MaterialTheme.typography.titleMedium
-        EXTRA_LARGE -> MaterialTheme.typography.titleLarge
     }
 
     fun fontWeight() = when (this) {
         SMALL -> FontWeight.SemiBold
         MEDIUM -> FontWeight.SemiBold
         LARGE -> FontWeight.SemiBold
-        EXTRA_LARGE -> FontWeight.SemiBold
     }
 
     fun getPaddingValues(): PaddingValues {
@@ -48,11 +45,6 @@ enum class ButtonSize(val height: Dp, val cornerRadius: Dp) {
         LARGE -> ButtonDefaults.buttonElevation(
             defaultElevation = 1.dp,
             pressedElevation = 0.dp
-        )
-
-        EXTRA_LARGE -> ButtonDefaults.buttonElevation(
-            defaultElevation = 2.dp,
-            pressedElevation = 1.dp
         )
     }
 }

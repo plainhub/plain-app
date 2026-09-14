@@ -71,10 +71,6 @@ fun ChatListItem(
                 .height(IntrinsicSize.Min)
                 .background(if (selected) MaterialTheme.colorScheme.cardBackgroundActive else Color.Unspecified)
         ) {
-            if (chatVM.selectMode.value) {
-                HorizontalSpace(dp = 16.dp)
-                Checkbox(checked = chatVM.selectedIds.contains(m.id), onCheckedChange = { chatVM.select(m.id) })
-            }
             if (m.fromId == "me") {
                 Box(
                     modifier = Modifier
@@ -84,6 +80,10 @@ fun ChatListItem(
                 )
             } else {
                 HorizontalSpace(dp = 4.dp)
+            }
+            if (chatVM.selectMode.value) {
+                HorizontalSpace(dp = 16.dp)
+                Checkbox(checked = chatVM.selectedIds.contains(m.id), onCheckedChange = { chatVM.select(m.id) })
             }
             Box(modifier = Modifier.weight(1f)) {
                 Column(

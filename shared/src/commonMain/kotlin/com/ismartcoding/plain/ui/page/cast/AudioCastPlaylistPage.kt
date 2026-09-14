@@ -46,7 +46,6 @@ import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListSta
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.theme.cardBackgroundActive
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -95,7 +94,7 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f), contentAlignment = Alignment.Center) {
-                    Text(text = stringResource(Res.string.cast_playlist_empty), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.secondaryTextColor)
+                    Text(text = stringResource(Res.string.cast_playlist_empty), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(state = lazyListState, modifier = Modifier

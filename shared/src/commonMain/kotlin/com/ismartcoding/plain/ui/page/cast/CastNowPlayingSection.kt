@@ -47,7 +47,6 @@ import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -115,7 +114,7 @@ fun CastNowPlayingSection(
                     Icon(
                         painter = painterResource(Res.drawable.cast),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondaryTextColor,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(48.dp),
                     )
                 }

@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">Reçues, super qualité !</string>
     <string name="onboarding_3_share_hint">Partage depuis d'autres applications → transférer vers une discussion en un geste</string>
     <string name="onboarding_4_title">Bien plus qu'un transfert de fichiers</string>
-    <string name="onboarding_4_body">Photos, musique, notes et autres outils pratiques, tout fonctionne hors ligne ; la musique prend en charge les paroles synchronisées et l'extraction de paroles par IA sur l'appareil.</string>
+    <string name="onboarding_4_body">Photos, musique, notes et autres outils pratiques, tout fonctionne hors ligne ; la musique prend en charge les paroles synchronisées.</string>
     <string name="onboarding_4_photo_title">Photos et vidéos</string>
     <string name="onboarding_4_photo_desc">Parcourir et organiser</string>
     <string name="onboarding_4_music_title">Musique</string>
-    <string name="onboarding_4_music_desc">Paroles synchronisées · Extraction IA</string>
+    <string name="onboarding_4_music_desc">Paroles synchronisées</string>
     <string name="onboarding_4_notes_desc">Édition Markdown</string>
     <string name="onboarding_4_tools_desc">Scanner et plus</string>
     <string name="onboarding_5_title">Trois étapes pour commencer</string>

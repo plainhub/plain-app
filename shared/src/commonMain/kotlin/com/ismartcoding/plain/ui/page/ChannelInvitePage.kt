@@ -108,7 +108,7 @@ fun ChannelInvitePage(
                 PFilledButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.accept),
-                    buttonSize = ButtonSize.EXTRA_LARGE,
+                    buttonSize = ButtonSize.LARGE,
                     isLoading = accepting,
                     enabled = !accepting && !declining,
                     onClick = {
@@ -124,7 +124,7 @@ fun ChannelInvitePage(
                 PFilledButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.decline),
-                    buttonSize = ButtonSize.EXTRA_LARGE,
+                    buttonSize = ButtonSize.LARGE,
                     type = ButtonType.DANGER,
                     isLoading = declining,
                     enabled = !accepting && !declining,

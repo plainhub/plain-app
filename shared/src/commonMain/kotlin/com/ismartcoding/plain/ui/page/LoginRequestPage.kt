@@ -127,7 +127,7 @@ fun LoginRequestPage(
                 PFilledButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.allow),
-                    buttonSize = ButtonSize.EXTRA_LARGE,
+                    buttonSize = ButtonSize.LARGE,
                     isLoading = allowing,
                     enabled = !allowing && !denying,
                     onClick = {
@@ -142,7 +142,7 @@ fun LoginRequestPage(
                 PFilledButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(Res.string.deny),
-                    buttonSize = ButtonSize.EXTRA_LARGE,
+                    buttonSize = ButtonSize.LARGE,
                     type = ButtonType.DANGER,
                     isLoading = denying,
                     enabled = !allowing && !denying,

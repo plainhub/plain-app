@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">Got them, great quality!</string>
     <string name="onboarding_3_share_hint">Share from other apps → forward to a chat in one tap</string>
     <string name="onboarding_4_title">More than file transfer</string>
-    <string name="onboarding_4_body">Photos, music, notes and more handy tools — all work offline. Music supports synced lyrics and on-device AI lyrics extraction.</string>
+    <string name="onboarding_4_body">Photos, music, notes and more handy tools — all work offline. Music supports synced lyrics.</string>
     <string name="onboarding_4_photo_title">Photos &amp; videos</string>
     <string name="onboarding_4_photo_desc">Browse and organize</string>
     <string name="onboarding_4_music_title">Music</string>
-    <string name="onboarding_4_music_desc">Synced lyrics · AI extraction</string>
+    <string name="onboarding_4_music_desc">Synced lyrics</string>
     <string name="onboarding_4_notes_desc">Markdown editing</string>
     <string name="onboarding_4_tools_desc">Scan and more</string>
     <string name="onboarding_5_title">Three steps to get started</string>

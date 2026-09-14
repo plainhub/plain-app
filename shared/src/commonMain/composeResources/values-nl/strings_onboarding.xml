@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">Gehad, wat een mooie kwaliteit!</string>
     <string name="onboarding_3_share_hint">Delen uit andere apps → met één tik doorsturen naar een chat</string>
     <string name="onboarding_4_title">Meer dan bestanden versturen</string>
-    <string name="onboarding_4_body">Foto's, muziek, notities en meer handige tools, allemaal offline; muziek ondersteunt gesynchroniseerde songteksten en AI-songtekstextractie op het apparaat.</string>
+    <string name="onboarding_4_body">Foto's, muziek, notities en meer handige tools, allemaal offline; muziek ondersteunt gesynchroniseerde songteksten.</string>
     <string name="onboarding_4_photo_title">Foto's en video's</string>
     <string name="onboarding_4_photo_desc">Bekijken en organiseren</string>
     <string name="onboarding_4_music_title">Muziek</string>
-    <string name="onboarding_4_music_desc">Gesynchroniseerde songteksten · AI-extractie</string>
+    <string name="onboarding_4_music_desc">Gesynchroniseerde songteksten</string>
     <string name="onboarding_4_notes_desc">Markdown-bewerking</string>
     <string name="onboarding_4_tools_desc">Scannen en meer</string>
     <string name="onboarding_5_title">In drie stappen aan de slag</string>

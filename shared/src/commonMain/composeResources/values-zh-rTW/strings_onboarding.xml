@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">收到了，畫質很棒！</string>
     <string name="onboarding_3_share_hint">其他應用分享 → 一鍵轉傳到聊天</string>
     <string name="onboarding_4_title">不只傳檔案</string>
-    <string name="onboarding_4_body">相簿、音樂、筆記等實用工具，全部離線可用；音樂支援同步歌詞與 AI 歌詞擷取。</string>
+    <string name="onboarding_4_body">相簿、音樂、筆記等實用工具，全部離線可用；音樂支援同步歌詞。</string>
     <string name="onboarding_4_photo_title">照片影片</string>
     <string name="onboarding_4_photo_desc">瀏覽與整理</string>
     <string name="onboarding_4_music_title">音樂</string>
-    <string name="onboarding_4_music_desc">同步歌詞 · AI 擷取</string>
+    <string name="onboarding_4_music_desc">同步歌詞</string>
     <string name="onboarding_4_notes_desc">Markdown 編輯</string>
     <string name="onboarding_4_tools_desc">掃描 · 更多</string>
     <string name="onboarding_5_title">三步，開始使用</string>

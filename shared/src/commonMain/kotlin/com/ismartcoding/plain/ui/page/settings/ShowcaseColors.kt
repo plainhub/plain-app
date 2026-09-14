@@ -34,7 +34,6 @@ fun ShowcaseColors() {
             "cardBackgroundNormal" to cs.cardBackgroundNormal,
             "cardBackgroundActive" to cs.cardBackgroundActive,
             "circleBackground" to cs.circleBackground,
-            "secondaryTextColor" to cs.secondaryTextColor,
             "waveInactiveColor" to cs.waveInactiveColor,
             "badgeBorderColor" to cs.badgeBorderColor,
             "lightMask" to cs.lightMask(),

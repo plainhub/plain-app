@@ -92,13 +92,13 @@ internal fun PomodoroTimerSection(
             PFilledButton(
                 modifier = Modifier.weight(1f),
                 text = stringResource(Res.string.pause),
-                buttonSize = ButtonSize.EXTRA_LARGE,
+                buttonSize = ButtonSize.LARGE,
                 onClick = { pomodoroVM.pauseSession(); sendPomodoroAction("pause", pomodoroVM) },
             )
             PFilledButton(
                 modifier = Modifier.weight(1f),
                 text = stringResource(Res.string.stop),
-                buttonSize = ButtonSize.EXTRA_LARGE,
+                buttonSize = ButtonSize.LARGE,
                 type = ButtonType.DANGER,
                 onClick = {
                     pomodoroVM.resetTimer()
@@ -113,7 +113,7 @@ internal fun PomodoroTimerSection(
                 pomodoroVM.isPaused.value -> stringResource(Res.string.resume)
                 else -> stringResource(Res.string.start)
             },
-            buttonSize = ButtonSize.EXTRA_LARGE,
+            buttonSize = ButtonSize.LARGE,
             onClick = {
                 onCheckNotificationPermission {
                     scope.launch(Dispatchers.Default) {

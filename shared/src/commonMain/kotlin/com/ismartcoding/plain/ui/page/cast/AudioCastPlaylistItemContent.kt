@@ -32,7 +32,6 @@ import com.ismartcoding.plain.ui.components.PulsatingWave
 import com.ismartcoding.plain.ui.theme.circleBackground
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
 internal fun ReorderableCollectionItemScope.AudioCastPlaylistItemContent(
@@ -59,7 +58,7 @@ internal fun ReorderableCollectionItemScope.AudioCastPlaylistItemContent(
             when {
                 isLoading -> CircularProgressIndicator(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
                 isPlaying -> PulsatingWave(isPlaying = true, color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.align(Alignment.Center))
-                else -> Text(text = "${index + 1}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.secondaryTextColor)
+                else -> Text(text = "${index + 1}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
         HorizontalSpace(16.dp)

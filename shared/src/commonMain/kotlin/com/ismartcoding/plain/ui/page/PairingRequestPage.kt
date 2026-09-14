@@ -149,7 +149,7 @@ fun PairingRequestPage(
                     PFilledButton(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(Res.string.close),
-                        buttonSize = ButtonSize.EXTRA_LARGE,
+                        buttonSize = ButtonSize.LARGE,
                         onClick = { navController.popBackStack() },
                     )
                 } else {
@@ -166,7 +166,7 @@ fun PairingRequestPage(
                     PFilledButton(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(Res.string.allow),
-                        buttonSize = ButtonSize.EXTRA_LARGE,
+                        buttonSize = ButtonSize.LARGE,
                         isLoading = accepting,
                         enabled = !accepting && !denying,
                         onClick = {
@@ -181,7 +181,7 @@ fun PairingRequestPage(
                     PFilledButton(
                         modifier = Modifier.fillMaxWidth(),
                         text = stringResource(Res.string.deny),
-                        buttonSize = ButtonSize.EXTRA_LARGE,
+                        buttonSize = ButtonSize.LARGE,
                         type = ButtonType.DANGER,
                         isLoading = denying,
                         enabled = !accepting && !denying,

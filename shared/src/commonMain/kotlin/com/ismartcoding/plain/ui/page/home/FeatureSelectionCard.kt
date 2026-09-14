@@ -26,7 +26,6 @@ import com.ismartcoding.plain.ui.base.reorderable.ReorderableCollectionItemScope
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.circleBackground
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
 internal fun ReorderableCollectionItemScope.EnabledFeatureCard(
@@ -58,7 +57,7 @@ internal fun ReorderableCollectionItemScope.EnabledFeatureCard(
                 Text(
                     text = "${index + 1}",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondaryTextColor,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             HorizontalSpace(12.dp)

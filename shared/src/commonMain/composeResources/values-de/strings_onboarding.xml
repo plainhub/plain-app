@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">Bekommen, tolle Qualität!</string>
     <string name="onboarding_3_share_hint">Aus anderen Apps teilen → mit einem Tipp in den Chat weiterleiten</string>
     <string name="onboarding_4_title">Mehr als Dateiübertragung</string>
-    <string name="onboarding_4_body">Fotos, Musik, Notizen und mehr — alles offline nutzbar. Musik unterstützt synchronisierte Lyrics und KI-Lyrics-Extraktion auf dem Gerät.</string>
+    <string name="onboarding_4_body">Fotos, Musik, Notizen und mehr — alles offline nutzbar. Musik unterstützt synchronisierte Lyrics.</string>
     <string name="onboarding_4_photo_title">Fotos und Videos</string>
     <string name="onboarding_4_photo_desc">Ansehen und sortieren</string>
     <string name="onboarding_4_music_title">Musik</string>
-    <string name="onboarding_4_music_desc">Synchronisierte Lyrics · KI-Extraktion</string>
+    <string name="onboarding_4_music_desc">Synchronisierte Lyrics</string>
     <string name="onboarding_4_notes_desc">Markdown-Bearbeitung</string>
     <string name="onboarding_4_tools_desc">Scannen und mehr</string>
     <string name="onboarding_5_title">In drei Schritten starten</string>

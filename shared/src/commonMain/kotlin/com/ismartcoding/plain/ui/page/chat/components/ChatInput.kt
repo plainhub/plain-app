@@ -29,7 +29,6 @@ import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
 fun ChatInput(
@@ -60,7 +59,7 @@ fun ChatInput(
             placeholder = {
                 Text(
                     hint,
-                    color = MaterialTheme.colorScheme.secondaryTextColor,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },

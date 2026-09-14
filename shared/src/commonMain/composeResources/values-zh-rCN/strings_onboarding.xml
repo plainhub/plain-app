@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">收到，画质很棒！</string>
     <string name="onboarding_3_share_hint">其他应用分享 → 一键转发到聊天</string>
     <string name="onboarding_4_title">不止传文件</string>
-    <string name="onboarding_4_body">相册、音乐、笔记等实用工具，全部离线可用；音乐支持同步歌词与 AI 歌词提取。</string>
+    <string name="onboarding_4_body">相册、音乐、笔记等实用工具，全部离线可用；音乐支持同步歌词。</string>
     <string name="onboarding_4_photo_title">照片视频</string>
     <string name="onboarding_4_photo_desc">浏览与整理</string>
     <string name="onboarding_4_music_title">音乐</string>
-    <string name="onboarding_4_music_desc">同步歌词 · AI 提取</string>
+    <string name="onboarding_4_music_desc">同步歌词</string>
     <string name="onboarding_4_notes_desc">Markdown 编辑</string>
     <string name="onboarding_4_tools_desc">扫码 · 更多</string>
     <string name="onboarding_5_title">三步，开始使用</string>

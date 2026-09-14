@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">Получил, качество отличное!</string>
     <string name="onboarding_3_share_hint">Поделиться из других приложений → переслать в чат одним касанием</string>
     <string name="onboarding_4_title">Больше чем передача файлов</string>
-    <string name="onboarding_4_body">Фото, музыка, заметки и другие полезные инструменты — всё офлайн; в музыке есть синхронизированные тексты и ИИ-извлечение текстов на устройстве.</string>
+    <string name="onboarding_4_body">Фото, музыка, заметки и другие полезные инструменты — всё офлайн; в музыке есть синхронизированные тексты.</string>
     <string name="onboarding_4_photo_title">Фото и видео</string>
     <string name="onboarding_4_photo_desc">Просмотр и порядок</string>
     <string name="onboarding_4_music_title">Музыка</string>
-    <string name="onboarding_4_music_desc">Синхро-тексты · ИИ-извлечение</string>
+    <string name="onboarding_4_music_desc">Синхро-тексты</string>
     <string name="onboarding_4_notes_desc">Редактирование Markdown</string>
     <string name="onboarding_4_tools_desc">Сканер и другое</string>
     <string name="onboarding_5_title">Три шага для начала</string>

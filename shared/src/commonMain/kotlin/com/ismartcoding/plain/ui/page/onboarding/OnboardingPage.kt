@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.onboarding
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,6 +39,7 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.StepNumber
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.launch
@@ -133,19 +133,7 @@ fun OnboardingPage(navController: NavHostController) {
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
         )
-        if (isLast) {
-            Text(
-                text = stringResource(Res.string.onboarding_revisit_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp, bottom = 16.dp),
-            )
-        } else {
-            VerticalSpace(dp = 28.dp)
-        }
+        VerticalSpace(dp = 28.dp)
     }
 }
 
@@ -231,7 +219,7 @@ private fun SlideFrame(
             VerticalSpace(dp = 16.dp)
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 badges.forEach { BadgeChip(it) }
@@ -245,8 +233,7 @@ private fun BadgeChip(text: String) {
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
-            .background(MaterialTheme.colorScheme.surface)
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(50))
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp),
@@ -261,6 +248,7 @@ private fun BadgeChip(text: String) {
             text = text,
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -290,7 +278,7 @@ private fun SlideGetStarted() {
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(50))
+                .background(MaterialTheme.colorScheme.cardBackgroundNormal)
                 .padding(horizontal = 14.dp, vertical = 7.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -308,6 +296,13 @@ private fun SlideGetStarted() {
                 fontFamily = FontFamily.Monospace,
             )
         }
+        VerticalSpace(dp = 16.dp)
+        Text(
+            text = stringResource(Res.string.onboarding_revisit_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -315,10 +310,12 @@ private fun SlideGetStarted() {
 private fun StepRow(index: Int, title: String, description: String) {
     Row(verticalAlignment = Alignment.Top) {
         StepNumber(num = index)
-        Column(Modifier.padding(vertical = 8.dp)) {
+        Column {
+            VerticalSpace(dp = 4.dp)
             Text(text = title, style = MaterialTheme.typography.listItemTitle())
             VerticalSpace(dp = 8.dp)
             Text(text = description, style = MaterialTheme.typography.listItemSubtitle())
+            VerticalSpace(dp = 8.dp)
         }
     }
 }

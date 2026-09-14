@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">Nhận được rồi, chất lượng đẹp quá!</string>
     <string name="onboarding_3_share_hint">Chia sẻ từ ứng dụng khác → chuyển tiếp vào trò chuyện với một chạm</string>
     <string name="onboarding_4_title">Không chỉ là truyền tệp</string>
-    <string name="onboarding_4_body">Ảnh, nhạc, ghi chú và nhiều công cụ hữu ích, tất cả hoạt động ngoại tuyến; nhạc hỗ trợ lời bài hát đồng bộ và trích xuất lời bằng AI ngay trên thiết bị.</string>
+    <string name="onboarding_4_body">Ảnh, nhạc, ghi chú và nhiều công cụ hữu ích, tất cả hoạt động ngoại tuyến; nhạc hỗ trợ lời bài hát đồng bộ.</string>
     <string name="onboarding_4_photo_title">Ảnh và video</string>
     <string name="onboarding_4_photo_desc">Xem và sắp xếp</string>
     <string name="onboarding_4_music_title">Nhạc</string>
-    <string name="onboarding_4_music_desc">Lời đồng bộ · Trích xuất AI</string>
+    <string name="onboarding_4_music_desc">Lời đồng bộ</string>
     <string name="onboarding_4_notes_desc">Chỉnh sửa Markdown</string>
     <string name="onboarding_4_tools_desc">Quét và hơn thế</string>
     <string name="onboarding_5_title">Ba bước để bắt đầu</string>

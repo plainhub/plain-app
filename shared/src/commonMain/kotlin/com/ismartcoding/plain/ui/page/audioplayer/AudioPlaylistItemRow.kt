@@ -50,7 +50,7 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
                 if (isPlaying) {
                     PulsatingWave(isPlaying = true, color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.align(Alignment.Center))
                 } else {
-                    Text(text = "${index + 1}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.secondaryTextColor)
+                    Text(text = "${index + 1}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             HorizontalSpace(16.dp)

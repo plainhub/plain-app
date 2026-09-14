@@ -42,7 +42,6 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.text.ifEmpty
@@ -99,7 +98,7 @@ fun CastSessionPlaylistItem(
                 else -> Icon(
                     painter = painterResource(Res.drawable.file),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondaryTextColor,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

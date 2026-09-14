@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
 fun LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
@@ -28,7 +27,7 @@ fun LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
             Text(
                 text = stringResource(Res.string.loading),
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.secondaryTextColor,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }

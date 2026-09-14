@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">받았어! 화질 좋네</string>
     <string name="onboarding_3_share_hint">다른 앱에서 공유 → 탭 한 번으로 채팅에 전달</string>
     <string name="onboarding_4_title">파일 전송 그 이상</string>
-    <string name="onboarding_4_body">사진·음악·메모 등 유용한 도구를 모두 오프라인으로; 음악은 가사 동기화와 기기 내 AI 가사 추출을 지원합니다.</string>
+    <string name="onboarding_4_body">사진·음악·메모 등 유용한 도구를 모두 오프라인으로; 음악은 가사 동기화를 지원합니다.</string>
     <string name="onboarding_4_photo_title">사진 및 동영상</string>
     <string name="onboarding_4_photo_desc">보기 및 정리</string>
     <string name="onboarding_4_music_title">음악</string>
-    <string name="onboarding_4_music_desc">가사 동기화 · AI 추출</string>
+    <string name="onboarding_4_music_desc">가사 동기화</string>
     <string name="onboarding_4_notes_desc">Markdown 편집</string>
     <string name="onboarding_4_tools_desc">스캔 그 외</string>
     <string name="onboarding_5_title">세 단계로 시작하기</string>

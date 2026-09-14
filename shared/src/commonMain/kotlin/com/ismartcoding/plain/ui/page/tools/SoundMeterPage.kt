@@ -123,12 +123,12 @@ fun SoundMeterPage(navController: NavHostController) {
                         PFilledButton(
                             modifier = Modifier.weight(1f),
                             text = stringResource(Res.string.stop),
-                            buttonSize = ButtonSize.EXTRA_LARGE,
+                            buttonSize = ButtonSize.LARGE,
                             onClick = { isRunning.value = false })
                         PFilledButton(
                             modifier = Modifier.weight(1f),
                             text = stringResource(Res.string.reset),
-                            buttonSize = ButtonSize.EXTRA_LARGE,
+                            buttonSize = ButtonSize.LARGE,
                             type = ButtonType.DANGER,
                             onClick = {
                                 total.floatValue = 0f; count.intValue = 0; decibel.floatValue = 0f
@@ -145,7 +145,7 @@ fun SoundMeterPage(navController: NavHostController) {
                         PFilledButton(
                             modifier = Modifier.weight(1f),
                             text = stringResource(Res.string.start),
-                            buttonSize = ButtonSize.EXTRA_LARGE,
+                            buttonSize = ButtonSize.LARGE,
                             onClick = {
                                 if (Permission.RECORD_AUDIO.isGranted()) isRunning.value = true
                                 else sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))
@@ -153,7 +153,7 @@ fun SoundMeterPage(navController: NavHostController) {
                         PFilledButton(
                             modifier = Modifier.weight(1f),
                             text = stringResource(Res.string.reset),
-                            buttonSize = ButtonSize.EXTRA_LARGE,
+                            buttonSize = ButtonSize.LARGE,
                             type = ButtonType.DANGER,
                             onClick = {
                                 total.floatValue = 0f; count.intValue = 0; decibel.floatValue = 0f
@@ -166,7 +166,7 @@ fun SoundMeterPage(navController: NavHostController) {
                             .padding(horizontal = 16.dp)
                             .fillMaxWidth(),
                         text = stringResource(Res.string.start),
-                        buttonSize = ButtonSize.EXTRA_LARGE,
+                        buttonSize = ButtonSize.LARGE,
                         onClick = {
                             if (Permission.RECORD_AUDIO.isGranted()) isRunning.value = true
                             else sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))

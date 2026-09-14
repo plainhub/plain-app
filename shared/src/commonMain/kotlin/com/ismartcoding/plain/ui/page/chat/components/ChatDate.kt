@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.formatDate
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
 fun ChatDate(
@@ -43,7 +42,7 @@ fun ChatDate(
         ) {
             Text(
                 text = m.createdAt.formatDate(),
-                color = MaterialTheme.colorScheme.secondaryTextColor,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
             )
         }

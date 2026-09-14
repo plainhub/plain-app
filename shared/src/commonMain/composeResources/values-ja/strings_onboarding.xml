@@ -16,11 +16,11 @@
     <string name="onboarding_3_bubble_out">受け取ったよ、画質いいね！</string>
     <string name="onboarding_3_share_hint">他のアプリから共有 → ワンタップでチャットへ転送</string>
     <string name="onboarding_4_title">ファイル転送だけじゃない</string>
-    <string name="onboarding_4_body">写真・音楽・メモなど便利なツールがすべてオフラインで使えます。音楽は同期歌詞と端末内 AI 歌詞抽出に対応。</string>
+    <string name="onboarding_4_body">写真・音楽・メモなど便利なツールがすべてオフラインで使えます。音楽は同期歌詞に対応。</string>
     <string name="onboarding_4_photo_title">写真と動画</string>
     <string name="onboarding_4_photo_desc">閲覧と整理</string>
     <string name="onboarding_4_music_title">音楽</string>
-    <string name="onboarding_4_music_desc">同期歌詞 · AI 抽出</string>
+    <string name="onboarding_4_music_desc">同期歌詞</string>
     <string name="onboarding_4_notes_desc">Markdown 編集</string>
     <string name="onboarding_4_tools_desc">スキャン その他</string>
     <string name="onboarding_5_title">3 ステップで始めよう</string>
