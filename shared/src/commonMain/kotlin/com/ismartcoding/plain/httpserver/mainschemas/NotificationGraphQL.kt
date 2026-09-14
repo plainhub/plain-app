@@ -12,6 +12,7 @@ import com.ismartcoding.plain.platform.filterNotificationsAsync
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.Notification
 import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.platform.replyNotification
 
 @GraphQLQuery
 suspend fun notifications(): List<Notification> {
@@ -21,13 +22,14 @@ suspend fun notifications(): List<Notification> {
 
 @GraphQLMutation
 suspend fun cancelNotifications(ids: List<ID>): Boolean {
+    Permission.NOTIFICATION_LISTENER.checkEnabledAsync()
     sendEvent(HCancelNotificationsEvent(ids.map { it.value }.toSet()))
     return true
 }
 
 @GraphQLMutation
 suspend fun replyNotification(id: ID, actionIndex: Int, text: String): Boolean {
-    val ok = com.ismartcoding.plain.platform.replyNotification(id.value, actionIndex, text)
+    val ok = replyNotification(id.value, actionIndex, text)
     if (!ok) {
         throw GraphQLError("action_not_found")
     }
