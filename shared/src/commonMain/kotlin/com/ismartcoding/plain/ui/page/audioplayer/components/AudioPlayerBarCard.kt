@@ -4,6 +4,7 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -75,9 +76,9 @@ fun AudioPlayerBarCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.clip(RoundedCornerShape(12.dp)).weight(1f).clickable { onClickContent() }.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                    Text(text = title, style = MaterialTheme.typography.listItemTitle(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = title, style = MaterialTheme.typography.listItemTitle(), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE))
                     VerticalSpace(4.dp)
-                    Text(text = artist, style = MaterialTheme.typography.listItemSubtitle(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = artist, style = MaterialTheme.typography.listItemSubtitle(), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE))
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(

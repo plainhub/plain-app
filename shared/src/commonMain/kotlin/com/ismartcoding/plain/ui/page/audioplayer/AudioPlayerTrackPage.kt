@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -118,7 +119,8 @@ internal fun AudioPlayerTrackPage(
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth(),
+                // Skip the marquee once fully faded into the lyrics view.
+                modifier = Modifier.fillMaxWidth().then(if (p < 1f) Modifier.basicMarquee(iterations = Int.MAX_VALUE) else Modifier),
             )
             Text(
                 text = item.artist,
@@ -127,7 +129,7 @@ internal fun AudioPlayerTrackPage(
                 textAlign = TextAlign.Center,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().then(if (p < 1f) Modifier.basicMarquee(iterations = Int.MAX_VALUE) else Modifier),
             )
             if (hasLyrics) {
                 val parsed = lyrics.orEmpty()
@@ -179,6 +181,7 @@ internal fun AudioPlayerTrackPage(
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
                 )
                 Text(
                     text = item.artist,
@@ -186,6 +189,7 @@ internal fun AudioPlayerTrackPage(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
                 )
             }
             IconButton(
