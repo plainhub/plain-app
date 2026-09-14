@@ -108,7 +108,7 @@ private fun TargetRow(option: ChatTargetOption, selected: Boolean, enabled: Bool
             Text(
                 text = option.title,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,

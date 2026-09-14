@@ -115,7 +115,7 @@ fun DlnaReceiverImageViewerContent(onExit: () -> Unit) {
                 Text(
                     text = mediaTitle,
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     color = Color.White,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

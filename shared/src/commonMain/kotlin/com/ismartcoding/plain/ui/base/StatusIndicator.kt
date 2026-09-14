@@ -86,7 +86,7 @@ fun StatusIndicator(
             }
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = textColor,
                 modifier = Modifier.padding(start = textStartPadding),
             )

@@ -49,7 +49,7 @@ fun PCircularButton(
         Text(
             text = text,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground
         )

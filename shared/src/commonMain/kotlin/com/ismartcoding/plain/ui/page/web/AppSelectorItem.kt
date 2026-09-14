@@ -55,7 +55,7 @@ internal fun AppSelectorItem(
             Text(
                 text = app.name,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold
                 ),
                 color = MaterialTheme.colorScheme.onSurface
             )

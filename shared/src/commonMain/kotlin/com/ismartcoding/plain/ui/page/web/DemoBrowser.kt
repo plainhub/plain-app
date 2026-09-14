@@ -211,7 +211,7 @@ internal fun DemoLoginPage() {
                 Text(
                     text = "Log in",
                     style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     color = Color.White,
                 )
             }

@@ -123,7 +123,7 @@ private fun DemoErrorPage(host: String, expanded: Boolean, ringOnAdvanced: Boole
                 Text(
                     text = stringResource(Res.string.faq_https_demo_advanced),
                     style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(Modifier.width(4.dp))
@@ -146,7 +146,7 @@ private fun DemoErrorPage(host: String, expanded: Boolean, ringOnAdvanced: Boole
                 Text(
                     text = stringResource(Res.string.faq_https_demo_proceed, host),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
                     textDecoration = TextDecoration.Underline,
                 )

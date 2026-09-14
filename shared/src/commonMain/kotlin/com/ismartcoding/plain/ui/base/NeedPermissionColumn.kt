@@ -87,7 +87,7 @@ fun NeedPermissionColumn(
                     Text(
                         text = stringResource(Res.string.grant_access),
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
             }

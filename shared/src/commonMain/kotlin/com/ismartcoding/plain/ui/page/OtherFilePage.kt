@@ -94,7 +94,7 @@ fun OtherFilePage(
                                 modifier = Modifier
                                     .padding(horizontal = 32.dp),
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Medium,
+                                fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                         }

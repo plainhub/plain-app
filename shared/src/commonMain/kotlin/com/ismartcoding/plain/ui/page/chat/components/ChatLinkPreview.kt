@@ -52,7 +52,7 @@ fun ChatLinkPreview(linkPreview: DLinkPreview, modifier: Modifier = Modifier) {
                     Surface(modifier = Modifier.wrapContentSize(), color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), shape = RoundedCornerShape(4.dp)) {
                         Text(text = domain.uppercase(), modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Medium, fontSize = 10.sp)
+                            fontWeight = FontWeight.SemiBold, fontSize = 10.sp)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                 }

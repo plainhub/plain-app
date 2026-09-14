@@ -101,18 +101,6 @@ object DialogHelper {
         }
     }
 
-    fun confirmToLeave(
-        callback: () -> Unit,
-    ) {
-        coIO {
-            sendEvent(ConfirmDialogEvent(
-                getComposeString(Res.string.leave_page_title),
-                getComposeString(Res.string.leave_page_message),
-                confirmButton = Pair(getComposeString(Res.string.leave)) { callback() },
-                dismissButton = Pair(getComposeString(Res.string.cancel)) {}))
-        }
-    }
-
     fun confirmToDelete(
         callback: () -> Unit,
     ) {
@@ -121,7 +109,7 @@ object DialogHelper {
 
     fun showTextCopiedMessage(text: String) {
         coIO {
-            showConfirmDialog("", getComposeString(Res.string.copied_to_clipboard_format, text))
+            showMessage(getComposeString(Res.string.copied_to_clipboard_format, text))
         }
     }
 }

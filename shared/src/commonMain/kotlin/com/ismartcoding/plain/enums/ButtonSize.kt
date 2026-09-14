@@ -23,8 +23,8 @@ enum class ButtonSize(val height: Dp, val cornerRadius: Dp) {
     }
 
     fun fontWeight() = when (this) {
-        SMALL -> FontWeight.Medium
-        MEDIUM -> FontWeight.Medium
+        SMALL -> FontWeight.SemiBold
+        MEDIUM -> FontWeight.SemiBold
         LARGE -> FontWeight.SemiBold
         EXTRA_LARGE -> FontWeight.SemiBold
     }

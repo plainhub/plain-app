@@ -50,13 +50,13 @@ val SystemTypography = Typography(
         letterSpacing = 0.sp,
     ),
     titleMedium = TextStyle(
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.2.sp,
     ),
     titleSmall = TextStyle(
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp,

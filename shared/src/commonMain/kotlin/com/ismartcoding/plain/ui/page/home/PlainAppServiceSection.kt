@@ -73,7 +73,7 @@ fun PlainAppServiceSection(
                         else -> stringResource(Res.string.plainapp_service_on)
                     },
                     style = MaterialTheme.typography.headlineSmall.copy(
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                         lineHeight = 24.sp,
                     ),
                     color = MaterialTheme.colorScheme.onSurface,

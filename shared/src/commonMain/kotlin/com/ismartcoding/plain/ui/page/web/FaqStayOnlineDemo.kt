@@ -126,7 +126,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                         Text(
                             text = stringResource(Res.string.stay_online),
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary,
                         )
                     }
@@ -146,7 +146,7 @@ private fun DemoHomeScreen(ring: Boolean, url: String) {
                         Text(
                             text = stringResource(Res.string.stop_service),
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
@@ -261,7 +261,7 @@ private fun DemoStayOnlineOverlay(ring: Boolean) {
                 Text(
                     text = stringResource(Res.string.stay_online_go_dark_now),
                     style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     color = Color.White.copy(alpha = 0.85f),
                 )
             }

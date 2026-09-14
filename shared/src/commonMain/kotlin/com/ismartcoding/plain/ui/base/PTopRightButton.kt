@@ -25,7 +25,7 @@ fun PTopRightButton(
         Text(
             text = label,
             fontSize = 17.sp,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.primary,
         )
     }

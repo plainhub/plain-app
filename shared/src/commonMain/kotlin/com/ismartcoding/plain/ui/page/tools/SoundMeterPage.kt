@@ -79,7 +79,7 @@ fun SoundMeterPage(navController: NavHostController) {
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
                             text = FormatHelper.formatFloat(abs(decibel.floatValue), digits = 1),
-                            style = MaterialTheme.typography.displayLarge.copy(fontSize = 80.sp, fontWeight = FontWeight.Medium),
+                            style = MaterialTheme.typography.displayLarge.copy(fontSize = 80.sp, fontWeight = FontWeight.SemiBold),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         HorizontalSpace(dp = 16.dp)

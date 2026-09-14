@@ -91,7 +91,7 @@ fun PAlert(
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = description,
-                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = if (trailing != null) Modifier.weight(1f) else Modifier,
                     )

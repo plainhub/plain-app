@@ -75,7 +75,7 @@ fun PlaybackSpeedButton(
                     text = currentLabel,
                     color = tint,
                     fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
         }

@@ -103,7 +103,7 @@ fun VideoOverlayScaffold(
                         Text(
                             text = title.ifEmpty { stringResource(Res.string.unknown) },
                             style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.SemiBold,
                             color = Color.White,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -152,13 +152,13 @@ fun VideoOverlayScaffold(
                         text = positionMs.formatMinSec(),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White.copy(alpha = 0.85f),
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                     )
                     Text(
                         text = durationMs.formatMinSec(),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White.copy(alpha = 0.85f),
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
                 // Progress slider

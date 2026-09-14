@@ -30,7 +30,7 @@ fun ChatLinkPreviewLoading(url: String, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = stringResource(Res.string.loading_link_preview), style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
@@ -54,12 +54,12 @@ fun ChatLinkPreviewError(url: String, modifier: Modifier = Modifier) {
                 Surface(modifier = Modifier.wrapContentSize(), color = MaterialTheme.colorScheme.error.copy(alpha = 0.15f), shape = RoundedCornerShape(4.dp)) {
                     Text(text = "ERROR", modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.Medium, fontSize = 10.sp)
+                        fontWeight = FontWeight.SemiBold, fontSize = 10.sp)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = stringResource(Res.string.link_preview_error), style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Medium)
+                color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)

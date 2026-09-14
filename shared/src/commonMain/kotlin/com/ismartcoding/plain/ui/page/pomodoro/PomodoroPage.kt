@@ -75,7 +75,7 @@ fun PomodoroPage(
             .padding(horizontal = 24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             item {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                    Text(text = pomodoroVM.currentState.value.getText(), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium)
+                    Text(text = pomodoroVM.currentState.value.getText(), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
                 }
                 VerticalSpace(dp = 8.dp)
                 Text(
@@ -94,7 +94,7 @@ fun PomodoroPage(
                     .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(Res.string.today_completed), style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium, textAlign = TextAlign.Center
+                        color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center
                     )
                     VerticalSpace(dp = 16.dp)
                     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
@@ -112,7 +112,7 @@ fun PomodoroPage(
                     Text(
                         text = pluralStringResource(Res.plurals.n_pomodoros, pomodoroVM.completedCount.intValue, pomodoroVM.completedCount.intValue),
                         style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
+                        fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth()
                     )
                 }
                 BottomSpace(paddingValues)

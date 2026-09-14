@@ -270,7 +270,7 @@ private fun parseScopeFontWeight(value: String): FontWeight {
     return when (value) {
         "bold" -> FontWeight.Bold
         "semibold", "600" -> FontWeight.SemiBold
-        "medium", "500" -> FontWeight.Medium
+        "medium", "500" -> FontWeight.SemiBold
         "light", "300" -> FontWeight.Light
         else -> FontWeight.Normal
     }

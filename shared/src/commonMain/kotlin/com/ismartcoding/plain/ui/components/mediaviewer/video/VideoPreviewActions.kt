@@ -95,7 +95,7 @@ fun VideoPreviewActions(
                 Text(
                     modifier = Modifier.width(52.dp),
                     text = videoState.currentTime.formatMinSec(),
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White,
                     textAlign = TextAlign.Center,
@@ -111,7 +111,7 @@ fun VideoPreviewActions(
                 Text(
                     modifier = Modifier.width(52.dp),
                     text = videoState.totalTime.formatMinSec(),
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White,
                     textAlign = TextAlign.Center,
