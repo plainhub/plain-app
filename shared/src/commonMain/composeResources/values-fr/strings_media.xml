@@ -63,27 +63,4 @@
     <string name="exit_fullscreen">Sortir du plein écran</string>
     <string name="mute">Muet</string>
     <string name="unmute">Activer le son</string>
-    <string name="extract_lyrics">Extraire les paroles</string>
-    <string name="extract_lyrics_hint">Transcrivez l'audio sur l'appareil avec Whisper pour obtenir des paroles synchronisées. Entièrement hors ligne — votre audio ne quitte jamais le téléphone.</string>
-    <string name="choose_model">Choisir un modèle</string>
-    <string name="model_not_downloaded">Aucun modèle téléchargé</string>
-    <string name="model_download_hint">Téléchargez un modèle une fois avant l'extraction (75–466 Mo)</string>
-    <string name="model_ready">Prêt</string>
-    <string name="change_model">Modifier</string>
-    <string name="model_privacy_note">Les modèles sont téléchargés une seule fois et fonctionnent ensuite entièrement hors ligne. La reconnaissance s'exécute sur votre téléphone ; les fichiers audio ne sont jamais envoyés.</string>
-    <string name="model_downloading">Téléchargement</string>
-    <string name="model_download_failed">Échec du téléchargement</string>
-    <string name="model_desc_tiny">Le plus rapide · précision moindre</string>
-    <string name="model_desc_base">Équilibré entre vitesse et précision</string>
-    <string name="model_desc_small">Le plus précis · idéal pour les chansons en chinois</string>
-    <string name="recognized_language">Langue de reconnaissance</string>
-    <string name="auto_detect">Détection auto</string>
-    <string name="current_song">Titre en cours</string>
-    <string name="songs_without_lyrics">%1$d titres sans paroles</string>
-    <string name="extract_all">Tout extraire</string>
-    <string name="extract">Extraire</string>
-    <string name="waiting">En attente</string>
-    <string name="no_speech">Pas de chant</string>
-    <string name="extract_failed">Échec</string>
-    <string name="model_downloaded">Téléchargé</string>
 </resources>

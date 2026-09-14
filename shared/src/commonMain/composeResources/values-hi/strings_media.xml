@@ -63,27 +63,4 @@
     <string name="exit_fullscreen">फुल स्क्रीन से बाहर निकलें</string>
     <string name="mute">म्यूट</string>
     <string name="unmute">अनम्यूट</string>
-    <string name="extract_lyrics">बोल प्राप्त करें</string>
-    <string name="extract_lyrics_hint">डिवाइस पर Whisper वाणी पहचान से ऑडियो में सिंक किए गए बोल प्राप्त करें। पूरी तरह ऑफ़लाइन — आपका ऑडियो कभी फ़ोन से बाहर नहीं जाता।</string>
-    <string name="choose_model">मॉडल चुनें</string>
-    <string name="model_not_downloaded">अभी कोई मॉडल डाउनलोड नहीं हुआ</string>
-    <string name="model_download_hint">निकालने से पहले एक बार मॉडल डाउनलोड करें (75–466 MB)</string>
-    <string name="model_ready">तैयार</string>
-    <string name="change_model">बदलें</string>
-    <string name="model_privacy_note">मॉडल एक बार डाउनलोड होते हैं और फिर पूरी तरह ऑफ़लाइन काम करते हैं। पहचान आपके फ़ोन पर चलती है; ऑडियो फ़ाइलें कभी अपलोड नहीं होतीं।</string>
-    <string name="model_downloading">डाउनलोड हो रहा है</string>
-    <string name="model_download_failed">डाउनलोड विफल</string>
-    <string name="model_desc_tiny">सबसे तेज़ · कम सटीकता</string>
-    <string name="model_desc_base">गति और सटीकता का संतुलन</string>
-    <string name="model_desc_small">सबसे सटीक · चीनी गानों के लिए सर्वोत्तम</string>
-    <string name="recognized_language">पहचान भाषा</string>
-    <string name="auto_detect">स्वतः पहचान</string>
-    <string name="current_song">वर्तमान गाना</string>
-    <string name="songs_without_lyrics">%1$d गाने बिना बोल के</string>
-    <string name="extract_all">सभी निकालें</string>
-    <string name="extract">निकालें</string>
-    <string name="waiting">प्रतीक्षा में</string>
-    <string name="no_speech">कोई स्वर नहीं</string>
-    <string name="extract_failed">विफल</string>
-    <string name="model_downloaded">डाउनलोड हो गया</string>
 </resources>

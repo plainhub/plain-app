@@ -63,27 +63,4 @@
     <string name="exit_fullscreen">Vollbildmodus verlassen</string>
     <string name="mute">Stumm</string>
     <string name="unmute">Ton einschalten</string>
-    <string name="extract_lyrics">Songtexte extrahieren</string>
-    <string name="extract_lyrics_hint">Mit Whisper-Spracherkennung auf dem Gerät synchronisierte Songtexte aus Audio erstellen. Vollständig offline — Ihr Audio verlässt das Telefon nie.</string>
-    <string name="choose_model">Modell wählen</string>
-    <string name="model_not_downloaded">Noch kein Modell heruntergeladen</string>
-    <string name="model_download_hint">Vor dem Extrahieren einmalig ein Modell herunterladen (75–466 MB)</string>
-    <string name="model_ready">Bereit</string>
-    <string name="change_model">Ändern</string>
-    <string name="model_privacy_note">Modelle werden einmal heruntergeladen und funktionieren danach vollständig offline. Die Erkennung läuft auf Ihrem Telefon; Audiodateien werden niemals hochgeladen.</string>
-    <string name="model_downloading">Wird heruntergeladen</string>
-    <string name="model_download_failed">Download fehlgeschlagen</string>
-    <string name="model_desc_tiny">Am schnellsten · geringere Genauigkeit</string>
-    <string name="model_desc_base">Ausgewogen in Geschwindigkeit und Genauigkeit</string>
-    <string name="model_desc_small">Am genauesten · ideal für chinesische Songs</string>
-    <string name="recognized_language">Erkennungssprache</string>
-    <string name="auto_detect">Automatisch erkennen</string>
-    <string name="current_song">Aktueller Song</string>
-    <string name="songs_without_lyrics">%1$d Songs ohne Songtext</string>
-    <string name="extract_all">Alle extrahieren</string>
-    <string name="extract">Extrahieren</string>
-    <string name="waiting">Wartet</string>
-    <string name="no_speech">Kein Gesang</string>
-    <string name="extract_failed">Fehlgeschlagen</string>
-    <string name="model_downloaded">Heruntergeladen</string>
 </resources>

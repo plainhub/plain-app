@@ -127,15 +127,7 @@ android {
         compose = true
     }
 
-    // Whisper lyrics extraction: native build of vendored whisper.cpp + JNI
-    // bridge (app/src/main/cpp/). The Kotlin declarations live in
-    // :shared androidMain (com.ismartcoding.plain.platform.WhisperJni).
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
-        }
-    }
+
 
     packaging {
         jniLibs {

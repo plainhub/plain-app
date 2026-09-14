@@ -55,7 +55,7 @@ fun PlainAppServiceSection(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        shape = RoundedCornerShape(PlainTheme.CARD_RADIUS),
+        shape = RoundedCornerShape(24.dp),
         color = MaterialTheme.colorScheme.primaryContainer,
     ) {
         Column {

@@ -63,27 +63,4 @@
     <string name="exit_fullscreen">Выйти из полноэкранного режима</string>
     <string name="mute">Без звука</string>
     <string name="unmute">Включить звук</string>
-    <string name="extract_lyrics">Извлечь текст песни</string>
-    <string name="extract_lyrics_hint">Распознавание речи Whisper прямо на устройстве: синхронизированный текст из аудио. Полностью офлайн — аудио не покидает телефон.</string>
-    <string name="choose_model">Выбрать модель</string>
-    <string name="model_not_downloaded">Модель ещё не загружена</string>
-    <string name="model_download_hint">Перед извлечением один раз загрузите модель (75–466 МБ)</string>
-    <string name="model_ready">Готово</string>
-    <string name="change_model">Изменить</string>
-    <string name="model_privacy_note">Модели загружаются один раз и далее работают полностью офлайн. Распознавание выполняется на телефоне; аудиофайлы никуда не отправляются.</string>
-    <string name="model_downloading">Загрузка</string>
-    <string name="model_download_failed">Не удалось загрузить</string>
-    <string name="model_desc_tiny">Самая быстрая · ниже точность</string>
-    <string name="model_desc_base">Баланс скорости и точности</string>
-    <string name="model_desc_small">Самая точная · лучшая для китайских песен</string>
-    <string name="recognized_language">Язык распознавания</string>
-    <string name="auto_detect">Автоопределение</string>
-    <string name="current_song">Текущая песня</string>
-    <string name="songs_without_lyrics">Песен без текста: %1$d</string>
-    <string name="extract_all">Извлечь все</string>
-    <string name="extract">Извлечь</string>
-    <string name="waiting">Ожидание</string>
-    <string name="no_speech">Нет вокала</string>
-    <string name="extract_failed">Ошибка</string>
-    <string name="model_downloaded">Загружено</string>
 </resources>

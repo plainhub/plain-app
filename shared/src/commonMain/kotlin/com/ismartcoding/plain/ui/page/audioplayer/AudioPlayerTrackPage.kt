@@ -64,7 +64,6 @@ internal fun AudioPlayerTrackPage(
     viewMode: PlayerView,
     onViewModeChange: (PlayerView) -> Unit,
     onSeek: (Long) -> Unit,
-    onNavigateToExtractLyrics: () -> Unit,
 ) {
     var lyrics by remember(item.path) { mutableStateOf<List<LrcParser.LrcLine>?>(null) }
     LaunchedEffect(item.path) {
@@ -218,7 +217,6 @@ internal fun AudioPlayerTrackPage(
                     lines = lyrics,
                     progressMs = progressMs,
                     onSeek = onSeek,
-                    onNavigateToExtractLyrics = onNavigateToExtractLyrics,
                     modifier = Modifier.fillMaxSize(),
                 )
             }

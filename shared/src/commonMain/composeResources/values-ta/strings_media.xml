@@ -63,27 +63,4 @@
     <string name="exit_fullscreen">முழுத்திரையிலிருந்து வெளியேறவும்</string>
     <string name="mute">ஒலியடக்கு</string>
     <string name="unmute">ஒலியை இயக்கு</string>
-    <string name="extract_lyrics">பாடல் வரிகளை எடுக்கவும்</string>
-    <string name="extract_lyrics_hint">சாதனத்தில் Whisper பேச்சு அறிதல் மூலம் ஒலியிலிருந்து ஒத்திசைவான பாடல் வரிகளை உருவாக்குங்கள். முழுக்க ஆஃப்லைன் — உங்கள் ஒலி எப்போதும் ஃபோனை விட்டு வெளியேறாது.</string>
-    <string name="choose_model">மாடலைத் தேர்ந்தெடுக்கவும்</string>
-    <string name="model_not_downloaded">இன்னும் மாடல் பதிவிறக்கப்படவில்லை</string>
-    <string name="model_download_hint">எடுப்பதற்கு முன் ஒரு முறை மாடலைப் பதிவிறக்கவும் (75–466 MB)</string>
-    <string name="model_ready">தயார்</string>
-    <string name="change_model">மாற்று</string>
-    <string name="model_privacy_note">மாடல்கள் ஒரே முறை பதிவிறக்கப்பட்டு, பின்னர் முழுக்க ஆஃப்லைனில் இயங்கும். அறிதல் உங்கள் ஃபோனிலேயே நடைபெறும்; ஒலி கோப்புகள் எப்போதும் பதிவேற்றப்படாது.</string>
-    <string name="model_downloading">பதிவிறக்குகிறது</string>
-    <string name="model_download_failed">பதிவிறக்கம் தோல்வி</string>
-    <string name="model_desc_tiny">மிக வேகமானது · குறைந்த துல்லியம்</string>
-    <string name="model_desc_base">வேகம்-துல்லியம் சமநிலை</string>
-    <string name="model_desc_small">மிகத் துல்லியமானது · சீனப் பாடல்களுக்கு சிறந்தது</string>
-    <string name="recognized_language">அறிதல் மொழி</string>
-    <string name="auto_detect">தானியங்கிக் கண்டறிதல்</string>
-    <string name="current_song">தற்போதைய பாடல்</string>
-    <string name="songs_without_lyrics">பாடல் வரிகள் இல்லாத %1$d பாடல்கள்</string>
-    <string name="extract_all">அனைத்தையும் எடுக்கவும்</string>
-    <string name="extract">எடுக்கவும்</string>
-    <string name="waiting">காத்திருப்பு</string>
-    <string name="no_speech">குரல் இல்லை</string>
-    <string name="extract_failed">தோல்வி</string>
-    <string name="model_downloaded">பதிவிறக்கப்பட்டது</string>
 </resources>
