@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">건너뛰기</string>
+    <string name="onboarding_next">다음</string>
+    <string name="onboarding_get_started">설정 시작</string>
+    <string name="onboarding_1_title">휴대폰과 컴퓨터, 프라이빗 연결</string>
+    <string name="onboarding_1_body">같은 Wi-Fi에서 파일 전송, 채팅, 휴대폰 관리 — 모든 것이 기기 사이에서만 이루어집니다.</string>
+    <string name="onboarding_badge_no_account">계정 불필요</string>
+    <string name="onboarding_badge_no_cloud">데이터는 네트워크 밖으로 나가지 않음</string>
+    <string name="onboarding_badge_no_ads">광고 없음</string>
+    <string name="onboarding_2_title">컴퓨터에서 휴대폰 관리</string>
+    <string name="onboarding_2_body">컴퓨터 브라우저에서 주소를 열면 사진·동영상 보기, 파일 전송, 클립보드와 알림 확인이 바로 가능합니다.</string>
+    <string name="onboarding_3_title">기기 간 채팅과 전송</string>
+    <string name="onboarding_3_body">휴대폰과 컴퓨터 사이에서 채팅하고 채널을 만들어 보세요. 다른 앱에서 공유한 내용도 한 번의 탭으로 채팅에 전달됩니다.</string>
+    <string name="onboarding_3_bubble_in">주말 사진 다 됐어, 보낼게</string>
+    <string name="onboarding_3_bubble_out">받았어! 화질 좋네</string>
+    <string name="onboarding_3_share_hint">다른 앱에서 공유 → 탭 한 번으로 채팅에 전달</string>
+    <string name="onboarding_4_title">파일 전송 그 이상</string>
+    <string name="onboarding_4_body">사진·음악·메모 등 유용한 도구를 모두 오프라인으로; 음악은 가사 동기화와 기기 내 AI 가사 추출을 지원합니다.</string>
+    <string name="onboarding_4_photo_title">사진 및 동영상</string>
+    <string name="onboarding_4_photo_desc">보기 및 정리</string>
+    <string name="onboarding_4_music_title">음악</string>
+    <string name="onboarding_4_music_desc">가사 동기화 · AI 추출</string>
+    <string name="onboarding_4_notes_desc">Markdown 편집</string>
+    <string name="onboarding_4_tools_desc">스캔 그 외</string>
+    <string name="onboarding_5_title">세 단계로 시작하기</string>
+    <string name="onboarding_step1_title">서비스 시작</string>
+    <string name="onboarding_step1_desc">PlainApp을 열고 홈 화면에서 서비스 시작</string>
+    <string name="onboarding_step2_title">같은 Wi-Fi에 연결</string>
+    <string name="onboarding_step2_desc">휴대폰과 컴퓨터를 같은 라우터에 연결</string>
+    <string name="onboarding_step3_title">컴퓨터에서 주소 열기</string>
+    <string name="onboarding_step3_desc">브라우저에 휴대폰 화면에 표시된 주소 입력</string>
+    <string name="onboarding_revisit_hint">설정 → 사용 방법에서 언제든 이 소개를 다시 볼 수 있습니다</string>
+    <string name="onboarding_replay">소개 다시 보기</string>
+</resources>

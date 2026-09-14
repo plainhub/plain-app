@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_get_started">Начать настройку</string>
+    <string name="onboarding_1_title">Ваш телефон и компьютер — приватное соединение</string>
+    <string name="onboarding_1_body">Передавайте файлы, общайтесь в чате и управляйте телефоном через один Wi-Fi — всё остаётся между вашими устройствами.</string>
+    <string name="onboarding_badge_no_account">Без аккаунта</string>
+    <string name="onboarding_badge_no_cloud">Данные не покидают вашу сеть</string>
+    <string name="onboarding_badge_no_ads">Без рекламы</string>
+    <string name="onboarding_2_title">Управляйте телефоном с компьютера</string>
+    <string name="onboarding_2_body">Откройте адрес в браузере компьютера: просматривайте фото и видео, передавайте файлы, смотрите буфер обмена и уведомления.</string>
+    <string name="onboarding_3_title">Чат и передача между устройствами</string>
+    <string name="onboarding_3_body">Общайтесь и создавайте каналы между телефонами и компьютерами. Контентом из других приложений можно поделиться в чате одним касанием.</string>
+    <string name="onboarding_3_bubble_in">Фотографии с выходных готовы, отправляю</string>
+    <string name="onboarding_3_bubble_out">Получил, качество отличное!</string>
+    <string name="onboarding_3_share_hint">Поделиться из других приложений → переслать в чат одним касанием</string>
+    <string name="onboarding_4_title">Больше чем передача файлов</string>
+    <string name="onboarding_4_body">Фото, музыка, заметки и другие полезные инструменты — всё офлайн; в музыке есть синхронизированные тексты и ИИ-извлечение текстов на устройстве.</string>
+    <string name="onboarding_4_photo_title">Фото и видео</string>
+    <string name="onboarding_4_photo_desc">Просмотр и порядок</string>
+    <string name="onboarding_4_music_title">Музыка</string>
+    <string name="onboarding_4_music_desc">Синхро-тексты · ИИ-извлечение</string>
+    <string name="onboarding_4_notes_desc">Редактирование Markdown</string>
+    <string name="onboarding_4_tools_desc">Сканер и другое</string>
+    <string name="onboarding_5_title">Три шага для начала</string>
+    <string name="onboarding_step1_title">Запустите службу</string>
+    <string name="onboarding_step1_desc">Откройте PlainApp и включите службу на главном экране</string>
+    <string name="onboarding_step2_title">Подключитесь к одному Wi-Fi</string>
+    <string name="onboarding_step2_desc">Подключите телефон и компьютер к одному роутеру</string>
+    <string name="onboarding_step3_title">Откройте адрес на компьютере</string>
+    <string name="onboarding_step3_desc">Введите в браузере адрес с экрана телефона</string>
+    <string name="onboarding_revisit_hint">Эту инструкцию можно снова посмотреть в Настройки → Как пользоваться</string>
+    <string name="onboarding_replay">Посмотреть инструкцию снова</string>
+</resources>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Salta</string>
+    <string name="onboarding_next">Avanti</string>
+    <string name="onboarding_get_started">Inizia la configurazione</string>
+    <string name="onboarding_1_title">Il tuo telefono e il tuo computer, connessi in privato</string>
+    <string name="onboarding_1_body">Trasferisci file, chatta e gestisci il telefono sulla stessa Wi-Fi — tutto resta tra i tuoi dispositivi.</string>
+    <string name="onboarding_badge_no_account">Senza account</string>
+    <string name="onboarding_badge_no_cloud">I dati restano nella tua rete</string>
+    <string name="onboarding_badge_no_ads">Senza pubblicità</string>
+    <string name="onboarding_2_title">Gestisci il telefono dal computer</string>
+    <string name="onboarding_2_body">Apri un indirizzo nel browser del computer per sfogliare foto e video, trasferire file e vedere appunti e notifiche.</string>
+    <string name="onboarding_3_title">Chat e trasferimenti tra dispositivi</string>
+    <string name="onboarding_3_body">Chatta e crea canali tra telefoni e computer. I contenuti condivisi da altre app possono essere inoltrati in una chat con un tocco.</string>
+    <string name="onboarding_3_bubble_in">Le foto del weekend sono pronte, te le invio</string>
+    <string name="onboarding_3_bubble_out">Ricevute, qualità ottima!</string>
+    <string name="onboarding_3_share_hint">Condivisione da altre app → inoltrare in una chat con un tocco</string>
+    <string name="onboarding_4_title">Più del semplice trasferimento file</string>
+    <string name="onboarding_4_body">Foto, musica, note e altri strumenti utili, tutto offline; la musica supporta testi sincronizzati ed estrazione dei testi con IA sul dispositivo.</string>
+    <string name="onboarding_4_photo_title">Foto e video</string>
+    <string name="onboarding_4_photo_desc">Sfoglia e organizza</string>
+    <string name="onboarding_4_music_title">Musica</string>
+    <string name="onboarding_4_music_desc">Testi sincronizzati · Estrazione IA</string>
+    <string name="onboarding_4_notes_desc">Modifica Markdown</string>
+    <string name="onboarding_4_tools_desc">Scansione e altro</string>
+    <string name="onboarding_5_title">Tre passi per iniziare</string>
+    <string name="onboarding_step1_title">Avvia il servizio</string>
+    <string name="onboarding_step1_desc">Apri PlainApp e avvia il servizio nella schermata principale</string>
+    <string name="onboarding_step2_title">Connettiti alla stessa Wi-Fi</string>
+    <string name="onboarding_step2_desc">Collega telefono e computer allo stesso router</string>
+    <string name="onboarding_step3_title">Apri l'indirizzo sul computer</string>
+    <string name="onboarding_step3_desc">Digita nel browser l'indirizzo mostrato sullo schermo del telefono</string>
+    <string name="onboarding_revisit_hint">Puoi rivedere questa introduzione in Impostazioni → Come si usa</string>
+    <string name="onboarding_replay">Rivedi l'introduzione</string>
+</resources>

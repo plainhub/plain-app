@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Omitir</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_get_started">Empezar a configurar</string>
+    <string name="onboarding_1_title">Tu móvil y tu ordenador, conectados en privado</string>
+    <string name="onboarding_1_body">Transfiere archivos, chatea y gestiona tu móvil con el mismo Wi-Fi: todo se queda entre tus dispositivos.</string>
+    <string name="onboarding_badge_no_account">Sin cuenta</string>
+    <string name="onboarding_badge_no_cloud">Los datos no salen de tu red</string>
+    <string name="onboarding_badge_no_ads">Sin anuncios</string>
+    <string name="onboarding_2_title">Gestiona tu móvil desde el ordenador</string>
+    <string name="onboarding_2_body">Abre una dirección en el navegador del ordenador para ver fotos y vídeos, transferir archivos y consultar el portapapeles y las notificaciones.</string>
+    <string name="onboarding_3_title">Chat y transferencia entre dispositivos</string>
+    <string name="onboarding_3_body">Chatea y crea canales entre móviles y ordenadores. Lo que compartas desde otras apps se puede reenviar a un chat con un toque.</string>
+    <string name="onboarding_3_bubble_in">Las fotos del fin de semana ya están listas, te las envío</string>
+    <string name="onboarding_3_bubble_out">¡Recibidas! Qué calidad tan buena.</string>
+    <string name="onboarding_3_share_hint">Compartir desde otras apps → reenviar a un chat con un toque</string>
+    <string name="onboarding_4_title">Más que transferir archivos</string>
+    <string name="onboarding_4_body">Fotos, música, notas y más herramientas, todo sin conexión; la música admite letras sincronizadas y extracción de letras con IA en el dispositivo.</string>
+    <string name="onboarding_4_photo_title">Fotos y vídeos</string>
+    <string name="onboarding_4_photo_desc">Ver y organizar</string>
+    <string name="onboarding_4_music_title">Música</string>
+    <string name="onboarding_4_music_desc">Letras sincronizadas · Extracción con IA</string>
+    <string name="onboarding_4_notes_desc">Edición Markdown</string>
+    <string name="onboarding_4_tools_desc">Escanear y más</string>
+    <string name="onboarding_5_title">Tres pasos para empezar</string>
+    <string name="onboarding_step1_title">Inicia el servicio</string>
+    <string name="onboarding_step1_desc">Abre PlainApp e inicia el servicio en la pantalla de inicio</string>
+    <string name="onboarding_step2_title">Conéctate al mismo Wi-Fi</string>
+    <string name="onboarding_step2_desc">Conecta el móvil y el ordenador al mismo router</string>
+    <string name="onboarding_step3_title">Abre la dirección en el ordenador</string>
+    <string name="onboarding_step3_desc">Escribe en el navegador la dirección que muestra la pantalla del móvil</string>
+    <string name="onboarding_revisit_hint">Puedes volver a ver esta introducción en Ajustes → Cómo usar</string>
+    <string name="onboarding_replay">Ver la introducción de nuevo</string>
+</resources>

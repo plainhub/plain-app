@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Überspringen</string>
+    <string name="onboarding_next">Weiter</string>
+    <string name="onboarding_get_started">Einrichtung starten</string>
+    <string name="onboarding_1_title">Dein Handy und dein Computer, privat verbunden</string>
+    <string name="onboarding_1_body">Übertrage Dateien, chate und verwalte dein Handy im selben WLAN — alles bleibt zwischen deinen Geräten.</string>
+    <string name="onboarding_badge_no_account">Kein Konto</string>
+    <string name="onboarding_badge_no_cloud">Daten bleiben im LAN</string>
+    <string name="onboarding_badge_no_ads">Keine Werbung</string>
+    <string name="onboarding_2_title">Verwalte dein Handy vom Computer</string>
+    <string name="onboarding_2_body">Öffne eine Adresse im Browser deines Computers, um Fotos und Videos anzusehen, Dateien zu übertragen und Zwischenablage sowie Benachrichtigungen zu sehen.</string>
+    <string name="onboarding_3_title">Chat und Übertragung zwischen Geräten</string>
+    <string name="onboarding_3_body">Chatte und erstelle Kanäle zwischen Handys und Computern. Aus anderen Apps geteilte Inhalte lassen sich mit einem Tipp in einen Chat weiterleiten.</string>
+    <string name="onboarding_3_bubble_in">Die Fotos vom Wochenende sind fertig, ich schicke sie dir</string>
+    <string name="onboarding_3_bubble_out">Bekommen, tolle Qualität!</string>
+    <string name="onboarding_3_share_hint">Aus anderen Apps teilen → mit einem Tipp in den Chat weiterleiten</string>
+    <string name="onboarding_4_title">Mehr als Dateiübertragung</string>
+    <string name="onboarding_4_body">Fotos, Musik, Notizen und mehr — alles offline nutzbar. Musik unterstützt synchronisierte Lyrics und KI-Lyrics-Extraktion auf dem Gerät.</string>
+    <string name="onboarding_4_photo_title">Fotos und Videos</string>
+    <string name="onboarding_4_photo_desc">Ansehen und sortieren</string>
+    <string name="onboarding_4_music_title">Musik</string>
+    <string name="onboarding_4_music_desc">Synchronisierte Lyrics · KI-Extraktion</string>
+    <string name="onboarding_4_notes_desc">Markdown-Bearbeitung</string>
+    <string name="onboarding_4_tools_desc">Scannen und mehr</string>
+    <string name="onboarding_5_title">In drei Schritten starten</string>
+    <string name="onboarding_step1_title">Dienst starten</string>
+    <string name="onboarding_step1_desc">Öffne PlainApp und starte den Dienst auf dem Startbildschirm</string>
+    <string name="onboarding_step2_title">Mit demselben WLAN verbinden</string>
+    <string name="onboarding_step2_desc">Verbinde Handy und Computer mit demselben Router</string>
+    <string name="onboarding_step3_title">Adresse am Computer öffnen</string>
+    <string name="onboarding_step3_desc">Gib die im Handy angezeigte Adresse im Browser ein</string>
+    <string name="onboarding_revisit_hint">Du kannst die Einführung jederzeit unter Einstellungen → Verwendung erneut ansehen</string>
+    <string name="onboarding_replay">Einführung erneut ansehen</string>
+</resources>

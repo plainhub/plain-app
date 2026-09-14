@@ -43,6 +43,9 @@ class Routing {
     object HowToUse
 
     @Serializable
+    object Onboarding
+
+    @Serializable
     data class Text(val title: String, val content: String, val language: String)
 
     @Serializable

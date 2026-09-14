@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Overslaan</string>
+    <string name="onboarding_next">Volgende</string>
+    <string name="onboarding_get_started">Instellen starten</string>
+    <string name="onboarding_1_title">Je telefoon en computer, privé verbonden</string>
+    <string name="onboarding_1_body">Verzend bestanden, chat en beheer je telefoon via hetzelfde Wi-Fi — alles blijft tussen jouw apparaten.</string>
+    <string name="onboarding_badge_no_account">Geen account</string>
+    <string name="onboarding_badge_no_cloud">Data blijft in je netwerk</string>
+    <string name="onboarding_badge_no_ads">Geen advertenties</string>
+    <string name="onboarding_2_title">Beheer je telefoon vanaf de computer</string>
+    <string name="onboarding_2_body">Open een adres in de browser van de computer om foto's en video's te bekijken, bestanden te versturen en klembord en meldingen te zien.</string>
+    <string name="onboarding_3_title">Chatten en versturen tussen apparaten</string>
+    <string name="onboarding_3_body">Chat en maak kanalen aan tussen telefoons en computers. Gedeelde inhoud uit andere apps stuur je met één tik door naar een chat.</string>
+    <string name="onboarding_3_bubble_in">De foto's van het weekend zijn klaar, ik stuur ze door</string>
+    <string name="onboarding_3_bubble_out">Gehad, wat een mooie kwaliteit!</string>
+    <string name="onboarding_3_share_hint">Delen uit andere apps → met één tik doorsturen naar een chat</string>
+    <string name="onboarding_4_title">Meer dan bestanden versturen</string>
+    <string name="onboarding_4_body">Foto's, muziek, notities en meer handige tools, allemaal offline; muziek ondersteunt gesynchroniseerde songteksten en AI-songtekstextractie op het apparaat.</string>
+    <string name="onboarding_4_photo_title">Foto's en video's</string>
+    <string name="onboarding_4_photo_desc">Bekijken en organiseren</string>
+    <string name="onboarding_4_music_title">Muziek</string>
+    <string name="onboarding_4_music_desc">Gesynchroniseerde songteksten · AI-extractie</string>
+    <string name="onboarding_4_notes_desc">Markdown-bewerking</string>
+    <string name="onboarding_4_tools_desc">Scannen en meer</string>
+    <string name="onboarding_5_title">In drie stappen aan de slag</string>
+    <string name="onboarding_step1_title">Start de service</string>
+    <string name="onboarding_step1_desc">Open PlainApp en start de service op het startscherm</string>
+    <string name="onboarding_step2_title">Verbind met hetzelfde Wi-Fi</string>
+    <string name="onboarding_step2_desc">Verbind telefoon en computer met dezelfde router</string>
+    <string name="onboarding_step3_title">Open het adres op de computer</string>
+    <string name="onboarding_step3_desc">Typ het adres van het telefoonscherm in de browser</string>
+    <string name="onboarding_revisit_hint">Je kunt deze introductie op elk moment bekijken via Instellingen → Hoe te gebruiken</string>
+    <string name="onboarding_replay">Introductie opnieuw bekijken</string>
+</resources>

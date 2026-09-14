@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get started</string>
+    <string name="onboarding_1_title">Your phone and computer, privately connected</string>
+    <string name="onboarding_1_body">Transfer files, chat and manage your phone over the same Wi-Fi — everything stays between your devices.</string>
+    <string name="onboarding_badge_no_account">No account</string>
+    <string name="onboarding_badge_no_cloud">Data stays in your LAN</string>
+    <string name="onboarding_badge_no_ads">No ads</string>
+    <string name="onboarding_2_title">Manage your phone from a computer</string>
+    <string name="onboarding_2_body">Open one address in your computer browser to browse photos and videos, transfer files, and view the clipboard and notifications.</string>
+    <string name="onboarding_3_title">Chat and transfer between devices</string>
+    <string name="onboarding_3_body">Chat and create channels between phones and computers. Content shared from other apps can be forwarded to a chat in one tap.</string>
+    <string name="onboarding_3_bubble_in">Photos from the weekend are ready, sending them over</string>
+    <string name="onboarding_3_bubble_out">Got them, great quality!</string>
+    <string name="onboarding_3_share_hint">Share from other apps → forward to a chat in one tap</string>
+    <string name="onboarding_4_title">More than file transfer</string>
+    <string name="onboarding_4_body">Photos, music, notes and more handy tools — all work offline. Music supports synced lyrics and on-device AI lyrics extraction.</string>
+    <string name="onboarding_4_photo_title">Photos &amp; videos</string>
+    <string name="onboarding_4_photo_desc">Browse and organize</string>
+    <string name="onboarding_4_music_title">Music</string>
+    <string name="onboarding_4_music_desc">Synced lyrics · AI extraction</string>
+    <string name="onboarding_4_notes_desc">Markdown editing</string>
+    <string name="onboarding_4_tools_desc">Scan and more</string>
+    <string name="onboarding_5_title">Three steps to get started</string>
+    <string name="onboarding_step1_title">Start the service</string>
+    <string name="onboarding_step1_desc">Open PlainApp and start the service on the home screen</string>
+    <string name="onboarding_step2_title">Connect to the same Wi-Fi</string>
+    <string name="onboarding_step2_desc">Connect your phone and computer to the same router</string>
+    <string name="onboarding_step3_title">Open the address on your computer</string>
+    <string name="onboarding_step3_desc">Enter the web address shown on your phone screen in the browser</string>
+    <string name="onboarding_revisit_hint">You can watch this intro again in Settings → How to use</string>
+    <string name="onboarding_replay">Replay intro</string>
+</resources>

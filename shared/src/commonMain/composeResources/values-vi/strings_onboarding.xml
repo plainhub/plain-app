@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Bỏ qua</string>
+    <string name="onboarding_next">Tiếp</string>
+    <string name="onboarding_get_started">Bắt đầu thiết lập</string>
+    <string name="onboarding_1_title">Điện thoại và máy tính của bạn, kết nối riêng tư</string>
+    <string name="onboarding_1_body">Chuyển tệp, trò chuyện và quản lý điện thoại qua cùng một Wi-Fi — mọi thứ chỉ ở lại giữa các thiết bị của bạn.</string>
+    <string name="onboarding_badge_no_account">Không cần tài khoản</string>
+    <string name="onboarding_badge_no_cloud">Dữ liệu không rời mạng của bạn</string>
+    <string name="onboarding_badge_no_ads">Không quảng cáo</string>
+    <string name="onboarding_2_title">Quản lý điện thoại từ máy tính</string>
+    <string name="onboarding_2_body">Mở một địa chỉ trong trình duyệt máy tính để xem ảnh video, chuyển tệp và xem clipboard cùng thông báo.</string>
+    <string name="onboarding_3_title">Trò chuyện và truyền tệp giữa các thiết bị</string>
+    <string name="onboarding_3_body">Trò chuyện và tạo kênh giữa điện thoại và máy tính. Nội dung chia sẻ từ ứng dụng khác cũng có thể chuyển tiếp vào cuộc trò chuyện chỉ với một chạm.</string>
+    <string name="onboarding_3_bubble_in">Ảnh cuối tuần đã xong, gửi cho bạn đây</string>
+    <string name="onboarding_3_bubble_out">Nhận được rồi, chất lượng đẹp quá!</string>
+    <string name="onboarding_3_share_hint">Chia sẻ từ ứng dụng khác → chuyển tiếp vào trò chuyện với một chạm</string>
+    <string name="onboarding_4_title">Không chỉ là truyền tệp</string>
+    <string name="onboarding_4_body">Ảnh, nhạc, ghi chú và nhiều công cụ hữu ích, tất cả hoạt động ngoại tuyến; nhạc hỗ trợ lời bài hát đồng bộ và trích xuất lời bằng AI ngay trên thiết bị.</string>
+    <string name="onboarding_4_photo_title">Ảnh và video</string>
+    <string name="onboarding_4_photo_desc">Xem và sắp xếp</string>
+    <string name="onboarding_4_music_title">Nhạc</string>
+    <string name="onboarding_4_music_desc">Lời đồng bộ · Trích xuất AI</string>
+    <string name="onboarding_4_notes_desc">Chỉnh sửa Markdown</string>
+    <string name="onboarding_4_tools_desc">Quét và hơn thế</string>
+    <string name="onboarding_5_title">Ba bước để bắt đầu</string>
+    <string name="onboarding_step1_title">Khởi động dịch vụ</string>
+    <string name="onboarding_step1_desc">Mở PlainApp và khởi động dịch vụ trên màn hình chính</string>
+    <string name="onboarding_step2_title">Kết nối cùng một Wi-Fi</string>
+    <string name="onboarding_step2_desc">Kết nối điện thoại và máy tính vào cùng một bộ định tuyến</string>
+    <string name="onboarding_step3_title">Mở địa chỉ trên máy tính</string>
+    <string name="onboarding_step3_desc">Nhập vào trình duyệt địa chỉ hiển thị trên màn hình điện thoại</string>
+    <string name="onboarding_revisit_hint">Bạn có thể xem lại phần giới thiệu này bất cứ lúc nào trong Cài đặt → Cách sử dụng</string>
+    <string name="onboarding_replay">Xem lại phần giới thiệu</string>
+</resources>

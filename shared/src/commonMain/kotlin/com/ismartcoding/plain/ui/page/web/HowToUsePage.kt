@@ -39,6 +39,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.WebAddressPager
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.helpers.WebHelper
+import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.grey
@@ -86,6 +87,15 @@ fun HowToUsePage(
                                     OpenAddressDemo()
                                 }
                             }
+                        }
+                        VerticalSpace(dp = 16.dp)
+                        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                            PListItem(
+                                modifier = Modifier.clickable { navController.navigate(Routing.Onboarding) },
+                                icon = Res.drawable.refresh_ccw,
+                                title = stringResource(Res.string.onboarding_replay),
+                                showMore = true,
+                            )
                         }
                         VerticalSpace(dp = 16.dp)
                     }

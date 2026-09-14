@@ -227,6 +227,11 @@ object ServicePreference : BasePreference<Boolean>() {
     }
 }
 
+object OnboardingPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("onboarding_completed")
+}
+
 object DesktopAccessPreference : BasePreference<Boolean>() {
     override val default = true
     override val key = booleanPreferencesKey("desktop_access")

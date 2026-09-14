@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Pular</string>
+    <string name="onboarding_next">Avançar</string>
+    <string name="onboarding_get_started">Começar a configuração</string>
+    <string name="onboarding_1_title">Seu celular e seu computador, conectados com privacidade</string>
+    <string name="onboarding_1_body">Transfira arquivos, converse e gerencie o celular pelo mesmo Wi-Fi — tudo fica entre os seus dispositivos.</string>
+    <string name="onboarding_badge_no_account">Sem conta</string>
+    <string name="onboarding_badge_no_cloud">Os dados não saem da sua rede</string>
+    <string name="onboarding_badge_no_ads">Sem anúncios</string>
+    <string name="onboarding_2_title">Gerencie o celular pelo computador</string>
+    <string name="onboarding_2_body">Abra um endereço no navegador do computador para ver fotos e vídeos, transferir arquivos e consultar a área de transferência e as notificações.</string>
+    <string name="onboarding_3_title">Conversas e transferências entre dispositivos</string>
+    <string name="onboarding_3_body">Converse e crie canais entre celulares e computadores. O que você compartilhar de outros apps pode ser encaminhado para uma conversa com um toque.</string>
+    <string name="onboarding_3_bubble_in">As fotos do fim de semana ficaram prontas, vou te enviar</string>
+    <string name="onboarding_3_bubble_out">Recebi! A qualidade está ótima.</string>
+    <string name="onboarding_3_share_hint">Compartilhar de outros apps → encaminhar para uma conversa com um toque</string>
+    <string name="onboarding_4_title">Mais que transferência de arquivos</string>
+    <string name="onboarding_4_body">Fotos, músicas, notas e mais ferramentas úteis, tudo offline; a música suporta letras sincronizadas e extração de letras com IA no aparelho.</string>
+    <string name="onboarding_4_photo_title">Fotos e vídeos</string>
+    <string name="onboarding_4_photo_desc">Ver e organizar</string>
+    <string name="onboarding_4_music_title">Música</string>
+    <string name="onboarding_4_music_desc">Letras sincronizadas · Extração com IA</string>
+    <string name="onboarding_4_notes_desc">Edição Markdown</string>
+    <string name="onboarding_4_tools_desc">Escanear e mais</string>
+    <string name="onboarding_5_title">Três passos para começar</string>
+    <string name="onboarding_step1_title">Inicie o serviço</string>
+    <string name="onboarding_step1_desc">Abra o PlainApp e inicie o serviço na tela inicial</string>
+    <string name="onboarding_step2_title">Conecte ao mesmo Wi-Fi</string>
+    <string name="onboarding_step2_desc">Conecte o celular e o computador ao mesmo roteador</string>
+    <string name="onboarding_step3_title">Abra o endereço no computador</string>
+    <string name="onboarding_step3_desc">Digite no navegador o endereço mostrado na tela do celular</string>
+    <string name="onboarding_revisit_hint">Você pode rever esta introdução em Configurações → Como usar</string>
+    <string name="onboarding_replay">Rever a introdução</string>
+</resources>

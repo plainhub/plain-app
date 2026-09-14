@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">スキップ</string>
+    <string name="onboarding_next">次へ</string>
+    <string name="onboarding_get_started">設定を始める</string>
+    <string name="onboarding_1_title">スマホとパソコンをプライベートにつなぐ</string>
+    <string name="onboarding_1_body">同じ Wi-Fi でファイル転送・チャット・スマホ管理 — すべてあなたのデバイス間だけで完結します。</string>
+    <string name="onboarding_badge_no_account">アカウント不要</string>
+    <string name="onboarding_badge_no_cloud">データは LAN の外に出ない</string>
+    <string name="onboarding_badge_no_ads">広告なし</string>
+    <string name="onboarding_2_title">パソコンからスマホを管理</string>
+    <string name="onboarding_2_body">パソコンのブラウザでアドレスを開くだけで、写真や動画の閲覧、ファイル転送、クリップボードや通知の確認ができます。</string>
+    <string name="onboarding_3_title">デバイス間のチャットと転送</string>
+    <string name="onboarding_3_body">スマホとパソコンの間でチャットやチャンネルを作成。他のアプリで共有した内容もワンタップでチャットに転送できます。</string>
+    <string name="onboarding_3_bubble_in">週末の写真ができたよ、送るね</string>
+    <string name="onboarding_3_bubble_out">受け取ったよ、画質いいね！</string>
+    <string name="onboarding_3_share_hint">他のアプリから共有 → ワンタップでチャットへ転送</string>
+    <string name="onboarding_4_title">ファイル転送だけじゃない</string>
+    <string name="onboarding_4_body">写真・音楽・メモなど便利なツールがすべてオフラインで使えます。音楽は同期歌詞と端末内 AI 歌詞抽出に対応。</string>
+    <string name="onboarding_4_photo_title">写真と動画</string>
+    <string name="onboarding_4_photo_desc">閲覧と整理</string>
+    <string name="onboarding_4_music_title">音楽</string>
+    <string name="onboarding_4_music_desc">同期歌詞 · AI 抽出</string>
+    <string name="onboarding_4_notes_desc">Markdown 編集</string>
+    <string name="onboarding_4_tools_desc">スキャン その他</string>
+    <string name="onboarding_5_title">3 ステップで始めよう</string>
+    <string name="onboarding_step1_title">サービスを開始</string>
+    <string name="onboarding_step1_desc">PlainApp を開いてホーム画面でサービスを開始</string>
+    <string name="onboarding_step2_title">同じ Wi-Fi に接続</string>
+    <string name="onboarding_step2_desc">スマホとパソコンを同じルーターに接続</string>
+    <string name="onboarding_step3_title">パソコンでアドレスを開く</string>
+    <string name="onboarding_step3_desc">スマホ画面に表示されたアドレスをブラウザに入力</string>
+    <string name="onboarding_revisit_hint">設定 → 使い方 からいつでもこの案内をもう一度見られます</string>
+    <string name="onboarding_replay">案内をもう一度見る</string>
+</resources>

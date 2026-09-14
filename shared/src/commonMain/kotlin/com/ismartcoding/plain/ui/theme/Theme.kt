@@ -56,13 +56,16 @@ private fun plainDarkColorScheme(): ColorScheme {
         inverseSurface = Color(0xFFF2F2F7), inverseOnSurface = Color(0xFF000000),
         outline = Color(0xFF38383A), outlineVariant = Color(0xFF48484A),
         scrim = Color(0xFF000000),
-        surfaceBright = Color(0xFF2C2C2E),
-        surfaceDim = if (amoled) Color(0xFF000000) else Color(0xFF141416),
-        surfaceContainer = if (amoled) Color(0xFF000000) else Color(0xFF232325),
-        surfaceContainerLowest = if (amoled) Color(0xFF000000) else Color(0xFF141416),
-        surfaceContainerLow = if (amoled) Color(0xFF000000) else Color(0xFF1C1C1E),
-        surfaceContainerHigh = Color(0xFF2C2C2E),
-        surfaceContainerHighest = Color(0xFF3A3A3C),
+        // Surface container ramp synced from plain-desktop _base.scss (2026-09-14).
+        // Never forced to black in amoled: containers must stay lifted above
+        // the pure black background or cards blend into it.
+        surfaceBright = Color(0xFF383844),
+        surfaceDim = if (amoled) Color(0xFF000000) else Color(0xFF12121D),
+        surfaceContainer = Color(0xFF1E1F2A),
+        surfaceContainerLowest = Color(0xFF0D0D18),
+        surfaceContainerLow = Color(0xFF1A1B26),
+        surfaceContainerHigh = Color(0xFF292935),
+        surfaceContainerHighest = Color(0xFF333440),
     )
 }
 
@@ -84,10 +87,11 @@ private fun plainLightColorScheme(): ColorScheme = lightColorScheme(
     inverseSurface = Color(0xFF1C1C1E), inverseOnSurface = Color(0xFFFFFFFF),
     outline = Color(0xFFC6C6C8), outlineVariant = Color(0xFFE5E5EA),
     scrim = Color(0xFF000000),
-    surfaceBright = Color(0xFFFFFFFF), surfaceDim = Color(0xFFE5E5EA),
-    surfaceContainerLowest = Color(0xFFFFFFFF), surfaceContainerLow = Color(0xFFF9F9FB),
-    surfaceContainer = Color(0xFFEEF1F9), surfaceContainerHigh = Color(0xFFEAEAF0),
-    surfaceContainerHighest = Color(0xFFE5E5EA),
+    // Surface container ramp synced from plain-desktop _base.scss (2026-09-14).
+    surfaceBright = Color(0xFFFBF8FF), surfaceDim = Color(0xFFDAD8E8),
+    surfaceContainerLowest = Color(0xFFFFFFFF), surfaceContainerLow = Color(0xFFF5F2FF),
+    surfaceContainer = Color(0xFFEEECFC), surfaceContainerHigh = Color(0xFFE8E6F6),
+    surfaceContainerHighest = Color(0xFFE3E1F1),
 )
 
 val ColorScheme.green: Color

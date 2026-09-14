@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">छोड़ें</string>
+    <string name="onboarding_next">आगे</string>
+    <string name="onboarding_get_started">सेटअप शुरू करें</string>
+    <string name="onboarding_1_title">आपका फ़ोन और कंप्यूटर, निजी कनेक्शन में</string>
+    <string name="onboarding_1_body">एक ही Wi-Fi पर फ़ाइलें भेजें, चैट करें और फ़ोन प्रबंधित करें — सब कुछ आपके डिवाइस के बीच ही रहता है।</string>
+    <string name="onboarding_badge_no_account">खाता ज़रूरी नहीं</string>
+    <string name="onboarding_badge_no_cloud">डेटा आपके नेटवर्क में ही रहता है</string>
+    <string name="onboarding_badge_no_ads">कोई विज्ञापन नहीं</string>
+    <string name="onboarding_2_title">कंप्यूटर से फ़ोन प्रबंधित करें</string>
+    <string name="onboarding_2_body">कंप्यूटर के ब्राउज़र में एक पता खोलें — फ़ोटो-वीडियो देखें, फ़ाइलें भेजें और क्लिपबोर्ड व नोटिफ़िकेशन देखें।</string>
+    <string name="onboarding_3_title">डिवाइस के बीच चैट और ट्रांसफ़र</string>
+    <string name="onboarding_3_body">फ़ोन और कंप्यूटर के बीच चैट करें और चैनल बनाएं। दूसरी ऐप से साझा किया कोटेंट एक टैप में चैट पर भेजें।</string>
+    <string name="onboarding_3_bubble_in">वीकेंड की फ़ोटो तैयार हैं, भेज रहा हूँ</string>
+    <string name="onboarding_3_bubble_out">मिल गईं, क्वालिटी बहुत बढ़िया है!</string>
+    <string name="onboarding_3_share_hint">दूसरी ऐप से साझा करें → एक टैप में चैट पर भेजें</string>
+    <string name="onboarding_4_title">सिर्फ़ फ़ाइल ट्रांसफ़र से ज़्यादा</string>
+    <string name="onboarding_4_body">फ़ोटो, संगीत, नोट्स और भी उपयोगी टूल — सब ऑफ़लाइन; संगीत में सिंक लिरिक्स और डिवाइस पर AI लिरिक्स एक्सट्रैक्शन।</string>
+    <string name="onboarding_4_photo_title">फ़ोटो और वीडियो</string>
+    <string name="onboarding_4_photo_desc">देखें और व्यवस्थित करें</string>
+    <string name="onboarding_4_music_title">संगीत</string>
+    <string name="onboarding_4_music_desc">सिंक लिरिक्स · AI एक्सट्रैक्शन</string>
+    <string name="onboarding_4_notes_desc">Markdown संपादन</string>
+    <string name="onboarding_4_tools_desc">स्कैन और बहुत कुछ</string>
+    <string name="onboarding_5_title">शुरू करने के तीन चरण</string>
+    <string name="onboarding_step1_title">सेवा शुरू करें</string>
+    <string name="onboarding_step1_desc">PlainApp खोलें और होम स्क्रीन पर सेवा शुरू करें</string>
+    <string name="onboarding_step2_title">एक ही Wi-Fi से जुड़ें</string>
+    <string name="onboarding_step2_desc">फ़ोन और कंप्यूटर को एक ही राउटर से जोड़ें</string>
+    <string name="onboarding_step3_title">कंप्यूटर पर पता खोलें</string>
+    <string name="onboarding_step3_desc">ब्राउज़र में फ़ोन की स्क्रीन पर दिखाया गया पता लिखें</string>
+    <string name="onboarding_revisit_hint">इस परिचय को कभी भी सेटिंग्स → उपयोग कैसे करें में दोबारा देखें</string>
+    <string name="onboarding_replay">परिचय दोबारा देखें</string>
+</resources>

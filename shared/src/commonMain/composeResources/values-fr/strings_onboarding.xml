@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Ignorer</string>
+    <string name="onboarding_next">Suivant</string>
+    <string name="onboarding_get_started">Commencer la configuration</string>
+    <string name="onboarding_1_title">Votre téléphone et votre ordinateur, reliés en privé</string>
+    <string name="onboarding_1_body">Transférez des fichiers, discutez et gérez votre téléphone sur le même Wi-Fi — tout reste entre vos appareils.</string>
+    <string name="onboarding_badge_no_account">Sans compte</string>
+    <string name="onboarding_badge_no_cloud">Les données restent sur votre réseau</string>
+    <string name="onboarding_badge_no_ads">Sans publicité</string>
+    <string name="onboarding_2_title">Gérez votre téléphone depuis un ordinateur</string>
+    <string name="onboarding_2_body">Ouvrez une adresse dans le navigateur de l'ordinateur pour parcourir photos et vidéos, transférer des fichiers et voir le presse-papiers et les notifications.</string>
+    <string name="onboarding_3_title">Discussions et transferts entre appareils</string>
+    <string name="onboarding_3_body">Discutez et créez des canaux entre téléphones et ordinateurs. Le contenu partagé depuis d'autres applications peut être transféré vers une discussion en un geste.</string>
+    <string name="onboarding_3_bubble_in">Les photos du week-end sont prêtes, je te les envoie</string>
+    <string name="onboarding_3_bubble_out">Reçues, super qualité !</string>
+    <string name="onboarding_3_share_hint">Partage depuis d'autres applications → transférer vers une discussion en un geste</string>
+    <string name="onboarding_4_title">Bien plus qu'un transfert de fichiers</string>
+    <string name="onboarding_4_body">Photos, musique, notes et autres outils pratiques, tout fonctionne hors ligne ; la musique prend en charge les paroles synchronisées et l'extraction de paroles par IA sur l'appareil.</string>
+    <string name="onboarding_4_photo_title">Photos et vidéos</string>
+    <string name="onboarding_4_photo_desc">Parcourir et organiser</string>
+    <string name="onboarding_4_music_title">Musique</string>
+    <string name="onboarding_4_music_desc">Paroles synchronisées · Extraction IA</string>
+    <string name="onboarding_4_notes_desc">Édition Markdown</string>
+    <string name="onboarding_4_tools_desc">Scanner et plus</string>
+    <string name="onboarding_5_title">Trois étapes pour commencer</string>
+    <string name="onboarding_step1_title">Démarrez le service</string>
+    <string name="onboarding_step1_desc">Ouvrez PlainApp et démarrez le service sur l'écran d'accueil</string>
+    <string name="onboarding_step2_title">Connectez-vous au même Wi-Fi</string>
+    <string name="onboarding_step2_desc">Connectez le téléphone et l'ordinateur au même routeur</string>
+    <string name="onboarding_step3_title">Ouvrez l'adresse sur l'ordinateur</string>
+    <string name="onboarding_step3_desc">Saisissez dans le navigateur l'adresse affichée sur l'écran du téléphone</string>
+    <string name="onboarding_revisit_hint">Vous pouvez revoir cette présentation à tout moment dans Paramètres → Comment utiliser</string>
+    <string name="onboarding_replay">Revoir la présentation</string>
+</resources>

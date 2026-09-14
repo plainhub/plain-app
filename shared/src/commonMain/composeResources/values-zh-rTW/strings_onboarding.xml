@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">跳過</string>
+    <string name="onboarding_next">下一步</string>
+    <string name="onboarding_get_started">開始設定</string>
+    <string name="onboarding_1_title">手機與電腦，私有直連</string>
+    <string name="onboarding_1_body">在同一 Wi-Fi 下互傳檔案、聊天、管理手機資料——一切都在你的裝置之間完成。</string>
+    <string name="onboarding_badge_no_account">無需帳號</string>
+    <string name="onboarding_badge_no_cloud">資料不出區域網路</string>
+    <string name="onboarding_badge_no_ads">無廣告</string>
+    <string name="onboarding_2_title">電腦上，直接管理手機</string>
+    <string name="onboarding_2_body">在電腦瀏覽器開啟一個網址，即可瀏覽照片影片、傳輸檔案、查看剪貼簿和通知。</string>
+    <string name="onboarding_3_title">裝置間，聊天與互傳</string>
+    <string name="onboarding_3_body">手機、電腦之間直接聊天、建頻道。其他應用分享的內容，也能一鍵轉傳到聊天。</string>
+    <string name="onboarding_3_bubble_in">週末的照片拍好了，傳給你</string>
+    <string name="onboarding_3_bubble_out">收到了，畫質很棒！</string>
+    <string name="onboarding_3_share_hint">其他應用分享 → 一鍵轉傳到聊天</string>
+    <string name="onboarding_4_title">不只傳檔案</string>
+    <string name="onboarding_4_body">相簿、音樂、筆記等實用工具，全部離線可用；音樂支援同步歌詞與 AI 歌詞擷取。</string>
+    <string name="onboarding_4_photo_title">照片影片</string>
+    <string name="onboarding_4_photo_desc">瀏覽與整理</string>
+    <string name="onboarding_4_music_title">音樂</string>
+    <string name="onboarding_4_music_desc">同步歌詞 · AI 擷取</string>
+    <string name="onboarding_4_notes_desc">Markdown 編輯</string>
+    <string name="onboarding_4_tools_desc">掃描 · 更多</string>
+    <string name="onboarding_5_title">三步，開始使用</string>
+    <string name="onboarding_step1_title">啟動服務</string>
+    <string name="onboarding_step1_desc">開啟 PlainApp，在首頁啟動「服務」</string>
+    <string name="onboarding_step2_title">連接同一 Wi-Fi</string>
+    <string name="onboarding_step2_desc">手機與電腦連接到同一路由器</string>
+    <string name="onboarding_step3_title">電腦開啟網址</string>
+    <string name="onboarding_step3_desc">瀏覽器輸入手機螢幕上顯示的網址</string>
+    <string name="onboarding_revisit_hint">隨時可在 設置 → 使用方式 重新查看</string>
+    <string name="onboarding_replay">重新查看導覽</string>
+</resources>

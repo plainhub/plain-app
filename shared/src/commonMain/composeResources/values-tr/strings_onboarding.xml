@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Atla</string>
+    <string name="onboarding_next">İleri</string>
+    <string name="onboarding_get_started">Kuruluma başla</string>
+    <string name="onboarding_1_title">Telefonun ve bilgisayarın, özel bağlantı</string>
+    <string name="onboarding_1_body">Aynı Wi-Fi üzerinde dosya aktar, sohbet et ve telefonunu yönet — her şey cihazların arasında kalır.</string>
+    <string name="onboarding_badge_no_account">Hesap gerekmez</string>
+    <string name="onboarding_badge_no_cloud">Veriler ağdan çıkmaz</string>
+    <string name="onboarding_badge_no_ads">Reklam yok</string>
+    <string name="onboarding_2_title">Telefonunu bilgisayardan yönet</string>
+    <string name="onboarding_2_body">Bilgisayar tarayıcında bir adres aç: fotoğraf ve videolara göz at, dosya aktar, pano ve bildirimleri gör.</string>
+    <string name="onboarding_3_title">Cihazlar arası sohbet ve aktarım</string>
+    <string name="onboarding_3_body">Telefonlar ve bilgisayarlar arasında sohbet et ve kanal oluştur. Diğer uygulamalardan paylaşılan içerik tek dokunuşla sohbete iletilebilir.</string>
+    <string name="onboarding_3_bubble_in">Hafta sonu fotoğrafları hazır, gönderiyorum</string>
+    <string name="onboarding_3_bubble_out">Aldım, kalite harika!</string>
+    <string name="onboarding_3_share_hint">Diğer uygulamalardan paylaş → tek dokunuşla sohbete ilet</string>
+    <string name="onboarding_4_title">Dosya aktarımından fazlası</string>
+    <string name="onboarding_4_body">Fotoğraflar, müzik, notlar ve daha birçok araç — tamamen çevrimdışı; müzikte senkronize şarkı sözleri ve cihaz üzerinde AI söz çıkarma.</string>
+    <string name="onboarding_4_photo_title">Fotoğraflar ve videolar</string>
+    <string name="onboarding_4_photo_desc">Gözat ve düzenle</string>
+    <string name="onboarding_4_music_title">Müzik</string>
+    <string name="onboarding_4_music_desc">Senkronize sözler · AI çıkarma</string>
+    <string name="onboarding_4_notes_desc">Markdown düzenleme</string>
+    <string name="onboarding_4_tools_desc">Tarama ve dahası</string>
+    <string name="onboarding_5_title">Başlamak için üç adım</string>
+    <string name="onboarding_step1_title">Servisi başlat</string>
+    <string name="onboarding_step1_desc">PlainApp'i aç ve ana ekranda servisi başlat</string>
+    <string name="onboarding_step2_title">Aynı Wi-Fi'ye bağlan</string>
+    <string name="onboarding_step2_desc">Telefon ve bilgisayarı aynı yönlendiriciye bağla</string>
+    <string name="onboarding_step3_title">Adresi bilgisayarda aç</string>
+    <string name="onboarding_step3_desc">Tarayıcıya telefon ekranında görünen adresi yaz</string>
+    <string name="onboarding_revisit_hint">Bu tanıtımı Ayarlar → Nasıl kullanılır bölümünden istediğin an yeniden izleyebilirsin</string>
+    <string name="onboarding_replay">Tanıtımı yeniden izle</string>
+</resources>

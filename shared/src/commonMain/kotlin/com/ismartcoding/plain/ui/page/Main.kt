@@ -89,6 +89,16 @@ fun Main(
         scope.launch(Dispatchers.Default) { pomodoroVM.loadAsync() }
     }
 
+    LaunchedEffect(Unit) {
+        if (!OnboardingPreference.getAsync()) {
+            // singleTop: this effect re-runs on activity recreation while the
+            // onboarding is still showing and the pref is not yet written
+            navController.navigate(Routing.Onboarding) {
+                launchSingleTop = true
+            }
+        }
+    }
+
     MainEventCollector(
         scope, mainVM, ChatViewModel, audioPlaylistVM, pomodoroVM, peerVM, navController,
         onConfirmDialog = { confirmDialogEvent = it },

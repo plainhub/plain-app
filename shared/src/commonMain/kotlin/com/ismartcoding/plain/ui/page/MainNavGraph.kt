@@ -74,6 +74,7 @@ import com.ismartcoding.plain.ui.page.images.ImagesPage
 import com.ismartcoding.plain.ui.page.media.PlayMediaPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
+import com.ismartcoding.plain.ui.page.onboarding.OnboardingPage
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroPage
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroSettingsDialog
 import com.ismartcoding.plain.platform.checkNotificationPermission
@@ -200,6 +201,7 @@ fun MainNavGraph(
             val webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }
             HowToUsePage(navController, onRunDiagnostics = { webVM.dig() })
         }
+        composable<Routing.Onboarding> { OnboardingPage(navController) }
         composable<Routing.AppDetails> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.AppDetails>()
             AppPage(navController, r.id)
