@@ -46,6 +46,7 @@
     <string name="cannot_move_folder_into_itself">ஒரு கோப்புறையை அதற்குள்ளே அல்லது அதன் உட்புறை கோப்புறைக்கு நகர்த்த முடியாது.</string>
     <string name="cannot_copy_folder_into_itself">ஒரு கோப்புறையை அதற்குள்ளே அல்லது அதன் உட்புறை கோப்புறைக்கு நகலெடுக்க முடியாது.</string>
     <string name="file_save_to">கோப்பு %1$s இல் சேமிக்கப்பட்டது</string>
+    <string name="save_as">வேறு பெயரில் சேமிக்கவும்</string>
     <string name="group_by_taken_at">எடுக்கப்பட்ட நேரத்தின் படி குழுவாக்கு</string>
     <string name="view_mode">காட்சி முறை</string>
     <string name="browse_by_tags">குறிச்சொற்கள் அடிப்படையில் உலாவுக</string>

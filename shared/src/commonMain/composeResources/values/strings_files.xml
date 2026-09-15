@@ -7,6 +7,7 @@
     <string name="open_with_other_app">Open with other app</string>
     <string name="file_size">File size</string>
     <string name="file_save_to">File saved to %1$s</string>
+    <string name="save_as">Save as</string>
     <string name="files">Files</string>
     <string name="sdcard">SD card</string>
     <string name="files_title">Files (%1$s)</string>

@@ -46,6 +46,7 @@
     <string name="cannot_move_folder_into_itself">কোনো ফোল্ডারকে নিজেই বা তার উপ-ফোল্ডারে সরানো যায় না।</string>
     <string name="cannot_copy_folder_into_itself">কোনো ফোল্ডারকে নিজেই বা তার উপ-ফোল্ডারে কপি করা যায় না।</string>
     <string name="file_save_to">%1$s এ ফাইল সংরক্ষিত হয়েছে</string>
+    <string name="save_as">অন্য নামে সংরক্ষণ করুন</string>
     <string name="group_by_taken_at">তোলার সময় অনুযায়ী গ্রুপ করুন</string>
     <string name="view_mode">দেখার মোড</string>
     <string name="browse_by_tags">ট্যাগ অনুযায়ী ব্রাউজ করুন</string>
