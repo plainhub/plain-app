@@ -109,6 +109,7 @@
     <string name="enable_adb_token">ADB 토큰 사용</string>
     <string name="http_server_health_check_failed">서비스가 시작되었지만 접근할 수 없습니다. 방화벽 또는 VPN 앱이 localhost 연결을 차단하고 있을 수 있습니다. 네트워크 설정을 확인하고 앱을 다시 시작하세요.</string>
     <string name="access_settings">접근 설정</string>
+    <string name="access_feature_hint">여기서 켜면 컴퓨터에서 이 기능을 사용할 수 있습니다</string>
     <string name="certificate">인증서</string>
     <string name="certificate_file">인증서 파일</string>
     <string name="certificate_password">인증서 비밀번호</string>

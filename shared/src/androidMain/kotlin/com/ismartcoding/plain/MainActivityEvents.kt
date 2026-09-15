@@ -34,6 +34,7 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.page.web.AccessFeatureHighlight
 import kotlinx.coroutines.launch
 
 @SuppressLint("CheckResult")
@@ -115,6 +116,7 @@ internal fun MainActivity.initEvents() {
 
                 is HOpenWebSettingsEvent -> {
                     try {
+                        AccessFeatureHighlight.pending.value = event.feature
                         val nav = navControllerState.value
                         val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute<Routing.DesktopAccessSettings>() == true
                         if (AppHelper.foregrounded()) {

@@ -109,6 +109,7 @@
     <string name="enable_adb_token">ADB டோக்கன் இயக்கு</string>
     <string name="http_server_health_check_failed">சேவை தொடங்கப்பட்டது ஆனால் அணுக முடியவில்லை. ஃபயர்வால் அல்லது VPN பயன்பாடு localhost இணைப்புகளைத் தடுக்கலாம். உங்கள் நெட்வொர்க் அமைப்புகளைச் சரிபார்த்து, பயன்பாட்டை மறுதொடக்கம் செய்யவும்.</string>
     <string name="access_settings">அணுகல் அமைப்புகள்</string>
+    <string name="access_feature_hint">இதை இங்கே இயக்கவும், உங்கள் கணினி இந்த அம்சத்தைப் பயன்படுத்த முடியும்</string>
     <string name="certificate">சான்றிதழ்</string>
     <string name="certificate_file">சான்றிதழ் கோப்பு</string>
     <string name="certificate_password">சான்றிதழ் கடவுச்சொல்</string>

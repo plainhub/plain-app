@@ -116,6 +116,7 @@
     <string name="expand_section">Expand</string>
     <string name="more_settings">More settings</string>
     <string name="access_settings">Access Settings</string>
+    <string name="access_feature_hint">Turn it on here so your computer can use this feature</string>
     <string name="same_network_hint">Make sure your computer and phone are on the same network</string>
     <string name="ready">Ready</string>
     <string name="permission_settings">Permission Settings</string>

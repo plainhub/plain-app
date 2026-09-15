@@ -3,6 +3,7 @@ package com.ismartcoding.plain.httpserver.mainschemas
 import com.ismartcoding.plain.ai.ImageSearchStatusType
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.data.DevicePlatform
+import com.ismartcoding.plain.enums.AccessFeatureType
 import com.ismartcoding.plain.enums.AppChannelType
 import com.ismartcoding.plain.enums.ChannelMemberStatus
 import com.ismartcoding.plain.enums.ChatChannelStatus
@@ -30,6 +31,7 @@ fun SchemaBuilder.addMainSchemaTypes() {
     // Main is a superset of the peer schema (peer chat items also flow through
     // the authenticated schema), so reuse its shared types without duplicating.
     addPeerSchemaTypes()
+    enum<AccessFeatureType>()
     enum<ChatChannelStatus>()
     enum<MediaPlayMode>()
     enum<DataType>()

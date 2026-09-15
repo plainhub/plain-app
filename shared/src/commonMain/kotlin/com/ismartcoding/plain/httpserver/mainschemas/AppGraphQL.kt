@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
 import com.ismartcoding.plain.buildChannel
+import com.ismartcoding.plain.enums.AccessFeatureType
 import com.ismartcoding.plain.enums.AppChannelType
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -107,8 +108,8 @@ suspend fun openAccessibilitySettings(): Boolean {
 }
 
 @GraphQLMutation
-suspend fun openWebSettings(): Boolean {
-    sendEvent(HOpenWebSettingsEvent())
+suspend fun openWebSettings(feature: AccessFeatureType? = null): Boolean {
+    sendEvent(HOpenWebSettingsEvent(feature))
     return true
 }
 

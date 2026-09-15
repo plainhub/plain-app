@@ -109,6 +109,7 @@
     <string name="enable_adb_token">启用 ADB 令牌</string>
     <string name="http_server_health_check_failed">服务已启动但无法访问。防火墙或 VPN 应用可能阻止了 localhost 连接。请检查您的网络设置并重启应用。</string>
     <string name="access_settings">访问设置</string>
+    <string name="access_feature_hint">在这里打开，电脑才能使用该功能</string>
     <string name="try_more_addresses">无法访问？尝试更多地址</string>
     <string name="collapse_backup_addresses">收起备用地址</string>
     <string name="certificate">证书</string>
