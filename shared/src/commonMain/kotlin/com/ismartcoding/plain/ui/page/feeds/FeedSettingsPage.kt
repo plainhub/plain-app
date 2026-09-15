@@ -26,6 +26,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -121,7 +122,7 @@ fun FeedSettingsPage(
             }
             item {
                 VerticalSpace(dp = 48.dp)
-                PFilledButton(
+                POutlinedButton(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     text = stringResource(Res.string.clear_feed_items),
                     type = ButtonType.DANGER, onClick = {

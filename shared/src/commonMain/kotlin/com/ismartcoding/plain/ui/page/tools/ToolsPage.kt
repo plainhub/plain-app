@@ -26,7 +26,6 @@ import com.ismartcoding.plain.i18n.casting_to
 import com.ismartcoding.plain.i18n.tools
 import com.ismartcoding.plain.ui.base.ActionButtonAdd
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.StatusIndicator
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -37,7 +36,7 @@ import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.ui.components.QuickNoteCard
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.page.MainBottomBar
+import com.ismartcoding.plain.ui.page.MainNavScaffold
 import com.ismartcoding.plain.ui.page.home.HomeFeatureItemsGrid
 import com.ismartcoding.plain.ui.theme.greenPill
 import com.ismartcoding.plain.ui.theme.greenText
@@ -59,7 +58,9 @@ fun ToolsPage(
         HomeFeaturesPreference.parseList(featuresStr.ifEmpty { HomeFeaturesPreference.default })
             .contains(AppFeatureType.NOTES.name)
 
-    PScaffold(
+    MainNavScaffold(
+        selectedIndex = 2,
+        onTabSelected = onTabSelected,
         topBar = {
             PTopAppBar(
                 title = stringResource(Res.string.tools),
@@ -70,7 +71,6 @@ fun ToolsPage(
                 },
             )
         },
-        bottomBar = { MainBottomBar(selectedIndex = 2, onTabSelected = onTabSelected) },
     ) { paddingValues ->
         Column(
             modifier = Modifier

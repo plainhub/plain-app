@@ -50,7 +50,6 @@ import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PTextButton
-import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -62,7 +61,7 @@ import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
-import com.ismartcoding.plain.ui.page.MainBottomBar
+import com.ismartcoding.plain.ui.page.MainNavScaffold
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import kotlinx.coroutines.launch
@@ -173,9 +172,10 @@ fun HomePage(
         StayOnlineModeOverlay { showStayOnlineOverlay = false }
     }
 
-    PScaffold(
+    MainNavScaffold(
+        selectedIndex = 0,
+        onTabSelected = onTabSelected,
         topBar = { TopBarHome(navController) },
-        bottomBar = { MainBottomBar(selectedIndex = 0, onTabSelected = onTabSelected) },
     ) { paddingValues ->
         PullToRefresh(
             modifier = Modifier

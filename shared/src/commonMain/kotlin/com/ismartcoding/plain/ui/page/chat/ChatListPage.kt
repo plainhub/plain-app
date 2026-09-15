@@ -54,7 +54,6 @@ import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PTextButton
-import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -67,7 +66,7 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
-import com.ismartcoding.plain.ui.page.MainBottomBar
+import com.ismartcoding.plain.ui.page.MainNavScaffold
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
@@ -127,11 +126,10 @@ fun ChatListPage(
         }
     }
 
-    PScaffold(
+    MainNavScaffold(
+        selectedIndex = 1,
+        onTabSelected = onTabSelected,
         topBar = { TopBarChat(navController, onCreateChannel = { channelVM.showCreateChannelDialog.value = true }) },
-        bottomBar = if (onTabSelected != null) {
-            { MainBottomBar(selectedIndex = 1, onTabSelected = onTabSelected) }
-        } else null,
     ) { paddingValues ->
         PullToRefresh(
             modifier = Modifier
