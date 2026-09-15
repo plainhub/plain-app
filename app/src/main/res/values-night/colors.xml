@@ -4,4 +4,5 @@
     <color name="primary">#FEFEFE</color>
     <color name="launcher_background">#FFFFFF</color>
     <color name="scrollbar_primary">#0A84FF</color>
+    <color name="splash_icon">#B8C4FF</color>
 </resources>
