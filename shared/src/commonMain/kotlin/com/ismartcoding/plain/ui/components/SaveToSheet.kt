@@ -34,7 +34,6 @@ import com.ismartcoding.plain.i18n.save_to
 import com.ismartcoding.plain.platform.getDownloadsDirPath
 import com.ismartcoding.plain.preferences.RecentSaveDirsPreference
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetActionRow
@@ -78,13 +77,6 @@ fun SaveToSheet(
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
         PBottomSheetTopAppBar(
             title = title,
-            navigationIcon = {
-                PIconButton(
-                    icon = Res.drawable.x,
-                    contentDescription = stringResource(Res.string.close),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                ) { onDismiss() }
-            },
         )
         SectionLabel(stringResource(Res.string.save_to))
         if (downloadsAvailable) {

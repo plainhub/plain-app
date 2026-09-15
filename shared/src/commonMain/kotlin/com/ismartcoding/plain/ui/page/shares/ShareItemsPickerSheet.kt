@@ -40,7 +40,6 @@ import com.ismartcoding.plain.platform.listFilesInDir
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.components.DirBrowserRow
 import org.jetbrains.compose.resources.painterResource
@@ -75,13 +74,6 @@ fun ShareItemsPickerSheet(
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
         PBottomSheetTopAppBar(
             title = stringResource(Res.string.add_items),
-            navigationIcon = {
-                PIconButton(
-                    icon = Res.drawable.x,
-                    contentDescription = stringResource(Res.string.close),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                ) { onDismiss() }
-            },
         )
         Text(
             text = currentPath,

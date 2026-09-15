@@ -35,7 +35,6 @@ import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PIconButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.style.TextOverflow
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -80,13 +79,6 @@ fun FolderShareSheet(
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
         PBottomSheetTopAppBar(
             title = stringResource(Res.string.share_folder),
-            navigationIcon = {
-                PIconButton(
-                    icon = Res.drawable.x,
-                    contentDescription = stringResource(Res.string.close),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                ) { onDismiss() }
-            },
         )
         Text(
             text = currentPath,
