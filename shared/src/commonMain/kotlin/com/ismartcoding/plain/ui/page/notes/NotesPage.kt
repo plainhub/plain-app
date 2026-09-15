@@ -41,8 +41,8 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemTags
 import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.base.PDraggableElement
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -127,7 +127,7 @@ fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
                         else {
                             ActionButtonSearch { NotesViewModel.enterSearchMode() }
                             PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
-                                PDropdownMenuItemTags {
+                                PSheetActionRow(Res.drawable.tags, stringResource(Res.string.tags)) {
                                     dismiss()
                                     NotesViewModel.showTagsDialog.value = true
                                 }

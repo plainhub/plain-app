@@ -134,12 +134,12 @@ fun <T : IData> MediaTopBar(
                             PCapsuleMoreClose(
                                 onClose = { navController.navigateUp() },
                             ) { dismiss ->
-                                PDropdownMenuItemSort {
+                                PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
                                     dismiss()
                                     mediaVM.showSortAndBrowseDialog.value = true
                                 }
                                 if (!isDocs) {
-                                    PDropdownMenuItemCast {
+                                    PSheetActionRow(Res.drawable.cast, stringResource(Res.string.cast_mode)) {
                                         dismiss()
                                         castVM.showCastDialog.value = true
                                     }

@@ -93,7 +93,7 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
             title = title, scrollBehavior = scrollBehavior, actions = {
                 ActionButtonSearch { appsVM.enterSearchMode() }
                 PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
-                    PDropdownMenuItemSort {
+                    PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
                         dismiss()
                         appsVM.showSortDialog.value = true
                     }

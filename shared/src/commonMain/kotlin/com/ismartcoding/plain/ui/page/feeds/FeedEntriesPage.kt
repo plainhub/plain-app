@@ -19,11 +19,9 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -81,7 +79,6 @@ import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
 
@@ -191,15 +188,18 @@ fun FeedEntriesPage(
                     } else {
                         ActionButtonSearch { feedEntriesVM.enterSearchMode() }
                         PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
-                            PDropdownMenuItemSettings(onClick = { dismiss(); navController.navigate(Routing.FeedSettings) })
-                            PDropdownMenuItem(
-                                text = { Text(stringResource(Res.string.import_opml_file)) },
-                                leadingIcon = { Icon(painterResource(Res.drawable.upload), contentDescription = stringResource(Res.string.import_opml_file)) },
-                                onClick = { dismiss(); sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false)) })
-                            PDropdownMenuItem(
-                                text = { Text(stringResource(Res.string.export_opml_file)) },
-                                leadingIcon = { Icon(painterResource(Res.drawable.download), contentDescription = stringResource(Res.string.export_opml_file)) },
-                                onClick = { dismiss(); sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + TimeHelper.now().formatName() + ".opml")) })
+                            PSheetActionRow(Res.drawable.settings, stringResource(Res.string.settings)) {
+                                dismiss()
+                                navController.navigate(Routing.FeedSettings)
+                            }
+                            PSheetActionRow(Res.drawable.upload, stringResource(Res.string.import_opml_file)) {
+                                dismiss()
+                                sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false))
+                            }
+                            PSheetActionRow(Res.drawable.download, stringResource(Res.string.export_opml_file)) {
+                                dismiss()
+                                sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + TimeHelper.now().formatName() + ".opml"))
+                            }
                         }
                     }
                 },

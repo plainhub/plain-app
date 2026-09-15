@@ -31,8 +31,8 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemSettings
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
@@ -62,10 +62,10 @@ fun PomodoroPage(
     PScaffold(topBar = {
         PTopAppBar(title = "", actions = {
             PCapsuleMoreClose(onClose = { navController.navigateUp() }) { dismiss ->
-                PDropdownMenuItemSettings(onClick = {
+                PSheetActionRow(Res.drawable.settings, stringResource(Res.string.settings)) {
                     dismiss()
                     pomodoroVM.showSettings.value = true
-                })
+                }
             }
         })
     }) { paddingValues ->

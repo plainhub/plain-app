@@ -4,7 +4,6 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -20,15 +19,14 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.PSheetActionCard
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -45,54 +43,51 @@ fun FilesMoreActionsSheet(filesVM: FilesViewModel, onDismiss: () -> Unit) {
 
     PModalBottomSheet(onDismissRequest = onDismiss) {
         Column {
-            PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                Column {
-                    if (!isZip) {
-                        PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                            onDismiss()
-                            filesVM.enterSelectMode()
-                        }
-                    }
-                    PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
+            VerticalSpace(16.dp)
+            PSheetActionCard {
+                if (!isZip) {
+                    PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
                         onDismiss()
-                        filesVM.showSortDialog.value = true
+                        filesVM.enterSelectMode()
                     }
-                    PListItem(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable {
-                                onDismiss()
-                                scope.launch(Dispatchers.Default) {
-                                    ShowHiddenFilesPreference.putAsync(!showHiddenFiles)
-                                    filesVM.loadAsync()
-                                }
-                            },
-                        icon = if (showHiddenFiles) Res.drawable.eye else Res.drawable.eye_off,
-                        title = stringResource(Res.string.show_hidden_files),
-                        action = {
-                            PSwitch(activated = showHiddenFiles, onClick = {
-                                onDismiss()
-                                scope.launch(Dispatchers.Default) {
-                                    ShowHiddenFilesPreference.putAsync(!showHiddenFiles)
-                                    filesVM.loadAsync()
-                                }
-                            })
-                        },
-                    )
                 }
+                PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
+                    onDismiss()
+                    filesVM.showSortDialog.value = true
+                }
+                PListItem(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable {
+                            onDismiss()
+                            scope.launch(Dispatchers.Default) {
+                                ShowHiddenFilesPreference.putAsync(!showHiddenFiles)
+                                filesVM.loadAsync()
+                            }
+                        },
+                    icon = if (showHiddenFiles) Res.drawable.eye else Res.drawable.eye_off,
+                    title = stringResource(Res.string.show_hidden_files),
+                    action = {
+                        PSwitch(activated = showHiddenFiles, onClick = {
+                            onDismiss()
+                            scope.launch(Dispatchers.Default) {
+                                ShowHiddenFilesPreference.putAsync(!showHiddenFiles)
+                                filesVM.loadAsync()
+                            }
+                        })
+                    },
+                )
             }
             if (!isZip) {
-                VerticalSpace(12.dp)
-                PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                    Column {
-                        PSheetActionRow(Res.drawable.folder_plus, stringResource(Res.string.create_folder)) {
-                            onDismiss()
-                            filesVM.showCreateFolderDialog.value = true
-                        }
-                        PSheetActionRow(Res.drawable.file_plus, stringResource(Res.string.create_file)) {
-                            onDismiss()
-                            filesVM.showCreateFileDialog.value = true
-                        }
+                VerticalSpace(16.dp)
+                PSheetActionCard {
+                    PSheetActionRow(Res.drawable.folder_plus, stringResource(Res.string.create_folder)) {
+                        onDismiss()
+                        filesVM.showCreateFolderDialog.value = true
+                    }
+                    PSheetActionRow(Res.drawable.file_plus, stringResource(Res.string.create_file)) {
+                        onDismiss()
+                        filesVM.showCreateFileDialog.value = true
                     }
                 }
             }

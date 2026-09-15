@@ -70,10 +70,10 @@ import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
-import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
@@ -333,23 +333,17 @@ fun SharedFolderPage(
                     PCapsuleMoreClose(
                         onClose = { navController.popBackStack() },
                     ) { dismiss ->
-                        PDropdownMenuItem(
-                            text = { Text(stringResource(Res.string.open_in_browser)) },
-                            onClick = {
-                                dismiss()
-                                browserUrl()?.let { launchUrl(it) }
-                            },
-                        )
-                        PDropdownMenuItem(
-                            text = { Text(stringResource(Res.string.copy)) },
-                            onClick = {
-                                dismiss()
-                                browserUrl()?.let {
-                                    setClipboardText("", it)
-                                    DialogHelper.showSuccess(Res.string.copied)
-                                }
-                            },
-                        )
+                        PSheetActionRow(Res.drawable.chrome, stringResource(Res.string.open_in_browser)) {
+                            dismiss()
+                            browserUrl()?.let { launchUrl(it) }
+                        }
+                        PSheetActionRow(Res.drawable.copy, stringResource(Res.string.copy)) {
+                            dismiss()
+                            browserUrl()?.let {
+                                setClipboardText("", it)
+                                DialogHelper.showSuccess(Res.string.copied)
+                            }
+                        }
                     }
                 },
             )

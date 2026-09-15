@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -101,6 +102,13 @@ fun PSheetPrimaryAction(
             textAlign = TextAlign.Center,
             maxLines = 1,
         )
+    }
+}
+
+@Composable
+fun PSheetActionCard(content: @Composable ColumnScope.() -> Unit) {
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+        Column(content = content)
     }
 }
 
