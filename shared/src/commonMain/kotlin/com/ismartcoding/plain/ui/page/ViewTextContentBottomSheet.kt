@@ -63,7 +63,7 @@ fun ViewTextContentBottomSheet(
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.wrap_content), action = {
                         PSwitch(
-                            activated = textFileVM.wrapContent.value,
+                            activated = textFileVM.controller.wrapContent.value,
                         ) {
                             textFileVM.toggleWrapContent()
                         }

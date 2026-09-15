@@ -753,33 +753,6 @@ fun String.isUrl(): Boolean {
     }
 }
 
-fun String.pathToAceMode(): String {
-    return when (getFilenameExtension().lowercase()) {
-        "js", "javascript" -> "javascript"
-        "java" -> "java"
-        "kt", "kotlin" -> "kotlin"
-        "xml", "html", "htm", "xhtml", "jsp", "jspx", "php", "phtml", "volt", "twig" -> "xml"
-        "css", "less", "scss", "sass" -> "css"
-        "json" -> "json"
-        "md", "markdown" -> "markdown"
-        "sql" -> "sql"
-        "txt", "text", "log", "cfg", "ini", "conf", "properties", "bat", "sh" -> "text"
-        "c", "h", "cpp", "hpp" -> "c_cpp"
-        "py" -> "python"
-        "rb" -> "ruby"
-        "pl" -> "perl"
-        "groovy" -> "groovy"
-        "swift" -> "swift"
-        "go" -> "golang"
-        "rust" -> "rust"
-        "dart" -> "dart"
-        "yaml", "yml" -> "yaml"
-        "dockerfile" -> "dockerfile"
-        "r" -> "r"
-        else -> "text"
-    }
-}
-
 
 private val NUMERIC_CHAR_REF = Regex("&#([0-9]+);|&#[xX]([0-9a-fA-F]+);")
 

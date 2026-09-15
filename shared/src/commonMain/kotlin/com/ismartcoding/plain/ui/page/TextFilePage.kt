@@ -3,36 +3,33 @@ package com.ismartcoding.plain.ui.page
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
-import com.ismartcoding.plain.lib.extensions.pathToAceMode
-import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.TextFileType
-import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.platform.AceEditor
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.components.EditorData
+import com.ismartcoding.plain.ui.components.codeeditor.CodeEditor
+import com.ismartcoding.plain.ui.components.codeeditor.EditorLoadState
 import com.ismartcoding.plain.ui.models.TextFileViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,37 +39,28 @@ fun TextFilePage(
     title: String,
     mediaId: String = "",
     type: String = TextFileType.DEFAULT.name,
-    textFileVM: TextFileViewModel = viewModel { TextFileViewModel() }
+    textFileVM: TextFileViewModel = viewModel { TextFileViewModel() },
 ) {
-    val scope = rememberCoroutineScope()
-    val darkTheme = LocalDarkTheme.current
-    val isDarkTheme = DarkTheme.isDarkTheme(darkTheme)
-
     var isSaving by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (isSaving) 360f else 0f,
         animationSpec = tween(durationMillis = 600),
-        label = "save_rotation"
+        label = "save_rotation",
     )
 
     LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.Default) {
-            textFileVM.loadConfigAsync()
-            textFileVM.loadFileAsync(path, mediaId)
-            textFileVM.isDataLoading.value = false
-        }
+        textFileVM.loadConfigAsync()
+        textFileVM.loadFileAsync(path, mediaId, gotoEnd = type == TextFileType.APP_LOG.name)
     }
 
     if (textFileVM.showMoreActions.value) {
         ViewTextFileBottomSheet(textFileVM, path, textFileVM.file.value, onDeleted = {
-            scope.launch {
-                navController.navigateUp()
-            }
+            navController.navigateUp()
         })
     }
 
-    PBackHandler(enabled = !textFileVM.readOnly.value) {
-        textFileVM.exitEditMode()
+    PBackHandler(enabled = !textFileVM.controller.readOnly.value) {
+        textFileVM.exitEditMode(discard = true)
     }
 
     PScaffold(
@@ -81,11 +69,11 @@ fun TextFilePage(
                 title = title.ifEmpty { path.getFilenameFromPath() },
                 navController = navController,
                 navigationIcon = {
-                    if (textFileVM.readOnly.value) {
+                    if (textFileVM.controller.readOnly.value) {
                         NavigationBackIcon { navController.navigateUp() }
                     } else {
                         NavigationCloseIcon {
-                            textFileVM.exitEditMode()
+                            textFileVM.exitEditMode(discard = true)
                         }
                     }
                 },
@@ -96,37 +84,33 @@ fun TextFilePage(
                         path = path,
                         isSaving = isSaving,
                         rotation = rotation,
-                        scope = scope,
                         onSavingChanged = { isSaving = it },
                     )
                 },
             )
         },
         content = { paddingValues ->
-            // Use Box so the WebView renders in the background while the spinner
-            // overlays it — avoids a layout-shift freeze when the spinner hides.
-            Box(modifier = Modifier
-                .padding(top = paddingValues.calculateTopPadding())
-                .fillMaxSize()) {
-                if (!textFileVM.isDataLoading.value) {
-                    AceEditor(
-                        textFileVM, scope,
-                        EditorData(
-                            language = path.pathToAceMode(),
-                            wrapContent = textFileVM.wrapContent.value,
-                            isDarkTheme = isDarkTheme,
-                            readOnly = textFileVM.readOnly.value,
-                            gotoEnd = type == TextFileType.APP_LOG.name,
-                            content = textFileVM.content.value
-                        )
+            val loadState = textFileVM.controller.loadState.value
+            Box(
+                modifier = Modifier
+                    .padding(top = paddingValues.calculateTopPadding())
+                    .fillMaxSize(),
+            ) {
+                if (loadState is EditorLoadState.Error) {
+                    Text(
+                        text = loadState.message,
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
                     )
-                }
-                if (textFileVM.isDataLoading.value || !textFileVM.isEditorReady.value) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
+                } else {
+                    if (loadState is EditorLoadState.Ready) {
+                        CodeEditor(
+                            controller = textFileVM.controller,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }

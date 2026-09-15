@@ -23,6 +23,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(libs.kotlinx.coroutines.core)
+            api(libs.atomicfu)
             api(libs.kotlinx.serialization.json)
             api(libs.ktor.http)
 
@@ -50,7 +51,6 @@ kotlin {
         androidMain.dependencies {
             api(libs.androidx.core.ktx)
             api(libs.kotlin.reflect)
-            api(libs.atomicfu)
             api(libs.netty.handler)
             api(libs.netty.codec.http)
             api(libs.netty.transport.native.epoll)

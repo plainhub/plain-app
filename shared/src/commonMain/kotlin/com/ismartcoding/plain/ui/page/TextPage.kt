@@ -1,26 +1,24 @@
 package com.ismartcoding.plain.ui.page
 import com.ismartcoding.plain.preferences.*
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.platform.AceEditor
 import com.ismartcoding.plain.ui.base.ActionButtonMore
-import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.components.EditorData
+import com.ismartcoding.plain.ui.components.codeeditor.CodeEditor
+import com.ismartcoding.plain.ui.components.codeeditor.EditorLoadState
 import com.ismartcoding.plain.ui.models.TextFileViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,15 +29,9 @@ fun TextPage(
     language: String,
     textFileVM: TextFileViewModel = viewModel { TextFileViewModel() },
 ) {
-    val scope = rememberCoroutineScope()
-    val darkTheme = LocalDarkTheme.current
-    val isDarkTheme = DarkTheme.isDarkTheme(darkTheme)
-
     LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.Default) {
-            textFileVM.loadConfigAsync()
-            textFileVM.isDataLoading.value = false
-        }
+        textFileVM.loadConfigAsync()
+        textFileVM.controller.openText(content, language)
     }
 
     if (textFileVM.showMoreActions.value) {
@@ -55,24 +47,18 @@ fun TextPage(
             })
         },
         content = { paddingValues ->
+            val loadState = textFileVM.controller.loadState.value
             Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-                if (textFileVM.isDataLoading.value) {
-                    NoDataColumn(loading = true)
-                    return@PScaffold
-                }
-                if (!textFileVM.isEditorReady.value) {
-                    NoDataColumn(loading = true)
-                }
-                AceEditor(
-                    textFileVM, scope, EditorData(
-                        language,
-                        textFileVM.wrapContent.value,
-                        isDarkTheme = isDarkTheme,
-                        readOnly = textFileVM.readOnly.value,
-                        gotoEnd = false,
-                        content = content
+                if (loadState is EditorLoadState.Ready) {
+                    CodeEditor(
+                        controller = textFileVM.controller,
+                        modifier = Modifier.fillMaxSize(),
                     )
-                )
+                } else {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         },
     )

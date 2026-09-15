@@ -13,15 +13,14 @@ import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.platform.exportLogsAsync
 import com.ismartcoding.plain.platform.shareFile
-import com.ismartcoding.plain.platform.writeFileText
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TextFileViewModel
 import com.ismartcoding.plain.lib.withIO
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 
 @Composable
 internal fun RowScope.TextFilePageActions(
@@ -30,15 +29,23 @@ internal fun RowScope.TextFilePageActions(
     path: String,
     isSaving: Boolean,
     rotation: Float,
-    scope: CoroutineScope,
     onSavingChanged: (Boolean) -> Unit,
 ) {
-    if (!textFileVM.isEditorReady.value) return
+    val controller = textFileVM.controller
+    if (controller.loadState.value !is com.ismartcoding.plain.ui.components.codeeditor.EditorLoadState.Ready) return
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
 
-    if (textFileVM.readOnly.value) {
+    if (controller.readOnly.value) {
+        PIconButton(
+            icon = Res.drawable.search,
+            contentDescription = stringResource(Res.string.search),
+            tint = MaterialTheme.colorScheme.onSurface,
+        ) {
+            controller.setSearchVisible(!controller.searchVisible.value)
+        }
         if (type != TextFileType.APP_LOG.name && type != TextFileType.CRASH_REPORT.name && !textFileVM.isExternalFile.value) {
             PIconButton(
                 icon = Res.drawable.square_pen,
@@ -64,9 +71,11 @@ internal fun RowScope.TextFilePageActions(
                 focusManager.clearFocus()
                 onSavingChanged(true)
                 DialogHelper.showLoading()
-                withIO { writeFileText(path, textFileVM.content.value, overwrite = true) }
-                textFileVM.oldContent.value = textFileVM.content.value
+                val result = withIO { controller.saveAsync() }
                 DialogHelper.hideLoading()
+                if (result.isFailure) {
+                    DialogHelper.showErrorDialog(result.exceptionOrNull()?.toString() ?: "save failed")
+                }
                 delay(600)
                 onSavingChanged(false)
             }
