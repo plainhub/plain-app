@@ -20,6 +20,7 @@ import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
+import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.features.sms.MmsSendResultTracker
 import com.ismartcoding.plain.features.sms.SmsProviderContract
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -192,6 +193,84 @@ actual suspend fun restoreSms(query: String): Int {
     dao.deleteByMessageIds(restorable)
     return restorable.size
 }
+
+private const val SMS_TRASH_DIR = "sms-trash"
+private const val SMS_TRASH_RETENTION_DAYS = 30L
+
+/**
+ * Archive full message content to app-private storage before a real delete.
+ * Files are the last-resort recovery net (JSON for tools, CSV for spreadsheets)
+ * and are cleaned up after 30 days.
+ */
+private fun archiveDeletedMessages(messages: List<DMessage>) {
+    if (messages.isEmpty()) return
+    val dir = File(appContext.filesDir, SMS_TRASH_DIR).apply { mkdirs() }
+    val stamp = System.currentTimeMillis()
+    runCatching {
+        File(dir, "deleted_$stamp.json").writeText(JsonHelper.jsonEncode(messages, pretty = true))
+    }
+    runCatching {
+        val header = "id,body,address,date,thread_id,is_mms"
+        val rows = messages.joinToString("\n") { m ->
+            listOf(
+                m.id,
+                m.body.replace("\"", "\"\"").replace("\n", "\\n"),
+                m.address,
+                m.date.toEpochMilliseconds().toString(),
+                m.threadId,
+                m.isMms.toString(),
+            ).joinToString(",") { "\"$it\"" }
+        }
+        File(dir, "deleted_$stamp.csv").writeText(header + "\n" + rows)
+    }
+    // Retention: drop archives older than 30 days.
+    val cutoff = stamp - SMS_TRASH_RETENTION_DAYS * 24 * 60 * 60 * 1000
+    dir.listFiles()?.forEach { if (it.lastModified() < cutoff) it.delete() }
+}
+
+private fun shizukuDeleteUri(uri: String) {
+    // `content delete` runs as shell uid, which carries the WRITE_SMS appop.
+    ShizukuHelper.exec("content delete --uri $uri")
+}
+
+actual suspend fun deleteSms(query: String): Int {
+    if (!ShizukuHelper.isGranted()) {
+        throw IllegalStateException("Shizuku is not available or not granted")
+    }
+    // includeTrashed: permanently deleting from the trash bin must reach
+    // app-side trashed messages, which normal queries exclude.
+    val ids = SmsHelper.getIdsAsync(appContext, query, includeTrashed = true)
+    if (ids.isEmpty()) return 0
+    val messages = SmsHelper.searchAsync(
+        appContext,
+        "ids:${ids.joinToString(",")}",
+        limit = ids.size,
+        offset = 0,
+        includeTrashed = true,
+    )
+    // Recovery net before touching the provider: full content archive +
+    // shadow-table record (feeds the 30-day restore window).
+    archiveDeletedMessages(messages)
+    val now = Clock.System.now()
+    val dao = AppDatabase.instance.trashedMessageDao()
+    val known = getTrashedMessageIds()
+    dao.insertAll((ids - known).map { DTrashedMessage(messageId = it, isMms = it.startsWith("mms_"), trashedAt = now) })
+
+    var deleted = 0
+    ids.forEach { id ->
+        val uri = if (id.startsWith("mms_")) "content://mms/${id.removePrefix("mms_")}" else "content://sms/$id"
+        runCatching { shizukuDeleteUri(uri) }
+            .onSuccess { deleted++ }
+            .onFailure {
+                // Provider refused (e.g. id vanished meanwhile); drop the
+                // shadow record so it doesn't linger as a phantom entry.
+                dao.deleteByMessageIds(listOf(id))
+            }
+    }
+    return deleted
+}
+
+actual fun isSmsDeleteAvailable(): Boolean = ShizukuHelper.isGranted()
 
 actual suspend fun getDocExtGroups(query: String): List<Pair<String, Int>> =
     DocMediaStoreHelper.getDocExtGroupsAsync(appContext, query)

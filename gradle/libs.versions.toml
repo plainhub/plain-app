@@ -35,6 +35,7 @@ navigationCompose="2.9.2"
 navigationComposeVersion = "2.10.0"
 material3Version = "1.4.0"
 okhttpVersion="5.5.0"
+shizukuVersion = "13.1.5"
 room = "3.0.0"
 runtimeVersion="1.12.0"
 sqlite = "2.7.0"
@@ -160,6 +161,9 @@ ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processin
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
+shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizukuVersion" }
+shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizukuVersion" }
+shizuku-aidl = { module = "dev.rikka.shizuku:aidl", version.ref = "shizukuVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tinkAndroidVersion" }
 mediapipe-tasks-vision = { module = "com.google.mediapipe:tasks-vision", version.ref = "mediapipeVisionVersion" }

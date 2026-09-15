@@ -91,6 +91,10 @@
         <intent>
             <action android:name="android.speech.RecognitionService" />
         </intent>
+        <!-- Shizuku (privileged SMS deletion) -->
+        <intent>
+            <action android:name="moe.shizuku.manager.intent.ACTION_START_SERVICE" />
+        </intent>
     </queries>
 
     <attribution
@@ -298,6 +302,14 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
+
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
     </application>
 
 </manifest>

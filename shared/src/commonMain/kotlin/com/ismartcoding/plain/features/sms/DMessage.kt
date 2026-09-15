@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.features.sms
 
 import com.ismartcoding.plain.db.IData
+import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
+@Serializable
 data class DMessage(
     override var id: String,
     val body: String,
@@ -17,6 +19,7 @@ data class DMessage(
     val attachments: List<DMessageAttachment> = emptyList(),
 ) : IData
 
+@Serializable
 data class DMessageAttachment(
     val path: String,
     val contentType: String,

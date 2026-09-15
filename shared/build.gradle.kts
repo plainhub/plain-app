@@ -102,6 +102,11 @@ kotlin {
             implementation(libs.coil.video)
             implementation(libs.coil.network.okhttp)
 
+            // Shizuku (shell-uid privileged ops for SMS deletion)
+            implementation(libs.shizuku.api)
+            implementation(libs.shizuku.provider)
+            implementation(libs.shizuku.aidl)
+
             // Vendored libraries (lib/) dependencies
             implementation(libs.pdfium.android)
             implementation(libs.zxing.core)

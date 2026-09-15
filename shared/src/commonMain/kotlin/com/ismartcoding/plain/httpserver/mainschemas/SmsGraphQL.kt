@@ -25,6 +25,8 @@ import com.ismartcoding.plain.platform.getArchivedSmsConversations
 import com.ismartcoding.plain.platform.getSmsAllCounts
 import com.ismartcoding.plain.platform.trashSms as trashSmsInternal
 import com.ismartcoding.plain.platform.restoreSms as restoreSmsInternal
+import com.ismartcoding.plain.platform.deleteSms as deleteSmsInternal
+import com.ismartcoding.plain.platform.isSmsDeleteAvailable as isSmsDeleteAvailableInternal
 import com.ismartcoding.plain.platform.getLatestSentMmsId
 import com.ismartcoding.plain.platform.launchDefaultSmsApp
 import com.ismartcoding.plain.platform.mimeTypeFromExtension
@@ -137,6 +139,17 @@ suspend fun trashSms(query: String): Boolean {
 @GraphQLMutation
 suspend fun restoreSms(query: String): Boolean {
     restoreSmsInternal(query)
+    return true
+}
+
+@GraphQLQuery
+suspend fun smsDeleteAvailable(): Boolean {
+    return Permission.READ_SMS.enabledAndIsGrantedAsync() && isSmsDeleteAvailableInternal()
+}
+
+@GraphQLMutation
+suspend fun deleteSms(query: String): Boolean {
+    deleteSmsInternal(query)
     return true
 }
 

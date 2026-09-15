@@ -181,6 +181,27 @@ expect suspend fun trashSms(query: String): Int
 expect suspend fun restoreSms(query: String): Int
 
 /**
+ * Permanently delete SMS/MMS messages matching [query] from the system
+ * Telephony provider via Shizuku (shell uid). Requires the Shizuku app
+ * to be installed, running and granted.
+ *
+ * Before touching the provider, the full message content is archived to
+ * app-private storage (JSON + CSV, kept for 30 days) as a recovery net,
+ * and the ids are recorded in the shadow table.
+ *
+ * Returns the number of messages deleted.
+ * @throws IllegalStateException when Shizuku is unavailable or not granted.
+ */
+expect suspend fun deleteSms(query: String): Int
+
+/**
+ * Whether real SMS deletion ([deleteSms]) is currently possible:
+ * Shizuku installed, running and granted. Always false on unsupported
+ * platforms. Cheap enough to poll before showing delete affordances.
+ */
+expect fun isSmsDeleteAvailable(): Boolean
+
+/**
  * Send an SMS text message to [number] with body [body].
  * @param subscriptionId SIM subscription id, or null for default.
  * @param clientId web client identity derived from the authenticated request headers.

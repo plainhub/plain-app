@@ -324,10 +324,11 @@ object SmsHelper {
         query: String,
         limit: Int,
         offset: Int,
+        includeTrashed: Boolean = false,
     ): List<DMessage> = withIO {
         val conditions = QueryHelper.parseAsync(query)
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
-        val trashedIds = getTrashedMessageIds()
+        val trashedIds = if (includeTrashed) emptySet() else getTrashedMessageIds()
         val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
         if (threadId.isNotEmpty()) {
             return@withIO searchByThreadAsync(context, threadId, conditions, archivedRecords, trashedIds, limit, offset)
@@ -666,10 +667,10 @@ object SmsHelper {
         return smsCount + mmsCount
     }
 
-    suspend fun getIdsAsync(context: Context, query: String): Set<String> = withIO {
+    suspend fun getIdsAsync(context: Context, query: String, includeTrashed: Boolean = false): Set<String> = withIO {
         val conditions = QueryHelper.parseAsync(query)
         val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
-        val trashedIds = getTrashedMessageIds()
+        val trashedIds = if (includeTrashed) emptySet() else getTrashedMessageIds()
         val where = buildWhere(conditions, archivedRecords, trashedIds)
         val textMatchedMmsIds = findMmsIdsMatchingText(
             context,
