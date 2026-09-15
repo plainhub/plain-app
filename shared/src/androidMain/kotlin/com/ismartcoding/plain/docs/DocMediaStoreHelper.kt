@@ -3,6 +3,7 @@ package com.ismartcoding.plain.docs
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import com.ismartcoding.plain.data.DDoc
 import com.ismartcoding.plain.helpers.ContentWhere
 import com.ismartcoding.plain.lib.extensions.forEach
 import com.ismartcoding.plain.lib.extensions.getLongValue
@@ -149,7 +150,7 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
         val mimeTypePlaceholders = extraDocumentMimeTypes.joinToString(",") { "?" }
         val selection = "(${MediaStore.Files.FileColumns.MIME_TYPE} LIKE ? OR ${MediaStore.Files.FileColumns.MIME_TYPE} IN ($mimeTypePlaceholders)) AND ${MediaStore.Files.FileColumns.SIZE} > 0 AND ${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME} != ''"
         val selectionArgs = (listOf("text/%") + extraDocumentMimeTypes).toTypedArray()
-        context.contentResolver.query(uriExternal, projection, selection, selectionArgs, null)?.forEach { cursor, cache ->
+        context.contentResolver.query(uriExternal, projection, selection, selectionArgs, "${MediaStore.MediaColumns.DATE_MODIFIED} DESC")?.forEach { cursor, cache ->
             val bucketId = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_ID, cache)
             val bucketName = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, cache)
             val size = cursor.getLongValue(MediaStore.MediaColumns.SIZE, cache)

@@ -278,7 +278,7 @@ abstract class BaseMediaContentHelper {
                 "${MediaStore.MediaColumns.BUCKET_DISPLAY_NAME} != ''"
             },
             null,
-            null,
+            "${MediaStore.MediaColumns.DATE_MODIFIED} DESC",
         )?.forEach { cursor, cache ->
             val bucketId = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_ID, cache)
             val bucketName = cursor.getStringValue(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, cache)
