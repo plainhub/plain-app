@@ -61,6 +61,9 @@ suspend fun app(): App {
     if (Permission.RECORD_AUDIO.isGranted() && !grantedPermissions.contains(Permission.RECORD_AUDIO)) {
         grantedPermissions.add(Permission.RECORD_AUDIO)
     }
+    if (Permission.ADB.isGranted() && !grantedPermissions.contains(Permission.ADB)) {
+        grantedPermissions.add(Permission.ADB)
+    }
     return App(
         clientId = TempData.clientId,
         usbConnected = isUsbConnected(),

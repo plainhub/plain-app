@@ -91,8 +91,6 @@ actual suspend fun restoreSms(query: String): Int = 0
 
 actual suspend fun deleteSms(query: String): Int = 0
 
-actual fun isSmsDeleteAvailable(): Boolean = false
-
 actual fun sendSmsText(
     number: String,
     body: String,

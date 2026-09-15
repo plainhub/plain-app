@@ -25,6 +25,7 @@ actual fun isPermissionGranted(perm: String): Boolean {
 
 actual fun Permission.isGranted(): Boolean = when {
     this == Permission.QUERY_ALL_PACKAGES -> true
+    this == Permission.ADB -> ShizukuHelper.isGranted()
     this == Permission.WRITE_EXTERNAL_STORAGE -> FileHelper.hasStoragePermission(appContext)
     this == Permission.POST_NOTIFICATIONS -> {
         if (isTPlus()) appContext.hasPermission(this.toSysPermission())
