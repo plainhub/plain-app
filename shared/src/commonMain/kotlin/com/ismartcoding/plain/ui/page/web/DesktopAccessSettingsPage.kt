@@ -78,6 +78,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
         val notificationsCard = AppFeatureType.NOTIFICATIONS.has()
         val listState = rememberLazyListState()
         val anchors = remember { mutableStateMapOf<AccessFeatureType, Rect>() }
+        val switches = remember { mutableStateMapOf<AccessFeatureType, Rect>() }
         var listBounds by remember { mutableStateOf<Rect?>(null) }
         var overlayOrigin by remember { mutableStateOf(Offset.Zero) }
         var overlaySize by remember { mutableStateOf(IntSize.Zero) }
@@ -162,8 +163,16 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                             icon = m.icon, title = permission.getText(),
                             subtitle = stringResource(if (m.granted) Res.string.system_permission_granted else Res.string.system_permission_not_granted)
                         ) {
-                            PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
-                                togglePermission(scope, m, enable)
+                            if (af != null) {
+                                Box(Modifier.onGloballyPositioned { switches[af] = it.boundsInRoot() }) {
+                                    PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                                        togglePermission(scope, m, enable)
+                                    }
+                                }
+                            } else {
+                                PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                                    togglePermission(scope, m, enable)
+                                }
                             }
                             HorizontalSpace(8.dp)
                         }
@@ -183,7 +192,9 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                                     subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted),
                                     separatedActions = true
                                 ) {
-                                    PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
+                                    Box(Modifier.onGloballyPositioned { switches[AccessFeatureType.NOTIFICATIONS] = it.boundsInRoot() }) {
+                                        PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
+                                    }
                                     HorizontalSpace(8.dp)
                                 }
                             }
@@ -199,7 +210,9 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                                 icon = Res.drawable.content_paste, title = stringResource(Res.string.clipboard_sync),
                                 separatedActions = true
                             ) {
-                                PSwitch(activated = clipboardSync) { enable -> webVM.enableClipboardSync(enable) }
+                                Box(Modifier.onGloballyPositioned { switches[AccessFeatureType.CLIPBOARD_SYNC] = it.boundsInRoot() }) {
+                                    PSwitch(activated = clipboardSync) { enable -> webVM.enableClipboardSync(enable) }
+                                }
                                 HorizontalSpace(8.dp)
                             }
                         }
@@ -247,6 +260,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                     anchors[f]?.let { rect ->
                         AccessFeatureBubble(
                             anchor = rect,
+                            switchAnchor = switches[f],
                             overlayOrigin = overlayOrigin,
                             overlaySize = overlaySize,
                             label = bubbleLabel(f),
