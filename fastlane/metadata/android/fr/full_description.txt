@@ -1,0 +1,56 @@
+<b>PlainApp</b> est une application Android gratuite et open source qui transforme votre téléphone en centre de gestion auto-hébergé, accessible depuis n'importe quel navigateur sur le même réseau : sans compte, sans cloud, sans abonnement.
+
+<b>Pourquoi PlainApp ?</b>
+
+La plupart des outils de gestion mobile font passer vos données par leurs propres serveurs, verrouillent des fonctions derrière un abonnement ou affichent des publicités. PlainApp fait autrement :
+
+<ul>
+<li><b>100 % local</b> : vos données ne quittent jamais votre réseau</li>
+<li><b>Chiffrement de bout en bout</b> : chaque connexion est sécurisée par TLS + XChaCha20-Poly1305</li>
+<li><b>Gratuit et sans publicité</b> : aucun achat, aucune vente incitative, jamais</li>
+<li><b>Entièrement open source</b> : auditez le code, compilez votre propre binaire ou contribuez</li>
+</ul>
+
+<b>Fonctionnalités</b>
+
+<b>Gestion du téléphone depuis le navigateur</b>
+Ouvrez un navigateur sur n'importe quel appareil connecté au même réseau Wi-Fi pour gérer votre téléphone Android : aucune installation côté ordinateur.
+
+<ul>
+<li><b>Fichiers</b> : parcourez le stockage interne, la carte SD et les clés USB ; téléversement, téléchargement, renommage, suppression</li>
+<li><b>Médias</b> : consultez et gérez photos, vidéos et audio ; lecture en streaming dans le navigateur</li>
+<li><b>Contacts</b> : consultez, recherchez et gérez vos contacts</li>
+<li><b>SMS et appels</b> : lisez les messages et le journal d'appels ; envoyez des SMS depuis votre ordinateur</li>
+<li><b>Applications</b> : listez les applications installées et exportez les APK</li>
+<li><b>Notifications</b> : affichez les notifications du téléphone dans le navigateur en temps réel</li>
+<li><b>Miroir d'écran</b> : diffusez l'écran du téléphone dans le navigateur, avec audio et contrôle à distance</li>
+<li><b>Infos appareil</b> : batterie, stockage, réseau et détails du système</li>
+</ul>
+
+<b>Outils Android intégrés</b>
+PlainApp est aussi une application autonome complète :
+
+<ul>
+<li><b>Notes Markdown</b> : rédigez et organisez vos notes dans un éditeur épuré</li>
+<li><b>Lecteur RSS</b> : suivez vos sites préférés avec une lecture sans distraction</li>
+<li><b>Lecteur vidéo et audio</b> : lecteur multimédia complet avec listes de lecture</li>
+<li><b>Diffusion TV</b> : envoyez vos médias vers tout téléviseur compatible DLNA/Chromecast</li>
+<li><b>Chat P2P et partage de fichiers</b> : échangez fichiers et messages entre appareils sans serveur</li>
+<li><b>Minuteur Pomodoro</b> : restez concentré grâce au minuteur intégré</li>
+<li><b>Sonomètre</b> : mesurez le niveau de bruit ambiant en temps réel</li>
+</ul>
+
+<b>Confidentialité et sécurité</b>
+
+<ul>
+<li>Pas de Firebase Analytics ni de Messaging : les rapports de plantage sont optionnels et sur consentement</li>
+<li>Zéro donnée envoyée à des serveurs tiers</li>
+<li>Tout le trafic entre le téléphone et le navigateur est chiffré</li>
+<li>Aucune inscription de compte requise</li>
+</ul>
+
+<b>Liens</b>
+<ul>
+<li>GitHub : https://github.com/plainhub/plain-app</li>
+<li>Reddit : https://www.reddit.com/r/plainapp</li>
+</ul>

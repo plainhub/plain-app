@@ -1,0 +1,56 @@
+<b>PlainApp</b> ist eine kostenlose Open-Source-Android-App, die dein Smartphone in eine selbst gehostete Verwaltungszentrale verwandelt – erreichbar über jeden Browser im selben Netzwerk. Keine Konten, keine Cloud, keine Abos.
+
+<b>Warum PlainApp?</b>
+
+Die meisten Handy-Verwaltungstools leiten deine Daten über ihre eigenen Server, sperren Funktionen hinter Abos oder zeigen Werbung. PlainApp ist anders:
+
+<ul>
+<li><b>100 % lokal</b> – deine Daten verlassen dein Netzwerk nie</li>
+<li><b>Ende-zu-Ende-verschlüsselt</b> – jede Verbindung ist mit TLS + XChaCha20-Poly1305 gesichert</li>
+<li><b>Kostenlos und werbefrei</b> – keine Käufe, kein Upselling, niemals</li>
+<li><b>Vollständig quelloffen</b> – Code prüfen, eigene Builds erstellen oder mitwirken</li>
+</ul>
+
+<b>Funktionen</b>
+
+<b>Smartphone-Verwaltung im Browser</b>
+Öffne auf jedem Gerät im selben WLAN einen Browser und verwalte dein Android-Smartphone – auf dem Computer ist keine Installation nötig.
+
+<ul>
+<li><b>Dateien</b> – Internen Speicher, SD-Karte und USB-Laufwerke durchsehen; Hochladen, Herunterladen, Umbenennen, Löschen</li>
+<li><b>Medien</b> – Fotos, Videos und Audio ansehen und verwalten; direkt im Browser streamen</li>
+<li><b>Kontakte</b> – Kontakte ansehen, durchsuchen und verwalten</li>
+<li><b>SMS &amp; Anrufe</b> – Nachrichten und Anruflisten lesen; SMS vom Desktop senden</li>
+<li><b>Apps</b> – Installierte Apps auflisten und APKs exportieren</li>
+<li><b>Benachrichtigungen</b> – Handy-Benachrichtigungen in Echtzeit im Browser spiegeln</li>
+<li><b>Bildschirmspiegelung</b> – Den Bildschirm live mit Ton in den Browser streamen, inklusive Fernsteuerung</li>
+<li><b>Geräteinfo</b> – Akku, Speicher, Netzwerk und Systemdetails prüfen</li>
+</ul>
+
+<b>Integrierte Android-Werkzeuge</b>
+PlainApp ist auch eigenständig eine starke App:
+
+<ul>
+<li><b>Markdown-Notizen</b> – Notizen mit einem aufgeräumten Editor schreiben und ordnen</li>
+<li><b>RSS-Reader</b> – Lieblingswebsites mit einem ablenkungsfreien Reader verfolgen</li>
+<li><b>Video- &amp; Audio-Player</b> – Vollwertiger Media-Player mit Wiedergabelisten</li>
+<li><b>TV-Cast</b> – Medien auf jedes DLNA/Chromecast-kompatible Fernsehgerät übertragen</li>
+<li><b>P2P-Chat &amp; Dateiaustausch</b> – Dateien und Nachrichten direkt zwischen Geräten teilen, ohne Server</li>
+<li><b>Pomodoro-Timer</b> – Mit dem eingebauten Arbeitstimer fokussiert bleiben</li>
+<li><b>Schallpegelmesser</b> – Umgebungslautstärke in Echtzeit messen</li>
+</ul>
+
+<b>Datenschutz &amp; Sicherheit</b>
+
+<ul>
+<li>Kein Firebase Analytics oder Messaging – Absturzberichte sind optional und aktivierbar</li>
+<li>Null Daten an Server von Drittanbietern</li>
+<li>Der gesamte Datenverkehr zwischen Handy und Browser ist verschlüsselt</li>
+<li>Keine Kontoregistrierung nötig</li>
+</ul>
+
+<b>Links</b>
+<ul>
+<li>GitHub: https://github.com/plainhub/plain-app</li>
+<li>Reddit: https://www.reddit.com/r/plainapp</li>
+</ul>
