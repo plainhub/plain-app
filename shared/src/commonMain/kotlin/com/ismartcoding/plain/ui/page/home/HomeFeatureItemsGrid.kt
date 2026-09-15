@@ -33,6 +33,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -48,7 +49,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeFeatureItemsGrid(navController: NavHostController) {
+fun HomeFeatureItemsGrid(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+    minHeight: Dp = 0.dp,
+) {
     val scope = rememberCoroutineScope()
 
     val featuresStr = remember {
@@ -90,7 +95,7 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         state = gridState,
-        modifier = Modifier.fillMaxWidth().height(gridHeight),
+        modifier = modifier.fillMaxWidth().height(maxOf(gridHeight, minHeight)),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         userScrollEnabled = false,

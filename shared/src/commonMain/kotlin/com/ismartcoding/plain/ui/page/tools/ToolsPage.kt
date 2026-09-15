@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.page.tools
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,9 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -72,47 +77,67 @@ fun ToolsPage(
             )
         },
     ) { paddingValues ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(top = paddingValues.calculateTopPadding()),
         ) {
-            if (currentUri.isNotEmpty() && CastPlayer.currentDevice != null) {
-                val deviceName = CastPlayer.currentDevice?.getDeviceName() ?: ""
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    StatusIndicator(
-                        text = if (deviceName.isNotEmpty()) stringResource(Res.string.casting_to, deviceName) else stringResource(Res.string.casting),
-                        onClick = { navController.navigate(Routing.CastSession) },
-                        pillColor = MaterialTheme.colorScheme.greenPill,
-                        dotColor = MaterialTheme.colorScheme.greenText,
-                        textColor = MaterialTheme.colorScheme.greenText,
-                        cornerRadius = 24.dp,
-                        contentPaddingHorizontal = 16.dp,
-                        contentPaddingVertical = 8.dp,
-                        textStartPadding = 8.dp,
-                    )
-                }
-                VerticalSpace(8.dp)
-            }
-            TopSpace()
+            val density = LocalDensity.current
+            val viewportHeight = maxHeight
+            var aboveGridHeightPx by remember { mutableStateOf(0) }
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
             ) {
-                if (notesEnabled) {
-                    QuickNoteCard(
-                        onOpenNote = { id -> navController.navigate(Routing.NoteDetail(id)) },
-                        onEmptyExpand = { navController.navigate(Routing.NotesCreate("")) },
-                    )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onSizeChanged { aboveGridHeightPx = it.height },
+                ) {
+                    if (currentUri.isNotEmpty() && CastPlayer.currentDevice != null) {
+                        val deviceName = CastPlayer.currentDevice?.getDeviceName() ?: ""
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            StatusIndicator(
+                                text = if (deviceName.isNotEmpty()) stringResource(Res.string.casting_to, deviceName) else stringResource(Res.string.casting),
+                                onClick = { navController.navigate(Routing.CastSession) },
+                                pillColor = MaterialTheme.colorScheme.greenPill,
+                                dotColor = MaterialTheme.colorScheme.greenText,
+                                textColor = MaterialTheme.colorScheme.greenText,
+                                cornerRadius = 24.dp,
+                                contentPaddingHorizontal = 16.dp,
+                                contentPaddingVertical = 8.dp,
+                                textStartPadding = 8.dp,
+                            )
+                        }
+                        VerticalSpace(8.dp)
+                    }
+                    TopSpace()
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        if (notesEnabled) {
+                            QuickNoteCard(
+                                onOpenNote = { id -> navController.navigate(Routing.NoteDetail(id)) },
+                                onEmptyExpand = { navController.navigate(Routing.NotesCreate("")) },
+                            )
+                        }
+                    }
                 }
-                HomeFeatureItemsGrid(navController)
+                VerticalSpace(12.dp)
+                HomeFeatureItemsGrid(
+                    navController,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    minHeight = (viewportHeight - with(density) { aboveGridHeightPx.toDp() } - 12.dp - 16.dp - 40.dp - paddingValues.calculateBottomPadding())
+                        .coerceAtLeast(0.dp),
+                )
+                VerticalSpace(dp = 16.dp)
+                BottomSpace(paddingValues)
             }
-            VerticalSpace(dp = 16.dp)
-            BottomSpace(paddingValues)
         }
     }
 }
