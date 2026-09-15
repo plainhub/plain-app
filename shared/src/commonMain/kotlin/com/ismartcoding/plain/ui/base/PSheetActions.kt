@@ -113,11 +113,17 @@ fun PSheetActionCard(content: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-fun PSheetActionRow(icon: DrawableResource, title: String, click: () -> Unit) {
+fun PSheetActionRow(
+    icon: DrawableResource,
+    title: String,
+    trailing: (@Composable () -> Unit)? = null,
+    click: () -> Unit,
+) {
     PListItem(
         modifier = Modifier.clip(RoundedCornerShape(12.dp)).clickable(onClick = click),
         icon = icon,
         title = title,
+        action = trailing,
     )
 }
 

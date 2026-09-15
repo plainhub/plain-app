@@ -1,16 +1,10 @@
 package com.ismartcoding.plain.ui.page.media
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
@@ -19,22 +13,18 @@ import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.playlistAudioFromPath
-import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
-import com.ismartcoding.plain.platform.MediaPreviewer
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
+// Entry route for home-screen shortcut launches. Audio only: it starts playback
+// and hands over to the audio player page. Images/videos are previewed as an
+// overlay above the app UI instead (ShortcutMediaPreviewer), so they never land here.
 @Composable
 fun PlayMediaPage(
     navController: NavHostController,
     path: String,
     audioPlaylistVM: AudioPlaylistViewModel,
 ) {
-    val scope = rememberCoroutineScope()
-
     if (path.isAudioFast()) {
         LaunchedEffect(path) {
             coMain {
@@ -49,31 +39,6 @@ fun PlayMediaPage(
                 }
             }
         }
-        Box(modifier = Modifier.fillMaxSize().background(Color.Black))
-        return
     }
-
-    MediaPreviewData.items = listOf(PreviewItem(id = path, path = path))
-
-    val previewerState = rememberPreviewerState(
-        scope = scope,
-        pageCount = { MediaPreviewData.items.size },
-    )
-
-    var hasOpened by remember { mutableStateOf(false) }
-
-    LaunchedEffect(previewerState.visible) {
-        if (previewerState.visible) {
-            hasOpened = true
-        } else if (hasOpened && !previewerState.animating) {
-            navController.navigateUp()
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        LaunchedEffect(Unit) {
-            previewerState.open(0)
-        }
-        MediaPreviewer(state = previewerState)
-    }
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black))
 }

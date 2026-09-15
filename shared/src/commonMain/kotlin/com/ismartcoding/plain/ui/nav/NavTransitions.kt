@@ -41,6 +41,7 @@ private val PRESENTED_ROUTES: Set<KClass<out Any>> = setOf(
     Routing.PomodoroTimer::class,
     Routing.ImageEditor::class,
     Routing.Apps::class,
+    Routing.SharedFolder::class,
 )
 
 /** 当前目的地是否为模态呈现 */

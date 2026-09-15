@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">捷徑已添加到主螢幕</string>
     <string name="shortcut_not_supported">您的桌面不支援添加捷徑</string>
     <string name="shortcut_label_hint">注意：部分手機（如 MIUI）可能無法成功添加捷徑到主螢幕。</string>
+    <string name="home_screen_help_title">什麼是主螢幕？</string>
+    <string name="home_screen_help_text">主螢幕是手機的主畫面，就是顯示應用圖示和桌布的那一屏。此操作會在主螢幕建立該檔案的捷徑，隨時可像應用一樣點開。</string>
     <string name="help">說明</string>
     <string name="bluetooth_permission_denied">藍牙權限已被拒絕，請在系統設定中允許 PlainApp 使用藍牙。</string>
     <string name="bluetooth_off">藍牙已關閉，請在控制中心或系統設定中開啟藍牙。</string>

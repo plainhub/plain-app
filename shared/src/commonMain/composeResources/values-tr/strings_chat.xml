@@ -152,4 +152,13 @@
     <string name="shared_folder">Paylaşılan klasör</string>
     <string name="shared_items">Paylaşılan öğeler</string>
     <string name="add_items">Öğe ekle</string>
+    <string name="download_to_downloads">İndirilenler'e kaydet</string>
+    <string name="pick_directory">Dizin seç…</string>
+    <string name="sync_to_downloads">İndirilenler'e eşitle</string>
+    <string name="download_zip">ZIP olarak indir</string>
+    <string name="choose_this_folder">Bu Klasörü Seç</string>
+    <string name="syncing_files">Dosyalar eşitleniyor…</string>
+    <string name="download_failed">İndirme başarısız</string>
+    <string name="save_to">Kaydet</string>
+    <string name="recent_used">Son kullanılan</string>
 </resources>

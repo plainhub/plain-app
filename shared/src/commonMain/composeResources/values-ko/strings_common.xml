@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">바로가기가 홈 화면에 추가되었습니다</string>
     <string name="shortcut_not_supported">런처가 바로가기 추가를 지원하지 않습니다</string>
     <string name="shortcut_label_hint">참고: 일부 런처(예: MIUI)에서는 홈 화면에 바로가기를 추가하지 못할 수 있습니다.</string>
+    <string name="home_screen_help_title">홈 화면이란?</string>
+    <string name="home_screen_help_text">홈 화면은 앱 아이콘이 있는 휴대전화의 기본 화면입니다. 이 작업을 하면 파일 바로 가기가 홈 화면에 추가되어 앱처럼 언제든 열 수 있습니다.</string>
     <string name="help">도움말</string>
     <string name="bluetooth_permission_denied">블루투스 권한이 거부되었습니다. 설정에서 PlainApp의 블루투스를 허용해 주세요.</string>
     <string name="bluetooth_off">블루투스가 꺼져 있습니다. 제어 센터 또는 설정에서 켜 주세요.</string>

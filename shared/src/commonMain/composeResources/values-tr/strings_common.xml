@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">Kısayol ana ekrana eklendi</string>
     <string name="shortcut_not_supported">Başlatıcınız kısayol eklemeyi desteklemiyor</string>
     <string name="shortcut_label_hint">Not: Bazı başlatıcılar (ör. MIUI) kısayolları ana ekrana eklemeyi desteklemeyebilir.</string>
+    <string name="home_screen_help_title">Ana ekran nedir?</string>
+    <string name="home_screen_help_text">Ana ekran, telefonun uygulama simgelerinin bulunduğu ana ekranıdır. Bu işlem dosyanın kısayolunu oraya ekler; dilediğinizde bir uygulama gibi açabilirsiniz.</string>
     <string name="help">Yardım</string>
     <string name="bluetooth_permission_denied">Bluetooth izni reddedildi. Ayarlar\'dan PlainApp için Bluetooth\'a izin verin.</string>
     <string name="bluetooth_off">Bluetooth kapalı. Kontrol Merkezi\'nden veya Ayarlar\'dan açın.</string>

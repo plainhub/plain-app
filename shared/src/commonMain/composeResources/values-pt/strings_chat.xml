@@ -152,4 +152,13 @@
     <string name="shared_folder">Pasta compartilhada</string>
     <string name="shared_items">Itens compartilhados</string>
     <string name="add_items">Adicionar itens</string>
+    <string name="download_to_downloads">Salvar em Downloads</string>
+    <string name="pick_directory">Escolher diretório…</string>
+    <string name="sync_to_downloads">Sincronizar com Downloads</string>
+    <string name="download_zip">Baixar como ZIP</string>
+    <string name="choose_this_folder">Escolher esta pasta</string>
+    <string name="syncing_files">Sincronizando arquivos…</string>
+    <string name="download_failed">Falha no download</string>
+    <string name="save_to">Salvar em</string>
+    <string name="recent_used">Recentes</string>
 </resources>

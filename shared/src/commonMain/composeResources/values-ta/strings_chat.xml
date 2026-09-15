@@ -152,4 +152,13 @@
     <string name="shared_folder">பகிரப்பட்ட கோப்புறை</string>
     <string name="shared_items">பகிரப்பட்ட பொருட்கள்</string>
     <string name="add_items">பொருட்களைச் சேர்</string>
+    <string name="download_to_downloads">பதிவிறக்கங்களில் சேமி</string>
+    <string name="pick_directory">அடைவைத் தேர்வு…</string>
+    <string name="sync_to_downloads">பதிவிறக்கங்களுடன் ஒத்திசை</string>
+    <string name="download_zip">ZIP ஆகப் பதிவிறக்கவும்</string>
+    <string name="choose_this_folder">இந்த கோப்புறையைத் தேர்வு</string>
+    <string name="syncing_files">கோப்புகள் ஒத்திசைக்கப்படுகின்றன…</string>
+    <string name="download_failed">பதிவிறக்கம் தோல்வி</string>
+    <string name="save_to">சேமிக்கவும்</string>
+    <string name="recent_used">சமீபத்தியவை</string>
 </resources>

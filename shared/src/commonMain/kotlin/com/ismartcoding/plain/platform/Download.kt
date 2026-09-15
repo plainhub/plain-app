@@ -29,6 +29,12 @@ expect suspend fun saveTempFileToDownloads(handle: DownloadTempFileHandle, filen
 
 expect fun resolveAppFilePath(fidUri: String): String
 
+/**
+ * Streaming write handle for an arbitrary real filesystem path. Parent
+ * directories are created as needed; close() completes the file.
+ */
+expect fun createFileWriteHandle(filePath: String): DownloadTempFileHandle
+
 internal object CommonMimeTypes {
     operator fun get(extension: String): String = when (extension.lowercase()) {
         "txt" -> "text/plain"

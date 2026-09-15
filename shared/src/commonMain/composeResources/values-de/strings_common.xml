@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">Verknüpfung zum Startbildschirm hinzugefügt</string>
     <string name="shortcut_not_supported">Ihr Launcher unterstützt keine Verknüpfungen</string>
     <string name="shortcut_label_hint">Hinweis: Einige Launcher (z. B. MIUI) unterstützen möglicherweise das Hinzufügen von Verknüpfungen nicht.</string>
+    <string name="home_screen_help_title">Was ist der Startbildschirm?</string>
+    <string name="home_screen_help_text">Der Startbildschirm ist die Hauptseite Ihres Telefons mit den App-Symbolen. Damit wird dort eine Verknüpfung zur Datei erstellt, die Sie jederzeit wie eine App öffnen können.</string>
     <string name="help">Hilfe</string>
     <string name="bluetooth_permission_denied">Bluetooth-Berechtigung wurde verweigert. Aktivieren Sie Bluetooth für PlainApp in den Einstellungen.</string>
     <string name="bluetooth_off">Bluetooth ist ausgeschaltet. Aktivieren Sie es im Kontrollzentrum oder in den Einstellungen.</string>

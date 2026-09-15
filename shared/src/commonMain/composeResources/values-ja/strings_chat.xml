@@ -152,4 +152,13 @@
     <string name="shared_folder">共有フォルダ</string>
     <string name="shared_items">共有アイテム</string>
     <string name="add_items">アイテムを追加</string>
+    <string name="download_to_downloads">ダウンロードに保存</string>
+    <string name="pick_directory">ディレクトリを選択…</string>
+    <string name="sync_to_downloads">ダウンロードに同期</string>
+    <string name="download_zip">ZIPでダウンロード</string>
+    <string name="choose_this_folder">このフォルダを選択</string>
+    <string name="syncing_files">ファイルを同期中…</string>
+    <string name="download_failed">ダウンロードに失敗しました</string>
+    <string name="save_to">保存先</string>
+    <string name="recent_used">最近使用</string>
 </resources>

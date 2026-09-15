@@ -152,4 +152,13 @@
     <string name="shared_folder">共享文件夹</string>
     <string name="shared_items">共享内容</string>
     <string name="add_items">添加内容</string>
+    <string name="download_to_downloads">下载到 Downloads</string>
+    <string name="pick_directory">选择目录…</string>
+    <string name="sync_to_downloads">同步到 Downloads</string>
+    <string name="download_zip">下载 ZIP 包</string>
+    <string name="choose_this_folder">选择此文件夹</string>
+    <string name="syncing_files">正在同步文件…</string>
+    <string name="download_failed">下载失败</string>
+    <string name="save_to">保存到</string>
+    <string name="recent_used">最近使用</string>
 </resources>

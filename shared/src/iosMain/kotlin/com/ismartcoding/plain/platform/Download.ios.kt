@@ -59,6 +59,15 @@ actual fun getMimeTypeFromExtension(extension: String): String {
 }
 
 @OptIn(ExperimentalForeignApi::class)
+actual fun createFileWriteHandle(filePath: String): DownloadTempFileHandle {
+    val dir = filePath.substringBeforeLast('/', "")
+    if (dir.isNotEmpty()) {
+        NSFileManager.defaultManager.createDirectoryAtPath(dir, true, null, null)
+    }
+    return IosDownloadTempFileHandle(filePath)
+}
+
+@OptIn(ExperimentalForeignApi::class)
 actual suspend fun importDownloadedFile(handle: DownloadTempFileHandle, fileName: String, mimeType: String): String = withIO {
     val iosHandle = handle as? IosDownloadTempFileHandle ?: return@withIO ""
     iosHandle.close()

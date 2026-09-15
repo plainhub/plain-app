@@ -30,6 +30,7 @@ import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.AddToHomeDialog
+import com.ismartcoding.plain.ui.components.AddToHomeHelpAction
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -100,7 +101,7 @@ internal fun ViewImageActionButtons(
                     }
                 }
                 if (!m.path.isUrl() && !imagesVM.trash.value) {
-                    PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home)) {
+                    PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                         showAddToHomeDialog = true
                     }
                 }

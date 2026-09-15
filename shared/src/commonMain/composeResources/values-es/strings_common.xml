@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">Acceso directo añadido a la pantalla principal</string>
     <string name="shortcut_not_supported">Tu lanzador no admite añadir accesos directos</string>
     <string name="shortcut_label_hint">Nota: Algunos lanzadores (p. ej. MIUI) podrían no añadir accesos directos correctamente.</string>
+    <string name="home_screen_help_title">¿Qué es la pantalla de inicio?</string>
+    <string name="home_screen_help_text">La pantalla de inicio es la pantalla principal del teléfono, donde están los iconos de las aplicaciones. Esto añade allí un acceso directo al archivo, para abrirlo cuando quieras como una app.</string>
     <string name="help">Ayuda</string>
     <string name="bluetooth_permission_denied">Se denegó el permiso de Bluetooth. Activa el Bluetooth para PlainApp en Ajustes.</string>
     <string name="bluetooth_off">El Bluetooth está apagado. Actívalo en el Centro de control o en Ajustes.</string>

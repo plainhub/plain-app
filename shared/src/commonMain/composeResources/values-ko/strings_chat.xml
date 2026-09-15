@@ -152,4 +152,13 @@
     <string name="shared_folder">공유 폴더</string>
     <string name="shared_items">공유 항목</string>
     <string name="add_items">항목 추가</string>
+    <string name="download_to_downloads">다운로드에 저장</string>
+    <string name="pick_directory">디렉터리 선택…</string>
+    <string name="sync_to_downloads">다운로드에 동기화</string>
+    <string name="download_zip">ZIP으로 다운로드</string>
+    <string name="choose_this_folder">이 폴더 선택</string>
+    <string name="syncing_files">파일 동기화 중…</string>
+    <string name="download_failed">다운로드 실패</string>
+    <string name="save_to">저장 위치</string>
+    <string name="recent_used">최근 사용</string>
 </resources>

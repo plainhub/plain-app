@@ -35,7 +35,9 @@ import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.createDownloadTempFile
 import com.ismartcoding.plain.platform.fetchUrlToStream
+import com.ismartcoding.plain.platform.createFileWriteHandle
 import com.ismartcoding.plain.platform.saveTempFileToDownloads
+import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.httpserver.http.StreamSink
@@ -145,18 +147,24 @@ fun DlnaDownloadIconButton(
     val mediaType by DlnaRendererState.mediaType.collectAsState()
     val mediaTitle by DlnaRendererState.mediaTitle.collectAsState()
     var downloadState by remember { mutableStateOf(DlnaDownloadState.IDLE) }
+    var showSaveSheet by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    fun startDownload(dir: String?) {
+        if (downloadState == DlnaDownloadState.DOWNLOADING) return
+        downloadState = DlnaDownloadState.DOWNLOADING
+        scope.launch {
+            val success = downloadDlnaMedia(mediaUri, mediaType, mediaTitle, dir)
+            downloadState = if (success) DlnaDownloadState.SUCCESS else DlnaDownloadState.FAILED
+            delay(2000)
+            downloadState = DlnaDownloadState.IDLE
+        }
+    }
 
     IconButton(
         onClick = {
             if (downloadState == DlnaDownloadState.DOWNLOADING) return@IconButton
-            downloadState = DlnaDownloadState.DOWNLOADING
-            scope.launch {
-                val success = downloadDlnaMedia(mediaUri, mediaType, mediaTitle)
-                downloadState = if (success) DlnaDownloadState.SUCCESS else DlnaDownloadState.FAILED
-                delay(2000)
-                downloadState = DlnaDownloadState.IDLE
-            }
+            showSaveSheet = true
         },
         modifier = modifier,
     ) {
@@ -180,6 +188,22 @@ fun DlnaDownloadIconButton(
             )
         }
     }
+
+    if (showSaveSheet) {
+        SaveToSheet(
+            title = mediaTitle.ifEmpty { mediaType.name.lowercase().replaceFirstChar { it.uppercase() } },
+            isFolder = false,
+            onDismiss = { showSaveSheet = false },
+            onDownloads = {
+                showSaveSheet = false
+                startDownload(null)
+            },
+            onDirectory = { dir ->
+                showSaveSheet = false
+                startDownload(dir)
+            },
+        )
+    }
 }
 
 /** Adapts [DownloadTempFileHandle] to the [StreamSink] interface for [fetchUrlToStream]. */
@@ -195,12 +219,16 @@ private class DownloadTempFileSink(private val handle: com.ismartcoding.plain.pl
  * system Downloads directory via [saveTempFileToDownloads]. Shows a toast
  * notification with the saved path on success, or an error message on failure.
  */
-private suspend fun downloadDlnaMedia(url: String, mediaType: DlnaMediaType, title: String): Boolean {
+private suspend fun downloadDlnaMedia(url: String, mediaType: DlnaMediaType, title: String, dir: String? = null): Boolean {
     if (url.isEmpty()) return false
     val ext = defaultExtensionFor(mediaType)
     val baseName = title.ifEmpty { "dlna_${TimeHelper.nowMillis()}" }
     val filename = "$baseName.$ext"
-    val handle = createDownloadTempFile("dlna_${TimeHelper.nowMillis()}")
+    val handle = if (dir == null) {
+        createDownloadTempFile("dlna_${TimeHelper.nowMillis()}")
+    } else {
+        createFileWriteHandle("$dir/$filename")
+    }
     val sink = DownloadTempFileSink(handle)
     try {
         val (status, _) = fetchUrlToStream(url, sink)
@@ -208,6 +236,11 @@ private suspend fun downloadDlnaMedia(url: String, mediaType: DlnaMediaType, tit
             handle.delete()
             DialogHelper.showMessage(getString(Res.string.dlna_download_failed))
             return false
+        }
+        if (dir != null) {
+            handle.close()
+            DialogHelper.showMessage(getString(Res.string.dlna_download_success, "$dir/$filename"))
+            return true
         }
         val savedPath = saveTempFileToDownloads(handle, filename)
         if (savedPath.isNotEmpty()) {

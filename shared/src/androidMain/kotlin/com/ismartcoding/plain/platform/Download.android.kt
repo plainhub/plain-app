@@ -36,6 +36,13 @@ actual fun createDownloadTempFile(taskId: String): DownloadTempFileHandle {
     return AndroidDownloadTempFileHandle(file, FileOutputStream(file))
 }
 
+actual fun createFileWriteHandle(filePath: String): DownloadTempFileHandle {
+    val file = File(filePath)
+    file.parentFile?.mkdirs()
+    file.createNewFile()
+    return AndroidDownloadTempFileHandle(file, FileOutputStream(file))
+}
+
 actual fun getMimeTypeFromExtension(extension: String): String {
     return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: ""
 }

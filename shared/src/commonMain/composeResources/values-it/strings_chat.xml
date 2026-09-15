@@ -152,4 +152,13 @@
     <string name="shared_folder">Cartella condivisa</string>
     <string name="shared_items">Elementi condivisi</string>
     <string name="add_items">Aggiungi elementi</string>
+    <string name="download_to_downloads">Salva in Download</string>
+    <string name="pick_directory">Scegli directory…</string>
+    <string name="sync_to_downloads">Sincronizza in Download</string>
+    <string name="download_zip">Scarica come ZIP</string>
+    <string name="choose_this_folder">Scegli questa cartella</string>
+    <string name="syncing_files">Sincronizzazione file…</string>
+    <string name="download_failed">Download non riuscito</string>
+    <string name="save_to">Salva in</string>
+    <string name="recent_used">Recenti</string>
 </resources>

@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">Raccourci ajouté à l'écran d'accueil</string>
     <string name="shortcut_not_supported">Votre lanceur ne prend pas en charge les raccourcis</string>
     <string name="shortcut_label_hint">Remarque : Certains lanceurs (p. ex. MIUI) pourraient ne pas ajouter les raccourcis avec succès.</string>
+    <string name="home_screen_help_title">Qu'est-ce que l'écran d'accueil ?</string>
+    <string name="home_screen_help_text">L'écran d'accueil est l'écran principal de votre téléphone, celui où se trouvent les icônes des applications. Cette action y ajoute un raccourci vers le fichier, à ouvrir à tout moment comme une application.</string>
     <string name="help">Aide</string>
     <string name="bluetooth_permission_denied">L\'autorisation Bluetooth a été refusée. Activez le Bluetooth pour PlainApp dans les réglages.</string>
     <string name="bluetooth_off">Le Bluetooth est désactivé. Activez-le dans le centre de contrôle ou dans les réglages.</string>

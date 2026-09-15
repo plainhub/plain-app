@@ -2,9 +2,11 @@ package com.ismartcoding.plain
 
 import android.content.Intent
 import androidx.navigation.NavDestination.Companion.hasRoute
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.not_supported_error
+import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigatePdf
@@ -41,6 +43,11 @@ internal fun MainActivity.handleIntent(intent: Intent) {
         }
     } else if (intent.action == AppIntents.ACTION_PLAY_MEDIA) {
         val path = intent.getStringExtra(Constants.EXTRA_MEDIA_PATH) ?: return
-        navControllerState.value?.navigate(Routing.PlayMedia(path))
+        if (path.isAudioFast()) {
+            navControllerState.value?.navigate(Routing.PlayMedia(path))
+        } else {
+            // Images/videos preview as an overlay above the app UI (no black route).
+            TempData.shortcutMediaPath.value = path
+        }
     }
 }

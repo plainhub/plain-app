@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">होम स्क्रीन पर शॉर्टकट जोड़ा गया</string>
     <string name="shortcut_not_supported">आपका लॉन्चर शॉर्टकट जोड़ने का समर्थन नहीं करता</string>
     <string name="shortcut_label_hint">नोट: कुछ लॉन्चर (जैसे MIUI) होम स्क्रीन पर शॉर्टकट जोड़ने में विफल हो सकते हैं।</string>
+    <string name="home_screen_help_title">होम स्क्रीन क्या है?</string>
+    <string name="home_screen_help_text">होम स्क्रीन आपके फ़ोन की मुख्य स्क्रीन है, जहाँ ऐप्लिकेशन आइकन होते हैं। यह वहाँ फ़ाइल का शॉर्टकट जोड़ता है, जिससे आप उसे कभी भी ऐप की तरह खोल सकते हैं।</string>
     <string name="help">सहायता</string>
     <string name="bluetooth_permission_denied">ब्लूटूथ अनुमति अस्वीकार कर दी गई थी। सेटिंग में PlainApp के लिए ब्लूटूथ चालू करें।</string>
     <string name="bluetooth_off">ब्लूटूथ बंद है। इसे कंट्रोल सेंटर या सेटिंग में चालू करें।</string>

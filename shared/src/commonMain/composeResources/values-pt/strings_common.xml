@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">Atalho adicionado à tela inicial</string>
     <string name="shortcut_not_supported">Seu launcher não suporta adicionar atalhos</string>
     <string name="shortcut_label_hint">Nota: alguns launchers (ex. MIUI) podem não adicionar atalhos com êxito.</string>
+    <string name="home_screen_help_title">O que é a tela inicial?</string>
+    <string name="home_screen_help_text">A tela inicial é a tela principal do telefone, onde ficam os ícones dos aplicativos. Isso adiciona ali um atalho para o arquivo, para abri-lo a qualquer momento como um app.</string>
     <string name="help">Ajuda</string>
     <string name="bluetooth_permission_denied">Permissão do Bluetooth negada. Ative o Bluetooth para o PlainApp nos Ajustes.</string>
     <string name="bluetooth_off">O Bluetooth está desligado. Ative-o na Central de Controle ou nos Ajustes.</string>

@@ -1,39 +1,27 @@
 @file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
-package com.ismartcoding.plain.ui.page.shares
+package com.ismartcoding.plain.ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.getInternalStoragePath
 import com.ismartcoding.plain.platform.listFilesInDir
@@ -43,38 +31,30 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.components.DirBrowserRow
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 /**
- * Bottom sheet to multi-select real files and folders from device storage.
- * Directory rows enter on tap and toggle selection via the trailing checkbox;
- * file rows toggle on tap anywhere. Confirm returns every selected real path.
+ * Bottom sheet to pick a destination folder on the device filesystem.
+ * Confirms the folder currently being viewed.
  */
 @Composable
-fun ShareItemsPickerSheet(
-    initialSelected: Set<String>,
+fun FolderPickSheet(
     onDismiss: () -> Unit,
-    onConfirm: (Set<String>) -> Unit,
+    onConfirm: (String) -> Unit,
 ) {
     val rootPath = remember { getInternalStoragePath() }
     var currentPath by remember { mutableStateOf(rootPath) }
-    var entries by remember { mutableStateOf<List<DFile>>(emptyList()) }
-    val selected = remember { mutableStateListOf<String>().apply { addAll(initialSelected) } }
+    var dirs by remember { mutableStateOf<List<DFile>>(emptyList()) }
 
     LaunchedEffect(currentPath) {
         withIO {
-            entries = listFilesInDir(currentPath, showHidden = false, sortBy = FileSortBy.NAME_ASC)
+            dirs = listFilesInDir(currentPath, showHidden = false, sortBy = FileSortBy.NAME_ASC).filter { it.isDir }
         }
-    }
-
-    fun toggle(path: String) {
-        if (selected.contains(path)) selected.remove(path) else selected.add(path)
     }
 
     PModalBottomSheet(onDismissRequest = onDismiss, modifier = Modifier.fillMaxWidth()) {
         PBottomSheetTopAppBar(
-            title = stringResource(Res.string.add_items),
+            title = stringResource(Res.string.pick_directory),
             navigationIcon = {
                 PIconButton(
                     icon = Res.drawable.x,
@@ -105,25 +85,17 @@ fun ShareItemsPickerSheet(
                     )
                 }
             }
-            items(entries, key = { it.path }) { entry ->
+            items(dirs, key = { it.path }) { dir ->
                 DirBrowserRow(
-                    name = entry.name,
-                    subtitle = if (entry.isDir) "" else entry.size.formatBytes(),
-                    isDir = entry.isDir,
-                    selected = selected.contains(entry.path),
-                    showCheckbox = true,
-                    onClick = {
-                        if (entry.isDir) currentPath = entry.path else toggle(entry.path)
-                    },
-                    onCheckedChange = { toggle(entry.path) },
+                    name = dir.name,
+                    onClick = { currentPath = dir.path },
                 )
             }
         }
         BottomActionButtons {
             PFilledButton(
-                text = stringResource(Res.string.done) + " (${selected.size})",
-                onClick = { onConfirm(selected.toSet()) },
-                enabled = selected.isNotEmpty(),
+                text = stringResource(Res.string.choose_this_folder),
+                onClick = { onConfirm(currentPath) },
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 8.dp),

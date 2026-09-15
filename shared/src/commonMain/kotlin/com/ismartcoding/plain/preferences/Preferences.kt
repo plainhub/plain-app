@@ -779,7 +779,7 @@ object HomeFeaturesPreference : BasePreference<String>() {
     private const val SEPARATOR = "|"
     override val default = listOf(
         AppFeatureType.IMAGES, AppFeatureType.VIDEOS, AppFeatureType.AUDIO,
-        AppFeatureType.DOCS, AppFeatureType.FILES, AppFeatureType.CHAT,
+        AppFeatureType.DOCS, AppFeatureType.FILES, AppFeatureType.NOTES, AppFeatureType.FEEDS,
     ).joinToString(SEPARATOR) { it.name }
     override val key = stringPreferencesKey("home_features_v2")
 

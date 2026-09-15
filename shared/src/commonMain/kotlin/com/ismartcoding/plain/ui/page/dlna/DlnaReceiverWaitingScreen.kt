@@ -33,10 +33,11 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.StepNumber
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun DlnaReceiverWaitingScreen() {
-    val deviceName = TempData.deviceName.value
+    val deviceName = TempData.deviceName.collectAsState().value
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -64,17 +65,17 @@ fun DlnaReceiverWaitingScreen() {
             PListItem(
                 title = stringResource(Res.string.dlna_receiver_step1_title),
                 subtitle = stringResource(Res.string.dlna_receiver_step1_desc),
-                start = { StepNumber(1) },
+                start = { Box(Modifier.align(Alignment.Top).padding(top = 8.dp)) { StepNumber(1) } },
             )
             PListItem(
                 title = stringResource(Res.string.dlna_receiver_step2_title),
                 subtitle = stringResource(Res.string.dlna_receiver_step2_desc),
-                start = { StepNumber(2) },
+                start = { Box(Modifier.align(Alignment.Top).padding(top = 8.dp)) { StepNumber(2) } },
             )
             PListItem(
                 title = stringResource(Res.string.dlna_receiver_step3_title),
                 subtitle = stringResource(Res.string.dlna_receiver_step3_desc, deviceName),
-                start = { StepNumber(3) },
+                start = { Box(Modifier.align(Alignment.Top).padding(top = 8.dp)) { StepNumber(3) } },
             )
         }
         Tips(text = stringResource(Res.string.dlna_receiver_protocol_note))

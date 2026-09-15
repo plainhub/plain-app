@@ -152,4 +152,13 @@
     <string name="shared_folder">Thư mục được chia sẻ</string>
     <string name="shared_items">Mục được chia sẻ</string>
     <string name="add_items">Thêm mục</string>
+    <string name="download_to_downloads">Lưu vào Tải xuống</string>
+    <string name="pick_directory">Chọn thư mục…</string>
+    <string name="sync_to_downloads">Đồng bộ vào Tải xuống</string>
+    <string name="download_zip">Tải dạng ZIP</string>
+    <string name="choose_this_folder">Chọn thư mục này</string>
+    <string name="syncing_files">Đang đồng bộ tệp…</string>
+    <string name="download_failed">Tải xuống thất bại</string>
+    <string name="save_to">Lưu vào</string>
+    <string name="recent_used">Gần đây</string>
 </resources>

@@ -152,4 +152,13 @@
     <string name="shared_folder">শেয়ার করা ফোল্ডার</string>
     <string name="shared_items">শেয়ার করা আইটেম</string>
     <string name="add_items">আইটেম যোগ করুন</string>
+    <string name="download_to_downloads">ডাউনলোডে সংরক্ষণ করুন</string>
+    <string name="pick_directory">ডিরেক্টরি নির্বাচন করুন…</string>
+    <string name="sync_to_downloads">ডাউনলোডে সিঙ্ক করুন</string>
+    <string name="download_zip">ZIP হিসেবে ডাউনলোড</string>
+    <string name="choose_this_folder">এই ফোল্ডারটি নির্বাচন করুন</string>
+    <string name="syncing_files">ফাইল সিঙ্ক হচ্ছে…</string>
+    <string name="download_failed">ডাউনলোড ব্যর্থ হয়েছে</string>
+    <string name="save_to">সংরক্ষণ করুন</string>
+    <string name="recent_used">সাম্প্রতিক</string>
 </resources>

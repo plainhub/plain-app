@@ -152,4 +152,13 @@
     <string name="shared_folder">Общая папка</string>
     <string name="shared_items">Общие элементы</string>
     <string name="add_items">Добавить элементы</string>
+    <string name="download_to_downloads">Сохранить в «Загрузки»</string>
+    <string name="pick_directory">Выбрать папку…</string>
+    <string name="sync_to_downloads">Синхронизировать с «Загрузки»</string>
+    <string name="download_zip">Скачать ZIP</string>
+    <string name="choose_this_folder">Выбрать эту папку</string>
+    <string name="syncing_files">Синхронизация файлов…</string>
+    <string name="download_failed">Ошибка загрузки</string>
+    <string name="save_to">Сохранить в</string>
+    <string name="recent_used">Недавние</string>
 </resources>

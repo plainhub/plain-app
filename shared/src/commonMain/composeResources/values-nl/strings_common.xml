@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">Snelkoppeling toegevoegd aan startscherm</string>
     <string name="shortcut_not_supported">Uw launcher ondersteunt geen snelkoppelingen</string>
     <string name="shortcut_label_hint">Opmerking: sommige launchers (bijv. MIUI) ondersteunen mogelijk geen snelkoppelingen.</string>
+    <string name="home_screen_help_title">Wat is het startscherm?</string>
+    <string name="home_screen_help_text">Het startscherm is het hoofdscherm van je telefoon, met de app-pictogrammen. Hiermee wordt daar een snelkoppeling naar het bestand toegevoegd, die je altijd als een app kunt openen.</string>
     <string name="help">Help</string>
     <string name="bluetooth_permission_denied">Bluetooth-toestemming geweigerd. Schakel Bluetooth voor PlainApp in bij Instellingen.</string>
     <string name="bluetooth_off">Bluetooth is uitgeschakeld. Zet het aan in het Bedieningscentrum of in Instellingen.</string>

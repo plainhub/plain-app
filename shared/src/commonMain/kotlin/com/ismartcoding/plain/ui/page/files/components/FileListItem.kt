@@ -42,6 +42,7 @@ import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import org.jetbrains.compose.resources.pluralStringResource
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.FileEntryThumb
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.platform.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
@@ -154,27 +155,20 @@ private fun FileListItemThumbnail(
     }
 
     val widthPx = with(density) { 48.dp.toPx() }.toInt()
-    Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
-        when {
-            isMedia && !isZipEntry -> {
-                // Regular file — use TransformImageView for the zoom-into-preview animation.
-                TransformImageView(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
-                    path = file.path, fileName = file.name, key = file.path,
-                    itemState = itemState, previewerState = previewerState, widthPx = widthPx)
-            }
-            isMedia && zipCachedPath != null -> {
-                // Zip entry extracted — use TransformImageView so itemState is registered
-                // and openTransform() can animate from the thumbnail position.
-                TransformImageView(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
-                    path = zipCachedPath!!, fileName = file.name, key = file.path,
-                    itemState = itemState, previewerState = previewerState, widthPx = widthPx)
-            }
-            else -> {
-                AsyncImage(
-                    model = if (file.isDir) getFileIconPath("folder") else getFileIconPath(file.path.getFilenameExtension()),
-                    modifier = Modifier.size(48.dp), alignment = Alignment.Center, contentDescription = file.path,
-                )
-            }
-        }
+    // Empty display path while a zip entry is still extracting: the shared
+    // thumb falls back to the type icon until the cached path arrives.
+    val displayPath = when {
+        !isZipEntry -> file.path
+        zipCachedPath != null -> zipCachedPath!!
+        else -> ""
     }
+    FileEntryThumb(
+        name = file.name,
+        path = displayPath,
+        isDir = file.isDir,
+        isMedia = isMedia,
+        itemState = itemState,
+        previewerState = previewerState,
+        widthPx = widthPx,
+    )
 }

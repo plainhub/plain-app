@@ -152,4 +152,13 @@
     <string name="shared_folder">Gedeelde map</string>
     <string name="shared_items">Gedeelde items</string>
     <string name="add_items">Items toevoegen</string>
+    <string name="download_to_downloads">Opslaan in Downloads</string>
+    <string name="pick_directory">Kies map…</string>
+    <string name="sync_to_downloads">Synchroniseren met Downloads</string>
+    <string name="download_zip">Downloaden als ZIP</string>
+    <string name="choose_this_folder">Deze map kiezen</string>
+    <string name="syncing_files">Bestanden synchroniseren…</string>
+    <string name="download_failed">Download mislukt</string>
+    <string name="save_to">Opslaan in</string>
+    <string name="recent_used">Recent</string>
 </resources>

@@ -157,6 +157,8 @@
     <string name="shortcut_added_to_home">快捷方式已添加到主屏幕</string>
     <string name="shortcut_not_supported">您的桌面不支持添加快捷方式</string>
     <string name="shortcut_label_hint">注意：部分手机（如 MIUI）可能无法成功添加快捷方式到主屏幕。</string>
+    <string name="home_screen_help_title">什么是主屏幕？</string>
+    <string name="home_screen_help_text">主屏幕是手机的主界面，就是显示应用图标和壁纸的那一屏。此操作会在主屏幕创建该文件的快捷方式，随时可像应用一样点开。</string>
     <string name="help">帮助</string>
     <string name="bluetooth_permission_denied">蓝牙权限已被拒绝，请在系统设置中允许 PlainApp 使用蓝牙。</string>
     <string name="bluetooth_off">蓝牙已关闭，请在控制中心或系统设置中打开蓝牙。</string>

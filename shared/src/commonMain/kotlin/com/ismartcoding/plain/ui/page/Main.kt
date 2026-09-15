@@ -44,6 +44,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverOverlay
 import com.ismartcoding.plain.ui.page.audioplayer.AudioPlayerPage
+import com.ismartcoding.plain.ui.page.media.ShortcutMediaPreviewer
 import com.ismartcoding.plain.ui.page.home.ServiceOnboardingWizard
 import com.ismartcoding.plain.ui.theme.backgroundNormal
 import kotlinx.coroutines.Dispatchers
@@ -125,6 +126,13 @@ fun Main(
         val audioPlayerVisible by TempData.audioPlayerVisible.collectAsState()
         if (audioPlayerVisible) {
             AudioPlayerPage(audioPlaylistVM) { TempData.audioPlayerVisible.value = false }
+        }
+
+        // Home-screen shortcut media preview: overlay instead of a route so the
+        // app UI stays composed beneath and closing the preview reveals it.
+        val shortcutMediaPath by TempData.shortcutMediaPath.collectAsState()
+        if (shortcutMediaPath != null) {
+            ShortcutMediaPreviewer(shortcutMediaPath!!) { TempData.shortcutMediaPath.value = null }
         }
 
         DlnaReceiverOverlay()

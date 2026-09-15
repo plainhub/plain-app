@@ -152,4 +152,13 @@
     <string name="shared_folder">Dossier partagé</string>
     <string name="shared_items">Éléments partagés</string>
     <string name="add_items">Ajouter des éléments</string>
+    <string name="download_to_downloads">Enregistrer dans Téléchargements</string>
+    <string name="pick_directory">Choisir un dossier…</string>
+    <string name="sync_to_downloads">Synchroniser avec Téléchargements</string>
+    <string name="download_zip">Télécharger en ZIP</string>
+    <string name="choose_this_folder">Choisir ce dossier</string>
+    <string name="syncing_files">Synchronisation des fichiers…</string>
+    <string name="download_failed">Échec du téléchargement</string>
+    <string name="save_to">Enregistrer dans</string>
+    <string name="recent_used">Récents</string>
 </resources>

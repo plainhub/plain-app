@@ -152,4 +152,13 @@
     <string name="shared_folder">साझा फ़ोल्डर</string>
     <string name="shared_items">साझा की गई वस्तुएं</string>
     <string name="add_items">आइटम जोड़ें</string>
+    <string name="download_to_downloads">डाउनलोड में सहेजें</string>
+    <string name="pick_directory">निर्देशिका चुनें…</string>
+    <string name="sync_to_downloads">डाउनलोड में सिंक करें</string>
+    <string name="download_zip">ZIP के रूप में डाउनलोड करें</string>
+    <string name="choose_this_folder">इस फ़ोल्डर को चुनें</string>
+    <string name="syncing_files">फ़ाइलें सिंक हो रही हैं…</string>
+    <string name="download_failed">डाउनलोड विफल</string>
+    <string name="save_to">सहेजें</string>
+    <string name="recent_used">हाल के</string>
 </resources>

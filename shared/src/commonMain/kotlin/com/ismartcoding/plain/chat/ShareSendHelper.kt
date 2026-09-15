@@ -144,7 +144,7 @@ object ShareSendHelper {
             ChatManager.sendMessage(item, target, PeerCacher.getOnlinePeerIds())
         }
         sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(item.toModel()))))
-        ChatViewModel.onMessagesCreated(target, listOf(item))
+        ChatViewModel.onMessagesCreated(target, listOf(item), scroll = true)
         item.status == ChatStatus.SENT
     }
 }

@@ -26,6 +26,8 @@ object TempData {
     val audioPlayMode = MutableStateFlow(MediaPlayMode.REPEAT)
     val audioPlaybackSpeed = MutableStateFlow(1f)
     val audioPlayerVisible = MutableStateFlow(false)
+    /** Media path requested by a home-screen shortcut; null = no preview open. */
+    val shortcutMediaPath = MutableStateFlow<String?>(null)
 
     var adbToken = "" // in-memory cache of the ADB automation token
 
