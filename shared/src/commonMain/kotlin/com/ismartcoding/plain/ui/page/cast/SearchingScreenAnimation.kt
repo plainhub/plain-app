@@ -71,7 +71,7 @@ fun SearchingScreenAnimation(modifier: Modifier = Modifier) {
                 else -> 1f
             }
             drawCircle(
-                color = Color(0xFF1A73E8).copy(alpha = edgeFade * baseAlpha),
+                color = Color(0xFF4F5F9E).copy(alpha = edgeFade * baseAlpha),
                 radius = 6f,
                 center = Offset(x, y),
             )

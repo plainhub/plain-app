@@ -85,11 +85,6 @@ fun IconTextZipButton(click: () -> Unit) {
 }
 
 @Composable
-fun IconTextAddToHomeButton(click: () -> Unit) {
-    PIconTextActionButton(Res.drawable.smartphone, text = stringResource(Res.string.add_to_home), click = click)
-}
-
-@Composable
 fun IconTextForwardButton(click: () -> Unit) {
     PIconTextActionButton(Res.drawable.forward, text = stringResource(Res.string.forward), click = click)
 }

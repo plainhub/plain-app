@@ -42,7 +42,7 @@ internal fun DrawScope.drawMonitor(monLeft: Float, monTop: Float, monW: Float, m
 
 internal fun DrawScope.drawPhone(phoneLeft: Float, phoneTop: Float, phoneW: Float, phoneH: Float) {
     drawRoundRect(
-        color = Color(0xFF1A73E8),
+        color = Color(0xFF4F5F9E),
         topLeft = Offset(phoneLeft, phoneTop),
         size = Size(phoneW, phoneH),
         cornerRadius = CornerRadius(14f),

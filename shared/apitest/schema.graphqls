@@ -169,7 +169,7 @@ type Mutation {
   setTempValue(key: String!, value: String!): TempValue!
   relaunchApp: Boolean!
   openAccessibilitySettings: Boolean!
-  openWebSettings: Boolean!
+  openWebSettings(feature: AccessFeatureType): Boolean!
   setClip(text: String!): Boolean!
   updateDeviceName(name: String!): Boolean!
   deleteContacts(query: String!): Boolean!
@@ -200,6 +200,18 @@ type Mutation {
   createBookmarkGroup(name: String!): BookmarkGroup!
   updateBookmarkGroup(id: ID!, name: String!, collapsed: Boolean!, sortOrder: Int!): BookmarkGroup
   deleteBookmarkGroup(id: ID!): Boolean!
+}
+
+enum AccessFeatureType {
+  FILES
+  CONTACTS
+  SMS
+  CALL_LOGS
+  CALL_PHONE
+  PHONE_NUMBER
+  APPS
+  NOTIFICATIONS
+  CLIPBOARD_SYNC
 }
 
 type ActionResult {
