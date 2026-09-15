@@ -22,6 +22,7 @@ import coil3.compose.AsyncImage
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.isAndroidOnly
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable
 fun PDonationBanner(
@@ -57,6 +58,7 @@ fun PDonationBanner(
 @Composable
 private fun WeChatDonateDialog(onDismiss: () -> Unit) {
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         title = { Text("微信赞赏") },
         text = {

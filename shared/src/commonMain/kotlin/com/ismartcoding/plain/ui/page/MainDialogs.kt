@@ -21,6 +21,7 @@ import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.ui.base.PToast
 import com.ismartcoding.plain.ui.base.ToastEvent
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable
 fun MainDialogs(
@@ -47,6 +48,7 @@ fun MainDialogs(
     }
     confirmEvent?.let {
         AlertDialog(
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             onDismissRequest = onDismissConfirm,
             title = { if (it.title.isNotEmpty()) Text(it.title) },
             text = { Text(it.message) },

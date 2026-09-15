@@ -2,8 +2,6 @@ package com.ismartcoding.plain.ui.page.docs
 
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -14,7 +12,7 @@ import androidx.compose.runtime.getValue
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
-import com.ismartcoding.plain.docs.DDoc
+import com.ismartcoding.plain.data.DDoc
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
 import com.ismartcoding.plain.ui.models.DocsViewModel

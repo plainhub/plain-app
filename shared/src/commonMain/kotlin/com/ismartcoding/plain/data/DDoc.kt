@@ -1,8 +1,8 @@
-package com.ismartcoding.plain.docs
+package com.ismartcoding.plain.data
 
-import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.db.IMedia
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import kotlin.time.Instant
 
 data class DDoc(

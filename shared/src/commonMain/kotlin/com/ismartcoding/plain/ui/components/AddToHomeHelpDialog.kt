@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.min
@@ -62,7 +63,7 @@ fun AddToHomeHelpAction() {
 fun AddToHomeHelpDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         title = {
             Text(
                 text = stringResource(Res.string.home_screen_help_title),

@@ -10,6 +10,8 @@ import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.ui.base.PTextButton
 
 @Composable
 fun PeerDeliveryStatusDialog(
@@ -20,7 +22,7 @@ fun PeerDeliveryStatusDialog(
     val failed = statusData.failedResults.firstOrNull()
 
     AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         title = {
             Text(
@@ -47,7 +49,7 @@ fun PeerDeliveryStatusDialog(
             )
         },
         dismissButton = {
-            PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
+            PTextButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
         },
     )
 }

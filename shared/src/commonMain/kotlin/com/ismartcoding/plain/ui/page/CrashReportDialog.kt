@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.writeCrashReport
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.nav.navigateTextFile
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable
 fun CrashReportDialog(
@@ -29,6 +30,7 @@ fun CrashReportDialog(
     onDismiss: () -> Unit,
 ) {
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.crash_report_title)) },
         text = {

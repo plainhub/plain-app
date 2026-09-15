@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">Chatta e crea canali tra telefoni e computer. I contenuti condivisi da altre app possono essere inoltrati in una chat con un tocco.</string>
     <string name="onboarding_3_bubble_in">Le foto del weekend sono pronte, te le invio</string>
     <string name="onboarding_3_bubble_out">Ricevute, qualità ottima!</string>
+    <string name="onboarding_3_msg_sent">Tutto inviato: controlla sul computer</string>
     <string name="onboarding_3_share_hint">Condivisione da altre app → inoltrare in una chat con un tocco</string>
     <string name="onboarding_4_title">Più del semplice trasferimento file</string>
     <string name="onboarding_4_body">Foto, musica, note e altri strumenti utili, tutto offline; la musica supporta testi sincronizzati.</string>

@@ -21,6 +21,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -30,9 +31,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.preferences.OnboardingPreference
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -52,6 +56,13 @@ private const val PAGE_COUNT = 5
 fun OnboardingPage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
+    // outline is near-invisible against the dark background; the inactive
+    // dots need the mid gray there.
+    val inactiveDot = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    } else {
+        MaterialTheme.colorScheme.outline
+    }
 
     fun complete(navigateToHowToUse: Boolean) {
         scope.launch {
@@ -68,13 +79,15 @@ fun OnboardingPage(navController: NavHostController) {
 
     PBackHandler { complete(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-    ) {
+    // Surface provides LocalContentColor = onSurface — texts without an
+    // explicit color (URL capsule, step rows) must not fall back to black.
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding(),
+        ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -115,7 +128,7 @@ fun OnboardingPage(navController: NavHostController) {
                         .width(if (selected) 20.dp else 8.dp)
                         .height(8.dp)
                         .clip(RoundedCornerShape(50))
-                        .background(if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline),
+                        .background(if (selected) MaterialTheme.colorScheme.primary else inactiveDot),
                 )
             }
         }
@@ -134,6 +147,7 @@ fun OnboardingPage(navController: NavHostController) {
                 .padding(horizontal = 24.dp),
         )
         VerticalSpace(dp = 28.dp)
+        }
     }
 }
 
@@ -164,6 +178,7 @@ private fun SlideDesktopAccess() {
 private fun SlideChat() {
     SlideFrame(
         illustration = { ChatIllustration() },
+        illustrationHeight = 320.dp,
         title = stringResource(Res.string.onboarding_3_title),
         body = stringResource(Res.string.onboarding_3_body),
     )
@@ -184,6 +199,7 @@ private fun SlideFrame(
     title: String,
     body: String,
     illustration: @Composable () -> Unit,
+    illustrationHeight: Dp = 300.dp,
     badges: List<String> = emptyList(),
 ) {
     Column(
@@ -196,7 +212,7 @@ private fun SlideFrame(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp),
+                .height(illustrationHeight),
             contentAlignment = Alignment.Center,
         ) {
             illustration()

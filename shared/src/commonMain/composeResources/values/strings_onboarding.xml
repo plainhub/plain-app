@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">Chat and create channels between phones and computers. Content shared from other apps can be forwarded to a chat in one tap.</string>
     <string name="onboarding_3_bubble_in">Photos from the weekend are ready, sending them over</string>
     <string name="onboarding_3_bubble_out">Got them, great quality!</string>
+    <string name="onboarding_3_msg_sent">All sent — check your computer</string>
     <string name="onboarding_3_share_hint">Share from other apps → forward to a chat in one tap</string>
     <string name="onboarding_4_title">More than file transfer</string>
     <string name="onboarding_4_body">Photos, music, notes and more handy tools — all work offline. Music supports synced lyrics.</string>

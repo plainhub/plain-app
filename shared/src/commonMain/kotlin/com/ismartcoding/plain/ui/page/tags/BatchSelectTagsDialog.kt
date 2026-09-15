@@ -26,6 +26,7 @@ import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -40,7 +41,7 @@ fun BatchSelectTagsDialog(
     val tagIds = remember { mutableStateListOf<String>() }
 
     AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = {
             onDismiss()
         },

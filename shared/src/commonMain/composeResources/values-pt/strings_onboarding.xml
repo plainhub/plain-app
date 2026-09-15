@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">Converse e crie canais entre celulares e computadores. O que você compartilhar de outros apps pode ser encaminhado para uma conversa com um toque.</string>
     <string name="onboarding_3_bubble_in">As fotos do fim de semana ficaram prontas, vou te enviar</string>
     <string name="onboarding_3_bubble_out">Recebi! A qualidade está ótima.</string>
+    <string name="onboarding_3_msg_sent">Tudo enviado — confira no computador</string>
     <string name="onboarding_3_share_hint">Compartilhar de outros apps → encaminhar para uma conversa com um toque</string>
     <string name="onboarding_4_title">Mais que transferência de arquivos</string>
     <string name="onboarding_4_body">Fotos, músicas, notas e mais ferramentas úteis, tudo offline; a música suporta letras sincronizadas.</string>

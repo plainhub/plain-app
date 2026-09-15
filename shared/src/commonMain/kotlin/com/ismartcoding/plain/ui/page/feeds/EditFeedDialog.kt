@@ -21,13 +21,14 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable
 fun EditFeedDialog(feedsVM: FeedsViewModel) {
     if (feedsVM.showEditDialog.value) {
         val focusManager = LocalFocusManager.current
         AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             onDismissRequest = {
                 feedsVM.showEditDialog.value = false
             },

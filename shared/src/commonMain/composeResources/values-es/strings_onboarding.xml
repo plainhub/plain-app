@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">Chatea y crea canales entre móviles y ordenadores. Lo que compartas desde otras apps se puede reenviar a un chat con un toque.</string>
     <string name="onboarding_3_bubble_in">Las fotos del fin de semana ya están listas, te las envío</string>
     <string name="onboarding_3_bubble_out">¡Recibidas! Qué calidad tan buena.</string>
+    <string name="onboarding_3_msg_sent">Todo enviado: revisa tu ordenador</string>
     <string name="onboarding_3_share_hint">Compartir desde otras apps → reenviar a un chat con un toque</string>
     <string name="onboarding_4_title">Más que transferir archivos</string>
     <string name="onboarding_4_body">Fotos, música, notas y más herramientas, todo sin conexión; la música admite letras sincronizadas.</string>

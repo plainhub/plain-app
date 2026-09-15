@@ -41,6 +41,7 @@ import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.httpserver.http.StreamSink
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.getString
@@ -70,6 +71,7 @@ private fun DlnaCastRequestDialog() {
         pendingRequest.senderIp.ifEmpty { stringResource(Res.string.unknown) }
     }
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = {},
         title = { Text(stringResource(Res.string.dlna_cast_request_title)) },
         text = {

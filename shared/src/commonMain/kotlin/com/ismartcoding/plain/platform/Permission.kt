@@ -41,6 +41,7 @@ enum class Permission {
     READ_PHONE_NUMBERS,
     SCHEDULE_EXACT_ALARM,
     QUERY_ALL_PACKAGES,
+    ADB,
     NONE
     ;
 

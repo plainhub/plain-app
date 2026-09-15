@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">スマホとパソコンの間でチャットやチャンネルを作成。他のアプリで共有した内容もワンタップでチャットに転送できます。</string>
     <string name="onboarding_3_bubble_in">週末の写真ができたよ、送るね</string>
     <string name="onboarding_3_bubble_out">受け取ったよ、画質いいね！</string>
+    <string name="onboarding_3_msg_sent">送信完了。パソコンで確認してください</string>
     <string name="onboarding_3_share_hint">他のアプリから共有 → ワンタップでチャットへ転送</string>
     <string name="onboarding_4_title">ファイル転送だけじゃない</string>
     <string name="onboarding_4_body">写真・音楽・メモなど便利なツールがすべてオフラインで使えます。音楽は同期歌詞に対応。</string>

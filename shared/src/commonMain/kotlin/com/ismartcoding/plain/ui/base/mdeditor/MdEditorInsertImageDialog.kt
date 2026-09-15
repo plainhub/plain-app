@@ -31,6 +31,7 @@ import com.ismartcoding.plain.platform.PickImageEffect
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -45,7 +46,7 @@ fun MdEditorInsertImageDialog(
     PickImageEffect(imageUrl = imageUrlState)
 
     AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = {
             mdEditorVM.showInsertImage.value = false
         },

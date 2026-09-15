@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">Telefonlar ve bilgisayarlar arasında sohbet et ve kanal oluştur. Diğer uygulamalardan paylaşılan içerik tek dokunuşla sohbete iletilebilir.</string>
     <string name="onboarding_3_bubble_in">Hafta sonu fotoğrafları hazır, gönderiyorum</string>
     <string name="onboarding_3_bubble_out">Aldım, kalite harika!</string>
+    <string name="onboarding_3_msg_sent">Her şey gönderildi — bilgisayarından kontrol et</string>
     <string name="onboarding_3_share_hint">Diğer uygulamalardan paylaş → tek dokunuşla sohbete ilet</string>
     <string name="onboarding_4_title">Dosya aktarımından fazlası</string>
     <string name="onboarding_4_body">Fotoğraflar, müzik, notlar ve daha birçok araç — tamamen çevrimdışı; müzikte senkronize şarkı sözleri var.</string>

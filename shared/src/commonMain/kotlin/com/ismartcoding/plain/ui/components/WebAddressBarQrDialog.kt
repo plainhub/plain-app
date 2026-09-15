@@ -15,9 +15,10 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.generateQrCode
-import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.lib.extensions.toBreakableUrl
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable
 fun WebAddressBarQrDialog(
@@ -25,10 +26,10 @@ fun WebAddressBarQrDialog(
     onClose: () -> Unit,
 ) {
     AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onClose,
         confirmButton = {
-            PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onClose)
+            PTextButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onClose)
         },
         title = {},
         text = {

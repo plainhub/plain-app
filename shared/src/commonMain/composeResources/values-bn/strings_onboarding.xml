@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">ফোন ও কম্পিউটারের মধ্যে চ্যাট করুন ও চ্যানেল তৈরি করুন। অন্য অ্যাপ থেকে শেয়ার করা জিনিস এক ট্যাপে চ্যাটে পাঠানো যায়।</string>
     <string name="onboarding_3_bubble_in">সপ্তাহান্তের ছবিগুলো তৈরি, পাঠাচ্ছি</string>
     <string name="onboarding_3_bubble_out">পেয়েছি, কোয়ালিটি দুর্দান্ত!</string>
+    <string name="onboarding_3_msg_sent">সব পাঠানো হয়েছে — আপনার কম্পিউটারে দেখুন</string>
     <string name="onboarding_3_share_hint">অন্য অ্যাপ থেকে শেয়ার → এক ট্যাপে চ্যাটে পাঠান</string>
     <string name="onboarding_4_title">শুধু ফাইল ট্রান্সফার নয়</string>
     <string name="onboarding_4_body">ছবি, গান, নোট আরও দরকারি টুল — সবই অফলাইনে; গানে আছে সিঙ্ক করা লিরিক্স সুবিধা।</string>

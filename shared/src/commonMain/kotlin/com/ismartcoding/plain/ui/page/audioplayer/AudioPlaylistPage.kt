@@ -21,6 +21,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -38,7 +39,7 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
 
     if (showClearConfirmDialog) {
         AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             onDismissRequest = { showClearConfirmDialog = false },
             title = { Text(stringResource(Res.string.clear_all)) },
             text = { Text(stringResource(Res.string.clear_all_confirm)) },

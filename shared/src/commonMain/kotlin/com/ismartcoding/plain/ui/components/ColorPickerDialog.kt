@@ -36,6 +36,7 @@ import com.ismartcoding.plain.ui.base.colorpicker.ColorEnvelope
 import com.ismartcoding.plain.ui.base.colorpicker.HsvColorPicker
 import com.ismartcoding.plain.ui.base.colorpicker.rememberColorPickerController
 import com.ismartcoding.plain.ui.theme.safeHexToColor
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -48,7 +49,7 @@ fun ColorPickerDialog(
     val colorPickerController = rememberColorPickerController()
     var customColorValue by remember { mutableStateOf(initValue) }
     AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         confirmButton = {
             PFilledButton(

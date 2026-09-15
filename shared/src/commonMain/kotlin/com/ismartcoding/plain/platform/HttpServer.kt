@@ -343,3 +343,9 @@ fun restartServer() {
         startHttpServerService()
     }
 }
+
+
+expect fun isHttpServerRunning(): Boolean
+expect fun isMdnsRunning(): Boolean
+expect fun getAwareAttachStatus(): String
+expect fun getAwareDiscoveredPeerCount(): Int

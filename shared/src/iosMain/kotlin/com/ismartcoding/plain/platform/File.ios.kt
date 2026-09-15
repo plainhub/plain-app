@@ -16,7 +16,6 @@ import com.ismartcoding.plain.lib.toNSData
 import com.ismartcoding.plain.thumbnail.DecodePolicy
 import com.ismartcoding.plain.lib.toByteArray
 import com.ismartcoding.plain.httpserver.http.StreamSink
-import com.ismartcoding.plain.platform.copyTo
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
@@ -26,7 +25,6 @@ import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSize
-import platform.Foundation.NSLog
 import platform.Foundation.NSNumber
 import platform.Foundation.NSString
 import platform.Foundation.NSTemporaryDirectory
@@ -40,10 +38,8 @@ import platform.UIKit.UIGraphicsBeginImageContextWithOptions
 import platform.UIKit.UIGraphicsEndImageContext
 import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
 import platform.posix.fclose
-import platform.posix.fflush
 import platform.posix.fopen
 import platform.posix.fread
-import platform.posix.fwrite
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun deleteFileAt(path: String) {

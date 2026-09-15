@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">手機、電腦之間直接聊天、建頻道。其他應用分享的內容，也能一鍵轉傳到聊天。</string>
     <string name="onboarding_3_bubble_in">週末的照片拍好了，傳給你</string>
     <string name="onboarding_3_bubble_out">收到了，畫質很棒！</string>
+    <string name="onboarding_3_msg_sent">已全部傳送，在電腦上查看吧</string>
     <string name="onboarding_3_share_hint">其他應用分享 → 一鍵轉傳到聊天</string>
     <string name="onboarding_4_title">不只傳檔案</string>
     <string name="onboarding_4_body">相簿、音樂、筆記等實用工具，全部離線可用；音樂支援同步歌詞。</string>
