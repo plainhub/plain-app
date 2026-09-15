@@ -55,6 +55,8 @@ kotlin {
             api(libs.netty.codec.http)
             api(libs.netty.transport.native.epoll)
             api(libs.netty.transport.native.kqueue)
+            implementation(libs.androidx.exifinterface)
+            implementation(libs.zxing.core)
         }
 
         commonTest.dependencies {
@@ -87,9 +89,9 @@ val checkJava21Collisions by tasks.registering {
             .filter { it.isFile && it.extension == "kt" }
             .forEach { f ->
                 f.readLines().forEachIndexed { i, line ->
-                    // LockFreeLinkedListHead is a kotlinx-coroutines class with its own addLast member
-                    if (line.contains("LockFreeLinkedListHead")) return@forEachIndexed
-                    if (forbidden.containsMatchIn(line)) offenders += "${f.relativeTo(srcRoot.asFile)}:${i + 1}: ${line.trim()}"
+                // LockFreeLinkedListHead is a kotlinx-coroutines class with its own addLast member
+                if (line.contains("LockFreeLinkedListHead")) return@forEachIndexed
+                if (forbidden.containsMatchIn(line)) offenders += "${f.relativeTo(srcRoot.asFile)}:${i + 1}: ${line.trim()}"
                 }
             }
         if (offenders.isNotEmpty()) {

@@ -192,7 +192,6 @@ fun DlnaDownloadIconButton(
     if (showSaveSheet) {
         SaveToSheet(
             title = mediaTitle.ifEmpty { mediaType.name.lowercase().replaceFirstChar { it.uppercase() } },
-            isFolder = false,
             onDismiss = { showSaveSheet = false },
             onDownloads = {
                 showSaveSheet = false

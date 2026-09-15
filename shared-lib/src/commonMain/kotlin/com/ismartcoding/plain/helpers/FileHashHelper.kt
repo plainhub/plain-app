@@ -3,8 +3,11 @@ package com.ismartcoding.plain.helpers
 import com.ismartcoding.plain.lib.crypto.sha256
 import com.ismartcoding.plain.lib.extensions.toHexString
 
-/** Bytes used for the edge-based [FileHashHelper.weakHash] fragment hash. */
-internal const val FileHashEdgeBytes = 4 * 1024
+/**
+ * Bytes used for the edge-based [FileHashHelper.weakHash] fragment hash.
+ * Public: shared's platform file hashing uses the same edge scheme.
+ */
+const val FileHashEdgeBytes = 4 * 1024
 
 /** SHA-256 hex of [data]. */
 internal fun sha256Hex(data: ByteArray): String {

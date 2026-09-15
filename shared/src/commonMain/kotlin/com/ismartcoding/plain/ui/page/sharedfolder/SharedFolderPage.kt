@@ -42,6 +42,7 @@ import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.platform.getDownloadsDirPath
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.launchUrl
+import com.ismartcoding.plain.platform.streamZipToSink
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
@@ -248,6 +249,22 @@ fun SharedFolderPage(
         }
     }
 
+    /** Zips the selected file entries into one archive in the Downloads dir. */
+    fun zipSelection() {
+        val urlToken = rootInfo?.urlToken ?: return
+        val link = activeLink ?: return
+        val zipName = (rootInfo?.name ?: "shared") + "_selected.zip"
+        val dest = "${getDownloadsDirPath().trimEnd('/')}/PlainApp/$zipName"
+        syncStatus = LocaleHelper.getString(Res.string.syncing_files)
+        scope.launch {
+            val ok = runCatching {
+                withIO { SharedFolderTransfer.zipEntriesTo(link, urlToken, sortedSelection(), dest) }
+            }.isSuccess
+            syncStatus = null
+            reportResult(ok)
+        }
+    }
+
     fun browserUrl(): String? {
         val msg = shareMsg ?: return null
         val link = activeLink ?: SharedLinkClient.linkOf(msg.shareId, msg.urlToken, msg.peerInfo.ip, msg.peerInfo.port)
@@ -412,7 +429,6 @@ fun SharedFolderPage(
     downloadTarget?.let { target ->
         SaveToSheet(
             title = target.name,
-            isFolder = target.isDir,
             onDismiss = { downloadTarget = null },
             onDownloads = {
                 downloadTarget = null
@@ -428,9 +444,9 @@ fun SharedFolderPage(
     }
 
     if (showSaveSelectedSheet) {
+        val fileCount = selected.count { !it.isDir }
         SaveToSheet(
             title = stringResource(Res.string.save_selected, selected.size),
-            isFolder = true,
             onDismiss = { showSaveSelectedSheet = false },
             onDownloads = {
                 showSaveSelectedSheet = false
@@ -439,6 +455,14 @@ fun SharedFolderPage(
             onDirectory = { dir ->
                 showSaveSelectedSheet = false
                 saveSelectionToDir(dir)
+            },
+            onZip = if (fileCount >= 2) {
+                ({
+                    showSaveSelectedSheet = false
+                    zipSelection()
+                })
+            } else {
+                null
             },
         )
     }

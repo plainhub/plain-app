@@ -55,7 +55,6 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun SaveToSheet(
     title: String,
-    isFolder: Boolean,
     onDismiss: () -> Unit,
     onDownloads: () -> Unit,
     onDirectory: (dirPath: String) -> Unit,
@@ -108,7 +107,7 @@ fun SaveToSheet(
         PSheetActionRow(Res.drawable.folders, stringResource(Res.string.pick_directory)) {
             showFolderPick = true
         }
-        if (isFolder && onZip != null) {
+        if (onZip != null) {
             PSheetActionRow(Res.drawable.download, stringResource(Res.string.download_zip)) {
                 onDismiss()
                 onZip()

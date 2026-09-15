@@ -1156,7 +1156,7 @@ object Mp4Helper {
                             // presentation order before any video sample is
                             // written.
                             while (pendingAudio.isNotEmpty()) {
-                                val p = pendingAudio.removeFirst()
+                                val p = pendingAudio.removeFirstOrNull() ?: break
                                 info.set(0, p.data.size, p.pts, p.flags)
                                 muxer.writeSampleData(audioOut, ByteBuffer.wrap(p.data), info)
                             }

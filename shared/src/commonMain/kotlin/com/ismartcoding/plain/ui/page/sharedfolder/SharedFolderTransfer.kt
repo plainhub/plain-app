@@ -7,7 +7,10 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.DownloadTempFileHandle
 import com.ismartcoding.plain.platform.createDownloadTempFile
+import com.ismartcoding.plain.platform.ZipStreamEntry
+import com.ismartcoding.plain.platform.createFileSink
 import com.ismartcoding.plain.platform.createFileWriteHandle
+import com.ismartcoding.plain.platform.streamZipToSink
 import com.ismartcoding.plain.platform.getMimeTypeFromExtension
 import com.ismartcoding.plain.platform.importDownloadedFile
 import com.ismartcoding.plain.platform.saveTempFileToDownloads
@@ -182,6 +185,42 @@ internal object SharedFolderTransfer {
             if (done) ok++
         }
         return ok
+    }
+
+    /**
+     * Zips the selected **file** entries into one archive at [destZipPath].
+     * Files are downloaded to temp first, zipped, then cleaned up. Returns
+     * true on success.
+     */
+    suspend fun zipEntriesTo(
+        link: SharedLink,
+        urlToken: String,
+        entries: List<SharedFileDto>,
+        destZipPath: String,
+    ): Boolean {
+        val tempFiles = mutableListOf<Pair<DownloadTempFileHandle, String>>() // handle to entry name
+        try {
+            entries.filter { !it.isDir }.forEach { entry ->
+                val handle = createDownloadTempFile("zipitem_${entry.name}")
+                withIO {
+                    downloadToHandle(
+                        SharedLinkClient.fileUrl(link, urlToken, entry.virtualPath),
+                        handle,
+                    )
+                }
+                tempFiles.add(handle to entry.name)
+            }
+            if (tempFiles.isEmpty()) return false
+            val sink = createFileSink(destZipPath)
+            val ok = streamZipToSink(
+                tempFiles.map { (handle, name) -> ZipStreamEntry(sourcePath = handle.filePath, entryName = name) },
+                sink,
+            )
+            sink.close()
+            return ok
+        } finally {
+            tempFiles.forEach { (handle, _) -> handle.delete() }
+        }
     }
 
     /**
