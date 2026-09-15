@@ -2,6 +2,7 @@ package com.ismartcoding.plain.platform
 
 import androidx.core.content.pm.PackageInfoCompat
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.features.BundleApkInstaller
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.lib.withIO
@@ -68,9 +69,14 @@ actual fun installPackage(path: String): PackageInstallResult {
     if (!file.exists()) {
         throw IllegalArgumentException("File does not exist")
     }
-    if (!file.name.endsWith(".apk", ignoreCase = true)) {
-        throw IllegalArgumentException("Unsupported file format. Only APK files are supported.")
+    return when (file.extension.lowercase()) {
+        "apk" -> installApkFile(file)
+        in BundleApkInstaller.BUNDLE_EXTENSIONS -> BundleApkInstaller.install(file)
+        else -> throw IllegalArgumentException("Unsupported file format. Supported: .apk, .apkm, .apks, .xapk")
     }
+}
+
+private fun installApkFile(file: java.io.File): PackageInstallResult {
     LogCat.d("Installing APK file: ${file.name}")
     val apkMeta = ApkParsers.getMetaInfo(file)
         ?: throw IllegalArgumentException("Failed to parse APK package ID")

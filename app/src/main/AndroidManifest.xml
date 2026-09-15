@@ -277,6 +277,10 @@
             android:name=".receivers.SmsSentReceiver"
             android:exported="false" />
 
+        <receiver
+            android:name="com.ismartcoding.plain.features.PackageInstallStatusReceiver"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
