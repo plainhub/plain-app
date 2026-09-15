@@ -68,7 +68,6 @@ object MainAppHelper {
         initDiskLogging()
 
         AppEvents.register()
-        warmUpHttpServer()
         NetworkMonitor.init(app)
         if (isQPlus()) {
             try {
@@ -97,6 +96,12 @@ object MainAppHelper {
             }
 
             val preferences = initCommonPreferences()
+            // Must run after initCommonPreferences: the keystore warm-up loads
+            // keystore.bks with the stored password, which only exists once
+            // KeyStorePasswordPreference.ensureValueAsync has run — warming up
+            // earlier creates the file with an empty password and forces a
+            // regenerate cycle on the first server start.
+            warmUpHttpServer()
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
             AdbTokenPreference.ensureValueAsync(preferences)
             if (TempData.serviceEnabled.value && PlugInControlReceiver.isUSBConnected(app)) {
