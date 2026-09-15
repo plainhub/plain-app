@@ -215,6 +215,8 @@ object AppEvents {
                                 restartAudioIfPlaying()
                             }
                         }
+                        // Push permission changes to web clients so they refetch the app query.
+                        sendEvent(WebSocketEvent(EventType.PERMISSIONS_UPDATED, jsonEncode(event.map)))
                     }
 
                     is StartHttpServerEvent -> {
