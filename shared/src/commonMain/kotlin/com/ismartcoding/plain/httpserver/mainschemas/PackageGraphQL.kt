@@ -7,6 +7,7 @@ import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.checkEnabledAsync
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.countPackages
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.getPackageInfoMap
@@ -54,7 +55,8 @@ suspend fun uninstallPackages(ids: List<ID>): Boolean {
 suspend fun installPackage(path: String): PackageInstallPending {
     checkEnabledAsync(setOf(Permission.QUERY_ALL_PACKAGES))
     try {
-        val result = com.ismartcoding.plain.platform.installPackage(path)
+        // bundle unpacking is heavy disk I/O, keep it off the engine event loop
+        val result = withIO { com.ismartcoding.plain.platform.installPackage(path) }
         return PackageInstallPending(result.packageName, result.lastUpdateTime, result.isNew)
     } catch (e: Exception) {
         LogCat.e("Installation failed: ${e.message}", e)
