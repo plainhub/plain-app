@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.ui.components.mediaviewer
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
@@ -12,15 +15,13 @@ import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.platform.shareFile
-import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.CopyIconButton
-import com.ismartcoding.plain.ui.base.IconTextCastButton
-import com.ismartcoding.plain.ui.base.IconTextDeleteButton
-import com.ismartcoding.plain.ui.base.IconTextRenameButton
-import com.ismartcoding.plain.ui.base.IconTextScanQrCodeButton
-import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PSheetActionRow
+import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -34,21 +35,34 @@ internal fun ViewMediaActionButtons(
     onDismiss: () -> Unit,
     onCast: (() -> Unit)? = null,
 ) {
-    ActionButtons {
-        if (qrScanResult.isNotEmpty()) {
-            IconTextScanQrCodeButton { onShowQrScanResult() }
-        }
-        val isMediaFile = m.data is DImage || m.data is DVideo
-        IconTextShareButton {
+    val isMediaFile = m.data is DImage || m.data is DVideo
+    var slots = 1
+    if (qrScanResult.isNotEmpty()) slots++
+    if (onCast != null) slots++
+    if (isMediaFile) slots += 2
+    PSheetPrimaryActionsCard(slots = slots) {
+        PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
             shareFile(m.path)
             onDismiss()
         }
+        if (qrScanResult.isNotEmpty()) {
+            PSheetPrimaryAction(Res.drawable.scan_qr_code, stringResource(Res.string.scan_qrcode)) {
+                onShowQrScanResult()
+            }
+        }
         if (onCast != null) {
-            IconTextCastButton { onCast() }
+            PSheetPrimaryAction(Res.drawable.cast, stringResource(Res.string.cast)) { onCast() }
         }
         if (isMediaFile) {
-            IconTextRenameButton { onShowRenameDialog() }
-            IconTextDeleteButton {
+            PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                onShowRenameDialog()
+            }
+            PSheetPrimaryAction(
+                Res.drawable.delete_forever,
+                stringResource(Res.string.delete),
+                container = MaterialTheme.colorScheme.errorContainer,
+                tint = MaterialTheme.colorScheme.error,
+            ) {
                 DialogHelper.confirmToDelete {
                     deleteAction()
                     onDismiss()

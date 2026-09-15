@@ -5,7 +5,10 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,20 +24,15 @@ import com.ismartcoding.plain.platform.addMediaShortcut
 import com.ismartcoding.plain.platform.getMediaItemUriString
 import com.ismartcoding.plain.platform.openFileExternal
 import com.ismartcoding.plain.platform.shareFiles
-import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.CopyIconButton
-import com.ismartcoding.plain.ui.base.IconTextAddToHomeButton
-import com.ismartcoding.plain.ui.components.AddToHomeDialog
-import com.ismartcoding.plain.ui.base.IconTextDeleteButton
-import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
-import com.ismartcoding.plain.ui.base.IconTextRenameButton
-import com.ismartcoding.plain.ui.base.IconTextRestoreButton
-import com.ismartcoding.plain.ui.base.IconTextSelectButton
-import com.ismartcoding.plain.ui.base.IconTextShareButton
-import com.ismartcoding.plain.ui.base.IconTextTrashButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PSheetActionRow
+import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.components.AddToHomeDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VideosViewModel
@@ -49,54 +47,61 @@ internal fun VideoActionButtons(
     onDismiss: () -> Unit,
 ) {
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    ActionButtons {
-        if (!videosVM.showSearchBar.value) {
-            IconTextSelectButton {
-                dragSelectState.enterSelectMode()
-                dragSelectState.select(m.id)
-                onDismiss()
-            }
-        }
-        IconTextShareButton {
+    PSheetPrimaryActionsCard {
+        PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
             shareFiles(listOf(getMediaItemUriString(videosVM.dataType, m.id)))
             onDismiss()
         }
         if (!m.path.isUrl()) {
-            IconTextOpenWithButton {
+            PSheetPrimaryAction(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                 openFileExternal(m.path)
             }
         }
-        if (!m.path.isUrl() && !videosVM.trash.value) {
-            IconTextAddToHomeButton {
-                showAddToHomeDialog = true
-            }
-        }
-        IconTextRenameButton {
+        PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
             videosVM.showRenameDialog.value = true
         }
-        if (AppFeatureType.MEDIA_TRASH.has()) {
-            if (videosVM.trash.value) {
-                IconTextRestoreButton {
-                    videosVM.restore(tagsVM, setOf(m.id))
-                    onDismiss()
-                }
-                IconTextDeleteButton {
-                    DialogHelper.confirmToDelete {
-                        videosVM.delete(tagsVM, setOf(m.id))
-                        onDismiss()
-                    }
-                }
-            } else {
-                IconTextTrashButton {
-                    videosVM.trash(tagsVM, setOf(m.id))
-                    onDismiss()
-                }
+        if (AppFeatureType.MEDIA_TRASH.has() && videosVM.trash.value) {
+            PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                videosVM.restore(tagsVM, setOf(m.id))
+                onDismiss()
             }
         } else {
-            IconTextDeleteButton {
+            PSheetPrimaryAction(
+                Res.drawable.delete_forever,
+                stringResource(Res.string.delete),
+                container = MaterialTheme.colorScheme.errorContainer,
+                tint = MaterialTheme.colorScheme.error,
+            ) {
                 DialogHelper.confirmToDelete {
                     videosVM.delete(tagsVM, setOf(m.id))
                     onDismiss()
+                }
+            }
+        }
+    }
+    val hasSecondary = !videosVM.showSearchBar.value || (!m.path.isUrl() && !videosVM.trash.value) ||
+        (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value)
+    if (hasSecondary) {
+        VerticalSpace(12.dp)
+        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+            Column {
+                if (!videosVM.showSearchBar.value) {
+                    PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                        dragSelectState.enterSelectMode()
+                        dragSelectState.select(m.id)
+                        onDismiss()
+                    }
+                }
+                if (!m.path.isUrl() && !videosVM.trash.value) {
+                    PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home)) {
+                        showAddToHomeDialog = true
+                    }
+                }
+                if (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value) {
+                    PSheetActionRow(Res.drawable.trash_2, stringResource(Res.string.trash)) {
+                        videosVM.trash(tagsVM, setOf(m.id))
+                        onDismiss()
+                    }
                 }
             }
         }

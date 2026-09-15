@@ -11,16 +11,13 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,15 +35,10 @@ import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
-import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
-import com.ismartcoding.plain.ui.base.PDropdownMenuItem
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemCreateFile
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemCreateFolder
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemSort
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopRightButton
@@ -82,12 +74,17 @@ fun FilesPage(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val previewerState = rememberPreviewerState()
     val itemsState by filesVM.itemsFlow.collectAsState()
+    var showMoreSheet by remember { mutableStateOf(false) }
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch { filesVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
 
     FilesPageEffects(filesVM, scope, folderPath, previewerState, audioPlaylistVM)
     FilesPageDialogs(filesVM, scope)
+
+    if (showMoreSheet) {
+        FilesMoreActionsSheet(filesVM = filesVM, onDismiss = { showMoreSheet = false })
+    }
 
     val drawerFolderTitle = filesVM.currentFolderTitleOverride()
     val title = when {
@@ -133,42 +130,8 @@ fun FilesPage(
                     ActionButtonSearch { filesVM.enterSearchMode() }
                     PCapsuleMoreClose(
                         onClose = { navController.navigateUp() },
-                    ) { dismiss ->
-                        PDropdownMenuItemSort {
-                            dismiss()
-                            filesVM.showSortDialog.value = true
-                        }
-                        var showHiddenFiles by remember { mutableStateOf(false) }
-                        LaunchedEffect(Unit) {
-                            showHiddenFiles = ShowHiddenFilesPreference.getAsync()
-                        }
-                        PDropdownMenuItem(
-                            text = { Text(stringResource(Res.string.show_hidden_files)) },
-                            leadingIcon = {
-                                Checkbox(
-                                    checked = showHiddenFiles,
-                                    onCheckedChange = null
-                                )
-                            },
-                            onClick = {
-                                dismiss()
-                                scope.launch(Dispatchers.Default) {
-                                    val nv = !showHiddenFiles
-                                    ShowHiddenFilesPreference.putAsync(nv)
-                                    showHiddenFiles = nv; filesVM.loadAsync()
-                                }
-                            })
-                        if (!ZipBrowserHelper.isZipPath(filesVM.selectedPath)) {
-                            PDropdownMenuItemCreateFolder {
-                                dismiss()
-                                filesVM.showCreateFolderDialog.value = true
-                            }
-                            PDropdownMenuItemCreateFile {
-                                dismiss()
-                                filesVM.showCreateFileDialog.value = true
-                            }
-                        }
-                    }
+                        onMore = { showMoreSheet = true },
+                    )
                 } else {
                     PTopRightButton(
                         label = stringResource(if (filesVM.isAllSelected()) Res.string.unselect_all else Res.string.select_all),

@@ -1,29 +1,61 @@
 package com.ismartcoding.plain.ui.page.files
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.features.file.DFile
+import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.openFileExternal
 import com.ismartcoding.plain.platform.shareFiles
-import com.ismartcoding.plain.ui.base.ActionButtons
-import com.ismartcoding.plain.ui.base.IconTextCopyButton
-import com.ismartcoding.plain.ui.base.IconTextCutButton
-import com.ismartcoding.plain.ui.base.IconTextDeleteButton
-import com.ismartcoding.plain.ui.base.IconTextFavoriteButton
-import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
-import com.ismartcoding.plain.ui.base.IconTextRenameButton
-import com.ismartcoding.plain.ui.base.IconTextSelectButton
-import com.ismartcoding.plain.ui.base.IconTextShareButton
-import com.ismartcoding.plain.ui.base.IconTextShareLinkButton
-import com.ismartcoding.plain.ui.base.IconTextZipButton
+import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PSheetActionRow
+import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsRow
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.CoroutineScope
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
-internal fun FileInfoActionButtons(
+internal fun FileInfoPrimaryActions(
+    file: DFile,
+    filesVM: FilesViewModel,
+    onDismiss: () -> Unit,
+    onShowPasteBar: (Boolean) -> Unit,
+) {
+    PSheetPrimaryActionsRow {
+        PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+            shareFiles(listOf(file.path))
+            onDismiss()
+        }
+        PSheetPrimaryAction(Res.drawable.copy, stringResource(Res.string.copy)) {
+            performCopyFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
+        }
+        PSheetPrimaryAction(Res.drawable.scissors, stringResource(Res.string.cut)) {
+            performCutFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
+        }
+        PSheetPrimaryAction(
+            Res.drawable.delete_forever,
+            stringResource(Res.string.delete),
+            container = MaterialTheme.colorScheme.errorContainer,
+            tint = MaterialTheme.colorScheme.error,
+        ) {
+            DialogHelper.confirmToDelete {
+                filesVM.deleteFiles(setOf(file.path))
+                onDismiss()
+            }
+        }
+    }
+}
+
+@Composable
+internal fun FileInfoSecondaryActions(
     file: DFile,
     filesVM: FilesViewModel,
     isFavorite: Boolean,
@@ -31,58 +63,40 @@ internal fun FileInfoActionButtons(
     showRenameDialog: MutableState<Boolean>,
     scope: CoroutineScope,
     onDismiss: () -> Unit,
-    onShowPasteBar: (Boolean) -> Unit,
 ) {
-    ActionButtons {
-        if (!filesVM.showSearchBar.value) {
-            IconTextSelectButton {
-                filesVM.enterSelectMode()
-                filesVM.select(file.path)
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+        Column {
+            if (!filesVM.showSearchBar.value) {
+                PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                    filesVM.enterSelectMode()
+                    filesVM.select(file.path)
+                    onDismiss()
+                }
+            }
+            PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
+                showRenameDialog.value = true
+            }
+            PSheetActionRow(Res.drawable.link, stringResource(Res.string.share_link)) {
+                filesVM.sharePaths.clear()
+                filesVM.sharePaths.add(file.path)
                 onDismiss()
+                filesVM.showCreateShareDialog.value = true
             }
-        }
-
-        IconTextCutButton {
-            performCutFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
-        }
-
-        IconTextCopyButton {
-            performCopyFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
-        }
-
-        if (file.isDir) {
-            IconTextFavoriteButton(isFavorite = isFavorite) {
-                onFavoriteToggle()
+            if (file.isDir) {
+                PSheetActionRow(
+                    if (isFavorite) Res.drawable.check else Res.drawable.plus,
+                    stringResource(Res.string.favorites),
+                ) {
+                    onFavoriteToggle()
+                }
             }
-        }
-
-        IconTextShareButton {
-            shareFiles(listOf(file.path))
-            onDismiss()
-        }
-        IconTextShareLinkButton {
-            filesVM.sharePaths.clear()
-            filesVM.sharePaths.add(file.path)
-            onDismiss()
-            filesVM.showCreateShareDialog.value = true
-        }
-        if (!file.isDir) {
-            IconTextOpenWithButton {
-                openFileExternal(file.path)
-            }
-        }
-        if (!file.isDir) {
-            IconTextZipButton {
-                performZipFiles(scope, filesVM, listOf(file)) { onDismiss() }
-            }
-        }
-        IconTextRenameButton {
-            showRenameDialog.value = true
-        }
-        IconTextDeleteButton {
-            DialogHelper.confirmToDelete {
-                filesVM.deleteFiles(setOf(file.path))
-                onDismiss()
+            if (!file.isDir) {
+                PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+                    openFileExternal(file.path)
+                }
+                PSheetActionRow(Res.drawable.package2, stringResource(Res.string.compress)) {
+                    performZipFiles(scope, filesVM, listOf(file)) { onDismiss() }
+                }
             }
         }
     }

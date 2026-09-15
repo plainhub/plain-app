@@ -12,13 +12,11 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.platform.shareText
-import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.IconTextShareButton
-import com.ismartcoding.plain.ui.base.IconTextToTopButton
 import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.IconTextToBottomButton
+import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSwitch
@@ -45,16 +43,16 @@ fun ViewTextContentBottomSheet(
                 VerticalSpace(32.dp)
             }
             item {
-                ActionButtons {
-                    IconTextShareButton {
+                PSheetPrimaryActionsCard {
+                    PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
                         shareText(content)
                         onDismiss()
                     }
-                    IconTextToTopButton {
+                    PSheetPrimaryAction(Res.drawable.arrow_up_to_line, stringResource(Res.string.jump_to_top)) {
                         textFileVM.gotoTop()
                         onDismiss()
                     }
-                    IconTextToBottomButton {
+                    PSheetPrimaryAction(Res.drawable.arrow_down_to_line, stringResource(Res.string.jump_to_bottom)) {
                         textFileVM.gotoEnd()
                         onDismiss()
                     }

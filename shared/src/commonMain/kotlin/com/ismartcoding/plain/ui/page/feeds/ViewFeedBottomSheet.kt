@@ -5,6 +5,7 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,16 +23,15 @@ import com.ismartcoding.plain.features.feed.FeedWorkerState
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.launchUrl
-import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.IconTextDeleteButton
-import com.ismartcoding.plain.ui.base.IconTextEditButton
-import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.PSheetActionRow
+import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
@@ -68,17 +68,22 @@ fun ViewFeedBottomSheet(
         },
     ) {
         VerticalSpace(32.dp)
-        ActionButtons {
-            IconTextSelectButton {
+        PSheetPrimaryActionsCard {
+            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
                 feedsVM.enterSelectMode()
                 feedsVM.select(m.id)
                 onDismiss()
             }
-            IconTextEditButton {
+            PSheetPrimaryAction(Res.drawable.square_pen, stringResource(Res.string.edit)) {
                 feedsVM.showEditDialog(m)
                 onDismiss()
             }
-            IconTextDeleteButton {
+            PSheetPrimaryAction(
+                Res.drawable.delete_forever,
+                stringResource(Res.string.delete),
+                container = MaterialTheme.colorScheme.errorContainer,
+                tint = MaterialTheme.colorScheme.error,
+            ) {
                 val id = m.id
                 // Await the delete so the caller reloads the entry list after
                 // the rows are actually gone, not mid-deletion.

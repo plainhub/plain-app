@@ -10,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.getMimeType
@@ -18,17 +19,14 @@ import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.scanFiles
 import com.ismartcoding.plain.platform.shareFiles
 import com.ismartcoding.plain.features.file.DFile
-import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.IconTextDeleteButton
-import com.ismartcoding.plain.ui.base.IconTextShareButton
-import com.ismartcoding.plain.ui.base.IconTextToBottomButton
-import com.ismartcoding.plain.ui.base.IconTextToTopButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -55,20 +53,25 @@ fun ViewTextFileBottomSheet(
         },
     ) {
         VerticalSpace(32.dp)
-        ActionButtons {
-            IconTextShareButton {
+        PSheetPrimaryActionsCard {
+            PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
                 shareFiles(listOf(path))
                 onDismiss()
             }
-            IconTextToTopButton {
+            PSheetPrimaryAction(Res.drawable.arrow_up_to_line, stringResource(Res.string.jump_to_top)) {
                 textFileVM.gotoTop()
                 onDismiss()
             }
-            IconTextToBottomButton {
+            PSheetPrimaryAction(Res.drawable.arrow_down_to_line, stringResource(Res.string.jump_to_bottom)) {
                 textFileVM.gotoEnd()
                 onDismiss()
             }
-            IconTextDeleteButton {
+            PSheetPrimaryAction(
+                Res.drawable.delete_forever,
+                stringResource(Res.string.delete),
+                container = MaterialTheme.colorScheme.errorContainer,
+                tint = MaterialTheme.colorScheme.error,
+            ) {
                 DialogHelper.confirmToDelete {
                     scope.launch(Dispatchers.Default) {
                         val paths = mutableListOf(path)
