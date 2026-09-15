@@ -198,17 +198,32 @@ internal object SharedFolderTransfer {
         entries: List<SharedFileDto>,
         destZipPath: String,
     ): Boolean {
+        // Expand selected directories into their file trees so one zip holds
+        // everything: files keep their name, dir files nest under dirName/.
+        val items = mutableListOf<Pair<SharedFileDto, String>>() // entry to entry name
+        suspend fun walk(entry: SharedFileDto, base: String) {
+            if (!entry.isDir) {
+                items.add(entry to base)
+                return
+            }
+            val info = SharedLinkClient.fetchSharedInfo(link, entry.virtualPath.takeIf { it.isNotEmpty() })
+            info.entries.forEach { child ->
+                walk(child, if (base.isEmpty()) child.name else "$base/${child.name}")
+            }
+        }
+        entries.forEach { walk(it, it.name) }
+
         val tempFiles = mutableListOf<Pair<DownloadTempFileHandle, String>>() // handle to entry name
         try {
-            entries.filter { !it.isDir }.forEach { entry ->
-                val handle = createDownloadTempFile("zipitem_${entry.name}")
+            items.forEach { (entry, entryName) ->
+                val handle = createDownloadTempFile("zipitem_${entryName}")
                 withIO {
                     downloadToHandle(
                         SharedLinkClient.fileUrl(link, urlToken, entry.virtualPath),
                         handle,
                     )
                 }
-                tempFiles.add(handle to entry.name)
+                tempFiles.add(handle to entryName)
             }
             if (tempFiles.isEmpty()) return false
             val sink = createFileSink(destZipPath)

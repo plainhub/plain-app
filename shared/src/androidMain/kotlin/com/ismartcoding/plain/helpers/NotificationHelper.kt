@@ -15,8 +15,10 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
+import androidx.compose.ui.graphics.toArgb
 import com.ismartcoding.plain.lib.extensions.notificationManager
 import com.ismartcoding.plain.platform.isSPlus
+import com.ismartcoding.plain.ui.theme.BrandPrimary
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.AppIntents
 import com.ismartcoding.plain.IntentExtras
@@ -119,6 +121,7 @@ object NotificationHelper {
 
         val notification = NotificationCompat.Builder(context, Constants.CHAT_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(notificationDrawableId())
+            .setColor(BrandPrimary.toArgb())
             .setContentTitle(targetName)
             .setContentText(messageText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -138,6 +141,7 @@ object NotificationHelper {
         val description = listOf(clientIp, browserDisplay, "$osName $osVersion").filter { it.isNotBlank() }.joinToString(" · ")
         val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(notificationDrawableId())
+            .setColor(BrandPrimary.toArgb())
             .setContentTitle(LocaleHelper.getString(Res.string.client_connected))
             .setContentText(description)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -178,6 +182,7 @@ object NotificationHelper {
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
             setSmallIcon(notificationDrawableId())
+            setColor(BrandPrimary.toArgb())
             setContentTitle(title)
             setContentText(description)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

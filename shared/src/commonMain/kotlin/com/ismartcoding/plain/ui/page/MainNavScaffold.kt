@@ -7,21 +7,26 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Text
+import androidx.compose.material3.WideNavigationRail
+import androidx.compose.material3.WideNavigationRailDefaults
+import androidx.compose.material3.WideNavigationRailItem
+import androidx.compose.material3.WideNavigationRailItemDefaults
+import androidx.compose.material3.WideNavigationRailValue
+import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -55,15 +60,20 @@ internal val mainNavItems: List<MainNavItem>
         }
     }
 
-// Material 3 window width class breakpoints: compact < 600dp <= medium < 840dp <= expanded.
+// Material 3 window width classes: compact < 600dp <= medium < 840dp <= expanded.
+// The drawer sheet itself is a fixed 360dp (NavigationDrawerTokens.ContainerWidth),
+// so the drawer only pays off from the "Large" boundary (1200dp) — below that it
+// would eat up to ~40% of the window (worst right at 840dp) and the expanded rail
+// leaves far more room for content.
 private val MediumNavMinWidth = 600.dp
-private val ExpandedNavMinWidth = 840.dp
+private val DrawerNavMinWidth = 1200.dp
 
 /**
  * Scaffold for the root tab pages with navigation that adapts to the window
- * width: bottom bar (compact), navigation rail (medium) or permanent
- * navigation drawer (expanded). Pass `onTabSelected = null` when the page is
- * hosted outside the main tab layout — it renders a plain scaffold.
+ * width: bottom bar (compact), expanded navigation rail with icon + label on
+ * one line (medium up to 1200dp) or permanent navigation drawer (>= 1200dp).
+ * Pass `onTabSelected = null` when the page is hosted outside the main tab
+ * layout — it renders a plain scaffold.
  */
 @Composable
 fun MainNavScaffold(
@@ -81,9 +91,13 @@ fun MainNavScaffold(
         // but sibling content still reads the raw window insets — report start
         // as consumed so the inner Scaffold and the pages' TopAppBar don't pad
         // it a second time (visible as a blank strip before the title).
+        // displayCutout is unioned in to match M3's systemBarsForVisualComponents:
+        // on Android the landscape punch-hole sits on the left edge and plain
+        // systemBars doesn't report it.
         val consumedStart = WindowInsets.systemBars.only(WindowInsetsSides.Start)
+            .union(WindowInsets.displayCutout.only(WindowInsetsSides.Start))
         when {
-            maxWidth >= ExpandedNavMinWidth -> {
+            maxWidth >= DrawerNavMinWidth -> {
                 PermanentNavigationDrawer(
                     drawerContent = { MainNavDrawerContent(selectedIndex, onTabSelected) },
                 ) {
@@ -117,19 +131,23 @@ fun MainNavScaffold(
 
 @Composable
 private fun MainNavRail(selectedIndex: Int, onTabSelected: (Int) -> Unit) {
-    NavigationRail(containerColor = MaterialTheme.colorScheme.background) {
+    WideNavigationRail(
+        state = rememberWideNavigationRailState(WideNavigationRailValue.Expanded),
+        colors = WideNavigationRailDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.background,
+        ),
+    ) {
         mainNavItems.forEach { item ->
-            NavigationRailItem(
+            WideNavigationRailItem(
                 selected = selectedIndex == item.index,
                 onClick = { onTabSelected(item.index) },
-                icon = {
-                    Icon(painterResource(item.icon), contentDescription = null)
-                },
+                icon = { Icon(painterResource(item.icon), contentDescription = null) },
                 label = { Text(stringResource(item.label)) },
-                colors = NavigationRailItemDefaults.colors(
+                railExpanded = true,
+                colors = WideNavigationRailItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     selectedTextColor = MaterialTheme.colorScheme.primary,
-                    indicatorColor = MaterialTheme.colorScheme.primaryPill,
+                    selectedIndicatorColor = MaterialTheme.colorScheme.primaryPill,
                 ),
             )
         }
@@ -145,15 +163,12 @@ private fun MainNavDrawerContent(selectedIndex: Int, onTabSelected: (Int) -> Uni
                 label = { Text(stringResource(item.label)) },
                 selected = selectedIndex == item.index,
                 onClick = { onTabSelected(item.index) },
-                icon = {
-                    Icon(painterResource(item.icon), contentDescription = null)
-                },
+                icon = { Icon(painterResource(item.icon), contentDescription = null) },
                 colors = NavigationDrawerItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     selectedTextColor = MaterialTheme.colorScheme.primary,
                     selectedContainerColor = MaterialTheme.colorScheme.primaryPill,
                 ),
-                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
             )
         }
     }

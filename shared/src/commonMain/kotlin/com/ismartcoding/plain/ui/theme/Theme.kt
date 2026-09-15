@@ -24,6 +24,9 @@ fun AppTheme(useDarkTheme: Boolean, content: @Composable () -> Unit) {
 /** Soft near-white for dark-theme text: #E5E5EA glared at large sizes (user, 2026-09-13). */
 private val DarkSoftOnSurface = Color(0xFFD1D1D6)
 
+/** Brand indigo (light primary): single source for the scheme and non-Compose surfaces (notification accent). */
+internal val BrandPrimary = Color(0xFF4F5F9E)
+
 @Composable
 private fun plainDarkColorScheme(): ColorScheme {
     val amoled = LocalAmoledDarkTheme.current
@@ -35,7 +38,7 @@ private fun plainDarkColorScheme(): ColorScheme {
         // replacing the iOS blue): pastel indigo fill with dark navy content.
         primary = Color(0xFFB8C4FF), onPrimary = Color(0xFF1F2E61),
         primaryContainer = Color(0xFF374777), onPrimaryContainer = Color(0xFFDDE2F9),
-        inversePrimary = Color(0xFF4F5F9E),
+        inversePrimary = BrandPrimary,
         secondary = Color(0xFFB8C4FF), onSecondary = Color(0xFF1F2E61),
         // Dark container synced from plain-desktop: muted indigo replaces the
         // glaring saturated blue pill (#003380) and ice-blue text (#CCDFFF).
@@ -70,10 +73,10 @@ private fun plainDarkColorScheme(): ColorScheme {
 }
 
 private fun plainLightColorScheme(): ColorScheme = lightColorScheme(
-    primary = Color(0xFF4F5F9E), onPrimary = Color(0xFFFFFFFF),
+    primary = BrandPrimary, onPrimary = Color(0xFFFFFFFF),
     primaryContainer = Color(0xFFDDE2F9), onPrimaryContainer = Color(0xFF111A3A),
     inversePrimary = Color(0xFFB8C4FF),
-    secondary = Color(0xFF4F5F9E), onSecondary = Color(0xFFFFFFFF),
+    secondary = BrandPrimary, onSecondary = Color(0xFFFFFFFF),
     secondaryContainer = Color(0xFFE5F0FF), onSecondaryContainer = Color(0xFF001B47),
     tertiary = Color(0xFF625B71), onTertiary = Color(0xFFFFFFFF),
     tertiaryContainer = Color(0xFFE8DEF8), onTertiaryContainer = Color(0xFF1D192B),
@@ -83,7 +86,7 @@ private fun plainLightColorScheme(): ColorScheme = lightColorScheme(
     background = Color(0xFFFFFBFE), onBackground = Color(0xFF000000),
     surface = Color(0xFFFFFFFF), onSurface = Color(0xFF000000),
     surfaceVariant = Color(0xFFFFFFFF), onSurfaceVariant = Color(0xFF636366),
-    surfaceTint = Color(0xFF4F5F9E).copy(alpha = 0.05f),
+    surfaceTint = BrandPrimary.copy(alpha = 0.05f),
     inverseSurface = Color(0xFF1C1C1E), inverseOnSurface = Color(0xFFFFFFFF),
     outline = Color(0xFFC6C6C8), outlineVariant = Color(0xFFE5E5EA),
     scrim = Color(0xFF000000),

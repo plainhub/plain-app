@@ -45,11 +45,13 @@ import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.platform.streamZipToSink
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.ui.base.BottomActionButtons
+import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSheetActionRow
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
@@ -271,23 +273,49 @@ fun SharedFolderPage(
         return SharedLinkClient.pageUrl(link)
     }
 
+    val currentInfo = dirCache[currentPath]
+    val entries = currentInfo?.entries
+        ?.sortedWith(compareBy<SharedFileDto> { !it.isDir }.thenBy { it.name.lowercase() })
+        ?: emptyList()
+    val active = activeLink
+    val pathLoading = loadingPath == currentPath
+    val pathError = errorPath == currentPath
+
     PScaffold(
         topBar = {
             PTopAppBar(
-                title = rootInfo?.name ?: shareMsg?.name ?: "",
+                title = if (selectMode) {
+                    stringResource(Res.string.x_selected, selected.size)
+                } else {
+                    rootInfo?.name ?: shareMsg?.name ?: ""
+                },
+                navigationIcon = if (selectMode) {
+                    { NavigationCloseIcon { selectMode = false; selected = emptySet() } }
+                } else {
+                    null
+                },
                 actions = {
-                    PCapsuleMoreClose(
-                        onClose = { navController.popBackStack() },
-                    ) { dismiss ->
-                        PSheetActionRow(Res.drawable.chrome, stringResource(Res.string.open_in_browser)) {
-                            dismiss()
-                            browserUrl()?.let { launchUrl(it) }
-                        }
-                        PSheetActionRow(Res.drawable.copy, stringResource(Res.string.copy)) {
-                            dismiss()
-                            browserUrl()?.let {
-                                setClipboardText("", it)
-                                DialogHelper.showSuccess(Res.string.copied)
+                    if (selectMode) {
+                        PTextButton(
+                            text = stringResource(if (selected.containsAll(entries)) Res.string.unselect_all else Res.string.select_all),
+                            onClick = {
+                                if (selected.containsAll(entries)) selected = emptySet() else selected = entries.toSet()
+                            },
+                        )
+                    } else {
+                        PCapsuleMoreClose(
+                            onClose = { navController.popBackStack() },
+                        ) { dismiss ->
+                            PSheetActionRow(Res.drawable.chrome, stringResource(Res.string.open_in_browser)) {
+                                dismiss()
+                                browserUrl()?.let { launchUrl(it) }
+                            }
+                            PSheetActionRow(Res.drawable.copy, stringResource(Res.string.copy)) {
+                                dismiss()
+                                browserUrl()?.let {
+                                    setClipboardText("", it)
+                                    DialogHelper.showSuccess(Res.string.copied)
+                                }
                             }
                         }
                     }
@@ -295,17 +323,10 @@ fun SharedFolderPage(
             )
         },
     ) { paddingValues ->
-        val currentInfo = dirCache[currentPath]
-        val entries = currentInfo?.entries
-            ?.sortedWith(compareBy<SharedFileDto> { !it.isDir }.thenBy { it.name.lowercase() })
-            ?: emptyList()
         val breadcrumbs = buildList {
             add(BreadcrumbItem(rootInfo?.name ?: "/", ""))
             crumbs.forEach { add(BreadcrumbItem(it.name, it.virtualPath)) }
         }
-        val active = activeLink
-        val pathLoading = loadingPath == currentPath
-        val pathError = errorPath == currentPath
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -456,13 +477,9 @@ fun SharedFolderPage(
                 showSaveSelectedSheet = false
                 saveSelectionToDir(dir)
             },
-            onZip = if (fileCount >= 2) {
-                ({
-                    showSaveSelectedSheet = false
-                    zipSelection()
-                })
-            } else {
-                null
+            onZip = {
+                showSaveSelectedSheet = false
+                zipSelection()
             },
         )
     }

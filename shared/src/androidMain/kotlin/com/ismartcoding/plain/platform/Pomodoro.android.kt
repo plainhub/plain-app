@@ -10,6 +10,8 @@ import android.media.AudioFormat
 import android.media.AudioTrack
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.compose.ui.graphics.toArgb
+import com.ismartcoding.plain.ui.theme.BrandPrimary
 import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.withIO
@@ -83,6 +85,7 @@ actual suspend fun showPomodoroNotification(state: PomodoroState) {
     val notificationId = NotificationHelper.generateId()
     val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(appResourceDrawable("notification"))
+        .setColor(BrandPrimary.toArgb())
         .setContentTitle(title)
         .setContentText(message)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
