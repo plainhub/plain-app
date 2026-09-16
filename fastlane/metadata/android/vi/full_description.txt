@@ -1,0 +1,56 @@
+<b>PlainApp</b> là ứng dụng Android miễn phí, mã nguồn mở, biến điện thoại của bạn thành trung tâm quản lý tự lưu trữ, truy cập được từ bất kỳ trình duyệt nào trong cùng mạng — không tài khoản, không đám mây, không gói đăng ký.
+
+<b>Tại sao chọn PlainApp?</b>
+
+Hầu hết các công cụ quản lý điện thoại đều đưa dữ liệu của bạn qua máy chủ của họ, khóa tính năng sau gói đăng ký hoặc hiển thị quảng cáo. PlainApp khác biệt:
+
+<ul>
+<li><b>100% cục bộ</b> — dữ liệu không bao giờ rời mạng của bạn</li>
+<li><b>Mã hóa đầu cuối</b> — mọi kết nối được bảo vệ bằng TLS + XChaCha20-Poly1305</li>
+<li><b>Miễn phí và không quảng cáo</b> — không mua hàng, không bán thêm, không bao giờ</li>
+<li><b>Hoàn toàn mã nguồn mở</b> — kiểm tra mã, tự build, hoặc đóng góp</li>
+</ul>
+
+<b>Tính năng</b>
+
+<b>Quản lý điện thoại qua trình duyệt</b>
+Mở trình duyệt trên bất kỳ thiết bị nào cùng mạng Wi-Fi để quản lý điện thoại Android — không cần cài đặt gì trên máy tính.
+
+<ul>
+<li><b>Tệp</b> — duyệt bộ nhớ trong, thẻ SD và ổ USB; tải lên, tải xuống, đổi tên, xóa</li>
+<li><b>Phương tiện</b> — xem và quản lý ảnh, video, âm thanh; phát trực tiếp trên trình duyệt</li>
+<li><b>Danh bạ</b> — xem, tìm kiếm và quản lý danh bạ</li>
+<li><b>SMS và Cuộc gọi</b> — đọc tin nhắn và lịch sử cuộc gọi; gửi SMS từ máy tính</li>
+<li><b>Ứng dụng</b> — liệt kê ứng dụng đã cài và xuất APK</li>
+<li><b>Thông báo</b> — phản chiếu thông báo điện thoại lên trình duyệt theo thời gian thực</li>
+<li><b>Phản chiếu màn hình</b> — truyền màn hình điện thoại trực tiếp lên trình duyệt, kèm âm thanh và điều khiển từ xa</li>
+<li><b>Thông tin thiết bị</b> — xem pin, bộ nhớ, mạng và chi tiết hệ thống</li>
+</ul>
+
+<b>Công cụ Android tích hợp</b>
+PlainApp cũng là một ứng dụng độc lập đầy đủ tính năng:
+
+<ul>
+<li><b>Ghi chú Markdown</b> — viết và sắp xếp ghi chú với trình soạn thảo gọn gàng</li>
+<li><b>Trình đọc RSS</b> — theo dõi các trang web yêu thích với trải nghiệm đọc không xao nhãng</li>
+<li><b>Trình phát video và âm thanh</b> — trình phát đa phương tiện đầy đủ, hỗ trợ danh sách phát</li>
+<li><b>Chiếu lên TV</b> — chiếu phương tiện lên bất kỳ TV tương thích DLNA/Chromecast</li>
+<li><b>Trò chuyện và chia sẻ tệp P2P</b> — chia sẻ tệp và tin nhắn trực tiếp giữa các thiết bị, không cần máy chủ</li>
+<li><b>Hẹn giờ Pomodoro</b> — giữ sự tập trung với bộ hẹn giờ làm việc tích hợp</li>
+<li><b>Máy đo tiếng ồn</b> — đo mức ồn môi trường theo thời gian thực</li>
+</ul>
+
+<b>Quyền riêng tư và bảo mật</b>
+
+<ul>
+<li>Không có Firebase Analytics hay Messaging — báo cáo sự cố là tùy chọn và cần bạn bật</li>
+<li>Không gửi bất kỳ dữ liệu nào đến máy chủ bên thứ ba</li>
+<li>Toàn bộ lưu lượng giữa điện thoại và trình duyệt đều được mã hóa</li>
+<li>Không cần đăng ký tài khoản</li>
+</ul>
+
+<b>Liên kết</b>
+<ul>
+<li>GitHub: https://github.com/plainhub/plain-app</li>
+<li>Reddit: https://www.reddit.com/r/plainapp</li>
+</ul>

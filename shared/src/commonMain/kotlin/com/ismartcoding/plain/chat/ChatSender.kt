@@ -12,9 +12,20 @@ import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getRecipientIds
+import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlinx.coroutines.withTimeoutOrNull
 
 object ChatSender {
+    /**
+     * Overall cap on one peer send, covering the full transport fallback
+     * chain. A dead peer surfaces as FAILED quickly instead of wedging the
+     * caller (share sheet / forward dialog) for minutes. Channel sends are
+     * not capped here: a leader broadcast fans out to every member, which
+     * can legitimately exceed the cap.
+     */
+    private const val PEER_SEND_TIMEOUT_MS = 20_000L
+
     suspend fun send(
         item: DChat,
         target: ChatTarget,
@@ -27,7 +38,15 @@ object ChatSender {
         when (target.type) {
             ChatTargetType.PEER -> {
                 val peer = AppDatabase.instance.peerDao().getById(target.toId) ?: return@withIO
-                sendToPeer(item, peer)
+                val finished = withTimeoutOrNull(PEER_SEND_TIMEOUT_MS) {
+                    sendToPeer(item, peer)
+                    true
+                }
+                if (finished == null) {
+                    LogCat.w("Send to peer ${peer.id} timed out after ${PEER_SEND_TIMEOUT_MS / 1000}s")
+                    ChatDbHelper.updateChatItemStatus(item, ChatStatus.FAILED)
+                    triggerPeerRediscovery(peer.id)
+                }
             }
 
             ChatTargetType.CHANNEL -> {

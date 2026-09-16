@@ -25,6 +25,7 @@
     <string name="save_as_note">ノートとして保存</string>
     <string name="send_count">送信（%1$d）</string>
     <string name="sent_to_n_targets">%1$d 件のチャットに送信しました</string>
+    <string name="send_failed">一部のチャットに送信できませんでした</string>
     <string name="saved_to_downloads">ダウンロードに保存しました</string>
     <string name="cannot_get_content">共有コンテンツを取得できません</string>
     <string name="files_with_size">%1$d 個のファイル · %2$s</string>

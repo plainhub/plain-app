@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">Общайтесь и создавайте каналы между телефонами и компьютерами. Контентом из других приложений можно поделиться в чате одним касанием.</string>
     <string name="onboarding_3_bubble_in">Фотографии с выходных готовы, отправляю</string>
     <string name="onboarding_3_bubble_out">Получил, качество отличное!</string>
+    <string name="onboarding_3_msg_sent">Всё отправлено — проверьте на компьютере</string>
     <string name="onboarding_3_share_hint">Поделиться из других приложений → переслать в чат одним касанием</string>
     <string name="onboarding_4_title">Больше чем передача файлов</string>
     <string name="onboarding_4_body">Фото, музыка, заметки и другие полезные инструменты — всё офлайн; в музыке есть синхронизированные тексты.</string>

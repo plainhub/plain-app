@@ -7,6 +7,7 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.appContext
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
+import com.ismartcoding.plain.chat.peer.transport.WifiAwareTransport
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.features.ClipboardWatcher
 import com.ismartcoding.plain.features.sms.SmsProviderObserver
@@ -25,6 +26,7 @@ import com.ismartcoding.plain.httpserver.getSslSignatureBytes
 import com.ismartcoding.plain.httpserver.httpServer
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreBytes
 import com.ismartcoding.plain.httpserver.replaceSslKeyStoreFromPem
+import com.ismartcoding.plain.lib.mdns.MdnsHostResponder
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -178,3 +180,12 @@ actual suspend fun stopHttpServiceAsync(): Unit = withIO {
         appContext.stopService(Intent(appContext, HttpServerService::class.java))
     }
 }
+
+actual fun isHttpServerRunning(): Boolean = HttpServerService.isRunning()
+
+actual fun isMdnsRunning(): Boolean = MdnsHostResponder.isRunning
+
+actual fun getAwareAttachStatus(): String =
+    if (WifiAwareTransport.awareSession != null) "attached" else "not attached"
+
+actual fun getAwareDiscoveredPeerCount(): Int = WifiAwareTransport.discoveredPeerCount

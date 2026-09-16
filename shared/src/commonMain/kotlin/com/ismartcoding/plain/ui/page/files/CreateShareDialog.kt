@@ -59,6 +59,7 @@ import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 import com.ismartcoding.plain.chat.ShareSendHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.i18n.sent
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -110,7 +111,7 @@ fun CreateShareDialog(
 
     if (share != null) {
         AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             onDismissRequest = onDismiss,
             title = { Text(stringResource(Res.string.share_created), style = MaterialTheme.typography.titleLarge) },
             text = {
@@ -131,14 +132,14 @@ fun CreateShareDialog(
                 }
             },
             confirmButton = {
-                PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
+                PTextButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
             },
         )
         return
     }
 
     AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         title = { Text(stringResource(Res.string.create_share_link), style = MaterialTheme.typography.titleLarge) },
         text = {

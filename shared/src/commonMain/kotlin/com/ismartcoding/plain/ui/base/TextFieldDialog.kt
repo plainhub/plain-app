@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable
 fun TextFieldDialog(
@@ -57,7 +58,7 @@ fun TextFieldDialog(
     
     AlertDialog(
         modifier = modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismissRequest,
         icon = {
             icon?.let {

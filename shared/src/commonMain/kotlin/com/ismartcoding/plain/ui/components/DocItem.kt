@@ -27,7 +27,7 @@ import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.fileToUriString
 import com.ismartcoding.plain.platform.getFileIconPath
 import com.ismartcoding.plain.db.DTag
-import com.ismartcoding.plain.docs.DDoc
+import com.ismartcoding.plain.data.DDoc
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState

@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.debug.ServiceDebugInfo
-import com.ismartcoding.plain.debug.getServiceDebugInfo
+import com.ismartcoding.plain.data.ServiceDebugInfo
+import com.ismartcoding.plain.data.getServiceDebugInfo
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem

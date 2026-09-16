@@ -5,7 +5,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.LocalAmoledDarkTheme
@@ -99,7 +101,9 @@ private fun plainLightColorScheme(): ColorScheme = lightColorScheme(
 
 val ColorScheme.green: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF30D158) else Color(0xFF34C759)
+    // Softened from the iOS greens (#30D158/#34C759) per user 2026-09-16 —
+    // same Material ramp family as greenText (#A5D6A7/#2E7D32).
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF81C784) else Color(0xFF43A047)
 
 val ColorScheme.grey: Color
     @Composable @ReadOnlyComposable
@@ -115,6 +119,11 @@ val ColorScheme.orange: Color
 
 // -------- App semantic colors --------
 
+/** Container color of the nearest floating host (bottom sheet). Null on plain
+ *  pages; PModalBottomSheet provides its own container color so card
+ *  backgrounds can adapt and stay visible on top of it. */
+val LocalFloatingHostColor: ProvidableCompositionLocal<Color?> = staticCompositionLocalOf { null }
+
 // Soft content for filled surfaces that stay dark in dark mode (danger red,
 // unchecked switch track): soft white there, white in light. Content on the
 // pastel primary fill uses onPrimary (dark navy) instead.
@@ -128,16 +137,42 @@ val ColorScheme.backgroundNormal: Color
 
 val ColorScheme.cardBackgroundNormal: Color
     @Composable @ReadOnlyComposable
-    get() = this.surfaceContainerLow
+    get() {
+        val base = this.surfaceContainerLow
+        // Floating hosts (bottom sheets) use the same color as cards in dark
+        // mode, which would hide cards and their PListItem rows — lift one
+        // ramp step when content sits on a provided host surface.
+        val host = LocalFloatingHostColor.current
+        return if (host == base) this.surfaceContainerHighest else base
+    }
+
+/** Dialog & bottom-sheet containers track the modal drawer color
+ *  (surfaceContainerLow) in dark mode — a plain surface blends into the app
+ *  background there (amoled) or lifts inconsistently. Light keeps white. */
+val ColorScheme.dialogSheetBackground: Color
+    @Composable @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) this.surfaceContainerLow else this.surface
 
 // Selected/playing cards, same treatment as plain-desktop .selectable-card.selected.
 val ColorScheme.cardBackgroundActive: Color
     @Composable @ReadOnlyComposable
-    get() = this.surfaceContainerHighest
+    get() {
+        val base = this.surfaceContainerHighest
+        // On a dark floating host, normal cards lift to surfaceContainerHighest —
+        // push active cards to surfaceBright to keep the selected state distinct.
+        val host = LocalFloatingHostColor.current
+        return if (host == this.surfaceContainerLow) this.surfaceBright else base
+    }
 
 val ColorScheme.circleBackground: Color
     @Composable @ReadOnlyComposable
-    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF2C2C2E) else Color(0xFFFFFFFF)
+    get() {
+        val base = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF2C2C2E) else Color(0xFFFFFFFF)
+        // Same collision as cards: the base color equals the floating host
+        // surface in dark mode — lift to stay visible.
+        val host = LocalFloatingHostColor.current
+        return if (host == base) this.surfaceBright else base
+    }
 
 val ColorScheme.greenDot: Color
     @Composable @ReadOnlyComposable

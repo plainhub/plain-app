@@ -1,0 +1,56 @@
+<b>PlainApp</b>, telefonunuzu kendi sunucunuzda barındırılan bir yönetim merkezine dönüştüren ücretsiz ve açık kaynaklı bir Android uygulamasıdır. Aynı ağdaki herhangi bir web tarayıcısından erişilebilir — hesap yok, bulut yok, abonelik yok.
+
+<b>Neden PlainApp?</b>
+
+Çoğu telefon yönetim aracı verilerinizi kendi sunucularından geçirir, özellikleri aboneliğin arkasına kilitler veya reklam gösterir. PlainApp farklıdır:
+
+<ul>
+<li><b>%100 yerel</b> — verileriniz ağınızdan asla çıkmaz</li>
+<li><b>Uçtan uca şifreli</b> — her bağlantı TLS + XChaCha20-Poly1305 ile korunur</li>
+<li><b>Ücretsiz ve reklamsız</b> — asla satın alma, asla ek satış yok</li>
+<li><b>Tamamen açık kaynak</b> — kodu denetleyin, kendi derlemenizi yapın veya katkıda bulunun</li>
+</ul>
+
+<b>Özellikler</b>
+
+<b>Tarayıcı tabanlı telefon yönetimi</b>
+Aynı Wi-Fi ağına bağlı herhangi bir cihazda tarayıcı açarak Android telefonunuzu yönetin — bilgisayar tarafında kurulum gerekmez.
+
+<ul>
+<li><b>Dosyalar</b> — dahili depolama, SD kart ve USB sürücülere göz atın; yükleme, indirme, yeniden adlandırma, silme</li>
+<li><b>Medya</b> — fotoğraf, video ve sesleri görüntüleyin ve yönetin; tarayıcıda akıtarak oynatın</li>
+<li><b>Kişiler</b> — kişileri görüntüleyin, arayın ve yönetin</li>
+<li><b>SMS ve Aramalar</b> — mesajları ve arama kayıtlarını okuyun; masaüstünden SMS gönderin</li>
+<li><b>Uygulamalar</b> — yüklü uygulamaları listeleyin ve APK dışa aktarın</li>
+<li><b>Bildirimler</b> — telefon bildirimlerini gerçek zamanlı tarayıcıya yansıtın</li>
+<li><b>Ekran Yansıtma</b> — telefon ekranını sesli ve uzaktan kumandalı şekilde tarayıcıya canlı aktarın</li>
+<li><b>Cihaz Bilgisi</b> — pil, depolama, ağ ve sistem ayrıntılarını kontrol edin</li>
+</ul>
+
+<b>Yerleşik Android Araçları</b>
+PlainApp aynı zamanda tek başına da yetenekli bir uygulamadır:
+
+<ul>
+<li><b>Markdown Notlar</b> — sade bir düzenleyiciyle notlar yazın ve düzenleyin</li>
+<li><b>RSS Okuyucu</b> — dikkat dağıtmayan okuyucuyla favori sitelerinizi takip edin</li>
+<li><b>Video ve Ses Oynatıcı</b> — oynatma listesi destekli tam donanımlı medya oynatıcı</li>
+<li><b>TV'ye Yansıt</b> — medyayı DLNA/Chromecast uyumlu her TV'ye gönderin</li>
+<li><b>P2P Sohbet ve Dosya Paylaşımı</b> — sunucu olmadan cihazlar arasında doğrudan dosya ve mesaj paylaşın</li>
+<li><b>Pomodoro Zamanlayıcı</b> — yerleşik çalışma zamanlayıcıyla odaklanın</li>
+<li><b>Ses Ölçer</b> — ortam gürültüsü seviyesini gerçek zamanlı ölçün</li>
+</ul>
+
+<b>Gizlilik ve Güvenlik</b>
+
+<ul>
+<li>Firebase Analytics veya Messaging yok — çökme raporları isteğe bağlıdır ve onayınızla açılır</li>
+<li>Üçüncü taraf sunuculara sıfır veri gönderimi</li>
+<li>Telefon ile tarayıcı arasındaki tüm trafik şifrelenir</li>
+<li>Hesap kaydı gerekmez</li>
+</ul>
+
+<b>Bağlantılar</b>
+<ul>
+<li>GitHub: https://github.com/plainhub/plain-app</li>
+<li>Reddit: https://www.reddit.com/r/plainapp</li>
+</ul>

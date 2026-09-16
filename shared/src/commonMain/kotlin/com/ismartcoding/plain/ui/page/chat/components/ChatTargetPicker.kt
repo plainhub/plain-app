@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,9 +41,10 @@ import org.jetbrains.compose.resources.painterResource
 /**
  * Multi-select chat target list used by the share sheet and the forward
  * dialog: local chat pinned first, then Channels / Devices sections, with a
- * circular confirm button that shows the selection count. Selection state is
- * owned by the caller ([selectedIds] holds [com.ismartcoding.plain.chat.data.ChatTarget.encodedToId]
- * values). The caller owns the top app bar.
+ * circular confirm button that shows the selection count (and a spinner
+ * while [sending]). Selection state is owned by the caller ([selectedIds]
+ * holds [com.ismartcoding.plain.chat.data.ChatTarget.encodedToId] values).
+ * The caller owns the top app bar.
  */
 @Composable
 fun ChatTargetPicker(
@@ -50,6 +52,7 @@ fun ChatTargetPicker(
     onToggle: (String) -> Unit,
     onConfirm: () -> Unit,
     enabled: Boolean = true,
+    sending: Boolean = false,
 ) {
     val options = chatTargetOptions()
     val localOption = options.first { it.target.isLocal() }
@@ -75,7 +78,7 @@ fun ChatTargetPicker(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
     ) {
         Spacer(modifier = Modifier.weight(1f))
-        SendButton(count = selectedIds.size, enabled = selectedIds.isNotEmpty() && enabled, onClick = onConfirm)
+        SendButton(count = selectedIds.size, enabled = selectedIds.isNotEmpty() && enabled && !sending, sending = sending, onClick = onConfirm)
     }
 }
 
@@ -90,7 +93,7 @@ private fun TargetRow(option: ChatTargetOption, selected: Boolean, enabled: Bool
             .clip(RoundedCornerShape(12.dp))
             .background(if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f) else Color.Transparent)
             .clickable(enabled = enabled) { onToggle(id) }
-            .padding(86.dp),
+            .padding(horizontal = 8.dp, vertical = 10.dp),
     ) {
         Box(
             modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer),
@@ -151,24 +154,32 @@ private fun CheckCircle(selected: Boolean) {
 }
 
 @Composable
-private fun SendButton(count: Int, enabled: Boolean, onClick: () -> Unit) {
+private fun SendButton(count: Int, enabled: Boolean, sending: Boolean, onClick: () -> Unit) {
     Box(modifier = Modifier.size(56.dp), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                .background(if (enabled || sending) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                 .clickable(enabled = enabled, onClick = onClick),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                painter = painterResource(Res.drawable.send),
-                contentDescription = null,
-                tint = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(22.dp),
-            )
+            if (sending) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.5.dp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
+            } else {
+                Icon(
+                    painter = painterResource(Res.drawable.send),
+                    contentDescription = null,
+                    tint = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
         }
-        if (count > 0) {
+        if (count > 0 && !sending) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)

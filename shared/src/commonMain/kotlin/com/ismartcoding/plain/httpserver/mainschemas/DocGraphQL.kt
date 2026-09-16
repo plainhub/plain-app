@@ -2,7 +2,7 @@ package com.ismartcoding.plain.httpserver.mainschemas
 
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
-import com.ismartcoding.plain.docs.DDoc
+import com.ismartcoding.plain.data.DDoc
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync

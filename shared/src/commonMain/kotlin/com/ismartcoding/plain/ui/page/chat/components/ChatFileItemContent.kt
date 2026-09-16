@@ -11,6 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -25,6 +29,7 @@ import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.extensions.isZipFile
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.platform.fileToUriString
+import com.ismartcoding.plain.platform.copyFileToDir
 import com.ismartcoding.plain.platform.playAudioWithNotificationCheck
 import com.ismartcoding.plain.platform.saveFileToDownloads
 import com.ismartcoding.plain.lib.withIO
@@ -34,6 +39,7 @@ import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
+import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -63,6 +69,36 @@ internal fun ChatFileItemContent(
     index: Int,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
+    var showSaveSheet by remember { mutableStateOf(false) }
+
+    if (showSaveSheet) {
+        SaveToSheet(
+            title = fileName,
+            onDismiss = { showSaveSheet = false },
+            onDownloads = {
+                showSaveSheet = false
+                coMain {
+                    val result = withIO { saveFileToDownloads(path, fileName) }
+                    if (result.isNotEmpty()) {
+                        DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, result))
+                    } else {
+                        DialogHelper.showErrorMessage(result)
+                    }
+                }
+            },
+            onDirectory = { dir ->
+                showSaveSheet = false
+                coMain {
+                    val result = withIO { copyFileToDir(path, dir, fileName) }
+                    if (result.isNotEmpty()) {
+                        DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, result))
+                    } else {
+                        DialogHelper.showErrorMessage(result)
+                    }
+                }
+            },
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -101,17 +137,10 @@ internal fun ChatFileItemContent(
             onDismissRequest = { showContextMenu.value = false },
         ) {
             PDropdownMenuItem(
-                text = { Text(stringResource(Res.string.save)) },
+                text = { Text(stringResource(Res.string.save_as)) },
                 onClick = {
                     showContextMenu.value = false
-                    coMain {
-                        val result = withIO { saveFileToDownloads(path, fileName) }
-                        if (result.isNotEmpty()) {
-                            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.file_save_to, result))
-                        } else {
-                            DialogHelper.showErrorMessage(result)
-                        }
-                    }
+                    showSaveSheet = true
                 },
             )
         }

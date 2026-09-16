@@ -33,6 +33,7 @@ import com.ismartcoding.plain.preferences.LocalNewVersionSize
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.UpdateViewModel
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
@@ -47,7 +48,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
 
     if (updateVM.updateDialogVisible.value) {
         AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             modifier = Modifier.heightIn(max = 400.dp),
             onDismissRequest = { updateVM.updateDialogVisible.value = false },
             icon = {

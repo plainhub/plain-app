@@ -1,13 +1,11 @@
 package com.ismartcoding.plain.platform
 
-import android.os.Environment
 import coil3.imageLoader
 import com.ismartcoding.plain.appContextValue
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.helpers.DownloadHelper
 import com.ismartcoding.plain.helpers.FileHelper
-import com.ismartcoding.plain.helpers.PathHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.Res
@@ -47,36 +45,39 @@ actual suspend fun sharePreviewMedia(m: PreviewItem) {
     }
 }
 
-actual suspend fun savePreviewMedia(m: PreviewItem) {
+actual suspend fun savePreviewMedia(m: PreviewItem, dir: String?) {
+    val fileName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() }
+        ?: m.path.getFilenameFromPath()
     if (m.path.isUrl()) {
-        DialogHelper.showLoading()
-        val context = appContextValue
-        val cachedPath = context?.imageLoader?.diskCache?.openSnapshot(m.path)?.data
+        val context = appContextValue ?: return
+        val cachedPath = context.imageLoader.diskCache?.openSnapshot(m.path)?.data
         if (cachedPath != null) {
-            val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = m.path.getFilenameFromPath()) }
-            DialogHelper.hideLoading()
-            if (r.isNotEmpty()) {
-                DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, r))
-            } else {
-                DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.image_save_to_failed))
-            }
+            savePreviewMediaFile(cachedPath.toString(), fileName, dir)
             return
         }
-        val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_PICTURES)
-        val r = DownloadHelper.downloadAsync(m.path, dir.absolutePath)
+        DialogHelper.showLoading()
+        val tempFile = File.createTempFile("imagePreviewSave", "." + m.path.getFilenameExtension(), File(context.cacheDir, "/image_cache"))
+        val r = DownloadHelper.downloadToTempAsync(m.path, tempFile)
         DialogHelper.hideLoading()
-        if (r.success) {
-            DialogHelper.showConfirmDialog("", LocaleHelper.getStringFAsync(Res.string.image_save_to, r.path))
-        } else {
+        if (!r.success) {
             DialogHelper.showMessage(r.message)
+            return
         }
+        savePreviewMediaFile(r.path, fileName, dir)
+        withIO { tempFile.delete() }
     } else {
-        val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""
-        val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES, newName = newName) }
-        if (r.isNotEmpty()) {
-            DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, r))
-        } else {
-            DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.image_save_to_failed))
-        }
+        savePreviewMediaFile(m.path, fileName, dir)
+    }
+}
+
+private suspend fun savePreviewMediaFile(srcPath: String, fileName: String, dir: String?) {
+    val savedPath = withIO {
+        if (dir == null) FileHelper.copyFileToDownloads(srcPath, fileName)
+        else copyFileToDir(srcPath, dir, fileName)
+    }
+    if (savedPath.isNotEmpty()) {
+        DialogHelper.showMessage(LocaleHelper.getStringFAsync(Res.string.image_save_to, savedPath))
+    } else {
+        DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.image_save_to_failed))
     }
 }

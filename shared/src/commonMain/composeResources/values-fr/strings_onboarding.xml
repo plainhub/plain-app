@@ -14,6 +14,7 @@
     <string name="onboarding_3_body">Discutez et créez des canaux entre téléphones et ordinateurs. Le contenu partagé depuis d'autres applications peut être transféré vers une discussion en un geste.</string>
     <string name="onboarding_3_bubble_in">Les photos du week-end sont prêtes, je te les envoie</string>
     <string name="onboarding_3_bubble_out">Reçues, super qualité !</string>
+    <string name="onboarding_3_msg_sent">Tout est envoyé — regardez sur votre ordinateur</string>
     <string name="onboarding_3_share_hint">Partage depuis d'autres applications → transférer vers une discussion en un geste</string>
     <string name="onboarding_4_title">Bien plus qu'un transfert de fichiers</string>
     <string name="onboarding_4_body">Photos, musique, notes et autres outils pratiques, tout fonctionne hors ligne ; la musique prend en charge les paroles synchronisées.</string>

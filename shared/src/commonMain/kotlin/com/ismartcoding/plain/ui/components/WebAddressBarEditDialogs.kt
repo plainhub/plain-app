@@ -28,6 +28,7 @@ import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.httpserver.httpPorts
 import com.ismartcoding.plain.httpserver.httpsPorts
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @Composable
 fun MdnsAndPortEditDialog(
@@ -44,7 +45,7 @@ fun MdnsAndPortEditDialog(
 
     AlertDialog(
         modifier = Modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(Res.string.edit)) },
         text = {

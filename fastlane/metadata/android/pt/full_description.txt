@@ -1,0 +1,56 @@
+<b>PlainApp</b> é um aplicativo Android gratuito e de código aberto que transforma seu telefone em um hub de gerenciamento auto-hospedado, acessível de qualquer navegador na mesma rede — sem contas, sem nuvem, sem assinaturas.
+
+<b>Por que o PlainApp?</b>
+
+A maioria das ferramentas de gerenciamento de celular roteia seus dados por servidores próprios, bloqueia recursos atrás de assinaturas ou exibe anúncios. O PlainApp é diferente:
+
+<ul>
+<li><b>100% local</b> — seus dados nunca saem da sua rede</li>
+<li><b>Criptografia de ponta a ponta</b> — cada conexão é protegida com TLS + XChaCha20-Poly1305</li>
+<li><b>Grátis e sem anúncios</b> — sem compras, sem upsell, nunca</li>
+<li><b>Totalmente de código aberto</b> — audite o código, compile seu próprio binário ou contribua</li>
+</ul>
+
+<b>Recursos</b>
+
+<b>Gerenciamento do celular pelo navegador</b>
+Abra um navegador em qualquer dispositivo conectado à mesma rede Wi-Fi para gerenciar seu celular Android — sem precisar instalar nada no computador.
+
+<ul>
+<li><b>Arquivos</b> — navegue pelo armazenamento interno, cartão SD e unidades USB; envie, baixe, renomeie, exclua</li>
+<li><b>Mídia</b> — veja e gerencie fotos, vídeos e áudio; reproduza no navegador</li>
+<li><b>Contatos</b> — veja, pesquise e gerencie contatos</li>
+<li><b>SMS e chamadas</b> — leia mensagens e registro de chamadas; envie SMS do computador</li>
+<li><b>Apps</b> — liste os aplicativos instalados e exporte APKs</li>
+<li><b>Notificações</b> — espelhe as notificações do celular no navegador em tempo real</li>
+<li><b>Espelhamento de tela</b> — transmita a tela do celular para o navegador com áudio e controle remoto</li>
+<li><b>Informações do dispositivo</b> — bateria, armazenamento, rede e detalhes do sistema</li>
+</ul>
+
+<b>Ferramentas Android integradas</b>
+O PlainApp também é um aplicativo independente completo:
+
+<ul>
+<li><b>Notas Markdown</b> — escreva e organize notas com um editor limpo</li>
+<li><b>Leitor RSS</b> — acompanhe seus sites favoritos com uma leitura sem distrações</li>
+<li><b>Player de vídeo e áudio</b> — player multimídia completo com suporte a playlists</li>
+<li><b>Transmissão para TV</b> — envie mídia para qualquer TV compatível com DLNA/Chromecast</li>
+<li><b>Chat P2P e compartilhamento de arquivos</b> — compartilhe arquivos e mensagens entre dispositivos sem servidor</li>
+<li><b>Timer Pomodoro</b> — mantenha o foco com um timer de trabalho integrado</li>
+<li><b>Medidor de som</b> — meça o nível de ruído ambiente em tempo real</li>
+</ul>
+
+<b>Privacidade e segurança</b>
+
+<ul>
+<li>Sem Firebase Analytics ou Messaging — relatórios de falhas são opcionais e exigem sua autorização</li>
+<li>Zero dados enviados a servidores de terceiros</li>
+<li>Todo o tráfego entre celular e navegador é criptografado</li>
+<li>Não é necessário criar conta</li>
+</ul>
+
+<b>Links</b>
+<ul>
+<li>GitHub: https://github.com/plainhub/plain-app</li>
+<li>Reddit: https://www.reddit.com/r/plainapp</li>
+</ul>

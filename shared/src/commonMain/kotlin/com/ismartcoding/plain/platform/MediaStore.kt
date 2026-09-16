@@ -195,13 +195,6 @@ expect suspend fun restoreSms(query: String): Int
 expect suspend fun deleteSms(query: String): Int
 
 /**
- * Whether real SMS deletion ([deleteSms]) is currently possible:
- * Shizuku installed, running and granted. Always false on unsupported
- * platforms. Cheap enough to poll before showing delete affordances.
- */
-expect fun isSmsDeleteAvailable(): Boolean
-
-/**
  * Send an SMS text message to [number] with body [body].
  * @param subscriptionId SIM subscription id, or null for default.
  * @param clientId web client identity derived from the authenticated request headers.

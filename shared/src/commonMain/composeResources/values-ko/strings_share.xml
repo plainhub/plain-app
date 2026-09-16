@@ -25,6 +25,7 @@
     <string name="save_as_note">노트로 저장</string>
     <string name="send_count">보내기(%1$d)</string>
     <string name="sent_to_n_targets">%1$d개 채팅에 보냈습니다</string>
+    <string name="send_failed">일부 채팅에 보내지 못했습니다</string>
     <string name="saved_to_downloads">다운로드에 저장됨</string>
     <string name="cannot_get_content">공유 콘텐츠를 가져올 수 없습니다</string>
     <string name="files_with_size">파일 %1$d개 · %2$s</string>

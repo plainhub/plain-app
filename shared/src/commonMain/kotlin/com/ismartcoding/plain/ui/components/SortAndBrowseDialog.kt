@@ -22,10 +22,11 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preferences.DocTabsModePreference
 import com.ismartcoding.plain.ui.base.PDialogRadioRow
-import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.models.BaseMediaViewModel
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -44,7 +45,7 @@ fun <T : IData> SortAndBrowseDialog(
 
     AlertDialog(
         modifier = Modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         title = null,
         text = {
@@ -123,7 +124,7 @@ fun <T : IData> SortAndBrowseDialog(
             }
         },
         confirmButton = {
-            PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
+            PTextButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismiss)
         },
         dismissButton = {},
     )

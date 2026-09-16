@@ -91,6 +91,18 @@ expect fun createLongTextFile(text: String): DMessageContent
 expect fun saveFileToDownloads(path: String, fileName: String): String
 
 /**
+ * Copy [srcPath] into [dirPath] as [fileName], creating the directory when
+ * missing. Returns the destination path on success, empty string on failure.
+ */
+suspend fun copyFileToDir(srcPath: String, dirPath: String, fileName: String): String {
+    val dir = dirPath.trimEnd('/')
+    if (dir.isEmpty()) return ""
+    val dest = "$dir/$fileName"
+    ensureParentDir(dest)
+    return if (copyFile(srcPath, dest)) dest else ""
+}
+
+/**
  * Convert a filesystem path to a URI string suitable for viewers (e.g. PDF viewer).
  */
 expect fun fileToUriString(path: String): String

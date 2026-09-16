@@ -25,6 +25,7 @@
     <string name="save_as_note">Salvar como nota</string>
     <string name="send_count">Enviar (%1$d)</string>
     <string name="sent_to_n_targets">Enviado para %1$d chats</string>
+    <string name="send_failed">Falha ao enviar para alguns chats</string>
     <string name="saved_to_downloads">Salvo em Downloads</string>
     <string name="cannot_get_content">Não foi possível acessar o conteúdo compartilhado</string>
     <string name="files_with_size">%1$d arquivos · %2$s</string>

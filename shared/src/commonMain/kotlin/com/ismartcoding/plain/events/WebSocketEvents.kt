@@ -69,6 +69,7 @@ enum class EventType(val value: Int) {
     MMS_SEND_RESULT(37),
     UPLOAD_MERGE_RESULT(38),
     CLIPBOARD_CHANGED(39),
+    PERMISSIONS_UPDATED(40),
 }
 
 

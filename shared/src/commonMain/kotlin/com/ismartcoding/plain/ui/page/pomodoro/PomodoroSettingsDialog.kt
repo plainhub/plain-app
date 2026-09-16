@@ -17,11 +17,12 @@ import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.platform.copyPickedFileToAppStorage
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.ui.base.PListItem
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,6 +57,7 @@ fun PomodoroSettingsDialog(
     }
 
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(Res.string.settings), style = MaterialTheme.typography.titleLarge) },
         text = {
@@ -75,12 +77,12 @@ fun PomodoroSettingsDialog(
                     OutlinedTextField(value = pomodorosBeforeLongBreak, onValueChange = { pomodorosBeforeLongBreak = it },
                         label = { Text(stringResource(Res.string.pomodoros_before_long_break)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 16.dp)
-                    PDialogListItem(title = stringResource(Res.string.show_notification)) {
+                    PListItem(title = stringResource(Res.string.show_notification)) {
                         PSwitch(activated = showNotification) { showNotification = it }
                         HorizontalSpace(8.dp)
                     }
                     VerticalSpace(dp = 8.dp)
-                    PDialogListItem(title = stringResource(Res.string.play_sound_on_complete)) {
+                    PListItem(title = stringResource(Res.string.play_sound_on_complete)) {
                         PSwitch(activated = playSoundOnComplete) { playSoundOnComplete = it }
                         HorizontalSpace(8.dp)
                     }

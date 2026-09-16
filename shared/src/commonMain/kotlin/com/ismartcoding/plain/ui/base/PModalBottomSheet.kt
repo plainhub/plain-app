@@ -12,12 +12,15 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.theme.LocalFloatingHostColor
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,16 +47,20 @@ fun PModalBottomSheet(
             }
         }
     }
-    ModalBottomSheet(
-        modifier = if (fullHeight) modifier else modifier.statusBarsPadding(),
-        sheetState = sheetState,
-        sheetGesturesEnabled = sheetGesturesEnabled,
-        shape = if (fullHeight) topCornerShape else BottomSheetDefaults.ExpandedShape,
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
-        onDismissRequest = onDismissRequest,
-        dragHandle = null,
-        contentWindowInsets = { if (fullHeight) WindowInsets(0) else BottomSheetDefaults.windowInsets },
-        content = content
-    )
+    // Publish this sheet's container color so nested PCard / cardBackgroundNormal
+    // content can adapt and stay visible on top of it in dark mode.
+    CompositionLocalProvider(LocalFloatingHostColor provides MaterialTheme.colorScheme.dialogSheetBackground) {
+        ModalBottomSheet(
+            modifier = if (fullHeight) modifier else modifier.statusBarsPadding(),
+            sheetState = sheetState,
+            sheetGesturesEnabled = sheetGesturesEnabled,
+            shape = if (fullHeight) topCornerShape else BottomSheetDefaults.ExpandedShape,
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
+            tonalElevation = 0.dp,
+            onDismissRequest = onDismissRequest,
+            dragHandle = null,
+            contentWindowInsets = { if (fullHeight) WindowInsets(0) else BottomSheetDefaults.windowInsets },
+            content = content
+        )
+    }
 }

@@ -270,8 +270,6 @@ actual suspend fun deleteSms(query: String): Int {
     return deleted
 }
 
-actual fun isSmsDeleteAvailable(): Boolean = ShizukuHelper.isGranted()
-
 actual suspend fun getDocExtGroups(query: String): List<Pair<String, Int>> =
     DocMediaStoreHelper.getDocExtGroupsAsync(appContext, query)
 

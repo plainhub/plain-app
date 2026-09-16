@@ -1,0 +1,56 @@
+<b>PlainApp</b> is een gratis open-source Android-app die je telefoon omtovert tot een zelfgehost beheerhub, bereikbaar vanuit elke browser op hetzelfde netwerk — zonder accounts, zonder cloud, zonder abonnementen.
+
+<b>Waarom PlainApp?</b>
+
+De meeste telefoonbeheertools sturen je gegevens via hun eigen servers, zetten functies achter een abonnement of tonen advertenties. PlainApp is anders:
+
+<ul>
+<li><b>100% lokaal</b> — je gegevens verlaten je netwerk nooit</li>
+<li><b>End-to-end versleuteld</b> — elke verbinding is beveiligd met TLS + XChaCha20-Poly1305</li>
+<li><b>Gratis en advertentievrij</b> — geen aankopen, geen upsells, nooit</li>
+<li><b>Volledig open source</b> — controleer de code, bouw je eigen binary of draag bij</li>
+</ul>
+
+<b>Functies</b>
+
+<b>Telefoonbeheer via de browser</b>
+Open op elk apparaat in hetzelfde Wi-Fi-netwerk een browser om je Android-telefoon te beheren — geen installatie nodig aan de computerkant.
+
+<ul>
+<li><b>Bestanden</b> — blader door interne opslag, SD-kaart en USB-schijven; uploaden, downloaden, hernoemen, verwijderen</li>
+<li><b>Media</b> — bekijk en beheer foto's, video's en audio; stream ze in de browser</li>
+<li><b>Contacten</b> — bekijk, zoek en beheer contacten</li>
+<li><b>Sms en oproepen</b> — lees berichten en oproepgeschiedenis; verstuur sms vanaf je computer</li>
+<li><b>Apps</b> — geïnstalleerde apps weergeven en APK's exporteren</li>
+<li><b>Meldingen</b> — telefoonmeldingen in realtime naar de browser spiegelen</li>
+<li><b>Schermspiegeling</b> — stream het telefoonscherm live naar de browser, met audio en afstandsbediening</li>
+<li><b>Apparaatinfo</b> — accu, opslag, netwerk en systeemdetails bekijken</li>
+</ul>
+
+<b>Ingebouwde Android-hulpmiddelen</b>
+PlainApp is ook op zichzelf een krachtige app:
+
+<ul>
+<li><b>Markdown-notities</b> — schrijf en orden notities met een overzichtelijke editor</li>
+<li><b>RSS-lezer</b> — volg je favoriete websites met een afleidingsvrije lezer</li>
+<li><b>Video- en audiospeler</b> — volwaardige mediaspeler met afspeellijsten</li>
+<li><b>TV-cast</b> — zend media naar elke DLNA/Chromecast-compatibele tv</li>
+<li><b>P2P-chat en bestandsdeling</b> — deel bestanden en berichten rechtstreeks tussen apparaten, zonder server</li>
+<li><b>Pomodoro-timer</b> — blijf gefocust met de ingebouwde werktimer</li>
+<li><b>Geluidsmeter</b> — meet het omgevingsgeluid in realtime</li>
+</ul>
+
+<b>Privacy en beveiliging</b>
+
+<ul>
+<li>Geen Firebase Analytics of Messaging — crashrapporten zijn optioneel en moeten actief worden ingeschakeld</li>
+<li>Nul gegevens naar servers van derden</li>
+<li>Al het verkeer tussen telefoon en browser is versleuteld</li>
+<li>Geen accountregistratie nodig</li>
+</ul>
+
+<b>Links</b>
+<ul>
+<li>GitHub: https://github.com/plainhub/plain-app</li>
+<li>Reddit: https://www.reddit.com/r/plainapp</li>
+</ul>

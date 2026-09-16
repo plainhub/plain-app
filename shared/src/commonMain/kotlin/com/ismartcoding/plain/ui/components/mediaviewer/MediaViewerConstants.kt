@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.components.mediaviewer
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 
 const val DEFAULT_OFFSET_X = 0F
 const val DEFAULT_OFFSET_Y = 0F
@@ -14,6 +15,8 @@ const val MIN_GESTURE_FINGER_DISTANCE = 200
 
 val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(320)
 val DEFAULT_CROSS_FADE_ANIMATE_SPEC: AnimationSpec<Float> = tween(80)
+
+val PreviewerSoftWhite = Color(0xFFCCCCCC)
 
 class GestureScope(
     var onTap: (Offset) -> Unit = {},

@@ -60,7 +60,6 @@ import com.ismartcoding.plain.i18n.resend_invite
 import com.ismartcoding.plain.i18n.status
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
@@ -77,6 +76,8 @@ import com.ismartcoding.plain.ui.page.chat.components.ChannelMemberListItem
 import com.ismartcoding.plain.ui.page.chat.components.PeerIconWithStatus
 import com.ismartcoding.plain.ui.page.chat.components.PeerMember
 import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.ui.base.PTextButton
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -344,10 +345,10 @@ private fun MemberInfoDialog(
 ) {
     val peer = peerMember.peer
     AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismiss,
         confirmButton = {
-            PFilledButton(
+            PTextButton(
                 text = stringResource(Res.string.close),
                 buttonSize = ButtonSize.MEDIUM,
                 onClick = onDismiss,
@@ -383,13 +384,13 @@ private fun MemberInfoDialog(
         title = { Text(text = peer.getName(), style = MaterialTheme.typography.titleLarge) },
         text = {
             Column {
-                PDialogListItem(title = stringResource(Res.string.peer_id), value = peer.id)
-                PDialogListItem(title = stringResource(Res.string.ip_address), value = peer.getBestIp())
-                PDialogListItem(title = stringResource(Res.string.port), value = peer.port.toString())
-                PDialogListItem(title = stringResource(Res.string.device_type), value = peer.deviceType.getText())
+                PListItem(title = stringResource(Res.string.peer_id), value = peer.id)
+                PListItem(title = stringResource(Res.string.ip_address), value = peer.getBestIp())
+                PListItem(title = stringResource(Res.string.port), value = peer.port.toString())
+                PListItem(title = stringResource(Res.string.device_type), value = peer.deviceType.getText())
                 val status = peer.status.getText()
                 if (status.isNotEmpty()) {
-                    PDialogListItem(title = stringResource(Res.string.status), value = status)
+                    PListItem(title = stringResource(Res.string.status), value = status)
                 }
             }
         },

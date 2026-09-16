@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.volume_2
 import com.ismartcoding.plain.i18n.volume_x
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -45,7 +46,7 @@ fun ControlChipIconButton(
             Icon(
                 painter = painterResource(icon),
                 contentDescription = contentDescription,
-                tint = Color.White,
+                tint = PreviewerSoftWhite,
                 modifier = Modifier.size(22.dp),
             )
         }

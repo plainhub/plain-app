@@ -40,6 +40,8 @@ import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.ui.base.PTextButton
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -179,9 +181,9 @@ fun SoundMeterPage(navController: NavHostController) {
 
     if (decibelValuesDialogVisible.value) {
         AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             onDismissRequest = { decibelValuesDialogVisible.value = false },
-            confirmButton = { PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = { decibelValuesDialogVisible.value = false }) },
+            confirmButton = { PTextButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = { decibelValuesDialogVisible.value = false }) },
             title = { Text(text = stringResource(Res.string.decibel_values), style = MaterialTheme.typography.titleLarge) },
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {

@@ -144,8 +144,13 @@ actual suspend fun stopHttpServiceAsync(): Unit = withIO {
 }
 
 
+actual fun isHttpServerRunning(): Boolean =
+    IosPlatformRegistry.httpServerBridge()?.isRunning() == true
 
+actual fun isMdnsRunning(): Boolean = MdnsHostResponder.isRunning
 
+actual fun getAwareAttachStatus(): String = "not available"
+actual fun getAwareDiscoveredPeerCount(): Int = 0
 
 
 

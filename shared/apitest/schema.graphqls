@@ -96,7 +96,6 @@ type Mutation {
   archiveConversation(id: String!, date: Long!): Boolean!
   trashSms(query: String!): Boolean!
   restoreSms(query: String!): Boolean!
-  smsDeleteAvailable: Boolean!
   deleteSms(query: String!): Boolean!
   sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: String!): String!
   createTag(type: DataType!, name: String!): Tag
@@ -979,6 +978,7 @@ enum Permission {
   READ_PHONE_NUMBERS
   SCHEDULE_EXACT_ALARM
   QUERY_ALL_PACKAGES
+  ADB
   NONE
 }
 

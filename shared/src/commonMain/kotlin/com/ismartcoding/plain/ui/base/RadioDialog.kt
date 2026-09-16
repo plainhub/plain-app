@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.base
 
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,7 +26,7 @@ fun RadioDialog(
 ) {
     AlertDialog(
         modifier = modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = onDismissRequest,
         title = {
             Text(
@@ -44,7 +45,7 @@ fun RadioDialog(
             }
         },
         confirmButton = {
-            PFilledButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismissRequest)
+            PTextButton(text = stringResource(Res.string.close), buttonSize = ButtonSize.MEDIUM, onClick = onDismissRequest)
         },
         dismissButton = {},
     )

@@ -23,12 +23,13 @@ import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.enums.ButtonSize
-import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.platform.IODispatcher
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -52,7 +53,7 @@ fun SelectTagsDialog(
     }
 
     AlertDialog(
-        containerColor = MaterialTheme.colorScheme.surface,
+        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
         onDismissRequest = {
             onDismiss()
         },
@@ -90,7 +91,7 @@ fun SelectTagsDialog(
                 })
             }
         }, confirmButton = {
-            PFilledButton(
+            PTextButton(
                 text = stringResource(Res.string.close),
                 buttonSize = ButtonSize.MEDIUM,
                 onClick = {

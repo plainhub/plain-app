@@ -28,7 +28,7 @@ actual suspend fun sharePreviewMedia(m: PreviewItem) {
     }
 }
 
-actual suspend fun savePreviewMedia(m: PreviewItem) {
+actual suspend fun savePreviewMedia(m: PreviewItem, dir: String?) {
     // iOS has no public-directory save path; no-op (button is hidden via canSavePreviewMedia).
 }
 

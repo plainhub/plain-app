@@ -33,6 +33,7 @@ import com.ismartcoding.plain.i18n.more_info
 import com.ismartcoding.plain.i18n.unknown
 import com.ismartcoding.plain.lib.extensions.formatMinSec
 import com.ismartcoding.plain.ui.base.PlayerSlider
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -89,7 +90,7 @@ fun VideoOverlayScaffold(
                         Icon(
                             painter = painterResource(Res.drawable.arrow_left),
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = PreviewerSoftWhite,
                             modifier = Modifier.size(22.dp),
                         )
                     }
@@ -104,7 +105,7 @@ fun VideoOverlayScaffold(
                             text = title.ifEmpty { stringResource(Res.string.unknown) },
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
+                            color = PreviewerSoftWhite,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -128,7 +129,7 @@ fun VideoOverlayScaffold(
                             Icon(
                                 painter = painterResource(Res.drawable.ellipsis),
                                 contentDescription = stringResource(Res.string.more_info),
-                                tint = Color.White,
+                                tint = PreviewerSoftWhite,
                                 modifier = Modifier.size(22.dp),
                             )
                         }
@@ -151,13 +152,13 @@ fun VideoOverlayScaffold(
                     Text(
                         text = positionMs.formatMinSec(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.85f),
+                        color = PreviewerSoftWhite,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
                         text = durationMs.formatMinSec(),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.85f),
+                        color = PreviewerSoftWhite,
                         fontWeight = FontWeight.SemiBold,
                     )
                 }

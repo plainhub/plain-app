@@ -46,6 +46,7 @@ import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListSta
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.theme.cardBackgroundActive
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -64,7 +65,7 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
 
     if (showClearConfirmDialog) {
         AlertDialog(
-            containerColor = MaterialTheme.colorScheme.surface,
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             onDismissRequest = { showClearConfirmDialog = false },
             title = { Text(stringResource(Res.string.clear_all)) },
             text = { Text(stringResource(Res.string.clear_all_confirm)) },
