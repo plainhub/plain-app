@@ -71,7 +71,7 @@ fun AudioPlayerBar(
     AnimatedVisibility(
         visible = currentPlayingPath.value.isNotEmpty() &&
             dragSelectState?.selectMode != true &&
-            castVM?.let { it.castMode.value } == true,
+            castVM?.castMode?.value != true,
         enter = slideInVertically { it }, exit = slideOutVertically { it }, modifier = modifier,
     ) {
         AudioPlayerBarCard(
