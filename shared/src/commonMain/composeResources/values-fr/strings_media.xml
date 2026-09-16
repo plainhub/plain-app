@@ -63,4 +63,29 @@
     <string name="exit_fullscreen">Sortir du plein écran</string>
     <string name="mute">Muet</string>
     <string name="unmute">Activer le son</string>
+
+    <string name="shuffle_play">Lecture aléatoire</string>
+    <string name="all_songs">Tous les morceaux</string>
+    <string name="artists">Artistes</string>
+    <string name="playlists">Playlists</string>
+    <string name="recent">Récents</string>
+    <string name="view_all">Tout voir</string>
+    <string name="new_playlist">Nouvelle playlist</string>
+    <string name="playlist_name">Nom de la playlist</string>
+    <string name="rename_playlist">Renommer la playlist</string>
+    <string name="delete_playlist">Supprimer la playlist</string>
+    <string name="delete_playlist_confirm_text">Les morceaux de "%1$s" seront retirés de la playlist. Les fichiers audio ne seront pas supprimés.</string>
+    <string name="add_songs">Ajouter des morceaux</string>
+    <string name="add_n_songs">Ajouter %1$d</string>
+    <string name="n_songs">%1$d morceaux</string>
+    <string name="total_minutes">%1$d min</string>
+    <string name="play_next">Lire ensuite</string>
+    <string name="add_to_queue">Ajouter à la file</string>
+    <string name="sort_order">Ordre de tri</string>
+    <string name="sort_custom">Ordre personnalisé</string>
+    <string name="sort_title_asc">Titre A–Z</string>
+    <string name="sort_title_desc">Titre Z–A</string>
+    <string name="playlist_created">Playlist créée</string>
+    <string name="playlist_deleted">Playlist supprimée</string>
+    <string name="renamed">Renommé</string>
 </resources>

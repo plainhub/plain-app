@@ -63,4 +63,29 @@
     <string name="exit_fullscreen">Vollbildmodus verlassen</string>
     <string name="mute">Stumm</string>
     <string name="unmute">Ton einschalten</string>
+
+    <string name="shuffle_play">Zufällig wiedergeben</string>
+    <string name="all_songs">Alle Songs</string>
+    <string name="artists">Künstler</string>
+    <string name="playlists">Wiedergabelisten</string>
+    <string name="recent">Zuletzt</string>
+    <string name="view_all">Alle anzeigen</string>
+    <string name="new_playlist">Neue Wiedergabeliste</string>
+    <string name="playlist_name">Wiedergabelistenname</string>
+    <string name="rename_playlist">Wiedergabeliste umbenennen</string>
+    <string name="delete_playlist">Wiedergabeliste löschen</string>
+    <string name="delete_playlist_confirm_text">Songs in "%1$s" werden aus der Playlist entfernt. Audiodateien werden nicht gelöscht.</string>
+    <string name="add_songs">Songs hinzufügen</string>
+    <string name="add_n_songs">%1$d hinzufügen</string>
+    <string name="n_songs">%1$d Songs</string>
+    <string name="total_minutes">%1$d Min</string>
+    <string name="play_next">Als Nächstes</string>
+    <string name="add_to_queue">Zur Warteschlange</string>
+    <string name="sort_order">Sortierung</string>
+    <string name="sort_custom">Eigene Reihenfolge</string>
+    <string name="sort_title_asc">Titel A–Z</string>
+    <string name="sort_title_desc">Titel Z–A</string>
+    <string name="playlist_created">Playlist erstellt</string>
+    <string name="playlist_deleted">Playlist gelöscht</string>
+    <string name="renamed">Umbenannt</string>
 </resources>

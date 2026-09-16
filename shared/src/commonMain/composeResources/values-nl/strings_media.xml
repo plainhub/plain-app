@@ -63,4 +63,29 @@
     <string name="exit_fullscreen">Afsluiten volledig scherm</string>
     <string name="mute">Dempen</string>
     <string name="unmute">Ontdempen</string>
+
+    <string name="shuffle_play">Willekeurig</string>
+    <string name="all_songs">Alle nummers</string>
+    <string name="artists">Artiesten</string>
+    <string name="playlists">Afspeellijsten</string>
+    <string name="recent">Recent</string>
+    <string name="view_all">Alles bekijken</string>
+    <string name="new_playlist">Nieuwe afspeellijst</string>
+    <string name="playlist_name">Afspeellijstnaam</string>
+    <string name="rename_playlist">Afspeellijst hernoemen</string>
+    <string name="delete_playlist">Afspeellijst verwijderen</string>
+    <string name="delete_playlist_confirm_text">Nummers in "%1$s" worden uit de afspeellijst verwijderd. Audiobestanden worden niet verwijderd.</string>
+    <string name="add_songs">Nummers toevoegen</string>
+    <string name="add_n_songs">%1$d toevoegen</string>
+    <string name="n_songs">%1$d nummers</string>
+    <string name="total_minutes">%1$d min</string>
+    <string name="play_next">Volgende afspelen</string>
+    <string name="add_to_queue">Aan wachtrij toevoegen</string>
+    <string name="sort_order">Sorteervolgorde</string>
+    <string name="sort_custom">Aangepaste volgorde</string>
+    <string name="sort_title_asc">Titel A–Z</string>
+    <string name="sort_title_desc">Titel Z–A</string>
+    <string name="playlist_created">Afspeellijst gemaakt</string>
+    <string name="playlist_deleted">Afspeellijst verwijderd</string>
+    <string name="renamed">Hernoemd</string>
 </resources>

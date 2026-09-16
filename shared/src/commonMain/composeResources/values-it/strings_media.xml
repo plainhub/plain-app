@@ -63,4 +63,29 @@
     <string name="exit_fullscreen">Esci da schermo intero</string>
     <string name="mute">Muto</string>
     <string name="unmute">Attiva audio</string>
+
+    <string name="shuffle_play">Riproduzione casuale</string>
+    <string name="all_songs">Tutti i brani</string>
+    <string name="artists">Artisti</string>
+    <string name="playlists">Playlist</string>
+    <string name="recent">Recenti</string>
+    <string name="view_all">Visualizza tutto</string>
+    <string name="new_playlist">Nuova playlist</string>
+    <string name="playlist_name">Nome playlist</string>
+    <string name="rename_playlist">Rinomina playlist</string>
+    <string name="delete_playlist">Elimina playlist</string>
+    <string name="delete_playlist_confirm_text">I brani in "%1$s" saranno rimossi dalla playlist. I file audio non verranno eliminati.</string>
+    <string name="add_songs">Aggiungi brani</string>
+    <string name="add_n_songs">Aggiungi %1$d</string>
+    <string name="n_songs">%1$d brani</string>
+    <string name="total_minutes">%1$d min</string>
+    <string name="play_next">Riproduci successivo</string>
+    <string name="add_to_queue">Aggiungi alla coda</string>
+    <string name="sort_order">Ordinamento</string>
+    <string name="sort_custom">Ordine personalizzato</string>
+    <string name="sort_title_asc">Titolo A–Z</string>
+    <string name="sort_title_desc">Titolo Z–A</string>
+    <string name="playlist_created">Playlist creata</string>
+    <string name="playlist_deleted">Playlist eliminata</string>
+    <string name="renamed">Rinominato</string>
 </resources>

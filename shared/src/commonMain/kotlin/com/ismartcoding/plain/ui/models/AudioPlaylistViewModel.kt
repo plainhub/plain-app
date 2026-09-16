@@ -86,6 +86,14 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         selectedPath.value = path
     }
 
+    /** Play a track known by its queue fields (history rows, artist page). */
+    suspend fun playItem(audio: DPlaylistAudio) {
+        AudioQueueManager.enqueue(listOf(audio))
+        audioJustPlay(audio)
+        setCurrentPlaying(audio.path)
+        refreshWindow()
+    }
+
     suspend fun playAsync(item: DAudio) {
         val audio = item.toPlaylistAudio()
         AudioQueueManager.enqueue(listOf(audio))

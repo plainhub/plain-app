@@ -39,7 +39,11 @@ import com.ismartcoding.plain.ui.nav.navPopExitTransition
 import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
-import com.ismartcoding.plain.ui.page.audio.AudioPage
+import com.ismartcoding.plain.ui.page.audio.AudioAllPage
+import com.ismartcoding.plain.ui.page.audio.AudioHomePage
+import com.ismartcoding.plain.ui.page.audio.AudioArtistPage
+import com.ismartcoding.plain.ui.page.playlist.PlaylistDetailPage
+import com.ismartcoding.plain.ui.page.playlist.PlaylistAddSongsPage
 import com.ismartcoding.plain.ui.page.cast.CastSessionPage
 import com.ismartcoding.plain.ui.page.chat.ChannelInfoPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
@@ -139,7 +143,20 @@ fun MainNavGraph(
         }
         composable<Routing.Images> { ImagesPage(navController) }
         composable<Routing.Videos> { VideosPage(navController) }
-        composable<Routing.Audio> { AudioPage(navController, audioPlaylistVM) }
+        composable<Routing.Audio> { AudioHomePage(navController, audioPlaylistVM) }
+        composable<Routing.AudioAll> { AudioAllPage(navController, audioPlaylistVM) }
+        composable<Routing.ArtistDetail> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.ArtistDetail>()
+            AudioArtistPage(navController, r.name, audioPlaylistVM)
+        }
+        composable<Routing.PlaylistDetail> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.PlaylistDetail>()
+            PlaylistDetailPage(navController, r.id, audioPlaylistVM)
+        }
+        composable<Routing.PlaylistAddSongs> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.PlaylistAddSongs>()
+            PlaylistAddSongsPage(navController, r.id)
+        }
         composable<Routing.Apps> { AppsPage(navController) }
         composable<Routing.Docs> { DocsPage(navController) }
         composable<Routing.Notes> { NotesPage(navController, tagsVM = noteTagsVM) }

@@ -63,4 +63,29 @@
     <string name="exit_fullscreen">전체 화면 나가기</string>
     <string name="mute">음소거</string>
     <string name="unmute">음소거 해제</string>
+
+    <string name="shuffle_play">랜덤 재생</string>
+    <string name="all_songs">모든 곡</string>
+    <string name="artists">아티스트</string>
+    <string name="playlists">재생목록</string>
+    <string name="recent">최근</string>
+    <string name="view_all">모두 보기</string>
+    <string name="new_playlist">새 재생목록</string>
+    <string name="playlist_name">재생목록 이름</string>
+    <string name="rename_playlist">재생목록 이름 바꾸기</string>
+    <string name="delete_playlist">재생목록 삭제</string>
+    <string name="delete_playlist_confirm_text">"%1$s"의 곡이 재생목록에서 제거됩니다. 오디오 파일은 삭제되지 않습니다.</string>
+    <string name="add_songs">곡 추가</string>
+    <string name="add_n_songs">%1$d개 추가</string>
+    <string name="n_songs">%1$d곡</string>
+    <string name="total_minutes">%1$d분</string>
+    <string name="play_next">다음 재생</string>
+    <string name="add_to_queue">대기열에 추가</string>
+    <string name="sort_order">정렬</string>
+    <string name="sort_custom">사용자 지정 순서</string>
+    <string name="sort_title_asc">제목 A–Z</string>
+    <string name="sort_title_desc">제목 Z–A</string>
+    <string name="playlist_created">재생목록이 생성되었습니다</string>
+    <string name="playlist_deleted">재생목록이 삭제되었습니다</string>
+    <string name="renamed">이름이 변경되었습니다</string>
 </resources>

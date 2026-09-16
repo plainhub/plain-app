@@ -63,4 +63,29 @@
     <string name="exit_fullscreen">Thoát chế độ toàn màn hình</string>
     <string name="mute">Tắt tiếng</string>
     <string name="unmute">Bật tiếng</string>
+
+    <string name="shuffle_play">Phát ngẫu nhiên</string>
+    <string name="all_songs">Tất cả bài hát</string>
+    <string name="artists">Nghệ sĩ</string>
+    <string name="playlists">Danh sách phát</string>
+    <string name="recent">Gần đây</string>
+    <string name="view_all">Xem tất cả</string>
+    <string name="new_playlist">Danh sách phát mới</string>
+    <string name="playlist_name">Tên danh sách phát</string>
+    <string name="rename_playlist">Đổi tên danh sách phát</string>
+    <string name="delete_playlist">Xóa danh sách phát</string>
+    <string name="delete_playlist_confirm_text">Các bài hát trong "%1$s" sẽ bị xóa khỏi danh sách phát. Tệp âm thanh sẽ không bị xóa.</string>
+    <string name="add_songs">Thêm bài hát</string>
+    <string name="add_n_songs">Thêm %1$d</string>
+    <string name="n_songs">%1$d bài hát</string>
+    <string name="total_minutes">%1$d phút</string>
+    <string name="play_next">Phát tiếp theo</string>
+    <string name="add_to_queue">Thêm vào hàng đợi</string>
+    <string name="sort_order">Sắp xếp</string>
+    <string name="sort_custom">Thứ tự tùy chỉnh</string>
+    <string name="sort_title_asc">Tiêu đề A–Z</string>
+    <string name="sort_title_desc">Tiêu đề Z–A</string>
+    <string name="playlist_created">Đã tạo danh sách phát</string>
+    <string name="playlist_deleted">Đã xóa danh sách phát</string>
+    <string name="renamed">Đã đổi tên</string>
 </resources>

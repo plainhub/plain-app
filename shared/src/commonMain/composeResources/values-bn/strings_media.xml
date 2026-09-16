@@ -63,4 +63,29 @@
     <string name="exit_fullscreen">পূর্ণ স্ক্রিন থেকে প্রস্থান করুন</string>
     <string name="mute">নিঃশব্দ</string>
     <string name="unmute">শব্দ চালু করুন</string>
+
+    <string name="shuffle_play">শাফল</string>
+    <string name="all_songs">সব গান</string>
+    <string name="artists">শিল্পী</string>
+    <string name="playlists">প্লেলিস্ট</string>
+    <string name="recent">সাম্প্রতিক</string>
+    <string name="view_all">সব দেখুন</string>
+    <string name="new_playlist">নতুন প্লেলিস্ট</string>
+    <string name="playlist_name">প্লেলিস্টের নাম</string>
+    <string name="rename_playlist">প্লেলিস্টের নাম বদলান</string>
+    <string name="delete_playlist">প্লেলিস্ট মুছুন</string>
+    <string name="delete_playlist_confirm_text">"%1$s"-এর গানগুলি প্লেলিস্ট থেকে সরানো হবে। অডিও ফাইল মুছবে না।</string>
+    <string name="add_songs">গান যোগ করুন</string>
+    <string name="add_n_songs">%1$d যোগ করুন</string>
+    <string name="n_songs">%1$d টি গান</string>
+    <string name="total_minutes">%1$d মিনিট</string>
+    <string name="play_next">পরেরটি চালান</string>
+    <string name="add_to_queue">সারিতে যোগ করুন</string>
+    <string name="sort_order">সাজানোর ক্রম</string>
+    <string name="sort_custom">কাস্টম ক্রম</string>
+    <string name="sort_title_asc">শিরোনাম A–Z</string>
+    <string name="sort_title_desc">শিরোনাম Z–A</string>
+    <string name="playlist_created">প্লেলিস্ট তৈরি হয়েছে</string>
+    <string name="playlist_deleted">প্লেলিস্ট মুছে ফেলা হয়েছে</string>
+    <string name="renamed">নাম বদলানো হয়েছে</string>
 </resources>

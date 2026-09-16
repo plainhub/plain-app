@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.ui.page.audio
 
+/** The flat "all songs" list, kept as the [com.ismartcoding.plain.ui.nav.Routing.AudioAll] page. */
+
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -54,7 +56,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun AudioPage(
+fun AudioAllPage(
     navController: NavHostController,
     audioPlaylistVM: AudioPlaylistViewModel,
     audioVM: AudioViewModel = viewModel(key = "audioVM") { AudioViewModel() },

@@ -401,6 +401,8 @@ object AudioQueueManager {
 
     // ---------- user playlists ----------
 
+    suspend fun playlist(id: String): DAudioPlaylist? = playlistDao.getById(id)
+
     suspend fun playlists(): List<Pair<DAudioPlaylist, Int>> {
         ensureMigrated()
         val all = playlistDao.getAll()

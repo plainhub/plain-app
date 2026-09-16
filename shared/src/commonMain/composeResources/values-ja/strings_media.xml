@@ -63,4 +63,29 @@
     <string name="exit_fullscreen">フルスクリーンを終了</string>
     <string name="mute">ミュート</string>
     <string name="unmute">ミュート解除</string>
+
+    <string name="shuffle_play">シャッフル再生</string>
+    <string name="all_songs">すべての曲</string>
+    <string name="artists">アーティスト</string>
+    <string name="playlists">プレイリスト</string>
+    <string name="recent">最近</string>
+    <string name="view_all">すべて表示</string>
+    <string name="new_playlist">新規プレイリスト</string>
+    <string name="playlist_name">プレイリスト名</string>
+    <string name="rename_playlist">プレイリストの名前を変更</string>
+    <string name="delete_playlist">プレイリストを削除</string>
+    <string name="delete_playlist_confirm_text">「%1$s」の曲はプレイリストから削除されます。オーディオファイルは削除されません。</string>
+    <string name="add_songs">曲を追加</string>
+    <string name="add_n_songs">%1$d 追加</string>
+    <string name="n_songs">%1$d 曲</string>
+    <string name="total_minutes">%1$d 分</string>
+    <string name="play_next">次に再生</string>
+    <string name="add_to_queue">キューに追加</string>
+    <string name="sort_order">並び替え</string>
+    <string name="sort_custom">カスタム順</string>
+    <string name="sort_title_asc">タイトル A–Z</string>
+    <string name="sort_title_desc">タイトル Z–A</string>
+    <string name="playlist_created">プレイリストを作成しました</string>
+    <string name="playlist_deleted">プレイリストを削除しました</string>
+    <string name="renamed">名前を変更しました</string>
 </resources>

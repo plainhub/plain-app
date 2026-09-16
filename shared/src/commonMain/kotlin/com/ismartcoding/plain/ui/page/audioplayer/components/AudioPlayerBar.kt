@@ -19,6 +19,7 @@ import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.platform.audioPlayerProgress
+import com.ismartcoding.plain.platform.audioSkipToNext
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -31,14 +32,18 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @Composable
-fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewModel, modifier: Modifier = Modifier, dragSelectState: DragSelectState) {
+fun AudioPlayerBar(
+    audioPlaylistVM: AudioPlaylistViewModel,
+    castVM: CastViewModel? = null,
+    modifier: Modifier = Modifier,
+    dragSelectState: DragSelectState? = null,
+) {
     val scope = rememberCoroutineScope()
     var title by remember { mutableStateOf("") }
     var artist by remember { mutableStateOf("") }
     var progress by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableFloatStateOf(1f) }
     val isPlaying by audioIsPlayingFlow().collectAsState()
-    var showSleepTimer by remember { mutableStateOf(false) }
     var showPlaylist by remember { mutableStateOf(false) }
     val currentPlayingPath = audioPlaylistVM.selectedPath
 
@@ -65,17 +70,24 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
     }
 
     AnimatedVisibility(
-        visible = currentPlayingPath.value.isNotEmpty() && !dragSelectState.selectMode && !castVM.castMode.value,
-        enter = slideInVertically { it }, exit = slideOutVertically { it }, modifier = modifier
+        visible = currentPlayingPath.value.isNotEmpty() &&
+            dragSelectState?.selectMode != true &&
+            castVM?.let { it.castMode.value } == true,
+        enter = slideInVertically { it }, exit = slideOutVertically { it }, modifier = modifier,
     ) {
         AudioPlayerBarCard(
-            title = title, artist = artist, progress = progress, duration = duration,
+            title = title,
+            artist = artist,
+            coverPath = currentPlayingPath.value.ifEmpty { null },
+            progress = progress,
+            duration = duration,
             isPlaying = isPlaying,
-            onClickContent = { TempData.audioPlayerVisible.value = true }, onClickPlaylist = { showPlaylist = true },
+            onClickContent = { TempData.audioPlayerVisible.value = true },
+            onClickSkipNext = { audioSkipToNext() },
             onPlayPause = { if (isPlaying) audioPause() else audioPlay() },
+            onClickQueue = { showPlaylist = true },
         )
     }
 
-    if (showSleepTimer) SleepTimerPage(onDismissRequest = { showSleepTimer = false })
     if (showPlaylist) AudioPlaylistPage(audioPlaylistVM, onDismissRequest = { showPlaylist = false })
 }
