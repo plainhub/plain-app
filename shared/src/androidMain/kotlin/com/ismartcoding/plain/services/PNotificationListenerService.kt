@@ -16,6 +16,7 @@ import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.extensions.toDNotification
+import com.ismartcoding.plain.features.getGrantedWebPermissionsAsync
 import com.ismartcoding.plain.events.HCancelNotificationsEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isGranted
@@ -138,6 +139,19 @@ class PNotificationListenerService : NotificationListenerService() {
             return
         } catch (ex: Exception) {
             LogCat.e("Error getting active notifications: ${ex.message}")
+        }
+
+        // The system binds this service as soon as notification access is
+        // granted — including grants made directly in Android settings with no
+        // in-app toggle involved, so no PermissionsResultEvent ever fires. Push
+        // the fresh snapshot so web clients drop their no-permission state.
+        coIO {
+            sendEvent(
+                WebSocketEvent(
+                    EventType.PERMISSIONS_UPDATED,
+                    JsonHelper.jsonEncode(getGrantedWebPermissionsAsync()),
+                ),
+            )
         }
 
         try {
