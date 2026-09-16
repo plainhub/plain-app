@@ -42,6 +42,7 @@ enum class Permission {
     SCHEDULE_EXACT_ALARM,
     QUERY_ALL_PACKAGES,
     ADB,
+    CLIPBOARD,
     NONE
     ;
 

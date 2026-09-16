@@ -14,13 +14,14 @@ import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.httpserver.models.Clipboard
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.platform.setClipboardText
-import com.ismartcoding.plain.preferences.ClipboardSyncPreference
 
 private const val MAX_TEXT_LENGTH = 256 * 1024
 
 private suspend fun ensureClipboardEnabled() {
-    if (!ClipboardSyncPreference.getAsync()) {
+    if (!Permission.CLIPBOARD.isEnabledAsync()) {
         throw GraphQLError("clipboard_sync_disabled")
     }
 }

@@ -42,7 +42,6 @@ import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.isIgnoringBatteryOptimizations
 import com.ismartcoding.plain.platform.openBatteryOptimizationSettings
 import com.ismartcoding.plain.preferences.LocalApiPermissions
-import com.ismartcoding.plain.preferences.LocalClipboardSync
 import com.ismartcoding.plain.preferences.LocalKeepAwake
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -68,7 +67,6 @@ import kotlinx.coroutines.launch
 fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAccessSettingsViewModel = viewModel { DesktopAccessSettingsViewModel() }) {
         WebSettingsProvider {
             val keepAwake = LocalKeepAwake.current
-            val clipboardSync = LocalClipboardSync.current
         val scope = rememberCoroutineScope()
         val enabledPermissions = LocalApiPermissions.current
         val permissionList = remember { mutableStateOf(getWebList()) }
@@ -202,21 +200,23 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                     }
                     item {
                         VerticalSpace(dp = 16.dp)
+                        val m = remember { PermissionItem.create(Res.drawable.content_paste, Permission.CLIPBOARD) }
+                        val clipboardEnabled = enabledPermissions.contains(m.permission.name)
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 modifier = Modifier
                                     .onGloballyPositioned { anchors[AccessFeatureType.CLIPBOARD_SYNC] = it.boundsInRoot() }
                                     .clickable { navController.navigate(Routing.ClipboardHistory) },
-                                icon = Res.drawable.content_paste, title = stringResource(Res.string.clipboard_sync),
+                                icon = m.icon, title = stringResource(Res.string.clipboard_sync),
                                 separatedActions = true
                             ) {
                                 Box(Modifier.onGloballyPositioned { switches[AccessFeatureType.CLIPBOARD_SYNC] = it.boundsInRoot() }) {
-                                    PSwitch(activated = clipboardSync) { enable -> webVM.enableClipboardSync(enable) }
+                                    PSwitch(activated = clipboardEnabled) { enable -> togglePermission(scope, m, enable) }
                                 }
                                 HorizontalSpace(8.dp)
                             }
                         }
-                        if (clipboardSync) {
+                        if (clipboardEnabled) {
                             Tips(stringResource(Res.string.clipboard_sync_tips))
                         }
                     }

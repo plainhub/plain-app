@@ -28,7 +28,6 @@ import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.ClipboardSyncPreference
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
@@ -77,7 +76,6 @@ suspend fun app(): App {
         internalStoragePath = getInternalStoragePath(),
         downloadsDir = getDownloadsDirPath(),
         developerMode = DeveloperModePreference.getAsync(),
-        clipboardSync = ClipboardSyncPreference.getAsync(),
         favoriteFolders = FavoriteFoldersPreference.getValueAsync().map { it.toModel() },
         debug = isDebugBuild(),
     )

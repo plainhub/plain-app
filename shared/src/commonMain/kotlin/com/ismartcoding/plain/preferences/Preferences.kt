@@ -207,11 +207,6 @@ object KeepAwakePreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("keep_awake")
 }
 
-object ClipboardSyncPreference : BasePreference<Boolean>() {
-    override val default = false
-    override val key = booleanPreferencesKey("clipboard_sync")
-}
-
 object LanguagePreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("locale")

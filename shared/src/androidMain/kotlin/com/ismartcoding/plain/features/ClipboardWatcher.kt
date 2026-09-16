@@ -21,7 +21,8 @@ import com.ismartcoding.plain.lib.crypto.sha256
 import com.ismartcoding.plain.lib.generateId
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.ClipboardSyncPreference
+import com.ismartcoding.plain.platform.Permission
+import com.ismartcoding.plain.platform.isEnabledAsync
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -37,7 +38,7 @@ import java.util.Locale
  * Watches the system clipboard while the HTTP server service is alive.
  *
  * Focused reads (app in foreground, or our transparent floating activity):
- * the primary-clip listener captures changes, gates on [ClipboardSyncPreference],
+ * the primary-clip listener captures changes, gates on [Permission.CLIPBOARD],
  * dedups by content hash (also suppresses loops from desktop writes), persists
  * to the clipboard history table and broadcasts CLIPBOARD_CHANGED(39).
  *
@@ -75,7 +76,7 @@ object ClipboardWatcher {
             LogCat.e("ClipboardWatcher start failed: ${e.message}")
         }
         eventJob = coIO {
-            if (ClipboardSyncPreference.getAsync()) startLogcat()
+            if (Permission.CLIPBOARD.isEnabledAsync()) startLogcat()
             Channel.sharedFlow.collect { event ->
                 when (event) {
                     is ClipboardSyncChangedEvent ->
@@ -159,7 +160,7 @@ object ClipboardWatcher {
     }
 
     private suspend fun handleClipboardChange() {
-        if (!ClipboardSyncPreference.getAsync()) return
+        if (!Permission.CLIPBOARD.isEnabledAsync()) return
         val clip = clipboardManager.primaryClip ?: return
         val text = clip.getItemAt(0).coerceToText(appContext)?.toString() ?: return
         if (text.isBlank()) return
