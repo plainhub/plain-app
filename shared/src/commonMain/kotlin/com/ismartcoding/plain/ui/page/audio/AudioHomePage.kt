@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -27,8 +29,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,24 +39,22 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.db.DAudioPlaylist
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
-import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
-import com.ismartcoding.plain.ui.components.AddToPlaylistSheet
 import com.ismartcoding.plain.ui.components.PlaylistNameDialog
 import com.ismartcoding.plain.ui.models.AudioHomeViewModel
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -63,15 +63,12 @@ import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.audio.components.ArtistAvatar
-import com.ismartcoding.plain.ui.page.audio.components.HomeSongRow
+import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.audio.components.PlaylistCoverArtwork
-import com.ismartcoding.plain.ui.page.audio.components.SongMenuSheetContent
+import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -88,11 +85,15 @@ fun AudioHomePage(
     val tagsVM: TagsViewModel = viewModel(key = "audioTagsVM") { TagsViewModel() }
     val castVM: CastViewModel = viewModel(key = "audioCastVM") { CastViewModel() }
     val songs by audioVM.itemsFlow.collectAsState()
+    val tagsState by tagsVM.itemsFlow.collectAsState()
+    val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val isAudioPlaying by audioIsPlayingFlow().collectAsState()
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    var menuAudio by remember { mutableStateOf<DPlaylistAudio?>(null) }
-    var addToPlaylistAudio by remember { mutableStateOf<DPlaylistAudio?>(null) }
+    val scrollState = rememberLazyListState()
+    val dragSelectState = rememberListDragSelectState({ scrollState })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
+        scrollState.firstVisibleItemIndex > 0 && !dragSelectState.selectMode
+    })
     var showCreatePlaylist by remember { mutableStateOf(false) }
 
     val topRefreshLayoutState = rememberRefreshLayoutState {
@@ -106,13 +107,14 @@ fun AudioHomePage(
     }
 
     LaunchedEffect(Unit) {
+        tagsVM.dataType.value = audioVM.dataType
         coIO {
             audioVM.loadAsync(tagsVM)
             homeVM.loadAsync(audioVM)
         }
     }
     LaunchedEffect(songs) {
-        homeVM.rebuildArtists(songs)
+        homeVM.rebuild(songs)
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -133,21 +135,29 @@ fun AudioHomePage(
                     },
                     scrollBehavior = scrollBehavior,
                 )
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
                     item(key = "pills") {
                         Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-                            HomePill(Res.drawable.shuffle, stringResource(Res.string.shuffle_play), Modifier.weight(1f)) {
-                                scope.launch {
-                                    coIO {
-                                        val start = AudioQueueManager.setLibrarySource(startPath = null, shuffle = true)
-                                        if (start != null) audioJustPlayWithNotificationCheck(start)
+                            PFilledButton(
+                                text = stringResource(Res.string.shuffle_play),
+                                icon = painterResource(Res.drawable.shuffle),
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    scope.launch {
+                                        coIO {
+                                            val start = AudioQueueManager.setLibrarySource(startPath = null, shuffle = true)
+                                            if (start != null) audioJustPlayWithNotificationCheck(start)
+                                        }
                                     }
-                                }
-                            }
+                                },
+                            )
                             Spacer(Modifier.width(12.dp))
-                            HomePill(Res.drawable.music2, stringResource(Res.string.all_songs), Modifier.weight(1f)) {
-                                navController.navigate(Routing.AudioAll)
-                            }
+                            POutlinedButton(
+                                text = stringResource(Res.string.all_songs),
+                                icon = painterResource(Res.drawable.music2),
+                                modifier = Modifier.weight(1f),
+                                onClick = { navController.navigate(Routing.AudioAll) },
+                            )
                         }
                     }
                     if (homeVM.artists.value.isNotEmpty()) {
@@ -178,21 +188,20 @@ fun AudioHomePage(
                             navController.navigate(Routing.AudioAll)
                         }
                     }
-                    items(
-                        count = homeVM.recent.value.size,
-                        key = { index -> homeVM.recent.value[index].path },
-                    ) { index ->
-                        val item = homeVM.recent.value[index]
-                        val plAudio = DPlaylistAudio(item.title, item.path, item.artist, item.duration)
-                        HomeSongRow(
-                            item = plAudio,
-                            isPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                            isCurrent = audioPlaylistVM.selectedPath.value == item.path,
-                            onRowClick = {
-                                scope.launch { audioPlaylistVM.playItem(plAudio) }
-                            },
-                            onMoreClick = { menuAudio = plAudio },
+                    items(homeVM.recentSongs.value.size, key = { homeVM.recentSongs.value[it].path }) { index ->
+                        val song = homeVM.recentSongs.value[index]
+                        AudioListItem(
+                            item = song,
+                            audioVM = audioVM,
+                            audioPlaylistVM = audioPlaylistVM,
+                            tagsVM = tagsVM,
+                            castVM = castVM,
+                            tags = emptyList(),
+                            dragSelectState = dragSelectState,
+                            isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == song.path,
+                            isInPlaylist = audioPlaylistVM.isInPlaylist(song.path),
                         )
+                        VerticalSpace(8.dp)
                     }
                     item(key = "bottom") { VerticalSpace(136.dp) }
                 }
@@ -201,44 +210,14 @@ fun AudioHomePage(
         AudioPlayerBar(audioPlaylistVM, castVM, modifier = Modifier.align(Alignment.BottomCenter))
     }
 
-    if (menuAudio != null) {
-        val item = menuAudio!!
-        PModalBottomSheet(onDismissRequest = { menuAudio = null }) {
-            PBottomSheetTopAppBar(title = item.title)
-            SongMenuSheetContent(
-                onPlay = {
-                    menuAudio = null
-                    scope.launch { audioPlaylistVM.playItem(item) }
-                },
-                onPlayNext = {
-                    menuAudio = null
-                    scope.launch {
-                        coIO { AudioQueueManager.enqueue(listOf(item), playNext = true) }
-                        audioPlaylistVM.loadAsync()
-                    }
-                },
-                onAddToPlaylist = {
-                    menuAudio = null
-                    addToPlaylistAudio = item
-                },
-                onAddToQueue = {
-                    menuAudio = null
-                    scope.launch {
-                        coIO { AudioQueueManager.enqueue(listOf(item)) }
-                        audioPlaylistVM.loadAsync()
-                    }
-                },
-            )
-            BottomSpace()
-        }
-    }
-
-    if (addToPlaylistAudio != null) {
-        AddToPlaylistSheet(
-            item = addToPlaylistAudio!!,
-            onDismiss = { addToPlaylistAudio = null },
-        )
-    }
+    ViewAudioBottomSheet(
+        audioVM = audioVM,
+        tagsVM = tagsVM,
+        tagsMapState = tagsMapState,
+        tagsState = tagsState,
+        dragSelectState = dragSelectState,
+        castVM = castVM,
+    )
 
     if (showCreatePlaylist) {
         PlaylistNameDialog(
@@ -287,34 +266,9 @@ private fun HomeSectionHeader(title: String, onViewAll: (() -> Unit)?) {
 }
 
 @Composable
-private fun HomePill(icon: DrawableResource, label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Row(
-        modifier = modifier
-            .height(48.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(20.dp),
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.listItemTitle(),
-            modifier = Modifier.padding(start = 8.dp),
-        )
-    }
-}
-
-@Composable
 private fun ArtistsRow(artists: List<com.ismartcoding.plain.ui.models.AudioHomeArtist>, onArtistClick: (com.ismartcoding.plain.ui.models.AudioHomeArtist) -> Unit) {
     LazyRow(
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -347,7 +301,7 @@ private fun PlaylistsRow(
     onPlaylistClick: (Pair<DAudioPlaylist, Int>) -> Unit,
 ) {
     LazyRow(
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {

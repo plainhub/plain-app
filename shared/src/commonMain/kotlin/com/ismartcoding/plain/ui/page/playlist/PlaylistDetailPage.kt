@@ -50,7 +50,6 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.audio.components.PlaylistCoverArtwork
-import com.ismartcoding.plain.ui.page.audio.components.SongMenuSheetContent
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
@@ -187,30 +186,20 @@ fun PlaylistDetailPage(
         val song = menuSong!!
         PModalBottomSheet(onDismissRequest = { menuSong = null }) {
             PBottomSheetTopAppBar(title = song.title)
-            SongMenuSheetContent(
-                onPlay = {
-                    menuSong = null
-                    scope.launch {
-                        val start = withIO { AudioQueueManager.setPlaylistSource(playlistId, song.audioPath) }
-                        if (start != null) audioJustPlayWithNotificationCheck(start)
-                    }
-                },
-                onPlayNext = {
-                    menuSong = null
-                    scope.launch {
-                        withIO { AudioQueueManager.enqueue(listOf(song.toPlaylistAudio()), playNext = true) }
-                        audioPlaylistVM.loadAsync()
-                    }
-                },
-                onAddToPlaylist = { menuSong = null },
-                onAddToQueue = {
-                    menuSong = null
-                    scope.launch {
-                        withIO { AudioQueueManager.enqueue(listOf(song.toPlaylistAudio())) }
-                        audioPlaylistVM.loadAsync()
-                    }
-                },
-            )
+            PSheetActionRow(Res.drawable.play_arrow, stringResource(Res.string.play)) {
+                menuSong = null
+                scope.launch {
+                    val start = withIO { AudioQueueManager.setPlaylistSource(playlistId, song.audioPath) }
+                    if (start != null) audioJustPlayWithNotificationCheck(start)
+                }
+            }
+            PSheetActionRow(Res.drawable.skip_next, stringResource(Res.string.play_next)) {
+                menuSong = null
+                scope.launch {
+                    withIO { AudioQueueManager.enqueue(listOf(song.toPlaylistAudio()), playNext = true) }
+                    audioPlaylistVM.loadAsync()
+                }
+            }
             PSheetActionRow(Res.drawable.delete_forever, stringResource(Res.string.remove_from_playlist)) {
                 menuSong = null
                 scope.launch {

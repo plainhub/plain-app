@@ -65,7 +65,12 @@ import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
+import com.ismartcoding.plain.lib.markdown.compose.Markdown
+import com.ismartcoding.plain.lib.markdown.compose.MarkdownElement
+import com.ismartcoding.plain.lib.markdown.model.State
+import com.ismartcoding.plain.lib.markdown.model.rememberMarkdownState
+import com.ismartcoding.plain.ui.base.markdowntext.rememberMarkdownImageTransformer
+import com.ismartcoding.plain.ui.base.markdowntext.rememberMarkdownTextConfig
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -130,7 +135,10 @@ fun FeedEntryPage(
     }
 
     // Mirror the visible page into feedEntryVM for the top bar and fetch
-    // actions, then preload neighbor rows and neighbor full content.
+    // actions, then preload neighbor rows and neighbor full content. The
+    // content mirror is only ever set by an actual fetch (pull refresh / load
+    // button) — mirroring m.content here would re-parse the article after the
+    // first frame already rendered it from the pager cache.
     LaunchedEffect(pagerState.currentPage) {
         val pageId = pagerIds.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
         feedEntryVM.content.value = ""
@@ -140,7 +148,6 @@ fun FeedEntryPage(
         if (!m.read) pagerVM.markRead(pageId)
         feedEntryVM.item.value = m
         feedEntryVM.feed.value = pagerVM.feedAsync(m.feedId)
-        feedEntryVM.content.value = m.content
         pagerVM.preloadAroundAsync(pageId)
     }
 
@@ -208,44 +215,75 @@ private fun FeedEntryArticle(
     val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
 
     val density = LocalDensity.current
-    CompositionLocalProvider(LocalDensity provides Density(density = density.density, fontScale = density.fontScale * fontScale)) {
-        LazyColumn(
-            Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            state = scrollState,
-        ) {
-            item {
-                Box(modifier = Modifier.padding(horizontal = 8.dp).clip(RoundedCornerShape(PlainTheme.CARD_RADIUS)).combinedClickable(onDoubleClick = { navController.navigateText("JSON", jsonEncode(m, pretty = true), "json") }, onClick = { WebHelper.open(m.url) })) {
-                    Text(text = m.title, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold))
-                }
-            }
-            item {
-                VerticalSpace(dp = 8.dp)
-                val tags = tagsState.filter { tagIds.contains(it.id) }
-                FlowRow(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(text = arrayOf(feedState.value?.name ?: "", m.author, m.publishedAt.timeAgo()).filter { it.isNotEmpty() }.joinToString(" \u00b7 "), style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant))
-                    tags.forEach { tag -> Text(text = AnnotatedString("#" + tag.name), modifier = Modifier.wrapContentHeight().align(Alignment.Bottom), style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)) }
-                }
-                VerticalSpace(dp = 16.dp)
-            }
-            item {
-                SelectionContainer {
-                    MarkdownText(text = content, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), previewerState = previewerState)
-                }
-            }
-            if (isCurrent && feedEntryVM.content.value.isEmpty() && !m.isFullContent && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
+    val config = rememberMarkdownTextConfig()
+    // Top-level blocks render as lazy list items inside the column below, so
+    // opening composes only the visible screenful of blocks and starts image
+    // requests only for them — not the whole article ×3 pager pages at once.
+    // retainState keeps the previous blocks while replacement content parses,
+    // so a completed full-content fetch swaps in without a blank flash.
+    val markdownState = rememberMarkdownState(content, retainState = true)
+    val mdState by markdownState.state.collectAsState()
+
+    // Shared scaffold for both parse slots: title/meta paint on the very first
+    // frame, before the background parse emits Success.
+    val articleBody: @Composable (State.Success?, Modifier) -> Unit = { success, modifier ->
+        SelectionContainer {
+            LazyColumn(
+                modifier
+                    .fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                state = scrollState,
+            ) {
                 item {
-                    // Keep the button on the article's base density so its label
-                    // never truncates when the user scales the text up.
-                    CompositionLocalProvider(LocalDensity provides density) {
-                        VerticalSpace(dp = 32.dp)
-                        if (feedEntryVM.fetchingContent.value) { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) { CircularProgressIndicator(modifier = Modifier.size(32.dp), color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp) } }
-                        else { POutlinedButton(text = stringResource(Res.string.load_full_content), modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).fillMaxWidth(), enabled = !feedEntryVM.fetchingContent.value, onClick = { scope.launch { feedEntryVM.item.value?.let { mm -> feedEntryVM.fetchingContent.value = true; val r = mm.fetchContentAsync(); feedEntryVM.fetchingContent.value = false; if (r.isOk()) { feedEntryVM.content.value = mm.content; pagerVM.cacheContent(mm.id, mm.content) } else DialogHelper.showErrorDialog(r.errorMessage()) } } }) }
+                    Box(modifier = Modifier.padding(horizontal = 8.dp).clip(RoundedCornerShape(PlainTheme.CARD_RADIUS)).combinedClickable(onDoubleClick = { navController.navigateText("JSON", jsonEncode(m, pretty = true), "json") }, onClick = { WebHelper.open(m.url) })) {
+                        Text(text = m.title, modifier = Modifier.padding(8.dp), style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold))
                     }
                 }
+                item {
+                    VerticalSpace(dp = 8.dp)
+                    val tags = tagsState.filter { tagIds.contains(it.id) }
+                    FlowRow(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(text = arrayOf(feedState.value?.name ?: "", m.author, m.publishedAt.timeAgo()).filter { it.isNotEmpty() }.joinToString(" \u00b7 "), style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant))
+                        tags.forEach { tag -> Text(text = AnnotatedString("#" + tag.name), modifier = Modifier.wrapContentHeight().align(Alignment.Bottom), style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.primary)) }
+                    }
+                    VerticalSpace(dp = 16.dp)
+                }
+                if (success != null) {
+                    items(success.node.children.size, contentType = { "MarkdownBlock" }) { index ->
+                        Box(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+                            MarkdownElement(success.node.children[index], config.components, success.content)
+                        }
+                    }
+                }
+                if (isCurrent && feedEntryVM.content.value.isEmpty() && !m.isFullContent && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
+                    item {
+                        // Keep the button on the article's base density so its label
+                        // never truncates when the user scales the text up.
+                        CompositionLocalProvider(LocalDensity provides density) {
+                            VerticalSpace(dp = 32.dp)
+                            if (feedEntryVM.fetchingContent.value) { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) { CircularProgressIndicator(modifier = Modifier.size(32.dp), color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp) } }
+                            else { POutlinedButton(text = stringResource(Res.string.load_full_content), modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN).fillMaxWidth(), enabled = !feedEntryVM.fetchingContent.value, onClick = { scope.launch { feedEntryVM.item.value?.let { mm -> feedEntryVM.fetchingContent.value = true; val r = mm.fetchContentAsync(); feedEntryVM.fetchingContent.value = false; if (r.isOk()) { feedEntryVM.content.value = mm.content; pagerVM.cacheContent(mm.id, mm.content) } else DialogHelper.showErrorDialog(r.errorMessage()) } } }) }
+                        }
+                    }
+                }
+                item { BottomSpace(paddingValues) }
             }
-            item { BottomSpace(paddingValues) }
         }
+    }
+
+    CompositionLocalProvider(LocalDensity provides Density(density = density.density, fontScale = density.fontScale * fontScale)) {
+        Markdown(
+            state = mdState,
+            colors = config.colors,
+            typography = config.typography,
+            modifier = Modifier,
+            padding = config.padding,
+            dimens = config.dimens,
+            extendedSpans = config.extendedSpans,
+            imageTransformer = rememberMarkdownImageTransformer(content, previewerState),
+            components = config.components,
+            loading = { articleBody(null, it) },
+            success = { s, _, modifier -> articleBody(s, modifier) },
+        )
     }
 }

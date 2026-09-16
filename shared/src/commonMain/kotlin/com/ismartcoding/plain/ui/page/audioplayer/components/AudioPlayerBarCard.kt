@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import com.ismartcoding.plain.ui.page.audio.components.PlayingEqIndicator
+import com.ismartcoding.plain.ui.components.PulsatingWave
 
 /**
  * Mini player bar: cover + title/artist + skip-next + play/pause + queue,
@@ -85,7 +85,9 @@ fun AudioPlayerBarCard(
                     )
                 }
                 if (isPlaying) {
-                    PlayingEqIndicator(
+                    PulsatingWave(
+                        isPlaying = true,
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(3.dp),
