@@ -25,6 +25,7 @@
     <string name="save_as_note">Lưu thành ghi chú</string>
     <string name="send_count">Gửi (%1$d)</string>
     <string name="sent_to_n_targets">Đã gửi tới %1$d chat</string>
+    <string name="send_failed">Gửi tới một số chat thất bại</string>
     <string name="saved_to_downloads">Đã lưu vào Tải xuống</string>
     <string name="cannot_get_content">Không thể truy cập nội dung được chia sẻ</string>
     <string name="files_with_size">%1$d tệp · %2$s</string>

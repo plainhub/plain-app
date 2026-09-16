@@ -83,6 +83,7 @@ fun ShareSheet(
                 onToggle = vm::toggle,
                 onConfirm = onSend,
                 enabled = !vm.sending,
+                sending = vm.sending,
             )
         }
         BottomSpace()

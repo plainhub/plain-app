@@ -26,6 +26,9 @@ import com.ismartcoding.plain.platform.importPickedFiles
 import com.ismartcoding.plain.platform.listFilesInDir
 import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.platform.textMessageContent
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlin.time.Instant
 
 /**
@@ -38,13 +41,16 @@ object ShareSendHelper {
     /**
      * Send files ([uris]) or [text] to every [target]. [caption] (text shared
      * alongside files) is delivered as its own message after the files.
-     * Returns false when there is nothing sendable.
+     * Targets are delivered to concurrently so one dead peer can't stretch
+     * the total wait to N× the per-send timeout. Returns false when there is
+     * nothing sendable or any target failed.
      */
     suspend fun sendAsync(targets: List<ChatTarget>, uris: List<String>, text: String?, caption: String?): Boolean = withIO {
         if (uris.isEmpty()) {
             if (text.isNullOrBlank()) return@withIO false
-            targets.forEach { sendText(it, text) }
-            return@withIO true
+            return@withIO coroutineScope {
+                targets.map { async { sendText(it, text) } }.all { it.await() }
+            }
         }
         val placeholders = buildPickedFilePlaceholders(uris.toSet(), normalizeExtension = false)
         if (placeholders.isEmpty()) return@withIO false
@@ -58,12 +64,16 @@ object ShareSendHelper {
             item.id
         }
         val finalItems = importPickedFiles(placeholders)
-        targets.forEachIndexed { index, target ->
-            val updated = ChatManager.updateFilesMessage(messageIds[index], finalItems, target, PeerCacher.getOnlinePeerIds())
-            if (updated != null) ChatViewModel.onMessageUpdated(updated.id)
-            if (!caption.isNullOrBlank()) sendText(target, caption)
+        coroutineScope {
+            targets.mapIndexed { index, target ->
+                async {
+                    val updated = ChatManager.updateFilesMessage(messageIds[index], finalItems, target, PeerCacher.getOnlinePeerIds())
+                    if (updated != null) ChatViewModel.onMessageUpdated(updated.id)
+                    val captionOk = caption.isNullOrBlank() || sendText(target, caption)
+                    captionOk && updated?.status != ChatStatus.FAILED
+                }
+            }.all { it.await() }
         }
-        true
     }
 
     /**
@@ -71,7 +81,9 @@ object ShareSendHelper {
      * store) to every target. Used by in-app forwarding.
      */
     suspend fun sendContentAsync(targets: List<ChatTarget>, content: DMessageContent) {
-        targets.forEach { sendContent(it, content) }
+        coroutineScope {
+            targets.map { async { sendContent(it, content) } }.awaitAll()
+        }
     }
 
     /**
@@ -134,9 +146,8 @@ object ShareSendHelper {
         )
     }
 
-    private suspend fun sendText(target: ChatTarget, text: String) {
+    private suspend fun sendText(target: ChatTarget, text: String): Boolean =
         sendContent(target, textMessageContent(text))
-    }
 
     private suspend fun sendContent(target: ChatTarget, content: DMessageContent) = withIO {
         val item = ChatManager.createChatItem(target, content)

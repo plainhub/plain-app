@@ -25,6 +25,7 @@
     <string name="save_as_note">নোট হিসেবে সংরক্ষণ করুন</string>
     <string name="send_count">পাঠান (%1$d)</string>
     <string name="sent_to_n_targets">%1$dটি চ্যাটে পাঠানো হয়েছে</string>
+    <string name="send_failed">কিছু চ্যাটে পাঠানো ব্যর্থ হয়েছে</string>
     <string name="saved_to_downloads">ডাউনলোডে সংরক্ষিত</string>
     <string name="cannot_get_content">শেয়ার করা বিষয়বস্তু অ্যাক্সেস করা যাচ্ছে না</string>
     <string name="files_with_size">%1$dটি ফাইল · %2$s</string>

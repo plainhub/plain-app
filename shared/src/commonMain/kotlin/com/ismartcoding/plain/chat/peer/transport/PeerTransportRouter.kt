@@ -5,8 +5,17 @@ import com.ismartcoding.plain.chat.peer.GraphQLResponse
 import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlinx.coroutines.withTimeoutOrNull
 
 object PeerTransportRouter {
+    /**
+     * Cap on a single transport attempt for a small signed request. BLE can
+     * legitimately need ~10s scan + connect + RPC for a slow peer; past 15s
+     * the endpoint is dead and the fallback chain should move on instead of
+     * wedging the caller.
+     */
+    private const val SEND_ATTEMPT_TIMEOUT_MS = 15_000L
+
     private val transports: List<PeerTransport> = buildList {
         add(LanTransport)
         createWifiAwareTransport()?.let { add(it) }
@@ -33,7 +42,13 @@ object PeerTransportRouter {
                 }
                 PeerCacher.setCurrentTransport(peer.id, t.type)
                 try {
-                    val resp = t.send(peer, request, keyBytes)
+                    val resp = withTimeoutOrNull(SEND_ATTEMPT_TIMEOUT_MS) { t.send(peer, request, keyBytes) }
+                    if (resp == null) {
+                        PeerCircuitBreaker.recordFailure(peer.id, t.type)
+                        errors.add("${t.type.name} timeout after ${SEND_ATTEMPT_TIMEOUT_MS / 1000}s")
+                        LogCat.d("${t.type.name} timeout for peer ${peer.id}")
+                        continue
+                    }
                     PeerCircuitBreaker.recordSuccess(peer.id, t.type)
                     return resp
                 } catch (e: TransportUnavailable) {

@@ -18,6 +18,7 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.cannot_get_content
 import com.ismartcoding.plain.i18n.note_saved
 import com.ismartcoding.plain.i18n.saved_to_downloads
+import com.ismartcoding.plain.i18n.send_failed
 import com.ismartcoding.plain.i18n.sent_to_n_targets
 import com.ismartcoding.plain.lib.extensions.parcelable
 import com.ismartcoding.plain.lib.extensions.parcelableArrayList
@@ -115,12 +116,12 @@ class ShareActivity : ComponentActivity() {
                     finish()
                 } else {
                     vm.sending = false
-                    finishWithErrorToast()
+                    toast(LocaleHelper.getString(Res.string.send_failed))
                 }
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
                 vm.sending = false
-                Toast.makeText(this@ShareActivity, ex.message ?: "Send failed", Toast.LENGTH_SHORT).show()
+                toast(LocaleHelper.getString(Res.string.send_failed))
             }
         }
     }

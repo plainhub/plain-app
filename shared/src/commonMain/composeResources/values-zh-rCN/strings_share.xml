@@ -26,6 +26,7 @@
     <string name="save_as_note">保存为笔记</string>
     <string name="send_count">发送（%1$d）</string>
     <string name="sent_to_n_targets">已发送到 %1$d 个聊天</string>
+    <string name="send_failed">部分聊天发送失败</string>
     <string name="saved_to_downloads">已保存到下载</string>
     <string name="cannot_get_content">无法获取分享内容</string>
     <string name="files_with_size">%1$d 个文件 · %2$s</string>
