@@ -15,6 +15,7 @@
     <string name="jump_to_top">शीर्ष पर जाएं</string>
     <string name="jump_to_bottom">नीचे जाएं</string>
     <string name="today">आज</string>
+    <string name="yesterday">कल</string>
     <string name="invalid_url">अमान्य URL प्रारूप। उदाहरण: https://www.example.com</string>
     <string name="undo">पूर्ववत करें</string>
     <string name="redo">पुनः करें</string>

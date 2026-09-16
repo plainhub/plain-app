@@ -15,6 +15,7 @@
     <string name="jump_to_top">Naar boven springen</string>
     <string name="jump_to_bottom">Naar beneden springen</string>
     <string name="today">Vandaag</string>
+    <string name="yesterday">Gisteren</string>
     <string name="invalid_url">Ongeldig URL-formaat. Voorbeeld: https://www.example.com</string>
     <string name="undo">Ongedaan maken</string>
     <string name="redo">Opnieuw doen</string>

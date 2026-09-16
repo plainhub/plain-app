@@ -15,6 +15,7 @@
     <string name="jump_to_top">উপরে যান</string>
     <string name="jump_to_bottom">নীচে যান</string>
     <string name="today">আজ</string>
+    <string name="yesterday">গতকাল</string>
     <string name="invalid_url">অবৈধ URL ফরম্যাট। উদাহরণ: https://www.example.com</string>
     <string name="undo">বাতিল করুন</string>
     <string name="redo">পুনঃসংরক্ষণ করুন</string>

@@ -15,6 +15,7 @@
     <string name="jump_to_top">跳到首行</string>
     <string name="jump_to_bottom">跳到末行</string>
     <string name="today">今天</string>
+    <string name="yesterday">昨天</string>
     <string name="invalid_url">无效的URL格式。示例：https://www.example.com</string>
     <string name="undo">撤销</string>
     <string name="redo">重做</string>

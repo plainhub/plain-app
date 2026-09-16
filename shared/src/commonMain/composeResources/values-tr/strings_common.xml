@@ -15,6 +15,7 @@
     <string name="jump_to_top">Başa atla</string>
     <string name="jump_to_bottom">Sona atla</string>
     <string name="today">Bugün</string>
+    <string name="yesterday">Dün</string>
     <string name="invalid_url">Geçersiz URL formatı. Örnek: https://www.example.com</string>
     <string name="undo">Geri al</string>
     <string name="redo">Yinele</string>

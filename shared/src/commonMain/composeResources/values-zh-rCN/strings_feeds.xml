@@ -75,4 +75,11 @@
     <string name="feed_err_server">服务端错误</string>
     <string name="feed_err_ssl">证书错误</string>
     <string name="feed_err_parse">订阅格式无法解析</string>
+    <string name="n_articles">%1$d 篇</string>
+    <string name="n_unread">%1$d 未读</string>
+    <string name="all_read">全部已读</string>
+    <string name="mark_all_read">标记全部已读</string>
+    <string name="latest_entry">最新：%1$s</string>
+    <string name="mark_as_read">标记为已读</string>
+    <string name="mark_as_unread">标记为未读</string>
 </resources>

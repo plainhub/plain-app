@@ -15,6 +15,7 @@
     <string name="jump_to_top">Перейти наверх</string>
     <string name="jump_to_bottom">Перейти вниз</string>
     <string name="today">Сегодня</string>
+    <string name="yesterday">Вчера</string>
     <string name="invalid_url">Недопустимый формат URL. Пример: https://www.example.com</string>
     <string name="undo">Отменить</string>
     <string name="redo">Повторить</string>

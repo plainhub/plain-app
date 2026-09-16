@@ -3,13 +3,17 @@ package com.ismartcoding.plain.ui.page.feeds
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.i18n.*
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
+import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabel
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabelOff
 import com.ismartcoding.plain.ui.base.PBottomAppBar
@@ -50,6 +54,16 @@ fun FeedEntriesSelectModeBottomActions(
                 showSelectTagsDialog = true
                 removeFromTags = true
             }
+            val selectedIds = feedEntriesVM.selectedIds.toSet()
+            val anyUnread = feedEntriesVM.itemsFlow.collectAsState().value.any { it.id in selectedIds && !it.read }
+            PIconTextSmallButton(
+                icon = if (anyUnread) Res.drawable.circle_check else Res.drawable.circle_dot,
+                text = stringResource(if (anyUnread) Res.string.mark_as_read else Res.string.mark_as_unread),
+                click = {
+                    feedEntriesVM.markRead(selectedIds, anyUnread)
+                    feedEntriesVM.exitSelectMode()
+                },
+            )
             IconTextSmallButtonDelete {
                 feedEntriesVM.delete(tagsVM, feedEntriesVM.selectedIds.toSet())
                 feedEntriesVM.exitSelectMode()

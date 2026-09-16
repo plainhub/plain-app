@@ -84,6 +84,13 @@ object FeedEntryHelper {
         feedEntryDao.update(item)
     }
 
+    /** Batch read-state flip; `read` changes must not bump updatedAt. */
+    suspend fun markReadAsync(ids: Set<String>, read: Boolean = true) = withIO {
+        ids.chunked(100).forEach { chunk ->
+            feedEntryDao.updateRead(chunk, read)
+        }
+    }
+
     suspend fun deleteAsync(ids: Set<String>) = withIO {
         ids.chunked(50).forEach { chunk ->
             releaseImageRefs(feedEntryDao.getByIds(chunk.toSet()))

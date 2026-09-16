@@ -15,6 +15,7 @@
     <string name="jump_to_top">Zum Anfang springen</string>
     <string name="jump_to_bottom">Zum Ende springen</string>
     <string name="today">Heute</string>
+    <string name="yesterday">Gestern</string>
     <string name="invalid_url">Ungültiges URL-Format. Beispiel: https://www.example.com</string>
     <string name="undo">Rückgängig machen</string>
     <string name="redo">Wiederholen</string>

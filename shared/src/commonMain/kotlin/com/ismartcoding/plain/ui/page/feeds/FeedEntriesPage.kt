@@ -7,11 +7,19 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +27,10 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItemDefaults
@@ -34,6 +46,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -79,7 +96,10 @@ import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -107,6 +127,7 @@ fun FeedEntriesPage(
         feedEntriesVM.feedId.value = newFeedId
         feedEntriesVM.filterType.value = filterType
         feedEntriesVM.tag.value = tag
+        feedEntriesVM.clusterExpandedOverrides.clear()
         scope.launch { scrollState.scrollToItem(0) }
         scope.launch(IODispatcher) { feedEntriesVM.loadAsync(tagsVM) }
     }
@@ -262,15 +283,42 @@ fun FeedEntriesPage(
                             LazyColumnScrollbar(state = scrollState) {
                                 LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection), state = scrollState) {
                                     item(key = "top") { TopSpace() }
-                                    itemsIndexed(itemsState, key = { _, m -> m.id }) { idx, m ->
-                                        val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
-                                        FeedEntryListItem(
-                                            feedEntriesVM, idx, m, feedsMap.value[m.feedId], tagsState.filter { tagIds.contains(it.id) },
-                                            onClick = { if (feedEntriesVM.selectMode.value) feedEntriesVM.select(m.id) else { pagerVM.setup(itemsState.map { it.id }); navController.navigate(Routing.FeedEntry(m.id)) } },
-                                            onLongClick = { if (!feedEntriesVM.selectMode.value) feedEntriesVM.selectedItem.value = m },
-                                            onClickTag = { tag -> if (!feedEntriesVM.selectMode.value) applyFilter("", FeedEntryFilterType.DEFAULT, tag) }
-                                        )
-                                        VerticalSpace(dp = 8.dp)
+                                    val rows = buildFeedListRows(
+                                        itemsState,
+                                        feedsMap.value,
+                                        feedEntriesVM.clusterExpandedOverrides,
+                                        TimeZone.currentSystemDefault(),
+                                        TimeHelper.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                                    )
+                                    rows.forEach { row ->
+                                        when (row) {
+                                            is FeedListRow.DayHeader -> stickyHeader(key = row.key) {
+                                                FeedDayHeaderRow(row, onMarkRead = {
+                                                    feedEntriesVM.markRead(row.markReadIds)
+                                                })
+                                            }
+                                            is FeedListRow.ClusterHeader -> item(key = row.key) {
+                                                FeedClusterHeaderRow(row, onToggle = {
+                                                    feedEntriesVM.clusterExpandedOverrides[row.clusterKey] = !row.collapsed
+                                                })
+                                            }
+                                            is FeedListRow.Entry -> item(key = row.key) {
+                                                val m = row.entry
+                                                val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
+                                                FeedEntryListItem(
+                                                    feedEntriesVM, m, feedsMap.value[m.feedId], tagsState.filter { tagIds.contains(it.id) },
+                                                    onClick = { if (feedEntriesVM.selectMode.value) feedEntriesVM.select(m.id) else { if (!m.read) feedEntriesVM.markRead(setOf(m.id)); pagerVM.setup(itemsState.map { it.id }); navController.navigate(Routing.FeedEntry(m.id)) } },
+                                                    onLongClick = { if (!feedEntriesVM.selectMode.value) feedEntriesVM.selectedItem.value = m },
+                                                    onClickTag = { tag -> if (!feedEntriesVM.selectMode.value) applyFilter("", FeedEntryFilterType.DEFAULT, tag) }
+                                                )
+                                                VerticalSpace(dp = 8.dp)
+                                            }
+                                            is FeedListRow.CollapsedDigest -> item(key = row.key) {
+                                                FeedClusterDigestRow(row, onToggle = {
+                                                    feedEntriesVM.clusterExpandedOverrides[row.clusterKey] = false
+                                                })
+                                            }
+                                        }
                                     }
                                     item(key = "bottom") {
                                         if (!feedEntriesVM.noMore.value) {
@@ -388,5 +436,126 @@ private fun FeedEntriesDrawerContent(
         }
         BottomSpace()
     }
+}
+
+/**
+ * Sticky day separator for the grouped feed list. The mark-read action only
+ * covers the entries loaded in the current paging window.
+ */
+@Composable
+private fun FeedDayHeaderRow(
+    row: FeedListRow.DayHeader,
+    onMarkRead: () -> Unit,
+) {
+    val label = when (row.kind) {
+        DayKind.TODAY -> stringResource(Res.string.today)
+        DayKind.YESTERDAY -> stringResource(Res.string.yesterday)
+        DayKind.DATE -> row.dateLabel
+    }
+    val meta = listOf(
+        stringResource(Res.string.n_articles, row.count),
+        if (row.unreadCount > 0) stringResource(Res.string.n_unread, row.unreadCount) else stringResource(Res.string.all_read),
+    ).joinToString(" · ")
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold))
+        HorizontalSpace(dp = 8.dp)
+        Text(
+            meta,
+            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(Modifier.weight(1f))
+        if (row.unreadCount > 0) {
+            TextButton(onClick = onMarkRead) {
+                Text(stringResource(Res.string.mark_all_read), style = MaterialTheme.typography.labelMedium)
+            }
+        }
+    }
+}
+
+@Composable
+private fun FeedClusterHeaderRow(
+    row: FeedListRow.ClusterHeader,
+    onToggle: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onToggle)
+            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = row.feed?.name?.take(1)?.uppercase() ?: "#",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+            )
+        }
+        HorizontalSpace(dp = 8.dp)
+        Text(
+            text = row.feed?.name ?: "#",
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        HorizontalSpace(dp = 8.dp)
+        Text(
+            stringResource(Res.string.n_articles, row.count),
+            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+        )
+        if (row.unreadCount > 0) {
+            HorizontalSpace(dp = 8.dp)
+            Text(
+                stringResource(Res.string.n_unread, row.unreadCount),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                ),
+            )
+        }
+        HorizontalSpace(dp = 8.dp)
+        Icon(
+            painter = painterResource(Res.drawable.chevron_right),
+            contentDescription = null,
+            modifier = Modifier
+                .size(16.dp)
+                .rotate(if (row.collapsed) 0f else 90f),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun FeedClusterDigestRow(
+    row: FeedListRow.CollapsedDigest,
+    onToggle: () -> Unit,
+) {
+    Text(
+        text = stringResource(Res.string.latest_entry, row.entry.title),
+        style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onToggle)
+            .padding(start = 48.dp, end = 16.dp, bottom = 12.dp),
+    )
 }
 

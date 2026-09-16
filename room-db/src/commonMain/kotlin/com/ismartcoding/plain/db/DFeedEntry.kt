@@ -91,6 +91,9 @@ interface FeedEntryDao {
     @Query("DELETE FROM feed_entries WHERE id in (:ids)")
     suspend fun delete(ids: Set<String>)
 
+    @Query("UPDATE feed_entries SET read=:read WHERE id IN (:ids)")
+    suspend fun updateRead(ids: Collection<String>, read: Boolean)
+
     @Query("DELETE FROM feed_entries WHERE feed_id in (:ids)")
     suspend fun deleteByFeedIds(ids: Set<String>)
 

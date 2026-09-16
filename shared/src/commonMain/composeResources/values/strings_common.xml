@@ -17,6 +17,7 @@
     <string name="jump_to_top">Jump to top</string>
     <string name="jump_to_bottom">Jump to bottom</string>
     <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
     <string name="invalid_url">Invalid URL format. Example: https://www.example.com</string>
     <string name="undo">Undo</string>
     <string name="redo">Redo</string>

@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.db.DFeed
@@ -42,7 +46,6 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 @Composable
 fun FeedEntryListItem(
     feedEntriesVM: FeedEntriesViewModel,
-    index: Int,
     m: DFeedEntry,
     feed: DFeed?,
     tags: List<DTag>,
@@ -72,17 +75,35 @@ fun FeedEntryListItem(
                     .fillMaxWidth()
                     .padding(16.dp),
             ) {
+                val unread = !m.read
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
+                    if (!feedEntriesVM.selectMode.value) {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 7.dp)
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(if (unread) MaterialTheme.colorScheme.primary else Color.Transparent),
+                        )
+                        HorizontalSpace(dp = 8.dp)
+                    }
                     Column(
                         modifier = Modifier
                             .weight(1f)
                     ) {
                         Text(
                             text = m.title,
-                            style = MaterialTheme.typography.listItemTitle()
+                            style = if (unread) {
+                                MaterialTheme.typography.listItemTitle()
+                            } else {
+                                MaterialTheme.typography.listItemTitle().copy(
+                                    fontWeight = FontWeight.Normal,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         )
                     }
                     if (m.image.isNotEmpty()) {
@@ -103,7 +124,7 @@ fun FeedEntryListItem(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = arrayOf((index + 1).toString(), feed?.name ?: "", m.author, m.publishedAt.timeAgo()).filter {
+                        text = arrayOf(feed?.name ?: "", m.author, m.publishedAt.timeAgo()).filter {
                             it.isNotEmpty()
                         }.joinToString(" · "),
                         style = MaterialTheme.typography.listItemSubtitle(),

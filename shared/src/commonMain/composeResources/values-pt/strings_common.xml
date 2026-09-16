@@ -15,6 +15,7 @@
     <string name="jump_to_top">Pular para o topo</string>
     <string name="jump_to_bottom">Pular para o fundo</string>
     <string name="today">Hoje</string>
+    <string name="yesterday">Ontem</string>
     <string name="invalid_url">Formato de URL inválido. Exemplo: https://www.example.com</string>
     <string name="undo">Desfazer</string>
     <string name="redo">Refazer</string>

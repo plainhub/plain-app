@@ -15,6 +15,7 @@
     <string name="jump_to_top">மேலே செல்</string>
     <string name="jump_to_bottom">கீழே செல்</string>
     <string name="today">இன்று</string>
+    <string name="yesterday">நேற்று</string>
     <string name="invalid_url">தவறான URL வடிவம். எடுத்துக்காட்டு: https://www.example.com</string>
     <string name="undo">மீள்பதிவு செய்</string>
     <string name="redo">மீண்டும் செய்</string>

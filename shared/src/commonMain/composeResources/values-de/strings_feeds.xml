@@ -75,4 +75,11 @@
     <string name="feed_err_server">Serverfehler</string>
     <string name="feed_err_ssl">Zertifikatsfehler</string>
     <string name="feed_err_parse">Feed-Format konnte nicht gelesen werden</string>
+    <string name="n_articles">%1$d Artikel</string>
+    <string name="n_unread">%1$d ungelesen</string>
+    <string name="all_read">Alles gelesen</string>
+    <string name="mark_all_read">Alle als gelesen markieren</string>
+    <string name="latest_entry">Neueste: %1$s</string>
+    <string name="mark_as_read">Als gelesen markieren</string>
+    <string name="mark_as_unread">Als ungelesen markieren</string>
 </resources>

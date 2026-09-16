@@ -15,6 +15,7 @@
     <string name="jump_to_top">Salta in alto</string>
     <string name="jump_to_bottom">Salta in basso</string>
     <string name="today">Oggi</string>
+    <string name="yesterday">Ieri</string>
     <string name="invalid_url">Formato URL non valido. Esempio: https://www.example.com</string>
     <string name="undo">Annulla</string>
     <string name="redo">Rifai</string>

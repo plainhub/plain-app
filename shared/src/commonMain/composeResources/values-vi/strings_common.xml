@@ -15,6 +15,7 @@
     <string name="jump_to_top">Nhảy lên đầu</string>
     <string name="jump_to_bottom">Nhảy xuống đáy</string>
     <string name="today">Hôm nay</string>
+    <string name="yesterday">Hôm qua</string>
     <string name="invalid_url">Định dạng URL không hợp lệ. Ví dụ: https://www.example.com</string>
     <string name="undo">Hoàn tác</string>
     <string name="redo">Làm lại</string>

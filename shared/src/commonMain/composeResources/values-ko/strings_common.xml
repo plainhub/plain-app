@@ -15,6 +15,7 @@
     <string name="jump_to_top">맨 위로 이동</string>
     <string name="jump_to_bottom">맨 아래로 이동</string>
     <string name="today">오늘</string>
+    <string name="yesterday">어제</string>
     <string name="invalid_url">잘못된 URL 형식입니다. 예: https://www.example.com</string>
     <string name="undo">되돌리기</string>
     <string name="redo">다시 실행</string>

@@ -68,6 +68,13 @@ fun ViewFeedEntryBottomSheet(
                         }
                     }
                     PSheetPrimaryAction(
+                        if (m.read) Res.drawable.circle_dot else Res.drawable.circle_check,
+                        stringResource(if (m.read) Res.string.mark_as_unread else Res.string.mark_as_read),
+                    ) {
+                        feedEntriesVM.markRead(setOf(m.id), !m.read)
+                        onDismiss()
+                    }
+                    PSheetPrimaryAction(
                         Res.drawable.delete_forever,
                         stringResource(Res.string.delete),
                         container = MaterialTheme.colorScheme.errorContainer,

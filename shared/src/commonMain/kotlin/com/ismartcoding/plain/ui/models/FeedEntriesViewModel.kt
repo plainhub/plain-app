@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,6 +36,10 @@ class FeedEntriesViewModel :
     val dataType = DataType.FEED_ENTRY
     var selectedItem = mutableStateOf<DFeedEntry?>(null)
     val showTagsDialog = mutableStateOf(false)
+
+    // Cluster key ("date/feedId" from buildFeedListRows) -> explicit expanded/collapsed
+    // choice. Absent = default (collapsed once the cluster has no unread entries).
+    val clusterExpandedOverrides = mutableStateMapOf<String, Boolean>()
 
     // Discovery (first-run catalog) page state: null until the feed list has
     // loaded once, then true = show the catalog, false = normal list. The page
@@ -74,6 +79,12 @@ class FeedEntriesViewModel :
         totalToday.intValue = FeedEntryHelper.count(getTotalTodayQuery())
         noMore.value = _itemsFlow.value.size < limit.intValue
         showLoading.value = false
+    }
+
+    /** Optimistic read-state flip: update the loaded list immediately, persist async. */
+    fun markRead(ids: Set<String>, read: Boolean = true) {
+        _itemsFlow.update { list -> list.map { if (it.id in ids) it.copy(read = read) else it } }
+        viewModelScope.launchSafe { FeedEntryHelper.markReadAsync(ids, read) }
     }
 
     fun sync() {

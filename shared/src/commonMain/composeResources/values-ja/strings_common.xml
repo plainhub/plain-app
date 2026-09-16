@@ -15,6 +15,7 @@
     <string name="jump_to_top">トップへジャンプ</string>
     <string name="jump_to_bottom">最下部へジャンプ</string>
     <string name="today">今日</string>
+    <string name="yesterday">昨日</string>
     <string name="invalid_url">無効なURL形式です。例：https://www.example.com</string>
     <string name="undo">元に戻す</string>
     <string name="redo">やり直す</string>
