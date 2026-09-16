@@ -531,6 +531,12 @@ object AudioPlayingPreference : BasePreference<String>() {
     }
 }
 
+/** One-shot flag: legacy audio_playlist JSON imported into the Room queue tables. */
+object AudioQueueMigratedPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("audio_queue_migrated")
+}
+
 object AudioPlaylistPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("audio_playlist")

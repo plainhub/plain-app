@@ -31,6 +31,8 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
     audio: DPlaylistAudio,
     index: Int,
     isPlaying: Boolean,
+    canReorder: Boolean,
+    canRemove: Boolean,
     audioPlaylistVM: AudioPlaylistViewModel,
     scope: CoroutineScope,
 ) {
@@ -44,7 +46,7 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
             Box(
                 modifier = Modifier.size(36.dp).clip(CircleShape)
                     .background(if (isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.circleBackground)
-                    .draggableHandle(),
+                    .then(if (canReorder) Modifier.draggableHandle() else Modifier),
                 contentAlignment = Alignment.Center
             ) {
                 if (isPlaying) {
@@ -59,9 +61,11 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
                 VerticalSpace(4.dp)
                 Text(text = audio.artist, style = MaterialTheme.typography.listItemSubtitle())
             }
-            PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.error,
-                contentDescription = stringResource(Res.string.remove_from_playlist),
-                click = { scope.launch(Dispatchers.Default) { audioPlaylistVM.removeAsync(audio.path) } })
+            if (canRemove) {
+                PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.error,
+                    contentDescription = stringResource(Res.string.remove_from_playlist),
+                    click = { scope.launch(Dispatchers.Default) { audioPlaylistVM.removeAsync(audio.path) } })
+            }
         }
     }
 }

@@ -69,8 +69,7 @@ fun openAppFile(
             coMain {
                 try {
                     val audio = withIO { playlistAudioFromPath(path) }
-                    audioPlaylistVM.playlistItems.value = listOf(audio)
-                    audioPlaylistVM.selectedPath.value = path
+                    audioPlaylistVM.playSingleAsync(audio)
                     playAudioWithNotificationCheck(path)
                 } catch (ex: Exception) {
                     DialogHelper.showMessage(Res.string.audio_play_error)

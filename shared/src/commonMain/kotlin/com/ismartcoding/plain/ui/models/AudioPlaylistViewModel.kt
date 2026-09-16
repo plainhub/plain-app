@@ -4,37 +4,78 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.db.AudioPlaySource
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.audioClear
 import com.ismartcoding.plain.platform.audioJustPlay
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
-import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 
 class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
     val playlistItems = mutableStateOf<List<DPlaylistAudio>>(listOf())
+    val queueCount = mutableStateOf(0)
+    val noMore = mutableStateOf(false)
+
+    /** Drag & drop reorder only applies to the manual queue (no playback source). */
+    val canReorder = mutableStateOf(false)
+
+    /** Paths currently in the manual queue — "remove" applies to these only. */
+    val queuedPaths = mutableStateOf<Set<String>>(emptySet())
     override val selectedPath = mutableStateOf("")
 
+    private val pageLimit = 200
+
     suspend fun loadAsync() {
+        AudioQueueManager.ensureMigrated()
         selectedPath.value = AudioPlayingPreference.getValueAsync()
-        playlistItems.value = AudioPlaylistPreference.getValueAsync()
+        refreshWindow()
+    }
+
+    fun isInQueue(path: String): Boolean = path in queuedPaths.value
+
+    suspend fun moreAsync() {
+        if (noMore.value) return
+        val more = AudioQueueManager.queuePage(playlistItems.value.size, pageLimit)
+        if (more.isEmpty()) {
+            noMore.value = true
+            return
+        }
+        playlistItems.value = playlistItems.value + more
+        noMore.value = playlistItems.value.size >= queueCount.value
     }
 
     fun isInPlaylist(path: String): Boolean {
-        return playlistItems.value.any { it.path == path }
+        return path in queuedPaths.value
     }
 
     suspend fun addAsync(items: List<DAudio>) {
         val audio = items.map { it.toPlaylistAudio() }
-        playlistItems.value = AudioPlaylistPreference.addAsync(audio)
+        AudioQueueManager.enqueue(audio)
         if (selectedPath.value.isEmpty()) {
             setCurrentPlaying(audio.first().path)
         }
+        refreshWindow()
+    }
+
+    /** Replace the whole queue with a single track ("open with player" flows). */
+    suspend fun playSingleAsync(audio: DPlaylistAudio) {
+        AudioQueueManager.clearQueue()
+        AudioQueueManager.enqueue(listOf(audio))
+        selectedPath.value = audio.path
+        playlistItems.value = listOf(audio)
+        queueCount.value = 1
+        noMore.value = true
+        canReorder.value = true
+        queuedPaths.value = setOf(audio.path)
     }
 
     suspend fun clearAsync() {
-        AudioPlaylistPreference.putAsync(listOf())
+        AudioQueueManager.clearQueue()
+        AudioPlayingPreference.putAsync("")
         playlistItems.value = listOf()
+        queueCount.value = 0
+        noMore.value = true
         audioClear()
         setCurrentPlaying("")
         sendEvent(ClearAudioPlaylistEvent())
@@ -47,34 +88,47 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
 
     suspend fun playAsync(item: DAudio) {
         val audio = item.toPlaylistAudio()
-        playlistItems.value = AudioPlaylistPreference.addAsync(listOf(audio))
+        AudioQueueManager.enqueue(listOf(audio))
         audioJustPlay(audio)
         setCurrentPlaying(audio.path)
+        refreshWindow()
     }
 
     suspend fun removeAsync(path: String) {
-        val newList = AudioPlaylistPreference.deleteAsync(setOf(path))
-        playlistItems.value = newList
+        AudioQueueManager.removeQueued(path)
         if (path == selectedPath.value) {
-            if (newList.isNotEmpty()) {
-                val nextItem = newList[0]
+            val nextItem = AudioQueueManager.resolveNext(isNext = true, shuffle = false)
+            if (nextItem != null) {
                 AudioPlayingPreference.putAsync(nextItem.path)
                 audioJustPlay(nextItem)
+                selectedPath.value = nextItem.path
             }
         }
-        if (newList.isEmpty()) {
+        if (AudioQueueManager.queueTotal() == 0) {
             setCurrentPlaying("")
             audioClear()
             sendEvent(ClearAudioPlaylistEvent())
         }
+        refreshWindow()
     }
 
     suspend fun reorder(from: Int, to: Int) {
-        val newList = playlistItems.value.toMutableList()
-        newList.apply {
-            add(to, removeAt(from))
+        if (!canReorder.value) return
+        AudioQueueManager.moveQueued(from, to)
+        val list = playlistItems.value.toMutableList()
+        if (from in list.indices && to in list.indices) {
+            list.add(to, list.removeAt(from))
+            playlistItems.value = list
         }
-        playlistItems.value = newList
-        AudioPlaylistPreference.putAsync(newList)
+    }
+
+    private suspend fun refreshWindow() {
+        val total = AudioQueueManager.queueTotal()
+        val window = AudioQueueManager.queuePage(0, maxOf(playlistItems.value.size, pageLimit))
+        playlistItems.value = window
+        queueCount.value = total
+        noMore.value = window.size >= total
+        canReorder.value = AudioQueueManager.source().source == AudioPlaySource.NONE
+        queuedPaths.value = AudioQueueManager.queuedPaths()
     }
 }

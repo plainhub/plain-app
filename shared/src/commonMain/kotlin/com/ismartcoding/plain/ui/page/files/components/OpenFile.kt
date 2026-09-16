@@ -93,8 +93,7 @@ fun openFile(
             try {
                 if (audioPlaylistVM != null) {
                     val audio = playlistAudioFromPath(path)
-                    audioPlaylistVM.playlistItems.value = listOf(audio)
-                    audioPlaylistVM.selectedPath.value = path
+                    coMain { audioPlaylistVM.playSingleAsync(audio) }
                 }
                 playAudioWithNotificationCheck(path)
             } catch (ex: Exception) {

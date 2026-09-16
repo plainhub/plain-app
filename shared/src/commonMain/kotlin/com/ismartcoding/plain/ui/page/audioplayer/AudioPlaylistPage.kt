@@ -18,6 +18,7 @@ import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -56,10 +57,10 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
     PModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
         Column {
             PBottomSheetTopAppBar(
-                title = if (audioPlaylistVM.playlistItems.value.isNotEmpty())
-                    LocaleHelper.getStringF(Res.string.playlist_title, audioPlaylistVM.playlistItems.value.size)
+                title = if (audioPlaylistVM.queueCount.value > 0)
+                    LocaleHelper.getStringF(Res.string.playlist_title, audioPlaylistVM.queueCount.value)
                 else stringResource(Res.string.playlist),
-                subtitle = if (audioPlaylistVM.playlistItems.value.isEmpty()) "" else stringResource(Res.string.drag_number_to_reorder_list),
+                subtitle = if (audioPlaylistVM.canReorder.value && audioPlaylistVM.playlistItems.value.isNotEmpty()) stringResource(Res.string.drag_number_to_reorder_list) else "",
                 actions = {
                     if (audioPlaylistVM.playlistItems.value.isNotEmpty()) {
                         IconButton(onClick = { showClearConfirmDialog = true }) {
@@ -88,9 +89,19 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                         ReorderableItem(reorderableLazyListState, key = audio.path) { isDragging ->
                             AudioPlaylistItemRow(
                                 audio = audio, index = index, isPlaying = isPlaying,
+                                canReorder = audioPlaylistVM.canReorder.value,
+                                canRemove = audioPlaylistVM.isInQueue(audio.path),
                                 audioPlaylistVM = audioPlaylistVM, scope = scope
                             )
                         }
+                    }
+                    item(key = "loadMore") {
+                        if (!audioPlaylistVM.noMore.value) {
+                            LaunchedEffect(audioPlaylistVM.playlistItems.value.size) {
+                                scope.launch(Dispatchers.Default) { audioPlaylistVM.moreAsync() }
+                            }
+                        }
+                        LoadMoreRefreshContent(audioPlaylistVM.noMore.value)
                     }
                 }
             }

@@ -25,3 +25,18 @@ data class PlaylistAudio(
     val path: String,
     val duration: Long,
 )
+
+@GraphQLType
+data class AudioPlaylist(
+    val id: ID,
+    val name: String,
+    val songCount: Int,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+)
+
+@GraphQLType
+data class AudioPlaylistPage(
+    val items: List<PlaylistAudio>,
+    val total: Int,
+)

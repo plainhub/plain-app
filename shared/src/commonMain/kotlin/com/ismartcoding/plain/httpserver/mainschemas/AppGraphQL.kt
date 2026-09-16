@@ -29,10 +29,8 @@ import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
-import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.DeviceNamePreference
-import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.httpserver.models.App
 import com.ismartcoding.plain.httpserver.models.Battery
 import com.ismartcoding.plain.httpserver.models.DeviceInfo
@@ -68,7 +66,6 @@ suspend fun app(): App {
         getSdkInt(),
         AppChannelType.fromString(buildChannel),
         grantedPermissions,
-        AudioPlaylistPreference.getValueAsync().map { it.toModel() },
         TempData.audioPlayMode.value,
         AudioPlayingPreference.getValueAsync(),
         sdcardPath = getSDCardPath(),
@@ -76,7 +73,6 @@ suspend fun app(): App {
         internalStoragePath = getInternalStoragePath(),
         downloadsDir = getDownloadsDirPath(),
         developerMode = DeveloperModePreference.getAsync(),
-        favoriteFolders = FavoriteFoldersPreference.getValueAsync().map { it.toModel() },
         debug = isDebugBuild(),
     )
 }

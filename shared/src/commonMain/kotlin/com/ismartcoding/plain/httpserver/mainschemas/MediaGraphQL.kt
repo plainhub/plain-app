@@ -21,7 +21,7 @@ import com.ismartcoding.plain.platform.trashMedia
 import com.ismartcoding.plain.platform.enqueueRemoveImageIndex
 import com.ismartcoding.plain.platform.moveMedia
 import com.ismartcoding.plain.helpers.FilePathValidator
-import com.ismartcoding.plain.preferences.AudioPlaylistPreference
+import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.preferences.VideoPlaylistPreference
 import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.MediaBucket
@@ -58,7 +58,7 @@ suspend fun trashMediaItems(type: DataType, query: String): ActionResult {
         DataType.AUDIO -> {
             val paths = getMediaPathsByIds(type, ids)
             trashMedia(type, ids)
-            AudioPlaylistPreference.deleteAsync(paths)
+            AudioQueueManager.removePaths(paths)
         }
 
         DataType.VIDEO -> {

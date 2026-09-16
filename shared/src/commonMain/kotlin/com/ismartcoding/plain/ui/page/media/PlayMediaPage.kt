@@ -29,10 +29,7 @@ fun PlayMediaPage(
         LaunchedEffect(path) {
             coMain {
                 val audio = withIO { playlistAudioFromPath(path) }
-                withIO {
-                    audioPlaylistVM.playlistItems.value = listOf(audio)
-                    audioPlaylistVM.selectedPath.value = path
-                }
+                withIO { audioPlaylistVM.playSingleAsync(audio) }
                 audioJustPlayWithNotificationCheck(audio)
                 navController.navigate(Routing.Audio) {
                     popUpTo(Routing.PlayMedia(path)) { inclusive = true }

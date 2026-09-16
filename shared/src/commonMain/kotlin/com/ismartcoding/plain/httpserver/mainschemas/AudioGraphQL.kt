@@ -5,12 +5,14 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.audio.DAudio
-import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.features.audio.AudioQueueManager
+import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.audioClear
+import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -21,10 +23,12 @@ import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
-import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.Audio
+import com.ismartcoding.plain.httpserver.models.AudioPlaylist
+import com.ismartcoding.plain.httpserver.models.AudioPlaylistPage
+import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.PlaylistAudio
 import com.ismartcoding.plain.httpserver.models.toModel
 
@@ -37,13 +41,22 @@ suspend fun audioCount(query: String): Int {
     }
 }
 
+/** The active playback queue (manual items + context), paginated. */
+@GraphQLQuery
+suspend fun audioPlaylist(offset: Int, limit: Int): AudioPlaylistPage {
+    Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
+    return AudioPlaylistPage(
+        items = AudioQueueManager.queuePage(offset, limit).map { it.toModel() },
+        total = AudioQueueManager.queueTotal(),
+    )
+}
+
+/** Play the given track: adds it to the manual queue when missing and marks it current. */
 @GraphQLMutation
 suspend fun playAudio(path: String): PlaylistAudio {
     val audio = playlistAudioFromPath(path)
     AudioPlayingPreference.putAsync(audio.path)
-    if (!AudioPlaylistPreference.getValueAsync().any { it.path == audio.path }) {
-        AudioPlaylistPreference.addAsync(listOf(audio))
-    }
+    AudioQueueManager.enqueue(listOf(audio))
     return audio.toModel()
 }
 
@@ -56,7 +69,7 @@ suspend fun updateAudioPlayMode(mode: MediaPlayMode): Boolean {
 @GraphQLMutation
 suspend fun clearAudioPlaylist(): Boolean {
     AudioPlayingPreference.putAsync("")
-    AudioPlaylistPreference.putAsync(arrayListOf())
+    AudioQueueManager.clearQueue()
     coMain {
         audioClear()
     }
@@ -66,7 +79,7 @@ suspend fun clearAudioPlaylist(): Boolean {
 
 @GraphQLMutation
 suspend fun deletePlaylistAudio(path: String): Boolean {
-    AudioPlaylistPreference.deleteAsync(setOf(path))
+    AudioQueueManager.removeQueued(path)
     return true
 }
 
@@ -75,41 +88,13 @@ suspend fun addPlaylistAudios(query: String): Boolean {
     // 1000 items at most
     val items = searchMedia(DataType.AUDIO, query, 1000, 0, AudioSortByPreference.getValueAsync())
         .filterIsInstance<DAudio>()
-    AudioPlaylistPreference.addAsync(items.map { it.toPlaylistAudio() })
+    AudioQueueManager.enqueue(items.map { it.toPlaylistAudio() })
     return true
 }
 
 @GraphQLMutation
 suspend fun reorderPlaylistAudios(paths: List<String>): Boolean {
-    // Get current playlist
-    val currentPlaylist = AudioPlaylistPreference.getValueAsync()
-    if (currentPlaylist.isEmpty() || paths.isEmpty()) {
-        return true
-    }
-
-    // Create a map of paths to audio items
-    val audioMap = currentPlaylist.associateBy { it.path }
-
-    // Reorder the playlist based on the provided paths
-    val reorderedPlaylist = mutableListOf<DPlaylistAudio>()
-
-    // First add audio items in the new order
-    paths.forEach { path ->
-        audioMap[path]?.let { audio ->
-            reorderedPlaylist.add(audio)
-        }
-    }
-
-    // Add other audio items that are not in the reorder list (keep their original positions)
-    currentPlaylist.forEach { audio ->
-        if (!paths.contains(audio.path)) {
-            reorderedPlaylist.add(audio)
-        }
-    }
-
-    // Save the reordered playlist
-    AudioPlaylistPreference.putAsync(reorderedPlaylist)
-
+    AudioQueueManager.reorderQueued(paths)
     return true
 }
 
@@ -125,6 +110,76 @@ suspend fun audios(offset: Int, limit: Int, query: String, sortBy: FileSortBy): 
 suspend fun audioLyrics(path: String): String {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     return getAudioLyrics(path)
+}
+
+// ---------- user playlists ----------
+
+@GraphQLQuery
+suspend fun audioPlaylists(): List<AudioPlaylist> {
+    return AudioQueueManager.playlists().map { (pl, count) ->
+        AudioPlaylist(id = ID(pl.id), name = pl.name, songCount = count, createdAt = pl.createdAt, updatedAt = pl.updatedAt)
+    }
+}
+
+@GraphQLQuery
+suspend fun audioPlaylistSongs(id: ID, offset: Int, limit: Int): AudioPlaylistPage {
+    return AudioPlaylistPage(
+        items = AudioQueueManager.playlistSongsPage(id.value, offset, limit).map { it.toPlaylistAudio().toModel() },
+        total = AudioQueueManager.playlistSongCount(id.value),
+    )
+}
+
+@GraphQLMutation
+suspend fun createAudioPlaylist(name: String): AudioPlaylist {
+    val pl = AudioQueueManager.createPlaylist(name)
+    return AudioPlaylist(id = ID(pl.id), name = pl.name, songCount = 0, createdAt = pl.createdAt, updatedAt = pl.updatedAt)
+}
+
+@GraphQLMutation
+suspend fun renameAudioPlaylist(id: ID, name: String): Boolean {
+    AudioQueueManager.renamePlaylist(id.value, name)
+    return true
+}
+
+@GraphQLMutation
+suspend fun deleteAudioPlaylist(id: ID): Boolean {
+    AudioQueueManager.deletePlaylist(id.value)
+    return true
+}
+
+@GraphQLMutation
+suspend fun addAudioPlaylistSongs(id: ID, paths: List<String>): Boolean {
+    AudioQueueManager.addPlaylistSongs(id.value, paths.map { playlistAudioFromPath(it) })
+    return true
+}
+
+@GraphQLMutation
+suspend fun removeAudioPlaylistSong(id: ID, path: String): Boolean {
+    AudioQueueManager.removePlaylistSong(id.value, path)
+    return true
+}
+
+/** Play a user playlist: sets it as the playback context and starts playback. */
+@GraphQLMutation
+suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean = false): Boolean {
+    val start = AudioQueueManager.setPlaylistSource(id.value, path)
+    if (start != null && !shuffle) {
+        coMain { audioJustPlayWithNotificationCheck(start) }
+    } else if (start != null && shuffle) {
+        val random = AudioQueueManager.resolveNext(isNext = true, shuffle = true)
+        if (random != null) coMain { audioJustPlayWithNotificationCheck(random) }
+    }
+    return true
+}
+
+/** Play the whole audio library (shuffle optional): full-library playback context. */
+@GraphQLMutation
+suspend fun playAllAudios(shuffle: Boolean = false, path: String? = null): Boolean {
+    val start = AudioQueueManager.setLibrarySource(startPath = path, shuffle = shuffle)
+    if (start != null) {
+        coMain { audioJustPlayWithNotificationCheck(start) }
+    }
+    return true
 }
 
 fun SchemaBuilder.addAudioSchema() {

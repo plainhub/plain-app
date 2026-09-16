@@ -5,6 +5,7 @@ package com.ismartcoding.plain.platform
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.logcat.LogCat
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CoroutineScope
@@ -30,8 +31,6 @@ private object AVPlayerAudioPlayer : AudioPlayer {
     override val isPlayingFlow: StateFlow<Boolean> = _isPlayingFlow.asStateFlow()
 
     private var player: AVPlayer? = null
-    private val playlist = mutableListOf<DPlaylistAudio>()
-    private var currentIndex = -1
     private var currentAudio: DPlaylistAudio? = null
     private var pollJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main)
@@ -88,9 +87,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
     override fun playFromPath(path: String) {
         scope.launch {
             val audio = playlistAudioFromPath(path)
-            playlist.clear()
-            playlist.add(audio)
-            currentIndex = 0
+            AudioQueueManager.enqueue(listOf(audio))
             currentAudio = audio
             TempData.audioPlayPosition = 0
             playInternal(audio)
@@ -99,8 +96,6 @@ private object AVPlayerAudioPlayer : AudioPlayer {
 
     override fun justPlay(audio: DPlaylistAudio) {
         scope.launch {
-            val idx = playlist.indexOfFirst { it.path == audio.path }
-            if (idx >= 0) currentIndex = idx
             currentAudio = audio
             TempData.audioPlayPosition = 0
             playInternal(audio)
@@ -115,8 +110,6 @@ private object AVPlayerAudioPlayer : AudioPlayer {
                 avPlayerPerformWithArg(p as NSObject, "replaceCurrentItemWithPlayerItem:", null)
             }
             player = null
-            playlist.clear()
-            currentIndex = -1
             currentAudio = null
             _isPlayingFlow.value = false
             TempData.audioPlayPosition = 0
@@ -130,19 +123,13 @@ private object AVPlayerAudioPlayer : AudioPlayer {
 
     private fun skipTo(isNext: Boolean) {
         scope.launch {
-            if (playlist.isEmpty()) return@launch
-            val audio = when (TempData.audioPlayMode.value) {
-                MediaPlayMode.SHUFFLE -> playlist.random()
-                else -> {
-                    var index = if (currentIndex < 0) 0 else currentIndex
-                    index = if (isNext) {
-                        (index + 1) % playlist.size
-                    } else {
-                        (index - 1 + playlist.size) % playlist.size
-                    }
-                    currentIndex = index
-                    playlist[index]
-                }
+            val audio = AudioQueueManager.resolveNext(
+                isNext = isNext,
+                shuffle = TempData.audioPlayMode.value == MediaPlayMode.SHUFFLE,
+            )
+            if (audio == null) {
+                LogCat.d("skipTo: nothing to play, queue is empty")
+                return@launch
             }
             currentAudio = audio
             TempData.audioPlayPosition = 0
@@ -180,6 +167,9 @@ private object AVPlayerAudioPlayer : AudioPlayer {
             }
             _isPlayingFlow.value = true
             startPolling()
+            scope.launch {
+                AudioQueueManager.onPlaying(audio.path, audio.title, audio.artist, audio.duration)
+            }
         } catch (e: Exception) {
             LogCat.e("playInternal: ${e.message}")
         }

@@ -8,7 +8,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.platform.deleteMedia
 import com.ismartcoding.plain.platform.getMediaPathsByIds
-import com.ismartcoding.plain.preferences.AudioPlaylistPreference
+import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 class AudioViewModel : BaseMediaViewModel<DAudio>() {
@@ -22,7 +22,7 @@ class AudioViewModel : BaseMediaViewModel<DAudio>() {
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             val pathes = getMediaPathsByIds(dataType, ids)
             deleteMedia(dataType, ids, trash.value)
-            AudioPlaylistPreference.deleteAsync(pathes)
+            AudioQueueManager.removePaths(pathes)
             loadAsync(tagsVM)
             DialogHelper.hideLoading()
         }

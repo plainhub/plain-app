@@ -21,7 +21,6 @@ data class App(
     val osVersion: Int,
     val channel: AppChannelType,
     val permissions: List<Permission>,
-    val audios: List<PlaylistAudio>,
     val audioMode: MediaPlayMode,
     val audioCurrent: String,
     val sdcardPath: String,
@@ -29,6 +28,5 @@ data class App(
     val internalStoragePath: String,
     val downloadsDir: String,
     val developerMode: Boolean,
-    val favoriteFolders: List<FavoriteFolder>,
     val debug: Boolean,
 )
