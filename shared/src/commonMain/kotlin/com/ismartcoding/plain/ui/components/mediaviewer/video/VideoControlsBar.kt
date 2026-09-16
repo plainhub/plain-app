@@ -30,6 +30,7 @@ import com.ismartcoding.plain.i18n.volume_x
 import com.ismartcoding.plain.ui.base.ControlChip
 import com.ismartcoding.plain.ui.base.ControlChipIconButton
 import com.ismartcoding.plain.ui.components.mediaviewer.PlaybackSpeedButton
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -57,7 +58,7 @@ fun VideoControlsBar(
             PlaybackSpeedButton(
                 speed = playbackSpeed,
                 onSpeedChange = onSpeedChange,
-                tint = Color.White,
+                tint = PreviewerSoftWhite,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -72,7 +73,7 @@ fun VideoControlsBar(
         // [Play] — big circular button
         Surface(
             shape = CircleShape,
-            color = Color.White.copy(alpha = 0.9f),
+            color = PreviewerSoftWhite.copy(alpha = 0.9f),
             modifier = Modifier.size(60.dp),
         ) {
             IconButton(onClick = onPlayPause, modifier = Modifier.fillMaxWidth()) {

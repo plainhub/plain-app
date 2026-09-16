@@ -42,10 +42,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.close
 import com.ismartcoding.plain.i18n.double_arrow_right
+import com.ismartcoding.plain.ui.base.ControlChipIconButton
 import com.ismartcoding.plain.ui.components.mediaviewer.GestureScope
 import com.ismartcoding.plain.ui.components.mediaviewer.ImagePreviewActions
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import com.ismartcoding.plain.ui.components.mediaviewer.ViewMediaBottomSheet
 import com.ismartcoding.plain.ui.components.mediaviewer.rememberViewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
@@ -59,6 +62,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 // Grace period before showing a loading icon: media that becomes ready within
 // this window switches without any visible loading state (Douyin-like).
@@ -229,6 +233,7 @@ fun MediaPreviewer(
                     ImagePreviewActions(castViewModel = castVM, m = m, state = state)
                 }
             }
+            PreviewerCloseButton(state)
             SpeedBoostIndicator(state)
         }
     }
@@ -253,6 +258,29 @@ fun MediaPreviewer(
     state.ticket.Next()
 }
 
+// WeChat-like close button in the top-left corner. Follows the actions
+// overlay: toggled by tap, fades with uiAlpha; PiP hides it like the
+// video control bar.
+@Composable
+private fun PreviewerCloseButton(state: MediaPreviewerState) {
+    if (state.videoState.enablePip) return
+    val scope = rememberCoroutineScope()
+    Box(
+        modifier = Modifier
+            .padding(start = 16.dp, top = 32.dp)
+            .alpha(state.uiAlpha.value),
+    ) {
+        if (state.showActions) {
+            ControlChipIconButton(
+                icon = Res.drawable.close,
+                contentDescription = stringResource(Res.string.close),
+            ) {
+                scope.launch { state.closeTransform() }
+            }
+        }
+    }
+}
+
 @Composable
 private fun SpeedBoostIndicator(state: MediaPreviewerState) {
     AnimatedVisibility(
@@ -272,8 +300,8 @@ private fun SpeedBoostIndicator(state: MediaPreviewerState) {
                     .padding(horizontal = 16.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(painter = painterResource(Res.drawable.double_arrow_right), contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
-                Text(text = " 2x", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                Icon(painter = painterResource(Res.drawable.double_arrow_right), contentDescription = null, tint = PreviewerSoftWhite, modifier = Modifier.size(20.dp))
+                Text(text = " 2x", color = PreviewerSoftWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             }
         }
     }

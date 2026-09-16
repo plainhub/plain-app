@@ -23,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,6 +33,7 @@ import com.ismartcoding.plain.lib.extensions.formatMinSec
 import com.ismartcoding.plain.platform.hasPipMode
 import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewerSoftWhite
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.theme.darkMask
 import kotlinx.coroutines.delay
@@ -97,7 +97,7 @@ fun VideoPreviewActions(
                     text = videoState.currentTime.formatMinSec(),
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
+                    color = PreviewerSoftWhite,
                     textAlign = TextAlign.Center,
                 )
                 Box(modifier = Modifier.weight(1f).padding(horizontal = 4.dp)) {
@@ -113,7 +113,7 @@ fun VideoPreviewActions(
                     text = videoState.totalTime.formatMinSec(),
                     fontWeight = FontWeight.SemiBold,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
+                    color = PreviewerSoftWhite,
                     textAlign = TextAlign.Center,
                 )
                 // More button — opens FileInfoBottomSheet
@@ -150,7 +150,7 @@ private fun MoreIconButton(onClick: () -> Unit) {
             modifier = Modifier.size(18.dp),
             painter = painterResource(Res.drawable.ellipsis),
             contentDescription = stringResource(Res.string.more_info),
-            tint = Color.White,
+            tint = PreviewerSoftWhite,
         )
     }
 }
