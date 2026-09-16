@@ -45,6 +45,12 @@ internal fun ease(fraction: Float): Float = FastOutSlowInEasing.transform(fracti
 internal fun bezelColor(): Color =
     if (isDarkTheme()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
 
+/** Muted color for tiny mockup labels (5.5–8sp): onSurfaceVariant is illegible
+ *  at that size on dark surfaces, so dark lifts to the soft onSurface gray. */
+@Composable
+internal fun mockupMutedColor(): Color =
+    if (isDarkTheme()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+
 // Generated scenic thumbnails (composeResources/drawable/demo_photo_*.png) —
 // real-looking demo photos, never dot placeholders.
 internal fun demoPhotoRes(index: Int): DrawableResource = when (((index % 6) + 6) % 6) {

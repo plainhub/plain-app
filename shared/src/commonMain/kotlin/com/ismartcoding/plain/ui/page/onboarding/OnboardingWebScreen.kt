@@ -103,13 +103,13 @@ internal fun WebRail(activeIndex: Int, pressed: Boolean, modifier: Modifier = Mo
                 Icon(
                     painter = painterResource(section.icon),
                     contentDescription = null,
-                    tint = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = if (isActive) MaterialTheme.colorScheme.primary else mockupMutedColor(),
                     modifier = Modifier.size(11.dp),
                 )
                 Text(
                     text = stringResource(section.label),
                     fontSize = 7.sp,
-                    color = if (isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (isActive) MaterialTheme.colorScheme.primary else mockupMutedColor(),
                     maxLines = 1,
                 )
             }
@@ -205,7 +205,7 @@ private fun WebAudioList() {
             ) {
                 MiniMusicCover(size = 16.dp)
                 Text(text = "song_0${index + 1}.mp3", fontSize = 8.sp, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
-                Text(text = "3:4$index", fontSize = 7.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = "3:4$index", fontSize = 7.sp, color = mockupMutedColor())
             }
         }
     }
@@ -223,7 +223,7 @@ private fun MiniChatRow(fromMe: Boolean, name: String, time: String, text: Strin
         Column(modifier = Modifier.padding(start = 6.dp).weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(text = name, fontSize = 8.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                Text(text = time, fontSize = 7.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = time, fontSize = 7.sp, color = mockupMutedColor())
             }
             Text(
                 text = text,

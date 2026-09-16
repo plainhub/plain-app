@@ -62,21 +62,21 @@ internal fun AppHomeScreen() {
             Icon(
                 painter = painterResource(Res.drawable.pen),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = mockupMutedColor(),
                 modifier = Modifier.size(6.dp),
             )
             HorizontalSpace(dp = 5.dp)
             Icon(
                 painter = painterResource(Res.drawable.settings),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = mockupMutedColor(),
                 modifier = Modifier.size(9.dp),
             )
             HorizontalSpace(dp = 5.dp)
             Icon(
                 painter = painterResource(Res.drawable.scan_qr_code),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = mockupMutedColor(),
                 modifier = Modifier.size(9.dp),
             )
         }
@@ -161,7 +161,7 @@ internal fun AppHomeScreen() {
                     text = stringResource(Res.string.try_more_addresses),
                     fontSize = 5.5.sp,
                     lineHeight = 6.5.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = mockupMutedColor(),
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     modifier = Modifier.fillMaxWidth(),
@@ -190,7 +190,7 @@ internal fun AppHomeScreen() {
                     Icon(
                         painter = painterResource(Res.drawable.chevron_right),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        tint = mockupMutedColor(),
                         modifier = Modifier.size(8.dp),
                     )
                 }
@@ -226,7 +226,7 @@ internal fun AppHomeScreen() {
                     text = stringResource(Res.string.dlna_receiver_desc),
                     fontSize = 5.5.sp,
                     lineHeight = 6.5.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = mockupMutedColor(),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -286,13 +286,13 @@ private fun BottomNavItem(icon: DrawableResource, label: StringResource, selecte
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
-            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = if (selected) MaterialTheme.colorScheme.primary else mockupMutedColor(),
             modifier = Modifier.size(11.dp),
         )
         Text(
             text = stringResource(label),
             fontSize = 6.sp,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (selected) MaterialTheme.colorScheme.primary else mockupMutedColor(),
             maxLines = 1,
         )
     }

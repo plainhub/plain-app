@@ -86,7 +86,10 @@ internal fun DeviceLink(modifier: Modifier = Modifier) {
 
 // ---------- Device frames ----------
 
-/** Phone mockup frame (bezel + screen), screen background matches the app. */
+/** Phone mockup frame (bezel + screen), screen background matches the app.
+ *  Dark lifts the screen to surfaceContainerLowest so the screen reads as a
+ *  panel distinct from the page background, which shares the app background
+ *  color. 240dp keeps the bottom nav row fully inside the clip. */
 @Composable
 internal fun PhoneFrame(
     modifier: Modifier = Modifier,
@@ -95,10 +98,10 @@ internal fun PhoneFrame(
     Column(
         modifier = modifier
             .width(128.dp)
-            .height(224.dp)
+            .height(240.dp)
             .clip(RoundedCornerShape(16.dp))
             .border(3.dp, bezelColor(), RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.background),
+            .background(if (isDarkTheme()) MaterialTheme.colorScheme.surfaceContainerLowest else MaterialTheme.colorScheme.background),
     ) {
         content()
     }
@@ -149,14 +152,14 @@ internal fun BrowserFrame(
                 Icon(
                     painter = painterResource(Res.drawable.lock),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = mockupMutedColor(),
                     modifier = Modifier.size(8.dp),
                 )
                 Text(
                     text = "192.168.1.20",
                     fontSize = 8.sp,
                     lineHeight = 9.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = mockupMutedColor(),
                     maxLines = 1,
                 )
             }
