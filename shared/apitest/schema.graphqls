@@ -80,6 +80,7 @@ type Query {
   files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
   fileInfo(id: ID!, path: String!, fileName: String!): FileInfo!
   fileIds(paths: [String!]!): [String!]!
+  favoriteFolders: [FavoriteFolder!]!
 }
 
 """Mutation object"""
@@ -222,7 +223,7 @@ enum AccessFeatureType {
   PHONE_NUMBER
   APPS
   NOTIFICATIONS
-  CLIPBOARD_SYNC
+  CLIPBOARD
 }
 
 type ActionResult {
@@ -272,7 +273,6 @@ type App {
   internalStoragePath: String!
   downloadsDir: String!
   developerMode: Boolean!
-  clipboardSync: Boolean!
   favoriteFolders: [FavoriteFolder!]!
   debug: Boolean!
 }

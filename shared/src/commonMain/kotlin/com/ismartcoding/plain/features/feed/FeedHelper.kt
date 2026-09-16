@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.feed
 
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.platform.releaseAppFile
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedCount
@@ -51,7 +52,19 @@ object FeedHelper {
 
     suspend fun deleteAsync(ids: Set<String>) = withIO {
         ids.forEach { FeedWorkerState.clear(it) }
+        feedDao.getByIds(ids).forEach { feed ->
+            if (feed.logo.startsWith("fid:", ignoreCase = true)) {
+                releaseAppFile(feed.logo.removePrefix("fid:"))
+            }
+        }
         feedDao.delete(ids)
+    }
+
+    suspend fun updateLogoAsync(id: String, logo: String) = withIO {
+        feedDao.getById(id)?.let { item ->
+            item.logo = logo
+            feedDao.update(item)
+        }
     }
 
     /**

@@ -7,15 +7,20 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -52,11 +57,15 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.extensions.getFinalPath
+import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.enums.PickFileTag
@@ -78,7 +87,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.components.FeedEntryListItem
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.extensions.reset
@@ -95,6 +104,7 @@ import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
+import com.ismartcoding.plain.ui.theme.listItemTag
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -282,7 +292,6 @@ fun FeedEntriesPage(
                         } else if (itemsState.isNotEmpty()) {
                             LazyColumnScrollbar(state = scrollState) {
                                 LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection), state = scrollState) {
-                                    item(key = "top") { TopSpace() }
                                     val rows = buildFeedListRows(
                                         itemsState,
                                         feedsMap.value,
@@ -305,13 +314,12 @@ fun FeedEntriesPage(
                                             is FeedListRow.Entry -> item(key = row.key) {
                                                 val m = row.entry
                                                 val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
-                                                FeedEntryListItem(
-                                                    feedEntriesVM, m, feedsMap.value[m.feedId], tagsState.filter { tagIds.contains(it.id) },
+                                                FeedClusterEntryRow(
+                                                    row, feedEntriesVM, tagsState.filter { tagIds.contains(it.id) },
                                                     onClick = { if (feedEntriesVM.selectMode.value) feedEntriesVM.select(m.id) else { if (!m.read) feedEntriesVM.markRead(setOf(m.id)); pagerVM.setup(itemsState.map { it.id }); navController.navigate(Routing.FeedEntry(m.id)) } },
                                                     onLongClick = { if (!feedEntriesVM.selectMode.value) feedEntriesVM.selectedItem.value = m },
                                                     onClickTag = { tag -> if (!feedEntriesVM.selectMode.value) applyFilter("", FeedEntryFilterType.DEFAULT, tag) }
                                                 )
-                                                VerticalSpace(dp = 8.dp)
                                             }
                                             is FeedListRow.CollapsedDigest -> item(key = row.key) {
                                                 FeedClusterDigestRow(row, onToggle = {
@@ -403,7 +411,36 @@ private fun FeedEntriesDrawerContent(
             feedsState.forEach { feed ->
                 SidebarItem(
                     label = feed.name,
-                    icon = Res.drawable.rss,
+                    // Same identity as the list's cluster header: synced logo, or a
+                    // first-letter chip on primaryContainer until one exists.
+                    leading = {
+                        if (feed.logo.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = feed.name.take(1).uppercase(),
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        fontWeight = FontWeight.SemiBold,
+                                    ),
+                                )
+                            }
+                        } else {
+                            AsyncImage(
+                                model = feed.logo.getFinalPath(),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
+                                contentScale = ContentScale.Crop,
+                            )
+                        }
+                    },
                     isSelected = feedEntriesVM.feedId.value == feed.id,
                     onClick = { onSelect(feed.id, FeedEntryFilterType.DEFAULT, null) },
                     onLongClick = { feedsVM.selectedItem.value = feed },
@@ -460,7 +497,7 @@ private fun FeedDayHeaderRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background)
-            .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold))
@@ -480,6 +517,11 @@ private fun FeedDayHeaderRow(
     }
 }
 
+/**
+ * Per-feed cluster header, borderless and full-bleed: letter chip + name +
+ * counts. Collapse is expressed by the rotating chevron plus child rows
+ * indented to align under the feed name (16 margin + 32 chip + 8 gap = 56dp).
+ */
 @Composable
 private fun FeedClusterHeaderRow(
     row: FeedListRow.ClusterHeader,
@@ -488,24 +530,37 @@ private fun FeedClusterHeaderRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
             .clickable(onClick = onToggle)
             .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = row.feed?.name?.take(1)?.uppercase() ?: "#",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.SemiBold,
-                ),
+        val logo = row.feed?.logo
+        if (!logo.isNullOrEmpty()) {
+            AsyncImage(
+                model = logo.getFinalPath(),
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentDescription = row.feed?.name,
+                contentScale = ContentScale.Crop,
             )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = row.feed?.name?.take(1)?.uppercase() ?: "#",
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                )
+            }
         }
         HorizontalSpace(dp = 8.dp)
         Text(
@@ -517,17 +572,22 @@ private fun FeedClusterHeaderRow(
         )
         HorizontalSpace(dp = 8.dp)
         Text(
-            stringResource(Res.string.n_articles, row.count),
+            text = stringResource(Res.string.n_articles, row.count),
             style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+            maxLines = 1,
         )
         if (row.unreadCount > 0) {
             HorizontalSpace(dp = 8.dp)
             Text(
-                stringResource(Res.string.n_unread, row.unreadCount),
+                text = stringResource(Res.string.n_unread, row.unreadCount),
                 style = MaterialTheme.typography.labelMedium.copy(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontWeight = FontWeight.SemiBold,
                 ),
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(horizontal = 8.dp, vertical = 2.dp),
             )
         }
         HorizontalSpace(dp = 8.dp)
@@ -535,27 +595,122 @@ private fun FeedClusterHeaderRow(
             painter = painterResource(Res.drawable.chevron_right),
             contentDescription = null,
             modifier = Modifier
-                .size(16.dp)
+                .size(20.dp)
                 .rotate(if (row.collapsed) 0f else 90f),
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
 
+/**
+ * One entry as a full-bleed borderless row, indented under its cluster's feed
+ * name. Unread state is typography only: bold dark title vs muted regular.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FeedClusterEntryRow(
+    row: FeedListRow.Entry,
+    feedEntriesVM: FeedEntriesViewModel,
+    tags: List<DTag>,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    onClickTag: (DTag) -> Unit,
+) {
+    val m = row.entry
+    val unread = !m.read
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .padding(start = 56.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
+    ) {
+        if (feedEntriesVM.selectMode.value) {
+            CheckCircle(
+                selected = feedEntriesVM.selectedIds.contains(m.id),
+                onClick = { feedEntriesVM.select(m.id) },
+            )
+            HorizontalSpace(dp = 8.dp)
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = m.title,
+                style = if (unread) {
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                } else {
+                    MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+                maxLines = 2,
+            )
+            FlowRow(
+                modifier = Modifier.padding(top = 2.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                // The cluster header already names the feed; byline keeps author + time.
+                Text(
+                    text = arrayOf(m.author, m.publishedAt.timeAgo()).filter { it.isNotEmpty() }.joinToString(" · "),
+                    style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                )
+                tags.forEach { tag ->
+                    Text(
+                        text = "#" + tag.name,
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .align(Alignment.Bottom)
+                            .clickable { onClickTag(tag) },
+                        style = MaterialTheme.typography.listItemTag(),
+                    )
+                }
+            }
+        }
+        if (m.image.isNotEmpty()) {
+            HorizontalSpace(dp = 12.dp)
+            AsyncImage(
+                model = m.image.getFinalPath(),
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentDescription = m.image,
+                contentScale = ContentScale.Crop,
+            )
+        }
+    }
+}
+
+/**
+ * Collapsed cluster body: newest entry titles as plain indented text lines,
+ * full-bleed and tappable to expand. Unread titles bold, read titles muted.
+ */
 @Composable
 private fun FeedClusterDigestRow(
     row: FeedListRow.CollapsedDigest,
     onToggle: () -> Unit,
 ) {
-    Text(
-        text = stringResource(Res.string.latest_entry, row.entry.title),
-        style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
             .clickable(onClick = onToggle)
-            .padding(start = 48.dp, end = 16.dp, bottom = 12.dp),
-    )
+            .padding(start = 56.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
+    ) {
+        row.entries.forEachIndexed { index, entry ->
+            if (index > 0) VerticalSpace(dp = 4.dp)
+            Text(
+                text = entry.title,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = if (entry.read) FontWeight.Normal else FontWeight.SemiBold,
+                    color = if (entry.read) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
 }
-

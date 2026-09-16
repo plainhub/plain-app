@@ -59,7 +59,8 @@ fun ViewFeedEntryBottomSheet(
                 VerticalSpace(32.dp)
             }
             item {
-                PSheetPrimaryActionsCard {
+                // 3 actions in a 4-slot grid truncates "标记为已读"; widen the slots.
+                PSheetPrimaryActionsCard(slots = 3) {
                     if (!feedEntriesVM.showSearchBar.value) {
                         PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
                             feedEntriesVM.enterSelectMode()
@@ -67,12 +68,14 @@ fun ViewFeedEntryBottomSheet(
                             onDismiss()
                         }
                     }
+                    // Toggle in place: the sheet stays open and the action flips
+                    // to the opposite state via the updated selected copy.
                     PSheetPrimaryAction(
                         if (m.read) Res.drawable.circle_dot else Res.drawable.circle_check,
                         stringResource(if (m.read) Res.string.mark_as_unread else Res.string.mark_as_read),
                     ) {
+                        feedEntriesVM.selectedItem.value = m.copy(read = !m.read)
                         feedEntriesVM.markRead(setOf(m.id), !m.read)
-                        onDismiss()
                     }
                     PSheetPrimaryAction(
                         Res.drawable.delete_forever,

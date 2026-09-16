@@ -51,7 +51,7 @@ class FeedEntriesGroupingTest {
         val rows = buildFeedListRows(items, feeds, emptyMap(), tz, today)
         assertEquals(listOf("ClusterHeader", "CollapsedDigest"), rows.drop(1).map { it::class.simpleName })
         val digest = rows.filterIsInstance<FeedListRow.CollapsedDigest>().first()
-        assertEquals("1", digest.entry.id)
+        assertEquals(listOf("1", "2"), digest.entries.map { it.id })
         assertEquals("2026-09-16/a/digest", digest.key)
     }
 

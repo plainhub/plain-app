@@ -14,8 +14,10 @@ import com.ismartcoding.plain.platform.searchFilesInDir
 import com.ismartcoding.plain.platform.getRecentFiles
 import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.helpers.getFileId
+import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.httpserver.loaders.MountsLoader
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
+import com.ismartcoding.plain.httpserver.models.FavoriteFolder
 import com.ismartcoding.plain.httpserver.models.File
 import com.ismartcoding.plain.httpserver.models.FileInfo
 import com.ismartcoding.plain.httpserver.models.ID
@@ -75,6 +77,11 @@ suspend fun fileInfo(id: ID, path: String, fileName: String): FileInfo {
 @GraphQLQuery
 suspend fun fileIds(paths: List<String>): List<String> {
     return paths.map { getFileId(it) }
+}
+
+@GraphQLQuery
+suspend fun favoriteFolders(): List<FavoriteFolder> {
+    return FavoriteFoldersPreference.getValueAsync().map { it.toModel() }
 }
 
 fun SchemaBuilder.addFileQuerySchema() {

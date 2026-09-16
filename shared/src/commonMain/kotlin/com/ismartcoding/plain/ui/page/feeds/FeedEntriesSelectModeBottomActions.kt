@@ -56,9 +56,11 @@ fun FeedEntriesSelectModeBottomActions(
             }
             val selectedIds = feedEntriesVM.selectedIds.toSet()
             val anyUnread = feedEntriesVM.itemsFlow.collectAsState().value.any { it.id in selectedIds && !it.read }
+            // Short Gmail-style labels: the action bar scrolls horizontally and
+            // 4-5 char labels overflow it.
             PIconTextSmallButton(
                 icon = if (anyUnread) Res.drawable.circle_check else Res.drawable.circle_dot,
-                text = stringResource(if (anyUnread) Res.string.mark_as_read else Res.string.mark_as_unread),
+                text = stringResource(if (anyUnread) Res.string.read else Res.string.unread),
                 click = {
                     feedEntriesVM.markRead(selectedIds, anyUnread)
                     feedEntriesVM.exitSelectMode()

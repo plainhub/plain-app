@@ -205,12 +205,12 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 modifier = Modifier
-                                    .onGloballyPositioned { anchors[AccessFeatureType.CLIPBOARD_SYNC] = it.boundsInRoot() }
+                                    .onGloballyPositioned { anchors[AccessFeatureType.CLIPBOARD] = it.boundsInRoot() }
                                     .clickable { navController.navigate(Routing.ClipboardHistory) },
                                 icon = m.icon, title = stringResource(Res.string.clipboard_sync),
                                 separatedActions = true
                             ) {
-                                Box(Modifier.onGloballyPositioned { switches[AccessFeatureType.CLIPBOARD_SYNC] = it.boundsInRoot() }) {
+                                Box(Modifier.onGloballyPositioned { switches[AccessFeatureType.CLIPBOARD] = it.boundsInRoot() }) {
                                     PSwitch(activated = clipboardEnabled) { enable -> togglePermission(scope, m, enable) }
                                 }
                                 HorizontalSpace(8.dp)
@@ -291,7 +291,7 @@ private fun itemIndexFor(feature: AccessFeatureType, rows: List<PermissionItem>,
     var index = 2 + rows.size
     if (feature == AccessFeatureType.NOTIFICATIONS) return if (notificationsShown) index else null
     if (notificationsShown) index++
-    if (feature == AccessFeatureType.CLIPBOARD_SYNC) return index
+    if (feature == AccessFeatureType.CLIPBOARD) return index
     return null
 }
 
@@ -305,5 +305,5 @@ private fun bubbleLabel(feature: AccessFeatureType): String = when (feature) {
     AccessFeatureType.PHONE_NUMBER -> Permission.READ_PHONE_NUMBERS.getText()
     AccessFeatureType.APPS -> Permission.QUERY_ALL_PACKAGES.getText()
     AccessFeatureType.NOTIFICATIONS -> Permission.NOTIFICATION_LISTENER.getText()
-    AccessFeatureType.CLIPBOARD_SYNC -> stringResource(Res.string.clipboard_sync)
+    AccessFeatureType.CLIPBOARD -> stringResource(Res.string.clipboard_sync)
 }

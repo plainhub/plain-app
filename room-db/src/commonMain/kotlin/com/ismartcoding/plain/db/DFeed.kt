@@ -27,6 +27,9 @@ data class DFeed(
     var name: String = "",
     var url: String = "",
 
+    @androidx.room3.ColumnInfo(name = "logo", defaultValue = "")
+    var logo: String = "",
+
     @androidx.room3.ColumnInfo(name = "fetch_content")
     var fetchContent: Boolean = false,
 
@@ -84,6 +87,9 @@ interface FeedDao {
 
     @Query("SELECT * FROM feeds WHERE id=:id")
     suspend fun getById(id: String): DFeed?
+
+    @Query("SELECT * FROM feeds WHERE id in (:ids)")
+    suspend fun getByIds(ids: Set<String>): List<DFeed>
 
     @Query("SELECT * FROM feeds WHERE url=:url")
     suspend fun getByUrl(url: String): DFeed?

@@ -82,4 +82,6 @@
     <string name="latest_entry">Neueste: %1$s</string>
     <string name="mark_as_read">Als gelesen markieren</string>
     <string name="mark_as_unread">Als ungelesen markieren</string>
+    <string name="read">Gelesen</string>
+    <string name="unread">Ungelesen</string>
 </resources>

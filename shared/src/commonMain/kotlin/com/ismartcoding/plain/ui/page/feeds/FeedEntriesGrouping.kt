@@ -37,10 +37,17 @@ internal sealed interface FeedListRow {
         val collapsed: Boolean,
     ) : FeedListRow
 
-    data class Entry(override val key: String, val entry: DFeedEntry) : FeedListRow
+    data class Entry(
+        override val key: String,
+        val entry: DFeedEntry,
+    ) : FeedListRow
 
-    /** One-line "latest: …" digest representing a collapsed cluster. */
-    data class CollapsedDigest(override val key: String, val clusterKey: String, val entry: DFeedEntry) : FeedListRow
+    /** Title-only previews (newest first) representing a collapsed cluster. */
+    data class CollapsedDigest(
+        override val key: String,
+        val clusterKey: String,
+        val entries: List<DFeedEntry>,
+    ) : FeedListRow
 }
 
 internal enum class DayKind { TODAY, YESTERDAY, DATE }
@@ -81,9 +88,11 @@ internal fun buildFeedListRows(
             val collapsed = expandedOverrides[clusterKey] ?: (clusterUnread == 0)
             rows += FeedListRow.ClusterHeader(clusterKey, clusterKey, feeds[feedId], cluster.size, clusterUnread, collapsed)
             if (collapsed) {
-                rows += FeedListRow.CollapsedDigest("$clusterKey/digest", clusterKey, cluster.first())
+                rows += FeedListRow.CollapsedDigest("$clusterKey/digest", clusterKey, cluster.take(2))
             } else {
-                cluster.forEach { rows += FeedListRow.Entry(it.id, it) }
+                cluster.forEach { e ->
+                    rows += FeedListRow.Entry(e.id, e)
+                }
             }
         }
     }

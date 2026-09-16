@@ -14,5 +14,5 @@ enum class AccessFeatureType {
     PHONE_NUMBER,
     APPS,
     NOTIFICATIONS,
-    CLIPBOARD_SYNC,
+    CLIPBOARD,
 }

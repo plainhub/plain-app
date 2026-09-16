@@ -8,6 +8,7 @@ import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.helpers.launchSafe
+import kotlinx.coroutines.delay
 import com.ismartcoding.plain.platform.fetchContentAsync
 
 /**
@@ -38,21 +39,35 @@ class FeedEntryPagerViewModel : ViewModel() {
 
     suspend fun feedAsync(feedId: String): DFeed? = feeds.getOrPut(feedId) { FeedHelper.getById(feedId) }
 
+    /** Mark an entry read while paging: persist immediately, keep the row cache in sync. */
+    fun markRead(id: String) {
+        entries[id]?.let { it.read = true }
+        viewModelScope.launchSafe { FeedEntryHelper.markReadAsync(setOf(id)) }
+    }
+
     fun cachedContent(id: String): String = contents[id] ?: entries[id]?.content ?: ""
 
     fun cacheContent(id: String, content: String) {
         if (content.isNotEmpty()) contents[id] = content
     }
 
+    private var latestPreloadId: String? = null
+
     // Cache DB rows for ±2 neighbors so a swipe needs no I/O, and prefetch the
     // full web content of the ±1 neighbors when the feed has fetchContent
-    // enabled and no full content is stored yet.
+    // enabled and no full content is stored yet. The content prefetch is heavy
+    // (network fetch + readability extraction + image import), so it only starts
+    // after the reader has settled on a page for a moment — a swipe burst must
+    // never compete with frame rendering.
     fun preloadAroundAsync(id: String) {
+        latestPreloadId = id
         viewModelScope.launchSafe {
             val i = ids.indexOf(id)
             if (i < 0) return@launchSafe
             val rowNeighbors = listOfNotNull(ids.getOrNull(i - 2), ids.getOrNull(i - 1), ids.getOrNull(i + 1), ids.getOrNull(i + 2))
             rowNeighbors.forEach { neighbor -> entryAsync(neighbor) }
+            delay(1000)
+            if (latestPreloadId != id) return@launchSafe
             listOfNotNull(ids.getOrNull(i - 1), ids.getOrNull(i + 1)).forEach { neighbor ->
                 val m = entries[neighbor] ?: return@forEach
                 if (m.content.isNotEmpty()) return@forEach

@@ -82,4 +82,6 @@
     <string name="latest_entry">最新：%1$s</string>
     <string name="mark_as_read">標記為已讀</string>
     <string name="mark_as_unread">標記為未讀</string>
+    <string name="read">已讀</string>
+    <string name="unread">未讀</string>
 </resources>

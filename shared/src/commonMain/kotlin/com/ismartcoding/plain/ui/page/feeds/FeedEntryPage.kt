@@ -136,6 +136,8 @@ fun FeedEntryPage(
         feedEntryVM.content.value = ""
         feedEntryVM.fetchingContent.value = false
         val m = pagerVM.entryAsync(pageId) ?: return@LaunchedEffect
+        // Swiping onto an article reads it, same as tapping it in the list.
+        if (!m.read) pagerVM.markRead(pageId)
         feedEntryVM.item.value = m
         feedEntryVM.feed.value = pagerVM.feedAsync(m.feedId)
         feedEntryVM.content.value = m.content

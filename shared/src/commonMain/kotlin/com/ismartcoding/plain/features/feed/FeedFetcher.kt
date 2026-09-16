@@ -12,6 +12,7 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.NetworkType
 import com.ismartcoding.plain.platform.fetchContentAsync
+import com.ismartcoding.plain.platform.fetchFeedLogoAsync
 import com.ismartcoding.plain.platform.fetchRssChannel
 import com.ismartcoding.plain.platform.getNetworkType
 import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference
@@ -91,6 +92,9 @@ object FeedFetcher {
                 inserted.chunked(4).forEach {
                     it.pmap { f -> f.fetchContentAsync() }
                 }
+            }
+            if (feed.logo.isEmpty()) {
+                fetchFeedLogoAsync(feed, syndFeed)
             }
             FeedWorkerState.errorMap.remove(feed.id)
             // Persist before the status event: event listeners reload from the DB.

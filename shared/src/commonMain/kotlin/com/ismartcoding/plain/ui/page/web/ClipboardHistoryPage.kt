@@ -113,7 +113,6 @@ fun ClipboardHistoryPage(
                                     LocaleHelper.getString(Res.string.clipboard_history),
                                     entry.text,
                                 )
-                                DialogHelper.showTextCopiedMessage(entry.text)
                             },
                             onDelete = { scope.launch { vm.deleteAsync(entry.id) } }
                         )
