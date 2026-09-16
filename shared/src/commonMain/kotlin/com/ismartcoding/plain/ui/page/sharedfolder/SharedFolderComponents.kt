@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,6 +33,7 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.FileEntryThumb
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.painterResource
@@ -137,7 +137,7 @@ internal fun EntryRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (selectMode) {
-                Checkbox(checked = selected, onCheckedChange = null)
+                CheckCircle(selected = selected)
                 Box(modifier = Modifier.size(8.dp))
             }
             FileEntryThumb(

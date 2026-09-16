@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,6 +44,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -135,7 +135,7 @@ fun ZipFilePage(
                         PDropdownMenuItem(
                             text = { Text(stringResource(Res.string.show_hidden_files)) },
                             leadingIcon = {
-                                Checkbox(checked = showHiddenFiles, onCheckedChange = null)
+                                CheckCircle(selected = showHiddenFiles)
                             },
                             onClick = {
                                 dismiss()

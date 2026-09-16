@@ -1,11 +1,13 @@
 package com.ismartcoding.plain.ui.page.onboarding
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -109,6 +112,7 @@ internal fun WebRail(activeIndex: Int, pressed: Boolean, modifier: Modifier = Mo
                 Text(
                     text = stringResource(section.label),
                     fontSize = 7.sp,
+                    lineHeight = 8.sp,
                     color = if (isActive) MaterialTheme.colorScheme.primary else mockupMutedColor(),
                     maxLines = 1,
                 )
@@ -196,38 +200,72 @@ private fun WebVideoGrid() {
 
 @Composable
 private fun WebAudioList() {
-    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+    // Mirrors plain-desktop audios list: numbered selectable-card rows
+    // (surface-container-low, radius 8) with cover, title, size·duration
+    // subtitle and right-aligned age.
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         repeat(4) { index ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(MaterialTheme.colorScheme.cardBackgroundNormal)
+                    .padding(start = 5.dp, end = 6.dp, top = 4.dp, bottom = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
-                MiniMusicCover(size = 16.dp)
-                Text(text = "song_0${index + 1}.mp3", fontSize = 8.sp, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
-                Text(text = "3:4$index", fontSize = 7.sp, color = mockupMutedColor())
+                Text(
+                    text = "${index + 1}",
+                    fontSize = 6.5.sp,
+                    lineHeight = 7.5.sp,
+                    color = mockupMutedColor(),
+                )
+                MiniMusicCover(size = 22.dp)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "song_0${index + 1}.mp3",
+                        fontSize = 8.sp,
+                        lineHeight = 9.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(text = "${index + 3}.2 MB", fontSize = 6.5.sp, lineHeight = 7.5.sp, color = mockupMutedColor())
+                        Text(text = "3:4$index", fontSize = 6.5.sp, lineHeight = 7.5.sp, color = mockupMutedColor())
+                    }
+                }
+                Text(
+                    text = "${index + 1}d",
+                    fontSize = 6.5.sp,
+                    lineHeight = 7.5.sp,
+                    color = mockupMutedColor(),
+                )
             }
         }
     }
 }
 
-/** One chat message row, mirroring the app ChatListItem layout. */
+/** One chat message row, mirroring plain-desktop .chat-item: full-width row
+ *  with name + time header over the text; self messages carry the 4px
+ *  primary left border instead of bubbles. */
 @Composable
 private fun MiniChatRow(fromMe: Boolean, name: String, time: String, text: String) {
     Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
         if (fromMe) {
             Box(Modifier.width(3.dp).fillMaxHeight().background(MaterialTheme.colorScheme.primary))
+            HorizontalSpace(dp = 6.dp)
         } else {
-            HorizontalSpace(dp = 3.dp)
+            HorizontalSpace(dp = 9.dp)
         }
-        Column(modifier = Modifier.padding(start = 6.dp).weight(1f)) {
+        Column(modifier = Modifier.padding(end = 6.dp, top = 2.dp, bottom = 2.dp).weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = name, fontSize = 8.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                Text(text = time, fontSize = 7.sp, color = mockupMutedColor())
+                Text(text = name, fontSize = 8.sp, lineHeight = 9.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+                Text(text = time, fontSize = 6.5.sp, lineHeight = 7.5.sp, color = mockupMutedColor())
             }
             Text(
                 text = text,
                 fontSize = 8.sp,
+                lineHeight = 9.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -237,9 +275,47 @@ private fun MiniChatRow(fromMe: Boolean, name: String, time: String, text: Strin
 
 @Composable
 private fun WebChatPreview() {
-    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-        MiniChatRow(fromMe = false, name = "MacBook", time = "09:41", text = stringResource(Res.string.onboarding_3_bubble_in))
-        MiniChatRow(fromMe = true, name = stringResource(Res.string.me), time = "09:42", text = stringResource(Res.string.onboarding_3_bubble_out))
-        MiniChatRow(fromMe = true, name = stringResource(Res.string.me), time = "09:43", text = stringResource(Res.string.onboarding_3_msg_sent))
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = "09/16",
+            fontSize = 6.5.sp,
+            lineHeight = 7.5.sp,
+            color = mockupMutedColor(),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 3.dp),
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            MiniChatRow(fromMe = false, name = "MacBook", time = "09:41", text = stringResource(Res.string.onboarding_3_bubble_in))
+            MiniChatRow(fromMe = true, name = stringResource(Res.string.me), time = "09:42", text = stringResource(Res.string.onboarding_3_bubble_out))
+            MiniChatRow(fromMe = true, name = stringResource(Res.string.me), time = "09:43", text = stringResource(Res.string.onboarding_3_msg_sent))
+        }
+        Spacer(Modifier.weight(1f))
+        // Composer mirroring ChatInput: outlined field with image/folder
+        // actions and the send button.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(6.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(6.dp))
+                .padding(horizontal = 6.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.chat_input_hint),
+                fontSize = 8.sp,
+                lineHeight = 9.sp,
+                color = mockupMutedColor(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Icon(
+                painter = painterResource(Res.drawable.send),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(10.dp),
+            )
+        }
     }
 }

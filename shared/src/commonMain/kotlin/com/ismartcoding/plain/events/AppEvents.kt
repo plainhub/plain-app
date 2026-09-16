@@ -14,6 +14,7 @@ import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.BookmarkHelper
+import com.ismartcoding.plain.features.getGrantedWebPermissionsAsync
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermissionResultEvent
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
@@ -215,8 +216,11 @@ object AppEvents {
                                 restartAudioIfPlaying()
                             }
                         }
-                        // Push permission changes to web clients so they refetch the app query.
-                        sendEvent(WebSocketEvent(EventType.PERMISSIONS_UPDATED, jsonEncode(event.map)))
+                        // Push the new permission snapshot to web clients so they
+                        // refetch the app query.
+                        coIO {
+                            sendEvent(WebSocketEvent(EventType.PERMISSIONS_UPDATED, jsonEncode(getGrantedWebPermissionsAsync())))
+                        }
                     }
 
                     is StartHttpServerEvent -> {

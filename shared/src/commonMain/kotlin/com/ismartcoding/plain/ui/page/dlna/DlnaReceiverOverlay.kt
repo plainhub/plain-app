@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +36,7 @@ import com.ismartcoding.plain.platform.createDownloadTempFile
 import com.ismartcoding.plain.platform.fetchUrlToStream
 import com.ismartcoding.plain.platform.createFileWriteHandle
 import com.ismartcoding.plain.platform.saveTempFileToDownloads
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -81,10 +81,7 @@ private fun DlnaCastRequestDialog() {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Checkbox(
-                        checked = rememberChoice,
-                        onCheckedChange = { rememberChoice = it },
-                    )
+                    CheckCircle(selected = rememberChoice, onClick = { rememberChoice = !rememberChoice })
                     Text(
                         text = stringResource(Res.string.dlna_cast_remember_choice),
                         style = MaterialTheme.typography.bodyMedium,

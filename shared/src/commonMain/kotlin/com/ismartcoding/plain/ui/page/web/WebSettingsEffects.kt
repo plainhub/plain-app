@@ -5,12 +5,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.coIO
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
+import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.PermissionItem
+import com.ismartcoding.plain.features.getGrantedWebPermissionsAsync
 import com.ismartcoding.plain.features.getWebList
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.isGranted
@@ -63,6 +67,10 @@ internal fun WebSettingsEffects(
 internal fun togglePermission(scope: CoroutineScope, m: PermissionItem, enable: Boolean) {
     scope.launch {
         ApiPermissionsPreference.putAsync(m.permission, enable)
+        // The web `permissions` list is backed by this preference and toggling
+        // a switch never produces a PermissionsResultEvent — push the fresh
+        // snapshot so web clients refetch.
+        sendEvent(WebSocketEvent(EventType.PERMISSIONS_UPDATED, jsonEncode(getGrantedWebPermissionsAsync())))
         if (m.permission == Permission.NOTIFICATION_LISTENER) {
             val webEnabled = DesktopAccessPreference.getAsync()
             toggleNotificationListener(enable && webEnabled)

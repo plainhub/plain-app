@@ -44,3 +44,22 @@ fun getWebList(): List<PermissionItem> {
     }
     return list
 }
+
+/**
+ * The authoritative web-facing permission snapshot — the same list the
+ * `app.permissions` GraphQL field returns. PERMISSIONS_UPDATED websocket
+ * events carry this shape: a state snapshot, not a change set — clients
+ * converge to it and derive enable/disable by diffing with their previous
+ * snapshot.
+ */
+suspend fun getGrantedWebPermissionsAsync(): List<Permission> {
+    val apiPermissions = ApiPermissionsPreference.getAsync()
+    val granted = Permission.entries.filter { apiPermissions.contains(it.name) && it.isGranted() }.toMutableList()
+    if (Permission.RECORD_AUDIO.isGranted() && !granted.contains(Permission.RECORD_AUDIO)) {
+        granted.add(Permission.RECORD_AUDIO)
+    }
+    if (Permission.ADB.isGranted() && !granted.contains(Permission.ADB)) {
+        granted.add(Permission.ADB)
+    }
+    return granted
+}

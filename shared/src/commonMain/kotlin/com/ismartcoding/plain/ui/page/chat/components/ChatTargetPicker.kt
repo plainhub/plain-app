@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,9 +32,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.check
 import com.ismartcoding.plain.i18n.send
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.CheckCircle
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -128,28 +127,6 @@ private fun TargetRow(option: ChatTargetOption, selected: Boolean, enabled: Bool
         }
         Spacer(modifier = Modifier.width(12.dp))
         CheckCircle(selected = selected)
-    }
-}
-
-@Composable
-private fun CheckCircle(selected: Boolean) {
-    val color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
-    Box(
-        modifier = Modifier
-            .size(24.dp)
-            .clip(CircleShape)
-            .background(if (selected) MaterialTheme.colorScheme.primary else Color.Transparent)
-            .border(width = 1.5.dp, color = color, shape = CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (selected) {
-            Icon(
-                painter = painterResource(Res.drawable.check),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(14.dp),
-            )
-        }
     }
 }
 

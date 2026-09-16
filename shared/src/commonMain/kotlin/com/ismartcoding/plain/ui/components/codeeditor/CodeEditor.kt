@@ -118,10 +118,10 @@ private fun EditorViewport(controller: EditorController, colors: EditorSyntaxCol
 
     LazyColumn(
         state = controller.listState,
-        modifier = Modifier.fillMaxWidth().onSizeChanged { size ->
-            controller.viewportWidthPx = size.width.toFloat()
-            controller.syncPan()
-        },
+            modifier = Modifier.fillMaxWidth().onSizeChanged { size ->
+                controller.pannableWidthPx = size.width.toFloat() - with(density) { gutterWidth.toPx() }
+                controller.syncPan()
+            },
     ) {
         items(controller.visualCount()) { visual ->
             EditorRow(
@@ -157,6 +157,7 @@ private fun EditorRow(
     controller.highlightVersion.value
     controller.matchesVersion.value
     controller.mapperVersion.value
+    val density = LocalDensity.current
     val selection = controller.selection.value?.normalized()
     val line = controller.rowLine(visual)
     val chunk = controller.rowChunk(visual)
@@ -172,9 +173,14 @@ private fun EditorRow(
     }
 
     layout?.let { l ->
-        if (!wrap && l.size.width.toFloat() > contentWidthPx.value) {
-            contentWidthPx.value = l.size.width.toFloat()
-            controller.syncPan()
+        if (!wrap) {
+            // Track the widest row including the trailing pad, so the pan bound stops the
+            // text 8dp short of the cell's right edge instead of clipping it flush.
+            val fullWidth = l.size.width + with(density) { RowTrailingPad.toPx() }
+            if (fullWidth > contentWidthPx.value) {
+                contentWidthPx.value = fullWidth
+                controller.syncPan()
+            }
         }
     }
 
@@ -256,7 +262,7 @@ private fun EditorRow(
                     Modifier
                         .wrapContentWidth(Alignment.Start, unbounded = true)
                         .offset { IntOffset(-controller.hPanOffset.floatValue.roundToInt(), 0) }
-                        .padding(end = 16.dp)
+                        .padding(end = RowTrailingPad)
                 },
             )
             val l = layout
@@ -324,3 +330,6 @@ private fun buildRowText(
 
 private val MatchBg = Color(0x24D9A514)
 private val MatchCurrentBg = Color(0x59D9A514)
+
+/** Trailing space kept after the text in no-wrap mode, also part of the pan bound. */
+private val RowTrailingPad = 8.dp

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +20,7 @@ import com.ismartcoding.plain.platform.DNotificationApp
 import com.ismartcoding.plain.platform.getAppIcon
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.CheckCircle
 
 @Composable
 internal fun AppSelectorItem(
@@ -69,9 +69,6 @@ internal fun AppSelectorItem(
 
         HorizontalSpace(dp = 12.dp)
 
-        Checkbox(
-            checked = isSelected,
-            onCheckedChange = { onToggleSelection() }
-        )
+        CheckCircle(selected = isSelected, onClick = { onToggleSelection() })
     }
 }

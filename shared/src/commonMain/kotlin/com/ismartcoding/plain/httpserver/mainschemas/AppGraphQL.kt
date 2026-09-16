@@ -12,8 +12,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.events.HOpenAccessibilitySettingsEvent
 import com.ismartcoding.plain.events.HOpenWebSettingsEvent
-import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.platform.isGranted
+import com.ismartcoding.plain.features.getGrantedWebPermissionsAsync
 import com.ismartcoding.plain.platform.appDir
 import com.ismartcoding.plain.platform.getBattery
 import com.ismartcoding.plain.platform.getDeviceInfo
@@ -29,7 +28,6 @@ import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.ApiPermissionsPreference
 import com.ismartcoding.plain.preferences.ClipboardSyncPreference
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference
@@ -56,14 +54,7 @@ suspend fun battery(): Battery {
 @OptIn(ExperimentalEncodingApi::class)
 @GraphQLQuery
 suspend fun app(): App {
-    val apiPermissions = ApiPermissionsPreference.getAsync()
-    val grantedPermissions = Permission.entries.filter { apiPermissions.contains(it.name) && it.isGranted() }.toMutableList()
-    if (Permission.RECORD_AUDIO.isGranted() && !grantedPermissions.contains(Permission.RECORD_AUDIO)) {
-        grantedPermissions.add(Permission.RECORD_AUDIO)
-    }
-    if (Permission.ADB.isGranted() && !grantedPermissions.contains(Permission.ADB)) {
-        grantedPermissions.add(Permission.ADB)
-    }
+    val grantedPermissions = getGrantedWebPermissionsAsync()
     return App(
         clientId = TempData.clientId,
         usbConnected = isUsbConnected(),

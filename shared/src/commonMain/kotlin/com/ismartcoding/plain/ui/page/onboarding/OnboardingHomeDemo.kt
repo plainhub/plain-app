@@ -52,19 +52,24 @@ internal fun AppHomeScreen() {
             modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 6.dp, top = 5.dp, bottom = 3.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = "Pixel 9",
-                fontSize = 8.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                modifier = Modifier.weight(1f),
-            )
-            Icon(
-                painter = painterResource(Res.drawable.pen),
-                contentDescription = null,
-                tint = mockupMutedColor(),
-                modifier = Modifier.size(6.dp),
-            )
+            // Title group mirrors TopBarHome: pen rename icon follows the
+            // device name; settings/scan are the far-right actions.
+            Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Pixel 9",
+                    fontSize = 8.sp,
+                    lineHeight = 9.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                )
+                HorizontalSpace(dp = 2.dp)
+                Icon(
+                    painter = painterResource(Res.drawable.pen),
+                    contentDescription = null,
+                    tint = mockupMutedColor(),
+                    modifier = Modifier.size(6.dp),
+                )
+            }
             HorizontalSpace(dp = 5.dp)
             Icon(
                 painter = painterResource(Res.drawable.settings),
@@ -292,6 +297,7 @@ private fun BottomNavItem(icon: DrawableResource, label: StringResource, selecte
         Text(
             text = stringResource(label),
             fontSize = 6.sp,
+            lineHeight = 7.sp,
             color = if (selected) MaterialTheme.colorScheme.primary else mockupMutedColor(),
             maxLines = 1,
         )

@@ -46,8 +46,9 @@ fun TextFilePage(
 ) {
     var isSaving by remember { mutableStateOf(false) }
     var showDiscardConfirm by remember { mutableStateOf(false) }
+    // Close affordances in edit mode (X / back) exit edit mode, not the page.
     fun requestClose() {
-        if (textFileVM.controller.isDirty.value) showDiscardConfirm = true else navController.navigateUp()
+        if (textFileVM.controller.isDirty.value) showDiscardConfirm = true else textFileVM.exitEditMode(discard = false)
     }
     val rotation by animateFloatAsState(
         targetValue = if (isSaving) 360f else 0f,
@@ -79,7 +80,6 @@ fun TextFilePage(
                 androidx.compose.material3.TextButton(onClick = {
                     showDiscardConfirm = false
                     textFileVM.exitEditMode(discard = true)
-                    navController.navigateUp()
                 }) { Text(stringResource(Res.string.ok)) }
             },
             dismissButton = {

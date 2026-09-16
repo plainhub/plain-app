@@ -1,19 +1,13 @@
 package com.ismartcoding.plain.ui.page.files
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
 import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,6 +45,9 @@ import kotlinx.coroutines.launch
 fun FileInfoBottomSheet(filesVM: FilesViewModel) {
     val scope = rememberCoroutineScope()
     val file = filesVM.selectedFile.value ?: return
+    // Scoped to this sheet instance: a fresh long-press always starts with the dialog
+    // closed, so a stale flag can never pop rename together with the sheet.
+    val showRenameDialog = remember { mutableStateOf(false) }
     var isFavorite by remember { mutableStateOf(false) }
     val onDismiss = { filesVM.selectedFile.value = null }
 
@@ -60,9 +57,9 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
         }
     }
 
-    if (filesVM.showRenameDialog.value) {
+    if (showRenameDialog.value) {
         FileRenameDialog(path = file.path, onDismiss = {
-            filesVM.showRenameDialog.value = false
+            showRenameDialog.value = false
         }, onRename = { p, name -> renameAndScanFile(p, name) }, onRenamed = {
             file.name = it.getFilenameFromPath()
             file.path = it
@@ -78,19 +75,11 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PSheetHeader(
                         thumbnail = {
-                            Box(
-                                modifier = Modifier
-                                    .size(44.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                AsyncImage(
-                                    model = if (file.isDir) getFileIconPath("folder") else getFileIconPath(file.path.getFilenameExtension()),
-                                    contentDescription = file.name,
-                                    modifier = Modifier.size(32.dp),
-                                )
-                            }
+                            AsyncImage(
+                                model = if (file.isDir) getFileIconPath("folder") else getFileIconPath(file.path.getFilenameExtension()),
+                                contentDescription = file.name,
+                                modifier = Modifier.size(44.dp),
+                            )
                         },
                         title = file.name,
                         subtitle = if (file.isDir) {
@@ -119,7 +108,7 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                             filesVM.favoriteFoldersVersion.value++
                         }
                     },
-                    showRenameDialog = filesVM.showRenameDialog,
+                    showRenameDialog = showRenameDialog,
                     scope = scope, onDismiss = onDismiss,
                 )
                 VerticalSpace(12.dp)

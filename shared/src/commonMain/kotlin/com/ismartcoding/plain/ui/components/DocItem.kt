@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -53,9 +52,7 @@ fun DocItem(
     Row {
         if (dragSelectState.selectMode) {
             HorizontalSpace(dp = 16.dp)
-            Checkbox(checked = dragSelectState.isSelected(m.id), onCheckedChange = {
-                dragSelectState.select(m.id)
-            })
+            CheckCircle(selected = dragSelectState.isSelected(m.id), onClick = { dragSelectState.select(m.id) })
         }
         Surface(
             modifier =

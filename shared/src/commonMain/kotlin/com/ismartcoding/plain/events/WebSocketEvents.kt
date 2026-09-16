@@ -69,6 +69,8 @@ enum class EventType(val value: Int) {
     MMS_SEND_RESULT(37),
     UPLOAD_MERGE_RESULT(38),
     CLIPBOARD_CHANGED(39),
+    // Payload: JSON array of granted permission names — a state snapshot
+    // identical to the `app.permissions` GraphQL field (not a change set).
     PERMISSIONS_UPDATED(40),
 }
 

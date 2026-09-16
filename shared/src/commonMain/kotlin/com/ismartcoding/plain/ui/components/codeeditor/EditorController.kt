@@ -78,13 +78,15 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
 
     val listState = LazyListState()
     val contentWidthPx = mutableStateOf(0f)
-    var viewportWidthPx = 0f
+    // Width of the pannable text cell (viewport minus gutter); the pan bound must use this,
+    // not the full viewport, so fully-panned lines stop short of the screen edge.
+    var pannableWidthPx = 0f
     val hPan = HorizontalPan()
     val hPanOffset = androidx.compose.runtime.mutableFloatStateOf(0f)
     val mapper = VisualLineMapper()
 
     fun syncPan() {
-        if (hPan.updateBounds(contentWidthPx.value, viewportWidthPx)) {
+        if (hPan.updateBounds(contentWidthPx.value, pannableWidthPx)) {
             hPanOffset.floatValue = hPan.offsetPx
         }
     }
@@ -308,6 +310,7 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
             onDocChanged(0)
         }
         snapshot = d.snapshot()
+        isDirty.value = false
         readOnly.value = true
         selection.value = null
         setActive(0, 0)

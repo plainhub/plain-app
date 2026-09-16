@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +41,7 @@ import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import org.jetbrains.compose.resources.pluralStringResource
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.FileEntryThumb
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.platform.TransformImageView
@@ -108,7 +108,7 @@ fun FileListItem(
             contentAlignment = Alignment.Center) {
             Row(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 if (isSelectMode) {
-                    Checkbox(checked = isSelected, onCheckedChange = null)
+                    CheckCircle(selected = isSelected)
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 FileListItemThumbnail(file, itemState, previewerState, density)

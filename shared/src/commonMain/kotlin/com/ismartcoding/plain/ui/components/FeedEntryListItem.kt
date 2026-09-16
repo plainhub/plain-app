@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,9 +53,7 @@ fun FeedEntryListItem(
     Row {
         if (feedEntriesVM.selectMode.value) {
             HorizontalSpace(dp = 16.dp)
-            Checkbox(checked = feedEntriesVM.selectedIds.contains(m.id), onCheckedChange = {
-                feedEntriesVM.select(m.id)
-            })
+            CheckCircle(selected = feedEntriesVM.selectedIds.contains(m.id), onClick = { feedEntriesVM.select(m.id) })
         }
 
         Surface(

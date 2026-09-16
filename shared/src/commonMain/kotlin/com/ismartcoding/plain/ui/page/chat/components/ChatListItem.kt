@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +34,7 @@ import com.ismartcoding.plain.db.MessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModelBase
 import com.ismartcoding.plain.chat.ChatViewModel
@@ -82,8 +82,9 @@ fun ChatListItem(
                 HorizontalSpace(dp = 4.dp)
             }
             if (chatVM.selectMode.value) {
-                HorizontalSpace(dp = 16.dp)
-                Checkbox(checked = chatVM.selectedIds.contains(m.id), onCheckedChange = { chatVM.select(m.id) })
+                Box(modifier = Modifier.padding(start = 16.dp, top = 8.dp)) {
+                    CheckCircle(selected = chatVM.selectedIds.contains(m.id), onClick = { chatVM.select(m.id) })
+                }
             }
             Box(modifier = Modifier.weight(1f)) {
                 Column(

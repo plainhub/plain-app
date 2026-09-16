@@ -4,7 +4,6 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +15,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.PulsatingWave
 
 @Composable
@@ -33,10 +33,7 @@ fun AudioListItemLeadingIcon(
         contentAlignment = Alignment.Center
     ) {
         if (dragSelectState.selectMode) {
-            Checkbox(
-                checked = dragSelectState.isSelected(item.id),
-                onCheckedChange = { dragSelectState.select(item.id) }
-            )
+            CheckCircle(selected = dragSelectState.isSelected(item.id), onClick = { dragSelectState.select(item.id) })
         } else if (castMode) {
             Box(
                 modifier = Modifier.size(40.dp),

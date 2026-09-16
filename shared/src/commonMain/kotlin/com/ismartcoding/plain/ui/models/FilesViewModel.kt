@@ -70,7 +70,6 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     init { breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), rootPath)) }
 
     val selectedFile = mutableStateOf<DFile?>(null)
-    val showRenameDialog = mutableStateOf(false)
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")
