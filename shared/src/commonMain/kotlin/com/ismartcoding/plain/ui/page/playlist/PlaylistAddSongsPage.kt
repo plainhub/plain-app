@@ -146,9 +146,10 @@ fun PlaylistAddSongsPage(
             }
             item { VerticalSpace(24.dp) }
         }
+        val changed = selected != existing
         PFilledButton(
             text = LocaleHelper.getStringF(Res.string.add_n_songs, selected.size),
-            enabled = selected.isNotEmpty(),
+            enabled = changed,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp),

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.audioplayer.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -30,6 +32,7 @@ import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import com.ismartcoding.plain.ui.components.PulsatingWave
+import com.ismartcoding.plain.ui.page.audio.components.AudioCoverOrIcon
 
 /**
  * Mini player bar: cover + title/artist + skip-next + play/pause + queue,
@@ -53,8 +56,10 @@ fun AudioPlayerBarCard(
             .navigationBarsPadding()
             .padding(start = 12.dp, end = 12.dp, bottom = 10.dp)
             .fillMaxWidth()
+            .shadow(elevation = 6.dp, shape = RoundedCornerShape(20.dp), clip = false)
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
             .clickable(onClick = onClickContent),
     ) {
         Row(
@@ -75,7 +80,7 @@ fun AudioPlayerBarCard(
                 contentAlignment = Alignment.Center,
             ) {
                 if (coverPath != null) {
-                    com.ismartcoding.plain.ui.page.audio.components.AudioCoverOrIcon(path = coverPath)
+                    AudioCoverOrIcon(path = coverPath)
                 } else {
                     Icon(
                         painter = painterResource(Res.drawable.music2),

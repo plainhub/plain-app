@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.page.playlist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,23 +40,24 @@ import com.ismartcoding.plain.db.DAudioPlaylistSong
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.ui.base.*
-import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.components.PlaylistNameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.audio.components.PlaylistCoverArtwork
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.enums.ButtonSize
+import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 private const val SORT_CUSTOM = 0
@@ -75,8 +78,6 @@ fun PlaylistDetailPage(
     audioPlaylistVM: AudioPlaylistViewModel,
 ) {
     val scope = rememberCoroutineScope()
-    val isAudioPlaying by audioIsPlayingFlow().collectAsState()
-
     var playlistName by remember { mutableStateOf("") }
     var songs by remember { mutableStateOf<List<DAudioPlaylistSong>>(listOf()) }
     var sort by remember { mutableIntStateOf(SORT_CUSTOM) }
@@ -108,7 +109,7 @@ fun PlaylistDetailPage(
         SORT_TITLE_DESC -> songs.sortedByDescending { it.title.lowercase() }
         else -> songs
     }
-    val totalMinutes = songs.sumOf { it.duration } / 60000
+    val totalMinutes = songs.sumOf { it.duration } / 60
 
     val renamedMsg = stringResource(Res.string.renamed)
     val deletedMsg = stringResource(Res.string.playlist_deleted)
@@ -129,7 +130,7 @@ fun PlaylistDetailPage(
         )
     }
     if (showDelete) {
-        androidx.compose.material3.AlertDialog(
+        AlertDialog(
             containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             onDismissRequest = { showDelete = false },
             title = { Text(stringResource(Res.string.delete_playlist)) },
@@ -145,8 +146,8 @@ fun PlaylistDetailPage(
             confirmButton = {
                 PFilledButton(
                     text = stringResource(Res.string.delete),
-                    type = com.ismartcoding.plain.enums.ButtonType.DANGER,
-                    buttonSize = com.ismartcoding.plain.enums.ButtonSize.SMALL,
+                    type = ButtonType.DANGER,
+                    buttonSize = ButtonSize.SMALL,
                     onClick = {
                         showDelete = false
                         scope.launch {
@@ -190,7 +191,10 @@ fun PlaylistDetailPage(
                 menuSong = null
                 scope.launch {
                     val start = withIO { AudioQueueManager.setPlaylistSource(playlistId, song.audioPath) }
-                    if (start != null) audioJustPlayWithNotificationCheck(start)
+                    if (start != null) {
+                        audioJustPlayWithNotificationCheck(start)
+                        audioPlaylistVM.onStarted(start)
+                    }
                 }
             }
             PSheetActionRow(Res.drawable.skip_next, stringResource(Res.string.play_next)) {
@@ -257,7 +261,7 @@ fun PlaylistDetailPage(
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp)) {
                     PFilledButton(
                         text = stringResource(Res.string.play_all),
-                        icon = org.jetbrains.compose.resources.painterResource(Res.drawable.play_arrow),
+                        icon = painterResource(Res.drawable.play_arrow),
                         modifier = Modifier.weight(1f),
                         onClick = {
                             scope.launch {
@@ -266,10 +270,10 @@ fun PlaylistDetailPage(
                             }
                         },
                     )
-                    Box(Modifier.width(12.dp))
+                    Spacer(Modifier.width(12.dp))
                     POutlinedButton(
                         text = stringResource(Res.string.shuffle_play),
-                        icon = org.jetbrains.compose.resources.painterResource(Res.drawable.shuffle),
+                        icon = painterResource(Res.drawable.shuffle),
                         modifier = Modifier.weight(1f),
                         onClick = {
                             scope.launch {
@@ -291,7 +295,10 @@ fun PlaylistDetailPage(
                         .clickable {
                             scope.launch {
                                 val start = withIO { AudioQueueManager.setPlaylistSource(playlistId, song.audioPath) }
-                                if (start != null) audioJustPlayWithNotificationCheck(start)
+                                if (start != null) {
+                                    audioJustPlayWithNotificationCheck(start)
+                                    audioPlaylistVM.onStarted(start)
+                                }
                             }
                         }
                         .padding(horizontal = 12.dp, vertical = 4.dp),
@@ -321,12 +328,12 @@ fun PlaylistDetailPage(
                             )
                         }
                         Text(
-                            text = formatDurationLabel(song.duration),
+                            text = song.duration.formatDuration(),
                             style = MaterialTheme.typography.listItemSubtitle(),
                             modifier = Modifier.padding(end = 4.dp),
                         )
                         Icon(
-                            painter = org.jetbrains.compose.resources.painterResource(Res.drawable.more_three_dots),
+                            painter = painterResource(Res.drawable.more_three_dots),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
@@ -341,9 +348,4 @@ fun PlaylistDetailPage(
             item(key = "bottom") { BottomSpace() }
         }
     }
-}
-
-private fun formatDurationLabel(durationMs: Long): String {
-    val totalSeconds = durationMs / 1000
-    return "${totalSeconds / 60}:" + (totalSeconds % 60).toString().padStart(2, '0')
 }

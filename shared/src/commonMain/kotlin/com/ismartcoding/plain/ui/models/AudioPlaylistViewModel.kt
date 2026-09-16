@@ -81,6 +81,12 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         sendEvent(ClearAudioPlaylistEvent())
     }
 
+    /** Sync UI state after playback was started from a queue source (engine is already playing). */
+    suspend fun onStarted(audio: DPlaylistAudio) {
+        setCurrentPlaying(audio.path)
+        refreshWindow()
+    }
+
     private suspend fun setCurrentPlaying(path: String) {
         AudioPlayingPreference.putAsync(path)
         selectedPath.value = path

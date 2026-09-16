@@ -63,7 +63,6 @@ fun AudioArtistPage(
     audioPlaylistVM: AudioPlaylistViewModel,
 ) {
     val scope = rememberCoroutineScope()
-    // Shared VMs so tags/cast/selection behave like the all-songs page.
     val audioVM: AudioViewModel = viewModel(key = "audioVM") { AudioViewModel() }
     val tagsVM: TagsViewModel = viewModel(key = "audioTagsVM") { TagsViewModel() }
     val castVM: CastViewModel = viewModel(key = "audioCastVM") { CastViewModel() }
@@ -92,7 +91,7 @@ fun AudioArtistPage(
             }
             val first = list.firstOrNull()?.toPlaylistAudio() ?: return@launch
             audioJustPlayWithNotificationCheck(first)
-            audioPlaylistVM.loadAsync()
+            audioPlaylistVM.onStarted(first)
         }
     }
 

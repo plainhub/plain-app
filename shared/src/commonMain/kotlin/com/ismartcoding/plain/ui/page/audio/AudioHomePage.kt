@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -76,6 +75,7 @@ import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.audio.components.PlaylistCoverArtwork
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
+import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.theme.listItemTitle
@@ -139,6 +139,7 @@ fun AudioHomePage(
     if (audioVM.showTagsDialog.value) {
         TagsBottomSheet(tagsVM) { audioVM.showTagsDialog.value = false }
     }
+    CastDialog(castVM)
 
     LaunchedEffect(Unit) {
         homeVM.loadAsync(audioVM)
@@ -187,6 +188,14 @@ fun AudioHomePage(
                 }
 
                 PullToRefresh(refreshLayoutState = topRefreshLayoutState, userEnable = !dragSelectState.selectMode, modifier = Modifier.weight(1f)) {
+                    // While the top search bar is active the home sections make no sense:
+                    // show the same flat results list as the all-songs page.
+                    if (audioVM.showSearchBar.value) {
+                        AudioPageList(
+                            scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
+                            tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues
+                        )
+                    } else {
                     LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
                         item(key = "pills") {
                             Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
@@ -198,7 +207,10 @@ fun AudioHomePage(
                                         scope.launch {
                                             coIO {
                                                 val start = AudioQueueManager.setLibrarySource(startPath = null, shuffle = true)
-                                                if (start != null) audioJustPlayWithNotificationCheck(start)
+                                                if (start != null) {
+                                                    audioJustPlayWithNotificationCheck(start)
+                                                    audioPlaylistVM.onStarted(start)
+                                                }
                                             }
                                         }
                                     },
@@ -253,8 +265,10 @@ fun AudioHomePage(
                                 isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == song.path,
                                 isInPlaylist = audioPlaylistVM.isInPlaylist(song.path),
                             )
+                            VerticalSpace(dp = 8.dp)
                         }
                         item(key = "bottom") { BottomSpace(paddingValues) }
+                    }
                     }
                 }
             }
@@ -321,6 +335,7 @@ private fun ArtistsRow(artists: List<com.ismartcoding.plain.ui.models.AudioHomeA
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
                     .clickable { onArtistClick(artist) }
                     .padding(4.dp)
                     .width(68.dp),
@@ -354,6 +369,7 @@ private fun PlaylistsRow(
             Column(
                 modifier = Modifier
                     .width(132.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .clickable { onPlaylistClick(pl to count) }
                     .padding(4.dp),
             ) {
