@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">L\'autorisation Bluetooth a été refusée. Activez le Bluetooth pour PlainApp dans les réglages.</string>
     <string name="bluetooth_off">Le Bluetooth est désactivé. Activez-le dans le centre de contrôle ou dans les réglages.</string>
     <string name="open_settings">Ouvrir les réglages</string>
+    <string name="modified">Modifié</string>
+    <string name="go_to_line">Aller à la ligne</string>
+    <string name="editor_font_size">Taille de police</string>
+    <string name="status_bar">Barre d'état</string>
+    <string name="discard_changes">Abandonner les modifications ?</string>
+    <string name="discard_changes_text">Les modifications n'ont pas été enregistrées.</string>
+    <string name="large_file_edit">Ce fichier est très volumineux. L'édition peut être lente. Continuer ?</string>
+    <string name="line_number">Numéro de ligne</string>
 </resources>

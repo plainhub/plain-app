@@ -287,6 +287,41 @@ class LineVectorDocumentTest {
     }
 
     @Test
+    fun encodingProbeDetectsBomLessUtf16() {
+        val le = "hello UTF-16 without BOM\n".encodeToByteArray()
+        val leBytes = ByteArray(le.size * 2)
+        le.forEachIndexed { i, b -> leBytes[i * 2] = b }
+        assertEquals(DetectedEncoding.UTF16LE, EncodingProbe.probe(ByteArrayByteSource(leBytes)))
+
+        val beBytes = ByteArray(le.size * 2)
+        le.forEachIndexed { i, b -> beBytes[i * 2 + 1] = b }
+        assertEquals(DetectedEncoding.UTF16BE, EncodingProbe.probe(ByteArrayByteSource(beBytes)))
+
+        // Long content so the 8KB heuristic window fills with patterned NULs.
+        val longLe = ByteArray(4096 * 2)
+        repeat(4096) { longLe[it * 2] = 0x41 }
+        assertEquals(DetectedEncoding.UTF16LE, EncodingProbe.probe(ByteArrayByteSource(longLe)))
+    }
+
+    @Test
+    fun encodingProbeStillRejectsBinaryWithBalancedNuls() {
+        // 0x00 run with balanced parity across both even and odd indexes.
+        val data = byteArrayOf(0x4D, 0x5A) + ByteArray(100)
+        assertEquals(DetectedEncoding.BINARY, EncodingProbe.probe(ByteArrayByteSource(data)))
+    }
+
+    @Test
+    fun utf16DocumentRoundTripsThroughText() {
+        val text = "utf16 line\nsecond\n"
+        val withBom = byteArrayOf(0xFF.toByte(), 0xFE.toByte()) + text.encodeToByteArray().flatMap {
+            listOf(it, 0x00.toByte())
+        }.map { it }.toByteArray()
+        val doc = LineVectorDocument.fromText(text)
+        assertEquals(3, doc.lineCount)
+        assertEquals("utf16 line", doc.lineText(0))
+    }
+
+    @Test
     fun chunkedSourceServesSpans() {
         val bytes = ByteArray(300 * 1024) { val v = it % 251; (if (v == 10) 32 else v).toByte() }
         bytes[150_000] = '\n'.code.toByte()

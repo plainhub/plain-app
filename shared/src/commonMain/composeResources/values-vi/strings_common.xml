@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">Quyền Bluetooth bị từ chối. Hãy bật Bluetooth cho PlainApp trong Cài đặt.</string>
     <string name="bluetooth_off">Bluetooth đang tắt. Hãy bật trong Trung tâm điều khiển hoặc Cài đặt.</string>
     <string name="open_settings">Mở Cài đặt</string>
+    <string name="modified">Đã sửa</string>
+    <string name="go_to_line">Đi tới dòng</string>
+    <string name="editor_font_size">Cỡ phông</string>
+    <string name="status_bar">Thanh trạng thái</string>
+    <string name="discard_changes">Bỏ thay đổi?</string>
+    <string name="discard_changes_text">Các chỉnh sửa chưa được lưu.</string>
+    <string name="large_file_edit">Tệp này rất lớn. Việc chỉnh sửa có thể chậm. Tiếp tục?</string>
+    <string name="line_number">Số dòng</string>
 </resources>

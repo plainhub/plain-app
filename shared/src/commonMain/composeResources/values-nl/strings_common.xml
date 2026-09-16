@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">Bluetooth-toestemming geweigerd. Schakel Bluetooth voor PlainApp in bij Instellingen.</string>
     <string name="bluetooth_off">Bluetooth is uitgeschakeld. Zet het aan in het Bedieningscentrum of in Instellingen.</string>
     <string name="open_settings">Instellingen openen</string>
+    <string name="modified">Gewijzigd</string>
+    <string name="go_to_line">Ga naar regel</string>
+    <string name="editor_font_size">Lettergrootte</string>
+    <string name="status_bar">Statusbalk</string>
+    <string name="discard_changes">Wijzigingen negeren?</string>
+    <string name="discard_changes_text">Wijzigingen zijn niet opgeslagen.</string>
+    <string name="large_file_edit">Dit bestand is zeer groot. Bewerken kan traag zijn. Doorgaan?</string>
+    <string name="line_number">Regelnummer</string>
 </resources>

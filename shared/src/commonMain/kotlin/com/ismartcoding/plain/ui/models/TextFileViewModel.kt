@@ -8,6 +8,8 @@ import com.ismartcoding.plain.helpers.launchSafe
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.platform.getFileByMediaId
 import com.ismartcoding.plain.platform.isContentUri
+import com.ismartcoding.plain.preferences.EditorFontSizePreference
+import com.ismartcoding.plain.preferences.EditorStatusBarPreference
 import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.components.codeeditor.EditorController
 import com.ismartcoding.plain.ui.components.codeeditor.EditorLoadState
@@ -24,8 +26,9 @@ class TextFileViewModel : ViewModel() {
 
     fun loadConfigAsync() {
         viewModelScope.launchSafe {
-            val wrap = EditorWrapContentPreference.getAsync()
-            controller.wrapContent.value = wrap
+            controller.wrapContent.value = EditorWrapContentPreference.getAsync()
+            controller.fontSizeSp.value = EditorFontSizePreference.getAsync()
+            controller.statusBarVisible.value = EditorStatusBarPreference.getAsync()
         }
     }
 

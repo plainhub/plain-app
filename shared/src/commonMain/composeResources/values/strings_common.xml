@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">Bluetooth permission was denied. Enable Bluetooth for PlainApp in Settings.</string>
     <string name="bluetooth_off">Bluetooth is turned off. Turn it on in Control Center or Settings.</string>
     <string name="open_settings">Open Settings</string>
+    <string name="modified">Modified</string>
+    <string name="go_to_line">Go to line</string>
+    <string name="editor_font_size">Font size</string>
+    <string name="status_bar">Status bar</string>
+    <string name="discard_changes">Discard changes?</string>
+    <string name="discard_changes_text">Your edits have not been saved.</string>
+    <string name="large_file_edit">This file is very large. Editing may be slow. Continue?</string>
+    <string name="line_number">Line number</string>
 </resources>

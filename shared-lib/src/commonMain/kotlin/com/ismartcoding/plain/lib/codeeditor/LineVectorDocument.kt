@@ -43,6 +43,40 @@ class LineVectorDocument internal constructor(
 
     fun lineText(n: Int): String = synchronized(this) { lineTextLocked(n) }
 
+    /**
+     * Batched variant for sequential scans (search): one positioned read per contiguous
+     * file-backed run instead of one per line — turns 700k reads into ~1.5k on a 100MB file.
+     */
+    fun lineTextBatch(fromLine: Int, toLineExcl: Int): List<String> = synchronized(this) {
+        val result = ArrayList<String>(toLineExcl - fromLine)
+        var i = fromLine
+        while (i < toLineExcl) {
+            if (edited.containsKey(i)) {
+                result.add(edited[i]!!)
+                i++
+                continue
+            }
+            var j = i
+            while (j < toLineExcl && !edited.containsKey(j)) j++
+            val from = starts.get(i).toLong()
+            val to = starts.get(j - 1) + lens.get(j - 1)
+            if (j == i + 1) {
+                val len = (to - from).toInt()
+                result.add(if (len == 0) "" else source!!.readAt(from, len).decodeToString())
+            } else {
+                val bytes = source!!.readAt(from, (to - from).toInt())
+                var off = 0
+                for (k in i until j) {
+                    val len = lens.get(k)
+                    result.add(bytes.decodeToString(off, off + len))
+                    off += len
+                }
+            }
+            i = j
+        }
+        result
+    }
+
     private fun lineTextLocked(n: Int): String {
         edited[n]?.let { return it }
         val start = starts.get(n)

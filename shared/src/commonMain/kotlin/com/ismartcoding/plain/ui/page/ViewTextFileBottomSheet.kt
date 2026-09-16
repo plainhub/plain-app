@@ -31,6 +31,11 @@ import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TextFileViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.ismartcoding.plain.ui.models.launchSafe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -113,6 +118,71 @@ fun ViewTextFileBottomSheet(
                 })
             }
         }
+        VerticalSpace(dp = 16.dp)
+        EditorDisplayActionsCard(textFileVM, scope)
         BottomSpace()
+    }
+}
+
+@Composable
+private fun EditorDisplayActionsCard(textFileVM: TextFileViewModel, scope: kotlinx.coroutines.CoroutineScope) {
+    val controller = textFileVM.controller
+    var showGoToLine by remember { mutableStateOf(false) }
+
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+        com.ismartcoding.plain.ui.base.PSheetActionRow(
+            icon = com.ismartcoding.plain.i18n.Res.drawable.arrow_down_to_line,
+            title = stringResource(Res.string.go_to_line),
+        ) { showGoToLine = true }
+        com.ismartcoding.plain.ui.base.PSheetActionRow(
+            icon = com.ismartcoding.plain.i18n.Res.drawable.type,
+            title = stringResource(Res.string.editor_font_size),
+            trailing = {
+                androidx.compose.material3.Text(
+                    "${controller.fontSizeSp.value}sp",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+        ) {
+            val next = when (controller.fontSizeSp.value) { 12 -> 14; 14 -> 16; else -> 12 }
+            controller.fontSizeSp.value = next
+            scope.launchSafe { com.ismartcoding.plain.preferences.EditorFontSizePreference.putAsync(next) }
+        }
+        PListItem(title = stringResource(Res.string.status_bar), action = {
+            PSwitch(activated = controller.statusBarVisible.value) {
+                controller.statusBarVisible.value = !controller.statusBarVisible.value
+                scope.launchSafe { com.ismartcoding.plain.preferences.EditorStatusBarPreference.putAsync(controller.statusBarVisible.value) }
+            }
+            HorizontalSpace(8.dp)
+        })
+    }
+
+    if (showGoToLine) {
+        var text by remember { mutableStateOf("") }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showGoToLine = false },
+            title = { androidx.compose.material3.Text(stringResource(Res.string.go_to_line)) },
+            text = {
+                androidx.compose.material3.OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it.filter { c -> c.isDigit() }.take(9) },
+                    label = { androidx.compose.material3.Text(stringResource(Res.string.line_number)) },
+                    singleLine = true,
+                )
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    text.toIntOrNull()?.let { controller.jumpToLine(it) }
+                    showGoToLine = false
+                    textFileVM.showMoreActions.value = false
+                }) { androidx.compose.material3.Text(stringResource(Res.string.ok)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showGoToLine = false }) {
+                    androidx.compose.material3.Text(stringResource(Res.string.cancel))
+                }
+            },
+        )
     }
 }

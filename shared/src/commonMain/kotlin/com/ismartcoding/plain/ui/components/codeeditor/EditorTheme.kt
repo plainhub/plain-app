@@ -41,17 +41,17 @@ data class EditorSyntaxColors(
 }
 
 val LightSyntaxColors = EditorSyntaxColors(
-    keyword = Color(0xFF7A00B8),
-    type = Color(0xFF0B7285),
-    string = Color(0xFF0B6E3A),
-    number = Color(0xFF9A5B00),
-    comment = Color(0xFF5F6B76),
-    annotation = Color(0xFF7A00B8),
-    function = Color(0xFF8A5A00),
-    tag = Color(0xFF9A2B2B),
-    attribute = Color(0xFFB04000),
-    constant = Color(0xFF1F3A93),
-    variable = Color(0xFF1F3A93),
+    keyword = Color(0xFF8B65B3),
+    type = Color(0xFF4682B4),
+    string = Color(0xFF59996A),
+    number = Color(0xFFB28455),
+    comment = Color(0xFF99999F),
+    annotation = Color(0xFFA67FAB),
+    function = Color(0xFF7187C4),
+    tag = Color(0xFFC48282),
+    attribute = Color(0xFF8F8F52),
+    constant = Color(0xFF6FA0CF),
+    variable = Color(0xFF7A96A8),
 )
 
 val DarkSyntaxColors = EditorSyntaxColors(

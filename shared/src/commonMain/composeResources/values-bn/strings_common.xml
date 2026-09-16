@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">ব্লুটুথ অনুমতি অস্বীকৃত হয়েছে। সেটিংসে PlainApp-এর জন্য ব্লুটুথ চালু করুন।</string>
     <string name="bluetooth_off">ব্লুটুথ বন্ধ আছে। কন্ট্রোল সেন্টার বা সেটিংসে এটি চালু করুন।</string>
     <string name="open_settings">সেটিংস খুলুন</string>
+    <string name="modified">পরিবর্তিত</string>
+    <string name="go_to_line">লাইনে যান</string>
+    <string name="editor_font_size">ফন্ট সাইজ</string>
+    <string name="status_bar">স্ট্যাটাস বার</string>
+    <string name="discard_changes">পরিবর্তনগুলো বাতিল করবেন?</string>
+    <string name="discard_changes_text">আপনার সম্পাদনাগুলো সংরক্ষিত হয়নি।</string>
+    <string name="large_file_edit">ফাইলটি খুব বড়। সম্পাদনা ধীর হতে পারে। চালিয়ে যাবেন?</string>
+    <string name="line_number">লাইন নম্বর</string>
 </resources>

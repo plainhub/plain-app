@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">Permissão do Bluetooth negada. Ative o Bluetooth para o PlainApp nos Ajustes.</string>
     <string name="bluetooth_off">O Bluetooth está desligado. Ative-o na Central de Controle ou nos Ajustes.</string>
     <string name="open_settings">Abrir ajustes</string>
+    <string name="modified">Modificado</string>
+    <string name="go_to_line">Ir para a linha</string>
+    <string name="editor_font_size">Tamanho da fonte</string>
+    <string name="status_bar">Barra de status</string>
+    <string name="discard_changes">Descartar alterações?</string>
+    <string name="discard_changes_text">As alterações não foram salvas.</string>
+    <string name="large_file_edit">Este arquivo é muito grande. A edição pode ser lenta. Continuar?</string>
+    <string name="line_number">Número da linha</string>
 </resources>

@@ -418,6 +418,16 @@ object EditorWrapContentPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("editor_wrap_content")
 }
 
+object EditorFontSizePreference : BasePreference<Int>() {
+    override val default = 14
+    override val key = intPreferencesKey("editor_font_size")
+}
+
+object EditorStatusBarPreference : BasePreference<Boolean>() {
+    override val default = true
+    override val key = booleanPreferencesKey("editor_status_bar")
+}
+
 object AudioSleepTimerMinutesPreference : BasePreference<Int>() {
     override val default = 30
     override val key = intPreferencesKey("audio_sleep_timer_minutes")

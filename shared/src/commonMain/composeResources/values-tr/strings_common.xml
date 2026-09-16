@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">Bluetooth izni reddedildi. Ayarlar\'dan PlainApp için Bluetooth\'a izin verin.</string>
     <string name="bluetooth_off">Bluetooth kapalı. Kontrol Merkezi\'nden veya Ayarlar\'dan açın.</string>
     <string name="open_settings">Ayarları aç</string>
+    <string name="modified">Değiştirildi</string>
+    <string name="go_to_line">Satıra git</string>
+    <string name="editor_font_size">Yazı tipi boyutu</string>
+    <string name="status_bar">Durum çubuğu</string>
+    <string name="discard_changes">Değişiklikler atılsın mı?</string>
+    <string name="discard_changes_text">Düzenlemeleriniz kaydedilmedi.</string>
+    <string name="large_file_edit">Bu dosya çok büyük. Düzenleme yavaş olabilir. Devam edilsin mi?</string>
+    <string name="line_number">Satır numarası</string>
 </resources>

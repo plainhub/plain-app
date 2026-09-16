@@ -10,7 +10,6 @@ import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.platform.extractZipEntryToCache
@@ -104,11 +103,7 @@ fun openFile(
         }
 
         path.isTextFile() -> {
-            if (file.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
-                navController.navigateTextFile(path)
-            } else {
-                DialogHelper.showMessage(Res.string.text_file_size_limit)
-            }
+            navController.navigateTextFile(path)
         }
 
         path.isPdfFile() -> {

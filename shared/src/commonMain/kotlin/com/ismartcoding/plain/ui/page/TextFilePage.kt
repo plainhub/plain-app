@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.enums.TextFileType
+import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
@@ -30,6 +32,7 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.codeeditor.CodeEditor
 import com.ismartcoding.plain.ui.components.codeeditor.EditorLoadState
 import com.ismartcoding.plain.ui.models.TextFileViewModel
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +45,10 @@ fun TextFilePage(
     textFileVM: TextFileViewModel = viewModel { TextFileViewModel() },
 ) {
     var isSaving by remember { mutableStateOf(false) }
+    var showDiscardConfirm by remember { mutableStateOf(false) }
+    fun requestClose() {
+        if (textFileVM.controller.isDirty.value) showDiscardConfirm = true else navController.navigateUp()
+    }
     val rotation by animateFloatAsState(
         targetValue = if (isSaving) 360f else 0f,
         animationSpec = tween(durationMillis = 600),
@@ -60,7 +67,27 @@ fun TextFilePage(
     }
 
     PBackHandler(enabled = !textFileVM.controller.readOnly.value) {
-        textFileVM.exitEditMode(discard = true)
+        requestClose()
+    }
+
+    if (showDiscardConfirm) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showDiscardConfirm = false },
+            title = { Text(stringResource(Res.string.discard_changes)) },
+            text = { Text(stringResource(Res.string.discard_changes_text)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showDiscardConfirm = false
+                    textFileVM.exitEditMode(discard = true)
+                    navController.navigateUp()
+                }) { Text(stringResource(Res.string.ok)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showDiscardConfirm = false }) {
+                    Text(stringResource(Res.string.cancel))
+                }
+            },
+        )
     }
 
     PScaffold(
@@ -72,9 +99,7 @@ fun TextFilePage(
                     if (textFileVM.controller.readOnly.value) {
                         NavigationBackIcon { navController.navigateUp() }
                     } else {
-                        NavigationCloseIcon {
-                            textFileVM.exitEditMode(discard = true)
-                        }
+                        NavigationCloseIcon { requestClose() }
                     }
                 },
                 actions = {
@@ -94,6 +119,7 @@ fun TextFilePage(
             Box(
                 modifier = Modifier
                     .padding(top = paddingValues.calculateTopPadding())
+                    .padding(bottom = paddingValues.calculateBottomPadding())
                     .fillMaxSize(),
             ) {
                 if (loadState is EditorLoadState.Error) {

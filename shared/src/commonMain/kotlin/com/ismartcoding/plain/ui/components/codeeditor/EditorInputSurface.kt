@@ -46,10 +46,11 @@ import com.ismartcoding.plain.ui.base.PIconButton
  */
 @Composable
 fun EditorInputSurface(controller: EditorController) {
+    val fontSize = controller.fontSizeSp.value
     val style = TextStyle(
         fontFamily = FontFamily.Monospace,
-        fontSize = 14.sp,
-        lineHeight = 21.sp,
+        fontSize = fontSize.sp,
+        lineHeight = (fontSize * 1.5f).sp,
         color = MaterialTheme.colorScheme.onSurface,
     )
     val focusRequester = remember { FocusRequester() }
@@ -83,7 +84,7 @@ fun EditorInputSurface(controller: EditorController) {
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .offset(
-                        x = with(density) { (gutterWidthPx - controller.hScroll.value).toDp() },
+                        x = with(density) { (gutterWidthPx - controller.hPanOffset.floatValue).toDp() },
                         y = with(density) { item.offset.toDp() },
                     )
                     .width(widthDp)

@@ -5,6 +5,10 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalFocusManager
@@ -37,6 +41,30 @@ internal fun RowScope.TextFilePageActions(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
+    var showLargeFileConfirm by remember { mutableStateOf(false) }
+
+    fun requestEditMode() {
+        if (controller.openFileSize > 20L * 1024 * 1024) showLargeFileConfirm = true else textFileVM.enterEditMode()
+    }
+
+    if (showLargeFileConfirm) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showLargeFileConfirm = false },
+            title = { androidx.compose.material3.Text(stringResource(com.ismartcoding.plain.i18n.Res.string.edit)) },
+            text = { androidx.compose.material3.Text(stringResource(com.ismartcoding.plain.i18n.Res.string.large_file_edit)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showLargeFileConfirm = false
+                    textFileVM.enterEditMode()
+                }) { androidx.compose.material3.Text(stringResource(com.ismartcoding.plain.i18n.Res.string.ok)) }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { showLargeFileConfirm = false }) {
+                    androidx.compose.material3.Text(stringResource(com.ismartcoding.plain.i18n.Res.string.cancel))
+                }
+            },
+        )
+    }
 
     if (controller.readOnly.value) {
         PIconButton(
@@ -46,13 +74,20 @@ internal fun RowScope.TextFilePageActions(
         ) {
             controller.setSearchVisible(!controller.searchVisible.value)
         }
+        PIconButton(
+            icon = Res.drawable.wrap_text,
+            contentDescription = stringResource(Res.string.wrap_content),
+            tint = if (controller.wrapContent.value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+        ) {
+            textFileVM.toggleWrapContent()
+        }
         if (type != TextFileType.APP_LOG.name && type != TextFileType.CRASH_REPORT.name && !textFileVM.isExternalFile.value) {
             PIconButton(
                 icon = Res.drawable.square_pen,
                 contentDescription = stringResource(Res.string.edit),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
-                textFileVM.enterEditMode()
+                requestEditMode()
             }
         }
     } else {
@@ -82,13 +117,6 @@ internal fun RowScope.TextFilePageActions(
         }
     }
     if (setOf(TextFileType.APP_LOG.name, TextFileType.CHAT.name, TextFileType.CRASH_REPORT.name).contains(type)) {
-        PIconButton(
-            icon = Res.drawable.wrap_text,
-            contentDescription = stringResource(Res.string.wrap_content),
-            tint = MaterialTheme.colorScheme.onSurface,
-        ) {
-            textFileVM.toggleWrapContent()
-        }
         PIconButton(
             icon = Res.drawable.share_2,
             contentDescription = stringResource(Res.string.share),

@@ -118,6 +118,26 @@ object EncodingProbe {
             if (head[0] == 0xFF.toByte() && head[1] == 0xFE.toByte()) return DetectedEncoding.UTF16LE
             if (head[0] == 0xFE.toByte() && head[1] == 0xFF.toByte()) return DetectedEncoding.UTF16BE
         }
+        // UTF-16 without BOM: NUL bytes dominate (one per code unit). Parity of the NULs
+        // reveals byte order; balanced NUL parity means binary content instead.
+        var zeros = 0
+        var zerosEven = 0
+        var zerosOdd = 0
+        val scan = minOf(head.size, 8192)
+        for (i in 0 until scan) {
+            if (head[i] == 0.toByte()) {
+                zeros++
+                if (i % 2 == 0) zerosEven++ else zerosOdd++
+            }
+        }
+        // Heuristic needs a meaningful sample; tiny inputs fall through to the binary check.
+        if (scan >= 32 && zeros * 100 >= scan * 25) {
+            val evenPct = zerosEven * 100 / scan
+            val oddPct = zerosOdd * 100 / scan
+            if (oddPct >= 20 && evenPct < 8) return DetectedEncoding.UTF16LE
+            if (evenPct >= 20 && oddPct < 8) return DetectedEncoding.UTF16BE
+            return DetectedEncoding.BINARY
+        }
         if (looksBinary(head)) return DetectedEncoding.BINARY
         return if (validUtf8(head)) DetectedEncoding.UTF8 else DetectedEncoding.UTF16LE
     }

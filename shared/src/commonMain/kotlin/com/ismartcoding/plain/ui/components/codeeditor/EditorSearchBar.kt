@@ -52,6 +52,10 @@ fun EditorSearchBar(controller: EditorController) {
             value = controller.searchQuery.value,
             onValueChange = { controller.requestSearch(it, controller.searchCaseSensitive.value, controller.searchRegex.value) },
             singleLine = true,
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                imeAction = androidx.compose.ui.text.input.ImeAction.Search,
+            ),
+            keyboardActions = androidx.compose.foundation.text.KeyboardActions(onSearch = { controller.nextMatch() }),
             textStyle = TextStyle(
                 fontSize = 14.sp,
                 fontFamily = FontFamily.Monospace,
@@ -75,10 +79,12 @@ fun EditorSearchBar(controller: EditorController) {
                 .focusRequester(focusRequester),
         )
         val count = controller.matchCount()
+        // Subscribe to search result publication: matchCount() reads a plain field.
+        controller.matchesVersion.value
         val countText = if (controller.searchQuery.value.isEmpty()) {
             ""
-        } else if (count == 0 && !controller.searchComplete.value) {
-            "…"
+        } else if (count == 0) {
+            if (controller.searchComplete.value) "0/0" else "…"
         } else if (controller.searchTruncated.value && count >= EditorController.MAX_MATCHES) {
             "${EditorController.MAX_MATCHES}+"
         } else {

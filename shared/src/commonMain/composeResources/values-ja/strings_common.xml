@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">Bluetooth権限が拒否されました。設定でPlainAppのBluetoothを許可してください。</string>
     <string name="bluetooth_off">Bluetoothがオフになっています。コントロールセンターまたは設定でオンにしてください。</string>
     <string name="open_settings">設定を開く</string>
+    <string name="modified">変更あり</string>
+    <string name="go_to_line">指定行へ移動</string>
+    <string name="editor_font_size">フォントサイズ</string>
+    <string name="status_bar">ステータスバー</string>
+    <string name="discard_changes">変更を破棄しますか？</string>
+    <string name="discard_changes_text">編集内容は保存されていません。</string>
+    <string name="large_file_edit">このファイルは非常に大きく、編集に時間がかかる可能性があります。続行しますか？</string>
+    <string name="line_number">行番号</string>
 </resources>

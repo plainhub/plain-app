@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">ब्लूटूथ अनुमति अस्वीकार कर दी गई थी। सेटिंग में PlainApp के लिए ब्लूटूथ चालू करें।</string>
     <string name="bluetooth_off">ब्लूटूथ बंद है। इसे कंट्रोल सेंटर या सेटिंग में चालू करें।</string>
     <string name="open_settings">सेटिंग खोलें</string>
+    <string name="modified">संशोधित</string>
+    <string name="go_to_line">पंक्ति पर जाएँ</string>
+    <string name="editor_font_size">फ़ॉन्ट आकार</string>
+    <string name="status_bar">स्थिति बार</string>
+    <string name="discard_changes">बदलाव रद्द करें?</string>
+    <string name="discard_changes_text">आपके संपादन सहेजे नहीं गए हैं।</string>
+    <string name="large_file_edit">यह फ़ाइल बहुत बड़ी है। संपादन धीमा हो सकता है। जारी रखें?</string>
+    <string name="line_number">पंक्ति संख्या</string>
 </resources>

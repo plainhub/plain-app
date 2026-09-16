@@ -6,6 +6,7 @@ import androidx.compose.ui.text.TextRange
 import com.ismartcoding.plain.lib.codeeditor.EditHistory
 import com.ismartcoding.plain.lib.codeeditor.EditRange
 import com.ismartcoding.plain.lib.codeeditor.HighlightEngine
+import com.ismartcoding.plain.lib.codeeditor.HorizontalPan
 import com.ismartcoding.plain.lib.codeeditor.Languages
 import com.ismartcoding.plain.lib.codeeditor.LineIndexBuilder
 import com.ismartcoding.plain.lib.codeeditor.LineVectorDocument
@@ -39,10 +40,14 @@ sealed class EditorLoadState {
 class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
     val loadState = mutableStateOf<EditorLoadState>(EditorLoadState.Idle)
     val docVersion = mutableStateOf(0)
+    val mapperVersion = mutableStateOf(0)
     val lineCount = mutableStateOf(0)
     val wrapContent = mutableStateOf(true)
     val readOnly = mutableStateOf(true)
     val isDirty = mutableStateOf(false)
+    val fontSizeSp = mutableStateOf(14)
+    val statusBarVisible = mutableStateOf(true)
+    val encodingLabel = mutableStateOf("UTF-8")
     val canUndo = mutableStateOf(false)
     val canRedo = mutableStateOf(false)
     val highlightVersion = mutableStateOf(0)
@@ -72,9 +77,17 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
     var lineHeightPx: Float = 44f
 
     val listState = LazyListState()
-    val hScroll = androidx.compose.foundation.ScrollState(0)
     val contentWidthPx = mutableStateOf(0f)
+    var viewportWidthPx = 0f
+    val hPan = HorizontalPan()
+    val hPanOffset = androidx.compose.runtime.mutableFloatStateOf(0f)
     val mapper = VisualLineMapper()
+
+    fun syncPan() {
+        if (hPan.updateBounds(contentWidthPx.value, viewportWidthPx)) {
+            hPanOffset.floatValue = hPan.offsetPx
+        }
+    }
 
     internal var doc: LineVectorDocument? = null
         private set
@@ -84,6 +97,9 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
     private var searchJob: Job? = null
     private var mapperJob: Job? = null
     private var suppressFieldSync = false
+
+    var openFileSize: Long = 0
+        private set
 
     private var matchesInternal: List<SearchMatch> = emptyList()
     private var matchesByLineInternal: Map<Int, List<SearchMatch>> = emptyMap()
@@ -105,6 +121,7 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
 
     /** Opens in-memory text (e.g. chat message content) instead of a file. */
     fun openText(content: String, languageId: String) {
+        openFileSize = content.encodeToByteArray().size.toLong()
         loadState.value = EditorLoadState.Loading(0f)
         scope.launch(Dispatchers.Default) {
             val loaded = LineVectorDocument.fromText(content)
@@ -118,29 +135,40 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
         lineCount.value = loaded.lineCount
         docVersion.value++
         setActive(0, 0)
+        // Publish the mapper BEFORE Ready: the first composition must already see the full
+        // visual count. Going 0 -> N via a later state write lost the recomposition race
+        // and left a blank viewport on huge files.
+        mapper.rebuild(loaded)
+        mapperVersion.value++
         loadState.value = EditorLoadState.Ready
-        scope.launch(Dispatchers.Default) { mapper.rebuild(loaded) }
         if (gotoEnd) gotoLine(loaded.lineCount - 1) else gotoLine(0)
     }
 
-    private fun loadDocument(filePath: String): LineVectorDocument {
+    private suspend fun loadDocument(filePath: String): LineVectorDocument {
         val source = openByteSource(filePath)
-        return when (EncodingProbe.probe(source)) {
+        openFileSize = source.size
+        val encoding = EncodingProbe.probe(source)
+        encodingLabel.value = when (encoding) {
+            DetectedEncoding.UTF16LE, DetectedEncoding.UTF16BE -> "UTF-16"
+            else -> "UTF-8"
+        }
+        return when (encoding) {
             DetectedEncoding.UTF8 -> LineIndexBuilder(source).buildAll()
             DetectedEncoding.UTF16LE, DetectedEncoding.UTF16BE -> {
                 // UTF-16 path: convert wholesale with a size guard (streamed read).
                 if (source.size > 50L * 1024 * 1024) throw IllegalArgumentException("UTF-16 file too large")
                 val bytes = source.readAt(0, source.size.toInt())
-                LineVectorDocument.fromText(decodeUtf16(bytes))
+                LineVectorDocument.fromText(decodeUtf16(bytes, little = encoding == DetectedEncoding.UTF16LE))
             }
             DetectedEncoding.BINARY -> throw IllegalArgumentException("binary file")
         }
     }
 
-    private fun decodeUtf16(bytes: ByteArray): String {
+    private fun decodeUtf16(bytes: ByteArray, little: Boolean): String {
         if (bytes.size < 2) return ""
-        val little = bytes[0] == 0xFF.toByte()
-        val start = if (bytes[0] == 0xFF.toByte() || bytes[0] == 0xFE.toByte()) 2 else 0
+        val hasBom = (bytes[0] == 0xFF.toByte() && bytes[1] == 0xFE.toByte()) ||
+            (bytes[0] == 0xFE.toByte() && bytes[1] == 0xFF.toByte())
+        val start = if (hasBom) 2 else 0
         val sb = StringBuilder((bytes.size - start) / 2)
         var i = start
         while (i + 1 < bytes.size) {
@@ -224,6 +252,12 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
         scope.launch {
             listState.scrollToItem(mapper.logicalToVisual(l).coerceIn(0, (mapper.visualCount - 1).coerceAtLeast(0)))
         }
+    }
+
+    fun jumpToLine(line: Int) {
+        val l = line.coerceIn(1, lineCount.value)
+        setActive(l - 1, 0)
+        gotoLine(l - 1)
     }
 
     fun gotoTop() = gotoLine(0)
@@ -482,10 +516,12 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
         val d = doc ?: return
         if (d.lineCount <= 200_000) {
             mapper.rebuild(d)
+            mapperVersion.value++
         } else {
             mapperJob = scope.launch(Dispatchers.Default) {
                 delay(150)
                 mapper.rebuild(d)
+                withContext(Dispatchers.Main) { mapperVersion.value++ }
             }
         }
     }
@@ -507,7 +543,12 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
         searchQuery.value = query
         searchCaseSensitive.value = caseSensitive
         searchRegex.value = regex
-        runSearch()
+        // Debounce: cancel-and-restart while typing so a 5-char query triggers one scan, not five.
+        searchJob?.cancel()
+        searchJob = scope.launch {
+            delay(400)
+            runSearch()
+        }
     }
 
     private fun scheduleSearchRefresh() {
@@ -522,7 +563,6 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
     private fun runSearch() {
         val d = doc ?: return
         val query = searchQuery.value
-        searchJob?.cancel()
         if (query.isEmpty()) {
             matchesInternal = emptyList()
             matchesByLineInternal = emptyMap()
@@ -542,21 +582,28 @@ class EditorController(private val scope: kotlinx.coroutines.CoroutineScope) {
                     null
                 }
             } else null
+            val needle = if (cs) null else query.lowercase()
             val found = ArrayList<SearchMatch>(256)
             var truncated = false
             var line = 0
+            val batch = 512
             while (line < d.lineCount) {
-                if (line % 2048 == 0) ensureActive()
-                val text = d.lineText(line)
-                SearchEngine.findInLine(text, query, cs, rx).forEach { found.add(SearchMatch(line, it.startCol, it.length)) }
+                ensureActive()
+                val end = minOf(line + batch, d.lineCount)
+                val texts = d.lineTextBatch(line, end)
+                for (idx in texts.indices) {
+                    SearchEngine.findInLine(texts[idx], query, cs, rx, needle).forEach { found.add(SearchMatch(line + idx, it.startCol, it.length)) }
+                }
                 if (found.size >= MAX_MATCHES) {
                     truncated = true
                     break
                 }
-                line++
+                line = end
             }
             val byLine = found.groupBy { it.line }
-            withContext(Dispatchers.Main) {
+            // The job may be cancelled by a newer requestSearch between scan end and commit
+            // (IME composing fires extra callbacks); the finished scan must still land.
+            withContext(Dispatchers.Main + kotlinx.coroutines.NonCancellable) {
                 matchesInternal = found
                 matchesByLineInternal = byLine
                 searchComplete.value = !truncated

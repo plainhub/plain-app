@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">புளூடூத் அனுமதி மறுக்கப்பட்டது. அமைப்புகளில் PlainApp-க்கு புளூடூத்தை இயக்கவும்.</string>
     <string name="bluetooth_off">புளூடூத் முடக்கப்பட்டுள்ளது. கட்டுப்பாட்டு மையம் அல்லது அமைப்புகளில் இயக்கவும்.</string>
     <string name="open_settings">அமைப்புகளைத் திறக்கவும்</string>
+    <string name="modified">மாற்றப்பட்டது</string>
+    <string name="go_to_line">வரிக்குச் செல்</string>
+    <string name="editor_font_size">எழுத்துரு அளவு</string>
+    <string name="status_bar">நிலைப் பட்டி</string>
+    <string name="discard_changes">மாற்றங்களை நிராகரிக்கவா?</string>
+    <string name="discard_changes_text">உங்கள் திருத்தங்கள் சேமிக்கப்படவில்லை.</string>
+    <string name="large_file_edit">இந்தக் கோப்பு மிகவும் பெரியது. திருத்துவது மெதுவாக இருக்கலாம். தொடரவா?</string>
+    <string name="line_number">வரி எண்</string>
 </resources>

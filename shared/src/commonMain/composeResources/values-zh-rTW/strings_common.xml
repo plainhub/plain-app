@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">藍牙權限已被拒絕，請在系統設定中允許 PlainApp 使用藍牙。</string>
     <string name="bluetooth_off">藍牙已關閉，請在控制中心或系統設定中開啟藍牙。</string>
     <string name="open_settings">開啟設定</string>
+    <string name="modified">已修改</string>
+    <string name="go_to_line">跳至指定行</string>
+    <string name="editor_font_size">字號</string>
+    <string name="status_bar">狀態列</string>
+    <string name="discard_changes">放棄變更？</string>
+    <string name="discard_changes_text">變更尚未儲存。</string>
+    <string name="large_file_edit">檔案很大，編輯可能較慢。繼續？</string>
+    <string name="line_number">行號</string>
 </resources>

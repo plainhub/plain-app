@@ -3,18 +3,18 @@ package com.ismartcoding.plain.ui.components.codeeditor
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.ScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,14 +25,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -43,6 +49,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.lib.codeeditor.EditRange
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,27 +71,30 @@ fun CodeEditor(controller: EditorController, modifier: Modifier = Modifier) {
                 }
                 SelectionToolbarOverlay(controller)
             }
+            if (controller.statusBarVisible.value) {
+                EditorStatusBar(controller)
+            }
         }
     }
 }
 
 @Composable
 private fun EditorViewport(controller: EditorController, colors: EditorSyntaxColors) {
-    val textStyle = remember {
-        TextStyle(fontFamily = FontFamily.Monospace, fontSize = 14.sp, lineHeight = 21.sp)
+    val fontSize = controller.fontSizeSp.value
+    val textStyle = remember(fontSize) {
+        TextStyle(fontFamily = FontFamily.Monospace, fontSize = fontSize.sp, lineHeight = (fontSize * 1.5f).sp)
     }
-    val gutterStyle = remember {
-        TextStyle(fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 21.sp)
+    val gutterStyle = remember(fontSize) {
+        TextStyle(fontFamily = FontFamily.Monospace, fontSize = (fontSize - 2).sp, lineHeight = (fontSize * 1.5f).sp)
     }
     val density = LocalDensity.current
     val gutterWidth = (controller.gutterDigits() * 9 + 16).dp
-    val hScroll = controller.hScroll
     val scope = rememberCoroutineScope()
     val contentWidthPx = controller.contentWidthPx
 
-    LaunchedEffect(controller) {
-        controller.charWidthPx = with(density) { 8.4.dp.toPx() }
-        controller.lineHeightPx = with(density) { 21.dp.toPx() }
+    LaunchedEffect(controller, controller.fontSizeSp.value) {
+        controller.charWidthPx = with(density) { 8.4.dp.toPx() * controller.fontSizeSp.value / 14f }
+        controller.lineHeightPx = with(density) { (controller.fontSizeSp.value * 1.5f).dp.toPx() }
     }
 
     // Async highlighting for whatever is visible.
@@ -103,9 +113,15 @@ private fun EditorViewport(controller: EditorController, colors: EditorSyntaxCol
     val onSurface = MaterialTheme.colorScheme.onSurface
     val gutterColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
 
+    // Subscribe to mapper publication: visualCount() itself is not backed by a State.
+    controller.mapperVersion.value
+
     LazyColumn(
         state = controller.listState,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxWidth().onSizeChanged { size ->
+            controller.viewportWidthPx = size.width.toFloat()
+            controller.syncPan()
+        },
     ) {
         items(controller.visualCount()) { visual ->
             EditorRow(
@@ -116,7 +132,6 @@ private fun EditorViewport(controller: EditorController, colors: EditorSyntaxCol
                 gutterStyle = gutterStyle,
                 gutterWidth = gutterWidth,
                 wrap = wrap,
-                hScroll = hScroll,
                 onSurface = onSurface,
                 gutterColor = gutterColor,
                 contentWidthPx = contentWidthPx,
@@ -134,7 +149,6 @@ private fun EditorRow(
     gutterStyle: TextStyle,
     gutterWidth: Dp,
     wrap: Boolean,
-    hScroll: ScrollState,
     onSurface: Color,
     gutterColor: Color,
     contentWidthPx: MutableState<Float>,
@@ -142,6 +156,7 @@ private fun EditorRow(
     controller.docVersion.value
     controller.highlightVersion.value
     controller.matchesVersion.value
+    controller.mapperVersion.value
     val selection = controller.selection.value?.normalized()
     val line = controller.rowLine(visual)
     val chunk = controller.rowChunk(visual)
@@ -159,6 +174,7 @@ private fun EditorRow(
     layout?.let { l ->
         if (!wrap && l.size.width.toFloat() > contentWidthPx.value) {
             contentWidthPx.value = l.size.width.toFloat()
+            controller.syncPan()
         }
     }
 
@@ -181,14 +197,22 @@ private fun EditorRow(
             maxLines = 1,
             modifier = Modifier.width(gutterWidth).padding(end = 8.dp),
         )
-        val density = LocalDensity.current
         val cellModifier = if (wrap) {
             Modifier.weight(1f)
         } else {
+            // Uniform horizontal panning: every row shifts by the same shared offset
+            // (short rows just reveal trailing space), clipped at the cell edge.
             Modifier
-                .weight(1f, fill = false)
-                .width(with(density) { maxOf(contentWidthPx.value, 320.dp.toPx()).toDp() })
-                .horizontalScroll(hScroll)
+                .weight(1f)
+                .clipToBounds()
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { change, dragAmount ->
+                        change.consume()
+                        if (controller.hPan.drag(dragAmount)) {
+                            controller.hPanOffset.floatValue = controller.hPan.offsetPx
+                        }
+                    }
+                }
         }
         Box(
             modifier = cellModifier
@@ -223,18 +247,28 @@ private fun EditorRow(
                 color = onSurface,
                 softWrap = wrap,
                 onTextLayout = { layout = it },
-                modifier = if (wrap) Modifier.fillMaxWidth() else Modifier,
+                modifier = if (wrap) {
+                    Modifier.fillMaxWidth()
+                } else {
+                    // Measure the full line without the cell width cap, pan it, and let the
+                    // cell clip. Measuring under the cap would clip the text to one screen
+                    // width and make panning a no-op.
+                    Modifier
+                        .wrapContentWidth(Alignment.Start, unbounded = true)
+                        .offset { IntOffset(-controller.hPanOffset.floatValue.roundToInt(), 0) }
+                        .padding(end = 16.dp)
+                },
             )
             val l = layout
             if (selStart in 0 until selEnd && l != null) {
-                SelectionHighlight(l, selStart, selEnd)
+                SelectionHighlight(l, selStart, selEnd, -controller.hPanOffset.floatValue)
             }
         }
     }
 }
 
 @Composable
-private fun SelectionHighlight(layout: TextLayoutResult, start: Int, end: Int) {
+private fun SelectionHighlight(layout: TextLayoutResult, start: Int, end: Int, panPx: Float) {
     val selColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
     val rects = ArrayList<Rect>()
     val firstDisplay = layout.getLineForOffset(start)
@@ -247,8 +281,11 @@ private fun SelectionHighlight(layout: TextLayoutResult, start: Int, end: Int) {
         }
     }
     Canvas(modifier = Modifier.fillMaxSize()) {
-        rects.forEach { r ->
-            drawRect(color = selColor, topLeft = Offset(r.left, r.top), size = Size(r.width, r.height))
+        // Row rects are laid out at offset 0; shift them with the panned content.
+        translate(left = panPx) {
+            rects.forEach { r ->
+                drawRect(color = selColor, topLeft = Offset(r.left, r.top), size = Size(r.width, r.height))
+            }
         }
     }
 }
@@ -285,5 +322,5 @@ private fun buildRowText(
     }
 }
 
-private val MatchBg = Color(0x2EF5B94F)
-private val MatchCurrentBg = Color(0x66F5A623)
+private val MatchBg = Color(0x24D9A514)
+private val MatchCurrentBg = Color(0x59D9A514)

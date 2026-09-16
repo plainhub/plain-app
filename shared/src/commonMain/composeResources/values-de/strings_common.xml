@@ -163,4 +163,12 @@
     <string name="bluetooth_permission_denied">Bluetooth-Berechtigung wurde verweigert. Aktivieren Sie Bluetooth für PlainApp in den Einstellungen.</string>
     <string name="bluetooth_off">Bluetooth ist ausgeschaltet. Aktivieren Sie es im Kontrollzentrum oder in den Einstellungen.</string>
     <string name="open_settings">Einstellungen öffnen</string>
+    <string name="modified">Geändert</string>
+    <string name="go_to_line">Zu Zeile springen</string>
+    <string name="editor_font_size">Schriftgröße</string>
+    <string name="status_bar">Statusleiste</string>
+    <string name="discard_changes">Änderungen verwerfen?</string>
+    <string name="discard_changes_text">Ungespeicherte Änderungen gehen verloren.</string>
+    <string name="large_file_edit">Diese Datei ist sehr groß. Das Bearbeiten kann langsam sein. Fortfahren?</string>
+    <string name="line_number">Zeilennummer</string>
 </resources>

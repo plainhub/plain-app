@@ -10,7 +10,6 @@ import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.extensions.resolveAppFileRealPath
 import com.ismartcoding.plain.platform.fileToUriString
@@ -80,11 +79,7 @@ fun openAppFile(
         }
 
         fileName.isTextFile() -> {
-            if (file.appFile.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
-                navController.navigateTextFile(path, fileName)
-            } else {
-                DialogHelper.showMessage(Res.string.text_file_size_limit)
-            }
+            navController.navigateTextFile(path, fileName)
         }
 
         fileName.isPdfFile() -> {
