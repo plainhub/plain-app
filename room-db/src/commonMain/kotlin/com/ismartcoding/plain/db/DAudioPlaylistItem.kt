@@ -12,13 +12,13 @@ import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
 
 @Entity(
-    tableName = "audio_playlist_songs",
+    tableName = "audio_playlist_items",
     indices = [
         Index(value = ["playlist_id", "position"]),
         Index(value = ["playlist_id", "audio_path"], unique = true),
     ],
 )
-data class DAudioPlaylistSong(
+data class DAudioPlaylistItem(
     @PrimaryKey
     @ColumnInfo(name = "id")
     val id: String,
@@ -43,42 +43,42 @@ data class DAudioPlaylistSong(
 @Dao
 interface AudioPlaylistSongDao {
     @Query(
-        "SELECT * FROM audio_playlist_songs WHERE playlist_id = :playlistId " +
+        "SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId " +
             "ORDER BY position LIMIT :limit OFFSET :offset"
     )
-    suspend fun pageByPlaylist(playlistId: String, limit: Int, offset: Int): List<DAudioPlaylistSong>
+    suspend fun pageByPlaylist(playlistId: String, limit: Int, offset: Int): List<DAudioPlaylistItem>
 
-    @Query("SELECT * FROM audio_playlist_songs WHERE playlist_id = :playlistId ORDER BY position")
-    suspend fun getByPlaylist(playlistId: String): List<DAudioPlaylistSong>
+    @Query("SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId ORDER BY position")
+    suspend fun getByPlaylist(playlistId: String): List<DAudioPlaylistItem>
 
-    @Query("SELECT * FROM audio_playlist_songs WHERE playlist_id = :playlistId AND audio_path = :path")
-    suspend fun getByPath(playlistId: String, path: String): DAudioPlaylistSong?
+    @Query("SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId AND audio_path = :path")
+    suspend fun getByPath(playlistId: String, path: String): DAudioPlaylistItem?
 
-    @Query("SELECT COALESCE(MAX(position), -1) FROM audio_playlist_songs WHERE playlist_id = :playlistId")
+    @Query("SELECT COALESCE(MAX(position), -1) FROM audio_playlist_items WHERE playlist_id = :playlistId")
     suspend fun maxPosition(playlistId: String): Int
 
-    @Query("SELECT COUNT(*) FROM audio_playlist_songs WHERE playlist_id = :playlistId")
+    @Query("SELECT COUNT(*) FROM audio_playlist_items WHERE playlist_id = :playlistId")
     suspend fun countByPlaylist(playlistId: String): Int
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(songs: List<DAudioPlaylistSong>): List<Long>
+    suspend fun insertAll(songs: List<DAudioPlaylistItem>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(song: DAudioPlaylistSong): Long
+    suspend fun insert(song: DAudioPlaylistItem): Long
 
-    @Query("UPDATE audio_playlist_songs SET position = :position WHERE id = :id")
+    @Query("UPDATE audio_playlist_items SET position = :position WHERE id = :id")
     suspend fun updatePosition(id: String, position: Int)
 
-    @Query("DELETE FROM audio_playlist_songs WHERE id = :id")
+    @Query("DELETE FROM audio_playlist_items WHERE id = :id")
     suspend fun deleteById(id: String)
 
-    @Query("DELETE FROM audio_playlist_songs WHERE playlist_id = :playlistId AND audio_path = :path")
+    @Query("DELETE FROM audio_playlist_items WHERE playlist_id = :playlistId AND audio_path = :path")
     suspend fun deleteByPath(playlistId: String, path: String)
 
-    @Query("DELETE FROM audio_playlist_songs WHERE playlist_id = :playlistId")
+    @Query("DELETE FROM audio_playlist_items WHERE playlist_id = :playlistId")
     suspend fun deleteByPlaylist(playlistId: String)
 
-    @Query("DELETE FROM audio_playlist_songs WHERE audio_path IN (:paths)")
+    @Query("DELETE FROM audio_playlist_items WHERE audio_path IN (:paths)")
     suspend fun deleteByPaths(paths: List<String>)
 }
