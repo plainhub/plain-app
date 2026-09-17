@@ -45,6 +45,13 @@ internal fun AudioActionButtons(
 ) {
     var showAddToHomeDialog by remember { mutableStateOf(false) }
     PSheetPrimaryActionsCard {
+        if (!audioVM.showSearchBar.value) {
+            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                dragSelectState.enterSelectMode()
+                dragSelectState.select(m.id)
+                onDismiss()
+            }
+        }
         if (!audioVM.trash.value) {
             PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
                 shareFiles(listOf(getMediaItemUriString(DataType.AUDIO, m.id)))
@@ -64,7 +71,8 @@ internal fun AudioActionButtons(
                 audioVM.restore(tagsVM, setOf(m.id))
                 onDismiss()
             }
-        } else {
+        }
+        if (!AppFeatureType.MEDIA_TRASH.has() || audioVM.trash.value) {
             PSheetPrimaryAction(
                 Res.drawable.delete_forever,
                 stringResource(Res.string.delete),
@@ -78,19 +86,12 @@ internal fun AudioActionButtons(
             }
         }
     }
-    val hasSecondary = !audioVM.showSearchBar.value || (!audioVM.trash.value && !m.path.isUrl()) ||
+    val hasSecondary = (!audioVM.trash.value && !m.path.isUrl()) ||
         (AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value)
     if (hasSecondary) {
         VerticalSpace(12.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             Column {
-                if (!audioVM.showSearchBar.value) {
-                    PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                        dragSelectState.enterSelectMode()
-                        dragSelectState.select(m.id)
-                        onDismiss()
-                    }
-                }
                 if (!audioVM.trash.value && !m.path.isUrl()) {
                     PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                         showAddToHomeDialog = true

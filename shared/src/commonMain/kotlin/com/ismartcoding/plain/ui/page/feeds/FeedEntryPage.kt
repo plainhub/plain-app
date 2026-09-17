@@ -209,8 +209,12 @@ private fun FeedEntryArticle(
     val m = entryState.value ?: return
 
     // Only the visible page honors the mirrored VM content (manual/pull fetch
-    // result); neighbor pages render from the pager cache while swiping.
-    val contentOverride = if (isCurrent) feedEntryVM.content.value else ""
+    // result), and only while the mirror still belongs to this entry: after a
+    // swipe settles, recomposition runs BEFORE the page-change effect re-points
+    // the mirror, so an ungated read would feed the previous article's fetched
+    // content into this page's parser — and retainState keeps painting it until
+    // the wrong parse finishes (the "next article shows this one" bug).
+    val contentOverride = if (isCurrent && feedEntryVM.item.value?.id == pageId) feedEntryVM.content.value else ""
     val content = contentOverride.ifEmpty { pagerVM.cachedContent(pageId).ifEmpty { m.description } }
     val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
 
@@ -255,7 +259,10 @@ private fun FeedEntryArticle(
                         }
                     }
                 }
-                if (isCurrent && feedEntryVM.content.value.isEmpty() && !m.isFullContent && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
+                // Show the fetch button only while the rendered body is still the
+                // bare description — a fetched full text (mirror or pager cache)
+                // hides it, per page, without consulting the shared mirror.
+                if (isCurrent && content == m.description && !m.isFullContent && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
                     item {
                         // Keep the button on the article's base density so its label
                         // never truncates when the user scales the text up.

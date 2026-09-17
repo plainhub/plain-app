@@ -76,6 +76,13 @@ fun ViewDocBottomSheet(
             }
             item {
                 PSheetPrimaryActionsCard {
+                    if (!docsVM.showSearchBar.value) {
+                        PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                            dragSelectState.enterSelectMode()
+                            dragSelectState.select(m.id)
+                            onDismiss()
+                        }
+                    }
                     if (!docsVM.trash.value) {
                         PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
                             shareFile(m.path)
@@ -95,7 +102,8 @@ fun ViewDocBottomSheet(
                                 onDismiss()
                             }
                         }
-                    } else {
+                    }
+                    if (!AppFeatureType.MEDIA_TRASH.has() || docsVM.trash.value) {
                         PSheetPrimaryAction(
                             Res.drawable.delete_forever,
                             stringResource(Res.string.delete),
@@ -109,19 +117,12 @@ fun ViewDocBottomSheet(
                         }
                     }
                 }
-                val hasSecondary = !docsVM.showSearchBar.value ||
+                val hasSecondary =
                     (AppFeatureType.MEDIA_TRASH.has() && !docsVM.trash.value)
                 if (hasSecondary) {
                     VerticalSpace(12.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                         Column {
-                            if (!docsVM.showSearchBar.value) {
-                                PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                                    dragSelectState.enterSelectMode()
-                                    dragSelectState.select(m.id)
-                                    onDismiss()
-                                }
-                            }
                             if (AppFeatureType.MEDIA_TRASH.has() && !docsVM.trash.value) {
                                 PSheetActionRow(Res.drawable.trash_2, stringResource(Res.string.trash)) {
                                     if (isRPlus()) {

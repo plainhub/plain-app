@@ -49,6 +49,13 @@ internal fun VideoActionButtons(
 ) {
     var showAddToHomeDialog by remember { mutableStateOf(false) }
     PSheetPrimaryActionsCard {
+        if (!videosVM.showSearchBar.value) {
+            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                dragSelectState.enterSelectMode()
+                dragSelectState.select(m.id)
+                onDismiss()
+            }
+        }
         PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
             shareFiles(listOf(getMediaItemUriString(videosVM.dataType, m.id)))
             onDismiss()
@@ -66,7 +73,8 @@ internal fun VideoActionButtons(
                 videosVM.restore(tagsVM, setOf(m.id))
                 onDismiss()
             }
-        } else {
+        }
+        if (!AppFeatureType.MEDIA_TRASH.has() || videosVM.trash.value) {
             PSheetPrimaryAction(
                 Res.drawable.delete_forever,
                 stringResource(Res.string.delete),
@@ -80,19 +88,12 @@ internal fun VideoActionButtons(
             }
         }
     }
-    val hasSecondary = !videosVM.showSearchBar.value || (!m.path.isUrl() && !videosVM.trash.value) ||
+    val hasSecondary = (!m.path.isUrl() && !videosVM.trash.value) ||
         (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value)
     if (hasSecondary) {
         VerticalSpace(12.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             Column {
-                if (!videosVM.showSearchBar.value) {
-                    PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                        dragSelectState.enterSelectMode()
-                        dragSelectState.select(m.id)
-                        onDismiss()
-                    }
-                }
                 if (!m.path.isUrl() && !videosVM.trash.value) {
                     PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                         showAddToHomeDialog = true

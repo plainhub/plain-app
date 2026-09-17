@@ -30,6 +30,13 @@ internal fun FileInfoPrimaryActions(
     onShowPasteBar: (Boolean) -> Unit,
 ) {
     PSheetPrimaryActionsRow {
+        if (!filesVM.showSearchBar.value) {
+            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                filesVM.enterSelectMode()
+                filesVM.select(file.path)
+                onDismiss()
+            }
+        }
         PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
             shareFiles(listOf(file.path))
             onDismiss()
@@ -66,13 +73,6 @@ internal fun FileInfoSecondaryActions(
 ) {
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Column {
-            if (!filesVM.showSearchBar.value) {
-                PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                    filesVM.enterSelectMode()
-                    filesVM.select(file.path)
-                    onDismiss()
-                }
-            }
             PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
                 showRenameDialog.value = true
             }

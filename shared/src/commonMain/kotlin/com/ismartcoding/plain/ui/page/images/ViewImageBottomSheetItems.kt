@@ -50,6 +50,13 @@ internal fun ViewImageActionButtons(
 ) {
     var showAddToHomeDialog by remember { mutableStateOf(false) }
     PSheetPrimaryActionsCard {
+        if (!imagesVM.showSearchBar.value) {
+            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                dragSelectState.enterSelectMode()
+                dragSelectState.select(m.id)
+                onDismiss()
+            }
+        }
         PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
             shareFiles(listOf(getMediaItemUriString(DataType.IMAGE, m.id)))
             onDismiss()
@@ -67,7 +74,8 @@ internal fun ViewImageActionButtons(
                 imagesVM.restore(tagsVM, setOf(m.id))
                 onDismiss()
             }
-        } else {
+        }
+        if (!AppFeatureType.MEDIA_TRASH.has() || imagesVM.trash.value) {
             PSheetPrimaryAction(
                 Res.drawable.delete_forever,
                 stringResource(Res.string.delete),
@@ -81,20 +89,13 @@ internal fun ViewImageActionButtons(
             }
         }
     }
-    val hasSecondary = !imagesVM.showSearchBar.value || qrScanResult.isNotEmpty() ||
+    val hasSecondary = qrScanResult.isNotEmpty() ||
         (!m.path.isUrl() && !imagesVM.trash.value) ||
         (AppFeatureType.MEDIA_TRASH.has() && !imagesVM.trash.value)
     if (hasSecondary) {
         VerticalSpace(12.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             Column {
-                if (!imagesVM.showSearchBar.value) {
-                    PSheetActionRow(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                        dragSelectState.enterSelectMode()
-                        dragSelectState.select(m.id)
-                        onDismiss()
-                    }
-                }
                 if (qrScanResult.isNotEmpty()) {
                     PSheetActionRow(Res.drawable.scan_qr_code, stringResource(Res.string.scan_qrcode)) {
                         onShowQrScanResult()

@@ -273,7 +273,6 @@ type App {
   internalStoragePath: String!
   downloadsDir: String!
   developerMode: Boolean!
-  favoriteFolders: [FavoriteFolder!]!
   debug: Boolean!
 }
 
