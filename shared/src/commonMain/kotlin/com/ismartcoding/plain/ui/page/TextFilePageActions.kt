@@ -5,10 +5,6 @@ import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalFocusManager
@@ -16,6 +12,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.platform.exportLogsAsync
+import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.shareFile
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.PIconButton
@@ -41,29 +38,18 @@ internal fun RowScope.TextFilePageActions(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
-    var showLargeFileConfirm by remember { mutableStateOf(false) }
 
     fun requestEditMode() {
-        if (controller.openFileSize > 20L * 1024 * 1024) showLargeFileConfirm = true else textFileVM.enterEditMode()
-    }
-
-    if (showLargeFileConfirm) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showLargeFileConfirm = false },
-            title = { androidx.compose.material3.Text(stringResource(com.ismartcoding.plain.i18n.Res.string.edit)) },
-            text = { androidx.compose.material3.Text(stringResource(com.ismartcoding.plain.i18n.Res.string.large_file_edit)) },
-            confirmButton = {
-                androidx.compose.material3.TextButton(onClick = {
-                    showLargeFileConfirm = false
+        if (controller.openFileSize > 20L * 1024 * 1024) {
+            DialogHelper.showConfirmDialog(
+                title = LocaleHelper.getString(Res.string.edit),
+                message = LocaleHelper.getString(Res.string.large_file_edit),
+                confirmButton = Pair(LocaleHelper.getString(Res.string.ok)) {
                     textFileVM.enterEditMode()
-                }) { androidx.compose.material3.Text(stringResource(com.ismartcoding.plain.i18n.Res.string.ok)) }
-            },
-            dismissButton = {
-                androidx.compose.material3.TextButton(onClick = { showLargeFileConfirm = false }) {
-                    androidx.compose.material3.Text(stringResource(com.ismartcoding.plain.i18n.Res.string.cancel))
-                }
-            },
-        )
+                },
+                dismissButton = Pair(LocaleHelper.getString(Res.string.cancel)) {},
+            )
+        } else textFileVM.enterEditMode()
     }
 
     if (controller.readOnly.value) {

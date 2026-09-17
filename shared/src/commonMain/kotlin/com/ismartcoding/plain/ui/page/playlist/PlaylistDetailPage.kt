@@ -4,10 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
@@ -25,8 +22,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DAudioPlaylistSong
-import com.ismartcoding.plain.enums.ButtonSize
-import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import com.ismartcoding.plain.i18n.*
@@ -85,7 +80,6 @@ fun PlaylistDetailPage(
     var version by remember { mutableIntStateOf(0) }
     var showMore by remember { mutableStateOf(false) }
     var showRename by remember { mutableStateOf(false) }
-    var showDelete by remember { mutableStateOf(false) }
 
     // Reload when coming back from add-songs or after any mutation.
     LaunchedEffect(playlistId, version) {
@@ -153,38 +147,6 @@ fun PlaylistDetailPage(
             onDismiss = { showRename = false },
         )
     }
-    if (showDelete) {
-        AlertDialog(
-            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
-            onDismissRequest = { showDelete = false },
-            title = { Text(stringResource(Res.string.delete_playlist)) },
-            text = {
-                Text(
-                    LocaleHelper.getStringF(
-                        Res.string.delete_playlist_confirm_text,
-                        playlistName,
-                        songs.size.toString(),
-                    ),
-                )
-            },
-            confirmButton = {
-                PFilledButton(
-                    text = stringResource(Res.string.delete),
-                    type = ButtonType.DANGER,
-                    buttonSize = ButtonSize.SMALL,
-                    onClick = {
-                        showDelete = false
-                        scope.launch {
-                            withIO { AudioQueueManager.deletePlaylist(playlistId) }
-                            DialogHelper.showMessage(deletedMsg)
-                            navController.popBackStack()
-                        }
-                    },
-                )
-            },
-            dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = { showDelete = false }) },
-        )
-    }
     if (showMore) {
         val sortNames = listOf(
             stringResource(Res.string.sort_custom),
@@ -207,7 +169,23 @@ fun PlaylistDetailPage(
             }
             PSheetActionRow(Res.drawable.delete_forever, stringResource(Res.string.delete_playlist)) {
                 showMore = false
-                showDelete = true
+                DialogHelper.showConfirmDialog(
+                    title = LocaleHelper.getString(Res.string.delete_playlist),
+                    message = LocaleHelper.getStringF(
+                        Res.string.delete_playlist_confirm_text,
+                        playlistName,
+                        songs.size.toString(),
+                    ),
+                    confirmButton = Pair(LocaleHelper.getString(Res.string.delete)) {
+                        scope.launch {
+                            withIO { AudioQueueManager.deletePlaylist(playlistId) }
+                            DialogHelper.showMessage(deletedMsg)
+                            navController.popBackStack()
+                        }
+                    },
+                    dismissButton = Pair(LocaleHelper.getString(Res.string.cancel)) {},
+                    danger = true,
+                )
             }
             BottomSpace()
         }

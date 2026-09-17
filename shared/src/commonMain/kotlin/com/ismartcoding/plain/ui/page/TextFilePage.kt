@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +24,7 @@ import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.platform.PBackHandler
+import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -32,6 +32,7 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.codeeditor.CodeEditor
 import com.ismartcoding.plain.ui.components.codeeditor.EditorLoadState
 import com.ismartcoding.plain.ui.models.TextFileViewModel
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,10 +46,18 @@ fun TextFilePage(
     textFileVM: TextFileViewModel = viewModel { TextFileViewModel() },
 ) {
     var isSaving by remember { mutableStateOf(false) }
-    var showDiscardConfirm by remember { mutableStateOf(false) }
     // Close affordances in edit mode (X / back) exit edit mode, not the page.
     fun requestClose() {
-        if (textFileVM.controller.isDirty.value) showDiscardConfirm = true else textFileVM.exitEditMode(discard = false)
+        if (textFileVM.controller.isDirty.value) {
+            DialogHelper.showConfirmDialog(
+                title = LocaleHelper.getString(Res.string.discard_changes),
+                message = LocaleHelper.getString(Res.string.discard_changes_text),
+                confirmButton = Pair(LocaleHelper.getString(Res.string.ok)) {
+                    textFileVM.exitEditMode(discard = true)
+                },
+                dismissButton = Pair(LocaleHelper.getString(Res.string.cancel)) {},
+            )
+        } else textFileVM.exitEditMode(discard = false)
     }
     val rotation by animateFloatAsState(
         targetValue = if (isSaving) 360f else 0f,
@@ -69,25 +78,6 @@ fun TextFilePage(
 
     PBackHandler(enabled = !textFileVM.controller.readOnly.value) {
         requestClose()
-    }
-
-    if (showDiscardConfirm) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showDiscardConfirm = false },
-            title = { Text(stringResource(Res.string.discard_changes)) },
-            text = { Text(stringResource(Res.string.discard_changes_text)) },
-            confirmButton = {
-                androidx.compose.material3.TextButton(onClick = {
-                    showDiscardConfirm = false
-                    textFileVM.exitEditMode(discard = true)
-                }) { Text(stringResource(Res.string.ok)) }
-            },
-            dismissButton = {
-                androidx.compose.material3.TextButton(onClick = { showDiscardConfirm = false }) {
-                    Text(stringResource(Res.string.cancel))
-                }
-            },
-        )
     }
 
     PScaffold(

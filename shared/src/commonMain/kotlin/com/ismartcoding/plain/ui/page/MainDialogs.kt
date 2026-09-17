@@ -48,22 +48,33 @@ fun MainDialogs(
     }
     confirmEvent?.let {
         AlertDialog(
-        containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
+            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
             onDismissRequest = onDismissConfirm,
-            title = { if (it.title.isNotEmpty()) Text(it.title) },
+            title = {
+                if (it.title.isNotEmpty()) {
+                    Text(it.title)
+                }
+            },
             text = { Text(it.message) },
             confirmButton = {
-                PFilledButton(
+                PTextButton(
                     text = it.confirmButton.first,
                     buttonSize = ButtonSize.MEDIUM,
-                    onClick = { it.confirmButton.second(); onDismissConfirm() },
+                    onClick = {
+                        it.confirmButton.second()
+                        onDismissConfirm()
+                    },
+                    contentColor = if (it.danger) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 )
             },
             dismissButton = {
                 it.dismissButton?.let { dismiss ->
                     PTextButton(
                         text = dismiss.first,
-                        onClick = { dismiss.second(); onDismissConfirm() },
+                        onClick = {
+                            dismiss.second()
+                            onDismissConfirm()
+                        },
                     )
                 }
             },

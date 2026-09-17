@@ -54,12 +54,13 @@ object DialogHelper {
         message: String,
         confirmButton: Pair<String, () -> Unit>? = null,
         dismissButton: Pair<String, () -> Unit>? = null,
+        danger: Boolean = false,
     ) {
         if (confirmButton != null) {
-            sendEvent(ConfirmDialogEvent(title, message, confirmButton, dismissButton))
+            sendEvent(ConfirmDialogEvent(title, message, confirmButton, dismissButton, danger))
         } else {
             coIO {
-                sendEvent(ConfirmDialogEvent(title, message, Pair(getComposeString(Res.string.ok)) {}, dismissButton))
+                sendEvent(ConfirmDialogEvent(title, message, Pair(getComposeString(Res.string.ok)) {}, dismissButton, danger))
             }
         }
     }
@@ -67,10 +68,11 @@ object DialogHelper {
     fun showConfirmDialog(
         title: String,
         message: String,
+        danger: Boolean = false,
         callback: () -> Unit = {},
     ) {
         coIO {
-            sendEvent(ConfirmDialogEvent(title, message, Pair(getComposeString(Res.string.ok), callback), null))
+            sendEvent(ConfirmDialogEvent(title, message, Pair(getComposeString(Res.string.ok), callback), null, danger))
         }
     }
 
@@ -95,9 +97,12 @@ object DialogHelper {
         callback: () -> Unit,
     ) {
         coIO {
-            sendEvent(ConfirmDialogEvent("", message,
-                confirmButton = Pair(getComposeString(Res.string.ok)) { callback() },
-                dismissButton = Pair(getComposeString(Res.string.cancel)) {}))
+            sendEvent(
+                ConfirmDialogEvent(
+                    "", message,
+                    confirmButton = Pair(getComposeString(Res.string.ok)) { callback() },
+                    dismissButton = Pair(getComposeString(Res.string.cancel)) {})
+            )
         }
     }
 

@@ -1,30 +1,48 @@
 package com.ismartcoding.plain.ui.page.audioplayer
 
-import com.ismartcoding.plain.i18n.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.clear_all
+import com.ismartcoding.plain.i18n.clear_all_confirm
+import com.ismartcoding.plain.i18n.delete_forever
+import com.ismartcoding.plain.i18n.drag_number_to_reorder_list
+import com.ismartcoding.plain.i18n.empty_playlist
+import com.ismartcoding.plain.i18n.playlist
+import com.ismartcoding.plain.i18n.playlist_title
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
-import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,26 +50,9 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isAudioPlaying by audioIsPlayingFlow().collectAsState()
-    var showClearConfirmDialog by remember { mutableStateOf(false) }
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
         scope.launch(Dispatchers.Default) { audioPlaylistVM.reorder(from.index, to.index) }
-    }
-
-    if (showClearConfirmDialog) {
-        AlertDialog(
-            containerColor = MaterialTheme.colorScheme.dialogSheetBackground,
-            onDismissRequest = { showClearConfirmDialog = false },
-            title = { Text(stringResource(Res.string.clear_all)) },
-            text = { Text(stringResource(Res.string.clear_all_confirm)) },
-            confirmButton = {
-                TextButton(
-                    onClick = { scope.launch(Dispatchers.Default) { audioPlaylistVM.clearAsync(); showClearConfirmDialog = false } },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
-                ) { Text(stringResource(Res.string.confirm)) }
-            },
-            dismissButton = { PTextButton(text = stringResource(Res.string.cancel), onClick = { showClearConfirmDialog = false }) },
-        )
     }
 
     PModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
@@ -63,7 +64,15 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                 subtitle = if (audioPlaylistVM.canReorder.value && audioPlaylistVM.playlistItems.value.isNotEmpty()) stringResource(Res.string.drag_number_to_reorder_list) else "",
                 actions = {
                     if (audioPlaylistVM.playlistItems.value.isNotEmpty()) {
-                        IconButton(onClick = { showClearConfirmDialog = true }) {
+                        IconButton(onClick = {
+                            DialogHelper.showConfirmDialog(
+                                LocaleHelper.getString(Res.string.clear_all),
+                                LocaleHelper.getString(Res.string.clear_all_confirm),
+                                danger = true
+                            ) {
+                                scope.launch { audioPlaylistVM.clearAsync() }
+                            }
+                        }) {
                             Icon(painter = painterResource(Res.drawable.delete_forever), contentDescription = "Clear", tint = MaterialTheme.colorScheme.error)
                         }
                     }

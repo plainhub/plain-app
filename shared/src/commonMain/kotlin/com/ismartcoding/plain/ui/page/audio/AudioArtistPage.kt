@@ -123,7 +123,10 @@ fun AudioArtistPage(
             )
         },
     ) { paddingValues ->
-        Box(Modifier.fillMaxSize().padding(paddingValues)) {
+        // Only the top inset goes on the container; the player bar carries its
+        // own navigationBarsPadding and must sit flush at the screen bottom
+        // (same pattern as AudioAllPage).
+        Box(Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
             LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
                 item(key = "hero") {
                     Row(
