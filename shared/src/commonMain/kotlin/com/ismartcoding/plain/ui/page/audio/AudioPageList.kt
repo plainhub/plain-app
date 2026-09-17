@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.DTag
@@ -49,6 +50,7 @@ internal fun ColumnScope.AudioPageList(
     tagsVM: TagsViewModel, castVM: CastViewModel,
     audioTagsMap: Map<String, List<DTag>>, isAudioPlaying: Boolean,
     topRefreshLayoutState: RefreshLayoutState, paddingValues: PaddingValues,
+    extraBottomPadding: Dp = 0.dp,
 ) {
     val scope = rememberCoroutineScope()
 
@@ -58,7 +60,8 @@ internal fun ColumnScope.AudioPageList(
                 val scrollState = audioVM.scrollStateMap[0] ?: rememberLazyListState()
                 LazyColumnScrollbar(state = scrollState) {
                     LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
-                        .listDragSelect(items = itemsState, state = dragSelectState), state = scrollState) {
+                        .listDragSelect(items = itemsState, state = dragSelectState), state = scrollState,
+                        contentPadding = PaddingValues(bottom = extraBottomPadding)) {
                         item { TopSpace() }
                         items(items = itemsState, key = { it.id }) { item ->
                             val tags = audioTagsMap[item.id] ?: emptyList()

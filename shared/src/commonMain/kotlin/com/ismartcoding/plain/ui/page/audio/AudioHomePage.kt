@@ -33,6 +33,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -106,6 +108,9 @@ fun AudioHomePage(
     val isAudioPlaying by audioIsPlayingFlow().collectAsState()
     audioVM.scrollStateMap[0] = scrollState
     var showCreatePlaylist by remember { mutableStateOf(false) }
+    // Floating player bar covers list content; measure it and pad the lists.
+    val density = LocalDensity.current
+    var playerBarClearance by remember { mutableStateOf(0.dp) }
 
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
@@ -195,10 +200,15 @@ fun AudioHomePage(
                     if (audioVM.showSearchBar.value || sidebarFilterActive) {
                         AudioPageList(
                             scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
-                            tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues
+                            tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues,
+                            extraBottomPadding = playerBarClearance,
                         )
                     } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        state = scrollState,
+                        contentPadding = PaddingValues(bottom = playerBarClearance),
+                    ) {
                         item(key = "pills") {
                             Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                                 PFilledButton(
@@ -274,7 +284,9 @@ fun AudioHomePage(
                     }
                 }
             }
-            AudioPlayerBar(audioPlaylistVM, castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = dragSelectState)
+            AudioPlayerBar(audioPlaylistVM, castVM, modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } }, dragSelectState = dragSelectState)
             AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = dragSelectState)
         }
     }

@@ -17,8 +17,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -73,6 +78,8 @@ fun AudioAllPage(
     val itemsState = audioState.itemsState
     val scrollState = audioState.scrollState
     val isAudioPlaying by audioIsPlayingFlow().collectAsState()
+    val density = LocalDensity.current
+    var playerBarClearance by remember { mutableStateOf(0.dp) }
     audioVM.scrollStateMap[0] = scrollState
 
     val topRefreshLayoutState = rememberRefreshLayoutState {
@@ -149,10 +156,13 @@ fun AudioAllPage(
 
                 AudioPageList(
                     scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
-                    tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues
+                    tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues,
+                    extraBottomPadding = playerBarClearance,
                 )
             }
-            AudioPlayerBar(audioPlaylistVM, castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = audioState.dragSelectState)
+            AudioPlayerBar(audioPlaylistVM, castVM, modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } }, dragSelectState = audioState.dragSelectState)
             AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = audioState.dragSelectState)
         }
     }
