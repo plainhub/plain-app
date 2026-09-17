@@ -42,9 +42,11 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun WelcomeIllustration() {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        PhoneFrame { AppHomeScreen() }
-        DeviceLink(Modifier.padding(horizontal = 4.dp))
-        BrowserFrame(modifier = Modifier.weight(1f), height = 136.dp) {
+        // Phone and browser share one height; below ~185dp the phone mock
+        // clips its bottom nav. Content lays out natively at the frame size.
+        PhoneFrame(modifier = Modifier.width(104.dp).height(200.dp)) { AppHomeScreen() }
+        DeviceLink(Modifier.padding(horizontal = 2.dp))
+        BrowserFrame(modifier = Modifier.weight(1f), height = 200.dp) {
             Row(modifier = Modifier.fillMaxSize()) {
                 WebRail(activeIndex = 2, pressed = false)
                 WebContent(sectionIndex = 2, modifier = Modifier.weight(1f))

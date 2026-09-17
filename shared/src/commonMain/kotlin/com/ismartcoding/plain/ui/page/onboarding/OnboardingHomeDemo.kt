@@ -44,7 +44,8 @@ import org.jetbrains.compose.resources.stringResource
 
 /** App home in the service-ON state: device-name top bar (TopBarHome) +
  *  service card (PlainAppServiceSection) + Desktop Access + Cast Receiver +
- *  bottom nav, mirroring the real home screen. Scaled to a 128dp mockup. */
+ *  bottom nav, mirroring the real home screen. Lays out natively at the
+ *  104×200dp mockup; long single-line labels ellipsize. */
 @Composable
 internal fun AppHomeScreen() {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -61,6 +62,7 @@ internal fun AppHomeScreen() {
                     lineHeight = 9.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 HorizontalSpace(dp = 2.dp)
                 Icon(
@@ -98,6 +100,7 @@ internal fun AppHomeScreen() {
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
                 VerticalSpace(dp = 4.dp)
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -130,6 +133,7 @@ internal fun AppHomeScreen() {
                         lineHeight = 8.5.sp,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
                     MiniSwitch(activated = true)
@@ -155,10 +159,11 @@ internal fun AppHomeScreen() {
                 }
                 VerticalSpace(dp = 3.dp)
                 Text(
-                    text = "http://192.168.1.20:8080",
+                    text = "192.168.1.20:8080",
                     fontSize = 7.sp,
                     lineHeight = 8.sp,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 7.dp),
                 )
                 VerticalSpace(dp = 2.dp)
@@ -169,6 +174,7 @@ internal fun AppHomeScreen() {
                     color = mockupMutedColor(),
                     textAlign = TextAlign.Center,
                     maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 VerticalSpace(dp = 3.dp)
@@ -190,6 +196,7 @@ internal fun AppHomeScreen() {
                         fontSize = 7.5.sp,
                         lineHeight = 8.5.sp,
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
                     Icon(
@@ -222,6 +229,7 @@ internal fun AppHomeScreen() {
                         lineHeight = 8.5.sp,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f),
                     )
                     MiniSwitch(activated = true)
@@ -259,7 +267,7 @@ private fun MiniOutlinedButton(text: String, color: Color, modifier: Modifier = 
             .padding(vertical = 2.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = text, fontSize = 6.sp, lineHeight = 7.sp, color = color, maxLines = 1)
+        Text(text = text, fontSize = 6.sp, lineHeight = 7.sp, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
