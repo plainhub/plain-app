@@ -204,17 +204,51 @@ object AudioQueueManager {
         ensureMigrated()
         val order = playbackOrder()
         if (order.total == 0) return null
+        val superseded = supersededSourcePaths(order)
         val current = currentRank(order)
-        val target = if (shuffle) {
-            Random.nextInt(order.total)
+        val total = order.total - superseded.size
+        var target = if (shuffle) {
+            Random.nextInt(total)
         } else {
             val from = if (current < 0) (if (isNext) -1 else 0) else current
-            if (isNext) (from + 1) % order.total else (from - 1 + order.total) % order.total
+            if (isNext) (from + 1) % total else (from - 1 + total) % total
         }
-        val audio = trackAt(order, target) ?: return null
+        // Walk past source copies of manually queued tracks — they play from
+        // their manual slot instead and must not repeat.
+        var audio = trackAt(order, target)
+        while (audio != null && audio.path in superseded) {
+            target = if (isNext) (target + 1) % order.total else (target - 1 + order.total) % order.total
+            val next = trackAt(order, target)
+            if (next?.path == audio.path) break
+            audio = next
+        }
+        if (audio == null || audio.path in superseded) return null
         saveCurrent(order, target)
         recordHistory(audio.path, audio.title, audio.artist, audio.duration)
         return audio
+    }
+
+    /**
+     * Source copies of manually queued tracks are superseded: the manual slot
+     * is the one that plays, so they are skipped in total/count, rendering and
+     * sequential resolution. This is what keeps the queue free of duplicates.
+     */
+    private suspend fun supersededSourcePaths(order: Order): Set<String> {
+        if (order.manualCount == 0 || order.source.source == AudioPlaySource.NONE) return emptySet()
+        val queued = queueDao.allItems().map { it.path }
+        return when (order.source.source) {
+            AudioPlaySource.PLAYLIST ->
+                songDao.getByPlaylist(order.source.playlistId)
+                    .filter { it.audioPath in queued.toSet() }
+                    .map { it.audioPath }
+                    .toSet()
+            else -> {
+                val found = searchMedia(DataType.AUDIO, "ids:" + queued.joinToString(","), queued.size, 0, librarySortOf(order.source))
+                    .filterIsInstance<DAudio>()
+                    .map { it.path }
+                found.toSet()
+            }
+        }
     }
 
     /** Record that [path] started playing (manual jumps included). */
@@ -327,11 +361,15 @@ object AudioQueueManager {
         saveSource(order.source.copy(currentPath = path, currentIndex = sourcePos))
     }
 
-    suspend fun queueTotal(): Int = playbackOrder().total
+    suspend fun queueTotal(): Int {
+        val order = playbackOrder()
+        return order.total - supersededSourcePaths(order).size
+    }
 
     /** A page of the playback order — never materializes the whole queue. */
     suspend fun queuePage(offset: Int, limit: Int): List<DPlaylistAudio> {
         val order = playbackOrder()
+        val superseded = supersededSourcePaths(order)
         val out = mutableListOf<DPlaylistAudio>()
         var rank = offset.coerceAtLeast(0)
         val end = minOf(offset + limit, order.total)
@@ -339,7 +377,7 @@ object AudioQueueManager {
             when {
                 rank <= order.currentPos -> { // head: source up to the current track
                     val segEnd = minOf(end, order.currentPos + 1)
-                    out += sourcePage(order.source, rank, segEnd - rank)
+                    out += sourcePage(order.source, rank, segEnd - rank).filter { it.path !in superseded }
                     rank = segEnd
                 }
                 rank <= order.currentPos + order.manualCount -> { // manual queue
@@ -348,7 +386,7 @@ object AudioQueueManager {
                     rank = segEnd
                 }
                 else -> { // tail: the rest of the source
-                    out += sourcePage(order.source, rank - order.manualCount, end - rank)
+                    out += sourcePage(order.source, rank - order.manualCount, end - rank).filter { it.path !in superseded }
                     rank = end
                 }
             }

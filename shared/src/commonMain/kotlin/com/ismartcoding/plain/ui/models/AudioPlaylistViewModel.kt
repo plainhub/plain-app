@@ -36,13 +36,10 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
 
     suspend fun moreAsync() {
         if (noMore.value) return
-        val more = AudioQueueManager.queuePage(playlistItems.value.size, pageLimit)
-        if (more.isEmpty()) {
-            noMore.value = true
-            return
-        }
-        playlistItems.value = playlistItems.value + more
-        noMore.value = playlistItems.value.size >= queueCount.value
+        // Refetch the whole window instead of offset-appending: manual queue
+        // mutations shift ranks, so an offset append can overlap the old window
+        // and duplicate tracks.
+        refreshWindow(playlistItems.value.size + pageLimit)
     }
 
     fun isInPlaylist(path: String): Boolean {
@@ -128,9 +125,9 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         }
     }
 
-    private suspend fun refreshWindow() {
+    private suspend fun refreshWindow(target: Int = pageLimit) {
         val total = AudioQueueManager.queueTotal()
-        val window = AudioQueueManager.queuePage(0, maxOf(playlistItems.value.size, pageLimit))
+        val window = AudioQueueManager.queuePage(0, maxOf(target, pageLimit))
         playlistItems.value = window
         queueCount.value = total
         noMore.value = window.size >= total

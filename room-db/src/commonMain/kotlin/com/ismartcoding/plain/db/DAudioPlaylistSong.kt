@@ -60,6 +60,7 @@ interface AudioPlaylistSongDao {
     @Query("SELECT COUNT(*) FROM audio_playlist_songs WHERE playlist_id = :playlistId")
     suspend fun countByPlaylist(playlistId: String): Int
 
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(songs: List<DAudioPlaylistSong>): List<Long>
 
