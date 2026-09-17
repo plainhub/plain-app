@@ -53,6 +53,10 @@ fun <T : IData> MediaTopBar(
     onSortSelected: (sortBy: FileSortBy) -> Unit = {},
     onSearchAction: (tagsViewModel: TagsViewModel) -> Unit,
     bottomBar: (@Composable () -> Unit)? = null,
+    /** Replaces the default leading icon (folder drawer) — e.g. a back arrow on sub-pages. */
+    navigationIcon: (@Composable () -> Unit)? = null,
+    /** Replaces the default trailing actions (search + more/close capsule) on sub-pages. */
+    topBarActions: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val isDocs = mediaVM.dataType == DataType.DOC
@@ -91,7 +95,7 @@ fun <T : IData> MediaTopBar(
                     title = title,
                     containerColor = containerColor,
                     scrollToTop = scrollToTop,
-                    navigationIcon = {
+                    navigationIcon = navigationIcon ?: @Composable {
                         if (dragSelectState.selectMode) {
                             NavigationCloseIcon {
                                 dragSelectState.exitSelectMode()
@@ -127,7 +131,9 @@ fun <T : IData> MediaTopBar(
                                 },
                             )
                             HorizontalSpace(dp = 8.dp)
-                        } else {
+                        } else topBarActions?.let {
+                            it()
+                        } ?: run {
                             ActionButtonSearch {
                                 mediaVM.enterSearchMode()
                             }

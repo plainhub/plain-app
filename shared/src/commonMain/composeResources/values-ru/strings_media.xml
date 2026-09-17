@@ -65,7 +65,6 @@
     <string name="unmute">Включить звук</string>
 
     <string name="shuffle_play">Перемешать</string>
-    <string name="all_songs">Все треки</string>
     <string name="artists">Исполнители</string>
     <string name="playlists">Плейлисты</string>
     <string name="recent">Недавние</string>
@@ -74,10 +73,8 @@
     <string name="playlist_name">Название плейлиста</string>
     <string name="rename_playlist">Переименовать плейлист</string>
     <string name="delete_playlist">Удалить плейлист</string>
-    <string name="delete_playlist_confirm_text">Треки из "%1$s" будут удалены из плейлиста. Аудиофайлы не будут удалены.</string>
-    <string name="add_songs">Добавить треки</string>
-    <string name="add_n_songs">Добавить %1$d</string>
-    <string name="n_songs">%1$d треков</string>
+    <string name="delete_playlist_confirm_text">Элементы из "%1$s" будут удалены из плейлиста. Аудиофайлы не будут удалены.</string>
+    <string name="add_n_items">Добавить %1$d</string>
     <string name="total_minutes">%1$d мин</string>
     <string name="play_next">Играть следующим</string>
     <string name="add_to_queue">В очередь</string>
@@ -88,4 +85,5 @@
     <string name="playlist_created">Плейлист создан</string>
     <string name="playlist_deleted">Плейлист удалён</string>
     <string name="renamed">Переименовано</string>
+
 </resources>

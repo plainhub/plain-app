@@ -48,4 +48,8 @@
         <item quantity="one">மொத்தம்: %1$d போமோடோரோ</item>
         <item quantity="other">மொத்தம்: %1$d போமோடோரோ</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">%1$d உருப்படிகள் சேர்க்கப்பட்டன</item>
+        <item quantity="other">%1$d உருப்படிகள் சேர்க்கப்பட்டன</item>
+    </plurals>
 </resources>

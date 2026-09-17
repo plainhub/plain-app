@@ -48,4 +48,8 @@
         <item quantity="one">Tổng: %1$d pomodoro</item>
         <item quantity="other">Tổng: %1$d pomodoro</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">Đã thêm %1$d mục</item>
+        <item quantity="other">Đã thêm %1$d mục</item>
+    </plurals>
 </resources>

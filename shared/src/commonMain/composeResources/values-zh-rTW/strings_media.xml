@@ -65,7 +65,6 @@
     <string name="unmute">取消靜音</string>
 
     <string name="shuffle_play">隨機播放</string>
-    <string name="all_songs">全部歌曲</string>
     <string name="artists">歌手</string>
     <string name="playlists">歌單</string>
     <string name="recent">最近</string>
@@ -74,10 +73,8 @@
     <string name="playlist_name">歌單名稱</string>
     <string name="rename_playlist">重命名歌單</string>
     <string name="delete_playlist">刪除歌單</string>
-    <string name="delete_playlist_confirm_text">「%1$s」中的歌曲將從歌單移除，音訊檔案不會被刪除。</string>
-    <string name="add_songs">添加歌曲</string>
-    <string name="add_n_songs">新增 %1$d</string>
-    <string name="n_songs">%1$d 首</string>
+    <string name="delete_playlist_confirm_text">「%1$s」中的項目將從歌單移除，音訊檔案不會被刪除。</string>
+    <string name="add_n_items">新增 %1$d</string>
     <string name="total_minutes">%1$d 分鐘</string>
     <string name="play_next">下一首播放</string>
     <string name="add_to_queue">加入播放佇列</string>
@@ -88,4 +85,5 @@
     <string name="playlist_created">歌單已建立</string>
     <string name="playlist_deleted">歌單已刪除</string>
     <string name="renamed">已重新命名</string>
+
 </resources>

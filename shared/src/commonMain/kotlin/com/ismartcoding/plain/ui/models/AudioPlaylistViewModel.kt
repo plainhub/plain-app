@@ -22,6 +22,9 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
 
     /** Paths currently in the manual queue — "remove" applies to these only. */
     val queuedPaths = mutableStateOf<Set<String>>(emptySet())
+
+    /** Playlist id of the active playback source, null when none. */
+    val activePlaylistId = mutableStateOf<String?>(null)
     override val selectedPath = mutableStateOf("")
 
     private val pageLimit = 200
@@ -132,6 +135,7 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         queueCount.value = total
         noMore.value = window.size >= total
         canReorder.value = AudioQueueManager.source().source == AudioPlaySource.NONE
+        activePlaylistId.value = AudioQueueManager.activePlaylistId()
         queuedPaths.value = AudioQueueManager.queuedPaths()
     }
 }

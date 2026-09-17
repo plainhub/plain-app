@@ -48,4 +48,8 @@
         <item quantity="one">Gesamt: %1$d Pomodoro</item>
         <item quantity="other">Gesamt: %1$d Pomodoros</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">%1$d Element hinzugefügt</item>
+        <item quantity="other">%1$d Elemente hinzugefügt</item>
+    </plurals>
 </resources>

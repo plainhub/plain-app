@@ -65,7 +65,6 @@
     <string name="unmute">ஒலியை இயக்கு</string>
 
     <string name="shuffle_play">கலக்கு</string>
-    <string name="all_songs">அனைத்து பாடல்களும்</string>
     <string name="artists">கலைஞர்கள்</string>
     <string name="playlists">ப்ளேலிஸ்டுகள்</string>
     <string name="recent">சமீபத்தியவை</string>
@@ -74,10 +73,8 @@
     <string name="playlist_name">ப்ளேலிஸ்ட் பெயர்</string>
     <string name="rename_playlist">ப்ளேலிஸ்ட்டை மறுபெயரிடு</string>
     <string name="delete_playlist">ப்ளேலிஸ்ட்டை நீக்கு</string>
-    <string name="delete_playlist_confirm_text">"%1$s" இல் உள்ள பாடல்கள் ப்ளேலிஸ்டிலிருந்து அகற்றப்படும். ஆடியோ கோப்புகள் நீக்கப்படாது.</string>
-    <string name="add_songs">பாடல்களைச் சேர்</string>
-    <string name="add_n_songs">%1$d சேர்</string>
-    <string name="n_songs">%1$d பாடல்கள்</string>
+    <string name="delete_playlist_confirm_text">"%1$s" இல் உள்ள உருப்படிகள் ப்ளேலிஸ்டிலிருந்து அகற்றப்படும். ஆடியோ கோப்புகள் நீக்கப்படாது.</string>
+    <string name="add_n_items">%1$d சேர்</string>
     <string name="total_minutes">%1$d நிமிடம்</string>
     <string name="play_next">அடுத்து இயக்கு</string>
     <string name="add_to_queue">வரிசையில் சேர்</string>
@@ -88,4 +85,5 @@
     <string name="playlist_created">ப்ளேலிஸ்ட் உருவாக்கப்பட்டதু</string>
     <string name="playlist_deleted">ப்ளேলிஸ்ட் நீக்கப்பட்டது</string>
     <string name="renamed">மறுபெயரிடப்பட்டது</string>
+
 </resources>

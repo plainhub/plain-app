@@ -20,6 +20,10 @@ import androidx.navigation.toRoute
 import com.ismartcoding.plain.chat.data.ChatTargetType
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
+import com.ismartcoding.plain.ui.models.AudioHomeViewModel
+import com.ismartcoding.plain.ui.models.CastViewModel
+import com.ismartcoding.plain.ui.models.AudioViewModel
+import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
@@ -40,6 +44,7 @@ import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.audio.AudioAllPage
+import com.ismartcoding.plain.ui.page.audio.ArtistsPage
 import com.ismartcoding.plain.ui.page.audio.AudioHomePage
 import com.ismartcoding.plain.ui.page.audio.AudioArtistPage
 import com.ismartcoding.plain.ui.page.playlist.PlaylistDetailPage
@@ -123,6 +128,13 @@ fun MainNavGraph(
     pomodoroVM: PomodoroViewModel,
 ) {
     val updateVM: UpdateViewModel = viewModel { UpdateViewModel() }
+    // Activity-scoped audio VMs shared by every audio destination (home,
+    // all-songs, artists, artist detail): one library load, one queue mirror.
+    val audioVM = viewModel(key = "audioVM") { AudioViewModel() }
+    val audioTagsVM = viewModel(key = "audioTagsVM") { TagsViewModel() }
+    val audioFoldersVM = viewModel(key = "audioFoldersVM") { MediaFoldersViewModel() }
+    val audioCastVM = viewModel(key = "audioCastVM") { CastViewModel() }
+    val audioHomeVM = viewModel(key = "audioHomeVM") { AudioHomeViewModel() }
     NavHost(
         modifier = Modifier.background(MaterialTheme.colorScheme.surface),
         navController = navController,
@@ -143,15 +155,20 @@ fun MainNavGraph(
         }
         composable<Routing.Images> { ImagesPage(navController) }
         composable<Routing.Videos> { VideosPage(navController) }
-        composable<Routing.Audio> { AudioHomePage(navController, audioPlaylistVM) }
-        composable<Routing.AudioAll> { AudioAllPage(navController, audioPlaylistVM) }
+        composable<Routing.Audio> {
+            AudioHomePage(navController, audioPlaylistVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM, audioHomeVM)
+        }
+        composable<Routing.AudioAll> {
+            AudioAllPage(navController, audioPlaylistVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM)
+        }
+        composable<Routing.Artists> { ArtistsPage(navController, audioVM, audioHomeVM) }
         composable<Routing.ArtistDetail> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.ArtistDetail>()
-            AudioArtistPage(navController, r.name, audioPlaylistVM)
+            AudioArtistPage(navController, r.name, audioPlaylistVM, audioVM, audioTagsVM, audioCastVM)
         }
         composable<Routing.PlaylistDetail> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlaylistDetail>()
-            PlaylistDetailPage(navController, r.id, audioPlaylistVM)
+            PlaylistDetailPage(navController, r.id, audioPlaylistVM, audioVM, audioTagsVM, audioCastVM)
         }
         composable<Routing.PlaylistAddSongs> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlaylistAddSongs>()

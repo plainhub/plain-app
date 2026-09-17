@@ -48,4 +48,8 @@
         <item quantity="one">कुल: %1$d पोमोडोरो</item>
         <item quantity="other">कुल: %1$d पोमोडोरो</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">%1$d आइटम जोड़े गए</item>
+        <item quantity="other">%1$d आइटम जोड़े गए</item>
+    </plurals>
 </resources>

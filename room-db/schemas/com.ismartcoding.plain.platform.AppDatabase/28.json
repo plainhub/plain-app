@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 28,
-    "identityHash": "6bedc1e5a3845bc91f9aadbc213249b7",
+    "identityHash": "9032139ba3689fbd3b477a3d2275a4a5",
     "entities": [
       {
         "tableName": "chats",
@@ -1507,7 +1507,7 @@
       },
       {
         "tableName": "audio_play_history",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`path` TEXT NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `duration` INTEGER NOT NULL, `played_at` TEXT NOT NULL, PRIMARY KEY(`path`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`path` TEXT NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `duration` INTEGER NOT NULL, `play_count` INTEGER NOT NULL DEFAULT 0, `played_at` TEXT NOT NULL, PRIMARY KEY(`path`))",
         "fields": [
           {
             "fieldPath": "path",
@@ -1532,6 +1532,13 @@
             "columnName": "duration",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "playCount",
+            "columnName": "play_count",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
           },
           {
             "fieldPath": "playedAt",
@@ -1662,7 +1669,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6bedc1e5a3845bc91f9aadbc213249b7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9032139ba3689fbd3b477a3d2275a4a5')"
     ]
   }
 }

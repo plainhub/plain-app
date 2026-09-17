@@ -25,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -36,6 +35,8 @@ import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.MediaTopBar
+import com.ismartcoding.plain.ui.base.ActionButtonSearch
+import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
@@ -49,6 +50,7 @@ import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VTabData
+import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.page.audio.components.AudioFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
@@ -64,10 +66,10 @@ import kotlinx.coroutines.launch
 fun AudioAllPage(
     navController: NavHostController,
     audioPlaylistVM: AudioPlaylistViewModel,
-    audioVM: AudioViewModel = viewModel(key = "audioVM") { AudioViewModel() },
-    tagsVM: TagsViewModel = viewModel(key = "audioTagsVM") { TagsViewModel() },
-    mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "audioFoldersVM") { MediaFoldersViewModel() },
-    castVM: CastViewModel = viewModel(key = "audioCastVM") { CastViewModel() },
+    audioVM: AudioViewModel,
+    tagsVM: TagsViewModel,
+    mediaFoldersVM: MediaFoldersViewModel,
+    castVM: CastViewModel,
 ) {
     val scope = rememberCoroutineScope()
     val audioState = AudioPageState.create(audioVM, tagsVM, mediaFoldersVM)
@@ -137,6 +139,14 @@ fun AudioAllPage(
                     scope.launch(Dispatchers.Default) {
                         audioVM.loadAsync(tv)
                     }
+                },
+                // Sub-page: back arrow instead of the folder drawer, search-only
+                // trailing actions (no more/close capsule).
+                navigationIcon = {
+                    NavigationBackIcon { navController.navigateUp() }
+                },
+                topBarActions = {
+                    ActionButtonSearch { audioVM.enterSearchMode() }
                 },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {

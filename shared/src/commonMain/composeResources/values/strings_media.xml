@@ -65,7 +65,6 @@
     <string name="unmute">Unmute</string>
 
     <string name="shuffle_play">Shuffle</string>
-    <string name="all_songs">All songs</string>
     <string name="artists">Artists</string>
     <string name="playlists">Playlists</string>
     <string name="recent">Recent</string>
@@ -74,11 +73,8 @@
     <string name="playlist_name">Playlist name</string>
     <string name="rename_playlist">Rename playlist</string>
     <string name="delete_playlist">Delete playlist</string>
-    <string name="delete_playlist_confirm_text">Songs in "%1$s" will be removed from the playlist. Audio files will not be deleted.</string>
-    <string name="add_songs">Add songs</string>
-    <string name="add_n_songs">Add %1$d</string>
-    <string name="n_songs">%1$d songs</string>
-    <string name="added_n_songs">Added %1$d songs</string>
+    <string name="delete_playlist_confirm_text">Items in "%1$s" will be removed from the playlist. Audio files will not be deleted.</string>
+    <string name="add_n_items">Add %1$d</string>
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Play next</string>
     <string name="add_to_queue">Add to queue</string>
@@ -89,4 +85,5 @@
     <string name="playlist_created">Playlist created</string>
     <string name="playlist_deleted">Playlist deleted</string>
     <string name="renamed">Renamed</string>
+
 </resources>

@@ -48,4 +48,8 @@
         <item quantity="one">总共: %1$d个番茄</item>
         <item quantity="other">总共: %1$d个番茄</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">已添加 %1$d 个项目</item>
+        <item quantity="other">已添加 %1$d 个项目</item>
+    </plurals>
 </resources>

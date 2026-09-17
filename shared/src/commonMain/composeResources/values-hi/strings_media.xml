@@ -65,7 +65,6 @@
     <string name="unmute">अनम्यूट</string>
 
     <string name="shuffle_play">शफ़ल करें</string>
-    <string name="all_songs">सभी गाने</string>
     <string name="artists">कलाकार</string>
     <string name="playlists">प्लेलिस्ट</string>
     <string name="recent">हाल के</string>
@@ -74,10 +73,8 @@
     <string name="playlist_name">प्लेलिस्ट का नाम</string>
     <string name="rename_playlist">प्लेलिस्ट नाम बदलें</string>
     <string name="delete_playlist">प्लेलिस्ट हटाएँ</string>
-    <string name="delete_playlist_confirm_text">"%1$s" के गाने प्लेलिस्ट से हटा दिए जाएँगे। ऑडियो फ़ाइलें नहीं हटेंगी।</string>
-    <string name="add_songs">गाने जोड़ें</string>
-    <string name="add_n_songs">%1$d जोड़ें</string>
-    <string name="n_songs">%1$d गाने</string>
+    <string name="delete_playlist_confirm_text">"%1$s" के आइटम प्लेलिस्ट से हटा दिए जाएँगे। ऑडियो फ़ाइलें नहीं हटेंगी।</string>
+    <string name="add_n_items">%1$d जोड़ें</string>
     <string name="total_minutes">%1$d मिनट</string>
     <string name="play_next">अगला चलाएँ</string>
     <string name="add_to_queue">कतार में जोड़ें</string>
@@ -88,4 +85,5 @@
     <string name="playlist_created">प्लेलिस्ट बनाई गई</string>
     <string name="playlist_deleted">प्लेलिस्ट हटाई गई</string>
     <string name="renamed">नाम बदला गया</string>
+
 </resources>

@@ -123,7 +123,6 @@ private fun DlnaReceiverDisabledScreen() {
                         startDlnaRenderer()
                     }
                 },
-                buttonSize = ButtonSize.LARGE,
             )
         }
     }

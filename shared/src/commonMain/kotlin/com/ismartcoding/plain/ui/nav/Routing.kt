@@ -101,6 +101,9 @@ class Routing {
     object AudioAll
 
     @Serializable
+    object Artists
+
+    @Serializable
     data class ArtistDetail(val name: String)
 
     @Serializable

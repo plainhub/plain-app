@@ -133,7 +133,6 @@ fun CastSessionPage(
                 },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 type = ButtonType.DANGER,
-                buttonSize = ButtonSize.LARGE,
             )
             BottomSpace(paddingValues)
         }

@@ -72,4 +72,10 @@
         <item quantity="many">Всего: %1$d помидоров</item>
         <item quantity="other">Всего: %1$d помидоров</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">%1$d элемент добавлен</item>
+        <item quantity="few">%1$d элемента добавлено</item>
+        <item quantity="many">%1$d элементов добавлено</item>
+        <item quantity="other">%1$d элементов добавлено</item>
+    </plurals>
 </resources>

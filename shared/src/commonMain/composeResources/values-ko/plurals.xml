@@ -48,4 +48,8 @@
         <item quantity="one">총: %1$d 포모도로</item>
         <item quantity="other">총: %1$d 포모도로</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">항목 %1$d개를 추가했습니다</item>
+        <item quantity="other">항목 %1$d개를 추가했습니다</item>
+    </plurals>
 </resources>

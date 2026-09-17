@@ -35,7 +35,7 @@ fun PFilledButton(
     modifier: Modifier = Modifier,
     icon: Painter? = null,
     type: ButtonType = ButtonType.PRIMARY,
-    buttonSize: ButtonSize = ButtonSize.LARGE,
+    buttonSize: ButtonSize = ButtonSize.MEDIUM,
     isLoading: Boolean = false,
     enabled: Boolean = true,
 ) {

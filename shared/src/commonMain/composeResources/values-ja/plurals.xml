@@ -48,4 +48,8 @@
         <item quantity="one">合計: %1$d ポモドーロ</item>
         <item quantity="other">合計: %1$d ポモドーロ</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">%1$d件のアイテムを追加しました</item>
+        <item quantity="other">%1$d件のアイテムを追加しました</item>
+    </plurals>
 </resources>

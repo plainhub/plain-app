@@ -6,13 +6,15 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.DAudioPlaylist
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 
-data class AudioHomeArtist(val name: String, val songCount: Int)
+data class AudioHomeArtist(val name: String, val songCount: Int, val playCount: Long)
 
 class AudioHomeViewModel : ViewModel() {
     val playlists = mutableStateOf<List<Pair<DAudioPlaylist, Int>>>(listOf())
 
     /** 最近 section: play history resolved to library tracks, or recently-added as fallback. */
     val recentSongs = mutableStateOf<List<DAudio>>(listOf())
+
+    /** All artists, most played first, then by name. */
     val artists = mutableStateOf<List<AudioHomeArtist>>(listOf())
 
     suspend fun loadAsync(audioVM: AudioViewModel) {
@@ -30,10 +32,13 @@ class AudioHomeViewModel : ViewModel() {
         } else {
             songs.sortedByDescending { it.createdAt }.take(8)
         }
+        val playCounts = AudioQueueManager.artistPlayCounts()
         artists.value = songs
             .filter { it.artist.isNotBlank() }
             .groupBy { it.artist }
-            .map { (name, list) -> AudioHomeArtist(name, list.size) }
-            .sortedWith(compareByDescending<AudioHomeArtist> { it.songCount }.thenBy { it.name })
+            .map { (name, list) ->
+                AudioHomeArtist(name = name, songCount = list.size, playCount = playCounts[name] ?: 0)
+            }
+            .sortedWith(compareByDescending<AudioHomeArtist> { it.playCount }.thenBy { it.name })
     }
 }

@@ -54,6 +54,12 @@ object AudioQueueManager {
 
     private suspend fun saveSource(source: DAudioQueueSource) = queueDao.putSource(source)
 
+    /** Playlist id when the active playback source is a user playlist, else null. */
+    suspend fun activePlaylistId(): String? {
+        val src = source()
+        return if (src.source == AudioPlaySource.PLAYLIST) src.playlistId else null
+    }
+
     // ---------- legacy import ----------
 
     /** One-shot import of the old DataStore queue into the manual queue table. */
@@ -265,11 +271,28 @@ object AudioQueueManager {
     }
 
     private suspend fun recordHistory(path: String, title: String, artist: String, duration: Long) {
-        historyDao.upsert(DAudioPlayHistory(path = path, title = title, artist = artist, duration = duration))
+        val existing = historyDao.getByPath(path)
+        historyDao.upsert(
+            if (existing != null) {
+                existing.copy(
+                    playCount = existing.playCount + 1,
+                    playedAt = TimeHelper.now(),
+                    title = title,
+                    artist = artist,
+                    duration = duration,
+                )
+            } else {
+                DAudioPlayHistory(path = path, title = title, artist = artist, duration = duration, playCount = 1)
+            },
+        )
         if (historyDao.count() > HISTORY_KEEP * 5 / 4) {
             historyDao.trim(HISTORY_KEEP)
         }
     }
+
+    /** Total plays per artist, from the play history window. */
+    suspend fun artistPlayCounts(): Map<String, Long> =
+        historyDao.playCountsByArtist().associate { it.artist to it.cnt }
 
     // ---------- playback order ----------
 

@@ -65,7 +65,6 @@
     <string name="unmute">Sesi aç</string>
 
     <string name="shuffle_play">Karıştır</string>
-    <string name="all_songs">Tüm şarkılar</string>
     <string name="artists">Sanatçılar</string>
     <string name="playlists">Çalma listeleri</string>
     <string name="recent">Son çalınanlar</string>
@@ -74,10 +73,8 @@
     <string name="playlist_name">Çalma listesi adı</string>
     <string name="rename_playlist">Çalma listesini yeniden adlandır</string>
     <string name="delete_playlist">Çalma listesini sil</string>
-    <string name="delete_playlist_confirm_text">"%1$s" içindeki şarkılar çalma listesinden çıkarılacak. Ses dosyaları silinmeyecek.</string>
-    <string name="add_songs">Şarkı ekle</string>
-    <string name="add_n_songs">%1$d ekle</string>
-    <string name="n_songs">%1$d şarkı</string>
+    <string name="delete_playlist_confirm_text">"%1$s" içindeki öğeler çalma listesinden çıkarılacak. Ses dosyaları silinmeyecek.</string>
+    <string name="add_n_items">%1$d ekle</string>
     <string name="total_minutes">%1$d dk</string>
     <string name="play_next">Sıradaki çal</string>
     <string name="add_to_queue">Kuyruğa ekle</string>
@@ -88,4 +85,5 @@
     <string name="playlist_created">Çalma listesi oluşturuldu</string>
     <string name="playlist_deleted">Çalma listesi silindi</string>
     <string name="renamed">Yeniden adlandırıldı</string>
+
 </resources>

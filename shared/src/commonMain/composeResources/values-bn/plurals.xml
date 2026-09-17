@@ -48,4 +48,8 @@
         <item quantity="one">Total: %1$d pomodoro</item>
         <item quantity="other">Total: %1$d pomodoros</item>
     </plurals>
+    <plurals name="added_n_items">
+        <item quantity="one">%1$d আইটেম যোগ করা হয়েছে</item>
+        <item quantity="other">%1$d আইটেম যোগ করা হয়েছে</item>
+    </plurals>
 </resources>

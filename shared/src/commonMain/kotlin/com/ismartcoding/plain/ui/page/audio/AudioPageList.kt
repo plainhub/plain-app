@@ -60,8 +60,7 @@ internal fun ColumnScope.AudioPageList(
                 val scrollState = audioVM.scrollStateMap[0] ?: rememberLazyListState()
                 LazyColumnScrollbar(state = scrollState) {
                     LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
-                        .listDragSelect(items = itemsState, state = dragSelectState), state = scrollState,
-                        contentPadding = PaddingValues(bottom = extraBottomPadding)) {
+                        .listDragSelect(items = itemsState, state = dragSelectState), state = scrollState) {
                         item { TopSpace() }
                         items(items = itemsState, key = { it.id }) { item ->
                             val tags = audioTagsMap[item.id] ?: emptyList()
@@ -79,7 +78,11 @@ internal fun ColumnScope.AudioPageList(
                             }
                             LoadMoreRefreshContent(audioVM.noMore.value)
                         }
-                        item(key = "bottomSpace") { BottomSpace(paddingValues) }
+                        item(key = "bottomSpace") {
+                            // Floating player bar clearance when playing; plain
+                            // nav-inset spacing otherwise — never both stacked.
+                            VerticalSpace(dp = maxOf(extraBottomPadding, 40.dp + paddingValues.calculateBottomPadding()))
+                        }
                     }
                 }
             } else {
