@@ -22,11 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.cancel
 import com.ismartcoding.plain.i18n.clear_all
 import com.ismartcoding.plain.i18n.clear_all_confirm
+import com.ismartcoding.plain.i18n.confirm
 import com.ismartcoding.plain.i18n.delete_forever
 import com.ismartcoding.plain.i18n.drag_number_to_reorder_list
 import com.ismartcoding.plain.i18n.empty_playlist
+import com.ismartcoding.plain.i18n.ok
 import com.ismartcoding.plain.i18n.playlist
 import com.ismartcoding.plain.i18n.playlist_title
 import com.ismartcoding.plain.platform.LocaleHelper
@@ -37,7 +40,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,15 +68,22 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                 actions = {
                     if (audioPlaylistVM.playlistItems.value.isNotEmpty()) {
                         IconButton(onClick = {
-                            DialogHelper.showConfirmDialog(
-                                LocaleHelper.getString(Res.string.clear_all),
-                                LocaleHelper.getString(Res.string.clear_all_confirm),
-                                danger = true
-                            ) {
-                                scope.launch { audioPlaylistVM.clearAsync() }
+                            scope.launch {
+                                confirmActionAsync(
+                                    Res.string.clear_all,
+                                    Res.string.clear_all_confirm,
+                                    callback = {
+                                        scope.launch { audioPlaylistVM.clearAsync() }
+                                    },
+                                    danger = true
+                                )
                             }
                         }) {
-                            Icon(painter = painterResource(Res.drawable.delete_forever), contentDescription = "Clear", tint = MaterialTheme.colorScheme.error)
+                            Icon(
+                                painter = painterResource(Res.drawable.delete_forever),
+                                contentDescription = stringResource(Res.string.clear_all),
+                                tint = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                 }

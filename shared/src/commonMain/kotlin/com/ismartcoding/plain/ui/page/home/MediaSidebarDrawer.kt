@@ -31,7 +31,7 @@ import com.ismartcoding.plain.ui.components.MediaSidebarTagItem
 import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.components.TagNameDialog
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.BaseMediaViewModel
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -201,8 +201,15 @@ fun <T : IData> MediaSidebarDrawer(
                     isSelected = !mediaVM.trash.value && mediaVM.tag.value?.id == tag.id,
                     onEdit = { tagsVM.showEditDialog(tag) },
                     onDelete = {
-                        DialogHelper.confirmToDelete {
-                            tagsVM.deleteTag(tag.id)
+                        scope.launch {
+                            confirmActionAsync(
+                                Res.string.delete,
+                                Res.string.confirm_to_delete,
+                                callback = {
+                                    tagsVM.deleteTag(tag.id)
+                                },
+                                danger = true
+                            )
                         }
                     },
                     onClick = {

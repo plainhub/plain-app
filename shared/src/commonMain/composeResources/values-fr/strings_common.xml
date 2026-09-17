@@ -31,8 +31,8 @@
     <string name="scan_result">Résultat du scan</string>
     <string name="view_detail">Voir les détails</string>
     <string name="refresh">Actualiser</string>
-    <string name="confirm_to_delete">Confirmer la suppression ?</string>
-    <string name="confirm_to_clear_logs">Confirmer la suppression des journaux ?</string>
+    <string name="confirm_to_delete">Voulez-vous vraiment supprimer ?</string>
+    <string name="confirm_to_clear_logs">Voulez-vous vraiment effacer les journaux ?</string>
     <string name="ok">OK</string>
     <string name="error">Erreur</string>
     <string name="more">Plus</string>

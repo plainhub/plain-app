@@ -3,6 +3,8 @@ package com.ismartcoding.plain.ui.page.docs
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +15,9 @@ import com.ismartcoding.plain.platform.shareFiles
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.delete
+import com.ismartcoding.plain.i18n.confirm_to_delete
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabel
@@ -22,7 +27,7 @@ import com.ismartcoding.plain.ui.base.IconTextSmallButtonShare
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonTrash
 import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
@@ -35,6 +40,7 @@ fun DocFilesSelectModeBottomActions(
     tagsState: List<DTag>,
     dragSelectState: DragSelectState,
 ) {
+    val scope = rememberCoroutineScope()
     var showSelectTagsDialog by remember { mutableStateOf(false) }
     var removeFromTags by remember { mutableStateOf(false) }
 
@@ -71,9 +77,16 @@ fun DocFilesSelectModeBottomActions(
                         dragSelectState.exitSelectMode()
                     }
                     IconTextSmallButtonDelete {
-                        DialogHelper.confirmToDelete {
-                            docsVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                            dragSelectState.exitSelectMode()
+                        scope.launch {
+                            confirmActionAsync(
+                                Res.string.delete,
+                                Res.string.confirm_to_delete,
+                                callback = {
+                                    docsVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
+                                    dragSelectState.exitSelectMode()
+                                },
+                                danger = true
+                            )
                         }
                     }
                 } else {
@@ -84,9 +97,16 @@ fun DocFilesSelectModeBottomActions(
                 }
             } else {
                 IconTextSmallButtonDelete {
-                    DialogHelper.confirmToDelete {
-                        docsVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                        dragSelectState.exitSelectMode()
+                    scope.launch {
+                        confirmActionAsync(
+                            Res.string.delete,
+                            Res.string.confirm_to_delete,
+                            callback = {
+                                docsVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
+                                dragSelectState.exitSelectMode()
+                            },
+                            danger = true
+                        )
                     }
                 }
             }

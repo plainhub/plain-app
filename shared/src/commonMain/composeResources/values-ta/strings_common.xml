@@ -32,8 +32,8 @@
     <string name="scan_result">ஸ்கேன் முடிவு</string>
     <string name="view_detail">விவரம் பார்க்க</string>
     <string name="refresh">புதுப்பி</string>
-    <string name="confirm_to_delete">அழிக்க உறுதிசெய்?</string>
-    <string name="confirm_to_clear_logs">பதிவுகளை தெளிவு செய்ய உறுதிசெய்?</string>
+    <string name="confirm_to_delete">நிச்சயமாக அழிக்க விரும்புகிறீர்களா?</string>
+    <string name="confirm_to_clear_logs">பதிவுகளை நிச்சயமாக அழிக்க விரும்புகிறீர்களா?</string>
     <string name="ok">சரி</string>
     <string name="error">பிழை</string>
     <string name="more">மேலும்</string>

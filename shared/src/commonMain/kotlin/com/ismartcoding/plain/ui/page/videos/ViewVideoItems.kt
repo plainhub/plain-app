@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +36,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.AddToHomeDialog
 import com.ismartcoding.plain.ui.components.AddToHomeHelpAction
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VideosViewModel
 
@@ -47,6 +49,7 @@ internal fun VideoActionButtons(
     dragSelectState: DragSelectState,
     onDismiss: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
     PSheetPrimaryActionsCard {
         if (!videosVM.showSearchBar.value) {
@@ -81,9 +84,16 @@ internal fun VideoActionButtons(
                 container = MaterialTheme.colorScheme.errorContainer,
                 tint = MaterialTheme.colorScheme.error,
             ) {
-                DialogHelper.confirmToDelete {
-                    videosVM.delete(tagsVM, setOf(m.id))
-                    onDismiss()
+                scope.launch {
+                    confirmActionAsync(
+                        Res.string.delete,
+                        Res.string.confirm_to_delete,
+                        callback = {
+                            videosVM.delete(tagsVM, setOf(m.id))
+                            onDismiss()
+                        },
+                        danger = true
+                    )
                 }
             }
         }

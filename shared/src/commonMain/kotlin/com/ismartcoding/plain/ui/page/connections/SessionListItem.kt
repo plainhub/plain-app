@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +37,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.VSession
 import com.ismartcoding.plain.httpserver.onlineClientIds
 
@@ -46,6 +48,7 @@ internal fun SessionListItem(
     onRename: (String, String) -> Unit,
     onHowToUse: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     val onlineIds by onlineClientIds.collectAsState()
     val isOnline = onlineIds.contains(m.clientId)
     val osDisplay = (m.osName.capitalize() + " " + m.osVersion).trim()
@@ -123,7 +126,7 @@ internal fun SessionListItem(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { DialogHelper.confirmToDelete { onDelete(m.clientId) } }
+                    .clickable { scope.launch { confirmActionAsync(Res.string.delete, Res.string.confirm_to_delete, callback = { onDelete(m.clientId) }, danger = true) } }
                     .padding(horizontal = 16.dp, vertical = 14.dp),
             )
         }

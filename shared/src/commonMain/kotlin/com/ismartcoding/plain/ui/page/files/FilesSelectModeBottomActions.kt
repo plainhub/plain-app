@@ -29,6 +29,7 @@ import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import kotlinx.coroutines.launch
 
@@ -80,19 +81,26 @@ fun FilesSelectModeBottomActions(
                 filesVM.showCreateShareDialog.value = true
             }
             IconTextSmallButtonDelete {
-                DialogHelper.confirmToDelete {
-                    scope.launch {
-                        val paths = filesVM.selectedIds.toSet()
-                        DialogHelper.showLoading()
-                        withIO {
-                            FilePathValidator.requireAllSafe(paths.toList())
-                            paths.forEach { deleteFileOrDir(it) }
-                            scanFiles(paths.toTypedArray())
-                            filesVM.loadAsync()
-                        }
-                        DialogHelper.hideLoading()
-                        filesVM.exitSelectMode()
-                    }
+                scope.launch {
+                    confirmActionAsync(
+                        Res.string.delete,
+                        Res.string.confirm_to_delete,
+                        callback = {
+                            scope.launch {
+                                val paths = filesVM.selectedIds.toSet()
+                                DialogHelper.showLoading()
+                                withIO {
+                                    FilePathValidator.requireAllSafe(paths.toList())
+                                    paths.forEach { deleteFileOrDir(it) }
+                                    scanFiles(paths.toTypedArray())
+                                    filesVM.loadAsync()
+                                }
+                                DialogHelper.hideLoading()
+                                filesVM.exitSelectMode()
+                            }
+                        },
+                        danger = true
+                    )
                 }
             }
             IconTextSmallButtonZip {

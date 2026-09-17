@@ -10,6 +10,8 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
@@ -22,7 +24,7 @@ import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -35,6 +37,7 @@ internal fun ViewMediaActionButtons(
     onDismiss: () -> Unit,
     onCast: (() -> Unit)? = null,
 ) {
+    val scope = rememberCoroutineScope()
     val isMediaFile = m.data is DImage || m.data is DVideo
     var slots = 1
     if (qrScanResult.isNotEmpty()) slots++
@@ -63,9 +66,16 @@ internal fun ViewMediaActionButtons(
                 container = MaterialTheme.colorScheme.errorContainer,
                 tint = MaterialTheme.colorScheme.error,
             ) {
-                DialogHelper.confirmToDelete {
-                    deleteAction()
-                    onDismiss()
+                scope.launch {
+                    confirmActionAsync(
+                        Res.string.delete,
+                        Res.string.confirm_to_delete,
+                        callback = {
+                            deleteAction()
+                            onDismiss()
+                        },
+                        danger = true
+                    )
                 }
             }
         }

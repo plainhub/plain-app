@@ -32,8 +32,8 @@
     <string name="scan_result">Risultato scansione</string>
     <string name="view_detail">Visualizza dettagli</string>
     <string name="refresh">Aggiorna</string>
-    <string name="confirm_to_delete">Confermare l'eliminazione?</string>
-    <string name="confirm_to_clear_logs">Confermare l'eliminazione dei registri?</string>
+    <string name="confirm_to_delete">Vuoi davvero eliminare?</string>
+    <string name="confirm_to_clear_logs">Vuoi davvero cancellare i registri?</string>
     <string name="ok">OK</string>
     <string name="error">Errore</string>
     <string name="more">Altro</string>

@@ -32,8 +32,8 @@
     <string name="scan_result">Resultado da varredura</string>
     <string name="view_detail">Ver detalhes</string>
     <string name="refresh">Atualizar</string>
-    <string name="confirm_to_delete">Confirmar exclusão?</string>
-    <string name="confirm_to_clear_logs">Confirmar limpeza de logs?</string>
+    <string name="confirm_to_delete">Tem certeza de que deseja excluir?</string>
+    <string name="confirm_to_clear_logs">Tem certeza de que deseja limpar os logs?</string>
     <string name="ok">OK</string>
     <string name="error">Erro</string>
     <string name="more">Mais</string>

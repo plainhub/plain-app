@@ -31,8 +31,8 @@
     <string name="scan_result">Scan-Ergebnis</string>
     <string name="view_detail">Details anzeigen</string>
     <string name="refresh">Aktualisieren</string>
-    <string name="confirm_to_delete">Löschen bestätigen?</string>
-    <string name="confirm_to_clear_logs">Protokolle löschen bestätigen?</string>
+    <string name="confirm_to_delete">Möchten Sie wirklich löschen?</string>
+    <string name="confirm_to_clear_logs">Möchten Sie die Protokolle wirklich löschen?</string>
     <string name="ok">OK</string>
     <string name="error">Fehler</string>
     <string name="more">Mehr</string>

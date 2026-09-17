@@ -28,6 +28,7 @@ import com.ismartcoding.plain.ui.base.IconTextSmallButtonTrash
 import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -90,9 +91,16 @@ fun AudioFilesSelectModeBottomActions(
                         dragSelectState.exitSelectMode()
                     }
                     IconTextSmallButtonDelete {
-                        DialogHelper.confirmToDelete {
-                            audioVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                            dragSelectState.exitSelectMode()
+                        scope.launch {
+                            confirmActionAsync(
+                                Res.string.delete,
+                                Res.string.confirm_to_delete,
+                                callback = {
+                                    audioVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
+                                    dragSelectState.exitSelectMode()
+                                },
+                                danger = true
+                            )
                         }
                     }
                 } else {
@@ -103,9 +111,16 @@ fun AudioFilesSelectModeBottomActions(
                 }
             } else {
                 IconTextSmallButtonDelete {
-                    DialogHelper.confirmToDelete {
-                        audioVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
-                        dragSelectState.exitSelectMode()
+                    scope.launch {
+                        confirmActionAsync(
+                            Res.string.delete,
+                            Res.string.confirm_to_delete,
+                            callback = {
+                                audioVM.delete(tagsVM, dragSelectState.selectedIds.toSet())
+                                dragSelectState.exitSelectMode()
+                            },
+                            danger = true
+                        )
                     }
                 }
             }

@@ -28,7 +28,7 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.TagNameDialog
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.launch
@@ -87,8 +87,15 @@ fun TagsBottomSheet(
                                     tint = MaterialTheme.colorScheme.error,
                                     contentDescription = stringResource(Res.string.delete),
                                     click = {
-                                        DialogHelper.confirmToDelete {
-                                            tagsVM.deleteTag(tag.id)
+                                        scope.launch {
+                                            confirmActionAsync(
+                                                Res.string.delete,
+                                                Res.string.confirm_to_delete,
+                                                callback = {
+                                                    tagsVM.deleteTag(tag.id)
+                                                },
+                                                danger = true
+                                            )
                                         }
                                     }
                                 )

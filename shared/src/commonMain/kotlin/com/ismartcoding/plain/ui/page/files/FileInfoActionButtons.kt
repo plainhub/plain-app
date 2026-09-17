@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.features.file.DFile
@@ -14,12 +15,13 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsRow
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -29,6 +31,7 @@ internal fun FileInfoPrimaryActions(
     onDismiss: () -> Unit,
     onShowPasteBar: (Boolean) -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     PSheetPrimaryActionsRow {
         if (!filesVM.showSearchBar.value) {
             PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
@@ -53,9 +56,16 @@ internal fun FileInfoPrimaryActions(
             container = MaterialTheme.colorScheme.errorContainer,
             tint = MaterialTheme.colorScheme.error,
         ) {
-            DialogHelper.confirmToDelete {
-                filesVM.deleteFiles(setOf(file.path))
-                onDismiss()
+            scope.launch {
+                confirmActionAsync(
+                    Res.string.delete,
+                    Res.string.confirm_to_delete,
+                    callback = {
+                        filesVM.deleteFiles(setOf(file.path))
+                        onDismiss()
+                    },
+                    danger = true
+                )
             }
         }
     }

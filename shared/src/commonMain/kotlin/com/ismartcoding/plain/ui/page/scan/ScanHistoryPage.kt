@@ -9,10 +9,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,7 +29,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.ScanHistoryViewModel
 import com.ismartcoding.plain.ui.page.scan.components.ScanHistoryItem
 
@@ -37,6 +39,7 @@ fun ScanHistoryPage(
     navController: NavHostController,
     scanHistoryVM: ScanHistoryViewModel = viewModel { ScanHistoryViewModel() },
 ) {
+    val scope = rememberCoroutineScope()
     val itemsState by scanHistoryVM.itemsFlow.collectAsState()
     val refreshState =
         rememberRefreshLayoutState {
@@ -66,8 +69,15 @@ fun ScanHistoryPage(
                             ScanHistoryItem(
                                 text = m,
                                 onDelete = {
-                                    DialogHelper.confirmToDelete {
-                                        scanHistoryVM.delete(m)
+                                    scope.launch {
+                                        confirmActionAsync(
+                                            Res.string.delete,
+                                            Res.string.confirm_to_delete,
+                                            callback = {
+                                                scanHistoryVM.delete(m)
+                                            },
+                                            danger = true
+                                        )
                                     }
                                 }
                             )

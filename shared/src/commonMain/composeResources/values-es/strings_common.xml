@@ -31,8 +31,8 @@
     <string name="scan_result">Resultado del escaneo</string>
     <string name="view_detail">Ver detalle</string>
     <string name="refresh">Actualizar</string>
-    <string name="confirm_to_delete">¿Confirmar eliminación?</string>
-    <string name="confirm_to_clear_logs">¿Confirmar para borrar los registros?</string>
+    <string name="confirm_to_delete">¿Seguro que quieres eliminar?</string>
+    <string name="confirm_to_clear_logs">¿Seguro que quieres borrar los registros?</string>
     <string name="ok">Aceptar</string>
     <string name="error">Error</string>
     <string name="more">Más</string>

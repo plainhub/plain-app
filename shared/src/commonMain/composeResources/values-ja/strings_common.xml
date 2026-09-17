@@ -31,7 +31,7 @@
     <string name="scan_result">スキャン結果</string>
     <string name="view_detail">詳細を表示</string>
     <string name="refresh">更新</string>
-    <string name="confirm_to_delete">削除を確認しますか？</string>
+    <string name="confirm_to_delete">削除しますか？</string>
     <string name="confirm_to_clear_logs">ログをクリアしますか？</string>
     <string name="ok">OK</string>
     <string name="error">エラー</string>

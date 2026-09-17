@@ -32,8 +32,8 @@
     <string name="scan_result">Tarama sonucu</string>
     <string name="view_detail">Ayrıntıları görüntüle</string>
     <string name="refresh">Yenile</string>
-    <string name="confirm_to_delete">Silmeyi onaylıyor musunuz?</string>
-    <string name="confirm_to_clear_logs">Günlükleri temizlemeyi onaylıyor musunuz?</string>
+    <string name="confirm_to_delete">Silmek istediğinize emin misiniz?</string>
+    <string name="confirm_to_clear_logs">Günlükleri temizlemek istediğinize emin misiniz?</string>
     <string name="ok">Tamam</string>
     <string name="error">Hata</string>
     <string name="more">Daha fazla</string>

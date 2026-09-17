@@ -42,7 +42,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.components.buildFolderOptions
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.ui.nav.Routing
@@ -186,11 +186,18 @@ fun FilesDrawerContent(
                         )
                         PDropdownMenuItemDelete {
                             contextMenuShareId = null
-                            DialogHelper.confirmToDelete {
-                                scope.launch {
-                                    ShareManager.deleteShare(share.id)
-                                    filesVM.sharesVersion.value++
-                                }
+                            scope.launch {
+                                confirmActionAsync(
+                                    Res.string.delete,
+                                    Res.string.confirm_to_delete,
+                                    callback = {
+                                        scope.launch {
+                                            ShareManager.deleteShare(share.id)
+                                            filesVM.sharesVersion.value++
+                                        }
+                                    },
+                                    danger = true
+                                )
                             }
                         }
                     }

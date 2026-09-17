@@ -32,8 +32,8 @@
     <string name="scan_result">Scanresultaat</string>
     <string name="view_detail">Bekijk details</string>
     <string name="refresh">Vernieuwen</string>
-    <string name="confirm_to_delete">Bevestigen om te verwijderen?</string>
-    <string name="confirm_to_clear_logs">Bevestigen om logs te wissen?</string>
+    <string name="confirm_to_delete">Weet je zeker dat je wilt verwijderen?</string>
+    <string name="confirm_to_clear_logs">Weet je zeker dat je de logs wilt wissen?</string>
     <string name="ok">OK</string>
     <string name="error">Fout</string>
     <string name="more">Meer</string>

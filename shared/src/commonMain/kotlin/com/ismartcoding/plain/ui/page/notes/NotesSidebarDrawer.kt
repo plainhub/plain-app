@@ -27,7 +27,7 @@ import com.ismartcoding.plain.ui.components.MediaSidebarTagItem
 import com.ismartcoding.plain.ui.components.SidebarItem
 import com.ismartcoding.plain.ui.components.SidebarSectionHeader
 import com.ismartcoding.plain.ui.components.TagNameDialog
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.launch
@@ -106,8 +106,15 @@ fun NotesSidebarDrawer(
                     isSelected = !NotesViewModel.trash.value && NotesViewModel.tag.value?.id == tag.id,
                     onEdit = { tagsVM.showEditDialog(tag) },
                     onDelete = {
-                        DialogHelper.confirmToDelete {
-                            tagsVM.deleteTag(tag.id)
+                        scope.launch {
+                            confirmActionAsync(
+                                Res.string.delete,
+                                Res.string.confirm_to_delete,
+                                callback = {
+                                    tagsVM.deleteTag(tag.id)
+                                },
+                                danger = true
+                            )
                         }
                     },
                     onClick = {

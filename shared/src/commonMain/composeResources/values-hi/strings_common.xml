@@ -32,8 +32,8 @@
     <string name="scan_result">स्कैन परिणाम</string>
     <string name="view_detail">विस्तार से देखें</string>
     <string name="refresh">ताजगी दें</string>
-    <string name="confirm_to_delete">हटाने की पुष्टि करें?</string>
-    <string name="confirm_to_clear_logs">लॉग को हटाने की पुष्टि करें?</string>
+    <string name="confirm_to_delete">क्या आप वाकई इसे हटाना चाहते हैं?</string>
+    <string name="confirm_to_clear_logs">क्या आप वाकई लॉग साफ़ करना चाहते हैं?</string>
     <string name="ok">ठीक है</string>
     <string name="error">त्रुटि</string>
     <string name="more">अधिक</string>

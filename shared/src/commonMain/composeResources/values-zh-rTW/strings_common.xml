@@ -32,8 +32,8 @@
     <string name="scan_result">掃描結果</string>
     <string name="view_detail">查看詳情</string>
     <string name="refresh">刷新</string>
-    <string name="confirm_to_delete">確認刪除？</string>
-    <string name="confirm_to_clear_logs">確認清空日誌？</string>
+    <string name="confirm_to_delete">確定要刪除嗎？</string>
+    <string name="confirm_to_clear_logs">確定要清空日誌嗎？</string>
     <string name="ok">確定</string>
     <string name="error">錯誤</string>
     <string name="more">更多</string>

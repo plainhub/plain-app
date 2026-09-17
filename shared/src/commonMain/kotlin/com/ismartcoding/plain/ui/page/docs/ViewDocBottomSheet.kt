@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
@@ -38,7 +40,7 @@ import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.platform.renameAndScanFile
 import com.ismartcoding.plain.ui.components.TagSelector
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 
@@ -51,6 +53,7 @@ fun ViewDocBottomSheet(
     tagsState: List<DTag>,
     dragSelectState: DragSelectState,
 ) {
+    val scope = rememberCoroutineScope()
     val m = docsVM.selectedItem.value ?: return
     val onDismiss = {
         docsVM.selectedItem.value = null
@@ -110,9 +113,16 @@ fun ViewDocBottomSheet(
                             container = MaterialTheme.colorScheme.errorContainer,
                             tint = MaterialTheme.colorScheme.error,
                         ) {
-                            DialogHelper.confirmToDelete {
-                                docsVM.delete(tagsVM, setOf(m.id))
-                                onDismiss()
+                            scope.launch {
+                                confirmActionAsync(
+                                    Res.string.delete,
+                                    Res.string.confirm_to_delete,
+                                    callback = {
+                                        docsVM.delete(tagsVM, setOf(m.id))
+                                        onDismiss()
+                                    },
+                                    danger = true
+                                )
                             }
                         }
                     }

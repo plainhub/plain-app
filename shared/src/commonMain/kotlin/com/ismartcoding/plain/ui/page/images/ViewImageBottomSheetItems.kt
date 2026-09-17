@@ -9,6 +9,7 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,11 +32,12 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.AddToHomeDialog
 import com.ismartcoding.plain.ui.components.AddToHomeHelpAction
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.enums.DataType
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -48,6 +50,7 @@ internal fun ViewImageActionButtons(
     onShowQrScanResult: () -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
     PSheetPrimaryActionsCard {
         if (!imagesVM.showSearchBar.value) {
@@ -82,9 +85,16 @@ internal fun ViewImageActionButtons(
                 container = MaterialTheme.colorScheme.errorContainer,
                 tint = MaterialTheme.colorScheme.error,
             ) {
-                DialogHelper.confirmToDelete {
-                    imagesVM.delete(tagsVM, setOf(m.id))
-                    onDismiss()
+                scope.launch {
+                    confirmActionAsync(
+                        Res.string.delete,
+                        Res.string.confirm_to_delete,
+                        callback = {
+                            imagesVM.delete(tagsVM, setOf(m.id))
+                            onDismiss()
+                        },
+                        danger = true
+                    )
                 }
             }
         }

@@ -34,6 +34,7 @@ import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.edit_share_link
 import com.ismartcoding.plain.i18n.name
 import com.ismartcoding.plain.i18n.add_items
+import com.ismartcoding.plain.i18n.confirm_to_delete
 import com.ismartcoding.plain.i18n.delete
 import com.ismartcoding.plain.i18n.file_text
 import com.ismartcoding.plain.i18n.folder
@@ -75,6 +76,7 @@ import com.ismartcoding.plain.ui.components.WebAddressBarQrDialog
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 import com.ismartcoding.plain.chat.ShareSendHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.i18n.sent
 import com.ismartcoding.plain.ui.page.files.label
 import kotlinx.coroutines.launch
@@ -241,11 +243,18 @@ fun EditSharePage(
                 text = stringResource(Res.string.delete),
                 type = ButtonType.DANGER,
                 onClick = {
-                    DialogHelper.confirmToDelete {
-                        scope.launch {
-                            withIO { ShareManager.deleteShare(current.id) }
-                            navController.popBackStack()
-                        }
+                    scope.launch {
+                        confirmActionAsync(
+                            Res.string.delete,
+                            Res.string.confirm_to_delete,
+                            callback = {
+                                scope.launch {
+                                    withIO { ShareManager.deleteShare(current.id) }
+                                    navController.popBackStack()
+                                }
+                            },
+                            danger = true
+                        )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

@@ -39,14 +39,22 @@ fun POutlinedButton(
         ButtonType.DANGER -> MaterialTheme.colorScheme.error
     }
     val borderColor = resolvedColor.copy(alpha = 0.5f)
+    // Disabled follows the Material default graying so icon, text and border
+    // mute together instead of a full-color icon beside washed-out text.
+    val disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+    val disabledBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
 
     OutlinedButton(
         onClick = onClick,
         modifier = modifier
             .height(buttonSize.height),
         shape = RoundedCornerShape(buttonSize.cornerRadius),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = resolvedColor),
-        border = BorderStroke(1.dp, borderColor),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = resolvedColor,
+            disabledContainerColor = Color.Transparent,
+            disabledContentColor = disabledContentColor,
+        ),
+        border = BorderStroke(1.dp, if (enabled) borderColor else disabledBorderColor),
         contentPadding = buttonSize.getPaddingValues(),
         enabled = enabled && !isLoading,
     ) {
@@ -55,7 +63,7 @@ fun POutlinedButton(
                 CircularProgressIndicator(modifier = Modifier.size(if (buttonSize == ButtonSize.SMALL) 14.dp else 16.dp), strokeWidth = 2.dp, color = resolvedColor)
                 HorizontalSpace(8.dp)
             } else if (icon != null) {
-                Icon(painter = icon, contentDescription = null, modifier = Modifier.size(if (buttonSize == ButtonSize.SMALL) 16.dp else 20.dp), tint = resolvedColor)
+                Icon(painter = icon, contentDescription = null, modifier = Modifier.size(if (buttonSize == ButtonSize.SMALL) 16.dp else 20.dp))
                 HorizontalSpace(8.dp)
             }
             Text(

@@ -28,6 +28,7 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -65,9 +66,16 @@ fun AboutLogsAndCacheCard(
                             buttonSize = ButtonSize.SMALL,
                             type = ButtonType.DANGER,
                             onClick = {
-                                DialogHelper.confirmToAction(Res.string.confirm_to_clear_logs) {
-                                    clearLogsAsync()
-                                    onFileSizeCleared()
+                                scope.launch {
+                                    confirmActionAsync(
+                                        Res.string.clear,
+                                        Res.string.confirm_to_clear_logs,
+                                        callback = {
+                                            clearLogsAsync()
+                                            onFileSizeCleared()
+                                        },
+                                        danger = true
+                                    )
                                 }
                             })
                     }

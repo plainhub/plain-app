@@ -32,8 +32,8 @@
     <string name="scan_result">স্ক্যান ফলাফল</string>
     <string name="view_detail">বিস্তারিত দেখুন</string>
     <string name="refresh">পুনরায় লোড করুন</string>
-    <string name="confirm_to_delete">মুছে ফেলতে নিশ্চিত?</string>
-    <string name="confirm_to_clear_logs">লগ সাফ করতে নিশ্চিত?</string>
+    <string name="confirm_to_delete">আপনি কি নিশ্চিতভাবে মুছে ফেলতে চান?</string>
+    <string name="confirm_to_clear_logs">আপনি কি নিশ্চিতভাবে লগ সাফ করতে চান?</string>
     <string name="ok">ঠিক আছে</string>
     <string name="error">ত্রুটি</string>
     <string name="more">আরও</string>

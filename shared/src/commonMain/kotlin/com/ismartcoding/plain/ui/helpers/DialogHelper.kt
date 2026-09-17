@@ -85,36 +85,24 @@ object DialogHelper {
         }
     }
 
-    fun confirmToAction(
-        resource: StringResource,
-        callback: () -> Unit,
-    ) {
-        coIO { confirmToAction(getComposeString(resource), callback) }
-    }
-
-    fun confirmToAction(
-        message: String,
-        callback: () -> Unit,
-    ) {
-        coIO {
-            sendEvent(
-                ConfirmDialogEvent(
-                    "", message,
-                    confirmButton = Pair(getComposeString(Res.string.ok)) { callback() },
-                    dismissButton = Pair(getComposeString(Res.string.cancel)) {})
-            )
-        }
-    }
-
-    fun confirmToDelete(
-        callback: () -> Unit,
-    ) {
-        coIO { confirmToAction(getComposeString(Res.string.confirm_to_delete), callback) }
-    }
-
     fun showTextCopiedMessage(text: String) {
         coIO {
             showMessage(getComposeString(Res.string.copied_to_clipboard_format, text))
         }
     }
+}
+
+suspend inline fun confirmActionAsync(
+    title: StringResource,
+    message: StringResource,
+    noinline callback: () -> Unit = {},
+    danger: Boolean = false,
+) {
+    sendEvent(
+        ConfirmDialogEvent(
+            getComposeString(title), getComposeString(message),
+            Pair(getComposeString(Res.string.confirm), callback),
+            Pair(getComposeString(Res.string.cancel)) { }, danger
+        )
+    )
 }

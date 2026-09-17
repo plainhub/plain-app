@@ -32,8 +32,8 @@
     <string name="scan_result">Kết quả quét</string>
     <string name="view_detail">Xem chi tiết</string>
     <string name="refresh">Làm mới</string>
-    <string name="confirm_to_delete">Xác nhận xóa?</string>
-    <string name="confirm_to_clear_logs">Xác nhận xóa log?</string>
+    <string name="confirm_to_delete">Bạn có chắc muốn xóa không?</string>
+    <string name="confirm_to_clear_logs">Bạn có chắc muốn xóa log không?</string>
     <string name="ok">OK</string>
     <string name="error">Lỗi</string>
     <string name="more">Thêm</string>

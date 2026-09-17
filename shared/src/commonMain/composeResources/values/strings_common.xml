@@ -33,8 +33,8 @@
     <string name="scan_result">Scan result</string>
     <string name="view_detail">View detail</string>
     <string name="refresh">Refresh</string>
-    <string name="confirm_to_delete">Confirm to delete?</string>
-    <string name="confirm_to_clear_logs">Confirm to clear logs?</string>
+    <string name="confirm_to_delete">Are you sure you want to delete?</string>
+    <string name="confirm_to_clear_logs">Are you sure you want to clear logs?</string>
     <string name="ok">OK</string>
     <string name="error">Error</string>
     <string name="more">More</string>

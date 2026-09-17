@@ -31,8 +31,8 @@
     <string name="scan_result">扫描结果</string>
     <string name="view_detail">查看详情</string>
     <string name="refresh">刷新</string>
-    <string name="confirm_to_delete">确认删除？</string>
-    <string name="confirm_to_clear_logs">确认清空日志？</string>
+    <string name="confirm_to_delete">确定要删除吗？</string>
+    <string name="confirm_to_clear_logs">确定要清空日志吗？</string>
     <string name="ok">确定</string>
     <string name="error">错误</string>
     <string name="more">更多</string>

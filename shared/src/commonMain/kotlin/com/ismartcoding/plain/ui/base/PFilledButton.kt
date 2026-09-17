@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.ui.theme.filledButtonContent
 
 
 @Composable
@@ -46,17 +45,16 @@ fun PFilledButton(
     }
     // Fills use their on-pair content: primary is the pastel accent in dark so
     // its content is the dark onPrimary; danger is pale salmon in dark so its
-    // content is the dark onError. Disabled (non-loading) content sits on a
-    // translucent fill over the dark surface, so it stays soft white.
+    // content is the dark onError.
     val contentColor = when (type) {
         ButtonType.PRIMARY -> MaterialTheme.colorScheme.onPrimary
         ButtonType.DANGER -> MaterialTheme.colorScheme.onError
         ButtonType.TERTIARY -> MaterialTheme.colorScheme.onTertiary
     }
-    val disabledContentColor = when (type) {
-        ButtonType.TERTIARY -> contentColor.copy(alpha = 0.38f)
-        else -> if (isLoading) contentColor else MaterialTheme.colorScheme.filledButtonContent.copy(alpha = 0.38f)
-    }
+    // Disabled content is muted onSurface (Material default): white from the
+    // on-pair would vanish on the light translucent fill in light theme.
+    val disabledContentColor =
+        if (isLoading) contentColor else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
     Button(
         onClick = onClick,
         modifier = modifier
@@ -90,7 +88,6 @@ fun PFilledButton(
                             painter = icon,
                             contentDescription = null,
                             modifier = Modifier.size(if (buttonSize == ButtonSize.SMALL) 16.dp else 20.dp),
-                            tint = contentColor,
                         )
                         HorizontalSpace(8.dp)
                     }

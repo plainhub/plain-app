@@ -31,8 +31,8 @@
     <string name="scan_result">Результат сканирования</string>
     <string name="view_detail">Посмотреть детали</string>
     <string name="refresh">Обновить</string>
-    <string name="confirm_to_delete">Подтвердить удаление?</string>
-    <string name="confirm_to_clear_logs">Подтвердить очистку логов?</string>
+    <string name="confirm_to_delete">Вы действительно хотите удалить?</string>
+    <string name="confirm_to_clear_logs">Вы действительно хотите очистить логи?</string>
     <string name="ok">OK</string>
     <string name="error">Ошибка</string>
     <string name="more">Ещё</string>

@@ -29,7 +29,7 @@ import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.TextFileViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -77,16 +77,23 @@ fun ViewTextFileBottomSheet(
                 container = MaterialTheme.colorScheme.errorContainer,
                 tint = MaterialTheme.colorScheme.error,
             ) {
-                DialogHelper.confirmToDelete {
-                    scope.launch(Dispatchers.Default) {
-                        val paths = mutableListOf(path)
-                        paths.forEach {
-                            deleteFileOrDir(it)
-                        }
-                        scanFiles(paths.toTypedArray())
-                        onDismiss()
-                        onDeleted()
-                    }
+                scope.launch {
+                    confirmActionAsync(
+                        Res.string.delete,
+                        Res.string.confirm_to_delete,
+                        callback = {
+                            scope.launch(Dispatchers.Default) {
+                                val paths = mutableListOf(path)
+                                paths.forEach {
+                                    deleteFileOrDir(it)
+                                }
+                                scanFiles(paths.toTypedArray())
+                                onDismiss()
+                                onDeleted()
+                            }
+                        },
+                        danger = true
+                    )
                 }
             }
         }
