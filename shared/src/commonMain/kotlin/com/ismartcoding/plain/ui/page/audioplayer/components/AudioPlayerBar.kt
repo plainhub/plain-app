@@ -77,14 +77,13 @@ fun AudioPlayerBar(
         AudioPlayerBarCard(
             title = title,
             artist = artist,
-            coverPath = currentPlayingPath.value.ifEmpty { null },
             progress = progress,
             duration = duration,
             isPlaying = isPlaying,
             onClickContent = { TempData.audioPlayerVisible.value = true },
             onClickSkipNext = { audioSkipToNext() },
+            onClickPlaylist = { showPlaylist = true },
             onPlayPause = { if (isPlaying) audioPause() else audioPlay() },
-            onClickQueue = { showPlaylist = true },
         )
     }
 
