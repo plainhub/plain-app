@@ -30,13 +30,33 @@ object AudioPlayer {
         return player?.isPlaying == true
     }
 
+    /**
+     * The flow exposes *playback intent* (playWhenReady), not "audio is coming
+     * out right now": it stays true while the player switches tracks, so play
+     * buttons never flicker during a skip. False only when paused, stopped or
+     * uninitialized. STATE_ENDED keeps playWhenReady true — skipTo pauses the
+     * player explicitly when the queue runs dry.
+     */
+    private fun refreshPlayingState() {
+        val p = player ?: return
+        _isPlayingFlow.value = p.playWhenReady && p.playbackState != Player.STATE_IDLE
+    }
+
     private val playerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             LogCat.d("Player.isPlaying changed to: $isPlaying")
-            _isPlayingFlow.value = isPlaying
+            refreshPlayingState()
             if (!isPlaying && player != null) {
                 TempData.audioPlayPosition = player?.currentPosition ?: 0
             }
+        }
+
+        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+            refreshPlayingState()
+        }
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            refreshPlayingState()
         }
     }
 
@@ -68,7 +88,7 @@ object AudioPlayer {
         mediaControllerFuture.addListener({
             player = mediaControllerFuture.get().also {
                 it.addListener(playerListener)
-                _isPlayingFlow.value = it.isPlaying
+                refreshPlayingState()
                 it.setPlaybackSpeed(TempData.audioPlaybackSpeed.value)
             }
             coMain {
@@ -165,6 +185,9 @@ object AudioPlayer {
             )
             if (audio == null) {
                 LogCat.d("skipTo: nothing to play, queue is empty")
+                // Stop so playWhenReady (and the flow) turns off instead of
+                // pretending to play a finished queue.
+                coMain { player?.pause() }
                 return@coIO
             }
             LogCat.d("skipTo: ${audio.path}")

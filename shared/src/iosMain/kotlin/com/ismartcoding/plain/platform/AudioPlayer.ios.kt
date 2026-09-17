@@ -32,6 +32,10 @@ private object AVPlayerAudioPlayer : AudioPlayer {
 
     private var player: AVPlayer? = null
     private var currentAudio: DPlaylistAudio? = null
+
+    /** Playback intent: true from play() until pause()/clear(); the flow
+     *  mirrors it so play buttons stay steady across track switches. */
+    private var playWhenReady = false
     private var pollJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.Main)
 
@@ -52,6 +56,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
 
     override fun pause() {
         scope.launch {
+            playWhenReady = false
             val p = player ?: return@launch
             TempData.audioPlayPosition = avPlayerTimeMs(p as NSObject, "currentTime")
             avPlayerPerform(p as NSObject, "pause")
@@ -62,6 +67,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
 
     override fun play() {
         scope.launch {
+            playWhenReady = true
             val p = player
             if (p != null) {
                 avPlayerPerform(p as NSObject, "play")
@@ -104,6 +110,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
 
     override fun clear() {
         scope.launch {
+            playWhenReady = false
             val p = player
             if (p != null) {
                 avPlayerPerform(p as NSObject, "pause")
@@ -129,6 +136,10 @@ private object AVPlayerAudioPlayer : AudioPlayer {
             )
             if (audio == null) {
                 LogCat.d("skipTo: nothing to play, queue is empty")
+                playWhenReady = false
+                _isPlayingFlow.value = false
+                val p = player
+                if (p != null) avPlayerPerform(p as NSObject, "pause")
                 return@launch
             }
             currentAudio = audio
@@ -165,6 +176,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
                 avPlayerPerform(newPlayer as NSObject, "play")
                 player = newPlayer
             }
+            playWhenReady = true
             _isPlayingFlow.value = true
             startPolling()
             scope.launch {
@@ -191,7 +203,6 @@ private object AVPlayerAudioPlayer : AudioPlayer {
                 delay(200)
                 val p = player ?: break
                 if (avPlayerRate(p as NSObject) == 0f) {
-                    _isPlayingFlow.value = false
                     TempData.audioPlayPosition = 0
                     onCompleted()
                     break

@@ -188,9 +188,11 @@ fun AudioHomePage(
                 }
 
                 PullToRefresh(refreshLayoutState = topRefreshLayoutState, userEnable = !dragSelectState.selectMode, modifier = Modifier.weight(1f)) {
-                    // While the top search bar is active the home sections make no sense:
+                    // While the top search bar is active or a sidebar filter (folder / tag / trash)
+                    // is selected the home sections make no sense:
                     // show the same flat results list as the all-songs page.
-                    if (audioVM.showSearchBar.value) {
+                    val sidebarFilterActive = audioVM.trash.value || audioVM.bucketId.value.isNotEmpty() || audioVM.tag.value != null
+                    if (audioVM.showSearchBar.value || sidebarFilterActive) {
                         AudioPageList(
                             scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
                             tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues

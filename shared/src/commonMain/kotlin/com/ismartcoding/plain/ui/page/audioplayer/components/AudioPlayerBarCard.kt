@@ -47,7 +47,6 @@ fun AudioPlayerBarCard(
     duration: Float,
     isPlaying: Boolean,
     onClickContent: () -> Unit,
-    onClickSkipNext: () -> Unit,
     onClickPlaylist: () -> Unit,
     onPlayPause: () -> Unit,
 ) {
@@ -93,10 +92,6 @@ fun AudioPlayerBarCard(
                         tint = if (isPlaying) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(24.dp)
                     )
-                }
-                HorizontalSpace(8.dp)
-                IconButton(onClick = onClickSkipNext, modifier = Modifier.size(42.dp).clip(CircleShape)) {
-                    Icon(painter = painterResource(Res.drawable.skip_next), contentDescription = stringResource(Res.string.play_next), tint = MaterialTheme.colorScheme.primary)
                 }
                 HorizontalSpace(8.dp)
                 IconButton(onClick = onClickPlaylist, modifier = Modifier.size(42.dp).clip(CircleShape)) {
