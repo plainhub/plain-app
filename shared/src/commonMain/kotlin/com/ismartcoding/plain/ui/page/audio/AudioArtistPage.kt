@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.audio.DAudio
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
@@ -142,6 +143,7 @@ fun AudioArtistPage(
                         text = stringResource(Res.string.shuffle_play),
                         icon = painterResource(Res.drawable.shuffle),
                         modifier = Modifier.weight(1f),
+                        buttonSize = ButtonSize.LARGE,
                         onClick = { playAll(true) },
                     )
                 }

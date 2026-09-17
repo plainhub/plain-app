@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
@@ -260,9 +261,7 @@ fun AudioHomePage(
                             }
                         }
                         item(key = "recent_header") {
-                            HomeSectionHeader(stringResource(Res.string.recent)) {
-                                navController.navigate(Routing.AudioAll)
-                            }
+                            HomeSectionHeader(stringResource(Res.string.recent), null)
                         }
                         items(homeVM.recentSongs.value.size, key = { homeVM.recentSongs.value[it].path }) { index ->
                             val song = homeVM.recentSongs.value[index]

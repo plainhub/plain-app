@@ -275,6 +275,7 @@ fun PlaylistDetailPage(
                         text = stringResource(Res.string.shuffle_play),
                         icon = painterResource(Res.drawable.shuffle),
                         modifier = Modifier.weight(1f),
+                        buttonSize = ButtonSize.LARGE,
                         onClick = {
                             scope.launch {
                                 withIO { AudioQueueManager.setPlaylistSource(playlistId, null) }
