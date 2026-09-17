@@ -43,6 +43,11 @@ fun AudioPlayerBar(
     var progress by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableFloatStateOf(1f) }
     val isPlaying by audioIsPlayingFlow().collectAsState()
+    // Optimistic "still playing" during a skip: the engine briefly reports
+    // not-playing between tracks, which made the button flicker pause->play.
+    var pendingPlay by remember { mutableStateOf(false) }
+    LaunchedEffect(isPlaying) { if (isPlaying) pendingPlay = false }
+    val effectivePlaying = isPlaying || pendingPlay
     var showPlaylist by remember { mutableStateOf(false) }
     val currentPlayingPath = audioPlaylistVM.selectedPath
 
@@ -79,11 +84,18 @@ fun AudioPlayerBar(
             artist = artist,
             progress = progress,
             duration = duration,
-            isPlaying = isPlaying,
+            isPlaying = effectivePlaying,
             onClickContent = { TempData.audioPlayerVisible.value = true },
-            onClickSkipNext = { audioSkipToNext() },
+            onClickSkipNext = {
+                pendingPlay = true
+                progress = 0f
+                audioSkipToNext()
+            },
             onClickPlaylist = { showPlaylist = true },
-            onPlayPause = { if (isPlaying) audioPause() else audioPlay() },
+            onPlayPause = {
+                pendingPlay = false
+                if (isPlaying) audioPause() else audioPlay()
+            },
         )
     }
 
