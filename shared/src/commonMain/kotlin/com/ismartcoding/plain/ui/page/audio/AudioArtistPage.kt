@@ -13,14 +13,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,6 +30,7 @@ import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.preferences.AudioSortByPreference
@@ -38,14 +38,14 @@ import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
-import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.audio.components.ArtistAvatar
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
@@ -64,6 +64,7 @@ fun AudioArtistPage(
     audioPlaylistVM: AudioPlaylistViewModel,
 ) {
     val scope = rememberCoroutineScope()
+    // Shared VMs so tags/cast/selection behave like the all-songs page.
     val audioVM: AudioViewModel = viewModel(key = "audioVM") { AudioViewModel() }
     val tagsVM: TagsViewModel = viewModel(key = "audioTagsVM") { TagsViewModel() }
     val castVM: CastViewModel = viewModel(key = "audioCastVM") { CastViewModel() }
@@ -92,78 +93,77 @@ fun AudioArtistPage(
             }
             val first = list.firstOrNull()?.toPlaylistAudio() ?: return@launch
             audioJustPlayWithNotificationCheck(first)
-            audioPlaylistVM.onStarted(first)
+            audioPlaylistVM.loadAsync()
         }
     }
 
-    Column(Modifier.fillMaxSize()) {
-        PTopAppBar(
-            title = stringResource(Res.string.artists),
-            navController = navController,
-        )
-        LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
-            item(key = "hero") {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    ArtistAvatar(name = artistName, gradientIndex = artistName.hashCode(), size = 96)
-                    Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
-                        Text(
-                            text = artistName,
-                            style = MaterialTheme.typography.listItemTitle(),
-                            maxLines = 2,
+    PScaffold(
+        topBar = {
+            PTopAppBar(
+                title = stringResource(Res.string.artists),
+                navController = navController,
+            )
+        },
+    ) { paddingValues ->
+        Column(Modifier.fillMaxSize().padding(paddingValues)) {
+            LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
+                item(key = "hero") {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        ArtistAvatar(name = artistName, gradientIndex = artistName.hashCode(), size = 96)
+                        Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
+                            Text(
+                                text = artistName,
+                                style = MaterialTheme.typography.listItemTitle(),
+                                maxLines = 2,
+                            )
+                            Text(
+                                text = com.ismartcoding.plain.platform.LocaleHelper.getStringF(Res.string.n_songs, songs.size),
+                                style = MaterialTheme.typography.listItemSubtitle(),
+                                modifier = Modifier.padding(top = 4.dp),
+                            )
+                        }
+                    }
+                }
+                item(key = "acts") {
+                    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp)) {
+                        PFilledButton(
+                            text = stringResource(Res.string.play_all),
+                            icon = painterResource(Res.drawable.play_arrow),
+                            modifier = Modifier.weight(1f),
+                            onClick = { playAll(false) },
                         )
-                        Text(
-                            text = com.ismartcoding.plain.platform.LocaleHelper.getStringF(
-                                Res.string.n_songs,
-                                songs.size,
-                            ) + " · " + com.ismartcoding.plain.platform.LocaleHelper.getStringF(
-                                Res.string.total_minutes,
-                                songs.sumOf { it.duration } / 60000,
-                            ),
-                            style = MaterialTheme.typography.listItemSubtitle(),
-                            modifier = Modifier.padding(top = 4.dp),
+                        Box(Modifier.size(12.dp))
+                        POutlinedButton(
+                            text = stringResource(Res.string.shuffle_play),
+                            icon = painterResource(Res.drawable.shuffle),
+                            modifier = Modifier.weight(1f),
+                            buttonSize = ButtonSize.LARGE,
+                            onClick = { playAll(true) },
                         )
                     }
                 }
-            }
-            item(key = "acts") {
-                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp)) {
-                    PFilledButton(
-                        text = stringResource(Res.string.play_all),
-                        icon = painterResource(Res.drawable.play_arrow),
-                        modifier = Modifier.weight(1f),
-                        onClick = { playAll(false) },
+                items(songs.size, key = { songs[it].path }) { index ->
+                    val song = songs[index]
+                    AudioListItem(
+                        item = song,
+                        audioVM = audioVM,
+                        audioPlaylistVM = audioPlaylistVM,
+                        tagsVM = tagsVM,
+                        castVM = castVM,
+                        tags = emptyList(),
+                        dragSelectState = dragSelectState,
+                        isCurrentlyPlaying = audioPlaylistVM.selectedPath.value == song.path,
+                        isInPlaylist = audioPlaylistVM.isInPlaylist(song.path),
                     )
-                    Box(Modifier.size(12.dp))
-                    POutlinedButton(
-                        text = stringResource(Res.string.shuffle_play),
-                        icon = painterResource(Res.drawable.shuffle),
-                        modifier = Modifier.weight(1f),
-                        buttonSize = ButtonSize.LARGE,
-                        onClick = { playAll(true) },
-                    )
+                    VerticalSpace(8.dp)
                 }
+                item(key = "bottom") { BottomSpace() }
             }
-            items(songs.size, key = { songs[it].path }) { index ->
-                val song = songs[index]
-                AudioListItem(
-                    item = song,
-                    audioVM = audioVM,
-                    audioPlaylistVM = audioPlaylistVM,
-                    tagsVM = tagsVM,
-                    castVM = castVM,
-                    tags = emptyList(),
-                    dragSelectState = dragSelectState,
-                    isCurrentlyPlaying = audioPlaylistVM.selectedPath.value == song.path,
-                    isInPlaylist = audioPlaylistVM.isInPlaylist(song.path),
-                )
-                VerticalSpace(8.dp)
-            }
-            item(key = "bottom") { BottomSpace() }
         }
     }
 
