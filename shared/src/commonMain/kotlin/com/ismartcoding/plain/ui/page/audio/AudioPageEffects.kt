@@ -9,6 +9,8 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.hasPermission
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.preferences.AudioSortByPreference
+import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
+import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,27 +31,28 @@ internal fun AudioPageEffects(
 ) {
     val scope = rememberCoroutineScope()
     val sharedFlow = Channel.sharedFlow
+    val reloadAfterGrant: () -> Unit = {
+        scope.launch(Dispatchers.Default) {
+            audioVM.sortBy.value = AudioSortByPreference.getValueAsync()
+            audioVM.loadAsync(tagsVM)
+            audioPlaylistVM.loadAsync()
+            mediaFoldersVM.loadAsync()
+        }
+    }
 
     LaunchedEffect(Unit) {
         audioVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
         if (audioVM.hasPermission.value) {
-            scope.launch(Dispatchers.Default) {
-                audioVM.sortBy.value = AudioSortByPreference.getValueAsync()
-                audioVM.loadAsync(tagsVM)
-                audioPlaylistVM.loadAsync()
-                mediaFoldersVM.loadAsync()
-            }
+            reloadAfterGrant()
         }
     }
+
+    StoragePermissionResumeEffect(audioVM.hasPermission, reloadAfterGrant)
 
     LaunchedEffect(sharedFlow) {
         sharedFlow.collect { event ->
             if (event is PermissionsResultEvent) {
-                audioVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
-                scope.launch(Dispatchers.Default) {
-                    audioVM.sortBy.value = AudioSortByPreference.getValueAsync()
-                    audioVM.loadAsync(tagsVM)
-                }
+                refreshStoragePermission(audioVM.hasPermission, reloadAfterGrant)
             }
         }
     }

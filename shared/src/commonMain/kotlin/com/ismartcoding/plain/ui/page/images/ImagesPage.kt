@@ -34,7 +34,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -58,13 +57,14 @@ import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
 import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
 import com.ismartcoding.plain.ui.base.pinchZoomGrid
-import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.rememberBoostFlingBehavior
+import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
+import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.components.ImageGridItem
 import com.ismartcoding.plain.ui.components.MediaDateGroupHeader
 import com.ismartcoding.plain.ui.components.MediaFilesSelectModeBottomActions
@@ -139,52 +139,29 @@ fun ImagesPage(
         }
     }
 
+    val reloadAfterGrant: () -> Unit = {
+        scope.launch {
+            cellsPerRow.value = ImageGridCellsPerRowPreference.getAsync()
+            imagesVM.sortBy.value = ImageSortByPreference.getValueAsync()
+            imagesVM.loadAsync(tagsVM)
+            mediaFoldersVM.loadAsync()
+        }
+    }
+
     LaunchedEffect(Unit) {
         imagesVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
         if (imagesVM.hasPermission.value) {
-            scope.launch {
-                cellsPerRow.value = ImageGridCellsPerRowPreference.getAsync()
-                imagesVM.sortBy.value = ImageSortByPreference.getValueAsync()
-                imagesVM.loadAsync(tagsVM)
-                mediaFoldersVM.loadAsync()
-            }
+            reloadAfterGrant()
         }
     }
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
             when (event) {
-                is PermissionsResultEvent -> {
-                    val granted = AppFeatureType.FILES.hasPermission()
-                    val wasGranted = imagesVM.hasPermission.value
-                    imagesVM.hasPermission.value = granted
-                    if (granted && !wasGranted) {
-                        scope.launch {
-                            imagesVM.sortBy.value = ImageSortByPreference.getValueAsync()
-                            imagesVM.loadAsync(tagsVM)
-                        }
-                    }
-                }
+                is PermissionsResultEvent -> refreshStoragePermission(imagesVM.hasPermission, reloadAfterGrant)
             }
         }
     }
-    // All-files-access is granted on the system settings screen. The event
-    // path covers returns through our launcher; ON_RESUME also catches
-    // grants made directly in system settings with no launcher round-trip.
-    val lifecycleEvent = rememberLifecycleEvent()
-    LaunchedEffect(lifecycleEvent) {
-        if (lifecycleEvent == Lifecycle.Event.ON_RESUME
-            && !imagesVM.hasPermission.value
-            && AppFeatureType.FILES.hasPermission()
-        ) {
-            imagesVM.hasPermission.value = true
-            scope.launch {
-                cellsPerRow.value = ImageGridCellsPerRowPreference.getAsync()
-                imagesVM.sortBy.value = ImageSortByPreference.getValueAsync()
-                imagesVM.loadAsync(tagsVM)
-                mediaFoldersVM.loadAsync()
-            }
-        }
-    }
+    StoragePermissionResumeEffect(imagesVM.hasPermission, reloadAfterGrant)
     LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !isGestureInteractionMode())) {
         if (dragSelectState.selectMode || (previewerState.visible && !isGestureInteractionMode())) {
             scrollBehavior.reset()

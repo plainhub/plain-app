@@ -2,20 +2,18 @@ package com.ismartcoding.plain.ui.page.files
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.Lifecycle
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.appDir
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.getInternalStoragePath
 import com.ismartcoding.plain.enums.ActionSourceType
-import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.FilesType
-import com.ismartcoding.plain.enums.hasPermission
 import com.ismartcoding.plain.events.ActionEvent
 import com.ismartcoding.plain.events.FolderKanbanSelectEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
-import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
+import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
+import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
@@ -31,21 +29,10 @@ internal fun FilesPageEffects(
     folderPath: String, previewerState: MediaPreviewerState,
     audioPlaylistVM: AudioPlaylistViewModel,
 ) {
-    fun refreshStoragePermission() {
-        val granted = AppFeatureType.FILES.hasPermission()
-        val wasGranted = filesVM.hasPermission.value
-        filesVM.hasPermission.value = granted
-        if (granted && !wasGranted) {
-            scope.launch(Dispatchers.Default) { filesVM.loadAsync() }
-        }
+    val reloadAfterGrant: () -> Unit = {
+        scope.launch(Dispatchers.Default) { filesVM.loadAsync() }
     }
-
-    val lifecycleEvent = rememberLifecycleEvent()
-    LaunchedEffect(lifecycleEvent) {
-        if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
-            refreshStoragePermission()
-        }
-    }
+    StoragePermissionResumeEffect(filesVM.hasPermission, reloadAfterGrant)
 
     PBackHandler(enabled = previewerState.visible || filesVM.selectMode.value || filesVM.showSearchBar.value || filesVM.showPasteBar.value || filesVM.canNavigateBack()) {
         when {
@@ -87,7 +74,7 @@ internal fun FilesPageEffects(
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
             when (event) {
-                is PermissionsResultEvent -> refreshStoragePermission()
+                is PermissionsResultEvent -> refreshStoragePermission(filesVM.hasPermission, reloadAfterGrant)
                 is FolderKanbanSelectEvent -> {
                     val m = event.data
                     filesVM.offset = 0

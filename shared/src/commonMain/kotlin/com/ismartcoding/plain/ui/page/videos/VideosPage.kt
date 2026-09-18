@@ -50,6 +50,8 @@ import com.ismartcoding.plain.preferences.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.MediaTopBar
+import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
+import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
@@ -138,24 +140,26 @@ fun VideosPage(
         }
     }
 
+    val reloadAfterGrant: () -> Unit = {
+        scope.launch(Dispatchers.Default) {
+            cellsPerRow.value = VideoGridCellsPerRowPreference.getAsync()
+            videosVM.sortBy.value = VideoSortByPreference.getValueAsync()
+            videosVM.loadAsync(tagsVM)
+            mediaFoldersVM.loadAsync()
+        }
+    }
+
     LaunchedEffect(Unit) {
         videosVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
         if (videosVM.hasPermission.value) {
-            scope.launch(Dispatchers.Default) {
-                cellsPerRow.value = VideoGridCellsPerRowPreference.getAsync()
-                videosVM.sortBy.value = VideoSortByPreference.getValueAsync()
-                videosVM.loadAsync(tagsVM)
-                mediaFoldersVM.loadAsync()
-            }
+            reloadAfterGrant()
         }
     }
+    StoragePermissionResumeEffect(videosVM.hasPermission, reloadAfterGrant)
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
             when (event) {
-                is PermissionsResultEvent -> {
-                    videosVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
-                    scope.launch(Dispatchers.Default) { videosVM.sortBy.value = VideoSortByPreference.getValueAsync(); videosVM.loadAsync(tagsVM) }
-                }
+                is PermissionsResultEvent -> refreshStoragePermission(videosVM.hasPermission, reloadAfterGrant)
             }
         }
     }

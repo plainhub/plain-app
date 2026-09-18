@@ -11,6 +11,8 @@ import com.ismartcoding.plain.enums.hasPermission
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.preferences.DocSortByPreference
 import com.ismartcoding.plain.preferences.DocTabsModePreference
+import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
+import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -28,28 +30,29 @@ internal fun DocsPageEffects(
 ) {
     val scope = rememberCoroutineScope()
     val sharedFlow = Channel.sharedFlow
+    val reloadAfterGrant: () -> Unit = {
+        scope.launch(Dispatchers.Default) {
+            docsVM.tabsShowTags.value = DocTabsModePreference.getAsync()
+            docsVM.sortBy.value = DocSortByPreference.getValueAsync()
+            tagsVM.loadAsync()
+            mediaFoldersVM.loadAsync()
+            docsVM.loadAsync(tagsVM)
+        }
+    }
 
     LaunchedEffect(Unit) {
         docsVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
         if (docsVM.hasPermission.value) {
-            scope.launch(Dispatchers.Default) {
-                docsVM.tabsShowTags.value = DocTabsModePreference.getAsync()
-                docsVM.sortBy.value = DocSortByPreference.getValueAsync()
-                tagsVM.loadAsync()
-                mediaFoldersVM.loadAsync()
-                docsVM.loadAsync(tagsVM)
-            }
+            reloadAfterGrant()
         }
     }
+
+    StoragePermissionResumeEffect(docsVM.hasPermission, reloadAfterGrant)
 
     LaunchedEffect(sharedFlow) {
         sharedFlow.collect { event ->
             if (event is PermissionsResultEvent) {
-                docsVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
-                scope.launch(Dispatchers.Default) {
-                    docsVM.sortBy.value = DocSortByPreference.getValueAsync()
-                    docsVM.loadAsync(tagsVM)
-                }
+                refreshStoragePermission(docsVM.hasPermission, reloadAfterGrant)
             }
         }
     }

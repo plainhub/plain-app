@@ -72,8 +72,8 @@ import org.jetbrains.compose.resources.stringResource
 /**
  * Audio home: quick actions + artists / playlists / recent sections on top of
  * the shared media infrastructure ([MediaTopBar], drag select, cast). While
- * the top search bar is active it shows the same flat results list as
- * [AudioAllPage].
+ * the top search bar is active or a sidebar folder/tag/trash filter is
+ * selected it shows the same flat results list as [AudioAllPage].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -181,9 +181,15 @@ fun AudioHomePage(
                     NeedPermissionColumn(Res.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column
                 }
 
-                if (audioVM.showSearchBar.value) {
-                    // Search mirrors the all-items page; AudioPageList brings
-                    // its own pull-to-refresh, so it sits outside ours.
+                // A sidebar folder/tag/trash filter shows the flat filtered
+                // list (same as search mode / the all-items page) instead of
+                // the home sections, which are not filter-aware.
+                val sidebarFilterActive =
+                    audioVM.trash.value || audioVM.bucketId.value.isNotEmpty() || audioVM.tag.value != null
+                if (audioVM.showSearchBar.value || sidebarFilterActive) {
+                    // Search and filtered views mirror the all-items page;
+                    // AudioPageList brings its own pull-to-refresh, so it sits
+                    // outside ours.
                     AudioPageList(
                         scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
                         tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues,
