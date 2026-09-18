@@ -1,4 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 100">
-<path d="M8 0 H46 L72 26 V92 Q72 100 64 100 H8 Q0 100 0 92 V8 Q0 0 8 0 Z" fill="#D3E4FF"/>
-<path d="M46 0 V26 H72 Z" fill="#A5CBFF"/>
-<text x="36" y="66" font-family="system-ui,'Segoe UI',Roboto,sans-serif" font-size="20" font-weight="600" fill="#0D2C55" text-anchor="middle">MSG</text></svg>
+<path d="M8 0 H46 L72 26 V92 Q72 100 64 100 H8 Q0 100 0 92 V8 Q0 0 8 0 Z" fill="#FFE2DA"/>
+<path d="M46 0 V26 H72 Z" fill="#FFA491"/>
+<text x="36" y="66" font-family="system-ui,'Segoe UI',Roboto,sans-serif" font-size="20" font-weight="600" fill="#701D0D" text-anchor="middle">MSG</text></svg>
