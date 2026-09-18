@@ -10,9 +10,13 @@ import kotlin.test.assertEquals
  * Regression origin: taps on devices whose digitizers report sub-pixel Move
  * jitter (e-ink / Android 12) never fired onTap because the old detector
  * required literally zero Move events and a press under 200ms wall clock.
- * Qualification now follows platform detectTapGestures semantics: single
- * pointer, movement never crossing touch slop, not canceled, press shorter
- * than the long-press timeout.
+ * Qualification follows platform detectTapGestures semantics: single pointer,
+ * movement never crossing touch slop, not canceled, press shorter than the
+ * long-press timeout.
+ *
+ * Latency contract: TAP fires synchronously at release (no double-tap wait
+ * window — the detector has no delayed tap). A later DOUBLE_TAP decision
+ * does not revoke the already-fired tap.
  */
 class GestureTapClassifierTest {
     private val longPressTimeout = 400L

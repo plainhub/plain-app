@@ -2,7 +2,9 @@ package com.ismartcoding.plain.ui.components.mediaviewer
 
 /**
  * Window in which a second qualifying release is treated as a double tap.
- * A single tap is fired after this delay so a quick second tap can cancel it.
+ * Single taps fire immediately at release; this window only upgrades a
+ * second release to a double tap (the already-fired tap is not revoked —
+ * industry photo-viewer behavior, keeps single-tap latency at zero).
  */
 internal const val DOUBLE_TAP_WINDOW_MILLIS = 272L
 
