@@ -107,10 +107,9 @@ fun ViewDocBottomSheet(
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PSheetHeader(
                         thumbnail = {
-                            AsyncImage(
+                            PSheetHeaderThumb(
                                 model = getFileIconPath(m.extension),
-                                contentDescription = m.title,
-                                modifier = Modifier.size(44.dp),
+                                fallbackIcon = Res.drawable.file,
                             )
                         },
                         title = m.title.ifEmpty { m.path.getFilenameFromPath() },

@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.files
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
@@ -18,7 +17,6 @@ import androidx.compose.runtime.setValue
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.ismartcoding.plain.lib.extensions.formatBytes
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
@@ -34,6 +32,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetHeader
+import com.ismartcoding.plain.ui.base.PSheetHeaderThumb
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.models.FilesViewModel
@@ -75,10 +74,9 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PSheetHeader(
                         thumbnail = {
-                            AsyncImage(
+                            PSheetHeaderThumb(
                                 model = if (file.isDir) getFileIconPath("folder") else getFileIconPath(file.path.getFilenameExtension()),
-                                contentDescription = file.name,
-                                modifier = Modifier.size(44.dp),
+                                fallbackIcon = Res.drawable.file,
                             )
                         },
                         title = file.name,

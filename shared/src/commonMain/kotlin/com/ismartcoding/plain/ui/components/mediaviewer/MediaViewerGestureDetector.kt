@@ -12,13 +12,11 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.util.fastAny
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.time.Clock
 import kotlin.math.PI
 import kotlin.math.abs
 
@@ -30,70 +28,81 @@ suspend fun PointerInputScope.detectTransformGestures(
     onDoubleTap: (Offset) -> Unit = {},
     onGesture: (centroid: Offset, pan: Offset, zoom: Float, rotation: Float, event: PointerEvent) -> Boolean,
 ) {
-    var lastReleaseTime = 0L
-    var scope: CoroutineScope? = null
-    awaitEachGesture {
-        var rotation = 0f
-        var zoom = 1f
-        var pan = Offset.Zero
-        var pastTouchSlop = false
-        val touchSlop = viewConfiguration.touchSlop
-        var lockedToPanZoom = false
+    val tapClassifier = GestureTapClassifier()
+    val tapScope = MainScope()
+    var pendingTap: Job? = null
+    try {
+        awaitEachGesture {
+            var rotation = 0f
+            var zoom = 1f
+            var pan = Offset.Zero
+            var pastTouchSlop = false
+            val touchSlop = viewConfiguration.touchSlop
+            var lockedToPanZoom = false
 
-        awaitFirstDown(requireUnconsumed = false)
-        val t0 = Clock.System.now().toEpochMilliseconds()
-        var releasedEvent: PointerEvent? = null
-        var moveCount = 0
+            val down = awaitFirstDown(requireUnconsumed = false)
+            var releasedEvent: PointerEvent? = null
+            var maxPointerCount = 1
+            var canceled = false
 
-        gestureStart()
-        do {
-            val event = awaitPointerEvent()
-            if (event.type == PointerEventType.Release) releasedEvent = event
-            if (event.type == PointerEventType.Move) moveCount++
-            val canceled = event.changes.fastAny { it.isConsumed }
-            if (!canceled) {
-                val zoomChange = event.calculateZoom()
-                val rotationChange = event.calculateRotation()
-                val panChange = event.calculatePan()
+            gestureStart()
+            do {
+                val event = awaitPointerEvent()
+                if (event.changes.size > maxPointerCount) maxPointerCount = event.changes.size
+                if (event.type == PointerEventType.Release) releasedEvent = event
+                canceled = event.changes.fastAny { it.isConsumed }
+                if (!canceled) {
+                    val zoomChange = event.calculateZoom()
+                    val rotationChange = event.calculateRotation()
+                    val panChange = event.calculatePan()
 
-                if (!pastTouchSlop) {
-                    zoom *= zoomChange
-                    rotation += rotationChange
-                    pan += panChange
-                    val centroidSize = event.calculateCentroidSize(useCurrent = false)
-                    val zoomMotion = abs(1 - zoom) * centroidSize
-                    val rotationMotion = abs(rotation * PI.toFloat() * centroidSize / 180f)
-                    val panMotion = pan.getDistance()
-                    if (zoomMotion > touchSlop || rotationMotion > touchSlop || panMotion > touchSlop) {
-                        pastTouchSlop = true
-                        lockedToPanZoom = panZoomLock && rotationMotion < touchSlop
+                    if (!pastTouchSlop) {
+                        zoom *= zoomChange
+                        rotation += rotationChange
+                        pan += panChange
+                        val centroidSize = event.calculateCentroidSize(useCurrent = false)
+                        val zoomMotion = abs(1 - zoom) * centroidSize
+                        val rotationMotion = abs(rotation * PI.toFloat() * centroidSize / 180f)
+                        val panMotion = pan.getDistance()
+                        if (zoomMotion > touchSlop || rotationMotion > touchSlop || panMotion > touchSlop) {
+                            pastTouchSlop = true
+                            lockedToPanZoom = panZoomLock && rotationMotion < touchSlop
+                        }
+                    }
+                    if (pastTouchSlop) {
+                        val centroid = event.calculateCentroid(useCurrent = false)
+                        val effectiveRotation = if (lockedToPanZoom) 0f else rotationChange
+                        if (effectiveRotation != 0f || zoomChange != 1f || panChange != Offset.Zero) {
+                            if (!onGesture(centroid, panChange, zoomChange, effectiveRotation, event)) break
+                        }
                     }
                 }
-                if (pastTouchSlop) {
-                    val centroid = event.calculateCentroid(useCurrent = false)
-                    val effectiveRotation = if (lockedToPanZoom) 0f else rotationChange
-                    if (effectiveRotation != 0f || zoomChange != 1f || panChange != Offset.Zero) {
-                        if (!onGesture(centroid, panChange, zoomChange, effectiveRotation, event)) break
+            } while (!canceled && event.changes.fastAny { it.pressed })
+
+            val release = releasedEvent
+            if (release != null && release.changes.isNotEmpty()) {
+                val up = release.changes.first()
+                when (tapClassifier.classifyRelease(
+                    upUptimeMillis = up.uptimeMillis,
+                    pressDurationMillis = up.uptimeMillis - down.uptimeMillis,
+                    longPressTimeoutMillis = viewConfiguration.longPressTimeoutMillis,
+                    maxPointerCount = maxPointerCount,
+                    passedTouchSlop = pastTouchSlop,
+                    canceled = canceled,
+                )) {
+                    GestureTapClassifier.Decision.TAP ->
+                        pendingTap = tapScope.launch { delay(DOUBLE_TAP_WINDOW_MILLIS); onTap(up.position) }
+                    GestureTapClassifier.Decision.DOUBLE_TAP -> {
+                        pendingTap?.cancel()
+                        pendingTap = null
+                        onDoubleTap(up.position)
                     }
+                    GestureTapClassifier.Decision.IGNORED -> Unit
                 }
             }
-        } while (!canceled && event.changes.fastAny { it.pressed })
-
-        var t1 = Clock.System.now().toEpochMilliseconds()
-        val dt = t1 - t0
-        val dlt = t1 - lastReleaseTime
-
-        if (moveCount == 0) releasedEvent?.let { e ->
-            if (e.changes.isEmpty()) return@let
-            val offset = e.changes.first().position
-            if (dlt < 272) {
-                t1 = 0L; scope?.cancel(); onDoubleTap(offset)
-            } else if (dt < 200) {
-                scope = MainScope()
-                scope.launch(Dispatchers.Main) { delay(272); onTap(offset) }
-            }
-            lastReleaseTime = t1
+            gestureEnd(pastTouchSlop)
         }
-        gestureEnd(moveCount != 0)
+    } finally {
+        tapScope.cancel()
     }
 }
