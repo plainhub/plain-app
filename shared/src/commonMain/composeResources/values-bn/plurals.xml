@@ -52,4 +52,8 @@
         <item quantity="one">%1$d আইটেম যোগ করা হয়েছে</item>
         <item quantity="other">%1$d আইটেম যোগ করা হয়েছে</item>
     </plurals>
+    <plurals name="sent_to_n_targets">
+        <item quantity="one">%1$dটি চ্যাটে পাঠানো হয়েছে</item>
+        <item quantity="other">%1$dটি চ্যাটে পাঠানো হয়েছে</item>
+    </plurals>
 </resources>

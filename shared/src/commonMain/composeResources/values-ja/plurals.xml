@@ -52,4 +52,8 @@
         <item quantity="one">%1$d件のアイテムを追加しました</item>
         <item quantity="other">%1$d件のアイテムを追加しました</item>
     </plurals>
+    <plurals name="sent_to_n_targets">
+        <item quantity="one">%1$d件のチャットに送信しました</item>
+        <item quantity="other">%1$d件のチャットに送信しました</item>
+    </plurals>
 </resources>

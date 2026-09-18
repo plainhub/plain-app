@@ -24,7 +24,6 @@
     <string name="save_to_files">Сохранить в файлы</string>
     <string name="save_as_note">Сохранить как заметку</string>
     <string name="send_count">Отправить (%1$d)</string>
-    <string name="sent_to_n_targets">Отправлено в %1$d чат(ов)</string>
     <string name="send_failed">Не удалось отправить в некоторые чаты</string>
     <string name="saved_to_downloads">Сохранено в «Загрузки»</string>
     <string name="cannot_get_content">Не удалось получить содержимое</string>

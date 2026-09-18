@@ -52,4 +52,8 @@
         <item quantity="one">%1$d உருப்படிகள் சேர்க்கப்பட்டன</item>
         <item quantity="other">%1$d உருப்படிகள் சேர்க்கப்பட்டன</item>
     </plurals>
+    <plurals name="sent_to_n_targets">
+        <item quantity="one">%1$d அரட்டைக்கு அனுப்பப்பட்டது</item>
+        <item quantity="other">%1$d அரட்டைகளுக்கு அனுப்பப்பட்டது</item>
+    </plurals>
 </resources>

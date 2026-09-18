@@ -24,7 +24,6 @@
     <string name="save_to_files">கோப்புகளில் சேமி</string>
     <string name="save_as_note">குறிப்பாகச் சேமி</string>
     <string name="send_count">அனுப்பு (%1$d)</string>
-    <string name="sent_to_n_targets">%1$d அரட்டைகளுக்கு அனுப்பப்பட்டது</string>
     <string name="send_failed">சில அரட்டைகளுக்கு அனுப்ப முடியவில்லை</string>
     <string name="saved_to_downloads">பதிவிறக்கங்களில் சேமிக்கப்பட்டது</string>
     <string name="cannot_get_content">பகிர்ந்த உள்ளடக்கத்தை அணுக முடியவில்லை</string>

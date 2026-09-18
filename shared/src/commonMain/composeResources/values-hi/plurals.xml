@@ -52,4 +52,8 @@
         <item quantity="one">%1$d आइटम जोड़े गए</item>
         <item quantity="other">%1$d आइटम जोड़े गए</item>
     </plurals>
+    <plurals name="sent_to_n_targets">
+        <item quantity="one">%1$d चैट पर भेजा गया</item>
+        <item quantity="other">%1$d चैटों पर भेजा गया</item>
+    </plurals>
 </resources>

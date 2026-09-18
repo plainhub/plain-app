@@ -24,7 +24,6 @@
     <string name="save_to_files">Opslaan in bestanden</string>
     <string name="save_as_note">Opslaan als notitie</string>
     <string name="send_count">Versturen (%1$d)</string>
-    <string name="sent_to_n_targets">Verzonden naar %1$d chats</string>
     <string name="send_failed">Verzenden naar sommige chats mislukt</string>
     <string name="saved_to_downloads">Opgeslagen in Downloads</string>
     <string name="cannot_get_content">Kan gedeelde inhoud niet ophalen</string>

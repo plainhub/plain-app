@@ -25,7 +25,6 @@
     <string name="save_to_files">Save to files</string>
     <string name="save_as_note">Save as note</string>
     <string name="send_count">Send (%1$d)</string>
-    <string name="sent_to_n_targets">Sent to %1$d chats</string>
     <string name="send_failed">Failed to send to some chats</string>
     <string name="saved_to_downloads">Saved to Downloads</string>
     <string name="cannot_get_content">Cannot access the shared content</string>

@@ -150,7 +150,7 @@ fun PlaylistDetailPage(
             navController = navController,
             actions = {
                 PIconButton(
-                    icon = Res.drawable.more_three_dots,
+                    icon = Res.drawable.more_horiz,
                     contentDescription = stringResource(Res.string.more),
                     click = { showMore = true },
                 )

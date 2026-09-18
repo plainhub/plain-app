@@ -78,4 +78,10 @@
         <item quantity="many">%1$d элементов добавлено</item>
         <item quantity="other">%1$d элементов добавлено</item>
     </plurals>
+    <plurals name="sent_to_n_targets">
+        <item quantity="one">Отправлено в %1$d чат</item>
+        <item quantity="few">Отправлено в %1$d чата</item>
+        <item quantity="many">Отправлено в %1$d чатов</item>
+        <item quantity="other">Отправлено в %1$d чата</item>
+    </plurals>
 </resources>

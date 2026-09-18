@@ -24,7 +24,6 @@
     <string name="save_to_files">In Dateien speichern</string>
     <string name="save_as_note">Als Notiz speichern</string>
     <string name="send_count">Senden (%1$d)</string>
-    <string name="sent_to_n_targets">An %1$d Chats gesendet</string>
     <string name="send_failed">Senden an einige Chats fehlgeschlagen</string>
     <string name="saved_to_downloads">In Downloads gespeichert</string>
     <string name="cannot_get_content">Freigabeinhalt konnte nicht abgerufen werden</string>

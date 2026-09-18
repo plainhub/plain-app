@@ -112,7 +112,7 @@ class ShareActivity : ComponentActivity() {
             try {
                 val ok = ShareSendHelper.sendAsync(targets, uris, vm.text, vm.caption.ifBlank { null })
                 if (ok) {
-                    toast(LocaleHelper.getStringF(Res.string.sent_to_n_targets, targets.size))
+                    toast(LocaleHelper.getPluralStringAsync(Res.plurals.sent_to_n_targets, targets.size))
                     finish()
                 } else {
                     vm.sending = false

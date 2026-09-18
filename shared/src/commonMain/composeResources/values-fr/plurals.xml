@@ -52,4 +52,8 @@
         <item quantity="one">%1$d élément ajouté</item>
         <item quantity="other">%1$d éléments ajoutés</item>
     </plurals>
+    <plurals name="sent_to_n_targets">
+        <item quantity="one">Envoyé à %1$d chat</item>
+        <item quantity="other">Envoyé à %1$d chats</item>
+    </plurals>
 </resources>

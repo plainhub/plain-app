@@ -52,4 +52,8 @@
         <item quantity="one">已添加 %1$d 个项目</item>
         <item quantity="other">已添加 %1$d 个项目</item>
     </plurals>
+    <plurals name="sent_to_n_targets">
+        <item quantity="one">已发送到 %1$d 个聊天</item>
+        <item quantity="other">已发送到 %1$d 个聊天</item>
+    </plurals>
 </resources>

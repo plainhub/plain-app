@@ -24,7 +24,6 @@
     <string name="save_to_files">फ़ाइलों में सहेजें</string>
     <string name="save_as_note">नोट के रूप में सहेजें</string>
     <string name="send_count">भेजें (%1$d)</string>
-    <string name="sent_to_n_targets">%1$d चैट पर भेजा गया</string>
     <string name="send_failed">कुछ चैट पर भेजना विफल रहा</string>
     <string name="saved_to_downloads">डाउनलोड में सहेजा गया</string>
     <string name="cannot_get_content">साझा की गई सामग्री तक पहुँच नहीं पा रहे हैं</string>

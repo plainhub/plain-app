@@ -52,4 +52,8 @@
         <item quantity="one">%1$d öğe eklendi</item>
         <item quantity="other">%1$d öğe eklendi</item>
     </plurals>
+    <plurals name="sent_to_n_targets">
+        <item quantity="one">%1$d sohbete gönderildi</item>
+        <item quantity="other">%1$d sohbete gönderildi</item>
+    </plurals>
 </resources>

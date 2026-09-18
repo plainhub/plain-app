@@ -25,7 +25,6 @@
     <string name="save_to_files">儲存到檔案</string>
     <string name="save_as_note">儲存為筆記</string>
     <string name="send_count">傳送（%1$d）</string>
-    <string name="sent_to_n_targets">已傳送至 %1$d 個聊天</string>
     <string name="send_failed">部分聊天傳送失敗</string>
     <string name="saved_to_downloads">已儲存到下載</string>
     <string name="cannot_get_content">無法取得分享內容</string>
