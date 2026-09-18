@@ -75,7 +75,6 @@
     <string name="feed_err_server">伺服器錯誤</string>
     <string name="feed_err_ssl">憑證錯誤</string>
     <string name="feed_err_parse">訂閱格式無法解析</string>
-    <string name="n_articles">%1$d 篇</string>
     <string name="n_unread">%1$d 未讀</string>
     <string name="all_read">全部已讀</string>
     <string name="mark_all_read">標記全部已讀</string>

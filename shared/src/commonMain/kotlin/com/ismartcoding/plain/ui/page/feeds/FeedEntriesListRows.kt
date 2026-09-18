@@ -58,12 +58,15 @@ private fun entryTitleStyle(read: Boolean) = if (read) {
 
 /**
  * Sticky day separator for the grouped feed list. The mark-read action only
- * covers the entries loaded in the current paging window.
+ * covers the entries loaded in the current paging window. In the single-feed
+ * view [onToggle] is set and the row doubles as the collapse toggle for the
+ * whole day (the day is the only cluster there).
  */
 @Composable
 internal fun FeedDayHeaderRow(
     row: FeedListRow.DayHeader,
     onMarkRead: () -> Unit,
+    onToggle: (() -> Unit)? = null,
 ) {
     val label = when (row.kind) {
         DayKind.TODAY -> stringResource(Res.string.today)
@@ -71,13 +74,14 @@ internal fun FeedDayHeaderRow(
         DayKind.DATE -> row.dateLabel
     }
     val meta = listOf(
-        stringResource(Res.string.n_articles, row.count),
+        row.count.toString(),
         if (row.unreadCount > 0) stringResource(Res.string.n_unread, row.unreadCount) else stringResource(Res.string.all_read),
     ).joinToString(" · ")
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.background)
+            .then(if (onToggle != null) Modifier.clip(RoundedCornerShape(8.dp)).clickable(onClick = onToggle) else Modifier)
             .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -94,6 +98,17 @@ internal fun FeedDayHeaderRow(
             TextButton(onClick = onMarkRead) {
                 Text(stringResource(Res.string.mark_all_read), style = MaterialTheme.typography.labelMedium)
             }
+        }
+        if (onToggle != null) {
+            HorizontalSpace(dp = 8.dp)
+            Icon(
+                painter = painterResource(Res.drawable.chevron_right),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(20.dp)
+                    .rotate(if (row.collapsed) 0f else 90f),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -153,7 +168,7 @@ internal fun FeedClusterHeaderRow(
         )
         HorizontalSpace(dp = 8.dp)
         Text(
-            text = stringResource(Res.string.n_articles, row.count),
+            text = row.count.toString(),
             style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
             maxLines = 1,
         )
@@ -185,7 +200,9 @@ internal fun FeedClusterHeaderRow(
 
 /**
  * One entry as a full-bleed borderless row, indented under its cluster's feed
- * name. Unread state is typography only: bold dark title vs muted regular.
+ * name, or flush at the list margin when no cluster header is shown (single
+ * feed filter view). Unread state is typography only: bold dark title vs muted
+ * regular.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -193,6 +210,7 @@ internal fun FeedClusterEntryRow(
     row: FeedListRow.Entry,
     feedEntriesVM: FeedEntriesViewModel,
     tags: List<DTag>,
+    indented: Boolean = true,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onClickTag: (DTag) -> Unit,
@@ -204,7 +222,7 @@ internal fun FeedClusterEntryRow(
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-            .padding(start = 56.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
+            .padding(start = if (indented) 56.dp else 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
     ) {
         if (feedEntriesVM.selectMode.value) {
             CheckCircle(
@@ -262,18 +280,21 @@ internal fun FeedClusterEntryRow(
 /**
  * Collapsed cluster body: newest entry titles as plain indented text lines,
  * full-bleed and tappable to expand. Unread titles bold, read titles muted.
+ * Flush at the list margin when no cluster header precedes it (single-feed
+ * filter view).
  */
 @Composable
 internal fun FeedClusterDigestRow(
     row: FeedListRow.CollapsedDigest,
     onToggle: () -> Unit,
+    indented: Boolean = true,
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .clickable(onClick = onToggle)
-            .padding(start = 56.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
+            .padding(start = if (indented) 56.dp else 16.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
     ) {
         row.entries.forEachIndexed { index, entry ->
             if (index > 0) VerticalSpace(dp = 4.dp)

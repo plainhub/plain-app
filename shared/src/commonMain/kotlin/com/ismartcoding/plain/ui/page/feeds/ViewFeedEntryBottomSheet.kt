@@ -14,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.extensions.getFinalPath
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.platform.launchUrl
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -52,7 +54,6 @@ fun ViewFeedEntryBottomSheet(
     val m = feedEntriesVM.selectedItem.value ?: return
     val feeds by feedsVM.itemsFlow.collectAsState()
     val feedLogo = feeds.find { it.id == m.feedId }?.logo?.takeIf { it.isNotEmpty() }
-    val scope = rememberCoroutineScope()
     val onDismiss = {
         feedEntriesVM.selectedItem.value = null
     }
@@ -70,7 +71,11 @@ fun ViewFeedEntryBottomSheet(
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PSheetHeader(
                         thumbnail = {
-                            PSheetHeaderThumb(model = feedLogo, fallbackIcon = Res.drawable.rss)
+                            PSheetHeaderThumb(
+                                model = m.image.getFinalPath().ifEmpty { feedLogo },
+                                fallbackIcon = Res.drawable.rss,
+                                contentScale = ContentScale.Crop,
+                            )
                         },
                         title = m.title.ifEmpty { m.url },
                         subtitle = (if (m.author.isNotEmpty()) m.author + " · " else "") + m.publishedAt.formatDateTime(),

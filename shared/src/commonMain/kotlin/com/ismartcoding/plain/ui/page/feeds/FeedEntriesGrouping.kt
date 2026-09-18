@@ -15,7 +15,9 @@ internal sealed interface FeedListRow {
 
     /**
      * Sticky per-day separator. Counts and [markReadIds] cover only the
-     * entries currently loaded in the paging window.
+     * entries currently loaded in the paging window. In the single-feed view
+     * the day IS the cluster, so [collapsed]/[toggleKey] carry the collapse
+     * state there; they stay default in the clustered view.
      */
     data class DayHeader(
         val dayKey: String,
@@ -24,6 +26,8 @@ internal sealed interface FeedListRow {
         val count: Int,
         val unreadCount: Int,
         val markReadIds: Set<String>,
+        val collapsed: Boolean = false,
+        val toggleKey: String? = null,
     ) : FeedListRow {
         override val key: String = "day_$dayKey"
     }
@@ -56,7 +60,10 @@ internal enum class DayKind { TODAY, YESTERDAY, DATE }
  * Groups a `published_at DESC` entry list into per-day buckets, each clustered
  * by feed. A cluster defaults to collapsed once it has no unread entries;
  * [expandedOverrides] (cluster key → explicit user choice) wins over the
- * default. Pure and cheap enough to run per recomposition on the paging window.
+ * default. With [clusterByFeed] false (single-feed filter view) the day is the
+ * cluster: the collapse toggle moves onto the day header and no per-feed
+ * cluster headers are emitted. Pure and cheap enough to run per recomposition
+ * on the paging window.
  */
 internal fun buildFeedListRows(
     items: List<DFeedEntry>,
@@ -64,6 +71,7 @@ internal fun buildFeedListRows(
     expandedOverrides: Map<String, Boolean>,
     timeZone: TimeZone,
     today: LocalDate,
+    clusterByFeed: Boolean = true,
 ): List<FeedListRow> {
     if (items.isEmpty()) return emptyList()
     val yesterday = today.minus(DatePeriod(days = 1))
@@ -73,6 +81,26 @@ internal fun buildFeedListRows(
             today -> DayKind.TODAY
             yesterday -> DayKind.YESTERDAY
             else -> DayKind.DATE
+        }
+        if (!clusterByFeed) {
+            val clusterKey = "$date/${dayEntries.first().feedId}"
+            val collapsed = expandedOverrides[clusterKey] ?: (dayEntries.count { !it.read } == 0)
+            rows += FeedListRow.DayHeader(
+                dayKey = date.toString(),
+                kind = kind,
+                dateLabel = dayEntries.first().publishedAt.formatDate(),
+                count = dayEntries.size,
+                unreadCount = dayEntries.count { !it.read },
+                markReadIds = dayEntries.map { it.id }.toSet(),
+                collapsed = collapsed,
+                toggleKey = clusterKey,
+            )
+            if (collapsed) {
+                rows += FeedListRow.CollapsedDigest("$clusterKey/digest", clusterKey, dayEntries.take(2))
+            } else {
+                dayEntries.forEach { e -> rows += FeedListRow.Entry(e.id, e) }
+            }
+            return@forEach
         }
         rows += FeedListRow.DayHeader(
             dayKey = date.toString(),

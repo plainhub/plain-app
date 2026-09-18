@@ -33,6 +33,7 @@ import com.ismartcoding.plain.platform.shareFile
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -106,7 +107,11 @@ fun ViewDocBottomSheet(
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PSheetHeader(
                         thumbnail = {
-                            PSheetHeaderThumb(model = getFileIconPath(m.extension), fallbackIcon = Res.drawable.file)
+                            AsyncImage(
+                                model = getFileIconPath(m.extension),
+                                contentDescription = m.title,
+                                modifier = Modifier.size(44.dp),
+                            )
                         },
                         title = m.title.ifEmpty { m.path.getFilenameFromPath() },
                         subtitle = m.path.getMimeType() + " · " + m.size.formatBytes(),

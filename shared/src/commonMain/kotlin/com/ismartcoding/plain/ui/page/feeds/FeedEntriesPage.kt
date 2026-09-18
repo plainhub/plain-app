@@ -252,18 +252,24 @@ fun FeedEntriesPage(
                         } else if (itemsState.isNotEmpty()) {
                             LazyColumnScrollbar(state = scrollState) {
                                 LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection), state = scrollState) {
+                                    // A feed-filtered list has one feed per cluster whose name
+                                    // is already in the page title: render entries flat.
+                                    val clusterByFeed = feedEntriesVM.feedId.value.isEmpty()
                                     val rows = buildFeedListRows(
                                         itemsState,
                                         feedsMap.value,
                                         feedEntriesVM.clusterExpandedOverrides,
                                         TimeZone.currentSystemDefault(),
                                         TimeHelper.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                                        clusterByFeed = clusterByFeed,
                                     )
                                     rows.forEach { row ->
                                         when (row) {
                                             is FeedListRow.DayHeader -> stickyHeader(key = row.key) {
                                                 FeedDayHeaderRow(row, onMarkRead = {
                                                     feedEntriesVM.markRead(row.markReadIds)
+                                                }, onToggle = row.toggleKey?.let { key ->
+                                                    { feedEntriesVM.clusterExpandedOverrides[key] = !row.collapsed }
                                                 })
                                             }
                                             is FeedListRow.ClusterHeader -> item(key = row.key) {
@@ -276,6 +282,7 @@ fun FeedEntriesPage(
                                                 val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
                                                 FeedClusterEntryRow(
                                                     row, feedEntriesVM, tagsState.filter { tagIds.contains(it.id) },
+                                                    indented = clusterByFeed,
                                                     onClick = { if (feedEntriesVM.selectMode.value) feedEntriesVM.select(m.id) else { if (!m.read) feedEntriesVM.markRead(setOf(m.id)); pagerVM.setup(itemsState.map { it.id }); navController.navigate(Routing.FeedEntry(m.id)) } },
                                                     onLongClick = { if (!feedEntriesVM.selectMode.value) feedEntriesVM.selectedItem.value = m },
                                                     onClickTag = { tag -> if (!feedEntriesVM.selectMode.value) applyFilter("", FeedEntryFilterType.DEFAULT, tag) }
@@ -284,7 +291,7 @@ fun FeedEntriesPage(
                                             is FeedListRow.CollapsedDigest -> item(key = row.key) {
                                                 FeedClusterDigestRow(row, onToggle = {
                                                     feedEntriesVM.clusterExpandedOverrides[row.clusterKey] = false
-                                                })
+                                                }, indented = clusterByFeed)
                                             }
                                         }
                                     }

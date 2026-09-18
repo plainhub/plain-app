@@ -4,6 +4,7 @@ import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedEntry
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -39,6 +40,8 @@ class FeedEntriesGroupingTest {
             listOf("ClusterHeader", "Entry", "Entry", "ClusterHeader", "Entry"),
             rows.drop(1).take(5).map { it::class.simpleName },
         )
+        // clustered days carry no collapse toggle of their own
+        assertTrue(rows.filterIsInstance<FeedListRow.DayHeader>().all { it.toggleKey == null && !it.collapsed })
     }
 
     @Test
@@ -72,6 +75,35 @@ class FeedEntriesGroupingTest {
         val allRead = items.map { it.copy(read = true) }
         rows = buildFeedListRows(allRead, feeds, mapOf("2026-09-16/a" to false), tz, today)
         assertEquals(listOf("ClusterHeader", "Entry", "Entry"), rows.drop(1).map { it::class.simpleName })
+    }
+
+    @Test
+    fun feedFilteredViewCollapsesOnDayHeader() {
+        val items =
+            listOf(
+                entry("1", "a", Instant.parse("2026-09-16T10:00:00Z"), read = true),
+                entry("2", "a", Instant.parse("2026-09-16T09:00:00Z"), read = true),
+                entry("3", "a", Instant.parse("2026-09-15T10:00:00Z")),
+            )
+        // no ClusterHeader anywhere; the all-read day collapses to a digest
+        // with the toggle on its day header, the day with unread stays expanded
+        var rows = buildFeedListRows(items, feeds, emptyMap(), tz, today, clusterByFeed = false)
+        assertEquals(
+            listOf("DayHeader", "CollapsedDigest", "DayHeader", "Entry"),
+            rows.map { it::class.simpleName },
+        )
+        val collapsedDay = rows.filterIsInstance<FeedListRow.DayHeader>().first()
+        assertTrue(collapsedDay.collapsed)
+        assertEquals("2026-09-16/a", collapsedDay.toggleKey)
+        val digest = rows.filterIsInstance<FeedListRow.CollapsedDigest>().first()
+        assertEquals(listOf("1", "2"), digest.entries.map { it.id })
+        assertEquals("2026-09-16/a/digest", digest.key)
+        // explicit override keeps the all-read day expanded
+        rows = buildFeedListRows(items, feeds, mapOf("2026-09-16/a" to false), tz, today, clusterByFeed = false)
+        assertEquals(
+            listOf("DayHeader", "Entry", "Entry", "DayHeader", "Entry"),
+            rows.map { it::class.simpleName },
+        )
     }
 
     @Test

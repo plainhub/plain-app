@@ -75,7 +75,6 @@
     <string name="feed_err_server">Server error</string>
     <string name="feed_err_ssl">Certificate error</string>
     <string name="feed_err_parse">Invalid feed format</string>
-    <string name="n_articles">%1$d articles</string>
     <string name="n_unread">%1$d unread</string>
     <string name="all_read">All read</string>
     <string name="mark_all_read">Mark all read</string>

@@ -54,7 +54,7 @@ fun PSheetHeader(
             Text(
                 text = title,
                 style = MaterialTheme.typography.listItemTitle(),
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             if (subtitle.isNotEmpty()) {
