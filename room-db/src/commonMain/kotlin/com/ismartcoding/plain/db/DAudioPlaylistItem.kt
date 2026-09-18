@@ -41,7 +41,7 @@ data class DAudioPlaylistItem(
 )
 
 @Dao
-interface AudioPlaylistSongDao {
+interface AudioPlaylistItemDao {
     @Query(
         "SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId " +
             "ORDER BY position LIMIT :limit OFFSET :offset"
@@ -62,10 +62,10 @@ interface AudioPlaylistSongDao {
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAll(songs: List<DAudioPlaylistItem>): List<Long>
+    suspend fun insertAll(items: List<DAudioPlaylistItem>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(song: DAudioPlaylistItem): Long
+    suspend fun insert(item: DAudioPlaylistItem): Long
 
     @Query("UPDATE audio_playlist_items SET position = :position WHERE id = :id")
     suspend fun updatePosition(id: String, position: Int)

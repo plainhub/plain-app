@@ -1417,7 +1417,7 @@
         }
       },
       {
-        "tableName": "audio_playlist_songs",
+        "tableName": "audio_playlist_items",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `playlist_id` TEXT NOT NULL, `audio_path` TEXT NOT NULL, `title` TEXT NOT NULL, `artist` TEXT NOT NULL, `duration` INTEGER NOT NULL, `position` INTEGER NOT NULL, `added_at` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
@@ -1477,24 +1477,24 @@
         },
         "indices": [
           {
-            "name": "index_audio_playlist_songs_playlist_id_position",
+            "name": "index_audio_playlist_items_playlist_id_position",
             "unique": false,
             "columnNames": [
               "playlist_id",
               "position"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_audio_playlist_songs_playlist_id_position` ON `${TABLE_NAME}` (`playlist_id`, `position`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_audio_playlist_items_playlist_id_position` ON `${TABLE_NAME}` (`playlist_id`, `position`)"
           },
           {
-            "name": "index_audio_playlist_songs_playlist_id_audio_path",
+            "name": "index_audio_playlist_items_playlist_id_audio_path",
             "unique": true,
             "columnNames": [
               "playlist_id",
               "audio_path"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_audio_playlist_songs_playlist_id_audio_path` ON `${TABLE_NAME}` (`playlist_id`, `audio_path`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_audio_playlist_items_playlist_id_audio_path` ON `${TABLE_NAME}` (`playlist_id`, `audio_path`)"
           }
         ]
       },

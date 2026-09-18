@@ -47,9 +47,6 @@ internal fun FileInfoPrimaryActions(
         PSheetPrimaryAction(Res.drawable.copy, stringResource(Res.string.copy)) {
             performCopyFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
         }
-        PSheetPrimaryAction(Res.drawable.scissors, stringResource(Res.string.cut)) {
-            performCutFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
-        }
         PSheetPrimaryAction(
             Res.drawable.delete_forever,
             stringResource(Res.string.delete),
@@ -79,12 +76,16 @@ internal fun FileInfoSecondaryActions(
     onFavoriteToggle: () -> Unit,
     showRenameDialog: MutableState<Boolean>,
     scope: CoroutineScope,
+    onShowPasteBar: (Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         Column {
             PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
                 showRenameDialog.value = true
+            }
+            PSheetActionRow(Res.drawable.scissors, stringResource(Res.string.cut)) {
+                performCutFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
             }
             PSheetActionRow(Res.drawable.link, stringResource(Res.string.share_link)) {
                 filesVM.sharePaths.clear()

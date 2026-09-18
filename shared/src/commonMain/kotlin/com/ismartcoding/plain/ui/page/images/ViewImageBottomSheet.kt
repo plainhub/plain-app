@@ -85,7 +85,7 @@ fun ViewImageBottomSheet(
 
     PModalBottomSheet(onDismissRequest = { onDismiss() }) {
         LazyColumn {
-            item { VerticalSpace(32.dp) }
+            item { VerticalSpace(16.dp) }
             item {
                 ViewImageActionButtons(
                     imagesVM = imagesVM, tagsVM = tagsVM, m = m,

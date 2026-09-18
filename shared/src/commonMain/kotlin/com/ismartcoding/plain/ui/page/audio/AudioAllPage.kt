@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.page.audio
 
-/** The flat "all songs" list, kept as the [com.ismartcoding.plain.ui.nav.Routing.AudioAll] page. */
+/** The flat "all items" list, kept as the [com.ismartcoding.plain.ui.nav.Routing.AudioAll] page. */
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi

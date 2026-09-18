@@ -30,7 +30,7 @@ data class PlaylistAudio(
 data class AudioPlaylist(
     val id: ID,
     val name: String,
-    val songCount: Int,
+    val itemCount: Int,
     val createdAt: Instant,
     val updatedAt: Instant,
 )

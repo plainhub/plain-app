@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.preferences.LocalDarkTheme
@@ -88,65 +89,66 @@ fun OnboardingPage(navController: NavHostController) {
                 .statusBarsPadding()
                 .navigationBarsPadding(),
         ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 8.dp),
-            horizontalArrangement = Arrangement.End,
-        ) {
-            Text(
-                text = stringResource(Res.string.onboarding_skip),
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.bodyLarge,
+            Row(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .clickable { complete(false) }
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-            )
-        }
-        HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
-            when (page) {
-                0 -> SlideWelcome()
-                1 -> SlideDesktopAccess()
-                2 -> SlideChat()
-                3 -> SlideMediaTools()
-                else -> SlideGetStarted()
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 12.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            repeat(PAGE_COUNT) { index ->
-                val selected = pagerState.currentPage == index
-                Box(
+                    .fillMaxWidth()
+                    .padding(end = 8.dp),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                Text(
+                    text = stringResource(Res.string.onboarding_skip),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .width(if (selected) 20.dp else 8.dp)
-                        .height(8.dp)
                         .clip(RoundedCornerShape(50))
-                        .background(if (selected) MaterialTheme.colorScheme.primary else inactiveDot),
+                        .clickable { complete(false) }
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
                 )
             }
-        }
-        val isLast = pagerState.currentPage == PAGE_COUNT - 1
-        PFilledButton(
-            text = stringResource(if (isLast) Res.string.onboarding_get_started else Res.string.onboarding_next),
-            onClick = {
-                if (isLast) {
-                    complete(true)
-                } else {
-                    scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+            HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
+                when (page) {
+                    0 -> SlideWelcome()
+                    1 -> SlideDesktopAccess()
+                    2 -> SlideChat()
+                    3 -> SlideMediaTools()
+                    else -> SlideGetStarted()
                 }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-        )
-        VerticalSpace(dp = 28.dp)
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                repeat(PAGE_COUNT) { index ->
+                    val selected = pagerState.currentPage == index
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .width(if (selected) 20.dp else 8.dp)
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(50))
+                            .background(if (selected) MaterialTheme.colorScheme.primary else inactiveDot),
+                    )
+                }
+            }
+            val isLast = pagerState.currentPage == PAGE_COUNT - 1
+            PFilledButton(
+                text = stringResource(if (isLast) Res.string.onboarding_get_started else Res.string.onboarding_next),
+                onClick = {
+                    if (isLast) {
+                        complete(true)
+                    } else {
+                        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                    }
+                },
+                buttonSize = ButtonSize.LARGE,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+            )
+            VerticalSpace(dp = 28.dp)
         }
     }
 }

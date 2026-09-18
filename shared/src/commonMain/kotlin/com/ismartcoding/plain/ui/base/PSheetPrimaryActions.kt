@@ -26,13 +26,27 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 // Primary bottom-sheet actions: a row of colored disc buttons, replacing
-// FlowRow button walls. The row is divided evenly by the number of actions
-// actually composed, so an action can never overflow off-screen.
+// FlowRow button walls. One or two actions keep four-column slots anchored
+// left (rest of the row stays empty); three or more split the width evenly,
+// capped at [MAX_PSheetPrimaryActionsPerRow] columns.
+// Contract: keep at most 4 actions per card. Anything beyond belongs in the
+// sheet's secondary actions card (PSheetActionRow) — overflow here would run
+// off-screen (the FileInfoBottomSheet delete-button regression).
 
-// Evenly divides [rowWidthPx] across [actionCount] actions. The invariant that
-// keeps the last action on-screen: actionCount * result <= rowWidthPx.
+internal const val MAX_PSheetPrimaryActionsPerRow = 4
+
+// Column count the row is divided into: 1-2 actions use the full four-column
+// grid so they anchor left; 3+ divide evenly, capped at 4.
+internal fun actionSlotColumns(actionCount: Int): Int = when {
+    actionCount <= 0 -> 1
+    actionCount <= 2 -> MAX_PSheetPrimaryActionsPerRow
+    else -> minOf(actionCount, MAX_PSheetPrimaryActionsPerRow)
+}
+
+// Evenly divides [rowWidthPx] into [actionSlotColumns] slots. The invariant
+// that keeps every action on-screen: columns * result <= rowWidthPx.
 internal fun actionSlotWidthPx(rowWidthPx: Int, actionCount: Int): Int =
-    if (actionCount <= 0) rowWidthPx else rowWidthPx / actionCount
+    rowWidthPx / actionSlotColumns(actionCount)
 
 @Composable
 private fun PSheetActionsFlowLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
@@ -53,10 +67,9 @@ fun PSheetPrimaryActionsRow(content: @Composable () -> Unit) {
 
 @Composable
 fun PSheetPrimaryActionsCard(content: @Composable () -> Unit) {
+    // No card background: this area holds icon buttons only, no header.
     Box(Modifier.fillMaxWidth().padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-        PCard {
-            PSheetActionsFlowLayout(Modifier.fillMaxWidth().padding(vertical = 12.dp), content = content)
-        }
+        PSheetActionsFlowLayout(Modifier.fillMaxWidth().padding(vertical = 12.dp), content = content)
     }
 }
 

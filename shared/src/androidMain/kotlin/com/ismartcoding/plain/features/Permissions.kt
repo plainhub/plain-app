@@ -157,16 +157,8 @@ object Permissions {
             intentLauncherMap[permission] =
                 activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                     canContinue = true
-                    if (permission == Permission.WRITE_EXTERNAL_STORAGE) {
-                        coIO {
-                            delay(1500)
-                            val map = mapOf(permission.toSysPermission() to permission.isGranted())
-                            sendEvent(PermissionsResultEvent(map))
-                        }
-                    } else {
-                        val map = mapOf(permission.toSysPermission() to permission.isGranted())
-                        sendEvent(PermissionsResultEvent(map))
-                    }
+                    val map = mapOf(permission.toSysPermission() to permission.isGranted())
+                    sendEvent(PermissionsResultEvent(map))
                 }
         }
 

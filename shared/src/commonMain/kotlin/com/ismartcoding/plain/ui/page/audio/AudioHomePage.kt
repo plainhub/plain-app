@@ -182,7 +182,7 @@ fun AudioHomePage(
                 }
 
                 if (audioVM.showSearchBar.value) {
-                    // Search mirrors the all-songs page; AudioPageList brings
+                    // Search mirrors the all-items page; AudioPageList brings
                     // its own pull-to-refresh, so it sits outside ours.
                     AudioPageList(
                         scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
@@ -214,7 +214,7 @@ fun AudioHomePage(
                                     }
                                 }
                             },
-                            onViewAllSongs = { navController.navigate(Routing.AudioAll) },
+                            onViewAllItems = { navController.navigate(Routing.AudioAll) },
                             onArtistsViewAll = { navController.navigate(Routing.Artists) },
                             onArtistClick = { artist -> navController.navigate(Routing.ArtistDetail(artist.name)) },
                             onPlaylistClick = { pl -> navController.navigate(Routing.PlaylistDetail(pl.id)) },
@@ -266,7 +266,7 @@ private fun HomeSections(
     playerBarClearance: Dp,
     paddingValues: PaddingValues,
     onShuffleAll: () -> Unit,
-    onViewAllSongs: () -> Unit,
+    onViewAllItems: () -> Unit,
     onArtistsViewAll: () -> Unit,
     onArtistClick: (AudioHomeArtist) -> Unit,
     onPlaylistClick: (DAudioPlaylist) -> Unit,
@@ -274,11 +274,11 @@ private fun HomeSections(
 ) {
     val artists = homeVM.artists.value
     val playlists = homeVM.playlists.value
-    val recent = homeVM.recentSongs.value
+    val recent = homeVM.recentItems.value
 
     LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
         item(key = "quick_actions") {
-            HomeQuickActions(onShuffleAll = onShuffleAll, onViewAllSongs = onViewAllSongs)
+            HomeQuickActions(onShuffleAll = onShuffleAll, onViewAllItems = onViewAllItems)
         }
         if (artists.isNotEmpty()) {
             item(key = "artists_header") {
@@ -298,17 +298,17 @@ private fun HomeSections(
             HomeSectionHeader(stringResource(Res.string.recent), null)
         }
         items(recent.size, key = { recent[it].path }) { index ->
-            val song = recent[index]
+            val item = recent[index]
             AudioListItem(
-                item = song,
+                item = item,
                 audioVM = audioVM,
                 audioPlaylistVM = audioPlaylistVM,
                 tagsVM = tagsVM,
                 castVM = castVM,
-                tags = audioTagsMap[song.id] ?: emptyList(),
+                tags = audioTagsMap[item.id] ?: emptyList(),
                 dragSelectState = dragSelectState,
-                isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == song.path,
-                isInPlaylist = audioPlaylistVM.isInPlaylist(song.path),
+                isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
+                isInPlaylist = audioPlaylistVM.isInPlaylist(item.path),
             )
             VerticalSpace(dp = 8.dp)
         }

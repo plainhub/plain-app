@@ -21,12 +21,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.db.DAudioPlaylistSong
+import com.ismartcoding.plain.db.DAudioPlaylistItem
 import com.ismartcoding.plain.features.audio.AudioQueueManager
-import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
-import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.audioPause
@@ -35,27 +34,22 @@ import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.components.PlaylistNameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.audio.DAudio
-import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.audio.DAudio
+import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistActionsRow
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistHeaderRow
-import com.ismartcoding.plain.ui.theme.dialogSheetBackground
+import com.ismartcoding.plain.ui.page.playlist.components.PlaylistMoreSheet
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
-private const val SORT_CUSTOM = 0
-private const val SORT_TITLE_ASC = 1
-private const val SORT_TITLE_DESC = 2
-
-/** Playlist detail: header, play-all/shuffle, tracks, and the manage menu. */
+/** Playlist detail page: state, load/reload, and wiring; pieces live in components/. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaylistDetailPage(
@@ -75,19 +69,19 @@ fun PlaylistDetailPage(
     val dragSelectState = rememberListDragSelectState({ scrollState })
 
     var playlistName by remember { mutableStateOf("") }
-    var songs by remember { mutableStateOf<List<DAudioPlaylistSong>>(listOf()) }
-    var sort by remember { mutableIntStateOf(SORT_CUSTOM) }
+    var items by remember { mutableStateOf<List<DAudioPlaylistItem>>(listOf()) }
+    var sort by remember { mutableStateOf(PlaylistSortOrder.CUSTOM) }
     var version by remember { mutableIntStateOf(0) }
     var showMore by remember { mutableStateOf(false) }
     var showRename by remember { mutableStateOf(false) }
 
-    // Reload when coming back from add-songs or after any mutation.
+    // Reload when coming back from add-items or after any mutation.
     LaunchedEffect(playlistId, version) {
         val (name, list) = withIO {
-            AudioQueueManager.playlist(playlistId)?.name to AudioQueueManager.playlistSongsPage(playlistId, 0, 1000)
+            AudioQueueManager.playlist(playlistId)?.name to AudioQueueManager.playlistItemsPage(playlistId, 0, 1000)
         }
         playlistName = name ?: ""
-        songs = list
+        items = list
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -98,36 +92,11 @@ fun PlaylistDetailPage(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val sorted = when (sort) {
-        SORT_TITLE_ASC -> songs.sortedBy { it.title.lowercase() }
-        SORT_TITLE_DESC -> songs.sortedByDescending { it.title.lowercase() }
-        else -> songs
-    }
+    val sorted = items.sortedByOrder(sort)
 
     val libraryByPath = remember(library) { library.associateBy { it.path } }
     val contextActive = audioPlaylistVM.activePlaylistId.value == playlistId
     val isPlayingContext = contextActive && isPlaying
-
-    /** Point the queue at this playlist starting from [startPath] (null = first). */
-    val playFrom: (String?) -> Unit = { startPath ->
-        scope.launch {
-            val start = withIO { AudioQueueManager.setPlaylistSource(playlistId, startPath) }
-            if (start != null) {
-                audioJustPlayWithNotificationCheck(start)
-                audioPlaylistVM.onStarted(start)
-            }
-        }
-    }
-    val playRandom: () -> Unit = {
-        scope.launch {
-            withIO { AudioQueueManager.setPlaylistSource(playlistId, null) }
-            val next = withIO { AudioQueueManager.resolveNext(isNext = true, shuffle = true) }
-            if (next != null) {
-                audioJustPlayWithNotificationCheck(next)
-                audioPlaylistVM.onStarted(next)
-            }
-        }
-    }
 
     val renamedMsg = stringResource(Res.string.renamed)
     val deletedMsg = stringResource(Res.string.playlist_deleted)
@@ -148,47 +117,22 @@ fun PlaylistDetailPage(
         )
     }
     if (showMore) {
-        val sortNames = listOf(
-            stringResource(Res.string.sort_custom),
-            stringResource(Res.string.sort_title_asc),
-            stringResource(Res.string.sort_title_desc),
+        PlaylistMoreSheet(
+            playlistName = playlistName,
+            itemCount = items.size,
+            sort = sort,
+            onDismiss = { showMore = false },
+            onRename = { showRename = true },
+            onAddItems = { navController.navigate(Routing.PlaylistAddItems(playlistId)) },
+            onToggleSort = { sort = sort.next() },
+            onDelete = {
+                scope.launch {
+                    withIO { AudioQueueManager.deletePlaylist(playlistId) }
+                    DialogHelper.showMessage(deletedMsg)
+                    navController.popBackStack()
+                }
+            },
         )
-        PModalBottomSheet(onDismissRequest = { showMore = false }) {
-            PBottomSheetTopAppBar(title = playlistName)
-            PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename_playlist)) {
-                showMore = false
-                showRename = true
-            }
-            PSheetActionRow(Res.drawable.plus, stringResource(Res.string.add_items)) {
-                showMore = false
-                navController.navigate(Routing.PlaylistAddSongs(playlistId))
-            }
-            PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort_order) + " · " + sortNames[sort]) {
-                showMore = false
-                sort = (sort + 1) % 3
-            }
-            PSheetActionRow(Res.drawable.delete_forever, stringResource(Res.string.delete_playlist)) {
-                showMore = false
-                DialogHelper.showConfirmDialog(
-                    title = LocaleHelper.getString(Res.string.delete_playlist),
-                    message = LocaleHelper.getStringF(
-                        Res.string.delete_playlist_confirm_text,
-                        playlistName,
-                        songs.size.toString(),
-                    ),
-                    confirmButton = Pair(LocaleHelper.getString(Res.string.delete)) {
-                        scope.launch {
-                            withIO { AudioQueueManager.deletePlaylist(playlistId) }
-                            DialogHelper.showMessage(deletedMsg)
-                            navController.popBackStack()
-                        }
-                    },
-                    dismissButton = Pair(LocaleHelper.getString(Res.string.cancel)) {},
-                    danger = true,
-                )
-            }
-            BottomSpace()
-        }
     }
     ViewAudioBottomSheet(
         audioVM = audioVM,
@@ -216,13 +160,13 @@ fun PlaylistDetailPage(
             item(key = "hero") {
                 PlaylistHeaderRow(
                     name = playlistName,
-                    songCount = songs.size,
+                    itemCount = items.size,
                     gradientIndex = playlistId.hashCode(),
                 )
             }
             item(key = "acts") {
                 PlaylistActionsRow(
-                    enabled = songs.isNotEmpty(),
+                    enabled = items.isNotEmpty(),
                     isPlaying = isPlayingContext,
                     onPlayAll = {
                         // Toggle pause/resume while this playlist is the
@@ -230,10 +174,10 @@ fun PlaylistDetailPage(
                         if (contextActive) {
                             if (isPlaying) audioPause() else audioPlay()
                         } else {
-                            playFrom(null)
+                            scope.launch { playFrom(playlistId, null, audioPlaylistVM) }
                         }
                     },
-                    onShuffle = playRandom,
+                    onShuffle = { scope.launch { playShuffled(playlistId, audioPlaylistVM) } },
                 )
             }
             items(sorted.size, key = { sorted[it].id }) { index ->
@@ -259,7 +203,26 @@ fun PlaylistDetailPage(
     }
 }
 
-private fun DAudioPlaylistSong.toDAudio(): DAudio = DAudio(
+/** Point the queue at this playlist starting from [startPath] (null = first). */
+private suspend fun playFrom(playlistId: String, startPath: String?, playlistVM: AudioPlaylistViewModel) {
+    val start = withIO { AudioQueueManager.setPlaylistSource(playlistId, startPath) }
+    if (start != null) {
+        audioJustPlayWithNotificationCheck(start)
+        playlistVM.onStarted(start)
+    }
+}
+
+/** Start the playlist from a shuffled pick instead of the top. */
+private suspend fun playShuffled(playlistId: String, playlistVM: AudioPlaylistViewModel) {
+    withIO { AudioQueueManager.setPlaylistSource(playlistId, null) }
+    val next = withIO { AudioQueueManager.resolveNext(isNext = true, shuffle = true) }
+    if (next != null) {
+        audioJustPlayWithNotificationCheck(next)
+        playlistVM.onStarted(next)
+    }
+}
+
+private fun DAudioPlaylistItem.toDAudio(): DAudio = DAudio(
     id = audioPath,
     title = title,
     artist = artist,

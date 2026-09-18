@@ -48,7 +48,7 @@ import com.ismartcoding.plain.ui.page.audio.ArtistsPage
 import com.ismartcoding.plain.ui.page.audio.AudioHomePage
 import com.ismartcoding.plain.ui.page.audio.AudioArtistPage
 import com.ismartcoding.plain.ui.page.playlist.PlaylistDetailPage
-import com.ismartcoding.plain.ui.page.playlist.PlaylistAddSongsPage
+import com.ismartcoding.plain.ui.page.playlist.PlaylistAddItemsPage
 import com.ismartcoding.plain.ui.page.cast.CastSessionPage
 import com.ismartcoding.plain.ui.page.chat.ChannelInfoPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
@@ -129,7 +129,7 @@ fun MainNavGraph(
 ) {
     val updateVM: UpdateViewModel = viewModel { UpdateViewModel() }
     // Activity-scoped audio VMs shared by every audio destination (home,
-    // all-songs, artists, artist detail): one library load, one queue mirror.
+    // all-items, artists, artist detail): one library load, one queue mirror.
     val audioVM = viewModel(key = "audioVM") { AudioViewModel() }
     val audioTagsVM = viewModel(key = "audioTagsVM") { TagsViewModel() }
     val audioFoldersVM = viewModel(key = "audioFoldersVM") { MediaFoldersViewModel() }
@@ -170,9 +170,9 @@ fun MainNavGraph(
             val r = backStackEntry.toRoute<Routing.PlaylistDetail>()
             PlaylistDetailPage(navController, r.id, audioPlaylistVM, audioVM, audioTagsVM, audioCastVM)
         }
-        composable<Routing.PlaylistAddSongs> { backStackEntry ->
-            val r = backStackEntry.toRoute<Routing.PlaylistAddSongs>()
-            PlaylistAddSongsPage(navController, r.id)
+        composable<Routing.PlaylistAddItems> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.PlaylistAddItems>()
+            PlaylistAddItemsPage(navController, r.id)
         }
         composable<Routing.Apps> { AppsPage(navController) }
         composable<Routing.Docs> { DocsPage(navController) }

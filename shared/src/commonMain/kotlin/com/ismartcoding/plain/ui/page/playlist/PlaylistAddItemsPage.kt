@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.ui.page.playlist
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +24,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.formatDuration
@@ -41,7 +37,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.PlaylistAddSongsViewModel
+import com.ismartcoding.plain.ui.models.PlaylistAddItemsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.page.audio.components.PlaylistCoverArtwork
 import com.ismartcoding.plain.ui.page.audio.components.audioHomeGradientIndexOf
@@ -58,12 +54,12 @@ import org.jetbrains.compose.resources.stringResource
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaylistAddSongsPage(
+fun PlaylistAddItemsPage(
     navController: NavHostController,
     playlistId: String,
 ) {
     val scope = rememberCoroutineScope()
-    val vm: PlaylistAddSongsViewModel = viewModel { PlaylistAddSongsViewModel() }
+    val vm: PlaylistAddItemsViewModel = viewModel { PlaylistAddItemsViewModel() }
     val scrollState = rememberLazyListState()
 
     LaunchedEffect(playlistId) {
@@ -108,21 +104,21 @@ fun PlaylistAddSongsPage(
             )
             LazyColumn(modifier = Modifier.weight(1f), state = scrollState) {
                 items(vm.items.value.size, key = { vm.items.value[it].path }) { index ->
-                    val song = vm.items.value[index]
-                    val isSelected = song.path in vm.selected.value
+                    val item = vm.items.value[index]
+                    val isSelected = item.path in vm.selected.value
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
                             .clickable {
                                 vm.selected.value =
-                                    if (isSelected) vm.selected.value - song.path else vm.selected.value + song.path
+                                    if (isSelected) vm.selected.value - item.path else vm.selected.value + item.path
                             }
                             .padding(horizontal = 12.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         PlaylistCoverArtwork(
-                            gradientIndex = audioHomeGradientIndexOf(song.path),
+                            gradientIndex = audioHomeGradientIndexOf(item.path),
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(8.dp)),
@@ -134,13 +130,13 @@ fun PlaylistAddSongsPage(
                                 .padding(start = 12.dp, end = 8.dp),
                         ) {
                             Text(
-                                text = song.title,
+                                text = item.title,
                                 style = MaterialTheme.typography.listItemTitle(),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Text(
-                                text = "${song.artist} · ${song.duration.formatDuration()}",
+                                text = "${item.artist} · ${item.duration.formatDuration()}",
                                 style = MaterialTheme.typography.listItemSubtitle(),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -151,7 +147,7 @@ fun PlaylistAddSongsPage(
                             modifier = Modifier.padding(end = 8.dp),
                             onClick = {
                                 vm.selected.value =
-                                    if (isSelected) vm.selected.value - song.path else vm.selected.value + song.path
+                                    if (isSelected) vm.selected.value - item.path else vm.selected.value + item.path
                             },
                         )
                     }
@@ -170,8 +166,8 @@ fun PlaylistAddSongsPage(
                         withIO {
                             val audioByPath = vm.items.value.associateBy { it.path }
                             val items = toAdd.mapNotNull { path -> audioByPath[path]?.toPlaylistAudio() }
-                            AudioQueueManager.addPlaylistSongs(playlistId, items)
-                            toRemove.forEach { AudioQueueManager.removePlaylistSong(playlistId, it) }
+                            AudioQueueManager.addPlaylistItems(playlistId, items)
+                            toRemove.forEach { AudioQueueManager.removePlaylistItem(playlistId, it) }
                         }
                         DialogHelper.showMessage(addedMsg)
                         navController.popBackStack()

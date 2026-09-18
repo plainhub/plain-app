@@ -96,7 +96,7 @@ class Routing {
     @Serializable
     object Audio
 
-    /** Flat "all songs" list, reached from the audio home page. */
+    /** Flat "all items" list, reached from the audio home page. */
     @Serializable
     object AudioAll
 
@@ -110,7 +110,7 @@ class Routing {
     data class PlaylistDetail(val id: String)
 
     @Serializable
-    data class PlaylistAddSongs(val id: String)
+    data class PlaylistAddItems(val id: String)
 
     @Serializable
     object ChatList

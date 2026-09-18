@@ -73,6 +73,23 @@ fun <T : IData> MediaTopBar(
     )
     val containerColor = if (castVM.castMode.value) MaterialTheme.colorScheme.secondaryContainer else null
 
+    val defaultCapsule: @Composable () -> Unit = {
+        PCapsuleMoreClose(
+            onClose = { navController.navigateUp() },
+        ) { dismiss ->
+            PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
+                dismiss()
+                mediaVM.showSortAndBrowseDialog.value = true
+            }
+            if (!isDocs) {
+                PSheetActionRow(Res.drawable.cast, stringResource(Res.string.cast_mode)) {
+                    dismiss()
+                    castVM.showCastDialog.value = true
+                }
+            }
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -118,6 +135,9 @@ fun <T : IData> MediaTopBar(
                     },
                     actions = {
                         if (!mediaVM.hasPermission.value) {
+                            // Data-dependent actions are useless while gated,
+                            // but keep the capsule available for closing the page.
+                            defaultCapsule()
                             return@SearchableTopBar
                         }
                         if (castVM.castMode.value) {
@@ -137,20 +157,7 @@ fun <T : IData> MediaTopBar(
                             ActionButtonSearch {
                                 mediaVM.enterSearchMode()
                             }
-                            PCapsuleMoreClose(
-                                onClose = { navController.navigateUp() },
-                            ) { dismiss ->
-                                PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
-                                    dismiss()
-                                    mediaVM.showSortAndBrowseDialog.value = true
-                                }
-                                if (!isDocs) {
-                                    PSheetActionRow(Res.drawable.cast, stringResource(Res.string.cast_mode)) {
-                                        dismiss()
-                                        castVM.showCastDialog.value = true
-                                    }
-                                }
-                            }
+                            defaultCapsule()
                         }
                     },
                     onSearchAction = {

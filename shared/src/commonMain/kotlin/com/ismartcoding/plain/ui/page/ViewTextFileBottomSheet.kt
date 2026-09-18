@@ -57,7 +57,7 @@ fun ViewTextFileBottomSheet(
             onDismiss()
         },
     ) {
-        VerticalSpace(32.dp)
+        VerticalSpace(16.dp)
         PSheetPrimaryActionsCard {
             PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
                 shareFiles(listOf(path))

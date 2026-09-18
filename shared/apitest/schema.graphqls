@@ -36,7 +36,7 @@ type Query {
   audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
   audioLyrics(path: String!): String!
   audioPlaylists: [AudioPlaylist!]!
-  audioPlaylistSongs(id: ID!, offset: Int!, limit: Int!): AudioPlaylistPage!
+  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!): AudioPlaylistPage!
   imageCount(query: String!): Int!
   imageSearchStatus: ImageSearchStatus!
   images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
@@ -157,8 +157,8 @@ type Mutation {
   createAudioPlaylist(name: String!): AudioPlaylist!
   renameAudioPlaylist(id: ID!, name: String!): Boolean!
   deleteAudioPlaylist(id: ID!): Boolean!
-  addAudioPlaylistSongs(id: ID!, paths: [String!]!): Boolean!
-  removeAudioPlaylistSong(id: ID!, path: String!): Boolean!
+  addAudioPlaylistItems(id: ID!, paths: [String!]!): Boolean!
+  removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
   playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): Boolean!
   playAllAudios(shuffle: Boolean!, path: String): Boolean!
   enableImageSearch: Boolean!
@@ -315,7 +315,7 @@ type AudioFileInfo {
 type AudioPlaylist {
   id: ID!
   name: String!
-  songCount: Int!
+  itemCount: Int!
   createdAt: Instant!
   updatedAt: Instant!
 }

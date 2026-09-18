@@ -63,13 +63,17 @@ internal fun VideoActionButtons(
             shareFiles(listOf(getMediaItemUriString(videosVM.dataType, m.id)))
             onDismiss()
         }
-        if (!m.path.isUrl()) {
+        // At most 4 disc actions per card: open-with and rename drop to the
+        // secondary rows whenever the trash view or delete crowds the row.
+        if (!m.path.isUrl() && !videosVM.trash.value) {
             PSheetPrimaryAction(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                 openFileExternal(m.path)
             }
         }
-        PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
-            videosVM.showRenameDialog.value = true
+        if (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value) {
+            PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                videosVM.showRenameDialog.value = true
+            }
         }
         if (AppFeatureType.MEDIA_TRASH.has() && videosVM.trash.value) {
             PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
@@ -99,7 +103,8 @@ internal fun VideoActionButtons(
         }
     }
     val hasSecondary = (!m.path.isUrl() && !videosVM.trash.value) ||
-        (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value)
+        (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value) ||
+        videosVM.trash.value || !AppFeatureType.MEDIA_TRASH.has()
     if (hasSecondary) {
         VerticalSpace(12.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
@@ -113,6 +118,16 @@ internal fun VideoActionButtons(
                     PSheetActionRow(Res.drawable.trash_2, stringResource(Res.string.trash)) {
                         videosVM.trash(tagsVM, setOf(m.id))
                         onDismiss()
+                    }
+                }
+                if (!m.path.isUrl() && videosVM.trash.value) {
+                    PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+                        openFileExternal(m.path)
+                    }
+                }
+                if (videosVM.trash.value || !AppFeatureType.MEDIA_TRASH.has()) {
+                    PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
+                        videosVM.showRenameDialog.value = true
                     }
                 }
             }

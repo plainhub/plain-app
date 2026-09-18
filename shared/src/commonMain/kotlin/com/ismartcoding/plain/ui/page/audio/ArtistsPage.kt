@@ -142,7 +142,7 @@ private fun ArtistRow(artist: AudioHomeArtist, gradientIndex: Int, onClick: () -
                 maxLines = 1,
             )
             Text(
-                text = pluralStringResource(Res.plurals.items, artist.songCount, artist.songCount),
+                text = pluralStringResource(Res.plurals.items, artist.itemCount, artist.itemCount),
                 style = MaterialTheme.typography.listItemSubtitle(),
             )
         }

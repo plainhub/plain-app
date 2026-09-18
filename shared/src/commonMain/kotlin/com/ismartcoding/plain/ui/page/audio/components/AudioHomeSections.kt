@@ -64,11 +64,11 @@ fun HomeSectionHeader(title: String, onViewAll: (() -> Unit)?) {
     }
 }
 
-/** Quick actions: shuffle the whole library / browse all songs. */
+/** Quick actions: shuffle the whole library / browse all items. */
 @Composable
 fun HomeQuickActions(
     onShuffleAll: () -> Unit,
-    onViewAllSongs: () -> Unit,
+    onViewAllItems: () -> Unit,
 ) {
     Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
         PFilledButton(
@@ -82,7 +82,7 @@ fun HomeQuickActions(
             text = stringResource(Res.string.view_all),
             icon = painterResource(Res.drawable.music2),
             modifier = Modifier.weight(1f),
-            onClick = onViewAllSongs,
+            onClick = onViewAllItems,
         )
     }
 }

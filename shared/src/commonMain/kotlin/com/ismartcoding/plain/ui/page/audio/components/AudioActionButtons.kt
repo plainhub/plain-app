@@ -65,8 +65,12 @@ internal fun AudioActionButtons(
                     openFileExternal(m.path)
                 }
             }
-            PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
-                audioVM.showRenameDialog.value = true
+            // At most 4 disc actions per card: rename drops to the secondary
+            // rows when delete occupies the fourth slot (no-trash builds).
+            if (AppFeatureType.MEDIA_TRASH.has()) {
+                PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                    audioVM.showRenameDialog.value = true
+                }
             }
         }
         if (AppFeatureType.MEDIA_TRASH.has() && audioVM.trash.value) {
@@ -97,7 +101,8 @@ internal fun AudioActionButtons(
         }
     }
     val hasSecondary = (!audioVM.trash.value && !m.path.isUrl()) ||
-        (AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value)
+        (AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value) ||
+        (!AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value)
     if (hasSecondary) {
         VerticalSpace(12.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
@@ -111,6 +116,11 @@ internal fun AudioActionButtons(
                     PSheetActionRow(Res.drawable.trash_2, stringResource(Res.string.trash)) {
                         audioVM.trash(tagsVM, setOf(m.id))
                         onDismiss()
+                    }
+                }
+                if (!AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value) {
+                    PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
+                        audioVM.showRenameDialog.value = true
                     }
                 }
             }

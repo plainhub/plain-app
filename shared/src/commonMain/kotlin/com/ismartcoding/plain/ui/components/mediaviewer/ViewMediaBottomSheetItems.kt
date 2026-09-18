@@ -39,11 +39,10 @@ internal fun ViewMediaActionButtons(
 ) {
     val scope = rememberCoroutineScope()
     val isMediaFile = m.data is DImage || m.data is DVideo
-    var slots = 1
-    if (qrScanResult.isNotEmpty()) slots++
-    if (onCast != null) slots++
-    if (isMediaFile) slots += 2
-    PSheetPrimaryActionsCard(slots = slots) {
+    // At most 4 disc actions per card: rename drops to a secondary row when
+    // qr-result and cast discs would crowd delete off the row.
+    val renameInPrimary = !(isMediaFile && qrScanResult.isNotEmpty() && onCast != null)
+    PSheetPrimaryActionsCard {
         PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
             shareFile(m.path)
             onDismiss()
@@ -57,8 +56,10 @@ internal fun ViewMediaActionButtons(
             PSheetPrimaryAction(Res.drawable.cast, stringResource(Res.string.cast)) { onCast() }
         }
         if (isMediaFile) {
-            PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
-                onShowRenameDialog()
+            if (renameInPrimary) {
+                PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                    onShowRenameDialog()
+                }
             }
             PSheetPrimaryAction(
                 Res.drawable.delete_forever,
@@ -77,6 +78,14 @@ internal fun ViewMediaActionButtons(
                         danger = true
                     )
                 }
+            }
+        }
+    }
+    if (!renameInPrimary) {
+        VerticalSpace(12.dp)
+        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+            PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
+                onShowRenameDialog()
             }
         }
     }

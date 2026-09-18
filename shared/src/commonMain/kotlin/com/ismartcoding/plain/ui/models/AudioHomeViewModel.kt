@@ -6,13 +6,13 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.DAudioPlaylist
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 
-data class AudioHomeArtist(val name: String, val songCount: Int, val playCount: Long)
+data class AudioHomeArtist(val name: String, val itemCount: Int, val playCount: Long)
 
 class AudioHomeViewModel : ViewModel() {
     val playlists = mutableStateOf<List<Pair<DAudioPlaylist, Int>>>(listOf())
 
     /** 最近 section: play history resolved to library tracks, or recently-added as fallback. */
-    val recentSongs = mutableStateOf<List<DAudio>>(listOf())
+    val recentItems = mutableStateOf<List<DAudio>>(listOf())
 
     /** All artists, most played first, then by name. */
     val artists = mutableStateOf<List<AudioHomeArtist>>(listOf())
@@ -22,22 +22,22 @@ class AudioHomeViewModel : ViewModel() {
         rebuild(audioVM.itemsFlow.value)
     }
 
-    suspend fun rebuild(songs: List<DAudio>) {
+    suspend fun rebuild(items: List<DAudio>) {
         val history = AudioQueueManager.recentPage(limit = 8, offset = 0)
-        recentSongs.value = if (history.isNotEmpty()) {
-            val byPath = songs.associateBy { it.path }
+        recentItems.value = if (history.isNotEmpty()) {
+            val byPath = items.associateBy { it.path }
             history.mapNotNull { byPath[it.path] }.ifEmpty {
-                songs.sortedByDescending { it.createdAt }.take(8)
+                items.sortedByDescending { it.createdAt }.take(8)
             }
         } else {
-            songs.sortedByDescending { it.createdAt }.take(8)
+            items.sortedByDescending { it.createdAt }.take(8)
         }
         val playCounts = AudioQueueManager.artistPlayCounts()
-        artists.value = songs
+        artists.value = items
             .filter { it.artist.isNotBlank() }
             .groupBy { it.artist }
             .map { (name, list) ->
-                AudioHomeArtist(name = name, songCount = list.size, playCount = playCounts[name] ?: 0)
+                AudioHomeArtist(name = name, itemCount = list.size, playCount = playCounts[name] ?: 0)
             }
             .sortedWith(compareByDescending<AudioHomeArtist> { it.playCount }.thenBy { it.name })
     }

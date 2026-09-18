@@ -22,7 +22,7 @@ data class DAudioPlaylist(
     var updatedAt: Instant = TimeHelper.now(),
 )
 
-data class AudioPlaylistSongCount(
+data class AudioPlaylistItemCount(
     val playlistId: String,
     val cnt: Int,
 )
@@ -45,8 +45,8 @@ interface AudioPlaylistDao {
     suspend fun delete(id: String)
 
     @Query(
-        "SELECT s.playlist_id AS playlistId, COUNT(*) AS cnt FROM audio_playlist_songs s " +
+        "SELECT s.playlist_id AS playlistId, COUNT(*) AS cnt FROM audio_playlist_items s " +
             "GROUP BY s.playlist_id"
     )
-    suspend fun songCounts(): List<AudioPlaylistSongCount>
+    suspend fun itemCounts(): List<AudioPlaylistItemCount>
 }

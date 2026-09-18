@@ -75,7 +75,7 @@ fun ViewDocBottomSheet(
     ) {
         LazyColumn {
             item {
-                VerticalSpace(32.dp)
+                VerticalSpace(16.dp)
             }
             item {
                 PSheetPrimaryActionsCard {
@@ -94,8 +94,13 @@ fun ViewDocBottomSheet(
                         PSheetPrimaryAction(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                             openFileExternal(m.path)
                         }
-                        PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
-                            docsVM.showRenameDialog.value = true
+                        // At most 4 disc actions per card: rename drops to the
+                        // secondary rows when delete occupies the fourth slot
+                        // (no-trash builds).
+                        if (AppFeatureType.MEDIA_TRASH.has()) {
+                            PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                                docsVM.showRenameDialog.value = true
+                            }
                         }
                     }
                     if (AppFeatureType.MEDIA_TRASH.has() && docsVM.trash.value) {
@@ -127,8 +132,7 @@ fun ViewDocBottomSheet(
                         }
                     }
                 }
-                val hasSecondary =
-                    (AppFeatureType.MEDIA_TRASH.has() && !docsVM.trash.value)
+                val hasSecondary = !docsVM.trash.value
                 if (hasSecondary) {
                     VerticalSpace(12.dp)
                     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
@@ -138,6 +142,11 @@ fun ViewDocBottomSheet(
                                     if (isRPlus()) {
                                         docsVM.trash(tagsVM, setOf(m.id))
                                     }
+                                }
+                            }
+                            if (!AppFeatureType.MEDIA_TRASH.has() && !docsVM.trash.value) {
+                                PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
+                                    docsVM.showRenameDialog.value = true
                                 }
                             }
                         }

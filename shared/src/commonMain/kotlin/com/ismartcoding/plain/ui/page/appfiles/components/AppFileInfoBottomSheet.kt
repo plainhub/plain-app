@@ -76,7 +76,7 @@ fun AppFileInfoBottomSheet(
 
     PModalBottomSheet(onDismissRequest = { onDismiss() }) {
         LazyColumn {
-            item { VerticalSpace(32.dp) }
+            item { VerticalSpace(16.dp) }
             item {
                 AppFileInfoActionButtons(
                     file = file,

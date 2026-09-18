@@ -56,11 +56,10 @@ fun ViewFeedEntryBottomSheet(
     ) {
         LazyColumn {
             item {
-                VerticalSpace(32.dp)
+                VerticalSpace(16.dp)
             }
             item {
-                // 3 actions in a 4-slot grid truncates "标记为已读"; widen the slots.
-                PSheetPrimaryActionsCard(slots = 3) {
+                PSheetPrimaryActionsCard {
                     if (!feedEntriesVM.showSearchBar.value) {
                         PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
                             feedEntriesVM.enterSelectMode()

@@ -8,7 +8,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.data.FilePathData
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.FilesType
+import com.ismartcoding.plain.enums.hasPermission
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.ZipBrowserHelper
@@ -62,6 +64,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     var cutFiles = mutableListOf<DFile>()
     var copyFiles = mutableListOf<DFile>()
     var type: FilesType = FilesType.INTERNAL_STORAGE
+    val hasPermission = mutableStateOf(AppFeatureType.FILES.hasPermission())
     var offset = 0
     var limit: Int = 1000
     var total: Int = 0

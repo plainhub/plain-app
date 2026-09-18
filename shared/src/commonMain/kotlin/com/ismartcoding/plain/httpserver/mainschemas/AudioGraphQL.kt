@@ -117,22 +117,22 @@ suspend fun audioLyrics(path: String): String {
 @GraphQLQuery
 suspend fun audioPlaylists(): List<AudioPlaylist> {
     return AudioQueueManager.playlists().map { (pl, count) ->
-        AudioPlaylist(id = ID(pl.id), name = pl.name, songCount = count, createdAt = pl.createdAt, updatedAt = pl.updatedAt)
+        AudioPlaylist(id = ID(pl.id), name = pl.name, itemCount = count, createdAt = pl.createdAt, updatedAt = pl.updatedAt)
     }
 }
 
 @GraphQLQuery
-suspend fun audioPlaylistSongs(id: ID, offset: Int, limit: Int): AudioPlaylistPage {
+suspend fun audioPlaylistItems(id: ID, offset: Int, limit: Int): AudioPlaylistPage {
     return AudioPlaylistPage(
-        items = AudioQueueManager.playlistSongsPage(id.value, offset, limit).map { it.toPlaylistAudio().toModel() },
-        total = AudioQueueManager.playlistSongCount(id.value),
+        items = AudioQueueManager.playlistItemsPage(id.value, offset, limit).map { it.toPlaylistAudio().toModel() },
+        total = AudioQueueManager.playlistItemCount(id.value),
     )
 }
 
 @GraphQLMutation
 suspend fun createAudioPlaylist(name: String): AudioPlaylist {
     val pl = AudioQueueManager.createPlaylist(name)
-    return AudioPlaylist(id = ID(pl.id), name = pl.name, songCount = 0, createdAt = pl.createdAt, updatedAt = pl.updatedAt)
+    return AudioPlaylist(id = ID(pl.id), name = pl.name, itemCount = 0, createdAt = pl.createdAt, updatedAt = pl.updatedAt)
 }
 
 @GraphQLMutation
@@ -148,14 +148,14 @@ suspend fun deleteAudioPlaylist(id: ID): Boolean {
 }
 
 @GraphQLMutation
-suspend fun addAudioPlaylistSongs(id: ID, paths: List<String>): Boolean {
-    AudioQueueManager.addPlaylistSongs(id.value, paths.map { playlistAudioFromPath(it) })
+suspend fun addAudioPlaylistItems(id: ID, paths: List<String>): Boolean {
+    AudioQueueManager.addPlaylistItems(id.value, paths.map { playlistAudioFromPath(it) })
     return true
 }
 
 @GraphQLMutation
-suspend fun removeAudioPlaylistSong(id: ID, path: String): Boolean {
-    AudioQueueManager.removePlaylistSong(id.value, path)
+suspend fun removeAudioPlaylistItem(id: ID, path: String): Boolean {
+    AudioQueueManager.removePlaylistItem(id.value, path)
     return true
 }
 

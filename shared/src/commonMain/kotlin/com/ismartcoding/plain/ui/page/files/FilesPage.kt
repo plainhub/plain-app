@@ -32,12 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.FilesType
-import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
+import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -167,7 +167,11 @@ fun FilesPage(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (Permission.WRITE_EXTERNAL_STORAGE.isGranted() && filesVM.type != FilesType.RECENTS) {
+            if (!filesVM.hasPermission.value && filesVM.type != FilesType.APP) {
+                NeedPermissionColumn(Res.drawable.folder, AppFeatureType.FILES.getPermission()!!)
+                return@Column
+            }
+            if (filesVM.type != FilesType.RECENTS) {
                 BreadcrumbView(
                     breadcrumbs = filesVM.breadcrumbs,
                     selectedIndex = filesVM.selectedBreadcrumbIndex.value,

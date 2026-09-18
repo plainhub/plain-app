@@ -31,7 +31,7 @@ class EntityConstructorGuardTest {
         DImageEmbedding::class, DMediaItem::class, DNote::class, DPeer::class,
         DPomodoroItem::class, DSession::class, DShare::class, DTag::class,
         DTagRelation::class, DVideoPlayProgress::class,
-        DAudioPlaylist::class, DAudioPlaylistSong::class, DAudioPlayHistory::class,
+        DAudioPlaylist::class, DAudioPlaylistItem::class, DAudioPlayHistory::class,
         DAudioQueueSource::class, DAudioQueueItem::class,
     )
 

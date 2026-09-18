@@ -67,7 +67,7 @@ fun ViewFeedBottomSheet(
             onDismiss()
         },
     ) {
-        VerticalSpace(32.dp)
+        VerticalSpace(16.dp)
         PSheetPrimaryActionsCard {
             PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
                 feedsVM.enterSelectMode()

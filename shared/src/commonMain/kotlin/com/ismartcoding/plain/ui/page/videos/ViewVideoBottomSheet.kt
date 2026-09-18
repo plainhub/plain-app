@@ -63,7 +63,7 @@ fun ViewVideoBottomSheet(
     PModalBottomSheet(onDismissRequest = { onDismiss() }) {
         LazyColumn {
             item {
-                VerticalSpace(32.dp)
+                VerticalSpace(16.dp)
             }
             item {
                 VideoActionButtons(m, videosVM, tagsVM, dragSelectState, onDismiss)

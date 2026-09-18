@@ -2,16 +2,20 @@ package com.ismartcoding.plain.ui.page.files
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.Lifecycle
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.appDir
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.getInternalStoragePath
 import com.ismartcoding.plain.enums.ActionSourceType
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.FilesType
+import com.ismartcoding.plain.enums.hasPermission
 import com.ismartcoding.plain.events.ActionEvent
 import com.ismartcoding.plain.events.FolderKanbanSelectEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
+import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
@@ -27,6 +31,22 @@ internal fun FilesPageEffects(
     folderPath: String, previewerState: MediaPreviewerState,
     audioPlaylistVM: AudioPlaylistViewModel,
 ) {
+    fun refreshStoragePermission() {
+        val granted = AppFeatureType.FILES.hasPermission()
+        val wasGranted = filesVM.hasPermission.value
+        filesVM.hasPermission.value = granted
+        if (granted && !wasGranted) {
+            scope.launch(Dispatchers.Default) { filesVM.loadAsync() }
+        }
+    }
+
+    val lifecycleEvent = rememberLifecycleEvent()
+    LaunchedEffect(lifecycleEvent) {
+        if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+            refreshStoragePermission()
+        }
+    }
+
     PBackHandler(enabled = previewerState.visible || filesVM.selectMode.value || filesVM.showSearchBar.value || filesVM.showPasteBar.value || filesVM.canNavigateBack()) {
         when {
             previewerState.visible -> scope.launch { previewerState.closeTransform() }
@@ -57,7 +77,9 @@ internal fun FilesPageEffects(
             } else {
                 filesVM.loadLastPathAsync()
             }
-            filesVM.loadAsync()
+            if (filesVM.hasPermission.value || filesVM.type == FilesType.APP) {
+                filesVM.loadAsync()
+            }
             audioPlaylistVM.loadAsync()
         }
     }
@@ -65,7 +87,7 @@ internal fun FilesPageEffects(
     LaunchedEffect(Channel.sharedFlow) {
         Channel.sharedFlow.collect { event ->
             when (event) {
-                is PermissionsResultEvent -> scope.launch(Dispatchers.Default) { filesVM.loadAsync() }
+                is PermissionsResultEvent -> refreshStoragePermission()
                 is FolderKanbanSelectEvent -> {
                     val m = event.data
                     filesVM.offset = 0

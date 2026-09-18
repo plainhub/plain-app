@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.models
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.audio.DAudio
-import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.withIO
@@ -14,7 +13,7 @@ import com.ismartcoding.plain.preferences.AudioSortByPreference
  * Picker state for adding library tracks to a playlist: search input plus the
  * selection sets. Follows the app's [ISearchableViewModel] search-bar pattern.
  */
-class PlaylistAddSongsViewModel : ViewModel(), ISearchableViewModel<DAudio> {
+class PlaylistAddItemsViewModel : ViewModel(), ISearchableViewModel<DAudio> {
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")
@@ -26,7 +25,7 @@ class PlaylistAddSongsViewModel : ViewModel(), ISearchableViewModel<DAudio> {
     val selected = mutableStateOf<Set<String>>(emptySet())
 
     suspend fun loadAsync(playlistId: String) {
-        val paths = withIO { AudioQueueManager.playlistSongsPage(playlistId, 0, 5000).map { it.audioPath } }
+        val paths = withIO { AudioQueueManager.playlistItemsPage(playlistId, 0, 5000).map { it.audioPath } }
         existing.value = paths.toSet()
         selected.value = paths.toSet()
         searchAsync()

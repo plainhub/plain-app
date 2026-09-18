@@ -47,7 +47,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DShare::class,
         DClipboard::class,
         DAudioPlaylist::class,
-        DAudioPlaylistSong::class,
+        DAudioPlaylistItem::class,
         DAudioPlayHistory::class,
         DAudioQueueSource::class,
         DAudioQueueItem::class,
@@ -117,7 +117,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun shareDao(): ShareDao
     abstract fun clipboardDao(): ClipboardDao
     abstract fun audioPlaylistDao(): AudioPlaylistDao
-    abstract fun audioPlaylistSongDao(): AudioPlaylistSongDao
+    abstract fun audioPlaylistItemDao(): AudioPlaylistItemDao
     abstract fun audioPlayHistoryDao(): AudioPlayHistoryDao
     abstract fun audioQueueDao(): AudioQueueDao
 

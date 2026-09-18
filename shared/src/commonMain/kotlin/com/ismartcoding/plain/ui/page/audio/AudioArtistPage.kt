@@ -81,7 +81,7 @@ fun AudioArtistPage(
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
 
     val isPlaying by audioIsPlayingFlow().collectAsState()
-    var songs by remember { mutableStateOf<List<DAudio>>(listOf()) }
+    var items by remember { mutableStateOf<List<DAudio>>(listOf()) }
     val scrollState = rememberLazyListState()
     val dragSelectState = rememberListDragSelectState({ scrollState })
     // Floating player bar clearance, measured live like on the other pages.
@@ -92,19 +92,19 @@ fun AudioArtistPage(
         tagsVM.dataType.value = audioVM.dataType
     }
     LaunchedEffect(artistName) {
-        songs = withIO {
+        items = withIO {
             searchMedia(DataType.AUDIO, artistName, 500, 0, AudioSortByPreference.getValueAsync())
         }.filterIsInstance<DAudio>().filter { it.artist == artistName }
     }
 
     // Play-all fills the manual queue with exactly this artist's tracks;
     // while that set matches, the play button toggles pause/resume.
-    val artistPaths = remember(songs) { songs.map { it.path }.toSet() }
-    val contextActive = songs.isNotEmpty() && audioPlaylistVM.queuedPaths.value == artistPaths
+    val artistPaths = remember(items) { items.map { it.path }.toSet() }
+    val contextActive = items.isNotEmpty() && audioPlaylistVM.queuedPaths.value == artistPaths
 
     val playAll: (Boolean) -> Unit = { shuffle ->
         scope.launch {
-            val list = if (shuffle) songs.shuffled() else songs
+            val list = if (shuffle) items.shuffled() else items
             withIO {
                 AudioQueueManager.clearQueue()
                 AudioQueueManager.enqueue(list.map { it.toPlaylistAudio() })
@@ -143,7 +143,7 @@ fun AudioArtistPage(
                                 maxLines = 2,
                             )
                             Text(
-                                text = pluralStringResource(Res.plurals.items, songs.size, songs.size),
+                                text = pluralStringResource(Res.plurals.items, items.size, items.size),
                                 style = MaterialTheme.typography.listItemSubtitle(),
                                 modifier = Modifier.padding(top = 4.dp),
                             )
@@ -173,18 +173,18 @@ fun AudioArtistPage(
                         )
                     }
                 }
-                items(songs.size, key = { songs[it].path }) { index ->
-                    val song = songs[index]
+                items(items.size, key = { items[it].path }) { index ->
+                    val item = items[index]
                     AudioListItem(
-                        item = song,
+                        item = item,
                         audioVM = audioVM,
                         audioPlaylistVM = audioPlaylistVM,
                         tagsVM = tagsVM,
                         castVM = castVM,
                         tags = emptyList(),
                         dragSelectState = dragSelectState,
-                        isCurrentlyPlaying = audioPlaylistVM.selectedPath.value == song.path,
-                        isInPlaylist = audioPlaylistVM.isInPlaylist(song.path),
+                        isCurrentlyPlaying = audioPlaylistVM.selectedPath.value == item.path,
+                        isInPlaylist = audioPlaylistVM.isInPlaylist(item.path),
                     )
                     VerticalSpace(8.dp)
                 }
