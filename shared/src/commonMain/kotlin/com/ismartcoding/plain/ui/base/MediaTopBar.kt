@@ -2,7 +2,9 @@ package com.ismartcoding.plain.ui.base
 
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -11,7 +13,9 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -103,72 +107,77 @@ fun <T : IData> MediaTopBar(
             }
         },
     ) {
-        PScaffold(
-            topBar = {
-                SearchableTopBar(
-                    navController = navController,
-                    viewModel = mediaVM,
-                    scrollBehavior = scrollBehavior,
-                    title = title,
-                    containerColor = containerColor,
-                    scrollToTop = scrollToTop,
-                    navigationIcon = navigationIcon ?: @Composable {
-                        if (dragSelectState.selectMode) {
-                            NavigationCloseIcon {
-                                dragSelectState.exitSelectMode()
-                            }
-                        } else if (castVM.castMode.value) {
-                            NavigationCloseIcon {
-                                castVM.exitCastMode()
-                            }
-                        } else {
-                            PIconButton(
-                                icon = Res.drawable.left_panel_open,
-                                contentDescription = stringResource(Res.string.folders),
-                                click = {
-                                    scope.launch {
-                                        if (drawerState.isOpen) drawerState.close() else drawerState.open()
-                                    }
+        Box(Modifier.fillMaxSize()) {
+            PScaffold(
+                topBar = {
+                    SearchableTopBar(
+                        navController = navController,
+                        viewModel = mediaVM,
+                        scrollBehavior = scrollBehavior,
+                        title = title,
+                        containerColor = containerColor,
+                        scrollToTop = scrollToTop,
+                        navigationIcon = navigationIcon ?: @Composable {
+                            if (dragSelectState.selectMode) {
+                                NavigationCloseIcon {
+                                    dragSelectState.exitSelectMode()
                                 }
-                            )
-                        }
-                    },
-                    actions = {
-                        if (!mediaVM.hasPermission.value) {
-                            // Data-dependent actions are useless while gated,
-                            // but keep the capsule available for closing the page.
-                            defaultCapsule()
-                            return@SearchableTopBar
-                        }
-                        if (castVM.castMode.value) {
-                            return@SearchableTopBar
-                        }
-                        if (dragSelectState.selectMode) {
-                            PTopRightButton(
-                                label = stringResource(if (dragSelectState.isAllSelected(itemsState)) Res.string.unselect_all else Res.string.select_all),
-                                click = {
-                                    dragSelectState.toggleSelectAll(itemsState)
-                                },
-                            )
-                            HorizontalSpace(dp = 8.dp)
-                        } else topBarActions?.let {
-                            it()
-                        } ?: run {
-                            ActionButtonSearch {
-                                mediaVM.enterSearchMode()
+                            } else if (castVM.castMode.value) {
+                                NavigationCloseIcon {
+                                    castVM.exitCastMode()
+                                }
+                            } else {
+                                PIconButton(
+                                    icon = Res.drawable.left_panel_open,
+                                    contentDescription = stringResource(Res.string.folders),
+                                    click = {
+                                        scope.launch {
+                                            if (drawerState.isOpen) drawerState.close() else drawerState.open()
+                                        }
+                                    }
+                                )
                             }
-                            defaultCapsule()
+                        },
+                        actions = {
+                            if (!mediaVM.hasPermission.value) {
+                                // Data-dependent actions are useless while gated,
+                                // but keep the capsule available for closing the page.
+                                defaultCapsule()
+                                return@SearchableTopBar
+                            }
+                            if (castVM.castMode.value) {
+                                return@SearchableTopBar
+                            }
+                            if (dragSelectState.selectMode) {
+                                PTopRightButton(
+                                    label = stringResource(if (dragSelectState.isAllSelected(itemsState)) Res.string.unselect_all else Res.string.select_all),
+                                    click = {
+                                        dragSelectState.toggleSelectAll(itemsState)
+                                    },
+                                )
+                                HorizontalSpace(dp = 8.dp)
+                            } else topBarActions?.let {
+                                it()
+                            } ?: run {
+                                ActionButtonSearch {
+                                    mediaVM.enterSearchMode()
+                                }
+                                defaultCapsule()
+                            }
+                        },
+                        onSearchAction = {
+                            mediaVM.showLoading.value = true
+                            onSearchAction(tagsVM)
                         }
-                    },
-                    onSearchAction = {
-                        mediaVM.showLoading.value = true
-                        onSearchAction(tagsVM)
-                    }
-                )
-            },
-            bottomBar = { bottomBar?.invoke() },
-        ) { paddingValues ->
-            content(paddingValues)
+                    )
+                },
+                bottomBar = { bottomBar?.invoke() },
+            ) { paddingValues ->
+                CompositionLocalProvider(LocalDrawerState provides drawerState) {
+                    content(paddingValues)
+                }
+            }
+            DrawerEdgeSwipeStrip(drawerState)
         }
     }
 

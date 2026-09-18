@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +28,7 @@ import com.ismartcoding.plain.db.DAudioPlaylist
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
+import com.ismartcoding.plain.ui.base.drawerOpenAtRowStart
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.ui.models.AudioHomeArtist
 import com.ismartcoding.plain.ui.theme.listItemTitle
@@ -93,10 +95,12 @@ fun ArtistsRow(
     artists: List<AudioHomeArtist>,
     onArtistClick: (AudioHomeArtist) -> Unit,
 ) {
+    val listState = rememberLazyListState()
     LazyRow(
+        state = listState,
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().drawerOpenAtRowStart(listState),
     ) {
         items(artists.size, key = { artists[it].name }) { index ->
             val artist = artists[index]
@@ -128,10 +132,12 @@ fun PlaylistsRow(
     onNewPlaylist: () -> Unit,
     onPlaylistClick: (DAudioPlaylist) -> Unit,
 ) {
+    val listState = rememberLazyListState()
     LazyRow(
+        state = listState,
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().drawerOpenAtRowStart(listState),
     ) {
         items(playlists.size, key = { playlists[it].first.id }) { index ->
             val (pl, count) = playlists[index]
