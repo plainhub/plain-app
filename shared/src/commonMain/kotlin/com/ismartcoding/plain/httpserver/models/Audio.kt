@@ -36,7 +36,11 @@ data class AudioPlaylist(
 )
 
 @GraphQLType
-data class AudioPlaylistPage(
-    val items: List<PlaylistAudio>,
-    val total: Int,
+data class AudioPlayHistory(
+    val path: String,
+    val title: String,
+    val artist: String,
+    val duration: Long,
+    val playCount: Long,
+    val playedAt: Instant,
 )

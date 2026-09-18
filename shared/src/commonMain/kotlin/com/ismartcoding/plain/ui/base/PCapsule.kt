@@ -40,43 +40,42 @@ fun PCapsuleMoreClose(
     var isSheetOpen by remember { mutableStateOf(false) }
     val tint = MaterialTheme.colorScheme.onSurface
     val shape = RoundedCornerShape(percent = 50)
-    Box(modifier = Modifier.background(MaterialTheme.colorScheme.cardBackgroundNormal, shape)) {
-        Row(
-            modifier = Modifier.height(32.dp),
-            verticalAlignment = Alignment.CenterVertically,
+    Row(
+        modifier = Modifier.height(36.dp)
+            .background(MaterialTheme.colorScheme.cardBackgroundNormal, shape),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { onMore?.invoke() ?: run { isSheetOpen = true } },
+            contentAlignment = Alignment.Center,
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                    ) { onMore?.invoke() ?: run { isSheetOpen = true } },
-                contentAlignment = Alignment.Center,
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.more_three_dots),
-                    contentDescription = stringResource(Res.string.more),
-                    modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
-                    colorFilter = ColorFilter.tint(tint),
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                    ) { onClose() },
-                contentAlignment = Alignment.Center,
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.circle_dot),
-                    contentDescription = stringResource(Res.string.close),
-                    modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
-                    colorFilter = ColorFilter.tint(tint),
-                )
-            }
+            Image(
+                painter = painterResource(Res.drawable.more_three_dots),
+                contentDescription = stringResource(Res.string.more),
+                modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
+                colorFilter = ColorFilter.tint(tint),
+            )
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { onClose() },
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                painter = painterResource(Res.drawable.circle_dot),
+                contentDescription = stringResource(Res.string.close),
+                modifier = Modifier.padding(horizontal = 9.dp).size(24.dp),
+                colorFilter = ColorFilter.tint(tint),
+            )
         }
     }
     if (isSheetOpen) {

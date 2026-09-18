@@ -2,6 +2,7 @@ package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.db.DAudioPlayHistory
 import com.ismartcoding.plain.platform.getAudioAlbumArtFileId
 
 fun DAudio.toModel(): Audio {
@@ -10,4 +11,8 @@ fun DAudio.toModel(): Audio {
 
 fun DPlaylistAudio.toModel(): PlaylistAudio {
     return PlaylistAudio(title, artist, path, duration)
+}
+
+fun DAudioPlayHistory.toModel(): AudioPlayHistory {
+    return AudioPlayHistory(path, title, artist, duration, playCount, playedAt)
 }

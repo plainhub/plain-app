@@ -26,8 +26,8 @@ import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.Audio
+import com.ismartcoding.plain.httpserver.models.AudioPlayHistory
 import com.ismartcoding.plain.httpserver.models.AudioPlaylist
-import com.ismartcoding.plain.httpserver.models.AudioPlaylistPage
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.PlaylistAudio
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -43,12 +43,15 @@ suspend fun audioCount(query: String): Int {
 
 /** The active playback queue (manual items + context), paginated. */
 @GraphQLQuery
-suspend fun audioPlaylist(offset: Int, limit: Int): AudioPlaylistPage {
+suspend fun audioQueueItems(offset: Int, limit: Int): List<PlaylistAudio> {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
-    return AudioPlaylistPage(
-        items = AudioQueueManager.queuePage(offset, limit).map { it.toModel() },
-        total = AudioQueueManager.queueTotal(),
-    )
+    return AudioQueueManager.queuePage(offset, limit).map { it.toModel() }
+}
+
+@GraphQLQuery
+suspend fun audioQueueItemCount(): Int {
+    Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
+    return AudioQueueManager.queueTotal()
 }
 
 /** Play the given track: adds it to the manual queue when missing and marks it current. */
@@ -122,11 +125,18 @@ suspend fun audioPlaylists(): List<AudioPlaylist> {
 }
 
 @GraphQLQuery
-suspend fun audioPlaylistItems(id: ID, offset: Int, limit: Int): AudioPlaylistPage {
-    return AudioPlaylistPage(
-        items = AudioQueueManager.playlistItemsPage(id.value, offset, limit).map { it.toPlaylistAudio().toModel() },
-        total = AudioQueueManager.playlistItemCount(id.value),
-    )
+suspend fun audioPlaylistItems(id: ID, offset: Int, limit: Int): List<PlaylistAudio> {
+    return AudioQueueManager.playlistItemsPage(id.value, offset, limit).map { it.toPlaylistAudio().toModel() }
+}
+
+@GraphQLQuery
+suspend fun audioPlaylistItemCount(id: ID): Int {
+    return AudioQueueManager.playlistItemCount(id.value)
+}
+
+@GraphQLQuery
+suspend fun audioPlayHistory(limit: Int = 50, offset: Int = 0): List<AudioPlayHistory> {
+    return AudioQueueManager.recentPage(limit, offset).map { it.toModel() }
 }
 
 @GraphQLMutation
