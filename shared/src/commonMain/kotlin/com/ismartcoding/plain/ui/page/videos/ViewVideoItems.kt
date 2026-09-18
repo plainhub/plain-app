@@ -44,11 +44,10 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VideosViewModel
 import coil3.compose.AsyncImage
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.layout.ContentScale
 import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.getMimeType
-import com.ismartcoding.plain.platform.getFileIconPath
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -64,7 +63,11 @@ internal fun VideoActionButtons(
     PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
         PSheetHeader(
             thumbnail = {
-                PSheetHeaderThumb(model = getFileIconPath(m.path.getFilenameExtension()), fallbackIcon = Res.drawable.file)
+                PSheetHeaderThumb(
+                    model = getMediaItemUriString(videosVM.dataType, m.id).ifEmpty { m.path },
+                    fallbackIcon = Res.drawable.file_video,
+                    contentScale = ContentScale.Crop,
+                )
             },
             title = m.title.ifEmpty { m.path.getFilenameFromPath() },
             subtitle = m.path.getMimeType() + " · " + m.size.formatBytes(),
