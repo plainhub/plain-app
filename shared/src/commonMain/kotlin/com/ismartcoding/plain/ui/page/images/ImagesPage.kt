@@ -78,6 +78,7 @@ import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSearchMode
+import com.ismartcoding.plain.ui.nav.NavLoadGate
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import com.ismartcoding.plain.platform.getMediaItemUriString
@@ -88,6 +89,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImagesPage(
     navController: NavHostController,
+    initialLoadGate: NavLoadGate? = null,
     imagesVM: ImagesViewModel = viewModel(key = "imagesVM") { ImagesViewModel() },
     tagsVM: TagsViewModel = viewModel(key = "imageTagsVM") { TagsViewModel() },
     mediaFoldersVM: MediaFoldersViewModel = viewModel(key = "imageFoldersVM") { MediaFoldersViewModel() },
@@ -151,6 +153,7 @@ fun ImagesPage(
     LaunchedEffect(Unit) {
         imagesVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
         if (imagesVM.hasPermission.value) {
+            initialLoadGate?.await()
             reloadAfterGrant()
         }
     }
@@ -177,6 +180,16 @@ fun ImagesPage(
     }
 
     CastDialog(castVM)
+
+    // Date grouping is computed outside the grid DSL: the DSL block re-executes
+    // on every recomposition (tags/buckets landing right after items), which
+    // would re-run the O(n) grouping each time.
+    val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+            && imagesVM.queryText.value.isEmpty()
+            && !imagesVM.useAiSearch.value
+    val groupedItems = remember(itemsState, isGroupMode) {
+        if (isGroupMode) groupMediaByDate(itemsState, { it.takenAt ?: it.createdAt }) else emptyList()
+    }
 
     MediaTopBar(
         navController = navController,
@@ -245,11 +258,7 @@ fun ImagesPage(
                                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                                 verticalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
-                                val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
-                                        && imagesVM.queryText.value.isEmpty()
-                                        && !imagesVM.useAiSearch.value
                                 if (isGroupMode) {
-                                    val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
                                     groupedItems.forEach { group ->
                                         item(span = { GridItemSpan(maxLineSpan) }, key = "header_${group.dateKey}", contentType = "header") {
                                             val ids = group.items.map { it.id }

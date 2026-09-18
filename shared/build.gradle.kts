@@ -92,6 +92,12 @@ kotlin {
         androidMain.dependencies {
             api(project(":shared-lib"))
             implementation(libs.okhttp)
+
+            // Offline phone number metadata: region, number type, carrier, geo description
+            implementation(libs.libphonenumber)
+            implementation(libs.libphonenumber.geocoder)
+            implementation(libs.libphonenumber.carrier)
+
             implementation(libs.tink.android)
             implementation(libs.androidx.exifinterface)
             implementation(libs.androidx.appcompat)

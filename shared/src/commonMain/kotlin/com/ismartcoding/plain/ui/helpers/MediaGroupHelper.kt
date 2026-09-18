@@ -14,12 +14,11 @@ data class MediaDateGroup<T>(
 
 fun <T> groupMediaByDate(
     items: List<T>,
-    getDate: (T) -> Instant
+    getDate: (T) -> Instant,
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ): List<MediaDateGroup<T>> {
     return items.groupBy { item ->
-        val instant = getDate(item)
-        val localDateTime = Instant.fromEpochSeconds(instant.epochSeconds)
-            .toLocalDateTime(TimeZone.currentSystemDefault())
+        val localDateTime = getDate(item).toLocalDateTime(timeZone)
         "${localDateTime.year.toString().padStart(4, '0')}-${localDateTime.month.number.toString().padStart(2, '0')}-${localDateTime.day.toString().padStart(2, '0')}"
     }.map { (dateKey, groupItems) ->
         MediaDateGroup(

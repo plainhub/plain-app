@@ -35,6 +35,9 @@ navigationCompose="2.9.2"
 navigationComposeVersion = "2.10.0"
 material3Version = "1.4.0"
 okhttpVersion="5.5.0"
+libphonenumberVersion = "9.0.32"
+libphonenumberGeocoderVersion = "3.32"
+libphonenumberCarrierVersion = "2.32"
 shizukuVersion = "13.1.5"
 room = "3.0.0"
 runtimeVersion="1.12.0"
@@ -161,6 +164,9 @@ ksp-symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processin
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
+libphonenumber = { module = "com.googlecode.libphonenumber:libphonenumber", version.ref = "libphonenumberVersion" }
+libphonenumber-geocoder = { module = "com.googlecode.libphonenumber:geocoder", version.ref = "libphonenumberGeocoderVersion" }
+libphonenumber-carrier = { module = "com.googlecode.libphonenumber:carrier", version.ref = "libphonenumberCarrierVersion" }
 shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizukuVersion" }
 shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizukuVersion" }
 shizuku-aidl = { module = "dev.rikka.shizuku:aidl", version.ref = "shizukuVersion" }

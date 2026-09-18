@@ -32,11 +32,14 @@ type Query {
   chatItems(id: String!): [ChatItem!]!
   latestChatItems: [ChatItem!]!
   audioCount(query: String!): Int!
-  audioPlaylist(offset: Int!, limit: Int!): AudioPlaylistPage!
+  audioQueueItems(offset: Int!, limit: Int!): [PlaylistAudio!]!
+  audioQueueItemCount: Int!
   audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
   audioLyrics(path: String!): String!
   audioPlaylists: [AudioPlaylist!]!
-  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!): AudioPlaylistPage!
+  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!): [PlaylistAudio!]!
+  audioPlaylistItemCount(id: ID!): Int!
+  audioPlayHistory(limit: Int!, offset: Int!): [AudioPlayHistory!]!
   imageCount(query: String!): Int!
   imageSearchStatus: ImageSearchStatus!
   images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
@@ -312,17 +315,21 @@ type AudioFileInfo {
   location: Location
 }
 
+type AudioPlayHistory {
+  path: String!
+  title: String!
+  artist: String!
+  duration: Long!
+  playCount: Long!
+  playedAt: Instant!
+}
+
 type AudioPlaylist {
   id: ID!
   name: String!
   itemCount: Int!
   createdAt: Instant!
   updatedAt: Instant!
-}
-
-type AudioPlaylistPage {
-  items: [PlaylistAudio!]!
-  total: Int!
 }
 
 type Battery {
@@ -1005,11 +1012,10 @@ enum Permission {
 }
 
 type PhoneGeo {
-  province: String!
-  city: String!
-  zipCode: String!
-  areaCode: String!
-  isp: Int!
+  country: String!
+  numberType: String!
+  carrier: String!
+  description: String!
 }
 
 type PlaylistAudio {

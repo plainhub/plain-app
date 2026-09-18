@@ -17,6 +17,7 @@ import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.nav.NavLoadGate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -27,6 +28,7 @@ internal fun DocsPageEffects(
     docsVM: DocsViewModel,
     tagsVM: TagsViewModel,
     mediaFoldersVM: MediaFoldersViewModel,
+    initialLoadGate: NavLoadGate? = null,
 ) {
     val scope = rememberCoroutineScope()
     val sharedFlow = Channel.sharedFlow
@@ -43,6 +45,7 @@ internal fun DocsPageEffects(
     LaunchedEffect(Unit) {
         docsVM.hasPermission.value = AppFeatureType.FILES.hasPermission()
         if (docsVM.hasPermission.value) {
+            initialLoadGate?.await()
             reloadAfterGrant()
         }
     }

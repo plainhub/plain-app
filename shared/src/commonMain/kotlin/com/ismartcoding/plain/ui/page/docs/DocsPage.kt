@@ -36,6 +36,7 @@ import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSearchMode
+import com.ismartcoding.plain.ui.nav.NavLoadGate
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,6 +45,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DocsPage(
     navController: NavHostController,
+    initialLoadGate: NavLoadGate? = null,
     docsVM: DocsViewModel = viewModel { DocsViewModel() },
     tagsVM: TagsViewModel = viewModel(key = "docTagsVM") { TagsViewModel() },
     castVM: CastViewModel = viewModel(key = "docsCastVM") { CastViewModel() },
@@ -77,7 +79,7 @@ fun DocsPage(
         }
     }
 
-    DocsPageEffects(docsState, docsVM, tagsVM, mediaFoldersVM)
+    DocsPageEffects(docsState, docsVM, tagsVM, mediaFoldersVM, initialLoadGate)
 
     val docsTagsMap = remember(tagsMapState, tagsState) {
         tagsMapState.mapValues { entry ->

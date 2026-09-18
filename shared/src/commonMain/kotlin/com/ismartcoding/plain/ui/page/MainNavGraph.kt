@@ -40,6 +40,7 @@ import com.ismartcoding.plain.ui.nav.navEnterTransition
 import com.ismartcoding.plain.ui.nav.navExitTransition
 import com.ismartcoding.plain.ui.nav.navPopEnterTransition
 import com.ismartcoding.plain.ui.nav.navPopExitTransition
+import com.ismartcoding.plain.ui.nav.rememberNavLoadGate
 import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
@@ -153,8 +154,8 @@ fun MainNavGraph(
                 2 -> ToolsPage(navController, onTabSelected = onTabSelected)
             }
         }
-        composable<Routing.Images> { ImagesPage(navController) }
-        composable<Routing.Videos> { VideosPage(navController) }
+        composable<Routing.Images> { ImagesPage(navController, initialLoadGate = rememberNavLoadGate()) }
+        composable<Routing.Videos> { VideosPage(navController, initialLoadGate = rememberNavLoadGate()) }
         composable<Routing.Audio> {
             AudioHomePage(navController, audioPlaylistVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM, audioHomeVM)
         }
@@ -175,7 +176,7 @@ fun MainNavGraph(
             PlaylistAddItemsPage(navController, r.id)
         }
         composable<Routing.Apps> { AppsPage(navController) }
-        composable<Routing.Docs> { DocsPage(navController) }
+        composable<Routing.Docs> { DocsPage(navController, initialLoadGate = rememberNavLoadGate()) }
         composable<Routing.Notes> { NotesPage(navController, tagsVM = noteTagsVM) }
         composable<Routing.SoundMeter> { SoundMeterPage(navController) }
 
