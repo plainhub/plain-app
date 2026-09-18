@@ -136,7 +136,7 @@ fun FeedEntriesPage(
     else if (feedEntriesVM.tag.value != null) listOf(feedName, feedEntriesVM.tag.value!!.name).joinToString(" - ")
     else if (feedEntriesVM.filterType.value == FeedEntryFilterType.TODAY) feedName + " - " + stringResource(Res.string.today) else feedName
 
-    ViewFeedEntryBottomSheet(feedEntriesVM, tagsVM, tagsMapState, tagsState)
+    ViewFeedEntryBottomSheet(feedEntriesVM, feedsVM, tagsVM, tagsMapState, tagsState)
     if (feedEntriesVM.showTagsDialog.value) {
         TagsBottomSheet(tagsVM) { feedEntriesVM.showTagsDialog.value = false }
     }

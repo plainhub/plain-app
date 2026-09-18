@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.page.files
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.MutableState
@@ -14,6 +13,7 @@ import com.ismartcoding.plain.platform.shareFiles
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsRow
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.FilesViewModel
@@ -47,12 +47,7 @@ internal fun FileInfoPrimaryActions(
         PSheetPrimaryAction(Res.drawable.copy, stringResource(Res.string.copy)) {
             performCopyFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
         }
-        PSheetPrimaryAction(
-            Res.drawable.delete_forever,
-            stringResource(Res.string.delete),
-            container = MaterialTheme.colorScheme.errorContainer,
-            tint = MaterialTheme.colorScheme.error,
-        ) {
+        PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
             scope.launch {
                 confirmActionAsync(
                     Res.string.delete,

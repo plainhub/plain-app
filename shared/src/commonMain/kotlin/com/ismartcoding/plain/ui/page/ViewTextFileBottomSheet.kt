@@ -26,6 +26,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -71,12 +72,7 @@ fun ViewTextFileBottomSheet(
                 textFileVM.gotoEnd()
                 onDismiss()
             }
-            PSheetPrimaryAction(
-                Res.drawable.delete_forever,
-                stringResource(Res.string.delete),
-                container = MaterialTheme.colorScheme.errorContainer,
-                tint = MaterialTheme.colorScheme.error,
-            ) {
+            PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                 scope.launch {
                     confirmActionAsync(
                         Res.string.delete,

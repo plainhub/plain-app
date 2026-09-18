@@ -80,7 +80,6 @@ fun ImageEditorListPage(
                 scrollBehavior = scrollBehavior,
                 actions = {
                     PCapsuleMoreClose(
-                        showMore = false,
                         onClose = { navController.navigateUp() },
                     )
                 },

@@ -7,7 +7,6 @@ import com.ismartcoding.plain.i18n.*
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,7 +30,11 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
-import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
+import com.ismartcoding.plain.ui.base.PSheetPrimaryTrashAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
+import com.ismartcoding.plain.ui.base.PSheetHeader
+import com.ismartcoding.plain.ui.base.PSheetHeaderThumb
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsRow
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.AddToHomeDialog
@@ -39,6 +42,13 @@ import com.ismartcoding.plain.ui.components.AddToHomeHelpAction
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VideosViewModel
+import coil3.compose.AsyncImage
+import androidx.compose.foundation.layout.size
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.getFilenameExtension
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.getMimeType
+import com.ismartcoding.plain.platform.getFileIconPath
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -51,60 +61,62 @@ internal fun VideoActionButtons(
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    PSheetPrimaryActionsCard {
-        if (!videosVM.showSearchBar.value) {
-            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                dragSelectState.enterSelectMode()
-                dragSelectState.select(m.id)
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+        PSheetHeader(
+            thumbnail = {
+                PSheetHeaderThumb(model = getFileIconPath(m.path.getFilenameExtension()), fallbackIcon = Res.drawable.file)
+            },
+            title = m.title.ifEmpty { m.path.getFilenameFromPath() },
+            subtitle = m.path.getMimeType() + " · " + m.size.formatBytes(),
+        )
+        PSheetPrimaryActionsRow {
+            if (!videosVM.showSearchBar.value) {
+                PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                    dragSelectState.enterSelectMode()
+                    dragSelectState.select(m.id)
+                    onDismiss()
+                }
+            }
+            PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+                shareFiles(listOf(getMediaItemUriString(videosVM.dataType, m.id)))
                 onDismiss()
             }
-        }
-        PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
-            shareFiles(listOf(getMediaItemUriString(videosVM.dataType, m.id)))
-            onDismiss()
-        }
-        // At most 4 disc actions per card: open-with and rename drop to the
-        // secondary rows whenever the trash view or delete crowds the row.
-        if (!m.path.isUrl() && !videosVM.trash.value) {
-            PSheetPrimaryAction(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-                openFileExternal(m.path)
+            if (!videosVM.trash.value) {
+                PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                    videosVM.showRenameDialog.value = true
+                }
             }
-        }
-        if (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value) {
-            PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
-                videosVM.showRenameDialog.value = true
+            if (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value) {
+                PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
+                    videosVM.trash(tagsVM, setOf(m.id))
+                    onDismiss()
+                }
             }
-        }
-        if (AppFeatureType.MEDIA_TRASH.has() && videosVM.trash.value) {
-            PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
-                videosVM.restore(tagsVM, setOf(m.id))
-                onDismiss()
+            if (AppFeatureType.MEDIA_TRASH.has() && videosVM.trash.value) {
+                PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                    videosVM.restore(tagsVM, setOf(m.id))
+                    onDismiss()
+                }
             }
-        }
-        if (!AppFeatureType.MEDIA_TRASH.has() || videosVM.trash.value) {
-            PSheetPrimaryAction(
-                Res.drawable.delete_forever,
-                stringResource(Res.string.delete),
-                container = MaterialTheme.colorScheme.errorContainer,
-                tint = MaterialTheme.colorScheme.error,
-            ) {
-                scope.launch {
-                    confirmActionAsync(
-                        Res.string.delete,
-                        Res.string.confirm_to_delete,
-                        callback = {
-                            videosVM.delete(tagsVM, setOf(m.id))
-                            onDismiss()
-                        },
-                        danger = true
-                    )
+            if (!AppFeatureType.MEDIA_TRASH.has() || videosVM.trash.value) {
+                PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
+                    scope.launch {
+                        confirmActionAsync(
+                            Res.string.delete,
+                            Res.string.confirm_to_delete,
+                            callback = {
+                                videosVM.delete(tagsVM, setOf(m.id))
+                                onDismiss()
+                            },
+                            danger = true
+                        )
+                    }
                 }
             }
         }
     }
     val hasSecondary = (!m.path.isUrl() && !videosVM.trash.value) ||
-        (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value) ||
-        videosVM.trash.value || !AppFeatureType.MEDIA_TRASH.has()
+        videosVM.trash.value
     if (hasSecondary) {
         VerticalSpace(12.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
@@ -113,19 +125,11 @@ internal fun VideoActionButtons(
                     PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                         showAddToHomeDialog = true
                     }
-                }
-                if (AppFeatureType.MEDIA_TRASH.has() && !videosVM.trash.value) {
-                    PSheetActionRow(Res.drawable.trash_2, stringResource(Res.string.trash)) {
-                        videosVM.trash(tagsVM, setOf(m.id))
-                        onDismiss()
-                    }
-                }
-                if (!m.path.isUrl() && videosVM.trash.value) {
                     PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                         openFileExternal(m.path)
                     }
                 }
-                if (videosVM.trash.value || !AppFeatureType.MEDIA_TRASH.has()) {
+                if (videosVM.trash.value) {
                     PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
                         videosVM.showRenameDialog.value = true
                     }

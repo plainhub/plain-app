@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.page.audio.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -26,7 +25,10 @@ import com.ismartcoding.plain.platform.shareFiles
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
-import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
+import com.ismartcoding.plain.ui.base.PSheetPrimaryTrashAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
+import com.ismartcoding.plain.ui.base.PSheetHeader
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsRow
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.AddToHomeDialog
 import com.ismartcoding.plain.ui.components.AddToHomeHelpAction
@@ -36,6 +38,9 @@ import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.foundation.layout.size
+import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 
 @Composable
 internal fun AudioActionButtons(
@@ -47,81 +52,70 @@ internal fun AudioActionButtons(
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    PSheetPrimaryActionsCard {
-        if (!audioVM.showSearchBar.value) {
-            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                dragSelectState.enterSelectMode()
-                dragSelectState.select(m.id)
-                onDismiss()
-            }
-        }
-        if (!audioVM.trash.value) {
-            PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
-                shareFiles(listOf(getMediaItemUriString(DataType.AUDIO, m.id)))
-                onDismiss()
-            }
-            if (!m.path.isUrl()) {
-                PSheetPrimaryAction(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-                    openFileExternal(m.path)
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+        PSheetHeader(
+            thumbnail = {
+                AudioCoverOrIcon(path = m.path, modifier = Modifier.size(44.dp))
+            },
+            title = m.title.ifEmpty { m.path.getFilenameFromPath() },
+            subtitle = (if (m.artist.isNotEmpty()) m.artist + " · " else "") + m.duration.formatDuration(),
+        )
+        PSheetPrimaryActionsRow {
+            if (!audioVM.showSearchBar.value) {
+                PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                    dragSelectState.enterSelectMode()
+                    dragSelectState.select(m.id)
+                    onDismiss()
                 }
             }
-            // At most 4 disc actions per card: rename drops to the secondary
-            // rows when delete occupies the fourth slot (no-trash builds).
-            if (AppFeatureType.MEDIA_TRASH.has()) {
+            if (!audioVM.trash.value) {
+                PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+                    shareFiles(listOf(getMediaItemUriString(DataType.AUDIO, m.id)))
+                    onDismiss()
+                }
                 PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
                     audioVM.showRenameDialog.value = true
                 }
-            }
-        }
-        if (AppFeatureType.MEDIA_TRASH.has() && audioVM.trash.value) {
-            PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
-                audioVM.restore(tagsVM, setOf(m.id))
-                onDismiss()
-            }
-        }
-        if (!AppFeatureType.MEDIA_TRASH.has() || audioVM.trash.value) {
-            PSheetPrimaryAction(
-                Res.drawable.delete_forever,
-                stringResource(Res.string.delete),
-                container = MaterialTheme.colorScheme.errorContainer,
-                tint = MaterialTheme.colorScheme.error,
-            ) {
-                scope.launch {
-                    confirmActionAsync(
-                        Res.string.delete,
-                        Res.string.confirm_to_delete,
-                        callback = {
-                            audioVM.delete(tagsVM, setOf(m.id))
-                            onDismiss()
-                        },
-                        danger = true
-                    )
-                }
-            }
-        }
-    }
-    val hasSecondary = (!audioVM.trash.value && !m.path.isUrl()) ||
-        (AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value) ||
-        (!AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value)
-    if (hasSecondary) {
-        VerticalSpace(12.dp)
-        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-            Column {
-                if (!audioVM.trash.value && !m.path.isUrl()) {
-                    PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
-                        showAddToHomeDialog = true
-                    }
-                }
-                if (AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value) {
-                    PSheetActionRow(Res.drawable.trash_2, stringResource(Res.string.trash)) {
+                if (AppFeatureType.MEDIA_TRASH.has()) {
+                    PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                         audioVM.trash(tagsVM, setOf(m.id))
                         onDismiss()
                     }
                 }
-                if (!AppFeatureType.MEDIA_TRASH.has() && !audioVM.trash.value) {
-                    PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
-                        audioVM.showRenameDialog.value = true
+            }
+            if (AppFeatureType.MEDIA_TRASH.has() && audioVM.trash.value) {
+                PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                    audioVM.restore(tagsVM, setOf(m.id))
+                    onDismiss()
+                }
+            }
+            if (!AppFeatureType.MEDIA_TRASH.has() || audioVM.trash.value) {
+                PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
+                    scope.launch {
+                        confirmActionAsync(
+                            Res.string.delete,
+                            Res.string.confirm_to_delete,
+                            callback = {
+                                audioVM.delete(tagsVM, setOf(m.id))
+                                onDismiss()
+                            },
+                            danger = true
+                        )
                     }
+                }
+            }
+        }
+    }
+    val hasSecondary = !audioVM.trash.value && !m.path.isUrl()
+    if (hasSecondary) {
+        VerticalSpace(12.dp)
+        PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+            Column {
+                PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
+                    showAddToHomeDialog = true
+                }
+                PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+                    openFileExternal(m.path)
                 }
             }
         }

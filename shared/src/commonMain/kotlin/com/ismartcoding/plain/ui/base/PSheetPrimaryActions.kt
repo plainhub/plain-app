@@ -16,11 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -110,4 +111,29 @@ fun PSheetPrimaryAction(
             maxLines = 1,
         )
     }
+}
+
+
+// Destructive primary actions with icon and error colors locked in — callers
+// cannot forget the red treatment.
+@Composable
+fun PSheetPrimaryTrashAction(text: String, click: () -> Unit) {
+    PSheetPrimaryAction(
+        Res.drawable.trash_2,
+        text,
+        container = MaterialTheme.colorScheme.errorContainer,
+        tint = MaterialTheme.colorScheme.error,
+        click = click,
+    )
+}
+
+@Composable
+fun PSheetPrimaryDeleteAction(text: String, click: () -> Unit) {
+    PSheetPrimaryAction(
+        Res.drawable.delete_forever,
+        text,
+        container = MaterialTheme.colorScheme.errorContainer,
+        tint = MaterialTheme.colorScheme.error,
+        click = click,
+    )
 }

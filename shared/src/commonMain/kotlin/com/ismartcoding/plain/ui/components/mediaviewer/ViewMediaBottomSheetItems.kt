@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.components.mediaviewer
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -22,6 +21,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
@@ -61,12 +61,7 @@ internal fun ViewMediaActionButtons(
                     onShowRenameDialog()
                 }
             }
-            PSheetPrimaryAction(
-                Res.drawable.delete_forever,
-                stringResource(Res.string.delete),
-                container = MaterialTheme.colorScheme.errorContainer,
-                tint = MaterialTheme.colorScheme.error,
-            ) {
+            PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                 scope.launch {
                     confirmActionAsync(
                         Res.string.delete,

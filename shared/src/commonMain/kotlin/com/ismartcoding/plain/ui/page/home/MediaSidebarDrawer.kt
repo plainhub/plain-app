@@ -24,6 +24,8 @@ import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.events.MediaStoreChangedEvent
+import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.MediaSidebarBucketItem
@@ -65,6 +67,15 @@ fun <T : IData> MediaSidebarDrawer(
         scope.launch(Dispatchers.Default) {
             mediaFoldersVM.loadAsync()
             tagsVM.loadAsync()
+        }
+    }
+    // Keep folder counts and the trash badge fresh when rows are
+    // trashed/restored/deleted from the detail sheet or select mode.
+    LaunchedEffect(Channel.sharedFlow) {
+        Channel.sharedFlow.collect { event ->
+            if (event is MediaStoreChangedEvent && event.dataType == mediaVM.dataType) {
+                mediaFoldersVM.loadAsync()
+            }
         }
     }
 

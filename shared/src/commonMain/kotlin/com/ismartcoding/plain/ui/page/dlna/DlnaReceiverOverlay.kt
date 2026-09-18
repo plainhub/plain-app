@@ -41,6 +41,7 @@ import com.ismartcoding.plain.ui.components.SaveToSheet
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.httpserver.http.StreamSink
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.theme.dialogSheetBackground
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -82,6 +83,7 @@ private fun DlnaCastRequestDialog() {
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     CheckCircle(selected = rememberChoice, onClick = { rememberChoice = !rememberChoice })
+                    HorizontalSpace(8.dp)
                     Text(
                         text = stringResource(Res.string.dlna_cast_remember_choice),
                         style = MaterialTheme.typography.bodyMedium,

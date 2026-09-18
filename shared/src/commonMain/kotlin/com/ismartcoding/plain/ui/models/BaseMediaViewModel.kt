@@ -4,10 +4,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.events.MediaStoreChangedEvent
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.countMedia
@@ -111,6 +113,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
             deleteMedia(dataType, ids, trash.value)
             loadAsync(tagsVM)
             DialogHelper.hideLoading()
+            sendEvent(MediaStoreChangedEvent(dataType))
         }
     }
 
@@ -123,6 +126,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
             trashMedia(dataType, ids)
             loadAsync(tagsVM)
             DialogHelper.hideLoading()
+            sendEvent(MediaStoreChangedEvent(dataType))
             _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
         }
     }
@@ -135,6 +139,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
             restoreMedia(dataType, ids)
             loadAsync(tagsVM)
             DialogHelper.hideLoading()
+            sendEvent(MediaStoreChangedEvent(dataType))
             _itemsFlow.update { it.filterNot { i -> ids.contains(i.id) } }
         }
     }

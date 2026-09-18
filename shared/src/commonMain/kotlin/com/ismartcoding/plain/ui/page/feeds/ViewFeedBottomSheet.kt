@@ -31,6 +31,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PSwitch
@@ -78,12 +79,7 @@ fun ViewFeedBottomSheet(
                 feedsVM.showEditDialog(m)
                 onDismiss()
             }
-            PSheetPrimaryAction(
-                Res.drawable.delete_forever,
-                stringResource(Res.string.delete),
-                container = MaterialTheme.colorScheme.errorContainer,
-                tint = MaterialTheme.colorScheme.error,
-            ) {
+            PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                 val id = m.id
                 // Await the delete so the caller reloads the entry list after
                 // the rows are actually gone, not mid-deletion.

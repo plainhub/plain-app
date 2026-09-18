@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,14 +24,16 @@ fun PSheetActionCard(content: @Composable ColumnScope.() -> Unit) {
 
 @Composable
 fun PSheetActionRow(
-    icon: DrawableResource,
+    icon: DrawableResource? = null,
     title: String,
+    start: (@Composable RowScope.() -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
     click: () -> Unit,
 ) {
     PListItem(
         modifier = Modifier.clip(RoundedCornerShape(12.dp)).clickable(onClick = click),
         icon = icon,
+        start = start,
         title = title,
         action = trailing,
     )

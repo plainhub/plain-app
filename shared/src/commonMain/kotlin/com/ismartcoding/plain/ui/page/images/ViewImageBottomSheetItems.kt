@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.images
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.theme.PlainTheme
 
@@ -27,7 +26,11 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
-import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
+import com.ismartcoding.plain.ui.base.PSheetPrimaryTrashAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
+import com.ismartcoding.plain.ui.base.PSheetHeader
+import com.ismartcoding.plain.ui.base.PSheetHeaderThumb
+import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsRow
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.AddToHomeDialog
@@ -39,6 +42,12 @@ import com.ismartcoding.plain.enums.DataType
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
+import coil3.compose.AsyncImage
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.layout.ContentScale
+import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
+import com.ismartcoding.plain.lib.extensions.getMimeType
 
 @Composable
 internal fun ViewImageActionButtons(
@@ -52,61 +61,63 @@ internal fun ViewImageActionButtons(
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
-    PSheetPrimaryActionsCard {
-        if (!imagesVM.showSearchBar.value) {
-            PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
-                dragSelectState.enterSelectMode()
-                dragSelectState.select(m.id)
+    PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
+        PSheetHeader(
+            thumbnail = {
+                PSheetHeaderThumb(model = m.path, fallbackIcon = Res.drawable.image, contentScale = ContentScale.Crop)
+            },
+            title = m.title.ifEmpty { m.path.getFilenameFromPath() },
+            subtitle = m.path.getMimeType() + " · " + m.size.formatBytes(),
+        )
+        PSheetPrimaryActionsRow {
+            if (!imagesVM.showSearchBar.value) {
+                PSheetPrimaryAction(Res.drawable.list_checks, stringResource(Res.string.select)) {
+                    dragSelectState.enterSelectMode()
+                    dragSelectState.select(m.id)
+                    onDismiss()
+                }
+            }
+            PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
+                shareFiles(listOf(getMediaItemUriString(DataType.IMAGE, m.id)))
                 onDismiss()
             }
-        }
-        PSheetPrimaryAction(Res.drawable.share_2, stringResource(Res.string.share)) {
-            shareFiles(listOf(getMediaItemUriString(DataType.IMAGE, m.id)))
-            onDismiss()
-        }
-        // At most 4 disc actions per card: open-with and rename drop to the
-        // secondary rows whenever the trash view or delete crowds the row.
-        if (!m.path.isUrl() && !imagesVM.trash.value) {
-            PSheetPrimaryAction(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-                openFileExternal(m.path)
+            if (!imagesVM.trash.value) {
+                PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
+                    imagesVM.showRenameDialog.value = true
+                }
             }
-        }
-        if (AppFeatureType.MEDIA_TRASH.has() && !imagesVM.trash.value) {
-            PSheetPrimaryAction(Res.drawable.pen, stringResource(Res.string.rename)) {
-                imagesVM.showRenameDialog.value = true
+            if (AppFeatureType.MEDIA_TRASH.has() && !imagesVM.trash.value) {
+                PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
+                    imagesVM.trash(tagsVM, setOf(m.id))
+                    onDismiss()
+                }
             }
-        }
-        if (AppFeatureType.MEDIA_TRASH.has() && imagesVM.trash.value) {
-            PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
-                imagesVM.restore(tagsVM, setOf(m.id))
-                onDismiss()
+            if (AppFeatureType.MEDIA_TRASH.has() && imagesVM.trash.value) {
+                PSheetPrimaryAction(Res.drawable.archive_restore, stringResource(Res.string.restore)) {
+                    imagesVM.restore(tagsVM, setOf(m.id))
+                    onDismiss()
+                }
             }
-        }
-        if (!AppFeatureType.MEDIA_TRASH.has() || imagesVM.trash.value) {
-            PSheetPrimaryAction(
-                Res.drawable.delete_forever,
-                stringResource(Res.string.delete),
-                container = MaterialTheme.colorScheme.errorContainer,
-                tint = MaterialTheme.colorScheme.error,
-            ) {
-                scope.launch {
-                    confirmActionAsync(
-                        Res.string.delete,
-                        Res.string.confirm_to_delete,
-                        callback = {
-                            imagesVM.delete(tagsVM, setOf(m.id))
-                            onDismiss()
-                        },
-                        danger = true
-                    )
+            if (!AppFeatureType.MEDIA_TRASH.has() || imagesVM.trash.value) {
+                PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
+                    scope.launch {
+                        confirmActionAsync(
+                            Res.string.delete,
+                            Res.string.confirm_to_delete,
+                            callback = {
+                                imagesVM.delete(tagsVM, setOf(m.id))
+                                onDismiss()
+                            },
+                            danger = true
+                        )
+                    }
                 }
             }
         }
     }
     val hasSecondary = qrScanResult.isNotEmpty() ||
         (!m.path.isUrl() && !imagesVM.trash.value) ||
-        (AppFeatureType.MEDIA_TRASH.has() && !imagesVM.trash.value) ||
-        imagesVM.trash.value || !AppFeatureType.MEDIA_TRASH.has()
+        imagesVM.trash.value
     if (hasSecondary) {
         VerticalSpace(12.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
@@ -120,19 +131,11 @@ internal fun ViewImageActionButtons(
                     PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
                         showAddToHomeDialog = true
                     }
-                }
-                if (AppFeatureType.MEDIA_TRASH.has() && !imagesVM.trash.value) {
-                    PSheetActionRow(Res.drawable.trash_2, stringResource(Res.string.trash)) {
-                        imagesVM.trash(tagsVM, setOf(m.id))
-                        onDismiss()
-                    }
-                }
-                if (!m.path.isUrl() && imagesVM.trash.value) {
                     PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
                         openFileExternal(m.path)
                     }
                 }
-                if (imagesVM.trash.value || !AppFeatureType.MEDIA_TRASH.has()) {
+                if (imagesVM.trash.value) {
                     PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename)) {
                         imagesVM.showRenameDialog.value = true
                     }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import org.jetbrains.compose.resources.stringResource
@@ -22,6 +21,8 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSheetPrimaryAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryTrashAction
+import com.ismartcoding.plain.ui.base.PSheetPrimaryDeleteAction
 import com.ismartcoding.plain.ui.base.PSheetPrimaryActionsCard
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -68,22 +69,12 @@ fun ViewNoteBottomSheet(
                             NotesViewModel.restore(tagsVM, setOf(m.id))
                             onDismiss()
                         }
-                        PSheetPrimaryAction(
-                            Res.drawable.delete_forever,
-                            stringResource(Res.string.delete),
-                            container = MaterialTheme.colorScheme.errorContainer,
-                            tint = MaterialTheme.colorScheme.error,
-                        ) {
+                        PSheetPrimaryDeleteAction(stringResource(Res.string.delete)) {
                             NotesViewModel.delete(tagsVM, setOf(m.id))
                             onDismiss()
                         }
                     } else {
-                        PSheetPrimaryAction(
-                            Res.drawable.trash_2,
-                            stringResource(Res.string.trash),
-                            container = MaterialTheme.colorScheme.errorContainer,
-                            tint = MaterialTheme.colorScheme.error,
-                        ) {
+                        PSheetPrimaryTrashAction(stringResource(Res.string.trash)) {
                             NotesViewModel.trash(tagsVM, setOf(m.id))
                             onDismiss()
                         }
