@@ -112,7 +112,7 @@ fun ArtistsRow(
                     .clickable { onArtistClick(artist) }
                     .padding(4.dp),
             ) {
-                ArtistAvatar(name = artist.name, gradientIndex = index + 1, size = 64)
+                ArtistAvatar(name = artist.name, artworkPath = artist.samplePath, size = 64.dp)
                 Text(
                     text = artist.name,
                     style = MaterialTheme.typography.bodySmall,

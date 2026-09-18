@@ -106,7 +106,7 @@ fun ArtistsPage(
                     }
                     items(artists.size, key = { artists[it].name }) { index ->
                         val artist = artists[index]
-                        ArtistRow(artist, index) {
+                        ArtistRow(artist) {
                             navController.navigate(Routing.ArtistDetail(artist.name))
                         }
                     }
@@ -126,7 +126,7 @@ fun ArtistsPage(
 }
 
 @Composable
-private fun ArtistRow(artist: AudioHomeArtist, gradientIndex: Int, onClick: () -> Unit) {
+private fun ArtistRow(artist: AudioHomeArtist, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -134,7 +134,7 @@ private fun ArtistRow(artist: AudioHomeArtist, gradientIndex: Int, onClick: () -
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        ArtistAvatar(name = artist.name, gradientIndex = gradientIndex, size = 48)
+        ArtistAvatar(name = artist.name, artworkPath = artist.samplePath, size = 48.dp)
         Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
             Text(
                 text = artist.name,

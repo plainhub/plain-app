@@ -254,7 +254,9 @@ private fun EditorRow(
                 softWrap = wrap,
                 onTextLayout = { layout = it },
                 modifier = if (wrap) {
-                    Modifier.fillMaxWidth()
+                    // Keep wrapped text clear of the cell's right edge; the input surface
+                    // subtracts the same pad so the caret wraps at the same column.
+                    Modifier.fillMaxWidth().padding(end = RowTrailingPad)
                 } else {
                     // Measure the full line without the cell width cap, pan it, and let the
                     // cell clip. Measuring under the cap would clip the text to one screen
@@ -331,5 +333,5 @@ private fun buildRowText(
 private val MatchBg = Color(0x24D9A514)
 private val MatchCurrentBg = Color(0x59D9A514)
 
-/** Trailing space kept after the text in no-wrap mode, also part of the pan bound. */
-private val RowTrailingPad = 8.dp
+/** Trailing space kept after the text in both wrap and no-wrap modes; part of the pan bound. */
+internal val RowTrailingPad = 8.dp

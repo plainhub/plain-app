@@ -54,7 +54,6 @@ suspend fun app(): App {
     val grantedPermissions = getGrantedWebPermissionsAsync()
     return App(
         clientId = TempData.clientId,
-        usbConnected = isUsbConnected(),
         urlToken = Base64.encode(TempData.urlToken),
         httpPort = TempData.httpPort.value,
         httpsPort = TempData.httpsPort.value,

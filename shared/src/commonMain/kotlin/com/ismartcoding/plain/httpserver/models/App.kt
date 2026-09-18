@@ -9,7 +9,6 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 @GraphQLType
 data class App(
     val clientId: String,
-    val usbConnected: Boolean,
     val urlToken: String,
     val httpPort: Int,
     val httpsPort: Int,

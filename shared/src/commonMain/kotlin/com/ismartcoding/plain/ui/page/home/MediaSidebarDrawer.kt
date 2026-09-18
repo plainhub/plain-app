@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationDrawerItemDefaults
@@ -63,10 +64,18 @@ fun <T : IData> MediaSidebarDrawer(
     var tagsExpanded by remember { mutableStateOf(true) }
     var extensionsExpanded by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.Default) {
-            mediaFoldersVM.loadAsync()
-            tagsVM.loadAsync()
+    // Drawer data loads on first open, not on page entry: the drawer stays
+    // composed (hidden) inside ModalNavigationDrawer, so an eager load would
+    // land mid enter-transition and recompose its rows while the page is
+    // still animating up. Pages still preload folders/tags via their own
+    // post-transition reload, so this is only a fallback.
+    val openLoader = remember { OnceOnOpenLoader() }
+    LaunchedEffect(drawerState.targetValue) {
+        if (openLoader.shouldLoad(drawerState.targetValue == DrawerValue.Open)) {
+            scope.launch(Dispatchers.Default) {
+                mediaFoldersVM.loadAsync()
+                tagsVM.loadAsync()
+            }
         }
     }
     // Keep folder counts and the trash badge fresh when rows are
@@ -239,5 +248,20 @@ fun <T : IData> MediaSidebarDrawer(
 
     TagNameDialog(tagsVM) {
         tagsVM.loadAsync()
+    }
+}
+
+/**
+ * Fires exactly once, on the first observed "open" state — used to defer a
+ * hidden drawer's data load until the user actually opens it. Pure state
+ * machine so the firing rule is unit-testable without composition.
+ */
+class OnceOnOpenLoader {
+    private var fired = false
+
+    fun shouldLoad(isOpen: Boolean): Boolean {
+        if (!isOpen || fired) return false
+        fired = true
+        return true
     }
 }

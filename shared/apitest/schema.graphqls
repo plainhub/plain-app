@@ -257,7 +257,6 @@ type AndroidDeviceInfo {
 
 type App {
   clientId: String!
-  usbConnected: Boolean!
   urlToken: String!
   httpPort: Int!
   httpsPort: Int!

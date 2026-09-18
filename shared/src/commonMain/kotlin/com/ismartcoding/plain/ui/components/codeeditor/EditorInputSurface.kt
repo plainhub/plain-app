@@ -70,7 +70,9 @@ fun EditorInputSurface(controller: EditorController) {
     Box(modifier = Modifier.fillMaxWidth()) {
         if (item != null) {
             val widthDp = if (controller.wrapContent.value) {
-                with(density) { (info.viewportSize.width - gutterWidthPx).toDp() }
+                // Match the row Text's wrap width (cell minus RowTrailingPad) so the
+                // caret and wrapped text align with the rendered rows.
+                with(density) { (info.viewportSize.width - gutterWidthPx - RowTrailingPad.toPx()).toDp() }
             } else {
                 with(density) { maxOf(controller.contentWidthPx.value, info.viewportSize.width * 0.5f).toDp() }
             }

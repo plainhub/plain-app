@@ -6,7 +6,7 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.DAudioPlaylist
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 
-data class AudioHomeArtist(val name: String, val itemCount: Int, val playCount: Long)
+data class AudioHomeArtist(val name: String, val itemCount: Int, val playCount: Long, val samplePath: String)
 
 class AudioHomeViewModel : ViewModel() {
     val playlists = mutableStateOf<List<Pair<DAudioPlaylist, Int>>>(listOf())
@@ -37,7 +37,7 @@ class AudioHomeViewModel : ViewModel() {
             .filter { it.artist.isNotBlank() }
             .groupBy { it.artist }
             .map { (name, list) ->
-                AudioHomeArtist(name = name, itemCount = list.size, playCount = playCounts[name] ?: 0)
+                AudioHomeArtist(name = name, itemCount = list.size, playCount = playCounts[name] ?: 0, samplePath = list.first().path)
             }
             .sortedWith(compareByDescending<AudioHomeArtist> { it.playCount }.thenBy { it.name })
     }

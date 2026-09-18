@@ -135,7 +135,7 @@ fun AudioArtistPage(
                             .padding(horizontal = 20.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        ArtistAvatar(name = artistName, gradientIndex = artistName.hashCode(), size = 96)
+                        ArtistAvatar(name = artistName, artworkPath = items.firstOrNull()?.path, size = 96.dp)
                         Column(modifier = Modifier.weight(1f).padding(start = 16.dp)) {
                             Text(
                                 text = artistName,
