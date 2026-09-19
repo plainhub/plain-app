@@ -61,6 +61,13 @@ Service (or use Android's explicit app/service stop controls). Keeping desktop
 access active can consume battery, especially with Keep awake enabled. Active
 authenticated browser requests now correctly keep a fresh idle window.
 
+Physical-phone follow-up on the owner's Pixel 9 Pro / Android 17 also passed:
+after removing both debug activity tasks from Recents, the debug HTTP foreground
+service and wake lock remained active. One authorized outgoing SMS was retained
+as sent, and both of the owner's replies appeared in the open browser conversation
+without a reload. The test used an isolated browser and USB-forwarded connection;
+a separate HTTP check over the LAN also returned 200. The phone was USB-powered.
+
 Tests above are not an overnight battery/Doze soak or proof across every OEM.
 The physical Pixel's release installation was not replaced. Force-stop and OS
 restrictions remain authoritative. Network changes and missed frontend events
