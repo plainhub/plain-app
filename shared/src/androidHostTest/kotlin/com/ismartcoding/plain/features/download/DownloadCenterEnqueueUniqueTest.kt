@@ -1,10 +1,14 @@
 package com.ismartcoding.plain.features.download
 
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -95,6 +99,7 @@ class DownloadCenterEnqueueUniqueTest {
 
         val fresh = DummyTask(TASK_ID)
         assertTrue(DownloadCenter.enqueueUnique(fresh))
+        awaitStatus(DownloadStatus.DOWNLOADING)
         assertTrue(first.refreshed, "a re-run must merge the fresh task's transport context (e.g. new endpoint)")
         assertFalse(fresh.refreshed, "the discarded fresh task is never the one refreshed")
         releaseGate()
@@ -142,7 +147,89 @@ class DownloadCenterEnqueueUniqueTest {
 
     private suspend fun releaseGate() {
         released = true
-        gate.send(Unit)
+        withTimeout(10_000) { gate.send(Unit) }
+    }
+
+    @Test
+    fun rerunCannotExecuteWhilePreviousEngineIsStillReturning() = runBlocking {
+        val firstTerminal = CompletableDeferred<Unit>()
+        val finishFirst = CompletableDeferred<Unit>()
+        val secondStarted = CompletableDeferred<Unit>()
+        val finishSecond = CompletableDeferred<Unit>()
+        val executions = java.util.concurrent.atomic.AtomicInteger()
+        DownloadCenter.registerEngine(TEST_KIND, object : DownloadEngine {
+            override suspend fun execute(task: DownloadTaskHandle) {
+                if (executions.incrementAndGet() == 1) {
+                    task.status = DownloadStatus.COMPLETED
+                    firstTerminal.complete(Unit)
+                    finishFirst.await()
+                } else {
+                    secondStarted.complete(Unit)
+                    finishSecond.await()
+                    task.status = DownloadStatus.COMPLETED
+                }
+            }
+        })
+        try {
+            assertTrue(DownloadCenter.enqueueUnique(DummyTask(TASK_ID)))
+            withTimeout(5000) { firstTerminal.await() }
+            assertTrue(DownloadCenter.enqueueUnique(DummyTask(TASK_ID)))
+            assertEquals(null, withTimeoutOrNull(300) { secondStarted.await(); true },
+                "a terminal status must not let two engines mutate the same task concurrently")
+            finishFirst.complete(Unit)
+            withTimeout(5000) { secondStarted.await() }
+            assertEquals(DownloadStatus.DOWNLOADING, DownloadCenter.get(TASK_ID)?.status)
+            finishSecond.complete(Unit)
+            awaitStatus(DownloadStatus.COMPLETED)
+        } finally {
+            finishFirst.complete(Unit)
+            finishSecond.complete(Unit)
+        }
+    }
+
+    @Test
+    fun resumeWaitsForCanceledExecutionCleanup() = runBlocking {
+        val started = CompletableDeferred<Unit>()
+        val cleaning = CompletableDeferred<Unit>()
+        val finishCleanup = CompletableDeferred<Unit>()
+        val resumed = CompletableDeferred<Unit>()
+        val finishResumed = CompletableDeferred<Unit>()
+        val executions = java.util.concurrent.atomic.AtomicInteger()
+        DownloadCenter.registerEngine(TEST_KIND, object : DownloadEngine {
+            override suspend fun execute(task: DownloadTaskHandle) {
+                if (executions.incrementAndGet() == 1) {
+                    started.complete(Unit)
+                    try {
+                        CompletableDeferred<Unit>().await()
+                    } finally {
+                        withContext(NonCancellable) {
+                            cleaning.complete(Unit)
+                            finishCleanup.await()
+                        }
+                    }
+                } else {
+                    resumed.complete(Unit)
+                    finishResumed.await()
+                    task.status = DownloadStatus.COMPLETED
+                }
+            }
+        })
+        try {
+            assertTrue(DownloadCenter.enqueueUnique(DummyTask(TASK_ID)))
+            withTimeout(5000) { started.await() }
+            assertTrue(DownloadCenter.pause(TASK_ID))
+            withTimeout(5000) { cleaning.await() }
+            assertTrue(DownloadCenter.resume(TASK_ID))
+            assertEquals(null, withTimeoutOrNull(300) { resumed.await(); true })
+            finishCleanup.complete(Unit)
+            withTimeout(5000) { resumed.await() }
+            assertEquals(DownloadStatus.DOWNLOADING, DownloadCenter.get(TASK_ID)?.status)
+            finishResumed.complete(Unit)
+            awaitStatus(DownloadStatus.COMPLETED)
+        } finally {
+            finishCleanup.complete(Unit)
+            finishResumed.complete(Unit)
+        }
     }
 
     companion object {

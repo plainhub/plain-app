@@ -93,3 +93,40 @@ restrictions remain authoritative. Network changes and missed frontend events
 also require client recovery; the related #371 frontend work is separate.
 
 Assignment was requested from the owner because self-assignment was denied.
+
+## Upstream integration and download-queue verification
+
+Merged upstream `124e0ccbb` without conflicts. Verification exposed two separate
+download-test failures, outside the SMS/background-service changes:
+
+- The fake engine used an unsynchronized mutable map for gates accessed from
+  multiple threads. Concurrent creation could release one gate while the engine
+  waited on another. Replaced it with atomic `ConcurrentHashMap.computeIfAbsent`,
+  and made the other cross-thread test collections safe.
+- A task's terminal status could be observed before its engine had returned.
+  Re-enqueueing immediately let two queue workers execute the same mutable task,
+  with old finalization able to mark the new run failed. A controlled test held
+  the first engine at its return boundary and failed on the original queue.
+
+Each dispatch now has an execution identity and predecessor-completion signal.
+Successors wait for predecessor cleanup; canceled, removed and superseded entries
+cannot start or normalize the newer run's status. Job publication precedes engine
+start so cancellation cannot miss a just-starting job. Fresh transport context is
+applied when the successor starts, not while the previous engine is still using it.
+The registry lock is not held while waiting or invoking completion callbacks.
+
+Dispatch stays ordered even beyond the former channel buffer capacity: an
+unbounded channel replaces the old overflow-send coroutines. This does not impose
+a new overall queue-size bound (the old registry/overflow coroutines were already
+unbounded). The existing three-worker concurrency cap remains; waiting for an old
+run's cleanup can occupy a worker until that cleanup finishes.
+
+Regression coverage includes terminal re-enqueue overlap, pause/resume during
+cancellation cleanup, removing queued work, a 100-task burst, duplicate rejection,
+missing engines, errors/retry, concurrency limiting and progress updates. Channel
+waits in the enqueue tests now have explicit deadlines instead of hanging forever.
+The combined tree passes all debug APK builds and the full Android host suite:
+1,122 passed, one skipped (107 suites). All 15 download tests also passed in five
+consecutive forced test reruns, followed by another passing full suite/build.
+These are real coroutine/queue tests with
+fake transfer engines, not an end-to-end network/download or iOS device test.
