@@ -161,4 +161,21 @@
     <string name="download_failed">İndirme başarısız</string>
     <string name="save_to">Kaydet</string>
     <string name="recent_used">Son kullanılan</string>
+
+    <string name="downloads">İndirmeler</string>
+    <string name="in_progress">Devam ediyor</string>
+    <string name="completed">Tamamlandı</string>
+    <string name="queued">Sırada</string>
+    <string name="failed">Başarısız</string>
+    <string name="canceled">İptal edildi</string>
+    <string name="partial_failure">Kısmen başarısız</string>
+    <string name="downloading_file">%1$s indiriliyor (%2$d/%3$d)</string>
+    <string name="reading_folder">Klasör okunuyor…</string>
+    <string name="packing">Paketleniyor…</string>
+    <string name="clear_completed">Tamamlananları temizle</string>
+    <string name="clear_completed_confirm">Tamamlanan tüm indirmeler listeden silinsin mi?</string>
+    <string name="no_running_downloads">Devam eden indirme yok</string>
+    <string name="no_finished_downloads">Tamamlanan indirme yok</string>
+    <string name="saved_n_of_m">%2$d öğeden %1$d kaydedildi</string>
+    <string name="saved_to_x">%1$s konumuna kaydedildi</string>
 </resources>

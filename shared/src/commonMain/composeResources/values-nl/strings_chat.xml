@@ -161,4 +161,21 @@
     <string name="download_failed">Download mislukt</string>
     <string name="save_to">Opslaan in</string>
     <string name="recent_used">Recent</string>
+
+    <string name="downloads">Downloads</string>
+    <string name="in_progress">Bezig</string>
+    <string name="completed">Voltooid</string>
+    <string name="queued">In wachtrij</string>
+    <string name="failed">Mislukt</string>
+    <string name="canceled">Geannuleerd</string>
+    <string name="partial_failure">Deels mislukt</string>
+    <string name="downloading_file">%1$s downloaden (%2$d/%3$d)</string>
+    <string name="reading_folder">Map lezen…</string>
+    <string name="packing">Inpakken…</string>
+    <string name="clear_completed">Voltooid wissen</string>
+    <string name="clear_completed_confirm">Alle voltooide downloads uit de lijst wissen?</string>
+    <string name="no_running_downloads">Geen actieve downloads</string>
+    <string name="no_finished_downloads">Geen voltooide downloads</string>
+    <string name="saved_n_of_m">%1$d van %2$d items opgeslagen</string>
+    <string name="saved_to_x">Opgeslagen in %1$s</string>
 </resources>

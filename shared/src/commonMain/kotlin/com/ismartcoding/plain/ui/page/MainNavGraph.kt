@@ -13,8 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.ismartcoding.plain.chat.data.ChatTargetType
@@ -79,6 +86,11 @@ import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.home.HomePage
 import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorListPage
 import com.ismartcoding.plain.ui.page.share.ShareImagePage
+import com.ismartcoding.plain.features.download.DownloadCenter
+import com.ismartcoding.plain.features.download.isTerminalDownloadStatus
+import com.ismartcoding.plain.features.share.SharedFolderBatchTask
+import com.ismartcoding.plain.ui.components.downloads.DownloadFloatingWidget
+import com.ismartcoding.plain.ui.components.downloads.DownloadListSheet
 import com.ismartcoding.plain.ui.page.sharedfolder.SharedFolderPage
 import com.ismartcoding.plain.ui.page.imageeditor.ImageEditorPage
 import com.ismartcoding.plain.ui.page.images.ImagesPage
@@ -136,15 +148,23 @@ fun MainNavGraph(
     val audioFoldersVM = viewModel(key = "audioFoldersVM") { MediaFoldersViewModel() }
     val audioCastVM = viewModel(key = "audioCastVM") { CastViewModel() }
     val audioHomeVM = viewModel(key = "audioHomeVM") { AudioHomeViewModel() }
-    NavHost(
-        modifier = Modifier.background(MaterialTheme.colorScheme.surface),
-        navController = navController,
-        startDestination = Routing.Home,
-        enterTransition = { navEnterTransition() },
-        exitTransition = { navExitTransition() },
-        popEnterTransition = { navPopEnterTransition() },
-        popExitTransition = { navPopExitTransition() },
-    ) {
+    // App-level overlay host: the download widget and its list sheet sit
+    // above every page so background share batches stay reachable.
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    var showDownloads by remember { mutableStateOf(false) }
+    val tasksMap = DownloadCenter.progress.collectAsState().value
+    val shareTasks = tasksMap.values.filterIsInstance<SharedFolderBatchTask>()
+    val onShareFolderPage = backStackEntry?.destination?.hasRoute<Routing.SharedFolder>() == true
+    Box(modifier = Modifier.fillMaxSize()) {
+        NavHost(
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+            navController = navController,
+            startDestination = Routing.Home,
+            enterTransition = { navEnterTransition() },
+            exitTransition = { navExitTransition() },
+            popEnterTransition = { navPopEnterTransition() },
+            popExitTransition = { navPopExitTransition() },
+        ) {
         composable<Routing.Home> {
             val selectedTab by mainVM.currentRootTab
             val onTabSelected: (Int) -> Unit = { mainVM.currentRootTab.value = it }
@@ -392,6 +412,20 @@ fun MainNavGraph(
                 navController = navController,
             )
         }
+        }
+
+        // Hidden while the share page itself is open (it has its own mini
+        // bar); shown as soon as batches run in the background elsewhere.
+        if (!onShareFolderPage && shareTasks.any { !it.status.isTerminalDownloadStatus() }) {
+            DownloadFloatingWidget(
+                tasks = shareTasks,
+                onClick = { showDownloads = true },
+            )
+        }
+    }
+
+    if (showDownloads) {
+        DownloadListSheet(onDismiss = { showDownloads = false })
     }
 }
 

@@ -56,4 +56,10 @@
         <item quantity="one">已傳送到 %1$d 個聊天</item>
         <item quantity="other">已傳送到 %1$d 個聊天</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="other">已儲存 %1$d 項</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="other">已保留 %1$d 個檔案</item>
+    </plurals>
 </resources>

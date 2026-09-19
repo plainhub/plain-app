@@ -6,7 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.db.DMessageShare
+import com.ismartcoding.plain.features.download.DownloadCenter
+import com.ismartcoding.plain.features.download.isTerminalDownloadStatus
 import com.ismartcoding.plain.features.share.SharedFileDto
+import com.ismartcoding.plain.features.share.SharedFolderBatchTask
+import com.ismartcoding.plain.features.share.SharedFolderDownloadEngine
 import com.ismartcoding.plain.features.share.SharedInfoDto
 import com.ismartcoding.plain.features.share.SharedLink
 import com.ismartcoding.plain.features.share.SharedLinkClient
@@ -16,7 +20,6 @@ import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.DownloadTempFileHandle
 import com.ismartcoding.plain.platform.LocaleHelper
-import com.ismartcoding.plain.platform.getDownloadsDirPath
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -29,8 +32,9 @@ internal data class Crumb(val virtualPath: String, val name: String)
 
 /**
  * State holder for [SharedFolderPage]: owns the share/navigation state and
- * wraps the [SharedFolderTransfer] engines with progress, status and result
- * reporting. The page composable is layout wiring only.
+ * the in-page media preview. Download/sync transfers are enqueued into the
+ * process-level [SharedFolderDownloadEngine] and survive page exit; progress
+ * is read back from [DownloadCenter].
  */
 internal class SharedFolderState(
     private val messageId: String,
@@ -52,9 +56,6 @@ internal class SharedFolderState(
     var selected by mutableStateOf(setOf<SharedFileDto>())
     var downloadTarget by mutableStateOf<SharedFileDto?>(null)
     var showSaveSelectedSheet by mutableStateOf(false)
-    var syncStatus by mutableStateOf<String?>(null)
-        private set
-    private var progress by mutableStateOf(mapOf<String, Float>())
     private var previewLoading by mutableStateOf(setOf<String>())
 
     /** Per-directory content cache: entering a visited directory renders instantly from here. */
@@ -140,9 +141,19 @@ internal class SharedFolderState(
         selected = if (selected.containsAll(entries)) emptySet() else entries.toSet()
     }
 
-    fun progressOf(entry: SharedFileDto): Float? = progress[entry.virtualPath]
-
     fun isPreviewLoading(entry: SharedFileDto): Boolean = previewLoading.contains(entry.virtualPath)
+
+    /** Batch tasks belonging to this share, in insertion order. */
+    fun shareTasks(): List<SharedFolderBatchTask> = DownloadCenter.progress.value.values
+        .filterIsInstance<SharedFolderBatchTask>()
+        .filter { it.messageId == messageId }
+
+    /** True while a batch covering [entry] is queued or downloading. */
+    fun isEntryBusy(entry: SharedFileDto): Boolean = DownloadCenter.progress.value.values.any {
+        it is SharedFolderBatchTask && it.messageId == messageId &&
+            !it.status.isTerminalDownloadStatus() &&
+            it.entries.any { e -> e.virtualPath == entry.virtualPath }
+    }
 
     fun browserUrl(): String? {
         val msg = shareMsg ?: return null
@@ -172,89 +183,37 @@ internal class SharedFolderState(
         }
     }
 
-    fun downloadFileToDownloads(entry: SharedFileDto) {
+    /** Enqueue one entry save (file streams, dir mirrors) into [targetDir]; "" = public Downloads. */
+    fun enqueueEntry(target: SharedFileDto, targetDir: String) {
         val (link, urlToken) = transferContext() ?: return
-        progress = progress + (entry.virtualPath to 0f)
-        scope.launch {
-            val saved = SharedFolderTransfer.downloadFileToDownloads(link, urlToken, entry)
-            progress = progress - entry.virtualPath
-            reportResult(saved.isNotEmpty())
+        if (target.isDir) {
+            SharedFolderDownloadEngine.enqueueDirSync(messageId, link, urlToken, target, targetDir)
+        } else {
+            SharedFolderDownloadEngine.enqueueFile(messageId, link, urlToken, target, targetDir)
         }
     }
 
-    fun downloadFileToDir(entry: SharedFileDto, dir: String) {
+    /** Enqueue one directory entry as a single zip archive. */
+    fun enqueueEntryZip(target: SharedFileDto) {
         val (link, urlToken) = transferContext() ?: return
-        progress = progress + (entry.virtualPath to 0f)
-        scope.launch {
-            val ok = SharedFolderTransfer.downloadFileToDir(link, urlToken, entry, dir)
-            progress = progress - entry.virtualPath
-            reportResult(ok)
-        }
+        SharedFolderDownloadEngine.enqueueZip(messageId, link, urlToken, listOf(target), "${target.name}.zip")
     }
 
-    fun downloadZipToDownloads(entry: SharedFileDto) {
-        val (link, urlToken) = transferContext() ?: return
-        progress = progress + (entry.virtualPath to 0f)
-        scope.launch {
-            val saved = SharedFolderTransfer.downloadZipToDownloads(link, urlToken, entry)
-            progress = progress - entry.virtualPath
-            reportResult(saved.isNotEmpty())
-        }
-    }
-
-    /** Mirror a shared directory into a local [baseDir] subfolder, no zip. */
-    fun syncDirTo(entry: SharedFileDto, baseDir: String) {
-        val (link, urlToken) = transferContext() ?: return
-        val targetDir = baseDir.trimEnd('/') + "/" + entry.name
-        syncStatus = LocaleHelper.getString(Res.string.syncing_files)
-        scope.launch {
-            val ok = runCatching {
-                withIO { SharedFolderTransfer.syncDirectory(link, urlToken, entry.virtualPath, "", targetDir) }
-            }.isSuccess
-            syncStatus = null
-            reportResult(ok)
-        }
-    }
-
-    /** Saves the current selection into the public Downloads dir. */
-    fun saveSelectionToDownloads() {
+    /** Enqueue the current multi-selection into [targetDir]; "" = public Downloads. */
+    fun enqueueSelection(targetDir: String) {
         val (link, urlToken) = transferContext() ?: return
         if (selected.isEmpty()) return
-        syncStatus = LocaleHelper.getString(Res.string.syncing_files)
-        scope.launch {
-            val okCount = SharedFolderTransfer.saveEntriesToDownloads(link, urlToken, sortedSelection(), getDownloadsDirPath())
-            syncStatus = null
-            reportResult(okCount == selected.size && selected.isNotEmpty())
-            clearSelection()
-        }
+        SharedFolderDownloadEngine.enqueueMulti(messageId, link, urlToken, sortedSelection(), targetDir)
+        clearSelection()
     }
 
-    /** Saves the current selection into a picked directory. */
-    fun saveSelectionToDir(dir: String) {
+    /** Enqueue the current selection as one zip archive into Downloads/PlainApp. */
+    fun enqueueSelectionZip() {
         val (link, urlToken) = transferContext() ?: return
         if (selected.isEmpty()) return
-        syncStatus = LocaleHelper.getString(Res.string.syncing_files)
-        scope.launch {
-            val okCount = SharedFolderTransfer.saveEntriesToDir(link, urlToken, sortedSelection(), dir)
-            syncStatus = null
-            reportResult(okCount == selected.size && selected.isNotEmpty())
-            clearSelection()
-        }
-    }
-
-    /** Zips the selected file entries into one archive in the Downloads dir. */
-    fun zipSelection() {
-        val (link, urlToken) = transferContext() ?: return
         val zipName = (rootInfo?.name ?: "shared") + "_selected.zip"
-        val dest = "${getDownloadsDirPath().trimEnd('/')}/PlainApp/$zipName"
-        syncStatus = LocaleHelper.getString(Res.string.syncing_files)
-        scope.launch {
-            val ok = runCatching {
-                withIO { SharedFolderTransfer.zipEntriesTo(link, urlToken, sortedSelection(), dest) }
-            }.isSuccess
-            syncStatus = null
-            reportResult(ok)
-        }
+        SharedFolderDownloadEngine.enqueueZip(messageId, link, urlToken, sortedSelection(), zipName)
+        clearSelection()
     }
 
     fun clearPreviewHandles() {
@@ -267,15 +226,6 @@ internal class SharedFolderState(
         val urlToken = rootInfo?.urlToken ?: return null
         val link = activeLink ?: return null
         return link to urlToken
-    }
-
-    /** Report download success/failure once an operation finishes. */
-    private fun reportResult(ok: Boolean) {
-        if (ok) {
-            DialogHelper.showSuccess(Res.string.saved)
-        } else {
-            DialogHelper.showErrorDialog(LocaleHelper.getString(Res.string.download_failed))
-        }
     }
 
     private fun sortedSelection(): List<SharedFileDto> =

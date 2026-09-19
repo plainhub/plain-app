@@ -56,4 +56,10 @@
         <item quantity="one">%1$d件のチャットに送信しました</item>
         <item quantity="other">%1$d件のチャットに送信しました</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="other">%1$d 件保存しました</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="other">%1$d 件のファイルを保持</item>
+    </plurals>
 </resources>

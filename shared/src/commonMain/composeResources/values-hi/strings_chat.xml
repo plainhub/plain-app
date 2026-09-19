@@ -161,4 +161,21 @@
     <string name="download_failed">डाउनलोड विफल</string>
     <string name="save_to">सहेजें</string>
     <string name="recent_used">हाल के</string>
+
+    <string name="downloads">डाउनलोड</string>
+    <string name="in_progress">चल रहे हैं</string>
+    <string name="completed">पूर्ण</string>
+    <string name="queued">कतार में</string>
+    <string name="failed">विफल</string>
+    <string name="canceled">रद्द</string>
+    <string name="partial_failure">आंशिक विफल</string>
+    <string name="downloading_file">%1$s डाउनलोड हो रहा है (%2$d/%3$d)</string>
+    <string name="reading_folder">फ़ोल्डर पढ़ा जा रहा है…</string>
+    <string name="packing">पैक हो रहा है…</string>
+    <string name="clear_completed">पूर्ण साफ़ करें</string>
+    <string name="clear_completed_confirm">सूची से सभी पूर्ण डाउनलोड हटाएँ?</string>
+    <string name="no_running_downloads">कोई डाउनलोड चल रहा है</string>
+    <string name="no_finished_downloads">कोई पूर्ण डाउनलोड नहीं</string>
+    <string name="saved_n_of_m">%2$d में से %1$d सहेजे गए</string>
+    <string name="saved_to_x">%1$s में सहेजा गया</string>
 </resources>

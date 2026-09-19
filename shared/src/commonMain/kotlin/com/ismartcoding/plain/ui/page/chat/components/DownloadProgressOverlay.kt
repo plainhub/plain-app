@@ -15,7 +15,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.chat.download.DownloadQueue
-import com.ismartcoding.plain.chat.download.DownloadStatus
+import com.ismartcoding.plain.features.download.DownloadStatus
 import com.ismartcoding.plain.ui.base.PIconButton
 
 @Composable

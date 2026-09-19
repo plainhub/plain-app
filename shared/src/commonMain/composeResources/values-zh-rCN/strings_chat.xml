@@ -161,4 +161,21 @@
     <string name="download_failed">下载失败</string>
     <string name="save_to">保存到</string>
     <string name="recent_used">最近使用</string>
+
+    <string name="downloads">下载</string>
+    <string name="in_progress">进行中</string>
+    <string name="completed">已完成</string>
+    <string name="queued">排队中</string>
+    <string name="failed">失败</string>
+    <string name="canceled">已取消</string>
+    <string name="partial_failure">部分失败</string>
+    <string name="downloading_file">正在下载 %1$s（%2$d/%3$d）</string>
+    <string name="reading_folder">正在读取文件夹…</string>
+    <string name="packing">打包中…</string>
+    <string name="clear_completed">清除已完成</string>
+    <string name="clear_completed_confirm">确定清除列表中所有已完成的下载吗？</string>
+    <string name="no_running_downloads">暂无进行中的下载</string>
+    <string name="no_finished_downloads">暂无已完成的下载</string>
+    <string name="saved_n_of_m">已保存 %1$d/%2$d 项</string>
+    <string name="saved_to_x">已保存到 %1$s</string>
 </resources>

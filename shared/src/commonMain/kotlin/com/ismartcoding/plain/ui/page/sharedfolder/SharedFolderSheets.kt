@@ -3,11 +3,13 @@ package com.ismartcoding.plain.ui.page.sharedfolder
 import androidx.compose.runtime.Composable
 import com.ismartcoding.plain.features.share.SharedFileDto
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.platform.getDownloadsDirPath
 import com.ismartcoding.plain.ui.components.SaveToSheet
 import org.jetbrains.compose.resources.stringResource
 
-/** Save-as sheet for one entry: folders mirror or zip, files stream. */
+/**
+ * Save-as sheet for one entry, reusing the shared [SaveToSheet]: folders
+ * mirror (or zip), files stream. The chosen destination enqueues a batch.
+ */
 @Composable
 internal fun SharedFolderDownloadSheet(
     state: SharedFolderState,
@@ -18,17 +20,16 @@ internal fun SharedFolderDownloadSheet(
         onDismiss = { state.downloadTarget = null },
         onDownloads = {
             state.downloadTarget = null
-            if (target.isDir) state.syncDirTo(target, "${getDownloadsDirPath().trimEnd('/')}/PlainApp")
-            else state.downloadFileToDownloads(target)
+            state.enqueueEntry(target, "")
         },
         onDirectory = { dir ->
             state.downloadTarget = null
-            if (target.isDir) state.syncDirTo(target, dir) else state.downloadFileToDir(target, dir)
+            state.enqueueEntry(target, dir)
         },
         onZip = target.takeIf { it.isDir }?.let { entry ->
             {
                 state.downloadTarget = null
-                state.downloadZipToDownloads(entry)
+                state.enqueueEntryZip(entry)
             }
         },
     )
@@ -42,15 +43,15 @@ internal fun SharedFolderSaveSelectionSheet(state: SharedFolderState) {
         onDismiss = { state.showSaveSelectedSheet = false },
         onDownloads = {
             state.showSaveSelectedSheet = false
-            state.saveSelectionToDownloads()
+            state.enqueueSelection("")
         },
         onDirectory = { dir ->
             state.showSaveSelectedSheet = false
-            state.saveSelectionToDir(dir)
+            state.enqueueSelection(dir)
         },
         onZip = {
             state.showSaveSelectedSheet = false
-            state.zipSelection()
+            state.enqueueSelectionZip()
         },
     )
 }

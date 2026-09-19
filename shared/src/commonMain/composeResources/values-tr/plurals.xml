@@ -56,4 +56,10 @@
         <item quantity="one">%1$d sohbete gönderildi</item>
         <item quantity="other">%1$d sohbete gönderildi</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="other">%1$d öğe kaydedildi</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="other">%1$d dosya korundu</item>
+    </plurals>
 </resources>

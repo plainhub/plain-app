@@ -56,4 +56,12 @@
         <item quantity="one">Sent to %1$d chat</item>
         <item quantity="other">Sent to %1$d chats</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="one">Saved %1$d item</item>
+        <item quantity="other">Saved %1$d items</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="one">Kept %1$d file</item>
+        <item quantity="other">Kept %1$d files</item>
+    </plurals>
 </resources>

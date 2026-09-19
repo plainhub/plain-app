@@ -161,4 +161,21 @@
     <string name="download_failed">Error al descargar</string>
     <string name="save_to">Guardar en</string>
     <string name="recent_used">Recientes</string>
+
+    <string name="downloads">Descargas</string>
+    <string name="in_progress">En curso</string>
+    <string name="completed">Completadas</string>
+    <string name="queued">En cola</string>
+    <string name="failed">Error</string>
+    <string name="canceled">Canceladas</string>
+    <string name="partial_failure">Error parcial</string>
+    <string name="downloading_file">Descargando %1$s (%2$d/%3$d)</string>
+    <string name="reading_folder">Leyendo carpeta…</string>
+    <string name="packing">Empaquetando…</string>
+    <string name="clear_completed">Borrar completadas</string>
+    <string name="clear_completed_confirm">¿Borrar todas las descargas terminadas de la lista?</string>
+    <string name="no_running_downloads">No hay descargas en curso</string>
+    <string name="no_finished_downloads">No hay descargas terminadas</string>
+    <string name="saved_n_of_m">%1$d de %2$d elementos guardados</string>
+    <string name="saved_to_x">Guardado en %1$s</string>
 </resources>

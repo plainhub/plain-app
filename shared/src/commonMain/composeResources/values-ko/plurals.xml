@@ -56,4 +56,10 @@
         <item quantity="one">%1$d개의 채팅에 전송됨</item>
         <item quantity="other">%1$d개의 채팅에 전송됨</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="other">%1$d개 저장됨</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="other">%1$d개 파일 유지됨</item>
+    </plurals>
 </resources>

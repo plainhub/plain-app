@@ -161,4 +161,21 @@
     <string name="download_failed">பதிவிறக்கம் தோல்வி</string>
     <string name="save_to">சேமிக்கவும்</string>
     <string name="recent_used">சமீபத்தியவை</string>
+
+    <string name="downloads">பதிவிறக்கங்கள்</string>
+    <string name="in_progress">நடைபெறுகிறது</string>
+    <string name="completed">முடிந்தது</string>
+    <string name="queued">வரிசையில்</string>
+    <string name="failed">தோல்வி</string>
+    <string name="canceled">ரத்து</string>
+    <string name="partial_failure">பகுதி தோல்வி</string>
+    <string name="downloading_file">%1$s பதிவிறக்குகிறது (%2$d/%3$d)</string>
+    <string name="reading_folder">கோப்புறை படிக்கிறது…</string>
+    <string name="packing">பேக் செய்கிறது…</string>
+    <string name="clear_completed">முடிந்தவற்றை அழி</string>
+    <string name="clear_completed_confirm">முடிந்த பதிவிறக்கங்களை பட்டியலிலிருந்து அழிக்கவா?</string>
+    <string name="no_running_downloads">நடைபெறும் பதிவிறக்கம் இல்லை</string>
+    <string name="no_finished_downloads">முடிந்த பதிவிறக்கம் இல்லை</string>
+    <string name="saved_n_of_m">%2$d-இல் %1$d சேமிக்கப்பட்டது</string>
+    <string name="saved_to_x">%1$s-இல் சேமிக்கப்பட்டது</string>
 </resources>

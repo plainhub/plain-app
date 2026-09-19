@@ -39,38 +39,6 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-/** Info strip under the top bar: item count plus expiry. */
-@Composable
-internal fun MetaBanner(info: SharedInfoDto?) {
-    if (info == null) return
-    val parts = mutableListOf(stringResource(Res.string.folder_card_items, info.entries.size))
-    val expiresAt = info.expiresAtInstant
-    if (expiresAt != null) {
-        val expired = expiresAt < TimeHelper.now()
-        val dateText = expiresAt.formatDateTime()
-        parts.add(
-            if (expired) dateText
-            else stringResource(Res.string.share_expires_on, dateText),
-        )
-    }
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.cardBackgroundNormal,
-    ) {
-        Text(
-            text = parts.joinToString(" · "),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-        )
-    }
-}
-
 /** Load-failure strip with a retry action. */
 @Composable
 internal fun ErrorBanner(onRetry: () -> Unit) {
@@ -110,7 +78,7 @@ internal fun EntryRow(
     urlToken: String,
     selectMode: Boolean,
     selected: Boolean,
-    progress: Float?,
+    busy: Boolean,
     previewLoading: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
@@ -166,7 +134,7 @@ internal fun EntryRow(
                     )
                 }
             }
-            if (!selectMode && progress == null && !previewLoading) {
+            if (!selectMode && !busy && !previewLoading) {
                 PIconButton(
                     icon = Res.drawable.download,
                     contentDescription = stringResource(Res.string.download),
@@ -174,14 +142,8 @@ internal fun EntryRow(
                 ) { onDownload() }
             }
         }
-        when {
-            progress != null -> LinearProgressIndicator(
-                progress = { progress },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
-            )
-            previewLoading -> LinearProgressIndicator(
+        if (previewLoading) {
+            LinearProgressIndicator(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp, vertical = 4.dp),
