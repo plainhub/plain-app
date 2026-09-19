@@ -163,8 +163,8 @@ type Mutation {
   deleteAudioPlaylist(id: ID!): Boolean!
   addAudioPlaylistItems(id: ID!, paths: [String!]!): Boolean!
   removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
-  playAudioPlaylist(id: ID!, path: String, shuffle: Boolean): Boolean!
-  playAllAudios(shuffle: Boolean, path: String): Boolean!
+  playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): Boolean!
+  playAllAudios(shuffle: Boolean!, path: String): Boolean!
   enableImageSearch: Boolean!
   disableImageSearch: Boolean!
   cancelImageModelDownload: Boolean!
@@ -229,12 +229,6 @@ enum AccessFeatureType {
   CLIPBOARD
 }
 
-type MediaActionResult {
-  type: MediaDataType!
-  query: String!
-  affectedCount: Int!
-}
-
 type AndroidExtras {
   sdkVersion: Int!
   versionCodeName: String!
@@ -250,11 +244,6 @@ type AndroidExtras {
   javaVmVersion: String!
   glEsVersion: String!
   buildTime: Instant!
-}
-
-enum DeviceFeature {
-  MEDIA_TRASH
-  MIRROR_AUDIO
 }
 
 type App {
@@ -316,6 +305,11 @@ type AudioPlayHistory {
   duration: Long!
   playCount: Long!
   playedAt: Instant!
+}
+
+type AudioPlayback {
+  mode: MediaPlayMode!
+  currentPath: String!
 }
 
 type AudioPlaylist {
@@ -522,13 +516,6 @@ input ContentItemInput {
   label: String!
 }
 
-enum MediaDataType {
-  AUDIO
-  VIDEO
-  IMAGE
-  DOC
-}
-
 enum DataType {
   DEFAULT
   AUDIO
@@ -548,6 +535,11 @@ enum DataType {
 
 type DbTableInfo {
   idKey: String!
+}
+
+enum DeviceFeature {
+  MEDIA_TRASH
+  MIRROR_AUDIO
 }
 
 type DeviceInfo {
@@ -780,11 +772,24 @@ type Location {
 """The Long scalar type represents a signed 64-bit numeric non-fractional value"""
 scalar Long
 
+type MediaActionResult {
+  type: MediaDataType!
+  query: String!
+  affectedCount: Int!
+}
+
 type MediaBucket {
   id: ID!
   name: String!
   itemCount: Int!
   topItems: [String!]!
+}
+
+enum MediaDataType {
+  AUDIO
+  VIDEO
+  IMAGE
+  DOC
 }
 
 union MediaFileInfo = AudioFileInfo | ImageFileInfo | VideoFileInfo
@@ -983,11 +988,6 @@ type PhoneGeo {
   numberType: String!
   carrier: String!
   description: String!
-}
-
-type AudioPlayback {
-  mode: MediaPlayMode!
-  currentPath: String!
 }
 
 type PlaylistAudio {

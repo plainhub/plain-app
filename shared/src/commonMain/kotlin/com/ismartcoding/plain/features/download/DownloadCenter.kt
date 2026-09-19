@@ -38,7 +38,7 @@ object DownloadCenter {
     }
 
     fun registerEngine(kind: String, engine: DownloadEngine) {
-        engines[kind] = engine
+        tasksLock.withLock { engines[kind] = engine }
     }
 
     fun get(taskId: String): DownloadTaskHandle? = tasksLock.withLock { tasks[taskId] }
@@ -69,6 +69,7 @@ object DownloadCenter {
             return@withLock true
         }
         if (!existing.status.isTerminalDownloadStatus()) return@withLock false
+        existing.refreshFrom(task)
         existing.aborted = false
         existing.status = DownloadStatus.PENDING
         dispatch(existing)
@@ -187,9 +188,10 @@ object DownloadCenter {
     }
 
     private suspend fun executeTaskAsync(task: DownloadTaskHandle) {
-        val engine = engines[task.kind]
+        val engine = tasksLock.withLock { engines[task.kind] }
         if (engine == null) {
             LogCat.e("No engine registered for download kind ${task.kind}, failing ${task.id}")
+            task.error = "no engine registered for kind ${task.kind}"
             task.status = DownloadStatus.FAILED
             updateProgressFlow()
             return

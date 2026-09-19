@@ -29,6 +29,13 @@ interface DownloadTaskHandle {
      * mutating the original.
      */
     fun flowSnapshot(): DownloadTaskHandle
+
+    /**
+     * Merge a fresh enqueue of the same id into this finished task before a
+     * re-run (see [DownloadCenter.enqueueUnique]) — e.g. refresh the transport
+     * endpoint captured when the first attempt was built. No-op by default.
+     */
+    fun refreshFrom(fresh: DownloadTaskHandle) {}
 }
 
 /**

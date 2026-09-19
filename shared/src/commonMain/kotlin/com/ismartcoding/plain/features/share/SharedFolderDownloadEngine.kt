@@ -44,8 +44,9 @@ class SharedFolderBatchTask(
     val title: String,
     /** "" = public Downloads target; otherwise an absolute directory path. */
     val targetDir: String,
-    val link: SharedLink,
-    val urlToken: String,
+    /** Working endpoint; refreshed from a fresh enqueue before a re-run (see [refreshFrom]). */
+    var link: SharedLink,
+    var urlToken: String,
     val entries: List<SharedFileDto>,
     val zipName: String = "",
 ) : DownloadTaskHandle {
@@ -84,6 +85,13 @@ class SharedFolderBatchTask(
         s.packing = packing
         s.failures = failures.toList().toMutableList()
         return s
+    }
+
+    /** Takes over the fresh enqueue's endpoint, so re-runs survive address changes. */
+    override fun refreshFrom(fresh: DownloadTaskHandle) {
+        if (fresh !is SharedFolderBatchTask) return
+        link = fresh.link
+        urlToken = fresh.urlToken
     }
 
     /** Overall fraction 0..1; 0 while the walker is still counting. */
@@ -173,6 +181,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
     override suspend fun execute(taskHandle: DownloadTaskHandle) {
         val task = taskHandle as SharedFolderBatchTask
         task.status = DownloadStatus.DOWNLOADING
+        task.error = ""
         task.failures.clear()
         task.failedFiles = 0
         task.packing = false

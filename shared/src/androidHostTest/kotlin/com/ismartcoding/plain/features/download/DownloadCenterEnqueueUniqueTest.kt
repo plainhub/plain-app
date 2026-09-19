@@ -35,7 +35,11 @@ class DownloadCenterEnqueueUniqueTest {
         override var error: String = ""
         override var aborted: Boolean = false
         override var job: Job? = null
+        var refreshed = false
         override fun flowSnapshot(): DownloadTaskHandle = this
+        override fun refreshFrom(fresh: DownloadTaskHandle) {
+            refreshed = true
+        }
     }
 
     init {
@@ -82,6 +86,23 @@ class DownloadCenterEnqueueUniqueTest {
     }
 
     @Test
+    fun reRunRefreshesContextFromTheFreshTask() = runBlocking {
+        val first = DummyTask(TASK_ID)
+        assertTrue(DownloadCenter.enqueueUnique(first))
+        awaitStatus(DownloadStatus.DOWNLOADING)
+        releaseGate()
+        awaitStatus(DownloadStatus.COMPLETED)
+
+        val fresh = DummyTask(TASK_ID)
+        assertTrue(DownloadCenter.enqueueUnique(fresh))
+        assertTrue(first.refreshed, "a re-run must merge the fresh task's transport context (e.g. new endpoint)")
+        assertFalse(fresh.refreshed, "the discarded fresh task is never the one refreshed")
+        releaseGate()
+        awaitStatus(DownloadStatus.COMPLETED)
+        Unit
+    }
+
+    @Test
     fun taskWithoutEngineFailsVisibly() = runBlocking {
         val orphan = object : DownloadTaskHandle {
             override val id = "orphan|$TASK_ID"
@@ -97,6 +118,10 @@ class DownloadCenterEnqueueUniqueTest {
             DownloadStatus.FAILED,
             awaitTerminal(orphan.id),
             "a task whose engine is missing must fail fast, never hang or vanish",
+        )
+        assertTrue(
+            DownloadCenter.get(orphan.id)!!.error.isNotEmpty(),
+            "engine-less failures must carry a visible error, not just a log line",
         )
         DownloadCenter.remove(orphan.id)
         Unit
