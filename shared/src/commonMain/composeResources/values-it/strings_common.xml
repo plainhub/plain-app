@@ -131,6 +131,8 @@
     <string name="cut">Taglia</string>
     <string name="scan">Scansiona</string>
     <string name="scan_qrcode">Scansiona codice QR</string>
+    <string name="scan_multiple_codes_hint">Più codici rilevati. Toccane uno per aprire</string>
+    <string name="scan_no_code_found">Nessun codice rilevato</string>
     <string name="copy_link">Copia link</string>
     <string name="link">Link</string>
     <string name="pull_down_to_sync_current_feed">Scorri verso il basso per sincronizzare il feed corrente</string>

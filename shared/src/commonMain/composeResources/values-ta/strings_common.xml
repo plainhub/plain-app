@@ -131,6 +131,8 @@
     <string name="cut">கிடைக்குமள்</string>
     <string name="scan">ஸ்கேன்</string>
     <string name="scan_qrcode">கியூஆர் குறியீடு ஸ்கேன் செய்</string>
+    <string name="scan_multiple_codes_hint">பல குறியீடுகள் கண்டறியப்பட்டன. ஒன்றைத் திறக்க தட்டவும்</string>
+    <string name="scan_no_code_found">எந்தக் குறியீடும் கண்டறியப்படவில்லை</string>
     <string name="copy_link">இணைப்பை நகலெடு</string>
     <string name="link">இணைப்பு</string>
     <string name="pull_down_to_sync_current_feed">தற்போதைய செய்தியை ஒத்துகொள்</string>

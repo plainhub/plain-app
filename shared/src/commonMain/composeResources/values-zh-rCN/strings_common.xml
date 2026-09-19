@@ -131,6 +131,8 @@
     <string name="cut">剪切</string>
     <string name="scan">扫描</string>
     <string name="scan_qrcode">扫描二维码</string>
+    <string name="scan_multiple_codes_hint">识别到多个二维码，点击选择</string>
+    <string name="scan_no_code_found">未识别到二维码</string>
     <string name="copy_link">复制链接</string>
     <string name="link">链接</string>
     <string name="pull_down_to_sync_current_feed">下拉同步当前订阅</string>

@@ -94,7 +94,8 @@ actual fun getImageMeta(path: String): DImageMeta? {
 
 actual fun tryDecodeQrCode(path: String): String? = try {
     val image = UIImage.imageWithContentsOfFile(path) ?: return null
-    val ciImage = image.CIImage() ?: return null
+    // file-backed UIImages have no CIImage; bridge through CGImage instead
+    val ciImage = image.CIImage() ?: image.CGImage?.let { platform.CoreImage.CIImage.imageWithCGImage(it) } ?: return null
     val context = platform.CoreImage.CIContext.context()
     val detector = platform.CoreImage.CIDetector.detectorOfType(
         platform.CoreImage.CIDetectorTypeQRCode, context, null,

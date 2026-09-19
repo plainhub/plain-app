@@ -131,6 +131,8 @@
     <string name="cut">Ausschneiden</string>
     <string name="scan">Scannen</string>
     <string name="scan_qrcode">QR-Code scannen</string>
+    <string name="scan_multiple_codes_hint">Mehrere Codes erkannt. Zum Öffnen einen antippen</string>
+    <string name="scan_no_code_found">Kein Code erkannt</string>
     <string name="copy_link">Link kopieren</string>
     <string name="link">Link</string>
     <string name="pull_down_to_sync_current_feed">Zum Synchronisieren des aktuellen Feeds nach unten ziehen</string>
