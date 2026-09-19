@@ -68,6 +68,13 @@ as sent, and both of the owner's replies appeared in the open browser conversati
 without a reload. The test used an isolated browser and USB-forwarded connection;
 a separate HTTP check over the LAN also returned 200. The phone was USB-powered.
 
+Five further authorized physical-phone SMS exchanges also completed. Sent bubbles
+remained visible without Sending indicators, and replies appeared without browser
+reloads, including a screen-off round. Browser-offline and deliberately dropped
+WebSocket-event rounds recovered successfully. An intended hidden-tab round was
+inconclusive as a visibility test: Chromium never reported the tab hidden, although
+that message exchange succeeded. No messages were automatically resent.
+
 Tests above are not an overnight battery/Doze soak or proof across every OEM.
 The physical Pixel's release installation was not replaced. Force-stop and OS
 restrictions remain authoritative. Network changes and missed frontend events
