@@ -75,6 +75,18 @@ WebSocket-event rounds recovered successfully. An intended hidden-tab round was
 inconclusive as a visibility test: Chromium never reported the tab hidden, although
 that message exchange succeeded. No messages were automatically resent.
 
+The owner clarified that PlainApp had been foregrounded during the preceding
+five-round run. A separate repeat verified resumed activities before each send,
+before each reply, and after recovery: PlainApp was never foregrounded at these
+checks. Firefox was observed foregrounded while awake, and the debug HTTP service
+remained an Android foreground service. Five outgoing messages were observed in
+the business phone's Google Messages web conversation, each followed by exactly
+one automated reply. All ten messages persisted in the PlainApp browser without
+reloads or stuck Sending indicators. This repeat included a page-scoped network
+outage, three suppressed WebSocket frames (recovery about 44.8 seconds), and a
+sleep command before the final reply. Display power state during that receipt
+was not separately sampled. The phone remained USB-powered/forwarded.
+
 Tests above are not an overnight battery/Doze soak or proof across every OEM.
 The physical Pixel's release installation was not replaced. Force-stop and OS
 restrictions remain authoritative. Network changes and missed frontend events
