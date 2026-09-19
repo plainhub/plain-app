@@ -27,7 +27,7 @@ fun DeviceType.getText(): String {
         DeviceType.PHONE -> stringResource(Res.string.phone)
         DeviceType.TABLET -> stringResource(Res.string.tablet)
         DeviceType.TV -> stringResource(Res.string.tv)
-        DeviceType.OTHER -> stringResource(Res.string.other)
+        DeviceType.NAS, DeviceType.OTHER -> stringResource(Res.string.other)
     }
 }
 
@@ -37,7 +37,7 @@ fun DeviceType.getIcon(): DrawableResource {
         DeviceType.PHONE -> Res.drawable.smartphone
         DeviceType.TABLET -> Res.drawable.tablet
         DeviceType.TV -> Res.drawable.tv
-        DeviceType.OTHER -> Res.drawable.devices
+        DeviceType.NAS, DeviceType.OTHER -> Res.drawable.devices
     }
 }
 

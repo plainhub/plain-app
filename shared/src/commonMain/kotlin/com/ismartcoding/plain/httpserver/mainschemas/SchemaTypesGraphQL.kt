@@ -10,6 +10,7 @@ import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.MediaDataType
 import com.ismartcoding.plain.enums.DriveType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.DiscoveryMethod
@@ -33,6 +34,7 @@ fun SchemaBuilder.addMainSchemaTypes() {
     enum<ChatChannelStatus>()
     enum<MediaPlayMode>()
     enum<DataType>()
+    enum<MediaDataType>()
     enum<DriveType>()
     enum<DeviceType>()
     enum<DeviceFeature>()

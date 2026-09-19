@@ -116,6 +116,12 @@ internal fun deriveShareBatchStatus(
 object SharedFolderDownloadEngine : DownloadEngine {
     private const val PROGRESS_INTERVAL_MS = 600L
 
+    init {
+        // Every enqueue API touches this object first, so the engine is
+        // always registered before any of its tasks can reach the queue.
+        DownloadCenter.registerEngine(DOWNLOAD_KIND_SHARE, this)
+    }
+
     /** Downloads root subfolder used when saving into public Downloads. */
     private fun downloadsBase(): String = "${getDownloadsDirPath().trimEnd('/')}/PlainApp"
 
@@ -125,7 +131,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             messageId = messageId, type = ShareBatchType.FILE, title = entry.name,
             targetDir = targetDir, link = link, urlToken = urlToken, entries = listOf(entry),
         )
-        DownloadCenter.add(task)
+        DownloadCenter.enqueueUnique(task)
     }
 
     fun enqueueDirSync(messageId: String, link: SharedLink, urlToken: String, entry: SharedFileDto, targetDir: String) {
@@ -134,7 +140,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             messageId = messageId, type = ShareBatchType.SYNC, title = entry.name,
             targetDir = targetDir, link = link, urlToken = urlToken, entries = listOf(entry),
         )
-        DownloadCenter.add(task)
+        DownloadCenter.enqueueUnique(task)
     }
 
     fun enqueueZip(messageId: String, link: SharedLink, urlToken: String, entries: List<SharedFileDto>, zipName: String) {
@@ -143,7 +149,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             messageId = messageId, type = ShareBatchType.ZIP, title = zipName,
             targetDir = "", link = link, urlToken = urlToken, entries = entries, zipName = zipName,
         )
-        DownloadCenter.add(task)
+        DownloadCenter.enqueueUnique(task)
     }
 
     fun enqueueMulti(messageId: String, link: SharedLink, urlToken: String, entries: List<SharedFileDto>, targetDir: String) {
@@ -154,7 +160,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             title = "${entries.firstOrNull()?.name ?: ""}${if (entries.size > 1) " (+${entries.size - 1})" else ""}",
             targetDir = targetDir, link = link, urlToken = urlToken, entries = entries,
         )
-        DownloadCenter.add(task)
+        DownloadCenter.enqueueUnique(task)
     }
 
     /** Re-runs only the failed files of a finished batch. */

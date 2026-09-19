@@ -145,7 +145,7 @@ suspend fun audioPlaylistItemCount(id: ID): Int {
 }
 
 @GraphQLQuery
-suspend fun audioPlayHistory(limit: Int = 50, offset: Int = 0): List<AudioPlayHistory> {
+suspend fun audioPlayHistory(offset: Int = 0, limit: Int = 50): List<AudioPlayHistory> {
     return AudioQueueManager.recentPage(limit, offset).map { it.toModel() }
 }
 
@@ -181,7 +181,8 @@ suspend fun removeAudioPlaylistItem(id: ID, path: String): Boolean {
 
 /** Play a user playlist: sets it as the playback context and starts playback. */
 @GraphQLMutation
-suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean = false): Boolean {
+suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean? = null): Boolean {
+    val shuffle = shuffle == true
     val start = AudioQueueManager.setPlaylistSource(id.value, path)
     if (start != null && !shuffle) {
         coMain { audioJustPlayWithNotificationCheck(start) }
@@ -194,8 +195,8 @@ suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean = f
 
 /** Play the whole audio library (shuffle optional): full-library playback context. */
 @GraphQLMutation
-suspend fun playAllAudios(shuffle: Boolean = false, path: String? = null): Boolean {
-    val start = AudioQueueManager.setLibrarySource(startPath = path, shuffle = shuffle)
+suspend fun playAllAudios(shuffle: Boolean? = null, path: String? = null): Boolean {
+    val start = AudioQueueManager.setLibrarySource(startPath = path, shuffle = shuffle == true)
     if (start != null) {
         coMain { audioJustPlayWithNotificationCheck(start) }
     }

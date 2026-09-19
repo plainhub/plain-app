@@ -40,7 +40,7 @@ type Query {
   audioPlaylists: [AudioPlaylist!]!
   audioPlaylistItems(id: ID!, offset: Int!, limit: Int!): [PlaylistAudio!]!
   audioPlaylistItemCount(id: ID!): Int!
-  audioPlayHistory(limit: Int!, offset: Int!): [AudioPlayHistory!]!
+  audioPlayHistory(offset: Int!, limit: Int!): [AudioPlayHistory!]!
   imageCount(query: String!): Int!
   imageSearchStatus: ImageSearchStatus!
   images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
@@ -50,7 +50,7 @@ type Query {
   noteCount(query: String!): Int!
   note(id: ID!): Note
   notes(offset: Int!, limit: Int!, query: String!): [Note!]!
-  mediaBuckets(type: DataType!): [MediaBucket!]!
+  mediaBuckets(type: MediaDataType!): [MediaBucket!]!
   deviceInfo: DeviceInfo!
   deviceStatus: DeviceStatus!
   app: App!
@@ -97,7 +97,7 @@ type Mutation {
   removeChatChannelMember(id: ID!, peerId: String!): ChatChannel!
   acceptChatChannelInvite(id: ID!): Boolean!
   declineChatChannelInvite(id: ID!): Boolean!
-  cancelNotifications(ids: [ID!]!): Boolean!
+  deleteNotifications(ids: [ID!]!): Boolean!
   replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
   unarchiveConversation(id: String!): Boolean!
   sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
@@ -163,8 +163,8 @@ type Mutation {
   deleteAudioPlaylist(id: ID!): Boolean!
   addAudioPlaylistItems(id: ID!, paths: [String!]!): Boolean!
   removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
-  playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): Boolean!
-  playAllAudios(shuffle: Boolean!, path: String): Boolean!
+  playAudioPlaylist(id: ID!, path: String, shuffle: Boolean): Boolean!
+  playAllAudios(shuffle: Boolean, path: String): Boolean!
   enableImageSearch: Boolean!
   disableImageSearch: Boolean!
   cancelImageModelDownload: Boolean!
@@ -178,15 +178,14 @@ type Mutation {
   restoreNotes(query: String!): String!
   deleteNotes(query: String!): String!
   exportNotes(query: String!): String!
-  deleteMediaItems(type: DataType!, query: String!): ActionResult!
-  trashMediaItems(type: DataType!, query: String!): ActionResult!
-  restoreMediaItems(type: DataType!, query: String!): ActionResult!
-  moveMediaItems(type: DataType!, query: String!, destDir: String!): ActionResult!
+  deleteMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
+  trashMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
+  restoreMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
+  moveMediaItems(type: MediaDataType!, query: String!, destDir: String!): MediaActionResult!
   setTempValue(key: String!, value: String!): TempValue!
   relaunchApp: Boolean!
   openAccessibilitySettings: Boolean!
   openWebSettings(feature: AccessFeatureType): Boolean!
-  setClip(text: String!): Boolean!
   updateDeviceName(name: String!): Boolean!
   deleteContacts(query: String!): Boolean!
   updateContact(id: ID!, input: ContactInput!): Contact
@@ -208,7 +207,7 @@ type Mutation {
   createDbTableRow(table: String!, row: String!): Boolean!
   deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
   setClipboard(text: String!): Boolean!
-  cancelClipboard(ids: [ID!]!): Boolean!
+  deleteClipboard(ids: [ID!]!): Boolean!
   addBookmarks(urls: [String!]!, groupId: String!): [Bookmark!]!
   updateBookmark(id: ID!, input: BookmarkInput!): Bookmark
   deleteBookmarks(ids: [ID!]!): Boolean!
@@ -230,9 +229,10 @@ enum AccessFeatureType {
   CLIPBOARD
 }
 
-type ActionResult {
-  type: DataType!
+type MediaActionResult {
+  type: MediaDataType!
   query: String!
+  affectedCount: Int!
 }
 
 type AndroidExtras {
@@ -522,6 +522,13 @@ input ContentItemInput {
   label: String!
 }
 
+enum MediaDataType {
+  AUDIO
+  VIDEO
+  IMAGE
+  DOC
+}
+
 enum DataType {
   DEFAULT
   AUDIO
@@ -585,6 +592,7 @@ enum DeviceType {
   PHONE
   TABLET
   TV
+  NAS
   OTHER
 }
 

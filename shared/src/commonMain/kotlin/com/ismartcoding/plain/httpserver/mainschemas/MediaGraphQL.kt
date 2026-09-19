@@ -6,6 +6,8 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.MediaDataType
+import com.ismartcoding.plain.enums.toDataType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync
@@ -23,92 +25,94 @@ import com.ismartcoding.plain.platform.moveMedia
 import com.ismartcoding.plain.helpers.FilePathValidator
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.preferences.VideoPlaylistPreference
-import com.ismartcoding.plain.httpserver.models.ActionResult
+import com.ismartcoding.plain.httpserver.models.MediaActionResult
 import com.ismartcoding.plain.httpserver.models.MediaBucket
 import com.ismartcoding.plain.httpserver.models.toModel
 
 @GraphQLQuery
-suspend fun mediaBuckets(type: DataType): List<MediaBucket> {
+suspend fun mediaBuckets(type: MediaDataType): List<MediaBucket> {
     return if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndIsGrantedAsync()) {
-        getMediaBuckets(type).map { it.toModel() }
+        getMediaBuckets(type.toDataType()).map { it.toModel() }
     } else {
         emptyList()
     }
 }
 
 @GraphQLMutation
-suspend fun deleteMediaItems(type: DataType, query: String): ActionResult {
+suspend fun deleteMediaItems(type: MediaDataType, query: String): MediaActionResult {
+    val dataType = type.toDataType()
     val hasTrashFeature = AppFeatureType.MEDIA_TRASH.has()
-    val ids = if (hasTrashFeature) getTrashedMediaIds(type, query) else getMediaIds(type, query)
-    if (type == DataType.IMAGE) {
+    val ids = if (hasTrashFeature) getTrashedMediaIds(dataType, query) else getMediaIds(dataType, query)
+    if (type == MediaDataType.IMAGE) {
         enqueueRemoveImageIndex(ids)
     }
-    deleteMedia(type, ids, true)
-    return ActionResult(type, query)
+    deleteMedia(dataType, ids, true)
+    return MediaActionResult(type, query, ids.size)
 }
 
 @GraphQLMutation
-suspend fun trashMediaItems(type: DataType, query: String): ActionResult {
+suspend fun trashMediaItems(type: MediaDataType, query: String): MediaActionResult {
+    val dataType = type.toDataType()
     if (!isRPlus()) {
-        return ActionResult(type, query)
+        return MediaActionResult(type, query, 0)
     }
 
-    val ids = getMediaIds(type, query)
+    val ids = getMediaIds(dataType, query)
     when (type) {
-        DataType.AUDIO -> {
-            val paths = getMediaPathsByIds(type, ids)
-            trashMedia(type, ids)
+        MediaDataType.AUDIO -> {
+            val paths = getMediaPathsByIds(dataType, ids)
+            trashMedia(dataType, ids)
             AudioQueueManager.removePaths(paths)
         }
 
-        DataType.VIDEO -> {
-            val paths = getMediaPathsByIds(type, ids)
-            trashMedia(type, ids)
+        MediaDataType.VIDEO -> {
+            val paths = getMediaPathsByIds(dataType, ids)
+            trashMedia(dataType, ids)
             VideoPlaylistPreference.deleteAsync(paths)
         }
 
-        DataType.IMAGE -> {
-            trashMedia(type, ids)
+        MediaDataType.IMAGE -> {
+            trashMedia(dataType, ids)
             enqueueRemoveImageIndex(ids)
         }
 
-        DataType.DOC -> {
-            trashMedia(type, ids)
+        MediaDataType.DOC -> {
+            trashMedia(dataType, ids)
         }
-
-        else -> {}
     }
-    TagHelper.deleteTagRelationByKeys(ids, type)
-    return ActionResult(type, query)
+    TagHelper.deleteTagRelationByKeys(ids, dataType)
+    return MediaActionResult(type, query, ids.size)
 }
 
 @GraphQLMutation
-suspend fun restoreMediaItems(type: DataType, query: String): ActionResult {
+suspend fun restoreMediaItems(type: MediaDataType, query: String): MediaActionResult {
+    val dataType = type.toDataType()
     if (!isRPlus()) {
-        return ActionResult(type, query)
+        return MediaActionResult(type, query, 0)
     }
 
-    val ids = getTrashedMediaIds(type, query)
-    if (type == DataType.IMAGE) {
+    val ids = getTrashedMediaIds(dataType, query)
+    if (type == MediaDataType.IMAGE) {
         enqueueRemoveImageIndex(ids)
     }
-    restoreMedia(type, ids)
-    return ActionResult(type, query)
+    restoreMedia(dataType, ids)
+    return MediaActionResult(type, query, ids.size)
 }
 
 @GraphQLMutation
-suspend fun moveMediaItems(type: DataType, query: String, destDir: String): ActionResult {
+suspend fun moveMediaItems(type: MediaDataType, query: String, destDir: String): MediaActionResult {
+    val dataType = type.toDataType()
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     FilePathValidator.requireAllSafe(listOf(destDir))
-    val ids = getMediaIds(type, query)
+    val ids = getMediaIds(dataType, query)
     if (ids.isEmpty()) {
-        return ActionResult(type, query)
+        return MediaActionResult(type, query, 0)
     }
-    if (type == DataType.IMAGE) {
+    if (type == MediaDataType.IMAGE) {
         enqueueRemoveImageIndex(ids)
     }
-    moveMedia(type, ids, destDir)
-    return ActionResult(type, query)
+    moveMedia(dataType, ids, destDir)
+    return MediaActionResult(type, query, ids.size)
 }
 
 fun SchemaBuilder.addMediaSchema() {

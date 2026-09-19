@@ -102,6 +102,12 @@ fun DownloadBatchCard(
 
             StatusChip(task.status, Modifier.padding(top = 8.dp))
 
+            // Whole-batch errors (engine failures, zip errors) never enter the
+            // per-file failures list — surface them here or they vanish.
+            if (task.status == DownloadStatus.FAILED && task.error.isNotEmpty()) {
+                StatusLine(task.error, color = MaterialTheme.colorScheme.error)
+            }
+
             if (active && task.downloadedSize > 0) {
                 LinearProgressIndicator(
                     progress = { task.fraction() },
