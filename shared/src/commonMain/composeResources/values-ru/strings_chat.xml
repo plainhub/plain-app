@@ -161,4 +161,21 @@
     <string name="download_failed">Ошибка загрузки</string>
     <string name="save_to">Сохранить в</string>
     <string name="recent_used">Недавние</string>
+
+    <string name="downloads">Загрузки</string>
+    <string name="in_progress">Выполняется</string>
+    <string name="completed">Завершены</string>
+    <string name="queued">В очереди</string>
+    <string name="failed">Ошибка</string>
+    <string name="canceled">Отменены</string>
+    <string name="partial_failure">Частичная ошибка</string>
+    <string name="downloading_file">Загрузка %1$s (%2$d/%3$d)</string>
+    <string name="reading_folder">Чтение папки…</string>
+    <string name="packing">Упаковка…</string>
+    <string name="clear_completed">Очистить завершённые</string>
+    <string name="clear_completed_confirm">Удалить все завершённые загрузки из списка?</string>
+    <string name="no_running_downloads">Нет активных загрузок</string>
+    <string name="no_finished_downloads">Нет завершённых загрузок</string>
+    <string name="saved_n_of_m">Сохранено %1$d из %2$d</string>
+    <string name="saved_to_x">Сохранено в %1$s</string>
 </resources>

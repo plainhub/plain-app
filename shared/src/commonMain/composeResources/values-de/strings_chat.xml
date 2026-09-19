@@ -161,4 +161,21 @@
     <string name="download_failed">Download fehlgeschlagen</string>
     <string name="save_to">Speichern in</string>
     <string name="recent_used">Zuletzt verwendet</string>
+
+    <string name="downloads">Downloads</string>
+    <string name="in_progress">Läuft</string>
+    <string name="completed">Abgeschlossen</string>
+    <string name="queued">Warteschlange</string>
+    <string name="failed">Fehlgeschlagen</string>
+    <string name="canceled">Abgebrochen</string>
+    <string name="partial_failure">Teilweise fehlgeschlagen</string>
+    <string name="downloading_file">Lade %1$s (%2$d/%3$d)</string>
+    <string name="reading_folder">Ordner wird gelesen…</string>
+    <string name="packing">Wird gepackt…</string>
+    <string name="clear_completed">Abgeschlossene entfernen</string>
+    <string name="clear_completed_confirm">Alle abgeschlossenen Downloads aus der Liste entfernen?</string>
+    <string name="no_running_downloads">Keine laufenden Downloads</string>
+    <string name="no_finished_downloads">Keine abgeschlossenen Downloads</string>
+    <string name="saved_n_of_m">%1$d von %2$d Elementen gespeichert</string>
+    <string name="saved_to_x">Gespeichert in %1$s</string>
 </resources>

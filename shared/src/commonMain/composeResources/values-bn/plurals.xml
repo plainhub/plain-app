@@ -56,4 +56,12 @@
         <item quantity="one">%1$dটি চ্যাটে পাঠানো হয়েছে</item>
         <item quantity="other">%1$dটি চ্যাটে পাঠানো হয়েছে</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="one">%1$dটি সংরক্ষিত</item>
+        <item quantity="other">%1$dটি সংরক্ষিত</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="one">%1$dটি ফাইল রাখা হয়েছে</item>
+        <item quantity="other">%1$dটি ফাইল রাখা হয়েছে</item>
+    </plurals>
 </resources>

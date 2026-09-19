@@ -161,4 +161,21 @@
     <string name="download_failed">Download failed</string>
     <string name="save_to">Save to</string>
     <string name="recent_used">Recent</string>
+
+    <string name="downloads">Downloads</string>
+    <string name="in_progress">In progress</string>
+    <string name="completed">Completed</string>
+    <string name="queued">Queued</string>
+    <string name="failed">Failed</string>
+    <string name="canceled">Canceled</string>
+    <string name="partial_failure">Partial failure</string>
+    <string name="downloading_file">Downloading %1$s (%2$d/%3$d)</string>
+    <string name="reading_folder">Reading folder…</string>
+    <string name="packing">Packing…</string>
+    <string name="clear_completed">Clear completed</string>
+    <string name="clear_completed_confirm">Clear all finished downloads from the list?</string>
+    <string name="no_running_downloads">No running downloads</string>
+    <string name="no_finished_downloads">No finished downloads</string>
+    <string name="saved_n_of_m">Saved %1$d of %2$d items</string>
+    <string name="saved_to_x">Saved to %1$s</string>
 </resources>

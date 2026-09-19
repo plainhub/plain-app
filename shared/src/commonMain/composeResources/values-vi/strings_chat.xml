@@ -161,4 +161,21 @@
     <string name="download_failed">Tải xuống thất bại</string>
     <string name="save_to">Lưu vào</string>
     <string name="recent_used">Gần đây</string>
+
+    <string name="downloads">Tải xuống</string>
+    <string name="in_progress">Đang chạy</string>
+    <string name="completed">Hoàn tất</string>
+    <string name="queued">Đang chờ</string>
+    <string name="failed">Thất bại</string>
+    <string name="canceled">Đã hủy</string>
+    <string name="partial_failure">Thất bại một phần</string>
+    <string name="downloading_file">Đang tải %1$s (%2$d/%3$d)</string>
+    <string name="reading_folder">Đang đọc thư mục…</string>
+    <string name="packing">Đang nén…</string>
+    <string name="clear_completed">Xóa hoàn tất</string>
+    <string name="clear_completed_confirm">Xóa tất cả bản tải đã hoàn tất khỏi danh sách?</string>
+    <string name="no_running_downloads">Không có tải xuống nào đang chạy</string>
+    <string name="no_finished_downloads">Không có tải xuống nào hoàn tất</string>
+    <string name="saved_n_of_m">Đã lưu %1$d/%2$d mục</string>
+    <string name="saved_to_x">Đã lưu vào %1$s</string>
 </resources>

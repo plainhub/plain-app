@@ -161,4 +161,21 @@
     <string name="download_failed">다운로드 실패</string>
     <string name="save_to">저장 위치</string>
     <string name="recent_used">최근 사용</string>
+
+    <string name="downloads">다운로드</string>
+    <string name="in_progress">진행 중</string>
+    <string name="completed">완료됨</string>
+    <string name="queued">대기 중</string>
+    <string name="failed">실패</string>
+    <string name="canceled">취소됨</string>
+    <string name="partial_failure">일부 실패</string>
+    <string name="downloading_file">%1$s 다운로드 중(%2$d/%3$d)</string>
+    <string name="reading_folder">폴더 읽는 중…</string>
+    <string name="packing">압축 중…</string>
+    <string name="clear_completed">완료 항목 지우기</string>
+    <string name="clear_completed_confirm">완료된 다운로드를 목록에서 모두 지우시겠습니까?</string>
+    <string name="no_running_downloads">진행 중인 다운로드가 없습니다</string>
+    <string name="no_finished_downloads">완료된 다운로드가 없습니다</string>
+    <string name="saved_n_of_m">%2$d개 중 %1$d개 저장됨</string>
+    <string name="saved_to_x">%1$s에 저장됨</string>
 </resources>

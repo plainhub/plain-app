@@ -4,17 +4,24 @@ package com.ismartcoding.plain.ui.page.sharedfolder
 
 import androidx.compose.runtime.Composable
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.platform.launchUrl
-import com.ismartcoding.plain.platform.setClipboardText
+import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.PTextButton
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.platform.launchUrl
+import com.ismartcoding.plain.platform.setClipboardText
+import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
-/** Top bar: select-mode title/actions, otherwise the capsule link menu. */
+/**
+ * Top bar, styled after FilesPage: browse mode shows the current directory
+ * with folder/file counts plus expiry as the subtitle; select mode swaps in
+ * the close icon and the select-all text button.
+ */
 @Composable
 internal fun SharedFolderTopBar(
     state: SharedFolderState,
@@ -24,8 +31,9 @@ internal fun SharedFolderTopBar(
         title = if (state.selectMode) {
             stringResource(Res.string.x_selected, state.selected.size)
         } else {
-            state.rootInfo?.name ?: state.shareMsg?.name ?: ""
+            state.crumbs.lastOrNull()?.name ?: state.rootInfo?.name ?: state.shareMsg?.name ?: ""
         },
+        subtitle = if (state.selectMode) "" else browseSubtitle(state),
         navigationIcon = if (state.selectMode) {
             { NavigationCloseIcon { state.clearSelection() } }
         } else {
@@ -58,4 +66,23 @@ internal fun SharedFolderTopBar(
             }
         },
     )
+}
+
+@Composable
+private fun browseSubtitle(state: SharedFolderState): String {
+    val parts = mutableListOf<String>()
+    val entries = state.entries
+    val dirCount = entries.count { it.isDir }
+    val fileCount = entries.count { !it.isDir }
+    if (dirCount > 0) parts.add(pluralStringResource(Res.plurals.x_folders, dirCount, dirCount))
+    if (fileCount > 0) parts.add(pluralStringResource(Res.plurals.x_files, fileCount, fileCount))
+    val expiresAt = state.rootInfo?.expiresAtInstant
+    if (expiresAt != null) {
+        val dateText = expiresAt.formatDateTime()
+        parts.add(
+            if (expiresAt < TimeHelper.now()) dateText
+            else stringResource(Res.string.share_expires_on, dateText),
+        )
+    }
+    return parts.joinToString(" · ")
 }

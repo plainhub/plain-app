@@ -161,4 +161,21 @@
     <string name="download_failed">Échec du téléchargement</string>
     <string name="save_to">Enregistrer dans</string>
     <string name="recent_used">Récents</string>
+
+    <string name="downloads">Téléchargements</string>
+    <string name="in_progress">En cours</string>
+    <string name="completed">Terminés</string>
+    <string name="queued">En attente</string>
+    <string name="failed">Échec</string>
+    <string name="canceled">Annulés</string>
+    <string name="partial_failure">Échec partiel</string>
+    <string name="downloading_file">Téléchargement de %1$s (%2$d/%3$d)</string>
+    <string name="reading_folder">Lecture du dossier…</string>
+    <string name="packing">Compression…</string>
+    <string name="clear_completed">Effacer les terminés</string>
+    <string name="clear_completed_confirm">Effacer tous les téléchargements terminés de la liste ?</string>
+    <string name="no_running_downloads">Aucun téléchargement en cours</string>
+    <string name="no_finished_downloads">Aucun téléchargement terminé</string>
+    <string name="saved_n_of_m">%1$d éléments sur %2$d enregistrés</string>
+    <string name="saved_to_x">Enregistré dans %1$s</string>
 </resources>

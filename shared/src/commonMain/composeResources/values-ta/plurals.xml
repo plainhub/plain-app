@@ -56,4 +56,12 @@
         <item quantity="one">%1$d அரட்டைக்கு அனுப்பப்பட்டது</item>
         <item quantity="other">%1$d அரட்டைகளுக்கு அனுப்பப்பட்டது</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="one">%1$d சேமிக்கப்பட்டது</item>
+        <item quantity="other">%1$d சேமிக்கப்பட்டன</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="one">%1$d கோப்பு வைக்கப்பட்டது</item>
+        <item quantity="other">%1$d கோப்புகள் வைக்கப்பட்டன</item>
+    </plurals>
 </resources>

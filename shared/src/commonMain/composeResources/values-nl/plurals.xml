@@ -56,4 +56,12 @@
         <item quantity="one">Verzonden naar %1$d chat</item>
         <item quantity="other">Verzonden naar %1$d chats</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="one">%1$d item opgeslagen</item>
+        <item quantity="other">%1$d items opgeslagen</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="one">%1$d bestand bewaard</item>
+        <item quantity="other">%1$d bestanden bewaard</item>
+    </plurals>
 </resources>

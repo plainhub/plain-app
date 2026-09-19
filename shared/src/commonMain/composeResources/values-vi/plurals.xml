@@ -56,4 +56,10 @@
         <item quantity="one">Đã gửi đến %1$d cuộc trò chuyện</item>
         <item quantity="other">Đã gửi đến %1$d cuộc trò chuyện</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="other">Đã lưu %1$d mục</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="other">Đã giữ %1$d tệp</item>
+    </plurals>
 </resources>

@@ -23,7 +23,7 @@ import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.download.DownloadQueue
-import com.ismartcoding.plain.chat.download.DownloadStatus
+import com.ismartcoding.plain.features.download.DownloadStatus
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer

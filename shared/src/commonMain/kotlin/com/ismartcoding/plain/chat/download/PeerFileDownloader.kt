@@ -7,6 +7,7 @@ import com.ismartcoding.plain.platform.createDownloadTempFile
 import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.peer.transport.PeerTransportRouter
+import com.ismartcoding.plain.features.download.DownloadStatus
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles

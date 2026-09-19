@@ -161,4 +161,21 @@
     <string name="download_failed">ডাউনলোড ব্যর্থ হয়েছে</string>
     <string name="save_to">সংরক্ষণ করুন</string>
     <string name="recent_used">সাম্প্রতিক</string>
+
+    <string name="downloads">ডাউনলোড</string>
+    <string name="in_progress">চলমান</string>
+    <string name="completed">সম্পন্ন</string>
+    <string name="queued">সারিতে</string>
+    <string name="failed">ব্যর্থ</string>
+    <string name="canceled">বাতিল</string>
+    <string name="partial_failure">আংশিক ব্যর্থ</string>
+    <string name="downloading_file">%1$s ডাউনলোড হচ্ছে (%2$d/%3$d)</string>
+    <string name="reading_folder">ফোল্ডার পড়া হচ্ছে…</string>
+    <string name="packing">প্যাক করা হচ্ছে…</string>
+    <string name="clear_completed">সম্পন্ন মুছুন</string>
+    <string name="clear_completed_confirm">তালিকা থেকে সম্পন্ন ডাউনলোডগুলো মুছে ফেলতে চান?</string>
+    <string name="no_running_downloads">কোনো চলমান ডাউনলোড নেই</string>
+    <string name="no_finished_downloads">কোনো সম্পন্ন ডাউনলোড নেই</string>
+    <string name="saved_n_of_m">%2$dটির মধ্যে %1$dটি সংরক্ষিত</string>
+    <string name="saved_to_x">%1$s-এ সংরক্ষিত</string>
 </resources>

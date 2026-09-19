@@ -161,4 +161,21 @@
     <string name="download_failed">ダウンロードに失敗しました</string>
     <string name="save_to">保存先</string>
     <string name="recent_used">最近使用</string>
+
+    <string name="downloads">ダウンロード</string>
+    <string name="in_progress">進行中</string>
+    <string name="completed">完了</string>
+    <string name="queued">待機中</string>
+    <string name="failed">失敗</string>
+    <string name="canceled">キャンセル済み</string>
+    <string name="partial_failure">一部失敗</string>
+    <string name="downloading_file">%1$s をダウンロード中（%2$d/%3$d）</string>
+    <string name="reading_folder">フォルダーを読み込み中…</string>
+    <string name="packing">圧縮中…</string>
+    <string name="clear_completed">完了を削除</string>
+    <string name="clear_completed_confirm">完了したダウンロードをすべてリストから削除しますか？</string>
+    <string name="no_running_downloads">実行中のダウンロードはありません</string>
+    <string name="no_finished_downloads">完了したダウンロードはありません</string>
+    <string name="saved_n_of_m">%2$d 件中 %1$d 件を保存しました</string>
+    <string name="saved_to_x">%1$s に保存しました</string>
 </resources>

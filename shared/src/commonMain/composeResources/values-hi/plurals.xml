@@ -56,4 +56,12 @@
         <item quantity="one">%1$d चैट पर भेजा गया</item>
         <item quantity="other">%1$d चैटों पर भेजा गया</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="one">%1$d सहेजा गया</item>
+        <item quantity="other">%1$d सहेजे गए</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="one">%1$d फ़ाइल रखी गई</item>
+        <item quantity="other">%1$d फ़ाइलें रखी गईं</item>
+    </plurals>
 </resources>

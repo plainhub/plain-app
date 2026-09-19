@@ -84,4 +84,16 @@
         <item quantity="many">Отправлено в %1$d чатов</item>
         <item quantity="other">Отправлено в %1$d чата</item>
     </plurals>
+    <plurals name="saved_n_items">
+        <item quantity="one">Сохранён %1$d элемент</item>
+        <item quantity="few">Сохранено %1$d элемента</item>
+        <item quantity="many">Сохранено %1$d файлов</item>
+        <item quantity="other">Сохранено %1$d</item>
+    </plurals>
+    <plurals name="kept_n_files">
+        <item quantity="one">Сохранён %1$d файл</item>
+        <item quantity="few">Сохранено %1$d файла</item>
+        <item quantity="many">Сохранено %1$d файлов</item>
+        <item quantity="other">Сохранено %1$d</item>
+    </plurals>
 </resources>
