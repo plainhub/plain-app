@@ -15,7 +15,6 @@ data class App(
     val appDir: String,
     val deviceName: String,
     val deviceType: DeviceType,
-    val battery: Int,
     val appVersion: String,
     val osVersion: Int,
     val channel: AppChannelType,

@@ -7,7 +7,7 @@ enum class DevicePlatform {
     ANDROID, IOS, MACOS, WINDOWS, LINUX
 }
 
-class DAndroidDeviceInfo {
+class DAndroidExtras {
     var sdkVersion: Int = 0
     var versionCodeName: String = ""
     var securityPatch: String = ""
@@ -17,23 +17,11 @@ class DAndroidDeviceInfo {
     var radioVersion: String = ""
     var board: String = ""
     var buildBrand: String = ""
-    var buildHost: String = ""
-    var buildUser: String = ""
     var buildNumber: String = ""
-    var product: String = ""
     var device: String = ""
     var javaVmVersion: String = ""
     var glEsVersion: String = ""
-    var serial: String = ""
     var buildTime: Instant = TimeHelper.now()
-}
-
-class DDesktopDeviceInfo {
-    var hostname: String = ""
-    var cpuModel: String = ""
-    var gpuModel: String = ""
-    var desktopEnvironment: String = ""
-    var windowManager: String = ""
 }
 
 class DDisplayInfo {
@@ -53,12 +41,10 @@ class DDeviceInfo {
     var appVersion: String = ""
     var appBuildNumber: String = ""
     var language: String = ""
-    var uptime: Long = 0L
     var cpuArch: String = ""
+    var cpuModel: String = ""
     var totalMemory: Long = 0L
     var totalStorage: Long = 0L
     var display: DDisplayInfo? = null
-    var android: DAndroidDeviceInfo? = null
-    var desktop: DDesktopDeviceInfo? = null
+    var android: DAndroidExtras? = null
 }
-

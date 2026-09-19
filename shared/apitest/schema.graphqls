@@ -51,7 +51,7 @@ type Query {
   notes(offset: Int!, limit: Int!, query: String!): [Note!]!
   mediaBuckets(type: DataType!): [MediaBucket!]!
   deviceInfo: DeviceInfo!
-  battery: Battery!
+  deviceStatus: DeviceStatus!
   app: App!
   contactCount(query: String!): Int!
   contactSources: [ContactSource!]!
@@ -234,7 +234,7 @@ type ActionResult {
   query: String!
 }
 
-type AndroidDeviceInfo {
+type AndroidExtras {
   sdkVersion: Int!
   versionCodeName: String!
   securityPatch: String!
@@ -244,14 +244,10 @@ type AndroidDeviceInfo {
   radioVersion: String!
   board: String!
   buildBrand: String!
-  buildHost: String!
-  buildUser: String!
   buildNumber: String!
-  product: String!
   device: String!
   javaVmVersion: String!
   glEsVersion: String!
-  serial: String!
   buildTime: Instant!
 }
 
@@ -263,7 +259,6 @@ type App {
   appDir: String!
   deviceName: String!
   deviceType: DeviceType!
-  battery: Int!
   appVersion: String!
   osVersion: Int!
   channel: AppChannelType!
@@ -329,42 +324,6 @@ type AudioPlaylist {
   itemCount: Int!
   createdAt: Instant!
   updatedAt: Instant!
-}
-
-type Battery {
-  level: Int!
-  voltage: Int!
-  health: BatteryHealth!
-  plugged: BatteryPlugged!
-  temperature: Int!
-  status: BatteryStatus!
-  technology: String!
-  capacity: Int!
-}
-
-enum BatteryHealth {
-  UNKNOWN
-  GOOD
-  OVERHEAT
-  DEAD
-  OVER_VOLTAGE
-  UNSPECIFIED_FAILURE
-  COLD
-}
-
-enum BatteryPlugged {
-  UNPLUGGED
-  AC
-  USB
-  WIRELESS
-}
-
-enum BatteryStatus {
-  UNKNOWN
-  CHARGING
-  DISCHARGING
-  NOT_CHARGING
-  FULL
 }
 
 type Bookmark {
@@ -584,14 +543,6 @@ type DbTableInfo {
   idKey: String!
 }
 
-type DesktopDeviceInfo {
-  hostname: String!
-  cpuModel: String!
-  gpuModel: String!
-  desktopEnvironment: String!
-  windowManager: String!
-}
-
 type DeviceInfo {
   name: String!
   platform: DevicePlatform!
@@ -603,13 +554,12 @@ type DeviceInfo {
   appVersion: String!
   appBuildNumber: String!
   language: String!
-  uptime: Long!
   cpuArch: String!
+  cpuModel: String
   totalMemory: Long!
   totalStorage: Long!
   display: DisplayInfo
-  android: AndroidDeviceInfo
-  desktop: DesktopDeviceInfo
+  android: AndroidExtras
 }
 
 enum DevicePlatform {
@@ -618,6 +568,16 @@ enum DevicePlatform {
   MACOS
   WINDOWS
   LINUX
+}
+
+type DeviceStatus {
+  uptimeSec: Long!
+  batteryLevel: Int
+  charging: Boolean!
+  temperatures: [Temperature!]!
+  cpuUsage: Float!
+  memoryAvailable: Long
+  storageAvailable: Long!
 }
 
 enum DeviceType {
@@ -1150,6 +1110,11 @@ input TagRelationStub {
 type TempValue {
   key: String!
   value: String!
+}
+
+type Temperature {
+  label: String!
+  celsius: Float!
 }
 
 input TouchPointInput {

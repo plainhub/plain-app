@@ -1,14 +1,10 @@
 package com.ismartcoding.plain.helpers
 
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.res.Configuration
-import android.os.BatteryManager
 import android.os.Build
 import android.provider.Settings
 import com.ismartcoding.plain.lib.extensions.capitalize
-import com.ismartcoding.plain.platform.isTPlus
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.uiModeManager
@@ -33,17 +29,6 @@ object PhoneHelper {
             }
         }
         return name
-    }
-
-    fun getBatteryPercentage(context: Context): Int {
-        var percentage = 0
-        val batteryStatus = getBatteryStatusIntent(context)
-        if (batteryStatus != null) {
-            val level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-            percentage = (level / scale.toFloat() * 100).toInt()
-        }
-        return percentage
     }
 
     fun getDeviceType(context: Context): DeviceType {
@@ -75,12 +60,4 @@ object PhoneHelper {
         return DeviceType.PHONE
     }
 
-    private fun getBatteryStatusIntent(context: Context): Intent? {
-        val batFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-        if (isTPlus()) {
-            return context.registerReceiver(null, batFilter, Context.RECEIVER_NOT_EXPORTED)
-        }
-
-        return context.registerReceiver(null, batFilter)
-    }
 }

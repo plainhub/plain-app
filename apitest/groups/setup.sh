@@ -3,7 +3,7 @@
 # Source-only; the runner sources this file.
 #
 # Schemas: AppGraphQL (9 of 9 endpoints in this group)
-#   app, deviceInfo, battery
+#   app, deviceInfo, deviceStatus
 #   + 2 introspection queries
 #
 # See docs/api-test-plan.md for the full case list.
@@ -15,7 +15,7 @@ run_group "setup" "setup + sanity" "docs/api-test-plan.md#setup--sanity"
 # The App model is a flat data class (see web/models/App.kt) — see notes there
 # for which fields map to what.
 # ----------------------------------------------------------------------------
-APP=$(call_gql '{ app { clientId usbConnected httpPort httpsPort appDir deviceName battery appVersion osVersion channel debug developerMode internalStoragePath downloadsDir } }')
+APP=$(call_gql '{ app { clientId usbConnected httpPort httpsPort appDir deviceName appVersion osVersion channel debug developerMode internalStoragePath downloadsDir } }')
 echo "  (raw app response saved to results/setup-app.json)"
 echo "$APP" > "$RESULTS_DIR/setup-app.json"
 
@@ -82,12 +82,12 @@ assert_jq "$APP" ".data.app.internalStoragePath" "/storage/emulated/0" "setup-C0
 # ----------------------------------------------------------------------------
 # setup-C08  app.battery (int) within 2 of dumpsys battery level
 # ----------------------------------------------------------------------------
-api_battery=$(printf '%s' "$APP" | jq -r '.data.app.battery')
+api_battery=$(printf '%s' "$BATT" | jq -r '.data.deviceStatus.batteryLevel')
 adb_battery=$(adb_sh "dumpsys battery" | grep "level:" | head -1 | grep -oE "[0-9]+" | head -1)
 if [[ -n "$api_battery" && -n "$adb_battery" ]]; then
   diff=$(( api_battery - adb_battery ))
-  [[ ${diff#-} -le 2 ]] && pass "setup-C08 app.battery ($api_battery) within 2 of adb ($adb_battery)" \
-                       || fail "setup-C08 app.battery=$api_battery, adb=$adb_battery, diff>2"
+  [[ ${diff#-} -le 2 ]] && pass "setup-C08 deviceStatus.batteryLevel ($api_battery) within 2 of adb ($adb_battery)" \
+                       || fail "setup-C08 deviceStatus.batteryLevel=$api_battery, adb=$adb_battery, diff>2"
 else
   fail "setup-C08 could not parse battery (api='$api_battery' adb='$adb_battery')"
 fi
@@ -166,15 +166,15 @@ compare_with_adb "$api_di_mfr" "$adb_mfr" "setup-C13d deviceInfo.manufacturer ==
 # ----------------------------------------------------------------------------
 # setup-C14  battery.level within 2 of dumpsys battery level
 # ----------------------------------------------------------------------------
-BATT=$(call_gql '{ battery { level status plugged health temperature } }')
-echo "$BATT" > "$RESULTS_DIR/setup-battery.json"
-api_bl=$(printf '%s' "$BATT" | jq -r '.data.battery.level')
+BATT=$(call_gql '{ deviceStatus { batteryLevel charging cpuUsage uptimeSec } }')
+echo "$BATT" > "$RESULTS_DIR/setup-device-status.json"
+api_bl=$(printf '%s' "$BATT" | jq -r '.data.deviceStatus.batteryLevel')
 if [[ -n "$api_bl" && -n "$adb_battery" ]]; then
   diff=$(( api_bl - adb_battery ))
-  [[ ${diff#-} -le 2 ]] && pass "setup-C14 battery.level ($api_bl) within 2 of dumpsys ($adb_battery)" \
-                       || fail "setup-C14 battery.level=$api_bl, dumpsys=$adb_battery, diff>2"
+  [[ ${diff#-} -le 2 ]] && pass "setup-C14 deviceStatus.batteryLevel ($api_bl) within 2 of dumpsys ($adb_battery)" \
+                       || fail "setup-C14 deviceStatus.batteryLevel=$api_bl, dumpsys=$adb_battery, diff>2"
 else
-  fail "setup-C14 could not parse battery.level (api='$api_bl' adb='$adb_battery')"
+  fail "setup-C14 could not parse batteryLevel (api='$api_bl' adb='$adb_battery')"
 fi
 
 # ----------------------------------------------------------------------------

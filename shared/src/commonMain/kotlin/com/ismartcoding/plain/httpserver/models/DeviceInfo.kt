@@ -1,13 +1,15 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.data.DDeviceInfo
+import com.ismartcoding.plain.data.DDeviceStatus
+import com.ismartcoding.plain.data.DTemperature
 import com.ismartcoding.plain.data.DevicePlatform
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
 @GraphQLType
-class AndroidDeviceInfo {
+class AndroidExtras {
     var sdkVersion: Int = 0
     var versionCodeName: String = ""
     var securityPatch: String = ""
@@ -17,24 +19,11 @@ class AndroidDeviceInfo {
     var radioVersion: String = ""
     var board: String = ""
     var buildBrand: String = ""
-    var buildHost: String = ""
-    var buildUser: String = ""
     var buildNumber: String = ""
-    var product: String = ""
     var device: String = ""
     var javaVmVersion: String = ""
     var glEsVersion: String = ""
-    var serial: String = ""
     var buildTime: Instant = TimeHelper.now()
-}
-
-@GraphQLType
-class DesktopDeviceInfo {
-    var hostname: String = ""
-    var cpuModel: String = ""
-    var gpuModel: String = ""
-    var desktopEnvironment: String = ""
-    var windowManager: String = ""
 }
 
 @GraphQLType
@@ -56,13 +45,29 @@ class DeviceInfo {
     var appVersion: String = ""
     var appBuildNumber: String = ""
     var language: String = ""
-    var uptime: Long = 0L
     var cpuArch: String = ""
+    var cpuModel: String? = null
     var totalMemory: Long = 0L
     var totalStorage: Long = 0L
     var display: DisplayInfo? = null
-    var android: AndroidDeviceInfo? = null
-    var desktop: DesktopDeviceInfo? = null
+    var android: AndroidExtras? = null
+}
+
+@GraphQLType
+class Temperature {
+    var label: String = ""
+    var celsius: Double = 0.0
+}
+
+@GraphQLType
+class DeviceStatus {
+    var uptimeSec: Long = 0L
+    var batteryLevel: Int? = null
+    var charging: Boolean = false
+    var temperatures: List<Temperature> = emptyList()
+    var cpuUsage: Double = 0.0
+    var memoryAvailable: Long? = null
+    var storageAvailable: Long = 0L
 }
 
 fun DDeviceInfo.toModel(): DeviceInfo {
@@ -77,8 +82,8 @@ fun DDeviceInfo.toModel(): DeviceInfo {
     m.appVersion = this.appVersion
     m.appBuildNumber = this.appBuildNumber
     m.language = this.language
-    m.uptime = this.uptime
     m.cpuArch = this.cpuArch
+    m.cpuModel = this.cpuModel.ifEmpty { null }
     m.totalMemory = this.totalMemory
     m.totalStorage = this.totalStorage
     this.display?.let { d ->
@@ -89,7 +94,7 @@ fun DDeviceInfo.toModel(): DeviceInfo {
         m.display = md
     }
     this.android?.let { a ->
-        val ma = AndroidDeviceInfo()
+        val ma = AndroidExtras()
         ma.sdkVersion = a.sdkVersion
         ma.versionCodeName = a.versionCodeName
         ma.securityPatch = a.securityPatch
@@ -99,16 +104,31 @@ fun DDeviceInfo.toModel(): DeviceInfo {
         ma.radioVersion = a.radioVersion
         ma.board = a.board
         ma.buildBrand = a.buildBrand
-        ma.buildHost = a.buildHost
-        ma.buildUser = a.buildUser
         ma.buildNumber = a.buildNumber
-        ma.product = a.product
         ma.device = a.device
         ma.javaVmVersion = a.javaVmVersion
         ma.glEsVersion = a.glEsVersion
-        ma.serial = a.serial
         ma.buildTime = a.buildTime
         m.android = ma
     }
+    return m
+}
+
+fun DTemperature.toModel(): Temperature {
+    val m = Temperature()
+    m.label = this.label
+    m.celsius = this.celsius
+    return m
+}
+
+fun DDeviceStatus.toModel(): DeviceStatus {
+    val m = DeviceStatus()
+    m.uptimeSec = this.uptimeSec
+    m.batteryLevel = this.batteryLevel
+    m.charging = this.charging
+    m.temperatures = this.temperatures.map { it.toModel() }
+    m.cpuUsage = this.cpuUsage
+    m.memoryAvailable = this.memoryAvailable
+    m.storageAvailable = this.storageAvailable
     return m
 }

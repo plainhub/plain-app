@@ -21,9 +21,6 @@ import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
-import com.ismartcoding.plain.httpserver.models.BatteryHealth
-import com.ismartcoding.plain.httpserver.models.BatteryPlugged
-import com.ismartcoding.plain.httpserver.models.BatteryStatus
 import com.ismartcoding.plain.httpserver.models.ID
 import kotlin.time.Instant
 
@@ -45,9 +42,6 @@ fun SchemaBuilder.addMainSchemaTypes() {
     enum<AppChannelType>()
     enum<ScreenMirrorControlAction>()
     enum<DevicePlatform>()
-    enum<BatteryHealth>()
-    enum<BatteryStatus>()
-    enum<BatteryPlugged>()
     enum<DiscoveryMethod>()
     enum<ChannelMemberStatus>()
     enum<ImageSearchStatusType>()

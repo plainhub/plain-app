@@ -8,16 +8,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
 import android.os.StatFs
-import android.os.SystemClock
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import androidx.core.content.ContextCompat
 import com.ismartcoding.plain.platform.isQPlus
+import com.ismartcoding.plain.platform.parseCpuInfoModel
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.getAppVersionName
 import com.ismartcoding.plain.getAppVersionCode
 import com.ismartcoding.plain.activityManager
-import com.ismartcoding.plain.data.DAndroidDeviceInfo
+import com.ismartcoding.plain.data.DAndroidExtras
 import com.ismartcoding.plain.data.DDeviceInfo
 import com.ismartcoding.plain.data.DDisplayInfo
 import com.ismartcoding.plain.data.DevicePlatform
@@ -40,8 +40,8 @@ object DeviceInfoHelper {
         info.appVersion = getAppVersionName()
         info.appBuildNumber = getAppVersionCode().toString()
         info.language = java.util.Locale.getDefault().language
-        info.uptime = SystemClock.elapsedRealtime()
         info.cpuArch = Build.SUPPORTED_ABIS.firstOrNull() ?: ""
+        info.cpuModel = cpuModel()
 
         val mi = ActivityManager.MemoryInfo()
         activityManager.getMemoryInfo(mi)
@@ -57,7 +57,7 @@ object DeviceInfoHelper {
         displayInfo.density = dm.density.toString()
         info.display = displayInfo
 
-        val androidInfo = DAndroidDeviceInfo()
+        val androidInfo = DAndroidExtras()
         androidInfo.sdkVersion = Build.VERSION.SDK_INT
         androidInfo.versionCodeName = Build.VERSION.CODENAME
         androidInfo.securityPatch = Build.VERSION.SECURITY_PATCH
@@ -67,18 +67,24 @@ object DeviceInfoHelper {
         androidInfo.radioVersion = Build.getRadioVersion() ?: ""
         androidInfo.board = Build.BOARD
         androidInfo.buildBrand = Build.BRAND
-        androidInfo.buildHost = Build.HOST
-        androidInfo.buildUser = Build.USER
         androidInfo.buildNumber = Build.DISPLAY
-        androidInfo.product = Build.PRODUCT
         androidInfo.device = Build.DEVICE
         androidInfo.javaVmVersion = System.getProperty("java.vm.version") ?: ""
         androidInfo.glEsVersion = activityManager.deviceConfigurationInfo.glEsVersion
-        androidInfo.serial = Build.SERIAL
         androidInfo.buildTime = Instant.fromEpochMilliseconds(Build.TIME)
         info.android = androidInfo
 
         return info
+    }
+
+    private fun cpuModel(): String {
+        if (Build.VERSION.SDK_INT >= 31) {
+            val soc = Build.SOC_MODEL
+            if (soc.isNotBlank() && soc != "unknown") return soc
+        }
+        // ARM kernels usually omit "model name" in /proc/cpuinfo; x86 images have it.
+        val content = runCatching { java.io.File("/proc/cpuinfo").readText() }.getOrNull() ?: return ""
+        return parseCpuInfoModel(content)
     }
 
     @SuppressLint("MissingPermission")

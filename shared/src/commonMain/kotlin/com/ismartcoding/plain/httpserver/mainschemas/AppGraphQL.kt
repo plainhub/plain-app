@@ -14,13 +14,12 @@ import com.ismartcoding.plain.events.HOpenAccessibilitySettingsEvent
 import com.ismartcoding.plain.events.HOpenWebSettingsEvent
 import com.ismartcoding.plain.features.getGrantedWebPermissionsAsync
 import com.ismartcoding.plain.platform.appDir
-import com.ismartcoding.plain.platform.getBattery
 import com.ismartcoding.plain.platform.getDeviceInfo
+import com.ismartcoding.plain.platform.getDeviceStatus
 import com.ismartcoding.plain.platform.getDownloadsDirPath
 import com.ismartcoding.plain.platform.getInternalStoragePath
 import com.ismartcoding.plain.platform.getSDCardPath
 import com.ismartcoding.plain.platform.getUsbDiskPaths
-import com.ismartcoding.plain.platform.isUsbConnected
 import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.platform.getAppVersionName
 import com.ismartcoding.plain.platform.getSdkInt
@@ -32,8 +31,8 @@ import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.httpserver.models.App
-import com.ismartcoding.plain.httpserver.models.Battery
 import com.ismartcoding.plain.httpserver.models.DeviceInfo
+import com.ismartcoding.plain.httpserver.models.DeviceStatus
 import com.ismartcoding.plain.httpserver.models.TempValue
 import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.platform.getDeviceType
@@ -44,8 +43,8 @@ suspend fun deviceInfo(): DeviceInfo {
 }
 
 @GraphQLQuery
-suspend fun battery(): Battery {
-    return getBattery().toModel()
+suspend fun deviceStatus(): DeviceStatus {
+    return getDeviceStatus().toModel()
 }
 
 @OptIn(ExperimentalEncodingApi::class)
@@ -60,7 +59,6 @@ suspend fun app(): App {
         appDir = appDir(),
         deviceName = TempData.deviceName.value,
         deviceType = getDeviceType(),
-        getBattery().level,
         getAppVersionName(),
         getSdkInt(),
         AppChannelType.fromString(buildChannel),
