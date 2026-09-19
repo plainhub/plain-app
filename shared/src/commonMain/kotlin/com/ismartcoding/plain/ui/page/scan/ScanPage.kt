@@ -1,29 +1,22 @@
 package com.ismartcoding.plain.ui.page.scan
 
 import com.ismartcoding.plain.i18n.*
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,14 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.lib.Channel
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.discover.PairingInitiator
@@ -49,10 +41,12 @@ import com.ismartcoding.plain.discover.QrPairPayload
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.platform.ScanCameraView
+import com.ismartcoding.plain.platform.ScannedCode
+import com.ismartcoding.plain.platform.ScannedFrame
+import com.ismartcoding.plain.platform.ScannedImage
 import com.ismartcoding.plain.platform.decodeQrFromUri
-import com.ismartcoding.plain.platform.isGestureInteractionMode
+import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -60,12 +54,15 @@ import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.preferences.ScanHistoryPreference
+import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.page.scan.components.ScanCodeTags
+import com.ismartcoding.plain.ui.page.scan.components.ScanImageCodePicker
 import com.ismartcoding.plain.ui.theme.darkMask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -78,8 +75,49 @@ fun ScanPage(navController: NavHostController) {
     var hasCamPermission by remember { mutableStateOf(Permission.CAMERA.isGranted()) }
     var showScanResultSheet by remember { mutableStateOf(false) }
     var scanResult by remember { mutableStateOf("") }
+    // frozen multi-code frame: recognition stops until cancelled, so tags never jitter
+    var frozenCodes by remember { mutableStateOf<List<ScannedCode>>(emptyList()) }
+    var pickedImage by remember { mutableStateOf<ScannedImage?>(null) }
+    var pickedImageUri by remember { mutableStateOf("") }
+    var pairingInFlight by remember { mutableStateOf(false) }
+    var handledText by remember { mutableStateOf<String?>(null) }
+    val tracker = remember { ScanCodeTracker() }
+    val autoOpenPolicy = remember { ScanAutoOpenPolicy() }
+    val freezeFrame = remember { mutableStateOf<ScannedFrame?>(null) }
+
+    val multiFrozen = frozenCodes.size >= 2
+    val showingPicker = pickedImage != null
+    val frozenSnapshot = freezeFrame.value
+
+    fun resumeScanning() {
+        frozenCodes = emptyList()
+        freezeFrame.value = null
+        tracker.reset()
+        autoOpenPolicy.reset()
+        handledText = null
+        cameraDetecting.value = true
+    }
+
+    fun resumeIfIdle() {
+        if (frozenCodes.isEmpty() && pickedImage == null && !showScanResultSheet) {
+            freezeFrame.value = null
+            tracker.reset()
+            autoOpenPolicy.reset()
+            handledText = null
+            cameraDetecting.value = true
+        }
+    }
+
+    fun openResult(text: String) {
+        scanResult = text
+        addScanResult(scope, text)
+        cameraDetecting.value = false
+        showScanResultSheet = true
+    }
 
     fun startQrPairing(payload: QrPairPayload) {
+        pairingInFlight = true
+        cameraDetecting.value = false
         scope.launch {
             val title = LocaleHelper.getStringFAsync(Res.string.pair_with_device, payload.name)
             val message = LocaleHelper.getStringFAsync(Res.string.confirm_pair_with_device, payload.name)
@@ -87,12 +125,17 @@ fun ScanPage(navController: NavHostController) {
                 title = title,
                 message = message,
                 confirmButton = Pair(LocaleHelper.getStringAsync(Res.string.confirm)) {
+                    pairingInFlight = false
+                    resumeIfIdle()
                     coIO {
                         PairingInitiator.start(payload.toDevice())
                         DialogHelper.showSuccess(Res.string.qr_pair_request_sent)
                     }
                 },
-                dismissButton = Pair(LocaleHelper.getStringAsync(Res.string.cancel)) {},
+                dismissButton = Pair(LocaleHelper.getStringAsync(Res.string.cancel)) {
+                    pairingInFlight = false
+                    resumeIfIdle()
+                },
             )
         }
     }
@@ -103,9 +146,37 @@ fun ScanPage(navController: NavHostController) {
             startQrPairing(qrPairPayload)
             return
         }
-        scanResult = text
-        addScanResult(scope, text)
-        showScanResultSheet = true
+        openResult(text)
+    }
+
+    /**
+     * Per-frame handler: a code only surfaces after [ScanCodeTracker] confirms it on
+     * consecutive frames. Several codes freeze recognition (WeChat-style) with tappable
+     * tags; a single code auto-opens only while no other unconfirmed code shares the
+     * frame (see [ScanAutoOpenPolicy]), so a multi-code scene never pops a sheet by
+     * itself.
+     */
+    fun onFrameCodes(codes: List<ScannedCode>) {
+        if (frozenCodes.isNotEmpty()) return
+        val confirmed = tracker.accept(codes)
+        if (handledText != null && confirmed.none { it.text == handledText }) {
+            handledText = null
+        }
+        if (confirmed.size >= 2) {
+            frozenCodes = confirmed
+            cameraDetecting.value = false
+            return
+        }
+        if (confirmed.size == 1) {
+            val code = confirmed.first()
+            if (autoOpenPolicy.allow(confirmed.size, codes.size) &&
+                handledText == null && !showScanResultSheet && !pairingInFlight && pickedImage == null
+            ) {
+                handledText = code.text
+                cameraDetecting.value = false
+                handleScanResult(code.text)
+            }
+        }
     }
 
     LaunchedEffect(Channel.sharedFlow) {
@@ -122,9 +193,21 @@ fun ScanPage(navController: NavHostController) {
                             cameraDetecting.value = false; DialogHelper.showLoading()
                             val result = decodeQrFromUri(event.uris.first())
                             DialogHelper.hideLoading()
-                            if (result != null) handleScanResult(result)
+                            when {
+                                result == null -> {
+                                    DialogHelper.showMessage(LocaleHelper.getStringAsync(Res.string.scan_no_code_found))
+                                    resumeIfIdle()
+                                }
+
+                                result.codes.size == 1 -> handleScanResult(result.codes.first().text)
+
+                                else -> {
+                                    pickedImageUri = event.uris.first()
+                                    pickedImage = result
+                                }
+                            }
                         } catch (ex: Exception) {
-                            DialogHelper.hideLoading(); cameraDetecting.value = true; ex.printStackTrace()
+                            DialogHelper.hideLoading(); resumeIfIdle(); ex.printStackTrace()
                         }
                     }
                 }
@@ -133,40 +216,103 @@ fun ScanPage(navController: NavHostController) {
     }
     if (!hasCamPermission) sendEvent(RequestPermissionsEvent(Permission.CAMERA))
     if (showScanResultSheet) {
-        QrScanResultBottomSheet(scanResult) { showScanResultSheet = false; cameraDetecting.value = true }
+        QrScanResultBottomSheet(scanResult) {
+            showScanResultSheet = false
+            resumeIfIdle()
+        }
     }
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController, title = stringResource(Res.string.scan_qrcode), actions = {
-            PIconButton(
-                icon = Res.drawable.history,
-                contentDescription = stringResource(Res.string.scan_history),
-                tint = MaterialTheme.colorScheme.onSurface
-            ) { navController.navigate(Routing.ScanHistory) }
-        })
+        PTopAppBar(
+            navController = navController,
+            navigationIcon = if (multiFrozen || showingPicker) {
+                {
+                    NavigationCloseIcon {
+                        if (showingPicker) {
+                            pickedImage = null
+                            resumeIfIdle()
+                        } else {
+                            resumeScanning()
+                        }
+                    }
+                }
+            } else {
+                null
+            },
+            title = stringResource(Res.string.scan_qrcode),
+            actions = {
+                PIconButton(
+                    icon = Res.drawable.history,
+                    contentDescription = stringResource(Res.string.scan_history),
+                    tint = MaterialTheme.colorScheme.onSurface
+                ) { navController.navigate(Routing.ScanHistory) }
+            })
     }, content = { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
-            if (hasCamPermission) ScanCameraView(cameraDetecting, onScanResult = { handleScanResult(it) })
-            if (hasCamPermission) ScanOverlay()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp, bottom = 64.dp)
-                    .align(Alignment.BottomCenter), horizontalArrangement = Arrangement.End
-            ) {
+            if (hasCamPermission) {
+                ScanCameraView(cameraDetecting, freezeFrame, onScanResult = { onFrameCodes(it) })
+                // freeze the detected frame over the live preview (WeChat-style);
+                // tag positions come from the snapshot so they match the image
+                if (frozenSnapshot != null && !showingPicker) {
+                    Image(
+                        bitmap = frozenSnapshot.bitmap,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+                val tagCodes = frozenSnapshot?.codes?.takeIf { it.size >= 2 } ?: frozenCodes.takeIf { multiFrozen }
+                if (tagCodes != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.25f))
+                    )
+                    ScanCodeTags(codes = tagCodes) { code -> handleScanResult(code.text) }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 24.dp, end = 24.dp, bottom = 144.dp)
+                            .align(Alignment.BottomCenter),
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.scan_multiple_codes_hint),
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(MaterialTheme.colorScheme.darkMask(0.6f))
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                    }
+                }
                 Box(
                     modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 24.dp, bottom = 64.dp)
                         .size(56.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.darkMask(0.2f))
-                        .clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) }, contentAlignment = Alignment.Center
+                        .clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) },
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(painter = painterResource(Res.drawable.image), contentDescription = stringResource(Res.string.images), tint = Color.White)
                 }
+            }
+            pickedImage?.let { image ->
+                ScanImageCodePicker(
+                    uri = pickedImageUri,
+                    image = image,
+                    // the picker stays up so the user can open another tag after
+                    // dismissing the result sheet; only the X button closes it
+                    onPick = { code -> handleScanResult(code.text) },
+                )
             }
         }
     })
@@ -178,74 +324,5 @@ private fun addScanResult(scope: CoroutineScope, value: String) {
         results.removeAll { it == value }
         results.add(0, value)
         ScanHistoryPreference.putAsync(results)
-    }
-}
-
-@Composable
-private fun ScanOverlay(modifier: Modifier = Modifier) {
-    val bottomInset = if (isGestureInteractionMode()) {
-        0.dp
-    } else {
-        WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    }
-    val infiniteTransition = rememberInfiniteTransition(label = "scan")
-    val scanProgress by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse,
-        ),
-        label = "scan_line",
-    )
-    Canvas(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(bottom = bottomInset)
-    ) {
-        val boxSize = minOf(size.width, size.height) * 0.65f
-        val left = (size.width - boxSize) / 2f
-        val top = (size.height - boxSize) / 2f
-
-        // Dark overlay around scan area
-        drawRect(color = Color.Black.copy(alpha = 0.5f), topLeft = Offset(0f, 0f), size = Size(size.width, top))
-        drawRect(color = Color.Black.copy(alpha = 0.5f), topLeft = Offset(0f, top + boxSize), size = Size(size.width, size.height - top - boxSize))
-        drawRect(color = Color.Black.copy(alpha = 0.5f), topLeft = Offset(0f, top), size = Size(left, boxSize))
-        drawRect(color = Color.Black.copy(alpha = 0.5f), topLeft = Offset(left + boxSize, top), size = Size(size.width - left - boxSize, boxSize))
-
-        // Corner decorations
-        val cornerLen = 40.dp.toPx()
-        val cornerStroke = 3.dp.toPx()
-        val white = Color.White
-        // top-left
-        drawLine(white, Offset(left, top), Offset(left + cornerLen, top), cornerStroke)
-        drawLine(white, Offset(left, top), Offset(left, top + cornerLen), cornerStroke)
-        // top-right
-        drawLine(white, Offset(left + boxSize, top), Offset(left + boxSize - cornerLen, top), cornerStroke)
-        drawLine(white, Offset(left + boxSize, top), Offset(left + boxSize, top + cornerLen), cornerStroke)
-        // bottom-left
-        drawLine(white, Offset(left, top + boxSize), Offset(left + cornerLen, top + boxSize), cornerStroke)
-        drawLine(white, Offset(left, top + boxSize), Offset(left, top + boxSize - cornerLen), cornerStroke)
-        // bottom-right
-        drawLine(white, Offset(left + boxSize, top + boxSize), Offset(left + boxSize - cornerLen, top + boxSize), cornerStroke)
-        drawLine(white, Offset(left + boxSize, top + boxSize), Offset(left + boxSize, top + boxSize - cornerLen), cornerStroke)
-
-        // Animated scan line
-        val lineY = top + boxSize * scanProgress
-        drawRect(
-            brush = Brush.horizontalGradient(
-                colors = listOf(
-                    Color.Transparent,
-                    Color(0xFF00E676).copy(alpha = 0.9f),
-                    Color(0xFF00E676),
-                    Color(0xFF00E676).copy(alpha = 0.9f),
-                    Color.Transparent,
-                ),
-                startX = left,
-                endX = left + boxSize,
-            ),
-            topLeft = Offset(left, lineY - 1.5.dp.toPx()),
-            size = Size(boxSize, 3.dp.toPx()),
-        )
     }
 }

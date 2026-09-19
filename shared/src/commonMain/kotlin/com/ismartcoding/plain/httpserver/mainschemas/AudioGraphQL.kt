@@ -26,6 +26,7 @@ import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.Audio
+import com.ismartcoding.plain.httpserver.models.AudioPlayback
 import com.ismartcoding.plain.httpserver.models.AudioPlayHistory
 import com.ismartcoding.plain.httpserver.models.AudioPlaylist
 import com.ismartcoding.plain.httpserver.models.ID
@@ -52,6 +53,15 @@ suspend fun audioQueueItems(offset: Int, limit: Int): List<PlaylistAudio> {
 suspend fun audioQueueItemCount(): Int {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     return AudioQueueManager.queueTotal()
+}
+
+/** Player state: play mode preference plus the current track path. */
+@GraphQLQuery
+suspend fun audioPlayback(): AudioPlayback {
+    return AudioPlayback(
+        mode = AudioPlayModePreference.getValueAsync(),
+        currentPath = AudioPlayingPreference.getValueAsync(),
+    )
 }
 
 /** Play the given track: adds it to the manual queue when missing and marks it current. */
@@ -135,7 +145,7 @@ suspend fun audioPlaylistItemCount(id: ID): Int {
 }
 
 @GraphQLQuery
-suspend fun audioPlayHistory(limit: Int = 50, offset: Int = 0): List<AudioPlayHistory> {
+suspend fun audioPlayHistory(offset: Int = 0, limit: Int = 50): List<AudioPlayHistory> {
     return AudioQueueManager.recentPage(limit, offset).map { it.toModel() }
 }
 

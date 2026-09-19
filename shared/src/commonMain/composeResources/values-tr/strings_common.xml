@@ -131,6 +131,8 @@
     <string name="cut">Kes</string>
     <string name="scan">Tara</string>
     <string name="scan_qrcode">QR kodu tara</string>
+    <string name="scan_multiple_codes_hint">Birden fazla kod algılandı. Birini seçmek için dokunun</string>
+    <string name="scan_no_code_found">Kod algılanmadı</string>
     <string name="copy_link">Bağlantıyı kopyala</string>
     <string name="link">Bağlantı</string>
     <string name="pull_down_to_sync_current_feed">Mevcut beslemeyi senkronize etmek için aşağı çekin</string>

@@ -22,7 +22,7 @@ type Query {
   screenMirrorControlEnabled: Boolean!
   screenMirrorQuality: ScreenMirrorQuality!
   uploadedChunks(fileId: String!): [String!]!
-  mergeStatus(fileId: String!): String!
+  mergeStatus(fileId: String!): MergeTask!
   feeds: [Feed!]!
   feedsCount: [FeedCount!]!
   feedEntryCount(query: String!): Int!
@@ -34,12 +34,13 @@ type Query {
   audioCount(query: String!): Int!
   audioQueueItems(offset: Int!, limit: Int!): [PlaylistAudio!]!
   audioQueueItemCount: Int!
+  audioPlayback: AudioPlayback!
   audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
   audioLyrics(path: String!): String!
   audioPlaylists: [AudioPlaylist!]!
   audioPlaylistItems(id: ID!, offset: Int!, limit: Int!): [PlaylistAudio!]!
   audioPlaylistItemCount(id: ID!): Int!
-  audioPlayHistory(limit: Int!, offset: Int!): [AudioPlayHistory!]!
+  audioPlayHistory(offset: Int!, limit: Int!): [AudioPlayHistory!]!
   imageCount(query: String!): Int!
   imageSearchStatus: ImageSearchStatus!
   images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
@@ -49,7 +50,7 @@ type Query {
   noteCount(query: String!): Int!
   note(id: ID!): Note
   notes(offset: Int!, limit: Int!, query: String!): [Note!]!
-  mediaBuckets(type: DataType!): [MediaBucket!]!
+  mediaBuckets(type: MediaDataType!): [MediaBucket!]!
   deviceInfo: DeviceInfo!
   deviceStatus: DeviceStatus!
   app: App!
@@ -96,7 +97,7 @@ type Mutation {
   removeChatChannelMember(id: ID!, peerId: String!): ChatChannel!
   acceptChatChannelInvite(id: ID!): Boolean!
   declineChatChannelInvite(id: ID!): Boolean!
-  cancelNotifications(ids: [ID!]!): Boolean!
+  deleteNotifications(ids: [ID!]!): Boolean!
   replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
   unarchiveConversation(id: String!): Boolean!
   sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
@@ -125,8 +126,8 @@ type Mutation {
   sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
   requestScreenMirrorKeyFrame: Boolean!
   deleteChunks(fileId: String!): Boolean!
-  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, isAppFile: Boolean!, totalSize: Long!): String!
-  mergeChunksAsync(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, isAppFile: Boolean!, totalSize: Long!): String!
+  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, totalSize: Long!): MergeTask!
+  mergeAppFileChunks(fileId: String!, totalChunks: Int!, fileName: String!, totalSize: Long!): MergeTask!
   deleteFiles(paths: [String!]!): Boolean!
   createDir(path: String!): File!
   renameFile(path: String!, name: String!): Boolean!
@@ -177,15 +178,14 @@ type Mutation {
   restoreNotes(query: String!): String!
   deleteNotes(query: String!): String!
   exportNotes(query: String!): String!
-  deleteMediaItems(type: DataType!, query: String!): ActionResult!
-  trashMediaItems(type: DataType!, query: String!): ActionResult!
-  restoreMediaItems(type: DataType!, query: String!): ActionResult!
-  moveMediaItems(type: DataType!, query: String!, destDir: String!): ActionResult!
+  deleteMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
+  trashMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
+  restoreMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
+  moveMediaItems(type: MediaDataType!, query: String!, destDir: String!): MediaActionResult!
   setTempValue(key: String!, value: String!): TempValue!
   relaunchApp: Boolean!
   openAccessibilitySettings: Boolean!
   openWebSettings(feature: AccessFeatureType): Boolean!
-  setClip(text: String!): Boolean!
   updateDeviceName(name: String!): Boolean!
   deleteContacts(query: String!): Boolean!
   updateContact(id: ID!, input: ContactInput!): Contact
@@ -207,7 +207,7 @@ type Mutation {
   createDbTableRow(table: String!, row: String!): Boolean!
   deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
   setClipboard(text: String!): Boolean!
-  cancelClipboard(ids: [ID!]!): Boolean!
+  deleteClipboard(ids: [ID!]!): Boolean!
   addBookmarks(urls: [String!]!, groupId: String!): [Bookmark!]!
   updateBookmark(id: ID!, input: BookmarkInput!): Bookmark
   deleteBookmarks(ids: [ID!]!): Boolean!
@@ -229,11 +229,6 @@ enum AccessFeatureType {
   CLIPBOARD
 }
 
-type ActionResult {
-  type: DataType!
-  query: String!
-}
-
 type AndroidExtras {
   sdkVersion: Int!
   versionCodeName: String!
@@ -251,11 +246,6 @@ type AndroidExtras {
   buildTime: Instant!
 }
 
-enum DeviceFeature {
-  MEDIA_TRASH
-  MIRROR_AUDIO
-}
-
 type App {
   clientId: String!
   urlToken: String!
@@ -267,11 +257,6 @@ type App {
   features: [DeviceFeature!]!
   channel: AppChannelType!
   permissions: [Permission!]!
-  audioMode: MediaPlayMode!
-  audioCurrent: String!
-  sdcardPath: String!
-  usbDiskPaths: [String!]!
-  internalStoragePath: String!
   downloadsDir: String!
   developerMode: Boolean!
   debug: Boolean!
@@ -320,6 +305,11 @@ type AudioPlayHistory {
   duration: Long!
   playCount: Long!
   playedAt: Instant!
+}
+
+type AudioPlayback {
+  mode: MediaPlayMode!
+  currentPath: String!
 }
 
 type AudioPlaylist {
@@ -418,6 +408,14 @@ enum ChatChannelStatus {
   KICKED
 }
 
+type ChatFiles {
+  ids: [String!]!
+}
+
+type ChatImages {
+  ids: [String!]!
+}
+
 type ChatItem {
   id: ID!
   fromId: String!
@@ -431,13 +429,17 @@ type ChatItem {
   data: ChatItemContent
 }
 
-union ChatItemContent = MessageFiles | MessageImages | MessageText
+union ChatItemContent = ChatFiles | ChatImages | ChatText
 
 enum ChatStatus {
   SENT
   PARTIAL
   FAILED
   PENDING
+}
+
+type ChatText {
+  ids: [String!]!
 }
 
 type Clipboard {
@@ -547,6 +549,23 @@ type DbTableInfo {
   idKey: String!
 }
 
+enum DeviceFeature {
+  MEDIA_TRASH
+  MIRROR_AUDIO
+  DOC_PREVIEW
+  IMAGE_SEARCH
+  MEDIA_SCAN
+  SMS
+  CALLS
+  CALL_PHONE
+  CONTACTS
+  PACKAGES
+  NOTES
+  FEEDS
+  SCREEN_MIRROR
+  IMAGE_EDITOR
+}
+
 type DeviceInfo {
   name: String!
   platform: DevicePlatform!
@@ -589,6 +608,7 @@ enum DeviceType {
   PHONE
   TABLET
   TV
+  NAS
   OTHER
 }
 
@@ -776,11 +796,24 @@ type Location {
 """The Long scalar type represents a signed 64-bit numeric non-fractional value"""
 scalar Long
 
+type MediaActionResult {
+  type: MediaDataType!
+  query: String!
+  affectedCount: Int!
+}
+
 type MediaBucket {
   id: ID!
   name: String!
   itemCount: Int!
   topItems: [String!]!
+}
+
+enum MediaDataType {
+  AUDIO
+  VIDEO
+  IMAGE
+  DOC
 }
 
 union MediaFileInfo = AudioFileInfo | ImageFileInfo | VideoFileInfo
@@ -789,6 +822,21 @@ enum MediaPlayMode {
   REPEAT
   REPEAT_ONE
   SHUFFLE
+}
+
+type MergeTask {
+  status: MergeTaskStatus!
+  value: String
+  mergedSize: Long
+  error: String
+}
+
+enum MergeTaskStatus {
+  NONE
+  STARTED
+  MERGING
+  DONE
+  FAILED
 }
 
 type Message {
@@ -820,18 +868,6 @@ type MessageConversation {
   messageCount: Int!
   read: Boolean!
   addresses: [String!]!
-}
-
-type MessageFiles {
-  ids: [String!]!
-}
-
-type MessageImages {
-  ids: [String!]!
-}
-
-type MessageText {
-  ids: [String!]!
 }
 
 type Note {

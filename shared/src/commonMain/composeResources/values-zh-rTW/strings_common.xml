@@ -131,6 +131,8 @@
     <string name="cut">剪切</string>
     <string name="scan">掃描</string>
     <string name="scan_qrcode">掃描二維碼</string>
+    <string name="scan_multiple_codes_hint">偵測到多個 QR Code，點擊選擇</string>
+    <string name="scan_no_code_found">未偵測到 QR Code</string>
     <string name="copy_link">複製鏈接</string>
     <string name="link">鏈接</string>
     <string name="pull_down_to_sync_current_feed">下拉同步當前訂閱</string>

@@ -131,6 +131,8 @@
     <string name="cut">Вырезать</string>
     <string name="scan">Сканировать</string>
     <string name="scan_qrcode">Сканировать QR-код</string>
+    <string name="scan_multiple_codes_hint">Обнаружено несколько кодов. Нажмите, чтобы выбрать</string>
+    <string name="scan_no_code_found">Код не обнаружен</string>
     <string name="copy_link">Копировать ссылку</string>
     <string name="link">Ссылка</string>
     <string name="pull_down_to_sync_current_feed">Потяните вниз, чтобы синхронизировать текущую подписку</string>

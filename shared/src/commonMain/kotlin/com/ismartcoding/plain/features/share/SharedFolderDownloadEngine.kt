@@ -44,8 +44,9 @@ class SharedFolderBatchTask(
     val title: String,
     /** "" = public Downloads target; otherwise an absolute directory path. */
     val targetDir: String,
-    val link: SharedLink,
-    val urlToken: String,
+    /** Working endpoint; refreshed from a fresh enqueue before a re-run (see [refreshFrom]). */
+    var link: SharedLink,
+    var urlToken: String,
     val entries: List<SharedFileDto>,
     val zipName: String = "",
 ) : DownloadTaskHandle {
@@ -86,6 +87,13 @@ class SharedFolderBatchTask(
         return s
     }
 
+    /** Takes over the fresh enqueue's endpoint, so re-runs survive address changes. */
+    override fun refreshFrom(fresh: DownloadTaskHandle) {
+        if (fresh !is SharedFolderBatchTask) return
+        link = fresh.link
+        urlToken = fresh.urlToken
+    }
+
     /** Overall fraction 0..1; 0 while the walker is still counting. */
     fun fraction(): Float = if (totalSize > 0) (downloadedSize.toFloat() / totalSize).coerceIn(0f, 1f) else 0f
 }
@@ -116,6 +124,12 @@ internal fun deriveShareBatchStatus(
 object SharedFolderDownloadEngine : DownloadEngine {
     private const val PROGRESS_INTERVAL_MS = 600L
 
+    init {
+        // Every enqueue API touches this object first, so the engine is
+        // always registered before any of its tasks can reach the queue.
+        DownloadCenter.registerEngine(DOWNLOAD_KIND_SHARE, this)
+    }
+
     /** Downloads root subfolder used when saving into public Downloads. */
     private fun downloadsBase(): String = "${getDownloadsDirPath().trimEnd('/')}/PlainApp"
 
@@ -125,7 +139,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             messageId = messageId, type = ShareBatchType.FILE, title = entry.name,
             targetDir = targetDir, link = link, urlToken = urlToken, entries = listOf(entry),
         )
-        DownloadCenter.add(task)
+        DownloadCenter.enqueueUnique(task)
     }
 
     fun enqueueDirSync(messageId: String, link: SharedLink, urlToken: String, entry: SharedFileDto, targetDir: String) {
@@ -134,7 +148,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             messageId = messageId, type = ShareBatchType.SYNC, title = entry.name,
             targetDir = targetDir, link = link, urlToken = urlToken, entries = listOf(entry),
         )
-        DownloadCenter.add(task)
+        DownloadCenter.enqueueUnique(task)
     }
 
     fun enqueueZip(messageId: String, link: SharedLink, urlToken: String, entries: List<SharedFileDto>, zipName: String) {
@@ -143,7 +157,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             messageId = messageId, type = ShareBatchType.ZIP, title = zipName,
             targetDir = "", link = link, urlToken = urlToken, entries = entries, zipName = zipName,
         )
-        DownloadCenter.add(task)
+        DownloadCenter.enqueueUnique(task)
     }
 
     fun enqueueMulti(messageId: String, link: SharedLink, urlToken: String, entries: List<SharedFileDto>, targetDir: String) {
@@ -154,7 +168,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
             title = "${entries.firstOrNull()?.name ?: ""}${if (entries.size > 1) " (+${entries.size - 1})" else ""}",
             targetDir = targetDir, link = link, urlToken = urlToken, entries = entries,
         )
-        DownloadCenter.add(task)
+        DownloadCenter.enqueueUnique(task)
     }
 
     /** Re-runs only the failed files of a finished batch. */
@@ -167,6 +181,7 @@ object SharedFolderDownloadEngine : DownloadEngine {
     override suspend fun execute(taskHandle: DownloadTaskHandle) {
         val task = taskHandle as SharedFolderBatchTask
         task.status = DownloadStatus.DOWNLOADING
+        task.error = ""
         task.failures.clear()
         task.failedFiles = 0
         task.packing = false

@@ -38,7 +38,7 @@ object DownloadCenter {
     }
 
     fun registerEngine(kind: String, engine: DownloadEngine) {
-        engines[kind] = engine
+        tasksLock.withLock { engines[kind] = engine }
     }
 
     fun get(taskId: String): DownloadTaskHandle? = tasksLock.withLock { tasks[taskId] }
@@ -50,6 +50,29 @@ object DownloadCenter {
         if (tasks.containsKey(task.id)) return@withLock false
         tasks[task.id] = task
         dispatch(task)
+        scope.launch { updateProgressFlow() }
+        true
+    }
+
+    /**
+     * Enqueues [task], or — when a task with the same id already exists —
+     * re-runs that one if it finished (retry semantics: fresh user intent),
+     * keeping its engine-side bookkeeping (e.g. completed files). Returns
+     * false only when an identical task is queued or running right now.
+     */
+    fun enqueueUnique(task: DownloadTaskHandle): Boolean = tasksLock.withLock {
+        val existing = tasks[task.id]
+        if (existing == null) {
+            tasks[task.id] = task
+            dispatch(task)
+            scope.launch { updateProgressFlow() }
+            return@withLock true
+        }
+        if (!existing.status.isTerminalDownloadStatus()) return@withLock false
+        existing.refreshFrom(task)
+        existing.aborted = false
+        existing.status = DownloadStatus.PENDING
+        dispatch(existing)
         scope.launch { updateProgressFlow() }
         true
     }
@@ -165,8 +188,10 @@ object DownloadCenter {
     }
 
     private suspend fun executeTaskAsync(task: DownloadTaskHandle) {
-        val engine = engines[task.kind]
+        val engine = tasksLock.withLock { engines[task.kind] }
         if (engine == null) {
+            LogCat.e("No engine registered for download kind ${task.kind}, failing ${task.id}")
+            task.error = "no engine registered for kind ${task.kind}"
             task.status = DownloadStatus.FAILED
             updateProgressFlow()
             return

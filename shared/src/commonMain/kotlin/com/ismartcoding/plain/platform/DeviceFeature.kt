@@ -1,12 +1,25 @@
 package com.ismartcoding.plain.platform
 
 /**
- * Optional capabilities the device declares about itself; clients gate UI on
- * these without knowing anything about the underlying OS version.
+ * Capabilities the device declares about itself; clients gate UI on these
+ * without knowing anything about the device type or OS version. Media/file
+ * domains are always present and therefore not listed.
  */
 enum class DeviceFeature {
     MEDIA_TRASH,
     MIRROR_AUDIO,
+    DOC_PREVIEW,
+    IMAGE_SEARCH,
+    MEDIA_SCAN,
+    SMS,
+    CALLS,
+    CALL_PHONE,
+    CONTACTS,
+    PACKAGES,
+    NOTES,
+    FEEDS,
+    SCREEN_MIRROR,
+    IMAGE_EDITOR,
 }
 
 /**

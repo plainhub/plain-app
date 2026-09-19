@@ -71,7 +71,7 @@ suspend fun setClipboard(text: String, context: Context): Boolean {
 
 /** Deletes clipboard history entries by ids. */
 @GraphQLMutation
-suspend fun cancelClipboard(ids: List<ID>): Boolean {
+suspend fun deleteClipboard(ids: List<ID>): Boolean {
     ensureClipboardEnabled()
     ClipboardHelper.deleteByIds(ids.map { it.value })
     return true

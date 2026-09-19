@@ -139,6 +139,8 @@
     <string name="cut">Cut</string>
     <string name="scan">Scan</string>
     <string name="scan_qrcode">Scan QR code</string>
+    <string name="scan_multiple_codes_hint">Multiple codes detected. Tap one to open</string>
+    <string name="scan_no_code_found">No code detected</string>
     <string name="copy_link">Copy link</string>
     <string name="link">Link</string>
     <string name="pull_down_to_sync_current_feed">Pull down to sync current feed</string>

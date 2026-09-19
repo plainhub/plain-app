@@ -32,7 +32,7 @@ actual fun getImageMeta(path: String): DImageMeta? = ImageHelper.getMeta(path)
 actual fun tryDecodeQrCode(path: String): String? {
     return try {
         val bitmap = BitmapFactory.decodeFile(path) ?: return null
-        QrCodeScanHelper.tryDecode(bitmap)?.text
+        QrCodeScanHelper.tryDecode(bitmap)
     } catch (e: Exception) {
         null
     }

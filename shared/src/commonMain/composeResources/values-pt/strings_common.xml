@@ -131,6 +131,8 @@
     <string name="cut">Cortar</string>
     <string name="scan">Digitalizar</string>
     <string name="scan_qrcode">Digitalizar código QR</string>
+    <string name="scan_multiple_codes_hint">Vários códigos detectados. Toque em um para abrir</string>
+    <string name="scan_no_code_found">Nenhum código detectado</string>
     <string name="copy_link">Copiar link</string>
     <string name="link">Link</string>
     <string name="pull_down_to_sync_current_feed">Puxe para baixo para sincronizar o feed atual</string>

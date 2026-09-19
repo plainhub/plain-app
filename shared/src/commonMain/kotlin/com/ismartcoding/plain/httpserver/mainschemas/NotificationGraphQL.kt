@@ -21,7 +21,7 @@ suspend fun notifications(): List<Notification> {
 }
 
 @GraphQLMutation
-suspend fun cancelNotifications(ids: List<ID>): Boolean {
+suspend fun deleteNotifications(ids: List<ID>): Boolean {
     Permission.NOTIFICATION_LISTENER.checkEnabledAsync()
     sendEvent(HCancelNotificationsEvent(ids.map { it.value }.toSet()))
     return true

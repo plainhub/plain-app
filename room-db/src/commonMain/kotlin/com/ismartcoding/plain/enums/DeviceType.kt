@@ -5,5 +5,6 @@ enum class DeviceType {
     PHONE,
     TABLET,
     TV,
+    NAS,
     OTHER;
 }

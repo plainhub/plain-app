@@ -18,6 +18,14 @@ enum ChannelSystemMessageType {
   LEAVE
 }
 
+type ChatFiles {
+  ids: [String!]!
+}
+
+type ChatImages {
+  ids: [String!]!
+}
+
 type ChatItem {
   id: ID!
   fromId: String!
@@ -31,7 +39,7 @@ type ChatItem {
   data: ChatItemContent
 }
 
-union ChatItemContent = MessageFiles | MessageImages | MessageText
+union ChatItemContent = ChatFiles | ChatImages | ChatText
 
 enum ChatStatus {
   SENT
@@ -40,22 +48,14 @@ enum ChatStatus {
   PENDING
 }
 
+type ChatText {
+  ids: [String!]!
+}
+
 scalar Instant
 
 """The Long scalar type represents a signed 64-bit numeric non-fractional value"""
 scalar Long
-
-type MessageFiles {
-  ids: [String!]!
-}
-
-type MessageImages {
-  ids: [String!]!
-}
-
-type MessageText {
-  ids: [String!]!
-}
 
 enum PeerStatus {
   PAIRED

@@ -131,6 +131,8 @@
     <string name="cut">कट दें</string>
     <string name="scan">स्कैन</string>
     <string name="scan_qrcode">क्यूआर कोड स्कैन करें</string>
+    <string name="scan_multiple_codes_hint">एकाधिक कोड पाए गए। खोलने के लिए एक पर टैप करें</string>
+    <string name="scan_no_code_found">कोई कोड नहीं मिला</string>
     <string name="copy_link">लिंक कॉपी करें</string>
     <string name="link">लिंक</string>
     <string name="pull_down_to_sync_current_feed">वर्तमान फ़ीड को सिंक करने के लिए नीचे खींचें</string>

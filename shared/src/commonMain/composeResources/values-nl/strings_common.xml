@@ -131,6 +131,8 @@
     <string name="cut">Knippen</string>
     <string name="scan">Scannen</string>
     <string name="scan_qrcode">Scan QR-code</string>
+    <string name="scan_multiple_codes_hint">Meerdere codes gedetecteerd. Tik er een aan om te openen</string>
+    <string name="scan_no_code_found">Geen code gedetecteerd</string>
     <string name="copy_link">Link kopiëren</string>
     <string name="link">Link</string>
     <string name="pull_down_to_sync_current_feed">Trek omlaag om de huidige feed te synchroniseren</string>

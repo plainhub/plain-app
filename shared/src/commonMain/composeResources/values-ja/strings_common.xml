@@ -131,6 +131,8 @@
     <string name="cut">カット</string>
     <string name="scan">スキャン</string>
     <string name="scan_qrcode">QRコードをスキャン</string>
+    <string name="scan_multiple_codes_hint">複数のQRコードを検出しました。タップして選択</string>
+    <string name="scan_no_code_found">QRコードを検出できませんでした</string>
     <string name="copy_link">リンクをコピー</string>
     <string name="link">リンク</string>
     <string name="pull_down_to_sync_current_feed">現在のフィードを同期するには下に引っ張ります</string>

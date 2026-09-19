@@ -131,6 +131,8 @@
     <string name="cut">কাটুন</string>
     <string name="scan">স্ক্যান</string>
     <string name="scan_qrcode">স্ক্যান করুন QR কোড</string>
+    <string name="scan_multiple_codes_hint">একাধিক কোড শনাক্ত হয়েছে। খুলতে একটিতে ট্যাপ করুন</string>
+    <string name="scan_no_code_found">কোনও কোড শনাক্ত হয়নি</string>
     <string name="copy_link">লিঙ্ক কপি করুন</string>
     <string name="link">লিঙ্ক</string>
     <string name="pull_down_to_sync_current_feed">বর্তমান ফিডটি সিঙ্ক করতে নামুন</string>

@@ -131,6 +131,8 @@
     <string name="cut">잘라내기</string>
     <string name="scan">스캔</string>
     <string name="scan_qrcode">QR 코드 스캔</string>
+    <string name="scan_multiple_codes_hint">여러 개의 코드가 감지되었습니다. 하나를 선택하세요</string>
+    <string name="scan_no_code_found">코드를 감지하지 못했습니다</string>
     <string name="copy_link">링크 복사</string>
     <string name="link">링크</string>
     <string name="pull_down_to_sync_current_feed">현재 피드 동기화하려면 아래로 당기세요</string>
