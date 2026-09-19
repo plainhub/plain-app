@@ -34,6 +34,7 @@ type Query {
   audioCount(query: String!): Int!
   audioQueueItems(offset: Int!, limit: Int!): [PlaylistAudio!]!
   audioQueueItemCount: Int!
+  audioPlayback: AudioPlayback!
   audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
   audioLyrics(path: String!): String!
   audioPlaylists: [AudioPlaylist!]!
@@ -267,11 +268,6 @@ type App {
   features: [DeviceFeature!]!
   channel: AppChannelType!
   permissions: [Permission!]!
-  audioMode: MediaPlayMode!
-  audioCurrent: String!
-  sdcardPath: String!
-  usbDiskPaths: [String!]!
-  internalStoragePath: String!
   downloadsDir: String!
   developerMode: Boolean!
   debug: Boolean!
@@ -979,6 +975,11 @@ type PhoneGeo {
   numberType: String!
   carrier: String!
   description: String!
+}
+
+type AudioPlayback {
+  mode: MediaPlayMode!
+  currentPath: String!
 }
 
 type PlaylistAudio {

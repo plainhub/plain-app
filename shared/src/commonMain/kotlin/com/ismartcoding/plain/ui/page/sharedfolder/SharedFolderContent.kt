@@ -52,15 +52,18 @@ internal fun SharedFolderContent(
         if (state.pathError) {
             ErrorBanner(onRetry = { state.retry() })
         }
-        val breadcrumbs = buildList {
-            add(BreadcrumbItem(state.rootInfo?.name ?: "/", ""))
-            state.crumbs.forEach { add(BreadcrumbItem(it.name, it.virtualPath)) }
+        // Breadcrumb only once the share's root info has loaded; a bare "/" placeholder while loading looks broken.
+        if (state.rootInfo != null) {
+            val breadcrumbs = buildList {
+                add(BreadcrumbItem(state.rootInfo?.name ?: "/", ""))
+                state.crumbs.forEach { add(BreadcrumbItem(it.name, it.virtualPath)) }
+            }
+            BreadcrumbView(
+                breadcrumbs = breadcrumbs,
+                selectedIndex = breadcrumbs.lastIndex,
+                onItemClick = { item -> state.onCrumbClick(item.path) },
+            )
         }
-        BreadcrumbView(
-            breadcrumbs = breadcrumbs,
-            selectedIndex = breadcrumbs.lastIndex,
-            onItemClick = { item -> state.onCrumbClick(item.path) },
-        )
         val showMini = tasks.isNotEmpty() && !state.selectMode
         var miniClearance by remember { mutableIntStateOf(0) }
         Box(modifier = Modifier.weight(1f)) {

@@ -5,7 +5,6 @@ import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import com.ismartcoding.plain.platform.DeviceFeature
 import com.ismartcoding.plain.platform.Permission
-import com.ismartcoding.plain.enums.MediaPlayMode
 
 @GraphQLType
 data class App(
@@ -19,11 +18,6 @@ data class App(
     val features: List<DeviceFeature>,
     val channel: AppChannelType,
     val permissions: List<Permission>,
-    val audioMode: MediaPlayMode,
-    val audioCurrent: String,
-    val sdcardPath: String,
-    val usbDiskPaths: List<String>,
-    val internalStoragePath: String,
     val downloadsDir: String,
     val developerMode: Boolean,
     val debug: Boolean,

@@ -17,15 +17,11 @@ import com.ismartcoding.plain.platform.appDir
 import com.ismartcoding.plain.platform.getDeviceInfo
 import com.ismartcoding.plain.platform.getDeviceStatus
 import com.ismartcoding.plain.platform.getDownloadsDirPath
-import com.ismartcoding.plain.platform.getInternalStoragePath
-import com.ismartcoding.plain.platform.getSDCardPath
-import com.ismartcoding.plain.platform.getUsbDiskPaths
 import com.ismartcoding.plain.platform.isDebugBuild
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.lib.sendEvent
-import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.httpserver.models.App
@@ -61,11 +57,6 @@ suspend fun app(): App {
         getDeviceFeatures(),
         AppChannelType.fromString(buildChannel),
         grantedPermissions,
-        TempData.audioPlayMode.value,
-        AudioPlayingPreference.getValueAsync(),
-        sdcardPath = getSDCardPath(),
-        usbDiskPaths = getUsbDiskPaths(),
-        internalStoragePath = getInternalStoragePath(),
         downloadsDir = getDownloadsDirPath(),
         developerMode = DeveloperModePreference.getAsync(),
         debug = isDebugBuild(),

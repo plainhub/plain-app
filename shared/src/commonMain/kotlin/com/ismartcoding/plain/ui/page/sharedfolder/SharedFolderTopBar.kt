@@ -55,7 +55,7 @@ internal fun SharedFolderTopBar(
                         dismiss()
                         state.browserUrl()?.let { launchUrl(it) }
                     }
-                    PSheetActionRow(Res.drawable.copy, stringResource(Res.string.copy)) {
+                    PSheetActionRow(Res.drawable.copy, stringResource(Res.string.copy_link)) {
                         dismiss()
                         state.browserUrl()?.let {
                             setClipboardText("", it)

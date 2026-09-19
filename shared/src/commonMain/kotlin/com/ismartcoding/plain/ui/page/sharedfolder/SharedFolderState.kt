@@ -157,7 +157,7 @@ internal class SharedFolderState(
 
     fun browserUrl(): String? {
         val msg = shareMsg ?: return null
-        val link = activeLink ?: SharedLinkClient.linkOf(msg.shareId, msg.urlToken, msg.peerInfo.ip, msg.peerInfo.port)
+        val link = activeLink ?: addressCandidates(msg).firstOrNull() ?: return null
         return SharedLinkClient.pageUrl(link)
     }
 

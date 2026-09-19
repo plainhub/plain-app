@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.sharedfolder
 
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.chat.peer.PeerCacher
@@ -14,16 +15,23 @@ import com.ismartcoding.plain.lib.mdns.MdnsServiceBrowser
 import com.ismartcoding.plain.lib.mdns.MdnsServiceSnapshot
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.platform.getDeviceIP4sWithPrefixLength
 import kotlinx.coroutines.delay
 
 /** A successful [SharedLinkClient.fetchSharedInfo] attempt: payload plus the address that worked. */
 internal class FetchResult(val info: SharedInfoDto, val link: SharedLink)
 
-/** Device address candidates for a share card: message endpoint first, then the paired peer record. */
+/** Device address candidates for a share card: our current local endpoints when the card is our own share, then message endpoint, then the paired peer record. */
 internal fun addressCandidates(msg: DMessageShare): List<SharedLink> {
-    val list = mutableListOf(
-        SharedLinkClient.linkOf(msg.shareId, msg.urlToken, msg.peerInfo.ip, msg.peerInfo.port),
-    )
+    val list = mutableListOf<SharedLink>()
+    if (msg.peerInfo.id == TempData.clientId && TempData.httpsPort.value > 0) {
+        // The share server is this device: today's local addresses beat the IP recorded at send time.
+        getDeviceIP4sWithPrefixLength().map { it.first }
+            .filter { it.isNotEmpty() }
+            .forEach { list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, it, TempData.httpsPort.value) }
+        list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, "127.0.0.1", TempData.httpsPort.value)
+    }
+    list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, msg.peerInfo.ip, msg.peerInfo.port)
     PeerCacher.getPeer(msg.peerInfo.id)?.let { peer ->
         if (peer.ip.isNotEmpty() && peer.port > 0) {
             list += SharedLinkClient.linkOf(msg.shareId, msg.urlToken, peer.ip, peer.port)
