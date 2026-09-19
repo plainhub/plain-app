@@ -22,7 +22,7 @@ type Query {
   screenMirrorControlEnabled: Boolean!
   screenMirrorQuality: ScreenMirrorQuality!
   uploadedChunks(fileId: String!): [String!]!
-  mergeStatus(fileId: String!): String!
+  mergeStatus(fileId: String!): MergeTask!
   feeds: [Feed!]!
   feedsCount: [FeedCount!]!
   feedEntryCount(query: String!): Int!
@@ -126,8 +126,8 @@ type Mutation {
   sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
   requestScreenMirrorKeyFrame: Boolean!
   deleteChunks(fileId: String!): Boolean!
-  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, isAppFile: Boolean!, totalSize: Long!): String!
-  mergeChunksAsync(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, isAppFile: Boolean!, totalSize: Long!): String!
+  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, totalSize: Long!): MergeTask!
+  mergeAppFileChunks(fileId: String!, totalChunks: Int!, fileName: String!, totalSize: Long!): MergeTask!
   deleteFiles(paths: [String!]!): Boolean!
   createDir(path: String!): File!
   renameFile(path: String!, name: String!): Boolean!
@@ -408,6 +408,14 @@ enum ChatChannelStatus {
   KICKED
 }
 
+type ChatFiles {
+  ids: [String!]!
+}
+
+type ChatImages {
+  ids: [String!]!
+}
+
 type ChatItem {
   id: ID!
   fromId: String!
@@ -421,13 +429,17 @@ type ChatItem {
   data: ChatItemContent
 }
 
-union ChatItemContent = MessageFiles | MessageImages | MessageText
+union ChatItemContent = ChatFiles | ChatImages | ChatText
 
 enum ChatStatus {
   SENT
   PARTIAL
   FAILED
   PENDING
+}
+
+type ChatText {
+  ids: [String!]!
 }
 
 type Clipboard {
@@ -540,6 +552,18 @@ type DbTableInfo {
 enum DeviceFeature {
   MEDIA_TRASH
   MIRROR_AUDIO
+  DOC_PREVIEW
+  IMAGE_SEARCH
+  MEDIA_SCAN
+  SMS
+  CALLS
+  CALL_PHONE
+  CONTACTS
+  PACKAGES
+  NOTES
+  FEEDS
+  SCREEN_MIRROR
+  IMAGE_EDITOR
 }
 
 type DeviceInfo {
@@ -800,6 +824,21 @@ enum MediaPlayMode {
   SHUFFLE
 }
 
+type MergeTask {
+  status: MergeTaskStatus!
+  value: String
+  mergedSize: Long
+  error: String
+}
+
+enum MergeTaskStatus {
+  NONE
+  STARTED
+  MERGING
+  DONE
+  FAILED
+}
+
 type Message {
   id: ID!
   body: String!
@@ -829,18 +868,6 @@ type MessageConversation {
   messageCount: Int!
   read: Boolean!
   addresses: [String!]!
-}
-
-type MessageFiles {
-  ids: [String!]!
-}
-
-type MessageImages {
-  ids: [String!]!
-}
-
-type MessageText {
-  ids: [String!]!
 }
 
 type Note {

@@ -6,17 +6,17 @@ import kotlin.time.Instant
 
 @GraphQLType
 data class Video(
-    var id: ID,
-    var title: String,
-    var path: String,
+    override var id: ID,
+    override var title: String,
+    override var path: String,
     val duration: Long,
-    val size: Long,
-    val bucketId: String,
-    val createdAt: Instant,
-    val updatedAt: Instant,
+    override val size: Long,
+    override val bucketId: String,
+    override val createdAt: Instant,
+    override val updatedAt: Instant,
     val takenAt: Instant?,
     val isFavorite: Boolean,
-)
+) : MediaItem
 
 fun DVideo.toModel(): Video {
     return Video(ID(id), title, path, duration, size, bucketId, createdAt, updatedAt, takenAt, isFavorite)

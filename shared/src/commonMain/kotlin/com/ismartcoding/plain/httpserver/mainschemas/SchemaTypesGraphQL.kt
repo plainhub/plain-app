@@ -24,6 +24,7 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.httpserver.models.ID
+import com.ismartcoding.plain.httpserver.models.MergeTaskStatus
 import kotlin.time.Instant
 
 fun SchemaBuilder.addMainSchemaTypes() {
@@ -38,6 +39,7 @@ fun SchemaBuilder.addMainSchemaTypes() {
     enum<DriveType>()
     enum<DeviceType>()
     enum<DeviceFeature>()
+    enum<MergeTaskStatus>()
     enum<Permission>()
     enum<FileSortBy>()
     enum<PomodoroState>()

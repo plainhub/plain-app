@@ -5,18 +5,18 @@ import kotlin.time.Instant
 
 @GraphQLType
 data class Audio(
-    val id: ID,
-    val title: String,
+    override val id: ID,
+    override val title: String,
     val artist: String,
-    val path: String,
+    override val path: String,
     val duration: Long,
-    val size: Long,
-    val bucketId: String,
+    override val size: Long,
+    override val bucketId: String,
     val albumFileId: String,
-    val createdAt: Instant,
-    val updatedAt: Instant,
+    override val createdAt: Instant,
+    override val updatedAt: Instant,
     val isFavorite: Boolean,
-)
+) : MediaItem
 
 @GraphQLType
 data class PlaylistAudio(

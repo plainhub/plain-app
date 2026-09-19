@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.httpserver.models.MergeTask
+import com.ismartcoding.plain.httpserver.models.MergeTaskStatus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -12,7 +14,7 @@ sealed class MergeJobState {
 sealed class MergeClaim {
     data object Claimed : MergeClaim()
     data object InProgress : MergeClaim()
-    data class AlreadyDone(val reply: String) : MergeClaim()
+    data class AlreadyDone(val task: MergeTask) : MergeClaim()
 }
 
 /**
@@ -27,7 +29,7 @@ object MergeJobs {
 
     suspend fun claim(fileId: String): MergeClaim = mutex.withLock {
         when (val state = jobs[fileId]) {
-            is MergeJobState.Done -> MergeClaim.AlreadyDone("done:${state.value}:${state.size}")
+            is MergeJobState.Done -> MergeClaim.AlreadyDone(MergeTask(MergeTaskStatus.DONE, state.value, state.size))
             MergeJobState.Merging -> MergeClaim.InProgress
             // A failed merge keeps its chunks on disk, so claiming again
             // (a retry) is expected and restarts the job.
@@ -54,12 +56,12 @@ object MergeJobs {
         jobs[fileId] = MergeJobState.Failed(error)
     }
 
-    suspend fun statusString(fileId: String): String = mutex.withLock {
+    suspend fun status(fileId: String): MergeTask = mutex.withLock {
         when (val state = jobs[fileId]) {
-            null -> "none"
-            MergeJobState.Merging -> "merging"
-            is MergeJobState.Done -> "done:${state.value}:${state.size}"
-            is MergeJobState.Failed -> "failed:${state.error}"
+            null -> MergeTask(MergeTaskStatus.NONE)
+            MergeJobState.Merging -> MergeTask(MergeTaskStatus.MERGING)
+            is MergeJobState.Done -> MergeTask(MergeTaskStatus.DONE, state.value, state.size)
+            is MergeJobState.Failed -> MergeTask(MergeTaskStatus.FAILED, error = state.error)
         }
     }
 

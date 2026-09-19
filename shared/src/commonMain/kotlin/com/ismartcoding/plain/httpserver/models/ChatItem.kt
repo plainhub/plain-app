@@ -32,7 +32,7 @@ data class ChatItem(
     fun getContentData(): ChatItemContent? {
         return when (_content?.value) {
             is DMessageImages -> {
-                ChatItemContent.MessageImages((_content.value as DMessageImages).items.map {
+                ChatItemContent.ChatImages((_content.value as DMessageImages).items.map {
                     val json = buildJsonObject {
                         put("path", it.uri)
                         put("name", it.fileName)
@@ -42,7 +42,7 @@ data class ChatItem(
             }
 
             is DMessageFiles -> {
-                ChatItemContent.MessageFiles((_content.value as DMessageFiles).items.map {
+                ChatItemContent.ChatFiles((_content.value as DMessageFiles).items.map {
                     val json = buildJsonObject {
                         put("path", it.uri)
                         put("name", it.fileName)
@@ -55,7 +55,7 @@ data class ChatItem(
                 val messageText = _content.value as DMessageText
                 val imageIds = messageText.linkPreviews
                     .map { val p = it.imageLocalPath; if (p.isNullOrEmpty()) "" else getFileId(p) }
-                ChatItemContent.MessageText(imageIds)
+                ChatItemContent.ChatText(imageIds)
             }
 
             else -> {
@@ -71,15 +71,15 @@ data class ChatItem(
 sealed class ChatItemContent {
     @GraphQLType
     @Serializable
-    data class MessageImages(val ids: List<String>) : ChatItemContent()
+    data class ChatImages(val ids: List<String>) : ChatItemContent()
 
     @GraphQLType
     @Serializable
-    data class MessageFiles(val ids: List<String>) : ChatItemContent()
+    data class ChatFiles(val ids: List<String>) : ChatItemContent()
 
     @GraphQLType
     @Serializable
-    data class MessageText(val ids: List<String>) : ChatItemContent()
+    data class ChatText(val ids: List<String>) : ChatItemContent()
 }
 
 fun DChat.toModel(): ChatItem {

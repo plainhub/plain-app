@@ -10,6 +10,8 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.httpserver.models.MergeTask
+import com.ismartcoding.plain.httpserver.models.MergeTaskStatus
 import com.ismartcoding.plain.platform.deleteUploadedChunks
 import com.ismartcoding.plain.platform.listUploadedChunks
 import com.ismartcoding.plain.platform.mergeUploadedChunks
@@ -25,14 +27,9 @@ suspend fun deleteChunks(fileId: String): Boolean {
     return deleteUploadedChunks(fileId)
 }
 
-@GraphQLMutation
-suspend fun mergeChunks(fileId: String, totalChunks: Int, path: String, replace: Boolean, isAppFile: Boolean, totalSize: Long): String {
-    return mergeUploadedChunks(fileId, totalChunks, path, replace, isAppFile, totalSize)
-}
-
 @GraphQLQuery
-suspend fun mergeStatus(fileId: String): String {
-    return MergeJobs.statusString(fileId)
+suspend fun mergeStatus(fileId: String): MergeTask {
+    return MergeJobs.status(fileId)
 }
 
 /**
@@ -41,11 +38,21 @@ suspend fun mergeStatus(fileId: String): String {
  * Completion is signalled by WS event 38; `mergeStatus` is the polling
  * fallback for lost events.
  */
+/** Start a background merge into [path]; completion arrives via the
+ *  upload_merge_result WS event, `mergeStatus` is the polling fallback. */
 @GraphQLMutation
-suspend fun mergeChunksAsync(fileId: String, totalChunks: Int, path: String, replace: Boolean, isAppFile: Boolean, totalSize: Long): String {
+suspend fun mergeChunks(fileId: String, totalChunks: Int, path: String, replace: Boolean, totalSize: Long): MergeTask =
+    mergeChunksAsyncImpl(fileId) { mergeUploadedChunks(fileId, totalChunks, path, replace, isAppFile = false, totalSize) }
+
+/** Background merge into the app-private content store; [fileName] is a name hint (no directory). */
+@GraphQLMutation
+suspend fun mergeAppFileChunks(fileId: String, totalChunks: Int, fileName: String, totalSize: Long): MergeTask =
+    mergeChunksAsyncImpl(fileId) { mergeUploadedChunks(fileId, totalChunks, fileName, replace = true, isAppFile = true, totalSize) }
+
+private suspend fun mergeChunksAsyncImpl(fileId: String, merge: suspend () -> String): MergeTask {
     when (val claim = MergeJobs.claim(fileId)) {
-        is MergeClaim.AlreadyDone -> return claim.reply
-        MergeClaim.InProgress -> return "merging"
+        is MergeClaim.AlreadyDone -> return claim.task
+        MergeClaim.InProgress -> return MergeTask(MergeTaskStatus.MERGING)
         MergeClaim.Claimed -> {}
     }
     if (listUploadedChunks(fileId).isEmpty()) {
@@ -53,7 +60,7 @@ suspend fun mergeChunksAsync(fileId: String, totalChunks: Int, path: String, rep
         throw GraphQLError("No chunks found for $fileId")
     }
     ChannelScope().launch {
-        val outcome = runCatching { mergeUploadedChunks(fileId, totalChunks, path, replace, isAppFile, totalSize) }
+        val outcome = runCatching { merge() }
         if (outcome.isSuccess) {
             val reply = outcome.getOrThrow()
             val idx = reply.lastIndexOf(':')
@@ -67,7 +74,7 @@ suspend fun mergeChunksAsync(fileId: String, totalChunks: Int, path: String, rep
             sendEvent(WebSocketEvent(EventType.UPLOAD_MERGE_RESULT, JsonHelper.jsonEncode(UploadMergeResultData(fileId = fileId, ok = false, error = message))))
         }
     }
-    return "started"
+    return MergeTask(MergeTaskStatus.STARTED)
 }
 
 fun SchemaBuilder.addFileUploadSchema() {

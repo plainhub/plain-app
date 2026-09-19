@@ -6,15 +6,15 @@ import kotlin.time.Instant
 
 @GraphQLType
 data class Doc(
-    val id: ID,
-    val title: String,
-    val path: String,
+    override val id: ID,
+    override val title: String,
+    override val path: String,
     val extension: String,
-    val size: Long,
-    val bucketId: String,
-    val createdAt: Instant,
-    val updatedAt: Instant,
-)
+    override val size: Long,
+    override val bucketId: String,
+    override val createdAt: Instant,
+    override val updatedAt: Instant,
+) : MediaItem
 
 @GraphQLType
 data class DocExtGroup(

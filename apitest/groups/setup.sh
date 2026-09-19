@@ -15,23 +15,29 @@ run_group "setup" "setup + sanity" "docs/api-test-plan.md#setup--sanity"
 # The App model is a flat data class (see web/models/App.kt) — see notes there
 # for which fields map to what.
 # ----------------------------------------------------------------------------
-APP=$(call_gql '{ app { clientId usbConnected httpPort httpsPort appDir deviceName appVersion osVersion channel debug developerMode internalStoragePath downloadsDir } }')
+APP=$(call_gql '{ app { clientId httpPort httpsPort appDir deviceName deviceType features channel debug developerMode downloadsDir } }')
 echo "  (raw app response saved to results/setup-app.json)"
 echo "$APP" > "$RESULTS_DIR/setup-app.json"
 
 # ----------------------------------------------------------------------------
-# setup-C01  app.appVersion (int) == dumpsys package versionCode
+# setup-C01  app.deviceType == PHONE on an Android device
 # ----------------------------------------------------------------------------
-api_vc=$(printf '%s' "$APP" | jq -r '.data.app.appVersion')
-adb_vc=$(adb_sh "dumpsys package com.ismartcoding.plain.debug" | grep "versionCode" | head -1 | grep -oE "versionCode=[0-9]+" | grep -oE "[0-9]+")
-compare_with_adb "$api_vc" "$adb_vc" "setup-C01 app.appVersion == dumpsys versionCode"
+assert_jq "$APP" ".data.app.deviceType" "PHONE" "setup-C01 app.deviceType == PHONE"
 
 # ----------------------------------------------------------------------------
-# setup-C02  app.osVersion (int) == adb ro.build.version.sdk
+# setup-C02  app.features matches the SDK level (MEDIA_TRASH >= 30,
+#         MIRROR_AUDIO >= 29) — the capability declaration that replaced
+#         App.osVersion
 # ----------------------------------------------------------------------------
-api_os=$(printf '%s' "$APP" | jq -r '.data.app.osVersion')
 adb_sdk=$(adb_get_property "ro.build.version.sdk")
-compare_with_adb "$api_os" "$adb_sdk" "setup-C02 app.osVersion == adb ro.build.version.sdk"
+api_features=$(printf '%s' "$APP" | jq -r '.data.app.features | join(",")')
+want_features="MIRROR_AUDIO"
+[[ "$adb_sdk" -ge 30 ]] && want_features="MEDIA_TRASH,MIRROR_AUDIO"
+if [[ "$api_features" == "$want_features" ]]; then
+  pass "setup-C02 app.features == $want_features (sdk=$adb_sdk)"
+else
+  fail "setup-C02 app.features='$api_features' want='$want_features' (sdk=$adb_sdk)"
+fi
 
 # ----------------------------------------------------------------------------
 # setup-C03  app.httpPort == 8080 (and adb netstat agrees)
@@ -75,9 +81,16 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# setup-C07  app.internalStoragePath == /storage/emulated/0
+# setup-C07  mounts: INTERNAL_STORAGE entry path == /storage/emulated/0
+#         (replaced App.internalStoragePath)
 # ----------------------------------------------------------------------------
-assert_jq "$APP" ".data.app.internalStoragePath" "/storage/emulated/0" "setup-C07 app.internalStoragePath"
+MOUNTS=$(call_gql '{ mounts { path driveType } }')
+api_int=$(printf '%s' "$MOUNTS" | jq -r '.data.mounts[] | select(.driveType == "INTERNAL_STORAGE") | .path' | head -1)
+if [[ "$api_int" == "/storage/emulated/0" ]]; then
+  pass "setup-C07 mounts INTERNAL_STORAGE path == /storage/emulated/0"
+else
+  fail "setup-C07 mounts INTERNAL_STORAGE path='$api_int' (expected /storage/emulated/0)"
+fi
 
 # ----------------------------------------------------------------------------
 # setup-C08  app.battery (int) within 2 of dumpsys battery level
@@ -129,15 +142,14 @@ case "$api_ch" in
 esac
 
 # ----------------------------------------------------------------------------
-# setup-C12  app.usbConnected reflects current USB plug state
+# setup-C12  app.downloadsDir points at the Download directory
+#         (usbConnected was removed from App)
 # ----------------------------------------------------------------------------
-api_usb=$(printf '%s' "$APP" | jq -r '.data.app.usbConnected')
-# adb-connected devices usually have USB unplugged from a hardware sense perspective,
-# but PlugInControlReceiver is checking the USB power sense. Just check it's a bool.
-if [[ "$api_usb" == "true" || "$api_usb" == "false" ]]; then
-  pass "setup-C12 app.usbConnected is a valid bool ($api_usb)"
+api_dl=$(printf '%s' "$APP" | jq -r '.data.app.downloadsDir')
+if [[ "$api_dl" == *"Download"* && -n "$api_dl" ]]; then
+  pass "setup-C12 app.downloadsDir looks sane ($api_dl)"
 else
-  fail "setup-C12 app.usbConnected not a bool: $api_usb"
+  fail "setup-C12 app.downloadsDir unexpected: $api_dl"
 fi
 
 # ----------------------------------------------------------------------------
@@ -148,6 +160,11 @@ echo "$DI" > "$RESULTS_DIR/setup-deviceinfo.json"
 api_di_os=$(printf '%s' "$DI" | jq -r '.data.deviceInfo.osVersion')
 adb_release=$(adb_get_property "ro.build.version.release")
 compare_with_adb "$api_di_os" "$adb_release" "setup-C13 deviceInfo.osVersion == adb ro.build.version.release"
+
+# setup-C13e deviceInfo.appVersion == dumpsys versionName (replaced App.appVersion)
+api_di_ver=$(printf '%s' "$DI" | jq -r '.data.deviceInfo.appVersion')
+adb_ver=$(adb_sh "dumpsys package com.ismartcoding.plain.debug" | grep "versionName" | head -1 | grep -oE "versionName=[^ ]+" | cut -d= -f2)
+compare_with_adb "$api_di_ver" "$adb_ver" "setup-C13e deviceInfo.appVersion == dumpsys versionName"
 
 # setup-C13b deviceInfo.android.sdkVersion == ro.build.version.sdk
 api_di_sdk=$(printf '%s' "$DI" | jq -r '.data.deviceInfo.android.sdkVersion')
