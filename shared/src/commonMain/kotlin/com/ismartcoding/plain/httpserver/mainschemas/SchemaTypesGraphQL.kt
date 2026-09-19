@@ -18,6 +18,7 @@ import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.enums.PackageType
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.enums.ScreenMirrorMode
+import com.ismartcoding.plain.platform.DeviceFeature
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
@@ -34,6 +35,7 @@ fun SchemaBuilder.addMainSchemaTypes() {
     enum<DataType>()
     enum<DriveType>()
     enum<DeviceType>()
+    enum<DeviceFeature>()
     enum<Permission>()
     enum<FileSortBy>()
     enum<PomodoroState>()

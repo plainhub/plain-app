@@ -21,8 +21,6 @@ import com.ismartcoding.plain.platform.getInternalStoragePath
 import com.ismartcoding.plain.platform.getSDCardPath
 import com.ismartcoding.plain.platform.getUsbDiskPaths
 import com.ismartcoding.plain.platform.isDebugBuild
-import com.ismartcoding.plain.platform.getAppVersionName
-import com.ismartcoding.plain.platform.getSdkInt
 import com.ismartcoding.plain.platform.setClipboardText
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
 import com.ismartcoding.plain.helpers.TempHelper
@@ -35,6 +33,7 @@ import com.ismartcoding.plain.httpserver.models.DeviceInfo
 import com.ismartcoding.plain.httpserver.models.DeviceStatus
 import com.ismartcoding.plain.httpserver.models.TempValue
 import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.platform.getDeviceFeatures
 import com.ismartcoding.plain.platform.getDeviceType
 
 @GraphQLQuery
@@ -59,8 +58,7 @@ suspend fun app(): App {
         appDir = appDir(),
         deviceName = TempData.deviceName.value,
         deviceType = getDeviceType(),
-        getAppVersionName(),
-        getSdkInt(),
+        getDeviceFeatures(),
         AppChannelType.fromString(buildChannel),
         grantedPermissions,
         TempData.audioPlayMode.value,

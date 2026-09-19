@@ -82,8 +82,3 @@ expect fun getAppVersionCode(): Long
  */
 expect fun isDebugBuild(): Boolean
 
-/**
- * Platform-specific SDK/API level integer. On Android this is Build.VERSION.SDK_INT.
- * Returns 0 on iOS (no equivalent notion).
- */
-expect fun getSdkInt(): Int

@@ -44,4 +44,3 @@ actual fun getAppVersionCode(): Long = com.ismartcoding.plain.getAppVersionCode(
 
 actual fun isDebugBuild(): Boolean = com.ismartcoding.plain.isDebugBuild()
 
-actual fun getSdkInt(): Int = android.os.Build.VERSION.SDK_INT

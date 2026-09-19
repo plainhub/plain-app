@@ -251,6 +251,11 @@ type AndroidExtras {
   buildTime: Instant!
 }
 
+enum DeviceFeature {
+  MEDIA_TRASH
+  MIRROR_AUDIO
+}
+
 type App {
   clientId: String!
   urlToken: String!
@@ -259,8 +264,7 @@ type App {
   appDir: String!
   deviceName: String!
   deviceType: DeviceType!
-  appVersion: String!
-  osVersion: Int!
+  features: [DeviceFeature!]!
   channel: AppChannelType!
   permissions: [Permission!]!
   audioMode: MediaPlayMode!

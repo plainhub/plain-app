@@ -72,4 +72,3 @@ actual fun isDebugBuild(): Boolean {
     return simulatorName != null
 }
 
-actual fun getSdkInt(): Int = 0
