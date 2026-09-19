@@ -49,11 +49,19 @@ object DownloadCenter {
     fun add(task: DownloadTaskHandle): Boolean = tasksLock.withLock {
         if (tasks.containsKey(task.id)) return@withLock false
         tasks[task.id] = task
-        scope.launch {
-            downloadChannel.send(task)
-            updateProgressFlow()
-        }
+        dispatch(task)
+        scope.launch { updateProgressFlow() }
         true
+    }
+
+    /**
+     * Sends under the caller's lock so bursts keep their order (trySend is
+     * non-suspending; the async send is only a fallback past capacity).
+     */
+    private fun dispatch(task: DownloadTaskHandle) {
+        if (!downloadChannel.trySend(task).isSuccess) {
+            scope.launch { downloadChannel.send(task) }
+        }
     }
 
     fun pause(taskId: String): Boolean = tasksLock.withLock {
@@ -80,10 +88,8 @@ object DownloadCenter {
         if (task.status != DownloadStatus.PAUSED) return@withLock false
         task.aborted = false
         task.status = DownloadStatus.PENDING
-        scope.launch {
-            downloadChannel.send(task)
-            updateProgressFlow()
-        }
+        dispatch(task)
+        scope.launch { updateProgressFlow() }
         true
     }
 
@@ -93,10 +99,8 @@ object DownloadCenter {
         if (task.status != DownloadStatus.FAILED && task.status != DownloadStatus.PARTIAL) return@withLock false
         task.aborted = false
         task.status = DownloadStatus.PENDING
-        scope.launch {
-            downloadChannel.send(task)
-            updateProgressFlow()
-        }
+        dispatch(task)
+        scope.launch { updateProgressFlow() }
         true
     }
 
@@ -109,10 +113,8 @@ object DownloadCenter {
         if (!task.status.isTerminalDownloadStatus()) return@withLock false
         task.aborted = false
         task.status = DownloadStatus.PENDING
-        scope.launch {
-            downloadChannel.send(task)
-            updateProgressFlow()
-        }
+        dispatch(task)
+        scope.launch { updateProgressFlow() }
         true
     }
 
@@ -149,7 +151,9 @@ object DownloadCenter {
     private suspend fun processDownloads() {
         for (task in downloadChannel) {
             try {
-                if (!task.aborted) executeTaskAsync(task)
+                // A channel entry may be stale (task paused, canceled or
+                // re-enqueued since it was sent); only fresh PENDING entries run.
+                if (!task.aborted && task.status == DownloadStatus.PENDING) executeTaskAsync(task)
             } catch (e: Exception) {
                 LogCat.e("Download task ${task.id} failed: ${e.message}")
                 if (!task.aborted && !task.status.isTerminalDownloadStatus()) {

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.download
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
@@ -20,8 +21,8 @@ import kotlin.test.assertTrue
 class DownloadCenterTest {
 
     private class GatedEngine : DownloadEngine {
-        val started = mutableListOf<String>()
-        val finished = mutableListOf<String>()
+        val started = java.util.concurrent.CopyOnWriteArrayList<String>()
+        val finished = java.util.concurrent.CopyOnWriteArrayList<String>()
         val gates = mutableMapOf<String, CompletableDeferred<Unit>>()
         val failThese = mutableSetOf<String>()
 
@@ -64,10 +65,12 @@ class DownloadCenterTest {
     private fun until(timeoutMs: Long = 5000, cond: () -> Boolean) {
         runBlocking {
             withTimeoutOrNull(timeoutMs) {
-                while (!cond()) yield()
-            } ?: error("condition not met in time")
+                while (!cond()) delay(1)
+            } ?: error("condition not met in time: " + DownloadCenter.all().joinToString { it.id + ":" + it.status })
         }
     }
+
+    private fun statusOf(id: String): DownloadStatus? = DownloadCenter.progress.value[id]?.status
 
     @Test
     fun addDeduplicatesById() {
@@ -78,8 +81,7 @@ class DownloadCenterTest {
         assertTrue(DownloadCenter.add(a))
         assertFalse(DownloadCenter.add(Task("dedupe-1", "test-dedupe")), "same id must be rejected")
         engine.gate("dedupe-1").complete(Unit)
-        until { engine.finished.contains("dedupe-1") }
-        until { DownloadCenter.get("dedupe-1") == null }
+        until { engine.finished.contains("dedupe-1") && DownloadCenter.get("dedupe-1") == null }
     }
 
     @Test
@@ -90,7 +92,11 @@ class DownloadCenterTest {
         val ids = (1..5).map { "cap-$it" }
         ids.forEach { DownloadCenter.add(Task(it, "test-cap")) }
 
-        until { engine.started.size == 3 }
+        until {
+            statusOf("cap-1") == DownloadStatus.DOWNLOADING &&
+                statusOf("cap-2") == DownloadStatus.DOWNLOADING &&
+                statusOf("cap-3") == DownloadStatus.DOWNLOADING
+        }
         // The two extra tasks stay queued in the registry.
         val snapshot = DownloadCenter.all().filter { it.id.startsWith("cap-") }
         assertEquals(5, snapshot.size)
@@ -149,9 +155,10 @@ class DownloadCenterTest {
         DownloadCenter.add(Task("fail-1", "test-fail"))
         until { DownloadCenter.get("fail-1")?.status == DownloadStatus.FAILED }
         until { engine.finished.contains("fail-1") }
+        engine.failThese.remove("fail-1")
         assertTrue(DownloadCenter.retry("fail-1"), "retry accepts FAILED tasks")
         engine.gate("fail-1").complete(Unit)
-        until { engine.finished.count { it == "fail-1" } == 2 }
+        until { engine.finished.count { it == "fail-1" } == 2 && DownloadCenter.get("fail-1") == null }
     }
 
     @Test
