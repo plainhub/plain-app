@@ -5,9 +5,9 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
 @GraphQLType
 data class PomodoroSettings(
-    val workDuration: Int,
-    val shortBreakDuration: Int,
-    val longBreakDuration: Int,
+    val workDurationMin: Int,
+    val shortBreakDurationMin: Int,
+    val longBreakDurationMin: Int,
     val pomodorosBeforeLongBreak: Int,
     val showNotification: Boolean,
     val playSoundOnComplete: Boolean,
@@ -17,9 +17,9 @@ data class PomodoroSettings(
 
 fun DPomodoroSettings.toModel(): PomodoroSettings {
     return PomodoroSettings(
-        workDuration = workDuration,
-        shortBreakDuration = shortBreakDuration,
-        longBreakDuration = longBreakDuration,
+        workDurationMin = workDuration,
+        shortBreakDurationMin = shortBreakDuration,
+        longBreakDurationMin = longBreakDuration,
         pomodorosBeforeLongBreak = pomodorosBeforeLongBreak,
         showNotification = showNotification,
         playSoundOnComplete = playSoundOnComplete,

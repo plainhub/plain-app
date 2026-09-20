@@ -14,7 +14,7 @@ interface MediaItem {
     val title: String
     val path: String
     val size: Long
-    val bucketId: String
+    val bucketId: ID
     val createdAt: Instant
     val updatedAt: Instant
 }

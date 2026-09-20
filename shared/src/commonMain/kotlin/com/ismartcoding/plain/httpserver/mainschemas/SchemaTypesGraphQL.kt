@@ -56,8 +56,12 @@ fun SchemaBuilder.addMainSchemaTypes() {
     enum<ImProtocol>()
     enum<ChatChannelStatus>()
     enum<MediaPlayMode>()
-    enum<DataType>()
-    enum<MediaDataType>()
+    enum<DataType> {
+        description = "Taggable data domains. The four media members (AUDIO/VIDEO/IMAGE/DOC) are exactly MediaDataType; a single variable cannot span both enums, so documents mixing e.g. tags(type: DataType!) with mediaBuckets(type: MediaDataType!) must declare one variable per enum."
+    }
+    enum<MediaDataType> {
+        description = "Media-library domains — a strict subset of DataType with the same four member names."
+    }
     enum<DriveType>()
     enum<DeviceType>()
     enum<DeviceFeature> {

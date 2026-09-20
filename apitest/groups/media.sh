@@ -219,46 +219,46 @@ fi
 # ----------------------------------------------------------------------------
 
 # media-C19  mediaBuckets(IMAGE)
-MB_I=$(call_gql '{ mediaBuckets(type: IMAGE) { id name count } }')
+MB_I=$(call_gql '{ mediaBuckets(type: IMAGE) { id name itemCount } }')
 api_mb_i=$(printf '%s' "$MB_I" | jq '.data.mediaBuckets | length')
 [[ "$api_mb_i" -ge 0 ]] && pass "media-C19 mediaBuckets(IMAGE) returned $api_mb_i buckets" \
                         || fail "media-C19 mediaBuckets(IMAGE) not a list: $MB_I"
 
 # media-C20  mediaBuckets(AUDIO)
-MB_A=$(call_gql '{ mediaBuckets(type: AUDIO) { id name count } }')
+MB_A=$(call_gql '{ mediaBuckets(type: AUDIO) { id name itemCount } }')
 api_mb_a=$(printf '%s' "$MB_A" | jq '.data.mediaBuckets | length')
 [[ "$api_mb_a" -ge 0 ]] && pass "media-C20 mediaBuckets(AUDIO) returned $api_mb_a buckets" \
                         || fail "media-C20 mediaBuckets(AUDIO) not a list: $MB_A"
 
 # media-C21  mediaBuckets(VIDEO)
-MB_V=$(call_gql '{ mediaBuckets(type: VIDEO) { id name count } }')
+MB_V=$(call_gql '{ mediaBuckets(type: VIDEO) { id name itemCount } }')
 api_mb_v=$(printf '%s' "$MB_V" | jq '.data.mediaBuckets | length')
 [[ "$api_mb_v" -ge 0 ]] && pass "media-C21 mediaBuckets(VIDEO) returned $api_mb_v buckets" \
                         || fail "media-C21 mediaBuckets(VIDEO) not a list: $MB_V"
 
 # media-C22  trashMediaItems on non-matching query (no-op)
-TMI=$(call_gql 'mutation { trashMediaItems(type: IMAGE, query: "text:nonexistent_xyz") { type query } }')
-api_tmi_type=$(printf '%s' "$TMI" | jq -r '.data.trashMediaItems.type // empty')
-if [[ -n "$api_tmi_type" ]]; then
-  pass "media-C22 trashMediaItems(IMAGE, non-matching) → $api_tmi_type"
+TMI=$(call_gql 'mutation { trashMediaItems(type: IMAGE, query: "text:nonexistent_xyz") { affectedCount } }')
+api_tmi_n=$(printf '%s' "$TMI" | jq -r '.data.trashMediaItems.affectedCount // empty')
+if [[ -n "$api_tmi_n" ]]; then
+  pass "media-C22 trashMediaItems(IMAGE, non-matching) → affectedCount=$api_tmi_n"
 else
   fail "media-C22 trashMediaItems returned: $TMI"
 fi
 
 # media-C23  restoreMediaItems on non-matching query (no-op)
-RMI=$(call_gql 'mutation { restoreMediaItems(type: IMAGE, query: "text:nonexistent_xyz") { type query } }')
-api_rmi_type=$(printf '%s' "$RMI" | jq -r '.data.restoreMediaItems.type // empty')
-if [[ -n "$api_rmi_type" ]]; then
-  pass "media-C23 restoreMediaItems(IMAGE, non-matching) → $api_rmi_type"
+RMI=$(call_gql 'mutation { restoreMediaItems(type: IMAGE, query: "text:nonexistent_xyz") { affectedCount } }')
+api_rmi_n=$(printf '%s' "$RMI" | jq -r '.data.restoreMediaItems.affectedCount // empty')
+if [[ -n "$api_rmi_n" ]]; then
+  pass "media-C23 restoreMediaItems(IMAGE, non-matching) → affectedCount=$api_rmi_n"
 else
   fail "media-C23 restoreMediaItems returned: $RMI"
 fi
 
 # media-C24  deleteMediaItems on non-matching query (no-op)
-DMI=$(call_gql 'mutation { deleteMediaItems(type: IMAGE, query: "text:nonexistent_xyz") { type query } }')
-api_dmi_type=$(printf '%s' "$DMI" | jq -r '.data.deleteMediaItems.type // empty')
-if [[ -n "$api_dmi_type" ]]; then
-  pass "media-C24 deleteMediaItems(IMAGE, non-matching) → $api_dmi_type"
+DMI=$(call_gql 'mutation { deleteMediaItems(type: IMAGE, query: "text:nonexistent_xyz") { affectedCount } }')
+api_dmi_n=$(printf '%s' "$DMI" | jq -r '.data.deleteMediaItems.affectedCount // empty')
+if [[ -n "$api_dmi_n" ]]; then
+  pass "media-C24 deleteMediaItems(IMAGE, non-matching) → affectedCount=$api_dmi_n"
 else
   fail "media-C24 deleteMediaItems returned: $DMI"
 fi

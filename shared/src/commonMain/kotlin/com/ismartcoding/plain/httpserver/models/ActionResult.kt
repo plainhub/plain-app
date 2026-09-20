@@ -1,11 +1,9 @@
 package com.ismartcoding.plain.httpserver.models
 
-import com.ismartcoding.plain.enums.MediaDataType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
+/** Result of a synchronous bulk mutation: how many items were affected. */
 @GraphQLType
-data class MediaActionResult(
-    val type: MediaDataType,
-    val query: String,
+data class ActionResult(
     val affectedCount: Int,
 )

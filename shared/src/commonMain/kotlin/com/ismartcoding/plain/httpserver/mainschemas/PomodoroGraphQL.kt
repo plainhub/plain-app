@@ -33,8 +33,8 @@ suspend fun pomodoroToday(): PomodoroToday {
             date = today,
             completedCount = info.completedCount,
             currentRound = info.currentRound,
-            timeLeft = info.timeLeft,
-            totalTime = info.totalTime,
+            timeLeftSec = info.timeLeft,
+            totalTimeSec = info.totalTime,
             isRunning = info.isRunning,
             isPaused = info.isPaused,
             state = info.state
@@ -44,8 +44,8 @@ suspend fun pomodoroToday(): PomodoroToday {
             date = today,
             completedCount = 0,
             currentRound = 1,
-            timeLeft = 0,
-            totalTime = 0,
+            timeLeftSec = 0,
+            totalTimeSec = 0,
             isRunning = false,
             isPaused = false,
             state = PomodoroState.WORK
@@ -54,8 +54,8 @@ suspend fun pomodoroToday(): PomodoroToday {
 }
 
 @GraphQLMutation
-suspend fun startPomodoro(timeLeft: Int): Boolean {
-    sendEvent(HPomodoroStartEvent(timeLeft))
+suspend fun startPomodoro(timeLeftSec: Int): Boolean {
+    sendEvent(HPomodoroStartEvent(timeLeftSec))
     return true
 }
 

@@ -10,6 +10,7 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.MergeTask
 import com.ismartcoding.plain.httpserver.models.MergeTaskStatus
 import com.ismartcoding.plain.platform.deleteUploadedChunks
@@ -18,18 +19,18 @@ import com.ismartcoding.plain.platform.mergeUploadedChunks
 import kotlinx.coroutines.launch
 
 @GraphQLQuery
-suspend fun uploadedChunks(fileId: String): List<String> {
-    return listUploadedChunks(fileId)
+suspend fun uploadedChunks(fileId: ID): List<String> {
+    return listUploadedChunks(fileId.value)
 }
 
 @GraphQLMutation
-suspend fun deleteChunks(fileId: String): Boolean {
-    return deleteUploadedChunks(fileId)
+suspend fun deleteChunks(fileId: ID): Boolean {
+    return deleteUploadedChunks(fileId.value)
 }
 
 @GraphQLQuery
-suspend fun mergeStatus(fileId: String): MergeTask {
-    return MergeJobs.status(fileId)
+suspend fun mergeStatus(fileId: ID): MergeTask {
+    return MergeJobs.status(fileId.value)
 }
 
 /**
@@ -41,13 +42,13 @@ suspend fun mergeStatus(fileId: String): MergeTask {
 /** Start a background merge into [path]; completion arrives via the
  *  upload_merge_result WS event, `mergeStatus` is the polling fallback. */
 @GraphQLMutation
-suspend fun mergeChunks(fileId: String, totalChunks: Int, path: String, replace: Boolean, totalSize: Long): MergeTask =
-    mergeChunksAsyncImpl(fileId) { mergeUploadedChunks(fileId, totalChunks, path, replace, isAppFile = false, totalSize) }
+suspend fun mergeChunks(fileId: ID, totalChunks: Int, path: String, replace: Boolean, totalSize: Long): MergeTask =
+    mergeChunksAsyncImpl(fileId.value) { mergeUploadedChunks(fileId.value, totalChunks, path, replace, isAppFile = false, totalSize) }
 
 /** Background merge into the app-private content store; [fileName] is a name hint (no directory). */
 @GraphQLMutation
-suspend fun mergeAppFileChunks(fileId: String, totalChunks: Int, fileName: String, totalSize: Long): MergeTask =
-    mergeChunksAsyncImpl(fileId) { mergeUploadedChunks(fileId, totalChunks, fileName, replace = true, isAppFile = true, totalSize) }
+suspend fun mergeAppFileChunks(fileId: ID, totalChunks: Int, fileName: String, totalSize: Long): MergeTask =
+    mergeChunksAsyncImpl(fileId.value) { mergeUploadedChunks(fileId.value, totalChunks, fileName, replace = true, isAppFile = true, totalSize) }
 
 private suspend fun mergeChunksAsyncImpl(fileId: String, merge: suspend () -> String): MergeTask {
     when (val claim = MergeJobs.claim(fileId)) {

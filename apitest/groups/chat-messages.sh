@@ -29,7 +29,7 @@ api_sci_to=$(printf '%s' "$SCI" | jq -r '.data.sendChatItem[0].toId // empty')
 if [[ -n "$api_sci_id" ]]; then
   pass "chat-messages-C02 sendChatItem(toId=local) → id=$api_sci_id"
   # C03: chatItems(toId) shows the new item
-  CHI=$(call_gql '{ chatItems(id: "local") { id fromId toId content } }')
+  CHI=$(call_gql '{ chatItems(id: "local", offset: 0, limit: 200, query: "") { id fromId toId content } }')
   api_chi_count=$(printf '%s' "$CHI" | jq '.data.chatItems | length')
   api_chi_has=$(printf '%s' "$CHI" | jq -r --arg id "$api_sci_id" '[.data.chatItems[] | select(.id == $id)] | length')
   if [[ "$api_chi_count" -ge 1 ]]; then
@@ -60,10 +60,10 @@ fi
 # ----------------------------------------------------------------------------
 # chat-messages-C05  deleteChatItems (with non-matching query — no-op)
 # ----------------------------------------------------------------------------
-DCIS=$(call_gql 'mutation { deleteChatItems(query: "id:nonexistent-xyz") }')
-api_dcis=$(printf '%s' "$DCIS" | jq -r '.data.deleteChatItems // empty')
-if [[ "$api_dcis" == "true" ]]; then
-  pass "chat-messages-C05 deleteChatItems(non-matching) → true"
+DCIS=$(call_gql 'mutation { deleteChatItems(query: "id:nonexistent-xyz") { affectedCount } }')
+api_dcis=$(printf '%s' "$DCIS" | jq -r '.data.deleteChatItems.affectedCount // empty')
+if [[ "$api_dcis" == "0" ]]; then
+  pass "chat-messages-C05 deleteChatItems(non-matching) → affectedCount=0"
 else
   fail "chat-messages-C05 deleteChatItems returned: $DCIS"
 fi

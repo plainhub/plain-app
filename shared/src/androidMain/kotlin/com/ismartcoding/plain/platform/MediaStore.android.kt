@@ -384,6 +384,10 @@ actual suspend fun countSmsConversations(query: String): Int =
 actual suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.features.sms.DMessageConversation> =
     com.ismartcoding.plain.features.sms.SmsConversationHelper.getArchivedConversations(appContext)
 
+actual suspend fun getSmsConversationDate(threadId: String): Long? =
+    com.ismartcoding.plain.features.sms.SmsConversationHelper.getConversationsByIds(appContext, listOf(threadId))
+        .firstOrNull()?.date?.toEpochMilliseconds()
+
 actual suspend fun getSmsAllCounts(): DSmsCounts =
     com.ismartcoding.plain.features.sms.SmsHelper.countAllAsync(appContext).let {
         DSmsCounts(it.total, it.inbox, it.sent, it.drafts)

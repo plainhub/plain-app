@@ -39,6 +39,6 @@ actual fun getDeviceInfo(): DDeviceInfo = DDeviceInfo().apply {
     val displayInfo = DDisplayInfo()
     displayInfo.width = (CGRectGetWidth(screen.bounds) * scale).toInt()
     displayInfo.height = (CGRectGetHeight(screen.bounds) * scale).toInt()
-    displayInfo.density = scale.toString()
+    displayInfo.density = scale.toFloat()
     display = displayInfo
 }

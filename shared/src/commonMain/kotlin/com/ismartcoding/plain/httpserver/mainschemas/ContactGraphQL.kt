@@ -22,6 +22,7 @@ import com.ismartcoding.plain.platform.getContactSources
 import com.ismartcoding.plain.platform.getMediaIds
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
+import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.Contact
 import com.ismartcoding.plain.httpserver.models.ContactGroup
 import com.ismartcoding.plain.httpserver.models.ContactInput
@@ -56,12 +57,12 @@ suspend fun contactGroups(node: Execution.Node): List<ContactGroup> {
 }
 
 @GraphQLMutation
-suspend fun deleteContacts(query: String): Boolean {
+suspend fun deleteContacts(query: String): ActionResult {
     Permission.WRITE_CONTACTS.checkEnabledAsync()
     val newIds = getMediaIds(DataType.CONTACT, query)
     TagHelper.deleteTagRelationByKeys(newIds, DataType.CONTACT)
     com.ismartcoding.plain.platform.deleteContacts(newIds)
-    return true
+    return ActionResult(newIds.size)
 }
 
 @GraphQLMutation

@@ -18,6 +18,7 @@ import com.ismartcoding.plain.platform.deleteMedia
 import com.ismartcoding.plain.platform.getMediaIds
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
+import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.Call
 import com.ismartcoding.plain.httpserver.models.Sim
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -44,12 +45,12 @@ suspend fun call(number: String, showDialer: Boolean): Boolean {
 }
 
 @GraphQLMutation
-suspend fun deleteCalls(query: String): Boolean {
+suspend fun deleteCalls(query: String): ActionResult {
     Permission.WRITE_CALL_LOG.checkEnabledAsync()
     val ids = getMediaIds(DataType.CALL, query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.CALL)
     deleteMedia(DataType.CALL, ids, true)
-    return true
+    return ActionResult(ids.size)
 }
 
 @GraphQLQuery

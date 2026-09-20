@@ -22,6 +22,7 @@ import com.ismartcoding.plain.platform.countSmsConversations
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.fileExists
 import com.ismartcoding.plain.platform.getArchivedSmsConversations
+import com.ismartcoding.plain.platform.getSmsConversationDate
 import com.ismartcoding.plain.platform.getSmsAllCounts
 import com.ismartcoding.plain.platform.trashSms as trashSmsInternal
 import com.ismartcoding.plain.platform.restoreSms as restoreSmsInternal
@@ -40,8 +41,9 @@ import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.ID
-import com.ismartcoding.plain.httpserver.models.Message
-import com.ismartcoding.plain.httpserver.models.MessageConversation
+import com.ismartcoding.plain.httpserver.models.Sms
+import com.ismartcoding.plain.httpserver.models.ActionResult
+import com.ismartcoding.plain.httpserver.models.SmsConversation
 import com.ismartcoding.plain.httpserver.models.SmsCounts
 import com.ismartcoding.plain.httpserver.models.toModel
 import kotlinx.coroutines.sync.Mutex
@@ -52,7 +54,7 @@ import kotlin.uuid.Uuid
 private val mmsSendMutex = Mutex()
 
 @GraphQLQuery
-suspend fun smsAllCounts(): SmsCounts {
+suspend fun smsBoxCounts(): SmsCounts {
     return if (Permission.READ_SMS.enabledAndIsGrantedAsync()) {
         getSmsAllCounts().toModel()
     } else {
@@ -66,7 +68,7 @@ suspend fun unarchiveConversation(id: ID): Boolean {
     return true
 }
 
-@GraphQLMutation
+@GraphQLMutation(description = "Send an SMS directly from the device. subscriptionId picks the SIM (-1 = system default, see sims); requestId is an optional idempotency key that dedupes retried sends. Returns true once the send is dispatched.")
 suspend fun sendSms(
     number: String,
     body: String,
@@ -87,7 +89,7 @@ suspend fun sendSms(
 }
 
 @GraphQLQuery
-suspend fun sms(offset: Int, limit: Int, query: String): List<Message> {
+suspend fun sms(offset: Int, limit: Int, query: String): List<Sms> {
     if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
     return searchMedia(DataType.SMS, query, limit, offset, FileSortBy.DATE_DESC)
         .filterIsInstance<DMessage>()
@@ -95,7 +97,7 @@ suspend fun sms(offset: Int, limit: Int, query: String): List<Message> {
 }
 
 @GraphQLQuery
-suspend fun smsConversations(offset: Int, limit: Int, query: String): List<MessageConversation> {
+suspend fun smsConversations(offset: Int, limit: Int, query: String): List<SmsConversation> {
     if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
     return searchSmsConversations(query, limit, offset).map { it.toModel() }
 }
@@ -119,38 +121,41 @@ suspend fun smsConversationCount(query: String): Int {
 }
 
 @GraphQLQuery
-suspend fun archivedConversations(): List<MessageConversation> {
+suspend fun archivedConversations(offset: Int, limit: Int, query: String): List<SmsConversation> {
     if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
-    return getArchivedSmsConversations().map { it.toModel() }
+    val q = query.trim().lowercase()
+    return getArchivedSmsConversations()
+        .filter { q.isEmpty() || it.address.lowercase().contains(q) || it.snippet.lowercase().contains(q) }
+        .drop(offset.coerceAtLeast(0))
+        .take(limit.coerceAtLeast(0))
+        .map { it.toModel() }
 }
 
 @GraphQLMutation
-suspend fun archiveConversation(id: ID, date: Long): Boolean {
+suspend fun archiveConversation(id: ID): Boolean {
+    val date = getSmsConversationDate(id.value) ?: TimeHelper.now().toEpochMilliseconds()
     AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id.value, conversationDate = date))
     return true
 }
 
 @GraphQLMutation
-suspend fun trashSms(query: String): Boolean {
-    trashSmsInternal(query)
-    return true
+suspend fun trashSms(query: String): ActionResult {
+    return ActionResult(trashSmsInternal(query))
 }
 
 @GraphQLMutation
-suspend fun restoreSms(query: String): Boolean {
-    restoreSmsInternal(query)
-    return true
+suspend fun restoreSms(query: String): ActionResult {
+    return ActionResult(restoreSmsInternal(query))
 }
 
 @GraphQLMutation
-suspend fun deleteSms(query: String): Boolean {
-    deleteSmsInternal(query)
-    return true
+suspend fun deleteSms(query: String): ActionResult {
+    return ActionResult(deleteSmsInternal(query))
 }
 
-@GraphQLMutation
+@GraphQLMutation(description = "Compose an MMS in the device's default SMS app and track the send. Returns a pendingId consumed by the mms polling/WebSocket flow — poll with it until the send resolves.")
 @OptIn(ExperimentalUuidApi::class)
-suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>, threadId: String): String = mmsSendMutex.withLock {
+suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>, threadId: ID): String = mmsSendMutex.withLock {
     try {
         require(number.isNotBlank()) { "MMS recipient is required" }
         val resolvedAttachments = attachmentPaths.map { path ->
@@ -164,7 +169,7 @@ suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>,
         val requestedFingerprint = SmsProviderContract.MmsSendFingerprint(
             address = number,
             body = body,
-            threadId = threadId,
+            threadId = threadId.value,
             attachmentContentTypes = resolvedAttachments.map { it.second },
         )
         val duplicatePendingSend = TempData.pendingMmsMessages.any { pending ->
@@ -191,7 +196,7 @@ suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>,
             attachments = resolvedAttachments.map { (path, mimeType) ->
                 DMessageAttachment(path, mimeType, path.getFilenameFromPath())
             },
-            threadId = threadId,
+            threadId = threadId.value,
             launchTimeSec = launchTimeSec,
             createdAt = TimeHelper.now(),
         )
@@ -203,7 +208,7 @@ suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>,
                 minimumMmsId,
                 number,
                 body,
-                threadId,
+                threadId.value,
                 resolvedAttachments.map { it.first },
                 resolvedAttachments.map { it.second },
             ),
@@ -216,7 +221,7 @@ suspend fun sendMms(number: String, body: String, attachmentPaths: List<String>,
 }
 
 fun SchemaBuilder.addSmsSchema() {
-    type<Message> {
+    type<Sms> {
         dataProperty("tags") {
             prepare { item -> item.id.value }
             loader { ids ->

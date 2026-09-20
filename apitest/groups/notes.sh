@@ -7,15 +7,15 @@
 #                  trashNotes, restoreNotes, deleteNotes, exportNotes
 #   TagGraphQL   : tags, tagRelations, createTag, updateTag, deleteTag,
 #                  addToTags, updateTagRelations, removeFromTags
-#   FeedGraphQL  : feeds, feedsCount, feedEntries, feedEntryCount, feedEntry,
-#                  fetchFeedContent, syncFeeds, updateFeed, createFeed,
+#   FeedGraphQL  : feeds, feedEntryCounts, feedEntries, feedEntryCount, feedEntry,
+#                  syncFeedContent, syncFeeds, updateFeed, createFeed,
 #                  importFeeds, exportFeeds, deleteFeed, syncFeedContent,
 #                  deleteFeedEntries
 #
 # Lifecycle: each entity is created via the API, verified in plain.db,
 # mutated, and finally deleted (or trashed for notes). createFeed actually
 # hits the network to fetch the RSS URL — we use a local-data-url feed to
-# avoid that, and skip the network-bound fetchFeedContent / syncFeeds /
+# avoid that, and skip the network-bound syncFeedContent / syncFeeds /
 # syncFeedContent mutations.
 
 run_group "notes" "notes + tags + feeds CRUD" "docs/api-test-plan.md#notes"
@@ -33,8 +33,8 @@ _cleanup_notes() {
     | jq -r '.data.notes[]? | select(.id | test("^[a-z0-9]+$")) | .id' \
     | { head -10 || true; })
   for nid in $stale_ids; do
-    call_gql "mutation { trashNotes(query: \"id:$nid\") }" > /dev/null 2>&1
-    call_gql "mutation { deleteNotes(query: \"id:$nid\") }" > /dev/null 2>&1
+    call_gql "mutation { trashNotes(query: \"id:$nid\") { affectedCount } }" > /dev/null 2>&1
+    call_gql "mutation { deleteNotes(query: \"id:$nid\") { affectedCount } }" > /dev/null 2>&1
   done
   # Re-pull DB after cleanup so subsequent db_count comparisons see the
   # post-cleanup state.
@@ -84,16 +84,16 @@ if [[ -n "$api_n_id" && "$api_n_title" == "apitest-note" ]]; then
   fi
 
   # C05: trash note
-  TRASH_N=$(call_gql "mutation { trashNotes(query: \"id:$api_n_id\") }")
-  api_trash=$(printf '%s' "$TRASH_N" | jq -r '.data.trashNotes // empty')
+  TRASH_N=$(call_gql "mutation { trashNotes(query: \"id:$api_n_id\") { affectedCount } }")
+  api_trash=$(printf '%s' "$TRASH_N" | jq -r '.data.trashNotes.affectedCount // empty')
   if [[ -n "$api_trash" ]]; then
     pass "notes-C05 trashNotes(id:$api_n_id) → $api_trash"
     db_trashed=$(sqlite3 "$DB_PULL" "SELECT deleted_at IS NOT NULL FROM notes WHERE id='$api_n_id';" 2>/dev/null || echo "?")
     pass "notes-C05b notes deleted_at IS NOT NULL = $db_trashed (WAL-write caveat: may show 0 if WAL hasn't flushed; not gating)"
 
     # C06: restore
-    RESTORE_N=$(call_gql "mutation { restoreNotes(query: \"id:$api_n_id\") }")
-    api_restore=$(printf '%s' "$RESTORE_N" | jq -r '.data.restoreNotes // empty')
+    RESTORE_N=$(call_gql "mutation { restoreNotes(query: \"id:$api_n_id\") { affectedCount } }")
+    api_restore=$(printf '%s' "$RESTORE_N" | jq -r '.data.restoreNotes.affectedCount // empty')
     if [[ -n "$api_restore" ]]; then
       pass "notes-C06 restoreNotes(id:$api_n_id) → $api_restore"
       db_restored=$(sqlite3 "$DB_PULL" "SELECT deleted_at IS NULL FROM notes WHERE id='$api_n_id';" 2>/dev/null || echo "?")
@@ -103,11 +103,11 @@ if [[ -n "$api_n_id" && "$api_n_title" == "apitest-note" ]]; then
     fi
 
     # trash again for delete
-    call_gql "mutation { trashNotes(query: \"id:$api_n_id\") }" > /dev/null
+    call_gql "mutation { trashNotes(query: \"id:$api_n_id\") { affectedCount } }" > /dev/null
 
     # C07: delete
-    DELETE_N=$(call_gql "mutation { deleteNotes(query: \"id:$api_n_id\") }")
-    api_delete=$(printf '%s' "$DELETE_N" | jq -r '.data.deleteNotes // empty')
+    DELETE_N=$(call_gql "mutation { deleteNotes(query: \"id:$api_n_id\") { affectedCount } }")
+    api_delete=$(printf '%s' "$DELETE_N" | jq -r '.data.deleteNotes.affectedCount // empty')
     if [[ -n "$api_delete" ]]; then
       pass "notes-C07 deleteNotes(id:$api_n_id) → $api_delete"
       db_gone=$(sqlite3 "$DB_PULL" "SELECT COUNT(*) FROM notes WHERE id='$api_n_id';")
@@ -231,8 +231,8 @@ fi
 
 # Cleanup C15/C16 fixtures
 if [[ -n "$api_n2_id" ]]; then
-  call_gql "mutation { trashNotes(query: \"id:$api_n2_id\")" > /dev/null
-  call_gql "mutation { deleteNotes(query: \"id:$api_n2_id\")" > /dev/null
+  call_gql "mutation { trashNotes(query: \"id:$api_n2_id\") { affectedCount } }" > /dev/null
+  call_gql "mutation { deleteNotes(query: \"id:$api_n2_id\") { affectedCount } }" > /dev/null
 fi
 if [[ -n "$api_t2_id" ]]; then
   call_gql "mutation { deleteTag(id: \"$api_t2_id\")" > /dev/null
@@ -254,11 +254,11 @@ if [[ "$api_import" == "true" ]]; then
     pass "notes-C18 feeds returned $api_feeds_count items"
     api_first_feed_id=$(printf '%s' "$FEEDS" | jq -r '.data.feeds[0].id')
 
-    # C19: feedsCount
-    FC=$(call_gql '{ feedsCount { id count } }')
-    api_fc_count=$(printf '%s' "$FC" | jq '.data.feedsCount | length')
-    [[ "$api_fc_count" -ge 0 ]] && pass "notes-C19 feedsCount returned $api_fc_count items (0 if no entries yet)" \
-                                || fail "notes-C19 feedsCount not a list: $FC"
+    # C19: feedEntryCounts
+    FC=$(call_gql '{ feedEntryCounts { id count } }')
+    api_fc_count=$(printf '%s' "$FC" | jq '.data.feedEntryCounts | length')
+    [[ "$api_fc_count" -ge 0 ]] && pass "notes-C19 feedEntryCounts returned $api_fc_count items (0 if no entries yet)" \
+                                || fail "notes-C19 feedEntryCounts not a list: $FC"
 
     # C20: feedEntries list
     FE=$(call_gql '{ feedEntries(offset: 0, limit: 10, query: "") { id title } }')
@@ -289,8 +289,8 @@ if [[ "$api_import" == "true" ]]; then
       fail "notes-C23 exportFeeds empty: $EXPORT_F"
     fi
 
-    # C24..25: fetchFeedContent / syncFeedContent — skip (real network)
-    skip "notes-C24 fetchFeedContent (skipped: would fetch real RSS content)"
+    # C24..25: syncFeedContent — skip (real network)
+    skip "notes-C24 syncFeedContent (skipped: would fetch real RSS content)"
     skip "notes-C25 syncFeedContent (skipped: same)"
 
     # C26: syncFeeds — skip (real network)
@@ -308,7 +308,7 @@ if [[ "$api_import" == "true" ]]; then
                                      || fail "notes-C28 feedEntry(nonexistent) returned: $FE_ID"
 
     # C29: deleteFeedEntries with non-matching query → no-op
-    DEL_FE=$(call_gql 'mutation { deleteFeedEntries(query: "id:nonexistent") }')
+    DEL_FE=$(call_gql 'mutation { deleteFeedEntries(query: "id:nonexistent") { affectedCount } }')
     api_del_fe=$(printf '%s' "$DEL_FE" | jq -r '.data.deleteFeedEntries // empty')
     [[ -n "$api_del_fe" ]] && pass "notes-C29 deleteFeedEntries(non-matching) → $api_del_fe" \
                            || fail "notes-C29 deleteFeedEntries returned: $DEL_FE"

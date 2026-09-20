@@ -26,6 +26,7 @@ import com.ismartcoding.plain.httpserver.models.toModel
 @GraphQLQuery
 suspend fun imageCount(query: String): Int {
     return if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndIsGrantedAsync()) {
+        val query = query
         val fields = SearchHelper.parse(query)
         val textField = fields.find { it.name == "text" }
         val queryText = textField?.value ?: ""
@@ -76,6 +77,7 @@ suspend fun cancelImageIndex(): Boolean {
 @GraphQLQuery
 suspend fun images(offset: Int, limit: Int, query: String, sortBy: FileSortBy): List<Image> {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
+    val query = query
     val fields = SearchHelper.parse(query)
     val textField = fields.find { it.name == "text" }
     val queryText = textField?.value ?: ""

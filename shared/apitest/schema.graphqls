@@ -1,46 +1,46 @@
 """Query object"""
 type Query {
-  appFiles(offset: Int!, limit: Int!): [AppFile!]!
+  appFiles(offset: Int!, limit: Int!, query: String!): [AppFile!]!
   appFileCount: Int!
   chatChannels: [ChatChannel!]!
-  notifications: [Notification!]!
+  notifications(offset: Int!, limit: Int!, query: String!): [Notification!]!
   docCount(query: String!): Int!
   docExtGroups: [DocExtGroup!]!
   docs(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Doc!]!
-  smsAllCounts: SmsCounts!
-  sms(offset: Int!, limit: Int!, query: String!): [Message!]!
-  smsConversations(offset: Int!, limit: Int!, query: String!): [MessageConversation!]!
+  smsBoxCounts: SmsCounts!
+  sms(offset: Int!, limit: Int!, query: String!): [Sms!]!
+  smsConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
   smsCount(query: String!): Int!
   smsConversationCount(query: String!): Int!
-  archivedConversations: [MessageConversation!]!
+  archivedConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
   tags(type: DataType!): [Tag!]!
   tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
-  appLogs(offset: Int!, limit: Int!): [String!]!
+  appLogs(offset: Int!, limit: Int!, query: String!): [String!]!
   appLogPath: String!
   screenMirrorState: Boolean!
   screenMirrorVideoCodec: ScreenMirrorVideoCodec
   screenMirrorControlEnabled: Boolean!
   screenMirrorQuality: ScreenMirrorQuality!
-  uploadedChunks(fileId: String!): [String!]!
-  mergeStatus(fileId: String!): MergeTask!
+  uploadedChunks(fileId: ID!): [String!]!
+  mergeStatus(fileId: ID!): MergeTask!
   feeds: [Feed!]!
-  feedsCount: [FeedCount!]!
+  feedEntryCounts: [FeedEntryCount!]!
   feedEntryCount(query: String!): Int!
   feedEntry(id: ID!): FeedEntry
   feedEntries(offset: Int!, limit: Int!, query: String!): [FeedEntry!]!
   peers: [Peer!]!
-  chatItems(id: ID!, offset: Int, limit: Int): [ChatItem!]!
+  chatItems(id: ID!, offset: Int!, limit: Int!, query: String!): [ChatItem!]!
   latestChatItems: [ChatItem!]!
   audioCount(query: String!): Int!
-  audioQueueItems(offset: Int!, limit: Int!): [AudioItem!]!
+  audioQueueItems(offset: Int!, limit: Int!, query: String!): [AudioItem!]!
   audioQueueItemCount: Int!
   audioPlayback: AudioPlayback!
   audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
   audioLyrics(path: String!): String
   audioPlaylists: [AudioPlaylist!]!
-  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!): [AudioItem!]!
+  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!, query: String!): [AudioItem!]!
   audioPlaylistItemCount(id: ID!): Int!
-  audioPlayHistory(offset: Int!, limit: Int!): [AudioPlayHistory!]!
+  audioPlayHistory(offset: Int!, limit: Int!, query: String!): [AudioPlayHistory!]!
   imageCount(query: String!): Int!
   imageSearchStatus: ImageSearchStatus!
   images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
@@ -97,15 +97,18 @@ type Mutation {
   removeChatChannelMember(id: ID!, peerId: ID!): ChatChannel!
   acceptChatChannelInvite(id: ID!): Boolean!
   declineChatChannelInvite(id: ID!): Boolean!
-  deleteNotifications(ids: [ID!]!): Boolean!
+  deleteNotifications(ids: [ID!]!): ActionResult!
+  """Reply to a notification. actionIndex indexes Notification.replyActions (the reply-capable subset only), NOT the plain actions list."""
   replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
   unarchiveConversation(id: ID!): Boolean!
+  """Send an SMS directly from the device. subscriptionId picks the SIM (-1 = system default, see sims); requestId is an optional idempotency key that dedupes retried sends. Returns true once the send is dispatched."""
   sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
-  archiveConversation(id: ID!, date: Long!): Boolean!
-  trashSms(query: String!): Boolean!
-  restoreSms(query: String!): Boolean!
-  deleteSms(query: String!): Boolean!
-  sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: String!): String!
+  archiveConversation(id: ID!): Boolean!
+  trashSms(query: String!): ActionResult!
+  restoreSms(query: String!): ActionResult!
+  deleteSms(query: String!): ActionResult!
+  """Compose an MMS in the device's default SMS app and track the send. Returns a pendingId consumed by the mms polling/WebSocket flow — poll with it until the send resolves."""
+  sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: ID!): String!
   createTag(type: DataType!, name: String!): Tag!
   updateTag(id: ID!, name: String!): Tag!
   deleteTag(id: ID!): Boolean!
@@ -125,10 +128,10 @@ type Mutation {
   updateScreenMirrorQuality(mode: ScreenMirrorMode!): Boolean!
   sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
   requestScreenMirrorKeyFrame: Boolean!
-  deleteChunks(fileId: String!): Boolean!
-  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, totalSize: Long!): MergeTask!
-  mergeAppFileChunks(fileId: String!, totalChunks: Int!, fileName: String!, totalSize: Long!): MergeTask!
-  deleteFiles(paths: [String!]!): Boolean!
+  deleteChunks(fileId: ID!): Boolean!
+  mergeChunks(fileId: ID!, totalChunks: Int!, path: String!, replace: Boolean!, totalSize: Long!): MergeTask!
+  mergeAppFileChunks(fileId: ID!, totalChunks: Int!, fileName: String!, totalSize: Long!): MergeTask!
+  deleteFiles(paths: [String!]!): ActionResult!
   createDir(path: String!): File!
   renameFile(path: String!, name: String!): Boolean!
   writeTextFile(path: String!, content: String!, overwrite: Boolean!): File!
@@ -137,7 +140,6 @@ type Mutation {
   addFavoriteFolder(rootPath: String!, fullPath: String!): [FavoriteFolder!]!
   removeFavoriteFolder(fullPath: String!): [FavoriteFolder!]!
   setFavoriteFolderAlias(fullPath: String!, alias: String!): [FavoriteFolder!]!
-  fetchFeedContent(id: ID!): FeedEntry!
   syncFeeds(id: ID): Boolean!
   updateFeed(id: ID!, name: String!, fetchContent: Boolean!): Feed!
   createFeed(url: String!, fetchContent: Boolean!): Feed!
@@ -145,12 +147,12 @@ type Mutation {
   exportFeeds: String!
   deleteFeed(id: ID!): Boolean!
   syncFeedContent(id: ID!): FeedEntry!
-  deleteFeedEntries(query: String!): Int!
+  deleteFeedEntries(query: String!): ActionResult!
   deletePeer(id: ID!): Boolean!
   unpairPeer(id: ID!): Boolean!
   sendChatItem(toId: ID!, content: String!): [ChatItem!]!
   deleteChatItem(id: ID!): Boolean!
-  deleteChatItems(query: String!): Boolean!
+  deleteChatItems(query: String!): ActionResult!
   retryChatItem(id: ID!): ChatItem!
   playAudio(path: String!): AudioItem!
   updateAudioPlayMode(mode: MediaPlayMode!): Boolean!
@@ -171,23 +173,23 @@ type Mutation {
   startImageIndex(force: Boolean): Boolean!
   cancelImageIndex: Boolean!
   call(number: String!, showDialer: Boolean!): Boolean!
-  deleteCalls(query: String!): Boolean!
+  deleteCalls(query: String!): ActionResult!
   saveNote(id: ID!, input: NoteInput!): Note!
   saveFeedEntriesToNotes(query: String!): [String!]!
-  trashNotes(query: String!): Int!
-  restoreNotes(query: String!): Int!
-  deleteNotes(query: String!): Int!
+  trashNotes(query: String!): ActionResult!
+  restoreNotes(query: String!): ActionResult!
+  deleteNotes(query: String!): ActionResult!
   exportNotes(query: String!): String!
-  deleteMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
-  trashMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
-  restoreMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
-  moveMediaItems(type: MediaDataType!, query: String!, destDir: String!): MediaActionResult!
+  deleteMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  trashMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  restoreMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  moveMediaItems(type: MediaDataType!, query: String!, destDir: String!): ActionResult!
   setTempValue(key: String!, value: String!): KeyValuePair!
   relaunchApp: Boolean!
   openAccessibilitySettings: Boolean!
   openWebSettings(feature: WebSettingsFeature): Boolean!
   updateDeviceName(name: String!): Boolean!
-  deleteContacts(query: String!): Boolean!
+  deleteContacts(query: String!): ActionResult!
   updateContact(id: ID!, input: ContactInput!): Contact!
   createContact(input: ContactInput!): Contact!
   createContactGroup(name: String!, accountName: String!, accountType: String!): ContactGroup!
@@ -195,7 +197,7 @@ type Mutation {
   deleteContactGroup(id: ID!): Boolean!
   startDiscovery: Boolean!
   stopDiscovery: Boolean!
-  startPomodoro(timeLeft: Int!): Boolean!
+  startPomodoro(timeLeftSec: Int!): Boolean!
   pausePomodoro: Boolean!
   stopPomodoro: Boolean!
   deleteDataStoreEntry(key: String!): Boolean!
@@ -207,14 +209,18 @@ type Mutation {
   createDbTableRow(table: String!, row: String!): Boolean!
   deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
   setClipboard(text: String!): Boolean!
-  deleteClipboard(ids: [ID!]!): Boolean!
-  addBookmarks(urls: [String!]!, groupId: String!): [Bookmark!]!
-  updateBookmark(id: ID!, input: BookmarkInput!): Bookmark
-  deleteBookmarks(ids: [ID!]!): Boolean!
+  deleteClipboard(ids: [ID!]!): ActionResult!
+  addBookmarks(urls: [String!]!, groupId: ID!): [Bookmark!]!
+  updateBookmark(id: ID!, input: BookmarkInput!): Bookmark!
+  deleteBookmarks(ids: [ID!]!): ActionResult!
   recordBookmarkClick(id: ID!): Boolean!
   createBookmarkGroup(name: String!): BookmarkGroup!
   updateBookmarkGroup(id: ID!, name: String!, collapsed: Boolean!, sortOrder: Int!): BookmarkGroup!
   deleteBookmarkGroup(id: ID!): Boolean!
+}
+
+type ActionResult {
+  affectedCount: Int!
 }
 
 type AndroidExtras {
@@ -273,8 +279,8 @@ type Audio implements MediaItem {
   path: String!
   durationMs: Long!
   size: Long!
-  bucketId: String!
-  albumFileId: String!
+  bucketId: ID!
+  albumFileId: ID!
   createdAt: Instant!
   updatedAt: Instant!
   isFavorite: Boolean!
@@ -303,8 +309,10 @@ type AudioPlayHistory {
 }
 
 type AudioPlayback {
+  currentPath: String
   mode: MediaPlayMode!
-  currentPath: String!
+  isPlaying: Boolean!
+  positionMs: Long!
 }
 
 type AudioPlaylist {
@@ -320,7 +328,7 @@ type Bookmark {
   url: String!
   title: String!
   faviconPath: String!
-  groupId: String!
+  groupId: ID!
   pinned: Boolean!
   clickCount: Int!
   lastClickedAt: Instant
@@ -334,6 +342,7 @@ type BookmarkGroup {
   name: String!
   collapsed: Boolean!
   sortOrder: Int!
+  itemCount: Int!
   createdAt: Instant!
   updatedAt: Instant!
 }
@@ -341,7 +350,7 @@ type BookmarkGroup {
 input BookmarkInput {
   url: String!
   title: String!
-  groupId: String!
+  groupId: ID!
   pinned: Boolean!
   sortOrder: Int!
 }
@@ -445,7 +454,7 @@ enum ChatStatus {
 }
 
 type ChatText {
-  ids: [String!]!
+  linkPreviewImageIds: [String!]!
 }
 
 type Clipboard {
@@ -588,6 +597,7 @@ input ContactWebsiteInput {
   label: String!
 }
 
+"""Taggable data domains. The four media members (AUDIO/VIDEO/IMAGE/DOC) are exactly MediaDataType; a single variable cannot span both enums, so documents mixing e.g. tags(type: DataType!) with mediaBuckets(type: MediaDataType!) must declare one variable per enum."""
 enum DataType {
   DEFAULT
   AUDIO
@@ -681,7 +691,7 @@ enum DiscoveryMethod {
 type DisplayInfo {
   width: Int!
   height: Int!
-  density: String!
+  density: Float!
 }
 
 type Doc implements MediaItem {
@@ -690,7 +700,7 @@ type Doc implements MediaItem {
   path: String!
   extension: String!
   size: Long!
-  bucketId: String!
+  bucketId: ID!
   createdAt: Instant!
   updatedAt: Instant!
   tags: [Tag!]!
@@ -738,11 +748,6 @@ type Feed {
   updatedAt: Instant!
 }
 
-type FeedCount {
-  id: ID!
-  count: Int!
-}
-
 type FeedEntry {
   feedId: ID!
   id: ID!
@@ -758,6 +763,11 @@ type FeedEntry {
   updatedAt: Instant!
   tags: [Tag!]!
   feed: Feed
+}
+
+type FeedEntryCount {
+  id: ID!
+  count: Int!
 }
 
 type File {
@@ -808,7 +818,7 @@ type Image implements MediaItem {
   title: String!
   path: String!
   size: Long!
-  bucketId: String!
+  bucketId: ID!
   createdAt: Instant!
   updatedAt: Instant!
   takenAt: Instant
@@ -885,19 +895,14 @@ type Location {
 """The Long scalar type represents a signed 64-bit numeric non-fractional value"""
 scalar Long
 
-type MediaActionResult {
-  type: MediaDataType!
-  query: String!
-  affectedCount: Int!
-}
-
 type MediaBucket {
   id: ID!
   name: String!
   itemCount: Int!
-  topItems: [String!]!
+  topItemPaths: [String!]!
 }
 
+"""Media-library domains — a strict subset of DataType with the same four member names."""
 enum MediaDataType {
   AUDIO
   VIDEO
@@ -912,7 +917,7 @@ interface MediaItem {
   title: String!
   path: String!
   size: Long!
-  bucketId: String!
+  bucketId: ID!
   createdAt: Instant!
   updatedAt: Instant!
 }
@@ -938,37 +943,6 @@ enum MergeTaskStatus {
   FAILED
 }
 
-type Message {
-  id: ID!
-  body: String!
-  address: String!
-  date: Instant!
-  serviceCenter: String!
-  read: Boolean!
-  threadId: String!
-  type: SmsType!
-  subscriptionId: Int!
-  isMms: Boolean!
-  attachments: [MessageAttachment!]!
-  tags: [Tag!]!
-}
-
-type MessageAttachment {
-  path: String!
-  contentType: String!
-  name: String!
-}
-
-type MessageConversation {
-  id: ID!
-  address: String!
-  snippet: String!
-  date: Instant!
-  messageCount: Int!
-  read: Boolean!
-  addresses: [String!]!
-}
-
 type Note {
   id: ID!
   title: String!
@@ -988,9 +962,9 @@ type Notification {
   id: ID!
   onlyOnce: Boolean!
   isClearable: Boolean!
-  appId: String!
+  appId: ID!
   appName: String!
-  time: Instant!
+  postedAt: Instant!
   silent: Boolean!
   title: String!
   body: String!
@@ -1038,7 +1012,7 @@ enum PackageType {
 }
 
 input PairingDeviceInput {
-  id: String!
+  id: ID!
   name: String!
   ips: [String!]!
   port: Int!
@@ -1050,7 +1024,7 @@ input PairingDeviceInput {
 }
 
 input PairingRequestInput {
-  fromId: String!
+  fromId: ID!
   fromName: String!
   port: Int!
   deviceType: DeviceType!
@@ -1140,9 +1114,9 @@ enum PhoneType {
 }
 
 type PomodoroSettings {
-  workDuration: Int!
-  shortBreakDuration: Int!
-  longBreakDuration: Int!
+  workDurationMin: Int!
+  shortBreakDurationMin: Int!
+  longBreakDurationMin: Int!
   pomodorosBeforeLongBreak: Int!
   showNotification: Boolean!
   playSoundOnComplete: Boolean!
@@ -1160,8 +1134,8 @@ type PomodoroToday {
   date: String!
   completedCount: Int!
   currentRound: Int!
-  timeLeft: Int!
-  totalTime: Int!
+  timeLeftSec: Int!
+  totalTimeSec: Int!
   isRunning: Boolean!
   isPaused: Boolean!
   state: PomodoroState!
@@ -1227,6 +1201,37 @@ type Sim {
   subscriptionId: Int!
 }
 
+type Sms {
+  id: ID!
+  body: String!
+  address: String!
+  date: Instant!
+  serviceCenter: String!
+  read: Boolean!
+  threadId: ID!
+  type: SmsType!
+  subscriptionId: Int!
+  isMms: Boolean!
+  attachments: [SmsAttachment!]!
+  tags: [Tag!]!
+}
+
+type SmsAttachment {
+  path: String!
+  contentType: String!
+  name: String!
+}
+
+type SmsConversation {
+  id: ID!
+  address: String!
+  snippet: String!
+  date: Instant!
+  messageCount: Int!
+  read: Boolean!
+  addresses: [String!]!
+}
+
 type SmsCounts {
   total: Int!
   inbox: Int!
@@ -1245,7 +1250,7 @@ enum SmsType {
 }
 
 type StorageMount {
-  id: String!
+  id: ID!
   name: String!
   path: String!
   mountPoint: String!
@@ -1266,7 +1271,7 @@ type Tag {
 }
 
 type TagRelation {
-  tagId: String!
+  tagId: ID!
   key: String!
 }
 
@@ -1293,7 +1298,7 @@ type Video implements MediaItem {
   path: String!
   durationMs: Long!
   size: Long!
-  bucketId: String!
+  bucketId: ID!
   createdAt: Instant!
   updatedAt: Instant!
   takenAt: Instant

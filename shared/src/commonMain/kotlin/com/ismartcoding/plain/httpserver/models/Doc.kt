@@ -11,7 +11,7 @@ data class Doc(
     override val path: String,
     val extension: String,
     override val size: Long,
-    override val bucketId: String,
+    override val bucketId: ID,
     override val createdAt: Instant,
     override val updatedAt: Instant,
 ) : MediaItem
@@ -23,5 +23,5 @@ data class DocExtGroup(
 )
 
 fun DDoc.toDocModel(): Doc {
-    return Doc(ID(id), title, path, extension, size, bucketId, createdAt, updatedAt)
+    return Doc(ID(id), title, path, extension, size, ID(bucketId), createdAt, updatedAt)
 }

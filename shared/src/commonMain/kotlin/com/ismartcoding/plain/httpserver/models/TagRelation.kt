@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
 @GraphQLType
 @Serializable
 data class TagRelation(
-    var tagId: String = "",
+    var tagId: ID = ID(""),
     var key: String = "",
 )
 
 fun DTagRelation.toModel(): TagRelation {
-    return TagRelation(tagId, key)
+    return TagRelation(ID(tagId), key)
 }

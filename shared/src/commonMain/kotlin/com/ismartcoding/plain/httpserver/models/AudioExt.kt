@@ -6,7 +6,7 @@ import com.ismartcoding.plain.db.DAudioPlayHistory
 import com.ismartcoding.plain.platform.getAudioAlbumArtFileId
 
 fun DAudio.toModel(): Audio {
-    return Audio(ID(id), title, artist, path, durationMs = duration, size = size, bucketId, getAudioAlbumArtFileId(this), createdAt, updatedAt, isFavorite)
+    return Audio(ID(id), title, artist, path, durationMs = duration, size = size, ID(bucketId), ID(getAudioAlbumArtFileId(this)), createdAt, updatedAt, isFavorite)
 }
 
 fun DPlaylistAudio.toModel(): AudioItem {

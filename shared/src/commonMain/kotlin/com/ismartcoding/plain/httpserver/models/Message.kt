@@ -7,36 +7,36 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
 @GraphQLType
-data class Message(
+data class Sms(
     val id: ID,
     val body: String,
     val address: String,
     val date: Instant,
     val serviceCenter: String,
     val read: Boolean,
-    val threadId: String,
+    val threadId: ID,
     val type: SmsType,
     val subscriptionId: Int,
     val isMms: Boolean,
-    val attachments: List<MessageAttachment>,
+    val attachments: List<SmsAttachment>,
 )
 
 @GraphQLType
-data class MessageAttachment(
+data class SmsAttachment(
     val path: String,
     val contentType: String,
     val name: String,
 )
 
-fun DMessage.toModel(): Message {
-    return Message(
+fun DMessage.toModel(): Sms {
+    return Sms(
         ID(id),
         body,
         address,
         date,
         serviceCenter,
         read,
-        threadId,
+        ID(threadId),
         SmsType.fromInt(type),
         subscriptionId,
         isMms,
@@ -44,6 +44,6 @@ fun DMessage.toModel(): Message {
     )
 }
 
-fun DMessageAttachment.toModel(): MessageAttachment {
-    return MessageAttachment(path, contentType, name)
+fun DMessageAttachment.toModel(): SmsAttachment {
+    return SmsAttachment(path, contentType, name)
 }

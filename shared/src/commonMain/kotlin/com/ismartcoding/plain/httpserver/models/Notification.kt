@@ -11,9 +11,9 @@ data class Notification(
     val id: ID,
     val onlyOnce: Boolean,
     val isClearable: Boolean,
-    val appId: String,
+    val appId: ID,
     val appName: String,
-    val time: Instant,
+    val postedAt: Instant,
     val silent: Boolean,
     val title: String,
     val body: String,
@@ -22,5 +22,5 @@ data class Notification(
 )
 
 fun DNotification.toModel(): Notification {
-    return Notification(ID(id), onlyOnce, isClearable, appId, appName, time, silent, title, body, actions, replyActions)
+    return Notification(ID(id), onlyOnce, isClearable, ID(appId), appName, time, silent, title, body, actions, replyActions)
 }

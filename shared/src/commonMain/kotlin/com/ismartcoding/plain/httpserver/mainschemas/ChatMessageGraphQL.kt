@@ -15,7 +15,9 @@ import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HRetryChatItemEvent
 import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.lib.sendEvent
+import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.ChatItem
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -23,13 +25,16 @@ import kotlin.reflect.typeOf
 
 @GraphQLQuery
 /** Latest-first page of a conversation, returned oldest-to-newest so clients can render directly. */
-suspend fun chatItems(id: ID, offset: Int? = 0, limit: Int? = 200): List<ChatItem> {
+suspend fun chatItems(id: ID, offset: Int, limit: Int, query: String): List<ChatItem> {
     val dao = AppDatabase.instance.chatDao()
     val target = ChatTarget.parseId(id.value)
+    val text = QueryHelper.textOf(query).trim()
     val items = if (target.type == ChatTargetType.CHANNEL) {
-        dao.getByChannelIdPage(target.toId, limit ?: 200, offset ?: 0)
+        if (text.isEmpty()) dao.getByChannelIdPage(target.toId, limit, offset)
+        else dao.getByChannelIdPageText(target.toId, "%$text%", limit, offset)
     } else {
-        dao.getByPeerIdPage(target.toId, limit ?: 200, offset ?: 0)
+        if (text.isEmpty()) dao.getByPeerIdPage(target.toId, limit, offset)
+        else dao.getByPeerIdPageText(target.toId, "%$text%", limit, offset)
     }
     return items.asReversed().map { it.toModel() }
 }
@@ -61,12 +66,12 @@ suspend fun deleteChatItem(id: ID): Boolean {
 }
 
 @GraphQLMutation
-suspend fun deleteChatItems(query: String): Boolean {
+suspend fun deleteChatItems(query: String): ActionResult {
     val ids = ChatManager.getIdsAsync(query)
     ChatManager.deleteByIds(ids)
     ChatViewModel.onMessagesDeleted(ids)
     sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, JsonHelper.jsonEncode(query)))
-    return true
+    return ActionResult(ids.size)
 }
 
 @GraphQLMutation

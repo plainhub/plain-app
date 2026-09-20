@@ -7,7 +7,7 @@
 #                     deleteContacts, updateContact, createContact,
 #                     createContactGroup, updateContactGroup, deleteContactGroup
 #   SmsGraphQL      : sms, smsConversations, smsCount, smsConversationCount,
-#                     archivedConversations, smsAllCounts,
+#                     archivedConversations, smsBoxCounts,
 #                     archiveConversation, unarchiveConversation,
 #                     sendSms, sendMms
 #   CallGraphQL     : calls, callCount, sims, call, deleteCalls
@@ -202,10 +202,10 @@ else
       fi
 
       # C07: delete the contact
-      DELETE_C=$(call_gql "mutation { deleteContacts(query: \"id:$api_new_id\") }")
-      api_del=$(printf '%s' "$DELETE_C" | jq -r '.data.deleteContacts // empty')
-      if [[ "$api_del" == "true" ]]; then
-        pass "content-provider-C07 deleteContacts(id:$api_new_id) → true"
+      DELETE_C=$(call_gql "mutation { deleteContacts(query: \"id:$api_new_id\") { affectedCount } }")
+      api_del=$(printf '%s' "$DELETE_C" | jq -r '.data.deleteContacts.affectedCount // empty')
+      if [[ "$api_del" == "1" ]]; then
+        pass "content-provider-C07 deleteContacts(id:$api_new_id) → affectedCount=1"
         sleep 1  # let content provider settle
         adb_after=$(adb_sh "content query --uri content://contacts/people/ --projection display_name:_id" 2>/dev/null | { grep "display_name=apitest2 fixture2" || true; } | wc -l | tr -d ' ')
         [[ "$adb_after" == "0" ]] && pass "content-provider-C07b contacts adb query shows fixture row is gone" \
@@ -296,23 +296,23 @@ fi
 # ----------------------------------------------------------------------------
 # content-provider-C14  archivedConversations is always readable (no SMS permission)
 # ----------------------------------------------------------------------------
-AC=$(call_gql '{ archivedConversations { id address } }')
+AC=$(call_gql '{ archivedConversations(offset: 0, limit: 50, query: "") { id address } }')
 api_ac_count=$(printf '%s' "$AC" | jq '.data.archivedConversations | length')
 [[ "$api_ac_count" -ge 0 ]] && pass "content-provider-C14 archivedConversations returns list (length=$api_ac_count)" \
                             || fail "content-provider-C14 archivedConversations not a list: $AC"
 
 # ----------------------------------------------------------------------------
-# content-provider-C15  smsAllCounts has inbox/sent/drafts counts
+# content-provider-C15  smsBoxCounts has inbox/sent/drafts counts
 # ----------------------------------------------------------------------------
-SAC=$(call_gql '{ smsAllCounts { total inbox sent drafts } }')
+SAC=$(call_gql '{ smsBoxCounts { total inbox sent drafts } }')
 echo "$SAC" > "$RESULTS_DIR/content-provider-sms-counts.json"
-api_sac_inbox=$(printf '%s' "$SAC" | jq -r '.data.smsAllCounts.inbox')
-api_sac_sent=$(printf '%s' "$SAC" | jq -r '.data.smsAllCounts.sent')
-api_sac_drafts=$(printf '%s' "$SAC" | jq -r '.data.smsAllCounts.drafts')
+api_sac_inbox=$(printf '%s' "$SAC" | jq -r '.data.smsBoxCounts.inbox')
+api_sac_sent=$(printf '%s' "$SAC" | jq -r '.data.smsBoxCounts.sent')
+api_sac_drafts=$(printf '%s' "$SAC" | jq -r '.data.smsBoxCounts.drafts')
 if [[ -n "$api_sac_inbox" && "$api_sac_inbox" != "null" ]]; then
-  pass "content-provider-C15 smsAllCounts (inbox=$api_sac_inbox sent=$api_sac_sent drafts=$api_sac_drafts)"
+  pass "content-provider-C15 smsBoxCounts (inbox=$api_sac_inbox sent=$api_sac_sent drafts=$api_sac_drafts)"
 else
-  fail "content-provider-C15 smsAllCounts missing fields: $SAC"
+  fail "content-provider-C15 smsBoxCounts missing fields: $SAC"
 fi
 
 # ----------------------------------------------------------------------------
@@ -328,7 +328,7 @@ fi
 #    Pixel userdebug has no sqlite3 binary, so we can't force a checkpoint.
 #    Verification therefore relies on the round-trip (archive → unarchive)
 #    succeeding, not on the DB count.
-ARCH=$(call_gql 'mutation { archiveConversation(id: "apitest-arch-xyz", date: 1719000000000) }')
+ARCH=$(call_gql 'mutation { archiveConversation(id: "apitest-arch-xyz") }')
 api_arch=$(printf '%s' "$ARCH" | jq -r '.data.archiveConversation // empty')
 if [[ "$api_arch" == "true" ]]; then
   pass "content-provider-C16 archiveConversation → true"
@@ -422,14 +422,14 @@ skip "content-provider-C23 call (skipped: would launch dialer intent)"
 # ----------------------------------------------------------------------------
 # content-provider-C24  deleteCalls lifecycle (only if WRITE_CALL_LOG granted)
 # ----------------------------------------------------------------------------
-DEL_CALLS=$(call_gql 'mutation { deleteCalls(query: "number:0000apitest0000") }')
+DEL_CALLS=$(call_gql 'mutation { deleteCalls(query: "number:0000apitest0000") { affectedCount } }')
 api_del_calls_err=$(printf '%s' "$DEL_CALLS" | jq -r '.errors[0].message // empty')
 if [[ -n "$api_del_calls_err" && "$api_del_calls_err" == *"permission"* ]]; then
   skip "content-provider-C24 deleteCalls (permission gated: WRITE_CALL_LOG)"
 else
-  api_del_calls=$(printf '%s' "$DEL_CALLS" | jq -r '.data.deleteCalls // empty')
-  if [[ "$api_del_calls" == "true" ]]; then
-    pass "content-provider-C24 deleteCalls → true (no-op for non-matching query)"
+  api_del_calls=$(printf '%s' "$DEL_CALLS" | jq -r '.data.deleteCalls.affectedCount // empty')
+  if [[ "$api_del_calls" == "0" ]]; then
+    pass "content-provider-C24 deleteCalls → affectedCount=0 (no-op for non-matching query)"
   else
     fail "content-provider-C24 deleteCalls returned: $DEL_CALLS"
   fi

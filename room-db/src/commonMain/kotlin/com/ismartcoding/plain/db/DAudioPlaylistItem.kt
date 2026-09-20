@@ -48,6 +48,12 @@ interface AudioPlaylistItemDao {
     )
     suspend fun pageByPlaylist(playlistId: String, limit: Int, offset: Int): List<DAudioPlaylistItem>
 
+    @Query(
+        "SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId AND (title LIKE :text OR artist LIKE :text OR audio_path LIKE :text) " +
+            "ORDER BY position LIMIT :limit OFFSET :offset",
+    )
+    suspend fun pageByPlaylistText(playlistId: String, text: String, limit: Int, offset: Int): List<DAudioPlaylistItem>
+
     @Query("SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId ORDER BY position")
     suspend fun getByPlaylist(playlistId: String): List<DAudioPlaylistItem>
 

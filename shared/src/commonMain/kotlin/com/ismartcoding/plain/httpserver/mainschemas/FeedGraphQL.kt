@@ -15,7 +15,8 @@ import com.ismartcoding.plain.features.feed.importAsync
 import com.ismartcoding.plain.httpserver.loaders.FeedsLoader
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.Feed
-import com.ismartcoding.plain.httpserver.models.FeedCount
+import com.ismartcoding.plain.httpserver.models.ActionResult
+import com.ismartcoding.plain.httpserver.models.FeedEntryCount
 import com.ismartcoding.plain.httpserver.models.FeedEntry
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -29,7 +30,7 @@ suspend fun feeds(): List<Feed> {
 }
 
 @GraphQLQuery
-suspend fun feedsCount(): List<FeedCount> {
+suspend fun feedEntryCounts(): List<FeedEntryCount> {
     return FeedHelper.getFeedCounts().map { it.toModel() }
 }
 
@@ -42,14 +43,6 @@ suspend fun feedEntryCount(query: String): Int {
 suspend fun feedEntry(id: ID): FeedEntry? {
     val data = FeedEntryHelper.feedEntryDao.getById(id.value)
     return data?.toModel()
-}
-
-@GraphQLMutation
-suspend fun fetchFeedContent(id: ID): FeedEntry {
-    val feed = FeedEntryHelper.feedEntryDao.getById(id.value)
-        ?: throw GraphQLError("Feed entry ${id.value} not found")
-    feed.fetchContentAsync()
-    return feed.toModel()
 }
 
 @GraphQLMutation
@@ -113,11 +106,11 @@ suspend fun syncFeedContent(id: ID): FeedEntry {
 }
 
 @GraphQLMutation
-suspend fun deleteFeedEntries(query: String): Int {
+suspend fun deleteFeedEntries(query: String): ActionResult {
     val ids = FeedEntryHelper.getIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
     FeedEntryHelper.deleteAsync(ids)
-    return ids.size
+    return ActionResult(ids.size)
 }
 
 @GraphQLQuery
@@ -127,8 +120,8 @@ suspend fun feedEntries(offset: Int, limit: Int, query: String): List<FeedEntry>
 }
 
 fun SchemaBuilder.addFeedSchema() {
-    type<FeedCount> {
-        property("id", typeOf<ID>(), { it: FeedCount -> ID(it.id) })
+    type<FeedEntryCount> {
+        property("id", typeOf<ID>(), { it: FeedEntryCount -> ID(it.id) })
     }
     type<FeedEntry> {
         property("feedId", typeOf<ID>(), { it: FeedEntry -> ID(it.feedId) })

@@ -49,7 +49,7 @@ enum ChatStatus {
 }
 
 type ChatText {
-  ids: [String!]!
+  linkPreviewImageIds: [String!]!
 }
 
 """ISO-8601 / RFC 3339 UTC timestamp string, e.g. 2026-09-20T12:34:56.789Z"""

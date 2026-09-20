@@ -53,8 +53,10 @@ data class ChatItem(
 
             is DMessageText -> {
                 val messageText = _content.value as DMessageText
-                val imageIds = messageText.linkPreviews
-                    .map { val p = it.imageLocalPath; if (p.isNullOrEmpty()) "" else getFileId(p) }
+                val imageIds = messageText.linkPreviews.mapNotNull {
+                    val p = it.imageLocalPath
+                    if (p.isNullOrEmpty()) null else getFileId(p)
+                }
                 ChatItemContent.ChatText(imageIds)
             }
 
@@ -71,15 +73,18 @@ data class ChatItem(
 sealed class ChatItemContent {
     @GraphQLType
     @Serializable
+    /** Shared image fileId list (app file store ids, String). */
     data class ChatImages(val ids: List<String>) : ChatItemContent()
 
     @GraphQLType
     @Serializable
+    /** Shared file fileId list (app file store ids, String). */
     data class ChatFiles(val ids: List<String>) : ChatItemContent()
 
     @GraphQLType
     @Serializable
-    data class ChatText(val ids: List<String>) : ChatItemContent()
+    /** fileId list (String) of locally cached link-preview images; the text itself is ChatItem.content. */
+    data class ChatText(val linkPreviewImageIds: List<String>) : ChatItemContent()
 }
 
 fun DChat.toModel(): ChatItem {

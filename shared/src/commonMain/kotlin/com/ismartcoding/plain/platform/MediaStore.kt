@@ -161,6 +161,9 @@ expect suspend fun countSmsConversations(query: String): Int
  */
 expect suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.features.sms.DMessageConversation>
 
+/** Epoch-millis date of one SMS conversation (thread), or null if it no longer exists. */
+expect suspend fun getSmsConversationDate(threadId: String): Long?
+
 /**
  * Aggregate SMS counts (total, unread, sent, drafts) on supported platforms.
  * Returns zeroes on unsupported platforms.

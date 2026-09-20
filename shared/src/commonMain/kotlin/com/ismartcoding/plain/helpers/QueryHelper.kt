@@ -3,6 +3,9 @@ package com.ismartcoding.plain.helpers
 import com.ismartcoding.plain.features.TagHelper
 
 object QueryHelper {
+    /** Text-search term of a query DSL string ("" when absent) — used by list endpoints that only support text filtering. */
+    fun textOf(query: String): String = SearchHelper.parse(query).firstOrNull { it.name == "text" }?.value ?: ""
+
     suspend fun parseAsync(query: String): List<FilterField>  {
         if (query.isNotEmpty()) {
             val parsed = SearchHelper.parse(query)

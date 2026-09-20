@@ -170,10 +170,10 @@ if [[ -z "$api_cd_err" || "$api_cd_err" == *"already exists"* ]]; then
   fi
 
   # C15: deleteFiles (cleanup all our fixtures)
-  DF=$(call_gql "mutation { deleteFiles(paths: [\"${FIXTURE_FILE}\", \"${FIXTURE_FILE}.copy\", \"${FIXTURE_FILE}.moved\", \"${FIXTURE_DIR}/renamed.txt\"]) }")
-  api_df=$(printf '%s' "$DF" | jq -r '.data.deleteFiles // empty')
-  if [[ "$api_df" == "true" ]]; then
-    pass "files-C15 deleteFiles → true"
+  DF=$(call_gql "mutation { deleteFiles(paths: [\"${FIXTURE_FILE}\", \"${FIXTURE_FILE}.copy\", \"${FIXTURE_FILE}.moved\", \"${FIXTURE_DIR}/renamed.txt\"]) { affectedCount } }")
+  api_df=$(printf '%s' "$DF" | jq -r '.data.deleteFiles.affectedCount // empty')
+  if [[ "$api_df" =~ ^[0-9]+$ ]]; then
+    pass "files-C15 deleteFiles → affectedCount=$api_df"
   else
     fail "files-C15 deleteFiles returned: $DF"
   fi

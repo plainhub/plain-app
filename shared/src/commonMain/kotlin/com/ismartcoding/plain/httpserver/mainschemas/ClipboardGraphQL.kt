@@ -11,6 +11,7 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
+import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.Clipboard
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
@@ -71,10 +72,10 @@ suspend fun setClipboard(text: String, context: Context): Boolean {
 
 /** Deletes clipboard history entries by ids. */
 @GraphQLMutation
-suspend fun deleteClipboard(ids: List<ID>): Boolean {
+suspend fun deleteClipboard(ids: List<ID>): ActionResult {
     ensureClipboardEnabled()
-    ClipboardHelper.deleteByIds(ids.map { it.value })
-    return true
+    val deleted = ClipboardHelper.deleteByIds(ids.map { it.value })
+    return ActionResult(deleted)
 }
 
 fun SchemaBuilder.addClipboardSchema() {

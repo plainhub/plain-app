@@ -30,7 +30,7 @@ class AndroidExtras {
 class DisplayInfo {
     var width: Int = 0
     var height: Int = 0
-    var density: String = ""
+    var density: Float = 0f
 }
 
 @GraphQLType
