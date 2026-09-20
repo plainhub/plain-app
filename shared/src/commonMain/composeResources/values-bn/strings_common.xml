@@ -174,4 +174,15 @@
     <string name="discard_changes_text">আপনার সম্পাদনাগুলো সংরক্ষিত হয়নি।</string>
     <string name="large_file_edit">ফাইলটি খুব বড়। সম্পাদনা ধীর হতে পারে। চালিয়ে যাবেন?</string>
     <string name="line_number">লাইন নম্বর</string>
+    <string name="global_search_hint">সবকিছু খুঁজুন</string>
+    <string name="search_in_domain">%1$s-এ খুঁজুন</string>
+    <string name="recent_searches">সাম্প্রতিক খোঁজ</string>
+    <string name="search_scope_hint">শুধু %1$s-এ খোঁজা হচ্ছে। সব ধরন খুঁজতে "সব" ট্যাপ করুন।</string>
+    <string name="view_all_n">সব দেখুন (%1$d)</string>
+    <string name="show_more_n">আরও দেখান (%1$d/%2$d)</string>
+    <string name="no_results_for">"%1$s"-এর জন্য কোনো ফলাফল পাওয়া যায়নি</string>
+    <string name="no_results_hint">ছোট কীওয়ার্ড চেষ্টা করুন বা একটি ধরন ফিল্টার বেছে নিন।</string>
+    <string name="no_results_hint_scope">ছোট কীওয়ার্ড চেষ্টা করুন বা "সব"-এ ফিরে যান</string>
+    <string name="search_in_all_types">সব ধরনে খুঁজুন</string>
+    <string name="clear_search_term">অনুসন্ধান শব্দ মুছুন</string>
 </resources>

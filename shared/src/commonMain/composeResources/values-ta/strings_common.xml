@@ -174,4 +174,15 @@
     <string name="discard_changes_text">உங்கள் திருத்தங்கள் சேமிக்கப்படவில்லை.</string>
     <string name="large_file_edit">இந்தக் கோப்பு மிகவும் பெரியது. திருத்துவது மெதுவாக இருக்கலாம். தொடரவா?</string>
     <string name="line_number">வரி எண்</string>
+    <string name="global_search_hint">அனைத்தையும் தேடுங்கள்</string>
+    <string name="search_in_domain">%1$s-இல் தேடுங்கள்</string>
+    <string name="recent_searches">சமீபத்திய தேடல்கள்</string>
+    <string name="search_scope_hint">%1$s-இல் மட்டும் தேடப்படுகிறது. அனைத்து வகைகளையும் தேட "அனைத்து" தட்டவும்.</string>
+    <string name="view_all_n">அனைத்தையும் பார்க்கவும் (%1$d)</string>
+    <string name="show_more_n">மேலும் காட்டு (%1$d/%2$d)</string>
+    <string name="no_results_for">"%1$s"-க்கு முடிவுகள் இல்லை</string>
+    <string name="no_results_hint">சிறிய முக்கிய வார்த்தையை முயற்சிக்கவும் அல்லது வகை வடிகட்டியைத் தேர்வு செய்யவும்.</string>
+    <string name="no_results_hint_scope">சிறிய முக்கிய வார்த்தையை முயற்சிக்கவும் அல்லது "அனைத்து"க்கு திரும்பவும்.</string>
+    <string name="search_in_all_types">அனைத்து வகைகளிலும் தேடுங்கள்</string>
+    <string name="clear_search_term">தேடல் வார்த்தையை அழிக்கவும்</string>
 </resources>

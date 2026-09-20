@@ -174,4 +174,15 @@
     <string name="discard_changes_text">आपके संपादन सहेजे नहीं गए हैं।</string>
     <string name="large_file_edit">यह फ़ाइल बहुत बड़ी है। संपादन धीमा हो सकता है। जारी रखें?</string>
     <string name="line_number">पंक्ति संख्या</string>
+    <string name="global_search_hint">सब कुछ खोजें</string>
+    <string name="search_in_domain">%1$s में खोजें</string>
+    <string name="recent_searches">हाल की खोजें</string>
+    <string name="search_scope_hint">केवल %1$s में खोजा जा रहा है. सभी प्रकार खोजने के लिए "सभी" पर टैप करें.</string>
+    <string name="view_all_n">सभी देखें (%1$d)</string>
+    <string name="show_more_n">और दिखाएं (%1$d/%2$d)</string>
+    <string name="no_results_for">"%1$s" के लिए कोई परिणाम नहीं मिला</string>
+    <string name="no_results_hint">छोटा कीवर्ड आज़माएं या कोई प्रकार फ़िल्टर चुनें।</string>
+    <string name="no_results_hint_scope">छोटा कीवर्ड आज़माएं या "सभी" पर वापस जाएं</string>
+    <string name="search_in_all_types">सभी प्रकारों में खोजें</string>
+    <string name="clear_search_term">खोज शब्द साफ़ करें</string>
 </resources>

@@ -174,4 +174,15 @@
     <string name="discard_changes_text">Wijzigingen zijn niet opgeslagen.</string>
     <string name="large_file_edit">Dit bestand is zeer groot. Bewerken kan traag zijn. Doorgaan?</string>
     <string name="line_number">Regelnummer</string>
+    <string name="global_search_hint">Alles doorzoeken</string>
+    <string name="search_in_domain">Zoeken in %1$s</string>
+    <string name="recent_searches">Recente zoekopdrachten</string>
+    <string name="search_scope_hint">Er wordt alleen in %1$s gezocht. Tik op "Alles" om alle typen te doorzoeken.</string>
+    <string name="view_all_n">Alles bekijken (%1$d)</string>
+    <string name="show_more_n">Meer tonen (%1$d/%2$d)</string>
+    <string name="no_results_for">Geen resultaten voor "%1$s"</string>
+    <string name="no_results_hint">Probeer een korter trefwoord of kies een typefilter.</string>
+    <string name="no_results_hint_scope">Probeer een korter trefwoord of ga terug naar "Alles".</string>
+    <string name="search_in_all_types">In alle typen zoeken</string>
+    <string name="clear_search_term">Zoekterm wissen</string>
 </resources>

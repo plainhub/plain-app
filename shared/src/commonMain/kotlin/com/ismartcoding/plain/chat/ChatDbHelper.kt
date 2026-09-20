@@ -4,6 +4,7 @@ import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageFiles
@@ -30,6 +31,20 @@ object ChatDbHelper {
 
     suspend fun getChatItem(id: String): DChat? = withIO {
         AppDatabase.instance.chatDao().getById(id)
+    }
+
+    suspend fun searchAsync(query: String, limit: Int, offset: Int): List<DChat> = withIO {
+        if (query.isEmpty()) return@withIO emptyList()
+        val dao = AppDatabase.instance.chatDao()
+        val sql = "SELECT * FROM chats WHERE content LIKE '%' || ? || '%' ORDER BY created_at DESC LIMIT $limit OFFSET $offset"
+        dao.search(rawQuery(sql, arrayOf(query)))
+    }
+
+    suspend fun countAsync(query: String): Int = withIO {
+        if (query.isEmpty()) return@withIO 0
+        val dao = AppDatabase.instance.chatDao()
+        val sql = "SELECT COUNT(*) FROM chats WHERE content LIKE '%' || ? || '%'"
+        dao.count(rawQuery(sql, arrayOf(query)))
     }
 
     suspend fun updateChatItemStatus(item: DChat, status: ChatStatus) = withIO {

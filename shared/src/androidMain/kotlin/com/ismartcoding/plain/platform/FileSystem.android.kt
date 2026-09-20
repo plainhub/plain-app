@@ -35,6 +35,12 @@ actual suspend fun searchFilesInDir(query: String, root: String, sortBy: FileSor
 actual fun searchFilesByName(query: String, dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile> =
     FileSystemHelper.search(query, dir, showHidden).sorted(sortBy)
 
+actual suspend fun searchFiles(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DFile> =
+    FileMediaStoreHelper.searchAsync(appContext, query, limit, offset, sortBy)
+
+actual suspend fun countFiles(query: String): Int =
+    FileMediaStoreHelper.countAsync(appContext, query)
+
 actual suspend fun getRecentFiles(): List<DFile> = withIO {
     if (isQPlus()) {
         FileMediaStoreHelper.getRecentFilesAsync(appContext)

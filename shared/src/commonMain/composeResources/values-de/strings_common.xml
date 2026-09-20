@@ -174,4 +174,15 @@
     <string name="discard_changes_text">Ungespeicherte Änderungen gehen verloren.</string>
     <string name="large_file_edit">Diese Datei ist sehr groß. Das Bearbeiten kann langsam sein. Fortfahren?</string>
     <string name="line_number">Zeilennummer</string>
+    <string name="global_search_hint">Alles durchsuchen</string>
+    <string name="search_in_domain">In %1$s suchen</string>
+    <string name="recent_searches">Letzte Suchanfragen</string>
+    <string name="search_scope_hint">Es wird nur in %1$s gesucht. Tippe auf "Alle", um alle Typen zu durchsuchen.</string>
+    <string name="view_all_n">Alle anzeigen (%1$d)</string>
+    <string name="show_more_n">Mehr anzeigen (%1$d/%2$d)</string>
+    <string name="no_results_for">Keine Ergebnisse für "%1$s" gefunden</string>
+    <string name="no_results_hint">Versuche ein kürzeres Stichwort oder wähle einen Typ-Filter.</string>
+    <string name="no_results_hint_scope">Versuche ein kürzeres Stichwort oder wechsle zurück zu "Alle".</string>
+    <string name="search_in_all_types">In allen Typen suchen</string>
+    <string name="clear_search_term">Suchbegriff löschen</string>
 </resources>

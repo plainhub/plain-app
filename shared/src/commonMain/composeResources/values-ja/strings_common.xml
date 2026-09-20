@@ -174,4 +174,15 @@
     <string name="discard_changes_text">編集内容は保存されていません。</string>
     <string name="large_file_edit">このファイルは非常に大きく、編集に時間がかかる可能性があります。続行しますか？</string>
     <string name="line_number">行番号</string>
+    <string name="global_search_hint">すべてを検索</string>
+    <string name="search_in_domain">%1$s内を検索</string>
+    <string name="recent_searches">最近の検索</string>
+    <string name="search_scope_hint">%1$sのみを検索します。「すべて」で全タイプを検索できます。</string>
+    <string name="view_all_n">すべて表示（%1$d）</string>
+    <string name="show_more_n">さらに表示（%1$d/%2$d）</string>
+    <string name="no_results_for">「%1$s」に関連する結果は見つかりませんでした</string>
+    <string name="no_results_hint">もっと短いキーワードを試すか、タイプで絞り込んでください</string>
+    <string name="no_results_hint_scope">もっと短いキーワードを試すか、「すべて」に戻ってください</string>
+    <string name="search_in_all_types">すべてのタイプで検索</string>
+    <string name="clear_search_term">検索語を消去</string>
 </resources>

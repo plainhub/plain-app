@@ -35,6 +35,7 @@ import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
+import com.ismartcoding.plain.ui.models.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -111,6 +112,7 @@ import com.ismartcoding.plain.httpserver.HttpServerManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
+import com.ismartcoding.plain.ui.page.search.GlobalSearchPage
 import com.ismartcoding.plain.ui.page.settings.AutoCheckUpdatePage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
 import com.ismartcoding.plain.ui.page.settings.ComponentShowcasePage
@@ -148,6 +150,8 @@ fun MainNavGraph(
     val audioFoldersVM = viewModel(key = "audioFoldersVM") { MediaFoldersViewModel() }
     val audioCastVM = viewModel(key = "audioCastVM") { CastViewModel() }
     val audioHomeVM = viewModel(key = "audioHomeVM") { AudioHomeViewModel() }
+    // Activity-scoped so query/results survive bottom-tab switches.
+    val globalSearchVM = viewModel(key = "globalSearchVM") { GlobalSearchViewModel() }
     // App-level overlay host: the download widget and its list sheet sit
     // above every page so background share batches stay reachable.
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -172,6 +176,7 @@ fun MainNavGraph(
                 0 -> HomePage(navController, mainVM, updateVM, peerVM, channelVM, onTabSelected = onTabSelected)
                 1 -> ChatListPage(navController, peerVM = peerVM, channelVM = channelVM, onTabSelected = onTabSelected)
                 2 -> ToolsPage(navController, onTabSelected = onTabSelected)
+                3 -> GlobalSearchPage(navController, audioPlaylistVM, globalSearchVM, onTabSelected = onTabSelected)
             }
         }
         composable<Routing.Images> { ImagesPage(navController, initialLoadGate = rememberNavLoadGate()) }
