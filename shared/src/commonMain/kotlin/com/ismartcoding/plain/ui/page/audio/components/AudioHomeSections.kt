@@ -31,6 +31,8 @@ import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.drawerOpenAtRowStart
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.ui.models.AudioHomeArtist
+import com.ismartcoding.plain.ui.page.playlist.PlaylistAlbumCover
+import com.ismartcoding.plain.ui.page.playlist.components.PlaylistMosaicCover
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
@@ -129,6 +131,7 @@ fun ArtistsRow(
 @Composable
 fun PlaylistsRow(
     playlists: List<Pair<DAudioPlaylist, Int>>,
+    covers: Map<String, List<PlaylistAlbumCover>>,
     onNewPlaylist: () -> Unit,
     onPlaylistClick: (DAudioPlaylist) -> Unit,
 ) {
@@ -148,7 +151,8 @@ fun PlaylistsRow(
                     .clickable { onPlaylistClick(pl) }
                     .padding(4.dp),
             ) {
-                PlaylistCoverArtwork(
+                PlaylistMosaicCover(
+                    albums = covers[pl.id].orEmpty(),
                     gradientIndex = index + 2,
                     modifier = Modifier
                         .size(124.dp)

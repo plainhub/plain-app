@@ -72,22 +72,47 @@ fun openFile(
 
     val path = file.path
 
-    when {
-        path.isImageFast() || path.isVideoFast() -> {
+    openLocalFileByType(
+        path = path,
+        navController = navController,
+        audioPlaylistVM = audioPlaylistVM,
+        onPreviewMedia = {
             coMain {
                 withIO {
                     MediaPreviewData.setDataAsync(
-                            itemState,
-                            files.filter { it.path.isImageFast() || it.path.isVideoFast() }.map { it.toPreviewItem() },
-                            file.toPreviewItem(),
-                        )
+                        itemState,
+                        files.filter { it.path.isImageFast() || it.path.isVideoFast() }.map { it.toPreviewItem() },
+                        file.toPreviewItem(),
+                    )
                 }
                 previewerState.openTransform(
                     index = MediaPreviewData.items.indexOfFirst { it.id == file.path },
                     itemState = itemState,
                 )
             }
-        }
+        },
+        onUnsupported = { openFileExternal(path) },
+    )
+}
+
+/**
+ * Type dispatch shared by every "open a local file" flow (FilesPage, zip
+ * browser, shared-folder browser): media → [onPreviewMedia] (the caller owns
+ * how its previewer opens), audio → the audio player, text/PDF → their
+ * pages, anything else → [onUnsupported]. [mediaHint] forces the media
+ * branch when the path lacks a recognizable media extension (e.g. a shared
+ * entry typed only by its MIME).
+ */
+fun openLocalFileByType(
+    path: String,
+    navController: NavHostController,
+    audioPlaylistVM: AudioPlaylistViewModel? = null,
+    mediaHint: Boolean = false,
+    onPreviewMedia: () -> Unit,
+    onUnsupported: () -> Unit = {},
+) {
+    when {
+        path.isImageFast() || path.isVideoFast() || mediaHint -> onPreviewMedia()
 
         path.isAudioFast() -> {
             try {
@@ -114,7 +139,7 @@ fun openFile(
         }
 
         else -> {
-            openFileExternal(path)
+            onUnsupported()
         }
     }
 }

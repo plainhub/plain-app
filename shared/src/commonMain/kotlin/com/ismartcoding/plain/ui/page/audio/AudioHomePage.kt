@@ -298,7 +298,7 @@ private fun HomeSections(
             HomeSectionHeader(stringResource(Res.string.playlists), null)
         }
         item(key = "playlists") {
-            PlaylistsRow(playlists, onNewPlaylist, onPlaylistClick)
+            PlaylistsRow(playlists, homeVM.playlistCovers.value, onNewPlaylist, onPlaylistClick)
         }
         item(key = "recent_header") {
             HomeSectionHeader(stringResource(Res.string.recent), null)
