@@ -19,13 +19,23 @@ import com.ismartcoding.plain.platform.replyNotification
 @GraphQLQuery
 suspend fun notifications(offset: Int, limit: Int, query: String): List<Notification> {
     Permission.NOTIFICATION_LISTENER.checkEnabledAsync()
+    return filterNotifications(query)
+        .drop(offset.coerceAtLeast(0))
+        .take(limit.coerceAtLeast(0))
+        .map { it.toModel() }
+}
+
+@GraphQLQuery
+suspend fun notificationCount(query: String): Int {
+    Permission.NOTIFICATION_LISTENER.checkEnabledAsync()
+    return filterNotifications(query).size
+}
+
+private suspend fun filterNotifications(query: String): List<com.ismartcoding.plain.data.DNotification> {
     val q = QueryHelper.textOf(query).trim().lowercase()
     return filterNotificationsAsync()
         .filter { q.isEmpty() || it.appName.lowercase().contains(q) || it.title.lowercase().contains(q) || it.body.lowercase().contains(q) }
         .sortedByDescending { it.time }
-        .drop(offset.coerceAtLeast(0))
-        .take(limit.coerceAtLeast(0))
-        .map { it.toModel() }
 }
 
 @GraphQLMutation

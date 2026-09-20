@@ -125,7 +125,7 @@ else
 fi
 
 # media-C10  videos first item
-VL=$(call_gql '{ videos(offset: 0, limit: 1, query: "", sortBy: NAME_ASC) { id title path duration } }')
+VL=$(call_gql '{ videos(offset: 0, limit: 1, query: "", sortBy: NAME_ASC) { id title path durationMs } }')
 api_vl_count=$(printf '%s' "$VL" | jq '.data.videos | length')
 if [[ "$api_vl_count" -ge 1 ]]; then
   api_v_path=$(printf '%s' "$VL" | jq -r '.data.videos[0].path')

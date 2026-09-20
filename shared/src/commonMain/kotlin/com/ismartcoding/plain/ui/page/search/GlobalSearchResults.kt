@@ -29,6 +29,7 @@ import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.models.GlobalSearchDomain
 import com.ismartcoding.plain.ui.models.GlobalSearchHit
 import com.ismartcoding.plain.ui.models.GlobalSearchViewModel
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import org.jetbrains.compose.resources.stringResource
 
@@ -39,7 +40,7 @@ internal fun SearchResults(
     domains: List<GlobalSearchDomain>,
     rowContext: GlobalSearchRowContext,
     onOpen: (GlobalSearchHit) -> Unit,
-    onPreviewMedia: (GlobalSearchHit) -> Unit,
+    onPreviewMedia: (GlobalSearchHit, TransformItemState) -> Unit,
 ) {
     val query = viewModel.queryText.value.trim()
     val domainScope = viewModel.domain.value

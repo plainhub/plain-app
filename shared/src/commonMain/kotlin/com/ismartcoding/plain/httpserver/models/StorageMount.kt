@@ -16,5 +16,5 @@ data class StorageMount(
     val remote: Boolean = false,
     val alias: String = "",
     val driveType: DriveType = DriveType.INTERNAL_STORAGE,
-    val diskID: String = "",
+    val diskId: String = "",
 )

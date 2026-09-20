@@ -47,8 +47,10 @@ import com.ismartcoding.plain.ui.models.GlobalSearchViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.globalSearchDomains
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.page.MainNavScaffold
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.lib.withIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -103,17 +105,28 @@ fun GlobalSearchPage(
     )
 
     // Tapping an image/video hit opens the shared fullscreen previewer seeded
-    // with every loaded hit of that section, at the tapped index
-    // (same plain open() flow as ShortcutMediaPreviewer: no source thumbnail
-    // is registered with the transform layer, so openTransform cannot run).
-    val onPreviewMedia: (GlobalSearchHit) -> Unit = { hit ->
+    // with every loaded hit of that section, at the tapped index. Same flow as
+    // ImagesPage: the row thumbnail is a registered TransformImageView, so
+    // open zooms in from it and close zooms back into it.
+    val onPreviewMedia: (GlobalSearchHit, TransformItemState) -> Unit = { hit, itemState ->
         val domain = if (hit.source is GlobalSearchSource.Video) GlobalSearchDomain.VIDEOS else GlobalSearchDomain.IMAGES
-        val previewItems = buildMediaPreviewItems(viewModel.domainStates[domain]?.hits?.value ?: emptyList())
-            .ifEmpty { listOfNotNull(hit.previewItem()) }
-        val index = previewItems.indexOfFirst { it.id == hit.previewItem()?.id }
-        if (index >= 0) {
-            MediaPreviewData.items = previewItems
-            scope.launch { rowContext.previewerState.open(index) }
+        val hits = viewModel.domainStates[domain]?.hits?.value ?: emptyList()
+        scope.launch {
+            withIO {
+                val image = (hit.source as? GlobalSearchSource.Image)?.image
+                val video = (hit.source as? GlobalSearchSource.Video)?.video
+                if (image != null) {
+                    val items = hits.mapNotNull { (it.source as? GlobalSearchSource.Image)?.image }
+                    MediaPreviewData.setDataAsync(itemState, items, image)
+                } else if (video != null) {
+                    val items = hits.mapNotNull { (it.source as? GlobalSearchSource.Video)?.video }
+                    MediaPreviewData.setDataAsync(itemState, items, video)
+                }
+            }
+            val index = MediaPreviewData.items.indexOfFirst { it.id == hit.previewItem()?.id }
+            if (index >= 0) {
+                rowContext.previewerState.openTransform(index = index, itemState = itemState)
+            }
         }
     }
 

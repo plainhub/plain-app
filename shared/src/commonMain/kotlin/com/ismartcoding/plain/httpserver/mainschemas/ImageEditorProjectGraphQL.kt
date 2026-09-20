@@ -42,8 +42,8 @@ suspend fun deleteImageEditorProject(id: ID): Boolean {
 }
 
 @GraphQLMutation
-suspend fun broadcastImageEditorUpdate(pid: String, update: String): Boolean {
-    ImageEditorProjectHelper.broadcastUpdate(pid, update)
+suspend fun broadcastImageEditorUpdate(id: ID, update: String): Boolean {
+    ImageEditorProjectHelper.broadcastUpdate(id.value, update)
     return true
 }
 

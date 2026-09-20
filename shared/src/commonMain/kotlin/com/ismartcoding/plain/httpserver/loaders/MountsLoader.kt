@@ -32,7 +32,7 @@ object MountsLoader {
                 remote = false,
                 alias = "",
                 driveType = driveType,
-                diskID = "",
+                diskId = "",
             )
         }
 

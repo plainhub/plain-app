@@ -16,6 +16,7 @@ import com.ismartcoding.plain.httpserver.models.PomodoroToday
 import com.ismartcoding.plain.httpserver.models.pomodoroRuntimeInfoProvider
 import com.ismartcoding.plain.httpserver.models.toModel
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 
 @GraphQLQuery
@@ -25,8 +26,8 @@ suspend fun pomodoroSettings(): PomodoroSettings {
 
 @GraphQLQuery
 suspend fun pomodoroToday(): PomodoroToday {
-    val dao = AppDatabase.instance.pomodoroItemDao()
-    val today = TimeHelper.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
+    val zone = TimeZone.currentSystemDefault()
+    val today = TimeHelper.now().toLocalDateTime(zone).date.atStartOfDayIn(zone)
     val info = pomodoroRuntimeInfoProvider?.invoke()
     return if (info != null) {
         PomodoroToday(

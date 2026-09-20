@@ -57,7 +57,7 @@ class PlainAccessibilityService : AccessibilityService() {
             ScreenMirrorControlAction.LONG_PRESS -> {
                 val x = normToX(control.x ?: return, screenWidth)
                 val y = normToY(control.y ?: return, screenHeight)
-                val duration = control.duration ?: 500L
+                val duration = control.durationMs ?: 500L
                 dispatchLongPress(x, y, duration)
             }
 
@@ -66,7 +66,7 @@ class PlainAccessibilityService : AccessibilityService() {
                 val startY = normToY(control.y ?: return, screenHeight)
                 val endX = normToX(control.endX ?: return, screenWidth)
                 val endY = normToY(control.endY ?: return, screenHeight)
-                val duration = control.duration ?: 300L
+                val duration = control.durationMs ?: 300L
                 dispatchSwipe(startX, startY, endX, endY, duration)
             }
 

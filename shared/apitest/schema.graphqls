@@ -1,9 +1,10 @@
 """Query object"""
 type Query {
   appFiles(offset: Int!, limit: Int!, query: String!): [AppFile!]!
-  appFileCount: Int!
+  appFileCount(query: String!): Int!
   chatChannels: [ChatChannel!]!
   notifications(offset: Int!, limit: Int!, query: String!): [Notification!]!
+  notificationCount(query: String!): Int!
   docCount(query: String!): Int!
   docExtGroups: [DocExtGroup!]!
   docs(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Doc!]!
@@ -82,7 +83,7 @@ type Query {
   mounts: [StorageMount!]!
   recentFiles: [File!]!
   files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
-  fileInfo(id: ID, path: String!, fileName: String): FileInfo!
+  fileInfo(path: String!, fileName: String): FileInfo!
   fileIds(paths: [String!]!): [String!]!
   favoriteFolders: [FavoriteFolder!]!
 }
@@ -203,7 +204,7 @@ type Mutation {
   deleteDataStoreEntry(key: String!): Boolean!
   saveImageEditorProject(id: ID!, input: ImageEditorProjectInput!): ImageEditorProject!
   deleteImageEditorProject(id: ID!): Boolean!
-  broadcastImageEditorUpdate(pid: String!, update: String!): Boolean!
+  broadcastImageEditorUpdate(id: ID!, update: String!): Boolean!
   uninstallPackages(ids: [ID!]!): Boolean!
   installPackage(path: String!): PackageInstallPending!
   createDbTableRow(table: String!, row: String!): Boolean!
@@ -786,7 +787,6 @@ type FileInfo {
   path: String!
   updatedAt: Instant!
   size: Long!
-  tags: [Tag!]!
   data: MediaFileInfo
 }
 
@@ -1131,7 +1131,8 @@ enum PomodoroState {
 }
 
 type PomodoroToday {
-  date: String!
+  """Start of the pomodoro day on the device (UTC instant). Clients derive the calendar date in their own timezone."""
+  date: Instant!
   completedCount: Int!
   currentRound: Int!
   timeLeftSec: Int!
@@ -1170,7 +1171,7 @@ input ScreenMirrorControlInput {
   y: Float
   endX: Float
   endY: Float
-  duration: Long
+  durationMs: Long
   deltaX: Float
   deltaY: Float
   key: String
@@ -1205,7 +1206,7 @@ type Sms {
   id: ID!
   body: String!
   address: String!
-  date: Instant!
+  sentAt: Instant!
   serviceCenter: String!
   read: Boolean!
   threadId: ID!
@@ -1261,7 +1262,7 @@ type StorageMount {
   remote: Boolean!
   alias: String!
   driveType: DriveType!
-  diskID: String!
+  diskId: String!
 }
 
 type Tag {

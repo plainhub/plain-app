@@ -28,7 +28,6 @@ import com.ismartcoding.plain.platform.countFiles
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.countPackages
 import com.ismartcoding.plain.platform.formatDateTime
-import com.ismartcoding.plain.platform.getMediaItemUriString
 import com.ismartcoding.plain.platform.searchFiles
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.platform.searchPackages
@@ -67,12 +66,6 @@ sealed interface GlobalSearchAction {
     data class PlayAudio(val audio: DAudio) : GlobalSearchAction
 }
 
-/** Leading visual of a hit row rendered with the generic row (chat, images, videos). */
-sealed interface GlobalSearchThumbModel {
-    data class Icon(val res: DrawableResource) : GlobalSearchThumbModel
-    data class Media(val uri: String) : GlobalSearchThumbModel
-}
-
 /** Source model for domains whose rows render with the source page's own list item component. */
 sealed interface GlobalSearchSource {
     data class Note(val note: com.ismartcoding.plain.db.DNote) : GlobalSearchSource
@@ -90,7 +83,7 @@ class GlobalSearchHit(
     val title: String,
     val subtitle: String = "",
     val snippet: String = "",
-    val thumb: GlobalSearchThumbModel? = null,
+    val iconRes: DrawableResource? = null,
     val roundThumb: Boolean = false,
     val source: GlobalSearchSource? = null,
     val action: GlobalSearchAction,
@@ -305,7 +298,6 @@ class GlobalSearchViewModel : ViewModel() {
         key = "image_$id",
         title = title,
         subtitle = (takenAt ?: createdAt).formatDateTime(),
-        thumb = GlobalSearchThumbModel.Media(getMediaItemUriString(DataType.IMAGE, id)),
         source = GlobalSearchSource.Image(this),
         action = GlobalSearchAction.Navigate(Routing.Images),
     )
@@ -314,7 +306,6 @@ class GlobalSearchViewModel : ViewModel() {
         key = "video_$id",
         title = title,
         subtitle = duration.formatDuration() + " · " + (takenAt ?: createdAt).formatDateTime(),
-        thumb = GlobalSearchThumbModel.Media(getMediaItemUriString(DataType.VIDEO, id)),
         source = GlobalSearchSource.Video(this),
         action = GlobalSearchAction.Navigate(Routing.Videos),
     )
@@ -360,21 +351,19 @@ class GlobalSearchViewModel : ViewModel() {
             chatRoute = "peer:$other"
             senderName = if (fromId == "me") LocaleHelper.getString(Res.string.me) else conversation
         }
-        val thumb = if (isChannel) {
-            GlobalSearchThumbModel.Icon(Res.drawable.hash)
+        val thumbRes: DrawableResource = if (isChannel) {
+            Res.drawable.hash
         } else {
             val other = if (fromId == "me" || fromId == "local") toId else fromId
-            GlobalSearchThumbModel.Icon(
-                if (other == "local") Res.drawable.bot
-                else PeerCacher.getPeer(other)?.deviceType?.getIcon() ?: Res.drawable.devices,
-            )
+            if (other == "local") Res.drawable.bot
+            else PeerCacher.getPeer(other)?.deviceType?.getIcon() ?: Res.drawable.devices
         }
         return GlobalSearchHit(
             key = "chat_$id",
             title = senderName,
             snippet = getMessagePreview().snippetAround(q),
             subtitle = conversation,
-            thumb = thumb,
+            iconRes = thumbRes,
             roundThumb = true,
             action = GlobalSearchAction.Navigate(Routing.Chat(chatRoute)),
         )

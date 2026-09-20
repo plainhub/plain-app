@@ -7,7 +7,6 @@ import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
-import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -17,14 +16,12 @@ import com.ismartcoding.plain.platform.statFile
 import com.ismartcoding.plain.helpers.getFileId
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.httpserver.loaders.MountsLoader
-import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.FavoriteFolder
 import com.ismartcoding.plain.httpserver.models.File
 import com.ismartcoding.plain.httpserver.models.FileInfo
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.MediaFileInfo
 import com.ismartcoding.plain.httpserver.models.StorageMount
-import com.ismartcoding.plain.httpserver.models.Tag
 import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.platform.loadAudioInfo
 import com.ismartcoding.plain.platform.loadImageInfo
@@ -49,32 +46,20 @@ suspend fun files(root: String, offset: Int, limit: Int, query: String, sortBy: 
 }
 
 @GraphQLQuery
-suspend fun fileInfo(id: ID? = null, path: String, fileName: String? = null): FileInfo {
+suspend fun fileInfo(path: String, fileName: String? = null): FileInfo {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     val finalPath = path.getFinalPath()
     val stat = statFile(finalPath)
     val updatedAt = stat?.updatedAt ?: kotlin.time.Instant.fromEpochMilliseconds(0)
     val size = stat?.size ?: 0L
     val name = fileName ?: finalPath.getFilenameFromPath()
-    var tags = emptyList<Tag>()
-    var data: MediaFileInfo? = null
-    if (name.isImageFast()) {
-        if (!id?.value.isNullOrEmpty()) {
-            tags = TagsLoader.load(id!!.value, DataType.IMAGE)
-        }
-        data = loadImageInfo(finalPath)
-    } else if (name.isVideoFast()) {
-        if (!id?.value.isNullOrEmpty()) {
-            tags = TagsLoader.load(id!!.value, DataType.VIDEO)
-        }
-        data = loadVideoInfo(finalPath)
-    } else if (name.isAudioFast()) {
-        if (!id?.value.isNullOrEmpty()) {
-            tags = TagsLoader.load(id!!.value, DataType.AUDIO)
-        }
-        data = loadAudioInfo(finalPath)
+    val data: MediaFileInfo? = when {
+        name.isImageFast() -> loadImageInfo(finalPath)
+        name.isVideoFast() -> loadVideoInfo(finalPath)
+        name.isAudioFast() -> loadAudioInfo(finalPath)
+        else -> null
     }
-    return FileInfo(path, updatedAt, size = size, tags, data)
+    return FileInfo(path, updatedAt, size, data)
 }
 
 @GraphQLQuery

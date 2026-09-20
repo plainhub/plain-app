@@ -19,8 +19,10 @@ suspend fun appFiles(offset: Int, limit: Int, query: String): List<AppFile> {
 }
 
 @GraphQLQuery
-suspend fun appFileCount(): Int {
-    return AppDatabase.instance.appFileDao().count()
+suspend fun appFileCount(query: String): Int {
+    val text = QueryHelper.textOf(query).trim()
+    val dao = AppDatabase.instance.appFileDao()
+    return if (text.isEmpty()) dao.count() else dao.countText("%$text%")
 }
 
 fun SchemaBuilder.addAppFileSchema() {

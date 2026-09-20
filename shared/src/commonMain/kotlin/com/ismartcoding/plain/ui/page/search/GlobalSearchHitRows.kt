@@ -19,15 +19,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil3.compose.AsyncImage
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.file.DFile
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.getApplicationIcon
+import com.ismartcoding.plain.platform.getMediaItemUriString
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -37,6 +39,7 @@ import com.ismartcoding.plain.ui.components.DocItem
 import com.ismartcoding.plain.ui.components.NoteListItem
 import com.ismartcoding.plain.ui.components.PackageListItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageViewWithUri
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
@@ -47,7 +50,6 @@ import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.GlobalSearchHit
 import com.ismartcoding.plain.ui.models.GlobalSearchSource
-import com.ismartcoding.plain.ui.models.GlobalSearchThumbModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VPackage
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
@@ -106,7 +108,7 @@ fun GlobalSearchRow(
     query: String,
     ctx: GlobalSearchRowContext,
     onOpen: (GlobalSearchHit) -> Unit,
-    onPreviewMedia: (GlobalSearchHit) -> Unit = { },
+    onPreviewMedia: (GlobalSearchHit, TransformItemState) -> Unit = { _, _ -> },
 ) {
     when (val src = hit.source) {
         is GlobalSearchSource.Note -> CardSpace {
@@ -134,11 +136,44 @@ fun GlobalSearchRow(
             )
         }
 
-        is GlobalSearchSource.Image, is GlobalSearchSource.Video -> GlobalSearchHitRow(
-            hit = hit,
-            query = query,
-            onOpen = { onPreviewMedia(hit) },
-        )
+        is GlobalSearchSource.Image, is GlobalSearchSource.Video -> {
+            // Register the row thumbnail with the previewer's transform layer
+            // (same as ImageGridItem) so open/close zoom to and from the thumb.
+            val itemState = rememberTransformItemState()
+            val widthPx = with(LocalDensity.current) { 40.dp.toPx() }.toInt()
+            GlobalSearchHitRow(
+                hit = hit,
+                query = query,
+                onOpen = { onPreviewMedia(hit, itemState) },
+                thumb = {
+                    when (src) {
+                        is GlobalSearchSource.Image -> TransformImageViewWithUri(
+                            modifier = Modifier.size(40.dp),
+                            path = src.image.path,
+                            fileName = src.image.path.getFilenameFromPath(),
+                            key = src.image.id,
+                            uri = getMediaItemUriString(DataType.IMAGE, src.image.id),
+                            itemState = itemState,
+                            previewerState = ctx.previewerState,
+                            widthPx = widthPx,
+                        )
+
+                        is GlobalSearchSource.Video -> TransformImageViewWithUri(
+                            modifier = Modifier.size(40.dp),
+                            path = src.video.path,
+                            fileName = src.video.path.getFilenameFromPath(),
+                            key = src.video.id,
+                            uri = getMediaItemUriString(DataType.VIDEO, src.video.id),
+                            itemState = itemState,
+                            previewerState = ctx.previewerState,
+                            widthPx = widthPx,
+                        )
+
+                        else -> Unit
+                    }
+                },
+            )
+        }
 
         is GlobalSearchSource.Doc -> CardSpace {
             DocItem(
@@ -191,7 +226,12 @@ fun GlobalSearchRow(
             )
         }
 
-        null -> GlobalSearchHitRow(hit = hit, query = query, onOpen = onOpen)
+        null -> GlobalSearchHitRow(
+            hit = hit,
+            query = query,
+            onOpen = onOpen,
+            thumb = { GlobalSearchThumb(hit) },
+        )
     }
 }
 
@@ -208,15 +248,13 @@ fun GlobalSearchHit.previewItem(): PreviewItem? = when (val s = source) {
     else -> null
 }
 
-/** Seeds the shared media previewer with every loaded image/video hit of the section. */
-fun buildMediaPreviewItems(hits: List<GlobalSearchHit>): List<PreviewItem> = hits.mapNotNull { it.previewItem() }
-
-/** Generic result row (chat, images, videos): type thumb, highlighted title, optional snippet and subtitle. */
+/** Generic result row (chat): leading icon, highlighted title, optional snippet and subtitle. */
 @Composable
 fun GlobalSearchHitRow(
     hit: GlobalSearchHit,
     query: String,
     onOpen: (GlobalSearchHit) -> Unit,
+    thumb: @Composable () -> Unit,
 ) {
     val highlight = MaterialTheme.colorScheme.searchHighlight
     Row(
@@ -227,7 +265,7 @@ fun GlobalSearchHitRow(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = if (hit.snippet.isEmpty()) Alignment.CenterVertically else Alignment.Top,
     ) {
-        GlobalSearchThumb(hit)
+        thumb()
         HorizontalSpace(12.dp)
         Column(
             modifier = Modifier
@@ -282,26 +320,14 @@ fun GlobalSearchHitRow(
 
 @Composable
 private fun GlobalSearchThumb(hit: GlobalSearchHit) {
-    when (val thumb = hit.thumb) {
-        is GlobalSearchThumbModel.Media -> AsyncImage(
-            model = thumb.uri,
-            contentDescription = hit.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(8.dp)),
-        )
-
-        is GlobalSearchThumbModel.Icon -> Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(if (hit.roundThumb) CircleShape else RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.cardBackgroundNormal),
-            contentAlignment = Alignment.Center,
-        ) {
-            PIcon(icon = thumb.res, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        }
-
-        null -> Unit
+    val iconRes = hit.iconRes ?: return
+    Box(
+        modifier = Modifier
+            .size(40.dp)
+            .clip(if (hit.roundThumb) CircleShape else RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.cardBackgroundNormal),
+        contentAlignment = Alignment.Center,
+    ) {
+        PIcon(icon = iconRes, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
     }
 }

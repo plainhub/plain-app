@@ -23,7 +23,7 @@
 | 实体标识 | `ID` | `String` |
 | 时间点 | `Instant`（ISO-8601 UTC 字符串标量） | `Long` epoch、`String` |
 | 字节数 / 时长（可能 >2GiB 或 >2.1e9 ms） | `Long` | `Int`（GraphQL Int 是 32 位，NAS 上 >2GiB 文件会溢出——真实 bug 教训） |
-| 本地日历日期 | `String`，格式 `YYYY-MM-DD`，必须加 description 说明设备时区（先例：`PomodoroToday.date`） | 用 Instant 冒充日历日 |
+| 本地日历日期 | `String`，格式 `YYYY-MM-DD`，必须加 description 说明设备时区 | 用 Instant 冒充日历日（2026-09-20 起 PomodoroToday.date 已改为 Instant，由客户端按本地时区推导日历日） |
 
 时间字段的**唯一 wire 例外**：`PairingRequestInput.timestamp: Long!`（配对防重放协议的协议层字段，保持协议字节兼容）。
 
@@ -119,7 +119,7 @@ term       := [field ":"] value op?
 | `ScreenMirrorControlInput.pointerId` | `Int` | 多指触控槽位序号 |
 | `ChatFiles.ids` / `ChatImages.ids` / `ChatText.linkPreviewImageIds` | `[String]` | app 文件仓 fileId（2026-09-20 用户定：String，禁止 ID 标量） |
 | `deleteDbTableRows(ids: [String!]!)` | `[String]` | 调试 API，原生表主键 |
-| `PomodoroToday.date` | `String` | 本地日历日（见 §1） |
+| `StorageMount.diskId` | `String` | OS 磁盘 uuid，外部标识（Android 端恒空串；2026-09-20 由 diskID 改名） |
 | `PairingRequestInput.timestamp` | `Long` | 配对协议防重放字段（见 §1） |
 | `DataType.DEFAULT` | 枚举成员 | 内部未赋值哨兵，客户端禁止发送（见 §7） |
 

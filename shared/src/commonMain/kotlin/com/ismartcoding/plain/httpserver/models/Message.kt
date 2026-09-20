@@ -11,7 +11,7 @@ data class Sms(
     val id: ID,
     val body: String,
     val address: String,
-    val date: Instant,
+    val sentAt: Instant,
     val serviceCenter: String,
     val read: Boolean,
     val threadId: ID,

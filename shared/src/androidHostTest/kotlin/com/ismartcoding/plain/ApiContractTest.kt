@@ -35,6 +35,7 @@ class ApiContractTest {
         "ids", // ChatFiles/ChatImages.ids — app file store fileIds (2026-09-20 user: String, not ID)
         "linkPreviewImageIds", // ChatText — cached link-preview image fileIds (String)
         "subscriptionId", // Android SIM subscription integer (slot index), not an entity id
+        "diskId", // StorageMount.diskId — OS disk uuid, foreign identifier (empty on Android)
     )
 
     // Bulk destructive/modify mutations that must return ActionResult.
@@ -60,7 +61,7 @@ class ApiContractTest {
     @Test
     fun idSuffixedFieldsUseTheIdScalar() {
         forEachTypedField { (owner, name, type) ->
-            val isIdName = name == "id" || name.endsWith("Id") || name.endsWith("Ids")
+            val isIdName = isIdName(name)
             if (!isIdName) return@forEachTypedField
             val usesIdScalar = type.startsWith("ID") || type.startsWith("[ID")
             if (!usesIdScalar && owner !in stringIdAllowlist && name !in stringIdAllowlist) {
@@ -72,7 +73,7 @@ class ApiContractTest {
     @Test
     fun idSuffixedArgumentsUseTheIdScalar() {
         forEachOperationArgument { (op, name, type) ->
-            val isIdName = name.endsWith("Id") || name.endsWith("Ids") || name == "id"
+            val isIdName = isIdName(name)
             if (!isIdName) return@forEachOperationArgument
             val usesIdScalar = type.startsWith("ID") || type.startsWith("[ID")
             if (!usesIdScalar && name !in stringIdAllowlist && name != "ids") { // deleteDbTableRows(ids): raw table PKs, debug-only
@@ -114,7 +115,7 @@ class ApiContractTest {
     @Test
     fun durationsAndSizesCarryUnitsAnd64BitWidth() {
         // Bare duration fields are forbidden — use durationMs / durationSec / *Min / *Sec.
-        forbiddenPattern("""\bduration(Ms)?: Int\b""".trim()) { "durations must be Long (durationMs), never Int — $it" }
+        forbiddenPattern("""\bduration:""".trim()) { "bare duration is forbidden — use durationMs/durationSec — $it" }
         forbiddenPattern("""\btimeLeft(?!Sec):""".trim()) { "use timeLeftSec — $it" }
         forbiddenPattern("""\btotalTime(?!Sec):""".trim()) { "use totalTimeSec — $it" }
         forbiddenPattern("""\bworkDuration(?!Min):""".trim()) { "use workDurationMin — $it" }
@@ -127,6 +128,17 @@ class ApiContractTest {
     @Test
     fun timestampsAreInstantsNotRawNumbersOrStrings() {
         forbiddenPattern("""\w+At: (Long|String)""".trim()) { "timestamp fields must use the Instant scalar — $it" }
+    }
+
+    @Test
+    fun countSiblingsCarryTheListFilter() {
+        val querySigs = operationSignaturesIn("Query")
+        querySigs.forEach { sig ->
+            if (!sig.contains("offset")) return@forEach
+            val list = sig.substringBefore("(")
+            val countSig = querySigs.firstOrNull { it.startsWith("${list}Count(") } ?: return@forEach
+            if (!countSig.contains("query: String!")) fail("Query $countSig must declare query: String! — sibling of paginated $sig (spec §3).")
+        }
     }
 
     @Test
@@ -191,6 +203,22 @@ class ApiContractTest {
             if (line == "type Query {" || line == "type Mutation {") inOperationBlock = true
             if (line == "}") inOperationBlock = false
             if (inOperationBlock && line.contains("(")) out.add(line.trimEnd(','))
+        }
+        return out
+    }
+
+    /** id/id-ish names, including casing drift like `diskID` (spec §IDs). */
+    private fun isIdName(name: String): Boolean =
+        name == "id" || name.endsWith("Id") || name.endsWith("Ids") || name.endsWith("IDs") || name.endsWith("ID")
+
+    /** Lines of one top-level operation block (Query/Mutation) that declare an operation. */
+    private fun operationSignaturesIn(block: String): List<String> {
+        var inside = false
+        val out = mutableListOf<String>()
+        sdl.lineSequence().map { it.trim() }.forEach { line ->
+            if (line == "type $block {") inside = true
+            if (inside && line == "}") inside = false
+            if (inside && line.contains("(")) out.add(line.trimEnd(','))
         }
         return out
     }

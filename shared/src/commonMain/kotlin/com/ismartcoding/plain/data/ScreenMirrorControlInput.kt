@@ -12,7 +12,7 @@ data class ScreenMirrorControlInput(
     val y: Float? = null,
     val endX: Float? = null,
     val endY: Float? = null,
-    val duration: Long? = null,
+    val durationMs: Long? = null,
     val deltaX: Float? = null,
     val deltaY: Float? = null,
     val key: String? = null,

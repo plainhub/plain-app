@@ -214,7 +214,7 @@ fi
 # ----------------------------------------------------------------------------
 
 # app-state-C21  appFileCount
-AFC=$(call_gql '{ appFileCount }')
+AFC=$(call_gql '{ appFileCount(query: "") }')
 api_afc=$(printf '%s' "$AFC" | jq -r '.data.appFileCount')
 db_afc=$(sqlite3 "$DB_PULL" "SELECT COUNT(*) FROM files;")
 if [[ "$api_afc" == "$db_afc" ]]; then
