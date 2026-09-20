@@ -88,12 +88,21 @@ fun GlobalSearchPage(
     val query = viewModel.queryText.value
     val domainScope = viewModel.domain.value
 
+    // Runs on every entry (and return from a viewer): syncs read flags of the
+    // loaded feed entries without touching anything else, so no flash.
+    LaunchedEffect(Unit) {
+        viewModel.refreshFeedReadStates()
+    }
+
     // Live suggestions: re-arm the debounce on every keystroke; a submit or a
     // recent-term tap flips `submitted` before this fires, so it stays quiet.
+    // The `searchedQuery` guard keeps this from wiping and reloading the
+    // result list when the page re-enters composition after returning from a
+    // viewer page (the query has not changed, so there is nothing to search).
     LaunchedEffect(viewModel.queryText.value) {
-        if (query.isNotBlank()) {
+        if (query.isNotBlank() && !viewModel.submitted.value) {
             delay(300)
-            if (!viewModel.submitted.value) {
+            if (!viewModel.submitted.value && viewModel.searchedQuery.value != query.trim()) {
                 viewModel.search()
             }
         }

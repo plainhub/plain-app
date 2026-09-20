@@ -121,12 +121,12 @@ term       := [field ":"] value op?
 | `deleteDbTableRows(ids: [String!]!)` | `[String]` | 调试 API，原生表主键 |
 | `StorageMount.diskId` | `String` | OS 磁盘 uuid，外部标识（Android 端恒空串；2026-09-20 由 diskID 改名） |
 | `PairingRequestInput.timestamp` | `Long` | 配对协议防重放字段（见 §1） |
-| `chatItems(target)` | `String` | 会话目标编址串（peer id 或带前缀的 channel target，ChatTarget.parseId 解析；2026-09-20 用户定 String，非单一实体 id） |
+| `chatItems(target)` / `sendChatItem(target)` | `String` | 会话目标编址串（peer id 或带前缀的 channel target，ChatTarget.parseId 解析；2026-09-20 用户定 String，非单一实体 id） |
 | `DataType.DEFAULT` | 枚举成员 | 内部未赋值哨兵，客户端禁止发送（见 §7） |
 
 ## 9. 平台门控与多平台对齐
 
-- 能力门控走 `App.features: [DeviceFeature!]`，**禁止客户端嗅探 OS 版本**。
+- 门控分两层：`App.features: [DeviceFeature!]` 表示**设备是否提供该能力**（NAS 无 SMS 就不放 SMS）；`App.permissions: [Permission!]` 表示**客户端访问权限**（Android 运行时权限已启用且授予）。客户端 UI 先看 features 再看 permissions，**禁止嗅探 OS 版本**。
 - NAS 对齐义务：同名类型的字段名/类型（ID/Instant/Long）、参数必填性、返回形状必须与主 SDL 一致；
   NAS 实现不了的语义用空值/空列表 + feature 门控，而不是改类型。
 - 每媒体类型共用 `interface MediaItem {id,title,path,size,bucketId,createdAt,updatedAt}`；跨类型查询返回 `MediaItem`。

@@ -57,7 +57,7 @@ suspend fun installPackage(path: String): PackageInstallPending {
     try {
         // bundle unpacking is heavy disk I/O, keep it off the engine event loop
         val result = withIO { com.ismartcoding.plain.platform.installPackage(path) }
-        return PackageInstallPending(result.packageName, result.lastUpdateTime, result.isNew)
+        return PackageInstallPending(ID(result.packageName), result.lastUpdateTime, result.isNew)
     } catch (e: Exception) {
         LogCat.e("Installation failed: ${e.message}", e)
         throw GraphQLError("Installation failed: ${e.message}")

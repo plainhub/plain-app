@@ -43,14 +43,14 @@ suspend fun latestChatItems(): List<ChatItem> {
     return AppDatabase.instance.chatDao().getAllLatestChats().map { it.toModel() }
 }
 
-@GraphQLMutation
-suspend fun sendChatItem(toId: ID, content: String): List<ChatItem> {
-    val target = ChatTarget.parseId(toId.value)
-    val item = ChatManager.createChatItem(target, DChat.parseContent(content))
-    ChatManager.sendMessage(item, target, emptySet())
+@GraphQLMutation(description = "Send a chat message. `target` is the chat target id — a peer id, or a channel id (channel targets are prefixed, see ChatTarget); same value space as the chatItems query.")
+suspend fun sendChatItem(target: String, content: String): List<ChatItem> {
+    val chatTarget = ChatTarget.parseId(target)
+    val item = ChatManager.createChatItem(chatTarget, DChat.parseContent(content))
+    ChatManager.sendMessage(item, chatTarget, emptySet())
     val model = item.toModel()
     sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
-    ChatViewModel.onMessagesCreated(target, listOf(item))
+    ChatViewModel.onMessagesCreated(chatTarget, listOf(item))
     return listOf(model)
 }
 

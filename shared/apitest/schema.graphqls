@@ -155,7 +155,8 @@ type Mutation {
   deleteFeedEntries(query: String!): ActionResult!
   deletePeer(id: ID!): Boolean!
   unpairPeer(id: ID!): Boolean!
-  sendChatItem(toId: ID!, content: String!): [ChatItem!]!
+  """Send a chat message. `target` is the chat target id — a peer id, or a channel id (channel targets are prefixed, see ChatTarget); same value space as the chatItems query."""
+  sendChatItem(target: String!, content: String!): [ChatItem!]!
   deleteChatItem(id: ID!): Boolean!
   deleteChatItems(query: String!): ActionResult!
   retryChatItem(id: ID!): ChatItem!
@@ -628,7 +629,7 @@ type DbTableInfo {
   idKey: String!
 }
 
-"""Capabilities this server declares (see App.features). Clients must gate features on this list instead of sniffing OS versions."""
+"""Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.features. Clients gate UI on App.features instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."""
 enum DeviceFeature {
   MEDIA_TRASH
   MIRROR_AUDIO
@@ -1009,7 +1010,7 @@ type Package {
 }
 
 type PackageInstallPending {
-  packageName: String!
+  id: ID!
   updatedAt: Instant
   isNew: Boolean!
 }
@@ -1069,7 +1070,7 @@ enum PeerStatus {
   CHANNEL
 }
 
-"""Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted."""
+"""Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.features (DeviceFeature)."""
 enum Permission {
   WRITE_EXTERNAL_STORAGE
   READ_SMS

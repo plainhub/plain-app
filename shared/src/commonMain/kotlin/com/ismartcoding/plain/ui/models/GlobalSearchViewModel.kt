@@ -105,6 +105,8 @@ class GlobalSearchViewModel : ViewModel() {
     var searching = mutableStateOf(false)
     /** True once the current query finished with zero hits everywhere (drives the empty state). */
     var empty = mutableStateOf(false)
+    /** Query the current domainStates were built for; guards re-entrant searches. */
+    var searchedQuery = mutableStateOf("")
     val domainStates = mutableStateMapOf<GlobalSearchDomain, GlobalSearchDomainState>()
     var recentQueries = mutableStateOf<List<String>>(emptyList())
 
@@ -129,13 +131,6 @@ class GlobalSearchViewModel : ViewModel() {
         if (queryText.value.isNotBlank()) {
             search()
         }
-    }
-
-    /** Switches the scope to a single domain with its full result list (from a suggestion section). */
-    fun viewAllOfType(d: GlobalSearchDomain) {
-        domain.value = d
-        submitted.value = true
-        search()
     }
 
     fun submit() {
@@ -172,15 +167,14 @@ class GlobalSearchViewModel : ViewModel() {
         }
     }
 
-    fun loadMore(d: GlobalSearchDomain) {
-        val q = queryText.value.trim()
+    fun loadMore(d: GlobalSearchDomain, pageSize: Int = PAGE_SIZE) {        val q = queryText.value.trim()
         if (q.isEmpty()) return
         val state = domainStates[d] ?: return
         if (state.loading.value || state.loaded.value >= state.total.value) return
         viewModelScope.launch {
             state.loading.value = true
             try {
-                val hits = queryDomain(d, q, PAGE_SIZE, state.loaded.value)
+                val hits = queryDomain(d, q, pageSize, state.loaded.value)
                 state.hits.value += hits
                 state.loaded.value += hits.size
             } finally {
@@ -193,6 +187,7 @@ class GlobalSearchViewModel : ViewModel() {
         searchJob?.cancel()
         searchJob = null
         domainStates.clear()
+        searchedQuery.value = ""
         searching.value = false
         empty.value = false
     }
@@ -204,8 +199,10 @@ class GlobalSearchViewModel : ViewModel() {
             return
         }
         searchJob?.cancel()
+        searchedQuery.value = q
         val scope = domain.value
         val targets = scope?.let { listOf(it) } ?: globalSearchDomains()
+        val firstPage = if (scope != null) SCROLL_PAGE_SIZE else PAGE_SIZE
         val fresh = targets.associateWith { GlobalSearchDomainState() }
         domainStates.clear()
         targets.forEach { domainStates[it] = fresh.getValue(it) }
@@ -222,7 +219,7 @@ class GlobalSearchViewModel : ViewModel() {
                                 val total = countDomain(d, q)
                                 state.total.value = total
                                 if (total > 0) {
-                                    val hits = queryDomain(d, q, PAGE_SIZE, 0)
+                                    val hits = queryDomain(d, q, firstPage, 0)
                                     state.hits.value = hits
                                     state.loaded.value = hits.size
                                 }
@@ -236,6 +233,25 @@ class GlobalSearchViewModel : ViewModel() {
             } finally {
                 searching.value = false
             }
+        }
+    }
+
+    /** Syncs the read flag of loaded feed entries after returning from the entry page. */
+    fun refreshFeedReadStates() {
+        val state = domainStates[GlobalSearchDomain.FEEDS] ?: return
+        val hits = state.hits.value
+        if (hits.isEmpty()) return
+        viewModelScope.launch {
+            var changed = false
+            hits.forEach { hit ->
+                val src = hit.source as? GlobalSearchSource.Feed ?: return@forEach
+                val fresh = FeedEntryHelper.getAsync(src.entry.id)
+                if (fresh != null && fresh.read != src.entry.read) {
+                    src.entry.read = fresh.read
+                    changed = true
+                }
+            }
+            if (changed) state.hits.value = hits.toList()
         }
     }
 
@@ -378,12 +394,11 @@ class GlobalSearchViewModel : ViewModel() {
     )
 
     companion object {
-        /** Rows fetched per domain page and shown per domain section in results mode. */
+        /** Rows fetched per tap of a section's more button. */
         const val PAGE_SIZE = 8
 
-        /** Rows shown per domain while typing (suggestion mode); snippet domains show fewer. */
-        const val SUGGEST_ROWS = 3
-        const val SUGGEST_ROWS_WITH_SNIPPET = 2
+        /** Rows fetched per scroll page; also the first page of a scoped search. */
+        const val SCROLL_PAGE_SIZE = 20
     }
 }
 

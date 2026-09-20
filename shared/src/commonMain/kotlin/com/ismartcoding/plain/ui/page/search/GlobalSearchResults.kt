@@ -63,25 +63,24 @@ internal fun SearchResults(
         return
     }
 
-    // A single visible category pages itself in on scroll (scoped filter, or
-    // All where only one category matched); grouped views keep manual buttons.
-    val dataDomains = sectionDomains.filter { (viewModel.domainStates[it]?.total?.intValue ?: 0) > 0 }
-    val autoPageDomain: GlobalSearchDomain? = when {
-        viewModel.searching.value -> null
-        domainScope != null -> domainScope
-        dataDomains.size == 1 -> dataDomains.first()
-        else -> null
+    // The last visible section pages itself in on scroll at 20 rows per page
+    // (a scoped filter is always last; in All it is the trailing section).
+    // Other grouped sections show a more button that appends 8 rows per tap.
+    val visibleSections = sectionDomains.filter {
+        val s = viewModel.domainStates[it]
+        (s?.total?.intValue ?: 0) > 0 || s?.loading?.value == true
     }
+    val lastSection = visibleSections.lastOrNull()
 
     val listState = rememberLazyListState()
-    LaunchedEffect(autoPageDomain) {
-        if (autoPageDomain == null) return@LaunchedEffect
+    LaunchedEffect(lastSection) {
+        if (lastSection == null) return@LaunchedEffect
         snapshotFlow {
             val info = listState.layoutInfo
             (info.visibleItemsInfo.lastOrNull()?.index ?: -1) to info.totalItemsCount
         }.collect { (lastVisible, totalItems) ->
             if (totalItems > 0 && lastVisible >= totalItems - 4) {
-                viewModel.loadMore(autoPageDomain)
+                viewModel.loadMore(lastSection, GlobalSearchViewModel.SCROLL_PAGE_SIZE)
             }
         }
     }
@@ -92,16 +91,15 @@ internal fun SearchResults(
             val total = state.total.intValue
             if (total == 0 && !state.loading.value) return@forEach
 
-            val isAutoPage = d == autoPageDomain
+            val isLast = d == lastSection
             item(key = "header_${d.name}") {
                 SectionHeader(d, total, state.loading.value)
             }
-            val topN = if (d == GlobalSearchDomain.NOTES || d == GlobalSearchDomain.CHAT) GlobalSearchViewModel.SUGGEST_ROWS_WITH_SNIPPET else GlobalSearchViewModel.SUGGEST_ROWS
-            val shown = if (isAutoPage || viewModel.submitted.value) state.hits.value else state.hits.value.take(topN)
+            val shown = state.hits.value
             items(shown, key = { it.key }) { hit ->
                 GlobalSearchRow(hit = hit, query = query, ctx = rowContext, onOpen = onOpen, onPreviewMedia = onPreviewMedia)
             }
-            if (isAutoPage) {
+            if (isLast) {
                 if (state.loading.value) {
                     item(key = "loading_${d.name}") {
                         Box(
@@ -117,13 +115,7 @@ internal fun SearchResults(
                         }
                     }
                 }
-            } else if (!viewModel.submitted.value && total > topN) {
-                item(key = "viewall_${d.name}") {
-                    SectionFooterButton(stringResource(Res.string.view_all_n, total)) {
-                        viewModel.viewAllOfType(d)
-                    }
-                }
-            } else if (viewModel.submitted.value && state.loaded.intValue < total) {
+            } else if (state.loaded.intValue < total) {
                 item(key = "more_${d.name}") {
                     SectionFooterButton(
                         stringResource(Res.string.show_more_n, state.loaded.intValue, total),

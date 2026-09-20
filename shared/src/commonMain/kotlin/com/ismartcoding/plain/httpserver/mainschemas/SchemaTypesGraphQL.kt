@@ -65,11 +65,11 @@ fun SchemaBuilder.addMainSchemaTypes() {
     enum<DriveType>()
     enum<DeviceType>()
     enum<DeviceFeature> {
-        description = "Capabilities this server declares (see App.features). Clients must gate features on this list instead of sniffing OS versions."
+        description = "Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.features. Clients gate UI on App.features instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."
     }
     enum<MergeTaskStatus>()
     enum<Permission> {
-        description = "Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted."
+        description = "Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.features (DeviceFeature)."
     }
     enum<FileSortBy>()
     enum<PomodoroState>()
