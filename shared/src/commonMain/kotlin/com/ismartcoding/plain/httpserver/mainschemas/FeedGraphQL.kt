@@ -45,7 +45,7 @@ suspend fun feedEntry(id: ID): FeedEntry? {
     return data?.toModel()
 }
 
-@GraphQLMutation
+@GraphQLMutation(description = "Queue a feed content sync. `id` is optional: omit it (null) to sync all feeds, or pass one feed id to sync only that feed.")
 suspend fun syncFeeds(id: ID?): Boolean {
     feedWorkerOneTimeRequest(id?.value ?: "")
     return true

@@ -46,6 +46,12 @@ suspend fun files(root: String, offset: Int, limit: Int, query: String, sortBy: 
 }
 
 @GraphQLQuery
+suspend fun filesCount(root: String, query: String): Int {
+    Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
+    return searchFilesInDir(query, root, FileSortBy.DATE_ASC).size
+}
+
+@GraphQLQuery(description = "Detailed info for one file. `fileName` is optional — when omitted it is derived from `path`; it selects the media-info probe (image/video/audio).")
 suspend fun fileInfo(path: String, fileName: String? = null): FileInfo {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     val finalPath = path.getFinalPath()

@@ -121,6 +121,7 @@ term       := [field ":"] value op?
 | `deleteDbTableRows(ids: [String!]!)` | `[String]` | 调试 API，原生表主键 |
 | `StorageMount.diskId` | `String` | OS 磁盘 uuid，外部标识（Android 端恒空串；2026-09-20 由 diskID 改名） |
 | `PairingRequestInput.timestamp` | `Long` | 配对协议防重放字段（见 §1） |
+| `chatItems(target)` | `String` | 会话目标编址串（peer id 或带前缀的 channel target，ChatTarget.parseId 解析；2026-09-20 用户定 String，非单一实体 id） |
 | `DataType.DEFAULT` | 枚举成员 | 内部未赋值哨兵，客户端禁止发送（见 §7） |
 
 ## 9. 平台门控与多平台对齐
@@ -156,7 +157,7 @@ GraphQL schema 没有 Subscription；实时变更走专用 WS 旁路。**事件�
 | 5 | SCREEN_MIRRORING | `{"running": bool}` |
 | 7/8/9 | NOTIFICATION_CREATED / UPDATED / DELETED | model 列表或 id 列表（见 PNotificationListenerService） |
 | 10 | NOTIFICATION_REFRESHED | 空（触发客户端重新拉取 `notifications`） |
-| 11 | POMODORO_ACTION | `PomodoroActionData{action:"start"|"pause"|"stop", timeLeft, totalTime, completedCount, round, state}`（秒） |
+| 11 | POMODORO_ACTION | `PomodoroActionData{action:"start"|"pause"|"stop", timeLeftSec, totalTimeSec, completedCount, round, state}`（秒；2026-09-20 字段改名加 Sec 后缀，多平台同周期生效） |
 | 12 | POMODORO_SETTINGS_UPDATE | DPomodoroSettings JSON |
 | 14 | SCREEN_MIRROR_AUDIO_GRANTED | JSON bool |
 | 15 | BOOKMARK_UPDATED | 空（重新拉取 `bookmarks`/`bookmarkGroups`） |

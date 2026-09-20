@@ -3,7 +3,7 @@
 # Source-only; the runner sources this file.
 #
 # Schemas covered:
-#   NoteGraphQL  : notes, noteCount, note, saveNote, saveFeedEntriesToNotes,
+#   NoteGraphQL  : notes, noteCount, note, createNote, updateNote, saveFeedEntriesToNotes,
 #                  trashNotes, restoreNotes, deleteNotes, exportNotes
 #   TagGraphQL   : tags, tagRelations, createTag, updateTag, deleteTag,
 #                  addToTags, updateTagRelations, removeFromTags
@@ -67,12 +67,18 @@ api_nl_count=$(printf '%s' "$NL" | jq '.data.notes | length')
 # ----------------------------------------------------------------------------
 # notes-C03..07  Note CRUD: save → note → trash → restore → delete
 # ----------------------------------------------------------------------------
-# Empty id + non-empty id is "create" in saveNote; same shape is update.
-SAVE_N=$(call_gql 'mutation { saveNote(id: "", input: { title: "apitest-note", content: "apitest content" }) { id title content } }')
-api_n_id=$(printf '%s' "$SAVE_N" | jq -r '.data.saveNote.id // empty')
-api_n_title=$(printf '%s' "$SAVE_N" | jq -r '.data.saveNote.title // empty')
+# createNote makes the fixture; updateNote exercises the update shape.
+SAVE_N=$(call_gql 'mutation { createNote(input: { title: "apitest-note", content: "apitest content" }) { id title content } }')
+api_n_id=$(printf '%s' "$SAVE_N" | jq -r '.data.createNote.id // empty')
+api_n_title=$(printf '%s' "$SAVE_N" | jq -r '.data.createNote.title // empty')
 if [[ -n "$api_n_id" && "$api_n_title" == "apitest-note" ]]; then
-  pass "notes-C03 saveNote → id=$api_n_id title='$api_n_title'"
+  pass "notes-C03 createNote → id=$api_n_id title='$api_n_title'"
+
+  # C03b: updateNote round-trip
+  UPD_N=$(call_gql "mutation { updateNote(id: \"$api_n_id\", input: { title: \"apitest-note-upd\", content: \"apitest content\" }) { id title } }")
+  api_n_upd=$(printf '%s' "$UPD_N" | jq -r '.data.updateNote.title // empty')
+  [[ "$api_n_upd" == "apitest-note-upd" ]] && pass "notes-C03b updateNote → title='$api_n_upd'" \
+                                               || fail "notes-C03b updateNote returned: $UPD_N"
 
   # C04: note(id) round-trip
   NOTE_GET=$(call_gql "{ note(id: \"$api_n_id\") { id title content } }")
@@ -122,7 +128,7 @@ if [[ -n "$api_n_id" && "$api_n_title" == "apitest-note" ]]; then
     skip "notes-C07 deleteNotes (C05 failed)"
   fi
 else
-  fail "notes-C03 saveNote did not return id/title: $SAVE_N"
+  fail "notes-C03 createNote did not return id/title: $SAVE_N"
   skip "notes-C04 note (no fixture id)"
   skip "notes-C05 trashNotes (no fixture id)"
   skip "notes-C06 restoreNotes (no fixture id)"
@@ -197,8 +203,8 @@ fi
 # ----------------------------------------------------------------------------
 # These need a note fixture. Create one and a tag, then exercise the
 # tag-relation mutations.
-SAVE_N2=$(call_gql 'mutation { saveNote(id: "", input: { title: "apitest-tag-rel", content: "" }) { id title } }')
-api_n2_id=$(printf '%s' "$SAVE_N2" | jq -r '.data.saveNote.id // empty')
+SAVE_N2=$(call_gql 'mutation { createNote(input: { title: "apitest-tag-rel", content: "" }) { id title } }')
+api_n2_id=$(printf '%s' "$SAVE_N2" | jq -r '.data.createNote.id // empty')
 CREATE_T2=$(call_gql 'mutation { createTag(type: NOTE, name: "apitest-tag-rel") { id name } }')
 api_t2_id=$(printf '%s' "$CREATE_T2" | jq -r '.data.createTag.id // empty')
 

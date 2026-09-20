@@ -23,18 +23,17 @@ import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
 import kotlin.reflect.typeOf
 
-@GraphQLQuery
-/** Latest-first page of a conversation, returned oldest-to-newest so clients can render directly. */
-suspend fun chatItems(id: ID, offset: Int, limit: Int, query: String): List<ChatItem> {
+@GraphQLQuery(description = "Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a peer id, or a channel id (channel targets are prefixed, see ChatTarget).")
+suspend fun chatItems(target: String, offset: Int, limit: Int, query: String): List<ChatItem> {
     val dao = AppDatabase.instance.chatDao()
-    val target = ChatTarget.parseId(id.value)
+    val chatTarget = ChatTarget.parseId(target)
     val text = QueryHelper.textOf(query).trim()
-    val items = if (target.type == ChatTargetType.CHANNEL) {
-        if (text.isEmpty()) dao.getByChannelIdPage(target.toId, limit, offset)
-        else dao.getByChannelIdPageText(target.toId, "%$text%", limit, offset)
+    val items = if (chatTarget.type == ChatTargetType.CHANNEL) {
+        if (text.isEmpty()) dao.getByChannelIdPage(chatTarget.toId, limit, offset)
+        else dao.getByChannelIdPageText(chatTarget.toId, "%$text%", limit, offset)
     } else {
-        if (text.isEmpty()) dao.getByPeerIdPage(target.toId, limit, offset)
-        else dao.getByPeerIdPageText(target.toId, "%$text%", limit, offset)
+        if (text.isEmpty()) dao.getByPeerIdPage(chatTarget.toId, limit, offset)
+        else dao.getByPeerIdPageText(chatTarget.toId, "%$text%", limit, offset)
     }
     return items.asReversed().map { it.toModel() }
 }

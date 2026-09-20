@@ -2,6 +2,7 @@ package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.enums.ChatStatus
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLField
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLIgnore
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLUnion
@@ -27,6 +28,7 @@ data class ChatItem(
     @Transient private val _content: DMessageContent? = null,
     @GraphQLIgnore @Contextual var data: ChatItemContent? = null,
     val status: ChatStatus = ChatStatus.SENT,
+    @GraphQLField(description = "Per-recipient delivery details as JSON (peer delivery results); empty when the message has no delivery failures. Drives SENT/PARTIAL/FAILED alongside `status`.")
     val statusData: String = "",
 ) {
     fun getContentData(): ChatItemContent? {

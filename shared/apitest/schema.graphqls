@@ -30,7 +30,8 @@ type Query {
   feedEntry(id: ID!): FeedEntry
   feedEntries(offset: Int!, limit: Int!, query: String!): [FeedEntry!]!
   peers: [Peer!]!
-  chatItems(id: ID!, offset: Int!, limit: Int!, query: String!): [ChatItem!]!
+  """Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a peer id, or a channel id (channel targets are prefixed, see ChatTarget)."""
+  chatItems(target: String!, offset: Int!, limit: Int!, query: String!): [ChatItem!]!
   latestChatItems: [ChatItem!]!
   audioCount(query: String!): Int!
   audioQueueItems(offset: Int!, limit: Int!, query: String!): [AudioItem!]!
@@ -83,6 +84,8 @@ type Query {
   mounts: [StorageMount!]!
   recentFiles: [File!]!
   files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
+  filesCount(root: String!, query: String!): Int!
+  """Detailed info for one file. `fileName` is optional — when omitted it is derived from `path`; it selects the media-info probe (image/video/audio)."""
   fileInfo(path: String!, fileName: String): FileInfo!
   fileIds(paths: [String!]!): [String!]!
   favoriteFolders: [FavoriteFolder!]!
@@ -141,6 +144,7 @@ type Mutation {
   addFavoriteFolder(rootPath: String!, fullPath: String!): [FavoriteFolder!]!
   removeFavoriteFolder(fullPath: String!): [FavoriteFolder!]!
   setFavoriteFolderAlias(fullPath: String!, alias: String!): [FavoriteFolder!]!
+  """Queue a feed content sync. `id` is optional: omit it (null) to sync all feeds, or pass one feed id to sync only that feed."""
   syncFeeds(id: ID): Boolean!
   updateFeed(id: ID!, name: String!, fetchContent: Boolean!): Feed!
   createFeed(url: String!, fetchContent: Boolean!): Feed!
@@ -166,7 +170,9 @@ type Mutation {
   deleteAudioPlaylist(id: ID!): Boolean!
   addAudioPlaylistItems(id: ID!, paths: [String!]!): Boolean!
   removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
+  """Start playback of a playlist. `path` optionally names the audio to start from (defaults to the first item); `shuffle` reorders before playing. Returns the item that starts playing, null when the playlist is empty."""
   playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): AudioItem
+  """Queue the whole audio library and start playback. `path` optionally scopes the library to a directory and/or names the track to start from (null = entire library, first track); `shuffle` reorders before playing. Returns the item that starts playing, null when nothing matched."""
   playAllAudios(path: String, shuffle: Boolean!): AudioItem
   enableImageSearch: Boolean!
   disableImageSearch: Boolean!
@@ -175,8 +181,9 @@ type Mutation {
   cancelImageIndex: Boolean!
   call(number: String!, showDialer: Boolean!): Boolean!
   deleteCalls(query: String!): ActionResult!
-  saveNote(id: ID!, input: NoteInput!): Note!
-  saveFeedEntriesToNotes(query: String!): [String!]!
+  createNote(input: NoteInput!): Note!
+  updateNote(id: ID!, input: NoteInput!): Note!
+  saveFeedEntriesToNotes(query: String!): [ID!]!
   trashNotes(query: String!): ActionResult!
   restoreNotes(query: String!): ActionResult!
   deleteNotes(query: String!): ActionResult!
@@ -243,6 +250,7 @@ type AndroidExtras {
 
 type App {
   clientId: String!
+  """Base64 key used to encrypt/decrypt URL parameters for this server's web access (see file display URLs). Treat as a secret for the current session."""
   urlToken: String!
   httpPort: Int!
   httpsPort: Int!
@@ -441,6 +449,7 @@ type ChatItem {
   createdAt: Instant!
   updatedAt: Instant!
   status: ChatStatus!
+  """Per-recipient delivery details as JSON (peer delivery results); empty when the message has no delivery failures. Drives SENT/PARTIAL/FAILED alongside `status`."""
   statusData: String!
   data: ChatItemContent
 }
@@ -776,6 +785,7 @@ type File {
   name: String!
   path: String!
   permission: String!
+  """Creation time from stat; null when the platform cannot report it (some filesystems/IO errors)."""
   createdAt: Instant
   updatedAt: Instant!
   size: Long!
@@ -828,7 +838,9 @@ type Image implements MediaItem {
 
 type ImageEditorProject {
   id: ID!
+  """Full editor canvas state (layer stack), base64-encoded."""
   stateB64: String!
+  """Preview image as a base64 data URL; null until the editor first saves a thumbnail."""
   thumbnail: String
   canvasWidth: Int!
   canvasHeight: Int!
@@ -930,8 +942,10 @@ enum MediaPlayMode {
 
 type MergeTask {
   status: MergeTaskStatus!
+  """Path of the merged file once status is DONE."""
   value: String
   mergedSize: Long
+  """Failure reason when status is FAILED."""
   error: String
 }
 
@@ -1227,7 +1241,7 @@ type SmsConversation {
   id: ID!
   address: String!
   snippet: String!
-  date: Instant!
+  lastMessageAt: Instant!
   messageCount: Int!
   read: Boolean!
   addresses: [String!]!

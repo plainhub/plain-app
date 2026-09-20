@@ -77,8 +77,8 @@ enum class EventType(val value: Int) {
 
 @Serializable
 data class PomodoroActionData(
-    val action: String, val timeLeft: Int,
-    val totalTime: Int, val completedCount: Int,
+    val action: String, val timeLeftSec: Int,
+    val totalTimeSec: Int, val completedCount: Int,
     val round: Int, val state: PomodoroState
 ) // action: "start", "pause",  "stop"
 

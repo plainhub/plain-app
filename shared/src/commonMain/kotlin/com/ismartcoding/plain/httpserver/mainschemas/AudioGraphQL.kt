@@ -196,7 +196,7 @@ suspend fun removeAudioPlaylistItem(id: ID, path: String): Boolean {
  * Play a user playlist: sets it as the playback context and starts playback.
  * Returns the track that started, or null when the context has nothing to play.
  */
-@GraphQLMutation
+@GraphQLMutation(description = "Start playback of a playlist. `path` optionally names the audio to start from (defaults to the first item); `shuffle` reorders before playing. Returns the item that starts playing, null when the playlist is empty.")
 suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean = false): AudioItem? {
     val start = AudioQueueManager.setPlaylistSource(id.value, path)
     if (start == null) {
@@ -217,7 +217,7 @@ suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean = f
  * Play the whole audio library: full-library playback context.
  * Returns the track that started, or null when the library is empty.
  */
-@GraphQLMutation
+@GraphQLMutation(description = "Queue the whole audio library and start playback. `path` optionally scopes the library to a directory and/or names the track to start from (null = entire library, first track); `shuffle` reorders before playing. Returns the item that starts playing, null when nothing matched.")
 suspend fun playAllAudios(path: String? = null, shuffle: Boolean = false): AudioItem? {
     val start = AudioQueueManager.setLibrarySource(startPath = path, shuffle = shuffle)
     if (start != null) {

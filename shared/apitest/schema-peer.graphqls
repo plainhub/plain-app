@@ -35,6 +35,7 @@ type ChatItem {
   createdAt: Instant!
   updatedAt: Instant!
   status: ChatStatus!
+  """Per-recipient delivery details as JSON (peer delivery results); empty when the message has no delivery failures. Drives SENT/PARTIAL/FAILED alongside `status`."""
   statusData: String!
   data: ChatItemContent
 }

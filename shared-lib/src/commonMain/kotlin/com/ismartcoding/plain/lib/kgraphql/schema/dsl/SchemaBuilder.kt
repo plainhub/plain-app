@@ -165,7 +165,9 @@ class SchemaBuilder internal constructor() {
             typedDesc.fields.forEach { f ->
                 if (f.name !in type.describedKotlinProperties) {
                     @Suppress("UNCHECKED_CAST")
-                    type.property(f.name, f.returnType, f.accessor as (T) -> Any?) {}
+                    type.property(f.name, f.returnType, f.accessor as (T) -> Any?) {
+                        description = f.description
+                    }
                 }
             }
             // The descriptor name is fixed at compile time — use it unless the

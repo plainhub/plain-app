@@ -29,7 +29,7 @@ api_sci_to=$(printf '%s' "$SCI" | jq -r '.data.sendChatItem[0].toId // empty')
 if [[ -n "$api_sci_id" ]]; then
   pass "chat-messages-C02 sendChatItem(toId=local) → id=$api_sci_id"
   # C03: chatItems(toId) shows the new item
-  CHI=$(call_gql '{ chatItems(id: "local", offset: 0, limit: 200, query: "") { id fromId toId content } }')
+  CHI=$(call_gql '{ chatItems(target: "local", offset: 0, limit: 200, query: "") { id fromId toId content } }')
   api_chi_count=$(printf '%s' "$CHI" | jq '.data.chatItems | length')
   api_chi_has=$(printf '%s' "$CHI" | jq -r --arg id "$api_sci_id" '[.data.chatItems[] | select(.id == $id)] | length')
   if [[ "$api_chi_count" -ge 1 ]]; then

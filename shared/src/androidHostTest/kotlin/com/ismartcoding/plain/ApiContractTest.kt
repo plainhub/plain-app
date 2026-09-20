@@ -131,6 +131,15 @@ class ApiContractTest {
     }
 
     @Test
+    fun operationsReturningEntityIdsUseIdScalar() {
+        // Operations whose return value is a list of entity ids must use [ID!]! —
+        // raw [String!]! return shapes bypass the id-suffix field check.
+        val returns = mutationReturnTypes()
+        assertEquals("[ID!]!", returns["saveFeedEntriesToNotes"],
+            "saveFeedEntriesToNotes returns feed-entry ids — must be [ID!]! (spec §1/§4).")
+    }
+
+    @Test
     fun countSiblingsCarryTheListFilter() {
         val querySigs = operationSignaturesIn("Query")
         querySigs.forEach { sig ->
