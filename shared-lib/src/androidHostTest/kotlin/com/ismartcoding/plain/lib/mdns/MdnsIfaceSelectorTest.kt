@@ -79,6 +79,31 @@ class MdnsIfaceSelectorTest {
     @Test fun `mobile data interface is not eligible`() =
         assertFalse(isMdnsInterfaceEligible("rmnet_data0", true, false, false, true))
 
+    // ── findResponseIface (response source-address selection) ───────────────
+
+    @Test fun `response interface matches the subnet containing the sender`() {
+        val candidates = listOf(
+            MdnsIface("wlan0", 24) to "192.168.1.10",
+            MdnsIface("eth1", 24) to "10.0.0.5",
+        )
+
+        val (iface, ip) = findResponseIface("10.0.0.77", candidates)
+
+        assertEquals("eth1", iface.name)
+        assertEquals("10.0.0.5", ip)
+    }
+
+    @Test fun `response interface falls back to the first candidate off subnet`() {
+        val candidates = listOf(
+            MdnsIface("wlan0", 24) to "192.168.1.10",
+            MdnsIface("eth1", 24) to "10.0.0.5",
+        )
+
+        val (iface, _) = findResponseIface("172.16.5.9", candidates)
+
+        assertEquals("wlan0", iface.name)
+    }
+
     // ── helpers ───────────────────────────────────────────────────────────────
 
     private fun ip4(addr: String) = InetAddress.getByName(addr) as Inet4Address

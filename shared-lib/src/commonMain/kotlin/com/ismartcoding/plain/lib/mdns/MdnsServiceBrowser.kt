@@ -96,14 +96,26 @@ object MdnsServiceBrowser {
         }
     }
 
-    /**
-     * Stops the periodic scan loop only. The packet listener and accumulated
+    /** Stops the periodic scan loop only. The packet listener and accumulated
      * instance state stay installed: passive listening keeps refreshing paired
-     * peers' IPs after a network change even when no page is scanning.
-     */
+     * peers' IPs after a network change even when no page is scanning. */
     fun stop() {
         discoverJob?.cancel()
         discoverJob = null
+    }
+
+    /** Clears all accumulated state for unit tests; never call in production. */
+    internal fun resetForTest() {
+        stop()
+        instances = emptyMap()
+        hostnameToInstance = emptyMap()
+        srvTxtQueriedAt = emptyMap()
+        aQueriedAt = emptyMap()
+        quActive = false
+        browseCycles = 0
+        listener = null
+        onDevice = null
+        hostnameProvider = null
     }
 
     /**
@@ -168,7 +180,12 @@ object MdnsServiceBrowser {
         }
     }
 
-    private fun handlePacket(data: ByteArray, sender: String) {
+    /**
+     * Single-writer packet processor, invoked from the responder's inbound
+     * consumer. Internal (not private) so unit tests can drive the state
+     * machine directly with crafted wire packets.
+     */
+    internal fun handlePacket(data: ByteArray, sender: String) {
         // Ignore our own looped-back packets so we don't discover ourselves
         // and re-query our own SRV/TXT records on every discovery cycle.
         if (isLocalIp(sender)) return

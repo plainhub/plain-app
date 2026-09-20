@@ -1,23 +1,32 @@
 package com.ismartcoding.plain.lib.mdns
 
+import kotlin.concurrent.Volatile
+
 /**
  * Collects candidate LAN interfaces with their primary IPv4 address string.
  * Platform-specific: java.net on Android, getifaddrs on iOS.
  */
 internal expect fun candidateInterfaces(): List<Pair<MdnsIface, String>>
 
+/** Test seam: overrides platform interface enumeration when set. Null in production. */
+@Volatile
+internal var interfacesProvider: (() -> List<Pair<MdnsIface, String>>)? = null
+
+internal fun currentInterfaces(): List<Pair<MdnsIface, String>> =
+    interfacesProvider?.invoke() ?: candidateInterfaces()
+
 /** Whether [ip] is one of this host's own IPv4 addresses, used to ignore the
  *  multicast loop-back of our own queries/announcements (RFC 6762 §5.2). */
-internal fun isLocalIp(ip: String): Boolean = candidateInterfaces().any { it.second == ip }
+internal fun isLocalIp(ip: String): Boolean = currentInterfaces().any { it.second == ip }
 
 /**
  * Public LAN interface snapshot as "iface:ip" strings (loopback and mobile-data
- * bearers excluded). Mirrors [candidateInterfaces]; exported so consumers in
+ * bearers excluded). Mirrors the interface enumeration; exported so consumers in
  * other modules (e.g. `MdnsRegister`) can track which interfaces mDNS was
  * registered on without re-implementing interface enumeration.
  */
 fun lanInterfaceSnapshot(): Set<String> =
-    candidateInterfaces().map { "${it.first.name}:${it.second}" }.toSet()
+    currentInterfaces().map { "${it.first.name}:${it.second}" }.toSet()
 
 /** Returns true for mobile-data-only bearer interface names (never LAN). */
 fun isMobileDataInterface(name: String): Boolean =

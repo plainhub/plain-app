@@ -42,6 +42,13 @@ object MdnsHostResponder {
      */
     @Volatile var logSink: ((String) -> Unit)? = { println("mDNS: $it") }
 
+    /** Test seams — production defaults delegate to the platform implementations. */
+    @Volatile internal var socketFactory: () -> MdnsSocket = { createMdnsSocket() }
+
+    @Volatile internal var workerFactory: (String, () -> Unit) -> MdnsWorkerHandle = { name, block ->
+        startMdnsWorker(name, block)
+    }
+
     private fun log(msg: String) {
         logSink?.invoke(msg)
     }
@@ -142,6 +149,21 @@ object MdnsHostResponder {
     }
 
     /**
+     * Resets all singleton state (sockets, jobs, listeners, flags) so each unit
+     * test starts from a clean responder. Test-only — never call in production.
+     */
+    internal fun resetForTest() {
+        tearDownSocket()
+        hostname = ""
+        serviceInfo = null
+        packetListeners = emptyList()
+        sawExternalMulticast = false
+        inboundConsumer?.cancel()
+        inboundConsumer = null
+        while (inboundChannel.tryReceive().isSuccess) { /* drain */ }
+    }
+
+    /**
      * Replaces the published service and re-announces it right away instead of
      * waiting for the next [REANNOUNCE_MS] cycle. Used when the advertised data
      * changed while the service stays up (e.g. the device was renamed).
@@ -192,7 +214,7 @@ object MdnsHostResponder {
             log("restart: abort, hostname not configured")
             return false
         }
-        val candidates = candidateInterfaces()
+        val candidates = currentInterfaces()
         if (candidates.isEmpty()) {
             log("restart: abort, no LAN interfaces")
             return false
@@ -202,7 +224,7 @@ object MdnsHostResponder {
         val isNew = existing == null || existing.isClosed
         val s: MdnsSocket
         if (isNew) {
-            s = runCatching { createMdnsSocket() }.getOrNull() ?: run {
+            s = runCatching { socketFactory() }.getOrNull() ?: run {
                 log("restart: failed to create socket")
                 scheduleRetry()
                 return false
@@ -215,7 +237,7 @@ object MdnsHostResponder {
             }
             joinedIfaces = emptySet()
             socket = s
-            worker = startMdnsWorker("plain-mdns-responder") { receiveLoop(s, respond = true) }
+            worker = workerFactory("plain-mdns-responder") { receiveLoop(s, respond = true) }
         } else {
             s = existing
         }
@@ -292,7 +314,7 @@ object MdnsHostResponder {
     fun broadcastService() {
         val s = socket ?: return
         val info = serviceInfo
-        val candidates = candidateInterfaces()
+        val candidates = currentInterfaces()
         if (candidates.isEmpty()) return
         log("announce ${info?.serviceType ?: hostname} -> $MDNS_GROUP:$MDNS_PORT on ${candidates.size} iface(s)")
         candidates.forEach { (iface, ip) ->
@@ -308,7 +330,7 @@ object MdnsHostResponder {
     /** Sends the TTL=0 goodbye for [previous] on every LAN interface. */
     private fun sendGoodbye(previous: MdnsServiceInfo) {
         val s = socket ?: return
-        val candidates = candidateInterfaces()
+        val candidates = currentInterfaces()
         if (candidates.isEmpty()) return
         val bytes = MdnsServiceResponseBuilder.buildGoodbye(previous)
         log("goodbye ${previous.instanceFqdn} -> $MDNS_GROUP:$MDNS_PORT on ${candidates.size} iface(s)")
@@ -383,7 +405,7 @@ object MdnsHostResponder {
         // setting, so a single send can only leave one NIC. Picking just the
         // first candidate silently drops the query when that interface is not
         // where the peers live.
-        val candidates = candidateInterfaces()
+        val candidates = currentInterfaces()
         val srcIp = candidates.firstOrNull()?.second.orEmpty()
         MdnsPacketCapture.recordOut(srcIp, MDNS_PORT, MDNS_GROUP, MDNS_PORT, bytes)
         if (candidates.isEmpty()) {
@@ -404,12 +426,12 @@ object MdnsHostResponder {
         val existing = quSocket
         if (existing != null && !existing.isClosed) return
         val created = runCatching {
-            createMdnsSocket().apply { bind(0, 1000) }
+            socketFactory().apply { bind(0, 1000) }
         }.getOrNull() ?: return
         runCatching { existing?.close() }
         ensureSingleConsumer()
         quSocket = created
-        quWorker = startMdnsWorker("plain-mdns-qu") { receiveLoop(created, respond = false) }
+        quWorker = workerFactory("plain-mdns-qu") { receiveLoop(created, respond = false) }
     }
 
     /**
@@ -448,7 +470,7 @@ object MdnsHostResponder {
      * queries are answered back to the group (RFC 6762 §6.7: source port 5353).
      */
     private fun respondToPacket(packet: InboundPacket) {
-        val fresh = candidateInterfaces()
+        val fresh = currentInterfaces()
         if (fresh.isEmpty()) return
         val local = fresh.any { it.second == packet.senderIp }
         // Any external packet proves the multicast receive path works; the
