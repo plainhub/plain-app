@@ -12,6 +12,7 @@ import com.ismartcoding.plain.features.feed.exportAsync
 import com.ismartcoding.plain.platform.fetchContentAsync
 import com.ismartcoding.plain.platform.fetchRssChannel
 import com.ismartcoding.plain.features.feed.importAsync
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.httpserver.loaders.FeedsLoader
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.Feed
@@ -107,6 +108,7 @@ suspend fun syncFeedContent(id: ID): FeedEntry {
 
 @GraphQLMutation
 suspend fun deleteFeedEntries(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val ids = FeedEntryHelper.getIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
     FeedEntryHelper.deleteAsync(ids)

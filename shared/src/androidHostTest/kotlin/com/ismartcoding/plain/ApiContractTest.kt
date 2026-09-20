@@ -47,6 +47,17 @@ class ApiContractTest {
         "restoreMediaItems", "moveMediaItems",
     )
 
+    // Query-addressed bulk mutations: the server rejects a blank query
+    // (QueryHelper.requireExplicitBulkQuery); whole-table intent is the explicit
+    // `all:true` sentinel (API_SPEC §5). deleteChatItems is guarded by its own
+    // empty-parse → empty-ids precedent (ChatDbHelper).
+    private val bulkQueryMutations = setOf(
+        "deleteMediaItems", "trashMediaItems", "restoreMediaItems", "moveMediaItems",
+        "trashNotes", "restoreNotes", "deleteNotes", "saveFeedEntriesToNotes",
+        "deleteFeedEntries", "trashSms", "restoreSms", "deleteSms",
+        "deleteCalls", "deleteContacts", "deleteChatItems",
+    )
+
     @Test
     fun sdlSnapshotMatchesCommittedFile() {
         val committed = java.io.File("apitest/schema.graphqls").readText()
@@ -95,6 +106,28 @@ class ApiContractTest {
                 fail("Bulk mutation $op returns $type — must be ActionResult!.")
             }
         }
+    }
+
+    @Test
+    fun bulkQueryMutationsKeepQueryRequired() {
+        val signatures = operationSignaturesIn("Mutation")
+        bulkQueryMutations.forEach { op ->
+            val sig = signatures.firstOrNull { it.startsWith("$op(") }
+                ?: fail("Mutation $op disappeared from the schema — update ApiContractTest.bulkQueryMutations.")
+            if (!sig.contains("query: String!")) {
+                fail("Mutation $sig must declare query: String! — the empty-query bulk guard relies on a required query (spec §5).")
+            }
+        }
+        // Registry drift: every ActionResult mutation addressed by query (plus
+        // saveFeedEntriesToNotes) must be registered here so it gets the blank-query guard.
+        val queryShaped = signatures
+            .filter { it.substringBefore("(").trim() in actionResultMutations }
+            .filter { it.contains("query: String!") }
+            .map { it.substringBefore("(").trim() }
+            .toSet()
+        val expected = queryShaped + setOf("saveFeedEntriesToNotes")
+        assertEquals(expected, bulkQueryMutations,
+            "Query-shaped bulk mutations drifted — update bulkQueryMutations and guard the new entry (spec §5).")
     }
 
     @Test

@@ -1,8 +1,25 @@
 package com.ismartcoding.plain.helpers
 
 import com.ismartcoding.plain.features.TagHelper
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 
 object QueryHelper {
+    /** Sentinel field name for explicitly targeting the whole table: `all:true` (API_SPEC §5). */
+    const val BULK_ALL_FIELD = "all"
+
+    /**
+     * Destructive bulk mutations must address an explicit target: a blank query would fall
+     * through the empty-where `1=1` path and silently hit the whole table. Whole-table
+     * intent is expressed with the `all:true` sentinel instead.
+     */
+    fun requireExplicitBulkQuery(query: String) {
+        if (query.isBlank()) {
+            throw GraphQLError(
+                "query is required for bulk mutations — pass 'all:true' to explicitly target everything (API_SPEC §5)",
+            )
+        }
+    }
+
     /** Text-search term of a query DSL string ("" when absent) — used by list endpoints that only support text filtering. */
     fun textOf(query: String): String = SearchHelper.parse(query).firstOrNull { it.name == "text" }?.value ?: ""
 

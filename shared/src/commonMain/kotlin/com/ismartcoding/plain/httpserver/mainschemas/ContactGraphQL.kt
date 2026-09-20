@@ -15,6 +15,7 @@ import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.features.checkEnabledAsync
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.getContactById
 import com.ismartcoding.plain.platform.getContactGroups
@@ -58,6 +59,7 @@ suspend fun contactGroups(node: Execution.Node): List<ContactGroup> {
 
 @GraphQLMutation
 suspend fun deleteContacts(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     Permission.WRITE_CONTACTS.checkEnabledAsync()
     val newIds = getMediaIds(DataType.CONTACT, query)
     TagHelper.deleteTagRelationByKeys(newIds, DataType.CONTACT)

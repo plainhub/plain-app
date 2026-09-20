@@ -12,6 +12,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.ID
@@ -54,6 +55,7 @@ private suspend fun upsertNote(id: String, updateItem: DNote.() -> Unit): Note {
 
 @GraphQLMutation
 suspend fun saveFeedEntriesToNotes(query: String): List<ID> {
+    QueryHelper.requireExplicitBulkQuery(query)
     val entries = FeedEntryHelper.search(query, Int.MAX_VALUE, 0)
     val ids = mutableListOf<ID>()
     entries.forEach { m ->
@@ -70,6 +72,7 @@ suspend fun saveFeedEntriesToNotes(query: String): List<ID> {
 
 @GraphQLMutation
 suspend fun trashNotes(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val ids = NoteHelper.getIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
     NoteHelper.trashAsync(ids)
@@ -79,6 +82,7 @@ suspend fun trashNotes(query: String): ActionResult {
 
 @GraphQLMutation
 suspend fun restoreNotes(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val ids = NoteHelper.getTrashedIdsAsync(query)
     NoteHelper.restoreAsync(ids)
     NotesViewModel.reloadAsync()
@@ -87,6 +91,7 @@ suspend fun restoreNotes(query: String): ActionResult {
 
 @GraphQLMutation
 suspend fun deleteNotes(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val ids = NoteHelper.getTrashedIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
     NoteHelper.deleteAsync(ids)

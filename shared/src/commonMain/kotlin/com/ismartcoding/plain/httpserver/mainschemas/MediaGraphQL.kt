@@ -23,6 +23,7 @@ import com.ismartcoding.plain.platform.trashMedia
 import com.ismartcoding.plain.platform.enqueueRemoveImageIndex
 import com.ismartcoding.plain.platform.moveMedia
 import com.ismartcoding.plain.helpers.FilePathValidator
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.preferences.VideoPlaylistPreference
 import com.ismartcoding.plain.httpserver.models.ActionResult
@@ -40,6 +41,7 @@ suspend fun mediaBuckets(type: MediaDataType): List<MediaBucket> {
 
 @GraphQLMutation
 suspend fun deleteMediaItems(type: MediaDataType, query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val dataType = type.toDataType()
     val hasTrashFeature = AppFeatureType.MEDIA_TRASH.has()
     val ids = if (hasTrashFeature) getTrashedMediaIds(dataType, query) else getMediaIds(dataType, query)
@@ -52,6 +54,7 @@ suspend fun deleteMediaItems(type: MediaDataType, query: String): ActionResult {
 
 @GraphQLMutation
 suspend fun trashMediaItems(type: MediaDataType, query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val dataType = type.toDataType()
     if (!isRPlus()) {
         return ActionResult(0)
@@ -86,6 +89,7 @@ suspend fun trashMediaItems(type: MediaDataType, query: String): ActionResult {
 
 @GraphQLMutation
 suspend fun restoreMediaItems(type: MediaDataType, query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val dataType = type.toDataType()
     if (!isRPlus()) {
         return ActionResult(0)
@@ -101,6 +105,7 @@ suspend fun restoreMediaItems(type: MediaDataType, query: String): ActionResult 
 
 @GraphQLMutation
 suspend fun moveMediaItems(type: MediaDataType, query: String, destDir: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val dataType = type.toDataType()
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     FilePathValidator.requireAllSafe(listOf(destDir))

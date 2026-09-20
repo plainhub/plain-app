@@ -7,6 +7,7 @@ import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.features.sms.DPendingMms
 import com.ismartcoding.plain.features.sms.SmsProviderContract
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
@@ -140,16 +141,19 @@ suspend fun archiveConversation(id: ID): Boolean {
 
 @GraphQLMutation
 suspend fun trashSms(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     return ActionResult(trashSmsInternal(query))
 }
 
 @GraphQLMutation
 suspend fun restoreSms(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     return ActionResult(restoreSmsInternal(query))
 }
 
 @GraphQLMutation
 suspend fun deleteSms(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     return ActionResult(deleteSmsInternal(query))
 }
 

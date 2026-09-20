@@ -13,6 +13,7 @@ import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.platform.getSims
 import com.ismartcoding.plain.platform.call as platformCall
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.deleteMedia
 import com.ismartcoding.plain.platform.getMediaIds
@@ -46,6 +47,7 @@ suspend fun call(number: String, showDialer: Boolean): Boolean {
 
 @GraphQLMutation
 suspend fun deleteCalls(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     Permission.WRITE_CALL_LOG.checkEnabledAsync()
     val ids = getMediaIds(DataType.CALL, query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.CALL)

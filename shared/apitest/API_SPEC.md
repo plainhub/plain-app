@@ -78,6 +78,7 @@ term       := [field ":"] value op?
 - **只支持 text 过滤的分页列表**（2026-09-20 新增 query 参数的六个：notifications、appFiles、appLogs、audioQueueItems、audioPlaylistItems、audioPlayHistory；另 chatItems 在会话内 text 搜索）：query 里只有 `text:` 字段生效，其余字段忽略（`QueryHelper.textOf` 提取）。
 - 各域支持的字段（冻结）：媒体=ids/tag_id/text/bucket_id/trash/artist(音频)/ext+parent+type+file_size(文档)；SMS=ids/tag_id/text/thread_id/archived/trashed；Note=ids/tag_id/text/trash；FeedEntry=ids/tag_id/text/feed_id/today/created_at；Call=ids/tag_id/text/type/duration/start_time；Contact=ids/text；Clipboard=ids/text；Package=ids/text/type；files=text。
 - 新过滤器字段（新的可搜索列）是增量允许的；语法本身冻结。
+- **空 query 守卫（2026-09-21 定）**：按 query 编址的破坏性/批量 mutation（delete/trash/restore/move/save 类，注册表由 `ApiContractTest.bulkQueryMutations` 锁死）**空串/纯空白 query 一律抛 `GraphQLError`**——空 where 会退化为 `1=1` 全表命中。全量意图必须用显式 sentinel **`all:true`** 表达（`SearchHelper.parse` 解析为 `name="all"` 字段，各域 where 构建显式忽略、不产生条件）。`deleteChatItems` 除外：空 query 走 `ChatDbHelper` 空 id 集先例（no-op）。客户端「全选」操作在无过滤条件时必须发 `all:true`，不得发空串。
 
 ## 6. 返回形状（同类操作同形状）
 
