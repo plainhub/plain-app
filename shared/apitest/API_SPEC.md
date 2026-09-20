@@ -24,6 +24,7 @@
 | 时间点 | `Instant`（ISO-8601 UTC 字符串标量） | `Long` epoch、`String` |
 | 字节数 / 时长（可能 >2GiB 或 >2.1e9 ms） | `Long` | `Int`（GraphQL Int 是 32 位，NAS 上 >2GiB 文件会溢出——真实 bug 教训） |
 | 本地日历日期 | `String`，格式 `YYYY-MM-DD`，必须加 description 说明设备时区 | 用 Instant 冒充日历日（2026-09-20 起 PomodoroToday.date 已改为 Instant，由客户端按本地时区推导日历日） |
+| fileId（app 文件仓内容寻址 id、相册封面/显示 URL 令牌、分片上传 fileId） | `String` | `ID`（2026-09-21 用户定：fileId 全域 String，禁止 ID 标量） |
 
 时间字段的**唯一 wire 例外**：`PairingRequestInput.timestamp: Long!`（配对防重放协议的协议层字段，保持协议字节兼容）。
 
@@ -41,7 +42,7 @@
 - 有 offset 必有 limit，反之亦然；两者必与 filter 同现（ApiContractTest 锁死）。
 - 需要展示总数的列表配 `xxxCount(filter: XxxFilter!): Int!` 兄弟字段；无总数需求的列表可以没有。
 - 分页返回最新在前、页内按可直接渲染的顺序（`chatItems` 取页后 asReversed 返回旧→新）。
-- **排序**：媒体/文件列表 `sortBy: FileSortBy!` 必填；`TAKEN_AT_DESC` 只对拍摄日期分组视图有意义，docs/packages 传入时按无此排序处理。
+- **排序**：媒体/文件列表 `sortBy: FileSortBy!` 必填；`TAKEN_AT_DESC` 只对拍摄日期分组视图有意义，其他域按各自回退序执行（docs/audio→入库时间，plain files→修改时间，packages→名称），与 FileSortBy 的 SDL description 一致（2026-09-21 核对代码后拍板：description 如实描述回退行为，不改代码）。
 
 ## 4. 编址体系（三个域，不混用）
 
@@ -53,7 +54,7 @@
 
 规则：
 - 读接口返回 `id: ID!` 的实体，其**单条**写操作用 id；**批量**操作用 query；**文件域**用 path。
-- id 后缀字段（`*Id` / `*Ids` / `id`）一律 `ID` 类型（例外见 §8）。
+- id 后缀字段（`*Id` / `*Ids` / `id`）一律 `ID` 类型（例外见 §8；fileId 值域整体 String，见 §1/§8）。
 - 不允许同一功能域内混用两种编址（教训：`Bookmark.groupId: String` vs `BookmarkGroup.id: ID` 已修）。
 
 ## 5. query DSL（批量过滤器语法——冻结的客户端契约，2026-09-20 用户定：永久保留 query: String）
@@ -118,7 +119,9 @@ term       := [field ":"] value op?
 | `FeedEntry.rawId` | `String` | 上游 RSS guid，外部标识 |
 | `sendMms/sendSms requestId` | `String` | 幂等键，非实体 id |
 | `ScreenMirrorControlInput.pointerId` | `Int` | 多指触控槽位序号 |
-| `ChatFiles.ids` / `ChatImages.ids` / `ChatText.linkPreviewImageIds` | `[String]` | app 文件仓 fileId（2026-09-20 用户定：String，禁止 ID 标量） |
+| `ChatFiles.ids` / `ChatImages.ids` / `ChatText.linkPreviewImageIds` | `[String]` | app 文件仓 fileId（2026-09-20 用户定 String；2026-09-21 起并入全域 fileId String 政策） |
+| `Audio.albumFileId` / `AppFile.id` | `String` | 相册封面显示令牌 / app 文件仓内容寻址 fileId，非实体 id（2026-09-21 用户定） |
+| `uploadedChunks` / `mergeStatus` / `deleteChunks` / `mergeChunks` / `mergeAppFileChunks` 的 `fileId` 参数 | `String` | 客户端自选的分片集合 id，非实体 id（2026-09-21 用户定） |
 | `deleteDbTableRows(ids: [String!]!)` | `[String]` | 调试 API，原生表主键 |
 | `StorageMount.diskId` | `String` | OS 磁盘 uuid，外部标识（Android 端恒空串；2026-09-20 由 diskID 改名） |
 | `PairingRequestInput.timestamp` | `Long` | 配对协议防重放字段（见 §1） |

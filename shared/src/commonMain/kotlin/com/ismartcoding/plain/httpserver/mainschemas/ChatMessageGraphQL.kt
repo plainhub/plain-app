@@ -38,12 +38,12 @@ suspend fun chatItems(target: String, offset: Int, limit: Int, query: String): L
     return items.asReversed().map { it.toModel() }
 }
 
-@GraphQLQuery
+@GraphQLQuery(description = "The most recent item of every conversation (direct and channel), newest conversation first.")
 suspend fun latestChatItems(): List<ChatItem> {
     return AppDatabase.instance.chatDao().getAllLatestChats().map { it.toModel() }
 }
 
-@GraphQLMutation(description = "Send a chat message. `target` is the chat target id — a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id; same value space as the chatItems query.")
+@GraphQLMutation(description = "Send a chat message. `target` is the chat target id — a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id; same value space as the chatItems query. `content` is the message envelope JSON ({type: TEXT|IMAGES|FILES|SHARE, value: {...}}), same shape as ChatItem.content.")
 suspend fun sendChatItem(target: String, content: String): List<ChatItem> {
     val chatTarget = ChatTarget.parseId(target)
     val item = ChatManager.createChatItem(chatTarget, DChat.parseContent(content))
@@ -84,8 +84,12 @@ suspend fun retryChatItem(id: ID): ChatItem {
 
 fun SchemaBuilder.addChatMessageSchema() {
     type<ChatItem> {
-        property("fromId", typeOf<ID>(), { it: ChatItem -> ID(it.fromId) })
-        property("toId", typeOf<ID>(), { it: ChatItem -> ID(it.toId) })
+        property("fromId", typeOf<ID>(), { it: ChatItem -> ID(it.fromId) }) {
+            description = "`me` when this device created the item, otherwise the client id of the originating peer."
+        }
+        property("toId", typeOf<ID>(), { it: ChatItem -> ID(it.toId) }) {
+            description = "Peer id for direct messages; empty for channel messages — `channelId` is authoritative there."
+        }
         // channelId is "" for direct messages — expose null instead of the empty sentinel.
         property("channelId", typeOf<ID?>(), { it: ChatItem -> it.channelId.ifEmpty { null }?.let { id -> ID(id) } })
         property("data") {

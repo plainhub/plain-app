@@ -31,6 +31,7 @@ type ChatItem {
   toId: ID!
   channelId: ID
   id: ID!
+  """Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`; the typed payload is also mirrored in `data`."""
   content: String!
   createdAt: Instant!
   updatedAt: Instant!

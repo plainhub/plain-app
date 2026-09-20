@@ -22,6 +22,7 @@ data class ChatItem(
     val fromId: String,
     val toId: String,
     val channelId: String,
+    @GraphQLField(description = "Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`; the typed payload is also mirrored in `data`.")
     val content: String,
     val createdAt: Instant,
     val updatedAt: Instant,
@@ -85,7 +86,7 @@ sealed class ChatItemContent {
 
     @GraphQLType
     @Serializable
-    /** fileId list (String) of locally cached link-preview images; the text itself is ChatItem.content. */
+    /** fileId list (String) of locally cached link-preview images; the message text lives inside the ChatItem.content envelope (value.text). */
     data class ChatText(val linkPreviewImageIds: List<String>) : ChatItemContent()
 }
 

@@ -72,7 +72,7 @@ fun SchemaBuilder.addMainSchemaTypes() {
         description = "Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.features (DeviceFeature)."
     }
     enum<FileSortBy> {
-        description = "Sort orders for file/media lists. TAKEN_AT_DESC sorts by capture time and is only meaningful in taken-date grouped views; docs/packages treat it as an ordinary no-op order."
+        description = "Sort orders for file/media lists. TAKEN_AT_DESC sorts by capture time where the domain tracks one (images/videos); other domains fall back to their ordinary order (docs/audio: add time, plain files: modification time, packages: name)."
     }
     enum<PomodoroState>()
     enum<ScreenMirrorMode>()

@@ -36,6 +36,10 @@ class ApiContractTest {
         "linkPreviewImageIds", // ChatText — cached link-preview image fileIds (String)
         "subscriptionId", // Android SIM subscription integer (slot index), not an entity id
         "diskId", // StorageMount.diskId — OS disk uuid, foreign identifier (empty on Android)
+        // fileId value space is String, never ID (2026-09-21 user decision: all fileIds are String).
+        "albumFileId", // Audio.albumFileId — album-art display fileId token
+        "AppFile", // AppFile.id — content-addressable app file store fileId (same space as ChatFiles.ids)
+        "fileId", // chunk-flow args (uploadedChunks/mergeStatus/deleteChunks/mergeChunks/mergeAppFileChunks)
     )
 
     // Bulk destructive/modify mutations that must return ActionResult.

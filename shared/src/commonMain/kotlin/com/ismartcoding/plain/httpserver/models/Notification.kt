@@ -20,6 +20,7 @@ data class Notification(
     val title: String,
     val body: String,
     val actions: List<String>,
+    @GraphQLField(description = "Subset of `actions` that support inline reply; `replyNotification`'s `actionIndex` indexes this list, not `actions`.")
     val replyActions: List<String>
 )
 

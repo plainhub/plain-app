@@ -31,7 +31,7 @@ private fun hashOf(text: String): String =
     sha256(text.encodeToByteArray()).joinToString("") { it.toString(16).padStart(2, '0') }
 
 /** Paged clipboard history, newest first. Desktop-side aggregation reads this. */
-@GraphQLQuery
+@GraphQLQuery(description = "Paged clipboard history, newest first.")
 suspend fun clipboard(offset: Int, limit: Int, query: String): List<Clipboard> {
     ensureClipboardEnabled()
     return ClipboardHelper.getPage(limit.coerceIn(1, 200), offset.coerceAtLeast(0), query).map { it.toModel() }
@@ -48,7 +48,7 @@ suspend fun clipboardCount(query: String): Int {
  * The write is recorded in the history with the caller as source; the local
  * watcher will see it but skip re-broadcasting (hash dedup), so no loop.
  */
-@GraphQLMutation
+@GraphQLMutation(description = "Write text into the system clipboard and record it in the history with the calling client as source; an identical latest entry is skipped (hash dedup).")
 suspend fun setClipboard(text: String, context: Context): Boolean {
     ensureClipboardEnabled()
     if (text.isBlank() || text.length > MAX_TEXT_LENGTH) {
@@ -71,7 +71,7 @@ suspend fun setClipboard(text: String, context: Context): Boolean {
 }
 
 /** Deletes clipboard history entries by ids. */
-@GraphQLMutation
+@GraphQLMutation(description = "Delete clipboard history entries by ids.")
 suspend fun deleteClipboard(ids: List<ID>): ActionResult {
     ensureClipboardEnabled()
     val deleted = ClipboardHelper.deleteByIds(ids.map { it.value })
