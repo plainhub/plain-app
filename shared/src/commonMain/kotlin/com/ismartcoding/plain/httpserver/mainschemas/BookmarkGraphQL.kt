@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -58,12 +59,12 @@ suspend fun createBookmarkGroup(name: String): BookmarkGroup {
 }
 
 @GraphQLMutation
-suspend fun updateBookmarkGroup(id: ID, name: String, collapsed: Boolean, sortOrder: Int): BookmarkGroup? {
+suspend fun updateBookmarkGroup(id: ID, name: String, collapsed: Boolean, sortOrder: Int): BookmarkGroup {
     return BookmarkHelper.updateGroup(id.value) {
         this.name = name
         this.collapsed = collapsed
         this.sortOrder = sortOrder
-    }?.toModel()
+    }?.toModel() ?: throw GraphQLError("Bookmark group ${id.value} not found")
 }
 
 @GraphQLMutation

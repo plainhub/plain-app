@@ -42,14 +42,12 @@ enum class Permission {
     SCHEDULE_EXACT_ALARM,
     QUERY_ALL_PACKAGES,
     ADB,
-    CLIPBOARD,
-    NONE
+    CLIPBOARD
     ;
 
     @Composable
     fun getText(): String {
         return when (this) {
-            NONE -> stringResource(Res.string.open_permission_settings)
             WRITE_EXTERNAL_STORAGE -> stringResource(Res.string.feature_WRITE_EXTERNAL_STORAGE)
             READ_SMS -> stringResource(Res.string.feature_READ_SMS)
             SEND_SMS -> stringResource(Res.string.feature_SEND_SMS)

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
 import com.ismartcoding.plain.lib.JsonHelper
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -18,17 +19,19 @@ import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.models.ChatItem
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
+import kotlin.reflect.typeOf
 
 @GraphQLQuery
-suspend fun chatItems(id: String): List<ChatItem> {
+/** Latest-first page of a conversation, returned oldest-to-newest so clients can render directly. */
+suspend fun chatItems(id: ID, offset: Int? = 0, limit: Int? = 200): List<ChatItem> {
     val dao = AppDatabase.instance.chatDao()
-    val target = ChatTarget.parseId(id)
+    val target = ChatTarget.parseId(id.value)
     val items = if (target.type == ChatTargetType.CHANNEL) {
-        dao.getByChannelId(target.toId)
+        dao.getByChannelIdPage(target.toId, limit ?: 200, offset ?: 0)
     } else {
-        dao.getByPeerId(target.toId)
+        dao.getByPeerIdPage(target.toId, limit ?: 200, offset ?: 0)
     }
-    return items.map { it.toModel() }
+    return items.asReversed().map { it.toModel() }
 }
 
 @GraphQLQuery
@@ -37,8 +40,8 @@ suspend fun latestChatItems(): List<ChatItem> {
 }
 
 @GraphQLMutation
-suspend fun sendChatItem(toId: String, content: String): List<ChatItem> {
-    val target = ChatTarget.parseId(toId)
+suspend fun sendChatItem(toId: ID, content: String): List<ChatItem> {
+    val target = ChatTarget.parseId(toId.value)
     val item = ChatManager.createChatItem(target, DChat.parseContent(content))
     ChatManager.sendMessage(item, target, emptySet())
     val model = item.toModel()
@@ -67,8 +70,9 @@ suspend fun deleteChatItems(query: String): Boolean {
 }
 
 @GraphQLMutation
-suspend fun retryChatItem(id: ID): ChatItem? {
-    val item = ChatManager.getChatItem(id.value) ?: return null
+suspend fun retryChatItem(id: ID): ChatItem {
+    val item = ChatManager.getChatItem(id.value)
+        ?: throw GraphQLError("Chat item ${id.value} not found")
     ChatManager.updateStatus(item, ChatStatus.PENDING)
     sendEvent(HRetryChatItemEvent(item))
     return item.toModel()
@@ -76,6 +80,10 @@ suspend fun retryChatItem(id: ID): ChatItem? {
 
 fun SchemaBuilder.addChatMessageSchema() {
     type<ChatItem> {
+        property("fromId", typeOf<ID>(), { it: ChatItem -> ID(it.fromId) })
+        property("toId", typeOf<ID>(), { it: ChatItem -> ID(it.toId) })
+        // channelId is "" for direct messages — expose null instead of the empty sentinel.
+        property("channelId", typeOf<ID?>(), { it: ChatItem -> it.channelId.ifEmpty { null }?.let { id -> ID(id) } })
         property("data") {
             resolver { c: ChatItem ->
                 c.getContentData()

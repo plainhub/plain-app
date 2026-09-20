@@ -18,8 +18,10 @@ import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpStatus
 import com.ismartcoding.plain.httpserver.models.ChatItem
+import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.mainschemas.addPeerSchemaTypes
 import kotlinx.serialization.json.Json
+import kotlin.reflect.typeOf
 
 /**
  * Holds the peer-chat GraphQL [Schema] and dispatches `/peer_graphql`
@@ -125,6 +127,9 @@ class PeerGraphQLService private constructor(
         fun SchemaBuilder.applyPeerSchema() {
             registerGeneratedPeerResolvers()
             type<ChatItem> {
+                property("fromId", typeOf<ID>(), { it: ChatItem -> ID(it.fromId) })
+                property("toId", typeOf<ID>(), { it: ChatItem -> ID(it.toId) })
+                property("channelId", typeOf<ID?>(), { it: ChatItem -> it.channelId.ifEmpty { null }?.let { id -> ID(id) } })
                 property("data") {
                     resolver { c: ChatItem -> c.getContentData() }
                 }

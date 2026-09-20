@@ -24,9 +24,6 @@ type SharedInfo {
   entries: [SharedFile!]!
 }
 
-"""The Short scalar type represents a signed 16-bit numeric non-fractional value"""
-scalar Short
-
 type __Directive {
   name: String!
   description: String

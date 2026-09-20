@@ -36,7 +36,7 @@ suspend fun pomodoroToday(): PomodoroToday {
             timeLeft = info.timeLeft,
             totalTime = info.totalTime,
             isRunning = info.isRunning,
-            isPause = info.isPause,
+            isPaused = info.isPaused,
             state = info.state
         )
     } else {
@@ -47,7 +47,7 @@ suspend fun pomodoroToday(): PomodoroToday {
             timeLeft = 0,
             totalTime = 0,
             isRunning = false,
-            isPause = false,
+            isPaused = false,
             state = PomodoroState.WORK
         )
     }

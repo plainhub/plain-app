@@ -8,7 +8,12 @@ import com.ismartcoding.plain.lib.extensions.getIntValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
 import com.ismartcoding.plain.lib.extensions.normalizePhoneNumber
 import com.ismartcoding.plain.lib.extensions.queryCursor
-import com.ismartcoding.plain.httpserver.models.ContentItemInput
+import com.ismartcoding.plain.httpserver.models.ContactAddressInput
+import com.ismartcoding.plain.httpserver.models.ContactEmailInput
+import com.ismartcoding.plain.httpserver.models.ContactEventInput
+import com.ismartcoding.plain.httpserver.models.ContactImInput
+import com.ismartcoding.plain.httpserver.models.ContactPhoneInput
+import com.ismartcoding.plain.httpserver.models.ContactWebsiteInput
 import com.ismartcoding.plain.httpserver.models.OrganizationInput
 import java.util.ArrayList
 
@@ -129,10 +134,30 @@ object ContentHelper {
         return o.build()
     }
 
-    fun newInsert(
+    fun newInsert(contactId: String, mimeType: String, item: ContactPhoneInput): ContentProviderOperation =
+        newInsert(contactId, mimeType, item.value, item.type.androidValue, item.label)
+
+    fun newInsert(contactId: String, mimeType: String, item: ContactEmailInput): ContentProviderOperation =
+        newInsert(contactId, mimeType, item.value, item.type.androidValue, item.label)
+
+    fun newInsert(contactId: String, mimeType: String, item: ContactAddressInput): ContentProviderOperation =
+        newInsert(contactId, mimeType, item.value, item.type.androidValue, item.label)
+
+    fun newInsert(contactId: String, mimeType: String, item: ContactEventInput): ContentProviderOperation =
+        newInsert(contactId, mimeType, item.value, item.type.androidValue, item.label)
+
+    fun newInsert(contactId: String, mimeType: String, item: ContactWebsiteInput): ContentProviderOperation =
+        newInsert(contactId, mimeType, item.value, item.type.androidValue, item.label)
+
+    fun newInsert(contactId: String, mimeType: String, item: ContactImInput): ContentProviderOperation =
+        newInsert(contactId, mimeType, item.value, item.protocol.androidValue, item.customProtocol)
+
+    private fun newInsert(
         contactId: String,
         mimeType: String,
-        item: ContentItemInput,
+        value: String,
+        typeValue: Int,
+        label: String,
     ): ContentProviderOperation {
         val o = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
         o.apply {
@@ -140,40 +165,40 @@ object ContentHelper {
             withValue(ContactsContract.Data.MIMETYPE, mimeType)
             when (mimeType) {
                 ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE -> {
-                    withValue(ContactsContract.CommonDataKinds.Email.DATA, item.value)
-                    withValue(ContactsContract.CommonDataKinds.Email.TYPE, item.type)
-                    withValue(ContactsContract.CommonDataKinds.Email.LABEL, item.label)
+                    withValue(ContactsContract.CommonDataKinds.Email.DATA, value)
+                    withValue(ContactsContract.CommonDataKinds.Email.TYPE, typeValue)
+                    withValue(ContactsContract.CommonDataKinds.Email.LABEL, label)
                 }
 
                 ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE -> {
-                    withValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, item.value)
-                    withValue(ContactsContract.CommonDataKinds.StructuredPostal.TYPE, item.type)
-                    withValue(ContactsContract.CommonDataKinds.StructuredPostal.LABEL, item.label)
+                    withValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, value)
+                    withValue(ContactsContract.CommonDataKinds.StructuredPostal.TYPE, typeValue)
+                    withValue(ContactsContract.CommonDataKinds.StructuredPostal.LABEL, label)
                 }
 
                 ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE -> {
-                    withValue(ContactsContract.CommonDataKinds.Im.DATA, item.value)
-                    withValue(ContactsContract.CommonDataKinds.Im.PROTOCOL, item.type)
-                    withValue(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL, item.label)
+                    withValue(ContactsContract.CommonDataKinds.Im.DATA, value)
+                    withValue(ContactsContract.CommonDataKinds.Im.PROTOCOL, typeValue)
+                    withValue(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL, label)
                 }
 
                 ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE -> {
-                    withValue(ContactsContract.CommonDataKinds.Event.START_DATE, item.value)
-                    withValue(ContactsContract.CommonDataKinds.Event.TYPE, item.type)
-                    withValue(ContactsContract.CommonDataKinds.Event.LABEL, item.label)
+                    withValue(ContactsContract.CommonDataKinds.Event.START_DATE, value)
+                    withValue(ContactsContract.CommonDataKinds.Event.TYPE, typeValue)
+                    withValue(ContactsContract.CommonDataKinds.Event.LABEL, label)
                 }
 
                 ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE -> {
-                    withValue(ContactsContract.CommonDataKinds.Website.URL, item.value)
-                    withValue(ContactsContract.CommonDataKinds.Website.TYPE, item.type)
-                    withValue(ContactsContract.CommonDataKinds.Website.LABEL, item.label)
+                    withValue(ContactsContract.CommonDataKinds.Website.URL, value)
+                    withValue(ContactsContract.CommonDataKinds.Website.TYPE, typeValue)
+                    withValue(ContactsContract.CommonDataKinds.Website.LABEL, label)
                 }
 
                 ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> {
-                    withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, item.value)
-                    withValue(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER, item.value.normalizePhoneNumber())
-                    withValue(ContactsContract.CommonDataKinds.Phone.TYPE, item.type)
-                    withValue(ContactsContract.CommonDataKinds.Phone.LABEL, item.label)
+                    withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, value)
+                    withValue(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER, value.normalizePhoneNumber())
+                    withValue(ContactsContract.CommonDataKinds.Phone.TYPE, typeValue)
+                    withValue(ContactsContract.CommonDataKinds.Phone.LABEL, label)
                 }
             }
         }

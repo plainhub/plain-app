@@ -4,8 +4,8 @@
 #
 # Schemas covered:
 #   AudioGraphQL  : audios, audioCount, playAudio, updateAudioPlayMode,
-#                   clearAudioPlaylist, deletePlaylistAudio,
-#                   addPlaylistAudios, reorderPlaylistAudios
+#                   clearAudioQueue, removeAudioFromQueue,
+#                   addAudiosToQueue, reorderAudioQueue
 #   VideoGraphQL  : videos, videoCount
 #   ImageGraphQL  : images, imageCount, imageSearchStatus, enableImageSearch,
 #                   disableImageSearch, cancelImageModelDownload,
@@ -72,40 +72,40 @@ else
   fail "media-C04 updateAudioPlayMode returned: $UAPM"
 fi
 
-# media-C05  addPlaylistAudios with empty query (no-op)
-APAS=$(call_gql 'mutation { addPlaylistAudios(query: "text:nonexistent_xyz") }')
-api_apas=$(printf '%s' "$APAS" | jq -r '.data.addPlaylistAudios // empty')
+# media-C05  addAudiosToQueue with empty query (no-op)
+APAS=$(call_gql 'mutation { addAudiosToQueue(query: "text:nonexistent_xyz") }')
+api_apas=$(printf '%s' "$APAS" | jq -r '.data.addAudiosToQueue // empty')
 if [[ "$api_apas" == "true" ]]; then
-  pass "media-C05 addPlaylistAudios(non-matching) → true"
+  pass "media-C05 addAudiosToQueue(non-matching) → true"
 else
-  fail "media-C05 addPlaylistAudios returned: $APAS"
+  fail "media-C05 addAudiosToQueue returned: $APAS"
 fi
 
-# media-C06  deletePlaylistAudio (no-op for missing path)
-DPA=$(call_gql 'mutation { deletePlaylistAudio(path: "/nonexistent.mp3") }')
-api_dpa=$(printf '%s' "$DPA" | jq -r '.data.deletePlaylistAudio // empty')
+# media-C06  removeAudioFromQueue (no-op for missing path)
+DPA=$(call_gql 'mutation { removeAudioFromQueue(path: "/nonexistent.mp3") }')
+api_dpa=$(printf '%s' "$DPA" | jq -r '.data.removeAudioFromQueue // empty')
 if [[ "$api_dpa" == "true" ]]; then
-  pass "media-C06 deletePlaylistAudio(non-existent) → true"
+  pass "media-C06 removeAudioFromQueue(non-existent) → true"
 else
-  fail "media-C06 deletePlaylistAudio returned: $DPA"
+  fail "media-C06 removeAudioFromQueue returned: $DPA"
 fi
 
-# media-C07  reorderPlaylistAudios (no-op with empty list)
-RPA=$(call_gql 'mutation { reorderPlaylistAudios(paths: []) }')
-api_rpa=$(printf '%s' "$RPA" | jq -r '.data.reorderPlaylistAudios // empty')
+# media-C07  reorderAudioQueue (no-op with empty list)
+RPA=$(call_gql 'mutation { reorderAudioQueue(paths: []) }')
+api_rpa=$(printf '%s' "$RPA" | jq -r '.data.reorderAudioQueue // empty')
 if [[ "$api_rpa" == "true" ]]; then
-  pass "media-C07 reorderPlaylistAudios([]) → true"
+  pass "media-C07 reorderAudioQueue([]) → true"
 else
-  fail "media-C07 reorderPlaylistAudios returned: $RPA"
+  fail "media-C07 reorderAudioQueue returned: $RPA"
 fi
 
-# media-C08  clearAudioPlaylist
-CAP=$(call_gql 'mutation { clearAudioPlaylist }')
-api_cap=$(printf '%s' "$CAP" | jq -r '.data.clearAudioPlaylist // empty')
+# media-C08  clearAudioQueue
+CAP=$(call_gql 'mutation { clearAudioQueue }')
+api_cap=$(printf '%s' "$CAP" | jq -r '.data.clearAudioQueue // empty')
 if [[ "$api_cap" == "true" ]]; then
-  pass "media-C08 clearAudioPlaylist → true"
+  pass "media-C08 clearAudioQueue → true"
 else
-  fail "media-C08 clearAudioPlaylist returned: $CAP"
+  fail "media-C08 clearAudioQueue returned: $CAP"
 fi
 
 # ----------------------------------------------------------------------------

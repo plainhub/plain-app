@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -64,17 +65,19 @@ suspend fun deleteContacts(query: String): Boolean {
 }
 
 @GraphQLMutation
-suspend fun updateContact(id: ID, input: ContactInput): Contact? {
+suspend fun updateContact(id: ID, input: ContactInput): Contact {
     Permission.WRITE_CONTACTS.checkEnabledAsync()
     com.ismartcoding.plain.platform.updateContact(id.value, input)
     return getContactById(id.value)?.toModel()
+        ?: throw GraphQLError("Contact ${id.value} not found after update")
 }
 
 @GraphQLMutation
-suspend fun createContact(input: ContactInput): Contact? {
+suspend fun createContact(input: ContactInput): Contact {
     Permission.WRITE_CONTACTS.checkEnabledAsync()
     val id = com.ismartcoding.plain.platform.createContact(input)
-    return if (id.isEmpty()) null else getContactById(id)?.toModel()
+    if (id.isEmpty()) throw GraphQLError("Failed to create contact")
+    return getContactById(id)?.toModel() ?: throw GraphQLError("Contact $id not found after create")
 }
 
 @GraphQLMutation

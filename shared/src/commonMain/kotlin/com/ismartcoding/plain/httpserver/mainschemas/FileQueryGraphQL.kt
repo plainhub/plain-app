@@ -3,6 +3,7 @@ package com.ismartcoding.plain.httpserver.mainschemas
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.extensions.getFinalPath
+import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
@@ -28,6 +29,7 @@ import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.platform.loadAudioInfo
 import com.ismartcoding.plain.platform.loadImageInfo
 import com.ismartcoding.plain.platform.loadVideoInfo
+import kotlin.reflect.typeOf
 
 @GraphQLQuery
 suspend fun mounts(): List<StorageMount> {
@@ -47,27 +49,28 @@ suspend fun files(root: String, offset: Int, limit: Int, query: String, sortBy: 
 }
 
 @GraphQLQuery
-suspend fun fileInfo(id: ID, path: String, fileName: String): FileInfo {
+suspend fun fileInfo(id: ID? = null, path: String, fileName: String? = null): FileInfo {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     val finalPath = path.getFinalPath()
     val stat = statFile(finalPath)
     val updatedAt = stat?.updatedAt ?: kotlin.time.Instant.fromEpochMilliseconds(0)
     val size = stat?.size ?: 0L
+    val name = fileName ?: finalPath.getFilenameFromPath()
     var tags = emptyList<Tag>()
     var data: MediaFileInfo? = null
-    if (fileName.isImageFast()) {
-        if (id.value.isNotEmpty()) {
-            tags = TagsLoader.load(id.value, DataType.IMAGE)
+    if (name.isImageFast()) {
+        if (!id?.value.isNullOrEmpty()) {
+            tags = TagsLoader.load(id!!.value, DataType.IMAGE)
         }
         data = loadImageInfo(finalPath)
-    } else if (fileName.isVideoFast()) {
-        if (id.value.isNotEmpty()) {
-            tags = TagsLoader.load(id.value, DataType.VIDEO)
+    } else if (name.isVideoFast()) {
+        if (!id?.value.isNullOrEmpty()) {
+            tags = TagsLoader.load(id!!.value, DataType.VIDEO)
         }
         data = loadVideoInfo(finalPath)
-    } else if (fileName.isAudioFast()) {
-        if (id.value.isNotEmpty()) {
-            tags = TagsLoader.load(id.value, DataType.AUDIO)
+    } else if (name.isAudioFast()) {
+        if (!id?.value.isNullOrEmpty()) {
+            tags = TagsLoader.load(id!!.value, DataType.AUDIO)
         }
         data = loadAudioInfo(finalPath)
     }
@@ -85,4 +88,8 @@ suspend fun favoriteFolders(): List<FavoriteFolder> {
 }
 
 fun SchemaBuilder.addFileQuerySchema() {
+    type<File> {
+        // mediaId is "" for non-media files — expose null instead of an empty sentinel.
+        property("mediaId", typeOf<ID?>(), { it: File -> it.mediaId.ifEmpty { null }?.let { id -> ID(id) } })
+    }
 }

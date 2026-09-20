@@ -260,8 +260,14 @@ interface ChatDao {
     @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at ASC")
     suspend fun getByPeerId(toId: String): List<DChat>
 
+    @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+    suspend fun getByPeerIdPage(toId: String, limit: Int, offset: Int): List<DChat>
+
     @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at ASC")
     suspend fun getByChannelId(channelId: String): List<DChat>
+
+    @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+    suspend fun getByChannelIdPage(channelId: String, limit: Int, offset: Int): List<DChat>
 
     @Query(
         """

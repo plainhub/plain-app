@@ -158,21 +158,46 @@ internal class MdnsResponderLifecycleTest : MdnsResponderTestBase() {
     }
 
     /**
-     * Documents CURRENT behavior: when the receive worker dies but the socket
-     * stays open, restartSocket() reuses the socket and never respawns the
-     * worker — isRunning stays false and inbound packets are lost until
-     * process restart. This is the hole a keep-alive fix must close; flip
-     * this test when the fix lands.
+     * The keep-alive contract: a receive worker killed by an uncaught Error
+     * (OOM) leaves the socket open but the pair broken — restartSocket must
+     * rebuild BOTH the socket and the worker instead of half-reusing the live
+     * socket (the "NearbyPage empty until app kill" failure mode).
      */
-    @Test fun `restart with a dead worker and live socket does not respawn the receive loop`() {
+    @Test fun `restart respawns a dead receive worker and rebuilds the socket pair`() {
         assertTrue(MdnsHostResponder.start("myhost", service()))
+        val first = mainSocket()
 
         workerNamed("plain-mdns-responder").isAlive = false
         assertFalse(MdnsHostResponder.isRunning)
 
         assertTrue(MdnsHostResponder.restartSocket())
+
+        assertTrue(MdnsHostResponder.isRunning)
+        assertEquals(2, workers.count { it.first == "plain-mdns-responder" })
+        assertTrue("old socket of the broken pair must be closed", first.isClosed)
+        val rebuilt = sockets[2]
+        assertEquals(listOf(5353), rebuilt.binds)
+        assertEquals(listOf("224.0.0.251" to "wlan0"), rebuilt.joins)
+    }
+
+    @Test fun `ensureStarted recovers a dead receive worker`() {
+        assertTrue(MdnsHostResponder.start("myhost", service()))
+
+        workerNamed("plain-mdns-responder").isAlive = false
+
+        // The app-layer revival paths (page open, browse, network change) all
+        // funnel into ensureStarted / restartSocket — they must heal a dead
+        // worker, not just a missing socket.
+        assertTrue(MdnsHostResponder.ensureStarted("myhost"))
+        assertTrue(MdnsHostResponder.isRunning)
+    }
+
+    @Test fun `isRunning is false while the socket is closed even if the worker handle lives`() {
+        assertTrue(MdnsHostResponder.start("myhost", service()))
+
+        mainSocket().close()
+
         assertFalse(MdnsHostResponder.isRunning)
-        assertEquals(1, workers.count { it.first == "plain-mdns-responder" })
     }
 
     @Test fun `announcement goes out once per interface with only that interface address`() {

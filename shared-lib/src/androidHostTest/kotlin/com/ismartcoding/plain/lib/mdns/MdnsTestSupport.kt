@@ -23,8 +23,11 @@ internal class FakeMdnsSocket : MdnsSocket {
     val sent = ConcurrentLinkedQueue<SentDatagram>()
     val inbox = LinkedBlockingQueue<FakeDatagram>()
 
-    /** When set, the next [bind] throws — simulates a port conflict. */
+    /** When set, [bind] throws — simulates a port conflict. */
     var bindFailure: Exception? = null
+
+    /** When set, the next [receive] throws it — simulates an OOM Error killing the receive thread. */
+    @Volatile var failReceive: Throwable? = null
 
     @Volatile private var closed = false
     override val isClosed: Boolean get() = closed
@@ -43,6 +46,7 @@ internal class FakeMdnsSocket : MdnsSocket {
     }
 
     override fun receive(buf: ByteArray): ReceiveResult? {
+        failReceive?.let { throw it }
         val d = inbox.poll(50, TimeUnit.MILLISECONDS) ?: return null
         System.arraycopy(d.bytes, 0, buf, 0, d.bytes.size)
         return ReceiveResult(d.bytes.size, d.senderIp, d.senderPort)
@@ -177,6 +181,7 @@ internal open class MdnsResponderTestBase {
         MdnsHostResponder.logSink = { println("mDNS: $it") }
         MdnsHostResponder.socketFactory = { createMdnsSocket() }
         MdnsHostResponder.workerFactory = { name, block -> startMdnsWorker(name, block) }
+        MdnsHostResponder.retryInitialDelayMs = 2_000L
         interfacesProvider = null
     }
 

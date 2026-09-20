@@ -28,7 +28,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.enums.AccessFeatureType
+import com.ismartcoding.plain.enums.WebSettingsFeature
 import com.ismartcoding.plain.platform.openAppSettings
 import org.jetbrains.compose.resources.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -75,12 +75,12 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
         val notificationListenerGranted = remember { mutableStateOf(Permission.NOTIFICATION_LISTENER.isGranted()) }
         val notificationsCard = AppFeatureType.NOTIFICATIONS.has()
         val listState = rememberLazyListState()
-        val anchors = remember { mutableStateMapOf<AccessFeatureType, Rect>() }
-        val switches = remember { mutableStateMapOf<AccessFeatureType, Rect>() }
+        val anchors = remember { mutableStateMapOf<WebSettingsFeature, Rect>() }
+        val switches = remember { mutableStateMapOf<WebSettingsFeature, Rect>() }
         var listBounds by remember { mutableStateOf<Rect?>(null) }
         var overlayOrigin by remember { mutableStateOf(Offset.Zero) }
         var overlaySize by remember { mutableStateOf(IntSize.Zero) }
-        var bubbleFeature by remember { mutableStateOf<AccessFeatureType?>(null) }
+        var bubbleFeature by remember { mutableStateOf<WebSettingsFeature?>(null) }
         val density = LocalDensity.current
 
         LaunchedEffect(Unit) {
@@ -184,13 +184,13 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                                 val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
                                 PListItem(
                                     modifier = Modifier
-                                        .onGloballyPositioned { anchors[AccessFeatureType.NOTIFICATIONS] = it.boundsInRoot() }
+                                        .onGloballyPositioned { anchors[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }
                                         .clickable { navController.navigate(Routing.NotificationSettings) },
                                     icon = m.icon, title = permission.getText(),
                                     subtitle = stringResource(if (notificationListenerGranted.value) Res.string.system_permission_granted else Res.string.system_permission_not_granted),
                                     separatedActions = true
                                 ) {
-                                    Box(Modifier.onGloballyPositioned { switches[AccessFeatureType.NOTIFICATIONS] = it.boundsInRoot() }) {
+                                    Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.NOTIFICATIONS] = it.boundsInRoot() }) {
                                         PSwitch(activated = enabled) { enable -> togglePermission(scope, m, enable) }
                                     }
                                     HorizontalSpace(8.dp)
@@ -205,12 +205,12 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                             PListItem(
                                 modifier = Modifier
-                                    .onGloballyPositioned { anchors[AccessFeatureType.CLIPBOARD] = it.boundsInRoot() }
+                                    .onGloballyPositioned { anchors[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }
                                     .clickable { navController.navigate(Routing.ClipboardHistory) },
                                 icon = m.icon, title = stringResource(Res.string.clipboard_sync),
                                 separatedActions = true
                             ) {
-                                Box(Modifier.onGloballyPositioned { switches[AccessFeatureType.CLIPBOARD] = it.boundsInRoot() }) {
+                                Box(Modifier.onGloballyPositioned { switches[WebSettingsFeature.CLIPBOARD] = it.boundsInRoot() }) {
                                     PSwitch(activated = clipboardEnabled) { enable -> togglePermission(scope, m, enable) }
                                 }
                                 HorizontalSpace(8.dp)
@@ -222,9 +222,8 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
                     }
                     item {
                         VerticalSpace(dp = 16.dp)
-                        val m = PermissionItem(null, Permission.NONE, setOf(Permission.NONE))
                         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
-                            PListItem(modifier = Modifier.clickable { openAppSettings() }, icon = m.icon, title = m.permission.getText(), showMore = true)
+                            PListItem(modifier = Modifier.clickable { openAppSettings() }, title = stringResource(Res.string.open_permission_settings), showMore = true)
                         }
                     }
                     item {
@@ -273,37 +272,37 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
     }
 }
 
-private fun Permission.accessFeatureOf(): AccessFeatureType? = when (this) {
-    Permission.WRITE_EXTERNAL_STORAGE -> AccessFeatureType.FILES
-    Permission.WRITE_CONTACTS -> AccessFeatureType.CONTACTS
-    Permission.READ_SMS -> AccessFeatureType.SMS
-    Permission.WRITE_CALL_LOG -> AccessFeatureType.CALL_LOGS
-    Permission.CALL_PHONE -> AccessFeatureType.CALL_PHONE
-    Permission.READ_PHONE_NUMBERS -> AccessFeatureType.PHONE_NUMBER
-    Permission.QUERY_ALL_PACKAGES -> AccessFeatureType.APPS
-    Permission.NOTIFICATION_LISTENER -> AccessFeatureType.NOTIFICATIONS
+private fun Permission.accessFeatureOf(): WebSettingsFeature? = when (this) {
+    Permission.WRITE_EXTERNAL_STORAGE -> WebSettingsFeature.FILES
+    Permission.WRITE_CONTACTS -> WebSettingsFeature.CONTACTS
+    Permission.READ_SMS -> WebSettingsFeature.SMS
+    Permission.WRITE_CALL_LOG -> WebSettingsFeature.CALL_LOGS
+    Permission.CALL_PHONE -> WebSettingsFeature.CALL_PHONE
+    Permission.READ_PHONE_NUMBERS -> WebSettingsFeature.PHONE_NUMBER
+    Permission.QUERY_ALL_PACKAGES -> WebSettingsFeature.APPS
+    Permission.NOTIFICATION_LISTENER -> WebSettingsFeature.NOTIFICATIONS
     else -> null
 }
 
 /** LazyColumn item index of the row a feature maps to; null when the row does not exist. */
-private fun itemIndexFor(feature: AccessFeatureType, rows: List<PermissionItem>, notificationsShown: Boolean): Int? {
+private fun itemIndexFor(feature: WebSettingsFeature, rows: List<PermissionItem>, notificationsShown: Boolean): Int? {
     rows.forEachIndexed { i, m -> if (m.permission.accessFeatureOf() == feature) return 2 + i }
     var index = 2 + rows.size
-    if (feature == AccessFeatureType.NOTIFICATIONS) return if (notificationsShown) index else null
+    if (feature == WebSettingsFeature.NOTIFICATIONS) return if (notificationsShown) index else null
     if (notificationsShown) index++
-    if (feature == AccessFeatureType.CLIPBOARD) return index
+    if (feature == WebSettingsFeature.CLIPBOARD) return index
     return null
 }
 
 @Composable
-private fun bubbleLabel(feature: AccessFeatureType): String = when (feature) {
-    AccessFeatureType.FILES -> Permission.WRITE_EXTERNAL_STORAGE.getText()
-    AccessFeatureType.CONTACTS -> Permission.WRITE_CONTACTS.getText()
-    AccessFeatureType.SMS -> Permission.READ_SMS.getText()
-    AccessFeatureType.CALL_LOGS -> Permission.WRITE_CALL_LOG.getText()
-    AccessFeatureType.CALL_PHONE -> Permission.CALL_PHONE.getText()
-    AccessFeatureType.PHONE_NUMBER -> Permission.READ_PHONE_NUMBERS.getText()
-    AccessFeatureType.APPS -> Permission.QUERY_ALL_PACKAGES.getText()
-    AccessFeatureType.NOTIFICATIONS -> Permission.NOTIFICATION_LISTENER.getText()
-    AccessFeatureType.CLIPBOARD -> stringResource(Res.string.clipboard_sync)
+private fun bubbleLabel(feature: WebSettingsFeature): String = when (feature) {
+    WebSettingsFeature.FILES -> Permission.WRITE_EXTERNAL_STORAGE.getText()
+    WebSettingsFeature.CONTACTS -> Permission.WRITE_CONTACTS.getText()
+    WebSettingsFeature.SMS -> Permission.READ_SMS.getText()
+    WebSettingsFeature.CALL_LOGS -> Permission.WRITE_CALL_LOG.getText()
+    WebSettingsFeature.CALL_PHONE -> Permission.CALL_PHONE.getText()
+    WebSettingsFeature.PHONE_NUMBER -> Permission.READ_PHONE_NUMBERS.getText()
+    WebSettingsFeature.APPS -> Permission.QUERY_ALL_PACKAGES.getText()
+    WebSettingsFeature.NOTIFICATIONS -> Permission.NOTIFICATION_LISTENER.getText()
+    WebSettingsFeature.CLIPBOARD -> stringResource(Res.string.clipboard_sync)
 }

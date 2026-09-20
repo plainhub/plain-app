@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.db.AudioPlaySource
-import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.events.ClearAudioQueueEvent
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.audioClear
@@ -78,7 +78,7 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         noMore.value = true
         audioClear()
         setCurrentPlaying("")
-        sendEvent(ClearAudioPlaylistEvent())
+        sendEvent(ClearAudioQueueEvent())
     }
 
     /** Sync UI state after playback was started from a queue source (engine is already playing). */
@@ -113,7 +113,7 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         if (AudioQueueManager.queueTotal() == 0) {
             setCurrentPlaying("")
             audioClear()
-            sendEvent(ClearAudioPlaylistEvent())
+            sendEvent(ClearAudioQueueEvent())
         }
         refreshWindow()
     }

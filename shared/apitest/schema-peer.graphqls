@@ -27,10 +27,10 @@ type ChatImages {
 }
 
 type ChatItem {
+  fromId: ID!
+  toId: ID!
+  channelId: ID
   id: ID!
-  fromId: String!
-  toId: String!
-  channelId: String!
   content: String!
   createdAt: Instant!
   updatedAt: Instant!
@@ -52,6 +52,7 @@ type ChatText {
   ids: [String!]!
 }
 
+"""ISO-8601 / RFC 3339 UTC timestamp string, e.g. 2026-09-20T12:34:56.789Z"""
 scalar Instant
 
 """The Long scalar type represents a signed 64-bit numeric non-fractional value"""
@@ -62,9 +63,6 @@ enum PeerStatus {
   UNPAIRED
   CHANNEL
 }
-
-"""The Short scalar type represents a signed 16-bit numeric non-fractional value"""
-scalar Short
 
 type __Directive {
   name: String!

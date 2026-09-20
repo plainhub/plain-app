@@ -9,7 +9,7 @@ data class Audio(
     override val title: String,
     val artist: String,
     override val path: String,
-    val duration: Long,
+    val durationMs: Long,
     override val size: Long,
     override val bucketId: String,
     val albumFileId: String,
@@ -19,11 +19,11 @@ data class Audio(
 ) : MediaItem
 
 @GraphQLType
-data class PlaylistAudio(
+data class AudioItem(
     val title: String,
     val artist: String,
     val path: String,
-    val duration: Long,
+    val durationMs: Long,
 )
 
 @GraphQLType
@@ -40,7 +40,7 @@ data class AudioPlayHistory(
     val path: String,
     val title: String,
     val artist: String,
-    val duration: Long,
+    val durationMs: Long,
     val playCount: Long,
     val playedAt: Instant,
 )

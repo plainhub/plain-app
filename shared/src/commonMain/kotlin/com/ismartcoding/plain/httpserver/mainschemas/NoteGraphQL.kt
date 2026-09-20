@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -29,7 +30,7 @@ suspend fun note(id: ID): Note? {
 }
 
 @GraphQLMutation
-suspend fun saveNote(id: ID, input: NoteInput): Note? {
+suspend fun saveNote(id: ID, input: NoteInput): Note {
     val item =
         NoteHelper.addOrUpdateAsync(id.value) {
             title = input.title
@@ -37,6 +38,7 @@ suspend fun saveNote(id: ID, input: NoteInput): Note? {
         }
     NotesViewModel.reloadAsync()
     return NoteHelper.getById(item.id)?.toModel()
+        ?: throw GraphQLError("Note ${'$'}{item.id} not found after save")
 }
 
 @GraphQLMutation
@@ -56,29 +58,29 @@ suspend fun saveFeedEntriesToNotes(query: String): List<String> {
 }
 
 @GraphQLMutation
-suspend fun trashNotes(query: String): String {
+suspend fun trashNotes(query: String): Int {
     val ids = NoteHelper.getIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
     NoteHelper.trashAsync(ids)
     NotesViewModel.reloadAsync()
-    return query
+    return ids.size
 }
 
 @GraphQLMutation
-suspend fun restoreNotes(query: String): String {
+suspend fun restoreNotes(query: String): Int {
     val ids = NoteHelper.getTrashedIdsAsync(query)
     NoteHelper.restoreAsync(ids)
     NotesViewModel.reloadAsync()
-    return query
+    return ids.size
 }
 
 @GraphQLMutation
-suspend fun deleteNotes(query: String): String {
+suspend fun deleteNotes(query: String): Int {
     val ids = NoteHelper.getTrashedIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
     NoteHelper.deleteAsync(ids)
     NotesViewModel.reloadAsync()
-    return query
+    return ids.size
 }
 
 @GraphQLMutation

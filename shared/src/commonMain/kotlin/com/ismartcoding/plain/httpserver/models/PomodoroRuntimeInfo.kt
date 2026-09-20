@@ -11,7 +11,7 @@ data class PomodoroRuntimeInfo(
     val timeLeft: Int,
     val totalTime: Int,
     val isRunning: Boolean,
-    val isPause: Boolean,
+    val isPaused: Boolean,
     val state: PomodoroState,
 )
 

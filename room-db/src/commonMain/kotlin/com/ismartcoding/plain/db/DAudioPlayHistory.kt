@@ -31,7 +31,7 @@ data class DAudioPlayHistory(
 
 data class ArtistPlayCount(
     val artist: String,
-    val cnt: Long,
+    val count: Long,
 )
 
 @Dao
@@ -42,7 +42,7 @@ interface AudioPlayHistoryDao {
     @Query("SELECT * FROM audio_play_history WHERE path = :path")
     suspend fun getByPath(path: String): DAudioPlayHistory?
 
-    @Query("SELECT artist AS artist, SUM(play_count) AS cnt FROM audio_play_history GROUP BY artist")
+    @Query("SELECT artist AS artist, SUM(play_count) AS count FROM audio_play_history GROUP BY artist")
     suspend fun playCountsByArtist(): List<ArtistPlayCount>
 
     @Query("SELECT COUNT(*) FROM audio_play_history")

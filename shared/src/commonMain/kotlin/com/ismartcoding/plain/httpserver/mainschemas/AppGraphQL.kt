@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
 import com.ismartcoding.plain.buildChannel
-import com.ismartcoding.plain.enums.AccessFeatureType
+import com.ismartcoding.plain.enums.WebSettingsFeature
 import com.ismartcoding.plain.enums.AppChannelType
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -26,7 +26,7 @@ import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.httpserver.models.App
 import com.ismartcoding.plain.httpserver.models.DeviceInfo
 import com.ismartcoding.plain.httpserver.models.DeviceStatus
-import com.ismartcoding.plain.httpserver.models.TempValue
+import com.ismartcoding.plain.httpserver.models.KeyValuePair
 import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.platform.getDeviceFeatures
 import com.ismartcoding.plain.platform.getDeviceType
@@ -63,9 +63,9 @@ suspend fun app(): App {
 }
 
 @GraphQLMutation
-suspend fun setTempValue(key: String, value: String): TempValue {
+suspend fun setTempValue(key: String, value: String): KeyValuePair {
     TempHelper.setValue(key, value)
-    return TempValue(key, value)
+    return KeyValuePair(key, value)
 }
 
 @GraphQLMutation
@@ -81,7 +81,7 @@ suspend fun openAccessibilitySettings(): Boolean {
 }
 
 @GraphQLMutation
-suspend fun openWebSettings(feature: AccessFeatureType? = null): Boolean {
+suspend fun openWebSettings(feature: WebSettingsFeature? = null): Boolean {
     sendEvent(HOpenWebSettingsEvent(feature))
     return true
 }

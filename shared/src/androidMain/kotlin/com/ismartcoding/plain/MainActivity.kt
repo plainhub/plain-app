@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                 timeLeft = vm.timeLeft.intValue,
                 totalTime = vm.settings.value.getTotalSeconds(vm.currentState.value),
                 isRunning = vm.isRunning.value,
-                isPause = vm.isPaused.value,
+                isPaused = vm.isPaused.value,
                 state = vm.currentState.value,
             )
         }

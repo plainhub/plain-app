@@ -10,6 +10,7 @@ import com.ismartcoding.plain.httpserver.models.ChatChannel
 import com.ismartcoding.plain.httpserver.models.ChatChannelMember
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
+import kotlin.reflect.typeOf
 
 @GraphQLQuery
 suspend fun chatChannels(): List<ChatChannel> {
@@ -41,13 +42,13 @@ suspend fun leaveChatChannel(id: ID): Boolean {
 }
 
 @GraphQLMutation
-suspend fun addChatChannelMember(id: ID, peerId: String): ChatChannel {
-    return ChannelManager.inviteMember(id.value, peerId).toModel()
+suspend fun addChatChannelMember(id: ID, peerId: ID): ChatChannel {
+    return ChannelManager.inviteMember(id.value, peerId.value).toModel()
 }
 
 @GraphQLMutation
-suspend fun removeChatChannelMember(id: ID, peerId: String): ChatChannel {
-    return ChannelManager.kickMember(id.value, peerId).toModel()
+suspend fun removeChatChannelMember(id: ID, peerId: ID): ChatChannel {
+    return ChannelManager.kickMember(id.value, peerId.value).toModel()
 }
 
 @GraphQLMutation
@@ -63,6 +64,11 @@ suspend fun declineChatChannelInvite(id: ID): Boolean {
 }
 
 fun SchemaBuilder.addChatChannelSchema() {
-    type<ChatChannel> {}
-    type<ChatChannelMember> {}
+    type<ChatChannel> {
+        property("id", typeOf<ID>(), { it: ChatChannel -> ID(it.id) })
+        property("owner", typeOf<ID>(), { it: ChatChannel -> ID(it.owner) })
+    }
+    type<ChatChannelMember> {
+        property("id", typeOf<ID>(), { it: ChatChannelMember -> ID(it.id) })
+    }
 }

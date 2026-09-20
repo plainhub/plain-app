@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.features.sms.DMessage
+import com.ismartcoding.plain.enums.SmsType
 import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
@@ -14,7 +15,7 @@ data class Message(
     val serviceCenter: String,
     val read: Boolean,
     val threadId: String,
-    val type: Int,
+    val type: SmsType,
     val subscriptionId: Int,
     val isMms: Boolean,
     val attachments: List<MessageAttachment>,
@@ -36,7 +37,7 @@ fun DMessage.toModel(): Message {
         serviceCenter,
         read,
         threadId,
-        type,
+        SmsType.fromInt(type),
         subscriptionId,
         isMms,
         attachments.map { it.toModel() },

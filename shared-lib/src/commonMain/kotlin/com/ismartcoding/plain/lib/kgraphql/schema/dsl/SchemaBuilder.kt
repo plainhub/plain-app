@@ -156,7 +156,10 @@ class SchemaBuilder internal constructor() {
         // `type<User> {}` working without forcing users to re-list every field
         // already captured by @GraphQLType. Custom properties (transformations,
         // extensions, ignored) declared in [block] take precedence.
-        GeneratedSchemaRegistry.types[kClass]?.let { desc ->
+        // @GraphQLInterface descriptors land in the `interfaces` registry, so an
+        // explicit `type<MediaItem>()` registration must merge from there too —
+        // otherwise the interface compiles as a field-less object and fails.
+        (GeneratedSchemaRegistry.types[kClass] ?: GeneratedSchemaRegistry.interfaces[kClass])?.let { desc ->
             @Suppress("UNCHECKED_CAST")
             val typedDesc = desc as com.ismartcoding.plain.lib.kgraphql.generated.TypeDescriptor<T>
             typedDesc.fields.forEach { f ->

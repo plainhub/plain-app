@@ -33,7 +33,7 @@ sealed class MediaFileInfo
 data class ImageFileInfo(val width: Int, val height: Int, val location: Location?) : MediaFileInfo()
 
 @GraphQLType
-data class AudioFileInfo(val duration: Long, val location: Location?) : MediaFileInfo()
+data class AudioFileInfo(val durationMs: Long, val location: Location?) : MediaFileInfo()
 
 @GraphQLType
-data class VideoFileInfo(val width: Int, val height: Int, val duration: Long, val location: Location?) : MediaFileInfo()
+data class VideoFileInfo(val width: Int, val height: Int, val durationMs: Long, val location: Location?) : MediaFileInfo()

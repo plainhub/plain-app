@@ -9,6 +9,7 @@ import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.Peer
 import com.ismartcoding.plain.httpserver.models.toModel
+import kotlin.reflect.typeOf
 
 @GraphQLQuery
 suspend fun peers(): List<Peer> {
@@ -28,5 +29,9 @@ suspend fun unpairPeer(id: ID): Boolean {
 }
 
 fun SchemaBuilder.addPeerSchema() {
-    // Peer type is registered via @GraphQLType + registerGeneratedSchema()
+    // Peer type is registered via @GraphQLType + registerGeneratedSchema();
+    // id is exposed as ID for contract consistency (wire format stays a string).
+    type<Peer> {
+        property("id", typeOf<ID>(), { it: Peer -> ID(it.id) })
+    }
 }

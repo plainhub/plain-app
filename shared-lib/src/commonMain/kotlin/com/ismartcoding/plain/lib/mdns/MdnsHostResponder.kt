@@ -68,6 +68,9 @@ object MdnsHostResponder {
     @Volatile private var retryJob: Job? = null
     @Volatile private var retryDelayMs = INITIAL_RETRY_MS
 
+    /** First retry/revival delay; test seam so death-notification tests run fast. */
+    @Volatile internal var retryInitialDelayMs = INITIAL_RETRY_MS
+
     /** Inbound-packet listeners (browser). Kept across socket restarts. */
     @Volatile private var packetListeners: List<(ByteArray, String) -> Unit> = emptyList()
 
@@ -113,7 +116,7 @@ object MdnsHostResponder {
     }
 
     val isRunning: Boolean
-        get() = worker?.isAlive == true && socket != null
+        get() = worker?.isAlive == true && socket?.isClosed == false
 
     /**
      * Starts the mDNS responder. [service] advertises the PlainApp service
@@ -128,7 +131,7 @@ object MdnsHostResponder {
         }
         hostname = normalized
         serviceInfo = service
-        retryDelayMs = INITIAL_RETRY_MS
+        retryDelayMs = retryInitialDelayMs
         log("start hostname=$normalized service=${service?.serviceType ?: "none"}")
         return restartSocket()
     }
@@ -207,7 +210,12 @@ object MdnsHostResponder {
      * Brings the responder up for the current network. Reuses the already-bound
      * socket when one exists, only joining interfaces that are missing — so a
      * network change does not tear down and rebuild (no dropped membership, no
-     * churn). The socket is rebuilt only when it does not exist yet.
+     * churn). The socket is rebuilt only when the receive path is broken: the
+     * socket does not exist / is closed, or its worker thread died (e.g. an
+     * OOM Error kills the receive loop without closing the socket — without
+     * this rebuild the responder silently stops receiving until the process
+     * restarts, which is exactly the "NearbyPage shows nothing until the app
+     * is killed" failure mode).
      */
     fun restartSocket(): Boolean {
         if (hostname.isEmpty()) {
@@ -221,9 +229,16 @@ object MdnsHostResponder {
         }
 
         val existing = socket
-        val isNew = existing == null || existing.isClosed
+        // Socket and receive worker are created as a pair; a dead worker with
+        // a live socket is a broken pair — rebuild both, never half-reuse.
+        val isNew = existing == null || existing.isClosed || worker?.isAlive != true
         val s: MdnsSocket
         if (isNew) {
+            if (existing != null && !existing.isClosed) {
+                log("restart: receive worker dead, rebuilding socket pair")
+                runCatching { existing.close() }
+                joinedIfaces = emptySet()
+            }
             s = runCatching { socketFactory() }.getOrNull() ?: run {
                 log("restart: failed to create socket")
                 scheduleRetry()
@@ -420,14 +435,19 @@ object MdnsHostResponder {
         }
     }
 
-    /** Best-effort: QU queries simply no-op until the socket exists. Idempotent — 
-     *  kept alive across network changes so a reuse path never rebuilds it. */
+    /** Best-effort: QU queries simply no-op until the socket exists. Idempotent —
+     *  kept alive across network changes so a reuse path never rebuilds it; a
+     *  dead QU worker (with a live socket) does rebuild, same pair rule as the
+     *  main socket. */
     private fun ensureQuSocket() {
         val existing = quSocket
-        if (existing != null && !existing.isClosed) return
+        if (existing != null && !existing.isClosed && quWorker?.isAlive == true) return
         val created = runCatching {
             socketFactory().apply { bind(0, 1000) }
         }.getOrNull() ?: return
+        if (existing != null && !existing.isClosed) {
+            log("QU receive worker dead, rebuilding QU socket")
+        }
         runCatching { existing?.close() }
         ensureSingleConsumer()
         quSocket = created
@@ -439,24 +459,49 @@ object MdnsHostResponder {
      * single consumer. The only difference is [respond] — the 5353 multicast socket
      * answers queries while the QU socket (not group-joined; unicast-only) just feeds
      * the shared consumer.
+     *
+     * The finally reports unexpected exits: the loop body only catches
+     * [Exception], so an [Error] (OOM under memory pressure) kills the thread —
+     * without the report, a dead receive loop with a live socket silently
+     * kills mDNS until the process restarts.
      */
     private fun receiveLoop(s: MdnsSocket, respond: Boolean) {
-        val buf = ByteArray(1500)
-        while (!s.isClosed) {
-            try {
-                val result = s.receive(buf) ?: continue
-                val senderIp = result.senderIp ?: continue
-                val length = result.length
-                // Guarded so production (capture disabled) never pays for the
-                // extra copy of the raw datagram.
-                if (MdnsPacketCapture.enabled) MdnsPacketCapture.recordIn(senderIp, result.senderPort, buf.copyOf(length))
-                inboundChannel.trySend(
-                    InboundPacket(buf.copyOf(length), senderIp, result.senderPort, respond)
-                )
-            } catch (_: Exception) {
-                if (s.isClosed) break
+        try {
+            val buf = ByteArray(1500)
+            while (!s.isClosed) {
+                try {
+                    val result = s.receive(buf) ?: continue
+                    val senderIp = result.senderIp ?: continue
+                    val length = result.length
+                    // Guarded so production (capture disabled) never pays for the
+                    // extra copy of the raw datagram.
+                    if (MdnsPacketCapture.enabled) MdnsPacketCapture.recordIn(senderIp, result.senderPort, buf.copyOf(length))
+                    inboundChannel.trySend(
+                        InboundPacket(buf.copyOf(length), senderIp, result.senderPort, respond)
+                    )
+                } catch (_: Exception) {
+                    if (s.isClosed) break
+                }
             }
+        } finally {
+            // Runs even while an Error unwinds this thread. Clean teardowns
+            // (stop, rebuild) close the socket first and are not a death.
+            if (!s.isClosed) onReceiveLoopDied(s)
         }
+    }
+
+    /**
+     * A receive loop is about to die with its socket still open. Close the
+     * socket so the pair is consistently dead — every existing revival path
+     * (ensureStarted on page open, network change, scan cycle) then rebuilds
+     * it — and schedule the rebuild immediately on the retry backoff. This is
+     * event-driven self-healing: the dying thread announces itself, no
+     * polling, no watchdog.
+     */
+    private fun onReceiveLoopDied(s: MdnsSocket) {
+        log("receive loop died unexpectedly, closing socket and scheduling rebuild")
+        runCatching { s.close() }
+        scheduleRetry()
     }
 
     private fun notifyPacketListeners(bytes: ByteArray, senderIp: String) {

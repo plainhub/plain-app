@@ -25,6 +25,14 @@ object DownloadCenter {
     private val tasksLock = PlatformLock()
     private val engines = mutableMapOf<String, DownloadEngine>()
 
+    /**
+     * Monotonic execution counter per task id, mutated under [tasksLock].
+     * Lets a finished execution recognize that a NEWER execution already
+     * claimed the task (requeue/resume raced the verdict) and hands off
+     * instead of failing the fresh run.
+     */
+    private val executions = mutableMapOf<String, Long>()
+
     /** Snapshot of all tasks, keyed by id, for UI collection. */
     val progress = MutableStateFlow<Map<String, DownloadTaskHandle>>(emptyMap())
 
@@ -176,28 +184,64 @@ object DownloadCenter {
             try {
                 // A channel entry may be stale (task paused, canceled or
                 // re-enqueued since it was sent); only fresh PENDING entries run.
-                if (!task.aborted && task.status == DownloadStatus.PENDING) executeTaskAsync(task)
+                // The fields are read under the registry lock: producers write
+                // status/aborted inside the same lock before dispatching, so an
+                // unlocked read could observe a stale terminal status on weakly
+                // ordered cores (arm64) and silently drop a fresh entry.
+                val fresh = tasksLock.withLock { !task.aborted && task.status == DownloadStatus.PENDING }
+                if (fresh) executeTaskAsync(task)
             } catch (e: Exception) {
                 LogCat.e("Download task ${task.id} failed: ${e.message}")
                 if (!task.aborted && !task.status.isTerminalDownloadStatus()) {
                     task.status = DownloadStatus.FAILED
+                    task.error = e.message ?: e.javaClass.simpleName
                 }
                 updateProgressFlow()
             }
         }
     }
 
+    /** How the previous engine execution ended, decided atomically under [tasksLock]. */
+    private enum class ExecutionVerdict {
+        /** pause/cancel/remove own the task now — skip finished bookkeeping. */
+        ABORTED,
+
+        /** The engine returned without a terminal status — treat as failure. */
+        SILENT,
+
+        /** Terminal status reported (or the task was re-enqueued since). */
+        DONE,
+    }
+
     private suspend fun executeTaskAsync(task: DownloadTaskHandle) {
         val engine = tasksLock.withLock { engines[task.kind] }
         if (engine == null) {
             LogCat.e("No engine registered for download kind ${task.kind}, failing ${task.id}")
-            task.error = "no engine registered for kind ${task.kind}"
-            task.status = DownloadStatus.FAILED
+            tasksLock.withLock {
+                if (task.status == DownloadStatus.PENDING) {
+                    task.error = "no engine registered for kind ${task.kind}"
+                    task.status = DownloadStatus.FAILED
+                }
+            }
             updateProgressFlow()
             return
         }
-        task.status = DownloadStatus.DOWNLOADING
-        task.aborted = false
+        // Claim this execution atomically: every re-dispatch path (resume,
+        // retry, requeue, enqueueUnique) also writes status under tasksLock,
+        // so a claim that finds anything other than PENDING is a stale
+        // channel entry and must not touch the task. The returned epoch
+        // identifies THIS execution for the post-join verdict.
+        val myEpoch = tasksLock.withLock {
+            if (task.status != DownloadStatus.PENDING) {
+                return@withLock 0L
+            }
+            task.status = DownloadStatus.DOWNLOADING
+            task.aborted = false
+            val epoch = (executions[task.id] ?: 0L) + 1L
+            executions[task.id] = epoch
+            epoch
+        }
+        if (myEpoch == 0L) return
         updateProgressFlow()
         // Engine work runs in its own child job so pause/cancel target the
         // transfer only — never the resident queue worker driving it.
@@ -212,10 +256,28 @@ object DownloadCenter {
         }
         task.job = executeJob
         executeJob.join()
-        if (task.aborted) return
-        if (!task.status.isTerminalDownloadStatus()) {
-            // Engines must report a terminal status; treat silence as failure.
-            task.status = DownloadStatus.FAILED
+        // Decide under the registry lock, together with every writer: an
+        // unlocked read here races a re-enqueue (status back to PENDING) or a
+        // pause and can wrongly flip a freshly requeued task to FAILED — the
+        // re-dispatched entry is then dropped by the stale-entry check and
+        // the task silently disappears.
+        val verdict = tasksLock.withLock {
+            when {
+                // A newer execution already claimed this task (the requeue
+                // raced this verdict): hands off, the fresh run owns the state.
+                executions[task.id] != myEpoch -> ExecutionVerdict.DONE
+                task.aborted -> ExecutionVerdict.ABORTED
+                task.status == DownloadStatus.DOWNLOADING -> {
+                    // Still the status this execution set and nobody requeued:
+                    // the engine went silent.
+                    task.status = DownloadStatus.FAILED
+                    ExecutionVerdict.SILENT
+                }
+                else -> ExecutionVerdict.DONE
+            }
+        }
+        if (verdict == ExecutionVerdict.ABORTED) return
+        if (verdict == ExecutionVerdict.SILENT) {
             LogCat.e("Download engine ${task.kind} returned without a terminal status for ${task.id}")
         }
         engine.onFinished(task)

@@ -39,6 +39,7 @@ import com.ismartcoding.plain.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
+import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.Message
 import com.ismartcoding.plain.httpserver.models.MessageConversation
 import com.ismartcoding.plain.httpserver.models.SmsCounts
@@ -60,8 +61,8 @@ suspend fun smsAllCounts(): SmsCounts {
 }
 
 @GraphQLMutation
-suspend fun unarchiveConversation(id: String): Boolean {
-    AppDatabase.instance.archivedConversationDao().delete(id)
+suspend fun unarchiveConversation(id: ID): Boolean {
+    AppDatabase.instance.archivedConversationDao().delete(id.value)
     return true
 }
 
@@ -124,8 +125,8 @@ suspend fun archivedConversations(): List<MessageConversation> {
 }
 
 @GraphQLMutation
-suspend fun archiveConversation(id: String, date: Long): Boolean {
-    AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id, conversationDate = date))
+suspend fun archiveConversation(id: ID, date: Long): Boolean {
+    AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id.value, conversationDate = date))
     return true
 }
 

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.events
 
 import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.enums.AccessFeatureType
+import com.ismartcoding.plain.enums.WebSettingsFeature
 import com.ismartcoding.plain.lib.ChannelEvent
 
 // Pomodoro events
@@ -18,7 +18,7 @@ class HRequestScreenMirrorAudioEvent : ChannelEvent()
 
 class HOpenAccessibilitySettingsEvent : ChannelEvent()
 
-class HOpenWebSettingsEvent(val feature: AccessFeatureType? = null) : ChannelEvent()
+class HOpenWebSettingsEvent(val feature: WebSettingsFeature? = null) : ChannelEvent()
 
 class HRetryChatItemEvent(val item: DChat) : ChannelEvent()
 /**

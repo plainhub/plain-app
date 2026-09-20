@@ -9,7 +9,7 @@ data class Video(
     override var id: ID,
     override var title: String,
     override var path: String,
-    val duration: Long,
+    val durationMs: Long,
     override val size: Long,
     override val bucketId: String,
     override val createdAt: Instant,
@@ -19,5 +19,5 @@ data class Video(
 ) : MediaItem
 
 fun DVideo.toModel(): Video {
-    return Video(ID(id), title, path, duration, size, bucketId, createdAt, updatedAt, takenAt, isFavorite)
+    return Video(ID(id), title, path, durationMs = duration, size = size, bucketId = bucketId, createdAt = createdAt, updatedAt = updatedAt, takenAt = takenAt, isFavorite = isFavorite)
 }

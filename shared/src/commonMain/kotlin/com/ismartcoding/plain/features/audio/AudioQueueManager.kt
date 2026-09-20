@@ -292,7 +292,7 @@ object AudioQueueManager {
 
     /** Total plays per artist, from the play history window. */
     suspend fun artistPlayCounts(): Map<String, Long> =
-        historyDao.playCountsByArtist().associate { it.artist to it.cnt }
+        historyDao.playCountsByArtist().associate { it.artist to it.count }
 
     // ---------- playback order ----------
 

@@ -158,7 +158,7 @@ class PlainAccessibilityService : AccessibilityService() {
             val p = points.first()
             val x = normToX(p.x, screenWidth)
             val y = normToY(p.y, screenHeight)
-            val duration = p.t.coerceAtLeast(0).toLong()
+            val duration = p.tMs.coerceAtLeast(0).toLong()
             if (duration >= 500L) {
                 dispatchLongPress(x, y, duration)
             } else {
@@ -167,10 +167,10 @@ class PlainAccessibilityService : AccessibilityService() {
             return
         }
 
-        val sorted = points.sortedBy { it.t }
+        val sorted = points.sortedBy { it.tMs }
         val first = sorted.first()
         val last = sorted.last()
-        val totalDuration = (last.t - first.t).coerceAtLeast(16).toLong()
+        val totalDuration = (last.tMs - first.tMs).coerceAtLeast(16).toLong()
 
         val fx = normToX(first.x, screenWidth)
         val fy = normToY(first.y, screenHeight)
