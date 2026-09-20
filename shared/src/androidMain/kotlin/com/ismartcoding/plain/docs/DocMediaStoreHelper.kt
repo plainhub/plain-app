@@ -78,6 +78,9 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
                     }
                     where.add("${MediaStore.Files.FileColumns.SIZE} $op ?", bytes.toString())
                 }
+                "ids" -> {
+                    where.addIn(MediaStore.Files.FileColumns._ID, it.value.split(","))
+                }
                 "bucket_id" -> if (isQPlus()) {
                     where.addEqual(MediaStore.MediaColumns.BUCKET_ID, it.value)
                 }

@@ -1,50 +1,32 @@
 package com.ismartcoding.plain.ui.page.search
 
 import com.ismartcoding.plain.i18n.*
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.platform.checkNotificationPermission
-import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.base.PIcon
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
@@ -60,7 +42,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.globalSearchDomains
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.page.MainNavScaffold
-import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.lib.withIO
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -88,17 +70,18 @@ fun GlobalSearchPage(
     val query = viewModel.queryText.value
     val domainScope = viewModel.domain.value
 
-    // Runs on every entry (and return from a viewer): syncs read flags of the
-    // loaded feed entries without touching anything else, so no flash.
+    // Runs on every entry (and return from a viewer): re-syncs loaded hits
+    // with their source data (note edits, feed read flags, ...) in place, so
+    // no full reload flash.
     LaunchedEffect(Unit) {
-        viewModel.refreshFeedReadStates()
+        viewModel.refreshHits()
     }
 
     // Live suggestions: re-arm the debounce on every keystroke; a submit or a
     // recent-term tap flips `submitted` before this fires, so it stays quiet.
     // The `searchedQuery` guard keeps this from wiping and reloading the
-    // result list when the page re-enters composition after returning from a
-    // viewer page (the query has not changed, so there is nothing to search).
+    // result list when the page re-enters composition after returning from
+    // a viewer page (the query has not changed, so there is nothing to search).
     LaunchedEffect(viewModel.queryText.value) {
         if (query.isNotBlank() && !viewModel.submitted.value) {
             delay(300)
@@ -228,65 +211,3 @@ private fun Modifier.hideKeyboardOnTap(focusManager: FocusManager, keyboard: Sof
             keyboard?.hide()
         }
     }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun GlobalSearchTopBar(
-    viewModel: GlobalSearchViewModel,
-    domainScope: GlobalSearchDomain?,
-) {
-    val focusRequester = remember { FocusRequester() }
-    // Auto-focus once per session when entering empty; returning from a
-    // viewer page (TextFilePage, FeedEntry, …) re-enters composition and
-    // must not pop the keyboard back up.
-    var autoFocusDone by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        if (!autoFocusDone && viewModel.queryText.value.isEmpty()) {
-            autoFocusDone = true
-            focusRequester.requestFocus()
-        }
-    }
-    val hint = if (domainScope == null) stringResource(Res.string.global_search_hint)
-    else stringResource(Res.string.search_in_domain, stringResource(domainScope.labelRes))
-
-    Column(Modifier.fillMaxWidth()) {
-        SearchBar(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-                .focusRequester(focusRequester),
-            inputField = {
-                SearchBarDefaults.InputField(
-                    query = viewModel.queryText.value,
-                    onQueryChange = viewModel::onQueryChange,
-                    onSearch = { viewModel.submit() },
-                    expanded = false,
-                    onExpandedChange = { },
-                    placeholder = { Text(hint) },
-                    leadingIcon = {
-                        PIcon(
-                            icon = Res.drawable.search,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    },
-                    trailingIcon = {
-                        if (viewModel.queryText.value.isNotEmpty()) {
-                            PIconButton(
-                                icon = Res.drawable.close,
-                                contentDescription = stringResource(Res.string.clear_search_term),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            ) {
-                                viewModel.onQueryChange("")
-                            }
-                        }
-                    },
-                )
-            },
-            expanded = false,
-            onExpandedChange = { },
-            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.cardBackgroundNormal),
-        ) {
-        }
-    }
-}

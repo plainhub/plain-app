@@ -22,10 +22,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.getApplicationIcon
@@ -33,26 +31,15 @@ import com.ismartcoding.plain.platform.getMediaItemUriString
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
 import com.ismartcoding.plain.ui.components.DocItem
 import com.ismartcoding.plain.ui.components.NoteListItem
 import com.ismartcoding.plain.ui.components.PackageListItem
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageViewWithUri
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.AudioViewModel
-import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.models.DocsViewModel
-import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.GlobalSearchHit
 import com.ismartcoding.plain.ui.models.GlobalSearchSource
-import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VPackage
-import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.feeds.FeedClusterEntryRow
 import com.ismartcoding.plain.ui.page.feeds.FeedListRow
@@ -62,44 +49,6 @@ import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import com.ismartcoding.plain.ui.theme.searchHighlight
-
-/** Per-list dependencies for rows that reuse the source page's own list item component. */
-class GlobalSearchRowContext(
-    val navController: NavHostController,
-    val audioPlaylistVM: AudioPlaylistViewModel,
-    val audioVM: AudioViewModel,
-    val tagsVM: TagsViewModel,
-    val castVM: CastViewModel,
-    val docsVM: DocsViewModel,
-    val feedEntriesVM: FeedEntriesViewModel,
-    val dragSelectState: DragSelectState,
-    val itemState: TransformItemState,
-    val previewerState: MediaPreviewerState,
-)
-
-@Composable
-fun rememberGlobalSearchRowContext(
-    navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModel,
-    audioVM: AudioViewModel,
-    tagsVM: TagsViewModel,
-    castVM: CastViewModel,
-    docsVM: DocsViewModel,
-    feedEntriesVM: FeedEntriesViewModel,
-): GlobalSearchRowContext {
-    val dragSelectState = rememberDragSelectState()
-    val itemState = rememberTransformItemState()
-    val previewerState = rememberPreviewerState()
-    return remember(
-        navController, audioPlaylistVM, audioVM, tagsVM, castVM, docsVM, feedEntriesVM,
-        dragSelectState, itemState, previewerState,
-    ) {
-        GlobalSearchRowContext(
-            navController, audioPlaylistVM, audioVM, tagsVM, castVM, docsVM, feedEntriesVM,
-            dragSelectState, itemState, previewerState,
-        )
-    }
-}
 
 /** Dispatches a hit to the list item component of its source domain; falls back to the generic row. */
 @Composable
@@ -239,13 +188,6 @@ fun GlobalSearchRow(
 @Composable
 private fun CardSpace(content: @Composable () -> Unit) {
     Box(Modifier.padding(vertical = 4.dp)) { content() }
-}
-
-/** Preview payload of an image/video hit, or null for other domains. */
-fun GlobalSearchHit.previewItem(): PreviewItem? = when (val s = source) {
-    is GlobalSearchSource.Image -> PreviewItem(s.image.id, s.image.path, s.image.size, mediaId = s.image.id, data = s.image)
-    is GlobalSearchSource.Video -> PreviewItem(s.video.id, s.video.path, s.video.size, mediaId = s.video.id, data = s.video)
-    else -> null
 }
 
 /** Generic result row (chat): leading icon, highlighted title, optional snippet and subtitle. */

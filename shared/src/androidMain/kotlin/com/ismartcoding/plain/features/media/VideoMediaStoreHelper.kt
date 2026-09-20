@@ -60,6 +60,8 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         filterFields.forEach {
             if (it.name == "text") {
                 where.add("${MediaStore.Video.Media.TITLE} LIKE ?", "%${it.value}%")
+            } else if (it.name == "ids") {
+                where.addIn(MediaStore.Video.Media._ID, it.value.split(","))
             } else if (it.name == "bucket_id") {
                 where.addEqual(MediaStore.Video.Media.BUCKET_ID, it.value)
             } else if (it.name == "trash") {

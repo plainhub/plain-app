@@ -24,6 +24,6 @@ data class DAudio(
     }
 
     fun toPlaylistAudio(): DPlaylistAudio {
-        return DPlaylistAudio(title, path, artist, duration)
+        return DPlaylistAudio(title, path, artist, duration, albumId)
     }
 }

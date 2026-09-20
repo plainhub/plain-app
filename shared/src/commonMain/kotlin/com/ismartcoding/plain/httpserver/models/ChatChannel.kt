@@ -4,6 +4,7 @@ import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.enums.ChannelMemberStatus
 import com.ismartcoding.plain.enums.ChatChannelStatus
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLField
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -22,6 +23,7 @@ data class ChatChannel(
     val name: String,
     val owner: String,
     val members: List<ChatChannelMember>,
+    @GraphQLField(description = "Monotonically increasing mutation counter; receivers ignore channel updates whose version is not greater than their local copy.")
     val version: Long,
     val status: ChatChannelStatus,
     val createdAt: Instant,

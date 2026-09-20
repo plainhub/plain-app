@@ -132,7 +132,9 @@ fun NearbyPage(
                     }
                 }
             }
-            nearbySearchingItem(isSearching)
+            // The list renders instantly from the discovery history cache;
+            // the spinner only fills in for a genuinely empty first sweep.
+            nearbySearchingItem(isSearching && nearbyDevices.isEmpty())
             nearbyDeviceListItems(nearbyDevices, peerVM, pairedPeers)
             if (nearbyDevices.isEmpty() && !isSearching) {
                 item {

@@ -23,7 +23,7 @@ import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
 import kotlin.reflect.typeOf
 
-@GraphQLQuery(description = "Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a peer id, or a channel id (channel targets are prefixed, see ChatTarget).")
+@GraphQLQuery(description = "Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id.")
 suspend fun chatItems(target: String, offset: Int, limit: Int, query: String): List<ChatItem> {
     val dao = AppDatabase.instance.chatDao()
     val chatTarget = ChatTarget.parseId(target)
@@ -43,7 +43,7 @@ suspend fun latestChatItems(): List<ChatItem> {
     return AppDatabase.instance.chatDao().getAllLatestChats().map { it.toModel() }
 }
 
-@GraphQLMutation(description = "Send a chat message. `target` is the chat target id — a peer id, or a channel id (channel targets are prefixed, see ChatTarget); same value space as the chatItems query.")
+@GraphQLMutation(description = "Send a chat message. `target` is the chat target id — a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id; same value space as the chatItems query.")
 suspend fun sendChatItem(target: String, content: String): List<ChatItem> {
     val chatTarget = ChatTarget.parseId(target)
     val item = ChatManager.createChatItem(chatTarget, DChat.parseContent(content))

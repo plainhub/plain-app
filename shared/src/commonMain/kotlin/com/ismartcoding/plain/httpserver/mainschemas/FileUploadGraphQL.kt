@@ -39,14 +39,11 @@ suspend fun mergeStatus(fileId: ID): MergeTask {
  * Completion is signalled by WS event 38; `mergeStatus` is the polling
  * fallback for lost events.
  */
-/** Start a background merge into [path]; completion arrives via the
- *  upload_merge_result WS event, `mergeStatus` is the polling fallback. */
-@GraphQLMutation
+@GraphQLMutation(description = "Start a background merge of the uploaded chunks into the file at `path`; completion arrives via the upload_merge_result WS event, `mergeStatus` is the polling fallback. `replace=false` keeps the existing file and writes to a new sibling path instead; the summed chunk sizes must match `totalSize`.")
 suspend fun mergeChunks(fileId: ID, totalChunks: Int, path: String, replace: Boolean, totalSize: Long): MergeTask =
     mergeChunksAsyncImpl(fileId.value) { mergeUploadedChunks(fileId.value, totalChunks, path, replace, isAppFile = false, totalSize) }
 
-/** Background merge into the app-private content store; [fileName] is a name hint (no directory). */
-@GraphQLMutation
+@GraphQLMutation(description = "Background merge into the app-private content store; `fileName` is a name hint (no directory), always overwrites. Returns a MergeTask — poll mergeStatus or wait for the upload_merge_result WS event.")
 suspend fun mergeAppFileChunks(fileId: ID, totalChunks: Int, fileName: String, totalSize: Long): MergeTask =
     mergeChunksAsyncImpl(fileId.value) { mergeUploadedChunks(fileId.value, totalChunks, fileName, replace = true, isAppFile = true, totalSize) }
 

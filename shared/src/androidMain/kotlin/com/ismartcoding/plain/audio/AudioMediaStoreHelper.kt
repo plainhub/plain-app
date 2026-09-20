@@ -68,6 +68,10 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
                     where.addEqual(MediaStore.Audio.Media.TITLE, it.value)
                 }
 
+                "ids" -> {
+                    where.addIn(MediaStore.Audio.Media._ID, it.value.split(","))
+                }
+
                 "bucket_id" -> {
                     where.addEqual(MediaStore.Audio.Media.BUCKET_ID, it.value)
                 }

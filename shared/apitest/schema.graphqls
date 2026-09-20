@@ -30,7 +30,7 @@ type Query {
   feedEntry(id: ID!): FeedEntry
   feedEntries(offset: Int!, limit: Int!, query: String!): [FeedEntry!]!
   peers: [Peer!]!
-  """Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a peer id, or a channel id (channel targets are prefixed, see ChatTarget)."""
+  """Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id."""
   chatItems(target: String!, offset: Int!, limit: Int!, query: String!): [ChatItem!]!
   latestChatItems: [ChatItem!]!
   audioCount(query: String!): Int!
@@ -133,7 +133,9 @@ type Mutation {
   sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
   requestScreenMirrorKeyFrame: Boolean!
   deleteChunks(fileId: ID!): Boolean!
+  """Start a background merge of the uploaded chunks into the file at `path`; completion arrives via the upload_merge_result WS event, `mergeStatus` is the polling fallback. `replace=false` keeps the existing file and writes to a new sibling path instead; the summed chunk sizes must match `totalSize`."""
   mergeChunks(fileId: ID!, totalChunks: Int!, path: String!, replace: Boolean!, totalSize: Long!): MergeTask!
+  """Background merge into the app-private content store; `fileName` is a name hint (no directory), always overwrites. Returns a MergeTask — poll mergeStatus or wait for the upload_merge_result WS event."""
   mergeAppFileChunks(fileId: ID!, totalChunks: Int!, fileName: String!, totalSize: Long!): MergeTask!
   deleteFiles(paths: [String!]!): ActionResult!
   createDir(path: String!): File!
@@ -155,7 +157,7 @@ type Mutation {
   deleteFeedEntries(query: String!): ActionResult!
   deletePeer(id: ID!): Boolean!
   unpairPeer(id: ID!): Boolean!
-  """Send a chat message. `target` is the chat target id — a peer id, or a channel id (channel targets are prefixed, see ChatTarget); same value space as the chatItems query."""
+  """Send a chat message. `target` is the chat target id — a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id; same value space as the chatItems query."""
   sendChatItem(target: String!, content: String!): [ChatItem!]!
   deleteChatItem(id: ID!): Boolean!
   deleteChatItems(query: String!): ActionResult!
@@ -416,6 +418,7 @@ type ChatChannel {
   owner: ID!
   name: String!
   members: [ChatChannelMember!]!
+  """Monotonically increasing mutation counter; receivers ignore channel updates whose version is not greater than their local copy."""
   version: Long!
   status: ChatChannelStatus!
   createdAt: Instant!
@@ -471,6 +474,7 @@ type ChatText {
 type Clipboard {
   id: ID!
   text: String!
+  """Client id of the sync origin: empty = captured locally on this device, otherwise received from that peer."""
   source: String!
   label: String!
   sensitive: Boolean!
@@ -663,6 +667,7 @@ type DeviceInfo {
   totalMemory: Long!
   totalStorage: Long!
   display: DisplayInfo
+  """Android-only build/runtime details; null on non-Android devices."""
   android: AndroidExtras
 }
 
@@ -676,10 +681,12 @@ enum DevicePlatform {
 
 type DeviceStatus {
   uptimeSec: Long!
+  """Battery percentage; null on devices without a battery (desktop/NAS)."""
   batteryLevel: Int
   charging: Boolean!
   temperatures: [Temperature!]!
   cpuUsage: Float!
+  """Available memory in bytes; null when the platform cannot report it."""
   memoryAvailable: Long
   storageAvailable: Long!
 }
@@ -801,6 +808,7 @@ type FileInfo {
   data: MediaFileInfo
 }
 
+"""Sort orders for file/media lists. TAKEN_AT_DESC sorts by capture time and is only meaningful in taken-date grouped views; docs/packages treat it as an ordinary no-op order."""
 enum FileSortBy {
   DATE_ASC
   DATE_DESC
@@ -975,6 +983,7 @@ input NoteInput {
 
 type Notification {
   id: ID!
+  """Android FLAG_ONLY_ALERT_ONCE: re-posted updates must not sound/vibrate again."""
   onlyOnce: Boolean!
   isClearable: Boolean!
   appId: ID!
@@ -1206,7 +1215,9 @@ type ScreenMirrorQuality {
 }
 
 type ScreenMirrorVideoCodec {
+  """H.264 Annex-B codec configuration (SPS/PPS), base64-encoded."""
   annexB: String!
+  """Latest H.264 keyframe, base64-encoded; null until the pipeline emits one."""
   keyFrame: String
 }
 

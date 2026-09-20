@@ -7,14 +7,8 @@ import com.ismartcoding.plain.features.download.DownloadFailure
 import com.ismartcoding.plain.features.download.DownloadStatus
 import com.ismartcoding.plain.features.download.DownloadTaskHandle
 import com.ismartcoding.plain.features.download.isTerminalDownloadStatus
-import com.ismartcoding.plain.i18n.Res
-import com.ismartcoding.plain.i18n.saved
-import com.ismartcoding.plain.i18n.saved_n_items
-import com.ismartcoding.plain.i18n.saved_n_of_m
 import com.ismartcoding.plain.lib.TimeHelper
-import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.getDownloadsDirPath
-import com.ismartcoding.plain.ui.base.ToastManager
 import com.ismartcoding.plain.ui.page.sharedfolder.SharedFolderTransfer
 import kotlinx.coroutines.CancellationException
 
@@ -214,17 +208,9 @@ object SharedFolderDownloadEngine : DownloadEngine {
     }
 
     override fun onFinished(taskHandle: DownloadTaskHandle) {
-        val task = taskHandle as SharedFolderBatchTask
-        when (task.status) {
-            DownloadStatus.COMPLETED -> ToastManager.showSuccessToast(
-                if (task.totalFiles <= 1) LocaleHelper.getString(Res.string.saved)
-                else kotlinx.coroutines.runBlocking { LocaleHelper.getPluralStringAsync(Res.plurals.saved_n_items, task.totalFiles) },
-            )
-            DownloadStatus.PARTIAL -> ToastManager.showWarningToast(
-                LocaleHelper.getStringF(Res.string.saved_n_of_m, task.doneFiles, task.totalFiles),
-            )
-            else -> {}
-        }
+        // Deliberately silent: completion feedback lives in the download UI
+        // (mini bar flips to a check state, the downloads list shows the
+        // terminal status), so finishing a batch does not interrupt the user.
     }
 
     /** File-based batches (FILE / SYNC / MULTI): enumerate once, stream serially. */

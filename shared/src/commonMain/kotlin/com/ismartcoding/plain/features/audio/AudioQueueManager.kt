@@ -532,6 +532,7 @@ object AudioQueueManager {
                 audioPath = a.path,
                 title = a.title,
                 artist = a.artist,
+                albumId = a.albumId,
                 duration = a.duration,
                 position = next,
             )
@@ -557,6 +558,11 @@ object AudioQueueManager {
 
     suspend fun playlistItemCount(playlistId: String): Int = itemDao.countByPlaylist(playlistId)
 
+    /** Backfills the album snapshot of rows written before the column existed. */
+    suspend fun updatePlaylistItemAlbums(updates: List<Pair<String, String>>) {
+        updates.forEach { (id, albumId) -> itemDao.updateAlbumId(id, albumId) }
+    }
+
     // ---------- play history ----------
 
     suspend fun recentPage(limit: Int, offset: Int): List<DAudioPlayHistory> = historyDao.page(limit, offset)
@@ -566,7 +572,7 @@ object AudioQueueManager {
 }
 
 fun DAudioPlaylistItem.toPlaylistAudio(): DPlaylistAudio =
-    DPlaylistAudio(title = title, path = audioPath, artist = artist, duration = duration)
+    DPlaylistAudio(title = title, path = audioPath, artist = artist, duration = duration, albumId = albumId)
 
 fun DAudioQueueItem.toPlaylistAudio(): DPlaylistAudio =
     DPlaylistAudio(title = title, path = path, artist = artist, duration = duration)
