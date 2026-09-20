@@ -14,6 +14,7 @@ import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.getMessagePreview
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.getIcon
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.NoteHelper
@@ -66,14 +67,32 @@ sealed interface GlobalSearchAction {
     data class PlayAudio(val audio: DAudio) : GlobalSearchAction
 }
 
+/** Leading visual of a hit row rendered with the generic row (chat, images, videos). */
+sealed interface GlobalSearchThumbModel {
+    data class Icon(val res: DrawableResource) : GlobalSearchThumbModel
+    data class Media(val uri: String) : GlobalSearchThumbModel
+}
+
+/** Source model for domains whose rows render with the source page's own list item component. */
+sealed interface GlobalSearchSource {
+    data class Note(val note: com.ismartcoding.plain.db.DNote) : GlobalSearchSource
+    data class Audio(val audio: DAudio) : GlobalSearchSource
+    data class Image(val image: com.ismartcoding.plain.data.DImage) : GlobalSearchSource
+    data class Video(val video: com.ismartcoding.plain.data.DVideo) : GlobalSearchSource
+    data class Doc(val doc: com.ismartcoding.plain.data.DDoc) : GlobalSearchSource
+    data class File(val file: DFile) : GlobalSearchSource
+    data class Feed(val entry: DFeedEntry) : GlobalSearchSource
+    data class App(val info: DPackageInfo) : GlobalSearchSource
+}
+
 class GlobalSearchHit(
     val key: String,
     val title: String,
     val subtitle: String = "",
     val snippet: String = "",
-    val iconRes: DrawableResource? = null,
-    val thumbUri: String? = null,
+    val thumb: GlobalSearchThumbModel? = null,
     val roundThumb: Boolean = false,
+    val source: GlobalSearchSource? = null,
     val action: GlobalSearchAction,
 )
 
@@ -270,7 +289,7 @@ class GlobalSearchViewModel : ViewModel() {
         key = "note_$id",
         title = title,
         snippet = content.snippetAround(q),
-        iconRes = Res.drawable.notebook_pen,
+        source = GlobalSearchSource.Note(this),
         action = GlobalSearchAction.Navigate(Routing.NoteDetail(id)),
     )
 
@@ -278,7 +297,7 @@ class GlobalSearchViewModel : ViewModel() {
         key = "audio_$id",
         title = title,
         subtitle = artist,
-        iconRes = Res.drawable.music,
+        source = GlobalSearchSource.Audio(this),
         action = GlobalSearchAction.PlayAudio(this),
     )
 
@@ -286,7 +305,8 @@ class GlobalSearchViewModel : ViewModel() {
         key = "image_$id",
         title = title,
         subtitle = (takenAt ?: createdAt).formatDateTime(),
-        thumbUri = getMediaItemUriString(DataType.IMAGE, id),
+        thumb = GlobalSearchThumbModel.Media(getMediaItemUriString(DataType.IMAGE, id)),
+        source = GlobalSearchSource.Image(this),
         action = GlobalSearchAction.Navigate(Routing.Images),
     )
 
@@ -294,7 +314,8 @@ class GlobalSearchViewModel : ViewModel() {
         key = "video_$id",
         title = title,
         subtitle = duration.formatDuration() + " · " + (takenAt ?: createdAt).formatDateTime(),
-        thumbUri = getMediaItemUriString(DataType.VIDEO, id),
+        thumb = GlobalSearchThumbModel.Media(getMediaItemUriString(DataType.VIDEO, id)),
+        source = GlobalSearchSource.Video(this),
         action = GlobalSearchAction.Navigate(Routing.Videos),
     )
 
@@ -302,7 +323,7 @@ class GlobalSearchViewModel : ViewModel() {
         key = "doc_$id",
         title = title,
         subtitle = size.formatBytes(),
-        iconRes = Res.drawable.file_text,
+        source = GlobalSearchSource.Doc(this),
         action = GlobalSearchAction.Navigate(Routing.Docs),
     )
 
@@ -310,7 +331,7 @@ class GlobalSearchViewModel : ViewModel() {
         key = "file_$path",
         title = name,
         subtitle = size.formatBytes(),
-        iconRes = Res.drawable.folder,
+        source = GlobalSearchSource.File(this),
         action = GlobalSearchAction.Navigate(Routing.Files(path.substringBeforeLast('/'))),
     )
 
@@ -318,7 +339,7 @@ class GlobalSearchViewModel : ViewModel() {
         key = "feed_$id",
         title = title,
         snippet = description.snippetAround(q),
-        iconRes = Res.drawable.rss,
+        source = GlobalSearchSource.Feed(this),
         action = GlobalSearchAction.Navigate(Routing.FeedEntry(id)),
     )
 
@@ -339,11 +360,21 @@ class GlobalSearchViewModel : ViewModel() {
             chatRoute = "peer:$other"
             senderName = if (fromId == "me") LocaleHelper.getString(Res.string.me) else conversation
         }
+        val thumb = if (isChannel) {
+            GlobalSearchThumbModel.Icon(Res.drawable.hash)
+        } else {
+            val other = if (fromId == "me" || fromId == "local") toId else fromId
+            GlobalSearchThumbModel.Icon(
+                if (other == "local") Res.drawable.bot
+                else PeerCacher.getPeer(other)?.deviceType?.getIcon() ?: Res.drawable.devices,
+            )
+        }
         return GlobalSearchHit(
             key = "chat_$id",
             title = senderName,
             snippet = getMessagePreview().snippetAround(q),
             subtitle = conversation,
+            thumb = thumb,
             roundThumb = true,
             action = GlobalSearchAction.Navigate(Routing.Chat(chatRoute)),
         )
@@ -353,7 +384,7 @@ class GlobalSearchViewModel : ViewModel() {
         key = "app_$id",
         title = name,
         subtitle = id,
-        iconRes = Res.drawable.layout_grid,
+        source = GlobalSearchSource.App(this),
         action = GlobalSearchAction.Navigate(Routing.AppDetails(id)),
     )
 
