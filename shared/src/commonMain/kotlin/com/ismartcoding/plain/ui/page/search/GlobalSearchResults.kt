@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,12 +13,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +43,7 @@ import org.jetbrains.compose.resources.stringResource
 internal fun SearchResults(
     viewModel: GlobalSearchViewModel,
     domains: List<GlobalSearchDomain>,
+    paddingValues: PaddingValues,
     rowContext: GlobalSearchRowContext,
     onOpen: (GlobalSearchHit) -> Unit,
     onPreviewMedia: (GlobalSearchHit, TransformItemState) -> Unit,
@@ -57,21 +63,61 @@ internal fun SearchResults(
         return
     }
 
-    LazyColumn(Modifier.fillMaxSize()) {
+    // A single visible category pages itself in on scroll (scoped filter, or
+    // All where only one category matched); grouped views keep manual buttons.
+    val dataDomains = sectionDomains.filter { (viewModel.domainStates[it]?.total?.intValue ?: 0) > 0 }
+    val autoPageDomain: GlobalSearchDomain? = when {
+        viewModel.searching.value -> null
+        domainScope != null -> domainScope
+        dataDomains.size == 1 -> dataDomains.first()
+        else -> null
+    }
+
+    val listState = rememberLazyListState()
+    LaunchedEffect(autoPageDomain) {
+        if (autoPageDomain == null) return@LaunchedEffect
+        snapshotFlow {
+            val info = listState.layoutInfo
+            (info.visibleItemsInfo.lastOrNull()?.index ?: -1) to info.totalItemsCount
+        }.collect { (lastVisible, totalItems) ->
+            if (totalItems > 0 && lastVisible >= totalItems - 4) {
+                viewModel.loadMore(autoPageDomain)
+            }
+        }
+    }
+
+    LazyColumn(Modifier.fillMaxSize(), state = listState) {
         sectionDomains.forEach { d ->
             val state = viewModel.domainStates[d] ?: return@forEach
             val total = state.total.intValue
             if (total == 0 && !state.loading.value) return@forEach
 
+            val isAutoPage = d == autoPageDomain
             item(key = "header_${d.name}") {
                 SectionHeader(d, total, state.loading.value)
             }
             val topN = if (d == GlobalSearchDomain.NOTES || d == GlobalSearchDomain.CHAT) GlobalSearchViewModel.SUGGEST_ROWS_WITH_SNIPPET else GlobalSearchViewModel.SUGGEST_ROWS
-            val shown = if (viewModel.submitted.value) state.hits.value else state.hits.value.take(topN)
+            val shown = if (isAutoPage || viewModel.submitted.value) state.hits.value else state.hits.value.take(topN)
             items(shown, key = { it.key }) { hit ->
                 GlobalSearchRow(hit = hit, query = query, ctx = rowContext, onOpen = onOpen, onPreviewMedia = onPreviewMedia)
             }
-            if (!viewModel.submitted.value && total > topN) {
+            if (isAutoPage) {
+                if (state.loading.value) {
+                    item(key = "loading_${d.name}") {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                            )
+                        }
+                    }
+                }
+            } else if (!viewModel.submitted.value && total > topN) {
                 item(key = "viewall_${d.name}") {
                     SectionFooterButton(stringResource(Res.string.view_all_n, total)) {
                         viewModel.viewAllOfType(d)
@@ -87,7 +133,7 @@ internal fun SearchResults(
                 }
             }
         }
-        item(key = "bottomSpace") { BottomSpace() }
+        item(key = "bottomSpace") { BottomSpace(paddingValues) }
     }
 }
 

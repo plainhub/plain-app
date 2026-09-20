@@ -18,19 +18,30 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.platform.checkNotificationPermission
 import com.ismartcoding.plain.ui.base.AlertType
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.PIconButton
@@ -51,6 +62,8 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemS
 import com.ismartcoding.plain.ui.page.MainNavScaffold
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.lib.withIO
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -69,6 +82,8 @@ fun GlobalSearchPage(
     onTabSelected: (Int) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     val domains = globalSearchDomains()
     val query = viewModel.queryText.value
     val domainScope = viewModel.domain.value
@@ -138,7 +153,8 @@ fun GlobalSearchPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .padding(top = paddingValues.calculateTopPadding())
+                .hideKeyboardOnTap(focusManager, keyboard),
         ) {
             // All scopes stay visible while searching so switching filters is always possible.
             GlobalSearchScopeChips(
@@ -168,11 +184,13 @@ fun GlobalSearchPage(
                         onRemove = viewModel::removeRecent,
                         onClear = viewModel::clearRecent,
                     )
+                    BottomSpace(paddingValues)
                 }
             } else {
                 SearchResults(
                     viewModel = viewModel,
                     domains = domains,
+                    paddingValues = paddingValues,
                     rowContext = rowContext,
                     onOpen = onOpen,
                     onPreviewMedia = onPreviewMedia,
@@ -184,6 +202,24 @@ fun GlobalSearchPage(
     MediaPreviewer(state = rowContext.previewerState)
 }
 
+/**
+ * Hides the search keyboard on any tap in the content area — result rows
+ * (whose own clickables consume the tap), chips and blank space alike. The
+ * search bar lives in the top bar and stays focusable.
+ */
+private fun Modifier.hideKeyboardOnTap(focusManager: FocusManager, keyboard: SoftwareKeyboardController?): Modifier =
+    pointerInput(focusManager) {
+        awaitEachGesture {
+            awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                if (event.changes.none { it.pressed }) break
+            }
+            focusManager.clearFocus()
+            keyboard?.hide()
+        }
+    }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GlobalSearchTopBar(
@@ -191,8 +227,15 @@ private fun GlobalSearchTopBar(
     domainScope: GlobalSearchDomain?,
 ) {
     val focusRequester = remember { FocusRequester() }
+    // Auto-focus once per session when entering empty; returning from a
+    // viewer page (TextFilePage, FeedEntry, …) re-enters composition and
+    // must not pop the keyboard back up.
+    var autoFocusDone by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+        if (!autoFocusDone && viewModel.queryText.value.isEmpty()) {
+            autoFocusDone = true
+            focusRequester.requestFocus()
+        }
     }
     val hint = if (domainScope == null) stringResource(Res.string.global_search_hint)
     else stringResource(Res.string.search_in_domain, stringResource(domainScope.labelRes))
