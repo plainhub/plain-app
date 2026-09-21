@@ -41,6 +41,9 @@ fun ViewAudioBottomSheet(
     tagsState: List<DTag>,
     dragSelectState: DragSelectState,
     castVM: CastViewModel? = null,
+    // Set when opened from a playlist detail page; enables remove-from-playlist.
+    playlistId: String? = null,
+    onPlaylistChanged: () -> Unit = {},
 ) {
     val m = audioVM.selectedItem.value ?: return
     val onDismiss = {
@@ -72,6 +75,8 @@ fun ViewAudioBottomSheet(
                     tagsVM = tagsVM,
                     dragSelectState = dragSelectState,
                     onDismiss = onDismiss,
+                    playlistId = playlistId,
+                    onPlaylistChanged = onPlaylistChanged,
                 )
             }
             if (!audioVM.trash.value) {

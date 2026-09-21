@@ -104,6 +104,7 @@
     <string name="added">Hinzugefügt</string>
     <string name="paste">Einfügen</string>
     <string name="added_to_playlist">Zur Wiedergabeliste hinzugefügt</string>
+    <string name="removed_from_playlist">Aus der Wiedergabeliste entfernt</string>
     <string name="on">An</string>
     <string name="off">Aus</string>
     <string name="reset">Zurücksetzen</string>

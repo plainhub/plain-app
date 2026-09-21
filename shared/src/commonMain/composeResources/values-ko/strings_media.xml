@@ -78,9 +78,6 @@
     <string name="total_minutes">%1$d분</string>
     <string name="play_next">다음 재생</string>
     <string name="add_to_queue">대기열에 추가</string>
-    <string name="sort_custom">사용자 지정 순서</string>
-    <string name="sort_title_asc">제목 A–Z</string>
-    <string name="sort_title_desc">제목 Z–A</string>
     <string name="playlist_created">재생목록이 생성되었습니다</string>
     <string name="playlist_deleted">재생목록이 삭제되었습니다</string>
     <string name="renamed">이름이 변경되었습니다</string>

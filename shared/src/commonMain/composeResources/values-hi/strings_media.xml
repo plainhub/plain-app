@@ -78,9 +78,6 @@
     <string name="total_minutes">%1$d मिनट</string>
     <string name="play_next">अगला चलाएँ</string>
     <string name="add_to_queue">कतार में जोड़ें</string>
-    <string name="sort_custom">कस्टम क्रम</string>
-    <string name="sort_title_asc">शीर्षक A–Z</string>
-    <string name="sort_title_desc">शीर्षक Z–A</string>
     <string name="playlist_created">प्लेलिस्ट बनाई गई</string>
     <string name="playlist_deleted">प्लेलिस्ट हटाई गई</string>
     <string name="renamed">नाम बदला गया</string>

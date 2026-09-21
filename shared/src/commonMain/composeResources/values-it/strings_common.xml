@@ -104,6 +104,7 @@
     <string name="added">Aggiunto</string>
     <string name="paste">Incolla</string>
     <string name="added_to_playlist">Aggiunto alla playlist</string>
+    <string name="removed_from_playlist">Rimosso dalla playlist</string>
     <string name="on">Attivo</string>
     <string name="off">Disattivo</string>
     <string name="reset">Ripristina</string>

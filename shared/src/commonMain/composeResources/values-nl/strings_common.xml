@@ -104,6 +104,7 @@
     <string name="added">Toegevoegd</string>
     <string name="paste">Plakken</string>
     <string name="added_to_playlist">Toegevoegd aan afspeellijst</string>
+    <string name="removed_from_playlist">Verwijderd uit afspeellijst</string>
     <string name="on">Aan</string>
     <string name="off">Uit</string>
     <string name="reset">Herstellen</string>

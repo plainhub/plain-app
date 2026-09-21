@@ -104,6 +104,7 @@
     <string name="added">சேர்க்கப்பட்டது</string>
     <string name="paste">ஒன்றினை சுழற்சி</string>
     <string name="added_to_playlist">பாட்டிலுக்கு சேர்க்கப்பட்டது</string>
+    <string name="removed_from_playlist">பாட்டிலிருந்து அகற்றப்பட்டது</string>
     <string name="on">ஆன்</string>
     <string name="off">ஆஃப்</string>
     <string name="reset">மீளமை</string>

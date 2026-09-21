@@ -22,6 +22,9 @@ fun Modifier.listDragSelect(
     autoScrollThreshold: Float? = null,
     enableHaptics: Boolean = true,
     hapticFeedback: HapticFeedback? = null,
+    // Number of non-selectable header items before [items] in the lazy list;
+    // [findItemAt] returns lazy indices which must be shifted to data indices.
+    itemIndexOffset: Int = 0,
 ): Modifier = composed {
     val localHapticFeedback = LocalHapticFeedback.current
     val scrollThreshold = autoScrollThreshold ?: DragSelectDefaults.autoScrollThreshold
@@ -49,8 +52,8 @@ fun Modifier.listDragSelect(
         detectDragGestures(
             onDragStart = { offset ->
                 val lazyListState = state.listState() ?: return@detectDragGestures
-                val itemIndex = findItemAt(lazyListState, offset.y)
-                if (itemIndex != -1) {
+                val itemIndex = findItemAt(lazyListState, offset.y) - itemIndexOffset
+                if (itemIndex >= 0) {
                     val item = items.getOrNull(itemIndex)
                     if (item != null) {
                         haptics?.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -73,9 +76,9 @@ fun Modifier.listDragSelect(
                         else -> 0f
                     }
                     
-                    // 查找当前位置的项目索引
-                    val itemIndex = findItemAt(lazyListState, change.position.y)
-                    if (itemIndex == -1 || itemIndex == dragState.current) {
+                    // 查找当前位置的项目索引（换算掉 header 偏移）
+                    val itemIndex = findItemAt(lazyListState, change.position.y) - itemIndexOffset
+                    if (itemIndex < 0 || itemIndex == dragState.current) {
                         return@whenDragging
                     }
                     

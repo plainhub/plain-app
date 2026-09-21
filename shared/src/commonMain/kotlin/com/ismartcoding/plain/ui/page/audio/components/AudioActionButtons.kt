@@ -17,7 +17,9 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.addMediaShortcut
 import com.ismartcoding.plain.platform.getMediaItemUriString
 import com.ismartcoding.plain.platform.openFileExternal
@@ -33,6 +35,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.AddToHomeDialog
 import com.ismartcoding.plain.ui.components.AddToHomeHelpAction
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -49,6 +52,8 @@ internal fun AudioActionButtons(
     tagsVM: TagsViewModel,
     dragSelectState: DragSelectState,
     onDismiss: () -> Unit,
+    playlistId: String? = null,
+    onPlaylistChanged: () -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     var showAddToHomeDialog by remember { mutableStateOf(false) }
@@ -106,16 +111,28 @@ internal fun AudioActionButtons(
             }
         }
     }
-    val hasSecondary = !audioVM.trash.value && !m.path.isUrl()
+    val hasSecondary = (!audioVM.trash.value && !m.path.isUrl()) || playlistId != null
     if (hasSecondary) {
         VerticalSpace(12.dp)
         PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
             Column {
-                PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
-                    showAddToHomeDialog = true
+                if (playlistId != null) {
+                    PSheetActionRow(Res.drawable.playlist_remove, stringResource(Res.string.remove_from_playlist)) {
+                        scope.launch {
+                            withIO { AudioQueueManager.removePlaylistItem(playlistId, m.path) }
+                            DialogHelper.showMessage(Res.string.removed_from_playlist)
+                            onPlaylistChanged()
+                            onDismiss()
+                        }
+                    }
                 }
-                PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
-                    openFileExternal(m.path)
+                if (!audioVM.trash.value && !m.path.isUrl()) {
+                    PSheetActionRow(Res.drawable.smartphone, stringResource(Res.string.add_to_home), trailing = { AddToHomeHelpAction() }) {
+                        showAddToHomeDialog = true
+                    }
+                    PSheetActionRow(Res.drawable.square_arrow_out_up_right, stringResource(Res.string.open_with)) {
+                        openFileExternal(m.path)
+                    }
                 }
             }
         }

@@ -36,24 +36,28 @@ import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.platform.searchMedia
+import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.dragselect.listDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.audio.components.ArtistAvatar
+import com.ismartcoding.plain.ui.page.audio.components.AudioFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
@@ -115,6 +119,10 @@ fun AudioArtistPage(
         }
     }
 
+    PBackHandler(enabled = dragSelectState.selectMode) {
+        dragSelectState.exitSelectMode()
+    }
+
     PScaffold(
         topBar = {
             PTopAppBar(
@@ -122,12 +130,22 @@ fun AudioArtistPage(
                 navController = navController,
             )
         },
+        bottomBar = {
+            AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
+                AudioFilesSelectModeBottomActions(audioVM, audioPlaylistVM, tagsVM, tagsState, dragSelectState)
+            }
+        },
     ) { paddingValues ->
         // Only the top inset goes on the container; the player bar carries its
         // own navigationBarsPadding and must sit flush at the screen bottom
         // (same pattern as AudioAllPage).
         Box(Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
-            LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+                    // Two header items (hero, acts) precede the track rows.
+                    .listDragSelect(items = items, state = dragSelectState, itemIndexOffset = 2),
+                state = scrollState,
+            ) {
                 item(key = "hero") {
                     Row(
                         modifier = Modifier

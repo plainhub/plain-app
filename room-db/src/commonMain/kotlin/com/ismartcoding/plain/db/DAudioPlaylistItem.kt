@@ -89,6 +89,9 @@ interface AudioPlaylistItemDao {
     @Query("DELETE FROM audio_playlist_items WHERE playlist_id = :playlistId AND audio_path = :path")
     suspend fun deleteByPath(playlistId: String, path: String)
 
+    @Query("DELETE FROM audio_playlist_items WHERE playlist_id = :playlistId AND audio_path IN (:paths)")
+    suspend fun deleteByPlaylistPaths(playlistId: String, paths: List<String>)
+
     @Query("DELETE FROM audio_playlist_items WHERE playlist_id = :playlistId")
     suspend fun deleteByPlaylist(playlistId: String)
 

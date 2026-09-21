@@ -78,9 +78,6 @@
     <string name="total_minutes">%1$d நிமிடம்</string>
     <string name="play_next">அடுத்து இயக்கு</string>
     <string name="add_to_queue">வரிசையில் சேர்</string>
-    <string name="sort_custom">தனிப்பயன் வரிசை</string>
-    <string name="sort_title_asc">தலைப்பு A–Z</string>
-    <string name="sort_title_desc">தலைப்பு Z–A</string>
     <string name="playlist_created">ப்ளேலிஸ்ட் உருவாக்கப்பட்டதু</string>
     <string name="playlist_deleted">ப்ளேলிஸ்ட் நீக்கப்பட்டது</string>
     <string name="renamed">மறுபெயரிடப்பட்டது</string>

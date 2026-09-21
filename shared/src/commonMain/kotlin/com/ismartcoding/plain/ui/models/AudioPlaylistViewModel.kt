@@ -30,7 +30,6 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
     private val pageLimit = 200
 
     suspend fun loadAsync() {
-        AudioQueueManager.ensureMigrated()
         selectedPath.value = AudioPlayingPreference.getValueAsync()
         refreshWindow()
     }

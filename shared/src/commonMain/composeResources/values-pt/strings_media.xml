@@ -78,9 +78,6 @@
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Tocar a seguir</string>
     <string name="add_to_queue">Adicionar à fila</string>
-    <string name="sort_custom">Ordem personalizada</string>
-    <string name="sort_title_asc">Título A–Z</string>
-    <string name="sort_title_desc">Título Z–A</string>
     <string name="playlist_created">Playlist criada</string>
     <string name="playlist_deleted">Playlist excluída</string>
     <string name="renamed">Renomeado</string>

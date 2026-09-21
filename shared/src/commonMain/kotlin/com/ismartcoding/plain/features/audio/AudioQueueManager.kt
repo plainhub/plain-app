@@ -78,7 +78,6 @@ object AudioQueueManager {
 
     /** Play a user playlist: make it the source, clear the manual queue. Returns the track to start with. */
     suspend fun setPlaylistSource(playlistId: String, startPath: String?): DPlaylistAudio? {
-        ensureMigrated()
         queueDao.deleteAll()
         val items = itemDao.getByPlaylist(playlistId)
         if (items.isEmpty()) {
@@ -100,7 +99,6 @@ object AudioQueueManager {
 
     /** Play the whole library: make it the source, clear the manual queue. Returns the track to start with. */
     suspend fun setLibrarySource(startPath: String?, shuffle: Boolean): DPlaylistAudio? {
-        ensureMigrated()
         queueDao.deleteAll()
         val size = countMedia(DataType.AUDIO, "")
         if (size == 0) {
@@ -145,7 +143,6 @@ object AudioQueueManager {
     /** Add tracks to the manual queue. [playNext] moves/inserts them at the front. */
     suspend fun enqueue(items: List<DPlaylistAudio>, playNext: Boolean = false) {
         if (items.isEmpty()) return
-        ensureMigrated()
         if (playNext) {
             queueDao.shiftSortOrdersFrom(0, items.size)
             items.forEachIndexed { i, a ->
@@ -207,7 +204,6 @@ object AudioQueueManager {
      * current track. Returns null when there is nothing to play.
      */
     suspend fun resolveNext(isNext: Boolean, shuffle: Boolean): DPlaylistAudio? {
-        ensureMigrated()
         val order = playbackOrder()
         if (order.total == 0) return null
         val superseded = supersededSourcePaths(order)
@@ -311,7 +307,6 @@ object AudioQueueManager {
     }
 
     private suspend fun playbackOrder(): Order {
-        ensureMigrated()
         val src = source()
         val manualCount = queueDao.count()
         val sourceSize = sourceSizeOf(src)
@@ -492,14 +487,12 @@ object AudioQueueManager {
     suspend fun playlist(id: String): DAudioPlaylist? = playlistDao.getById(id)
 
     suspend fun playlists(): List<Pair<DAudioPlaylist, Int>> {
-        ensureMigrated()
         val all = playlistDao.getAll()
         val counts = playlistDao.itemCounts().associate { it.playlistId to it.cnt }
         return all.map { it to (counts[it.id] ?: 0) }
     }
 
     suspend fun createPlaylist(name: String): DAudioPlaylist {
-        ensureMigrated()
         val pl = DAudioPlaylist(id = StringHelper.shortUUID(), name = name)
         playlistDao.upsert(pl)
         return pl
@@ -522,7 +515,6 @@ object AudioQueueManager {
     }
 
     suspend fun addPlaylistItems(playlistId: String, items: List<DPlaylistAudio>): Int {
-        ensureMigrated()
         var added = 0
         var next = itemDao.maxSortOrder(playlistId) + 1
         items.forEach { a ->
@@ -547,6 +539,12 @@ object AudioQueueManager {
 
     suspend fun removePlaylistItem(playlistId: String, path: String) {
         itemDao.deleteByPath(playlistId, path)
+        playlistDao.touch(playlistId, TimeHelper.now())
+    }
+
+    suspend fun removePlaylistItems(playlistId: String, paths: Collection<String>) {
+        if (paths.isEmpty()) return
+        itemDao.deleteByPlaylistPaths(playlistId, paths.toList())
         playlistDao.touch(playlistId, TimeHelper.now())
     }
 

@@ -78,9 +78,6 @@
     <string name="total_minutes">%1$d dk</string>
     <string name="play_next">Sıradaki çal</string>
     <string name="add_to_queue">Kuyruğa ekle</string>
-    <string name="sort_custom">Özel sıra</string>
-    <string name="sort_title_asc">Başlık A–Z</string>
-    <string name="sort_title_desc">Başlık Z–A</string>
     <string name="playlist_created">Çalma listesi oluşturuldu</string>
     <string name="playlist_deleted">Çalma listesi silindi</string>
     <string name="renamed">Yeniden adlandırıldı</string>

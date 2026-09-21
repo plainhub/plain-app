@@ -60,7 +60,7 @@ internal fun ColumnScope.AudioPageList(
                 val scrollState = audioVM.scrollStateMap[0] ?: rememberLazyListState()
                 LazyColumnScrollbar(state = scrollState) {
                     LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
-                        .listDragSelect(items = itemsState, state = dragSelectState), state = scrollState) {
+                        .listDragSelect(items = itemsState, state = dragSelectState, itemIndexOffset = 1), state = scrollState) {
                         item { TopSpace() }
                         items(items = itemsState, key = { it.id }) { item ->
                             val tags = audioTagsMap[item.id] ?: emptyList()

@@ -1,11 +1,15 @@
 package com.ismartcoding.plain.ui.page.playlist
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -22,15 +26,24 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DAudioPlaylistItem
+import com.ismartcoding.plain.db.IDData
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.base.dragselect.listDragSelect
+import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
+import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
+import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
+import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
+import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.ui.components.PlaylistNameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -38,10 +51,11 @@ import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.audio.DAudio
-import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
+import com.ismartcoding.plain.ui.page.audio.components.AudioFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
+import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
+import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistActionsRow
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistHeaderRow
@@ -71,18 +85,28 @@ fun PlaylistDetailPage(
     var playlistName by remember { mutableStateOf("") }
     var items by remember { mutableStateOf<List<DAudioPlaylistItem>>(listOf()) }
     var albumCovers by remember { mutableStateOf<List<PlaylistAlbumCover>>(emptyList()) }
-    var sort by remember { mutableStateOf(PlaylistSortOrder.CUSTOM) }
     var version by remember { mutableIntStateOf(0) }
     var showMore by remember { mutableStateOf(false) }
     var showRename by remember { mutableStateOf(false) }
 
-    // Reload when coming back from add-items or after any mutation.
-    LaunchedEffect(playlistId, version) {
+    val reload: suspend () -> Unit = {
         val (name, list) = withIO {
             AudioQueueManager.playlist(playlistId)?.name to AudioQueueManager.playlistItemsPage(playlistId, 0, 1000)
         }
         playlistName = name ?: ""
         items = list
+    }
+
+    // Reload when coming back from add-items or after any mutation.
+    LaunchedEffect(playlistId, version) {
+        reload()
+    }
+
+    val topRefreshLayoutState = rememberRefreshLayoutState {
+        scope.launch {
+            reload()
+            setRefreshState(RefreshContentState.Finished)
+        }
     }
 
     // Album mosaic loads from the items alone; legacy rows backfill inside.
@@ -98,11 +122,23 @@ fun PlaylistDetailPage(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    val sorted = items.sortedByOrder(sort)
-
+    // Track rows always list A-Z; "custom" only survives as the play order.
+    val sorted = items.sortedBy { it.title.lowercase() }
     val libraryByPath = remember(library) { library.associateBy { it.path } }
+    // Resolve rows to the same DAudio shown in AudioListItem so selection
+    // records one id space (library id, or audioPath for off-page rows).
+    val rowAudios = sorted.map { libraryByPath[it.audioPath] ?: it.toDAudio() }
+    val selectItems = remember(rowAudios) { rowAudios.map { IDData(it.id) } }
+    val pathById = remember(library) { library.associateBy { it.id } }
+    // Floating player bar clearance, measured live like on the other pages.
+    val density = LocalDensity.current
+    var playerBarClearance by remember { mutableStateOf(0.dp) }
     val contextActive = audioPlaylistVM.activePlaylistId.value == playlistId
     val isPlayingContext = contextActive && isPlaying
+
+    PBackHandler(enabled = dragSelectState.selectMode) {
+        dragSelectState.exitSelectMode()
+    }
 
     val renamedMsg = stringResource(Res.string.renamed)
     val deletedMsg = stringResource(Res.string.playlist_deleted)
@@ -126,11 +162,9 @@ fun PlaylistDetailPage(
         PlaylistMoreSheet(
             playlistName = playlistName,
             itemCount = items.size,
-            sort = sort,
             onDismiss = { showMore = false },
             onRename = { showRename = true },
             onAddItems = { navController.navigate(Routing.PlaylistAddItems(playlistId)) },
-            onToggleSort = { sort = sort.next() },
             onDelete = {
                 scope.launch {
                     withIO { AudioQueueManager.deletePlaylist(playlistId) }
@@ -147,65 +181,118 @@ fun PlaylistDetailPage(
         tagsState = tagsState,
         dragSelectState = dragSelectState,
         castVM = castVM,
+        playlistId = playlistId,
+        onPlaylistChanged = { version++ },
     )
     CastDialog(castVM)
 
-    Column(Modifier.fillMaxSize()) {
-        PTopAppBar(
-            title = stringResource(Res.string.playlists),
-            navController = navController,
-            actions = {
-                PIconButton(
-                    icon = Res.drawable.more_horiz,
-                    contentDescription = stringResource(Res.string.more),
-                    click = { showMore = true },
-                )
-            },
-        )
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            item(key = "hero") {
-                PlaylistHeaderRow(
-                    name = playlistName,
-                    itemCount = items.size,
-                    albums = albumCovers,
-                    gradientIndex = playlistId.hashCode(),
-                )
-            }
-            item(key = "acts") {
-                PlaylistActionsRow(
-                    enabled = items.isNotEmpty(),
-                    isPlaying = isPlayingContext,
-                    onPlayAll = {
-                        // Toggle pause/resume while this playlist is the
-                        // active source; otherwise start it from the top.
-                        if (contextActive) {
-                            if (isPlaying) audioPause() else audioPlay()
-                        } else {
-                            scope.launch { playFrom(playlistId, null, audioPlaylistVM) }
-                        }
-                    },
-                    onShuffle = { scope.launch { playShuffled(playlistId, audioPlaylistVM) } },
-                )
-            }
-            items(sorted.size, key = { sorted[it].id }) { index ->
-                val row = sorted[index]
-                // Prefer the real library item (id/tags/cover); fall back to a
-                // synthesized one for tracks outside the loaded library page.
-                val item = libraryByPath[row.audioPath] ?: row.toDAudio()
-                AudioListItem(
-                    item = item,
+    PScaffold(
+        topBar = {
+            PTopAppBar(
+                title = "",
+                navController = navController,
+                actions = {
+                    PIconButton(
+                        icon = Res.drawable.more_horiz,
+                        contentDescription = stringResource(Res.string.more),
+                        click = { showMore = true },
+                    )
+                },
+            )
+        },
+        bottomBar = {
+            AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
+                AudioFilesSelectModeBottomActions(
                     audioVM = audioVM,
                     audioPlaylistVM = audioPlaylistVM,
                     tagsVM = tagsVM,
-                    castVM = castVM,
-                    tags = emptyList(),
+                    tagsState = tagsState,
                     dragSelectState = dragSelectState,
-                    isCurrentlyPlaying = isPlaying && audioPlaylistVM.selectedPath.value == row.audioPath,
-                    isInPlaylist = audioPlaylistVM.isInPlaylist(row.audioPath),
+                    removeFromPlaylist = {
+                        scope.launch {
+                            val paths = dragSelectState.selectedIds.map { pathById[it]?.path ?: it }
+                            if (paths.isNotEmpty()) {
+                                withIO { AudioQueueManager.removePlaylistItems(playlistId, paths) }
+                                dragSelectState.exitSelectMode()
+                                DialogHelper.showMessage(Res.string.removed_from_playlist)
+                                version++
+                            }
+                        }
+                    },
                 )
-                VerticalSpace(8.dp)
             }
-            item(key = "bottom") { BottomSpace() }
+        },
+    ) { paddingValues ->
+        // Only the top inset goes on the container; the player bar carries its
+        // own navigationBarsPadding and must sit flush at the screen bottom
+        // (same pattern as AudioAllPage).
+        Box(Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
+            PullToRefresh(
+                refreshLayoutState = topRefreshLayoutState,
+                userEnable = !dragSelectState.selectMode,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                // Two header items (hero, acts) precede the track rows.
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .listDragSelect(items = selectItems, state = dragSelectState, itemIndexOffset = 2),
+                    state = scrollState,
+                ) {
+                    item(key = "hero") {
+                        PlaylistHeaderRow(
+                            name = playlistName,
+                            itemCount = items.size,
+                            albums = albumCovers,
+                            gradientIndex = playlistId.hashCode(),
+                        )
+                    }
+                    item(key = "acts") {
+                        PlaylistActionsRow(
+                            enabled = items.isNotEmpty(),
+                            isPlaying = isPlayingContext,
+                            onPlayAll = {
+                                // Toggle pause/resume while this playlist is the
+                                // active source; otherwise start it from the top.
+                                if (contextActive) {
+                                    if (isPlaying) audioPause() else audioPlay()
+                                } else {
+                                    scope.launch { playFrom(playlistId, null, audioPlaylistVM) }
+                                }
+                            },
+                            onShuffle = { scope.launch { playShuffled(playlistId, audioPlaylistVM) } },
+                        )
+                    }
+                    items(sorted.size, key = { sorted[it].id }) { index ->
+                        val item = rowAudios[index]
+                        AudioListItem(
+                            item = item,
+                            audioVM = audioVM,
+                            audioPlaylistVM = audioPlaylistVM,
+                            tagsVM = tagsVM,
+                            castVM = castVM,
+                            tags = emptyList(),
+                            dragSelectState = dragSelectState,
+                            isCurrentlyPlaying = isPlaying && audioPlaylistVM.selectedPath.value == item.path,
+                            isInPlaylist = audioPlaylistVM.isInPlaylist(item.path),
+                        )
+                        VerticalSpace(8.dp)
+                    }
+                    item(key = "bottom") {
+                        // Player bar clearance when playing; plain nav-inset
+                        // spacing otherwise — never both stacked.
+                        VerticalSpace(dp = maxOf(playerBarClearance, 40.dp + paddingValues.calculateBottomPadding()))
+                    }
+                }
+            }
+            AudioPlayerBar(
+                audioPlaylistVM, castVM,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } },
+                dragSelectState = dragSelectState,
+            )
+            AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = dragSelectState)
         }
     }
 }

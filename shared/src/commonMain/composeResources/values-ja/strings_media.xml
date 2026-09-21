@@ -78,9 +78,6 @@
     <string name="total_minutes">%1$d 分</string>
     <string name="play_next">次に再生</string>
     <string name="add_to_queue">キューに追加</string>
-    <string name="sort_custom">カスタム順</string>
-    <string name="sort_title_asc">タイトル A–Z</string>
-    <string name="sort_title_desc">タイトル Z–A</string>
     <string name="playlist_created">プレイリストを作成しました</string>
     <string name="playlist_deleted">プレイリストを削除しました</string>
     <string name="renamed">名前を変更しました</string>
