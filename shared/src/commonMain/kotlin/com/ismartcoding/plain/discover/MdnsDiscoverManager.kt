@@ -122,6 +122,9 @@ object MdnsDiscoverManager {
             discoveryMethods = setOf(DiscoveryMethod.LAN),
         )
         coIO {
+            // History cache: every sighting is persisted regardless of page
+            // state, so the nearby page can render instantly from history.
+            NearbyDeviceCache.upsertAsync(d)
             // Resident-listener path: always refresh a paired peer's address so a
             // changed IP is picked up by the next reconnect attempt even while
             // the nearby scan loop is off.

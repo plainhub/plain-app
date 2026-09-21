@@ -174,4 +174,15 @@
     <string name="discard_changes_text">Düzenlemeleriniz kaydedilmedi.</string>
     <string name="large_file_edit">Bu dosya çok büyük. Düzenleme yavaş olabilir. Devam edilsin mi?</string>
     <string name="line_number">Satır numarası</string>
+    <string name="global_search_hint">Her şeyi ara</string>
+    <string name="search_in_domain">%1$s içinde ara</string>
+    <string name="recent_searches">Son aramalar</string>
+    <string name="search_scope_hint">Yalnızca %1$s içinde aranıyor. Tüm türlerde aramak için "Tümü"ne dokunun.</string>
+    <string name="view_all_n">Tümünü görüntüle (%1$d)</string>
+    <string name="show_more_n">Daha fazla göster (%1$d/%2$d)</string>
+    <string name="no_results_for">"%1$s" için sonuç bulunamadı</string>
+    <string name="no_results_hint">Daha kısa bir anahtar kelime deneyin veya bir tür filtresi seçin.</string>
+    <string name="no_results_hint_scope">Daha kısa bir anahtar kelime deneyin veya "Tümü"ne geri dönün</string>
+    <string name="search_in_all_types">Tüm türlerde ara</string>
+    <string name="clear_search_term">Arama terimini temizle</string>
 </resources>

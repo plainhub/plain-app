@@ -174,4 +174,15 @@
     <string name="discard_changes_text">變更尚未儲存。</string>
     <string name="large_file_edit">檔案很大，編輯可能較慢。繼續？</string>
     <string name="line_number">行號</string>
+    <string name="global_search_hint">搜尋全部內容</string>
+    <string name="search_in_domain">在%1$s中搜尋</string>
+    <string name="recent_searches">最近搜尋</string>
+    <string name="search_scope_hint">將只在%1$s中搜尋，點「全部」恢復跨類型搜尋。</string>
+    <string name="view_all_n">檢視全部（%1$d）</string>
+    <string name="show_more_n">顯示更多（%1$d/%2$d）</string>
+    <string name="no_results_for">沒有找到「%1$s」相關的內容</string>
+    <string name="no_results_hint">試試更短的關鍵詞，或用類型篩選縮小範圍</string>
+    <string name="no_results_hint_scope">試試更短的關鍵詞，或切回「全部」</string>
+    <string name="search_in_all_types">在全部內容中搜尋</string>
+    <string name="clear_search_term">清除搜尋詞</string>
 </resources>

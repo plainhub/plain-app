@@ -64,6 +64,10 @@ actual suspend fun searchFilesInDir(query: String, root: String, sortBy: FileSor
 actual fun searchFilesByName(query: String, dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile> =
     listFilesInDir(dir, showHidden, sortBy).filter { it.name.contains(query, ignoreCase = true) }
 
+actual suspend fun searchFiles(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DFile> = emptyList()
+
+actual suspend fun countFiles(query: String): Int = 0
+
 actual suspend fun getRecentFiles(): List<DFile> = emptyList()
 
 actual fun createDirectory(path: String): DFile {

@@ -32,7 +32,7 @@ class EntityConstructorGuardTest {
         DPomodoroItem::class, DSession::class, DShare::class, DTag::class,
         DTagRelation::class, DVideoPlayProgress::class,
         DAudioPlaylist::class, DAudioPlaylistItem::class, DAudioPlayHistory::class,
-        DAudioQueueSource::class, DAudioQueueItem::class,
+        DAudioQueueSource::class, DAudioQueueItem::class, DNearbyDeviceCache::class,
     )
 
     @Test

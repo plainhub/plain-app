@@ -197,6 +197,7 @@ object SmsHelper {
         val where = ContentWhere()
         conditions.forEach {
             when (it.name) {
+                QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
                 "text" -> where.add("${Telephony.Sms.BODY} LIKE ?", "%${it.value}%")
                 "ids" -> {
                     val ids = SmsProviderContract.partitionMessageIds(it.value).sms
@@ -252,6 +253,7 @@ object SmsHelper {
         }
         conditions.forEach {
             when (it.name) {
+                QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
                 "ids" -> {
                     val ids = SmsProviderContract.partitionMessageIds(it.value).mms
                     if (ids.isEmpty()) return null

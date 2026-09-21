@@ -12,9 +12,9 @@ internal fun sendPomodoroAction(action: String, vm: PomodoroViewModel) {
         WebSocketEvent(
             EventType.POMODORO_ACTION, JsonHelper.jsonEncode(
                 PomodoroActionData(
-                    action, vm.timeLeft.intValue,
-                    vm.settings.value.getTotalSeconds(vm.currentState.value),
-                    vm.completedCount.intValue, vm.currentRound.value, vm.currentState.value
+                    action, timeLeftSec = vm.timeLeft.intValue,
+                    totalTimeSec = vm.settings.value.getTotalSeconds(vm.currentState.value),
+                    completedCount = vm.completedCount.intValue, round = vm.currentRound.value, state = vm.currentState.value
                 )
             )
         )

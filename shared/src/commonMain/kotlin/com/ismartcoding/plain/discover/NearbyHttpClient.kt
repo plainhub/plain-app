@@ -18,6 +18,9 @@ object NearbyHttpClient {
     /** Pairing is interactive; a stale/unreachable peer must fail fast. */
     private const val REQUEST_TIMEOUT_MS = 5_000L
 
+    /** Liveness probes run in sweeps over several devices; keep them snappy. */
+    private const val PROBE_TIMEOUT_MS = 2_500L
+
     private val client by lazy { createUnsafeHttpClient() }
 
     /**
@@ -42,6 +45,28 @@ object NearbyHttpClient {
             }
         } catch (e: Exception) {
             LogCat.e("NearbyHttpClient: failed ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * Cheap existence check for the nearby sweep: a `DISCOVER` ping (the
+     * `NearbyMessageType.DISCOVER` prefix with empty JSON — kept literal to
+     * avoid a PairingClient import cycle) that only needs the 2xx answer to
+     * tell "still on the LAN" from "gone". Unlike [post], a timeout or error
+     * is an expected outcome, not an error log.
+     */
+    suspend fun probe(targetIp: String, targetPort: Int): Boolean {
+        return try {
+            val response = withTimeoutOrNull(PROBE_TIMEOUT_MS) {
+                client.postText(
+                    "https://$targetIp:$targetPort/nearby",
+                    "DISCOVER:",
+                    contentType = "application/json",
+                )
+            }
+            response?.use { it.isSuccess() } ?: false
+        } catch (_: Exception) {
             false
         }
     }

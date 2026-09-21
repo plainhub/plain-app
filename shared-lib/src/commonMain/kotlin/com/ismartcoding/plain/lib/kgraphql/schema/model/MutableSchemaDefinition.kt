@@ -37,7 +37,6 @@ data class MutableSchemaDefinition (
         BUILT_IN_TYPE.BOOLEAN,
         BUILT_IN_TYPE.DOUBLE,
         BUILT_IN_TYPE.FLOAT,
-        BUILT_IN_TYPE.SHORT,
         BUILT_IN_TYPE.INT,
         BUILT_IN_TYPE.LONG,
 

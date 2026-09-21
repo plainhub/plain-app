@@ -5,7 +5,7 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 
 @GraphQLType
 data class StorageMount(
-    val id: String = "",
+    val id: ID = ID(""),
     val name: String = "",
     val path: String = "",
     val mountPoint: String = "",
@@ -16,5 +16,5 @@ data class StorageMount(
     val remote: Boolean = false,
     val alias: String = "",
     val driveType: DriveType = DriveType.INTERNAL_STORAGE,
-    val diskID: String = "",
+    val diskId: String = "",
 )

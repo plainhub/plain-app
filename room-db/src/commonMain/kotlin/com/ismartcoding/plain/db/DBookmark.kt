@@ -58,6 +58,9 @@ interface BookmarkDao {
     @Query("SELECT * FROM bookmarks WHERE group_id = :groupId ORDER BY pinned DESC, sort_order ASC, created_at ASC")
     suspend fun getByGroupId(groupId: String): List<DBookmark>
 
+    @Query("SELECT group_id AS groupId, COUNT(*) AS itemCount FROM bookmarks GROUP BY group_id")
+    suspend fun getGroupItemCount(): List<BookmarkGroupItemCount>
+
     @RawQuery
     suspend fun search(query: RoomRawQuery): List<DBookmark>
 
@@ -71,7 +74,7 @@ interface BookmarkDao {
     suspend fun update(vararg item: DBookmark)
 
     @Query("DELETE FROM bookmarks WHERE id IN (:ids)")
-    suspend fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>): Int
 
     @Query("DELETE FROM bookmarks WHERE group_id = :groupId")
     suspend fun deleteByGroupId(groupId: String)
@@ -108,5 +111,11 @@ interface BookmarkGroupDao {
     suspend fun update(vararg item: DBookmarkGroup)
 
     @Query("DELETE FROM bookmark_groups WHERE id IN (:ids)")
-    suspend fun delete(ids: Set<String>)
+    suspend fun delete(ids: Set<String>): Int
 }
+
+/** Aggregate row for BookmarkGroup.itemCount. */
+data class BookmarkGroupItemCount(
+    val groupId: String,
+    val itemCount: Int,
+)

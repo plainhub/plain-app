@@ -11,7 +11,7 @@ import kotlin.time.Instant
 @GraphQLInput
 @Serializable
 data class PairingDeviceInput(
-    val id: String,
+    val id: ID,
     val name: String,
     val ips: List<String> = emptyList(),
     val port: Int,
@@ -23,7 +23,7 @@ data class PairingDeviceInput(
 ) {
     fun toModel(): DNearbyDevice {
         return DNearbyDevice(
-            id = id,
+            id = id.value,
             name = name,
             ips = ips,
             port = port,
@@ -39,7 +39,7 @@ data class PairingDeviceInput(
 @GraphQLInput
 @Serializable
 data class PairingRequestInput(
-    val fromId: String,
+    val fromId: ID,
     val fromName: String,
     val port: Int,
     val deviceType: DeviceType,
@@ -53,7 +53,7 @@ data class PairingRequestInput(
 ) {
     fun toModel(): DPairingRequest {
         return DPairingRequest(
-            fromId = fromId,
+            fromId = fromId.value,
             fromName = fromName,
             port = port,
             deviceType = deviceType,

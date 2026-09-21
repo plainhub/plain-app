@@ -6,6 +6,8 @@ import androidx.room3.Entity
 import androidx.room3.Insert
 import androidx.room3.PrimaryKey
 import androidx.room3.Query
+import androidx.room3.RawQuery
+import androidx.room3.RoomRawQuery
 import androidx.room3.Update
 import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.lib.TimeHelper
@@ -257,11 +259,35 @@ interface ChatDao {
     @Query("SELECT * FROM chats")
     suspend fun getAll(): List<DChat>
 
+    @RawQuery
+    suspend fun search(query: RoomRawQuery): List<DChat>
+
+    @RawQuery
+    suspend fun count(query: RoomRawQuery): Int
+
     @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at ASC")
     suspend fun getByPeerId(toId: String): List<DChat>
 
+    @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+    suspend fun getByPeerIdPage(toId: String, limit: Int, offset: Int): List<DChat>
+
+    @Query(
+        "SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) AND content LIKE :text " +
+            "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
+    )
+    suspend fun getByPeerIdPageText(toId: String, text: String, limit: Int, offset: Int): List<DChat>
+
     @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at ASC")
     suspend fun getByChannelId(channelId: String): List<DChat>
+
+    @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+    suspend fun getByChannelIdPage(channelId: String, limit: Int, offset: Int): List<DChat>
+
+    @Query(
+        "SELECT * FROM chats WHERE channel_id = :channelId AND content LIKE :text " +
+            "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
+    )
+    suspend fun getByChannelIdPageText(channelId: String, text: String, limit: Int, offset: Int): List<DChat>
 
     @Query(
         """

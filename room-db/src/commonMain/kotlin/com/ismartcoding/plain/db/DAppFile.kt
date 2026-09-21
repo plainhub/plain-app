@@ -95,8 +95,17 @@ interface AppFileDao {
     @Query("SELECT * FROM files ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
     suspend fun getPage(limit: Int, offset: Int): List<DAppFile>
 
+    @Query(
+        "SELECT * FROM files WHERE real_path LIKE :text " +
+            "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
+    )
+    suspend fun getPageText(text: String, limit: Int, offset: Int): List<DAppFile>
+
     @Query("SELECT COUNT(*) FROM files")
     suspend fun count(): Int
+
+    @Query("SELECT COUNT(*) FROM files WHERE real_path LIKE :text")
+    suspend fun countText(text: String): Int
 
     @Query("SELECT * FROM files WHERE id IN (:ids)")
     suspend fun getByIds(ids: List<String>): List<DAppFile>

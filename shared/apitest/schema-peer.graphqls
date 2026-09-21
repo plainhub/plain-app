@@ -27,14 +27,16 @@ type ChatImages {
 }
 
 type ChatItem {
+  fromId: ID!
+  toId: ID!
+  channelId: ID
   id: ID!
-  fromId: String!
-  toId: String!
-  channelId: String!
+  """Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`; the typed payload is also mirrored in `data`."""
   content: String!
   createdAt: Instant!
   updatedAt: Instant!
   status: ChatStatus!
+  """Per-recipient delivery details as JSON (peer delivery results); empty when the message has no delivery failures. Drives SENT/PARTIAL/FAILED alongside `status`."""
   statusData: String!
   data: ChatItemContent
 }
@@ -49,9 +51,10 @@ enum ChatStatus {
 }
 
 type ChatText {
-  ids: [String!]!
+  linkPreviewImageIds: [String!]!
 }
 
+"""ISO-8601 / RFC 3339 UTC timestamp string, e.g. 2026-09-20T12:34:56.789Z"""
 scalar Instant
 
 """The Long scalar type represents a signed 64-bit numeric non-fractional value"""
@@ -62,9 +65,6 @@ enum PeerStatus {
   UNPAIRED
   CHANNEL
 }
-
-"""The Short scalar type represents a signed 16-bit numeric non-fractional value"""
-scalar Short
 
 type __Directive {
   name: String!

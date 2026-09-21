@@ -43,6 +43,19 @@ expect suspend fun searchFilesInDir(query: String, root: String, sortBy: FileSor
 expect fun searchFilesByName(query: String, dir: String, showHidden: Boolean, sortBy: FileSortBy): List<DFile>
 
 /**
+ * Search files by name across the primary external volume via MediaStore
+ * (no recursive filesystem walk). The [query] supports the shared query
+ * language (bare words filter DISPLAY_NAME). Returns empty list on iOS.
+ */
+expect suspend fun searchFiles(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DFile>
+
+/**
+ * Total file count on the primary external volume matching [query].
+ * Returns 0 on iOS.
+ */
+expect suspend fun countFiles(query: String): Int
+
+/**
  * Returns the most recently modified files (up to 100) from MediaStore.
  */
 expect suspend fun getRecentFiles(): List<DFile>

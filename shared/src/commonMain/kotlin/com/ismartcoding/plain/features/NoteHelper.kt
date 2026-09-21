@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features
 
 import com.ismartcoding.plain.helpers.ContentWhere
+import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.AppDatabase
 import com.ismartcoding.plain.db.rawQuery
@@ -35,15 +36,10 @@ object NoteHelper {
     }
 
     suspend fun getTrashedIdsAsync(query: String): Set<String> = withIO {
-        var sql = "SELECT id FROM notes"
         val where = ContentWhere()
         where.trash = true
-        if (query.isNotEmpty()) {
-            parseQuery(where, query)
-            sql += " WHERE ${where.toSelection()}"
-        }
-
-        return@withIO noteDao.getIds(rawQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
+        parseQuery(where, query)
+        noteDao.getIds(rawQuery("SELECT id FROM notes WHERE ${where.toSelection()}", where.args.toTypedArray())).map { it.id }.toSet()
     }
 
     suspend fun search(
@@ -145,8 +141,14 @@ object NoteHelper {
         where: ContentWhere,
         query: String,
     ) {
-        QueryHelper.parseAsync(query).forEach {
+        applyNotesFilterFields(where, QueryHelper.parseAsync(query))
+    }
+
+    /** Pure field-application seam (host-testable): parsed query fields → where conditions. */
+    internal fun applyNotesFilterFields(where: ContentWhere, fields: List<FilterField>) {
+        fields.forEach {
             when (it.name) {
+                QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
                 "text" -> {
                     where.addLike("content", it.value)
                 }

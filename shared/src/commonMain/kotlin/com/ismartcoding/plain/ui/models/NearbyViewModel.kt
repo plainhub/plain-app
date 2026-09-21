@@ -7,6 +7,8 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerManager
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.discover.MdnsDiscoverManager
+import com.ismartcoding.plain.discover.NearbyDeviceCache
+import com.ismartcoding.plain.discover.NearbyHttpClient
 import com.ismartcoding.plain.discover.PairingInitiator
 import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.events.EventType
@@ -17,11 +19,14 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.bleTransport
 import com.ismartcoding.plain.platform.ensureBlePermissionAsync
+import com.ismartcoding.plain.platform.getBestIp
 import com.ismartcoding.plain.platform.isBluetoothReadyToUse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -47,6 +52,7 @@ object NearbyViewModel {
 
     fun startDiscovering() {
         isDiscovering.value = true
+        loadCachedDevices()
         MdnsDiscoverManager.startPeriodicDiscovery()
         startDeviceCleanup()
     }
@@ -55,6 +61,29 @@ object NearbyViewModel {
         isDiscovering.value = false
         MdnsDiscoverManager.stopPeriodicDiscovery()
         stopDeviceCleanup()
+    }
+
+    /**
+     * Renders the persisted discovery history instantly, so the page opens
+     * with the last known LAN instead of an empty scan. Stale entries are
+     * then verified by [sweepStaleDevices]; live ones refresh via mDNS.
+     */
+    private fun loadCachedDevices() {
+        if (nearbyDevices.value.isNotEmpty()) return
+        scope.launch {
+            val cached = runCatching { NearbyDeviceCache.getAllAsync() }.getOrElse {
+                LogCat.e("NearbyDeviceCache load failed: ${it.message}", it)
+                return@launch
+            }
+            if (cached.isEmpty()) return@launch
+            val filled = deviceListMutex.withLock {
+                if (nearbyDevices.value.isNotEmpty()) return@withLock false
+                val pairedIds = PeerCacher.pairedPeers.value.map { it.id }.toSet()
+                nearbyDevices.value = cached.map { it.copy(status = getStatus(it.id, it.id in pairedIds)) }
+                true
+            }
+            if (filled) sweepStaleDevices()
+        }
     }
 
     private fun startDeviceCleanup() {
@@ -67,12 +96,7 @@ object NearbyViewModel {
                 // skipping this sweep prevents every BLE device from being
                 // timed out and cleared.
                 if (scanner.isScanPaused()) continue
-                val currentTime = TimeHelper.now()
-                deviceListMutex.withLock {
-                    nearbyDevices.value = nearbyDevices.value.filterNot {
-                        (currentTime - it.lastSeen).inWholeSeconds > 60
-                    }
-                }
+                sweepStaleDevices()
             }
         }
     }
@@ -81,6 +105,47 @@ object NearbyViewModel {
         if (isDiscovering.value || isBleScanning.value) return
         cleanupJob?.cancel()
         cleanupJob = null
+    }
+
+    /**
+     * Handles devices not seen for over a minute. A LAN-reachable device is
+     * probed over `/nearby` first — a peer that stopped announcing (screen
+     * off, dropped multicast) but is still on the LAN stays listed; only a
+     * confirmed-absent device is dropped from the list and the history
+     * cache. BLE-only devices have no probe endpoint and keep the plain
+     * timeout removal.
+     */
+    private suspend fun sweepStaleDevices() {
+        val now = TimeHelper.now()
+        val stale = deviceListMutex.withLock {
+            nearbyDevices.value.filter { (now - it.lastSeen).inWholeSeconds > 60 }
+        }
+        if (stale.isEmpty()) return
+        val probed = stale.map { device ->
+            scope.async {
+                val lanReachable = DiscoveryMethod.LAN in device.discoveryMethods && device.ips.isNotEmpty()
+                val alive = lanReachable && NearbyHttpClient.probe(getBestIp(device.ips), device.port)
+                device.id to alive
+            }
+        }.awaitAll()
+
+        val deadIds = probed.filter { !it.second }.map { it.first }.toSet()
+        val aliveIds = probed.filter { it.second }.map { it.first }
+        val verifiedAt = TimeHelper.now()
+        deviceListMutex.withLock {
+            if (deadIds.isEmpty() && aliveIds.isEmpty()) return@withLock
+            nearbyDevices.value = nearbyDevices.value.mapNotNull { d ->
+                when {
+                    d.id in deadIds -> null
+                    d.id in aliveIds -> d.copy(lastSeen = verifiedAt)
+                    else -> d
+                }
+            }
+        }
+        // Cache maintenance mirrors the in-memory verdict so the next page
+        // open does not resurrect devices that already left the LAN.
+        aliveIds.forEach { id -> runCatching { NearbyDeviceCache.touchAsync(id) } }
+        deadIds.forEach { id -> runCatching { NearbyDeviceCache.removeAsync(id) } }
     }
 
     fun requestBlePermission() {

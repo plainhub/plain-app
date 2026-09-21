@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -14,6 +15,7 @@ import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.features.checkEnabledAsync
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.getContactById
 import com.ismartcoding.plain.platform.getContactGroups
@@ -21,6 +23,7 @@ import com.ismartcoding.plain.platform.getContactSources
 import com.ismartcoding.plain.platform.getMediaIds
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
+import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.Contact
 import com.ismartcoding.plain.httpserver.models.ContactGroup
 import com.ismartcoding.plain.httpserver.models.ContactInput
@@ -55,26 +58,29 @@ suspend fun contactGroups(node: Execution.Node): List<ContactGroup> {
 }
 
 @GraphQLMutation
-suspend fun deleteContacts(query: String): Boolean {
+suspend fun deleteContacts(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     Permission.WRITE_CONTACTS.checkEnabledAsync()
     val newIds = getMediaIds(DataType.CONTACT, query)
     TagHelper.deleteTagRelationByKeys(newIds, DataType.CONTACT)
     com.ismartcoding.plain.platform.deleteContacts(newIds)
-    return true
+    return ActionResult(newIds.size)
 }
 
 @GraphQLMutation
-suspend fun updateContact(id: ID, input: ContactInput): Contact? {
+suspend fun updateContact(id: ID, input: ContactInput): Contact {
     Permission.WRITE_CONTACTS.checkEnabledAsync()
     com.ismartcoding.plain.platform.updateContact(id.value, input)
     return getContactById(id.value)?.toModel()
+        ?: throw GraphQLError("Contact ${id.value} not found after update")
 }
 
 @GraphQLMutation
-suspend fun createContact(input: ContactInput): Contact? {
+suspend fun createContact(input: ContactInput): Contact {
     Permission.WRITE_CONTACTS.checkEnabledAsync()
     val id = com.ismartcoding.plain.platform.createContact(input)
-    return if (id.isEmpty()) null else getContactById(id)?.toModel()
+    if (id.isEmpty()) throw GraphQLError("Failed to create contact")
+    return getContactById(id)?.toModel() ?: throw GraphQLError("Contact $id not found after create")
 }
 
 @GraphQLMutation

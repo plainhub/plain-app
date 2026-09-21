@@ -174,4 +174,15 @@
     <string name="discard_changes_text">Les modifications n'ont pas été enregistrées.</string>
     <string name="large_file_edit">Ce fichier est très volumineux. L'édition peut être lente. Continuer ?</string>
     <string name="line_number">Numéro de ligne</string>
+    <string name="global_search_hint">Tout rechercher</string>
+    <string name="search_in_domain">Rechercher dans %1$s</string>
+    <string name="recent_searches">Recherches récentes</string>
+    <string name="search_scope_hint">Recherche uniquement dans %1$s. Touchez « Tout » pour rechercher tous les types.</string>
+    <string name="view_all_n">Tout voir (%1$d)</string>
+    <string name="show_more_n">Afficher plus (%1$d/%2$d)</string>
+    <string name="no_results_for">Aucun résultat pour « %1$s »</string>
+    <string name="no_results_hint">Essayez un mot-clé plus court ou choisissez un filtre de type.</string>
+    <string name="no_results_hint_scope">Essayez un mot-clé plus court ou revenez à « Tout ».</string>
+    <string name="search_in_all_types">Rechercher dans tous les types</string>
+    <string name="clear_search_term">Effacer le terme de recherche</string>
 </resources>

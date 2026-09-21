@@ -1,46 +1,51 @@
 """Query object"""
 type Query {
-  appFiles(offset: Int!, limit: Int!): [AppFile!]!
-  appFileCount: Int!
+  appFiles(offset: Int!, limit: Int!, query: String!): [AppFile!]!
+  appFileCount(query: String!): Int!
   chatChannels: [ChatChannel!]!
-  notifications: [Notification!]!
+  notifications(offset: Int!, limit: Int!, query: String!): [Notification!]!
+  notificationCount(query: String!): Int!
   docCount(query: String!): Int!
   docExtGroups: [DocExtGroup!]!
   docs(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Doc!]!
-  smsAllCounts: SmsCounts!
-  sms(offset: Int!, limit: Int!, query: String!): [Message!]!
-  smsConversations(offset: Int!, limit: Int!, query: String!): [MessageConversation!]!
+  smsBoxCounts: SmsCounts!
+  sms(offset: Int!, limit: Int!, query: String!): [Sms!]!
+  smsConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
   smsCount(query: String!): Int!
   smsConversationCount(query: String!): Int!
-  archivedConversations: [MessageConversation!]!
+  archivedConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
   tags(type: DataType!): [Tag!]!
   tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
-  appLogs(offset: Int!, limit: Int!): [String!]!
+  appLogs(offset: Int!, limit: Int!, query: String!): [String!]!
   appLogPath: String!
   screenMirrorState: Boolean!
   screenMirrorVideoCodec: ScreenMirrorVideoCodec
   screenMirrorControlEnabled: Boolean!
   screenMirrorQuality: ScreenMirrorQuality!
+  """Chunk state for the client-chosen chunk-set id `fileId`, as `index:byteSize` strings."""
   uploadedChunks(fileId: String!): [String!]!
+  """Current state of the merge job for `fileId`; NONE when no job was ever started."""
   mergeStatus(fileId: String!): MergeTask!
   feeds: [Feed!]!
-  feedsCount: [FeedCount!]!
+  feedEntryCounts: [FeedEntryCount!]!
   feedEntryCount(query: String!): Int!
   feedEntry(id: ID!): FeedEntry
   feedEntries(offset: Int!, limit: Int!, query: String!): [FeedEntry!]!
   peers: [Peer!]!
-  chatItems(id: String!): [ChatItem!]!
+  """Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id."""
+  chatItems(target: String!, offset: Int!, limit: Int!, query: String!): [ChatItem!]!
+  """The most recent item of every conversation (direct and channel), newest conversation first."""
   latestChatItems: [ChatItem!]!
   audioCount(query: String!): Int!
-  audioQueueItems(offset: Int!, limit: Int!): [PlaylistAudio!]!
+  audioQueueItems(offset: Int!, limit: Int!, query: String!): [AudioItem!]!
   audioQueueItemCount: Int!
   audioPlayback: AudioPlayback!
   audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
-  audioLyrics(path: String!): String!
+  audioLyrics(path: String!): String
   audioPlaylists: [AudioPlaylist!]!
-  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!): [PlaylistAudio!]!
+  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!, query: String!): [AudioItem!]!
   audioPlaylistItemCount(id: ID!): Int!
-  audioPlayHistory(offset: Int!, limit: Int!): [AudioPlayHistory!]!
+  audioPlayHistory(offset: Int!, limit: Int!, query: String!): [AudioPlayHistory!]!
   imageCount(query: String!): Int!
   imageSearchStatus: ImageSearchStatus!
   images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
@@ -75,6 +80,7 @@ type Query {
   dbTableInfo(table: String!): DbTableInfo!
   videoCount(query: String!): Int!
   videos(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Video!]!
+  """Paged clipboard history, newest first."""
   clipboard(offset: Int!, limit: Int!, query: String!): [Clipboard!]!
   clipboardCount(query: String!): Int!
   bookmarks: [Bookmark!]!
@@ -82,7 +88,9 @@ type Query {
   mounts: [StorageMount!]!
   recentFiles: [File!]!
   files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
-  fileInfo(id: ID!, path: String!, fileName: String!): FileInfo!
+  filesCount(root: String!, query: String!): Int!
+  """Detailed info for one file. `fileName` is optional — when omitted it is derived from `path`; it selects the media-info probe (image/video/audio)."""
+  fileInfo(path: String!, fileName: String): FileInfo!
   fileIds(paths: [String!]!): [String!]!
   favoriteFolders: [FavoriteFolder!]!
 }
@@ -93,21 +101,24 @@ type Mutation {
   updateChatChannel(id: ID!, name: String!): ChatChannel!
   deleteChatChannel(id: ID!): Boolean!
   leaveChatChannel(id: ID!): Boolean!
-  addChatChannelMember(id: ID!, peerId: String!): ChatChannel!
-  removeChatChannelMember(id: ID!, peerId: String!): ChatChannel!
+  addChatChannelMember(id: ID!, peerId: ID!): ChatChannel!
+  removeChatChannelMember(id: ID!, peerId: ID!): ChatChannel!
   acceptChatChannelInvite(id: ID!): Boolean!
   declineChatChannelInvite(id: ID!): Boolean!
-  deleteNotifications(ids: [ID!]!): Boolean!
+  deleteNotifications(ids: [ID!]!): ActionResult!
+  """Reply to a notification. actionIndex indexes Notification.replyActions (the reply-capable subset only), NOT the plain actions list."""
   replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
-  unarchiveConversation(id: String!): Boolean!
+  unarchiveConversation(id: ID!): Boolean!
+  """Send an SMS directly from the device. subscriptionId picks the SIM (-1 = system default, see sims); requestId is an optional idempotency key that dedupes retried sends. Returns true once the send is dispatched."""
   sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
-  archiveConversation(id: String!, date: Long!): Boolean!
-  trashSms(query: String!): Boolean!
-  restoreSms(query: String!): Boolean!
-  deleteSms(query: String!): Boolean!
-  sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: String!): String!
-  createTag(type: DataType!, name: String!): Tag
-  updateTag(id: ID!, name: String!): Tag
+  archiveConversation(id: ID!): Boolean!
+  trashSms(query: String!): ActionResult!
+  restoreSms(query: String!): ActionResult!
+  deleteSms(query: String!): ActionResult!
+  """Compose an MMS in the device's default SMS app and track the send. Returns a pendingId consumed by the mms polling/WebSocket flow — poll with it until the send resolves."""
+  sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: ID!): String!
+  createTag(type: DataType!, name: String!): Tag!
+  updateTag(id: ID!, name: String!): Tag!
   deleteTag(id: ID!): Boolean!
   addToTags(type: DataType!, tagIds: [ID!]!, query: String!): Boolean!
   updateTagRelations(type: DataType!, item: TagRelationStub!, addTagIds: [ID!]!, removeTagIds: [ID!]!): Boolean!
@@ -116,7 +127,7 @@ type Mutation {
   """Initiate pairing with a discovered LAN device."""
   pairDevice(input: PairingDeviceInput!): Boolean!
   """Cancel an in-progress pairing initiated by this device."""
-  cancelPairing(deviceId: String!): Boolean!
+  cancelPairing(deviceId: ID!): Boolean!
   """Respond to an incoming pairing request — accept or reject."""
   respondToPairing(input: PairingRequestInput!, accepted: Boolean!): Boolean!
   startScreenMirror(audio: Boolean!): Boolean!
@@ -125,10 +136,13 @@ type Mutation {
   updateScreenMirrorQuality(mode: ScreenMirrorMode!): Boolean!
   sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
   requestScreenMirrorKeyFrame: Boolean!
+  """Delete all uploaded chunks for `fileId`, discarding an unfinished upload."""
   deleteChunks(fileId: String!): Boolean!
+  """Start a background merge of the uploaded chunks into the file at `path`; completion arrives via the upload_merge_result WS event, `mergeStatus` is the polling fallback. `replace=false` keeps the existing file and writes to a new sibling path instead; the summed chunk sizes must match `totalSize`."""
   mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, totalSize: Long!): MergeTask!
+  """Background merge into the app-private content store; `fileName` is a name hint (no directory), always overwrites. Returns a MergeTask — poll mergeStatus or wait for the upload_merge_result WS event."""
   mergeAppFileChunks(fileId: String!, totalChunks: Int!, fileName: String!, totalSize: Long!): MergeTask!
-  deleteFiles(paths: [String!]!): Boolean!
+  deleteFiles(paths: [String!]!): ActionResult!
   createDir(path: String!): File!
   renameFile(path: String!, name: String!): Boolean!
   writeTextFile(path: String!, content: String!, overwrite: Boolean!): File!
@@ -137,96 +151,94 @@ type Mutation {
   addFavoriteFolder(rootPath: String!, fullPath: String!): [FavoriteFolder!]!
   removeFavoriteFolder(fullPath: String!): [FavoriteFolder!]!
   setFavoriteFolderAlias(fullPath: String!, alias: String!): [FavoriteFolder!]!
-  fetchFeedContent(id: ID!): FeedEntry
+  """Queue a feed content sync. `id` is optional: omit it (null) to sync all feeds, or pass one feed id to sync only that feed."""
   syncFeeds(id: ID): Boolean!
-  updateFeed(id: ID!, name: String!, fetchContent: Boolean!): Feed
-  createFeed(url: String!, fetchContent: Boolean!): Feed
+  updateFeed(id: ID!, name: String!, fetchContent: Boolean!): Feed!
+  createFeed(url: String!, fetchContent: Boolean!): Feed!
   importFeeds(content: String!): Boolean!
   exportFeeds: String!
   deleteFeed(id: ID!): Boolean!
-  syncFeedContent(id: ID!): FeedEntry
-  deleteFeedEntries(query: String!): String!
+  syncFeedContent(id: ID!): FeedEntry!
+  deleteFeedEntries(query: String!): ActionResult!
   deletePeer(id: ID!): Boolean!
   unpairPeer(id: ID!): Boolean!
-  sendChatItem(toId: String!, content: String!): [ChatItem!]!
+  """Send a chat message. `target` is the chat target id — a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id; same value space as the chatItems query. `content` is the message envelope JSON ({type: TEXT|IMAGES|FILES|SHARE, value: {...}}), same shape as ChatItem.content."""
+  sendChatItem(target: String!, content: String!): [ChatItem!]!
   deleteChatItem(id: ID!): Boolean!
-  deleteChatItems(query: String!): Boolean!
-  retryChatItem(id: ID!): ChatItem
-  playAudio(path: String!): PlaylistAudio!
+  deleteChatItems(query: String!): ActionResult!
+  retryChatItem(id: ID!): ChatItem!
+  playAudio(path: String!): AudioItem!
   updateAudioPlayMode(mode: MediaPlayMode!): Boolean!
-  clearAudioPlaylist: Boolean!
-  deletePlaylistAudio(path: String!): Boolean!
-  addPlaylistAudios(query: String!): Boolean!
-  reorderPlaylistAudios(paths: [String!]!): Boolean!
+  clearAudioQueue: Boolean!
+  removeAudioFromQueue(path: String!): Boolean!
+  addAudiosToQueue(query: String!): Boolean!
+  reorderAudioQueue(paths: [String!]!): Boolean!
   createAudioPlaylist(name: String!): AudioPlaylist!
   renameAudioPlaylist(id: ID!, name: String!): Boolean!
   deleteAudioPlaylist(id: ID!): Boolean!
   addAudioPlaylistItems(id: ID!, paths: [String!]!): Boolean!
   removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
-  playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): Boolean!
-  playAllAudios(shuffle: Boolean!, path: String): Boolean!
+  """Start playback of a playlist. `path` optionally names the audio to start from (defaults to the first item); `shuffle` reorders before playing. Returns the item that starts playing, null when the playlist is empty."""
+  playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): AudioItem
+  """Queue the whole audio library and start playback. `path` optionally scopes the library to a directory and/or names the track to start from (null = entire library, first track); `shuffle` reorders before playing. Returns the item that starts playing, null when nothing matched."""
+  playAllAudios(path: String, shuffle: Boolean!): AudioItem
   enableImageSearch: Boolean!
   disableImageSearch: Boolean!
   cancelImageModelDownload: Boolean!
   startImageIndex(force: Boolean): Boolean!
   cancelImageIndex: Boolean!
   call(number: String!, showDialer: Boolean!): Boolean!
-  deleteCalls(query: String!): Boolean!
-  saveNote(id: ID!, input: NoteInput!): Note
-  saveFeedEntriesToNotes(query: String!): [String!]!
-  trashNotes(query: String!): String!
-  restoreNotes(query: String!): String!
-  deleteNotes(query: String!): String!
+  deleteCalls(query: String!): ActionResult!
+  createNote(input: NoteInput!): Note!
+  updateNote(id: ID!, input: NoteInput!): Note!
+  saveFeedEntriesToNotes(query: String!): [ID!]!
+  trashNotes(query: String!): ActionResult!
+  restoreNotes(query: String!): ActionResult!
+  deleteNotes(query: String!): ActionResult!
   exportNotes(query: String!): String!
-  deleteMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
-  trashMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
-  restoreMediaItems(type: MediaDataType!, query: String!): MediaActionResult!
-  moveMediaItems(type: MediaDataType!, query: String!, destDir: String!): MediaActionResult!
-  setTempValue(key: String!, value: String!): TempValue!
+  deleteMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  trashMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  restoreMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  moveMediaItems(type: MediaDataType!, query: String!, destDir: String!): ActionResult!
+  setTempValue(key: String!, value: String!): KeyValuePair!
   relaunchApp: Boolean!
   openAccessibilitySettings: Boolean!
-  openWebSettings(feature: AccessFeatureType): Boolean!
+  openWebSettings(feature: WebSettingsFeature): Boolean!
   updateDeviceName(name: String!): Boolean!
-  deleteContacts(query: String!): Boolean!
-  updateContact(id: ID!, input: ContactInput!): Contact
-  createContact(input: ContactInput!): Contact
+  deleteContacts(query: String!): ActionResult!
+  updateContact(id: ID!, input: ContactInput!): Contact!
+  createContact(input: ContactInput!): Contact!
   createContactGroup(name: String!, accountName: String!, accountType: String!): ContactGroup!
   updateContactGroup(id: ID!, name: String!): ContactGroup!
   deleteContactGroup(id: ID!): Boolean!
   startDiscovery: Boolean!
   stopDiscovery: Boolean!
-  startPomodoro(timeLeft: Int!): Boolean!
+  startPomodoro(timeLeftSec: Int!): Boolean!
   pausePomodoro: Boolean!
   stopPomodoro: Boolean!
   deleteDataStoreEntry(key: String!): Boolean!
-  saveImageEditorProject(id: ID!, input: ImageEditorProjectInput!): ImageEditorProject
+  saveImageEditorProject(id: ID!, input: ImageEditorProjectInput!): ImageEditorProject!
   deleteImageEditorProject(id: ID!): Boolean!
-  broadcastImageEditorUpdate(pid: String!, update: String!): Boolean!
+  broadcastImageEditorUpdate(id: ID!, update: String!): Boolean!
   uninstallPackages(ids: [ID!]!): Boolean!
   installPackage(path: String!): PackageInstallPending!
   createDbTableRow(table: String!, row: String!): Boolean!
   deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
+  """Write text into the system clipboard and record it in the history with the calling client as source; an identical latest entry is skipped (hash dedup)."""
   setClipboard(text: String!): Boolean!
-  deleteClipboard(ids: [ID!]!): Boolean!
-  addBookmarks(urls: [String!]!, groupId: String!): [Bookmark!]!
-  updateBookmark(id: ID!, input: BookmarkInput!): Bookmark
-  deleteBookmarks(ids: [ID!]!): Boolean!
+  """Delete clipboard history entries by ids."""
+  deleteClipboard(ids: [ID!]!): ActionResult!
+  addBookmarks(urls: [String!]!, groupId: ID!): [Bookmark!]!
+  updateBookmark(id: ID!, input: BookmarkInput!): Bookmark!
+  deleteBookmarks(ids: [ID!]!): ActionResult!
   recordBookmarkClick(id: ID!): Boolean!
   createBookmarkGroup(name: String!): BookmarkGroup!
-  updateBookmarkGroup(id: ID!, name: String!, collapsed: Boolean!, sortOrder: Int!): BookmarkGroup
+  updateBookmarkGroup(id: ID!, name: String!, collapsed: Boolean!, sortOrder: Int!): BookmarkGroup!
   deleteBookmarkGroup(id: ID!): Boolean!
 }
 
-enum AccessFeatureType {
-  FILES
-  CONTACTS
-  SMS
-  CALL_LOGS
-  CALL_PHONE
-  PHONE_NUMBER
-  APPS
-  NOTIFICATIONS
-  CLIPBOARD
+type ActionResult {
+  affectedCount: Int!
 }
 
 type AndroidExtras {
@@ -248,6 +260,7 @@ type AndroidExtras {
 
 type App {
   clientId: String!
+  """Base64 key used to encrypt/decrypt URL parameters for this server's web access (see file display URLs). Treat as a secret for the current session."""
   urlToken: String!
   httpPort: Int!
   httpsPort: Int!
@@ -269,7 +282,8 @@ enum AppChannelType {
 }
 
 type AppFile {
-  id: ID!
+  """Content-addressable fileId (the fid suffix, `{sha256}[.{ext}]`); same value space as ChatFiles.ids/ChatImages.ids."""
+  id: String!
   size: Long!
   mimeType: String!
   realPath: String!
@@ -278,14 +292,15 @@ type AppFile {
   updatedAt: Instant!
 }
 
-type Audio {
+type Audio implements MediaItem {
   id: ID!
   title: String!
   artist: String!
   path: String!
-  duration: Long!
+  durationMs: Long!
   size: Long!
-  bucketId: String!
+  bucketId: ID!
+  """FileId of the album-art image, usable in file display URLs; empty when the track has no album art."""
   albumFileId: String!
   createdAt: Instant!
   updatedAt: Instant!
@@ -294,22 +309,31 @@ type Audio {
 }
 
 type AudioFileInfo {
-  duration: Long!
+  durationMs: Long!
   location: Location
+}
+
+type AudioItem {
+  title: String!
+  artist: String!
+  path: String!
+  durationMs: Long!
 }
 
 type AudioPlayHistory {
   path: String!
   title: String!
   artist: String!
-  duration: Long!
+  durationMs: Long!
   playCount: Long!
   playedAt: Instant!
 }
 
 type AudioPlayback {
+  currentPath: String
   mode: MediaPlayMode!
-  currentPath: String!
+  isPlaying: Boolean!
+  positionMs: Long!
 }
 
 type AudioPlaylist {
@@ -325,7 +349,7 @@ type Bookmark {
   url: String!
   title: String!
   faviconPath: String!
-  groupId: String!
+  groupId: ID!
   pinned: Boolean!
   clickCount: Int!
   lastClickedAt: Instant
@@ -339,6 +363,7 @@ type BookmarkGroup {
   name: String!
   collapsed: Boolean!
   sortOrder: Int!
+  itemCount: Int!
   createdAt: Instant!
   updatedAt: Instant!
 }
@@ -346,7 +371,7 @@ type BookmarkGroup {
 input BookmarkInput {
   url: String!
   title: String!
-  groupId: String!
+  groupId: ID!
   pinned: Boolean!
   sortOrder: Int!
 }
@@ -357,11 +382,22 @@ type Call {
   name: String!
   photoId: String!
   startedAt: Instant!
-  duration: Int!
-  type: Int!
+  durationSec: Int!
+  type: CallType!
   accountId: ID!
   geo: PhoneGeo
   tags: [Tag!]!
+}
+
+enum CallType {
+  INCOMING
+  OUTGOING
+  MISSED
+  VOICEMAIL
+  REJECTED
+  BLOCKED
+  ANSWERED_EXTERNALLY
+  UNKNOWN
 }
 
 type Certificate {
@@ -387,10 +423,11 @@ enum ChannelSystemMessageType {
 }
 
 type ChatChannel {
-  id: String!
+  id: ID!
+  owner: ID!
   name: String!
-  owner: String!
   members: [ChatChannelMember!]!
+  """Monotonically increasing mutation counter; receivers ignore channel updates whose version is not greater than their local copy."""
   version: Long!
   status: ChatChannelStatus!
   createdAt: Instant!
@@ -398,7 +435,7 @@ type ChatChannel {
 }
 
 type ChatChannelMember {
-  id: String!
+  id: ID!
   status: ChannelMemberStatus!
 }
 
@@ -417,14 +454,18 @@ type ChatImages {
 }
 
 type ChatItem {
+  """`me` when this device created the item, otherwise the client id of the originating peer."""
+  fromId: ID!
+  """Peer id for direct messages; empty for channel messages — `channelId` is authoritative there."""
+  toId: ID!
+  channelId: ID
   id: ID!
-  fromId: String!
-  toId: String!
-  channelId: String!
+  """Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`; the typed payload is also mirrored in `data`."""
   content: String!
   createdAt: Instant!
   updatedAt: Instant!
   status: ChatStatus!
+  """Per-recipient delivery details as JSON (peer delivery results); empty when the message has no delivery failures. Drives SENT/PARTIAL/FAILED alongside `status`."""
   statusData: String!
   data: ChatItemContent
 }
@@ -439,12 +480,13 @@ enum ChatStatus {
 }
 
 type ChatText {
-  ids: [String!]!
+  linkPreviewImageIds: [String!]!
 }
 
 type Clipboard {
   id: ID!
   text: String!
+  """Client id of the sync origin: empty = captured locally on this device, otherwise received from that peer."""
   source: String!
   label: String!
   sensitive: Boolean!
@@ -461,9 +503,9 @@ type Contact {
   nickname: String!
   photoId: String!
   phoneNumbers: [ContactPhoneNumber!]!
-  emails: [ContentItem!]!
-  addresses: [ContentItem!]!
-  events: [ContentItem!]!
+  emails: [ContactEmail!]!
+  addresses: [ContactAddress!]!
+  events: [ContactEvent!]!
   source: String!
   starred: Boolean!
   contactId: ID!
@@ -471,17 +513,65 @@ type Contact {
   notes: String!
   groups: [ContactGroup!]!
   organization: Organization
-  websites: [ContentItem!]!
-  ims: [ContentItem!]!
+  websites: [ContactWebsite!]!
+  ims: [ContactIm!]!
   ringtone: String!
   updatedAt: Instant!
   tags: [Tag!]!
+}
+
+type ContactAddress {
+  value: String!
+  type: PostalType!
+  label: String!
+}
+
+input ContactAddressInput {
+  value: String!
+  type: PostalType!
+  label: String!
+}
+
+type ContactEmail {
+  value: String!
+  type: EmailType!
+  label: String!
+}
+
+input ContactEmailInput {
+  value: String!
+  type: EmailType!
+  label: String!
+}
+
+type ContactEvent {
+  value: String!
+  type: EventType!
+  label: String!
+}
+
+input ContactEventInput {
+  value: String!
+  type: EventType!
+  label: String!
 }
 
 type ContactGroup {
   id: ID!
   name: String!
   contactCount: Int!
+}
+
+type ContactIm {
+  value: String!
+  protocol: ImProtocol!
+  customProtocol: String!
+}
+
+input ContactImInput {
+  value: String!
+  protocol: ImProtocol!
+  customProtocol: String!
 }
 
 input ContactInput {
@@ -491,22 +581,28 @@ input ContactInput {
   lastName: String!
   suffix: String!
   nickname: String!
-  phoneNumbers: [ContentItemInput!]!
-  emails: [ContentItemInput!]!
-  addresses: [ContentItemInput!]!
-  events: [ContentItemInput!]!
+  phoneNumbers: [ContactPhoneInput!]!
+  emails: [ContactEmailInput!]!
+  addresses: [ContactAddressInput!]!
+  events: [ContactEventInput!]!
   source: String!
   starred: Boolean!
   notes: String!
   groupIds: [ID!]!
   organization: OrganizationInput
-  websites: [ContentItemInput!]!
-  ims: [ContentItemInput!]!
+  websites: [ContactWebsiteInput!]!
+  ims: [ContactImInput!]!
+}
+
+input ContactPhoneInput {
+  value: String!
+  type: PhoneType!
+  label: String!
 }
 
 type ContactPhoneNumber {
   value: String!
-  type: Int!
+  type: PhoneType!
   label: String!
   normalizedNumber: String!
 }
@@ -516,18 +612,19 @@ type ContactSource {
   type: String!
 }
 
-type ContentItem {
+type ContactWebsite {
   value: String!
-  type: Int!
+  type: WebsiteType!
   label: String!
 }
 
-input ContentItemInput {
+input ContactWebsiteInput {
   value: String!
-  type: Int!
+  type: WebsiteType!
   label: String!
 }
 
+"""Taggable data domains. The four media members (AUDIO/VIDEO/IMAGE/DOC) are exactly MediaDataType; a single variable cannot span both enums, so documents mixing e.g. tags(type: DataType!) with mediaBuckets(type: MediaDataType!) must declare one variable per enum."""
 enum DataType {
   DEFAULT
   AUDIO
@@ -538,7 +635,6 @@ enum DataType {
   NOTE
   FEED_ENTRY
   CALL
-  BOOK
   PACKAGE
   FILE
   APP_FILE
@@ -549,6 +645,7 @@ type DbTableInfo {
   idKey: String!
 }
 
+"""Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.features. Clients gate UI on App.features instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."""
 enum DeviceFeature {
   MEDIA_TRASH
   MIRROR_AUDIO
@@ -582,6 +679,7 @@ type DeviceInfo {
   totalMemory: Long!
   totalStorage: Long!
   display: DisplayInfo
+  """Android-only build/runtime details; null on non-Android devices."""
   android: AndroidExtras
 }
 
@@ -595,10 +693,12 @@ enum DevicePlatform {
 
 type DeviceStatus {
   uptimeSec: Long!
+  """Battery percentage; null on devices without a battery (desktop/NAS)."""
   batteryLevel: Int
   charging: Boolean!
   temperatures: [Temperature!]!
   cpuUsage: Float!
+  """Available memory in bytes; null when the platform cannot report it."""
   memoryAvailable: Long
   storageAvailable: Long!
 }
@@ -621,16 +721,16 @@ enum DiscoveryMethod {
 type DisplayInfo {
   width: Int!
   height: Int!
-  density: String!
+  density: Float!
 }
 
-type Doc {
+type Doc implements MediaItem {
   id: ID!
   title: String!
   path: String!
   extension: String!
   size: Long!
-  bucketId: String!
+  bucketId: ID!
   createdAt: Instant!
   updatedAt: Instant!
   tags: [Tag!]!
@@ -648,6 +748,21 @@ enum DriveType {
   APP
 }
 
+enum EmailType {
+  CUSTOM
+  HOME
+  WORK
+  OTHER
+  MOBILE
+}
+
+enum EventType {
+  CUSTOM
+  ANNIVERSARY
+  BIRTHDAY
+  OTHER
+}
+
 type FavoriteFolder {
   rootPath: String!
   fullPath: String!
@@ -663,12 +778,8 @@ type Feed {
   updatedAt: Instant!
 }
 
-type FeedCount {
-  id: String!
-  count: Int!
-}
-
 type FeedEntry {
+  feedId: ID!
   id: ID!
   title: String!
   url: String!
@@ -676,7 +787,6 @@ type FeedEntry {
   description: String!
   author: String!
   content: String!
-  feedId: String!
   rawId: String!
   publishedAt: Instant!
   createdAt: Instant!
@@ -685,26 +795,32 @@ type FeedEntry {
   feed: Feed
 }
 
+type FeedEntryCount {
+  id: ID!
+  count: Int!
+}
+
 type File {
+  mediaId: ID
   name: String!
   path: String!
   permission: String!
+  """Creation time from stat; null when the platform cannot report it (some filesystems/IO errors)."""
   createdAt: Instant
   updatedAt: Instant!
   size: Long!
   isDir: Boolean!
   children: Int!
-  mediaId: String!
 }
 
 type FileInfo {
   path: String!
   updatedAt: Instant!
   size: Long!
-  tags: [Tag!]!
   data: MediaFileInfo
 }
 
+"""Sort orders for file/media lists. TAKEN_AT_DESC sorts by capture time where the domain tracks one (images/videos); other domains fall back to their ordinary order (docs/audio: add time, plain files: modification time, packages: name)."""
 enum FileSortBy {
   DATE_ASC
   DATE_DESC
@@ -715,12 +831,25 @@ enum FileSortBy {
   TAKEN_AT_DESC
 }
 
-type Image {
+enum ImProtocol {
+  CUSTOM
+  AIM
+  MSN
+  YAHOO
+  SKYPE
+  QQ
+  GOOGLE_TALK
+  ICQ
+  JABBER
+  NETMEETING
+}
+
+type Image implements MediaItem {
   id: ID!
   title: String!
   path: String!
   size: Long!
-  bucketId: String!
+  bucketId: ID!
   createdAt: Instant!
   updatedAt: Instant!
   takenAt: Instant
@@ -730,7 +859,9 @@ type Image {
 
 type ImageEditorProject {
   id: ID!
+  """Full editor canvas state (layer stack), base64-encoded."""
   stateB64: String!
+  """Preview image as a base64 data URL; null until the editor first saves a thumbnail."""
   thumbnail: String
   canvasWidth: Int!
   canvasHeight: Int!
@@ -781,6 +912,7 @@ enum ImageSearchStatusType {
   ERROR
 }
 
+"""ISO-8601 / RFC 3339 UTC timestamp string, e.g. 2026-09-20T12:34:56.789Z"""
 scalar Instant
 
 type KeyValuePair {
@@ -796,19 +928,14 @@ type Location {
 """The Long scalar type represents a signed 64-bit numeric non-fractional value"""
 scalar Long
 
-type MediaActionResult {
-  type: MediaDataType!
-  query: String!
-  affectedCount: Int!
-}
-
 type MediaBucket {
   id: ID!
   name: String!
   itemCount: Int!
-  topItems: [String!]!
+  topItemPaths: [String!]!
 }
 
+"""Media-library domains — a strict subset of DataType with the same four member names."""
 enum MediaDataType {
   AUDIO
   VIDEO
@@ -818,6 +945,16 @@ enum MediaDataType {
 
 union MediaFileInfo = AudioFileInfo | ImageFileInfo | VideoFileInfo
 
+interface MediaItem {
+  id: ID!
+  title: String!
+  path: String!
+  size: Long!
+  bucketId: ID!
+  createdAt: Instant!
+  updatedAt: Instant!
+}
+
 enum MediaPlayMode {
   REPEAT
   REPEAT_ONE
@@ -826,8 +963,11 @@ enum MediaPlayMode {
 
 type MergeTask {
   status: MergeTaskStatus!
+  """Name of the merged result once status is DONE — the destination file's base name for mergeChunks, the content-store file name for mergeAppFileChunks; not a full path."""
   value: String
+  """Total size in bytes of the merged result once status is DONE; null otherwise."""
   mergedSize: Long
+  """Failure reason when status is FAILED."""
   error: String
 }
 
@@ -837,37 +977,6 @@ enum MergeTaskStatus {
   MERGING
   DONE
   FAILED
-}
-
-type Message {
-  id: ID!
-  body: String!
-  address: String!
-  date: Instant!
-  serviceCenter: String!
-  read: Boolean!
-  threadId: String!
-  type: Int!
-  subscriptionId: Int!
-  isMms: Boolean!
-  attachments: [MessageAttachment!]!
-  tags: [Tag!]!
-}
-
-type MessageAttachment {
-  path: String!
-  contentType: String!
-  name: String!
-}
-
-type MessageConversation {
-  id: ID!
-  address: String!
-  snippet: String!
-  date: Instant!
-  messageCount: Int!
-  read: Boolean!
-  addresses: [String!]!
 }
 
 type Note {
@@ -887,15 +996,17 @@ input NoteInput {
 
 type Notification {
   id: ID!
+  """Android FLAG_ONLY_ALERT_ONCE: re-posted updates must not sound/vibrate again."""
   onlyOnce: Boolean!
   isClearable: Boolean!
-  appId: String!
+  appId: ID!
   appName: String!
-  time: Instant!
+  postedAt: Instant!
   silent: Boolean!
   title: String!
   body: String!
   actions: [String!]!
+  """Subset of `actions` that support inline reply; `replyNotification`'s `actionIndex` indexes this list, not `actions`."""
   replyActions: [String!]!
 }
 
@@ -922,14 +1033,14 @@ type Package {
 }
 
 type PackageInstallPending {
-  packageName: String!
+  id: ID!
   updatedAt: Instant
   isNew: Boolean!
 }
 
 type PackageStatus {
   id: ID!
-  exist: Boolean!
+  exists: Boolean!
   updatedAt: Instant
 }
 
@@ -939,7 +1050,7 @@ enum PackageType {
 }
 
 input PairingDeviceInput {
-  id: String!
+  id: ID!
   name: String!
   ips: [String!]!
   port: Int!
@@ -951,7 +1062,7 @@ input PairingDeviceInput {
 }
 
 input PairingRequestInput {
-  fromId: String!
+  fromId: ID!
   fromName: String!
   port: Int!
   deviceType: DeviceType!
@@ -965,7 +1076,7 @@ input PairingRequestInput {
 }
 
 type Peer {
-  id: String!
+  id: ID!
   name: String!
   ip: String!
   status: PeerStatus!
@@ -982,6 +1093,7 @@ enum PeerStatus {
   CHANNEL
 }
 
+"""Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.features (DeviceFeature)."""
 enum Permission {
   WRITE_EXTERNAL_STORAGE
   READ_SMS
@@ -1007,7 +1119,6 @@ enum Permission {
   QUERY_ALL_PACKAGES
   ADB
   CLIPBOARD
-  NONE
 }
 
 type PhoneGeo {
@@ -1017,17 +1128,33 @@ type PhoneGeo {
   description: String!
 }
 
-type PlaylistAudio {
-  title: String!
-  artist: String!
-  path: String!
-  duration: Long!
+enum PhoneType {
+  CUSTOM
+  HOME
+  MOBILE
+  WORK
+  FAX_WORK
+  FAX_HOME
+  PAGER
+  OTHER
+  CALLBACK
+  CAR
+  COMPANY_MAIN
+  ISDN
+  MAIN
+  OTHER_FAX
+  RADIO
+  TELEX
+  TTY_TDD
+  WORK_MOBILE
+  WORK_PAGER
+  ASSISTANT
 }
 
 type PomodoroSettings {
-  workDuration: Int!
-  shortBreakDuration: Int!
-  longBreakDuration: Int!
+  workDurationMin: Int!
+  shortBreakDurationMin: Int!
+  longBreakDurationMin: Int!
   pomodorosBeforeLongBreak: Int!
   showNotification: Boolean!
   playSoundOnComplete: Boolean!
@@ -1042,14 +1169,22 @@ enum PomodoroState {
 }
 
 type PomodoroToday {
-  date: String!
+  """Start of the pomodoro day on the device (UTC instant). Clients derive the calendar date in their own timezone."""
+  date: Instant!
   completedCount: Int!
   currentRound: Int!
-  timeLeft: Int!
-  totalTime: Int!
+  timeLeftSec: Int!
+  totalTimeSec: Int!
   isRunning: Boolean!
-  isPause: Boolean!
+  isPaused: Boolean!
   state: PomodoroState!
+}
+
+enum PostalType {
+  CUSTOM
+  HOME
+  WORK
+  OTHER
 }
 
 enum ScreenMirrorControlAction {
@@ -1074,7 +1209,7 @@ input ScreenMirrorControlInput {
   y: Float
   endX: Float
   endY: Float
-  duration: Long
+  durationMs: Long
   deltaX: Float
   deltaY: Float
   key: String
@@ -1094,18 +1229,48 @@ type ScreenMirrorQuality {
 }
 
 type ScreenMirrorVideoCodec {
+  """H.264 Annex-B codec configuration (SPS/PPS), base64-encoded."""
   annexB: String!
+  """Latest H.264 keyframe, base64-encoded; null until the pipeline emits one."""
   keyFrame: String
 }
-
-"""The Short scalar type represents a signed 16-bit numeric non-fractional value"""
-scalar Short
 
 type Sim {
   id: ID!
   label: String!
   number: String!
   subscriptionId: Int!
+}
+
+type Sms {
+  id: ID!
+  body: String!
+  address: String!
+  sentAt: Instant!
+  serviceCenter: String!
+  read: Boolean!
+  threadId: ID!
+  type: SmsType!
+  subscriptionId: Int!
+  isMms: Boolean!
+  attachments: [SmsAttachment!]!
+  tags: [Tag!]!
+}
+
+type SmsAttachment {
+  path: String!
+  contentType: String!
+  name: String!
+}
+
+type SmsConversation {
+  id: ID!
+  address: String!
+  snippet: String!
+  lastMessageAt: Instant!
+  messageCount: Int!
+  read: Boolean!
+  addresses: [String!]!
 }
 
 type SmsCounts {
@@ -1115,8 +1280,18 @@ type SmsCounts {
   drafts: Int!
 }
 
+enum SmsType {
+  INBOX
+  SENT
+  DRAFT
+  OUTBOX
+  FAILED
+  QUEUED
+  UNKNOWN
+}
+
 type StorageMount {
-  id: String!
+  id: ID!
   name: String!
   path: String!
   mountPoint: String!
@@ -1127,7 +1302,7 @@ type StorageMount {
   remote: Boolean!
   alias: String!
   driveType: DriveType!
-  diskID: String!
+  diskId: String!
 }
 
 type Tag {
@@ -1137,7 +1312,7 @@ type Tag {
 }
 
 type TagRelation {
-  tagId: String!
+  tagId: ID!
   key: String!
 }
 
@@ -1145,11 +1320,6 @@ input TagRelationStub {
   key: String!
   title: String!
   size: Long!
-}
-
-type TempValue {
-  key: String!
-  value: String!
 }
 
 type Temperature {
@@ -1160,16 +1330,16 @@ type Temperature {
 input TouchPointInput {
   x: Float!
   y: Float!
-  t: Int!
+  tMs: Int!
 }
 
-type Video {
+type Video implements MediaItem {
   id: ID!
   title: String!
   path: String!
-  duration: Long!
+  durationMs: Long!
   size: Long!
-  bucketId: String!
+  bucketId: ID!
   createdAt: Instant!
   updatedAt: Instant!
   takenAt: Instant
@@ -1180,8 +1350,31 @@ type Video {
 type VideoFileInfo {
   width: Int!
   height: Int!
-  duration: Long!
+  durationMs: Long!
   location: Location
+}
+
+"""Deep-link targets on the web-access settings page; passed to openWebSettings to scroll to and highlight one option."""
+enum WebSettingsFeature {
+  FILES
+  CONTACTS
+  SMS
+  CALL_LOGS
+  CALL_PHONE
+  PHONE_NUMBER
+  APPS
+  NOTIFICATIONS
+  CLIPBOARD
+}
+
+enum WebsiteType {
+  CUSTOM
+  HOMEPAGE
+  BLOG
+  FTP
+  HOME
+  WORK
+  OTHER
 }
 
 type __Directive {

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.discover.PairingResponder
@@ -14,8 +15,8 @@ suspend fun pairDevice(input: PairingDeviceInput): Boolean {
 }
 
 @GraphQLMutation(description = "Cancel an in-progress pairing initiated by this device.")
-suspend fun cancelPairing(deviceId: String): Boolean {
-    NearbyViewModel.cancelPairing(deviceId)
+suspend fun cancelPairing(deviceId: ID): Boolean {
+    NearbyViewModel.cancelPairing(deviceId.value)
     return true
 }
 

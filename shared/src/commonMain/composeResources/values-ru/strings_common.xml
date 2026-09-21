@@ -174,4 +174,15 @@
     <string name="discard_changes_text">Изменения не сохранены.</string>
     <string name="large_file_edit">Файл очень большой, редактирование может быть медленным. Продолжить?</string>
     <string name="line_number">Номер строки</string>
+    <string name="global_search_hint">Поиск по всему</string>
+    <string name="search_in_domain">Поиск в %1$s</string>
+    <string name="recent_searches">Недавние запросы</string>
+    <string name="search_scope_hint">Поиск только в %1$s. Нажмите «Все», чтобы искать по всем типам.</string>
+    <string name="view_all_n">Показать все (%1$d)</string>
+    <string name="show_more_n">Показать ещё (%1$d/%2$d)</string>
+    <string name="no_results_for">Ничего не найдено по запросу «%1$s»</string>
+    <string name="no_results_hint">Попробуйте более короткий запрос или выберите фильтр типа.</string>
+    <string name="no_results_hint_scope">Попробуйте более короткий запрос или вернитесь к «Все».</string>
+    <string name="search_in_all_types">Искать по всем типам</string>
+    <string name="clear_search_term">Очистить запрос</string>
 </resources>

@@ -7,11 +7,15 @@ import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaPlayMode
-import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.events.ClearAudioQueueEvent
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
+import kotlin.reflect.typeOf
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.audioClear
+import com.ismartcoding.plain.platform.audioIsPlayingFlow
+import com.ismartcoding.plain.platform.audioPlayerProgress
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
@@ -30,7 +34,7 @@ import com.ismartcoding.plain.httpserver.models.AudioPlayback
 import com.ismartcoding.plain.httpserver.models.AudioPlayHistory
 import com.ismartcoding.plain.httpserver.models.AudioPlaylist
 import com.ismartcoding.plain.httpserver.models.ID
-import com.ismartcoding.plain.httpserver.models.PlaylistAudio
+import com.ismartcoding.plain.httpserver.models.AudioItem
 import com.ismartcoding.plain.httpserver.models.toModel
 
 @GraphQLQuery
@@ -44,9 +48,10 @@ suspend fun audioCount(query: String): Int {
 
 /** The active playback queue (manual items + context), paginated. */
 @GraphQLQuery
-suspend fun audioQueueItems(offset: Int, limit: Int): List<PlaylistAudio> {
+suspend fun audioQueueItems(offset: Int, limit: Int, query: String): List<AudioItem> {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
-    return AudioQueueManager.queuePage(offset, limit).map { it.toModel() }
+    val text = QueryHelper.textOf(query)
+    return (if (text.isEmpty()) AudioQueueManager.queuePage(offset, limit) else AudioQueueManager.queuePageFiltered(text, offset, limit)).map { it.toModel() }
 }
 
 @GraphQLQuery
@@ -61,12 +66,14 @@ suspend fun audioPlayback(): AudioPlayback {
     return AudioPlayback(
         mode = AudioPlayModePreference.getValueAsync(),
         currentPath = AudioPlayingPreference.getValueAsync(),
+        isPlaying = audioIsPlayingFlow().value,
+        positionMs = audioPlayerProgress(),
     )
 }
 
 /** Play the given track: adds it to the manual queue when missing and marks it current. */
 @GraphQLMutation
-suspend fun playAudio(path: String): PlaylistAudio {
+suspend fun playAudio(path: String): AudioItem {
     val audio = playlistAudioFromPath(path)
     AudioPlayingPreference.putAsync(audio.path)
     AudioQueueManager.enqueue(listOf(audio))
@@ -80,24 +87,24 @@ suspend fun updateAudioPlayMode(mode: MediaPlayMode): Boolean {
 }
 
 @GraphQLMutation
-suspend fun clearAudioPlaylist(): Boolean {
+suspend fun clearAudioQueue(): Boolean {
     AudioPlayingPreference.putAsync("")
     AudioQueueManager.clearQueue()
     coMain {
         audioClear()
     }
-    sendEvent(ClearAudioPlaylistEvent())
+    sendEvent(ClearAudioQueueEvent())
     return true
 }
 
 @GraphQLMutation
-suspend fun deletePlaylistAudio(path: String): Boolean {
+suspend fun removeAudioFromQueue(path: String): Boolean {
     AudioQueueManager.removeQueued(path)
     return true
 }
 
 @GraphQLMutation
-suspend fun addPlaylistAudios(query: String): Boolean {
+suspend fun addAudiosToQueue(query: String): Boolean {
     // 1000 items at most
     val items = searchMedia(DataType.AUDIO, query, 1000, 0, AudioSortByPreference.getValueAsync())
         .filterIsInstance<DAudio>()
@@ -106,7 +113,7 @@ suspend fun addPlaylistAudios(query: String): Boolean {
 }
 
 @GraphQLMutation
-suspend fun reorderPlaylistAudios(paths: List<String>): Boolean {
+suspend fun reorderAudioQueue(paths: List<String>): Boolean {
     AudioQueueManager.reorderQueued(paths)
     return true
 }
@@ -120,9 +127,9 @@ suspend fun audios(offset: Int, limit: Int, query: String, sortBy: FileSortBy): 
 }
 
 @GraphQLQuery
-suspend fun audioLyrics(path: String): String {
+suspend fun audioLyrics(path: String): String? {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
-    return getAudioLyrics(path)
+    return getAudioLyrics(path).ifEmpty { null }
 }
 
 // ---------- user playlists ----------
@@ -135,8 +142,11 @@ suspend fun audioPlaylists(): List<AudioPlaylist> {
 }
 
 @GraphQLQuery
-suspend fun audioPlaylistItems(id: ID, offset: Int, limit: Int): List<PlaylistAudio> {
-    return AudioQueueManager.playlistItemsPage(id.value, offset, limit).map { it.toPlaylistAudio().toModel() }
+suspend fun audioPlaylistItems(id: ID, offset: Int, limit: Int, query: String): List<AudioItem> {
+    val text = QueryHelper.textOf(query)
+    val items = if (text.isEmpty()) AudioQueueManager.playlistItemsPage(id.value, offset, limit)
+    else AudioQueueManager.playlistItemsPageFiltered(id.value, text, offset, limit)
+    return items.map { it.toPlaylistAudio().toModel() }
 }
 
 @GraphQLQuery
@@ -145,8 +155,11 @@ suspend fun audioPlaylistItemCount(id: ID): Int {
 }
 
 @GraphQLQuery
-suspend fun audioPlayHistory(offset: Int = 0, limit: Int = 50): List<AudioPlayHistory> {
-    return AudioQueueManager.recentPage(limit, offset).map { it.toModel() }
+suspend fun audioPlayHistory(offset: Int, limit: Int, query: String): List<AudioPlayHistory> {
+    val text = QueryHelper.textOf(query)
+    val items = if (text.isEmpty()) AudioQueueManager.recentPage(limit, offset)
+    else AudioQueueManager.recentPageFiltered(text, limit, offset)
+    return items.map { it.toModel() }
 }
 
 @GraphQLMutation
@@ -179,30 +192,45 @@ suspend fun removeAudioPlaylistItem(id: ID, path: String): Boolean {
     return true
 }
 
-/** Play a user playlist: sets it as the playback context and starts playback. */
-@GraphQLMutation
-suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean = false): Boolean {
+/**
+ * Play a user playlist: sets it as the playback context and starts playback.
+ * Returns the track that started, or null when the context has nothing to play.
+ */
+@GraphQLMutation(description = "Start playback of a playlist. `path` optionally names the audio to start from (defaults to the first item); `shuffle` reorders before playing. Returns the item that starts playing, null when the playlist is empty.")
+suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean = false): AudioItem? {
     val start = AudioQueueManager.setPlaylistSource(id.value, path)
-    if (start != null && !shuffle) {
-        coMain { audioJustPlayWithNotificationCheck(start) }
-    } else if (start != null && shuffle) {
-        val random = AudioQueueManager.resolveNext(isNext = true, shuffle = true)
-        if (random != null) coMain { audioJustPlayWithNotificationCheck(random) }
+    if (start == null) {
+        return null
     }
-    return true
+    val track = if (shuffle) {
+        AudioQueueManager.resolveNext(isNext = true, shuffle = true)
+    } else {
+        start
+    }
+    if (track != null) {
+        coMain { audioJustPlayWithNotificationCheck(track) }
+    }
+    return track?.toModel()
 }
 
-/** Play the whole audio library (shuffle optional): full-library playback context. */
-@GraphQLMutation
-suspend fun playAllAudios(shuffle: Boolean = false, path: String? = null): Boolean {
+/**
+ * Play the whole audio library: full-library playback context.
+ * Returns the track that started, or null when the library is empty.
+ */
+@GraphQLMutation(description = "Queue the whole audio library and start playback. `path` optionally scopes the library to a directory and/or names the track to start from (null = entire library, first track); `shuffle` reorders before playing. Returns the item that starts playing, null when nothing matched.")
+suspend fun playAllAudios(path: String? = null, shuffle: Boolean = false): AudioItem? {
     val start = AudioQueueManager.setLibrarySource(startPath = path, shuffle = shuffle)
     if (start != null) {
         coMain { audioJustPlayWithNotificationCheck(start) }
     }
-    return true
+    return start?.toModel()
 }
 
 fun SchemaBuilder.addAudioSchema() {
+    type<AudioPlayback> {
+        // currentPath is "" when idle — expose null instead of the empty sentinel.
+        property("currentPath", typeOf<String?>(), { it: AudioPlayback -> it.currentPath.ifEmpty { null } })
+    }
     type<Audio> {
         dataProperty("tags") {
             prepare { item -> item.id.value }

@@ -209,6 +209,7 @@ object DownloadCenter {
                 tasksLock.withLock {
                     if (isCurrent(run) && !task.aborted && !task.status.isTerminalDownloadStatus()) {
                         task.status = DownloadStatus.FAILED
+                        task.error = e.message ?: (e::class.simpleName ?: "error")
                     }
                 }
                 updateProgressFlow()

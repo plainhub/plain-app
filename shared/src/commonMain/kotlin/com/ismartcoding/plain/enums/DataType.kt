@@ -10,14 +10,10 @@ enum class DataType(val value: Int) {
     NOTE(6),
     FEED_ENTRY(7),
     CALL(8),
-    BOOK(9),
     PACKAGE(21),
     FILE(22),
     APP_FILE(23),
     DOC(24),
     ;
 
-    companion object {
-        fun fromInt(value: Int) = entries.first { it.value == value }
-    }
 }

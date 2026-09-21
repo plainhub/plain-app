@@ -36,6 +36,7 @@ import com.ismartcoding.plain.i18n.grid_3x3
 import com.ismartcoding.plain.i18n.home
 import com.ismartcoding.plain.i18n.house
 import com.ismartcoding.plain.i18n.message_circle
+import com.ismartcoding.plain.i18n.search
 import com.ismartcoding.plain.i18n.tools
 import com.ismartcoding.plain.platform.isAndroidOnly
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -58,6 +59,7 @@ internal val mainNavItems: List<MainNavItem>
         if (isAndroidOnly()) {
             add(MainNavItem(2, Res.drawable.grid_3x3, Res.string.tools))
         }
+        add(MainNavItem(3, Res.drawable.search, Res.string.search))
     }
 
 // Material 3 window width classes: compact < 600dp <= medium < 840dp <= expanded.

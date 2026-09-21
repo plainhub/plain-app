@@ -32,6 +32,10 @@ data class DAudioPlaylistItem(
     var title: String,
     @ColumnInfo(name = "artist")
     var artist: String,
+    // MediaStore album id snapshot for the playlist cover mosaic; blank for
+    // rows written before the column existed (backfilled on first load).
+    @ColumnInfo(name = "album_id", defaultValue = "")
+    var albumId: String = "",
     @ColumnInfo(name = "duration")
     var duration: Long,
     @ColumnInfo(name = "position")
@@ -47,6 +51,12 @@ interface AudioPlaylistItemDao {
             "ORDER BY position LIMIT :limit OFFSET :offset"
     )
     suspend fun pageByPlaylist(playlistId: String, limit: Int, offset: Int): List<DAudioPlaylistItem>
+
+    @Query(
+        "SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId AND (title LIKE :text OR artist LIKE :text OR audio_path LIKE :text) " +
+            "ORDER BY position LIMIT :limit OFFSET :offset",
+    )
+    suspend fun pageByPlaylistText(playlistId: String, text: String, limit: Int, offset: Int): List<DAudioPlaylistItem>
 
     @Query("SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId ORDER BY position")
     suspend fun getByPlaylist(playlistId: String): List<DAudioPlaylistItem>
@@ -69,6 +79,9 @@ interface AudioPlaylistItemDao {
 
     @Query("UPDATE audio_playlist_items SET position = :position WHERE id = :id")
     suspend fun updatePosition(id: String, position: Int)
+
+    @Query("UPDATE audio_playlist_items SET album_id = :albumId WHERE id = :id")
+    suspend fun updateAlbumId(id: String, albumId: String)
 
     @Query("DELETE FROM audio_playlist_items WHERE id = :id")
     suspend fun deleteById(id: String)

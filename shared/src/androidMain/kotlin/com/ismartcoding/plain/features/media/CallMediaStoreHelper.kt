@@ -37,6 +37,7 @@ object CallMediaStoreHelper : BaseContentHelper() {
         if (query.isNotEmpty()) {
             QueryHelper.parseAsync(query).forEach {
                 when (it.name) {
+                    QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
                     "text" -> {
                         where.add("${CallLog.Calls.NUMBER} LIKE ?", "%${it.value}%")
                     }

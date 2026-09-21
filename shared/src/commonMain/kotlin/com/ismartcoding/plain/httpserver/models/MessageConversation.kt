@@ -5,22 +5,22 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
 @GraphQLType
-data class MessageConversation(
+data class SmsConversation(
     val id: ID,
     val address: String,
     val snippet: String,
-    val date: Instant,
+    val lastMessageAt: Instant,
     val messageCount: Int,
     val read: Boolean,
     val addresses: List<String>,
 )
 
-fun DMessageConversation.toModel(): MessageConversation {
-    return MessageConversation(
+fun DMessageConversation.toModel(): SmsConversation {
+    return SmsConversation(
         id = ID(id),
         address = address,
         snippet = snippet,
-        date = date,
+        lastMessageAt = date,
         messageCount = messageCount,
         read = read,
         addresses = addresses,

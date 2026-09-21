@@ -8,5 +8,5 @@ import kotlinx.serialization.Serializable
 data class TouchPointInput(
     val x: Float,
     val y: Float,
-    val t: Int,
+    val tMs: Int,
 )

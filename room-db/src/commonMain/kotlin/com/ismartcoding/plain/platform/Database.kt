@@ -51,8 +51,9 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DAudioPlayHistory::class,
         DAudioQueueSource::class,
         DAudioQueueItem::class,
+        DNearbyDeviceCache::class,
     ],
-    version = 28,
+    version = 29,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -75,6 +76,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         AutoMigration(from = 25, to = 26),
         AutoMigration(from = 26, to = 27),
         AutoMigration(from = 27, to = 28),
+        AutoMigration(from = 28, to = 29),
     ],
     exportSchema = true,
 )
@@ -120,6 +122,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun audioPlaylistItemDao(): AudioPlaylistItemDao
     abstract fun audioPlayHistoryDao(): AudioPlayHistoryDao
     abstract fun audioQueueDao(): AudioQueueDao
+    abstract fun nearbyDeviceCacheDao(): NearbyDeviceCacheDao
 
     companion object {
         @kotlin.concurrent.Volatile

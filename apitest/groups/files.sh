@@ -49,7 +49,7 @@ api_rf_count=$(printf '%s' "$RF" | jq '.data.recentFiles | length')
 # ----------------------------------------------------------------------------
 # files-C04  fileInfo on existing file (Downloads)
 # ----------------------------------------------------------------------------
-FI=$(call_gql "{ fileInfo(id: \"\", path: \"/storage/emulated/0/Download\", fileName: \"Download\") { path size updatedAt } }")
+FI=$(call_gql "{ fileInfo(path: \"/storage/emulated/0/Download\", fileName: \"Download\") { path size updatedAt } }")
 api_fi_path=$(printf '%s' "$FI" | jq -r '.data.fileInfo.path // empty')
 if [[ "$api_fi_path" == "/storage/emulated/0/Download" ]]; then
   pass "files-C04 fileInfo(path=/storage/emulated/0/Download) returned path match"
@@ -98,7 +98,7 @@ if [[ -z "$api_cd_err" || "$api_cd_err" == *"already exists"* ]]; then
   if [[ -z "$api_wt_err" ]]; then
     pass "files-C07 writeTextFile → $FIXTURE_FILE"
     # C08: fileInfo on the file
-    FI2=$(call_gql "{ fileInfo(id: \"\", path: \"$FIXTURE_FILE\", fileName: \"sample.txt\") { path size } }")
+    FI2=$(call_gql "{ fileInfo(path: \"$FIXTURE_FILE\", fileName: \"sample.txt\") { path size } }")
     api_fi2_size=$(printf '%s' "$FI2" | jq -r '.data.fileInfo.size // empty')
     adb_fi2_size=$(adb_sh "stat -c '%s' $FIXTURE_FILE 2>/dev/null" | tr -d '\r')
     if [[ -n "$adb_fi2_size" && "$api_fi2_size" == "$adb_fi2_size" ]]; then
@@ -170,10 +170,10 @@ if [[ -z "$api_cd_err" || "$api_cd_err" == *"already exists"* ]]; then
   fi
 
   # C15: deleteFiles (cleanup all our fixtures)
-  DF=$(call_gql "mutation { deleteFiles(paths: [\"${FIXTURE_FILE}\", \"${FIXTURE_FILE}.copy\", \"${FIXTURE_FILE}.moved\", \"${FIXTURE_DIR}/renamed.txt\"]) }")
-  api_df=$(printf '%s' "$DF" | jq -r '.data.deleteFiles // empty')
-  if [[ "$api_df" == "true" ]]; then
-    pass "files-C15 deleteFiles → true"
+  DF=$(call_gql "mutation { deleteFiles(paths: [\"${FIXTURE_FILE}\", \"${FIXTURE_FILE}.copy\", \"${FIXTURE_FILE}.moved\", \"${FIXTURE_DIR}/renamed.txt\"]) { affectedCount } }")
+  api_df=$(printf '%s' "$DF" | jq -r '.data.deleteFiles.affectedCount // empty')
+  if [[ "$api_df" =~ ^[0-9]+$ ]]; then
+    pass "files-C15 deleteFiles → affectedCount=$api_df"
   else
     fail "files-C15 deleteFiles returned: $DF"
   fi

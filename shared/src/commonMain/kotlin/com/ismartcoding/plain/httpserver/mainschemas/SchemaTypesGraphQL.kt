@@ -3,9 +3,11 @@ package com.ismartcoding.plain.httpserver.mainschemas
 import com.ismartcoding.plain.ai.ImageSearchStatusType
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.data.DevicePlatform
-import com.ismartcoding.plain.enums.AccessFeatureType
+import com.ismartcoding.plain.enums.WebSettingsFeature
 import com.ismartcoding.plain.enums.AppChannelType
 import com.ismartcoding.plain.enums.ChannelMemberStatus
+import com.ismartcoding.plain.enums.WebsiteType
+import com.ismartcoding.plain.enums.CallType
 import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.ChannelSystemMessageType
 import com.ismartcoding.plain.enums.ChatStatus
@@ -14,16 +16,23 @@ import com.ismartcoding.plain.enums.MediaDataType
 import com.ismartcoding.plain.enums.DriveType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.DiscoveryMethod
+import com.ismartcoding.plain.enums.EmailType
+import com.ismartcoding.plain.enums.EventType
+import com.ismartcoding.plain.enums.ImProtocol
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PeerStatus
 import com.ismartcoding.plain.enums.PackageType
+import com.ismartcoding.plain.enums.PhoneType
+import com.ismartcoding.plain.enums.PostalType
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
+import com.ismartcoding.plain.enums.SmsType
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.platform.DeviceFeature
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.httpserver.models.ID
+import com.ismartcoding.plain.httpserver.models.MediaItem
 import com.ismartcoding.plain.httpserver.models.MergeTaskStatus
 import kotlin.time.Instant
 
@@ -31,17 +40,40 @@ fun SchemaBuilder.addMainSchemaTypes() {
     // Main is a superset of the peer schema (peer chat items also flow through
     // the authenticated schema), so reuse its shared types without duplicating.
     addPeerSchemaTypes()
-    enum<AccessFeatureType>()
+    // Shared media interface: must be registered so Audio/Image/Video/Doc print
+    // `implements MediaItem` and clients can define cross-type fragments on it.
+    type<MediaItem>()
+    enum<WebSettingsFeature> {
+        description = "Deep-link targets on the web-access settings page; passed to openWebSettings to scroll to and highlight one option."
+    }
+    enum<CallType>()
+    enum<SmsType>()
+    enum<PhoneType>()
+    enum<EmailType>()
+    enum<PostalType>()
+    enum<EventType>()
+    enum<WebsiteType>()
+    enum<ImProtocol>()
     enum<ChatChannelStatus>()
     enum<MediaPlayMode>()
-    enum<DataType>()
-    enum<MediaDataType>()
+    enum<DataType> {
+        description = "Taggable data domains. The four media members (AUDIO/VIDEO/IMAGE/DOC) are exactly MediaDataType; a single variable cannot span both enums, so documents mixing e.g. tags(type: DataType!) with mediaBuckets(type: MediaDataType!) must declare one variable per enum."
+    }
+    enum<MediaDataType> {
+        description = "Media-library domains — a strict subset of DataType with the same four member names."
+    }
     enum<DriveType>()
     enum<DeviceType>()
-    enum<DeviceFeature>()
+    enum<DeviceFeature> {
+        description = "Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.features. Clients gate UI on App.features instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."
+    }
     enum<MergeTaskStatus>()
-    enum<Permission>()
-    enum<FileSortBy>()
+    enum<Permission> {
+        description = "Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.features (DeviceFeature)."
+    }
+    enum<FileSortBy> {
+        description = "Sort orders for file/media lists. TAKEN_AT_DESC sorts by capture time where the domain tracks one (images/videos); other domains fall back to their ordinary order (docs/audio: add time, plain files: modification time, packages: name)."
+    }
     enum<PomodoroState>()
     enum<ScreenMirrorMode>()
     enum<PackageType>()
@@ -71,6 +103,7 @@ fun SchemaBuilder.addPeerSchemaTypes() {
     }
     stringScalar<Instant> {
         name = "Instant"
+        description = "ISO-8601 / RFC 3339 UTC timestamp string, e.g. 2026-09-20T12:34:56.789Z"
         deserialize = { value: String -> Instant.parse(value) }
         serialize = Instant::toString
     }

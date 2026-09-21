@@ -202,6 +202,12 @@ val ColorScheme.badgeBorderColor: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF1C1C1E) else Color(0xFFFFFFFF)
 
+/** Background of matched query spans in search results — pale marker yellow on
+ *  light, muted amber on dark so the bold span stays readable on e-ink. */
+val ColorScheme.searchHighlight: Color
+    @Composable @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF5A512E) else Color(0xFFFFF1B8)
+
 
 @Composable
 fun ColorScheme.lightMask(): Color = Color.White.copy(alpha = 0.4f)

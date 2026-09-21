@@ -58,7 +58,7 @@ interface ClipboardDao {
     suspend fun count(q: String): Int
 
     @Query("DELETE FROM clipboard WHERE id IN (:ids)")
-    suspend fun deleteByIds(ids: List<String>)
+    suspend fun deleteByIds(ids: List<String>): Int
 
     @Query("DELETE FROM clipboard")
     suspend fun clear()

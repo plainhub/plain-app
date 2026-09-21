@@ -174,4 +174,15 @@
     <string name="discard_changes_text">Các chỉnh sửa chưa được lưu.</string>
     <string name="large_file_edit">Tệp này rất lớn. Việc chỉnh sửa có thể chậm. Tiếp tục?</string>
     <string name="line_number">Số dòng</string>
+    <string name="global_search_hint">Tìm kiếm mọi thứ</string>
+    <string name="search_in_domain">Tìm trong %1$s</string>
+    <string name="recent_searches">Tìm kiếm gần đây</string>
+    <string name="search_scope_hint">Chỉ tìm trong %1$s. Chạm "Tất cả" để tìm mọi loại.</string>
+    <string name="view_all_n">Xem tất cả (%1$d)</string>
+    <string name="show_more_n">Hiện thêm (%1$d/%2$d)</string>
+    <string name="no_results_for">Không tìm thấy kết quả cho "%1$s"</string>
+    <string name="no_results_hint">Thử từ khóa ngắn hơn hoặc chọn bộ lọc loại.</string>
+    <string name="no_results_hint_scope">Thử từ khóa ngắn hơn hoặc quay lại "Tất cả".</string>
+    <string name="search_in_all_types">Tìm trong tất cả các loại</string>
+    <string name="clear_search_term">Xóa từ khóa tìm kiếm</string>
 </resources>

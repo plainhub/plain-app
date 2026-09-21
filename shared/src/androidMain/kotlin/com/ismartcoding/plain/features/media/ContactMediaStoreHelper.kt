@@ -54,6 +54,7 @@ object ContactMediaStoreHelper {
         if (query.isNotEmpty()) {
             QueryHelper.parseAsync(query).forEach {
                 when (it.name) {
+                    QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
                     "text" -> {
                         where.add("${ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME} LIKE ?", "%${it.value}%")
                     }

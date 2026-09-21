@@ -9,6 +9,7 @@ import com.ismartcoding.plain.platform.getSDCardPath
 import com.ismartcoding.plain.platform.getSDCardStorageStats
 import com.ismartcoding.plain.platform.getUSBStorageStats
 import com.ismartcoding.plain.platform.getUsbDiskPaths
+import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.StorageMount
 
 object MountsLoader {
@@ -21,7 +22,7 @@ object MountsLoader {
             driveType: DriveType,
         ): StorageMount {
             return StorageMount(
-                id = "path:$path",
+                id = ID("path:$path"),
                 name = name,
                 path = path,
                 mountPoint = path,
@@ -31,7 +32,7 @@ object MountsLoader {
                 remote = false,
                 alias = "",
                 driveType = driveType,
-                diskID = "",
+                diskId = "",
             )
         }
 

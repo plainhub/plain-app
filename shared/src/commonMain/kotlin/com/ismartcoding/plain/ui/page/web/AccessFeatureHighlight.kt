@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
 
-import com.ismartcoding.plain.enums.AccessFeatureType
+import com.ismartcoding.plain.enums.WebSettingsFeature
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
@@ -10,5 +10,5 @@ import kotlinx.coroutines.flow.MutableStateFlow
  * Works even when the page is already open, since it is route-independent.
  */
 object AccessFeatureHighlight {
-    val pending = MutableStateFlow<AccessFeatureType?>(null)
+    val pending = MutableStateFlow<WebSettingsFeature?>(null)
 }

@@ -17,17 +17,17 @@ import com.ismartcoding.plain.platform.listUploadedChunks
 import com.ismartcoding.plain.platform.mergeUploadedChunks
 import kotlinx.coroutines.launch
 
-@GraphQLQuery
+@GraphQLQuery(description = "Chunk state for the client-chosen chunk-set id `fileId`, as `index:byteSize` strings.")
 suspend fun uploadedChunks(fileId: String): List<String> {
     return listUploadedChunks(fileId)
 }
 
-@GraphQLMutation
+@GraphQLMutation(description = "Delete all uploaded chunks for `fileId`, discarding an unfinished upload.")
 suspend fun deleteChunks(fileId: String): Boolean {
     return deleteUploadedChunks(fileId)
 }
 
-@GraphQLQuery
+@GraphQLQuery(description = "Current state of the merge job for `fileId`; NONE when no job was ever started.")
 suspend fun mergeStatus(fileId: String): MergeTask {
     return MergeJobs.status(fileId)
 }
@@ -38,14 +38,11 @@ suspend fun mergeStatus(fileId: String): MergeTask {
  * Completion is signalled by WS event 38; `mergeStatus` is the polling
  * fallback for lost events.
  */
-/** Start a background merge into [path]; completion arrives via the
- *  upload_merge_result WS event, `mergeStatus` is the polling fallback. */
-@GraphQLMutation
+@GraphQLMutation(description = "Start a background merge of the uploaded chunks into the file at `path`; completion arrives via the upload_merge_result WS event, `mergeStatus` is the polling fallback. `replace=false` keeps the existing file and writes to a new sibling path instead; the summed chunk sizes must match `totalSize`.")
 suspend fun mergeChunks(fileId: String, totalChunks: Int, path: String, replace: Boolean, totalSize: Long): MergeTask =
     mergeChunksAsyncImpl(fileId) { mergeUploadedChunks(fileId, totalChunks, path, replace, isAppFile = false, totalSize) }
 
-/** Background merge into the app-private content store; [fileName] is a name hint (no directory). */
-@GraphQLMutation
+@GraphQLMutation(description = "Background merge into the app-private content store; `fileName` is a name hint (no directory), always overwrites. Returns a MergeTask — poll mergeStatus or wait for the upload_merge_result WS event.")
 suspend fun mergeAppFileChunks(fileId: String, totalChunks: Int, fileName: String, totalSize: Long): MergeTask =
     mergeChunksAsyncImpl(fileId) { mergeUploadedChunks(fileId, totalChunks, fileName, replace = true, isAppFile = true, totalSize) }
 

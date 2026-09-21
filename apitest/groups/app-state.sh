@@ -64,10 +64,10 @@ if [[ -n "$api_add_b_id" ]]; then
   fi
 
   # C06: deleteBookmarks
-  DEL_B=$(call_gql "mutation { deleteBookmarks(ids: [\"$api_add_b_id\"]) }")
-  api_del_b=$(printf '%s' "$DEL_B" | jq -r '.data.deleteBookmarks // empty')
-  if [[ "$api_del_b" == "true" ]]; then
-    pass "app-state-C06 deleteBookmarks → true"
+  DEL_B=$(call_gql "mutation { deleteBookmarks(ids: [\"$api_add_b_id\"]) { affectedCount } }")
+  api_del_b=$(printf '%s' "$DEL_B" | jq -r '.data.deleteBookmarks.affectedCount // empty')
+  if [[ "$api_del_b" == "1" ]]; then
+    pass "app-state-C06 deleteBookmarks → affectedCount=1"
   else
     fail "app-state-C06 deleteBookmarks returned: $DEL_B"
   fi
@@ -109,7 +109,7 @@ fi
 # ----------------------------------------------------------------------------
 
 # app-state-C10  pomodoroSettings returns the current settings
-PS=$(call_gql '{ pomodoroSettings { workDuration shortBreakDuration longBreakDuration pomodorosBeforeLongBreak showNotification playSoundOnComplete } }')
+PS=$(call_gql '{ pomodoroSettings { workDurationMin shortBreakDurationMin longBreakDurationMin pomodorosBeforeLongBreak showNotification playSoundOnComplete } }')
 api_ps=$(printf '%s' "$PS" | jq '.data.pomodoroSettings')
 if [[ "$api_ps" != "null" && -n "$api_ps" ]]; then
   pass "app-state-C10 pomodoroSettings returned: $api_ps"
@@ -118,7 +118,7 @@ else
 fi
 
 # app-state-C11  pomodoroToday returns current state
-PT=$(call_gql '{ pomodoroToday { date completedCount currentRound timeLeft totalTime isRunning isPause state } }')
+PT=$(call_gql '{ pomodoroToday { date completedCount currentRound timeLeftSec totalTimeSec isRunning isPaused state } }')
 api_pt=$(printf '%s' "$PT" | jq '.data.pomodoroToday')
 if [[ "$api_pt" != "null" && -n "$api_pt" ]]; then
   pass "app-state-C11 pomodoroToday returned: $api_pt"
@@ -127,10 +127,10 @@ else
 fi
 
 # app-state-C12..14  Pomodoro lifecycle (start/pause/stop)
-SP=$(call_gql 'mutation { startPomodoro(timeLeft: 1500) }')
+SP=$(call_gql 'mutation { startPomodoro(timeLeftSec: 1500) }')
 api_sp=$(printf '%s' "$SP" | jq -r '.data.startPomodoro // empty')
 if [[ "$api_sp" == "true" ]]; then
-  pass "app-state-C12 startPomodoro(timeLeft=1500) → true"
+  pass "app-state-C12 startPomodoro(timeLeftSec=1500) → true"
 else
   fail "app-state-C12 startPomodoro returned: $SP"
 fi
@@ -156,7 +156,7 @@ fi
 # ----------------------------------------------------------------------------
 
 # app-state-C15  notifications (may be permission gated)
-NT=$(call_gql '{ notifications { id packageName title text time } }')
+NT=$(call_gql '{ notifications(offset: 0, limit: 20, query: "") { id appId appName title body postedAt } }')
 api_nt_err=$(printf '%s' "$NT" | jq -r '.errors[0].message // empty')
 if [[ -n "$api_nt_err" && "$api_nt_err" == *"permission"* ]]; then
   skip "app-state-C15 notifications (permission gated: NOTIFICATION_LISTENER)"
@@ -214,7 +214,7 @@ fi
 # ----------------------------------------------------------------------------
 
 # app-state-C21  appFileCount
-AFC=$(call_gql '{ appFileCount }')
+AFC=$(call_gql '{ appFileCount(query: "") }')
 api_afc=$(printf '%s' "$AFC" | jq -r '.data.appFileCount')
 db_afc=$(sqlite3 "$DB_PULL" "SELECT COUNT(*) FROM files;")
 if [[ "$api_afc" == "$db_afc" ]]; then
@@ -224,7 +224,7 @@ else
 fi
 
 # app-state-C22  appFiles list
-AF=$(call_gql '{ appFiles(offset: 0, limit: 10) { id fileName size mimeType realPath createdAt } }')
+AF=$(call_gql '{ appFiles(offset: 0, limit: 10, query: "") { id fileName size mimeType realPath createdAt } }')
 api_af_count=$(printf '%s' "$AF" | jq '.data.appFiles | length')
 [[ "$api_af_count" -ge 0 ]] && pass "app-state-C22 appFiles returned $api_af_count items (db=$db_afc)" \
                             || fail "app-state-C22 appFiles not a list: $AF"

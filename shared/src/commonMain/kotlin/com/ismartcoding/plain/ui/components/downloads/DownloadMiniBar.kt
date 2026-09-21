@@ -23,14 +23,18 @@ import com.ismartcoding.plain.features.download.DownloadStatus
 import com.ismartcoding.plain.features.download.isTerminalDownloadStatus
 import com.ismartcoding.plain.features.share.SharedFolderBatchTask
 import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.check
 import com.ismartcoding.plain.i18n.download
 import com.ismartcoding.plain.lib.extensions.formatBytes
+import com.ismartcoding.plain.ui.theme.green
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 /**
  * In-page floating summary of the batch tasks: the most relevant batch's
  * progress plus how many are running. Clicking opens the download list.
+ * A finished batch flips to a green check state (no toast — the bar itself
+ * is the completion signal).
  */
 @Composable
 fun DownloadMiniBar(
@@ -41,6 +45,13 @@ fun DownloadMiniBar(
 ) {
     val task = mostRelevant(tasks) ?: return
     val running = tasks.count { !it.status.isTerminalDownloadStatus() }
+    val failed = task.status == DownloadStatus.PARTIAL || task.status == DownloadStatus.FAILED
+    val completed = task.status == DownloadStatus.COMPLETED
+    val accent = when {
+        failed -> MaterialTheme.colorScheme.error
+        completed -> MaterialTheme.colorScheme.green
+        else -> MaterialTheme.colorScheme.primary
+    }
     Surface(
         modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp),
         shape = RoundedCornerShape(12.dp),
@@ -52,13 +63,9 @@ fun DownloadMiniBar(
         Column(modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 10.dp, bottom = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    painterResource(leadingIcon),
+                    painterResource(if (completed) Res.drawable.check else leadingIcon),
                     contentDescription = null,
-                    tint = if (task.status == DownloadStatus.PARTIAL || task.status == DownloadStatus.FAILED) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
+                    tint = accent,
                     modifier = Modifier.size(18.dp),
                 )
                 Text(
@@ -77,11 +84,7 @@ fun DownloadMiniBar(
             LinearProgressIndicator(
                 progress = { task.fraction() },
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                color = if (task.status == DownloadStatus.PARTIAL || task.status == DownloadStatus.FAILED) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.primary
-                },
+                color = accent,
             )
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp),

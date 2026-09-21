@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -11,14 +12,17 @@ import com.ismartcoding.plain.features.feed.exportAsync
 import com.ismartcoding.plain.platform.fetchContentAsync
 import com.ismartcoding.plain.platform.fetchRssChannel
 import com.ismartcoding.plain.features.feed.importAsync
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.httpserver.loaders.FeedsLoader
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
 import com.ismartcoding.plain.httpserver.models.Feed
-import com.ismartcoding.plain.httpserver.models.FeedCount
+import com.ismartcoding.plain.httpserver.models.ActionResult
+import com.ismartcoding.plain.httpserver.models.FeedEntryCount
 import com.ismartcoding.plain.httpserver.models.FeedEntry
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.toModel
 import com.ismartcoding.plain.platform.feedWorkerOneTimeRequest
+import kotlin.reflect.typeOf
 
 @GraphQLQuery
 suspend fun feeds(): List<Feed> {
@@ -27,7 +31,7 @@ suspend fun feeds(): List<Feed> {
 }
 
 @GraphQLQuery
-suspend fun feedsCount(): List<FeedCount> {
+suspend fun feedEntryCounts(): List<FeedEntryCount> {
     return FeedHelper.getFeedCounts().map { it.toModel() }
 }
 
@@ -42,30 +46,24 @@ suspend fun feedEntry(id: ID): FeedEntry? {
     return data?.toModel()
 }
 
-@GraphQLMutation
-suspend fun fetchFeedContent(id: ID): FeedEntry? {
-    val feed = FeedEntryHelper.feedEntryDao.getById(id.value)
-    feed?.fetchContentAsync()
-    return feed?.toModel()
-}
-
-@GraphQLMutation
+@GraphQLMutation(description = "Queue a feed content sync. `id` is optional: omit it (null) to sync all feeds, or pass one feed id to sync only that feed.")
 suspend fun syncFeeds(id: ID?): Boolean {
     feedWorkerOneTimeRequest(id?.value ?: "")
     return true
 }
 
 @GraphQLMutation
-suspend fun updateFeed(id: ID, name: String, fetchContent: Boolean): Feed? {
+suspend fun updateFeed(id: ID, name: String, fetchContent: Boolean): Feed {
     FeedHelper.updateAsync(id.value) {
         this.name = name
         this.fetchContent = fetchContent
     }
     return FeedHelper.getById(id.value)?.toModel()
+        ?: throw GraphQLError("Feed ${id.value} not found after update")
 }
 
 @GraphQLMutation
-suspend fun createFeed(url: String, fetchContent: Boolean): Feed? {
+suspend fun createFeed(url: String, fetchContent: Boolean): Feed {
     val syndFeed = fetchRssChannel(url)
     val id =
         FeedHelper.addAsync {
@@ -74,7 +72,7 @@ suspend fun createFeed(url: String, fetchContent: Boolean): Feed? {
             this.fetchContent = fetchContent
         }
     feedWorkerOneTimeRequest(id)
-    return FeedHelper.getById(id)?.toModel()
+    return FeedHelper.getById(id)?.toModel() ?: throw GraphQLError("Feed $id not found after create")
 }
 
 @GraphQLMutation
@@ -101,18 +99,20 @@ suspend fun deleteFeed(id: ID): Boolean {
 }
 
 @GraphQLMutation
-suspend fun syncFeedContent(id: ID): FeedEntry? {
+suspend fun syncFeedContent(id: ID): FeedEntry {
     val feedEntry = FeedEntryHelper.feedEntryDao.getById(id.value)
-    feedEntry?.fetchContentAsync()
-    return feedEntry?.toModel()
+        ?: throw GraphQLError("Feed entry ${id.value} not found")
+    feedEntry.fetchContentAsync()
+    return feedEntry.toModel()
 }
 
 @GraphQLMutation
-suspend fun deleteFeedEntries(query: String): String {
+suspend fun deleteFeedEntries(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val ids = FeedEntryHelper.getIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
     FeedEntryHelper.deleteAsync(ids)
-    return query
+    return ActionResult(ids.size)
 }
 
 @GraphQLQuery
@@ -122,7 +122,11 @@ suspend fun feedEntries(offset: Int, limit: Int, query: String): List<FeedEntry>
 }
 
 fun SchemaBuilder.addFeedSchema() {
+    type<FeedEntryCount> {
+        property("id", typeOf<ID>(), { it: FeedEntryCount -> ID(it.id) })
+    }
     type<FeedEntry> {
+        property("feedId", typeOf<ID>(), { it: FeedEntry -> ID(it.feedId) })
         dataProperty("tags") {
             prepare { item -> item.id.value }
             loader { ids ->

@@ -55,6 +55,8 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
                     v,
                 )
                 where.args.add(v)
+            } else if (it.name == "ids") {
+                where.addIn(MediaStore.Images.Media._ID, it.value.split(","))
             } else if (it.name == "bucket_id") {
                 where.addEqual(MediaStore.Images.Media.BUCKET_ID, it.value)
             } else if (it.name == "trash") {

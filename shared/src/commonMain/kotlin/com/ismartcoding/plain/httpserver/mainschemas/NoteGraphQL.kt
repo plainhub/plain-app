@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.db.DNote
+import com.ismartcoding.plain.platform.AppDatabase
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -9,7 +12,9 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.httpserver.loaders.TagsLoader
+import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.ID
 import com.ismartcoding.plain.httpserver.models.Note
 import com.ismartcoding.plain.httpserver.models.NoteInput
@@ -29,56 +34,69 @@ suspend fun note(id: ID): Note? {
 }
 
 @GraphQLMutation
-suspend fun saveNote(id: ID, input: NoteInput): Note? {
-    val item =
-        NoteHelper.addOrUpdateAsync(id.value) {
-            title = input.title
-            content = input.content
-        }
-    NotesViewModel.reloadAsync()
-    return NoteHelper.getById(item.id)?.toModel()
+suspend fun createNote(input: NoteInput): Note {
+    return upsertNote("") { title = input.title; content = input.content }
 }
 
 @GraphQLMutation
-suspend fun saveFeedEntriesToNotes(query: String): List<String> {
+suspend fun updateNote(id: ID, input: NoteInput): Note {
+    if (AppDatabase.instance.noteDao().getById(id.value) == null) {
+        throw GraphQLError("Note ${'$'}{id.value} not found")
+    }
+    return upsertNote(id.value) { title = input.title; content = input.content }
+}
+
+private suspend fun upsertNote(id: String, updateItem: DNote.() -> Unit): Note {
+    val item = NoteHelper.addOrUpdateAsync(id, updateItem)
+    NotesViewModel.reloadAsync()
+    return NoteHelper.getById(item.id)?.toModel()
+        ?: throw GraphQLError("Note ${'$'}{item.id} not found after save")
+}
+
+@GraphQLMutation
+suspend fun saveFeedEntriesToNotes(query: String): List<ID> {
+    QueryHelper.requireExplicitBulkQuery(query)
     val entries = FeedEntryHelper.search(query, Int.MAX_VALUE, 0)
-    val ids = mutableListOf<String>()
+    val ids = mutableListOf<ID>()
     entries.forEach { m ->
         val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
         NoteHelper.saveToNotesAsync(m.id) {
             title = c.getMarkdownTitle()
             content = c
         }
-        ids.add(m.id)
+        ids.add(ID(m.id))
     }
     NotesViewModel.reloadAsync()
     return ids
 }
 
 @GraphQLMutation
-suspend fun trashNotes(query: String): String {
+suspend fun trashNotes(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val ids = NoteHelper.getIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
     NoteHelper.trashAsync(ids)
     NotesViewModel.reloadAsync()
-    return query
+    return ActionResult(ids.size)
 }
 
 @GraphQLMutation
-suspend fun restoreNotes(query: String): String {
+suspend fun restoreNotes(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val ids = NoteHelper.getTrashedIdsAsync(query)
     NoteHelper.restoreAsync(ids)
     NotesViewModel.reloadAsync()
-    return query
+    return ActionResult(ids.size)
 }
 
 @GraphQLMutation
-suspend fun deleteNotes(query: String): String {
+suspend fun deleteNotes(query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val ids = NoteHelper.getTrashedIdsAsync(query)
     TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
     NoteHelper.deleteAsync(ids)
     NotesViewModel.reloadAsync()
-    return query
+    return ActionResult(ids.size)
 }
 
 @GraphQLMutation

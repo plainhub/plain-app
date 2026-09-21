@@ -73,9 +73,12 @@ fun __Schema.toSDL(): String = buildString {
                 printedTypes.add(name)
                 printDescription(type.description)
                 append("interface $name")
-                if (!type.possibleTypes.isNullOrEmpty()) {
+                // An interface may implement other interfaces; its own possible
+                // types are implied by the objects' `implements` clauses and are
+                // NOT part of SDL syntax.
+                if (!type.interfaces.isNullOrEmpty()) {
                     append(" implements ")
-                    append(type.possibleTypes!!.joinToString(", ") { it.name!! })
+                    append(type.interfaces!!.joinToString(", ") { it.name!! })
                 }
                 appendLine(" {")
                 type.fields?.forEach { field ->

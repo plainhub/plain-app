@@ -27,8 +27,12 @@ class DownloadCenterTest {
     private class GatedEngine : DownloadEngine {
         val started = java.util.concurrent.CopyOnWriteArrayList<String>()
         val finished = java.util.concurrent.CopyOnWriteArrayList<String>()
+
+        // Test thread completes gates / mutates failThese while Dispatchers.Default
+        // workers await/read them — both must carry a happens-before (plain
+        // HashMap/Set lets a worker miss the completed gate and hang forever).
         val gates = java.util.concurrent.ConcurrentHashMap<String, CompletableDeferred<Unit>>()
-        val failThese = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+        val failThese: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
         fun gate(id: String) = gates.computeIfAbsent(id) { CompletableDeferred() }
 
@@ -70,10 +74,15 @@ class DownloadCenterTest {
         runBlocking {
             withTimeoutOrNull(timeoutMs) {
                 while (!cond()) delay(1)
-            } ?: error("condition not met in time: " + DownloadCenter.all().joinToString { it.id + ":" + it.status })
+            } ?: error("condition not met in time: " + DownloadCenter.all().joinToString { it.id + ":" + it.status + " err=" + it.error })
         }
     }
 
+    /**
+     * Poll the progress StateFlow, NOT the registry handle: flow writes give a
+     * happens-before with the worker's status write, plain field reads don't
+     * (arm64 can loop on a stale value until the timeout).
+     */
     private fun statusOf(id: String): DownloadStatus? = DownloadCenter.progress.value[id]?.status
 
     @Test
@@ -102,7 +111,7 @@ class DownloadCenterTest {
                 statusOf("cap-3") == DownloadStatus.DOWNLOADING
         }
         // The two extra tasks stay queued in the registry.
-        val snapshot = DownloadCenter.all().filter { it.id.startsWith("cap-") }
+        val snapshot = DownloadCenter.progress.value.values.filter { it.id.startsWith("cap-") }
         assertEquals(5, snapshot.size)
         assertEquals(
             2,
@@ -125,7 +134,7 @@ class DownloadCenterTest {
         until { engine.started.contains("cancel-1") }
 
         assertTrue(DownloadCenter.cancel("cancel-1"))
-        until { DownloadCenter.get("cancel-1")?.status == DownloadStatus.CANCELED }
+        until { statusOf("cancel-1") == DownloadStatus.CANCELED }
         assertNotNull(DownloadCenter.get("cancel-1"), "canceled task stays visible until removed")
         assertFalse(DownloadCenter.cancel("cancel-1"), "cancel of a terminal task is a no-op")
 
@@ -142,7 +151,7 @@ class DownloadCenterTest {
         until { engine.started.contains("pause-1") }
 
         assertTrue(DownloadCenter.pause("pause-1"))
-        until { DownloadCenter.get("pause-1")?.status == DownloadStatus.PAUSED }
+        until { statusOf("pause-1") == DownloadStatus.PAUSED }
 
         assertTrue(DownloadCenter.resume("pause-1"))
         until { engine.started.count { it == "pause-1" } == 2 }
@@ -157,7 +166,7 @@ class DownloadCenterTest {
         DownloadCenter.registerEngine("test-fail", engine)
         engine.failThese.add("fail-1")
         DownloadCenter.add(Task("fail-1", "test-fail"))
-        until { DownloadCenter.get("fail-1")?.status == DownloadStatus.FAILED }
+        until { statusOf("fail-1") == DownloadStatus.FAILED }
         until { engine.finished.contains("fail-1") }
         engine.failThese.remove("fail-1")
         assertTrue(DownloadCenter.retry("fail-1"), "retry accepts FAILED tasks")
@@ -170,7 +179,7 @@ class DownloadCenterTest {
         resetCenter()
         val engine = GatedEngine()
         DownloadCenter.registerEngine("test-updates", engine)
-        val seen = java.util.concurrent.CopyOnWriteArrayList<Int>()
+        val seen = java.util.concurrent.ConcurrentLinkedQueue<Int>()
         val job = launch(kotlinx.coroutines.Dispatchers.Unconfined) {
             DownloadCenter.updates.collect { seen.add(it.size) }
         }
@@ -186,7 +195,7 @@ class DownloadCenterTest {
     fun missingEngineFailsTheTask() {
         resetCenter()
         DownloadCenter.add(Task("noengine-1", "test-missing"))
-        until { DownloadCenter.get("noengine-1")?.status == DownloadStatus.FAILED }
+        until { statusOf("noengine-1") == DownloadStatus.FAILED }
         DownloadCenter.remove("noengine-1")
         until { DownloadCenter.get("noengine-1") == null }
     }

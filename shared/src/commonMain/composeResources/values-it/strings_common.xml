@@ -174,4 +174,15 @@
     <string name="discard_changes_text">Le modifiche non sono state salvate.</string>
     <string name="large_file_edit">Questo file è molto grande. La modifica può essere lenta. Continuare?</string>
     <string name="line_number">Numero di riga</string>
+    <string name="global_search_hint">Cerca tutto</string>
+    <string name="search_in_domain">Cerca in %1$s</string>
+    <string name="recent_searches">Ricerche recenti</string>
+    <string name="search_scope_hint">Ricerca solo in %1$s. Tocca "Tutti" per cercare ogni tipo.</string>
+    <string name="view_all_n">Vedi tutto (%1$d)</string>
+    <string name="show_more_n">Mostra altri (%1$d/%2$d)</string>
+    <string name="no_results_for">Nessun risultato per "%1$s"</string>
+    <string name="no_results_hint">Prova una parola chiave più breve o scegli un filtro di tipo.</string>
+    <string name="no_results_hint_scope">Prova una parola chiave più breve o torna a "Tutti".</string>
+    <string name="search_in_all_types">Cerca in tutti i tipi</string>
+    <string name="clear_search_term">Cancella il termine di ricerca</string>
 </resources>

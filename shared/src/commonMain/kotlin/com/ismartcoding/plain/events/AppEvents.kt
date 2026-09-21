@@ -120,7 +120,7 @@ data class ClipboardSyncChangedEvent(val enabled: Boolean) : ChannelEvent()
 
 class IgnoreBatteryOptimizationResultEvent : ChannelEvent()
 
-class ClearAudioPlaylistEvent : ChannelEvent()
+class ClearAudioQueueEvent : ChannelEvent()
 
 class DownloadUpdateEvent : ChannelEvent()
 class CancelUpdateDownloadEvent : ChannelEvent()

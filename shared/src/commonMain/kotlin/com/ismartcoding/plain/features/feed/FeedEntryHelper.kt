@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.feed
 
 import com.ismartcoding.plain.helpers.ContentWhere
+import com.ismartcoding.plain.helpers.FilterField
 import com.ismartcoding.plain.db.rawQuery
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.AppDatabase
@@ -124,9 +125,16 @@ object FeedEntryHelper {
         where: ContentWhere,
         query: String,
     ) = withIO {
-        QueryHelper.parseAsync(query).forEach {
+        applyFeedEntryFilterFields(where, QueryHelper.parseAsync(query))
+    }
+
+    /** Pure field-application seam (host-testable): parsed query fields → where conditions. */
+    internal fun applyFeedEntryFilterFields(where: ContentWhere, fields: List<FilterField>) {
+        fields.forEach {
             if (it.name == "text") {
                 where.addLikes(listOf("title", "description", "content"), listOf(it.value, it.value, it.value))
+            } else if (it.name == QueryHelper.BULK_ALL_FIELD) {
+                // explicit whole-table sentinel — no condition
             } else if (it.name == "feed_id") {
                 where.add("feed_id=?", it.value)
             } else if (it.name == "today" && it.value == "true") {

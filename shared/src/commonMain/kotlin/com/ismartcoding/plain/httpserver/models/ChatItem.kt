@@ -2,6 +2,7 @@ package com.ismartcoding.plain.httpserver.models
 
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.enums.ChatStatus
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLField
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLIgnore
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLUnion
@@ -21,12 +22,14 @@ data class ChatItem(
     val fromId: String,
     val toId: String,
     val channelId: String,
+    @GraphQLField(description = "Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`; the typed payload is also mirrored in `data`.")
     val content: String,
     val createdAt: Instant,
     val updatedAt: Instant,
     @Transient private val _content: DMessageContent? = null,
     @GraphQLIgnore @Contextual var data: ChatItemContent? = null,
     val status: ChatStatus = ChatStatus.SENT,
+    @GraphQLField(description = "Per-recipient delivery details as JSON (peer delivery results); empty when the message has no delivery failures. Drives SENT/PARTIAL/FAILED alongside `status`.")
     val statusData: String = "",
 ) {
     fun getContentData(): ChatItemContent? {
@@ -53,8 +56,10 @@ data class ChatItem(
 
             is DMessageText -> {
                 val messageText = _content.value as DMessageText
-                val imageIds = messageText.linkPreviews
-                    .map { val p = it.imageLocalPath; if (p.isNullOrEmpty()) "" else getFileId(p) }
+                val imageIds = messageText.linkPreviews.mapNotNull {
+                    val p = it.imageLocalPath
+                    if (p.isNullOrEmpty()) null else getFileId(p)
+                }
                 ChatItemContent.ChatText(imageIds)
             }
 
@@ -71,15 +76,18 @@ data class ChatItem(
 sealed class ChatItemContent {
     @GraphQLType
     @Serializable
+    /** Shared image fileId list (app file store ids, String). */
     data class ChatImages(val ids: List<String>) : ChatItemContent()
 
     @GraphQLType
     @Serializable
+    /** Shared file fileId list (app file store ids, String). */
     data class ChatFiles(val ids: List<String>) : ChatItemContent()
 
     @GraphQLType
     @Serializable
-    data class ChatText(val ids: List<String>) : ChatItemContent()
+    /** fileId list (String) of locally cached link-preview images; the message text lives inside the ChatItem.content envelope (value.text). */
+    data class ChatText(val linkPreviewImageIds: List<String>) : ChatItemContent()
 }
 
 fun DChat.toModel(): ChatItem {

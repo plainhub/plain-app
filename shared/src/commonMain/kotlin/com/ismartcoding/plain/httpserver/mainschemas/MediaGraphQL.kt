@@ -23,9 +23,10 @@ import com.ismartcoding.plain.platform.trashMedia
 import com.ismartcoding.plain.platform.enqueueRemoveImageIndex
 import com.ismartcoding.plain.platform.moveMedia
 import com.ismartcoding.plain.helpers.FilePathValidator
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.preferences.VideoPlaylistPreference
-import com.ismartcoding.plain.httpserver.models.MediaActionResult
+import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.MediaBucket
 import com.ismartcoding.plain.httpserver.models.toModel
 
@@ -39,7 +40,8 @@ suspend fun mediaBuckets(type: MediaDataType): List<MediaBucket> {
 }
 
 @GraphQLMutation
-suspend fun deleteMediaItems(type: MediaDataType, query: String): MediaActionResult {
+suspend fun deleteMediaItems(type: MediaDataType, query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val dataType = type.toDataType()
     val hasTrashFeature = AppFeatureType.MEDIA_TRASH.has()
     val ids = if (hasTrashFeature) getTrashedMediaIds(dataType, query) else getMediaIds(dataType, query)
@@ -47,14 +49,15 @@ suspend fun deleteMediaItems(type: MediaDataType, query: String): MediaActionRes
         enqueueRemoveImageIndex(ids)
     }
     deleteMedia(dataType, ids, true)
-    return MediaActionResult(type, query, ids.size)
+    return ActionResult(ids.size)
 }
 
 @GraphQLMutation
-suspend fun trashMediaItems(type: MediaDataType, query: String): MediaActionResult {
+suspend fun trashMediaItems(type: MediaDataType, query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val dataType = type.toDataType()
     if (!isRPlus()) {
-        return MediaActionResult(type, query, 0)
+        return ActionResult(0)
     }
 
     val ids = getMediaIds(dataType, query)
@@ -81,14 +84,15 @@ suspend fun trashMediaItems(type: MediaDataType, query: String): MediaActionResu
         }
     }
     TagHelper.deleteTagRelationByKeys(ids, dataType)
-    return MediaActionResult(type, query, ids.size)
+    return ActionResult(ids.size)
 }
 
 @GraphQLMutation
-suspend fun restoreMediaItems(type: MediaDataType, query: String): MediaActionResult {
+suspend fun restoreMediaItems(type: MediaDataType, query: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val dataType = type.toDataType()
     if (!isRPlus()) {
-        return MediaActionResult(type, query, 0)
+        return ActionResult(0)
     }
 
     val ids = getTrashedMediaIds(dataType, query)
@@ -96,23 +100,24 @@ suspend fun restoreMediaItems(type: MediaDataType, query: String): MediaActionRe
         enqueueRemoveImageIndex(ids)
     }
     restoreMedia(dataType, ids)
-    return MediaActionResult(type, query, ids.size)
+    return ActionResult(ids.size)
 }
 
 @GraphQLMutation
-suspend fun moveMediaItems(type: MediaDataType, query: String, destDir: String): MediaActionResult {
+suspend fun moveMediaItems(type: MediaDataType, query: String, destDir: String): ActionResult {
+    QueryHelper.requireExplicitBulkQuery(query)
     val dataType = type.toDataType()
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     FilePathValidator.requireAllSafe(listOf(destDir))
     val ids = getMediaIds(dataType, query)
     if (ids.isEmpty()) {
-        return MediaActionResult(type, query, 0)
+        return ActionResult(0)
     }
     if (type == MediaDataType.IMAGE) {
         enqueueRemoveImageIndex(ids)
     }
     moveMedia(dataType, ids, destDir)
-    return MediaActionResult(type, query, ids.size)
+    return ActionResult(ids.size)
 }
 
 fun SchemaBuilder.addMediaSchema() {

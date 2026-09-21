@@ -11,8 +11,10 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -20,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.features.download.DownloadStatus
 import com.ismartcoding.plain.features.share.SharedFileDto
 import com.ismartcoding.plain.features.share.SharedFolderBatchTask
 import com.ismartcoding.plain.features.share.SharedLink
@@ -29,6 +32,7 @@ import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.components.downloads.DownloadMiniBar
 import com.ismartcoding.plain.ui.models.BreadcrumbItem
 import com.ismartcoding.plain.ui.page.files.components.BreadcrumbView
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 
 /**
@@ -64,7 +68,21 @@ internal fun SharedFolderContent(
                 onItemClick = { item -> state.onCrumbClick(item.path) },
             )
         }
-        val showMini = tasks.isNotEmpty() && !state.selectMode
+        // All batches done: the bar flips to its green check state, lingers a
+        // few seconds so the completion is seen, then gets out of the way.
+        // Anything unfinished (partial/failed/queued) keeps the bar parked.
+        val allCompleted = tasks.isNotEmpty() && tasks.all { it.status == DownloadStatus.COMPLETED }
+        var completionDismissed by remember { mutableStateOf(false) }
+        LaunchedEffect(allCompleted) {
+            if (allCompleted) {
+                completionDismissed = false
+                delay(COMPLETION_LINGER_MS)
+                completionDismissed = true
+            } else {
+                completionDismissed = false
+            }
+        }
+        val showMini = tasks.isNotEmpty() && !state.selectMode && !(allCompleted && completionDismissed)
         var miniClearance by remember { mutableIntStateOf(0) }
         Box(modifier = Modifier.weight(1f)) {
             when {
@@ -133,3 +151,5 @@ private fun CenteredHint(text: String) {
         )
     }
 }
+
+private const val COMPLETION_LINGER_MS = 4_000L

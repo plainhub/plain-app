@@ -14,7 +14,7 @@ data class Bookmark(
     val url: String,
     val title: String,
     val faviconPath: String,
-    val groupId: String,
+    val groupId: ID,
     val pinned: Boolean,
     val clickCount: Int,
     val lastClickedAt: Instant?,
@@ -29,6 +29,8 @@ data class BookmarkGroup(
     val name: String,
     val collapsed: Boolean,
     val sortOrder: Int,
+    /** Number of bookmarks directly in this group (ungrouped bookmarks are not a group). */
+    val itemCount: Int,
     val createdAt: Instant,
     val updatedAt: Instant,
 )
@@ -38,7 +40,7 @@ data class BookmarkGroup(
 data class BookmarkInput(
     val url: String,
     val title: String,
-    val groupId: String,
+    val groupId: ID,
     val pinned: Boolean,
     val sortOrder: Int,
 )
@@ -49,7 +51,7 @@ fun DBookmark.toModel(): Bookmark {
         url = url,
         title = title,
         faviconPath = faviconPath,
-        groupId = groupId,
+        groupId = ID(groupId),
         pinned = pinned,
         clickCount = clickCount,
         lastClickedAt = lastClickedAt,
@@ -59,12 +61,13 @@ fun DBookmark.toModel(): Bookmark {
     )
 }
 
-fun DBookmarkGroup.toModel(): BookmarkGroup {
+fun DBookmarkGroup.toModel(itemCount: Int): BookmarkGroup {
     return BookmarkGroup(
         id = ID(id),
         name = name,
         collapsed = collapsed,
         sortOrder = sortOrder,
+        itemCount = itemCount,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )

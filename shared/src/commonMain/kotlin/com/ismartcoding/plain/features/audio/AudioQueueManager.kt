@@ -292,7 +292,7 @@ object AudioQueueManager {
 
     /** Total plays per artist, from the play history window. */
     suspend fun artistPlayCounts(): Map<String, Long> =
-        historyDao.playCountsByArtist().associate { it.artist to it.cnt }
+        historyDao.playCountsByArtist().associate { it.artist to it.count }
 
     // ---------- playback order ----------
 
@@ -382,6 +382,33 @@ object AudioQueueManager {
             AudioPlaySource.NONE -> -1
         }
         saveSource(order.source.copy(currentPath = path, currentIndex = sourcePos))
+    }
+
+    /**
+     * Text-filtered queue page: ranks are resolved lazily and items whose
+     * title/artist/path do not contain [text] are skipped before pagination,
+     * so offset/limit apply to the filtered sequence.
+     */
+    suspend fun queuePageFiltered(text: String, offset: Int, limit: Int): List<DPlaylistAudio> {
+        if (text.isEmpty()) return queuePage(offset, limit)
+        val order = playbackOrder()
+        val superseded = supersededSourcePaths(order)
+        val q = text.lowercase()
+        val out = mutableListOf<DPlaylistAudio>()
+        var matched = 0
+        var rank = 0
+        fun matches(a: DPlaylistAudio): Boolean =
+            a.title.lowercase().contains(q) || a.artist.lowercase().contains(q) || a.path.lowercase().contains(q)
+        while (rank < order.total && out.size < limit) {
+            val item = trackAt(order, rank) ?: break
+            rank++
+            if (item.path in superseded) continue
+            if (matches(item)) {
+                if (matched >= offset) out.add(item)
+                matched++
+            }
+        }
+        return out
     }
 
     suspend fun queueTotal(): Int {
@@ -505,6 +532,7 @@ object AudioQueueManager {
                 audioPath = a.path,
                 title = a.title,
                 artist = a.artist,
+                albumId = a.albumId,
                 duration = a.duration,
                 position = next,
             )
@@ -525,15 +553,26 @@ object AudioQueueManager {
     suspend fun playlistItemsPage(playlistId: String, offset: Int, limit: Int): List<DAudioPlaylistItem> =
         itemDao.pageByPlaylist(playlistId, limit, offset)
 
+    suspend fun playlistItemsPageFiltered(playlistId: String, text: String, offset: Int, limit: Int): List<DAudioPlaylistItem> =
+        itemDao.pageByPlaylistText(playlistId, "%$text%", limit, offset)
+
     suspend fun playlistItemCount(playlistId: String): Int = itemDao.countByPlaylist(playlistId)
+
+    /** Backfills the album snapshot of rows written before the column existed. */
+    suspend fun updatePlaylistItemAlbums(updates: List<Pair<String, String>>) {
+        updates.forEach { (id, albumId) -> itemDao.updateAlbumId(id, albumId) }
+    }
 
     // ---------- play history ----------
 
     suspend fun recentPage(limit: Int, offset: Int): List<DAudioPlayHistory> = historyDao.page(limit, offset)
+
+    suspend fun recentPageFiltered(text: String, limit: Int, offset: Int): List<DAudioPlayHistory> =
+        historyDao.pageText("%$text%", limit, offset)
 }
 
 fun DAudioPlaylistItem.toPlaylistAudio(): DPlaylistAudio =
-    DPlaylistAudio(title = title, path = audioPath, artist = artist, duration = duration)
+    DPlaylistAudio(title = title, path = audioPath, artist = artist, duration = duration, albumId = albumId)
 
 fun DAudioQueueItem.toPlaylistAudio(): DPlaylistAudio =
     DPlaylistAudio(title = title, path = path, artist = artist, duration = duration)

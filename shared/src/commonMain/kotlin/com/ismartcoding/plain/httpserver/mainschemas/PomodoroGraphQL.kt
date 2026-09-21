@@ -16,6 +16,7 @@ import com.ismartcoding.plain.httpserver.models.PomodoroToday
 import com.ismartcoding.plain.httpserver.models.pomodoroRuntimeInfoProvider
 import com.ismartcoding.plain.httpserver.models.toModel
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 
 @GraphQLQuery
@@ -25,18 +26,18 @@ suspend fun pomodoroSettings(): PomodoroSettings {
 
 @GraphQLQuery
 suspend fun pomodoroToday(): PomodoroToday {
-    val dao = AppDatabase.instance.pomodoroItemDao()
-    val today = TimeHelper.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
+    val zone = TimeZone.currentSystemDefault()
+    val today = TimeHelper.now().toLocalDateTime(zone).date.atStartOfDayIn(zone)
     val info = pomodoroRuntimeInfoProvider?.invoke()
     return if (info != null) {
         PomodoroToday(
             date = today,
             completedCount = info.completedCount,
             currentRound = info.currentRound,
-            timeLeft = info.timeLeft,
-            totalTime = info.totalTime,
+            timeLeftSec = info.timeLeft,
+            totalTimeSec = info.totalTime,
             isRunning = info.isRunning,
-            isPause = info.isPause,
+            isPaused = info.isPaused,
             state = info.state
         )
     } else {
@@ -44,18 +45,18 @@ suspend fun pomodoroToday(): PomodoroToday {
             date = today,
             completedCount = 0,
             currentRound = 1,
-            timeLeft = 0,
-            totalTime = 0,
+            timeLeftSec = 0,
+            totalTimeSec = 0,
             isRunning = false,
-            isPause = false,
+            isPaused = false,
             state = PomodoroState.WORK
         )
     }
 }
 
 @GraphQLMutation
-suspend fun startPomodoro(timeLeft: Int): Boolean {
-    sendEvent(HPomodoroStartEvent(timeLeft))
+suspend fun startPomodoro(timeLeftSec: Int): Boolean {
+    sendEvent(HPomodoroStartEvent(timeLeftSec))
     return true
 }
 

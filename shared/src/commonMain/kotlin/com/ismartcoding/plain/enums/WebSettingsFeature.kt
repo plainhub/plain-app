@@ -5,7 +5,7 @@ package com.ismartcoding.plain.enums
  * passes one via the openWebSettings mutation; the phone then opens the page,
  * scrolls to the option and shows a bubble pointing at it.
  */
-enum class AccessFeatureType {
+enum class WebSettingsFeature {
     FILES,
     CONTACTS,
     SMS,

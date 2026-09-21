@@ -21,4 +21,4 @@ data class Package(
 data class Certificate(val issuer: String, val subject: String, val serialNumber: String, val validFrom: Instant, val validTo: Instant)
 
 @GraphQLType
-data class PackageStatus(val id: ID, val exist: Boolean, val updatedAt: Instant?)
+data class PackageStatus(val id: ID, val exists: Boolean, val updatedAt: Instant?)

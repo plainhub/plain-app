@@ -83,6 +83,8 @@ actual suspend fun countSmsConversations(query: String): Int = 0
 
 actual suspend fun getArchivedSmsConversations(): List<com.ismartcoding.plain.features.sms.DMessageConversation> = emptyList()
 
+actual suspend fun getSmsConversationDate(threadId: String): Long? = null
+
 actual suspend fun getSmsAllCounts(): DSmsCounts = DSmsCounts(0, 0, 0, 0)
 
 actual suspend fun trashSms(query: String): Int = 0

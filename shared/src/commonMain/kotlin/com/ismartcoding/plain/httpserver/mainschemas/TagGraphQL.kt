@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -31,21 +32,21 @@ suspend fun tagRelations(type: DataType, keys: List<String>): List<TagRelation> 
 }
 
 @GraphQLMutation
-suspend fun createTag(type: DataType, name: String): Tag? {
+suspend fun createTag(type: DataType, name: String): Tag {
     val id =
         TagHelper.addOrUpdate("") {
             this.name = name
             this.type = type.value
         }
-    return TagHelper.get(id)?.toModel()
+    return TagHelper.get(id)?.toModel() ?: throw GraphQLError("Tag $id not found after create")
 }
 
 @GraphQLMutation
-suspend fun updateTag(id: ID, name: String): Tag? {
+suspend fun updateTag(id: ID, name: String): Tag {
     TagHelper.addOrUpdate(id.value) {
         this.name = name
     }
-    return TagHelper.get(id.value)?.toModel()
+    return TagHelper.get(id.value)?.toModel() ?: throw GraphQLError("Tag ${id.value} not found")
 }
 
 @GraphQLMutation

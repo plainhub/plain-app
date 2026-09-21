@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.models
 
+import com.ismartcoding.plain.enums.CallType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
@@ -10,8 +11,8 @@ data class Call(
     var name: String,
     var photoId: String,
     var startedAt: Instant,
-    var duration: Int,
-    var type: Int,
+    var durationSec: Int,
+    var type: CallType,
     val accountId: ID,
     val geo: PhoneGeo?,
 )

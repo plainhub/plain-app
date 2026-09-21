@@ -17,16 +17,17 @@ import com.ismartcoding.plain.platform.writeFileText
 import com.ismartcoding.plain.helpers.FilePathValidator
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.httpserver.models.FavoriteFolder
+import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.File
 import com.ismartcoding.plain.httpserver.models.toModel
 
 @GraphQLMutation
-suspend fun deleteFiles(paths: List<String>): Boolean {
+suspend fun deleteFiles(paths: List<String>): ActionResult {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     FilePathValidator.requireAllSafe(paths)
-    paths.forEach { deleteFileOrDir(it) }
+    val deleted = paths.count { deleteFileOrDir(it) }
     scanFiles(paths.toTypedArray())
-    return true
+    return ActionResult(deleted)
 }
 
 @GraphQLMutation

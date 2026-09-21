@@ -28,7 +28,7 @@ object ClipboardHelper {
         dao.insert(entry)
     }
 
-    suspend fun deleteByIds(ids: List<String>) = withIO {
+    suspend fun deleteByIds(ids: List<String>): Int = withIO {
         dao.deleteByIds(ids)
     }
 

@@ -5,6 +5,7 @@ import com.ismartcoding.plain.data.DDeviceStatus
 import com.ismartcoding.plain.data.DTemperature
 import com.ismartcoding.plain.data.DevicePlatform
 import com.ismartcoding.plain.lib.TimeHelper
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLField
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
@@ -30,7 +31,7 @@ class AndroidExtras {
 class DisplayInfo {
     var width: Int = 0
     var height: Int = 0
-    var density: String = ""
+    var density: Float = 0f
 }
 
 @GraphQLType
@@ -50,6 +51,7 @@ class DeviceInfo {
     var totalMemory: Long = 0L
     var totalStorage: Long = 0L
     var display: DisplayInfo? = null
+    @GraphQLField(description = "Android-only build/runtime details; null on non-Android devices.")
     var android: AndroidExtras? = null
 }
 
@@ -62,10 +64,12 @@ class Temperature {
 @GraphQLType
 class DeviceStatus {
     var uptimeSec: Long = 0L
+    @GraphQLField(description = "Battery percentage; null on devices without a battery (desktop/NAS).")
     var batteryLevel: Int? = null
     var charging: Boolean = false
     var temperatures: List<Temperature> = emptyList()
     var cpuUsage: Double = 0.0
+    @GraphQLField(description = "Available memory in bytes; null when the platform cannot report it.")
     var memoryAvailable: Long? = null
     var storageAvailable: Long = 0L
 }

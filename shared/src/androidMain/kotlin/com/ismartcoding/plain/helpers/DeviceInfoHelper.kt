@@ -54,7 +54,7 @@ object DeviceInfoHelper {
         val displayInfo = DDisplayInfo()
         displayInfo.width = dm.widthPixels
         displayInfo.height = dm.heightPixels
-        displayInfo.density = dm.density.toString()
+        displayInfo.density = dm.density
         info.display = displayInfo
 
         val androidInfo = DAndroidExtras()

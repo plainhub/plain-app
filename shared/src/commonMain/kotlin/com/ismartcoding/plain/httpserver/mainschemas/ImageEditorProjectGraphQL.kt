@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
 import com.ismartcoding.plain.features.ImageEditorProjectHelper
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -24,14 +25,14 @@ suspend fun imageEditorProject(id: ID): ImageEditorProject? {
 }
 
 @GraphQLMutation
-suspend fun saveImageEditorProject(id: ID, input: ImageEditorProjectInput): ImageEditorProject? {
+suspend fun saveImageEditorProject(id: ID, input: ImageEditorProjectInput): ImageEditorProject {
     return ImageEditorProjectHelper.addOrUpdateAsync(id.value) {
         stateB64 = input.stateB64
         thumbnail = input.thumbnail
         canvasWidth = input.canvasWidth
         canvasHeight = input.canvasHeight
         layerCount = input.layerCount
-    }?.toModel()
+    }?.toModel() ?: throw GraphQLError("Image editor project ${id.value} not found after save")
 }
 
 @GraphQLMutation
@@ -41,8 +42,8 @@ suspend fun deleteImageEditorProject(id: ID): Boolean {
 }
 
 @GraphQLMutation
-suspend fun broadcastImageEditorUpdate(pid: String, update: String): Boolean {
-    ImageEditorProjectHelper.broadcastUpdate(pid, update)
+suspend fun broadcastImageEditorUpdate(id: ID, update: String): Boolean {
+    ImageEditorProjectHelper.broadcastUpdate(id.value, update)
     return true
 }
 

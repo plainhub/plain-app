@@ -21,18 +21,19 @@ import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.enums.ButtonSize
-import com.ismartcoding.plain.ui.page.audio.components.PlaylistCoverArtwork
+import com.ismartcoding.plain.ui.page.playlist.PlaylistAlbumCover
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
-/** Hero row: cover + name + "N items" summary. */
+/** Hero row: cover mosaic + name + "N items" summary. */
 @Composable
 fun PlaylistHeaderRow(
     name: String,
     itemCount: Int,
+    albums: List<PlaylistAlbumCover>,
     gradientIndex: Int,
 ) {
     Row(
@@ -41,7 +42,8 @@ fun PlaylistHeaderRow(
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PlaylistCoverArtwork(
+        PlaylistMosaicCover(
+            albums = albums,
             gradientIndex = gradientIndex,
             modifier = Modifier.size(96.dp).clip(RoundedCornerShape(12.dp)),
             iconSize = 36,

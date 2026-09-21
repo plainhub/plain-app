@@ -10,7 +10,7 @@ data class Image(
     override var title: String,
     override var path: String,
     override val size: Long,
-    override val bucketId: String,
+    override val bucketId: ID,
     override val createdAt: Instant,
     override val updatedAt: Instant,
     val takenAt: Instant?,
@@ -18,5 +18,5 @@ data class Image(
 ) : MediaItem
 
 fun DImage.toModel(): Image {
-    return Image(ID(id), title, path, size, bucketId, createdAt, updatedAt, takenAt, isFavorite)
+    return Image(ID(id), title, path, size, ID(bucketId), createdAt, updatedAt, takenAt, isFavorite)
 }

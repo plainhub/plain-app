@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.models
 
+import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLField
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
 import kotlin.time.Instant
 
@@ -9,9 +10,10 @@ data class Audio(
     override val title: String,
     val artist: String,
     override val path: String,
-    val duration: Long,
+    val durationMs: Long,
     override val size: Long,
-    override val bucketId: String,
+    override val bucketId: ID,
+    @GraphQLField(description = "FileId of the album-art image, usable in file display URLs; empty when the track has no album art.")
     val albumFileId: String,
     override val createdAt: Instant,
     override val updatedAt: Instant,
@@ -19,11 +21,11 @@ data class Audio(
 ) : MediaItem
 
 @GraphQLType
-data class PlaylistAudio(
+data class AudioItem(
     val title: String,
     val artist: String,
     val path: String,
-    val duration: Long,
+    val durationMs: Long,
 )
 
 @GraphQLType
@@ -40,7 +42,7 @@ data class AudioPlayHistory(
     val path: String,
     val title: String,
     val artist: String,
-    val duration: Long,
+    val durationMs: Long,
     val playCount: Long,
     val playedAt: Instant,
 )

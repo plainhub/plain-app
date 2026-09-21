@@ -70,6 +70,7 @@ fun PlaylistDetailPage(
 
     var playlistName by remember { mutableStateOf("") }
     var items by remember { mutableStateOf<List<DAudioPlaylistItem>>(listOf()) }
+    var albumCovers by remember { mutableStateOf<List<PlaylistAlbumCover>>(emptyList()) }
     var sort by remember { mutableStateOf(PlaylistSortOrder.CUSTOM) }
     var version by remember { mutableIntStateOf(0) }
     var showMore by remember { mutableStateOf(false) }
@@ -82,6 +83,11 @@ fun PlaylistDetailPage(
         }
         playlistName = name ?: ""
         items = list
+    }
+
+    // Album mosaic loads from the items alone; legacy rows backfill inside.
+    LaunchedEffect(items) {
+        albumCovers = if (items.isEmpty()) emptyList() else loadPlaylistAlbumCovers(items)
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -161,6 +167,7 @@ fun PlaylistDetailPage(
                 PlaylistHeaderRow(
                     name = playlistName,
                     itemCount = items.size,
+                    albums = albumCovers,
                     gradientIndex = playlistId.hashCode(),
                 )
             }

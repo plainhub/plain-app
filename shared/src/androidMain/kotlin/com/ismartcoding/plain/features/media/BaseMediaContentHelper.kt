@@ -46,7 +46,8 @@ abstract class BaseMediaContentHelper {
     }
 
     private suspend fun buildWhere(query: String): ContentWhere {
-        val fields = QueryHelper.parseAsync(query)
+        // `all:true` is the explicit whole-table sentinel — drop it so the base where stays empty
+        val fields = QueryHelper.parseAsync(query).filterNot { it.name == QueryHelper.BULK_ALL_FIELD }
         val where = buildBaseWhere(fields)
         val idsField = fields.find { it.name == "ids" }
         if (idsField != null) {
@@ -56,7 +57,8 @@ abstract class BaseMediaContentHelper {
     }
 
     private suspend fun buildWheres(query: String): List<ContentWhere> {
-        val fields = QueryHelper.parseAsync(query)
+        // `all:true` is the explicit whole-table sentinel — drop it so the base where stays empty
+        val fields = QueryHelper.parseAsync(query).filterNot { it.name == QueryHelper.BULK_ALL_FIELD }
         val wheres = mutableListOf<ContentWhere>()
         val where = buildBaseWhere(fields)
         val idsField = fields.find { it.name == "ids" }
