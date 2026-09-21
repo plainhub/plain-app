@@ -78,7 +78,6 @@
     <string name="total_minutes">%1$d 分鐘</string>
     <string name="play_next">下一首播放</string>
     <string name="add_to_queue">加入播放佇列</string>
-    <string name="sort_order">排序方式</string>
     <string name="sort_custom">自訂順序</string>
     <string name="sort_title_asc">標題 A–Z</string>
     <string name="sort_title_desc">標題 Z–A</string>

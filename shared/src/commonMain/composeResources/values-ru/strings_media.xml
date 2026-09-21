@@ -78,7 +78,6 @@
     <string name="total_minutes">%1$d мин</string>
     <string name="play_next">Играть следующим</string>
     <string name="add_to_queue">В очередь</string>
-    <string name="sort_order">Сортировка</string>
     <string name="sort_custom">Свой порядок</string>
     <string name="sort_title_asc">Название А–Я</string>
     <string name="sort_title_desc">Название Я–А</string>

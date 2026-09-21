@@ -23,7 +23,6 @@ fun PlaylistMoreSheet(
     onDelete: () -> Unit,
 ) {
     PModalBottomSheet(onDismissRequest = onDismiss) {
-        PBottomSheetTopAppBar(title = playlistName)
         PSheetActionRow(Res.drawable.pen, stringResource(Res.string.rename_playlist)) {
             onDismiss()
             onRename()
@@ -32,7 +31,7 @@ fun PlaylistMoreSheet(
             onDismiss()
             onAddItems()
         }
-        PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort_order) + " · " + sort.label()) {
+        PSheetActionRow(Res.drawable.sort, stringResource(Res.string.sort)) {
             onDismiss()
             onToggleSort()
         }

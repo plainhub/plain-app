@@ -78,7 +78,6 @@
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Volgende afspelen</string>
     <string name="add_to_queue">Aan wachtrij toevoegen</string>
-    <string name="sort_order">Sorteervolgorde</string>
     <string name="sort_custom">Aangepaste volgorde</string>
     <string name="sort_title_asc">Titel A–Z</string>
     <string name="sort_title_desc">Titel Z–A</string>

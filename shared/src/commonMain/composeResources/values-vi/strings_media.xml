@@ -78,7 +78,6 @@
     <string name="total_minutes">%1$d phút</string>
     <string name="play_next">Phát tiếp theo</string>
     <string name="add_to_queue">Thêm vào hàng đợi</string>
-    <string name="sort_order">Sắp xếp</string>
     <string name="sort_custom">Thứ tự tùy chỉnh</string>
     <string name="sort_title_asc">Tiêu đề A–Z</string>
     <string name="sort_title_desc">Tiêu đề Z–A</string>

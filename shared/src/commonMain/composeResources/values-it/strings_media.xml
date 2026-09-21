@@ -78,7 +78,6 @@
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Riproduci successivo</string>
     <string name="add_to_queue">Aggiungi alla coda</string>
-    <string name="sort_order">Ordinamento</string>
     <string name="sort_custom">Ordine personalizzato</string>
     <string name="sort_title_asc">Titolo A–Z</string>
     <string name="sort_title_desc">Titolo Z–A</string>

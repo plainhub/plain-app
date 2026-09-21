@@ -91,7 +91,7 @@ object AudioQueueManager {
                 source = AudioPlaySource.PLAYLIST,
                 playlistId = playlistId,
                 currentPath = start.audioPath,
-                currentIndex = start.position,
+                currentIndex = start.sortOrder,
             )
         )
         recordHistory(start.audioPath, start.title, start.artist, start.duration)
@@ -147,13 +147,13 @@ object AudioQueueManager {
         if (items.isEmpty()) return
         ensureMigrated()
         if (playNext) {
-            queueDao.shiftPositionsFrom(0, items.size)
+            queueDao.shiftSortOrdersFrom(0, items.size)
             items.forEachIndexed { i, a ->
                 queueDao.deleteByPath(a.path)
                 queueDao.upsert(a.toQueueItem(i))
             }
         } else {
-            var next = queueDao.maxPosition() + 1
+            var next = queueDao.maxSortOrder() + 1
             items.forEach { a ->
                 queueDao.deleteByPath(a.path)
                 queueDao.upsert(a.toQueueItem(next))
@@ -171,7 +171,7 @@ object AudioQueueManager {
         val items = queueDao.allItems().toMutableList()
         if (from !in items.indices || to !in items.indices || from == to) return
         items.add(to, items.removeAt(from))
-        items.forEachIndexed { i, item -> queueDao.updatePosition(item.path, i) }
+        items.forEachIndexed { i, item -> queueDao.updateSortOrder(item.path, i) }
     }
 
     /** Reorder the manual queue to match [paths]; unknown paths keep their order at the end. */
@@ -182,7 +182,7 @@ object AudioQueueManager {
         val known = paths.toSet()
         val ordered = paths.mapNotNull { p -> all.firstOrNull { it.path == p } } +
             all.filter { it.path !in known }
-        ordered.forEachIndexed { i, item -> queueDao.updatePosition(item.path, i) }
+        ordered.forEachIndexed { i, item -> queueDao.updateSortOrder(item.path, i) }
     }
 
     suspend fun queuedPaths(): Set<String> = queueDao.allItems().map { it.path }.toSet()
@@ -329,7 +329,7 @@ object AudioQueueManager {
         val path = src.currentPath
         if (path.isEmpty() || sourceSize == 0) return -1
         return when (src.source) {
-            AudioPlaySource.PLAYLIST -> itemDao.getByPath(src.playlistId, path)?.position ?: -1
+            AudioPlaySource.PLAYLIST -> itemDao.getByPath(src.playlistId, path)?.sortOrder ?: -1
             AudioPlaySource.LIBRARY -> {
                 val sortBy = librarySortOf(src)
                 if (src.currentIndex in 0 until sourceSize) {
@@ -354,7 +354,7 @@ object AudioQueueManager {
         val queued = queueDao.itemByPath(path)
         if (queued != null) {
             // Queued items start right after the head: rank = currentPos+1 + rank in queue.
-            return order.currentPos + 1 + queueDao.countBefore(queued.position)
+            return order.currentPos + 1 + queueDao.countBefore(queued.sortOrder)
         }
         // The current track is in the source and always closes the head segment.
         return order.currentPos
@@ -373,7 +373,7 @@ object AudioQueueManager {
     private suspend fun saveCurrent(order: Order, rank: Int) {
         val path = trackAt(order, rank)?.path ?: return
         val sourcePos = when (order.source.source) {
-            AudioPlaySource.PLAYLIST -> itemDao.getByPath(order.source.playlistId, path)?.position ?: -1
+            AudioPlaySource.PLAYLIST -> itemDao.getByPath(order.source.playlistId, path)?.sortOrder ?: -1
             AudioPlaySource.LIBRARY -> when {
                 rank <= order.currentPos -> rank
                 rank <= order.currentPos + order.manualCount -> -1
@@ -444,11 +444,11 @@ object AudioQueueManager {
         return out
     }
 
-    private suspend fun sourceTrackAt(src: DAudioQueueSource, position: Int): DPlaylistAudio? {
+    private suspend fun sourceTrackAt(src: DAudioQueueSource, index: Int): DPlaylistAudio? {
         return when (src.source) {
             AudioPlaySource.PLAYLIST ->
-                itemDao.pageByPlaylist(src.playlistId, 1, position).firstOrNull()?.toPlaylistAudio()
-            AudioPlaySource.LIBRARY -> libraryTrackAt(position)?.toPlaylistAudio()
+                itemDao.pageByPlaylist(src.playlistId, 1, index).firstOrNull()?.toPlaylistAudio()
+            AudioPlaySource.LIBRARY -> libraryTrackAt(index)?.toPlaylistAudio()
             AudioPlaySource.NONE -> null
         }
     }
@@ -466,9 +466,9 @@ object AudioQueueManager {
         }
     }
 
-    private suspend fun libraryTrackAt(position: Int): DAudio? {
-        if (position < 0) return null
-        return searchMedia(DataType.AUDIO, "", 1, position, AudioSortByPreference.getValueAsync())
+    private suspend fun libraryTrackAt(index: Int): DAudio? {
+        if (index < 0) return null
+        return searchMedia(DataType.AUDIO, "", 1, index, AudioSortByPreference.getValueAsync())
             .filterIsInstance<DAudio>()
             .firstOrNull()
     }
@@ -524,7 +524,7 @@ object AudioQueueManager {
     suspend fun addPlaylistItems(playlistId: String, items: List<DPlaylistAudio>): Int {
         ensureMigrated()
         var added = 0
-        var next = itemDao.maxPosition(playlistId) + 1
+        var next = itemDao.maxSortOrder(playlistId) + 1
         items.forEach { a ->
             val row = DAudioPlaylistItem(
                 id = StringHelper.shortUUID(),
@@ -534,7 +534,7 @@ object AudioQueueManager {
                 artist = a.artist,
                 albumId = a.albumId,
                 duration = a.duration,
-                position = next,
+                sortOrder = next,
             )
             if (itemDao.insert(row) != -1L) {
                 added++
@@ -577,5 +577,5 @@ fun DAudioPlaylistItem.toPlaylistAudio(): DPlaylistAudio =
 fun DAudioQueueItem.toPlaylistAudio(): DPlaylistAudio =
     DPlaylistAudio(title = title, path = path, artist = artist, duration = duration)
 
-fun DPlaylistAudio.toQueueItem(position: Int): DAudioQueueItem =
-    DAudioQueueItem(path = path, position = position, title = title, artist = artist, duration = duration)
+fun DPlaylistAudio.toQueueItem(sortOrder: Int): DAudioQueueItem =
+    DAudioQueueItem(path = path, sortOrder = sortOrder, title = title, artist = artist, duration = duration)
