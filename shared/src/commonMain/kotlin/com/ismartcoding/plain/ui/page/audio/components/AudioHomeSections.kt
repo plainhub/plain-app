@@ -146,16 +146,16 @@ fun PlaylistsRow(
             val (pl, count) = playlists[index]
             Column(
                 modifier = Modifier
-                    .width(132.dp)
+                    .width(120.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable { onPlaylistClick(pl) }
-                    .padding(4.dp),
+                    .clickable { onPlaylistClick(pl) },
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 PlaylistMosaicCover(
                     albums = covers[pl.id].orEmpty(),
                     gradientIndex = index + 2,
                     modifier = Modifier
-                        .size(124.dp)
+                        .size(120.dp)
                         .clip(RoundedCornerShape(12.dp)),
                 )
                 Text(
@@ -163,11 +163,12 @@ fun PlaylistsRow(
                     style = MaterialTheme.typography.listItemTitle(),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 4.dp),
                 )
                 Text(
                     text = pluralStringResource(Res.plurals.items, count, count),
                     style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp),
                 )
             }
         }
