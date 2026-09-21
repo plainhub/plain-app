@@ -193,7 +193,7 @@
         <service
             android:name=".services.HttpServerService"
             android:exported="false"
-            android:foregroundServiceType="specialUse|dataSync"
+            android:foregroundServiceType="specialUse"
             android:stopWithTask="true">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
