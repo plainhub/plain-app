@@ -153,7 +153,9 @@ fun __Schema.toSDL(): String = buildString {
     if (query.name != null) {
         printDescription(query.description)
         appendLine("type ${query.name} {")
-        query.fields?.forEach { field ->
+        // Resolver registration order may vary across process runs. SDL snapshots
+        // must remain stable without changing field definitions or execution order.
+        query.fields?.sortedBy { it.name }?.forEach { field ->
             printDescription(field.description, "  ")
             append("  ${field.name}")
             if (field.args.isNotEmpty()) {
@@ -181,7 +183,7 @@ fun __Schema.toSDL(): String = buildString {
         if (mutation.name != null) {
             printDescription(mutation.description)
             appendLine("type ${mutation.name} {")
-            mutation.fields?.forEach { field ->
+            mutation.fields?.sortedBy { it.name }?.forEach { field ->
                 printDescription(field.description, "  ")
                 append("  ${field.name}")
                 if (field.args.isNotEmpty()) {
@@ -210,7 +212,7 @@ fun __Schema.toSDL(): String = buildString {
         if (subscription.name != null) {
             printDescription(subscription.description)
             appendLine("type ${subscription.name} {")
-            subscription.fields?.forEach { field ->
+            subscription.fields?.sortedBy { it.name }?.forEach { field ->
                 printDescription(field.description, "  ")
                 append("  ${field.name}")
                 if (field.args.isNotEmpty()) {
