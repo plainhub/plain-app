@@ -8,6 +8,8 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.events.ClearAudioQueueEvent
+import com.ismartcoding.plain.features.audio.AudioPlayHistoryManager
+import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.features.audio.toPlaylistAudio
 import kotlin.reflect.typeOf
@@ -136,7 +138,7 @@ suspend fun audioLyrics(path: String): String? {
 
 @GraphQLQuery
 suspend fun audioPlaylists(): List<AudioPlaylist> {
-    return AudioQueueManager.playlists().map { (pl, count) ->
+    return AudioPlaylistManager.playlists().map { (pl, count) ->
         AudioPlaylist(id = ID(pl.id), name = pl.name, itemCount = count, createdAt = pl.createdAt, updatedAt = pl.updatedAt)
     }
 }
@@ -144,51 +146,51 @@ suspend fun audioPlaylists(): List<AudioPlaylist> {
 @GraphQLQuery
 suspend fun audioPlaylistItems(id: ID, offset: Int, limit: Int, query: String): List<AudioItem> {
     val text = QueryHelper.textOf(query)
-    val items = if (text.isEmpty()) AudioQueueManager.playlistItemsPage(id.value, offset, limit)
-    else AudioQueueManager.playlistItemsPageFiltered(id.value, text, offset, limit)
+    val items = if (text.isEmpty()) AudioPlaylistManager.playlistItemsPage(id.value, offset, limit)
+    else AudioPlaylistManager.playlistItemsPageFiltered(id.value, text, offset, limit)
     return items.map { it.toPlaylistAudio().toModel() }
 }
 
 @GraphQLQuery
 suspend fun audioPlaylistItemCount(id: ID): Int {
-    return AudioQueueManager.playlistItemCount(id.value)
+    return AudioPlaylistManager.playlistItemCount(id.value)
 }
 
 @GraphQLQuery
 suspend fun audioPlayHistory(offset: Int, limit: Int, query: String): List<AudioPlayHistory> {
     val text = QueryHelper.textOf(query)
-    val items = if (text.isEmpty()) AudioQueueManager.recentPage(limit, offset)
-    else AudioQueueManager.recentPageFiltered(text, limit, offset)
+    val items = if (text.isEmpty()) AudioPlayHistoryManager.recentPage(limit, offset)
+    else AudioPlayHistoryManager.recentPageFiltered(text, limit, offset)
     return items.map { it.toModel() }
 }
 
 @GraphQLMutation
 suspend fun createAudioPlaylist(name: String): AudioPlaylist {
-    val pl = AudioQueueManager.createPlaylist(name)
+    val pl = AudioPlaylistManager.createPlaylist(name)
     return AudioPlaylist(id = ID(pl.id), name = pl.name, itemCount = 0, createdAt = pl.createdAt, updatedAt = pl.updatedAt)
 }
 
 @GraphQLMutation
 suspend fun renameAudioPlaylist(id: ID, name: String): Boolean {
-    AudioQueueManager.renamePlaylist(id.value, name)
+    AudioPlaylistManager.renamePlaylist(id.value, name)
     return true
 }
 
 @GraphQLMutation
 suspend fun deleteAudioPlaylist(id: ID): Boolean {
-    AudioQueueManager.deletePlaylist(id.value)
+    AudioPlaylistManager.deletePlaylist(id.value)
     return true
 }
 
 @GraphQLMutation
 suspend fun addAudioPlaylistItems(id: ID, paths: List<String>): Boolean {
-    AudioQueueManager.addPlaylistItems(id.value, paths.map { playlistAudioFromPath(it) })
+    AudioPlaylistManager.addPlaylistItems(id.value, paths.map { playlistAudioFromPath(it) })
     return true
 }
 
 @GraphQLMutation
 suspend fun removeAudioPlaylistItem(id: ID, path: String): Boolean {
-    AudioQueueManager.removePlaylistItem(id.value, path)
+    AudioPlaylistManager.removePlaylistItem(id.value, path)
     return true
 }
 

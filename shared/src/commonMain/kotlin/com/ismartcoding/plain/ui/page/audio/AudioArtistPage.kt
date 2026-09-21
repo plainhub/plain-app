@@ -202,7 +202,7 @@ fun AudioArtistPage(
                         tags = emptyList(),
                         dragSelectState = dragSelectState,
                         isCurrentlyPlaying = audioPlaylistVM.selectedPath.value == item.path,
-                        isInPlaylist = audioPlaylistVM.isInPlaylist(item.path),
+                        isInPlaylist = audioPlaylistVM.isInQueue(item.path),
                     )
                     VerticalSpace(8.dp)
                 }

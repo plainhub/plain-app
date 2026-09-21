@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.coIO
@@ -254,7 +255,7 @@ fun AudioHomePage(
             onConfirm = { name ->
                 showCreatePlaylist = false
                 scope.launch(Dispatchers.Default) {
-                    AudioQueueManager.createPlaylist(name)
+                    AudioPlaylistManager.createPlaylist(name)
                     homeVM.loadAsync(audioVM)
                 }
             },
@@ -321,7 +322,7 @@ private fun HomeSections(
                 tags = audioTagsMap[item.id] ?: emptyList(),
                 dragSelectState = dragSelectState,
                 isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                isInPlaylist = audioPlaylistVM.isInPlaylist(item.path),
+                isInPlaylist = audioPlaylistVM.isInQueue(item.path),
             )
             VerticalSpace(dp = 8.dp)
         }

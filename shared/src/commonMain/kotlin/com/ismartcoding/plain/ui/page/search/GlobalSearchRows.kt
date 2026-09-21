@@ -81,7 +81,7 @@ fun GlobalSearchRow(
                 tags = emptyList(),
                 dragSelectState = ctx.dragSelectState,
                 isCurrentlyPlaying = isAudioPlaying && ctx.audioPlaylistVM.selectedPath.value == src.audio.path,
-                isInPlaylist = ctx.audioPlaylistVM.isInPlaylist(src.audio.path),
+                isInPlaylist = ctx.audioPlaylistVM.isInQueue(src.audio.path),
             )
         }
 

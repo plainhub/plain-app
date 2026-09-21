@@ -27,6 +27,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DAudioPlaylistItem
 import com.ismartcoding.plain.db.IDData
+import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.TimeHelper
@@ -91,7 +92,7 @@ fun PlaylistDetailPage(
 
     val reload: suspend () -> Unit = {
         val (name, list) = withIO {
-            AudioQueueManager.playlist(playlistId)?.name to AudioQueueManager.playlistItemsPage(playlistId, 0, 1000)
+            AudioPlaylistManager.playlist(playlistId)?.name to AudioPlaylistManager.playlistItemsPage(playlistId, 0, 1000)
         }
         playlistName = name ?: ""
         items = list
@@ -150,7 +151,7 @@ fun PlaylistDetailPage(
             onConfirm = { name ->
                 showRename = false
                 scope.launch {
-                    withIO { AudioQueueManager.renamePlaylist(playlistId, name) }
+                    withIO { AudioPlaylistManager.renamePlaylist(playlistId, name) }
                     DialogHelper.showMessage(renamedMsg)
                     version++
                 }
@@ -167,7 +168,7 @@ fun PlaylistDetailPage(
             onAddItems = { navController.navigate(Routing.PlaylistAddItems(playlistId)) },
             onDelete = {
                 scope.launch {
-                    withIO { AudioQueueManager.deletePlaylist(playlistId) }
+                    withIO { AudioPlaylistManager.deletePlaylist(playlistId) }
                     DialogHelper.showMessage(deletedMsg)
                     navController.popBackStack()
                 }
@@ -212,7 +213,7 @@ fun PlaylistDetailPage(
                         scope.launch {
                             val paths = dragSelectState.selectedIds.map { pathById[it]?.path ?: it }
                             if (paths.isNotEmpty()) {
-                                withIO { AudioQueueManager.removePlaylistItems(playlistId, paths) }
+                                withIO { AudioPlaylistManager.removePlaylistItems(playlistId, paths) }
                                 dragSelectState.exitSelectMode()
                                 DialogHelper.showMessage(Res.string.removed_from_playlist)
                                 version++
@@ -274,7 +275,7 @@ fun PlaylistDetailPage(
                             tags = emptyList(),
                             dragSelectState = dragSelectState,
                             isCurrentlyPlaying = isPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                            isInPlaylist = audioPlaylistVM.isInPlaylist(item.path),
+                            isInPlaylist = audioPlaylistVM.isInQueue(item.path),
                         )
                         VerticalSpace(8.dp)
                     }

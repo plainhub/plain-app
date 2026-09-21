@@ -44,10 +44,6 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         refreshWindow(playlistItems.value.size + pageLimit)
     }
 
-    fun isInPlaylist(path: String): Boolean {
-        return path in queuedPaths.value
-    }
-
     suspend fun addAsync(items: List<DAudio>) {
         val audio = items.map { it.toPlaylistAudio() }
         AudioQueueManager.enqueue(audio)

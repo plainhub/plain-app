@@ -17,6 +17,7 @@ import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.withIO
@@ -119,7 +120,7 @@ internal fun AudioActionButtons(
                 if (playlistId != null) {
                     PSheetActionRow(Res.drawable.playlist_remove, stringResource(Res.string.remove_from_playlist)) {
                         scope.launch {
-                            withIO { AudioQueueManager.removePlaylistItem(playlistId, m.path) }
+                            withIO { AudioPlaylistManager.removePlaylistItem(playlistId, m.path) }
                             DialogHelper.showMessage(Res.string.removed_from_playlist)
                             onPlaylistChanged()
                             onDismiss()

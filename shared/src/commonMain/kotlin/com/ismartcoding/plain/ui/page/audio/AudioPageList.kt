@@ -67,7 +67,7 @@ internal fun ColumnScope.AudioPageList(
                             AudioListItem(item = item, audioVM = audioVM, audioPlaylistVM, tagsVM = tagsVM,
                                 castVM = castVM, tags = tags, dragSelectState = dragSelectState,
                                 isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                                isInPlaylist = audioPlaylistVM.isInPlaylist(item.path))
+                                isInPlaylist = audioPlaylistVM.isInQueue(item.path))
                             VerticalSpace(dp = 8.dp)
                         }
                         item(key = "loadMore") {
