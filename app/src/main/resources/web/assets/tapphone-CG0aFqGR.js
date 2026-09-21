@@ -1,1 +1,0 @@
-import{s as e}from"./VDropdown-BFc2VneL.js";var t=t=>{e.emit(`tap_phone`,t)};export{t};
