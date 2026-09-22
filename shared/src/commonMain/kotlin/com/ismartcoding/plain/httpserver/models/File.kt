@@ -9,7 +9,6 @@ import kotlin.time.Instant
 data class File(
     var name: String,
     val path: String,
-    val permission: String,
     @GraphQLField(description = "Creation time from stat; null when the platform cannot report it (some filesystems/IO errors).")
     val createdAt: Instant?,
     val updatedAt: Instant,
@@ -20,7 +19,7 @@ data class File(
 )
 
 fun DFile.toModel(): File {
-    return File(name, path, permission, createdAt, updatedAt, size, isDir, children, mediaId)
+    return File(name, path, createdAt, updatedAt, size, isDir, children, mediaId)
 }
 
 @GraphQLType

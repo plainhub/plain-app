@@ -18,7 +18,9 @@ data class App(
     val deviceName: String,
     val deviceType: DeviceType,
     val capabilities: List<Capability>,
-    val channel: AppChannelType,
+    /// Distribution channel of this build (GitHub/Play/FDROID) — renamed
+    /// from `channel` to avoid colliding with chat channels (2026-09-23).
+    val buildChannel: AppChannelType,
     val permissions: List<Permission>,
     val downloadsDir: String,
     val developerMode: Boolean,

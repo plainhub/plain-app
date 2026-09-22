@@ -219,9 +219,9 @@ suspend fun playAudioPlaylist(id: ID, path: String? = null, shuffle: Boolean = f
  * Play the whole audio library: full-library playback context.
  * Returns the track that started, or null when the library is empty.
  */
-@GraphQLMutation(description = "Queue the whole audio library and start playback. `path` optionally scopes the library to a directory and/or names the track to start from (null = entire library, first track); `shuffle` reorders before playing. Returns the item that starts playing, null when nothing matched.")
-suspend fun playAllAudios(path: String? = null, shuffle: Boolean = false): AudioItem? {
-    val start = AudioQueueManager.setLibrarySource(startPath = path, shuffle = shuffle)
+@GraphQLMutation(description = "Queue the whole audio library and start playback (first track, or shuffled order when `shuffle` is set). Returns the item that starts playing, null when the library is empty.")
+suspend fun playAllAudios(shuffle: Boolean): AudioItem? {
+    val start = AudioQueueManager.setLibrarySource(startPath = null, shuffle = shuffle)
     if (start != null) {
         coMain { audioJustPlayWithNotificationCheck(start) }
     }

@@ -184,8 +184,8 @@ type Mutation {
   removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
   """Start playback of a playlist. `path` optionally names the audio to start from (defaults to the first item); `shuffle` reorders before playing. Returns the item that starts playing, null when the playlist is empty."""
   playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): AudioItem
-  """Queue the whole audio library and start playback. `path` optionally scopes the library to a directory and/or names the track to start from (null = entire library, first track); `shuffle` reorders before playing. Returns the item that starts playing, null when nothing matched."""
-  playAllAudios(path: String, shuffle: Boolean!): AudioItem
+  """Queue the whole audio library and start playback (first track, or shuffled order when `shuffle` is set). Returns the item that starts playing, null when the library is empty."""
+  playAllAudios(shuffle: Boolean!): AudioItem
   enableImageSearch: Boolean!
   disableImageSearch: Boolean!
   cancelImageModelDownload: Boolean!
@@ -272,7 +272,7 @@ type App {
   deviceName: String!
   deviceType: DeviceType!
   capabilities: [Capability!]!
-  channel: AppChannelType!
+  buildChannel: AppChannelType!
   permissions: [Permission!]!
   downloadsDir: String!
   developerMode: Boolean!
@@ -808,7 +808,6 @@ type File {
   mediaId: ID
   name: String!
   path: String!
-  permission: String!
   """Creation time from stat; null when the platform cannot report it (some filesystems/IO errors)."""
   createdAt: Instant
   updatedAt: Instant!
