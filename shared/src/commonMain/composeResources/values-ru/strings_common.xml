@@ -104,6 +104,7 @@
     <string name="added">Добавлено</string>
     <string name="paste">Вставить</string>
     <string name="added_to_playlist">Добавлено в плейлист</string>
+    <string name="removed_from_playlist">Удалено из плейлиста</string>
     <string name="on">Включено</string>
     <string name="off">Выключено</string>
     <string name="reset">Сбросить</string>

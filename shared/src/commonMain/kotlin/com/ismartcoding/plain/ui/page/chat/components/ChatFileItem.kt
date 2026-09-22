@@ -27,7 +27,7 @@ import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.db.getPreviewPath
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModelBase
+import com.ismartcoding.plain.ui.models.AudioQueueViewModelBase
 import com.ismartcoding.plain.ui.models.VChat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -38,7 +38,7 @@ fun ChatFileItem(
     navController: NavHostController,
     m: VChat,
     peer: DPeer?,
-    audioPlaylistVM: AudioPlaylistViewModelBase,
+    audioQueueVM: AudioQueueViewModelBase,
     previewerState: MediaPreviewerState,
     item: DMessageFile,
     index: Int,
@@ -50,7 +50,7 @@ fun ChatFileItem(
     val path = item.uri.getFinalPath()
     val fileName = item.fileName.ifEmpty { path.getFilenameFromPath() }
     val isAudio = fileName.isAudioFast()
-    val currentPlayingPath = audioPlaylistVM.selectedPath
+    val currentPlayingPath = audioQueueVM.selectedPath
     val isCurrentlyPlaying = currentPlayingPath.value == path && isAudio
     val isPlaying by audioIsPlayingFlow().collectAsState()
 

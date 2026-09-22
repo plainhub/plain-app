@@ -78,10 +78,11 @@
     <string name="total_minutes">%1$d мин</string>
     <string name="play_next">Играть следующим</string>
     <string name="add_to_queue">В очередь</string>
-    <string name="sort_order">Сортировка</string>
-    <string name="sort_custom">Свой порядок</string>
-    <string name="sort_title_asc">Название А–Я</string>
-    <string name="sort_title_desc">Название Я–А</string>
+    <string name="remove_from_queue">Убрать из очереди</string>
+    <string name="added_to_queue">Добавлено в очередь</string>
+    <string name="queue">Очередь</string>
+    <string name="queue_title">Очередь (%1$s)</string>
+    <string name="empty_queue">Ваша очередь пуста</string>
     <string name="playlist_created">Плейлист создан</string>
     <string name="playlist_deleted">Плейлист удалён</string>
     <string name="renamed">Переименовано</string>

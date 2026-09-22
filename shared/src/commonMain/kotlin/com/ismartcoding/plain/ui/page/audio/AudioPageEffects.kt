@@ -12,7 +12,7 @@ import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
 import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.extensions.reset
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import androidx.compose.material3.ExperimentalMaterial3Api
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 internal fun AudioPageEffects(
     audioState: AudioPageState,
     audioVM: AudioViewModel,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     tagsVM: TagsViewModel,
     mediaFoldersVM: MediaFoldersViewModel,
 ) {
@@ -35,7 +35,7 @@ internal fun AudioPageEffects(
         scope.launch(Dispatchers.Default) {
             audioVM.sortBy.value = AudioSortByPreference.getValueAsync()
             audioVM.loadAsync(tagsVM)
-            audioPlaylistVM.loadAsync()
+            audioQueueVM.loadAsync()
             mediaFoldersVM.loadAsync()
         }
     }

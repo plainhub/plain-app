@@ -27,7 +27,7 @@ import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.platform.checkNotificationPermission
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.DocsViewModel
@@ -59,7 +59,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun GlobalSearchPage(
     navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     viewModel: GlobalSearchViewModel,
     onTabSelected: (Int) -> Unit,
 ) {
@@ -95,7 +95,7 @@ fun GlobalSearchPage(
         when (val action = hit.action) {
             is GlobalSearchAction.Navigate -> navController.navigate(action.route)
             is GlobalSearchAction.PlayAudio -> checkNotificationPermission(Res.string.audio_notification_prompt) {
-                scope.launch(Dispatchers.Default) { audioPlaylistVM.playAsync(action.audio) }
+                scope.launch(Dispatchers.Default) { audioQueueVM.playAsync(action.audio) }
             }
         }
     }
@@ -103,7 +103,7 @@ fun GlobalSearchPage(
     // Fresh VMs (search-prefixed keys) so search rows never mutate the source pages' state.
     val rowContext = rememberGlobalSearchRowContext(
         navController = navController,
-        audioPlaylistVM = audioPlaylistVM,
+        audioQueueVM = audioQueueVM,
         audioVM = viewModel(key = "searchAudioVM") { AudioViewModel() },
         tagsVM = viewModel(key = "searchTagsVM") { TagsViewModel() },
         castVM = viewModel(key = "searchCastVM") { CastViewModel() },

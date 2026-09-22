@@ -104,6 +104,7 @@
     <string name="added">Đã thêm</string>
     <string name="paste">Dán</string>
     <string name="added_to_playlist">Đã thêm vào danh sách phát</string>
+    <string name="removed_from_playlist">Đã xóa khỏi danh sách phát</string>
     <string name="on">Bật</string>
     <string name="off">Tắt</string>
     <string name="reset">Đặt lại</string>

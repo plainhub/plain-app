@@ -104,6 +104,7 @@
     <string name="added">जोड़ा गया</string>
     <string name="paste">पेस्ट करें</string>
     <string name="added_to_playlist">प्लेलिस्ट में जोड़ा गया</string>
+    <string name="removed_from_playlist">प्लेलिस्ट से हटाया गया</string>
     <string name="on">चालू</string>
     <string name="off">बंद</string>
     <string name="reset">रीसेट</string>

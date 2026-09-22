@@ -25,7 +25,7 @@ import com.ismartcoding.plain.events.HPomodoroStopEvent
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.ui.base.ToastEvent
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -43,7 +43,7 @@ fun MainEventCollector(
     scope: CoroutineScope,
     mainVM: MainViewModel,
     chatVM: ChatViewModel,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     pomodoroVM: PomodoroViewModel,
     peerVM: PeerViewModel,
     navController: NavHostController,
@@ -68,7 +68,7 @@ fun MainEventCollector(
 
                 is AudioActionEvent -> {
                     if (event.action == AudioAction.MEDIA_ITEM_TRANSITION) {
-                        scope.launch(Dispatchers.Default) { audioPlaylistVM.loadAsync() }
+                        scope.launch(Dispatchers.Default) { audioQueueVM.loadAsync() }
                     }
                 }
 

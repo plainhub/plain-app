@@ -46,7 +46,7 @@ fun SharedFolderPage(
 ) {
     val scope = rememberCoroutineScope()
     val previewerState = rememberPreviewerState(scope = scope, pageCount = { MediaPreviewData.items.size })
-    val state = remember(messageId) { SharedFolderState(messageId, scope, previewerState) }
+    val state = remember(messageId) { SharedFolderState(messageId, navController, scope, previewerState) }
     val tasksMap = DownloadCenter.progress.collectAsState().value
     val shareTasks = tasksMap.values
         .filterIsInstance<SharedFolderBatchTask>()

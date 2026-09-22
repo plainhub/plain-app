@@ -31,6 +31,16 @@ class ChatGroupsRenameMigrationSpec : AutoMigrationSpec
 @RenameColumn(tableName = "chats", fromColumnName = "group_id", toColumnName = "channel_id")
 class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
 
+/**
+ * Unifies every manual-ordering column to `sort_order` (2026-09-21):
+ * audio_playlist_items.position, audio_queue_items.position,
+ * book_chapters.display_order -> sort_order.
+ */
+@RenameColumn(tableName = "audio_playlist_items", fromColumnName = "position", toColumnName = "sort_order")
+@RenameColumn(tableName = "audio_queue_items", fromColumnName = "position", toColumnName = "sort_order")
+@RenameColumn(tableName = "book_chapters", fromColumnName = "display_order", toColumnName = "sort_order")
+class SortOrderUnifySpec : AutoMigrationSpec
+
 @Database(
     entities = [
         DChat::class, DSession::class, DTag::class, DTagRelation::class,
@@ -53,7 +63,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DAudioQueueItem::class,
         DNearbyDeviceCache::class,
     ],
-    version = 29,
+    version = 30,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -77,6 +87,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         AutoMigration(from = 26, to = 27),
         AutoMigration(from = 27, to = 28),
         AutoMigration(from = 28, to = 29),
+        AutoMigration(from = 29, to = 30, spec = SortOrderUnifySpec::class),
     ],
     exportSchema = true,
 )

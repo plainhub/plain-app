@@ -14,6 +14,7 @@ import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaDataType
 import com.ismartcoding.plain.enums.DriveType
+import com.ismartcoding.plain.enums.PathKind
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.DiscoveryMethod
 import com.ismartcoding.plain.enums.EmailType
@@ -27,7 +28,7 @@ import com.ismartcoding.plain.enums.PostalType
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.enums.SmsType
 import com.ismartcoding.plain.enums.ScreenMirrorMode
-import com.ismartcoding.plain.platform.DeviceFeature
+import com.ismartcoding.plain.platform.Capability
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
@@ -63,13 +64,14 @@ fun SchemaBuilder.addMainSchemaTypes() {
         description = "Media-library domains — a strict subset of DataType with the same four member names."
     }
     enum<DriveType>()
+    enum<PathKind>()
     enum<DeviceType>()
-    enum<DeviceFeature> {
-        description = "Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.features. Clients gate UI on App.features instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."
+    enum<Capability> {
+        description = "Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.capabilities. Clients gate UI on App.capabilities instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."
     }
     enum<MergeTaskStatus>()
     enum<Permission> {
-        description = "Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.features (DeviceFeature)."
+        description = "Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.capabilities (Capability)."
     }
     enum<FileSortBy> {
         description = "Sort orders for file/media lists. TAKEN_AT_DESC sorts by capture time where the domain tracks one (images/videos); other domains fall back to their ordinary order (docs/audio: add time, plain files: modification time, packages: name)."

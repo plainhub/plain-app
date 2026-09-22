@@ -78,10 +78,11 @@
     <string name="total_minutes">%1$d মিনিট</string>
     <string name="play_next">পরেরটি চালান</string>
     <string name="add_to_queue">সারিতে যোগ করুন</string>
-    <string name="sort_order">সাজানোর ক্রম</string>
-    <string name="sort_custom">কাস্টম ক্রম</string>
-    <string name="sort_title_asc">শিরোনাম A–Z</string>
-    <string name="sort_title_desc">শিরোনাম Z–A</string>
+    <string name="remove_from_queue">সারি থেকে সরান</string>
+    <string name="added_to_queue">সারিতে যোগ করা হয়েছে</string>
+    <string name="queue">সারি</string>
+    <string name="queue_title">সারি (%1$s)</string>
+    <string name="empty_queue">আপনার সারিটি খালি</string>
     <string name="playlist_created">প্লেলিস্ট তৈরি হয়েছে</string>
     <string name="playlist_deleted">প্লেলিস্ট মুছে ফেলা হয়েছে</string>
     <string name="renamed">নাম বদলানো হয়েছে</string>

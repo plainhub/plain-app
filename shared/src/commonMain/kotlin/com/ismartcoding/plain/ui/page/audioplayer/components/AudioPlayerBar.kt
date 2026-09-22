@@ -21,9 +21,9 @@ import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.platform.audioPlayerProgress
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.page.audioplayer.AudioPlaylistPage
+import com.ismartcoding.plain.ui.page.audioplayer.AudioQueuePage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AudioPlayerBar(
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     castVM: CastViewModel? = null,
     modifier: Modifier = Modifier,
     dragSelectState: DragSelectState? = null,
@@ -42,8 +42,8 @@ fun AudioPlayerBar(
     var progress by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableFloatStateOf(1f) }
     val isPlaying by audioIsPlayingFlow().collectAsState()
-    var showPlaylist by remember { mutableStateOf(false) }
-    val currentPlayingPath = audioPlaylistVM.selectedPath
+    var showQueue by remember { mutableStateOf(false) }
+    val currentPlayingPath = audioQueueVM.selectedPath
 
     LaunchedEffect(currentPlayingPath.value) {
         scope.launch {
@@ -80,10 +80,10 @@ fun AudioPlayerBar(
             duration = duration,
             isPlaying = isPlaying,
             onClickContent = { TempData.audioPlayerVisible.value = true },
-            onClickPlaylist = { showPlaylist = true },
+            onClickQueue = { showQueue = true },
             onPlayPause = { if (isPlaying) audioPause() else audioPlay() },
         )
     }
 
-    if (showPlaylist) AudioPlaylistPage(audioPlaylistVM, onDismissRequest = { showPlaylist = false })
+    if (showQueue) AudioQueuePage(audioQueueVM, onDismissRequest = { showQueue = false })
 }

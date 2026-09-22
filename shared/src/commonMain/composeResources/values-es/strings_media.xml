@@ -78,10 +78,11 @@
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Reproducir después</string>
     <string name="add_to_queue">Añadir a la cola</string>
-    <string name="sort_order">Orden</string>
-    <string name="sort_custom">Orden personalizado</string>
-    <string name="sort_title_asc">Título A–Z</string>
-    <string name="sort_title_desc">Título Z–A</string>
+    <string name="remove_from_queue">Quitar de la cola</string>
+    <string name="added_to_queue">Añadido a la cola</string>
+    <string name="queue">Cola</string>
+    <string name="queue_title">Cola (%1$s)</string>
+    <string name="empty_queue">Tu cola está vacía</string>
     <string name="playlist_created">Lista creada</string>
     <string name="playlist_deleted">Lista eliminada</string>
     <string name="renamed">Renombrado</string>

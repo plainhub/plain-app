@@ -21,29 +21,34 @@ import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabel
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabelOff
-import com.ismartcoding.plain.ui.base.IconTextSmallButtonPlaylistAdd
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonQueueAdd
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonRestore
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonShare
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonTrash
 import com.ismartcoding.plain.ui.base.PBottomAppBar
+import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AudioFilesSelectModeBottomActions(
     audioVM: AudioViewModel,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     tagsVM: TagsViewModel,
     tagsState: List<DTag>,
     dragSelectState: DragSelectState,
+    // Generic slot (playlist detail, artist page, ...): when provided, a
+    // remove-from-playlist action leads the bar and the slot runs the removal.
+    removeFromPlaylist: (() -> Unit)? = null,
 ) {
     val scope = rememberCoroutineScope()
     var showSelectTagsDialog by remember { mutableStateOf(false) }
@@ -60,6 +65,9 @@ fun AudioFilesSelectModeBottomActions(
 
     PBottomAppBar {
         BottomActionButtons {
+            if (removeFromPlaylist != null) {
+                PIconTextSmallButton(Res.drawable.playlist_remove, stringResource(Res.string.remove_from_playlist), click = removeFromPlaylist)
+            }
             if (!audioVM.trash.value) {
                 IconTextSmallButtonLabel {
                     showSelectTagsDialog = true
@@ -69,15 +77,15 @@ fun AudioFilesSelectModeBottomActions(
                     showSelectTagsDialog = true
                     removeFromTags = true
                 }
-                IconTextSmallButtonPlaylistAdd {
+                IconTextSmallButtonQueueAdd {
                     scope.launch {
                         val selectedIds = dragSelectState.selectedIds
                         val selectedItems = audioVM.itemsFlow.value.filter { selectedIds.contains(it.id) }
                         withIO {
-                            audioPlaylistVM.addAsync(selectedItems)
+                            audioQueueVM.addAsync(selectedItems)
                         }
                         dragSelectState.exitSelectMode()
-                        DialogHelper.showMessage(Res.string.added_to_playlist)
+                        DialogHelper.showMessage(Res.string.added_to_queue)
                     }
                 }
                 IconTextSmallButtonShare {

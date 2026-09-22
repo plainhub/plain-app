@@ -21,7 +21,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.extensions.toPreviewItem
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
@@ -32,7 +32,7 @@ fun openFile(
     navController: NavHostController,
     previewerState: MediaPreviewerState,
     itemState: TransformItemState,
-    audioPlaylistVM: AudioPlaylistViewModel? = null,
+    audioQueueVM: AudioQueueViewModel? = null,
 ) {
     // For files inside a zip archive, extract to the cache dir first, then open normally.
     if (ZipBrowserHelper.isZipPath(file.path)) {
@@ -63,7 +63,7 @@ fun openFile(
                 }
                 else -> {
                     // audio, text, PDF — real temp path works normally
-                    openFile(listOf(extracted), extracted, navController, previewerState, itemState, audioPlaylistVM)
+                    openFile(listOf(extracted), extracted, navController, previewerState, itemState, audioQueueVM)
                 }
             }
         }
@@ -72,28 +72,53 @@ fun openFile(
 
     val path = file.path
 
-    when {
-        path.isImageFast() || path.isVideoFast() -> {
+    openLocalFileByType(
+        path = path,
+        navController = navController,
+        audioQueueVM = audioQueueVM,
+        onPreviewMedia = {
             coMain {
                 withIO {
                     MediaPreviewData.setDataAsync(
-                            itemState,
-                            files.filter { it.path.isImageFast() || it.path.isVideoFast() }.map { it.toPreviewItem() },
-                            file.toPreviewItem(),
-                        )
+                        itemState,
+                        files.filter { it.path.isImageFast() || it.path.isVideoFast() }.map { it.toPreviewItem() },
+                        file.toPreviewItem(),
+                    )
                 }
                 previewerState.openTransform(
                     index = MediaPreviewData.items.indexOfFirst { it.id == file.path },
                     itemState = itemState,
                 )
             }
-        }
+        },
+        onUnsupported = { openFileExternal(path) },
+    )
+}
+
+/**
+ * Type dispatch shared by every "open a local file" flow (FilesPage, zip
+ * browser, shared-folder browser): media → [onPreviewMedia] (the caller owns
+ * how its previewer opens), audio → the audio player, text/PDF → their
+ * pages, anything else → [onUnsupported]. [mediaHint] forces the media
+ * branch when the path lacks a recognizable media extension (e.g. a shared
+ * entry typed only by its MIME).
+ */
+fun openLocalFileByType(
+    path: String,
+    navController: NavHostController,
+    audioQueueVM: AudioQueueViewModel? = null,
+    mediaHint: Boolean = false,
+    onPreviewMedia: () -> Unit,
+    onUnsupported: () -> Unit = {},
+) {
+    when {
+        path.isImageFast() || path.isVideoFast() || mediaHint -> onPreviewMedia()
 
         path.isAudioFast() -> {
             try {
-                if (audioPlaylistVM != null) {
+                if (audioQueueVM != null) {
                     val audio = playlistAudioFromPath(path)
-                    coMain { audioPlaylistVM.playSingleAsync(audio) }
+                    coMain { audioQueueVM.playSingleAsync(audio) }
                 }
                 playAudioWithNotificationCheck(path)
             } catch (ex: Exception) {
@@ -114,7 +139,7 @@ fun openFile(
         }
 
         else -> {
-            openFileExternal(path)
+            onUnsupported()
         }
     }
 }

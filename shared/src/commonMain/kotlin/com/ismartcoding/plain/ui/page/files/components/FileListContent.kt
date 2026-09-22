@@ -20,7 +20,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.components.NoDataView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.select
 
@@ -31,7 +31,7 @@ fun FileListContent(
     files: List<DFile>,
     loadFiles: (List<DFile>, Boolean) -> Unit,
     previewerState: MediaPreviewerState,
-    audioPlaylistVM: AudioPlaylistViewModel
+    audioQueueVM: AudioQueueViewModel
 ) {
     if (filesVM.isLoading.value) {
         Box(
@@ -72,7 +72,7 @@ fun FileListContent(
                                 // Enter the zip as a virtual directory
                                 filesVM.navigateToDirectory(ZipBrowserHelper.joinPath(file.path, ""))
                             } else {
-                                openFile(files, file, navController, previewerState, itemState, audioPlaylistVM)
+                                openFile(files, file, navController, previewerState, itemState, audioQueueVM)
                             }
                         }
                     },
@@ -85,7 +85,7 @@ fun FileListContent(
                             filesVM.select(file.path)
                         }
                     },
-                    audioPlaylistVM = audioPlaylistVM
+                    audioQueueVM = audioQueueVM
                 )
             }
             item {

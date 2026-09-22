@@ -104,6 +104,7 @@
     <string name="added">Eklendi</string>
     <string name="paste">Yapıştır</string>
     <string name="added_to_playlist">Çalma listesine eklendi</string>
+    <string name="removed_from_playlist">Çalma listesinden kaldırıldı</string>
     <string name="on">Açık</string>
     <string name="off">Kapalı</string>
     <string name="reset">Sıfırla</string>

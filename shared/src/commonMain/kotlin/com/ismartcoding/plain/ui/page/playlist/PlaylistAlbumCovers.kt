@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.page.playlist
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.db.DAudioPlaylistItem
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.lib.withIO
@@ -52,7 +53,7 @@ private suspend fun resolveBlankAlbums(items: List<DAudioPlaylistItem>): Map<Str
         val albumId = byPath[row.audioPath]?.albumId ?: return@mapNotNull null
         if (albumId.isNotBlank()) row.id to albumId else null
     }
-    if (updates.isNotEmpty()) AudioQueueManager.updatePlaylistItemAlbums(updates)
+    if (updates.isNotEmpty()) AudioPlaylistManager.updatePlaylistItemAlbums(updates)
     return updates.toMap()
 }
 

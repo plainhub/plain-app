@@ -44,7 +44,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.extensions.reset
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -65,7 +65,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AudioAllPage(
     navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
     mediaFoldersVM: MediaFoldersViewModel,
@@ -87,7 +87,7 @@ fun AudioAllPage(
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
             audioVM.loadAsync(tagsVM)
-            audioPlaylistVM.loadAsync()
+            audioQueueVM.loadAsync()
             withIO { mediaFoldersVM.loadAsync() }
             setRefreshState(RefreshContentState.Finished)
         }
@@ -105,7 +105,7 @@ fun AudioAllPage(
         }
     }
 
-    AudioPageEffects(audioState, audioVM, audioPlaylistVM, tagsVM, mediaFoldersVM)
+    AudioPageEffects(audioState, audioVM, audioQueueVM, tagsVM, mediaFoldersVM)
 
     val audioTagsMap = remember(tagsMapState, tagsState) {
         tagsMapState.mapValues { entry -> entry.value.mapNotNull { relation -> tagsState.find { it.id == relation.tagId } } }
@@ -150,7 +150,7 @@ fun AudioAllPage(
                 },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
-                AudioFilesSelectModeBottomActions(audioVM, audioPlaylistVM, tagsVM, tagsState, dragSelectState)
+                AudioFilesSelectModeBottomActions(audioVM, audioQueueVM, tagsVM, tagsState, dragSelectState)
             }
         },
     ) { paddingValues ->
@@ -165,12 +165,12 @@ fun AudioAllPage(
                 }
 
                 AudioPageList(
-                    scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
+                    scrollBehavior, dragSelectState, itemsState, audioVM, audioQueueVM,
                     tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues,
                     extraBottomPadding = playerBarClearance,
                 )
             }
-            AudioPlayerBar(audioPlaylistVM, castVM, modifier = Modifier
+            AudioPlayerBar(audioQueueVM, castVM, modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } }, dragSelectState = audioState.dragSelectState)
             AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = audioState.dragSelectState)

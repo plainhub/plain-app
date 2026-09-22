@@ -75,13 +75,13 @@ fun GlobalSearchRow(
             AudioListItem(
                 item = src.audio,
                 audioVM = ctx.audioVM,
-                audioPlaylistVM = ctx.audioPlaylistVM,
+                audioQueueVM = ctx.audioQueueVM,
                 tagsVM = ctx.tagsVM,
                 castVM = ctx.castVM,
                 tags = emptyList(),
                 dragSelectState = ctx.dragSelectState,
-                isCurrentlyPlaying = isAudioPlaying && ctx.audioPlaylistVM.selectedPath.value == src.audio.path,
-                isInPlaylist = ctx.audioPlaylistVM.isInPlaylist(src.audio.path),
+                isCurrentlyPlaying = isAudioPlaying && ctx.audioQueueVM.selectedPath.value == src.audio.path,
+                isInQueue = ctx.audioQueueVM.isInQueue(src.audio.path),
             )
         }
 
@@ -143,7 +143,7 @@ fun GlobalSearchRow(
             previewerState = ctx.previewerState,
             onClick = { onOpen(hit) },
             onLongClick = { },
-            audioPlaylistVM = ctx.audioPlaylistVM,
+            audioQueueVM = ctx.audioQueueVM,
         )
 
         is GlobalSearchSource.Feed -> FeedClusterEntryRow(

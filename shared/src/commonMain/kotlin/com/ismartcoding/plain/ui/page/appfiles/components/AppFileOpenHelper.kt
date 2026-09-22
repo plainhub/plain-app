@@ -19,7 +19,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.VAppFile
 import com.ismartcoding.plain.ui.nav.navigateOtherFile
@@ -32,7 +32,7 @@ fun openAppFile(
     navController: NavHostController,
     previewerState: MediaPreviewerState,
     itemState: TransformItemState,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
 ) {
     val path = file.appFile.realPath.resolveAppFileRealPath()
     val fileName = file.fileName
@@ -69,7 +69,7 @@ fun openAppFile(
             coMain {
                 try {
                     val audio = withIO { playlistAudioFromPath(path) }
-                    audioPlaylistVM.playSingleAsync(audio)
+                    audioQueueVM.playSingleAsync(audio)
                     playAudioWithNotificationCheck(path)
                 } catch (ex: Exception) {
                     DialogHelper.showMessage(Res.string.audio_play_error)

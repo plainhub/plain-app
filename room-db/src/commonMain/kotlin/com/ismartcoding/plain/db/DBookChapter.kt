@@ -26,8 +26,8 @@ data class DBookChapter(
 
     var content: String = "",
 
-    @ColumnInfo(name = "display_order")
-    var displayOrder: Int = 0,
+    @ColumnInfo(name = "sort_order")
+    var sortOrder: Int = 0,
 
     @ColumnInfo(name = "created_at")
     var createdAt: Instant = TimeHelper.now(),

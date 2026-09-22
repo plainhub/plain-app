@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.formatDuration
@@ -166,8 +167,8 @@ fun PlaylistAddItemsPage(
                         withIO {
                             val audioByPath = vm.items.value.associateBy { it.path }
                             val items = toAdd.mapNotNull { path -> audioByPath[path]?.toPlaylistAudio() }
-                            AudioQueueManager.addPlaylistItems(playlistId, items)
-                            toRemove.forEach { AudioQueueManager.removePlaylistItem(playlistId, it) }
+                            AudioPlaylistManager.addPlaylistItems(playlistId, items)
+                            toRemove.forEach { AudioPlaylistManager.removePlaylistItem(playlistId, it) }
                         }
                         DialogHelper.showMessage(addedMsg)
                         navController.popBackStack()

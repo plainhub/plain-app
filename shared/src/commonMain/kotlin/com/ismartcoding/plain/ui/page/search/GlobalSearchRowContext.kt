@@ -10,7 +10,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.DocsViewModel
@@ -22,7 +22,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 /** Per-list dependencies for rows that reuse the source page's own list item component. */
 class GlobalSearchRowContext(
     val navController: NavHostController,
-    val audioPlaylistVM: AudioPlaylistViewModel,
+    val audioQueueVM: AudioQueueViewModel,
     val audioVM: AudioViewModel,
     val tagsVM: TagsViewModel,
     val castVM: CastViewModel,
@@ -36,7 +36,7 @@ class GlobalSearchRowContext(
 @Composable
 fun rememberGlobalSearchRowContext(
     navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
     castVM: CastViewModel,
@@ -47,11 +47,11 @@ fun rememberGlobalSearchRowContext(
     val itemState = rememberTransformItemState()
     val previewerState = rememberPreviewerState()
     return remember(
-        navController, audioPlaylistVM, audioVM, tagsVM, castVM, docsVM, feedEntriesVM,
+        navController, audioQueueVM, audioVM, tagsVM, castVM, docsVM, feedEntriesVM,
         dragSelectState, itemState, previewerState,
     ) {
         GlobalSearchRowContext(
-            navController, audioPlaylistVM, audioVM, tagsVM, castVM, docsVM, feedEntriesVM,
+            navController, audioQueueVM, audioVM, tagsVM, castVM, docsVM, feedEntriesVM,
             dragSelectState, itemState, previewerState,
         )
     }

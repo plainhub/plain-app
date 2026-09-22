@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.has
+import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.coIO
@@ -36,6 +37,7 @@ import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.MediaTopBar
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
+import com.ismartcoding.plain.ui.base.PSheetActionRow
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -45,7 +47,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.components.PlaylistNameDialog
 import com.ismartcoding.plain.ui.models.AudioHomeArtist
 import com.ismartcoding.plain.ui.models.AudioHomeViewModel
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -79,7 +81,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun AudioHomePage(
     navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
     mediaFoldersVM: MediaFoldersViewModel,
@@ -104,7 +106,7 @@ fun AudioHomePage(
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
             audioVM.loadAsync(tagsVM)
-            audioPlaylistVM.loadAsync()
+            audioQueueVM.loadAsync()
             withIO { mediaFoldersVM.loadAsync() }
             homeVM.loadAsync(audioVM)
             setRefreshState(RefreshContentState.Finished)
@@ -123,7 +125,7 @@ fun AudioHomePage(
         }
     }
 
-    AudioPageEffects(audioState, audioVM, audioPlaylistVM, tagsVM, mediaFoldersVM)
+    AudioPageEffects(audioState, audioVM, audioQueueVM, tagsVM, mediaFoldersVM)
 
     val audioTagsMap = remember(tagsMapState, tagsState) {
         tagsMapState.mapValues { entry -> entry.value.mapNotNull { relation -> tagsState.find { it.id == relation.tagId } } }
@@ -165,9 +167,15 @@ fun AudioHomePage(
                 audioVM.loadAsync(tv)
             }
         },
+        moreMenu = { dismiss ->
+            PSheetActionRow(Res.drawable.plus, stringResource(Res.string.new_playlist)) {
+                dismiss()
+                showCreatePlaylist = true
+            }
+        },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
-                AudioFilesSelectModeBottomActions(audioVM, audioPlaylistVM, tagsVM, tagsState, dragSelectState)
+                AudioFilesSelectModeBottomActions(audioVM, audioQueueVM, tagsVM, tagsState, dragSelectState)
             }
         },
     ) { paddingValues ->
@@ -191,7 +199,7 @@ fun AudioHomePage(
                     // AudioPageList brings its own pull-to-refresh, so it sits
                     // outside ours.
                     AudioPageList(
-                        scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
+                        scrollBehavior, dragSelectState, itemsState, audioVM, audioQueueVM,
                         tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues,
                         extraBottomPadding = playerBarClearance,
                     )
@@ -200,7 +208,7 @@ fun AudioHomePage(
                         HomeSections(
                             homeVM = homeVM,
                             audioVM = audioVM,
-                            audioPlaylistVM = audioPlaylistVM,
+                            audioQueueVM = audioQueueVM,
                             tagsVM = tagsVM,
                             castVM = castVM,
                             audioTagsMap = audioTagsMap,
@@ -215,7 +223,7 @@ fun AudioHomePage(
                                         val start = AudioQueueManager.setLibrarySource(startPath = null, shuffle = true)
                                         if (start != null) {
                                             audioJustPlayWithNotificationCheck(start)
-                                            audioPlaylistVM.onStarted(start)
+                                            audioQueueVM.onStarted(start)
                                         }
                                     }
                                 }
@@ -224,13 +232,12 @@ fun AudioHomePage(
                             onArtistsViewAll = { navController.navigate(Routing.Artists) },
                             onArtistClick = { artist -> navController.navigate(Routing.ArtistDetail(artist.name)) },
                             onPlaylistClick = { pl -> navController.navigate(Routing.PlaylistDetail(pl.id)) },
-                            onNewPlaylist = { showCreatePlaylist = true },
                         )
                     }
                 }
             }
             AudioPlayerBar(
-                audioPlaylistVM, castVM,
+                audioQueueVM, castVM,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } },
@@ -248,7 +255,7 @@ fun AudioHomePage(
             onConfirm = { name ->
                 showCreatePlaylist = false
                 scope.launch(Dispatchers.Default) {
-                    AudioQueueManager.createPlaylist(name)
+                    AudioPlaylistManager.createPlaylist(name)
                     homeVM.loadAsync(audioVM)
                 }
             },
@@ -262,7 +269,7 @@ fun AudioHomePage(
 private fun HomeSections(
     homeVM: AudioHomeViewModel,
     audioVM: AudioViewModel,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     tagsVM: TagsViewModel,
     castVM: CastViewModel,
     audioTagsMap: Map<String, List<DTag>>,
@@ -276,7 +283,6 @@ private fun HomeSections(
     onArtistsViewAll: () -> Unit,
     onArtistClick: (AudioHomeArtist) -> Unit,
     onPlaylistClick: (DAudioPlaylist) -> Unit,
-    onNewPlaylist: () -> Unit,
 ) {
     val artists = homeVM.artists.value
     val playlists = homeVM.playlists.value
@@ -294,11 +300,13 @@ private fun HomeSections(
                 ArtistsRow(artists.take(10), onArtistClick)
             }
         }
-        item(key = "playlists_header") {
-            HomeSectionHeader(stringResource(Res.string.playlists), null)
-        }
-        item(key = "playlists") {
-            PlaylistsRow(playlists, onNewPlaylist, onPlaylistClick)
+        if (playlists.isNotEmpty()) {
+            item(key = "playlists_header") {
+                HomeSectionHeader(stringResource(Res.string.playlists), null)
+            }
+            item(key = "playlists") {
+                PlaylistsRow(playlists, homeVM.playlistCovers.value, onPlaylistClick)
+            }
         }
         item(key = "recent_header") {
             HomeSectionHeader(stringResource(Res.string.recent), null)
@@ -308,13 +316,13 @@ private fun HomeSections(
             AudioListItem(
                 item = item,
                 audioVM = audioVM,
-                audioPlaylistVM = audioPlaylistVM,
+                audioQueueVM = audioQueueVM,
                 tagsVM = tagsVM,
                 castVM = castVM,
                 tags = audioTagsMap[item.id] ?: emptyList(),
                 dragSelectState = dragSelectState,
-                isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                isInPlaylist = audioPlaylistVM.isInPlaylist(item.path),
+                isCurrentlyPlaying = isAudioPlaying && audioQueueVM.selectedPath.value == item.path,
+                isInQueue = audioQueueVM.isInQueue(item.path),
             )
             VerticalSpace(dp = 8.dp)
         }

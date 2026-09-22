@@ -33,7 +33,7 @@ import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshLayoutState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 internal fun ColumnScope.AudioPageList(
     scrollBehavior: TopAppBarScrollBehavior,
     dragSelectState: DragSelectState, itemsState: List<DAudio>,
-    audioVM: AudioViewModel, audioPlaylistVM: AudioPlaylistViewModel,
+    audioVM: AudioViewModel, audioQueueVM: AudioQueueViewModel,
     tagsVM: TagsViewModel, castVM: CastViewModel,
     audioTagsMap: Map<String, List<DTag>>, isAudioPlaying: Boolean,
     topRefreshLayoutState: RefreshLayoutState, paddingValues: PaddingValues,
@@ -60,14 +60,14 @@ internal fun ColumnScope.AudioPageList(
                 val scrollState = audioVM.scrollStateMap[0] ?: rememberLazyListState()
                 LazyColumnScrollbar(state = scrollState) {
                     LazyColumn(Modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection)
-                        .listDragSelect(items = itemsState, state = dragSelectState), state = scrollState) {
+                        .listDragSelect(items = itemsState, state = dragSelectState, itemIndexOffset = 1), state = scrollState) {
                         item { TopSpace() }
                         items(items = itemsState, key = { it.id }) { item ->
                             val tags = audioTagsMap[item.id] ?: emptyList()
-                            AudioListItem(item = item, audioVM = audioVM, audioPlaylistVM, tagsVM = tagsVM,
+                            AudioListItem(item = item, audioVM = audioVM, audioQueueVM, tagsVM = tagsVM,
                                 castVM = castVM, tags = tags, dragSelectState = dragSelectState,
-                                isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                                isInPlaylist = audioPlaylistVM.isInPlaylist(item.path))
+                                isCurrentlyPlaying = isAudioPlaying && audioQueueVM.selectedPath.value == item.path,
+                                isInQueue = audioQueueVM.isInQueue(item.path))
                             VerticalSpace(dp = 8.dp)
                         }
                         item(key = "loadMore") {

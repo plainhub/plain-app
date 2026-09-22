@@ -11,7 +11,7 @@ import kotlinx.coroutines.sync.withLock
  * After decryption, new-format requests look like: "TIMESTAMP|NONCE|{...json...}"
  */
 object ReplayGuard {
-    private const val MAX_TIMESTAMP_DIFF_MS = 30_000L // 30-second window
+    private const val MAX_TIMESTAMP_DIFF_MS = 60_000L // 60-second window
     private const val CLEANUP_INTERVAL_MS = 60_000L
 
     private val mutex = Mutex()

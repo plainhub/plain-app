@@ -36,7 +36,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModelBase
+import com.ismartcoding.plain.ui.models.AudioQueueViewModelBase
 import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.enterSelectMode
@@ -50,7 +50,7 @@ fun ChatListItem(
     navController: NavHostController,
     chatVM: ChatViewModel,
     chatTarget: ChatTarget,
-    audioPlaylistVM: AudioPlaylistViewModelBase,
+    audioQueueVM: AudioQueueViewModelBase,
     items: List<VChat>,
     m: VChat,
     peer: DPeer?,
@@ -117,7 +117,7 @@ fun ChatListItem(
                         } else null)
                     when (m.type) {
                         MessageType.IMAGES -> ChatImages(items, m, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
-                        MessageType.FILES -> ChatFiles(items, navController, m, peer, audioPlaylistVM, previewerState)
+                        MessageType.FILES -> ChatFiles(items, navController, m, peer, audioQueueVM, previewerState)
                         MessageType.TEXT -> ChatText(focusManager, m, isSelectMode = chatVM.selectMode.value, onSelect = { chatVM.select(it) }, onDoubleClick = {
                             navController.navigateChatText((m.value as DMessageText).text)
                         }, onLongClick = {

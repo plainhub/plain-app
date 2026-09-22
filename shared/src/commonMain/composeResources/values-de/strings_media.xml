@@ -78,10 +78,11 @@
     <string name="total_minutes">%1$d Min</string>
     <string name="play_next">Als Nächstes</string>
     <string name="add_to_queue">Zur Warteschlange</string>
-    <string name="sort_order">Sortierung</string>
-    <string name="sort_custom">Eigene Reihenfolge</string>
-    <string name="sort_title_asc">Titel A–Z</string>
-    <string name="sort_title_desc">Titel Z–A</string>
+    <string name="remove_from_queue">Aus Warteschlange entfernen</string>
+    <string name="added_to_queue">Zur Warteschlange hinzugefügt</string>
+    <string name="queue">Warteschlange</string>
+    <string name="queue_title">Warteschlange (%1$s)</string>
+    <string name="empty_queue">Ihre Warteschlange ist leer</string>
     <string name="playlist_created">Playlist erstellt</string>
     <string name="playlist_deleted">Playlist gelöscht</string>
     <string name="renamed">Umbenannt</string>

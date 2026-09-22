@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.base
 import com.ismartcoding.plain.i18n.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerValue
@@ -61,6 +62,8 @@ fun <T : IData> MediaTopBar(
     navigationIcon: (@Composable () -> Unit)? = null,
     /** Replaces the default trailing actions (search + more/close capsule) on sub-pages. */
     topBarActions: (@Composable () -> Unit)? = null,
+    /** Extra items appended to the default more-sheet, below sort/cast. */
+    moreMenu: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val isDocs = mediaVM.dataType == DataType.DOC
@@ -91,6 +94,7 @@ fun <T : IData> MediaTopBar(
                     castVM.showCastDialog.value = true
                 }
             }
+            moreMenu(dismiss)
         }
     }
 

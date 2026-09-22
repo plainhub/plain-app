@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
 import com.ismartcoding.plain.chat.ChatManager
 import com.ismartcoding.plain.db.DMessageShare
 import com.ismartcoding.plain.features.download.DownloadCenter
@@ -15,7 +16,10 @@ import com.ismartcoding.plain.features.share.SharedInfoDto
 import com.ismartcoding.plain.features.share.SharedLink
 import com.ismartcoding.plain.features.share.SharedLinkClient
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
+import com.ismartcoding.plain.lib.extensions.isPdfFile
+import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.DownloadTempFileHandle
@@ -24,6 +28,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MediaPreviewData
+import com.ismartcoding.plain.ui.page.files.components.openLocalFileByType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -38,6 +43,7 @@ internal data class Crumb(val virtualPath: String, val name: String)
  */
 internal class SharedFolderState(
     private val messageId: String,
+    private val navController: NavHostController,
     private val scope: CoroutineScope,
     private val previewerState: MediaPreviewerState,
 ) {
@@ -120,8 +126,7 @@ internal class SharedFolderState(
         when {
             selectMode -> selected = if (selected.contains(entry)) selected - entry else selected + entry
             entry.isDir -> crumbs = crumbs + Crumb(entry.virtualPath, entry.name)
-            entry.mimeType.startsWith("image/") || entry.mimeType.startsWith("video/") ||
-                entry.name.isImageFast() || entry.name.isVideoFast() -> openMediaPreview(entry)
+            entry.opensLikeLocal() -> openEntryPreview(entry)
         }
     }
 
@@ -162,11 +167,15 @@ internal class SharedFolderState(
     }
 
     /**
-     * Downloads an image/video entry into a preview temp file, then opens it
-     * in the shared MediaPreviewer (videos autoplay). Temp files are cleaned
-     * up on page exit.
+     * Downloads an entry into a preview temp file, then opens it through the
+     * same dispatch as local FilesPage items: media in the shared
+     * MediaPreviewer (videos autoplay), audio in the player, text/PDF on
+     * their pages. Media preview temps are cleaned up on page exit; audio,
+     * text and PDF keep being consumed after it closes (player notification,
+     * nav stack), so like the zip preview cache those temps are left for the
+     * OS cache dir to reclaim.
      */
-    fun openMediaPreview(entry: SharedFileDto) {
+    fun openEntryPreview(entry: SharedFileDto) {
         val (link, urlToken) = transferContext() ?: return
         if (previewLoading.contains(entry.virtualPath)) return
         previewLoading = previewLoading + entry.virtualPath
@@ -177,9 +186,18 @@ internal class SharedFolderState(
                 DialogHelper.showErrorDialog(LocaleHelper.getString(Res.string.cannot_load_share))
                 return@launch
             }
-            previewHandles.add(handle)
-            MediaPreviewData.items = listOf(PreviewItem(id = entry.virtualPath, path = handle.filePath))
-            previewerState.open(0)
+            val path = handle.filePath
+            val inPagePreview = !(path.isAudioFast() || path.isTextFile() || path.isPdfFile())
+            if (inPagePreview) previewHandles.add(handle)
+            openLocalFileByType(
+                path = path,
+                navController = navController,
+                mediaHint = entry.mimeType.startsWith("image/") || entry.mimeType.startsWith("video/"),
+                onPreviewMedia = {
+                    MediaPreviewData.items = listOf(PreviewItem(id = entry.virtualPath, path = path))
+                    scope.launch { previewerState.open(0) }
+                },
+            )
         }
     }
 
@@ -231,3 +249,9 @@ internal class SharedFolderState(
     private fun sortedSelection(): List<SharedFileDto> =
         selected.sortedWith(compareBy<SharedFileDto> { !it.isDir }.thenBy { it.name.lowercase() })
 }
+
+/** Entries that open like local FilesPage items (preview/play/text/PDF); the rest keep their download sheet. */
+private fun SharedFileDto.opensLikeLocal(): Boolean =
+    mimeType.startsWith("image/") || mimeType.startsWith("video/") || mimeType.startsWith("audio/") ||
+        mimeType == "application/pdf" ||
+        name.isImageFast() || name.isVideoFast() || name.isAudioFast() || name.isTextFile() || name.isPdfFile()

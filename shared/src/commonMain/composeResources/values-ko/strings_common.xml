@@ -104,6 +104,7 @@
     <string name="added">추가됨</string>
     <string name="paste">붙여넣기</string>
     <string name="added_to_playlist">재생 목록에 추가됨</string>
+    <string name="removed_from_playlist">재생 목록에서 제거됨</string>
     <string name="on">켜기</string>
     <string name="off">끄기</string>
     <string name="reset">초기화</string>

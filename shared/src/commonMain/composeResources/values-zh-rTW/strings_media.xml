@@ -78,10 +78,11 @@
     <string name="total_minutes">%1$d 分鐘</string>
     <string name="play_next">下一首播放</string>
     <string name="add_to_queue">加入播放佇列</string>
-    <string name="sort_order">排序方式</string>
-    <string name="sort_custom">自訂順序</string>
-    <string name="sort_title_asc">標題 A–Z</string>
-    <string name="sort_title_desc">標題 Z–A</string>
+    <string name="remove_from_queue">從播放佇列移除</string>
+    <string name="added_to_queue">已加入播放佇列</string>
+    <string name="queue">播放佇列</string>
+    <string name="queue_title">播放佇列 (%1$s)</string>
+    <string name="empty_queue">您的播放佇列為空</string>
     <string name="playlist_created">歌單已建立</string>
     <string name="playlist_deleted">歌單已刪除</string>
     <string name="renamed">已重新命名</string>

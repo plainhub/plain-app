@@ -104,6 +104,7 @@
     <string name="added">已添加</string>
     <string name="paste">粘貼</string>
     <string name="added_to_playlist">已添加到播放列表</string>
+    <string name="removed_from_playlist">已從播放清單移除</string>
     <string name="on">開啟</string>
     <string name="off">關閉</string>
     <string name="reset">重置</string>

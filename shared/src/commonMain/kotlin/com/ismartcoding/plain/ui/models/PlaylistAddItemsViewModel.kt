@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.audio.AudioPlaylistManager
 import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.searchMedia
@@ -25,7 +26,7 @@ class PlaylistAddItemsViewModel : ViewModel(), ISearchableViewModel<DAudio> {
     val selected = mutableStateOf<Set<String>>(emptySet())
 
     suspend fun loadAsync(playlistId: String) {
-        val paths = withIO { AudioQueueManager.playlistItemsPage(playlistId, 0, 5000).map { it.audioPath } }
+        val paths = withIO { AudioPlaylistManager.playlistItemsPage(playlistId, 0, 5000).map { it.audioPath } }
         existing.value = paths.toSet()
         selected.value = paths.toSet()
         searchAsync()

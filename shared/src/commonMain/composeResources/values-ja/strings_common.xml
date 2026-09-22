@@ -104,6 +104,7 @@
     <string name="added">追加されました</string>
     <string name="paste">貼り付け</string>
     <string name="added_to_playlist">プレイリストに追加されました</string>
+    <string name="removed_from_playlist">プレイリストから削除されました</string>
     <string name="on">オン</string>
     <string name="off">オフ</string>
     <string name="reset">リセット</string>

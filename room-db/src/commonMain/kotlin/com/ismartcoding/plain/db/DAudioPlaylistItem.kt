@@ -14,7 +14,7 @@ import kotlin.time.Instant
 @Entity(
     tableName = "audio_playlist_items",
     indices = [
-        Index(value = ["playlist_id", "position"]),
+        Index(value = ["playlist_id", "sort_order"]),
         Index(value = ["playlist_id", "audio_path"], unique = true),
     ],
 )
@@ -38,8 +38,8 @@ data class DAudioPlaylistItem(
     var albumId: String = "",
     @ColumnInfo(name = "duration")
     var duration: Long,
-    @ColumnInfo(name = "position")
-    var position: Int,
+    @ColumnInfo(name = "sort_order")
+    var sortOrder: Int,
     @ColumnInfo(name = "added_at")
     var addedAt: Instant = TimeHelper.now(),
 )
@@ -48,24 +48,24 @@ data class DAudioPlaylistItem(
 interface AudioPlaylistItemDao {
     @Query(
         "SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId " +
-            "ORDER BY position LIMIT :limit OFFSET :offset"
+            "ORDER BY sort_order LIMIT :limit OFFSET :offset"
     )
     suspend fun pageByPlaylist(playlistId: String, limit: Int, offset: Int): List<DAudioPlaylistItem>
 
     @Query(
         "SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId AND (title LIKE :text OR artist LIKE :text OR audio_path LIKE :text) " +
-            "ORDER BY position LIMIT :limit OFFSET :offset",
+            "ORDER BY sort_order LIMIT :limit OFFSET :offset",
     )
     suspend fun pageByPlaylistText(playlistId: String, text: String, limit: Int, offset: Int): List<DAudioPlaylistItem>
 
-    @Query("SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId ORDER BY position")
+    @Query("SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId ORDER BY sort_order")
     suspend fun getByPlaylist(playlistId: String): List<DAudioPlaylistItem>
 
     @Query("SELECT * FROM audio_playlist_items WHERE playlist_id = :playlistId AND audio_path = :path")
     suspend fun getByPath(playlistId: String, path: String): DAudioPlaylistItem?
 
-    @Query("SELECT COALESCE(MAX(position), -1) FROM audio_playlist_items WHERE playlist_id = :playlistId")
-    suspend fun maxPosition(playlistId: String): Int
+    @Query("SELECT COALESCE(MAX(sort_order), -1) FROM audio_playlist_items WHERE playlist_id = :playlistId")
+    suspend fun maxSortOrder(playlistId: String): Int
 
     @Query("SELECT COUNT(*) FROM audio_playlist_items WHERE playlist_id = :playlistId")
     suspend fun countByPlaylist(playlistId: String): Int
@@ -77,8 +77,8 @@ interface AudioPlaylistItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: DAudioPlaylistItem): Long
 
-    @Query("UPDATE audio_playlist_items SET position = :position WHERE id = :id")
-    suspend fun updatePosition(id: String, position: Int)
+    @Query("UPDATE audio_playlist_items SET sort_order = :sortOrder WHERE id = :id")
+    suspend fun updateSortOrder(id: String, sortOrder: Int)
 
     @Query("UPDATE audio_playlist_items SET album_id = :albumId WHERE id = :id")
     suspend fun updateAlbumId(id: String, albumId: String)
@@ -88,6 +88,9 @@ interface AudioPlaylistItemDao {
 
     @Query("DELETE FROM audio_playlist_items WHERE playlist_id = :playlistId AND audio_path = :path")
     suspend fun deleteByPath(playlistId: String, path: String)
+
+    @Query("DELETE FROM audio_playlist_items WHERE playlist_id = :playlistId AND audio_path IN (:paths)")
+    suspend fun deleteByPlaylistPaths(playlistId: String, paths: List<String>)
 
     @Query("DELETE FROM audio_playlist_items WHERE playlist_id = :playlistId")
     suspend fun deleteByPlaylist(playlistId: String)

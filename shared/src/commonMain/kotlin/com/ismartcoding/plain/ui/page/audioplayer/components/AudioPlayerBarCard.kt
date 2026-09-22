@@ -47,7 +47,7 @@ fun AudioPlayerBarCard(
     duration: Float,
     isPlaying: Boolean,
     onClickContent: () -> Unit,
-    onClickPlaylist: () -> Unit,
+    onClickQueue: () -> Unit,
     onPlayPause: () -> Unit,
 ) {
     // Dark list items use cardBackgroundNormal (#2C2C2E) which equals surfaceVariant,
@@ -94,7 +94,7 @@ fun AudioPlayerBarCard(
                     )
                 }
                 HorizontalSpace(8.dp)
-                IconButton(onClick = onClickPlaylist, modifier = Modifier.size(42.dp).clip(CircleShape)) {
+                IconButton(onClick = onClickQueue, modifier = Modifier.size(42.dp).clip(CircleShape)) {
                     Icon(painter = painterResource(Res.drawable.list_music), contentDescription = "Queue", tint = MaterialTheme.colorScheme.primary)
                 }
             }

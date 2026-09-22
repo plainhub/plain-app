@@ -55,7 +55,7 @@ import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.platform.extractZipEntryToCache
 import com.ismartcoding.plain.platform.playlistAudioFromPath
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.page.audioplayer.AudioPlayerPage
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Job
@@ -68,12 +68,12 @@ import kotlinx.coroutines.launch
 fun FileListItem(
     file: DFile, isSelected: Boolean, isSelectMode: Boolean,
     itemState: TransformItemState, previewerState: MediaPreviewerState,
-    onClick: () -> Unit, onLongClick: () -> Unit, audioPlaylistVM: AudioPlaylistViewModel,
+    onClick: () -> Unit, onLongClick: () -> Unit, audioQueueVM: AudioQueueViewModel,
 ) {
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
     val isAudio = file.path.isAudioFast()
-    val isCurrentlyPlaying = audioPlaylistVM.selectedPath.value == file.path && isAudio
+    val isCurrentlyPlaying = audioQueueVM.selectedPath.value == file.path && isAudio
     val isPlaying by audioIsPlayingFlow().collectAsState()
     var progress by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableFloatStateOf(0f) }
@@ -134,7 +134,7 @@ fun FileListItem(
     }
 
     if (showAudioPlayer) {
-        AudioPlayerPage(audioPlaylistVM, onDismissRequest = { showAudioPlayer = false })
+        AudioPlayerPage(audioQueueVM, onDismissRequest = { showAudioPlayer = false })
     }
 }
 

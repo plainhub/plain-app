@@ -73,6 +73,10 @@ type Query {
   packageCount(query: String!): Int!
   packageStatuses(ids: [ID!]!): [PackageStatus!]!
   packages(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Package!]!
+  """Whether the path exists. Blank and '.' paths are false; stat errors (e.g. permission denied) count as not-there — a total predicate, never raises."""
+  pathExists(path: String!): Boolean!
+  """Kind of the path: FILE or DIR; null when the path does not exist (same total-predicate semantics as pathExists)."""
+  pathKind(path: String!): PathKind
   peers: [Peer!]!
   pomodoroSettings: PomodoroSettings!
   pomodoroToday: PomodoroToday!
@@ -267,7 +271,7 @@ type App {
   appDir: String!
   deviceName: String!
   deviceType: DeviceType!
-  features: [DeviceFeature!]!
+  capabilities: [Capability!]!
   channel: AppChannelType!
   permissions: [Permission!]!
   downloadsDir: String!
@@ -398,6 +402,24 @@ enum CallType {
   BLOCKED
   ANSWERED_EXTERNALLY
   UNKNOWN
+}
+
+"""Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.capabilities. Clients gate UI on App.capabilities instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."""
+enum Capability {
+  MEDIA_TRASH
+  MIRROR_AUDIO
+  DOC_PREVIEW
+  IMAGE_SEARCH
+  MEDIA_SCAN
+  SMS
+  CALLS
+  CALL_PHONE
+  CONTACTS
+  PACKAGES
+  NOTES
+  FEEDS
+  SCREEN_MIRROR
+  IMAGE_EDITOR
 }
 
 type Certificate {
@@ -643,24 +665,6 @@ enum DataType {
 
 type DbTableInfo {
   idKey: String!
-}
-
-"""Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.features. Clients gate UI on App.features instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."""
-enum DeviceFeature {
-  MEDIA_TRASH
-  MIRROR_AUDIO
-  DOC_PREVIEW
-  IMAGE_SEARCH
-  MEDIA_SCAN
-  SMS
-  CALLS
-  CALL_PHONE
-  CONTACTS
-  PACKAGES
-  NOTES
-  FEEDS
-  SCREEN_MIRROR
-  IMAGE_EDITOR
 }
 
 type DeviceInfo {
@@ -1075,6 +1079,11 @@ input PairingRequestInput {
   awareSupported: Boolean!
 }
 
+enum PathKind {
+  FILE
+  DIR
+}
+
 type Peer {
   id: ID!
   name: String!
@@ -1093,7 +1102,7 @@ enum PeerStatus {
   CHANNEL
 }
 
-"""Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.features (DeviceFeature)."""
+"""Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.capabilities (Capability)."""
 enum Permission {
   WRITE_EXTERNAL_STORAGE
   READ_SMS

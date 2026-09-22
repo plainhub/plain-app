@@ -58,7 +58,7 @@ internal fun ColumnScope.DocsPageContent(
                         Modifier
                             .fillMaxSize()
                             .nestedScroll(scrollBehavior.nestedScrollConnection)
-                            .listDragSelect(items = itemsState, state = dragSelectState),
+                            .listDragSelect(items = itemsState, state = dragSelectState, itemIndexOffset = 1),
                         state = scrollState
                     ) {
                         item { TopSpace() }

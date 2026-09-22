@@ -15,7 +15,7 @@ import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
 import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 internal fun FilesPageEffects(
     filesVM: FilesViewModel, scope: CoroutineScope,
     folderPath: String, previewerState: MediaPreviewerState,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
 ) {
     val reloadAfterGrant: () -> Unit = {
         scope.launch(Dispatchers.Default) { filesVM.loadAsync() }
@@ -67,7 +67,7 @@ internal fun FilesPageEffects(
             if (filesVM.hasPermission.value || filesVM.type == FilesType.APP) {
                 filesVM.loadAsync()
             }
-            audioPlaylistVM.loadAsync()
+            audioQueueVM.loadAsync()
         }
     }
 

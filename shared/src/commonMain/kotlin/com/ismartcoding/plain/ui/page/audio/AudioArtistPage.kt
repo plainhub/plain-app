@@ -36,24 +36,28 @@ import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
 import com.ismartcoding.plain.lib.extensions.formatDuration
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.platform.searchMedia
+import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.dragselect.listDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.audio.components.ArtistAvatar
+import com.ismartcoding.plain.ui.page.audio.components.AudioFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
@@ -71,7 +75,7 @@ import org.jetbrains.compose.resources.stringResource
 fun AudioArtistPage(
     navController: NavHostController,
     artistName: String,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
     castVM: CastViewModel,
@@ -100,7 +104,7 @@ fun AudioArtistPage(
     // Play-all fills the manual queue with exactly this artist's tracks;
     // while that set matches, the play button toggles pause/resume.
     val artistPaths = remember(items) { items.map { it.path }.toSet() }
-    val contextActive = items.isNotEmpty() && audioPlaylistVM.queuedPaths.value == artistPaths
+    val contextActive = items.isNotEmpty() && audioQueueVM.queuedPaths.value == artistPaths
 
     val playAll: (Boolean) -> Unit = { shuffle ->
         scope.launch {
@@ -111,8 +115,12 @@ fun AudioArtistPage(
             }
             val first = list.firstOrNull()?.toPlaylistAudio() ?: return@launch
             audioJustPlayWithNotificationCheck(first)
-            audioPlaylistVM.onStarted(first)
+            audioQueueVM.onStarted(first)
         }
+    }
+
+    PBackHandler(enabled = dragSelectState.selectMode) {
+        dragSelectState.exitSelectMode()
     }
 
     PScaffold(
@@ -122,12 +130,22 @@ fun AudioArtistPage(
                 navController = navController,
             )
         },
+        bottomBar = {
+            AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
+                AudioFilesSelectModeBottomActions(audioVM, audioQueueVM, tagsVM, tagsState, dragSelectState)
+            }
+        },
     ) { paddingValues ->
         // Only the top inset goes on the container; the player bar carries its
         // own navigationBarsPadding and must sit flush at the screen bottom
         // (same pattern as AudioAllPage).
         Box(Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
-            LazyColumn(modifier = Modifier.fillMaxSize(), state = scrollState) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+                    // Two header items (hero, acts) precede the track rows.
+                    .listDragSelect(items = items, state = dragSelectState, itemIndexOffset = 2),
+                state = scrollState,
+            ) {
                 item(key = "hero") {
                     Row(
                         modifier = Modifier
@@ -178,13 +196,13 @@ fun AudioArtistPage(
                     AudioListItem(
                         item = item,
                         audioVM = audioVM,
-                        audioPlaylistVM = audioPlaylistVM,
+                        audioQueueVM = audioQueueVM,
                         tagsVM = tagsVM,
                         castVM = castVM,
                         tags = emptyList(),
                         dragSelectState = dragSelectState,
-                        isCurrentlyPlaying = audioPlaylistVM.selectedPath.value == item.path,
-                        isInPlaylist = audioPlaylistVM.isInPlaylist(item.path),
+                        isCurrentlyPlaying = audioQueueVM.selectedPath.value == item.path,
+                        isInQueue = audioQueueVM.isInQueue(item.path),
                     )
                     VerticalSpace(8.dp)
                 }
@@ -193,7 +211,7 @@ fun AudioArtistPage(
                 }
             }
             AudioPlayerBar(
-                audioPlaylistVM, castVM,
+                audioQueueVM, castVM,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } },

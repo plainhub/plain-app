@@ -130,7 +130,7 @@ term       := [field ":"] value op?
 
 ## 9. 平台门控与多平台对齐
 
-- 门控分两层：`App.features: [DeviceFeature!]` 表示**设备是否提供该能力**（NAS 无 SMS 就不放 SMS）；`App.permissions: [Permission!]` 表示**客户端访问权限**（Android 运行时权限已启用且授予）。客户端 UI 先看 features 再看 permissions，**禁止嗅探 OS 版本**。
+- 门控分两层：`App.capabilities: [Capability!]` 表示**设备是否提供该能力**（NAS 无 SMS 就不放 SMS；2026-09-22 用户定：`App.features`/`DeviceFeature` 更名，旧名禁用）；`App.permissions: [Permission!]` 表示**客户端访问权限**（Android 运行时权限已启用且授予）。客户端 UI 先看 capabilities 再看 permissions，**禁止嗅探 OS 版本**。
 - NAS 对齐义务：同名类型的字段名/类型（ID/Instant/Long）、参数必填性、返回形状必须与主 SDL 一致；
   NAS 实现不了的语义用空值/空列表 + feature 门控，而不是改类型。
 - 每媒体类型共用 `interface MediaItem {id,title,path,size,bucketId,createdAt,updatedAt}`；跨类型查询返回 `MediaItem`。
@@ -138,9 +138,11 @@ term       := [field ":"] value op?
 ## 10. 已知待办与既定不动项
 
 - ~~P2：`Message`/`MessageConversation` 命名、sendSms/sendMms 不对称、`ChatItemContent` union 建模、WS 事件协议文档化、`AudioPlayback` 缺 isPlaying/positionMs~~ —— 2026-09-20 第五轮已落地：SMS 域类型改名 `Sms`/`SmsConversation`/`SmsAttachment`；`ChatItemContent` 的 `ChatFiles/ChatImages.ids` → `[ID!]!`、`ChatText.ids` → `linkPreviewImageIds`（文本本体在 `content`）；`AudioPlayback` 补 `isPlaying`/`positionMs` 且 `currentPath` 空串改暴露 null；`Notification.time` → `postedAt`；`BookmarkGroup` 补 `itemCount`；sendSms/sendMms/replyNotification 已加语义 description。事件协议见 §11。
-- **debug/工具 API（dbTables 系、dataStore 系）是产品需求，常驻主 schema，不做门控/拆分（2026-09-20 用户定，禁止再议）。**
+- **debug/工具 API（dbTables 系、dataStore 系、appLogs 系、sessions/events 审计系）是产品需求，常驻主 schema，不做门控/拆分（2026-09-20 用户定；2026-09-22 复核再次确认：主 schema 有意暴露这些测试/诊断 API——这不是问题，是设计，禁止再议）。**
 - `DriveType` 封闭集保持现状：NAS 恒 `INTERNAL_STORAGE` + `remote: Boolean!` 区分网络挂载；将来桌面网络盘需要时**新增枚举成员是增量安全操作**。
 - 编址三体系定案（2026-09-20）：批量编址 = **query DSL 字符串（§5），永久保留，禁止改成 filter input**（typed FilterInput 方案被用户否决并回滚）。path→id（音频队列）留待单独评估。
+
+- `audioLyrics`（2026-09-22 用户定）：NAS 返回 `String!`（无歌词=空串），与手机的 nullable `String`（无歌词=null）**刻意分歧**；客户端对两端都兼容（空串与 null 同义处理）。
 
 ## 11. WebSocket 事件协议（旁路实时契约，2026-09-20 冻结记录）
 

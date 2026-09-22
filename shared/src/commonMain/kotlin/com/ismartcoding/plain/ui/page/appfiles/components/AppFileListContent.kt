@@ -23,7 +23,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.components.NoDataView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.VAppFile
 
 @Composable
@@ -33,7 +33,7 @@ fun AppFileListContent(
     isLoading: Boolean,
     noMore: Boolean,
     previewerState: MediaPreviewerState,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     onRefresh: () -> Unit,
     onLoadMore: () -> Unit,
 ) {
@@ -73,9 +73,9 @@ fun AppFileListContent(
                 file = file,
                 itemState = itemState,
                 previewerState = previewerState,
-                audioPlaylistVM = audioPlaylistVM,
+                audioQueueVM = audioQueueVM,
                 onClick = {
-                    openAppFile(files, file, navController, previewerState, itemState, audioPlaylistVM)
+                    openAppFile(files, file, navController, previewerState, itemState, audioQueueVM)
                 },
                 onLongClick = {
                     selectedFile = file

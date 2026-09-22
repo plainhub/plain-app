@@ -78,10 +78,11 @@
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Play next</string>
     <string name="add_to_queue">Add to queue</string>
-    <string name="sort_order">Sort order</string>
-    <string name="sort_custom">Custom order</string>
-    <string name="sort_title_asc">Title A–Z</string>
-    <string name="sort_title_desc">Title Z–A</string>
+    <string name="remove_from_queue">Remove from queue</string>
+    <string name="added_to_queue">Added to queue</string>
+    <string name="queue">Queue</string>
+    <string name="queue_title">Queue (%1$s)</string>
+    <string name="empty_queue">Your queue is empty</string>
     <string name="playlist_created">Playlist created</string>
     <string name="playlist_deleted">Playlist deleted</string>
     <string name="renamed">Renamed</string>
