@@ -4,7 +4,7 @@ import com.ismartcoding.plain.enums.AppChannelType
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLField
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLType
-import com.ismartcoding.plain.platform.DeviceFeature
+import com.ismartcoding.plain.platform.Capability
 import com.ismartcoding.plain.platform.Permission
 
 @GraphQLType
@@ -17,7 +17,7 @@ data class App(
     val appDir: String,
     val deviceName: String,
     val deviceType: DeviceType,
-    val features: List<DeviceFeature>,
+    val capabilities: List<Capability>,
     val channel: AppChannelType,
     val permissions: List<Permission>,
     val downloadsDir: String,

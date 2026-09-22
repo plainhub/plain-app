@@ -28,7 +28,7 @@ import com.ismartcoding.plain.httpserver.models.DeviceInfo
 import com.ismartcoding.plain.httpserver.models.DeviceStatus
 import com.ismartcoding.plain.httpserver.models.KeyValuePair
 import com.ismartcoding.plain.httpserver.models.toModel
-import com.ismartcoding.plain.platform.getDeviceFeatures
+import com.ismartcoding.plain.platform.getDeviceCapabilities
 import com.ismartcoding.plain.platform.getDeviceType
 
 @GraphQLQuery
@@ -53,7 +53,7 @@ suspend fun app(): App {
         appDir = appDir(),
         deviceName = TempData.deviceName.value,
         deviceType = getDeviceType(),
-        getDeviceFeatures(),
+        getDeviceCapabilities(),
         AppChannelType.fromString(buildChannel),
         grantedPermissions,
         downloadsDir = getDownloadsDirPath(),

@@ -7,6 +7,7 @@ import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isVideoFast
+import com.ismartcoding.plain.enums.PathKind
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -71,6 +72,21 @@ suspend fun fileInfo(path: String, fileName: String? = null): FileInfo {
 @GraphQLQuery
 suspend fun fileIds(paths: List<String>): List<String> {
     return paths.map { getFileId(it) }
+}
+
+@GraphQLQuery(description = "Whether the path exists. Blank and '.' paths are false; stat errors (e.g. permission denied) count as not-there — a total predicate, never raises.")
+suspend fun pathExists(path: String): Boolean {
+    val finalPath = path.getFinalPath()
+    if (finalPath.isBlank() || finalPath == ".") return false
+    return statFile(finalPath) != null
+}
+
+@GraphQLQuery(description = "Kind of the path: FILE or DIR; null when the path does not exist (same total-predicate semantics as pathExists).")
+suspend fun pathKind(path: String): PathKind? {
+    val finalPath = path.getFinalPath()
+    if (finalPath.isBlank() || finalPath == ".") return null
+    val stat = statFile(finalPath) ?: return null
+    return if (stat.isDir) PathKind.DIR else PathKind.FILE
 }
 
 @GraphQLQuery

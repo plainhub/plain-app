@@ -5,7 +5,7 @@ package com.ismartcoding.plain.platform
  * without knowing anything about the device type or OS version. Media/file
  * domains are always present and therefore not listed.
  */
-enum class DeviceFeature {
+enum class Capability {
     MEDIA_TRASH,
     MIRROR_AUDIO,
     DOC_PREVIEW,
@@ -26,4 +26,4 @@ enum class DeviceFeature {
  * Capabilities supported by this device right now; platform-specific
  * gating (e.g. Android SDK level) stays inside the actuals.
  */
-expect fun getDeviceFeatures(): List<DeviceFeature>
+expect fun getDeviceCapabilities(): List<Capability>
