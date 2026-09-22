@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.yield
 import kotlin.test.Test
+import kotlin.test.AfterTest
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -20,6 +21,9 @@ import kotlin.test.assertTrue
  */
 class DownloadCenterTest {
 
+    @AfterTest
+    fun tearDown() = resetCenter()
+
     private class GatedEngine : DownloadEngine {
         val started = java.util.concurrent.CopyOnWriteArrayList<String>()
         val finished = java.util.concurrent.CopyOnWriteArrayList<String>()
@@ -30,7 +34,7 @@ class DownloadCenterTest {
         val gates = java.util.concurrent.ConcurrentHashMap<String, CompletableDeferred<Unit>>()
         val failThese: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
-        fun gate(id: String) = gates.getOrPut(id) { CompletableDeferred() }
+        fun gate(id: String) = gates.computeIfAbsent(id) { CompletableDeferred() }
 
         override suspend fun execute(task: DownloadTaskHandle) {
             task.status = DownloadStatus.DOWNLOADING
@@ -194,5 +198,41 @@ class DownloadCenterTest {
         until { statusOf("noengine-1") == DownloadStatus.FAILED }
         DownloadCenter.remove("noengine-1")
         until { DownloadCenter.get("noengine-1") == null }
+    }
+
+    @Test
+    fun removedQueuedTaskIsNeverExecuted() {
+        resetCenter()
+        val engine = GatedEngine()
+        DownloadCenter.registerEngine("test-removed", engine)
+        val blockers = (1..DownloadCenter.MAX_CONCURRENT).map { "blocker-$it" }
+        blockers.forEach { DownloadCenter.add(Task(it, "test-removed")) }
+        until { engine.started.containsAll(blockers) }
+        DownloadCenter.add(Task("removed-queued", "test-removed"))
+        assertTrue(DownloadCenter.remove("removed-queued"))
+        DownloadCenter.add(Task("after-removed", "test-removed"))
+        blockers.forEach { engine.gate(it).complete(Unit) }
+        until { engine.started.contains("after-removed") }
+        assertFalse(engine.started.contains("removed-queued"))
+        engine.gate("after-removed").complete(Unit)
+        until { engine.finished.contains("after-removed") }
+    }
+
+    @Test
+    fun burstBeyondChannelBufferCapacityDrainsWithoutLosingTasks() {
+        resetCenter()
+        val engine = GatedEngine()
+        DownloadCenter.registerEngine("test-burst", engine)
+        val blockers = (1..DownloadCenter.MAX_CONCURRENT).map { "burst-blocker-$it" }
+        blockers.forEach { DownloadCenter.add(Task(it, "test-burst")) }
+        until { engine.started.containsAll(blockers) }
+        val queued = (1..100).map { "burst-$it" }
+        queued.forEach {
+            engine.gate(it).complete(Unit)
+            assertTrue(DownloadCenter.add(Task(it, "test-burst")))
+        }
+        blockers.forEach { engine.gate(it).complete(Unit) }
+        until(10000) { engine.finished.containsAll(queued) }
+        assertEquals(queued.size, engine.started.count { it in queued })
     }
 }

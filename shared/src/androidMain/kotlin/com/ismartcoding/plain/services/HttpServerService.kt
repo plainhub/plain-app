@@ -129,24 +129,6 @@ class HttpServerService : LifecycleService() {
         }
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-        // User swiped away the app from recents; stop server immediately to release ports.
-        NsdHelper.unregisterService()
-        try {
-            httpServer?.stop(500, 1000)
-        } catch (e: Exception) {
-            LogCat.e("Error stopping server on task removed: ${e.message}")
-        } finally {
-            PeerStatusManager.stop()
-            SmsProviderObserver.stop()
-            SmsHelper.stopSmsSendTracking()
-            cancelMmsPolling()
-            httpServer = null
-        }
-        stopSelf()
-    }
-
     override fun onDestroy() {
         instance = null
         serverJob?.cancel()

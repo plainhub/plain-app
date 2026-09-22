@@ -74,6 +74,17 @@ class ApiContractTest {
     }
 
     @Test
+    fun rootOperationsPrintInStableNameOrder() {
+        for (root in listOf("Query", "Mutation", "Subscription")) {
+            val body = Regex("type $root\\s*\\{([\\s\\S]*?)\\}").find(sdl)
+                ?.groupValues?.get(1) ?: continue
+            val names = Regex("(?m)^  (\\w+)(?:\\(|:)").findAll(body)
+                .map { it.groupValues[1] }.toList()
+            assertEquals(names.sorted(), names, "$root operation order must not depend on registration order")
+        }
+    }
+
+    @Test
     fun idSuffixedFieldsUseTheIdScalar() {
         forEachTypedField { (owner, name, type) ->
             val isIdName = isIdName(name)

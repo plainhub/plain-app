@@ -1,244 +1,244 @@
 """Query object"""
 type Query {
-  appFiles(offset: Int!, limit: Int!, query: String!): [AppFile!]!
+  app: App!
   appFileCount(query: String!): Int!
-  chatChannels: [ChatChannel!]!
-  notifications(offset: Int!, limit: Int!, query: String!): [Notification!]!
-  notificationCount(query: String!): Int!
-  docCount(query: String!): Int!
-  docExtGroups: [DocExtGroup!]!
-  docs(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Doc!]!
-  smsBoxCounts: SmsCounts!
-  sms(offset: Int!, limit: Int!, query: String!): [Sms!]!
-  smsConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
-  smsCount(query: String!): Int!
-  smsConversationCount(query: String!): Int!
-  archivedConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
-  tags(type: DataType!): [Tag!]!
-  tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
-  appLogs(offset: Int!, limit: Int!, query: String!): [String!]!
+  appFiles(offset: Int!, limit: Int!, query: String!): [AppFile!]!
   appLogPath: String!
-  screenMirrorState: Boolean!
-  screenMirrorVideoCodec: ScreenMirrorVideoCodec
-  screenMirrorControlEnabled: Boolean!
-  screenMirrorQuality: ScreenMirrorQuality!
-  """Chunk state for the client-chosen chunk-set id `fileId`, as `index:byteSize` strings."""
-  uploadedChunks(fileId: String!): [String!]!
-  """Current state of the merge job for `fileId`; NONE when no job was ever started."""
-  mergeStatus(fileId: String!): MergeTask!
-  feeds: [Feed!]!
-  feedEntryCounts: [FeedEntryCount!]!
-  feedEntryCount(query: String!): Int!
-  feedEntry(id: ID!): FeedEntry
-  feedEntries(offset: Int!, limit: Int!, query: String!): [FeedEntry!]!
-  peers: [Peer!]!
+  appLogs(offset: Int!, limit: Int!, query: String!): [String!]!
+  archivedConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
+  audioCount(query: String!): Int!
+  audioLyrics(path: String!): String
+  audioPlayHistory(offset: Int!, limit: Int!, query: String!): [AudioPlayHistory!]!
+  audioPlayback: AudioPlayback!
+  audioPlaylistItemCount(id: ID!): Int!
+  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!, query: String!): [AudioItem!]!
+  audioPlaylists: [AudioPlaylist!]!
+  audioQueueItemCount: Int!
+  audioQueueItems(offset: Int!, limit: Int!, query: String!): [AudioItem!]!
+  audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
+  bookmarkGroups: [BookmarkGroup!]!
+  bookmarks: [Bookmark!]!
+  callCount(query: String!): Int!
+  calls(offset: Int!, limit: Int!, query: String!): [Call!]!
+  chatChannels: [ChatChannel!]!
   """Latest-first page of one conversation, returned oldest-to-newest so clients can render directly. `target` is the chat target id: a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id."""
   chatItems(target: String!, offset: Int!, limit: Int!, query: String!): [ChatItem!]!
-  """The most recent item of every conversation (direct and channel), newest conversation first."""
-  latestChatItems: [ChatItem!]!
-  audioCount(query: String!): Int!
-  audioQueueItems(offset: Int!, limit: Int!, query: String!): [AudioItem!]!
-  audioQueueItemCount: Int!
-  audioPlayback: AudioPlayback!
-  audios(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Audio!]!
-  audioLyrics(path: String!): String
-  audioPlaylists: [AudioPlaylist!]!
-  audioPlaylistItems(id: ID!, offset: Int!, limit: Int!, query: String!): [AudioItem!]!
-  audioPlaylistItemCount(id: ID!): Int!
-  audioPlayHistory(offset: Int!, limit: Int!, query: String!): [AudioPlayHistory!]!
-  imageCount(query: String!): Int!
-  imageSearchStatus: ImageSearchStatus!
-  images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
-  callCount(query: String!): Int!
-  sims: [Sim!]!
-  calls(offset: Int!, limit: Int!, query: String!): [Call!]!
-  noteCount(query: String!): Int!
-  note(id: ID!): Note
-  notes(offset: Int!, limit: Int!, query: String!): [Note!]!
-  mediaBuckets(type: MediaDataType!): [MediaBucket!]!
-  deviceInfo: DeviceInfo!
-  deviceStatus: DeviceStatus!
-  app: App!
-  contactCount(query: String!): Int!
-  contactSources: [ContactSource!]!
-  contactGroups: [ContactGroup!]!
-  contacts(offset: Int!, limit: Int!, query: String!): [Contact!]!
-  isDiscovering: Boolean!
-  pomodoroSettings: PomodoroSettings!
-  pomodoroToday: PomodoroToday!
-  dataStorePath: String!
-  dataStoreEntries: [KeyValuePair!]!
-  imageEditorProjects: [ImageEditorProjectSummary!]!
-  imageEditorProject(id: ID!): ImageEditorProject
-  packages(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Package!]!
-  packageStatuses(ids: [ID!]!): [PackageStatus!]!
-  packageCount(query: String!): Int!
-  dbPath: String!
-  dbTables: [String!]!
-  dbTableRowCount(table: String!): Long!
-  dbTableRows(table: String!, offset: Int!, limit: Int!): [String!]!
-  dbTableInfo(table: String!): DbTableInfo!
-  videoCount(query: String!): Int!
-  videos(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Video!]!
   """Paged clipboard history, newest first."""
   clipboard(offset: Int!, limit: Int!, query: String!): [Clipboard!]!
   clipboardCount(query: String!): Int!
-  bookmarks: [Bookmark!]!
-  bookmarkGroups: [BookmarkGroup!]!
-  mounts: [StorageMount!]!
-  recentFiles: [File!]!
-  files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
-  filesCount(root: String!, query: String!): Int!
+  contactCount(query: String!): Int!
+  contactGroups: [ContactGroup!]!
+  contactSources: [ContactSource!]!
+  contacts(offset: Int!, limit: Int!, query: String!): [Contact!]!
+  dataStoreEntries: [KeyValuePair!]!
+  dataStorePath: String!
+  dbPath: String!
+  dbTableInfo(table: String!): DbTableInfo!
+  dbTableRowCount(table: String!): Long!
+  dbTableRows(table: String!, offset: Int!, limit: Int!): [String!]!
+  dbTables: [String!]!
+  deviceInfo: DeviceInfo!
+  deviceStatus: DeviceStatus!
+  docCount(query: String!): Int!
+  docExtGroups: [DocExtGroup!]!
+  docs(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Doc!]!
+  favoriteFolders: [FavoriteFolder!]!
+  feedEntries(offset: Int!, limit: Int!, query: String!): [FeedEntry!]!
+  feedEntry(id: ID!): FeedEntry
+  feedEntryCount(query: String!): Int!
+  feedEntryCounts: [FeedEntryCount!]!
+  feeds: [Feed!]!
+  fileIds(paths: [String!]!): [String!]!
   """Detailed info for one file. `fileName` is optional — when omitted it is derived from `path`; it selects the media-info probe (image/video/audio)."""
   fileInfo(path: String!, fileName: String): FileInfo!
-  fileIds(paths: [String!]!): [String!]!
+  files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
+  filesCount(root: String!, query: String!): Int!
+  imageCount(query: String!): Int!
+  imageEditorProject(id: ID!): ImageEditorProject
+  imageEditorProjects: [ImageEditorProjectSummary!]!
+  imageSearchStatus: ImageSearchStatus!
+  images(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Image!]!
+  isDiscovering: Boolean!
+  """The most recent item of every conversation (direct and channel), newest conversation first."""
+  latestChatItems: [ChatItem!]!
+  mediaBuckets(type: MediaDataType!): [MediaBucket!]!
+  """Current state of the merge job for `fileId`; NONE when no job was ever started."""
+  mergeStatus(fileId: String!): MergeTask!
+  mounts: [StorageMount!]!
+  note(id: ID!): Note
+  noteCount(query: String!): Int!
+  notes(offset: Int!, limit: Int!, query: String!): [Note!]!
+  notificationCount(query: String!): Int!
+  notifications(offset: Int!, limit: Int!, query: String!): [Notification!]!
+  packageCount(query: String!): Int!
+  packageStatuses(ids: [ID!]!): [PackageStatus!]!
+  packages(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Package!]!
   """Whether the path exists. Blank and '.' paths are false; stat errors (e.g. permission denied) count as not-there — a total predicate, never raises."""
   pathExists(path: String!): Boolean!
   """Kind of the path: FILE or DIR; null when the path does not exist (same total-predicate semantics as pathExists)."""
   pathKind(path: String!): PathKind
-  favoriteFolders: [FavoriteFolder!]!
+  peers: [Peer!]!
+  pomodoroSettings: PomodoroSettings!
+  pomodoroToday: PomodoroToday!
+  recentFiles: [File!]!
+  screenMirrorControlEnabled: Boolean!
+  screenMirrorQuality: ScreenMirrorQuality!
+  screenMirrorState: Boolean!
+  screenMirrorVideoCodec: ScreenMirrorVideoCodec
+  sims: [Sim!]!
+  sms(offset: Int!, limit: Int!, query: String!): [Sms!]!
+  smsBoxCounts: SmsCounts!
+  smsConversationCount(query: String!): Int!
+  smsConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
+  smsCount(query: String!): Int!
+  tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
+  tags(type: DataType!): [Tag!]!
+  """Chunk state for the client-chosen chunk-set id `fileId`, as `index:byteSize` strings."""
+  uploadedChunks(fileId: String!): [String!]!
+  videoCount(query: String!): Int!
+  videos(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Video!]!
 }
 
 """Mutation object"""
 type Mutation {
-  createChatChannel(name: String!): ChatChannel!
-  updateChatChannel(id: ID!, name: String!): ChatChannel!
-  deleteChatChannel(id: ID!): Boolean!
-  leaveChatChannel(id: ID!): Boolean!
-  addChatChannelMember(id: ID!, peerId: ID!): ChatChannel!
-  removeChatChannelMember(id: ID!, peerId: ID!): ChatChannel!
   acceptChatChannelInvite(id: ID!): Boolean!
-  declineChatChannelInvite(id: ID!): Boolean!
-  deleteNotifications(ids: [ID!]!): ActionResult!
-  """Reply to a notification. actionIndex indexes Notification.replyActions (the reply-capable subset only), NOT the plain actions list."""
-  replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
-  unarchiveConversation(id: ID!): Boolean!
-  """Send an SMS directly from the device. subscriptionId picks the SIM (-1 = system default, see sims); requestId is an optional idempotency key that dedupes retried sends. Returns true once the send is dispatched."""
-  sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
-  archiveConversation(id: ID!): Boolean!
-  trashSms(query: String!): ActionResult!
-  restoreSms(query: String!): ActionResult!
-  deleteSms(query: String!): ActionResult!
-  """Compose an MMS in the device's default SMS app and track the send. Returns a pendingId consumed by the mms polling/WebSocket flow — poll with it until the send resolves."""
-  sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: ID!): String!
-  createTag(type: DataType!, name: String!): Tag!
-  updateTag(id: ID!, name: String!): Tag!
-  deleteTag(id: ID!): Boolean!
+  addAudioPlaylistItems(id: ID!, paths: [String!]!): Boolean!
+  addAudiosToQueue(query: String!): Boolean!
+  addBookmarks(urls: [String!]!, groupId: ID!): [Bookmark!]!
+  addChatChannelMember(id: ID!, peerId: ID!): ChatChannel!
+  addFavoriteFolder(rootPath: String!, fullPath: String!): [FavoriteFolder!]!
   addToTags(type: DataType!, tagIds: [ID!]!, query: String!): Boolean!
-  updateTagRelations(type: DataType!, item: TagRelationStub!, addTagIds: [ID!]!, removeTagIds: [ID!]!): Boolean!
-  removeFromTags(type: DataType!, tagIds: [ID!]!, query: String!): Boolean!
-  clearAppLogs: Boolean!
-  """Initiate pairing with a discovered LAN device."""
-  pairDevice(input: PairingDeviceInput!): Boolean!
+  archiveConversation(id: ID!): Boolean!
+  broadcastImageEditorUpdate(id: ID!, update: String!): Boolean!
+  call(number: String!, showDialer: Boolean!): Boolean!
+  cancelImageIndex: Boolean!
+  cancelImageModelDownload: Boolean!
   """Cancel an in-progress pairing initiated by this device."""
   cancelPairing(deviceId: ID!): Boolean!
-  """Respond to an incoming pairing request — accept or reject."""
-  respondToPairing(input: PairingRequestInput!, accepted: Boolean!): Boolean!
-  startScreenMirror(audio: Boolean!): Boolean!
-  requestScreenMirrorAudio: Boolean!
-  stopScreenMirror: Boolean!
-  updateScreenMirrorQuality(mode: ScreenMirrorMode!): Boolean!
-  sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
-  requestScreenMirrorKeyFrame: Boolean!
-  """Delete all uploaded chunks for `fileId`, discarding an unfinished upload."""
-  deleteChunks(fileId: String!): Boolean!
-  """Start a background merge of the uploaded chunks into the file at `path`; completion arrives via the upload_merge_result WS event, `mergeStatus` is the polling fallback. `replace=false` keeps the existing file and writes to a new sibling path instead; the summed chunk sizes must match `totalSize`."""
-  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, totalSize: Long!): MergeTask!
-  """Background merge into the app-private content store; `fileName` is a name hint (no directory), always overwrites. Returns a MergeTask — poll mergeStatus or wait for the upload_merge_result WS event."""
-  mergeAppFileChunks(fileId: String!, totalChunks: Int!, fileName: String!, totalSize: Long!): MergeTask!
-  deleteFiles(paths: [String!]!): ActionResult!
-  createDir(path: String!): File!
-  renameFile(path: String!, name: String!): Boolean!
-  writeTextFile(path: String!, content: String!, overwrite: Boolean!): File!
-  copyFile(src: String!, dst: String!, overwrite: Boolean!): Boolean!
-  moveFile(src: String!, dst: String!, overwrite: Boolean!): Boolean!
-  addFavoriteFolder(rootPath: String!, fullPath: String!): [FavoriteFolder!]!
-  removeFavoriteFolder(fullPath: String!): [FavoriteFolder!]!
-  setFavoriteFolderAlias(fullPath: String!, alias: String!): [FavoriteFolder!]!
-  """Queue a feed content sync. `id` is optional: omit it (null) to sync all feeds, or pass one feed id to sync only that feed."""
-  syncFeeds(id: ID): Boolean!
-  updateFeed(id: ID!, name: String!, fetchContent: Boolean!): Feed!
-  createFeed(url: String!, fetchContent: Boolean!): Feed!
-  importFeeds(content: String!): Boolean!
-  exportFeeds: String!
-  deleteFeed(id: ID!): Boolean!
-  syncFeedContent(id: ID!): FeedEntry!
-  deleteFeedEntries(query: String!): ActionResult!
-  deletePeer(id: ID!): Boolean!
-  unpairPeer(id: ID!): Boolean!
-  """Send a chat message. `target` is the chat target id — a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id; same value space as the chatItems query. `content` is the message envelope JSON ({type: TEXT|IMAGES|FILES|SHARE, value: {...}}), same shape as ChatItem.content."""
-  sendChatItem(target: String!, content: String!): [ChatItem!]!
-  deleteChatItem(id: ID!): Boolean!
-  deleteChatItems(query: String!): ActionResult!
-  retryChatItem(id: ID!): ChatItem!
-  playAudio(path: String!): AudioItem!
-  updateAudioPlayMode(mode: MediaPlayMode!): Boolean!
+  clearAppLogs: Boolean!
   clearAudioQueue: Boolean!
-  removeAudioFromQueue(path: String!): Boolean!
-  addAudiosToQueue(query: String!): Boolean!
-  reorderAudioQueue(paths: [String!]!): Boolean!
+  copyFile(src: String!, dst: String!, overwrite: Boolean!): Boolean!
   createAudioPlaylist(name: String!): AudioPlaylist!
-  renameAudioPlaylist(id: ID!, name: String!): Boolean!
-  deleteAudioPlaylist(id: ID!): Boolean!
-  addAudioPlaylistItems(id: ID!, paths: [String!]!): Boolean!
-  removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
-  """Start playback of a playlist. `path` optionally names the audio to start from (defaults to the first item); `shuffle` reorders before playing. Returns the item that starts playing, null when the playlist is empty."""
-  playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): AudioItem
-  """Queue the whole audio library and start playback. `path` optionally scopes the library to a directory and/or names the track to start from (null = entire library, first track); `shuffle` reorders before playing. Returns the item that starts playing, null when nothing matched."""
-  playAllAudios(path: String, shuffle: Boolean!): AudioItem
-  enableImageSearch: Boolean!
-  disableImageSearch: Boolean!
-  cancelImageModelDownload: Boolean!
-  startImageIndex(force: Boolean): Boolean!
-  cancelImageIndex: Boolean!
-  call(number: String!, showDialer: Boolean!): Boolean!
-  deleteCalls(query: String!): ActionResult!
-  createNote(input: NoteInput!): Note!
-  updateNote(id: ID!, input: NoteInput!): Note!
-  saveFeedEntriesToNotes(query: String!): [ID!]!
-  trashNotes(query: String!): ActionResult!
-  restoreNotes(query: String!): ActionResult!
-  deleteNotes(query: String!): ActionResult!
-  exportNotes(query: String!): String!
-  deleteMediaItems(type: MediaDataType!, query: String!): ActionResult!
-  trashMediaItems(type: MediaDataType!, query: String!): ActionResult!
-  restoreMediaItems(type: MediaDataType!, query: String!): ActionResult!
-  moveMediaItems(type: MediaDataType!, query: String!, destDir: String!): ActionResult!
-  setTempValue(key: String!, value: String!): KeyValuePair!
-  relaunchApp: Boolean!
-  openAccessibilitySettings: Boolean!
-  openWebSettings(feature: WebSettingsFeature): Boolean!
-  updateDeviceName(name: String!): Boolean!
-  deleteContacts(query: String!): ActionResult!
-  updateContact(id: ID!, input: ContactInput!): Contact!
+  createBookmarkGroup(name: String!): BookmarkGroup!
+  createChatChannel(name: String!): ChatChannel!
   createContact(input: ContactInput!): Contact!
   createContactGroup(name: String!, accountName: String!, accountType: String!): ContactGroup!
-  updateContactGroup(id: ID!, name: String!): ContactGroup!
-  deleteContactGroup(id: ID!): Boolean!
-  startDiscovery: Boolean!
-  stopDiscovery: Boolean!
-  startPomodoro(timeLeftSec: Int!): Boolean!
-  pausePomodoro: Boolean!
-  stopPomodoro: Boolean!
-  deleteDataStoreEntry(key: String!): Boolean!
-  saveImageEditorProject(id: ID!, input: ImageEditorProjectInput!): ImageEditorProject!
-  deleteImageEditorProject(id: ID!): Boolean!
-  broadcastImageEditorUpdate(id: ID!, update: String!): Boolean!
-  uninstallPackages(ids: [ID!]!): Boolean!
-  installPackage(path: String!): PackageInstallPending!
   createDbTableRow(table: String!, row: String!): Boolean!
-  deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
-  """Write text into the system clipboard and record it in the history with the calling client as source; an identical latest entry is skipped (hash dedup)."""
-  setClipboard(text: String!): Boolean!
+  createDir(path: String!): File!
+  createFeed(url: String!, fetchContent: Boolean!): Feed!
+  createNote(input: NoteInput!): Note!
+  createTag(type: DataType!, name: String!): Tag!
+  declineChatChannelInvite(id: ID!): Boolean!
+  deleteAudioPlaylist(id: ID!): Boolean!
+  deleteBookmarkGroup(id: ID!): Boolean!
+  deleteBookmarks(ids: [ID!]!): ActionResult!
+  deleteCalls(query: String!): ActionResult!
+  deleteChatChannel(id: ID!): Boolean!
+  deleteChatItem(id: ID!): Boolean!
+  deleteChatItems(query: String!): ActionResult!
+  """Delete all uploaded chunks for `fileId`, discarding an unfinished upload."""
+  deleteChunks(fileId: String!): Boolean!
   """Delete clipboard history entries by ids."""
   deleteClipboard(ids: [ID!]!): ActionResult!
-  addBookmarks(urls: [String!]!, groupId: ID!): [Bookmark!]!
-  updateBookmark(id: ID!, input: BookmarkInput!): Bookmark!
-  deleteBookmarks(ids: [ID!]!): ActionResult!
+  deleteContactGroup(id: ID!): Boolean!
+  deleteContacts(query: String!): ActionResult!
+  deleteDataStoreEntry(key: String!): Boolean!
+  deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
+  deleteFeed(id: ID!): Boolean!
+  deleteFeedEntries(query: String!): ActionResult!
+  deleteFiles(paths: [String!]!): ActionResult!
+  deleteImageEditorProject(id: ID!): Boolean!
+  deleteMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  deleteNotes(query: String!): ActionResult!
+  deleteNotifications(ids: [ID!]!): ActionResult!
+  deletePeer(id: ID!): Boolean!
+  deleteSms(query: String!): ActionResult!
+  deleteTag(id: ID!): Boolean!
+  disableImageSearch: Boolean!
+  enableImageSearch: Boolean!
+  exportFeeds: String!
+  exportNotes(query: String!): String!
+  importFeeds(content: String!): Boolean!
+  installPackage(path: String!): PackageInstallPending!
+  leaveChatChannel(id: ID!): Boolean!
+  """Background merge into the app-private content store; `fileName` is a name hint (no directory), always overwrites. Returns a MergeTask — poll mergeStatus or wait for the upload_merge_result WS event."""
+  mergeAppFileChunks(fileId: String!, totalChunks: Int!, fileName: String!, totalSize: Long!): MergeTask!
+  """Start a background merge of the uploaded chunks into the file at `path`; completion arrives via the upload_merge_result WS event, `mergeStatus` is the polling fallback. `replace=false` keeps the existing file and writes to a new sibling path instead; the summed chunk sizes must match `totalSize`."""
+  mergeChunks(fileId: String!, totalChunks: Int!, path: String!, replace: Boolean!, totalSize: Long!): MergeTask!
+  moveFile(src: String!, dst: String!, overwrite: Boolean!): Boolean!
+  moveMediaItems(type: MediaDataType!, query: String!, destDir: String!): ActionResult!
+  openAccessibilitySettings: Boolean!
+  openWebSettings(feature: WebSettingsFeature): Boolean!
+  """Initiate pairing with a discovered LAN device."""
+  pairDevice(input: PairingDeviceInput!): Boolean!
+  pausePomodoro: Boolean!
+  """Queue the whole audio library and start playback. `path` optionally scopes the library to a directory and/or names the track to start from (null = entire library, first track); `shuffle` reorders before playing. Returns the item that starts playing, null when nothing matched."""
+  playAllAudios(path: String, shuffle: Boolean!): AudioItem
+  playAudio(path: String!): AudioItem!
+  """Start playback of a playlist. `path` optionally names the audio to start from (defaults to the first item); `shuffle` reorders before playing. Returns the item that starts playing, null when the playlist is empty."""
+  playAudioPlaylist(id: ID!, path: String, shuffle: Boolean!): AudioItem
   recordBookmarkClick(id: ID!): Boolean!
-  createBookmarkGroup(name: String!): BookmarkGroup!
+  relaunchApp: Boolean!
+  removeAudioFromQueue(path: String!): Boolean!
+  removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
+  removeChatChannelMember(id: ID!, peerId: ID!): ChatChannel!
+  removeFavoriteFolder(fullPath: String!): [FavoriteFolder!]!
+  removeFromTags(type: DataType!, tagIds: [ID!]!, query: String!): Boolean!
+  renameAudioPlaylist(id: ID!, name: String!): Boolean!
+  renameFile(path: String!, name: String!): Boolean!
+  reorderAudioQueue(paths: [String!]!): Boolean!
+  """Reply to a notification. actionIndex indexes Notification.replyActions (the reply-capable subset only), NOT the plain actions list."""
+  replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
+  requestScreenMirrorAudio: Boolean!
+  requestScreenMirrorKeyFrame: Boolean!
+  """Respond to an incoming pairing request — accept or reject."""
+  respondToPairing(input: PairingRequestInput!, accepted: Boolean!): Boolean!
+  restoreMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  restoreNotes(query: String!): ActionResult!
+  restoreSms(query: String!): ActionResult!
+  retryChatItem(id: ID!): ChatItem!
+  saveFeedEntriesToNotes(query: String!): [ID!]!
+  saveImageEditorProject(id: ID!, input: ImageEditorProjectInput!): ImageEditorProject!
+  """Send a chat message. `target` is the chat target id — a bare peer id (an optional `peer:` prefix is accepted), or a `channel:<id>` prefixed channel id; same value space as the chatItems query. `content` is the message envelope JSON ({type: TEXT|IMAGES|FILES|SHARE, value: {...}}), same shape as ChatItem.content."""
+  sendChatItem(target: String!, content: String!): [ChatItem!]!
+  """Compose an MMS in the device's default SMS app and track the send. Returns a pendingId consumed by the mms polling/WebSocket flow — poll with it until the send resolves."""
+  sendMms(number: String!, body: String!, attachmentPaths: [String!]!, threadId: ID!): String!
+  sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
+  """Send an SMS directly from the device. subscriptionId picks the SIM (-1 = system default, see sims); requestId is an optional idempotency key that dedupes retried sends. Returns true once the send is dispatched."""
+  sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
+  """Write text into the system clipboard and record it in the history with the calling client as source; an identical latest entry is skipped (hash dedup)."""
+  setClipboard(text: String!): Boolean!
+  setFavoriteFolderAlias(fullPath: String!, alias: String!): [FavoriteFolder!]!
+  setTempValue(key: String!, value: String!): KeyValuePair!
+  startDiscovery: Boolean!
+  startImageIndex(force: Boolean): Boolean!
+  startPomodoro(timeLeftSec: Int!): Boolean!
+  startScreenMirror(audio: Boolean!): Boolean!
+  stopDiscovery: Boolean!
+  stopPomodoro: Boolean!
+  stopScreenMirror: Boolean!
+  syncFeedContent(id: ID!): FeedEntry!
+  """Queue a feed content sync. `id` is optional: omit it (null) to sync all feeds, or pass one feed id to sync only that feed."""
+  syncFeeds(id: ID): Boolean!
+  trashMediaItems(type: MediaDataType!, query: String!): ActionResult!
+  trashNotes(query: String!): ActionResult!
+  trashSms(query: String!): ActionResult!
+  unarchiveConversation(id: ID!): Boolean!
+  uninstallPackages(ids: [ID!]!): Boolean!
+  unpairPeer(id: ID!): Boolean!
+  updateAudioPlayMode(mode: MediaPlayMode!): Boolean!
+  updateBookmark(id: ID!, input: BookmarkInput!): Bookmark!
   updateBookmarkGroup(id: ID!, name: String!, collapsed: Boolean!, sortOrder: Int!): BookmarkGroup!
-  deleteBookmarkGroup(id: ID!): Boolean!
+  updateChatChannel(id: ID!, name: String!): ChatChannel!
+  updateContact(id: ID!, input: ContactInput!): Contact!
+  updateContactGroup(id: ID!, name: String!): ContactGroup!
+  updateDeviceName(name: String!): Boolean!
+  updateFeed(id: ID!, name: String!, fetchContent: Boolean!): Feed!
+  updateNote(id: ID!, input: NoteInput!): Note!
+  updateScreenMirrorQuality(mode: ScreenMirrorMode!): Boolean!
+  updateTag(id: ID!, name: String!): Tag!
+  updateTagRelations(type: DataType!, item: TagRelationStub!, addTagIds: [ID!]!, removeTagIds: [ID!]!): Boolean!
+  writeTextFile(path: String!, content: String!, overwrite: Boolean!): File!
 }
 
 type ActionResult {

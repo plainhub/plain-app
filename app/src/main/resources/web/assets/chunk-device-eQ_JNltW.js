@@ -1,0 +1,1 @@
+import{C as e}from"./chunk-reactivity.esm-bundler-B13GM2Wg.js";var t=e(window.innerWidth<=480),n=e(window.innerWidth<=768);function r(){t.value=window.innerWidth<=480,n.value=window.innerWidth<=768}window.addEventListener(`resize`,r);function i(){return n}function a(){return t}export{i as n,a as t};
