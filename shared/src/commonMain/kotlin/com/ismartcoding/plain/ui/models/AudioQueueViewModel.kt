@@ -12,8 +12,8 @@ import com.ismartcoding.plain.platform.audioClear
 import com.ismartcoding.plain.platform.audioJustPlay
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
 
-class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
-    val playlistItems = mutableStateOf<List<DPlaylistAudio>>(listOf())
+class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
+    val queueItems = mutableStateOf<List<DPlaylistAudio>>(listOf())
     val queueCount = mutableStateOf(0)
     val noMore = mutableStateOf(false)
 
@@ -41,7 +41,7 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         // Refetch the whole window instead of offset-appending: manual queue
         // mutations shift ranks, so an offset append can overlap the old window
         // and duplicate tracks.
-        refreshWindow(playlistItems.value.size + pageLimit)
+        refreshWindow(queueItems.value.size + pageLimit)
     }
 
     suspend fun addAsync(items: List<DAudio>) {
@@ -58,7 +58,7 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
         AudioQueueManager.clearQueue()
         AudioQueueManager.enqueue(listOf(audio))
         selectedPath.value = audio.path
-        playlistItems.value = listOf(audio)
+        queueItems.value = listOf(audio)
         queueCount.value = 1
         noMore.value = true
         canReorder.value = true
@@ -68,7 +68,7 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
     suspend fun clearAsync() {
         AudioQueueManager.clearQueue()
         AudioPlayingPreference.putAsync("")
-        playlistItems.value = listOf()
+        queueItems.value = listOf()
         queueCount.value = 0
         noMore.value = true
         audioClear()
@@ -116,17 +116,17 @@ class AudioPlaylistViewModel : ViewModel(), AudioPlaylistViewModelBase {
     suspend fun reorder(from: Int, to: Int) {
         if (!canReorder.value) return
         AudioQueueManager.moveQueued(from, to)
-        val list = playlistItems.value.toMutableList()
+        val list = queueItems.value.toMutableList()
         if (from in list.indices && to in list.indices) {
             list.add(to, list.removeAt(from))
-            playlistItems.value = list
+            queueItems.value = list
         }
     }
 
     private suspend fun refreshWindow(target: Int = pageLimit) {
         val total = AudioQueueManager.queueTotal()
         val window = AudioQueueManager.queuePage(0, maxOf(target, pageLimit))
-        playlistItems.value = window
+        queueItems.value = window
         queueCount.value = total
         noMore.value = window.size >= total
         canReorder.value = AudioQueueManager.source().source == AudioPlaySource.NONE

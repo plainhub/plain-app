@@ -31,7 +31,7 @@ import com.ismartcoding.plain.ui.models.AudioHomeViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
@@ -134,7 +134,7 @@ import com.ismartcoding.plain.ui.page.web.DesktopAccessSettingsPage
 fun MainNavGraph(
     navController: NavHostController,
     mainVM: MainViewModel,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
     feedTagsVM: TagsViewModel,
@@ -176,25 +176,25 @@ fun MainNavGraph(
                 0 -> HomePage(navController, mainVM, updateVM, peerVM, channelVM, onTabSelected = onTabSelected)
                 1 -> ChatListPage(navController, peerVM = peerVM, channelVM = channelVM, onTabSelected = onTabSelected)
                 2 -> ToolsPage(navController, onTabSelected = onTabSelected)
-                3 -> GlobalSearchPage(navController, audioPlaylistVM, globalSearchVM, onTabSelected = onTabSelected)
+                3 -> GlobalSearchPage(navController, audioQueueVM, globalSearchVM, onTabSelected = onTabSelected)
             }
         }
         composable<Routing.Images> { ImagesPage(navController, initialLoadGate = rememberNavLoadGate()) }
         composable<Routing.Videos> { VideosPage(navController, initialLoadGate = rememberNavLoadGate()) }
         composable<Routing.Audio> {
-            AudioHomePage(navController, audioPlaylistVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM, audioHomeVM)
+            AudioHomePage(navController, audioQueueVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM, audioHomeVM)
         }
         composable<Routing.AudioAll> {
-            AudioAllPage(navController, audioPlaylistVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM)
+            AudioAllPage(navController, audioQueueVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM)
         }
         composable<Routing.Artists> { ArtistsPage(navController, audioVM, audioHomeVM) }
         composable<Routing.ArtistDetail> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.ArtistDetail>()
-            AudioArtistPage(navController, r.name, audioPlaylistVM, audioVM, audioTagsVM, audioCastVM)
+            AudioArtistPage(navController, r.name, audioQueueVM, audioVM, audioTagsVM, audioCastVM)
         }
         composable<Routing.PlaylistDetail> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlaylistDetail>()
-            PlaylistDetailPage(navController, r.id, audioPlaylistVM, audioVM, audioTagsVM, audioCastVM)
+            PlaylistDetailPage(navController, r.id, audioQueueVM, audioVM, audioTagsVM, audioCastVM)
         }
         composable<Routing.PlaylistAddItems> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlaylistAddItems>()
@@ -243,7 +243,7 @@ fun MainNavGraph(
         composable<Routing.ReplaceSslCertificate> { ReplaceSslCertificatePage(navController) }
         composable<Routing.Chat> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Chat>()
-            ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = ChatViewModel, peerVM = peerVM, channelVM = channelVM, r.id)
+            ChatPage(navController, audioQueueVM = audioQueueVM, chatVM = ChatViewModel, peerVM = peerVM, channelVM = channelVM, r.id)
         }
         composable<Routing.ChatInfo> {
             val chatVM = ChatViewModel
@@ -320,7 +320,7 @@ fun MainNavGraph(
         }
         composable<Routing.ZipFile> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.ZipFile>()
-            ZipFilePage(navController, audioPlaylistVM, r.path, r.title)
+            ZipFilePage(navController, audioQueueVM, r.path, r.title)
         }
         composable<Routing.PdfViewer> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PdfViewer>()
@@ -328,10 +328,10 @@ fun MainNavGraph(
         }
         composable<Routing.Files> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Files>()
-            FilesPage(navController, audioPlaylistVM, r.folderPath)
+            FilesPage(navController, audioQueueVM, r.folderPath)
         }
         composable<Routing.AppFiles> {
-            AppFilesPage(navController, audioPlaylistVM)
+            AppFilesPage(navController, audioQueueVM)
         }
         composable<Routing.EditShare> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.EditShare>()
@@ -362,7 +362,7 @@ fun MainNavGraph(
         composable<Routing.CastSession> { CastSessionPage(navController) }
         composable<Routing.PlayMedia> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlayMedia>()
-            PlayMediaPage(navController, r.path, audioPlaylistVM)
+            PlayMediaPage(navController, r.path, audioQueueVM)
         }
         composable<Routing.ShareImage> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.ShareImage>()

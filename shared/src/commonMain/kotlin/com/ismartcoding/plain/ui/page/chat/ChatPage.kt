@@ -76,7 +76,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModelBase
+import com.ismartcoding.plain.ui.models.AudioQueueViewModelBase
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -114,7 +114,7 @@ internal suspend fun scrollToLatest(
 @Composable
 fun ChatPage(
     navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModelBase,
+    audioQueueVM: AudioQueueViewModelBase,
     chatVM: ChatViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
@@ -268,7 +268,7 @@ fun ChatPage(
                                 navController = navController,
                                 chatVM = chatVM,
                                 chatTarget = chatTarget.value,
-                                audioPlaylistVM,
+                                audioQueueVM,
                                 itemsState.value,
                                 m = m,
                                 peer = (if (chatTarget.value.type == ChatTargetType.PEER) PeerCacher.getPeer(chatTarget.value.toId) else null)

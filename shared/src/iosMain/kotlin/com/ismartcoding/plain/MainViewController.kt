@@ -21,7 +21,7 @@ import com.ismartcoding.plain.platform.initDiskLogging
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.preferences.SettingsProvider
 import com.ismartcoding.plain.preferences.initDataStore
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -120,14 +120,14 @@ fun MainViewController(): UIViewController {
                 // commonMain) which work on all platforms.
                 val factory = viewModelFactory {
                     initializer { MainViewModel() }
-                    initializer { AudioPlaylistViewModel() }
+                    initializer { AudioQueueViewModel() }
                     initializer { PomodoroViewModel() }
                     initializer { PeerViewModel() }
                     initializer { ChannelViewModel() }
                     initializer { TagsViewModel() }
                 }
                 val mainVM: MainViewModel = viewModel(factory = factory)
-                val audioPlaylistVM: AudioPlaylistViewModel = viewModel(factory = factory)
+                val audioQueueVM: AudioQueueViewModel = viewModel(factory = factory)
                 val pomodoroVM: PomodoroViewModel = viewModel(factory = factory)
                 val peerVM: PeerViewModel = viewModel(factory = factory)
                 val channelVM: ChannelViewModel = viewModel(factory = factory)
@@ -138,7 +138,7 @@ fun MainViewController(): UIViewController {
                         MainScope().launch { com.ismartcoding.plain.enums.Language.initLocaleAsync() }
                     },
                     mainVM = mainVM,
-                    audioPlaylistVM = audioPlaylistVM,
+                    audioQueueVM = audioQueueVM,
                     pomodoroVM = pomodoroVM,
                     peerVM = peerVM,
                     channelVM = channelVM,

@@ -49,14 +49,14 @@ import com.ismartcoding.plain.platform.exitImmersiveFullscreen
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: () -> Unit) {
+fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> Unit) {
     DisposableEffect(Unit) {
         onDispose { exitImmersiveFullscreen() }
     }
@@ -66,12 +66,12 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
     val isPlaying by audioIsPlayingFlow().collectAsState()
     val playMode by TempData.audioPlayMode.collectAsState()
     val playbackSpeed by TempData.audioPlaybackSpeed.collectAsState()
-    var showPlaylist by remember { mutableStateOf(false) }
+    var showQueue by remember { mutableStateOf(false) }
     var showSleepTimer by remember { mutableStateOf(false) }
     var isDragging by remember { mutableStateOf(false) }
     var isTimerActive by remember { mutableStateOf(false) }
     var viewMode by remember { mutableStateOf(PlayerView.COVER) }
-    val currentPlayingPath = audioPlaylistVM.selectedPath
+    val currentPlayingPath = audioQueueVM.selectedPath
 
     // Pager pages mirror the play queue; fall back to the single playing
     // track when the queue is empty (e.g. player opened from chat).
@@ -79,11 +79,11 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
     LaunchedEffect(currentPlayingPath.value) {
         fallbackItem = null
         if (!isDragging) progress = audioPlayerProgress() / 1000f
-        if (audioPlaylistVM.playlistItems.value.isEmpty() && currentPlayingPath.value.isNotEmpty()) {
+        if (audioQueueVM.queueItems.value.isEmpty() && currentPlayingPath.value.isNotEmpty()) {
             fallbackItem = withIO { playlistAudioFromPath(currentPlayingPath.value) }
         }
     }
-    val pages = audioPlaylistVM.playlistItems.value.ifEmpty { listOfNotNull(fallbackItem) }
+    val pages = audioQueueVM.queueItems.value.ifEmpty { listOfNotNull(fallbackItem) }
 
     val playingIndex = pages.indexOfFirst { it.path == currentPlayingPath.value }
     val initialIndex = playingIndex.coerceAtLeast(0)
@@ -204,7 +204,7 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
                 playbackSpeed = playbackSpeed,
                 isTimerActive = isTimerActive,
                 onSleepTimer = { showSleepTimer = true },
-                onPlaylist = { showPlaylist = true },
+                onOpenQueue = { showQueue = true },
                 onPlayPrevious = { audioSkipToPrevious() },
                 onPlayPause = { if (isPlaying) audioPause() else audioPlay() },
                 onPlayNext = { audioSkipToNext() },
@@ -216,7 +216,7 @@ fun AudioPlayerPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: (
     if (showSleepTimer) {
         SleepTimerPage(onDismissRequest = { showSleepTimer = false; isTimerActive = TempData.audioSleepTimerFutureTime > TimeHelper.nowMillis() })
     }
-    if (showPlaylist) {
-        AudioPlaylistPage(audioPlaylistVM, onDismissRequest = { showPlaylist = false })
+    if (showQueue) {
+        AudioQueuePage(audioQueueVM, onDismissRequest = { showQueue = false })
     }
 }

@@ -78,6 +78,11 @@
     <string name="total_minutes">%1$d phút</string>
     <string name="play_next">Phát tiếp theo</string>
     <string name="add_to_queue">Thêm vào hàng đợi</string>
+    <string name="remove_from_queue">Xóa khỏi hàng đợi</string>
+    <string name="added_to_queue">Đã thêm vào hàng đợi</string>
+    <string name="queue">Hàng đợi</string>
+    <string name="queue_title">Hàng đợi (%1$s)</string>
+    <string name="empty_queue">Hàng đợi của bạn trống</string>
     <string name="playlist_created">Đã tạo danh sách phát</string>
     <string name="playlist_deleted">Đã xóa danh sách phát</string>
     <string name="renamed">Đã đổi tên</string>

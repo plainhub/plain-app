@@ -28,13 +28,10 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.db.DAudioPlaylistItem
 import com.ismartcoding.plain.db.IDData
 import com.ismartcoding.plain.features.audio.AudioPlaylistManager
-import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
-import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.ui.base.*
@@ -47,7 +44,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.ui.components.PlaylistNameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -59,6 +56,9 @@ import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistActionsRow
+import com.ismartcoding.plain.ui.page.playlist.components.playPlaylistFrom
+import com.ismartcoding.plain.ui.page.playlist.components.playPlaylistShuffled
+import com.ismartcoding.plain.ui.page.playlist.components.toDAudio
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistHeaderRow
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistMoreSheet
 import kotlinx.coroutines.launch
@@ -70,7 +70,7 @@ import org.jetbrains.compose.resources.stringResource
 fun PlaylistDetailPage(
     navController: NavHostController,
     playlistId: String,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
     castVM: CastViewModel,
@@ -134,7 +134,7 @@ fun PlaylistDetailPage(
     // Floating player bar clearance, measured live like on the other pages.
     val density = LocalDensity.current
     var playerBarClearance by remember { mutableStateOf(0.dp) }
-    val contextActive = audioPlaylistVM.activePlaylistId.value == playlistId
+    val contextActive = audioQueueVM.activePlaylistId.value == playlistId
     val isPlayingContext = contextActive && isPlaying
 
     PBackHandler(enabled = dragSelectState.selectMode) {
@@ -205,7 +205,7 @@ fun PlaylistDetailPage(
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
                 AudioFilesSelectModeBottomActions(
                     audioVM = audioVM,
-                    audioPlaylistVM = audioPlaylistVM,
+                    audioQueueVM = audioQueueVM,
                     tagsVM = tagsVM,
                     tagsState = tagsState,
                     dragSelectState = dragSelectState,
@@ -258,10 +258,10 @@ fun PlaylistDetailPage(
                                 if (contextActive) {
                                     if (isPlaying) audioPause() else audioPlay()
                                 } else {
-                                    scope.launch { playFrom(playlistId, null, audioPlaylistVM) }
+                                    scope.launch { playPlaylistFrom(playlistId, null, audioQueueVM) }
                                 }
                             },
-                            onShuffle = { scope.launch { playShuffled(playlistId, audioPlaylistVM) } },
+                            onShuffle = { scope.launch { playPlaylistShuffled(playlistId, audioQueueVM) } },
                         )
                     }
                     items(sorted.size, key = { sorted[it].id }) { index ->
@@ -269,13 +269,13 @@ fun PlaylistDetailPage(
                         AudioListItem(
                             item = item,
                             audioVM = audioVM,
-                            audioPlaylistVM = audioPlaylistVM,
+                            audioQueueVM = audioQueueVM,
                             tagsVM = tagsVM,
                             castVM = castVM,
                             tags = emptyList(),
                             dragSelectState = dragSelectState,
-                            isCurrentlyPlaying = isPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                            isInPlaylist = audioPlaylistVM.isInQueue(item.path),
+                            isCurrentlyPlaying = isPlaying && audioQueueVM.selectedPath.value == item.path,
+                            isInQueue = audioQueueVM.isInQueue(item.path),
                         )
                         VerticalSpace(8.dp)
                     }
@@ -287,7 +287,7 @@ fun PlaylistDetailPage(
                 }
             }
             AudioPlayerBar(
-                audioPlaylistVM, castVM,
+                audioQueueVM, castVM,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } },
@@ -298,34 +298,3 @@ fun PlaylistDetailPage(
     }
 }
 
-/** Point the queue at this playlist starting from [startPath] (null = first). */
-private suspend fun playFrom(playlistId: String, startPath: String?, playlistVM: AudioPlaylistViewModel) {
-    val start = withIO { AudioQueueManager.setPlaylistSource(playlistId, startPath) }
-    if (start != null) {
-        audioJustPlayWithNotificationCheck(start)
-        playlistVM.onStarted(start)
-    }
-}
-
-/** Start the playlist from a shuffled pick instead of the top. */
-private suspend fun playShuffled(playlistId: String, playlistVM: AudioPlaylistViewModel) {
-    withIO { AudioQueueManager.setPlaylistSource(playlistId, null) }
-    val next = withIO { AudioQueueManager.resolveNext(isNext = true, shuffle = true) }
-    if (next != null) {
-        audioJustPlayWithNotificationCheck(next)
-        playlistVM.onStarted(next)
-    }
-}
-
-private fun DAudioPlaylistItem.toDAudio(): DAudio = DAudio(
-    id = audioPath,
-    title = title,
-    artist = artist,
-    path = audioPath,
-    duration = duration,
-    size = 0,
-    bucketId = "",
-    albumId = "",
-    createdAt = TimeHelper.now(),
-    updatedAt = TimeHelper.now(),
-)

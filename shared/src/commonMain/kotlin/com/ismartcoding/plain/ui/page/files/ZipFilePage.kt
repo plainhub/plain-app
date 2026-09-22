@@ -47,7 +47,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.components.CheckCircle
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.page.files.components.BreadcrumbView
 import com.ismartcoding.plain.ui.page.files.components.FileListContent
@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ZipFilePage(
     navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     path: String,
     title: String = "",
     filesVM: FilesViewModel = viewModel { FilesViewModel() },
@@ -81,7 +81,7 @@ fun ZipFilePage(
             filesVM.initSelectedPath(rootPath, type, zipVirtualRoot, zipVirtualRoot)
             filesVM.sortBy.value = FileSortByPreference.getValueAsync()
             filesVM.loadAsync()
-            audioPlaylistVM.loadAsync()
+            audioQueueVM.loadAsync()
         }
     }
 
@@ -172,7 +172,7 @@ fun ZipFilePage(
                     files = itemsState,
                     loadFiles = { _, _ -> scope.launch(Dispatchers.Default) { filesVM.loadAsync() } },
                     previewerState = previewerState,
-                    audioPlaylistVM = audioPlaylistVM
+                    audioQueueVM = audioQueueVM
                 )
             }
         }

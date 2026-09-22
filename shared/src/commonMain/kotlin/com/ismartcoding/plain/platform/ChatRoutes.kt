@@ -2,7 +2,7 @@ package com.ismartcoding.plain.platform
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -18,9 +18,9 @@ fun ChatListPageRoute(navController: NavHostController) {
 
 @Composable
 fun ChatPageRoute(navController: NavHostController, id: String) {
-    val audioPlaylistVM = rememberViewModel(AudioPlaylistViewModel::class) { AudioPlaylistViewModel() }
+    val audioQueueVM = rememberViewModel(AudioQueueViewModel::class) { AudioQueueViewModel() }
     val chatVM = ChatViewModel
     val peerVM = rememberViewModel(PeerViewModel::class) { PeerViewModel() }
     val channelVM = rememberViewModel(ChannelViewModel::class) { ChannelViewModel() }
-    ChatPage(navController, audioPlaylistVM, chatVM, peerVM, channelVM, id)
+    ChatPage(navController, audioQueueVM, chatVM, peerVM, channelVM, id)
 }

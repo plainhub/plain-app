@@ -78,6 +78,11 @@
     <string name="total_minutes">%1$d 分</string>
     <string name="play_next">次に再生</string>
     <string name="add_to_queue">キューに追加</string>
+    <string name="remove_from_queue">キューから削除</string>
+    <string name="added_to_queue">キューに追加しました</string>
+    <string name="queue">キュー</string>
+    <string name="queue_title">キュー (%1$s)</string>
+    <string name="empty_queue">キューが空です</string>
     <string name="playlist_created">プレイリストを作成しました</string>
     <string name="playlist_deleted">プレイリストを削除しました</string>
     <string name="renamed">名前を変更しました</string>

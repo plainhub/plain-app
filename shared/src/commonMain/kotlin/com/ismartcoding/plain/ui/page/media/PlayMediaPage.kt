@@ -14,7 +14,7 @@ import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.playlistAudioFromPath
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 
 // Entry route for home-screen shortcut launches. Audio only: it starts playback
 // and hands over to the audio player page. Images/videos are previewed as an
@@ -23,13 +23,13 @@ import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 fun PlayMediaPage(
     navController: NavHostController,
     path: String,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
 ) {
     if (path.isAudioFast()) {
         LaunchedEffect(path) {
             coMain {
                 val audio = withIO { playlistAudioFromPath(path) }
-                withIO { audioPlaylistVM.playSingleAsync(audio) }
+                withIO { audioQueueVM.playSingleAsync(audio) }
                 audioJustPlayWithNotificationCheck(audio)
                 navController.navigate(Routing.Audio) {
                     popUpTo(Routing.PlayMedia(path)) { inclusive = true }

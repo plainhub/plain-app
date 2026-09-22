@@ -45,8 +45,8 @@ fun IconTextSmallButtonCopy(click: () -> Unit) {
 }
 
 @Composable
-fun IconTextSmallButtonPlaylistAdd(click: () -> Unit) {
-    PIconTextSmallButton(Res.drawable.playlist_add, text = stringResource(Res.string.add_to_playlist), click = click)
+fun IconTextSmallButtonQueueAdd(click: () -> Unit) {
+    PIconTextSmallButton(Res.drawable.playlist_add, text = stringResource(Res.string.add_to_queue), click = click)
 }
 
 @Composable

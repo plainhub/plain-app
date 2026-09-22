@@ -1,13 +1,10 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
 import com.ismartcoding.plain.i18n.*
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,7 +23,7 @@ import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -40,25 +37,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AudioListItem(
-    item: DAudio, audioVM: AudioViewModel, audioPlaylistVM: AudioPlaylistViewModel,
+    item: DAudio, audioVM: AudioViewModel, audioQueueVM: AudioQueueViewModel,
     tagsVM: TagsViewModel, castVM: CastViewModel, tags: List<DTag>,
     dragSelectState: DragSelectState,
-    isCurrentlyPlaying: Boolean = false, isInPlaylist: Boolean = false,
+    isCurrentlyPlaying: Boolean = false, isInQueue: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
-    var animatingButton by remember { mutableStateOf(false) }
     val castItems by CastPlayer.items.collectAsState()
     val currentUri by CastPlayer.currentUri.collectAsState()
     val castPlaying by CastPlayer.isPlaying.collectAsState()
     val isCurrentlyPlayingByCast = currentUri == item.path && castPlaying
     val isCurrentItemLoading = castVM.isLoading.value && currentUri == item.path
-
-    val rotation by animateFloatAsState(
-        targetValue = if (animatingButton) 90f else 0f,
-        animationSpec = tween(durationMillis = 400), label = "icon_rotation"
-    )
-    val iconResource = if (isInPlaylist) Res.drawable.playlist_remove else Res.drawable.playlist_add
-    val iconColor = if (isInPlaylist) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
 
     val selected = remember(item.id, dragSelectState.selectedIds, audioVM.selectedItem.value) {
         dragSelectState.isSelected(item.id) || audioVM.selectedItem.value?.id == item.id
@@ -73,7 +62,7 @@ fun AudioListItem(
                     else if (isCurrentlyPlaying) { TempData.audioPlayerVisible.value = true }
                     else {
                         checkNotificationPermission(Res.string.audio_notification_prompt) {
-                            scope.launch(Dispatchers.Default) { audioPlaylistVM.playAsync(item) }
+                            scope.launch(Dispatchers.Default) { audioQueueVM.playAsync(item) }
                         }
                     }
                 },
@@ -123,14 +112,12 @@ fun AudioListItem(
             if (!dragSelectState.selectMode) {
                 AudioListItemActions(
                     item = item, castMode = castVM.castMode.value,
-                    castItems = castItems, isInPlaylist = isInPlaylist, iconResource = iconResource,
-                    iconColor = iconColor, rotation = rotation,
-                    onAnimStart = { animatingButton = true }, onAnimEnd = { animatingButton = false },
-                    onCastToggle = { audio, isInQueue ->
-                        if (isInQueue) CastPlayer.removeItem(audio) else CastPlayer.addItem(audio)
+                    castItems = castItems, isInQueue = isInQueue,
+                    onCastToggle = { audio, isInCastQueue ->
+                        if (isInCastQueue) CastPlayer.removeItem(audio) else CastPlayer.addItem(audio)
                     },
-                    onPlaylistToggle = { audio, inPlaylist ->
-                        if (inPlaylist) audioPlaylistVM.removeAsync(audio.path) else audioPlaylistVM.addAsync(listOf(audio))
+                    onQueueToggle = { audio, inQueue ->
+                        if (inQueue) audioQueueVM.removeAsync(audio.path) else audioQueueVM.addAsync(listOf(audio))
                     },
                 )
             }

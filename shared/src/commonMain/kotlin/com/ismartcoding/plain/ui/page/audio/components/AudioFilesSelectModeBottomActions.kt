@@ -21,7 +21,7 @@ import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabel
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabelOff
-import com.ismartcoding.plain.ui.base.IconTextSmallButtonPlaylistAdd
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonQueueAdd
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonRestore
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonShare
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonTrash
@@ -30,7 +30,7 @@ import com.ismartcoding.plain.ui.base.PIconTextSmallButton
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
@@ -42,7 +42,7 @@ import androidx.compose.runtime.collectAsState
 @Composable
 fun AudioFilesSelectModeBottomActions(
     audioVM: AudioViewModel,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     tagsVM: TagsViewModel,
     tagsState: List<DTag>,
     dragSelectState: DragSelectState,
@@ -77,15 +77,15 @@ fun AudioFilesSelectModeBottomActions(
                     showSelectTagsDialog = true
                     removeFromTags = true
                 }
-                IconTextSmallButtonPlaylistAdd {
+                IconTextSmallButtonQueueAdd {
                     scope.launch {
                         val selectedIds = dragSelectState.selectedIds
                         val selectedItems = audioVM.itemsFlow.value.filter { selectedIds.contains(it.id) }
                         withIO {
-                            audioPlaylistVM.addAsync(selectedItems)
+                            audioQueueVM.addAsync(selectedItems)
                         }
                         dragSelectState.exitSelectMode()
-                        DialogHelper.showMessage(Res.string.added_to_playlist)
+                        DialogHelper.showMessage(Res.string.added_to_queue)
                     }
                 }
                 IconTextSmallButtonShare {

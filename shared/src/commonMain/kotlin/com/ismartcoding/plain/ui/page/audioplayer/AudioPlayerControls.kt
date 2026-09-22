@@ -34,7 +34,7 @@ fun AudioPlayerControls(
     onPlayModeChange: (MediaPlayMode) -> Unit,
     isTimerActive: Boolean,
     onSleepTimer: () -> Unit,
-    onPlaylist: () -> Unit,
+    onOpenQueue: () -> Unit,
     isPlaying: Boolean,
     onPlayPrevious: () -> Unit,
     onPlayPause: () -> Unit,
@@ -85,10 +85,10 @@ fun AudioPlayerControls(
             )
         }
         IconButton(
-            onClick = onPlaylist,
+            onClick = onOpenQueue,
             modifier = Modifier.size(44.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         ) {
-            Icon(painter = painterResource(Res.drawable.list_music), contentDescription = "Playlist", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
+            Icon(painter = painterResource(Res.drawable.list_music), contentDescription = "Queue", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
         }
     }
 

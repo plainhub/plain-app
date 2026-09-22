@@ -78,6 +78,11 @@
     <string name="total_minutes">%1$d dk</string>
     <string name="play_next">Sıradaki çal</string>
     <string name="add_to_queue">Kuyruğa ekle</string>
+    <string name="remove_from_queue">Sıradan kaldır</string>
+    <string name="added_to_queue">Sıraya eklendi</string>
+    <string name="queue">Sıra</string>
+    <string name="queue_title">Sıra (%1$s)</string>
+    <string name="empty_queue">Sıranız boş</string>
     <string name="playlist_created">Çalma listesi oluşturuldu</string>
     <string name="playlist_deleted">Çalma listesi silindi</string>
     <string name="renamed">Yeniden adlandırıldı</string>

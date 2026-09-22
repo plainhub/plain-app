@@ -78,6 +78,11 @@
     <string name="total_minutes">%1$d min</string>
     <string name="play_next">Volgende afspelen</string>
     <string name="add_to_queue">Aan wachtrij toevoegen</string>
+    <string name="remove_from_queue">Uit wachtrij verwijderen</string>
+    <string name="added_to_queue">Toegevoegd aan wachtrij</string>
+    <string name="queue">Wachtrij</string>
+    <string name="queue_title">Wachtrij (%1$s)</string>
+    <string name="empty_queue">Je wachtrij is leeg</string>
     <string name="playlist_created">Afspeellijst gemaakt</string>
     <string name="playlist_deleted">Afspeellijst verwijderd</string>
     <string name="renamed">Hernoemd</string>

@@ -44,7 +44,7 @@ import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.PlainAccessibilityService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.platform.FilePickHelper
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     internal var pickFileTag = PickFileTag.SEND_MESSAGE
     internal var exportFileType = ExportFileType.OPML
     internal val mainVM: MainViewModel by viewModels()
-    internal val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
+    internal val audioQueueVM: AudioQueueViewModel by viewModels()
     val pomodoroVM: PomodoroViewModel by viewModels()
     internal val peerVM: PeerViewModel by viewModels()
     internal val channelVM: ChannelViewModel by viewModels()
@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity() {
                 AppTheme(useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
                     Main(
                         navControllerState, onLaunched = { handleIntent(intent) },
-                        mainVM, audioPlaylistVM, pomodoroVM,
+                        mainVM, audioQueueVM, pomodoroVM,
                         peerVM = peerVM,
                         channelVM = channelVM
                     )

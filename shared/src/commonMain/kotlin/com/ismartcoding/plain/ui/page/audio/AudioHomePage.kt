@@ -47,7 +47,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.components.PlaylistNameDialog
 import com.ismartcoding.plain.ui.models.AudioHomeArtist
 import com.ismartcoding.plain.ui.models.AudioHomeViewModel
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -81,7 +81,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun AudioHomePage(
     navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
     mediaFoldersVM: MediaFoldersViewModel,
@@ -106,7 +106,7 @@ fun AudioHomePage(
     val topRefreshLayoutState = rememberRefreshLayoutState {
         scope.launch {
             audioVM.loadAsync(tagsVM)
-            audioPlaylistVM.loadAsync()
+            audioQueueVM.loadAsync()
             withIO { mediaFoldersVM.loadAsync() }
             homeVM.loadAsync(audioVM)
             setRefreshState(RefreshContentState.Finished)
@@ -125,7 +125,7 @@ fun AudioHomePage(
         }
     }
 
-    AudioPageEffects(audioState, audioVM, audioPlaylistVM, tagsVM, mediaFoldersVM)
+    AudioPageEffects(audioState, audioVM, audioQueueVM, tagsVM, mediaFoldersVM)
 
     val audioTagsMap = remember(tagsMapState, tagsState) {
         tagsMapState.mapValues { entry -> entry.value.mapNotNull { relation -> tagsState.find { it.id == relation.tagId } } }
@@ -175,7 +175,7 @@ fun AudioHomePage(
         },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
-                AudioFilesSelectModeBottomActions(audioVM, audioPlaylistVM, tagsVM, tagsState, dragSelectState)
+                AudioFilesSelectModeBottomActions(audioVM, audioQueueVM, tagsVM, tagsState, dragSelectState)
             }
         },
     ) { paddingValues ->
@@ -199,7 +199,7 @@ fun AudioHomePage(
                     // AudioPageList brings its own pull-to-refresh, so it sits
                     // outside ours.
                     AudioPageList(
-                        scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
+                        scrollBehavior, dragSelectState, itemsState, audioVM, audioQueueVM,
                         tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues,
                         extraBottomPadding = playerBarClearance,
                     )
@@ -208,7 +208,7 @@ fun AudioHomePage(
                         HomeSections(
                             homeVM = homeVM,
                             audioVM = audioVM,
-                            audioPlaylistVM = audioPlaylistVM,
+                            audioQueueVM = audioQueueVM,
                             tagsVM = tagsVM,
                             castVM = castVM,
                             audioTagsMap = audioTagsMap,
@@ -223,7 +223,7 @@ fun AudioHomePage(
                                         val start = AudioQueueManager.setLibrarySource(startPath = null, shuffle = true)
                                         if (start != null) {
                                             audioJustPlayWithNotificationCheck(start)
-                                            audioPlaylistVM.onStarted(start)
+                                            audioQueueVM.onStarted(start)
                                         }
                                     }
                                 }
@@ -237,7 +237,7 @@ fun AudioHomePage(
                 }
             }
             AudioPlayerBar(
-                audioPlaylistVM, castVM,
+                audioQueueVM, castVM,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } },
@@ -269,7 +269,7 @@ fun AudioHomePage(
 private fun HomeSections(
     homeVM: AudioHomeViewModel,
     audioVM: AudioViewModel,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     tagsVM: TagsViewModel,
     castVM: CastViewModel,
     audioTagsMap: Map<String, List<DTag>>,
@@ -316,13 +316,13 @@ private fun HomeSections(
             AudioListItem(
                 item = item,
                 audioVM = audioVM,
-                audioPlaylistVM = audioPlaylistVM,
+                audioQueueVM = audioQueueVM,
                 tagsVM = tagsVM,
                 castVM = castVM,
                 tags = audioTagsMap[item.id] ?: emptyList(),
                 dragSelectState = dragSelectState,
-                isCurrentlyPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == item.path,
-                isInPlaylist = audioPlaylistVM.isInQueue(item.path),
+                isCurrentlyPlaying = isAudioPlaying && audioQueueVM.selectedPath.value == item.path,
+                isInQueue = audioQueueVM.isInQueue(item.path),
             )
             VerticalSpace(dp = 8.dp)
         }

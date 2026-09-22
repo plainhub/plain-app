@@ -21,7 +21,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.extensions.toPreviewItem
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
@@ -32,7 +32,7 @@ fun openFile(
     navController: NavHostController,
     previewerState: MediaPreviewerState,
     itemState: TransformItemState,
-    audioPlaylistVM: AudioPlaylistViewModel? = null,
+    audioQueueVM: AudioQueueViewModel? = null,
 ) {
     // For files inside a zip archive, extract to the cache dir first, then open normally.
     if (ZipBrowserHelper.isZipPath(file.path)) {
@@ -63,7 +63,7 @@ fun openFile(
                 }
                 else -> {
                     // audio, text, PDF — real temp path works normally
-                    openFile(listOf(extracted), extracted, navController, previewerState, itemState, audioPlaylistVM)
+                    openFile(listOf(extracted), extracted, navController, previewerState, itemState, audioQueueVM)
                 }
             }
         }
@@ -75,7 +75,7 @@ fun openFile(
     openLocalFileByType(
         path = path,
         navController = navController,
-        audioPlaylistVM = audioPlaylistVM,
+        audioQueueVM = audioQueueVM,
         onPreviewMedia = {
             coMain {
                 withIO {
@@ -106,7 +106,7 @@ fun openFile(
 fun openLocalFileByType(
     path: String,
     navController: NavHostController,
-    audioPlaylistVM: AudioPlaylistViewModel? = null,
+    audioQueueVM: AudioQueueViewModel? = null,
     mediaHint: Boolean = false,
     onPreviewMedia: () -> Unit,
     onUnsupported: () -> Unit = {},
@@ -116,9 +116,9 @@ fun openLocalFileByType(
 
         path.isAudioFast() -> {
             try {
-                if (audioPlaylistVM != null) {
+                if (audioQueueVM != null) {
                     val audio = playlistAudioFromPath(path)
-                    coMain { audioPlaylistVM.playSingleAsync(audio) }
+                    coMain { audioQueueVM.playSingleAsync(audio) }
                 }
                 playAudioWithNotificationCheck(path)
             } catch (ex: Exception) {

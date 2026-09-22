@@ -49,7 +49,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.platform.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.VAppFile
 import com.ismartcoding.plain.ui.page.audioplayer.AudioPlayerPage
 import com.ismartcoding.plain.ui.page.files.components.FileListItemPlayer
@@ -64,7 +64,7 @@ fun AppFileListItem(
     file: VAppFile,
     itemState: TransformItemState,
     previewerState: MediaPreviewerState,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     onClick: () -> Unit,
     onLongClick: () -> Unit = {},
 ) {
@@ -76,7 +76,7 @@ fun AppFileListItem(
         getExtensionFromMimeType(file.appFile.mimeType)
     }
     val isAudio = path.isAudioFast()
-    val isCurrentlyPlaying = audioPlaylistVM.selectedPath.value == path && isAudio
+    val isCurrentlyPlaying = audioQueueVM.selectedPath.value == path && isAudio
     val isPlaying by audioIsPlayingFlow().collectAsState()
     var progress by remember { mutableFloatStateOf(0f) }
     var duration by remember { mutableFloatStateOf(0f) }
@@ -187,6 +187,6 @@ fun AppFileListItem(
     }
 
     if (showAudioPlayer) {
-        AudioPlayerPage(audioPlaylistVM, onDismissRequest = { showAudioPlayer = false })
+        AudioPlayerPage(audioQueueVM, onDismissRequest = { showAudioPlayer = false })
     }
 }

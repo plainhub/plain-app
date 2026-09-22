@@ -28,10 +28,10 @@ import com.ismartcoding.plain.i18n.clear_all_confirm
 import com.ismartcoding.plain.i18n.confirm
 import com.ismartcoding.plain.i18n.delete_forever
 import com.ismartcoding.plain.i18n.drag_number_to_reorder_list
-import com.ismartcoding.plain.i18n.empty_playlist
+import com.ismartcoding.plain.i18n.empty_queue
 import com.ismartcoding.plain.i18n.ok
-import com.ismartcoding.plain.i18n.playlist
-import com.ismartcoding.plain.i18n.playlist_title
+import com.ismartcoding.plain.i18n.queue
+import com.ismartcoding.plain.i18n.queue_title
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
@@ -41,7 +41,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
 import com.ismartcoding.plain.ui.helpers.confirmActionAsync
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -49,31 +49,31 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest: () -> Unit) {
+fun AudioQueuePage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> Unit) {
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isAudioPlaying by audioIsPlayingFlow().collectAsState()
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        scope.launch(Dispatchers.Default) { audioPlaylistVM.reorder(from.index, to.index) }
+        scope.launch(Dispatchers.Default) { audioQueueVM.reorder(from.index, to.index) }
     }
 
     PModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
         Column {
             PBottomSheetTopAppBar(
-                title = if (audioPlaylistVM.queueCount.value > 0)
-                    LocaleHelper.getStringF(Res.string.playlist_title, audioPlaylistVM.queueCount.value)
-                else stringResource(Res.string.playlist),
-                subtitle = if (audioPlaylistVM.canReorder.value && audioPlaylistVM.playlistItems.value.isNotEmpty()) stringResource(Res.string.drag_number_to_reorder_list) else "",
+                title = if (audioQueueVM.queueCount.value > 0)
+                    LocaleHelper.getStringF(Res.string.queue_title, audioQueueVM.queueCount.value)
+                else stringResource(Res.string.queue),
+                subtitle = if (audioQueueVM.canReorder.value && audioQueueVM.queueItems.value.isNotEmpty()) stringResource(Res.string.drag_number_to_reorder_list) else "",
                 actions = {
-                    if (audioPlaylistVM.playlistItems.value.isNotEmpty()) {
+                    if (audioQueueVM.queueItems.value.isNotEmpty()) {
                         IconButton(onClick = {
                             scope.launch {
                                 confirmActionAsync(
                                     Res.string.clear_all,
                                     Res.string.clear_all_confirm,
                                     callback = {
-                                        scope.launch { audioPlaylistVM.clearAsync() }
+                                        scope.launch { audioQueueVM.clearAsync() }
                                     },
                                     danger = true
                                 )
@@ -89,13 +89,13 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                 }
             )
             VerticalSpace(8.dp)
-            if (audioPlaylistVM.playlistItems.value.isEmpty()) {
+            if (audioQueueVM.queueItems.value.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f), contentAlignment = Alignment.Center
                 ) {
-                    Text(text = stringResource(Res.string.empty_playlist), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = stringResource(Res.string.empty_queue), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
@@ -103,24 +103,24 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                         .fillMaxWidth()
                         .weight(1f), contentPadding = PaddingValues(bottom = 96.dp)
                 ) {
-                    itemsIndexed(audioPlaylistVM.playlistItems.value, { _, item -> item.path }) { index, audio ->
-                        val isPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == audio.path
+                    itemsIndexed(audioQueueVM.queueItems.value, { _, item -> item.path }) { index, audio ->
+                        val isPlaying = isAudioPlaying && audioQueueVM.selectedPath.value == audio.path
                         ReorderableItem(reorderableLazyListState, key = audio.path) { isDragging ->
-                            AudioPlaylistItemRow(
+                            AudioQueueItemRow(
                                 audio = audio, index = index, isPlaying = isPlaying,
-                                canReorder = audioPlaylistVM.canReorder.value,
-                                canRemove = audioPlaylistVM.isInQueue(audio.path),
-                                audioPlaylistVM = audioPlaylistVM, scope = scope
+                                canReorder = audioQueueVM.canReorder.value,
+                                canRemove = audioQueueVM.isInQueue(audio.path),
+                                audioQueueVM = audioQueueVM, scope = scope
                             )
                         }
                     }
                     item(key = "loadMore") {
-                        if (!audioPlaylistVM.noMore.value) {
-                            LaunchedEffect(audioPlaylistVM.playlistItems.value.size) {
-                                scope.launch(Dispatchers.Default) { audioPlaylistVM.moreAsync() }
+                        if (!audioQueueVM.noMore.value) {
+                            LaunchedEffect(audioQueueVM.queueItems.value.size) {
+                                scope.launch(Dispatchers.Default) { audioQueueVM.moreAsync() }
                             }
                         }
-                        LoadMoreRefreshContent(audioPlaylistVM.noMore.value)
+                        LoadMoreRefreshContent(audioQueueVM.noMore.value)
                     }
                 }
             }

@@ -32,7 +32,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.DebugCornerBadge
 import com.ismartcoding.plain.ui.base.ToastEvent
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.chat.ChatViewModel
 import com.ismartcoding.plain.ui.models.FeedEntryPagerViewModel
@@ -55,7 +55,7 @@ fun Main(
     navControllerState: MutableState<NavHostController?>,
     onLaunched: () -> Unit,
     mainVM: MainViewModel,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     pomodoroVM: PomodoroViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
@@ -101,7 +101,7 @@ fun Main(
     }
 
     MainEventCollector(
-        scope, mainVM, ChatViewModel, audioPlaylistVM, pomodoroVM, peerVM, navController,
+        scope, mainVM, ChatViewModel, audioQueueVM, pomodoroVM, peerVM, navController,
         onConfirmDialog = { confirmDialogEvent = it },
         onLoadingDialog = { loadingDialogEvent = if (it.show) it else null },
         onToast = { toastState = it },
@@ -118,14 +118,14 @@ fun Main(
     }
 
     Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
-        MainNavGraph(navController, mainVM, audioPlaylistVM, peerVM, channelVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM)
+        MainNavGraph(navController, mainVM, audioQueueVM, peerVM, channelVM, feedTagsVM, feedEntryPagerVM, noteTagsVM, pomodoroVM)
 
         // Global fullscreen audio player: hosted above all pages so playback
         // keeps working across tabs, with the page beneath visible during the
         // slide-up transition.
         val audioPlayerVisible by TempData.audioPlayerVisible.collectAsState()
         if (audioPlayerVisible) {
-            AudioPlayerPage(audioPlaylistVM) { TempData.audioPlayerVisible.value = false }
+            AudioPlayerPage(audioQueueVM) { TempData.audioPlayerVisible.value = false }
         }
 
         // Home-screen shortcut media preview: overlay instead of a route so the

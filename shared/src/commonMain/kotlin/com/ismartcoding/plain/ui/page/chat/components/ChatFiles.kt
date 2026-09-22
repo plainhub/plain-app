@@ -18,7 +18,7 @@ import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModelBase
+import com.ismartcoding.plain.ui.models.AudioQueueViewModelBase
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
@@ -28,11 +28,11 @@ fun ChatFiles(
     navController: NavHostController,
     m: VChat,
     peer: DPeer?,
-    audioPlaylistVM: AudioPlaylistViewModelBase,
+    audioQueueVM: AudioQueueViewModelBase,
     previewerState: MediaPreviewerState,
 ) {
     val fileItems = (m.value as DMessageFiles).items
-    val currentPlayingPath = audioPlaylistVM.selectedPath
+    val currentPlayingPath = audioQueueVM.selectedPath
     val downloadProgressMap by DownloadQueue.downloadProgress.collectAsState(mapOf())
 
     LaunchedEffect(currentPlayingPath.value) {
@@ -52,7 +52,7 @@ fun ChatFiles(
                 navController = navController,
                 m = m,
                 peer = peer,
-                audioPlaylistVM = audioPlaylistVM,
+                audioQueueVM = audioQueueVM,
                 previewerState = previewerState,
                 item = item,
                 index = index,

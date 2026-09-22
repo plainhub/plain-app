@@ -20,20 +20,20 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableCollectionItemScope
 import com.ismartcoding.plain.ui.components.PulsatingWave
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.theme.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
+fun ReorderableCollectionItemScope.AudioQueueItemRow(
     audio: DPlaylistAudio,
     index: Int,
     isPlaying: Boolean,
     canReorder: Boolean,
     canRemove: Boolean,
-    audioPlaylistVM: AudioPlaylistViewModel,
+    audioQueueVM: AudioQueueViewModel,
     scope: CoroutineScope,
 ) {
     Card(
@@ -63,8 +63,8 @@ fun ReorderableCollectionItemScope.AudioPlaylistItemRow(
             }
             if (canRemove) {
                 PIconButton(icon = Res.drawable.playlist_remove, tint = MaterialTheme.colorScheme.error,
-                    contentDescription = stringResource(Res.string.remove_from_playlist),
-                    click = { scope.launch(Dispatchers.Default) { audioPlaylistVM.removeAsync(audio.path) } })
+                    contentDescription = stringResource(Res.string.remove_from_queue),
+                    click = { scope.launch(Dispatchers.Default) { audioQueueVM.removeAsync(audio.path) } })
             }
         }
     }

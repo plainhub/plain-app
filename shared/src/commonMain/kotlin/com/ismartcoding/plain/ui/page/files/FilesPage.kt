@@ -49,7 +49,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -66,7 +66,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FilesPage(
-    navController: NavHostController, audioPlaylistVM: AudioPlaylistViewModel,
+    navController: NavHostController, audioQueueVM: AudioQueueViewModel,
     folderPath: String = "", filesVM: FilesViewModel = viewModel { FilesViewModel() },
 ) {
     val scope = rememberCoroutineScope()
@@ -79,7 +79,7 @@ fun FilesPage(
         scope.launch { filesVM.loadAsync(); setRefreshState(RefreshContentState.Finished) }
     }
 
-    FilesPageEffects(filesVM, scope, folderPath, previewerState, audioPlaylistVM)
+    FilesPageEffects(filesVM, scope, folderPath, previewerState, audioQueueVM)
     FilesPageDialogs(filesVM, scope)
 
     if (showMoreSheet) {
@@ -184,7 +184,7 @@ fun FilesPage(
                     files = itemsState,
                     loadFiles = { _, _ -> scope.launch(Dispatchers.Default) { filesVM.loadAsync() } },
                     previewerState = previewerState,
-                    audioPlaylistVM = audioPlaylistVM
+                    audioQueueVM = audioQueueVM
                 )
             }
         }
