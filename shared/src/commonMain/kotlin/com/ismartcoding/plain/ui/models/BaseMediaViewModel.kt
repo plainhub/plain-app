@@ -14,6 +14,7 @@ import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.countMedia
 import com.ismartcoding.plain.platform.deleteMedia
+import com.ismartcoding.plain.platform.getMediaPathsByIds
 import com.ismartcoding.plain.platform.restoreMedia
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.platform.trashMedia
@@ -102,6 +103,9 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         trashItems(tagsVM, ids)
     }
 
+    /** Type-specific cascade after trashing; [paths] are resolved before the trash flag hides them. */
+    internal open suspend fun onTrashed(paths: Set<String>) {}
+
     fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
         restoreItems(tagsVM, ids)
     }
@@ -122,8 +126,10 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     ) {
         viewModelScope.launchSafe {
             DialogHelper.showLoading()
+            val paths = getMediaPathsByIds(dataType, ids)
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             trashMedia(dataType, ids)
+            onTrashed(paths)
             loadAsync(tagsVM)
             DialogHelper.hideLoading()
             sendEvent(MediaStoreChangedEvent(dataType))

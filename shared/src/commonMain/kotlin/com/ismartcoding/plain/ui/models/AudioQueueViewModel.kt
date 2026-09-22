@@ -58,21 +58,15 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
         AudioQueueManager.clearQueue()
         AudioQueueManager.enqueue(listOf(audio))
         selectedPath.value = audio.path
-        queueItems.value = listOf(audio)
-        queueCount.value = 1
-        noMore.value = true
-        canReorder.value = true
-        queuedPaths.value = setOf(audio.path)
+        refreshWindow()
     }
 
     suspend fun clearAsync() {
         AudioQueueManager.clearQueue()
         AudioPlayingPreference.putAsync("")
-        queueItems.value = listOf()
-        queueCount.value = 0
-        noMore.value = true
         audioClear()
         setCurrentPlaying("")
+        refreshWindow()
         sendEvent(ClearAudioQueueEvent())
     }
 

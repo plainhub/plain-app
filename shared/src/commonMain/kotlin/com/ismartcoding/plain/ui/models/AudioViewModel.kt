@@ -27,4 +27,9 @@ class AudioViewModel : BaseMediaViewModel<DAudio>() {
             DialogHelper.hideLoading()
         }
     }
+
+    /** Trash matches the server flow (MediaGraphQL.trashMediaItems): drop paths from queue, history and playlists. */
+    override suspend fun onTrashed(paths: Set<String>) {
+        AudioQueueManager.removePaths(paths)
+    }
 }

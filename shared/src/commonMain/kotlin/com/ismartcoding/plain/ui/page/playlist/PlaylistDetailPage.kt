@@ -58,6 +58,7 @@ import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistActionsRow
 import com.ismartcoding.plain.ui.page.playlist.components.playPlaylistFrom
 import com.ismartcoding.plain.ui.page.playlist.components.playPlaylistShuffled
+import com.ismartcoding.plain.ui.page.playlist.components.pruneTrashedRows
 import com.ismartcoding.plain.ui.page.playlist.components.toDAudio
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistHeaderRow
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistMoreSheet
@@ -95,7 +96,7 @@ fun PlaylistDetailPage(
             AudioPlaylistManager.playlist(playlistId)?.name to AudioPlaylistManager.playlistItemsPage(playlistId, 0, 1000)
         }
         playlistName = name ?: ""
-        items = list
+        items = list.pruneTrashedRows(playlistId)
     }
 
     // Reload when coming back from add-items or after any mutation.
