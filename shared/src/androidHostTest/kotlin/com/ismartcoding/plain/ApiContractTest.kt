@@ -193,7 +193,14 @@ class ApiContractTest {
         forbiddenPattern("smsAllCounts") { "renamed to smsBoxCounts — $it" }
         forbiddenPattern("feedsCount") { "renamed to feedEntryCounts — $it" }
         forbiddenPattern("topItems") { "renamed to topItemPaths — $it" }
-        forbiddenPattern("fetchFeedContent") { "duplicate of syncFeedContent was removed — $it" }
+        forbiddenPattern("fetchFeedContent") { "duplicate of syncFeedEntryContent was removed — $it" }
+        // 2026-09-24 naming cleanup (API_SPEC §7) — old names must not come back.
+        forbiddenPattern("filesCount") { "renamed to fileCount — $it" }
+        forbiddenPattern("screenMirrorState") { "renamed to isScreenMirroring — $it" }
+        forbiddenPattern("syncFeedContent") { "renamed to syncFeedEntryContent (the id is a feed-entry id) — $it" }
+        forbiddenPattern("renameAudioPlaylist") { "renamed to updateAudioPlaylist (returns the entity) — $it" }
+        forbiddenPattern("archiveConversation") { "renamed to archiveSmsConversation/unarchiveSmsConversation — $it" }
+        forbiddenPattern("""\bchildren:""") { "File.children was renamed to childCount (it is a count, not a collection) — $it" }
     }
 
     // ------------------------------------------------------------------

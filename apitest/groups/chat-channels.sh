@@ -22,7 +22,7 @@ adb -s "$ADB_ID" exec-out "run-as com.ismartcoding.plain.debug cat databases/pla
 # ----------------------------------------------------------------------------
 # chat-channels-C01  chatChannels returns list
 # ----------------------------------------------------------------------------
-CCS=$(call_gql '{ chatChannels { id name owner members { id peerId } version status createdAt updatedAt } }')
+CCS=$(call_gql '{ chatChannels { id name ownerId members { peerId status } version status createdAt updatedAt } }')
 api_ccs_count=$(printf '%s' "$CCS" | jq '.data.chatChannels | length')
 [[ "$api_ccs_count" -ge 0 ]] && pass "chat-channels-C01 chatChannels returned $api_ccs_count items" \
                               || fail "chat-channels-C01 chatChannels not a list: $CCS"
@@ -30,7 +30,7 @@ api_ccs_count=$(printf '%s' "$CCS" | jq '.data.chatChannels | length')
 # ----------------------------------------------------------------------------
 # chat-channels-C02..03  createChatChannel → chatChannels contains it → updateChatChannel
 # ----------------------------------------------------------------------------
-CREATE_CC=$(call_gql 'mutation { createChatChannel(name: "apitest-channel") { id name owner version status } }')
+CREATE_CC=$(call_gql 'mutation { createChatChannel(name: "apitest-channel") { id name ownerId version status } }')
 api_cc_id=$(printf '%s' "$CREATE_CC" | jq -r '.data.createChatChannel.id // empty')
 api_cc_name=$(printf '%s' "$CREATE_CC" | jq -r '.data.createChatChannel.name // empty')
 if [[ -n "$api_cc_id" && "$api_cc_name" == "apitest-channel" ]]; then
@@ -53,7 +53,7 @@ fi
 # chat-channels-C04  addChatChannelMember (with synthetic peerId)
 # ----------------------------------------------------------------------------
 if [[ -n "$api_cc_id" ]]; then
-  ADD_CCM=$(call_gql "mutation { addChatChannelMember(id: \"$api_cc_id\", peerId: \"apitest-fake-peer\") { id name members { id peerId } } }")
+  ADD_CCM=$(call_gql "mutation { addChatChannelMember(id: \"$api_cc_id\", peerId: \"apitest-fake-peer\") { id name members { peerId status } } }")
   api_add_err=$(printf '%s' "$ADD_CCM" | jq -r '.errors[0].message // empty')
   api_add_members=$(printf '%s' "$ADD_CCM" | jq '.data.addChatChannelMember.members | length // 0')
   if [[ -z "$api_add_err" ]]; then
@@ -69,7 +69,7 @@ fi
 # chat-channels-C05  removeChatChannelMember (synthetic)
 # ----------------------------------------------------------------------------
 if [[ -n "$api_cc_id" ]]; then
-  REM_CCM=$(call_gql "mutation { removeChatChannelMember(id: \"$api_cc_id\", peerId: \"apitest-fake-peer\") { id name members { id peerId } } }")
+  REM_CCM=$(call_gql "mutation { removeChatChannelMember(id: \"$api_cc_id\", peerId: \"apitest-fake-peer\") { id name members { peerId status } } }")
   api_rem_err=$(printf '%s' "$REM_CCM" | jq -r '.errors[0].message // empty')
   if [[ -z "$api_rem_err" ]]; then
     pass "chat-channels-C05 removeChatChannelMember → ok"

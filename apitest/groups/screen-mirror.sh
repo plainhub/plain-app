@@ -3,7 +3,7 @@
 # Source-only; the runner sources this file.
 #
 # Schemas covered:
-#   ScreenMirrorGraphQL : screenMirrorState, screenMirrorControlEnabled,
+#   ScreenMirrorGraphQL : isScreenMirroring, screenMirrorControlEnabled,
 #                         screenMirrorQuality, screenMirrorVideoCodec,
 #                         startScreenMirror, requestScreenMirrorAudio,
 #                         stopScreenMirror, updateScreenMirrorQuality,
@@ -17,14 +17,14 @@
 run_group "screen-mirror" "Screen mirror control" "docs/api-test-plan.md#screen-mirror"
 
 # ----------------------------------------------------------------------------
-# screen-mirror-C01  screenMirrorState (initially false)
+# screen-mirror-C01  isScreenMirroring (initially false)
 # ----------------------------------------------------------------------------
-SMS=$(call_gql '{ screenMirrorState }')
-api_sms=$(printf '%s' "$SMS" | jq -r '.data.screenMirrorState')
+SMS=$(call_gql '{ isScreenMirroring }')
+api_sms=$(printf '%s' "$SMS" | jq -r '.data.isScreenMirroring')
 if [[ "$api_sms" == "true" || "$api_sms" == "false" ]]; then
-  pass "screen-mirror-C01 screenMirrorState = $api_sms"
+  pass "screen-mirror-C01 isScreenMirroring = $api_sms"
 else
-  fail "screen-mirror-C01 screenMirrorState returned: $SMS"
+  fail "screen-mirror-C01 isScreenMirroring returned: $SMS"
 fi
 
 # ----------------------------------------------------------------------------

@@ -14,12 +14,12 @@ data class File(
     val updatedAt: Instant,
     val size: Long,
     val isDir: Boolean,
-    val children: Int,
+    val childCount: Int,
     val mediaId: String
 )
 
 fun DFile.toModel(): File {
-    return File(name, path, createdAt, updatedAt, size, isDir, children, mediaId)
+    return File(name, path, createdAt, updatedAt, size, isDir, childCount, mediaId)
 }
 
 @GraphQLType

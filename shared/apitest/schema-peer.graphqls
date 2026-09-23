@@ -4,8 +4,11 @@ type Query {
 
 """Mutation object"""
 type Mutation {
+  """Deliver a channel control message (invite / invite accept-decline / update / kick / leave) from the sending peer. `payload` is a channel-protocol JSON envelope interpreted per `type`."""
   channelSystemMessage(type: ChannelSystemMessageType!, payload: String!): Boolean!
+  """Deliver a chat message envelope from the sending peer (direct, or channel-bound via the c-cid header). Returns the stored item; a replayed message is silently dropped and returns an empty list."""
   createChatItem(content: String!): [ChatItem!]!
+  """Ask this device to start the aware (LAN presence) channel and subscribe the sending peer. Returns whether the aware channel was started by this call."""
   startAware: Boolean!
 }
 

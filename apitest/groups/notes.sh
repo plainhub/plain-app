@@ -8,15 +8,15 @@
 #   TagGraphQL   : tags, tagRelations, createTag, updateTag, deleteTag,
 #                  addToTags, updateTagRelations, removeFromTags
 #   FeedGraphQL  : feeds, feedEntryCounts, feedEntries, feedEntryCount, feedEntry,
-#                  syncFeedContent, syncFeeds, updateFeed, createFeed,
-#                  importFeeds, exportFeeds, deleteFeed, syncFeedContent,
+#                  syncFeedEntryContent, syncFeeds, updateFeed, createFeed,
+#                  importFeeds, exportFeeds, deleteFeed, syncFeedEntryContent,
 #                  deleteFeedEntries
 #
 # Lifecycle: each entity is created via the API, verified in plain.db,
 # mutated, and finally deleted (or trashed for notes). createFeed actually
 # hits the network to fetch the RSS URL — we use a local-data-url feed to
-# avoid that, and skip the network-bound syncFeedContent / syncFeeds /
-# syncFeedContent mutations.
+# avoid that, and skip the network-bound syncFeedEntryContent / syncFeeds /
+# syncFeedEntryContent mutations.
 
 run_group "notes" "notes + tags + feeds CRUD" "docs/api-test-plan.md#notes"
 
@@ -295,9 +295,9 @@ if [[ "$api_import" == "true" ]]; then
       fail "notes-C23 exportFeeds empty: $EXPORT_F"
     fi
 
-    # C24..25: syncFeedContent — skip (real network)
-    skip "notes-C24 syncFeedContent (skipped: would fetch real RSS content)"
-    skip "notes-C25 syncFeedContent (skipped: same)"
+    # C24..25: syncFeedEntryContent — skip (real network)
+    skip "notes-C24 syncFeedEntryContent (skipped: would fetch real RSS content)"
+    skip "notes-C25 syncFeedEntryContent (skipped: same)"
 
     # C26: syncFeeds — skip (real network)
     skip "notes-C26 syncFeeds (skipped: triggers network fetch)"

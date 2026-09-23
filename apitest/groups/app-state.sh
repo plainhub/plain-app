@@ -127,10 +127,10 @@ else
 fi
 
 # app-state-C12..14  Pomodoro lifecycle (start/pause/stop)
-SP=$(call_gql 'mutation { startPomodoro(timeLeftSec: 1500) }')
+SP=$(call_gql 'mutation { startPomodoro(durationSec: 1500) }')
 api_sp=$(printf '%s' "$SP" | jq -r '.data.startPomodoro // empty')
 if [[ "$api_sp" == "true" ]]; then
-  pass "app-state-C12 startPomodoro(timeLeftSec=1500) → true"
+  pass "app-state-C12 startPomodoro(durationSec=1500) → true"
 else
   fail "app-state-C12 startPomodoro returned: $SP"
 fi

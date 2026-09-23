@@ -12,7 +12,7 @@ data class DFile(
     val updatedAt: Instant,
     val size: Long,
     val isDir: Boolean,
-    val children: Int,
+    val childCount: Int,
     val mediaId: String = "",
 ) : IData {
     override var id: String

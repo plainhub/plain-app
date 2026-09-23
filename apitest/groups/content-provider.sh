@@ -8,7 +8,7 @@
 #                     createContactGroup, updateContactGroup, deleteContactGroup
 #   SmsGraphQL      : sms, smsConversations, smsCount, smsConversationCount,
 #                     archivedConversations, smsBoxCounts,
-#                     archiveConversation, unarchiveConversation,
+#                     archiveSmsConversation, unarchiveSmsConversation,
 #                     sendSms, sendMms
 #   CallGraphQL     : calls, callCount, sims, call, deleteCalls
 #
@@ -316,7 +316,7 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# content-provider-C16/17  archiveConversation / unarchiveConversation lifecycle
+# content-provider-C16/17  archiveSmsConversation / unarchiveSmsConversation lifecycle
 # ----------------------------------------------------------------------------
 # Caveats:
 #  - SmsConversationHelper.getArchivedConversations cross-references with the
@@ -328,25 +328,25 @@ fi
 #    Pixel userdebug has no sqlite3 binary, so we can't force a checkpoint.
 #    Verification therefore relies on the round-trip (archive → unarchive)
 #    succeeding, not on the DB count.
-ARCH=$(call_gql 'mutation { archiveConversation(id: "apitest-arch-xyz") }')
-api_arch=$(printf '%s' "$ARCH" | jq -r '.data.archiveConversation // empty')
+ARCH=$(call_gql 'mutation { archiveSmsConversation(id: "apitest-arch-xyz") }')
+api_arch=$(printf '%s' "$ARCH" | jq -r '.data.archiveSmsConversation // empty')
 if [[ "$api_arch" == "true" ]]; then
-  pass "content-provider-C16 archiveConversation → true"
+  pass "content-provider-C16 archiveSmsConversation → true"
   # Best-effort DB cross-check; tolerate WAL write delay (don't fail).
   adb -s "$ADB_ID" exec-out "run-as com.ismartcoding.plain.debug cat databases/plain.db" > "$DB_PULL"
   db_arch=$(sqlite3 "$DB_PULL" "SELECT COUNT(*) FROM archived_conversations WHERE conversation_id='apitest-arch-xyz';" 2>/dev/null || echo "?")
   pass "content-provider-C16b archived_conversations db count=$db_arch for apitest-arch-xyz (WAL-write caveat: may be 0 if WAL hasn't flushed; not gating on this)"
-  UNARCH=$(call_gql 'mutation { unarchiveConversation(id: "apitest-arch-xyz") }')
-  api_unarch=$(printf '%s' "$UNARCH" | jq -r '.data.unarchiveConversation // empty')
+  UNARCH=$(call_gql 'mutation { unarchiveSmsConversation(id: "apitest-arch-xyz") }')
+  api_unarch=$(printf '%s' "$UNARCH" | jq -r '.data.unarchiveSmsConversation // empty')
   if [[ "$api_unarch" == "true" ]]; then
-    pass "content-provider-C17 unarchiveConversation → true"
+    pass "content-provider-C17 unarchiveSmsConversation → true"
     pass "content-provider-C17b archive→unarchive round-trip completed without errors"
   else
-    fail "content-provider-C17 unarchiveConversation: $UNARCH"
+    fail "content-provider-C17 unarchiveSmsConversation: $UNARCH"
   fi
 else
-  fail "content-provider-C16 archiveConversation: $ARCH"
-  skip "content-provider-C17 unarchiveConversation (C16 failed)"
+  fail "content-provider-C16 archiveSmsConversation: $ARCH"
+  skip "content-provider-C17 unarchiveSmsConversation (C16 failed)"
 fi
 
 # ----------------------------------------------------------------------------

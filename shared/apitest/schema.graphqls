@@ -18,7 +18,7 @@ type Query {
   tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
   appLogs(offset: Int!, limit: Int!, query: String!): [String!]!
   appLogPath: String!
-  screenMirrorState: Boolean!
+  isScreenMirroring: Boolean!
   screenMirrorVideoCodec: ScreenMirrorVideoCodec
   screenMirrorControlEnabled: Boolean!
   screenMirrorQuality: ScreenMirrorQuality!
@@ -88,7 +88,7 @@ type Query {
   mounts: [StorageMount!]!
   recentFiles: [File!]!
   files(root: String!, offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [File!]!
-  filesCount(root: String!, query: String!): Int!
+  fileCount(root: String!, query: String!): Int!
   """Detailed info for one file. `fileName` is optional — when omitted it is derived from `path`; it selects the media-info probe (image/video/audio)."""
   fileInfo(path: String!, fileName: String): FileInfo!
   fileIds(paths: [String!]!): [String!]!
@@ -112,10 +112,10 @@ type Mutation {
   deleteNotifications(ids: [ID!]!): ActionResult!
   """Reply to a notification. actionIndex indexes Notification.replyActions (the reply-capable subset only), NOT the plain actions list."""
   replyNotification(id: ID!, actionIndex: Int!, text: String!): Boolean!
-  unarchiveConversation(id: ID!): Boolean!
+  unarchiveSmsConversation(id: ID!): Boolean!
   """Send an SMS directly from the device. subscriptionId picks the SIM (-1 = system default, see sims); requestId is an optional idempotency key that dedupes retried sends. Returns true once the send is dispatched."""
   sendSms(number: String!, body: String!, subscriptionId: Int!, requestId: String): Boolean!
-  archiveConversation(id: ID!): Boolean!
+  archiveSmsConversation(id: ID!): Boolean!
   trashSms(query: String!): ActionResult!
   restoreSms(query: String!): ActionResult!
   deleteSms(query: String!): ActionResult!
@@ -162,7 +162,7 @@ type Mutation {
   importFeeds(content: String!): Boolean!
   exportFeeds: String!
   deleteFeed(id: ID!): Boolean!
-  syncFeedContent(id: ID!): FeedEntry!
+  syncFeedEntryContent(id: ID!): FeedEntry!
   deleteFeedEntries(query: String!): ActionResult!
   deletePeer(id: ID!): Boolean!
   unpairPeer(id: ID!): Boolean!
@@ -178,7 +178,7 @@ type Mutation {
   addAudiosToQueue(query: String!): Boolean!
   reorderAudioQueue(paths: [String!]!): Boolean!
   createAudioPlaylist(name: String!): AudioPlaylist!
-  renameAudioPlaylist(id: ID!, name: String!): Boolean!
+  updateAudioPlaylist(id: ID!, name: String!): AudioPlaylist!
   deleteAudioPlaylist(id: ID!): Boolean!
   addAudioPlaylistItems(id: ID!, paths: [String!]!): Boolean!
   removeAudioPlaylistItem(id: ID!, path: String!): Boolean!
@@ -217,7 +217,7 @@ type Mutation {
   deleteContactGroup(id: ID!): Boolean!
   startDiscovery: Boolean!
   stopDiscovery: Boolean!
-  startPomodoro(timeLeftSec: Int!): Boolean!
+  startPomodoro(durationSec: Int!): Boolean!
   pausePomodoro: Boolean!
   stopPomodoro: Boolean!
   deleteDataStoreEntry(key: String!): Boolean!
@@ -449,7 +449,7 @@ enum ChannelSystemMessageType {
 
 type ChatChannel {
   id: ID!
-  owner: ID!
+  ownerId: ID!
   name: String!
   members: [ChatChannelMember!]!
   """Monotonically increasing mutation counter; receivers ignore channel updates whose version is not greater than their local copy."""
@@ -460,7 +460,7 @@ type ChatChannel {
 }
 
 type ChatChannelMember {
-  id: ID!
+  peerId: ID!
   status: ChannelMemberStatus!
 }
 
@@ -816,7 +816,7 @@ type File {
   updatedAt: Instant!
   size: Long!
   isDir: Boolean!
-  children: Int!
+  childCount: Int!
 }
 
 type FileInfo {

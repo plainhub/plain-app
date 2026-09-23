@@ -117,7 +117,7 @@ fun FileListItem(
                     Text(text = file.name, style = MaterialTheme.typography.bodyLarge,
                         color = if (isCurrentlyPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
                     VerticalSpace(4.dp)
-                    Text(text = if (file.isDir) pluralStringResource(Res.plurals.items, file.children, file.children) + ", " + file.updatedAt.formatDateTime()
+                    Text(text = if (file.isDir) pluralStringResource(Res.plurals.items, file.childCount, file.childCount) + ", " + file.updatedAt.formatDateTime()
                         else file.size.formatBytes() + ", " + file.updatedAt.formatDateTime(),
                         style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

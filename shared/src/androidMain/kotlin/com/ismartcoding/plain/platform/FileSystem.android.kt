@@ -54,7 +54,7 @@ actual suspend fun getRecentFiles(): List<DFile> = withIO {
                 updatedAt = Instant.fromEpochMilliseconds(file.lastModified()),
                 size = file.length(),
                 isDir = false,
-                children = 0,
+                childCount = 0,
                 mediaId = "",
             )
         }
@@ -116,7 +116,7 @@ actual fun listZipEntries(zipVirtualPath: String, sortBy: FileSortBy): List<DFil
                                 updatedAt = if (entry.time > 0) Instant.fromEpochMilliseconds(entry.time) else Instant.fromEpochMilliseconds(0),
                                 size = entry.size.coerceAtLeast(0),
                                 isDir = false,
-                                children = 0,
+                                childCount = 0,
                             )
                         }
                     }
@@ -131,7 +131,7 @@ actual fun listZipEntries(zipVirtualPath: String, sortBy: FileSortBy): List<DFil
                                 updatedAt = if (entry.time > 0) Instant.fromEpochMilliseconds(entry.time) else Instant.fromEpochMilliseconds(0),
                                 size = 0,
                                 isDir = true,
-                                children = 0,
+                                childCount = 0,
                             )
                         }
                     }
@@ -152,7 +152,7 @@ actual fun listZipEntries(zipVirtualPath: String, sortBy: FileSortBy): List<DFil
                                 updatedAt = Instant.fromEpochMilliseconds(0),
                                 size = 0,
                                 isDir = true,
-                                children = 0,
+                                childCount = 0,
                             )
                         }
                     }
@@ -163,7 +163,7 @@ actual fun listZipEntries(zipVirtualPath: String, sortBy: FileSortBy): List<DFil
         LogCat.e(e.toString())
     }
     return entries.values.map { dfile ->
-        if (dfile.isDir) dfile.copy(children = directChildren[dfile.name]?.size ?: 0) else dfile
+        if (dfile.isDir) dfile.copy(childCount = directChildren[dfile.name]?.size ?: 0) else dfile
     }.sorted(sortBy)
 }
 
@@ -239,7 +239,7 @@ actual fun statFile(path: String): DFile? {
         updatedAt = Instant.fromEpochMilliseconds(file.lastModified()),
         size = if (file.isDirectory) 0L else file.length(),
         isDir = file.isDirectory,
-        children = 0,
+        childCount = 0,
         mediaId = "",
     )
 }

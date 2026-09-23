@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Regenerate ficons file-type SVGs in Material You (MD3) flat tonal style.
 
-Writes the full set into both consumer directories:
-  app/src/main/assets/ficons/       (Android, loaded via Coil SVG decoder)
-  app/src/main/resources/web/ficons/ (plain-desktop web UI)
+Writes the full set into both consumer sources:
+  app/src/main/assets/ficons/        (Android, loaded via Coil SVG decoder)
+  ../plain-desktop/public/ficons/    (plain-desktop web source; reaches plain-app
+                                     resources/web/ficons via the user's dist sync)
 
 Usage: python3 scripts/generate_ficons.py [--review DIR]
   --review DIR also writes review.html + a copy of the set into DIR for visual review.
@@ -12,9 +13,10 @@ Usage: python3 scripts/generate_ficons.py [--review DIR]
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DESKTOP = os.path.join(os.path.dirname(ROOT), "plain-desktop")
 TARGETS = [
     os.path.join(ROOT, "app/src/main/assets/ficons"),
-    os.path.join(ROOT, "app/src/main/resources/web/ficons"),
+    os.path.join(DESKTOP, "public/ficons"),
 ]
 
 # (container, fold, on-text) — MD3 tonal pastels, recolored 2026-09-18 away from

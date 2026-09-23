@@ -99,7 +99,7 @@ suspend fun deleteFeed(id: ID): Boolean {
 }
 
 @GraphQLMutation
-suspend fun syncFeedContent(id: ID): FeedEntry {
+suspend fun syncFeedEntryContent(id: ID): FeedEntry {
     val feedEntry = FeedEntryHelper.feedEntryDao.getById(id.value)
         ?: throw GraphQLError("Feed entry ${id.value} not found")
     feedEntry.fetchContentAsync()

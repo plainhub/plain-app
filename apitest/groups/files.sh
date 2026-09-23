@@ -29,7 +29,7 @@ api_mo_count=$(printf '%s' "$MO" | jq '.data.mounts | length')
 # ----------------------------------------------------------------------------
 # files-C02  files(root: "/") returns the sdcard listing
 # ----------------------------------------------------------------------------
-FL=$(call_gql '{ files(root: "/storage/emulated/0", offset: 0, limit: 100, query: "", sortBy: NAME_ASC) { name path size isDir children } }')
+FL=$(call_gql '{ files(root: "/storage/emulated/0", offset: 0, limit: 100, query: "", sortBy: NAME_ASC) { name path size isDir childCount } }')
 api_fl_count=$(printf '%s' "$FL" | jq '.data.files | length')
 adb_fl_count=$(adb_sh "ls -1 /storage/emulated/0/ 2>/dev/null" | { grep -vc '^$' || true; })
 if [[ "$api_fl_count" -gt 0 ]]; then

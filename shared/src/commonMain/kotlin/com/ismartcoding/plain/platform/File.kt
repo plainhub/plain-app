@@ -41,7 +41,7 @@ fun buildTextFile(path: String, size: Long, updatedAtMillis: Long): DFile = DFil
     updatedAt = Instant.fromEpochMilliseconds(updatedAtMillis),
     size = size,
     isDir = false,
-    children = 0,
+    childCount = 0,
     mediaId = "",
 )
 

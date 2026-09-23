@@ -12,7 +12,7 @@ import kotlin.time.Instant
 @GraphQLType
 @Serializable
 data class ChatChannelMember(
-    val id: String,
+    val peerId: String,
     val status: ChannelMemberStatus,
 )
 
@@ -21,7 +21,7 @@ data class ChatChannelMember(
 data class ChatChannel(
     val id: String,
     val name: String,
-    val owner: String,
+    val ownerId: String,
     val members: List<ChatChannelMember>,
     @GraphQLField(description = "Monotonically increasing mutation counter; receivers ignore channel updates whose version is not greater than their local copy.")
     val version: Long,
@@ -31,14 +31,14 @@ data class ChatChannel(
 )
 
 fun ChannelMember.toModel(): ChatChannelMember {
-    return ChatChannelMember(id, status)
+    return ChatChannelMember(peerId = id, status = status)
 }
 
 fun DChatChannel.toModel(): ChatChannel {
     return ChatChannel(
         id = id,
         name = name,
-        owner = owner,
+        ownerId = owner,
         members = members.map { it.toModel() },
         version = version,
         status = status,

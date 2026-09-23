@@ -66,9 +66,9 @@ suspend fun declineChatChannelInvite(id: ID): Boolean {
 fun SchemaBuilder.addChatChannelSchema() {
     type<ChatChannel> {
         property("id", typeOf<ID>(), { it: ChatChannel -> ID(it.id) })
-        property("owner", typeOf<ID>(), { it: ChatChannel -> ID(it.owner) })
+        property("ownerId", typeOf<ID>(), { it: ChatChannel -> ID(it.ownerId) })
     }
     type<ChatChannelMember> {
-        property("id", typeOf<ID>(), { it: ChatChannelMember -> ID(it.id) })
+        property("peerId", typeOf<ID>(), { it: ChatChannelMember -> ID(it.peerId) })
     }
 }

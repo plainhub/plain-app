@@ -55,8 +55,8 @@ suspend fun pomodoroToday(): PomodoroToday {
 }
 
 @GraphQLMutation
-suspend fun startPomodoro(timeLeftSec: Int): Boolean {
-    sendEvent(HPomodoroStartEvent(timeLeftSec))
+suspend fun startPomodoro(durationSec: Int): Boolean {
+    sendEvent(HPomodoroStartEvent(durationSec))
     return true
 }
 

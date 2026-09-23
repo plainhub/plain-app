@@ -64,7 +64,7 @@ suspend fun smsBoxCounts(): SmsCounts {
 }
 
 @GraphQLMutation
-suspend fun unarchiveConversation(id: ID): Boolean {
+suspend fun unarchiveSmsConversation(id: ID): Boolean {
     AppDatabase.instance.archivedConversationDao().delete(id.value)
     return true
 }
@@ -133,7 +133,7 @@ suspend fun archivedConversations(offset: Int, limit: Int, query: String): List<
 }
 
 @GraphQLMutation
-suspend fun archiveConversation(id: ID): Boolean {
+suspend fun archiveSmsConversation(id: ID): Boolean {
     val date = getSmsConversationDate(id.value) ?: TimeHelper.now().toEpochMilliseconds()
     AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id.value, conversationDate = date))
     return true

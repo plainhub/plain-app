@@ -136,7 +136,7 @@ object RootHelper {
                     updatedAt = Instant.fromEpochMilliseconds(epochSeconds * 1000L),
                     size = if (isDir) 0L else size,
                     isDir = isDir,
-                    children = 0,
+                    childCount = 0,
                 )
             }
     }

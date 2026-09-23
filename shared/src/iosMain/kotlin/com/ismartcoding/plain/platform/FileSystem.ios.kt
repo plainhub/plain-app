@@ -82,7 +82,7 @@ actual fun createDirectory(path: String): DFile {
         updatedAt = Instant.fromEpochMilliseconds(0),
         size = 0,
         isDir = true,
-        children = 0,
+        childCount = 0,
     )
 }
 
@@ -96,7 +96,7 @@ actual fun createFile(path: String): DFile {
         updatedAt = Instant.fromEpochMilliseconds(0),
         size = 0,
         isDir = false,
-        children = 0,
+        childCount = 0,
     )
 }
 
@@ -197,7 +197,7 @@ private fun buildDFile(
     val size = if (isDir) 0L else (attrs[NSFileSize] as? Long) ?: 0L
     val updatedAt = (attrs[NSFileModificationDate] as? NSDate?)?.toKotlinInstant()
         ?: Instant.fromEpochMilliseconds(0)
-    val children = if (isDir && computeChildren) countChildren(path, showHidden) else 0
+    val childCount = if (isDir && computeChildren) countChildren(path, showHidden) else 0
     return DFile(
         name = name,
         path = path,
@@ -206,7 +206,7 @@ private fun buildDFile(
         updatedAt = updatedAt,
         size = size,
         isDir = isDir,
-        children = children,
+        childCount = childCount,
         mediaId = "",
     )
 }

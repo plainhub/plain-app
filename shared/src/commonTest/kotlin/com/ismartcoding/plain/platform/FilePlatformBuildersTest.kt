@@ -43,7 +43,7 @@ class FilePlatformBuildersTest {
         assertEquals("/docs/notes.txt", file.path)
         assertEquals(123L, file.size)
         assertEquals(false, file.isDir)
-        assertEquals(0, file.children)
+        assertEquals(0, file.childCount)
         assertEquals("rw", file.permission)
         assertEquals("", file.mediaId)
         assertNull(file.createdAt)

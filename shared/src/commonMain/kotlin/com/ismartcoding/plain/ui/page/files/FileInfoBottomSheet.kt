@@ -81,7 +81,7 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                         },
                         title = file.name,
                         subtitle = if (file.isDir) {
-                            stringResource(Res.string.folder) + " · " + pluralStringResource(Res.plurals.items, file.children, file.children)
+                            stringResource(Res.string.folder) + " · " + pluralStringResource(Res.plurals.items, file.childCount, file.childCount)
                         } else {
                             file.path.getMimeType() + " · " + file.size.formatBytes()
                         },

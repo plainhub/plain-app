@@ -43,6 +43,7 @@
 - 需要展示总数的列表配 `xxxCount(filter: XxxFilter!): Int!` 兄弟字段；无总数需求的列表可以没有。
 - 分页返回最新在前、页内按可直接渲染的顺序（`chatItems` 取页后 asReversed 返回旧→新）。
 - **排序**：媒体/文件列表 `sortBy: FileSortBy!` 必填；`TAKEN_AT_DESC` 只对拍摄日期分组视图有意义，其他域按各自回退序执行（docs/audio→入库时间，plain files→修改时间，packages→名称），与 FileSortBy 的 SDL description 一致（2026-09-21 核对代码后拍板：description 如实描述回退行为，不改代码）。
+  例外（2026-09-24 复核拍板，刻意不带 sortBy）：`appFiles`（内容仓库浏览，固定最新在前，无排序 UI 需求）、`recentFiles`（便利查询，无分页）。
 
 ## 4. 编址体系（三个域，不混用）
 
@@ -86,7 +87,7 @@ term       := [field ":"] value op?
 | 操作类别 | 返回 | 例子 |
 |---|---|---|
 | 批量破坏/变更（delete/trash/restore/move，按 query 或 id 列表编址，同步完成） | `ActionResult!`（`{ affectedCount: Int! }`） | `deleteSms`、`trashNotes`、`deleteMediaItems`、`deleteBookmarks`、`deleteFiles`、`deleteNotifications`、`deleteClipboard`、`deleteChatItems`、`deleteCalls`、`deleteContacts`、`deleteFeedEntries` |
-| 单条 create/update | 实体非空 + 找不到时抛 `GraphQLError`（不返回 null） | `updateBookmark`、`saveNote`、`updateContact` |
+| 单条 create/update | 实体非空 + 找不到时抛 `GraphQLError`（不返回 null） | `updateBookmark`、`createNote`/`updateNote`、`updateContact`、`updateAudioPlaylist` |
 | 单条 lookup query | 实体可空（null = 不存在） | `note(id)`、`feedEntry(id)` |
 | 异步触发型 | `Boolean!` 或专用 pending 类型 | `uninstallPackages`、`installPackage → PackageInstallPending`、`syncFeeds` |
 | 单条幂等删除 | `Boolean!` | `deleteTag`、`deleteFeed`、`deleteChatChannel` |
@@ -102,10 +103,11 @@ term       := [field ":"] value op?
 - `DataType.DEFAULT` 是内部哨兵成员，保留在 wire 枚举里（删除会级联 nullable 改造，2026-09-20 复核维持）；
   **客户端禁止发送它**；新枚举禁止再携带内部哨兵成员。
 - 命名规则：
-  - 计数字段名必须如实：`feedEntryCounts`（每 feed 条目总数，不是未读数）、`smsBoxCounts`（收件箱/已发送/草稿箱计数）。
+  - 计数字段名必须如实：`feedEntryCounts`（每 feed 条目总数，不是未读数）、`smsBoxCounts`（收件箱/已发送/草稿箱计数）、`File.childCount`（目录直接子项计数，2026-09-24 由 children 改名）。
   - 缩略图样本字段：`MediaBucket.topItemPaths`（是文件路径，不是 id）。
-  - 重复 API 禁止：`fetchFeedContent` 已删（与 `syncFeedContent` 实现相同，保留后者——与 UI 文案「同步正文」一致）。
-  - `archiveConversation(id)`：服务端自行推导会话时间（归档快照语义），客户端不传 date。
+  - 重复 API 禁止：`fetchFeedContent` 已删（与 `syncFeedEntryContent` 实现相同，保留后者——与 UI 文案「同步正文」一致）。
+  - `archiveSmsConversation(id)`：服务端自行推导会话时间（归档快照语义），客户端不传 date（2026-09-24 由 archiveConversation 改名，补齐 Sms 前缀）。
+  - **2026-09-24 命名清理（breaking，多仓同周期同步）**：`File.children`→`childCount`、`ChatChannel.owner`→`ownerId`、`ChatChannelMember.id`→`peerId`（成员身份即 peer id）、`filesCount`→`fileCount`（对齐单数实体+Count）、`screenMirrorState`→`isScreenMirroring`（Boolean 不叫 State）、`syncFeedContent`→`syncFeedEntryContent`（id 是条目 id 非 feed id）、`renameAudioPlaylist`→`updateAudioPlaylist`（动词对齐 update* 且返回实体）、`archiveConversation`/`unarchiveConversation`→`archiveSmsConversation`/`unarchiveSmsConversation`、`startPomodoro(timeLeftSec)`→`startPomodoro(durationSec)`（参数是本次时长，非剩余时间；WS 事件 POMODORO_ACTION.timeLeftSec 是冻结字段不受影响）。旧名由 `ApiContractTest.legacyShapesAreGone` 锁死禁回潮。
 - 配对/发现域的 `platform: String` 是自由字符串（`android`/`ios`/`macos`…，QR 配对可为空串）；
   **类型化枚举只有 `DeviceInfo.platform: DevicePlatform`**。发现协议不保证枚举闭包，勿改。
 
@@ -125,6 +127,7 @@ term       := [field ":"] value op?
 | `deleteDbTableRows(ids: [String!]!)` | `[String]` | 调试 API，原生表主键 |
 | `StorageMount.diskId` | `String` | OS 磁盘 uuid，外部标识（Android 端恒空串；2026-09-20 由 diskID 改名） |
 | `PairingRequestInput.timestamp` | `Long` | 配对协议防重放字段（见 §1） |
+| guest `SharedInfo.expiresAt` | `Long` | guest schema（schema-guest.graphqls）的既有 wire 契约，已被 web guest 端消费；客户端在解析边界立即转 Instant（2026-09-24 收录，见 LONG_TERM「既有 wire 例外」） |
 | `chatItems(target)` / `sendChatItem(target)` | `String` | 会话目标编址串（peer id 或带前缀的 channel target，ChatTarget.parseId 解析；2026-09-20 用户定 String，非单一实体 id） |
 | `DataType.DEFAULT` | 枚举成员 | 内部未赋值哨兵，客户端禁止发送（见 §7） |
 

@@ -47,7 +47,7 @@ suspend fun files(root: String, offset: Int, limit: Int, query: String, sortBy: 
 }
 
 @GraphQLQuery
-suspend fun filesCount(root: String, query: String): Int {
+suspend fun fileCount(root: String, query: String): Int {
     Permission.WRITE_EXTERNAL_STORAGE.checkEnabledAsync()
     return searchFilesInDir(query, root, FileSortBy.DATE_ASC).size
 }

@@ -92,7 +92,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
         val folderIds = items.filter { it.isDir }.map { it.mediaId }
         val counts = getChildrenCountAsync(context, folderIds)
         return@withIO items.map {
-            it.copy(children = counts[it.mediaId] ?: 0)
+            it.copy(childCount = counts[it.mediaId] ?: 0)
         }
     }
 

@@ -24,7 +24,7 @@ import com.ismartcoding.plain.httpserver.models.ScreenMirrorVideoCodec
 import com.ismartcoding.plain.httpserver.models.toModel
 
 @GraphQLQuery
-suspend fun screenMirrorState(): Boolean {
+suspend fun isScreenMirroring(): Boolean {
     return isScreenMirrorRunning()
 }
 

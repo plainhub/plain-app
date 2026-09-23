@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
+import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
@@ -171,9 +172,11 @@ suspend fun createAudioPlaylist(name: String): AudioPlaylist {
 }
 
 @GraphQLMutation
-suspend fun renameAudioPlaylist(id: ID, name: String): Boolean {
+suspend fun updateAudioPlaylist(id: ID, name: String): AudioPlaylist {
     AudioPlaylistManager.renamePlaylist(id.value, name)
-    return true
+    val pl = AudioPlaylistManager.playlist(id.value)
+        ?: throw GraphQLError("Playlist ${id.value} not found after update")
+    return AudioPlaylist(id = ID(pl.id), name = pl.name, itemCount = AudioPlaylistManager.playlistItemCount(pl.id), createdAt = pl.createdAt, updatedAt = pl.updatedAt)
 }
 
 @GraphQLMutation
