@@ -21,6 +21,8 @@ enum class Capability {
     SCREEN_MIRROR,
     IMAGE_EDITOR,
     NOTIFICATIONS,
+    CLIPBOARD,
+    POMODORO,
 }
 
 /**

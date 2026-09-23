@@ -17,19 +17,20 @@ TARGETS = [
     os.path.join(ROOT, "app/src/main/resources/web/ficons"),
 ]
 
-# (container, fold, on-text) — MD3 tonal pastels
+# (container, fold, on-text) — MD3 tonal pastels, recolored 2026-09-18 away from
+# blue/purple (card-clashing); palette keys keep the original category names.
 PALETTES = {
-    "red":    ("#FFDAD6", "#FFB4A8", "#8C1D18"),  # pdf
+    "red":    ("#FFE2DA", "#FFA491", "#701D0D"),  # pdf / document (salmon)
     "amber":  ("#FFDDB0", "#FFC46B", "#5C4300"),  # presentation
     "green":  ("#C9EFC5", "#9CD67E", "#1E4D18"),  # spreadsheet / office data
     "teal":   ("#C2EBDD", "#8CD4BC", "#0B4F3A"),  # image / cad / 3d
-    "blue":   ("#D3E4FF", "#A5CBFF", "#0D2C55"),  # document / text
-    "indigo": ("#E1E2FF", "#BFC2FF", "#252766"),  # code / config
-    "purple": ("#EBDCFF", "#D1BCFF", "#48218A"),  # audio
+    "blue":   ("#FFE2DA", "#FFA491", "#701D0D"),  # document / text (shares salmon)
+    "indigo": ("#FFE3C6", "#FFA757", "#6E3400"),  # code / config (orange)
+    "purple": ("#DBF0CE", "#6ECB5E", "#14420D"),  # audio (green)
     "pink":   ("#FFD9E7", "#FFB1CC", "#6E1147"),  # video
     "brown":  ("#EFDCBE", "#D9BC90", "#4B3415"),  # archive
     "lime":   ("#E9F0B0", "#D2E277", "#3E4E10"),  # font
-    "slate":  ("#DFE3EA", "#C3C9D6", "#22293A"),  # exec / disk / security / misc
+    "slate":  ("#F7EEDB", "#C9A163", "#5C4300"),  # exec / disk / security / misc (warm tan)
 }
 
 CATEGORY = {}
@@ -79,6 +80,39 @@ vcd ova ovf vdi vmdk nes rom torrent dat db mdf sdf pdb sqlite idx lnk
 ds_store dist tmp part crdownload download pid swp swd sys ocx retry ru sol gdp
 cer crt pem pfx p7b p12 gpg pgp asc enc crypt rsa licx inv ac ait browser cd data
 """)
+
+# gap coverage batch (2026-09): extensions seen in the wild but absent from the set
+assign("slate", """
+hprof dex odex vdex art oat so apks xapk apkm idsig
+jks bks keystore der csr p7c p7s sig
+tflite onnx pt pth h5 keras gguf safetensors npy npz
+""")
+assign("brown", "aar zst zstd br lz4 lzo cpio arj lzh tbz2 txz taz")
+assign("purple", "opus mka m4b ape ac3 dts wv tta spx dsf dff")
+assign("pink", "rmvb mts m2ts mxf divx ogm")
+assign("teal", """
+avif jxl heif hdr exr psb
+cr3 arw orf rw2 raf dcr mrw x3f
+3ds blend fbx obj mtl dae glb gltf usdz ply
+""")
+assign("blue", "djvu azw azw3 cbr cbz cb7")
+assign("green", "parquet avro orc bson ndjson jsonl xlam xlsb")
+assign("indigo", """
+mjs cjs cts rs toml env
+vue svelte astro prisma graphql gql proto thrift json5 ipynb mdx pyi klib
+properties pro
+""")
+assign("amber", "potm ppam thmx odp")
+assign("lime", "ttc otc bdf")
+
+# extensions hardcoded in consumer whitelists (Constants.kt / file.ts photo-video-audio-raw,
+# String.isTextFile, desktop LANG_MAP/file-kind/ChatInput) that had no icon of their own
+assign("pink", "3gpp")
+assign("teal", "apng jfif")
+assign("blue", "markdown")
+assign("indigo", "ovpn opml cc hpp cxx hxx")
+assign("purple", "oga ogx")
+assign("slate", "ipa")
 
 # drop junk keys defensively
 CATEGORY = {k: v for k, v in CATEGORY.items() if not k.endswith("?")}
