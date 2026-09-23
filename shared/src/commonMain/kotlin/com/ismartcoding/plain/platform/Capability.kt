@@ -20,6 +20,7 @@ enum class Capability {
     FEEDS,
     SCREEN_MIRROR,
     IMAGE_EDITOR,
+    NOTIFICATIONS,
 }
 
 /**
