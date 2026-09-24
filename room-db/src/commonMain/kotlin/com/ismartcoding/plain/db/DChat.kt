@@ -13,8 +13,13 @@ import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.generateId
 import kotlin.time.Instant
-import kotlinx.serialization.json.JsonNames
+import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -54,14 +59,17 @@ enum class MessageType {
 @Serializable
 class DMessageText(val text: String, val linkPreviews: List<DLinkPreview> = emptyList())
 
-@Serializable
+/**
+ * Chat message file with media duration in milliseconds. Legacy rows stored
+ * seconds under `durationSec` / `duration`; [DMessageFileSerializer] converts
+ * those once at the decode boundary so no other call site multiplies.
+ */
+@Serializable(with = DMessageFileSerializer::class)
 data class DMessageFile(
     override var id: String = generateId(),
     val uri: String,
     val size: Long,
-    /** Audio/video duration in seconds; "duration" is the legacy wire key. */
-    @JsonNames("duration")
-    val durationSec: Long = 0,
+    val durationMs: Long = 0,
     val width: Int = 0,
     val height: Int = 0,
     val summary: String = "",
@@ -84,6 +92,55 @@ data class DMessageFile(
 
     /** Remote fileId extracted from a fsid: URI (used as query param for /fs endpoint). */
     fun parseFileId(): String = uri.replace("fsid:", "")
+}
+
+@Serializable
+private data class DMessageFileSurrogate(
+    val id: String = generateId(),
+    val uri: String,
+    val size: Long,
+    @JsonNames( "duration")
+    val legacyDurationSec: Long? = null,
+    val durationMs: Long? = null,
+    val width: Int = 0,
+    val height: Int = 0,
+    val summary: String = "",
+    val fileName: String = "",
+)
+
+object DMessageFileSerializer : KSerializer<DMessageFile> {
+    private val surrogateSerializer = DMessageFileSurrogate.serializer()
+    override val descriptor: SerialDescriptor = surrogateSerializer.descriptor
+
+    override fun serialize(encoder: Encoder, value: DMessageFile) {
+        encoder.encodeSerializableValue(
+            surrogateSerializer,
+            DMessageFileSurrogate(
+                id = value.id,
+                uri = value.uri,
+                size = value.size,
+                durationMs = value.durationMs,
+                width = value.width,
+                height = value.height,
+                summary = value.summary,
+                fileName = value.fileName,
+            ),
+        )
+    }
+
+    override fun deserialize(decoder: Decoder): DMessageFile {
+        val raw = decoder.decodeSerializableValue(surrogateSerializer)
+        return DMessageFile(
+            id = raw.id,
+            uri = raw.uri,
+            size = raw.size,
+            durationMs = raw.durationMs ?: (raw.legacyDurationSec ?: 0L) * 1000,
+            width = raw.width,
+            height = raw.height,
+            summary = raw.summary,
+            fileName = raw.fileName,
+        )
+    }
 }
 
 @Serializable

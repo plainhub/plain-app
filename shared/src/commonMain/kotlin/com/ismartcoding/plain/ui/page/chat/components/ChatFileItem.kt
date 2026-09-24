@@ -69,7 +69,7 @@ fun ChatFileItem(
     }
 
     var progressMs by remember(item.id) { mutableFloatStateOf(0f) }
-    var durationMs by remember(item.id) { mutableFloatStateOf(item.durationSec * 1000f) }
+    var durationMs by remember(item.id) { mutableFloatStateOf(item.durationMs.toFloat()) }
     var isDraggingProgress by remember(item.id) { mutableStateOf(false) }
 
     LaunchedEffect(path, isAudio, isCurrentlyPlaying) {
