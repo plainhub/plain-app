@@ -27,10 +27,10 @@ actual suspend fun processSingleDurationZero(
             DMediaItem(
                 mediaType = mediaType,
                 mediaId = item.id,
-                duration = durationSec,
+                durationMs = durationSec * 1000,
             )
         )
-        TempData.mediaDurationMap["$mediaType:${item.id}"] = durationSec
+        TempData.mediaDurationMap["$mediaType:${item.id}"] = durationSec * 1000
         LogCat.d("Cached duration for $mediaType ${item.id}: ${durationSec}s")
     } catch (e: Exception) {
         LogCat.e("Failed to cache duration for ${item.path}: ${e.message}")

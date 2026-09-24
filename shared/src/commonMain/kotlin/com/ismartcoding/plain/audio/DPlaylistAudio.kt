@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.audio
 
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -8,12 +8,12 @@ data class DPlaylistAudio(
     val title: String,
     val path: String,
     val artist: String,
-    val duration: Long,
+    val durationMs: Long,
     /** MediaStore album snapshot for the playlist cover mosaic. */
     val albumId: String = "",
 ) {
     fun getSubtitle(): String {
-        return listOf(artist, duration.formatDuration()).filter { it.isNotEmpty() }.joinToString(" · ")
+        return listOf(artist, durationMs.formatDurationMs()).filter { it.isNotEmpty() }.joinToString(" · ")
     }
 
     companion object {

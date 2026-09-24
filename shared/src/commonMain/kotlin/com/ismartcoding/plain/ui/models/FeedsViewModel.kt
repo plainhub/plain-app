@@ -41,12 +41,12 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
     fun loadAsync(withCount: Boolean = false) {
         viewModelScope.launchSafe {
             val countMap = if (withCount) {
-                FeedHelper.getFeedCounts().associate { it.id to it.count }
+                FeedHelper.getFeedCounts().associate { it.id to it.entryCount }
             } else {
                 emptyMap()
             }
             _itemsFlow.value = FeedHelper.getAll().map {
-                it.count = countMap[it.id] ?: 0
+                it.entryCount = countMap[it.id] ?: 0
                 it
             }
             showLoading.value = false
@@ -66,7 +66,7 @@ class FeedsViewModel : ISelectableViewModel<DFeed>, ViewModel() {
         val id = selectedItem.value?.id ?: return
         viewModelScope.launchSafe {
             val fresh = FeedHelper.getById(id) ?: return@launchSafe
-            fresh.count = selectedItem.value?.count ?: 0
+            fresh.entryCount = selectedItem.value?.entryCount ?: 0
             selectedItem.value = fresh
         }
     }

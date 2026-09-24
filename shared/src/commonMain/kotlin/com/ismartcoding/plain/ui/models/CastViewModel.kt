@@ -5,7 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationSec
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.audio.DAudio
@@ -88,7 +88,7 @@ class CastViewModel : ViewModel() {
 
     fun seekCast(positionSeconds: Float) {
         val device = CastPlayer.currentDevice ?: return
-        val target = positionSeconds.toLong().formatDuration(alwaysShowHour = true)
+        val target = positionSeconds.toLong().formatDurationSec(alwaysShowHour = true)
         viewModelScope.launchSafe {
             DlnaTransportController.seekAVTransportAsync(device, target)
             CastPlayer.progress.value = positionSeconds

@@ -10,7 +10,7 @@ data class DVideo(
     override var id: String,
     override val title: String,
     override val path: String,
-    override val duration: Long,
+    override val durationMs: Long,
     override val size: Long,
     val width: Int,
     val height: Int,

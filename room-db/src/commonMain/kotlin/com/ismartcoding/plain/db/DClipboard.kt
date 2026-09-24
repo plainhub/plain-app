@@ -18,7 +18,7 @@ import kotlin.time.Instant
  * [sensitive] mirrors the platform sensitive flag set by password managers.
  * [label] is an optional user label.
  */
-@Entity(tableName = "clipboard", indices = [Index(value = ["hash"])])
+@Entity(tableName = "clipboards", indices = [Index(value = ["hash"])])
 data class DClipboard(
     @PrimaryKey @ColumnInfo(name = "id") var id: String,
     @ColumnInfo(name = "text") var text: String = "",
@@ -34,32 +34,32 @@ interface ClipboardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: DClipboard)
 
-    @Query("SELECT * FROM clipboard WHERE id = :id")
+    @Query("SELECT * FROM clipboards WHERE id = :id")
     suspend fun getById(id: String): DClipboard?
 
-    @Query("SELECT * FROM clipboard ORDER BY created_at DESC LIMIT 1")
+    @Query("SELECT * FROM clipboards ORDER BY created_at DESC LIMIT 1")
     suspend fun getLatest(): DClipboard?
 
-    @Query("SELECT * FROM clipboard WHERE hash = :hash ORDER BY created_at DESC LIMIT 1")
+    @Query("SELECT * FROM clipboards WHERE hash = :hash ORDER BY created_at DESC LIMIT 1")
     suspend fun getLatestByHash(hash: String): DClipboard?
 
     /** [q] is the raw LIKE pattern with % wildcards; empty matches everything. */
     @Query(
-        "SELECT * FROM clipboard WHERE text LIKE :q ESCAPE '\\' " +
+        "SELECT * FROM clipboards WHERE text LIKE :q ESCAPE '\\' " +
             "OR label LIKE :q ESCAPE '\\' OR source LIKE :q ESCAPE '\\' " +
             "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
     )
     suspend fun getPage(limit: Int, offset: Int, q: String): List<DClipboard>
 
     @Query(
-        "SELECT COUNT(*) FROM clipboard WHERE text LIKE :q ESCAPE '\\' " +
+        "SELECT COUNT(*) FROM clipboards WHERE text LIKE :q ESCAPE '\\' " +
             "OR label LIKE :q ESCAPE '\\' OR source LIKE :q ESCAPE '\\'",
     )
     suspend fun count(q: String): Int
 
-    @Query("DELETE FROM clipboard WHERE id IN (:ids)")
+    @Query("DELETE FROM clipboards WHERE id IN (:ids)")
     suspend fun deleteByIds(ids: List<String>): Int
 
-    @Query("DELETE FROM clipboard")
+    @Query("DELETE FROM clipboards")
     suspend fun clear()
 }

@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.lib.coMain
 import com.ismartcoding.plain.lib.withIO
@@ -118,7 +118,7 @@ fun VideoGridItem(
             Box(modifier = Modifier.align(Alignment.BottomEnd)) {
                 SizeLabel(
                     text = if (setOf(FileSortBy.SIZE_ASC, FileSortBy.SIZE_DESC).contains(sort))
-                        m.size.formatBytes() else m.duration.formatDuration()
+                        m.size.formatBytes() else m.durationMs.formatDurationMs()
                 )
             }
         }

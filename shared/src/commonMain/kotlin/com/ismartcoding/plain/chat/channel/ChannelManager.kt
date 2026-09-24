@@ -48,10 +48,10 @@ object ChannelManager {
         return withIO {
             val channel = DChatChannel()
             channel.name = name.trim()
-            channel.owner = TempData.clientId
+            channel.ownerId = TempData.clientId
             channel.key = generateChaCha20Key()
             channel.version = 1
-            channel.members = listOf(ChannelMember(id = TempData.clientId))
+            channel.members = listOf(ChannelMember(peerId = TempData.clientId))
 
             AppDatabase.instance.chatChannelDao().insert(channel)
             ChannelCacher.load()
@@ -90,10 +90,10 @@ object ChannelManager {
             val existing = ensureChannel(channelId)
             if (existing.isOwnedByMe()) throw Exception("Owner cannot leave; delete the channel instead")
 
-            val ownerPeer = AppDatabase.instance.peerDao().getById(existing.owner)
+            val ownerPeer = AppDatabase.instance.peerDao().getById(existing.ownerId)
             val channel = ChannelCacher.mutateChannel(channelId) { ch ->
                 ch.status = ChatChannelStatus.LEFT
-                ch.members = ch.members.filter { it.id != TempData.clientId }
+                ch.members = ch.members.filter { it.peerId != TempData.clientId }
             } ?: throw Exception("Channel not found")
             if (ownerPeer != null) {
                 ChannelSystemMessageSender.sendLeave(channel.id, ownerPeer)
@@ -108,7 +108,7 @@ object ChannelManager {
                 if (!ch.isOwnedByMe()) throw Exception("Only owner can add members")
                 if (ch.hasMember(peerId)) throw Exception("Already a member")
                 ch.members += ChannelMember(
-                    id = peerId,
+                    peerId = peerId,
                     status = ChannelMemberStatus.PENDING,
                 )
                 ch.version++
@@ -140,7 +140,7 @@ object ChannelManager {
             val channel = ChannelCacher.mutateChannel(channelId) { ch ->
                 if (!ch.isOwnedByMe()) throw Exception("Only owner can remove members")
                 if (!ch.hasMember(peerId)) throw Exception("Not a member")
-                ch.members = ch.members.filter { it.id != peerId }
+                ch.members = ch.members.filter { it.peerId != peerId }
                 ch.version++
                 ch.updatedAt = TimeHelper.now()
             } ?: throw Exception("Channel not found")

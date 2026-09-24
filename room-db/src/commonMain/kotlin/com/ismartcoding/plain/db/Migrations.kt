@@ -253,6 +253,76 @@ object Migrations {
     }
 
     /**
+     * 2026-09-24 naming/unit cleanup (all folded into one migration — v31 never
+     * shipped to users; dev devices that already applied the interim 30→31 must
+     * clear app data once):
+     * - `chat_channels.owner` → `owner_id`; members JSON key `id` → `peerId`
+     *   (legacy `id` keys stay decodable via `@JsonNames`).
+     * - `video_play_progress.duration` → `position_ms` (it stores the playback
+     *   position, not a duration).
+     * - `archived_conversations.conversation_date`: epoch-millis INTEGER →
+     *   ISO-8601 TEXT (Instant).
+     * - audio/media duration columns `duration` → `duration_ms` with values
+     *   converted seconds → milliseconds (unit alignment with MediaStore and
+     *   the GraphQL `durationMs` contract): audio_queue_items,
+     *   audio_playlist_items, audio_play_history, media_item.
+     * - `feeds.entryCount` is an @Ignore in-memory field — no column, no migration.
+     * - table `clipboard` → `clipboards` (plural, like every other table).
+     */
+    val MIGRATION_30_31 = object : Migration(30, 31) {
+        override suspend fun migrate(connection: SQLiteConnection) {
+            connection.execSQL("ALTER TABLE chat_channels RENAME COLUMN owner TO owner_id")
+            connection.execSQL(
+                """
+                UPDATE chat_channels
+                SET members = REPLACE(members, '"id":', '"peerId":')
+                WHERE members LIKE '%"id"%'
+                """.trimIndent()
+            )
+            connection.execSQL("ALTER TABLE video_play_progress RENAME COLUMN duration TO position_ms")
+            connection.execSQL("ALTER TABLE audio_queue_items RENAME COLUMN duration TO duration_ms")
+            connection.execSQL("ALTER TABLE audio_playlist_items RENAME COLUMN duration TO duration_ms")
+            connection.execSQL("ALTER TABLE audio_play_history RENAME COLUMN duration TO duration_ms")
+            connection.execSQL("ALTER TABLE media_item RENAME COLUMN duration TO duration_ms")
+            connection.execSQL("UPDATE audio_queue_items SET duration_ms = duration_ms * 1000")
+            connection.execSQL("UPDATE audio_playlist_items SET duration_ms = duration_ms * 1000")
+            connection.execSQL("UPDATE audio_play_history SET duration_ms = duration_ms * 1000")
+            connection.execSQL("UPDATE media_item SET duration_ms = duration_ms * 1000")
+            connection.execSQL("ALTER TABLE clipboard RENAME TO clipboards")
+            // archived_conversations.conversation_date: INTEGER epoch millis → TEXT ISO-8601.
+            connection.execSQL(
+                """
+                CREATE TABLE archived_conversations_new (
+                    conversation_id TEXT NOT NULL,
+                    conversation_date TEXT NOT NULL,
+                    PRIMARY KEY(conversation_id)
+                )
+                """.trimIndent()
+            )
+            connection.execSQL(
+                "INSERT INTO archived_conversations_new (conversation_id, conversation_date) " +
+                    "SELECT conversation_id, conversation_date FROM archived_conversations"
+            )
+            val rows = mutableListOf<Pair<String, Long>>()
+            connection.prepare("SELECT conversation_id, conversation_date FROM archived_conversations_new").use { stmt ->
+                while (stmt.step()) {
+                    rows.add(Pair(stmt.getText(0), stmt.getLong(1)))
+                }
+            }
+            connection.prepare("UPDATE archived_conversations_new SET conversation_date = ? WHERE conversation_id = ?").use { update ->
+                rows.forEach { (id, epochMillis) ->
+                    update.bindText(1, kotlin.time.Instant.fromEpochMilliseconds(epochMillis).toString())
+                    update.bindText(2, id)
+                    update.step()
+                    update.reset()
+                }
+            }
+            connection.execSQL("DROP TABLE archived_conversations")
+            connection.execSQL("ALTER TABLE archived_conversations_new RENAME TO archived_conversations")
+        }
+    }
+
+    /**
      * All manual migrations in the order they should be applied.
      * Register this array with `addMigrations()` on the platform-specific builder.
      */
@@ -263,5 +333,6 @@ object Migrations {
         MIGRATION_20_21,
         MIGRATION_21_22,
         MIGRATION_22_23,
+        MIGRATION_30_31,
     )
 }

@@ -24,7 +24,7 @@ data class DSession(
     var type: SessionType = SessionType.WEB,
 
     @ColumnInfo(name = "client_ip")
-    var clientIP: String = "",
+    var clientIp: String = "",
 
     @ColumnInfo(name = "os_name")
     var osName: String = "",

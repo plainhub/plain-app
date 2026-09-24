@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.media
 
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationSec
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -15,26 +15,26 @@ class CastPlayerSeekTimeTest {
 
     @Test
     fun formatDuration_alwaysShowHour_zeroSeconds() {
-        assertEquals("00:00:00", 0L.formatDuration(alwaysShowHour = true))
+        assertEquals("00:00:00", 0L.formatDurationSec(alwaysShowHour = true))
     }
 
     @Test
     fun formatDuration_alwaysShowHour_secondsOnly() {
-        assertEquals("00:00:05", 5L.formatDuration(alwaysShowHour = true))
-        assertEquals("00:00:59", 59L.formatDuration(alwaysShowHour = true))
+        assertEquals("00:00:05", 5L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("00:00:59", 59L.formatDurationSec(alwaysShowHour = true))
     }
 
     @Test
     fun formatDuration_alwaysShowHour_minutesAndSeconds() {
-        assertEquals("00:01:00", 60L.formatDuration(alwaysShowHour = true))
-        assertEquals("00:01:05", 65L.formatDuration(alwaysShowHour = true))
+        assertEquals("00:01:00", 60L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("00:01:05", 65L.formatDurationSec(alwaysShowHour = true))
     }
 
     @Test
     fun formatDuration_alwaysShowHour_hoursMinutesSeconds() {
-        assertEquals("01:00:00", 3600L.formatDuration(alwaysShowHour = true))
-        assertEquals("01:01:01", 3661L.formatDuration(alwaysShowHour = true))
-        assertEquals("10:30:45", (10 * 3600 + 30 * 60 + 45).toLong().formatDuration(alwaysShowHour = true))
+        assertEquals("01:00:00", 3600L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("01:01:01", 3661L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("10:30:45", (10 * 3600 + 30 * 60 + 45).toLong().formatDurationSec(alwaysShowHour = true))
     }
 
     @Test
@@ -55,7 +55,7 @@ class CastPlayerSeekTimeTest {
     fun roundTrip_secondsToHmsAndBack() {
         val testCases = listOf(0L, 5L, 59L, 60L, 65L, 3600L, 3661L, 10 * 3600 + 30 * 60 + 45L)
         for (seconds in testCases) {
-            val hms = seconds.formatDuration(alwaysShowHour = true)
+            val hms = seconds.formatDurationSec(alwaysShowHour = true)
             val parsed = CastPlayer.parseTimeToSeconds(hms)
             assertEquals(seconds.toFloat(), parsed, "Round-trip failed for $seconds seconds: $hms")
         }

@@ -19,5 +19,5 @@ data class Video(
 ) : MediaItem
 
 fun DVideo.toModel(): Video {
-    return Video(ID(id), title, path, durationMs = duration, size = size, bucketId = ID(bucketId), createdAt = createdAt, updatedAt = updatedAt, takenAt = takenAt, isFavorite = isFavorite)
+    return Video(ID(id), title, path, durationMs = durationMs, size = size, bucketId = ID(bucketId), createdAt = createdAt, updatedAt = updatedAt, takenAt = takenAt, isFavorite = isFavorite)
 }

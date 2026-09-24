@@ -83,7 +83,7 @@ fun FileListItem(
         if (isCurrentlyPlaying && isAudio) {
             scope.launch { withIO {
                 val audio = playlistAudioFromPath(file.path)
-                duration = audio.duration.toFloat()
+                duration = audio.durationMs / 1000f
             } }
         }
     }

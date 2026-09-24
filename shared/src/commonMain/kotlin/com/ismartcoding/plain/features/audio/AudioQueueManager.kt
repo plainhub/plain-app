@@ -83,7 +83,7 @@ object AudioQueueManager {
                 currentIndex = start.sortOrder,
             )
         )
-        AudioPlayHistoryManager.recordHistory(start.audioPath, start.title, start.artist, start.duration)
+        AudioPlayHistoryManager.recordHistory(start.audioPath, start.title, start.artist, start.durationMs)
         return start.toPlaylistAudio()
     }
 
@@ -118,7 +118,7 @@ object AudioQueueManager {
                 sortBy = sortBy.name,
             )
         )
-        AudioPlayHistoryManager.recordHistory(start.path, start.title, start.artist, start.duration)
+        AudioPlayHistoryManager.recordHistory(start.path, start.title, start.artist, start.durationMs)
         return start.toPlaylistAudio()
     }
 
@@ -229,7 +229,7 @@ object AudioQueueManager {
         }
         if (audio == null || audio.path in superseded) return null
         saveCurrent(order, target)
-        AudioPlayHistoryManager.recordHistory(audio.path, audio.title, audio.artist, audio.duration)
+        AudioPlayHistoryManager.recordHistory(audio.path, audio.title, audio.artist, audio.durationMs)
         return audio
     }
 

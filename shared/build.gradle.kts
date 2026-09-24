@@ -177,6 +177,8 @@ dependencies {
     add("androidHostTestImplementation", libs.junit)
     // Test-only: KGraphQLTest synthesizes accessor lambdas via memberProperties
     add("androidHostTestImplementation", libs.kotlin.reflect)
+    // Test-only: Migration30to31Test drives the raw SQLite connection
+    add("androidHostTestImplementation", libs.sqlite.bundled)
 }
 
 compose.resources {

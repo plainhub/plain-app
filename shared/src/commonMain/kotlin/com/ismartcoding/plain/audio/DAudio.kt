@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.audio
 
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.db.IData
 import com.ismartcoding.plain.data.IItemMetadata
 import com.ismartcoding.plain.db.IMedia
@@ -11,7 +11,7 @@ data class DAudio(
     override val title: String,
     val artist: String,
     override val path: String,
-    override val duration: Long,
+    override val durationMs: Long,
     override val size: Long,
     val bucketId: String,
     val albumId: String,
@@ -20,10 +20,10 @@ data class DAudio(
     val isFavorite: Boolean = false,
 ) : IItemMetadata, IMedia, IData {
     fun getSubtitle(): String {
-        return listOf(artist, duration.formatDuration()).filter { it.isNotEmpty() }.joinToString(" · ")
+        return listOf(artist, durationMs.formatDurationMs()).filter { it.isNotEmpty() }.joinToString(" · ")
     }
 
     fun toPlaylistAudio(): DPlaylistAudio {
-        return DPlaylistAudio(title, path, artist, duration, albumId)
+        return DPlaylistAudio(title, path, artist, durationMs, albumId)
     }
 }

@@ -19,7 +19,7 @@ import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.platform.DPackageInfo
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.countFiles
@@ -155,7 +155,7 @@ private fun DImage.toHit(): GlobalSearchHit = GlobalSearchHit(
 private fun DVideo.toHit(): GlobalSearchHit = GlobalSearchHit(
     key = "video_$id",
     title = title,
-    subtitle = duration.formatDuration() + " · " + (takenAt ?: createdAt).formatDateTime(),
+    subtitle = durationMs.formatDurationMs() + " · " + (takenAt ?: createdAt).formatDateTime(),
     source = GlobalSearchSource.Video(this),
     action = GlobalSearchAction.Navigate(Routing.Videos),
 )

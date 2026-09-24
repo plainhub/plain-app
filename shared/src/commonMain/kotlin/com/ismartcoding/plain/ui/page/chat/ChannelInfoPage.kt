@@ -94,15 +94,15 @@ fun ChannelInfoPage(
     val showRenameDialog = remember { mutableStateOf(false) }
     val selectedMemberPeer = remember { mutableStateOf<PeerMember?>(null) }
 
-    val ownerPeerId: String? = remember(liveChannel?.owner) {
-        if (liveChannel?.owner.isNullOrEmpty()) null
+    val ownerPeerId: String? = remember(liveChannel?.ownerId) {
+        if (liveChannel?.ownerId.isNullOrEmpty()) null
         else if (liveChannel.isOwnedByMe()) TempData.clientId
-        else liveChannel.owner
+        else liveChannel.ownerId
     }
     val memberPeers: List<PeerMember> = remember(liveChannel?.members, ownerPeerId) {
         liveChannel?.members?.mapNotNull { m ->
-            val peer = if (m.isMe()) mePeer() else PeerCacher.getPeer(m.id) ?: return@mapNotNull null
-            PeerMember(peer, m, isSelf = m.isMe(), isOwner = m.id == ownerPeerId)
+            val peer = if (m.isMe()) mePeer() else PeerCacher.getPeer(m.peerId) ?: return@mapNotNull null
+            PeerMember(peer, m, isSelf = m.isMe(), isOwner = m.peerId == ownerPeerId)
         } ?: emptyList()
     }
     val inviteLabel = stringResource(Res.string.invite)
@@ -124,7 +124,7 @@ fun ChannelInfoPage(
         addAll(pendingMembers.sortedBy { it.displayName() })
     }
     val addablePeers: List<DPeer> = if (ownedByMe) {
-        val presentIds = liveChannel.members.map { it.id }.toMutableSet().apply {
+        val presentIds = liveChannel.members.map { it.peerId }.toMutableSet().apply {
             ownerPeerId?.let { add(it) }
         }
         PeerCacher.pairedPeers.collectAsState().value
@@ -173,7 +173,7 @@ fun ChannelInfoPage(
                                                 Routing.ChannelInviteRequest(
                                                     channelId = liveChannel.id,
                                                     channelName = liveChannel.name,
-                                                    ownerPeerId = liveChannel.owner,
+                                                    ownerPeerId = liveChannel.ownerId,
                                                     ownerPeerName = ownerPeer?.getName() ?: "",
                                                 )
                                             )

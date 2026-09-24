@@ -11,7 +11,7 @@ object AudioPlayHistoryManager {
     private const val HISTORY_KEEP = 200
 
     /** Record that [path] started playing (manual jumps included). */
-    suspend fun recordHistory(path: String, title: String, artist: String, duration: Long) {
+    suspend fun recordHistory(path: String, title: String, artist: String, durationMs: Long) {
         val existing = historyDao.getByPath(path)
         historyDao.upsert(
             if (existing != null) {
@@ -20,10 +20,10 @@ object AudioPlayHistoryManager {
                     playedAt = TimeHelper.now(),
                     title = title,
                     artist = artist,
-                    duration = duration,
+                    durationMs = durationMs,
                 )
             } else {
-                DAudioPlayHistory(path = path, title = title, artist = artist, duration = duration, playCount = 1)
+                DAudioPlayHistory(path = path, title = title, artist = artist, durationMs = durationMs, playCount = 1)
             },
         )
         if (historyDao.count() > HISTORY_KEEP * 5 / 4) {

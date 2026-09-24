@@ -31,14 +31,14 @@ data class ChatChannel(
 )
 
 fun ChannelMember.toModel(): ChatChannelMember {
-    return ChatChannelMember(peerId = id, status = status)
+    return ChatChannelMember(peerId = peerId, status = status)
 }
 
 fun DChatChannel.toModel(): ChatChannel {
     return ChatChannel(
         id = id,
         name = name,
-        ownerId = owner,
+        ownerId = ownerId,
         members = members.map { it.toModel() },
         version = version,
         status = status,

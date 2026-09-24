@@ -239,7 +239,7 @@ object AudioPlayer {
         player?.seekTo(TempData.audioPlayPosition)
         player?.setPlaybackSpeed(TempData.audioPlaybackSpeed.value)
         player?.play()
-        coIO { AudioQueueManager.onPlaying(audio.path, audio.title, audio.artist, audio.duration) }
+        coIO { AudioQueueManager.onPlaying(audio.path, audio.title, audio.artist, audio.durationMs) }
     }
 
     fun setChangedNotify(action: AudioAction) {

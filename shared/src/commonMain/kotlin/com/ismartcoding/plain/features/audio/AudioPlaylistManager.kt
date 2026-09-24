@@ -50,7 +50,7 @@ object AudioPlaylistManager {
                 title = a.title,
                 artist = a.artist,
                 albumId = a.albumId,
-                duration = a.duration,
+                durationMs = a.durationMs,
                 sortOrder = next,
             )
             if (itemDao.insert(row) != -1L) {

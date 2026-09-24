@@ -31,7 +31,7 @@ actual fun loadVideoInfo(path: String): VideoFileInfo {
     retriever.setDataSource(appContext, Uri.fromFile(file))
     val width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 0
     val height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 0
-    val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()?.div(1000) ?: 0L
+    val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
     val location = parseMediaLocation(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION))
     retriever.release()
     return VideoFileInfo(width, height, duration, location)
@@ -41,7 +41,7 @@ actual fun loadAudioInfo(path: String): AudioFileInfo {
     val file = File(path)
     val retriever = MediaMetadataRetriever()
     retriever.setDataSource(appContext, Uri.fromFile(file))
-    val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()?.div(1000) ?: 0L
+    val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
     val location = parseMediaLocation(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION))
     retriever.release()
     return AudioFileInfo(duration, location)

@@ -75,39 +75,39 @@ class LongFormatTest {
 
     @Test
     fun formatDuration_zeroSeconds() {
-        assertEquals("00:00", 0L.formatDuration())
+        assertEquals("00:00", 0L.formatDurationSec())
     }
 
     @Test
     fun formatDuration_secondsOnly() {
-        assertEquals("00:05", 5L.formatDuration())
-        assertEquals("00:59", 59L.formatDuration())
+        assertEquals("00:05", 5L.formatDurationSec())
+        assertEquals("00:59", 59L.formatDurationSec())
     }
 
     @Test
     fun formatDuration_minutesAndSeconds() {
-        assertEquals("01:00", 60L.formatDuration())
-        assertEquals("01:05", 65L.formatDuration())
-        assertEquals("59:59", (59 * 60 + 59).toLong().formatDuration())
+        assertEquals("01:00", 60L.formatDurationSec())
+        assertEquals("01:05", 65L.formatDurationSec())
+        assertEquals("59:59", (59 * 60 + 59).toLong().formatDurationSec())
     }
 
     @Test
     fun formatDuration_hoursMinutesSeconds() {
-        assertEquals("01:00:00", 3600L.formatDuration())
-        assertEquals("01:01:01", 3661L.formatDuration())
+        assertEquals("01:00:00", 3600L.formatDurationSec())
+        assertEquals("01:01:01", 3661L.formatDurationSec())
     }
 
     @Test
     fun formatDuration_alwaysShowHour() {
         // With alwaysShowHour=true, even short durations include hour component.
-        assertEquals("00:00:05", 5L.formatDuration(alwaysShowHour = true))
-        assertEquals("00:05:00", 300L.formatDuration(alwaysShowHour = true))
+        assertEquals("00:00:05", 5L.formatDurationSec(alwaysShowHour = true))
+        assertEquals("00:05:00", 300L.formatDurationSec(alwaysShowHour = true))
     }
 
     @Test
     fun formatDuration_noHourWhenNotForced() {
         // Without alwaysShowHour, durations < 1 hour omit the hour field.
-        assertEquals("05:00", 300L.formatDuration())
+        assertEquals("05:00", 300L.formatDurationSec())
     }
 
     // ---------- formatMinSec ----------

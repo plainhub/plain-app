@@ -125,7 +125,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
     }
 
     val currentItem = pages.getOrNull(playingIndex) ?: pages.getOrNull(initialIndex)
-    val duration = currentItem?.duration?.toFloat() ?: 0f
+    val duration = currentItem?.durationMs?.toFloat()?.div(1000f) ?: 0f
 
     // Full-height sheet reaching the top of the screen; inset padding and
     // the drag corner animation are handled by PModalBottomSheet.

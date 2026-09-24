@@ -44,14 +44,14 @@ actual fun fileLength(path: String): Long {
 
 actual suspend fun renameMediaFile(path: String, newName: String): String? = renameAndScanFile(path, newName)
 
-actual fun getMediaDuration(path: String): Long {
+actual fun getMediaDurationSec(path: String): Long {
     val duration = File(path).getDuration(appContext)
     if (duration > 0) return duration
     return Mp4Helper.getMp4Duration(path)
 }
 
-actual fun getAudioDurationFromPath(path: String): Long =
-    DPlaylistAudio.fromPath(appContext, path).duration
+actual fun getAudioDurationSecFromPath(path: String): Long =
+    DPlaylistAudio.fromPath(appContext, path).durationMs
 
 actual fun generateQrCode(text: String, width: Int, height: Int): ImageBitmap {
     return QrCodeGenerateHelper.generate(text, width, height).asImageBitmap()

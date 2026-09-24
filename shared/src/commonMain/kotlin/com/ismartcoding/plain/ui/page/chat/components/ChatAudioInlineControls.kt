@@ -22,7 +22,7 @@ import androidx.compose.ui.draw.shadow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationSec
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
@@ -61,12 +61,12 @@ fun ChatAudioInlineControls(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = progress.toLong().formatDuration(),
+                    text = progress.toLong().formatDurationSec(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = duration.toLong().formatDuration(),
+                    text = duration.toLong().formatDurationSec(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -61,8 +61,8 @@ data class DAudioQueueItem(
     var title: String,
     @ColumnInfo(name = "artist")
     var artist: String,
-    @ColumnInfo(name = "duration")
-    var duration: Long,
+    @ColumnInfo(name = "duration_ms")
+    var durationMs: Long,
 )
 
 @Dao

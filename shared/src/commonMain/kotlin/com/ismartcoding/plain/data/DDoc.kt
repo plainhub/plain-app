@@ -9,7 +9,7 @@ data class DDoc(
     override var id: String,
     override var title: String,
     override var path: String,
-    override val duration: Long,
+    override val durationMs: Long,
     val size: Long,
     val bucketId: String = "",
     val createdAt: Instant,

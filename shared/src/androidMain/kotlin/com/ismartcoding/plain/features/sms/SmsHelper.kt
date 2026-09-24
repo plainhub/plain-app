@@ -229,9 +229,9 @@ object SmsHelper {
             val archivedConversation = archivedRecords.firstOrNull { it.conversationId == threadIdCondition.value }
             if (archivedConversation != null) {
                 if (isArchived) {
-                    where.add("${Telephony.Sms.DATE} <= ?", archivedConversation.conversationDate.toString())
+                    where.add("${Telephony.Sms.DATE} <= ?", archivedConversation.conversationDate.toEpochMilliseconds().toString())
                 } else {
-                    where.add("${Telephony.Sms.DATE} > ?", archivedConversation.conversationDate.toString())
+                    where.add("${Telephony.Sms.DATE} > ?", archivedConversation.conversationDate.toEpochMilliseconds().toString())
                 }
             }
         }
@@ -287,7 +287,7 @@ object SmsHelper {
             val isArchived = conditions.any { it.name == "archived" && it.value == "1" }
             where.add(
                 "${Telephony.Mms.DATE} ${if (isArchived) "<=" else ">"} ?",
-                (archivedConversation.conversationDate / 1000).toString(),
+                (archivedConversation.conversationDate.toEpochMilliseconds() / 1000).toString(),
             )
         }
         return where

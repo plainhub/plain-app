@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.extensions.getMimeType
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
@@ -107,7 +107,7 @@ fun ViewAudioBottomSheet(
                 PCard(modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)) {
                     PListItem(title = stringResource(Res.string.file_size), value = m.size.formatBytes())
                     PListItem(title = stringResource(Res.string.type), value = m.path.getMimeType())
-                    PListItem(title = stringResource(Res.string.duration), value = m.duration.formatDuration())
+                    PListItem(title = stringResource(Res.string.duration), value = m.durationMs.formatDurationMs())
                     PListItem(title = stringResource(Res.string.created_at), value = m.createdAt.formatDateTime())
                     PListItem(title = stringResource(Res.string.updated_at), value = m.updatedAt.formatDateTime())
                 }

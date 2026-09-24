@@ -92,7 +92,7 @@ object MainAppHelper {
             // and rely on this cache; loading it last caused a race where the
             // Videos page showed duration=0 on quick app open.
             AppDatabase.instance.mediaItemDao().getAll().forEach {
-                TempData.mediaDurationMap["${it.mediaType}:${it.mediaId}"] = it.duration
+                TempData.mediaDurationMap["${it.mediaType}:${it.mediaId}"] = it.durationMs
             }
 
             val preferences = initCommonPreferences()
@@ -118,7 +118,7 @@ object MainAppHelper {
             ImageSearchManager.restoreIfEnabled()
             val thirtyDaysAgo = (Clock.System.now() - 30.days).toString()
             AppDatabase.instance.videoPlayProgressDao().getRecentProgress(thirtyDaysAgo).forEach {
-                TempData.videoPlayProgressMap[it.mediaId] = it.duration
+                TempData.videoPlayProgressMap[it.mediaId] = it.positionMs
             }
 
             val updateInfo = UpdateInfoPreference.getValueAsync()

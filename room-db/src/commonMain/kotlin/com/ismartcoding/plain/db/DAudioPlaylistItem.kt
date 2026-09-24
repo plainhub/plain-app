@@ -36,8 +36,8 @@ data class DAudioPlaylistItem(
     // rows written before the column existed (backfilled on first load).
     @ColumnInfo(name = "album_id", defaultValue = "")
     var albumId: String = "",
-    @ColumnInfo(name = "duration")
-    var duration: Long,
+    @ColumnInfo(name = "duration_ms")
+    var durationMs: Long,
     @ColumnInfo(name = "sort_order")
     var sortOrder: Int,
     @ColumnInfo(name = "added_at")

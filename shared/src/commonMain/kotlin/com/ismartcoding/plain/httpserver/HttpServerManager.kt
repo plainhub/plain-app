@@ -315,7 +315,7 @@ object HttpServerManager {
         val signedResponse = response.copy(signature = signature)
 
         SessionList.addOrUpdateAsync(event.clientId) {
-            it.clientIP = clientIp
+            it.clientIp = clientIp
             it.osName = r.osName
             it.osVersion = r.osVersion
             it.browserName = r.browserName

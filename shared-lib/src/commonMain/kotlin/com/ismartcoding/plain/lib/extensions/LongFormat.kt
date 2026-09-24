@@ -36,7 +36,7 @@ fun Long.formatBytes(): String {
     return formatOneDecimal(newBytes / 1000.0) + " ${prefix}B"
 }
 
-fun Long.formatDuration(
+fun Long.formatDurationSec(
     alwaysShowHour: Boolean = false,
 ): String {
     val totalSeconds = this
@@ -59,6 +59,11 @@ fun Long.formatMinSec(): String {
     val seconds = totalSeconds % 60
     return "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
 }
+
+/** Millisecond variant of [formatDurationSec] — for `durationMs` fields. */
+fun Long.formatDurationMs(
+    alwaysShowHour: Boolean = false,
+): String = (this / 1000).formatDurationSec(alwaysShowHour)
 
 private fun formatOneDecimal(value: Double): String {
     val rounded = round(value * 10.0).toInt()

@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationSec
 import com.ismartcoding.plain.lib.extensions.isTextFile
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
@@ -37,7 +37,7 @@ fun ChatFileInfo(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 8.dp),
-            text = size.formatBytes() + if (duration > 0) " / ${duration.formatDuration()}" else "",
+            text = size.formatBytes() + if (duration > 0) " / ${duration.formatDurationSec()}" else "",
             style = MaterialTheme.typography.listItemSubtitle(),
         )
 

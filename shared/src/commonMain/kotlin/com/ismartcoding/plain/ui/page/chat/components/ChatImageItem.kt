@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.lib.extensions.formatBytes
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationSec
 import com.ismartcoding.plain.lib.extensions.isVideoFast
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.download.DownloadQueue
@@ -106,7 +106,7 @@ internal fun ChatImageItem(
                 .clip(RoundedCornerShape(bottomEnd = 6.dp))
                 .background(Color.Black.copy(alpha = 0.4f)),
         ) {
-            val sizeText = if (item.duration > 0) item.duration.formatDuration() else item.size.formatBytes()
+            val sizeText = if (item.duration > 0) item.duration.formatDurationSec() else item.size.formatBytes()
             val labelText = if (taskActive) {
                 "${(downloadProgress * 100).toInt()}%  $sizeText"
             } else {

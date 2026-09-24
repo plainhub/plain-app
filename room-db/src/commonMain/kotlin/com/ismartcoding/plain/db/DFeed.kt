@@ -34,7 +34,7 @@ data class DFeed(
     var fetchContent: Boolean = false,
 
     @Ignore
-    var count: Int = 0,
+    var entryCount: Int = 0,
 
     // Last sync attempt state, written by FeedFetcher after every sync;
     // the UI (banner, drawer dot, sheet status card) derives from it.
@@ -107,9 +107,9 @@ interface FeedDao {
     suspend fun updateSyncStatus(id: String, at: Instant, error: DFeedError)
 
     @Query(
-        "SELECT feed_entries.feed_id AS id, count(feed_entries.feed_id) AS count FROM feed_entries GROUP BY feed_entries.feed_id",
+        "SELECT feed_entries.feed_id AS id, count(feed_entries.feed_id) AS entryCount FROM feed_entries GROUP BY feed_entries.feed_id",
     )
     suspend fun getFeedCounts(): List<DFeedCount>
 }
 
-data class DFeedCount(var id: String, var count: Int)
+data class DFeedCount(var id: String, var entryCount: Int)

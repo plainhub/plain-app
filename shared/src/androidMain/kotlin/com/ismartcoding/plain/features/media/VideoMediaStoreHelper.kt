@@ -87,7 +87,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             val id = cursor.getStringValue(MediaStore.Video.Media._ID, cache)
             val title = cursor.getStringValue(MediaStore.Video.Media.TITLE, cache)
             val size = cursor.getLongValue(MediaStore.Video.Media.SIZE, cache)
-            val duration = cursor.getLongValue(MediaStore.Video.Media.DURATION, cache) / 1000
+            val duration = cursor.getLongValue(MediaStore.Video.Media.DURATION, cache)
             val createdAt = cursor.getTimeSecondsValue(MediaStore.Video.Media.DATE_ADDED, cache)
             val updatedAt = cursor.getTimeSecondsValue(MediaStore.Video.Media.DATE_MODIFIED, cache)
             val width = cursor.getIntValue(MediaStore.Video.Media.WIDTH, cache)
@@ -101,8 +101,8 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
 
             // MediaStore.DURATION is read-only on Android 10+; for fMP4 files
             // it stays 0. Fall back to the app-local cache (computed by
-            // MediaDurationFixQueue, stored in seconds — same unit as
-            // DVideo.duration) before reporting zero to the UI.
+            // MediaDurationFixQueue, stored in milliseconds — same unit as
+            // DVideo.durationMs and the MediaStore column) before reporting zero to the UI.
             val effectiveDuration = if (duration <= 0L) {
                 TempData.mediaDurationMap["video:$id"] ?: 0L
             } else {

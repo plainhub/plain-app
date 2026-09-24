@@ -119,7 +119,7 @@ object ChannelSystemMessageReceiver {
             ChannelCacher.mutateChannel(msg.channelId) { ch ->
                 ch.name = msg.channelName
                 ch.key = msg.key
-                ch.owner = fromId
+                ch.ownerId = fromId
                 ch.members = msg.members
                 ch.version = msg.version
                 ch.status = ChatChannelStatus.JOINED
@@ -130,7 +130,7 @@ object ChannelSystemMessageReceiver {
             channel.id = msg.channelId
             channel.name = msg.channelName
             channel.key = msg.key
-            channel.owner = fromId
+            channel.ownerId = fromId
             channel.members = msg.members
             channel.version = msg.version
             AppDatabase.instance.chatChannelDao().insert(channel)
@@ -193,7 +193,7 @@ object ChannelSystemMessageReceiver {
 
         val updatedChannel = ChannelCacher.mutateChannel(msg.channelId) { ch ->
             ch.members = ch.members.map {
-                if (it.id == fromId) it.copy(status = ChannelMemberStatus.JOINED) else it
+                if (it.peerId == fromId) it.copy(status = ChannelMemberStatus.JOINED) else it
             }
             ch.version++
             ch.updatedAt = TimeHelper.now()
@@ -211,7 +211,7 @@ object ChannelSystemMessageReceiver {
 
         if (channel.hasMember(fromId)) {
             ChannelCacher.mutateChannel(msg.channelId) { ch ->
-                ch.members = ch.members.filter { it.id != fromId }
+                ch.members = ch.members.filter { it.peerId != fromId }
                 ch.version++
                 ch.updatedAt = TimeHelper.now()
             }
@@ -228,14 +228,14 @@ object ChannelSystemMessageReceiver {
             return
         }
 
-        if (channel.owner != fromId) {
-            LogCat.e("ChannelUpdate from non-owner $fromId (owner=${channel.owner}) — rejected")
+        if (channel.ownerId != fromId) {
+            LogCat.e("ChannelUpdate from non-owner $fromId (owner=${channel.ownerId}) — rejected")
             return
         }
 
-        val ownerPeer = PeerCacher.getPeer(channel.owner)
+        val ownerPeer = PeerCacher.getPeer(channel.ownerId)
         if (ownerPeer == null) {
-            LogCat.e("ChannelUpdate: owner peer ${channel.owner} not found locally — rejected")
+            LogCat.e("ChannelUpdate: owner peer ${channel.ownerId} not found locally — rejected")
             return
         }
         val updatePayload = channelMessagePayload(
@@ -286,14 +286,14 @@ object ChannelSystemMessageReceiver {
             return
         }
 
-        if (channel.owner != fromId) {
-            LogCat.e("ChannelKick from non-owner $fromId (owner=${channel.owner}) — rejected")
+        if (channel.ownerId != fromId) {
+            LogCat.e("ChannelKick from non-owner $fromId (owner=${channel.ownerId}) — rejected")
             return
         }
 
-        val ownerPeer = PeerCacher.getPeer(channel.owner)
+        val ownerPeer = PeerCacher.getPeer(channel.ownerId)
         if (ownerPeer == null) {
-            LogCat.e("ChannelKick: owner peer ${channel.owner} not found locally — rejected")
+            LogCat.e("ChannelKick: owner peer ${channel.ownerId} not found locally — rejected")
             return
         }
         val kickPayload = channelMessagePayload(
@@ -310,7 +310,7 @@ object ChannelSystemMessageReceiver {
         val wasPending = channel.findMember(TempData.clientId)?.isPending() == true
         ChannelCacher.mutateChannel(msg.channelId) { ch ->
             ch.status = ChatChannelStatus.KICKED
-            ch.members = ch.members.filter { it.id != TempData.clientId }
+            ch.members = ch.members.filter { it.peerId != TempData.clientId }
         }
 
         if (wasPending) {
@@ -328,7 +328,7 @@ object ChannelSystemMessageReceiver {
         }
 
         val updatedChannel = ChannelCacher.mutateChannel(msg.channelId) { ch ->
-            ch.members = ch.members.filter { it.id != fromId }
+            ch.members = ch.members.filter { it.peerId != fromId }
             ch.version++
             ch.updatedAt = TimeHelper.now()
         } ?: return

@@ -147,7 +147,7 @@ fun MediaVideo(
         val isActive = pagerState.settledPage == page
         if (isActive) {
             videoState.initData(controller)
-            val expectedTotalMs = ((model.data as? DVideo)?.duration ?: 0L) * 1000
+            val expectedTotalMs = (model.data as? DVideo)?.durationMs ?: 0L
             if (expectedTotalMs > 0L) {
                 videoState.totalTime = expectedTotalMs
             }

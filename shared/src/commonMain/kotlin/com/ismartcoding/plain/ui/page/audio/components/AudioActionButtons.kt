@@ -43,7 +43,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.foundation.layout.size
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.extensions.getFilenameFromPath
 
 @Composable
@@ -64,7 +64,7 @@ internal fun AudioActionButtons(
                 AudioCoverOrIcon(path = m.path, modifier = Modifier.size(44.dp))
             },
             title = m.title.ifEmpty { m.path.getFilenameFromPath() },
-            subtitle = (if (m.artist.isNotEmpty()) m.artist + " · " else "") + m.duration.formatDuration(),
+            subtitle = (if (m.artist.isNotEmpty()) m.artist + " · " else "") + m.durationMs.formatDurationMs(),
         )
         PSheetPrimaryActionsRow {
             if (!audioVM.showSearchBar.value) {

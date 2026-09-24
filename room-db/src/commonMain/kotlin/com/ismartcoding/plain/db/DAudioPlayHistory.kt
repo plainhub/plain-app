@@ -20,8 +20,8 @@ data class DAudioPlayHistory(
     var title: String,
     @ColumnInfo(name = "artist")
     var artist: String,
-    @ColumnInfo(name = "duration")
-    var duration: Long,
+    @ColumnInfo(name = "duration_ms")
+    var durationMs: Long,
     /** Total times this track was played (incremented on every play). */
     @ColumnInfo(name = "play_count", defaultValue = "0")
     var playCount: Long = 0,

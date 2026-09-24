@@ -34,7 +34,7 @@ object SmsConversationHelper {
         val convDates = queryConversationsByThreadIds(context, archivedRecords.map { it.conversationId })
         return@withIO archivedRecords.filter { archived ->
             val conv = convDates[archived.conversationId]
-            conv == null || conv.date.toEpochMilliseconds() <= archived.conversationDate
+            conv == null || conv.date <= archived.conversationDate
         }.map { it.conversationId }.toSet()
     }
 
@@ -81,10 +81,10 @@ object SmsConversationHelper {
         val archivedMap = archivedRecords.associateBy { it.conversationId }
         return@withIO conversations.map { conv ->
             val archiveDate = archivedMap[conv.id]?.conversationDate ?: return@map conv
-            val oldSnippet = getSnippetBeforeDate(context, conv.id, archiveDate)
+            val oldSnippet = getSnippetBeforeDate(context, conv.id, archiveDate.toEpochMilliseconds())
             conv.copy(
                 snippet = oldSnippet ?: conv.snippet,
-                date = Instant.fromEpochMilliseconds(archiveDate),
+                date = archiveDate,
             )
         }
     }
@@ -359,7 +359,7 @@ object SmsConversationHelper {
                 val date = cursor.getTimeValue(Telephony.Threads.DATE, cache)
                 // Check if this conversation is actively archived
                 val archived = archivedMap[id]
-                if (archived != null && date.toEpochMilliseconds() <= archived.conversationDate) continue
+                if (archived != null && date <= archived.conversationDate) continue
                 if (skip < offset) { skip++; continue }
                 conversations.add(DMessageConversation(
                     id, "",

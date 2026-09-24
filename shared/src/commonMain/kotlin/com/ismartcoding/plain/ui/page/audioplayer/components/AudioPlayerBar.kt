@@ -51,7 +51,7 @@ fun AudioPlayerBar(
             if (path.isNotEmpty()) {
                 val audio = withIO { playlistAudioFromPath(path) }
                 title = audio.title; artist = audio.artist
-                duration = audio.duration.toFloat(); progress = audioPlayerProgress() / 1000f
+                duration = audio.durationMs / 1000f; progress = audioPlayerProgress() / 1000f
             }
             if (TempData.audioPlayerVisible.value) TempData.audioPlayerVisible.value = path.isNotEmpty()
         }

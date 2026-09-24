@@ -7,6 +7,7 @@ import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.PrimaryKey
 import androidx.room3.Query
+import kotlin.time.Instant
 
 @Entity(tableName = "archived_conversations")
 data class DArchivedConversation(
@@ -14,7 +15,7 @@ data class DArchivedConversation(
     @ColumnInfo(name = "conversation_id")
     val conversationId: String,
     @ColumnInfo(name = "conversation_date")
-    val conversationDate: Long, // epoch millis when archived; messages before this date are archived
+    val conversationDate: Instant, // snapshot moment when archived; messages before this date are archived
 )
 
 @Dao

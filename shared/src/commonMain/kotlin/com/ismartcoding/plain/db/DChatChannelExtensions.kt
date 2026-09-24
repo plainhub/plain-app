@@ -12,10 +12,10 @@ import com.ismartcoding.plain.enums.ChatChannelStatus
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.helpers.SignatureHelper
 
-fun ChannelMember.isMe(): Boolean = id == TempData.clientId
+fun ChannelMember.isMe(): Boolean = peerId == TempData.clientId
 
 fun DChatChannel.isOwnedByMe(): Boolean {
-    return owner == "me" || owner == TempData.clientId
+    return ownerId == "me" || ownerId == TempData.clientId
 }
 
 fun DChatChannel.canLeave(): Boolean = !isOwnedByMe() && isJoined()
@@ -25,7 +25,7 @@ fun DChatChannel.canDeleteFromThisDevice(): Boolean =
 
 fun DChatChannel.getRecipientIds(): List<String> {
     return joinedMembers()
-        .map { it.id }
+        .map { it.peerId }
         .distinct()
         .filter { it != TempData.clientId }
 }
@@ -58,7 +58,7 @@ fun mePeer(): DPeer = DPeer(
 )
 
 fun DChatChannel.getOwner(): DPeer? {
-    return if (isOwnedByMe()) mePeer() else PeerCacher.getPeer(owner)
+    return if (isOwnedByMe()) mePeer() else PeerCacher.getPeer(ownerId)
 }
 
 @OptIn(ExperimentalEncodingApi::class)

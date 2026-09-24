@@ -32,13 +32,13 @@ fun DPlaylistAudio.toMediaItem(): MediaItem {
         .build()
 }
 
-fun DPlaylistAudio.Companion.fromPath(
+fun DPlaylistAudio.fromPath(
     context: Context,
     path: String,
 ): DPlaylistAudio {
     val retriever = MediaMetadataRetriever()
     var title = path.getFilenameWithoutExtensionFromPath()
-    var duration = 0L
+    var durationMs = 0L
     var artist = LocaleHelper.getString(Res.string.unknown)
 
     try {
@@ -47,7 +47,7 @@ fun DPlaylistAudio.Companion.fromPath(
         if (keyTitle.isNotEmpty()) {
             title = keyTitle
         }
-        duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
+        durationMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
         val keyArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: ""
         if (keyArtist.isNotEmpty()) {
             artist = keyArtist
@@ -56,5 +56,5 @@ fun DPlaylistAudio.Companion.fromPath(
     } catch (ex: Throwable) {
         ex.printStackTrace()
     }
-    return DPlaylistAudio(title, path, artist, duration / 1000)
+    return DPlaylistAudio(title, path, artist, durationMs)
 }

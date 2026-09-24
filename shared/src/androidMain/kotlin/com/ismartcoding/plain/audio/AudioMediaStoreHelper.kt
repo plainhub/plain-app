@@ -107,7 +107,7 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE, cache)
             val artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST, cache).replace(MediaStore.UNKNOWN_STRING, "")
             val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE, cache)
-            val duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION, cache) / 1000
+            val duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION, cache)
             val createdAt = cursor.getTimeSecondsValue(MediaStore.Audio.Media.DATE_ADDED, cache)
             val updatedAt = cursor.getTimeSecondsValue(MediaStore.Audio.Media.DATE_MODIFIED, cache)
             val path = cursor.getStringValue(MediaStore.Audio.Media.DATA, cache)
@@ -119,8 +119,8 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
 
             // MediaStore.DURATION is read-only on Android 10+; for fMP4 files
             // it stays 0. Fall back to the app-local cache (computed by
-            // MediaDurationFixQueue, stored in seconds — same unit as
-            // DAudio.duration) before reporting zero to the UI.
+            // MediaDurationFixQueue, stored in milliseconds — same unit as
+            // DAudio.durationMs and the MediaStore column) before reporting zero to the UI.
             val effectiveDuration = if (duration <= 0L) {
                 TempData.mediaDurationMap["audio:$id"] ?: 0L
             } else {

@@ -25,9 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.features.audio.AudioPlaylistManager
-import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -137,7 +136,7 @@ fun PlaylistAddItemsPage(
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Text(
-                                text = "${item.artist} · ${item.duration.formatDuration()}",
+                                text = "${item.artist} · ${item.durationMs.formatDurationMs()}",
                                 style = MaterialTheme.typography.listItemSubtitle(),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,

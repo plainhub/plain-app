@@ -130,7 +130,7 @@ internal fun FeedEntriesDrawerContent(
                     isSelected = feedEntriesVM.feedId.value == feed.id,
                     onClick = { onSelect(feed.id, FeedEntryFilterType.DEFAULT, null) },
                     onLongClick = { feedsVM.selectedItem.value = feed },
-                    badge = feed.count.toString(),
+                    badge = feed.entryCount.toString(),
                     // Persisted sync failure: keep the broken feed visible at a glance.
                     showErrorDot = feed.hasSyncError,
                 )

@@ -15,8 +15,8 @@ data class DVideoPlayProgress(
     @PrimaryKey
     @ColumnInfo(name = "media_id")
     val mediaId: String,
-    @ColumnInfo(name = "duration")
-    val duration: Long,
+    @ColumnInfo(name = "position_ms")
+    val positionMs: Long,
     @ColumnInfo(name = "updated_at")
     val updatedAt: Instant = TimeHelper.now(),
 )

@@ -16,8 +16,9 @@ import kotlin.time.Instant
  * DURATION column is read-only on Android 10+, so we cannot write back; instead
  * we persist the computed duration here and merge it during list queries.
  *
- * Duration is stored in **seconds** to match DVideo/DAudio.duration's unit,
- * so list queries can use the cached value directly without conversion.
+ * Duration is stored in **milliseconds** to match DVideo/DAudio.durationMs's
+ * unit (and the MediaStore DURATION column), so list queries can use the
+ * cached value directly without conversion.
  *
  * `media_id` is the single primary key — MediaStore _ID is globally unique
  * across video/audio content URIs in practice (same pattern as
@@ -31,8 +32,8 @@ data class DMediaItem(
     @PrimaryKey
     @ColumnInfo(name = "media_id")
     val mediaId: String,
-    @ColumnInfo(name = "duration")
-    val duration: Long, // seconds
+    @ColumnInfo(name = "duration_ms")
+    val durationMs: Long, // milliseconds
     @ColumnInfo(name = "updated_at")
     val updatedAt: Instant = TimeHelper.now(),
 )

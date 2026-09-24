@@ -112,8 +112,8 @@ internal fun SessionListItem(
                     }
                 )
             }
-            if (m.clientIP.isNotEmpty()) {
-                PListItem(title = stringResource(Res.string.ip_address), value = m.clientIP)
+            if (m.clientIp.isNotEmpty()) {
+                PListItem(title = stringResource(Res.string.ip_address), value = m.clientIp)
             }
             if (browserDisplay.isNotEmpty()) {
                 PListItem(title = stringResource(Res.string.browser), value = browserDisplay)

@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.extensions.formatDuration
+import com.ismartcoding.plain.lib.extensions.formatDurationSec
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -159,7 +159,7 @@ fun CastNowPlayingSection(
                 ) {
                     Text(
                         modifier = Modifier.width(52.dp),
-                        text = progress.toLong().formatDuration(),
+                        text = progress.toLong().formatDurationSec(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -175,7 +175,7 @@ fun CastNowPlayingSection(
                     }
                     Text(
                         modifier = Modifier.width(52.dp),
-                        text = duration.toLong().formatDuration(),
+                        text = duration.toLong().formatDurationSec(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,

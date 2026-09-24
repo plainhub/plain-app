@@ -9,6 +9,7 @@ import com.ismartcoding.plain.features.sms.SmsProviderContract
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.lib.kgraphql.Context
+import kotlin.time.Instant
 import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
@@ -134,7 +135,7 @@ suspend fun archivedConversations(offset: Int, limit: Int, query: String): List<
 
 @GraphQLMutation
 suspend fun archiveSmsConversation(id: ID): Boolean {
-    val date = getSmsConversationDate(id.value) ?: TimeHelper.now().toEpochMilliseconds()
+    val date = getSmsConversationDate(id.value)?.let { Instant.fromEpochMilliseconds(it) } ?: TimeHelper.now()
     AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id.value, conversationDate = date))
     return true
 }
