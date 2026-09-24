@@ -78,7 +78,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
     var fallbackItem by remember { mutableStateOf<DPlaylistAudio?>(null) }
     LaunchedEffect(currentPlayingPath.value) {
         fallbackItem = null
-        if (!isDragging) progress = audioPlayerProgress() / 1000f
+        if (!isDragging) progress = audioPlayerProgress().toFloat()
         if (audioQueueVM.queueItems.value.isEmpty() && currentPlayingPath.value.isNotEmpty()) {
             fallbackItem = withIO { playlistAudioFromPath(currentPlayingPath.value) }
         }
@@ -111,7 +111,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
     LaunchedEffect(isPlaying, isDragging) {
         if (isPlaying && !isDragging) {
             while (true) {
-                progress = audioPlayerProgress() / 1000f
+                progress = audioPlayerProgress().toFloat()
                 delay(250)
             }
         }
@@ -125,7 +125,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
     }
 
     val currentItem = pages.getOrNull(playingIndex) ?: pages.getOrNull(initialIndex)
-    val durationSec = currentItem?.durationMs?.toFloat()?.div(1000f) ?: 0f
+    val durationMs = currentItem?.durationMs?.toFloat() ?: 0f
 
     // Full-height sheet reaching the top of the screen; inset padding and
     // the drag corner animation are handled by PModalBottomSheet.
@@ -175,7 +175,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
                 val item = pages.getOrNull(page) ?: return@HorizontalPager
                 AudioPlayerTrackPage(
                     item = item,
-                    progressMs = (progress * 1000).toLong(),
+                    progressMs = progress.toLong(),
                     isPlaying = isPlaying,
                     viewMode = viewMode,
                     onViewModeChange = { viewMode = it },
@@ -183,7 +183,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
                         // Update the UI position synchronously: the 250ms
                         // poll (absent while paused) would leave the highlight
                         // on the previous line for a beat.
-                        progress = it / 1000f
+                        progress = it.toFloat()
                         audioSeekTo(it)
                     },
                 )
@@ -193,11 +193,11 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
             AudioPlayerBottomControls(
                 visible = viewMode == PlayerView.COVER,
                 progress = progress,
-                durationSec = durationSec,
+                durationMs = durationMs,
                 isPlaying = isPlaying,
-                onScrub = { isDragging = true; progress = minOf(it, durationSec) },
+                onScrub = { isDragging = true; progress = minOf(it, durationMs) },
                 onScrubFinished = {
-                    if (durationSec > 0 && progress >= 0) audioSeekTo((progress * 1000).toLong())
+                    if (durationMs > 0 && progress >= 0) audioSeekTo(progress.toLong())
                     isDragging = false
                 },
                 playMode = playMode,

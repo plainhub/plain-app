@@ -51,11 +51,11 @@ class Mp4TranscodeInstrumentedTest {
         val outFile = File(out)
         assertTrue("output too small: ${outFile.length()}", outFile.length() > 100_000)
         assertEquals("output video codec", "avc1", Mp4Helper.firstVideoSampleEntry(out))
-        val srcDurationSec = Mp4Helper.getMp4DurationSec(src.absolutePath)
-        val outDurationSec = Mp4Helper.getMp4DurationSec(out)
+        val srcDurationMs = Mp4Helper.getMp4DurationMs(src.absolutePath)
+        val outDurationMs = Mp4Helper.getMp4DurationMs(out)
         assertTrue(
-            "duration drift: src=$srcDurationSec out=$outDurationSec",
-            Math.abs(srcDurationSec - outDurationSec) <= 2,
+            "duration drift: src=$srcDurationMs out=$outDurationMs",
+            Math.abs(srcDurationMs - outDurationMs) <= 2_000,
         )
         // 12 s / ~21 Mbps source: the non-blocking feed/drain loop should
         // finish well under 10 s on a Tensor-class device (regression guard

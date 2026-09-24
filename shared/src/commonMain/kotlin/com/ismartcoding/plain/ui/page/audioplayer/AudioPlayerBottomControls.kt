@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.enums.MediaPlayMode
-import com.ismartcoding.plain.lib.extensions.formatDurationSec
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.WaveSlider
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 fun AudioPlayerBottomControls(
     visible: Boolean,
     progress: Float,
-    durationSec: Float,
+    durationMs: Float,
     isPlaying: Boolean,
     onScrub: (Float) -> Unit,
     onScrubFinished: () -> Unit,
@@ -59,13 +59,13 @@ fun AudioPlayerBottomControls(
                     value = progress,
                     onValueChange = onScrub,
                     onValueChangeFinished = onScrubFinished,
-                    valueRange = 0f..maxOf(durationSec, 1f),
+                    valueRange = 0f..maxOf(durationMs, 1f),
                     modifier = Modifier.fillMaxWidth().height(32.dp),
                     isPlaying = isPlaying,
                 )
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = progress.toLong().formatDurationSec(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(text = durationSec.toLong().formatDurationSec(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = progress.toLong().formatDurationMs(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = durationMs.toLong().formatDurationMs(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))

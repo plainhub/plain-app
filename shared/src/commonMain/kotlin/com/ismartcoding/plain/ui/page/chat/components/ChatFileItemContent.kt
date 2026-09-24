@@ -154,7 +154,7 @@ internal fun ChatFileItemContent(
                 modifier = Modifier.weight(1f),
                 fileName = fileName,
                 size = item.size,
-                durationSec = item.durationSec,
+                durationMs = item.durationSec * 1000,
                 summary = item.summary,
                 isCurrentlyPlaying = isCurrentlyPlaying,
             )

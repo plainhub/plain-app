@@ -9,7 +9,7 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.fromPath
 import com.ismartcoding.plain.data.DImageMeta
 import com.ismartcoding.plain.data.DVideoMeta
-import com.ismartcoding.plain.extensions.getDurationSec
+import com.ismartcoding.plain.extensions.getDurationMs
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.MediaShortcutHelper
 import com.ismartcoding.plain.helpers.Mp4Helper
@@ -44,14 +44,14 @@ actual fun fileLength(path: String): Long {
 
 actual suspend fun renameMediaFile(path: String, newName: String): String? = renameAndScanFile(path, newName)
 
-actual fun getMediaDurationSec(path: String): Long {
-    val durationSec = File(path).getDurationSec(appContext)
-    if (durationSec > 0) return durationSec
-    return Mp4Helper.getMp4DurationSec(path)
+actual fun getMediaDurationMs(path: String): Long {
+    val durationMs = File(path).getDurationMs(appContext)
+    if (durationMs > 0) return durationMs
+    return Mp4Helper.getMp4DurationMs(path)
 }
 
-actual fun getAudioDurationSecFromPath(path: String): Long =
-    DPlaylistAudio.fromPath(appContext, path).durationMs / 1000
+actual fun getAudioDurationMs(path: String): Long =
+    DPlaylistAudio.fromPath(appContext, path).durationMs
 
 actual fun generateQrCode(text: String, width: Int, height: Int): ImageBitmap {
     return QrCodeGenerateHelper.generate(text, width, height).asImageBitmap()

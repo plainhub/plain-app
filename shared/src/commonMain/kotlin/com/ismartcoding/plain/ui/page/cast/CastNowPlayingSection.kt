@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.i18n.*
-import com.ismartcoding.plain.lib.extensions.formatDurationSec
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
@@ -54,8 +54,8 @@ import org.jetbrains.compose.resources.stringResource
 fun CastNowPlayingSection(
     currentUri: String,
     isPlaying: Boolean,
-    progress: Float,
-    durationSec: Float,
+    progressMs: Float,
+    durationMs: Float,
     supportsCallback: Boolean,
     isLoading: Boolean,
     onPlay: () -> Unit,
@@ -150,7 +150,7 @@ fun CastNowPlayingSection(
         }
 
         if (canControl) {
-            if (supportsCallback && durationSec > 0f) {
+            if (supportsCallback && durationMs > 0f) {
                 VerticalSpace(16.dp)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -159,7 +159,7 @@ fun CastNowPlayingSection(
                 ) {
                     Text(
                         modifier = Modifier.width(52.dp),
-                        text = progress.toLong().formatDurationSec(),
+                        text = progressMs.toLong().formatDurationMs(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -167,15 +167,15 @@ fun CastNowPlayingSection(
                     Box(modifier = Modifier.weight(1f).padding(horizontal = 4.dp)) {
                         PlayerSlider(
                             modifier = Modifier.fillMaxWidth().height(20.dp),
-                            progress = if (durationSec > 0f) (progress / durationSec).coerceIn(0f, 1f) else 0f,
+                            progress = if (durationMs > 0f) (progressMs / durationMs).coerceIn(0f, 1f) else 0f,
                             bufferedProgress = 0f,
-                            onProgressChange = { ratio -> onSeek(ratio * durationSec) },
+                            onProgressChange = { ratio -> onSeek(ratio * durationMs) },
                             colors = PlayerSliderDefaults.lightColors(),
                         )
                     }
                     Text(
                         modifier = Modifier.width(52.dp),
-                        text = durationSec.toLong().formatDurationSec(),
+                        text = durationMs.toLong().formatDurationMs(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,

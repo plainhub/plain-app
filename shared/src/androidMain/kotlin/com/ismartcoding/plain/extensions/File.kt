@@ -40,12 +40,11 @@ fun File.newFile(): File {
     return File(newPath())
 }
 
-fun File.getDurationSec(context: Context): Long {
+fun File.getDurationMs(context: Context): Long {
     val retriever = MediaMetadataRetriever()
     return try {
         retriever.setDataSource(context, Uri.fromFile(this))
-        val timeMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        (timeMs?.toLong()?.div(1000)) ?: 0L
+        retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
     } catch (ex: Exception) {
         0L
     } finally {

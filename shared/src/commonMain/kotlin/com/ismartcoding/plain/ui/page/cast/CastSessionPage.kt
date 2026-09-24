@@ -47,8 +47,8 @@ fun CastSessionPage(
 ) {
     val currentUri by CastPlayer.currentUri.collectAsState()
     val isPlaying by CastPlayer.isPlaying.collectAsState()
-    val progress by CastPlayer.progress.collectAsState()
-    val durationSec by CastPlayer.durationSec.collectAsState()
+    val progressMs by CastPlayer.progressMs.collectAsState()
+    val durationMs by CastPlayer.durationMs.collectAsState()
     val supportsCallback by CastPlayer.supportsCallback.collectAsState()
     val castItems by CastPlayer.items.collectAsState()
     val deviceName = CastPlayer.currentDevice?.getDeviceName() ?: ""
@@ -98,8 +98,8 @@ fun CastSessionPage(
             CastNowPlayingSection(
                 currentUri = currentUri,
                 isPlaying = isPlaying,
-                progress = progress,
-                durationSec = durationSec,
+                progressMs = progressMs,
+                durationMs = durationMs,
                 supportsCallback = supportsCallback,
                 isLoading = castVM.isLoading.value,
                 onPlay = { castVM.playCast() },

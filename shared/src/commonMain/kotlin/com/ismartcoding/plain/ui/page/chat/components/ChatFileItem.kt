@@ -18,7 +18,7 @@ import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.platform.audioPlayerProgress
 import com.ismartcoding.plain.platform.audioSeekTo
-import com.ismartcoding.plain.platform.getAudioDurationSecFromPath
+import com.ismartcoding.plain.platform.getAudioDurationMs
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadTask
@@ -68,19 +68,19 @@ fun ChatFileItem(
         }
     }
 
-    var progress by remember(item.id) { mutableFloatStateOf(0f) }
-    var durationSec by remember(item.id) { mutableFloatStateOf(item.durationSec.toFloat()) }
+    var progressMs by remember(item.id) { mutableFloatStateOf(0f) }
+    var durationMs by remember(item.id) { mutableFloatStateOf(item.durationSec * 1000f) }
     var isDraggingProgress by remember(item.id) { mutableStateOf(false) }
 
     LaunchedEffect(path, isAudio, isCurrentlyPlaying) {
-        if (isAudio && isCurrentlyPlaying && durationSec <= 0f) {
-            val loadedDurationSec = withIO {
+        if (isAudio && isCurrentlyPlaying && durationMs <= 0f) {
+            val loadedDurationMs = withIO {
                 runCatching {
-                    getAudioDurationSecFromPath(path).toFloat()
+                    getAudioDurationMs(path).toFloat()
                 }.getOrDefault(0f)
             }
-            if (loadedDurationSec > 0f) {
-                durationSec = loadedDurationSec
+            if (loadedDurationMs > 0f) {
+                durationMs = loadedDurationMs
             }
         }
     }
@@ -89,7 +89,7 @@ fun ChatFileItem(
         if (isCurrentlyPlaying) {
             while (isActive) {
                 if (!isDraggingProgress) {
-                    progress = audioPlayerProgress() / 1000f
+                    progressMs = audioPlayerProgress().toFloat()
                 }
                 delay(500)
             }
@@ -116,18 +116,18 @@ fun ChatFileItem(
 
         if (isCurrentlyPlaying) {
             ChatAudioInlineControls(
-                progress = progress,
-                durationSec = durationSec,
+                progressMs = progressMs,
+                durationMs = durationMs,
                 isPlaying = isPlaying,
                 onProgressChange = { newProgress ->
                     isDraggingProgress = true
-                    if (durationSec > 0f) {
-                        progress = newProgress * durationSec
+                    if (durationMs > 0f) {
+                        progressMs = newProgress * durationMs
                     }
                 },
                 onValueChangeFinished = { normalizedProgress ->
-                    if (durationSec > 0f) {
-                        audioSeekTo((normalizedProgress * durationSec * 1000).toLong())
+                    if (durationMs > 0f) {
+                        audioSeekTo((normalizedProgress * durationMs).toLong())
                     }
                     isDraggingProgress = false
                 },

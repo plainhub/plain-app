@@ -17,8 +17,8 @@ object CastPlayer {
     val isPlaying = MutableStateFlow(false)
 
     // 播放进度相关状态
-    val progress = MutableStateFlow(0f) // 当前播放位置（秒）
-    val durationSec = MutableStateFlow(0f) // 总时长（秒）
+    val progressMs = MutableStateFlow(0f) // 当前播放位置（毫秒）
+    val durationMs = MutableStateFlow(0f) // 总时长（毫秒）
     val supportsCallback = MutableStateFlow(false) // 是否支持回调
 
     // 是否有正在进行的投屏任务（设备已选且有内容在投）
@@ -46,8 +46,8 @@ object CastPlayer {
         _items.value = emptyList()
         _currentUri.value = ""
         isPlaying.value = false
-        progress.value = 0f
-        durationSec.value = 0f
+        progressMs.value = 0f
+        durationMs.value = 0f
         supportsCallback.value = false
     }
 
@@ -65,9 +65,9 @@ object CastPlayer {
     }
 
     /**
-     * 解析 UPnP 时间格式 (HH:MM:SS 或 HH:MM:SS.mmm) 到秒数
+     * 解析 UPnP 时间格式 (HH:MM:SS 或 HH:MM:SS.mmm) 到毫秒
      */
-    fun parseTimeToSeconds(timeString: String): Float {
+    fun parseTimeToMs(timeString: String): Float {
         if (timeString.isEmpty() || timeString == "NOT_IMPLEMENTED") return 0f
 
         return try {
@@ -75,8 +75,8 @@ object CastPlayer {
             if (parts.size >= 3) {
                 val hours = parts[0].toFloat()
                 val minutes = parts[1].toFloat()
-                val seconds = parts[2].split(".")[0].toFloat() // 忽略毫秒部分
-                hours * 3600 + minutes * 60 + seconds
+                val seconds = parts[2].split(".")[0].toFloat()
+                (hours * 3600 + minutes * 60 + seconds) * 1000
             } else {
                 0f
             }
@@ -86,7 +86,7 @@ object CastPlayer {
     }
 
     fun updatePositionInfo(relTime: String, trackDurationText: String) {
-        progress.value = parseTimeToSeconds(relTime)
-        durationSec.value = parseTimeToSeconds(trackDurationText)
+        progressMs.value = parseTimeToMs(relTime)
+        durationMs.value = parseTimeToMs(trackDurationText)
     }
 }

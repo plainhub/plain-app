@@ -23,14 +23,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.lib.extensions.formatDurationSec
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
 
 @Composable
 internal fun FileListItemPlayer(
-    isSelected: Boolean, isPlaying: Boolean, progress: Float, durationSec: Float,
+    isSelected: Boolean, isPlaying: Boolean, progress: Float, durationMs: Float,
     onProgressChange: (Float) -> Unit, onShowFullPlayer: () -> Unit,
     onSeekTo: (Long) -> Unit, onTogglePlay: () -> Unit,
 ) {
@@ -44,15 +44,15 @@ internal fun FileListItemPlayer(
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
                     PlayerSlider(
-                        progress = if (durationSec == 0f) 0f else progress / durationSec, bufferedProgress = 0f,
+                        progress = if (durationMs == 0f) 0f else progress / durationMs, bufferedProgress = 0f,
                         modifier = Modifier.fillMaxWidth().height(20.dp),
                         onProgressChange = onProgressChange,
-                        onValueChangeFinished = { normalizedProgress -> onSeekTo((normalizedProgress * durationSec * 1000).toLong()) },
+                        onValueChangeFinished = { normalizedProgress -> onSeekTo((normalizedProgress * durationMs).toLong()) },
                         colors = PlayerSliderDefaults.lightColors(),
                     )
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(text = progress.toLong().formatDurationSec(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(text = durationSec.toLong().formatDurationSec(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = progress.toLong().formatDurationMs(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = durationMs.toLong().formatDurationMs(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 HorizontalSpace(16.dp)

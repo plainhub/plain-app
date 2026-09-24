@@ -40,7 +40,7 @@ fun AudioPlayerBar(
     var title by remember { mutableStateOf("") }
     var artist by remember { mutableStateOf("") }
     var progress by remember { mutableFloatStateOf(0f) }
-    var durationSec by remember { mutableFloatStateOf(1f) }
+    var durationMs by remember { mutableFloatStateOf(1000f) }
     val isPlaying by audioIsPlayingFlow().collectAsState()
     var showQueue by remember { mutableStateOf(false) }
     val currentPlayingPath = audioQueueVM.selectedPath
@@ -51,7 +51,7 @@ fun AudioPlayerBar(
             if (path.isNotEmpty()) {
                 val audio = withIO { playlistAudioFromPath(path) }
                 title = audio.title; artist = audio.artist
-                durationSec = audio.durationMs / 1000f; progress = audioPlayerProgress() / 1000f
+                durationMs = audio.durationMs.toFloat(); progress = audioPlayerProgress().toFloat()
             }
             if (TempData.audioPlayerVisible.value) TempData.audioPlayerVisible.value = path.isNotEmpty()
         }
@@ -62,7 +62,7 @@ fun AudioPlayerBar(
         progressUpdateJob?.cancel()
         if (isPlaying) {
             progressUpdateJob = scope.launch {
-                while (isActive) { progress = audioPlayerProgress() / 1000f; delay(1000) }
+                while (isActive) { progress = audioPlayerProgress().toFloat(); delay(1000) }
             }
         }
     }
@@ -77,7 +77,7 @@ fun AudioPlayerBar(
             title = title,
             artist = artist,
             progress = progress,
-            durationSec = durationSec,
+            durationMs = durationMs,
             isPlaying = isPlaying,
             onClickContent = { TempData.audioPlayerVisible.value = true },
             onClickQueue = { showQueue = true },

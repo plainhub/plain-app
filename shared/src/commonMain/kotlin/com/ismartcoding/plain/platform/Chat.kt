@@ -88,7 +88,7 @@ suspend fun importPickedFiles(placeholders: List<Pair<DMessageFile, PickedFileIn
                     id = placeholder.id,
                     uri = fidUri,
                     size = placeholder.size,
-                    durationSec = getMediaDurationSec(realPath),
+                    durationSec = getMediaDurationMs(realPath) / 1000, // chat message wire stores seconds
                     width = intrinsicSize.width,
                     height = intrinsicSize.height,
                     summary = placeholder.summary,

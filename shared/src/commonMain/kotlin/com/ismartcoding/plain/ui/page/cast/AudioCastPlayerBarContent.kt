@@ -37,8 +37,8 @@ internal fun AudioCastPlayerBarContent(
     title: String,
     artist: String,
     isPlaying: Boolean,
-    progress: Float,
-    durationSec: Float,
+    progressMs: Float,
+    durationMs: Float,
     supportsCallback: Boolean,
     currentUri: String,
     deviceName: String,
@@ -49,7 +49,7 @@ internal fun AudioCastPlayerBarContent(
     Column(modifier = Modifier.fillMaxWidth()) {
         LinearProgressIndicator(
             progress = {
-                if (supportsCallback && durationSec > 0f) progress / durationSec else 0f
+                if (supportsCallback && durationMs > 0f) progressMs / durationMs else 0f
             },
             modifier = Modifier.fillMaxWidth().height(4.dp),
             color = MaterialTheme.colorScheme.primary,

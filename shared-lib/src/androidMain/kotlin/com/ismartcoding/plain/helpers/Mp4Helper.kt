@@ -40,42 +40,42 @@ object Mp4Helper {
     )
 
     /**
-     * Media duration in seconds for fMP4 files whose moov reports
+     * Media duration in milliseconds for fMP4 files whose moov reports
      * duration=0 (real duration lives in moof fragments), where
      * MediaMetadataRetriever fails. Two-tier strategy: MediaExtractor
      * (primary) + MP4 box parsing (fallback). The box parser matches the
      * video track, so audio-only fMP4 returns 0.
      */
-    fun getMp4DurationSec(path: String): Long {
+    fun getMp4DurationMs(path: String): Long {
         val file = File(path)
         if (!file.exists() || file.length() < 8) return 0L
 
-        val durationSecFromExtractor = getDurationSecViaExtractor(path)
-        if (durationSecFromExtractor > 0) return durationSecFromExtractor
+        val durationMsFromExtractor = getDurationMsViaExtractor(path)
+        if (durationMsFromExtractor > 0) return durationMsFromExtractor
 
-        val durationSecFromBoxes = getDurationSecFromMp4Boxes(path)
-        if (durationSecFromBoxes > 0) return durationSecFromBoxes
+        val durationMsFromBoxes = getDurationMsFromMp4Boxes(path)
+        if (durationMsFromBoxes > 0) return durationMsFromBoxes
 
         return 0L
     }
 
-    private fun getDurationSecViaExtractor(path: String): Long {
+    private fun getDurationMsViaExtractor(path: String): Long {
         val extractor = MediaExtractor()
         return try {
             extractor.setDataSource(path)
             if (extractor.trackCount == 0) return 0L
             val format = extractor.getTrackFormat(0)
             if (!format.containsKey(MediaFormat.KEY_DURATION)) return 0L
-            format.getLong(MediaFormat.KEY_DURATION) / 1_000_000L // microseconds → seconds
+            format.getLong(MediaFormat.KEY_DURATION) / 1_000L // microseconds → milliseconds
         } catch (e: Exception) {
-            LogCat.e("getDurationSecViaExtractor failed: ${e.message}")
+            LogCat.e("getDurationMsViaExtractor failed: ${e.message}")
             0L
         } finally {
             try { extractor.release() } catch (_: Exception) {}
         }
     }
 
-    private fun getDurationSecFromMp4Boxes(path: String): Long {
+    private fun getDurationMsFromMp4Boxes(path: String): Long {
         return try {
             RandomAccessFile(path, "r").use { raf ->
                 val fileLength = raf.length()
@@ -133,10 +133,10 @@ object Mp4Helper {
                     offset += boxSize
                 }
 
-                if (totalDurationTicks > 0) totalDurationTicks / timescale else 0L
+                if (totalDurationTicks > 0) totalDurationTicks * 1000 / timescale else 0L
             }
         } catch (e: Exception) {
-            LogCat.e("getDurationSecFromMp4Boxes failed: ${e.message}")
+            LogCat.e("getDurationMsFromMp4Boxes failed: ${e.message}")
             0L
         }
     }
@@ -911,7 +911,7 @@ object Mp4Helper {
     private val HEVC_SAMPLE_ENTRIES = setOf("hvc1", "hev1")
     // Waiting on a 10-minute transcode over HTTP is worse than downloading;
     // longer videos fall back to the "download to watch" hint in the web UI.
-    private const val MAX_TRANSCODE_DURATION_SECONDS = 600L
+    private const val MAX_TRANSCODE_DURATION_MS = 600_000L
 
     fun isHevc(path: String): Boolean = firstVideoSampleEntry(path) in HEVC_SAMPLE_ENTRIES
 
@@ -929,9 +929,9 @@ object Mp4Helper {
         val src = File(path)
         if (!src.exists() || src.length() == 0L) return null
         if (!isHevc(path)) return null
-        val durationSec = getMp4DurationSec(path)
-        if (durationSec > MAX_TRANSCODE_DURATION_SECONDS) {
-            LogCat.d("Mp4Helper: transcode skipped, duration ${durationSec}s > ${MAX_TRANSCODE_DURATION_SECONDS}s")
+        val durationMs = getMp4DurationMs(path)
+        if (durationMs > MAX_TRANSCODE_DURATION_MS) {
+            LogCat.d("Mp4Helper: transcode skipped, duration ${durationMs}ms > ${MAX_TRANSCODE_DURATION_MS}ms")
             return null
         }
 

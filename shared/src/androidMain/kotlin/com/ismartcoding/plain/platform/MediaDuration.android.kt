@@ -21,17 +21,17 @@ actual suspend fun processSingleDurationZero(
     item: MediaDurationZeroItem,
 ) {
     try {
-        val durationSec = Mp4Helper.getMp4DurationSec(item.path)
-        if (durationSec <= 0) return
+        val durationMs = Mp4Helper.getMp4DurationMs(item.path)
+        if (durationMs <= 0) return
         AppDatabase.instance.mediaItemDao().upsert(
             DMediaItem(
                 mediaType = mediaType,
                 mediaId = item.id,
-                durationMs = durationSec * 1000,
+                durationMs = durationMs,
             )
         )
-        TempData.mediaDurationMap["$mediaType:${item.id}"] = durationSec * 1000
-        LogCat.d("Cached duration for $mediaType ${item.id}: ${durationSec}s")
+        TempData.mediaDurationMap["$mediaType:${item.id}"] = durationMs
+        LogCat.d("Cached duration for $mediaType ${item.id}: ${durationMs}ms")
     } catch (e: Exception) {
         LogCat.e("Failed to cache duration for ${item.path}: ${e.message}")
     }

@@ -22,15 +22,15 @@ import androidx.compose.ui.draw.shadow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.lib.extensions.formatDurationSec
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
 
 @Composable
 fun ChatAudioInlineControls(
-    progress: Float,
-    durationSec: Float,
+    progressMs: Float,
+    durationMs: Float,
     isPlaying: Boolean,
     onProgressChange: (Float) -> Unit,
     onValueChangeFinished: (Float) -> Unit,
@@ -46,7 +46,7 @@ fun ChatAudioInlineControls(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             PlayerSlider(
-                progress = if (durationSec == 0f) 0f else progress / durationSec,
+                progress = if (durationMs == 0f) 0f else progressMs / durationMs,
                 bufferedProgress = 0f,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -61,12 +61,12 @@ fun ChatAudioInlineControls(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = progress.toLong().formatDurationSec(),
+                    text = progressMs.toLong().formatDurationMs(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = durationSec.toLong().formatDurationSec(),
+                    text = durationMs.toLong().formatDurationMs(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
