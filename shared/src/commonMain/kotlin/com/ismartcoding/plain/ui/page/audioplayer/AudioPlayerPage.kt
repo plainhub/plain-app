@@ -125,7 +125,7 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
     }
 
     val currentItem = pages.getOrNull(playingIndex) ?: pages.getOrNull(initialIndex)
-    val duration = currentItem?.durationMs?.toFloat()?.div(1000f) ?: 0f
+    val durationSec = currentItem?.durationMs?.toFloat()?.div(1000f) ?: 0f
 
     // Full-height sheet reaching the top of the screen; inset padding and
     // the drag corner animation are handled by PModalBottomSheet.
@@ -193,11 +193,11 @@ fun AudioPlayerPage(audioQueueVM: AudioQueueViewModel, onDismissRequest: () -> U
             AudioPlayerBottomControls(
                 visible = viewMode == PlayerView.COVER,
                 progress = progress,
-                duration = duration,
+                durationSec = durationSec,
                 isPlaying = isPlaying,
-                onScrub = { isDragging = true; progress = minOf(it, duration) },
+                onScrub = { isDragging = true; progress = minOf(it, durationSec) },
                 onScrubFinished = {
-                    if (duration > 0 && progress >= 0) audioSeekTo((progress * 1000).toLong())
+                    if (durationSec > 0 && progress >= 0) audioSeekTo((progress * 1000).toLong())
                     isDragging = false
                 },
                 playMode = playMode,

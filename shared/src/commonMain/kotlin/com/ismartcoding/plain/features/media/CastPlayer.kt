@@ -18,7 +18,7 @@ object CastPlayer {
 
     // 播放进度相关状态
     val progress = MutableStateFlow(0f) // 当前播放位置（秒）
-    val duration = MutableStateFlow(0f) // 总时长（秒）
+    val durationSec = MutableStateFlow(0f) // 总时长（秒）
     val supportsCallback = MutableStateFlow(false) // 是否支持回调
 
     // 是否有正在进行的投屏任务（设备已选且有内容在投）
@@ -47,7 +47,7 @@ object CastPlayer {
         _currentUri.value = ""
         isPlaying.value = false
         progress.value = 0f
-        duration.value = 0f
+        durationSec.value = 0f
         supportsCallback.value = false
     }
 
@@ -85,8 +85,8 @@ object CastPlayer {
         }
     }
 
-    fun updatePositionInfo(relTime: String, trackDuration: String) {
+    fun updatePositionInfo(relTime: String, trackDurationText: String) {
         progress.value = parseTimeToSeconds(relTime)
-        duration.value = parseTimeToSeconds(trackDuration)
+        durationSec.value = parseTimeToSeconds(trackDurationText)
     }
 }

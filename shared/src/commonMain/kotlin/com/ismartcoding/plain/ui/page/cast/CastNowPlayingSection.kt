@@ -55,7 +55,7 @@ fun CastNowPlayingSection(
     currentUri: String,
     isPlaying: Boolean,
     progress: Float,
-    duration: Float,
+    durationSec: Float,
     supportsCallback: Boolean,
     isLoading: Boolean,
     onPlay: () -> Unit,
@@ -150,7 +150,7 @@ fun CastNowPlayingSection(
         }
 
         if (canControl) {
-            if (supportsCallback && duration > 0f) {
+            if (supportsCallback && durationSec > 0f) {
                 VerticalSpace(16.dp)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -167,15 +167,15 @@ fun CastNowPlayingSection(
                     Box(modifier = Modifier.weight(1f).padding(horizontal = 4.dp)) {
                         PlayerSlider(
                             modifier = Modifier.fillMaxWidth().height(20.dp),
-                            progress = if (duration > 0f) (progress / duration).coerceIn(0f, 1f) else 0f,
+                            progress = if (durationSec > 0f) (progress / durationSec).coerceIn(0f, 1f) else 0f,
                             bufferedProgress = 0f,
-                            onProgressChange = { ratio -> onSeek(ratio * duration) },
+                            onProgressChange = { ratio -> onSeek(ratio * durationSec) },
                             colors = PlayerSliderDefaults.lightColors(),
                         )
                     }
                     Text(
                         modifier = Modifier.width(52.dp),
-                        text = duration.toLong().formatDurationSec(),
+                        text = durationSec.toLong().formatDurationSec(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,

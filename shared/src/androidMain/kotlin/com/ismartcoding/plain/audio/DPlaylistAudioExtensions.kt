@@ -32,7 +32,7 @@ fun DPlaylistAudio.toMediaItem(): MediaItem {
         .build()
 }
 
-fun DPlaylistAudio.fromPath(
+fun DPlaylistAudio.Companion.fromPath(
     context: Context,
     path: String,
 ): DPlaylistAudio {

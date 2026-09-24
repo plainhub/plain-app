@@ -56,7 +56,7 @@ public class ColorPickerController {
   internal var colorChangedTick = MutableStateFlow<ColorEnvelope?>(null)
   internal val debounceScope = MainScope()
   internal var debounceJob: Job? = null
-  internal var debounceDuration: Long = 0L
+  internal var debounceDurationMs: Long = 0L
 
   public fun setPaletteImageBitmap(imageBitmap: ImageBitmap) {
     val targetSize = canvasSize.value.takeIf { it.width != 0 && it.height != 0 }
@@ -77,7 +77,7 @@ public class ColorPickerController {
   public fun setWheelColor(color: Color) { wheelPaint.color = color; reviseTick.intValue++ }
   public fun setWheelAlpha(alpha: Float) { wheelPaint.alpha = alpha; reviseTick.intValue++ }
   public fun setEnabled(enabled: Boolean) { this.enabled.value = enabled }
-  public fun setDebounceDuration(duration: Long) { debounceDuration = duration }
+  public fun setDebounceDuration(durationMs: Long) { debounceDurationMs = durationMs }
 
   public fun selectByCoordinate(x: Float, y: Float, fromUser: Boolean) {
     enabled.value.takeIf { it } ?: return
@@ -100,7 +100,7 @@ public class ColorPickerController {
     val hsv = colorToHsv(pureSelectedColor.value)
     hsv[2] = brightness
     _selectedColor.value = hsvToColor(hsv[0], hsv[1], hsv[2], alpha.value)
-    if (fromUser && debounceDuration != 0L) notifyColorChangedWithDebounce(fromUser) else notifyColorChanged(fromUser)
+    if (fromUser && debounceDurationMs != 0L) notifyColorChangedWithDebounce(fromUser) else notifyColorChanged(fromUser)
   }
 
   internal fun releaseBitmap() {

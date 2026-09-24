@@ -33,7 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 fun AudioPlayerBottomControls(
     visible: Boolean,
     progress: Float,
-    duration: Float,
+    durationSec: Float,
     isPlaying: Boolean,
     onScrub: (Float) -> Unit,
     onScrubFinished: () -> Unit,
@@ -59,13 +59,13 @@ fun AudioPlayerBottomControls(
                     value = progress,
                     onValueChange = onScrub,
                     onValueChangeFinished = onScrubFinished,
-                    valueRange = 0f..maxOf(duration, 1f),
+                    valueRange = 0f..maxOf(durationSec, 1f),
                     modifier = Modifier.fillMaxWidth().height(32.dp),
                     isPlaying = isPlaying,
                 )
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(text = progress.toLong().formatDurationSec(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(text = duration.toLong().formatDurationSec(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(text = durationSec.toLong().formatDurationSec(), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))

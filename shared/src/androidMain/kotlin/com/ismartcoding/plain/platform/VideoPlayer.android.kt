@@ -309,7 +309,7 @@ class ExoPlayerVideoController(
             listener(
                 VideoPlayerEvent.StateChanged(
                     isPlaying = player.isPlaying,
-                    duration = player.duration.coerceAtLeast(0L),
+                    durationMs = player.duration.coerceAtLeast(0L),
                 ),
             )
             if (events.contains(Player.EVENT_POSITION_DISCONTINUITY)) {
@@ -371,8 +371,8 @@ class ExoPlayerVideoController(
         focusManager?.abandonFocus()
     }
 
-    override val duration: Long get() = exoPlayer.duration.coerceAtLeast(0L)
-    override val currentPosition: Long get() = exoPlayer.currentPosition.coerceAtLeast(0L)
+    override val durationMs: Long get() = exoPlayer.duration.coerceAtLeast(0L)
+    override val currentPositionMs: Long get() = exoPlayer.currentPosition.coerceAtLeast(0L)
     override val bufferedPercentage: Int get() = exoPlayer.bufferedPercentage
     override val isPlaying: Boolean get() = exoPlayer.isPlaying
     override val isBuffering: Boolean get() = exoPlayer.playbackState == ExoPlayer.STATE_BUFFERING

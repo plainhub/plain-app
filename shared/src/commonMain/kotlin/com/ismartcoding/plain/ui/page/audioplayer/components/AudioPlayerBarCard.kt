@@ -44,7 +44,7 @@ fun AudioPlayerBarCard(
     title: String,
     artist: String,
     progress: Float,
-    duration: Float,
+    durationSec: Float,
     isPlaying: Boolean,
     onClickContent: () -> Unit,
     onClickQueue: () -> Unit,
@@ -66,7 +66,7 @@ fun AudioPlayerBarCard(
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             LinearProgressIndicator(
-                progress = { if (duration == 0f) 0f else progress / duration },
+                progress = { if (durationSec == 0f) 0f else progress / durationSec },
                 modifier = Modifier.fillMaxWidth().height(4.dp),
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = containerColor

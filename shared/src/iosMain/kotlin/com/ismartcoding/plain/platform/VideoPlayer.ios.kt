@@ -108,10 +108,10 @@ private class AVPlayerVideoController : VideoPlayerController {
     override fun requestAudioFocus() {}
     override fun abandonAudioFocus() {}
 
-    override val duration: Long
+    override val durationMs: Long
         get() = player?.let { avPlayerTimeMs(it, "duration") } ?: 0L
 
-    override val currentPosition: Long
+    override val currentPositionMs: Long
         get() = player?.let { avPlayerTimeMs(it, "currentTime") } ?: 0L
 
     override val bufferedPercentage: Int get() = 0
@@ -136,7 +136,7 @@ private class AVPlayerVideoController : VideoPlayerController {
                     eventListener?.invoke(
                         VideoPlayerEvent.StateChanged(
                             isPlaying = playing,
-                            duration = duration,
+                            durationMs = durationMs,
                         ),
                     )
                 }

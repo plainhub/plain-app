@@ -52,8 +52,8 @@ fun DlnaReceiverVideoPlayerContent(onExit: () -> Unit) {
         controller.setEventListener { event ->
             when (event) {
                 is VideoPlayerEvent.StateChanged -> {
-                    if (event.duration > 0L) {
-                        state.totalTime = event.duration
+                    if (event.durationMs > 0L) {
+                        state.totalTime = event.durationMs
                     }
                     state.isPlaying = event.isPlaying
                     state.updateTime()

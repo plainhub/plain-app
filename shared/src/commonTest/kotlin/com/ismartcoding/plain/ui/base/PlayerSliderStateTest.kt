@@ -159,12 +159,12 @@ class PlayerSliderStateTest {
     @Test
     fun `custom seek hold duration is exposed for LaunchedEffect`() {
         val state = PlayerSliderState(initialProgress = 0f, seekHoldDurationMs = 2500L)
-        assertEquals(2500L, state.seekHoldDuration)
+        assertEquals(2500L, state.seekHoldDurationMs)
     }
 
     @Test
     fun `default seek hold duration is 1500ms`() {
         val state = PlayerSliderState(initialProgress = 0f)
-        assertEquals(1500L, state.seekHoldDuration)
+        assertEquals(1500L, state.seekHoldDurationMs)
     }
 }

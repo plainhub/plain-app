@@ -180,7 +180,7 @@ private object AVPlayerAudioPlayer : AudioPlayer {
             _isPlayingFlow.value = true
             startPolling()
             scope.launch {
-                AudioQueueManager.onPlaying(audio.path, audio.title, audio.artist, audio.duration)
+                AudioQueueManager.onPlaying(audio.path, audio.title, audio.artist, audio.durationMs)
             }
         } catch (e: Exception) {
             LogCat.e("playInternal: ${e.message}")

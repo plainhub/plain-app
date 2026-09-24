@@ -57,8 +57,8 @@ class PlainAccessibilityService : AccessibilityService() {
             ScreenMirrorControlAction.LONG_PRESS -> {
                 val x = normToX(control.x ?: return, screenWidth)
                 val y = normToY(control.y ?: return, screenHeight)
-                val duration = control.durationMs ?: 500L
-                dispatchLongPress(x, y, duration)
+                val durationMs = control.durationMs ?: 500L
+                dispatchLongPress(x, y, durationMs)
             }
 
             ScreenMirrorControlAction.SWIPE -> {
@@ -66,8 +66,8 @@ class PlainAccessibilityService : AccessibilityService() {
                 val startY = normToY(control.y ?: return, screenHeight)
                 val endX = normToX(control.endX ?: return, screenWidth)
                 val endY = normToY(control.endY ?: return, screenHeight)
-                val duration = control.durationMs ?: 300L
-                dispatchSwipe(startX, startY, endX, endY, duration)
+                val durationMs = control.durationMs ?: 300L
+                dispatchSwipe(startX, startY, endX, endY, durationMs)
             }
 
             ScreenMirrorControlAction.SCROLL -> {
@@ -132,19 +132,19 @@ class PlainAccessibilityService : AccessibilityService() {
         dispatchGesture(gesture, null, null)
     }
 
-    private fun dispatchLongPress(x: Float, y: Float, duration: Long) {
+    private fun dispatchLongPress(x: Float, y: Float, durationMs: Long) {
         val path = Path()
         path.moveTo(x, y)
-        val stroke = GestureDescription.StrokeDescription(path, 0, duration.coerceAtLeast(500))
+        val stroke = GestureDescription.StrokeDescription(path, 0, durationMs.coerceAtLeast(500))
         val gesture = GestureDescription.Builder().addStroke(stroke).build()
         dispatchGesture(gesture, null, null)
     }
 
-    private fun dispatchSwipe(startX: Float, startY: Float, endX: Float, endY: Float, duration: Long) {
+    private fun dispatchSwipe(startX: Float, startY: Float, endX: Float, endY: Float, durationMs: Long) {
         val path = Path()
         path.moveTo(startX, startY)
         path.lineTo(endX, endY)
-        val stroke = GestureDescription.StrokeDescription(path, 0, duration.coerceAtLeast(50))
+        val stroke = GestureDescription.StrokeDescription(path, 0, durationMs.coerceAtLeast(50))
         val gesture = GestureDescription.Builder().addStroke(stroke).build()
         dispatchGesture(gesture, null, null)
     }
@@ -158,9 +158,9 @@ class PlainAccessibilityService : AccessibilityService() {
             val p = points.first()
             val x = normToX(p.x, screenWidth)
             val y = normToY(p.y, screenHeight)
-            val duration = p.tMs.coerceAtLeast(0).toLong()
-            if (duration >= 500L) {
-                dispatchLongPress(x, y, duration)
+            val durationMs = p.tMs.coerceAtLeast(0).toLong()
+            if (durationMs >= 500L) {
+                dispatchLongPress(x, y, durationMs)
             } else {
                 dispatchTap(x, y)
             }
@@ -170,7 +170,7 @@ class PlainAccessibilityService : AccessibilityService() {
         val sorted = points.sortedBy { it.tMs }
         val first = sorted.first()
         val last = sorted.last()
-        val totalDuration = (last.tMs - first.tMs).coerceAtLeast(16).toLong()
+        val totalDurationMs = (last.tMs - first.tMs).coerceAtLeast(16).toLong()
 
         val fx = normToX(first.x, screenWidth)
         val fy = normToY(first.y, screenHeight)
@@ -181,8 +181,8 @@ class PlainAccessibilityService : AccessibilityService() {
         val totalDistance = kotlin.math.sqrt(dx * dx + dy * dy)
 
         if (totalDistance < 4f) {
-            if (totalDuration >= 500L) {
-                dispatchLongPress(fx, fy, totalDuration)
+            if (totalDurationMs >= 500L) {
+                dispatchLongPress(fx, fy, totalDurationMs)
             } else {
                 dispatchTap(fx, fy)
             }
@@ -195,16 +195,16 @@ class PlainAccessibilityService : AccessibilityService() {
             val pt = sorted[i]
             path.lineTo(normToX(pt.x, screenWidth), normToY(pt.y, screenHeight))
         }
-        dispatchPathGesture(path, totalDuration, false, null)
+        dispatchPathGesture(path, totalDurationMs, false, null)
     }
 
     private fun dispatchPathGesture(
         path: Path,
-        duration: Long,
+        durationMs: Long,
         willContinue: Boolean,
         callback: GestureResultCallback?,
     ) {
-        val d = duration.coerceAtLeast(16)
+        val d = durationMs.coerceAtLeast(16)
         val stroke = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             GestureDescription.StrokeDescription(path, 0, d, willContinue)
         } else {

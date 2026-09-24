@@ -186,7 +186,7 @@ fun QuickNoteCard(
                                         ToastManager.showToast(
                                             savedText,
                                             type = ToastType.SUCCESS,
-                                            duration = 4000L,
+                                            durationMs = 4000L,
                                             actionLabel = undoText,
                                         ) {
                                             coIO { NoteHelper.trashAsync(setOf(id)) }

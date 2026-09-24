@@ -17,9 +17,9 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import kotlin.reflect.KClass
 
-private const val PUSH_DURATION = 300
-private const val PUSH_FADE_DURATION = 150
-private const val PRESENT_DURATION = 300
+private const val PUSH_DURATION_MS = 300
+private const val PUSH_FADE_DURATION_MS = 150
+private const val PRESENT_DURATION_MS = 300
 
 /**
  * 以模态方式呈现的路由集合：这些页面从底部垂直升起/落下，其余页面左右水平推入/推出。
@@ -56,31 +56,31 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.dismissing() = ini
 /** 进入：模态页面从底部升起（渐显），普通页面从右侧推入 */
 fun AnimatedContentTransitionScope<NavBackStackEntry>.navEnterTransition(): EnterTransition =
     if (presenting()) {
-        slideInVertically(tween(PRESENT_DURATION, easing = LinearOutSlowInEasing)) { it } +
-            fadeIn(tween(PRESENT_DURATION, easing = LinearOutSlowInEasing))
+        slideInVertically(tween(PRESENT_DURATION_MS, easing = LinearOutSlowInEasing)) { it } +
+            fadeIn(tween(PRESENT_DURATION_MS, easing = LinearOutSlowInEasing))
     } else {
-        slideInHorizontally(tween(PUSH_DURATION, easing = LinearOutSlowInEasing)) { it } +
-            fadeIn(tween(PUSH_FADE_DURATION, 50, easing = LinearOutSlowInEasing))
+        slideInHorizontally(tween(PUSH_DURATION_MS, easing = LinearOutSlowInEasing)) { it } +
+            fadeIn(tween(PUSH_FADE_DURATION_MS, 50, easing = LinearOutSlowInEasing))
     }
 
 /** 退出：被模态页面覆盖时保持静止，否则视差滑向左侧 */
 fun AnimatedContentTransitionScope<NavBackStackEntry>.navExitTransition(): ExitTransition =
     if (presenting()) ExitTransition.None
-    else slideOutHorizontally(tween(PUSH_DURATION, easing = FastOutLinearInEasing)) { -it / 3 } +
-        fadeOut(tween(PUSH_FADE_DURATION, easing = FastOutLinearInEasing))
+    else slideOutHorizontally(tween(PUSH_DURATION_MS, easing = FastOutLinearInEasing)) { -it / 3 } +
+        fadeOut(tween(PUSH_FADE_DURATION_MS, easing = FastOutLinearInEasing))
 
 /** pop 后重新进入：模态页面落下时下方保持静止，否则视差滑回原位 */
 fun AnimatedContentTransitionScope<NavBackStackEntry>.navPopEnterTransition(): EnterTransition =
     if (dismissing()) EnterTransition.None
-    else slideInHorizontally(tween(PUSH_DURATION, easing = LinearOutSlowInEasing)) { -it / 3 } +
-        fadeIn(tween(PUSH_FADE_DURATION, 50, easing = LinearOutSlowInEasing))
+    else slideInHorizontally(tween(PUSH_DURATION_MS, easing = LinearOutSlowInEasing)) { -it / 3 } +
+        fadeIn(tween(PUSH_FADE_DURATION_MS, 50, easing = LinearOutSlowInEasing))
 
 /** pop 退出：模态页面向底部落下（渐隐），普通页面滑向右侧 */
 fun AnimatedContentTransitionScope<NavBackStackEntry>.navPopExitTransition(): ExitTransition =
     if (dismissing()) {
-        slideOutVertically(tween(PRESENT_DURATION, easing = FastOutLinearInEasing)) { it } +
-            fadeOut(tween(PRESENT_DURATION, easing = FastOutLinearInEasing))
+        slideOutVertically(tween(PRESENT_DURATION_MS, easing = FastOutLinearInEasing)) { it } +
+            fadeOut(tween(PRESENT_DURATION_MS, easing = FastOutLinearInEasing))
     } else {
-        slideOutHorizontally(tween(PUSH_DURATION, easing = FastOutLinearInEasing)) { it } +
-            fadeOut(tween(PUSH_FADE_DURATION, easing = FastOutLinearInEasing))
+        slideOutHorizontally(tween(PUSH_DURATION_MS, easing = FastOutLinearInEasing)) { it } +
+            fadeOut(tween(PUSH_FADE_DURATION_MS, easing = FastOutLinearInEasing))
     }

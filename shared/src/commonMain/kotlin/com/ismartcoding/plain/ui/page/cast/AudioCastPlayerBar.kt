@@ -41,7 +41,7 @@ fun AudioCastPlayerBar(
     var showCastPlaylist by remember { mutableStateOf(false) }
     val isPlaying by CastPlayer.isPlaying.collectAsState()
     val progress by CastPlayer.progress.collectAsState()
-    val duration by CastPlayer.duration.collectAsState()
+    val durationSec by CastPlayer.durationSec.collectAsState()
     val supportsCallback by CastPlayer.supportsCallback.collectAsState()
     val currentUri by CastPlayer.currentUri.collectAsState()
 
@@ -75,7 +75,7 @@ fun AudioCastPlayerBar(
         ) {
             AudioCastPlayerBarContent(
                 title = title, artist = artist,
-                isPlaying = isPlaying, progress = progress, duration = duration,
+                isPlaying = isPlaying, progress = progress, durationSec = durationSec,
                 supportsCallback = supportsCallback, currentUri = currentUri,
                 deviceName = castVM.currentDeviceName,
                 onPlay = { castVM.playCast() },

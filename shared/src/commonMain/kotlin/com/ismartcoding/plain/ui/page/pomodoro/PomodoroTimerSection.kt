@@ -54,8 +54,8 @@ internal fun PomodoroTimerSection(
                         val angle = atan2(dragVector.y, dragVector.x)
                         var normalizedAngle = (angle + PI / 2) / (2 * PI)
                         if (normalizedAngle < 0) normalizedAngle += 1
-                        val totalDuration = pomodoroVM.getTotalSeconds()
-                        pomodoroVM.timeLeft.intValue = (totalDuration * (1 - normalizedAngle)).toInt().coerceIn(0, totalDuration)
+                        val totalDurationSec = pomodoroVM.getTotalSeconds()
+                        pomodoroVM.timeLeft.intValue = (totalDurationSec * (1 - normalizedAngle)).toInt().coerceIn(0, totalDurationSec)
                         pomodoroVM.adjustJob.value?.cancel()
                         pomodoroVM.adjustJob.value = coIO {
                             delay(500)
@@ -68,8 +68,8 @@ internal fun PomodoroTimerSection(
             },
         contentAlignment = Alignment.Center
     ) {
-        val totalDuration = pomodoroVM.getTotalSeconds()
-        val progress = if (totalDuration > 0) 1f - (pomodoroVM.timeLeft.intValue.toFloat() / totalDuration.toFloat()) else 0f
+        val totalDurationSec = pomodoroVM.getTotalSeconds()
+        val progress = if (totalDurationSec > 0) 1f - (pomodoroVM.timeLeft.intValue.toFloat() / totalDurationSec.toFloat()) else 0f
         CircularTimer(progress = progress)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(

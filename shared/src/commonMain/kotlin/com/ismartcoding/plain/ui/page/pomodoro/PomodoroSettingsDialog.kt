@@ -31,9 +31,9 @@ fun PomodoroSettingsDialog(
     settings: DPomodoroSettings, onSettingsChange: (DPomodoroSettings) -> Unit, onDismiss: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    var workDuration by remember { mutableStateOf(settings.workDuration.toString()) }
-    var shortBreakDuration by remember { mutableStateOf(settings.shortBreakDuration.toString()) }
-    var longBreakDuration by remember { mutableStateOf(settings.longBreakDuration.toString()) }
+    var workDurationMin by remember { mutableStateOf(settings.workDurationMin.toString()) }
+    var shortBreakDurationMin by remember { mutableStateOf(settings.shortBreakDurationMin.toString()) }
+    var longBreakDurationMin by remember { mutableStateOf(settings.longBreakDurationMin.toString()) }
     var pomodorosBeforeLongBreak by remember { mutableStateOf(settings.pomodorosBeforeLongBreak.toString()) }
     var showNotification by remember { mutableStateOf(settings.showNotification) }
     var playSoundOnComplete by remember { mutableStateOf(settings.playSoundOnComplete) }
@@ -63,13 +63,13 @@ fun PomodoroSettingsDialog(
         text = {
             LazyColumn {
                 item {
-                    OutlinedTextField(value = workDuration, onValueChange = { workDuration = it },
+                    OutlinedTextField(value = workDurationMin, onValueChange = { workDurationMin = it },
                         label = { Text(stringResource(Res.string.work_duration)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 8.dp)
-                    OutlinedTextField(value = shortBreakDuration, onValueChange = { shortBreakDuration = it },
+                    OutlinedTextField(value = shortBreakDurationMin, onValueChange = { shortBreakDurationMin = it },
                         label = { Text(stringResource(Res.string.short_break_duration)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 8.dp)
-                    OutlinedTextField(value = longBreakDuration, onValueChange = { longBreakDuration = it },
+                    OutlinedTextField(value = longBreakDurationMin, onValueChange = { longBreakDurationMin = it },
                         label = { Text(stringResource(Res.string.long_break_duration)) }, modifier = Modifier.fillMaxWidth())
                     VerticalSpace(dp = 8.dp)
                 }
@@ -100,8 +100,8 @@ fun PomodoroSettingsDialog(
                 buttonSize = ButtonSize.MEDIUM,
                 onClick = {
                     onSettingsChange(DPomodoroSettings(
-                        workDuration = workDuration.toIntOrNull() ?: 25, shortBreakDuration = shortBreakDuration.toIntOrNull() ?: 5,
-                        longBreakDuration = longBreakDuration.toIntOrNull() ?: 15, pomodorosBeforeLongBreak = pomodorosBeforeLongBreak.toIntOrNull() ?: 4,
+                        workDurationMin = workDurationMin.toIntOrNull() ?: 25, shortBreakDurationMin = shortBreakDurationMin.toIntOrNull() ?: 5,
+                        longBreakDurationMin = longBreakDurationMin.toIntOrNull() ?: 15, pomodorosBeforeLongBreak = pomodorosBeforeLongBreak.toIntOrNull() ?: 4,
                         showNotification = showNotification, playSoundOnComplete = playSoundOnComplete,
                         soundPath = soundPath, originalSoundName = originalFileName,
                     ))

@@ -57,12 +57,12 @@ actual suspend fun getAudioLyrics(path: String): String = withIO {
 actual fun playlistAudioFromPath(path: String): DPlaylistAudio {
     val fallbackTitle = path.getFilenameWithoutExtensionFromPath()
     val (title, artist) = tryExtractMetadata(path) ?: (fallbackTitle to "")
-    val duration = tryExtractDurationMs(path)
+    val durationMs = tryExtractDurationMs(path)
     return DPlaylistAudio(
         title = title.ifEmpty { fallbackTitle },
         path = path,
         artist = artist,
-        duration = duration,
+        durationMs = durationMs,
     )
 }
 

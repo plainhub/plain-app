@@ -63,7 +63,7 @@ fun MainEventCollector(
                 is ToastEvent -> {
                     onToast(event)
                     dismissToastJob?.cancel()
-                    dismissToastJob = coIO { delay(event.duration); clearToast() }
+                    dismissToastJob = coIO { delay(event.durationMs); clearToast() }
                 }
 
                 is AudioActionEvent -> {

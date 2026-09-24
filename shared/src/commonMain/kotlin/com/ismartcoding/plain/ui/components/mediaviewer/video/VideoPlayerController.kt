@@ -28,8 +28,8 @@ interface VideoPlayerController {
         seekTo(0L)
     }
 
-    val duration: Long
-    val currentPosition: Long
+    val durationMs: Long
+    val currentPositionMs: Long
     val bufferedPercentage: Int
     val isPlaying: Boolean
     val isBuffering: Boolean

@@ -11,7 +11,7 @@ data class DCall(
     var name: String,
     var photoUri: String,
     var startedAt: Instant,
-    var duration: Int,
+    var durationSec: Int,
     var type: Int,
     val accountId: String,
 ) : IData

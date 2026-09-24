@@ -46,20 +46,20 @@ object Mp4Helper {
      * (primary) + MP4 box parsing (fallback). The box parser matches the
      * video track, so audio-only fMP4 returns 0.
      */
-    fun getMp4Duration(path: String): Long {
+    fun getMp4DurationSec(path: String): Long {
         val file = File(path)
         if (!file.exists() || file.length() < 8) return 0L
 
-        val durationFromExtractor = getDurationViaExtractor(path)
-        if (durationFromExtractor > 0) return durationFromExtractor
+        val durationSecFromExtractor = getDurationSecViaExtractor(path)
+        if (durationSecFromExtractor > 0) return durationSecFromExtractor
 
-        val durationFromBoxes = getDurationFromMp4Boxes(path)
-        if (durationFromBoxes > 0) return durationFromBoxes
+        val durationSecFromBoxes = getDurationSecFromMp4Boxes(path)
+        if (durationSecFromBoxes > 0) return durationSecFromBoxes
 
         return 0L
     }
 
-    private fun getDurationViaExtractor(path: String): Long {
+    private fun getDurationSecViaExtractor(path: String): Long {
         val extractor = MediaExtractor()
         return try {
             extractor.setDataSource(path)
@@ -68,14 +68,14 @@ object Mp4Helper {
             if (!format.containsKey(MediaFormat.KEY_DURATION)) return 0L
             format.getLong(MediaFormat.KEY_DURATION) / 1_000_000L // microseconds → seconds
         } catch (e: Exception) {
-            LogCat.e("getDurationViaExtractor failed: ${e.message}")
+            LogCat.e("getDurationSecViaExtractor failed: ${e.message}")
             0L
         } finally {
             try { extractor.release() } catch (_: Exception) {}
         }
     }
 
-    private fun getDurationFromMp4Boxes(path: String): Long {
+    private fun getDurationSecFromMp4Boxes(path: String): Long {
         return try {
             RandomAccessFile(path, "r").use { raf ->
                 val fileLength = raf.length()
@@ -119,7 +119,7 @@ object Mp4Helper {
 
                 // Phase 2: sum trun sample durations across all moof fragments that
                 // belong to the video track (matched via tfhd.track_ID).
-                var totalDuration = 0L
+                var totalDurationTicks = 0L
                 offset = 0L
                 while (offset in 0..<fileLength) {
                     raf.seek(offset)
@@ -128,15 +128,15 @@ object Mp4Helper {
                     val boxType = readBoxType(raf)
 
                     if (boxType == "moof") {
-                        totalDuration += parseMoofForVideoDuration(raf, offset, boxSize, videoTrackId)
+                        totalDurationTicks += parseMoofForVideoDurationTicks(raf, offset, boxSize, videoTrackId)
                     }
                     offset += boxSize
                 }
 
-                if (totalDuration > 0) totalDuration / timescale else 0L
+                if (totalDurationTicks > 0) totalDurationTicks / timescale else 0L
             }
         } catch (e: Exception) {
-            LogCat.e("getDurationFromMp4Boxes failed: ${e.message}")
+            LogCat.e("getDurationSecFromMp4Boxes failed: ${e.message}")
             0L
         }
     }
@@ -223,8 +223,8 @@ object Mp4Helper {
         return MdiaInfo(isVideo, timescale)
     }
 
-    /** Parse a moof box: sum trun durations for the traf whose tfhd matches [videoTrackId]. */
-    private fun parseMoofForVideoDuration(
+    /** Parse a moof box: sum trun durations (track-timescale ticks) for the traf whose tfhd matches [videoTrackId]. */
+    private fun parseMoofForVideoDurationTicks(
         raf: RandomAccessFile,
         moofOffset: Long,
         moofSize: Long,
@@ -232,7 +232,7 @@ object Mp4Helper {
     ): Long {
         val moofEnd = moofOffset + moofSize
         var offset = moofOffset + 8
-        var totalDuration = 0L
+        var totalDurationTicks = 0L
 
         while (offset < moofEnd) {
             raf.seek(offset)
@@ -242,11 +242,11 @@ object Mp4Helper {
 
             if (subType == "traf") {
                 val trafInfo = parseTrafForVideoTrun(raf, offset, subSize, videoTrackId)
-                totalDuration += trafInfo
+                totalDurationTicks += trafInfo
             }
             offset += subSize
         }
-        return totalDuration
+        return totalDurationTicks
     }
 
     /** Parse traf: read tfhd to get track_ID and defaultSampleDuration, and if
@@ -263,8 +263,8 @@ object Mp4Helper {
         val trafEnd = trafOffset + trafSize
         var offset = trafOffset + 8
         var trafTrackId = -1
-        var defaultSampleDuration = 0L
-        var trunDuration = 0L
+        var defaultSampleDurationTicks = 0L
+        var trunDurationTicks = 0L
         var foundTrun = false
 
         // First pass: find tfhd to get track_ID and defaultSampleDuration
@@ -283,7 +283,7 @@ object Mp4Helper {
                 trafTrackId = raf.readInt()
                 // defaultSampleDurationPresent (flag 0x08) → 4 bytes
                 if ((flags and 0x08) != 0) {
-                    defaultSampleDuration = raf.readInt().toLong() and 0xFFFFFFFFL
+                    defaultSampleDurationTicks = raf.readInt().toLong() and 0xFFFFFFFFL
                 }
                 break
             }
@@ -302,22 +302,22 @@ object Mp4Helper {
             val subType = readBoxType(raf)
 
             if (subType == "trun") {
-                trunDuration += parseTrunDuration(raf, offset, subSize, defaultSampleDuration)
+                trunDurationTicks += parseTrunDurationTicks(raf, offset, subSize, defaultSampleDurationTicks)
                 foundTrun = true
             }
             offset += subSize
         }
-        return if (foundTrun) trunDuration else 0L
+        return if (foundTrun) trunDurationTicks else 0L
     }
 
     /** Parse a trun box and return the sum of per-sample durations (in timescale
      *  units). When sampleDurationPresent is false, each sample uses
      *  [defaultSampleDuration] from tfhd. */
-    private fun parseTrunDuration(
+    private fun parseTrunDurationTicks(
         raf: RandomAccessFile,
         trunOffset: Long,
         trunSize: Long,
-        defaultSampleDuration: Long,
+        defaultSampleDurationTicks: Long,
     ): Long {
         raf.seek(trunOffset + 8)
         val version = raf.readByte().toInt()
@@ -340,20 +340,20 @@ object Mp4Helper {
         // first_sample_flags (optional) — read BEFORE the samples array
         if (firstSampleFlagsPresent) raf.skipBytes(4)
 
-        var totalDuration = 0L
+        var totalDurationTicks = 0L
         var remaining = sampleCount
         while (remaining > 0) {
             if (sampleDurationPresent) {
-                totalDuration += raf.readInt().toLong() and 0xFFFFFFFFL
+                totalDurationTicks += raf.readInt().toLong() and 0xFFFFFFFFL
             } else {
-                totalDuration += defaultSampleDuration
+                totalDurationTicks += defaultSampleDurationTicks
             }
             if (sampleSizePresent) raf.skipBytes(4)
             if (sampleFlagsPresent) raf.skipBytes(4)
             if (sampleCompositionOffsetsPresent) raf.skipBytes(4)
             remaining--
         }
-        return totalDuration
+        return totalDurationTicks
     }
 
     private fun readBoxSize(raf: RandomAccessFile): Long {
@@ -929,9 +929,9 @@ object Mp4Helper {
         val src = File(path)
         if (!src.exists() || src.length() == 0L) return null
         if (!isHevc(path)) return null
-        val duration = getMp4Duration(path)
-        if (duration > MAX_TRANSCODE_DURATION_SECONDS) {
-            LogCat.d("Mp4Helper: transcode skipped, duration ${duration}s > ${MAX_TRANSCODE_DURATION_SECONDS}s")
+        val durationSec = getMp4DurationSec(path)
+        if (durationSec > MAX_TRANSCODE_DURATION_SECONDS) {
+            LogCat.d("Mp4Helper: transcode skipped, duration ${durationSec}s > ${MAX_TRANSCODE_DURATION_SECONDS}s")
             return null
         }
 

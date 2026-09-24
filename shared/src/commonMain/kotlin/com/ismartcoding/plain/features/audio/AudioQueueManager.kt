@@ -257,7 +257,7 @@ object AudioQueueManager {
     }
 
     /** Record that [path] started playing (manual jumps included). */
-    suspend fun onPlaying(path: String, title: String, artist: String, duration: Long) {
+    suspend fun onPlaying(path: String, title: String, artist: String, durationMs: Long) {
         if (path.isEmpty()) return
         val src = source()
         // A manual jump breaks the cached library position; mark it unknown and
@@ -266,7 +266,7 @@ object AudioQueueManager {
         if (src.currentPath != path || newIndex != src.currentIndex) {
             saveSource(src.copy(currentPath = path, currentIndex = newIndex))
         }
-        AudioPlayHistoryManager.recordHistory(path, title, artist, duration)
+        AudioPlayHistoryManager.recordHistory(path, title, artist, durationMs)
     }
 
     // ---------- playback order ----------

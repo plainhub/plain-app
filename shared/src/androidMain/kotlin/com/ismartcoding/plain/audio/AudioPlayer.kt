@@ -68,12 +68,12 @@ object AudioPlayer {
                 return TempData.audioPlayPosition
             }
 
-            val currentPosition = currentPlayer.currentPosition
+            val currentPositionMs = currentPlayer.currentPosition
             // Keep UI stable right after seek when player may briefly report 0.
-            if (currentPosition == 0L && TempData.audioPlayPosition > 0L) {
+            if (currentPositionMs == 0L && TempData.audioPlayPosition > 0L) {
                 return TempData.audioPlayPosition
             }
-            return currentPosition
+            return currentPositionMs
         }
 
     fun ensurePlayer(context: Context, callback: suspend () -> Unit = {}) {

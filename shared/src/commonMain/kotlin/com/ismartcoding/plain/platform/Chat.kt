@@ -88,7 +88,7 @@ suspend fun importPickedFiles(placeholders: List<Pair<DMessageFile, PickedFileIn
                     id = placeholder.id,
                     uri = fidUri,
                     size = placeholder.size,
-                    duration = getMediaDurationSec(realPath),
+                    durationSec = getMediaDurationSec(realPath),
                     width = intrinsicSize.width,
                     height = intrinsicSize.height,
                     summary = placeholder.summary,

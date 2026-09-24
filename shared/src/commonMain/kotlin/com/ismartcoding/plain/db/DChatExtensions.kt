@@ -21,7 +21,7 @@ fun DChat.getMessagePreview(): String {
         MessageType.IMAGES -> {
             val imagesMessage = content.value as? DMessageImages
             val items = imagesMessage?.items ?: emptyList()
-            val videoCount = items.count { it.duration > 0 }
+            val videoCount = items.count { it.durationSec > 0 }
             val imageCount = items.size - videoCount
             when {
                 imageCount > 0 && videoCount > 0 -> {

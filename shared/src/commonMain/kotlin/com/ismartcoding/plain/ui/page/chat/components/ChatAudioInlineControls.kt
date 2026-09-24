@@ -30,7 +30,7 @@ import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
 @Composable
 fun ChatAudioInlineControls(
     progress: Float,
-    duration: Float,
+    durationSec: Float,
     isPlaying: Boolean,
     onProgressChange: (Float) -> Unit,
     onValueChangeFinished: (Float) -> Unit,
@@ -46,7 +46,7 @@ fun ChatAudioInlineControls(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             PlayerSlider(
-                progress = if (duration == 0f) 0f else progress / duration,
+                progress = if (durationSec == 0f) 0f else progress / durationSec,
                 bufferedProgress = 0f,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -66,7 +66,7 @@ fun ChatAudioInlineControls(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = duration.toLong().formatDurationSec(),
+                    text = durationSec.toLong().formatDurationSec(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

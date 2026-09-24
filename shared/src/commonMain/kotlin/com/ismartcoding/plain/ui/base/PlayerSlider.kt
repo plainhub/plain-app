@@ -79,7 +79,7 @@ object PlayerSliderDefaults {
  */
 class PlayerSliderState(
     initialProgress: Float = 0f,
-    private val seekHoldDurationMs: Long = DEFAULT_SEEK_HOLD_MS,
+    val seekHoldDurationMs: Long = DEFAULT_SEEK_HOLD_MS,
 ) {
     var isDragging by mutableStateOf(false)
         private set
@@ -140,9 +140,6 @@ class PlayerSliderState(
     val displayProgress: Float
         get() = dragPosition
 
-    val seekHoldDuration: Long
-        get() = seekHoldDurationMs
-
     private companion object {
         const val DEFAULT_SEEK_HOLD_MS = 1500L
     }
@@ -193,7 +190,7 @@ private fun PlayerSliderImpl(
     // release so the slider re-syncs to the parent's actual progress.
     LaunchedEffect(state.seekHoldActive) {
         if (state.seekHoldActive) {
-            delay(state.seekHoldDuration)
+            delay(state.seekHoldDurationMs)
             state.expireSeekHold()
         }
     }

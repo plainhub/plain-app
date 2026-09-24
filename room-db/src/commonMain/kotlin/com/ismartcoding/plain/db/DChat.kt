@@ -13,6 +13,7 @@ import com.ismartcoding.plain.enums.ChatStatus
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.lib.generateId
 import kotlin.time.Instant
+import kotlinx.serialization.json.JsonNames
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
@@ -58,7 +59,9 @@ data class DMessageFile(
     override var id: String = generateId(),
     val uri: String,
     val size: Long,
-    val duration: Long = 0,
+    /** Audio/video duration in seconds; "duration" is the legacy wire key. */
+    @JsonNames("duration")
+    val durationSec: Long = 0,
     val width: Int = 0,
     val height: Int = 0,
     val summary: String = "",

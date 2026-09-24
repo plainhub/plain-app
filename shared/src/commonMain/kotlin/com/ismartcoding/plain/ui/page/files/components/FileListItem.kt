@@ -76,14 +76,14 @@ fun FileListItem(
     val isCurrentlyPlaying = audioQueueVM.selectedPath.value == file.path && isAudio
     val isPlaying by audioIsPlayingFlow().collectAsState()
     var progress by remember { mutableFloatStateOf(0f) }
-    var duration by remember { mutableFloatStateOf(0f) }
+    var durationSec by remember { mutableFloatStateOf(0f) }
     var showAudioPlayer by remember { mutableStateOf(false) }
 
     LaunchedEffect(isCurrentlyPlaying) {
         if (isCurrentlyPlaying && isAudio) {
             scope.launch { withIO {
                 val audio = playlistAudioFromPath(file.path)
-                duration = audio.durationMs / 1000f
+                durationSec = audio.durationMs / 1000f
             } }
         }
     }
@@ -125,8 +125,8 @@ fun FileListItem(
         }
 
         if (isCurrentlyPlaying) {
-            FileListItemPlayer(isSelected = isSelected, isPlaying = isPlaying, progress = progress, duration = duration,
-                onProgressChange = { newProgress -> progress = newProgress * duration },
+            FileListItemPlayer(isSelected = isSelected, isPlaying = isPlaying, progress = progress, durationSec = durationSec,
+                onProgressChange = { newProgress -> progress = newProgress * durationSec },
                 onShowFullPlayer = { showAudioPlayer = true },
                 onSeekTo = { audioSeekTo(it) },
                 onTogglePlay = { if (isPlaying) audioPause() else audioPlay() })

@@ -19,7 +19,7 @@ fun ChatFileInfo(
     modifier: Modifier = Modifier,
     fileName: String,
     size: Long,
-    duration: Long,
+    durationSec: Long,
     summary: String,
     isCurrentlyPlaying: Boolean,
 ) {
@@ -37,7 +37,7 @@ fun ChatFileInfo(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(end = 8.dp),
-            text = size.formatBytes() + if (duration > 0) " / ${duration.formatDurationSec()}" else "",
+            text = size.formatBytes() + if (durationSec > 0) " / ${durationSec.formatDurationSec()}" else "",
             style = MaterialTheme.typography.listItemSubtitle(),
         )
 

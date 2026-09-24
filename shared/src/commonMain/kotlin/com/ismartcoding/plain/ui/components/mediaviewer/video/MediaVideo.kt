@@ -105,8 +105,8 @@ fun MediaVideo(
         when (event) {
             is VideoPlayerEvent.StateChanged -> {
                 if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return@setEventListener
-                if (event.duration > 0L) {
-                    videoState.totalTime = event.duration
+                if (event.durationMs > 0L) {
+                    videoState.totalTime = event.durationMs
                 }
                 videoState.isPlaying = event.isPlaying
                 videoState.updateTime()
@@ -133,9 +133,9 @@ fun MediaVideo(
 
     LaunchedEffect(controller, pagerState.settledPage, videoState.isPreviewerOpen) {
         if (!videoState.isPreviewerOpen) {
-            if (model.mediaId.isNotEmpty() && controller.currentPosition > 0) {
+            if (model.mediaId.isNotEmpty() && controller.currentPositionMs > 0) {
                 val mediaId = model.mediaId
-                val pos = controller.currentPosition
+                val pos = controller.currentPositionMs
                 TempData.videoPlayProgressMap[mediaId] = pos
                 coIO { progressDao.upsert(DVideoPlayProgress(mediaId, pos, TimeHelper.now())) }
             }
@@ -187,7 +187,7 @@ fun MediaVideo(
     DisposableEffect(Unit) {
         onDispose {
             val mediaId = model.mediaId
-            val pos = controller.currentPosition
+            val pos = controller.currentPositionMs
             if (mediaId.isNotEmpty() && pos > 0) {
                 TempData.videoPlayProgressMap[mediaId] = pos
                 coIO { progressDao.upsert(DVideoPlayProgress(mediaId, pos, TimeHelper.now())) }

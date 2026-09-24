@@ -107,7 +107,7 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE, cache)
             val artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST, cache).replace(MediaStore.UNKNOWN_STRING, "")
             val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE, cache)
-            val duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION, cache)
+            val durationMs = cursor.getLongValue(MediaStore.Audio.Media.DURATION, cache)
             val createdAt = cursor.getTimeSecondsValue(MediaStore.Audio.Media.DATE_ADDED, cache)
             val updatedAt = cursor.getTimeSecondsValue(MediaStore.Audio.Media.DATE_MODIFIED, cache)
             val path = cursor.getStringValue(MediaStore.Audio.Media.DATA, cache)
@@ -121,15 +121,15 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             // it stays 0. Fall back to the app-local cache (computed by
             // MediaDurationFixQueue, stored in milliseconds — same unit as
             // DAudio.durationMs and the MediaStore column) before reporting zero to the UI.
-            val effectiveDuration = if (duration <= 0L) {
+            val effectiveDurationMs = if (durationMs <= 0L) {
                 TempData.mediaDurationMap["audio:$id"] ?: 0L
             } else {
-                duration
+                durationMs
             }
-            val audio = DAudio(id, title, artist, path, effectiveDuration, size, bucketId, albumId, createdAt, updatedAt, isFavorite)
+            val audio = DAudio(id, title, artist, path, effectiveDurationMs, size, bucketId, albumId, createdAt, updatedAt, isFavorite)
             audios.add(audio)
 
-            if (effectiveDuration <= 0L && path.isNotEmpty()) {
+            if (effectiveDurationMs <= 0L && path.isNotEmpty()) {
                 zeroDurationItems.add(MediaDurationZeroItem(id, path))
             }
         }

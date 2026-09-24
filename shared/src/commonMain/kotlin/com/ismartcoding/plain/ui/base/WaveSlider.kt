@@ -25,7 +25,7 @@ data class WaveOptions(
     val frequency: Float = 0.12f,
     val lineWidth: Float = 3f,
     val thumbRadius: Float = 5f,
-    val animationDuration: Int = 2000
+    val animationDurationMs: Int = 2000
 )
 
 data class WaveSliderColors(
@@ -57,7 +57,7 @@ fun WaveSlider(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(waveOptions.animationDuration, easing = LinearEasing)
+            animation = tween(waveOptions.animationDurationMs, easing = LinearEasing)
         ),
         label = "waveOffset"
     )

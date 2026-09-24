@@ -19,7 +19,7 @@ internal fun ColorPickerController.doSelectByCoordinate(x: Float, y: Float, from
         pureSelectedColor.value = extractedColor
         _selectedPoint.value = Offset(snapPoint.x, snapPoint.y)
         _selectedColor.value = applyHSVFactors(extractedColor)
-        if (fromUser && debounceDuration != 0L) {
+        if (fromUser && debounceDurationMs != 0L) {
             notifyColorChangedWithDebounce(fromUser)
         } else {
             notifyColorChanged(fromUser)
@@ -82,7 +82,7 @@ internal fun ColorPickerController.notifyColorChanged(fromUser: Boolean) {
 internal fun ColorPickerController.notifyColorChangedWithDebounce(fromUser: Boolean) {
     debounceJob?.cancel()
     debounceJob = debounceScope.launch {
-        delay(debounceDuration)
+        delay(debounceDurationMs)
         notifyColorChanged(fromUser)
     }
 }

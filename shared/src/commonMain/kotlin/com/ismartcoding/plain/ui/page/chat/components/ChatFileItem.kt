@@ -69,7 +69,7 @@ fun ChatFileItem(
     }
 
     var progress by remember(item.id) { mutableFloatStateOf(0f) }
-    var durationSec by remember(item.id) { mutableFloatStateOf(item.duration.toFloat()) }
+    var durationSec by remember(item.id) { mutableFloatStateOf(item.durationSec.toFloat()) }
     var isDraggingProgress by remember(item.id) { mutableStateOf(false) }
 
     LaunchedEffect(path, isAudio, isCurrentlyPlaying) {
@@ -117,7 +117,7 @@ fun ChatFileItem(
         if (isCurrentlyPlaying) {
             ChatAudioInlineControls(
                 progress = progress,
-                duration = durationSec,
+                durationSec = durationSec,
                 isPlaying = isPlaying,
                 onProgressChange = { newProgress ->
                     isDraggingProgress = true

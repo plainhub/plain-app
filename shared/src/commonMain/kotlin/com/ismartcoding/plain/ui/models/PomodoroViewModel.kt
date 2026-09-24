@@ -23,7 +23,7 @@ class PomodoroViewModel : ViewModel() {
 
     // Constants
     companion object {
-        private const val DEFAULT_WORK_DURATION = 25 * 60 // 25 minutes in seconds
+        private const val DEFAULT_WORK_DURATION_SEC = 25 * 60 // 25 minutes in seconds
     }
 
     // State variables
@@ -31,7 +31,7 @@ class PomodoroViewModel : ViewModel() {
     var isRunning = mutableStateOf(false)
     var adjustJob = mutableStateOf<Job?>(null)
     var isPaused = mutableStateOf(false)
-    var timeLeft = mutableIntStateOf(DEFAULT_WORK_DURATION)
+    var timeLeft = mutableIntStateOf(DEFAULT_WORK_DURATION_SEC)
     var completedCount = mutableIntStateOf(0)
     var currentRound = mutableIntStateOf(1)
     var settings = mutableStateOf(DPomodoroSettings())
@@ -91,7 +91,7 @@ class PomodoroViewModel : ViewModel() {
         completedCount.intValue = newCount
 
         if (!isSkip) {
-            updateDailyRecord(newCount, settings.value.workDuration * 60)
+            updateDailyRecord(newCount, settings.value.workDurationMin * 60)
         }
 
         currentState.value = if (shouldTakeLongBreak(newCount)) {

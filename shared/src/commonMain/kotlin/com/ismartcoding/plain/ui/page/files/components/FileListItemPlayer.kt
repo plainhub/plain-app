@@ -30,7 +30,7 @@ import com.ismartcoding.plain.ui.base.PlayerSliderDefaults
 
 @Composable
 internal fun FileListItemPlayer(
-    isSelected: Boolean, isPlaying: Boolean, progress: Float, duration: Float,
+    isSelected: Boolean, isPlaying: Boolean, progress: Float, durationSec: Float,
     onProgressChange: (Float) -> Unit, onShowFullPlayer: () -> Unit,
     onSeekTo: (Long) -> Unit, onTogglePlay: () -> Unit,
 ) {
@@ -44,15 +44,15 @@ internal fun FileListItemPlayer(
             Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f)) {
                     PlayerSlider(
-                        progress = if (duration == 0f) 0f else progress / duration, bufferedProgress = 0f,
+                        progress = if (durationSec == 0f) 0f else progress / durationSec, bufferedProgress = 0f,
                         modifier = Modifier.fillMaxWidth().height(20.dp),
                         onProgressChange = onProgressChange,
-                        onValueChangeFinished = { normalizedProgress -> onSeekTo((normalizedProgress * duration * 1000).toLong()) },
+                        onValueChangeFinished = { normalizedProgress -> onSeekTo((normalizedProgress * durationSec * 1000).toLong()) },
                         colors = PlayerSliderDefaults.lightColors(),
                     )
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text(text = progress.toLong().formatDurationSec(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text(text = duration.toLong().formatDurationSec(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(text = durationSec.toLong().formatDurationSec(), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 HorizontalSpace(16.dp)

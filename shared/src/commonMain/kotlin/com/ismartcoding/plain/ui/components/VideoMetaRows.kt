@@ -11,7 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.resources.stringResource
 import com.ismartcoding.plain.lib.extensions.formatBitrate
-import com.ismartcoding.plain.lib.extensions.formatDurationSec
+import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.data.DVideoMeta
 import com.ismartcoding.plain.platform.formatDateTime
 import com.ismartcoding.plain.ui.base.PListItem
@@ -42,7 +42,7 @@ fun VideoMetaRows(
         if (mt.title.isNotEmpty()) {
             PListItem(title = stringResource(Res.string.title), value = mt.title)
         }
-        PListItem(title = stringResource(Res.string.duration), value = mt.durationMs.formatDurationSec())
+        PListItem(title = stringResource(Res.string.duration), value = mt.durationMs.formatDurationMs())
         PListItem(title = stringResource(Res.string.bitrate), value =  mt.bitrate.formatBitrate())
     }
 }

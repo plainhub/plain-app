@@ -26,8 +26,8 @@ private class FakeVideoPlayerController : VideoPlayerController {
 
     // Configurable state for updateTime() to read
     var fakeIsPlaying = false
-    var fakeCurrentPosition = 0L
-    var fakeDuration = 0L
+    var fakeCurrentPositionMs = 0L
+    var fakeDurationMs = 0L
     var fakeBufferedPercentage = 0
 
     override fun play() { playCount++ }
@@ -43,8 +43,8 @@ private class FakeVideoPlayerController : VideoPlayerController {
     override fun requestAudioFocus() { focusRequested = true }
     override fun abandonAudioFocus() { focusAbandoned = true }
 
-    override val duration: Long get() = fakeDuration
-    override val currentPosition: Long get() = fakeCurrentPosition
+    override val durationMs: Long get() = fakeDurationMs
+    override val currentPositionMs: Long get() = fakeCurrentPositionMs
     override val bufferedPercentage: Int get() = fakeBufferedPercentage
     override val isPlaying: Boolean get() = fakeIsPlaying
     override val isBuffering: Boolean = false
@@ -260,8 +260,8 @@ class VideoStateTest {
         val fake = FakeVideoPlayerController()
         state.initData(fake)
         fake.fakeIsPlaying = true
-        fake.fakeCurrentPosition = 2000L
-        fake.fakeDuration = 10000L
+        fake.fakeCurrentPositionMs = 2000L
+        fake.fakeDurationMs = 10000L
         fake.fakeBufferedPercentage = 75
 
         state.updateTime()
@@ -279,7 +279,7 @@ class VideoStateTest {
         state.initData(fake)
         state.isSeeking = true
         state.currentTime = 9999L
-        fake.fakeCurrentPosition = 2000L
+        fake.fakeCurrentPositionMs = 2000L
 
         state.updateTime()
 
@@ -302,8 +302,8 @@ class VideoStateTest {
         val state = VideoState()
         val fake = FakeVideoPlayerController()
         state.initData(fake)
-        fake.fakeCurrentPosition = -100L
-        fake.fakeDuration = -50L
+        fake.fakeCurrentPositionMs = -100L
+        fake.fakeDurationMs = -50L
 
         state.updateTime()
 
@@ -320,8 +320,8 @@ class VideoStateTest {
         val fake = FakeVideoPlayerController()
         state.initData(fake)
         state.totalTime = 84000L // expectedTotalMs from DVideo.duration * 1000
-        fake.fakeCurrentPosition = 3000L
-        fake.fakeDuration = 0L // ExoPlayer can't determine fMP4 duration
+        fake.fakeCurrentPositionMs = 3000L
+        fake.fakeDurationMs = 0L // ExoPlayer can't determine fMP4 duration
 
         state.updateTime()
 

@@ -59,7 +59,7 @@ class CastViewModel : ViewModel() {
             }
             CastPlayer.supportsCallback.value = false
             CastPlayer.progress.value = 0f
-            CastPlayer.duration.value = 0f
+            CastPlayer.durationSec.value = 0f
 
             positionUpdateJob?.cancel()
             positionUpdateJob = null

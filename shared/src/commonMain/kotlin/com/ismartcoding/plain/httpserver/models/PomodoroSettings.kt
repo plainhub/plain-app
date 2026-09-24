@@ -17,9 +17,9 @@ data class PomodoroSettings(
 
 fun DPomodoroSettings.toModel(): PomodoroSettings {
     return PomodoroSettings(
-        workDurationMin = workDuration,
-        shortBreakDurationMin = shortBreakDuration,
-        longBreakDurationMin = longBreakDuration,
+        workDurationMin = workDurationMin,
+        shortBreakDurationMin = shortBreakDurationMin,
+        longBreakDurationMin = longBreakDurationMin,
         pomodorosBeforeLongBreak = pomodorosBeforeLongBreak,
         showNotification = showNotification,
         playSoundOnComplete = playSoundOnComplete,
