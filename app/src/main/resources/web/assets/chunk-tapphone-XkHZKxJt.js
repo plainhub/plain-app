@@ -1,0 +1,1 @@
+import{r as e}from"./chunk-VDropdown-BpR51Q5I.js";var t=t=>{e.emit(`tap_phone`,t)};export{t};

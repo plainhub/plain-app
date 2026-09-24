@@ -1,1 +1,0 @@
-import{r as e}from"./chunk-VDropdown-35juquAP.js";var t=t=>{e.emit(`tap_phone`,t)};export{t};
