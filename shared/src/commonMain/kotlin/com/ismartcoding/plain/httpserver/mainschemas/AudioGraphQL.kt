@@ -18,7 +18,7 @@ import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.audioClear
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
-import com.ismartcoding.plain.platform.audioPlayerProgress
+import com.ismartcoding.plain.platform.audioPlayerProgressAsync
 import com.ismartcoding.plain.platform.audioJustPlayWithNotificationCheck
 import com.ismartcoding.plain.platform.checkEnabledAsync
 import com.ismartcoding.plain.platform.enabledAndIsGrantedAsync
@@ -70,7 +70,7 @@ suspend fun audioPlayback(): AudioPlayback {
         mode = AudioPlayModePreference.getValueAsync(),
         currentPath = AudioPlayingPreference.getValueAsync(),
         isPlaying = audioIsPlayingFlow().value,
-        positionMs = audioPlayerProgress(),
+        positionMs = audioPlayerProgressAsync(),
     )
 }
 

@@ -86,7 +86,7 @@ term       := [field ":"] value op?
 
 | 操作类别 | 返回 | 例子 |
 |---|---|---|
-| 批量破坏/变更（delete/trash/restore/move，按 query 或 id 列表编址，同步完成） | `ActionResult!`（`{ affectedCount: Int! }`） | `deleteSms`、`trashNotes`、`deleteMediaItems`、`deleteBookmarks`、`deleteFiles`、`deleteNotifications`、`deleteClipboard`、`deleteChatItems`、`deleteCalls`、`deleteContacts`、`deleteFeedEntries` |
+| 批量破坏/变更（delete/trash/restore/move，按 query 或 id 列表编址，同步完成） | `ActionResult!`（`{ affectedCount: Int! }`） | `deleteSms`、`trashNotes`、`deleteMediaItems`、`deleteBookmarks`、`deleteFiles`、`deleteNotifications`、`deleteClipboards`、`deleteChatItems`、`deleteCalls`、`deleteContacts`、`deleteFeedEntries` |
 | 单条 create/update | 实体非空 + 找不到时抛 `GraphQLError`（不返回 null） | `updateBookmark`、`createNote`/`updateNote`、`updateContact`、`updateAudioPlaylist` |
 | 单条 lookup query | 实体可空（null = 不存在） | `note(id)`、`feedEntry(id)` |
 | 异步触发型 | `Boolean!` 或专用 pending 类型 | `uninstallPackages`、`installPackage → PackageInstallPending`、`syncFeeds` |
@@ -108,6 +108,7 @@ term       := [field ":"] value op?
   - 重复 API 禁止：`fetchFeedContent` 已删（与 `syncFeedEntryContent` 实现相同，保留后者——与 UI 文案「同步正文」一致）。
   - `archiveSmsConversation(id)`：服务端自行推导会话时间（归档快照语义），客户端不传 date（2026-09-24 由 archiveConversation 改名，补齐 Sms 前缀）。
   - **2026-09-24 命名清理（breaking，多仓同周期同步）**：`File.children`→`childCount`、`ChatChannel.owner`→`ownerId`、`ChatChannelMember.id`→`peerId`（成员身份即 peer id）、`filesCount`→`fileCount`（对齐单数实体+Count）、`screenMirrorState`→`isScreenMirroring`（Boolean 不叫 State）、`syncFeedContent`→`syncFeedEntryContent`（id 是条目 id 非 feed id）、`renameAudioPlaylist`→`updateAudioPlaylist`（动词对齐 update* 且返回实体）、`archiveConversation`/`unarchiveConversation`→`archiveSmsConversation`/`unarchiveSmsConversation`、`startPomodoro(timeLeftSec)`→`startPomodoro(durationSec)`（参数是本次时长，非剩余时间；WS 事件 POMODORO_ACTION.timeLeftSec 是冻结字段不受影响）。旧名由 `ApiContractTest.legacyShapesAreGone` 锁死禁回潮。
+  - **2026-09-25 命名清理（breaking，多仓同周期同步）**：`deleteClipboard`→`deleteClipboards`（批量删除按 id 列表，对齐 deleteBookmarks/deleteNotifications 复数命名）、`archivedConversations`→`archivedSmsConversations`（补齐 Sms 前缀，对齐 smsConversations 及 2026-09-24 archiveSmsConversation 改名决策）。旧名由 `ApiContractTest.legacyShapesAreGone` 锁死禁回潮。
 - 配对/发现域的 `platform: String` 是自由字符串（`android`/`ios`/`macos`…，QR 配对可为空串）；
   **类型化枚举只有 `DeviceInfo.platform: DevicePlatform`**。发现协议不保证枚举闭包，勿改。
 

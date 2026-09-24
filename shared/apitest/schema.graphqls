@@ -13,7 +13,7 @@ type Query {
   smsConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
   smsCount(query: String!): Int!
   smsConversationCount(query: String!): Int!
-  archivedConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
+  archivedSmsConversations(offset: Int!, limit: Int!, query: String!): [SmsConversation!]!
   tags(type: DataType!): [Tag!]!
   tagRelations(type: DataType!, keys: [String!]!): [TagRelation!]!
   appLogs(offset: Int!, limit: Int!, query: String!): [String!]!
@@ -231,7 +231,7 @@ type Mutation {
   """Write text into the system clipboard and record it in the history with the calling client as source; an identical latest entry is skipped (hash dedup)."""
   setClipboard(text: String!): Boolean!
   """Delete clipboard history entries by ids."""
-  deleteClipboard(ids: [ID!]!): ActionResult!
+  deleteClipboards(ids: [ID!]!): ActionResult!
   addBookmarks(urls: [String!]!, groupId: ID!): [Bookmark!]!
   updateBookmark(id: ID!, input: BookmarkInput!): Bookmark!
   deleteBookmarks(ids: [ID!]!): ActionResult!

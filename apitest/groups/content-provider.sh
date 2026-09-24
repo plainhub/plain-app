@@ -7,7 +7,7 @@
 #                     deleteContacts, updateContact, createContact,
 #                     createContactGroup, updateContactGroup, deleteContactGroup
 #   SmsGraphQL      : sms, smsConversations, smsCount, smsConversationCount,
-#                     archivedConversations, smsBoxCounts,
+#                     archivedSmsConversations, smsBoxCounts,
 #                     archiveSmsConversation, unarchiveSmsConversation,
 #                     sendSms, sendMms
 #   CallGraphQL     : calls, callCount, sims, call, deleteCalls
@@ -294,12 +294,12 @@ else
 fi
 
 # ----------------------------------------------------------------------------
-# content-provider-C14  archivedConversations is always readable (no SMS permission)
+# content-provider-C14  archivedSmsConversations is always readable (no SMS permission)
 # ----------------------------------------------------------------------------
-AC=$(call_gql '{ archivedConversations(offset: 0, limit: 50, query: "") { id address } }')
-api_ac_count=$(printf '%s' "$AC" | jq '.data.archivedConversations | length')
-[[ "$api_ac_count" -ge 0 ]] && pass "content-provider-C14 archivedConversations returns list (length=$api_ac_count)" \
-                            || fail "content-provider-C14 archivedConversations not a list: $AC"
+AC=$(call_gql '{ archivedSmsConversations(offset: 0, limit: 50, query: "") { id address } }')
+api_ac_count=$(printf '%s' "$AC" | jq '.data.archivedSmsConversations | length')
+[[ "$api_ac_count" -ge 0 ]] && pass "content-provider-C14 archivedSmsConversations returns list (length=$api_ac_count)" \
+                            || fail "content-provider-C14 archivedSmsConversations not a list: $AC"
 
 # ----------------------------------------------------------------------------
 # content-provider-C15  smsBoxCounts has inbox/sent/drafts counts
@@ -321,7 +321,7 @@ fi
 # Caveats:
 #  - SmsConversationHelper.getArchivedConversations cross-references with the
 #    SMS content provider; if the id doesn't exist as a real SMS thread, the
-#    row is filtered out. So we can't use archivedConversations to verify
+#    row is filtered out. So we can't use archivedSmsConversations to verify
 #    our fixture id.
 #  - Direct DB inspection via `cat databases/plain.db` doesn't flush the WAL,
 #    so newly-inserted rows may not be visible until the next checkpoint.

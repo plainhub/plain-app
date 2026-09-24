@@ -123,7 +123,7 @@ suspend fun smsConversationCount(query: String): Int {
 }
 
 @GraphQLQuery
-suspend fun archivedConversations(offset: Int, limit: Int, query: String): List<SmsConversation> {
+suspend fun archivedSmsConversations(offset: Int, limit: Int, query: String): List<SmsConversation> {
     if (!Permission.READ_SMS.enabledAndIsGrantedAsync()) return emptyList()
     val q = query.trim().lowercase()
     return getArchivedSmsConversations()

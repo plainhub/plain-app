@@ -3,7 +3,9 @@ package com.ismartcoding.plain.platform
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.audio_notification_prompt
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 
 interface AudioPlayer {
     val isPlayingFlow: StateFlow<Boolean>
@@ -27,6 +29,9 @@ private val audioPlayer: AudioPlayer by lazy { createAudioPlayer() }
 fun audioIsPlayingFlow(): StateFlow<Boolean> = audioPlayer.isPlayingFlow
 
 fun audioPlayerProgress(): Long = audioPlayer.progress
+
+/** Suspending read for non-main threads (e.g. the HTTP server): the Android player is a Media3 MediaController which only allows calls on the app thread. */
+suspend fun audioPlayerProgressAsync(): Long = withContext(Dispatchers.Main) { audioPlayer.progress }
 
 fun audioSeekTo(positionMs: Long) = audioPlayer.seekTo(positionMs)
 
