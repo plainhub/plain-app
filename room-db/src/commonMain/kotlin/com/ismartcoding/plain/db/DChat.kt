@@ -61,8 +61,8 @@ class DMessageText(val text: String, val linkPreviews: List<DLinkPreview> = empt
 
 /**
  * Chat message file with media duration in milliseconds. Legacy rows stored
- * seconds under `durationSec` / `duration`; [DMessageFileSerializer] converts
- * those once at the decode boundary so no other call site multiplies.
+ * seconds under `duration`; [DMessageFileSerializer] converts those once at
+ * the decode boundary so no other call site multiplies.
  */
 @Serializable(with = DMessageFileSerializer::class)
 data class DMessageFile(
@@ -332,7 +332,7 @@ interface ChatDao {
     suspend fun getByPeerIdPage(toId: String, limit: Int, offset: Int): List<DChat>
 
     @Query(
-        "SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) AND content LIKE :text " +
+        "SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) AND content LIKE :text ESCAPE '\\' " +
             "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
     )
     suspend fun getByPeerIdPageText(toId: String, text: String, limit: Int, offset: Int): List<DChat>
@@ -344,7 +344,7 @@ interface ChatDao {
     suspend fun getByChannelIdPage(channelId: String, limit: Int, offset: Int): List<DChat>
 
     @Query(
-        "SELECT * FROM chats WHERE channel_id = :channelId AND content LIKE :text " +
+        "SELECT * FROM chats WHERE channel_id = :channelId AND content LIKE :text ESCAPE '\\' " +
             "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
     )
     suspend fun getByChannelIdPageText(channelId: String, text: String, limit: Int, offset: Int): List<DChat>

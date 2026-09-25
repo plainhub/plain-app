@@ -8,6 +8,8 @@ import androidx.room3.Insert
 import androidx.room3.OnConflictStrategy
 import androidx.room3.PrimaryKey
 import androidx.room3.Query
+import androidx.room3.RawQuery
+import androidx.room3.RoomRawQuery
 import com.ismartcoding.plain.lib.TimeHelper
 import kotlin.time.Instant
 
@@ -43,22 +45,17 @@ interface ClipboardDao {
     @Query("SELECT * FROM clipboards WHERE hash = :hash ORDER BY created_at DESC LIMIT 1")
     suspend fun getLatestByHash(hash: String): DClipboard?
 
-    /** [q] is the raw LIKE pattern with % wildcards; empty matches everything. */
-    @Query(
-        "SELECT * FROM clipboards WHERE text LIKE :q ESCAPE '\\' " +
-            "OR label LIKE :q ESCAPE '\\' OR source LIKE :q ESCAPE '\\' " +
-            "ORDER BY created_at DESC LIMIT :limit OFFSET :offset",
-    )
-    suspend fun getPage(limit: Int, offset: Int, q: String): List<DClipboard>
+    @RawQuery
+    suspend fun search(query: RoomRawQuery): List<DClipboard>
 
-    @Query(
-        "SELECT COUNT(*) FROM clipboards WHERE text LIKE :q ESCAPE '\\' " +
-            "OR label LIKE :q ESCAPE '\\' OR source LIKE :q ESCAPE '\\'",
-    )
-    suspend fun count(q: String): Int
+    @RawQuery
+    suspend fun count(query: RoomRawQuery): Int
 
     @Query("DELETE FROM clipboards WHERE id IN (:ids)")
     suspend fun deleteByIds(ids: List<String>): Int
+
+    @RawQuery
+    suspend fun getIds(query: RoomRawQuery): List<IDData>
 
     @Query("DELETE FROM clipboards")
     suspend fun clear()

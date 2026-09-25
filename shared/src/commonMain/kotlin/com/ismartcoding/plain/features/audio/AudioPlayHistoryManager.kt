@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.audio
 
 import com.ismartcoding.plain.db.DAudioPlayHistory
+import com.ismartcoding.plain.helpers.escapeLike
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.AppDatabase
 
@@ -44,5 +45,5 @@ object AudioPlayHistoryManager {
     suspend fun recentPage(limit: Int, offset: Int): List<DAudioPlayHistory> = historyDao.page(limit, offset)
 
     suspend fun recentPageFiltered(text: String, limit: Int, offset: Int): List<DAudioPlayHistory> =
-        historyDao.pageText("%$text%", limit, offset)
+        historyDao.pageText("%${escapeLike(text)}%", limit, offset)
 }

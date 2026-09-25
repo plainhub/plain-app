@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import com.ismartcoding.plain.data.DDoc
 import com.ismartcoding.plain.helpers.ContentWhere
+import com.ismartcoding.plain.helpers.escapeLike
 import com.ismartcoding.plain.lib.extensions.forEach
 import com.ismartcoding.plain.lib.extensions.getLongValue
 import com.ismartcoding.plain.lib.extensions.getStringValue
@@ -65,9 +66,9 @@ object DocMediaStoreHelper : BaseMediaContentHelper() {
 
         filterFields.forEach {
             when (it.name) {
-                "text" -> where.add("${MediaStore.Files.FileColumns.DISPLAY_NAME} LIKE ?", "%${it.value}%")
-                "ext" -> where.add("${MediaStore.Files.FileColumns.DISPLAY_NAME} LIKE ?", "%.${it.value}")
-                "parent" -> where.add("${MediaStore.Files.FileColumns.DATA} LIKE ?", "${it.value}/%")
+                "text" -> where.addLike("${MediaStore.Files.FileColumns.DISPLAY_NAME}", it.value)
+                "ext" -> where.add("${MediaStore.Files.FileColumns.DISPLAY_NAME} LIKE ? ESCAPE '\\'", "%.${escapeLike(it.value)}")
+                "parent" -> where.add("${MediaStore.Files.FileColumns.DATA} LIKE ? ESCAPE '\\'", "${escapeLike(it.value)}/%")
                 "type" -> where.add("${MediaStore.Files.FileColumns.MIME_TYPE} = ?", it.value)
                 "file_size" -> {
                     val (rawOp, rawValue) = it.normalizeComparison(defaultOp = "=")

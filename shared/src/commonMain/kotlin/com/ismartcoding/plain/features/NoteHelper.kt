@@ -60,17 +60,6 @@ object NoteHelper {
         noteDao.search(rawQuery(sql, where.args.toTypedArray()))
     }
 
-    suspend fun deleteAsync(query: String) = withIO {
-        var sql = "DELETE FROM notes"
-        val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            parseQuery(where, query)
-            sql += " WHERE ${where.toSelection()}"
-        }
-
-        noteDao.delete(rawQuery(sql, where.args.toTypedArray()))
-    }
-
     suspend fun getById(id: String): DNote? = withIO {
         noteDao.getById(id)
     }

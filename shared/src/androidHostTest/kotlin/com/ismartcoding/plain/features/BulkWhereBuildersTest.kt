@@ -51,4 +51,54 @@ class BulkWhereBuildersTest {
         FeedEntryHelper.applyFeedEntryFilterFields(where, SearchHelper.parse("text:foo"))
         assertTrue(where.toSelection().contains("LIKE"), where.toSelection())
     }
+
+    @Test
+    fun clipboardAllSentinelAddsNoCondition() {
+        val where = ContentWhere()
+        ClipboardHelper.applyClipboardFilterFields(where, SearchHelper.parse("all:true"))
+        assertEquals("1=1", where.toSelection())
+        assertTrue(where.args.isEmpty())
+    }
+
+    @Test
+    fun clipboardIdsFilterConstrainsToIdSet() {
+        val where = ContentWhere()
+        ClipboardHelper.applyClipboardFilterFields(where, SearchHelper.parse("ids:a,b"))
+        assertEquals("id IN (?,?)", where.toSelection())
+        assertEquals(listOf("a", "b"), where.args)
+    }
+
+    @Test
+    fun clipboardTextFilterLikesTextColumn() {
+        val where = ContentWhere()
+        ClipboardHelper.applyClipboardFilterFields(where, SearchHelper.parse("text:foo"))
+        assertTrue(where.toSelection().contains("text LIKE"), where.toSelection())
+        assertEquals(listOf("foo"), where.args)
+    }
+
+    @Test
+    fun clipboardTextFilterEscapesLikeWildcards() {
+        // User input must match literally — % / _ are escaped and the SQL carries ESCAPE '\'.
+        val where = ContentWhere()
+        ClipboardHelper.applyClipboardFilterFields(where, SearchHelper.parse("text:\"100%_a\""))
+        assertTrue(where.toSelection().contains("ESCAPE '\\'"), where.toSelection())
+        assertEquals(listOf("100\\%\\_a"), where.args)
+    }
+
+    @Test
+    fun clipboardHistorySearchEscapesWildcardsOnAllColumns() {
+        val where = ContentWhere()
+        ClipboardHelper.applyClipboardSearch(where, "a_b%c")
+        assertTrue(where.toSelection().contains("ESCAPE '\\'"), where.toSelection())
+        assertEquals(listOf("a\\_b\\%c", "a\\_b\\%c", "a\\_b\\%c"), where.args)
+    }
+
+    @Test
+    fun clipboardUnknownFieldAddsNoCondition() {
+        // The clipboard seam serves only ids:/text:/all — other DSL fields must not silently widen the filter.
+        val where = ContentWhere()
+        ClipboardHelper.applyClipboardFilterFields(where, SearchHelper.parse("source:abc"))
+        assertEquals("1=1", where.toSelection())
+        assertTrue(where.args.isEmpty())
+    }
 }

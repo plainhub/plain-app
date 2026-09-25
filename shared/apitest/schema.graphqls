@@ -81,8 +81,8 @@ type Query {
   videoCount(query: String!): Int!
   videos(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Video!]!
   """Paged clipboard history, newest first."""
-  clipboard(offset: Int!, limit: Int!, query: String!): [Clipboard!]!
-  clipboardCount(query: String!): Int!
+  clipboardItems(offset: Int!, limit: Int!, query: String!): [ClipboardItem!]!
+  clipboardItemCount(query: String!): Int!
   bookmarks: [Bookmark!]!
   bookmarkGroups: [BookmarkGroup!]!
   mounts: [StorageMount!]!
@@ -230,8 +230,8 @@ type Mutation {
   deleteDbTableRows(table: String!, ids: [String!]!): Boolean!
   """Write text into the system clipboard and record it in the history with the calling client as source; an identical latest entry is skipped (hash dedup)."""
   setClipboard(text: String!): Boolean!
-  """Delete clipboard history entries by ids."""
-  deleteClipboards(ids: [ID!]!): ActionResult!
+  """Delete clipboard history entries matching the query DSL (ids:/text:, bare word = text LIKE); blank query is rejected — send all:true to clear the whole history."""
+  deleteClipboardItems(query: String!): ActionResult!
   addBookmarks(urls: [String!]!, groupId: ID!): [Bookmark!]!
   updateBookmark(id: ID!, input: BookmarkInput!): Bookmark!
   deleteBookmarks(ids: [ID!]!): ActionResult!
@@ -508,7 +508,7 @@ type ChatText {
   linkPreviewImageIds: [String!]!
 }
 
-type Clipboard {
+type ClipboardItem {
   id: ID!
   text: String!
   """Client id of the sync origin: empty = captured locally on this device, otherwise received from that peer."""

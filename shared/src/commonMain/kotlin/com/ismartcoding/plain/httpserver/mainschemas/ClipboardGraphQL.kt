@@ -12,9 +12,9 @@ import com.ismartcoding.plain.lib.kgraphql.Context
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.httpserver.http.GraphqlRequestContext
 import com.ismartcoding.plain.httpserver.models.ActionResult
-import com.ismartcoding.plain.httpserver.models.Clipboard
-import com.ismartcoding.plain.httpserver.models.ID
+import com.ismartcoding.plain.httpserver.models.ClipboardItem
 import com.ismartcoding.plain.httpserver.models.toModel
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.isEnabledAsync
 import com.ismartcoding.plain.platform.setClipboardText
@@ -32,13 +32,13 @@ private fun hashOf(text: String): String =
 
 /** Paged clipboard history, newest first. Desktop-side aggregation reads this. */
 @GraphQLQuery(description = "Paged clipboard history, newest first.")
-suspend fun clipboard(offset: Int, limit: Int, query: String): List<Clipboard> {
+suspend fun clipboardItems(offset: Int, limit: Int, query: String): List<ClipboardItem> {
     ensureClipboardEnabled()
     return ClipboardHelper.getPage(limit.coerceIn(1, 200), offset.coerceAtLeast(0), query).map { it.toModel() }
 }
 
 @GraphQLQuery
-suspend fun clipboardCount(query: String): Int {
+suspend fun clipboardItemCount(query: String): Int {
     ensureClipboardEnabled()
     return ClipboardHelper.count(query)
 }
@@ -70,12 +70,13 @@ suspend fun setClipboard(text: String, context: Context): Boolean {
     return true
 }
 
-/** Deletes clipboard history entries by ids. */
-@GraphQLMutation(description = "Delete clipboard history entries by ids.")
-suspend fun deleteClipboards(ids: List<ID>): ActionResult {
+/** Deletes clipboard history entries matching the query DSL (`ids:`/`text:`, bare word = text LIKE). Blank query is rejected — send `all:true` to clear the whole history. */
+@GraphQLMutation(description = "Delete clipboard history entries matching the query DSL (ids:/text:, bare word = text LIKE); blank query is rejected — send all:true to clear the whole history.")
+suspend fun deleteClipboardItems(query: String): ActionResult {
     ensureClipboardEnabled()
-    val deleted = ClipboardHelper.deleteByIds(ids.map { it.value })
-    return ActionResult(deleted)
+    QueryHelper.requireExplicitBulkQuery(query)
+    val ids = ClipboardHelper.getIdsAsync(query)
+    return ActionResult(ClipboardHelper.deleteByIds(ids.toList()))
 }
 
 fun SchemaBuilder.addClipboardSchema() {

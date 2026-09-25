@@ -16,6 +16,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HRetryChatItemEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.helpers.QueryHelper
+import com.ismartcoding.plain.helpers.escapeLike
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.httpserver.models.ActionResult
 import com.ismartcoding.plain.httpserver.models.ChatItem
@@ -30,10 +31,10 @@ suspend fun chatItems(target: String, offset: Int, limit: Int, query: String): L
     val text = QueryHelper.textOf(query).trim()
     val items = if (chatTarget.type == ChatTargetType.CHANNEL) {
         if (text.isEmpty()) dao.getByChannelIdPage(chatTarget.toId, limit, offset)
-        else dao.getByChannelIdPageText(chatTarget.toId, "%$text%", limit, offset)
+        else dao.getByChannelIdPageText(chatTarget.toId, "%${escapeLike(text)}%", limit, offset)
     } else {
         if (text.isEmpty()) dao.getByPeerIdPage(chatTarget.toId, limit, offset)
-        else dao.getByPeerIdPageText(chatTarget.toId, "%$text%", limit, offset)
+        else dao.getByPeerIdPageText(chatTarget.toId, "%${escapeLike(text)}%", limit, offset)
     }
     return items.asReversed().map { it.toModel() }
 }

@@ -44,7 +44,7 @@ class ApiContractTest {
 
     // Bulk destructive/modify mutations that must return ActionResult.
     private val actionResultMutations = setOf(
-        "deleteNotifications", "deleteClipboards", "deleteBookmarks", "deleteFiles",
+        "deleteNotifications", "deleteClipboardItems", "deleteBookmarks", "deleteFiles",
         "deleteSms", "trashSms", "restoreSms", "deleteCalls", "deleteContacts",
         "deleteChatItems", "trashNotes", "restoreNotes", "deleteNotes",
         "deleteFeedEntries", "deleteMediaItems", "trashMediaItems",
@@ -59,7 +59,7 @@ class ApiContractTest {
         "deleteMediaItems", "trashMediaItems", "restoreMediaItems", "moveMediaItems",
         "trashNotes", "restoreNotes", "deleteNotes", "saveFeedEntriesToNotes",
         "deleteFeedEntries", "trashSms", "restoreSms", "deleteSms",
-        "deleteCalls", "deleteContacts", "deleteChatItems",
+        "deleteCalls", "deleteContacts", "deleteChatItems", "deleteClipboardItems",
     )
 
     @Test
@@ -201,7 +201,8 @@ class ApiContractTest {
         forbiddenPattern("renameAudioPlaylist") { "renamed to updateAudioPlaylist (returns the entity) — $it" }
         forbiddenPattern("archiveConversation") { "renamed to archiveSmsConversation/unarchiveSmsConversation — $it" }
         forbiddenPattern("""\bchildren:""") { "File.children was renamed to childCount (it is a count, not a collection) — $it" }
-        forbiddenPattern("""\bdeleteClipboard\b""".trim()) { "renamed to deleteClipboards (bulk delete is plural) — $it" }
+        forbiddenPattern("""\bdeleteClipboard\b""".trim()) { "renamed to deleteClipboardItems — $it" }
+        forbiddenPattern("""\bdeleteClipboards\b""".trim()) { "renamed to deleteClipboardItems (the entity is ClipboardItem) — $it" }
         forbiddenPattern("""\barchivedConversations\b""".trim()) { "renamed to archivedSmsConversations (Sms prefix, aligned with smsConversations) — $it" }
     }
 

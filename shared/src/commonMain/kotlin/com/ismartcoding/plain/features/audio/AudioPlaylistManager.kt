@@ -4,6 +4,7 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.db.DAudioPlaylist
 import com.ismartcoding.plain.db.DAudioPlaylistItem
 import com.ismartcoding.plain.helpers.StringHelper
+import com.ismartcoding.plain.helpers.escapeLike
 import com.ismartcoding.plain.lib.TimeHelper
 import com.ismartcoding.plain.platform.AppDatabase
 
@@ -83,7 +84,7 @@ object AudioPlaylistManager {
         itemDao.pageByPlaylist(playlistId, limit, offset)
 
     suspend fun playlistItemsPageFiltered(playlistId: String, text: String, offset: Int, limit: Int): List<DAudioPlaylistItem> =
-        itemDao.pageByPlaylistText(playlistId, "%$text%", limit, offset)
+        itemDao.pageByPlaylistText(playlistId, "%${escapeLike(text)}%", limit, offset)
 
     suspend fun playlistItemCount(playlistId: String): Int = itemDao.countByPlaylist(playlistId)
 

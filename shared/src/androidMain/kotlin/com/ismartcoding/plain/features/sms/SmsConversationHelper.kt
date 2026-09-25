@@ -210,7 +210,7 @@ object SmsConversationHelper {
             QueryHelper.parseAsync(query).forEach {
                 when (it.name) {
                     "text" -> {
-                        where.add("${Telephony.Sms.BODY} LIKE ?", "%${it.value}%")
+                        where.addLike("${Telephony.Sms.BODY}", it.value)
                     }
 
                     "ids" -> {

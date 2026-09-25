@@ -40,7 +40,7 @@ interface AudioPlayHistoryDao {
     suspend fun page(limit: Int, offset: Int): List<DAudioPlayHistory>
 
     @Query(
-        "SELECT * FROM audio_play_history WHERE title LIKE :text OR artist LIKE :text OR path LIKE :text " +
+        "SELECT * FROM audio_play_history WHERE title LIKE :text ESCAPE '\\' OR artist LIKE :text ESCAPE '\\' OR path LIKE :text ESCAPE '\\' " +
             "ORDER BY played_at DESC LIMIT :limit OFFSET :offset",
     )
     suspend fun pageText(text: String, limit: Int, offset: Int): List<DAudioPlayHistory>

@@ -46,9 +46,6 @@ interface NoteDao {
     suspend fun search(query: RoomRawQuery): List<DNote>
 
     @RawQuery
-    suspend fun delete(query: RoomRawQuery): Int
-
-    @RawQuery
     suspend fun count(query: RoomRawQuery): Int
 
     @Query("SELECT * FROM notes WHERE id=:id")

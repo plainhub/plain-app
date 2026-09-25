@@ -76,12 +76,6 @@ class DMessageFileDurationTest {
     }
 
     @Test
-    fun `decodes legacy durationSec as milliseconds`() {
-        val files = json.decodeFromString<DMessageFiles>("""{"items":[{"id":"1","uri":"fid:a","size":9,"durationSec":30}]}""")
-        assertEquals(30000L, files.items[0].durationMs)
-    }
-
-    @Test
     fun `decodes legacy duration as milliseconds`() {
         val files = json.decodeFromString<DMessageFiles>("""{"items":[{"id":"1","uri":"fid:a","size":9,"duration":30}]}""")
         assertEquals(30000L, files.items[0].durationMs)
@@ -98,7 +92,6 @@ class DMessageFileDurationTest {
         val item = DMessageFile(id = "1", uri = "fid:a", size = 9, durationMs = 30000)
         val obj = json.encodeToString(DMessageFiles(listOf(item)))
         kotlin.test.assertTrue(obj.contains(""""durationMs":30000"""), obj)
-        kotlin.test.assertFalse(obj.contains("durationSec"), obj)
         kotlin.test.assertFalse(obj.contains(""""duration""""), obj)
     }
 }

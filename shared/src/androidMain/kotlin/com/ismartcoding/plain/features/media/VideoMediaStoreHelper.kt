@@ -59,7 +59,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         // where.add("${MediaStore.Video.Media.DURATION}>0")
         filterFields.forEach {
             if (it.name == "text") {
-                where.add("${MediaStore.Video.Media.TITLE} LIKE ?", "%${it.value}%")
+                where.addLike("${MediaStore.Video.Media.TITLE}", it.value)
             } else if (it.name == "ids") {
                 where.addIn(MediaStore.Video.Media._ID, it.value.split(","))
             } else if (it.name == "bucket_id") {

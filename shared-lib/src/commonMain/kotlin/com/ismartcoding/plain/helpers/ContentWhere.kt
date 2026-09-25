@@ -1,5 +1,14 @@
 package com.ismartcoding.plain.helpers
 
+/**
+ * Escapes SQLite LIKE wildcards in [value] so it matches literally. The single
+ * source of LIKE escaping — every LIKE built from user input goes through this
+ * (ContentWhere's LIKE builders do it automatically; custom LIKE selections must
+ * pair the escaped value with an explicit `ESCAPE '\'` clause).
+ */
+fun escapeLike(value: String): String =
+    value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
 data class ContentWhere(
     private val selections: MutableList<String> = mutableListOf(),
     val args: MutableList<String> = mutableListOf(),
@@ -39,17 +48,17 @@ data class ContentWhere(
     }
 
     fun addLike(field: String, value: String) {
-        add("$field LIKE '%' || ? || '%'", value)
+        add("$field LIKE '%' || ? || '%' ESCAPE '\\'", escapeLike(value))
     }
 
     fun addNotStartsWith(field: String, value: String) {
-        add("$field NOT LIKE ? || '%'", value)
+        add("$field NOT LIKE ? || '%' ESCAPE '\\'", escapeLike(value))
     }
 
     fun addLikes(fields: List<String>, values: List<String>) {
-        val r = fields.joinToString(" OR ") { "$it LIKE '%' || ? || '%'" }
+        val r = fields.joinToString(" OR ") { "$it LIKE '%' || ? || '%' ESCAPE '\\'" }
         selections.add("($r)")
-        args.addAll(values)
+        args.addAll(values.map { escapeLike(it) })
     }
 
     fun toSelection(): String {

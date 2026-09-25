@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 @GraphQLType
 @Serializable
-data class Clipboard(
+data class ClipboardItem(
     val id: ID,
     val text: String,
     @GraphQLField(description = "Client id of the sync origin: empty = captured locally on this device, otherwise received from that peer.")
@@ -18,6 +18,6 @@ data class Clipboard(
     val createdAt: Instant,
 )
 
-fun DClipboard.toModel(): Clipboard {
-    return Clipboard(ID(id), text, source, label, sensitive, createdAt)
+fun DClipboard.toModel(): ClipboardItem {
+    return ClipboardItem(ID(id), text, source, label, sensitive, createdAt)
 }

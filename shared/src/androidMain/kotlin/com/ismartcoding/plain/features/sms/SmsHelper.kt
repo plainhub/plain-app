@@ -198,7 +198,7 @@ object SmsHelper {
         conditions.forEach {
             when (it.name) {
                 QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
-                "text" -> where.add("${Telephony.Sms.BODY} LIKE ?", "%${it.value}%")
+                "text" -> where.addLike("${Telephony.Sms.BODY}", it.value)
                 "ids" -> {
                     val ids = SmsProviderContract.partitionMessageIds(it.value).sms
                     val predicate = SmsProviderContract.numericIdPredicate(BaseColumns._ID, ids)

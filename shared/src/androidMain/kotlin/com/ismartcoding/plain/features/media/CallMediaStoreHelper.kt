@@ -39,7 +39,7 @@ object CallMediaStoreHelper : BaseContentHelper() {
                 when (it.name) {
                     QueryHelper.BULK_ALL_FIELD -> {} // explicit whole-table sentinel — no condition
                     "text" -> {
-                        where.add("${CallLog.Calls.NUMBER} LIKE ?", "%${it.value}%")
+                        where.addLike("${CallLog.Calls.NUMBER}", it.value)
                     }
 
                     "ids" -> {

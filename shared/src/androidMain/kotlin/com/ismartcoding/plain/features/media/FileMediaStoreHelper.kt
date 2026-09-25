@@ -43,7 +43,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
             QueryHelper.parseAsync(query).forEach {
                 when (it.name) {
                     "text" -> {
-                        where.add("${MediaStore.Files.FileColumns.DISPLAY_NAME} LIKE ?", "%${it.value}%")
+                        where.addLike("${MediaStore.Files.FileColumns.DISPLAY_NAME}", it.value)
                     }
                     "parent" -> {
                         where.add("${MediaStore.Files.FileColumns.PARENT} = ?", getIdByPathAsync(appContext, it.value) ?: "-1")
