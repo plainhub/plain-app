@@ -4,6 +4,8 @@ import androidx.room3.useReaderConnection
 import androidx.room3.useWriterConnection
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.appContext
+import com.ismartcoding.plain.httpserver.models.DbTableColumn
+import com.ismartcoding.plain.httpserver.models.DbColumnType
 import com.ismartcoding.plain.httpserver.models.DbTableInfo
 import org.json.JSONObject
 
@@ -85,6 +87,37 @@ actual suspend fun getDbTableRows(table: String, offset: Int, limit: Int): List<
                 rows.add(obj.toString())
             }
             rows
+        }
+    }
+}
+
+private fun dbColumnType(declared: String): DbColumnType =
+    when (declared.uppercase()) {
+        "TEXT" -> DbColumnType.TEXT
+        "INTEGER" -> DbColumnType.INTEGER
+        "REAL" -> DbColumnType.REAL
+        "BLOB" -> DbColumnType.BLOB
+        "NUMERIC" -> DbColumnType.NUMERIC
+        else -> DbColumnType.UNKNOWN
+    }
+
+actual suspend fun getDbTableColumns(table: String): List<DbTableColumn> {
+    val safeName = getValidatedTableName(table)
+    return AppDatabase.instance.useReaderConnection { c ->
+        c.usePrepared("PRAGMA table_info(`$safeName`)") { stmt ->
+            val columns = mutableListOf<DbTableColumn>()
+            while (stmt.step()) {
+                columns.add(
+                    DbTableColumn(
+                        name = stmt.getText(1),
+                        dataType = dbColumnType(stmt.getText(2)),
+                        notNull = stmt.getLong(3) != 0L,
+                        defaultValue = if (stmt.isNull(4)) null else stmt.getText(4),
+                        primaryKey = stmt.getLong(5) > 0L,
+                    ),
+                )
+            }
+            columns
         }
     }
 }

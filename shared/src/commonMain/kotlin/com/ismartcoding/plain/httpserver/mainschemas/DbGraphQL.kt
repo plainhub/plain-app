@@ -4,10 +4,12 @@ import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.platform.getDbPath
+import com.ismartcoding.plain.platform.getDbTableColumns
 import com.ismartcoding.plain.platform.getDbTableInfo
 import com.ismartcoding.plain.platform.getDbTableNames
 import com.ismartcoding.plain.platform.getDbTableRowCount
 import com.ismartcoding.plain.platform.getDbTableRows
+import com.ismartcoding.plain.httpserver.models.DbTableColumn
 import com.ismartcoding.plain.httpserver.models.DbTableInfo
 
 @GraphQLQuery
@@ -28,6 +30,11 @@ suspend fun dbTableRowCount(table: String): Long {
 @GraphQLQuery
 suspend fun dbTableRows(table: String, offset: Int, limit: Int): List<String> {
     return getDbTableRows(table, offset, limit)
+}
+
+@GraphQLQuery
+suspend fun dbTableColumns(table: String): List<DbTableColumn> {
+    return getDbTableColumns(table)
 }
 
 @GraphQLQuery

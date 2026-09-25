@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.platform
 
+import com.ismartcoding.plain.httpserver.models.DbTableColumn
 import com.ismartcoding.plain.httpserver.models.DbTableInfo
 
 /**
@@ -27,6 +28,14 @@ expect suspend fun getDbTableRowCount(table: String): Long
  * not a safe identifier.
  */
 expect suspend fun getDbTableRows(table: String, offset: Int, limit: Int): List<String>
+
+/**
+ * Returns the columns of [table] in declaration order (name, declared type,
+ * not-null flag, default value, primary-key flag).
+ * Throws IllegalArgumentException if the table does not exist or the name is
+ * not a safe identifier.
+ */
+expect suspend fun getDbTableColumns(table: String): List<DbTableColumn>
 
 /**
  * Returns metadata about [table] including its primary-key column name.

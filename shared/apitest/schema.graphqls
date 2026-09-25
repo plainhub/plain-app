@@ -77,6 +77,7 @@ type Query {
   dbTables: [String!]!
   dbTableRowCount(table: String!): Long!
   dbTableRows(table: String!, offset: Int!, limit: Int!): [String!]!
+  dbTableColumns(table: String!): [DbTableColumn!]!
   dbTableInfo(table: String!): DbTableInfo!
   videoCount(query: String!): Int!
   videos(offset: Int!, limit: Int!, query: String!, sortBy: FileSortBy!): [Video!]!
@@ -664,6 +665,24 @@ enum DataType {
   FILE
   APP_FILE
   DOC
+}
+
+"""Declared column type for dbTableColumns.dataType; UNKNOWN covers undeclared columns and declared types outside SQLite's standard set."""
+enum DbColumnType {
+  TEXT
+  INTEGER
+  REAL
+  BLOB
+  NUMERIC
+  UNKNOWN
+}
+
+type DbTableColumn {
+  name: String!
+  dataType: DbColumnType!
+  notNull: Boolean!
+  defaultValue: String
+  primaryKey: Boolean!
 }
 
 type DbTableInfo {

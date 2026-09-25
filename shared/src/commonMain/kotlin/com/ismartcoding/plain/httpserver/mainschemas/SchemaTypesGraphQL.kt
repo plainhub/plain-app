@@ -33,6 +33,7 @@ import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.httpserver.models.ID
+import com.ismartcoding.plain.httpserver.models.DbColumnType
 import com.ismartcoding.plain.httpserver.models.MediaItem
 import com.ismartcoding.plain.httpserver.models.MergeTaskStatus
 import kotlin.time.Instant
@@ -70,6 +71,9 @@ fun SchemaBuilder.addMainSchemaTypes() {
         description = "Whether the device (server) itself provides this capability — e.g. a NAS has no SMS, so it omits SMS from App.capabilities. Clients gate UI on App.capabilities instead of sniffing OS versions; this says nothing about client-side access rights, which are App.permissions (Permission)."
     }
     enum<MergeTaskStatus>()
+    enum<DbColumnType> {
+        description = "Declared column type for dbTableColumns.dataType; UNKNOWN covers undeclared columns and declared types outside SQLite's standard set."
+    }
     enum<Permission> {
         description = "Client-side access rights: Android runtime permissions that gate web API access. App.permissions lists the ones currently enabled AND granted. Whether the device supports a capability at all is App.capabilities (Capability)."
     }
