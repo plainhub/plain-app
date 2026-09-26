@@ -21,3 +21,5 @@ actual fun dispatchScreenMirrorControl(input: ScreenMirrorControlInput): Boolean
 actual fun requestScreenMirrorKeyFrame() = Unit
 
 actual fun getAccessibilityScreenSize(): Pair<Int, Int> = Pair(0, 0)
+
+actual fun resetScreenMirrorTouchStream() = Unit

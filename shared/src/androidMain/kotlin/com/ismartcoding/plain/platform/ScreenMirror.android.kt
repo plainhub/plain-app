@@ -48,3 +48,9 @@ actual fun getAccessibilityScreenSize(): Pair<Int, Int> {
     val size = PlainAccessibilityService.getScreenSize(appContext)
     return Pair(size.x, size.y)
 }
+
+actual fun resetScreenMirrorTouchStream() {
+    com.ismartcoding.plain.services.TouchInjectThread.handler.post {
+        com.ismartcoding.plain.services.StreamTouchInjector.reset()
+    }
+}
