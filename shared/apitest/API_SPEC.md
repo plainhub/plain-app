@@ -193,3 +193,82 @@ GraphQL schema 没有 Subscription；实时变更走专用 WS 旁路。**事件�
 | 40 | PERMISSIONS_UPDATED | JSON 字符串数组（已授权权限名快照，同 `app.permissions`） |
 
 编号 6/13/28 已跳过不存在，**禁止回收复用**。新增事件顺次取下一个空闲编号。
+
+上行（客户端→手机）控制通道见 §12。
+
+## 12. WebSocket 上行控制协议（Screen Mirror 触控/控制通道，2026-09-26 冻结记录）
+
+GraphQL 之外的客户端→手机实时控制旁路，协议与 plain-cast 同源（`plain-cast docs/touch-low-latency-design.md`）。
+权威源码：`shared/src/commonMain/kotlin/com/ismartcoding/plain/httpserver/routes/WebSocketRoutes.kt`（`handleUpstreamControl`/`decodeTouchFrame`）与
+`shared/src/androidMain/kotlin/com/ismartcoding/plain/services/StreamTouchInjector.kt`。改动视同 breaking。
+
+### 12.1 连接与会话生命周期
+
+1. `GET /`（WebSocket 升级）带 `?cid=<clientId>`；桌面访问关闭时连不上（`desktop_access_disabled`）。
+2. **第一帧 = 注册帧**：ChaCha20 加密的时间戳 JSON 字符串；解密失败 `invalid_request` 关连接。
+3. 注册成功后的每一帧都是**控制帧**，一律用同一 token 加密（见 12.2）。
+4. 连接断开：服务端清 session 并强制释放流式触控（`resetScreenMirrorTouchStream`）——客户端断连前应先对在途手势补发 CANCEL。
+
+### 12.2 加密
+
+- 算法 XChaCha20-Poly1305（Tink；@noble `xchacha20poly1305` 同构），wire = `nonce(24B) || ciphertext+tag`，每帧独立加密。
+- key = 32 字节 token：登录握手下发（base64），客户端 `tokenToKey`（atob）还原；服务端用 `sha512(password)` hex 前 32 字符的 ASCII 字节（`HttpServerManager.hashToToken`）。与下行 §11 同一 key。
+
+### 12.3 控制帧分派（解密后的明文）
+
+| 明文首字节 | 含义 |
+|---|---|
+| 空 | 忽略 |
+| `0x54` | 二进制触摸帧（12.4，热路径） |
+| 其他 | UTF-8 JSON `ScreenMirrorControlInput`（12.5，冷路径） |
+
+### 12.4 二进制触摸帧（touch 热路径）
+
+little-endian，与 plain-cast 逐字节同格式。`streamId` 本通道恒 0。
+
+| 偏移 | 大小 | 字段 | 说明 |
+|---|---|---|---|
+| 0 | 1 | magic | `0x54` |
+| 1 | 1 | count | 样本数（u8） |
+| 2 | 2 | streamId | u16 LE，恒 0 |
+| 4+8n | 8 | 样本 n | 见下 |
+
+样本（8 字节）：`action` u8（0=DOWN 1=MOVE 2=UP 3=CANCEL，**服务端把 CANCEL 映射为 UP**）｜`pointerId` u8｜`x` u16 LE（0..65535 → 归一化 0..1）｜`y` u16 LE｜`dtMs` u16 LE（距同指上一采样毫秒数，服务端保留字段）。count=0 或长度不符整帧丢弃。
+
+每个样本语义等价于 `TOUCH_DOWN/MOVE/UP` 的 `ScreenMirrorControlInput`；多指帧合法但 a11y 注入单流——第二指 DOWN 被忽略（plain-cast 未激活内核注入时同款行为）。
+
+### 12.5 JSON 控制帧（`ScreenMirrorControlInput`）
+
+字段定义（归一化 Float 0..1 = 相对**渲染画面矩形**，越界值服务端钳制不丢弃）：
+
+| 字段 | 类型 | 用途 | 必传于 |
+|---|---|---|---|
+| `action` | enum（下表） | 动作 | 全部 |
+| `x` / `y` | Float | 画面归一化坐标 | TAP/LONG_PRESS/SWIPE/SCROLL/TOUCH_DOWN/MOVE；TOUCH_UP 可省略（沿用最后坐标） |
+| `endX` / `endY` | Float | 终点坐标 | SWIPE |
+| `durationMs` | Long | 时长（LONG_PRESS 缺省 500，SWIPE 缺省 300） | LONG_PRESS/SWIPE |
+| `deltaX` / `deltaY` | Float | 像素增量，服务端钳 ±500 | SCROLL |
+| `pathPoints` | `[TouchPointInput]` | 轨迹点 `{x: Float, y: Float, tMs: Int}`，tMs 相对首点毫秒 | TOUCH |
+| `pointerId` | Int | 触控槽位（u8 域 0..255，§8 例外项） | TOUCH_DOWN/MOVE/UP |
+| `key` | String | 按键名（保留，暂只记日志） | KEY |
+| `pressure` | Float | 兼容字段，服务端忽略 | — |
+
+action 语义：
+
+| action | 参数 | 服务端行为 |
+|---|---|---|
+| `TAP` | x,y | 一次 50ms 点按 |
+| `LONG_PRESS` | x,y,durationMs | 一次长按（<500ms 抬到 500） |
+| `SWIPE` | x,y,endX,endY,durationMs | 一次直线滑动（<50ms 抬到 50） |
+| `SCROLL` | x,y,deltaX,deltaY | 合成 200ms swipe（增量钳 ±500px，0,0 忽略） |
+| `BACK`/`HOME`/`RECENTS`/`LOCK_SCREEN` | 无 | 对应 `GLOBAL_ACTION_*` |
+| `KEY` | key | 保留（未注入） |
+| `TOUCH` | pathPoints | 整段轨迹回放：单点 tMs≥500→长按，否则点按；多点距离<4px 同上，否则全轨迹一次派发 |
+| `TOUCH_DOWN`/`MOVE`/`UP` | x,y,pointerId | 流式注入（悬空长段+终结释放；边缘起始拖拽在 UP 分类：底部上滑→HOME、左右内滑→BACK、顶部下拉→通知栏） |
+
+### 12.6 客户端选路契约
+
+- 触摸样本（DOWN/MOVE/UP/CANCEL）**必须走二进制帧**——每秒上百样本，HTTP 逐请求不可接受；流式手势必须以 UP/CANCEL 终结，无终结帧 = 触摸滞留到 stale watchdog（10s）强制释放。
+- 冷路径动作走 JSON 帧；WS 不可用时可回落 GraphQL `sendScreenMirrorControl(input)`（同一 input schema），触摸热路径**禁止**回落。
+- 无障碍服务未启用时控制帧静默丢弃（`dispatchScreenMirrorControl` 返回 false 不抛错）；开关状态以 GraphQL `screenMirrorControlEnabled` 为准。
+- 同一 WebSocket 同时承载 §11 下行事件与 §12 上行控制，互不影响。

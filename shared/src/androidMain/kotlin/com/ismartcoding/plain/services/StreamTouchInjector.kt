@@ -46,38 +46,19 @@ internal object StreamTouchInjector {
     private const val LIVE_MIN_INTERVAL_MS = 30L
     private const val LIVE_MIN_DUR_MS = 24L
     private const val LIVE_MAX_DUR_MS = 100L
-    private const val TAP_SLOP_PX = 28f
     private const val RELEASE_DUR_MS = 24L
     private const val STALE_INPUT_MS = 10_000L
-    // Edge-assist zone: a drag starting within this fraction of a screen
-    // edge has its first live stroke re-anchored to the exact edge, so
-    // mouse users pressing near (but not on) the edge still produce a
-    // "finger sliding in from the bezel" touch that triggers system edge
-    // gestures (bottom→home, left/right→back, top→notifications).
-    private const val EDGE_ASSIST_FRACTION = 0.03f
-    // Minimum inward displacement (as a screen fraction) for an
-    // edge-originated drag to fire its system action.
-    private const val EDGE_TRIGGER_FRACTION = 0.12f
     // Delay before the system action so the injected touch fully ends first.
     private const val EDGE_ACTION_DELAY_MS = 120L
-
-    private enum class Edge { NONE, LEFT, RIGHT, TOP, BOTTOM }
 
     private class Stream(val pointerId: Int, x: Float, y: Float, w: Int, h: Int) {
         val downX = x
         val downY = y
-        val originX = edgeSnap(x, w.toFloat())
-        val originY = edgeSnap(y, h.toFloat())
+        val originX = TouchEdgeGesture.snapToEdge(x, w.toFloat())
+        val originY = TouchEdgeGesture.snapToEdge(y, h.toFloat())
         val screenW = w
         val screenH = h
-        val edge: Edge = when {
-            w <= 0 || h <= 0 -> Edge.NONE
-            x < w * EDGE_ASSIST_FRACTION -> Edge.LEFT
-            x > w * (1f - EDGE_ASSIST_FRACTION) -> Edge.RIGHT
-            y < h * EDGE_ASSIST_FRACTION -> Edge.TOP
-            y > h * (1f - EDGE_ASSIST_FRACTION) -> Edge.BOTTOM
-            else -> Edge.NONE
-        }
+        val edge = TouchEdgeGesture.edgeOf(x, y, w, h)
         var lastX = x
         var lastY = y
         var strokeEndX = x
@@ -89,18 +70,6 @@ internal object StreamTouchInjector {
         var downAt = 0L
         var strokeDispatchAt = 0L
         var lastLiveAt = 0L
-
-        companion object {
-            /** Snap a coordinate to the screen edge when inside the assist zone. */
-            fun edgeSnap(v: Float, dim: Float): Float {
-                val zone = dim * EDGE_ASSIST_FRACTION
-                return when {
-                    v < zone -> 0f
-                    v > dim - zone -> dim
-                    else -> v
-                }
-            }
-        }
     }
 
     private var stream: Stream? = null
@@ -160,11 +129,10 @@ internal object StreamTouchInjector {
         if (s.buffer.isEmpty()) s.bufferStartAt = lastInputAt
         s.buffer.add(Pair(x, y))
         if (!s.live) {
-            val dx = x - s.downX
-            val dy = y - s.downY
-            val drag = (dx * dx + dy * dy) > TAP_SLOP_PX * TAP_SLOP_PX
-            if (!drag) return // stays a single continuous press (tap)
-            if (s.edge != Edge.NONE) {
+            if (!TouchEdgeGesture.isBeyondTapSlop(x - s.downX, y - s.downY)) {
+                return // stays a single continuous press (tap)
+            }
+            if (s.edge != TouchEdgeGesture.Edge.NONE) {
                 // Edge-originated drags are held (no live strokes — they
                 // would scroll the app) and classified at UP: inward swipes
                 // fire the matching system action.
@@ -219,16 +187,10 @@ internal object StreamTouchInjector {
         var ex = endX
         var ey = endY
         var systemAction = 0
-        if (s.edge != Edge.NONE && !s.live) {
+        if (s.edge != TouchEdgeGesture.Edge.NONE && !s.live) {
             val dx = endX - s.downX
             val dy = endY - s.downY
-            systemAction = when (s.edge) {
-                Edge.BOTTOM -> if (dy < -s.screenH * EDGE_TRIGGER_FRACTION) AccessibilityService.GLOBAL_ACTION_HOME else 0
-                Edge.TOP -> if (dy > s.screenH * EDGE_TRIGGER_FRACTION) AccessibilityService.GLOBAL_ACTION_NOTIFICATIONS else 0
-                Edge.LEFT -> if (dx > s.screenW * EDGE_TRIGGER_FRACTION) AccessibilityService.GLOBAL_ACTION_BACK else 0
-                Edge.RIGHT -> if (dx < -s.screenW * EDGE_TRIGGER_FRACTION) AccessibilityService.GLOBAL_ACTION_BACK else 0
-                Edge.NONE -> 0
-            }
+            systemAction = TouchEdgeGesture.actionFor(s.edge, dx, dy, s.screenW, s.screenH)
             if (systemAction != 0) {
                 // Qualifying edge swipe: end the touch where it started
                 // (no app scroll) and fire the system action after the
