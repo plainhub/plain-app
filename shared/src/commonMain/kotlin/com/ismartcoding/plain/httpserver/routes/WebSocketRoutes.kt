@@ -258,9 +258,10 @@ private fun handleUpstreamControl(plain: ByteArray) {
  * Binary touch-frame layout (little-endian), same wire format as plain-cast:
  * u8 magic=0x54 | u8 count | u16 streamId (always 0 here) |
  * count × [u8 action | u8 pointerId | u16 x | u16 y | u16 dtMs]
+ * internal for TouchFrameDecodeTest (wire contract lock).
  */
-private fun decodeTouchFrame(bytes: ByteArray): List<ScreenMirrorControlInput> {
-    if (bytes.size < 4) return emptyList()
+internal fun decodeTouchFrame(bytes: ByteArray): List<ScreenMirrorControlInput> {
+    if (bytes.size < 4 || (bytes[0].toInt() and 0xff) != TOUCH_FRAME_MAGIC) return emptyList()
     val count = bytes[1].toInt() and 0xff
     if (count == 0 || bytes.size < 4 + count * 8) return emptyList()
     val inputs = ArrayList<ScreenMirrorControlInput>(count)
