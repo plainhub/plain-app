@@ -56,3 +56,9 @@ expect fun requestScreenMirrorKeyFrame()
  * scaling. Returns (0, 0) on unsupported platforms.
  */
 expect fun getAccessibilityScreenSize(): Pair<Int, Int>
+
+/**
+ * Force-release any in-flight streamed touch gesture. Called when the last
+ * web client disconnects so a press interrupted mid-stroke cannot linger.
+ */
+expect fun resetScreenMirrorTouchStream()

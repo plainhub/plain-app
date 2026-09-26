@@ -5,6 +5,8 @@ import com.ismartcoding.plain.chat.peer.PeerCacher
 import com.ismartcoding.plain.chat.peer.PeerChatParser
 import com.ismartcoding.plain.chat.peer.PeerStatusManager
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.data.ScreenMirrorControlInput
+import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.lib.JsonHelper.jsonDecode
 import com.ismartcoding.plain.lib.JsonHelper.jsonEncode
 import com.ismartcoding.plain.lib.TimeHelper
@@ -13,6 +15,8 @@ import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.chaCha20Decrypt
 import com.ismartcoding.plain.platform.chaCha20Encrypt
+import com.ismartcoding.plain.platform.dispatchScreenMirrorControl
+import com.ismartcoding.plain.platform.resetScreenMirrorTouchStream
 import com.ismartcoding.plain.platform.sha512
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
 import com.ismartcoding.plain.preferences.PasswordPreference
@@ -128,6 +132,11 @@ fun HttpRouter.addWebSocketRoutes() {
             // LogCat.d("ws: remove session $clientId, ${sessionHandle.id}")
             HttpServerManager.wsSessions.removeAll { it.id == sessionHandle.id }
             setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
+            // The last client dropping mid-stroke would leave a dangling
+            // injected touch — force-release the stream injector.
+            if (HttpServerManager.wsSessions.isEmpty()) {
+                resetScreenMirrorTouchStream()
+            }
         }
     }
 }
@@ -189,14 +198,14 @@ private suspend fun handleLoginFrame(
  * Handle a session-register frame (no `?auth=1`). The frame is encrypted
  * with the cached token; on success the session is added to the active
  * WebSocket set so [com.ismartcoding.plain.httpserver.websocket.WebSocketHelper]
- * can push events to it.
+ * can push events to it. Returns true when the session was newly registered.
  */
 private suspend fun handleSessionFrame(
     ws: WsSession,
     clientId: String,
     frame: ByteArray,
     sessionHandle: WsSessionAsHandle,
-) {
+): Boolean {
     val token = HttpServerManager.tokenCache.get(clientId)
     val decryptedBytes = token?.let { chaCha20Decrypt(it, frame) }
     if (decryptedBytes != null) {
@@ -204,9 +213,79 @@ private suspend fun handleSessionFrame(
             LogCat.d("ws: add session ${sessionHandle.id}, ts: ${decryptedBytes.decodeToString()}")
             setOnlineClientIds(HttpServerManager.wsSessions.map { it.clientId }.toSet())
             onWebSocketSessionStarted()
+            return true
         }
+        // Already-registered session: this is an upstream control frame.
+        handleUpstreamControl(decryptedBytes)
+        return true
     } else {
 //        LogCat.d("ws: invalid_request: $clientId")
         ws.close(WsCloseCode.TRY_AGAIN_LATER, "invalid_request")
+        return false
     }
 }
+
+// Upstream control protocol (mirrors plain-cast's screen-mirror control):
+// every post-registration frame is ChaCha20-encrypted with the session token.
+// The decrypted payload is either a binary touch frame (first byte 0x54) or a
+// JSON-encoded ScreenMirrorControlInput for cold-path actions (BACK/HOME/SCROLL/…).
+private const val TOUCH_FRAME_MAGIC = 0x54
+private const val TOUCH_ACTION_DOWN = 0
+private const val TOUCH_ACTION_MOVE = 1
+
+/**
+ * Dispatch one decrypted upstream control payload. Touch frames are decoded
+ * sample-by-sample and injected on the dedicated touch thread (hot path —
+ * no main-thread hop); failures are dropped silently, mirroring the
+ * accessibility-off behavior of the GraphQL mutation.
+ */
+private fun handleUpstreamControl(plain: ByteArray) {
+    if (plain.isEmpty()) return
+    if (plain[0].toInt() and 0xff == TOUCH_FRAME_MAGIC) {
+        decodeTouchFrame(plain).forEach { dispatchScreenMirrorControl(it) }
+    } else {
+        val input = try {
+            jsonDecode<ScreenMirrorControlInput>(plain.decodeToString())
+        } catch (ex: Exception) {
+            LogCat.w("ws control: bad json (${ex.message})")
+            return
+        }
+        dispatchScreenMirrorControl(input)
+    }
+}
+
+/**
+ * Binary touch-frame layout (little-endian), same wire format as plain-cast:
+ * u8 magic=0x54 | u8 count | u16 streamId (always 0 here) |
+ * count × [u8 action | u8 pointerId | u16 x | u16 y | u16 dtMs]
+ */
+private fun decodeTouchFrame(bytes: ByteArray): List<ScreenMirrorControlInput> {
+    if (bytes.size < 4) return emptyList()
+    val count = bytes[1].toInt() and 0xff
+    if (count == 0 || bytes.size < 4 + count * 8) return emptyList()
+    val inputs = ArrayList<ScreenMirrorControlInput>(count)
+    var offset = 4
+    repeat(count) {
+        val action = bytes[offset].toInt() and 0xff
+        val pointerId = bytes[offset + 1].toInt() and 0xff
+        val x = u16LE(bytes, offset + 2) / 65535f
+        val y = u16LE(bytes, offset + 4) / 65535f
+        // dtMs (offset + 6) is reserved for replay-accurate injection; the
+        // injector paces segments by the wall clock at dispatch time.
+        offset += 8
+        val controlAction = when (action) {
+            TOUCH_ACTION_DOWN -> ScreenMirrorControlAction.TOUCH_DOWN
+            TOUCH_ACTION_MOVE -> ScreenMirrorControlAction.TOUCH_MOVE
+            else -> ScreenMirrorControlAction.TOUCH_UP // 2 = UP, 3 = CANCEL (mapped to UP)
+        }
+        inputs.add(
+            ScreenMirrorControlInput(
+                action = controlAction, x = x, y = y, pointerId = pointerId,
+            ),
+        )
+    }
+    return inputs
+}
+
+private fun u16LE(bytes: ByteArray, offset: Int): Int =
+    (bytes[offset].toInt() and 0xff) or ((bytes[offset + 1].toInt() and 0xff) shl 8)

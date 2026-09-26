@@ -2,22 +2,26 @@ package com.ismartcoding.plain.services
 import com.ismartcoding.plain.appContext
 
 import android.accessibilityservice.AccessibilityService
-import android.accessibilityservice.GestureDescription
 import android.content.Context
 import android.content.Intent
-import android.graphics.Path
 import android.graphics.Point
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import android.view.accessibility.AccessibilityEvent
 import com.ismartcoding.plain.lib.logcat.LogCat
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
-import com.ismartcoding.plain.data.TouchPointInput
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.services.screenmirror.getRealScreenSize as getMirrorRealScreenSize
 
+/**
+ * The accessibility service: publishes its singleton instance, routes remote
+ * control inputs to the right injector and exposes screen-size helpers.
+ *
+ * Injection responsibilities live in their own units:
+ *  - [StreamTouchInjector] — streaming TOUCH_DOWN/MOVE/UP (dangling stroke +
+ *    terminal release, edge gestures)
+ *  - [SingleShotTouchGestures] — legacy one-shot actions (TAP/SWIPE/…)
+ *  - [TouchInjectThread] — the shared injection thread
+ */
 class PlainAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
@@ -35,6 +39,8 @@ class PlainAccessibilityService : AccessibilityService() {
     override fun onDestroy() {
         super.onDestroy()
         instance = null
+        StreamTouchInjector.reset()
+        TouchInjectThread.shutdown()
         LogCat.d("PlainAccessibilityService destroyed")
     }
 
@@ -51,14 +57,14 @@ class PlainAccessibilityService : AccessibilityService() {
             ScreenMirrorControlAction.TAP -> {
                 val x = normToX(control.x ?: return, screenWidth)
                 val y = normToY(control.y ?: return, screenHeight)
-                dispatchTap(x, y)
+                SingleShotTouchGestures.tap(this, x, y)
             }
 
             ScreenMirrorControlAction.LONG_PRESS -> {
                 val x = normToX(control.x ?: return, screenWidth)
                 val y = normToY(control.y ?: return, screenHeight)
                 val durationMs = control.durationMs ?: 500L
-                dispatchLongPress(x, y, durationMs)
+                SingleShotTouchGestures.longPress(this, x, y, durationMs)
             }
 
             ScreenMirrorControlAction.SWIPE -> {
@@ -67,15 +73,16 @@ class PlainAccessibilityService : AccessibilityService() {
                 val endX = normToX(control.endX ?: return, screenWidth)
                 val endY = normToY(control.endY ?: return, screenHeight)
                 val durationMs = control.durationMs ?: 300L
-                dispatchSwipe(startX, startY, endX, endY, durationMs)
+                SingleShotTouchGestures.swipe(this, startX, startY, endX, endY, durationMs)
             }
 
             ScreenMirrorControlAction.SCROLL -> {
                 val x = normToX(control.x ?: return, screenWidth)
                 val y = normToY(control.y ?: return, screenHeight)
-                val deltaY = control.deltaY ?: 0f
-                val scrollDistance = deltaY.coerceIn(-500f, 500f)
-                dispatchSwipe(x, y, x, y + scrollDistance, 200L)
+                val dx = (control.deltaX ?: 0f).coerceIn(-500f, 500f)
+                val dy = (control.deltaY ?: 0f).coerceIn(-500f, 500f)
+                if (dx == 0f && dy == 0f) return
+                SingleShotTouchGestures.swipe(this, x, y, x + dx, y + dy, 200L)
             }
 
             ScreenMirrorControlAction.BACK -> {
@@ -101,235 +108,35 @@ class PlainAccessibilityService : AccessibilityService() {
             ScreenMirrorControlAction.TOUCH -> {
                 val points = control.pathPoints
                 if (points == null || points.isEmpty()) return
-                dispatchTouchPath(points, screenWidth, screenHeight)
+                SingleShotTouchGestures.touchPath(this, points, screenWidth, screenHeight)
             }
 
             ScreenMirrorControlAction.TOUCH_DOWN -> {
                 val x = normToX(control.x ?: return, screenWidth)
                 val y = normToY(control.y ?: return, screenHeight)
-                TouchGestureStream.begin(this, x, y)
+                val pointerId = control.pointerId ?: 0
+                TouchInjectThread.handler.post {
+                    StreamTouchInjector.down(pointerId, x, y, screenWidth, screenHeight)
+                }
             }
 
             ScreenMirrorControlAction.TOUCH_MOVE -> {
                 val x = normToX(control.x ?: return, screenWidth)
                 val y = normToY(control.y ?: return, screenHeight)
-                TouchGestureStream.move(this, x, y)
+                val pointerId = control.pointerId ?: 0
+                TouchInjectThread.handler.post { StreamTouchInjector.move(pointerId, x, y) }
             }
 
             ScreenMirrorControlAction.TOUCH_UP -> {
                 val x = if (control.x != null) normToX(control.x, screenWidth) else null
                 val y = if (control.y != null) normToY(control.y, screenHeight) else null
-                TouchGestureStream.end(this, x, y)
+                val pointerId = control.pointerId ?: 0
+                TouchInjectThread.handler.post { StreamTouchInjector.up(pointerId, x, y) }
             }
-        }
-    }
-
-    private fun dispatchTap(x: Float, y: Float) {
-        val path = Path()
-        path.moveTo(x, y)
-        val stroke = GestureDescription.StrokeDescription(path, 0, 50)
-        val gesture = GestureDescription.Builder().addStroke(stroke).build()
-        dispatchGesture(gesture, null, null)
-    }
-
-    private fun dispatchLongPress(x: Float, y: Float, durationMs: Long) {
-        val path = Path()
-        path.moveTo(x, y)
-        val stroke = GestureDescription.StrokeDescription(path, 0, durationMs.coerceAtLeast(500))
-        val gesture = GestureDescription.Builder().addStroke(stroke).build()
-        dispatchGesture(gesture, null, null)
-    }
-
-    private fun dispatchSwipe(startX: Float, startY: Float, endX: Float, endY: Float, durationMs: Long) {
-        val path = Path()
-        path.moveTo(startX, startY)
-        path.lineTo(endX, endY)
-        val stroke = GestureDescription.StrokeDescription(path, 0, durationMs.coerceAtLeast(50))
-        val gesture = GestureDescription.Builder().addStroke(stroke).build()
-        dispatchGesture(gesture, null, null)
-    }
-
-    private fun dispatchTouchPath(
-        points: List<TouchPointInput>,
-        screenWidth: Int,
-        screenHeight: Int,
-    ) {
-        if (points.size == 1) {
-            val p = points.first()
-            val x = normToX(p.x, screenWidth)
-            val y = normToY(p.y, screenHeight)
-            val durationMs = p.tMs.coerceAtLeast(0).toLong()
-            if (durationMs >= 500L) {
-                dispatchLongPress(x, y, durationMs)
-            } else {
-                dispatchTap(x, y)
-            }
-            return
-        }
-
-        val sorted = points.sortedBy { it.tMs }
-        val first = sorted.first()
-        val last = sorted.last()
-        val totalDurationMs = (last.tMs - first.tMs).coerceAtLeast(16).toLong()
-
-        val fx = normToX(first.x, screenWidth)
-        val fy = normToY(first.y, screenHeight)
-        val lx = normToX(last.x, screenWidth)
-        val ly = normToY(last.y, screenHeight)
-        val dx = lx - fx
-        val dy = ly - fy
-        val totalDistance = kotlin.math.sqrt(dx * dx + dy * dy)
-
-        if (totalDistance < 4f) {
-            if (totalDurationMs >= 500L) {
-                dispatchLongPress(fx, fy, totalDurationMs)
-            } else {
-                dispatchTap(fx, fy)
-            }
-            return
-        }
-
-        val path = Path()
-        path.moveTo(fx, fy)
-        for (i in 1 until sorted.size) {
-            val pt = sorted[i]
-            path.lineTo(normToX(pt.x, screenWidth), normToY(pt.y, screenHeight))
-        }
-        dispatchPathGesture(path, totalDurationMs, false, null)
-    }
-
-    private fun dispatchPathGesture(
-        path: Path,
-        durationMs: Long,
-        willContinue: Boolean,
-        callback: GestureResultCallback?,
-    ) {
-        val d = durationMs.coerceAtLeast(16)
-        val stroke = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            GestureDescription.StrokeDescription(path, 0, d, willContinue)
-        } else {
-            @Suppress("DEPRECATION")
-            GestureDescription.StrokeDescription(path, 0, d)
-        }
-        val gesture = GestureDescription.Builder().addStroke(stroke).build()
-        dispatchGesture(gesture, callback, mainHandler)
-    }
-
-    private object TouchGestureStream {
-        private const val SEGMENT_DURATION_MS = 20L
-        private const val FINAL_DURATION_MS = 24L
-
-        private val lock = Any()
-        private var active = false
-        private var lastX = 0f
-        private var lastY = 0f
-        private var inFlight = false
-        private var pending: Pair<Float, Float>? = null
-
-        private val callback = object : GestureResultCallback() {
-            override fun onCompleted(gestureDescription: GestureDescription?) {
-                val next = synchronized(lock) {
-                    val p = pending
-                    pending = null
-                    if (p == null) inFlight = false
-                    p
-                }
-                val svc = instance
-                if (next != null && svc != null && active) {
-                    dispatchMoveLocked(svc, next.first, next.second)
-                }
-            }
-
-            override fun onCancelled(gestureDescription: GestureDescription?) {
-                LogCat.w("TouchGestureStream: gesture cancelled, resetting stream")
-                synchronized(lock) {
-                    active = false
-                    inFlight = false
-                    pending = null
-                }
-            }
-        }
-
-        fun begin(service: PlainAccessibilityService, x: Float, y: Float) {
-            synchronized(lock) {
-                active = true
-                inFlight = true
-                pending = null
-                lastX = x
-                lastY = y
-            }
-            val path = Path()
-            path.moveTo(x, y)
-            path.lineTo(x, y)
-            service.dispatchPathGesture(path, SEGMENT_DURATION_MS, true, callback)
-        }
-
-        fun move(service: PlainAccessibilityService, x: Float, y: Float) {
-            val shouldDispatch = synchronized(lock) {
-                if (!active) {
-                    active = true
-                    inFlight = true
-                    pending = null
-                    lastX = x
-                    lastY = y
-                    0
-                } else if (inFlight) {
-                    pending = Pair(x, y)
-                    -1
-                } else {
-                    inFlight = true
-                    pending = null
-                    1
-                }
-            }
-            when (shouldDispatch) {
-                0 -> {
-                    val path = Path()
-                    path.moveTo(x, y)
-                    path.lineTo(x, y)
-                    service.dispatchPathGesture(path, SEGMENT_DURATION_MS, true, callback)
-                }
-                1 -> dispatchMoveLocked(service, x, y)
-            }
-        }
-
-        private fun dispatchMoveLocked(service: PlainAccessibilityService, x: Float, y: Float) {
-            val fromX: Float
-            val fromY: Float
-            synchronized(lock) {
-                fromX = lastX
-                fromY = lastY
-                lastX = x
-                lastY = y
-            }
-            val path = Path()
-            path.moveTo(fromX, fromY)
-            path.lineTo(x, y)
-            service.dispatchPathGesture(path, SEGMENT_DURATION_MS, true, callback)
-        }
-
-        fun end(service: PlainAccessibilityService, x: Float?, y: Float?) {
-            val (fromX, fromY, endX, endY) = synchronized(lock) {
-                if (!active) return
-                val ex = x ?: lastX
-                val ey = y ?: lastY
-                val fx = lastX
-                val fy = lastY
-                active = false
-                inFlight = false
-                pending = null
-                listOf(fx, fy, ex, ey)
-            }
-            val path = Path()
-            path.moveTo(fromX, fromY)
-            path.lineTo(endX, endY)
-            service.dispatchPathGesture(path, FINAL_DURATION_MS, false, null)
         }
     }
 
     companion object {
-        private val mainHandler = Handler(Looper.getMainLooper())
-
         @Volatile
         var instance: PlainAccessibilityService? = null
 
