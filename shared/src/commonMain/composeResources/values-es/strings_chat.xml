@@ -56,6 +56,7 @@
     <string name="allow_web_access_desc">Permite el acceso a los datos de tu teléfono desde un navegador web</string>
     <string name="allow_desktop_access">Permitir acceso de escritorio</string>
     <string name="allow_desktop_access_desc">Permite el acceso a los datos de tu teléfono desde la aplicación de escritorio</string>
+    <string name="allow_desktop_chat_access_desc">Permite que este equipo administre tu teléfono e intercambie mensajes y archivos</string>
     <string name="chat_input_hint">¿En qué estás pensando?</string>
     <string name="client_id">ID del cliente</string>
     <string name="online">En línea</string>

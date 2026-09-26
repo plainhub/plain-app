@@ -44,6 +44,7 @@
     <string name="allow_web_access_desc">允許從網頁瀏覽器存取您的手機資料</string>
     <string name="allow_desktop_access">允許桌面應用程式存取</string>
     <string name="allow_desktop_access_desc">允許從桌面應用程式存取您的手機資料</string>
+    <string name="allow_desktop_chat_access_desc">允許這台電腦管理手機，並互傳聊天訊息與檔案</string>
     <string name="invalid_password">密碼錯誤</string>
     <string name="empty_password">密碼不為空</string>
     <string name="unknown_ip">未知IP</string>

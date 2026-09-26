@@ -56,6 +56,7 @@
     <string name="allow_web_access_desc">Consenti l'accesso ai dati del tuo telefono da un browser web</string>
     <string name="allow_desktop_access">Consenti accesso desktop</string>
     <string name="allow_desktop_access_desc">Consenti l'accesso ai dati del tuo telefono dall'app desktop</string>
+    <string name="allow_desktop_chat_access_desc">Consenti a questo computer di gestire il telefono e scambiare messaggi e file</string>
     <string name="chat_input_hint">Cosa ti frulla per la testa?</string>
     <string name="client_id">ID cliente</string>
     <string name="online">Online</string>

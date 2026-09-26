@@ -20,6 +20,7 @@ import com.ismartcoding.plain.httpserver.AuthRequest
 import com.ismartcoding.plain.httpserver.AuthResponse
 import com.ismartcoding.plain.httpserver.AuthStatus
 import com.ismartcoding.plain.httpserver.HttpServerManager
+import com.ismartcoding.plain.httpserver.requiresLoginConfirmation
 import com.ismartcoding.plain.httpserver.setOnlineClientIds
 import com.ismartcoding.plain.httpserver.http.HttpCall
 import com.ismartcoding.plain.httpserver.http.HttpRouter
@@ -165,7 +166,7 @@ private suspend fun handleLoginFrame(
     }
     if (r?.password == hash) {
         val event = ConfirmToAcceptLoginEvent(sessionHandle, clientId, r, r.ecdhPublicKey)
-        if (AuthTwoFactorPreference.getAsync()) {
+        if (requiresLoginConfirmation(r, AuthTwoFactorPreference.getAsync())) {
             ws.sendBinary(
                 chaCha20Encrypt(
                     token,

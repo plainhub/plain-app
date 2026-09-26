@@ -44,6 +44,7 @@
     <string name="allow_web_access_desc">允许从网页浏览器访问您的手机数据</string>
     <string name="allow_desktop_access">允许桌面应用访问</string>
     <string name="allow_desktop_access_desc">允许从桌面应用访问您的手机数据</string>
+    <string name="allow_desktop_chat_access_desc">允许这台电脑管理手机，并互发聊天消息与文件</string>
     <string name="invalid_password">密码错误</string>
     <string name="empty_password">密码不为空</string>
     <string name="unknown_ip">未知IP</string>

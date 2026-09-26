@@ -50,7 +50,11 @@ fun LoginRequestPage(
     val request = event.request
     val isWeb = request.browserName != "PlainApp"
     val titleRes = Res.string.allow_desktop_access
-    val descRes = if (isWeb) Res.string.allow_web_access_desc else Res.string.allow_desktop_access_desc
+    val descRes = when {
+        request.peer != null -> Res.string.allow_desktop_chat_access_desc
+        isWeb -> Res.string.allow_web_access_desc
+        else -> Res.string.allow_desktop_access_desc
+    }
     val iconRes = if (isWeb) Res.drawable.chrome else Res.drawable.laptop
 
     var allowing by remember { mutableStateOf(false) }

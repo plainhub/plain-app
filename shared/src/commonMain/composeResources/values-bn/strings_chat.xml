@@ -56,6 +56,7 @@
     <string name="allow_web_access_desc">একটি ওয়েব ব্রাউজার থেকে আপনার ফোনের ডেটা অ্যাক্সেস করার অনুমতি দিন</string>
     <string name="allow_desktop_access">ডেস্কটপ অ্যাক্সেস অনুমতি দিন</string>
     <string name="allow_desktop_access_desc">ডেস্কটপ অ্যাপ থেকে আপনার ফোনের ডেটা অ্যাক্সেস করার অনুমতি দিন</string>
+    <string name="allow_desktop_chat_access_desc">এই কম্পিউটারকে আপনার ফোন পরিচালনা এবং চ্যাট বার্তা ও ফাইল আদান-প্রদানের অনুমতি দিন</string>
     <string name="chat_input_hint">আপনার মন্তব্য কি?</string>
     <string name="client_id">ক্লায়েন্ট আইডি</string>
     <string name="online">অনলাইন</string>

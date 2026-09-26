@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateSetOf
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.SessionClientTsUpdate
+import com.ismartcoding.plain.discover.PairingPeerStore
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.ShowPermissionWizardEvent
@@ -303,6 +304,22 @@ object HttpServerManager {
             return@withIO
         }
 
+        val peer = r.peer?.takeIf {
+            it.port in 1..65535 && it.signaturePublicKey.isNotBlank() &&
+                runCatching { Base64Lenient.decode(it.signaturePublicKey).size == 32 }.getOrDefault(false)
+        }
+        if (peer != null) {
+            PairingPeerStore.save(
+                deviceId = event.clientId,
+                deviceName = peer.deviceName,
+                deviceIps = (listOf(clientIp) + peer.ips).filter { it.isNotBlank() }.distinct(),
+                port = peer.port,
+                deviceType = peer.deviceType,
+                key = deriveLoginChatKey(token),
+                signaturePublicKey = peer.signaturePublicKey,
+            )
+        }
+
         val timestamp = TimeHelper.nowMillis()
         val response = AuthResponse(
             clientId = TempData.clientId,
@@ -310,6 +327,7 @@ object HttpServerManager {
             ecdhPublicKey = serverPublicKeyBase64,
             signature = "", // filled after signing
             timestamp = timestamp,
+            chatPaired = peer != null,
         )
         val signature = SignatureHelper.signTextAsync(response.toSignatureData())
         val signedResponse = response.copy(signature = signature)
