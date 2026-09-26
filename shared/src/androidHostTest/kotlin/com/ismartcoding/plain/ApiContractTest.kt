@@ -31,13 +31,11 @@ class ApiContractTest {
         "clientId", // App.clientId — public client identity string, not an addressable entity id
         "rawId", // FeedEntry.rawId — upstream RSS guid, foreign identifier
         "requestId", // sendSms request id — idempotency key, not an entity id
-        "ids", // ChatFiles/ChatImages.ids — app file store fileIds (2026-09-20 user: String, not ID)
-        "linkPreviewImageIds", // ChatText — cached link-preview image fileIds (String)
         "subscriptionId", // Android SIM subscription integer (slot index), not an entity id
         "diskId", // StorageMount.diskId — OS disk uuid, foreign identifier (empty on Android)
         // fileId value space is String, never ID (2026-09-21 user decision: all fileIds are String).
         "albumFileId", // Audio.albumFileId — album-art display fileId token
-        "AppFile", // AppFile.id — content-addressable app file store fileId (same space as ChatFiles.ids)
+        "AppFile", // AppFile.id — content-addressable app file store fileId
         "fileId", // chunk-flow args (uploadedChunks/mergeStatus/deleteChunks/mergeChunks/mergeAppFileChunks)
     )
 

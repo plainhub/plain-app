@@ -112,6 +112,8 @@ term       := [field ":"] value op?
   - **2026-09-25 第二批（breaking）**：`deleteClipboards(ids: [ID!]!)`→`deleteClipboards(query: String!)`——编址从 id 列表改为 query DSL（§4 批量操作口径；DSL 字段 ids:/text:/all，见 §5 Clipboard 行），纳入空 query 守卫（`bulkQueryMutations` 注册表）；where 构建由 `ClipboardHelper.applyClipboardFilterFields` 承担（`BulkWhereBuildersTest` 锁死）。
   - **2026-09-25 第三批（breaking）**：剪贴板族整体对齐实体单复数——`Clipboard`→`ClipboardItem`、`clipboard`→`clipboardItems`、`clipboardCount`→`clipboardItemCount`、`deleteClipboards`→`deleteClipboardItems`。旧名由 `ApiContractTest.legacyShapesAreGone` 锁死禁回潮。
   - **2026-09-26（breaking）**：删除 mutation `sendScreenMirrorControl`（连同 GraphQL 侧 `ScreenMirrorControlInput`/`TouchPointInput` input 类型）——屏幕镜像触控/控制唯一通道是 WS §12，禁止 GraphQL/WS 双方案并存（用户定）。`ScreenMirrorControlInput` 类保留，仅作 WS JSON 信封载荷（§12.5）。
+  - **2026-09-26（breaking）**：删除 `ChatItem.data`（`ChatItemContent` union 连同 `ChatFiles`/`ChatImages`/`ChatText` 类型整体出 schema）——fileId 不再由后端计算，客户端解析 `ChatItem.content` 信封后自行用 urlToken 加密 fileId（图片/文件 = `JSON.stringify({path, name})`，文本链接预览图 = 裸 `imageLocalPath`；`/fs` 解密后按 JSON 键取 `path`，键序无关）。plain-nas 同步删除。
+  - **2026-09-27（breaking）**：删除 query `fileIds(paths)`——同类行为：客户端已持有 urlToken，fileId 一律客户端自算（chat 侧同日删除 `ChatItem.data`），后端不再提供代算端点。
 - 配对/发现域的 `platform: String` 是自由字符串（`android`/`ios`/`macos`…，QR 配对可为空串）；
   **类型化枚举只有 `DeviceInfo.platform: DevicePlatform`**。发现协议不保证枚举闭包，勿改。
 
@@ -124,7 +126,6 @@ term       := [field ":"] value op?
 | `subscriptionId`（Sim 字段、sendSms 参数） | `Int` | Android SIM 订阅整数（槽位序号） |
 | `FeedEntry.rawId` | `String` | 上游 RSS guid，外部标识 |
 | `sendMms/sendSms requestId` | `String` | 幂等键，非实体 id |
-| `ChatFiles.ids` / `ChatImages.ids` / `ChatText.linkPreviewImageIds` | `[String]` | app 文件仓 fileId（2026-09-20 用户定 String；2026-09-21 起并入全域 fileId String 政策） |
 | `Audio.albumFileId` / `AppFile.id` | `String` | 相册封面显示令牌 / app 文件仓内容寻址 fileId，非实体 id（2026-09-21 用户定） |
 | `uploadedChunks` / `mergeStatus` / `deleteChunks` / `mergeChunks` / `mergeAppFileChunks` 的 `fileId` 参数 | `String` | 客户端自选的分片集合 id，非实体 id（2026-09-21 用户定） |
 | `deleteDbTableRows(ids: [String!]!)` | `[String]` | 调试 API，原生表主键 |

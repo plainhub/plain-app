@@ -21,40 +21,25 @@ enum ChannelSystemMessageType {
   LEAVE
 }
 
-type ChatFiles {
-  ids: [String!]!
-}
-
-type ChatImages {
-  ids: [String!]!
-}
-
 type ChatItem {
   fromId: ID!
   toId: ID!
   channelId: ID
   id: ID!
-  """Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`; the typed payload is also mirrored in `data`."""
+  """Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`."""
   content: String!
   createdAt: Instant!
   updatedAt: Instant!
   status: ChatStatus!
   """Per-recipient delivery details as JSON (peer delivery results); empty when the message has no delivery failures. Drives SENT/PARTIAL/FAILED alongside `status`."""
   statusData: String!
-  data: ChatItemContent
 }
-
-union ChatItemContent = ChatFiles | ChatImages | ChatText
 
 enum ChatStatus {
   SENT
   PARTIAL
   FAILED
   PENDING
-}
-
-type ChatText {
-  linkPreviewImageIds: [String!]!
 }
 
 """ISO-8601 / RFC 3339 UTC timestamp string, e.g. 2026-09-20T12:34:56.789Z"""

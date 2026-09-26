@@ -14,7 +14,6 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.platform.searchFilesInDir
 import com.ismartcoding.plain.platform.getRecentFiles
 import com.ismartcoding.plain.platform.statFile
-import com.ismartcoding.plain.helpers.getFileId
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.httpserver.loaders.MountsLoader
 import com.ismartcoding.plain.httpserver.models.FavoriteFolder
@@ -67,11 +66,6 @@ suspend fun fileInfo(path: String, fileName: String? = null): FileInfo {
         else -> null
     }
     return FileInfo(path, updatedAt, size, data)
-}
-
-@GraphQLQuery
-suspend fun fileIds(paths: List<String>): List<String> {
-    return paths.map { getFileId(it) }
 }
 
 @GraphQLQuery(description = "Whether the path exists. Blank and '.' paths are false; stat errors (e.g. permission denied) count as not-there — a total predicate, never raises.")

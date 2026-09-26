@@ -93,10 +93,5 @@ fun SchemaBuilder.addChatMessageSchema() {
         }
         // channelId is "" for direct messages — expose null instead of the empty sentinel.
         property("channelId", typeOf<ID?>(), { it: ChatItem -> it.channelId.ifEmpty { null }?.let { id -> ID(id) } })
-        property("data") {
-            resolver { c: ChatItem ->
-                c.getContentData()
-            }
-        }
     }
 }

@@ -93,7 +93,7 @@ fun SchemaBuilder.addMainSchemaTypes() {
 
 /**
  * Types used by the peer-chat schema (`/peer_graphql`): the [ChatItem] result
- * references [ID], [Instant], [ChatStatus], and the `ChatItemContent` union;
+ * references [ID], [Instant], and [ChatStatus];
  * the `channelSystemMessage` mutation takes a [ChannelSystemMessageType].
  */
 fun SchemaBuilder.addPeerSchemaTypes() {

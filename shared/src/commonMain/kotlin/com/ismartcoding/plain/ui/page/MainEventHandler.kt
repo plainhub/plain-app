@@ -95,7 +95,6 @@ fun MainEventCollector(
                         if (chat != null) {
                             chatVM.update(chat)
                             val m = chat.toModel()
-                            m.data = m.getContentData()
                             sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(m))))
                         }
                     }

@@ -130,9 +130,6 @@ class PeerGraphQLService private constructor(
                 property("fromId", typeOf<ID>(), { it: ChatItem -> ID(it.fromId) })
                 property("toId", typeOf<ID>(), { it: ChatItem -> ID(it.toId) })
                 property("channelId", typeOf<ID?>(), { it: ChatItem -> it.channelId.ifEmpty { null }?.let { id -> ID(id) } })
-                property("data") {
-                    resolver { c: ChatItem -> c.getContentData() }
-                }
             }
         }
     }

@@ -3,7 +3,7 @@
 # Source-only; the runner sources this file.
 #
 # Schemas covered:
-#   FileQueryGraphQL   : mounts, recentFiles, files, fileInfo, fileIds
+#   FileQueryGraphQL   : mounts, recentFiles, files, fileInfo
 #   FileMutationGraphQL: deleteFiles, createDir, renameFile, writeTextFile,
 #                        copyFile, moveFile, addFavoriteFolder,
 #                        removeFavoriteFolder, setFavoriteFolderAlias
@@ -55,23 +55,6 @@ if [[ "$api_fi_path" == "/storage/emulated/0/Download" ]]; then
   pass "files-C04 fileInfo(path=/storage/emulated/0/Download) returned path match"
 else
   fail "files-C04 fileInfo path=$api_fi_path: $FI"
-fi
-
-# ----------------------------------------------------------------------------
-# files-C05  fileIds returns deterministic ids for paths
-# ----------------------------------------------------------------------------
-FIDS=$(call_gql '{ fileIds(paths: ["/storage/emulated/0/Download", "/storage/emulated/0/Music"]) }')
-api_fids_count=$(printf '%s' "$FIDS" | jq '.data.fileIds | length')
-if [[ "$api_fids_count" == "2" ]]; then
-  api_fid1=$(printf '%s' "$FIDS" | jq -r '.data.fileIds[0]')
-  api_fid2=$(printf '%s' "$FIDS" | jq -r '.data.fileIds[1]')
-  if [[ -n "$api_fid1" && -n "$api_fid2" && "$api_fid1" != "$api_fid2" ]]; then
-    pass "files-C05 fileIds returned distinct ids: $api_fid1, $api_fid2"
-  else
-    fail "files-C05 fileIds returned identical/empty ids: $FIDS"
-  fi
-else
-  fail "files-C05 fileIds returned $api_fids_count items (expected 2)"
 fi
 
 # ----------------------------------------------------------------------------

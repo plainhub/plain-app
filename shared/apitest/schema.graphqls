@@ -92,7 +92,6 @@ type Query {
   fileCount(root: String!, query: String!): Int!
   """Detailed info for one file. `fileName` is optional — when omitted it is derived from `path`; it selects the media-info probe (image/video/audio)."""
   fileInfo(path: String!, fileName: String): FileInfo!
-  fileIds(paths: [String!]!): [String!]!
   """Whether the path exists. Blank and '.' paths are false; stat errors (e.g. permission denied) count as not-there — a total predicate, never raises."""
   pathExists(path: String!): Boolean!
   """Kind of the path: FILE or DIR; null when the path does not exist (same total-predicate semantics as pathExists)."""
@@ -470,14 +469,6 @@ enum ChatChannelStatus {
   KICKED
 }
 
-type ChatFiles {
-  ids: [String!]!
-}
-
-type ChatImages {
-  ids: [String!]!
-}
-
 type ChatItem {
   """`me` when this device created the item, otherwise the client id of the originating peer."""
   fromId: ID!
@@ -485,27 +476,20 @@ type ChatItem {
   toId: ID!
   channelId: ID
   id: ID!
-  """Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`; the typed payload is also mirrored in `data`."""
+  """Message envelope JSON: {type: TEXT|IMAGES|FILES|SHARE, value: {...}} — parse `value` according to `type`."""
   content: String!
   createdAt: Instant!
   updatedAt: Instant!
   status: ChatStatus!
   """Per-recipient delivery details as JSON (peer delivery results); empty when the message has no delivery failures. Drives SENT/PARTIAL/FAILED alongside `status`."""
   statusData: String!
-  data: ChatItemContent
 }
-
-union ChatItemContent = ChatFiles | ChatImages | ChatText
 
 enum ChatStatus {
   SENT
   PARTIAL
   FAILED
   PENDING
-}
-
-type ChatText {
-  linkPreviewImageIds: [String!]!
 }
 
 type ClipboardItem {

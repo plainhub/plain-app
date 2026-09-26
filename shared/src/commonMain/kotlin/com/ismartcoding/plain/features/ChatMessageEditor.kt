@@ -70,7 +70,7 @@ object ChatMessageEditor {
         )
         ChatDbHelper.updateChatItemContent(item, content)
 
-        val model = item.toModel().apply { data = getContentData() }
+        val model = item.toModel()
         sendEvent(
             WebSocketEvent(
                 EventType.MESSAGE_UPDATED,
