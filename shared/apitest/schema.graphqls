@@ -139,7 +139,6 @@ type Mutation {
   requestScreenMirrorAudio: Boolean!
   stopScreenMirror: Boolean!
   updateScreenMirrorQuality(mode: ScreenMirrorMode!): Boolean!
-  sendScreenMirrorControl(input: ScreenMirrorControlInput!): Boolean!
   requestScreenMirrorKeyFrame: Boolean!
   """Delete all uploaded chunks for `fileId`, discarding an unfinished upload."""
   deleteChunks(fileId: String!): Boolean!
@@ -1233,21 +1232,6 @@ enum ScreenMirrorControlAction {
   TOUCH_UP
 }
 
-input ScreenMirrorControlInput {
-  action: ScreenMirrorControlAction!
-  x: Float
-  y: Float
-  endX: Float
-  endY: Float
-  durationMs: Long
-  deltaX: Float
-  deltaY: Float
-  key: String
-  pathPoints: [TouchPointInput!]
-  pointerId: Int
-  pressure: Float
-}
-
 enum ScreenMirrorMode {
   HD
   SMOOTH
@@ -1355,12 +1339,6 @@ input TagRelationStub {
 type Temperature {
   label: String!
   celsius: Float!
-}
-
-input TouchPointInput {
-  x: Float!
-  y: Float!
-  tMs: Int!
 }
 
 type Video implements MediaItem {

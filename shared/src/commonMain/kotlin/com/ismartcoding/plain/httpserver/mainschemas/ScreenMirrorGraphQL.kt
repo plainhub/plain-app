@@ -1,18 +1,15 @@
 package com.ismartcoding.plain.httpserver.mainschemas
 
-import com.ismartcoding.plain.lib.kgraphql.GraphQLError
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLMutation
 import com.ismartcoding.plain.lib.kgraphql.annotations.GraphQLQuery
 import com.ismartcoding.plain.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.data.DScreenMirrorQuality
-import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.events.HRequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.events.HStartScreenMirrorEvent
 import com.ismartcoding.plain.lib.sendEvent
 import com.ismartcoding.plain.platform.Permission
 import com.ismartcoding.plain.platform.applyScreenMirrorQualityPreference
-import com.ismartcoding.plain.platform.dispatchScreenMirrorControl
 import com.ismartcoding.plain.platform.getScreenMirrorVideoCodec
 import com.ismartcoding.plain.platform.isScreenMirrorControlEnabled
 import com.ismartcoding.plain.platform.isScreenMirrorRunning
@@ -75,15 +72,6 @@ suspend fun updateScreenMirrorQuality(mode: ScreenMirrorMode): Boolean {
     val qualityData = DScreenMirrorQuality(mode, resolution)
     ScreenMirrorQualityPreference.putAsync(qualityData)
     onScreenMirrorQualityChanged(mode)
-    return true
-}
-
-@GraphQLMutation
-suspend fun sendScreenMirrorControl(input: ScreenMirrorControlInput): Boolean {
-    val ok = dispatchScreenMirrorControl(input)
-    if (!ok) {
-        throw GraphQLError("Accessibility service is not enabled")
-    }
     return true
 }
 

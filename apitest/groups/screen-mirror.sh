@@ -7,7 +7,7 @@
 #                         screenMirrorQuality, screenMirrorVideoCodec,
 #                         startScreenMirror, requestScreenMirrorAudio,
 #                         stopScreenMirror, updateScreenMirrorQuality,
-#                         sendScreenMirrorControl
+#                         requestScreenMirrorKeyFrame
 #
 # Screen mirror requires the AccessibilityService to be enabled. On a
 # stock Pixel userdebug it isn't, so the mutations that dispatch
@@ -90,20 +90,7 @@ else
   fail "screen-mirror-C07 requestScreenMirrorAudio returned: $RSMA"
 fi
 
-# ----------------------------------------------------------------------------
-# screen-mirror-C08  sendScreenMirrorControl — requires AccessibilityService
-# ----------------------------------------------------------------------------
-# Try a benign no-op control (tap at origin) and expect it to throw if
-# the AccessibilityService is disabled.
-SSMC=$(call_gql 'mutation { sendScreenMirrorControl(input: { action: TAP, x: 0.5, y: 0.5 }) }')
-api_ssmc_err=$(printf '%s' "$SSMC" | jq -r '.errors[0].message // empty')
-api_ssmc=$(printf '%s' "$SSMC" | jq -r '.data.sendScreenMirrorControl // empty')
-if [[ "$api_ssmc_err" == *"Accessibility"* ]] || [[ "$api_ssmc_err" == *"not enabled"* ]]; then
-  pass "screen-mirror-C08 sendScreenMirrorControl correctly errored: AccessibilityService not enabled"
-elif [[ "$api_ssmc" == "true" ]]; then
-  pass "screen-mirror-C08 sendScreenMirrorControl → true (AccessibilityService enabled)"
-else
-  fail "screen-mirror-C08 sendScreenMirrorControl returned: $SSMC"
-fi
+# sendScreenMirrorControl was removed (2026-09-26): screen mirror control is
+# WS-only (API_SPEC §12); touch/control must never ride GraphQL.
 
 end_group

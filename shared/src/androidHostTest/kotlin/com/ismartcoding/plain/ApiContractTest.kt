@@ -31,7 +31,6 @@ class ApiContractTest {
         "clientId", // App.clientId — public client identity string, not an addressable entity id
         "rawId", // FeedEntry.rawId — upstream RSS guid, foreign identifier
         "requestId", // sendSms request id — idempotency key, not an entity id
-        "pointerId", // multi-touch pointer slot index, not an entity id
         "ids", // ChatFiles/ChatImages.ids — app file store fileIds (2026-09-20 user: String, not ID)
         "linkPreviewImageIds", // ChatText — cached link-preview image fileIds (String)
         "subscriptionId", // Android SIM subscription integer (slot index), not an entity id
