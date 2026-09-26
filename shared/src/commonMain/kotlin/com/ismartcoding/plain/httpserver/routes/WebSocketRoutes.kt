@@ -18,6 +18,8 @@ import com.ismartcoding.plain.platform.chaCha20Encrypt
 import com.ismartcoding.plain.platform.dispatchScreenMirrorControl
 import com.ismartcoding.plain.platform.resetScreenMirrorTouchStream
 import com.ismartcoding.plain.platform.sha512
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
 import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.httpserver.AuthRequest
@@ -228,30 +230,54 @@ private suspend fun handleSessionFrame(
 // Upstream control protocol (mirrors plain-cast's screen-mirror control):
 // every post-registration frame is ChaCha20-encrypted with the session token.
 // The decrypted payload is either a binary touch frame (first byte 0x54) or a
-// JSON-encoded ScreenMirrorControlInput for cold-path actions (BACK/HOME/SCROLL/…).
+// JSON envelope discriminated by its `type` field (see UpstreamMessage — a
+// bare ScreenMirrorControlInput is NOT accepted; only envelopes route).
+// Binary magic bytes and JSON type names are both registries owned by
+// API_SPEC §12: new upstream protocols take a new magic byte / type name
+// there, never an overload of an existing one.
 private const val TOUCH_FRAME_MAGIC = 0x54
 private const val TOUCH_ACTION_DOWN = 0
 private const val TOUCH_ACTION_MOVE = 1
 
+/** Typed envelope for JSON upstream frames (API_SPEC §12.3 registry). */
+@Serializable
+private sealed interface UpstreamMessage {
+    @Serializable
+    @SerialName("screenMirrorControl")
+    data class ScreenMirrorControl(val input: ScreenMirrorControlInput) : UpstreamMessage
+}
+
 /**
  * Dispatch one decrypted upstream control payload. Touch frames are decoded
  * sample-by-sample and injected on the dedicated touch thread (hot path —
- * no main-thread hop); failures are dropped silently, mirroring the
- * accessibility-off behavior of the GraphQL mutation.
+ * single byte compare before any parsing, no main-thread hop); failures are
+ * dropped silently, mirroring the accessibility-off behavior of the GraphQL
+ * mutation.
  */
 private fun handleUpstreamControl(plain: ByteArray) {
     if (plain.isEmpty()) return
     if (plain[0].toInt() and 0xff == TOUCH_FRAME_MAGIC) {
         decodeTouchFrame(plain).forEach { dispatchScreenMirrorControl(it) }
     } else {
-        val input = try {
-            jsonDecode<ScreenMirrorControlInput>(plain.decodeToString())
-        } catch (ex: Exception) {
-            LogCat.w("ws control: bad json (${ex.message})")
-            return
-        }
-        dispatchScreenMirrorControl(input)
+        decodeUpstreamEnvelope(plain)?.let { dispatchScreenMirrorControl(it) }
     }
+}
+
+/**
+ * Decode one JSON upstream frame. Returns the control input for the (single)
+ * screenMirrorControl envelope, or null when the frame is malformed, carries
+ * an unknown `type`, or is a bare pre-envelope input — unknown types fail
+ * fast inside kotlinx polymorphic deserialization (discriminator lookup
+ * throws before any payload field is read).
+ * internal for UpstreamControlDecodeTest (routing contract lock).
+ */
+internal fun decodeUpstreamEnvelope(plain: ByteArray): ScreenMirrorControlInput? = try {
+    when (val message = jsonDecode<UpstreamMessage>(plain.decodeToString())) {
+        is UpstreamMessage.ScreenMirrorControl -> message.input
+    }
+} catch (ex: Exception) {
+    LogCat.w("ws control: dropped upstream json (${ex.message})")
+    null
 }
 
 /**

@@ -111,6 +111,7 @@ term       := [field ":"] value op?
   - **2026-09-25 命名清理（breaking，多仓同周期同步）**：`deleteClipboard`→`deleteClipboards`（批量删除按 id 列表，对齐 deleteBookmarks/deleteNotifications 复数命名）、`archivedConversations`→`archivedSmsConversations`（补齐 Sms 前缀，对齐 smsConversations 及 2026-09-24 archiveSmsConversation 改名决策）。旧名由 `ApiContractTest.legacyShapesAreGone` 锁死禁回潮。
   - **2026-09-25 第二批（breaking）**：`deleteClipboards(ids: [ID!]!)`→`deleteClipboards(query: String!)`——编址从 id 列表改为 query DSL（§4 批量操作口径；DSL 字段 ids:/text:/all，见 §5 Clipboard 行），纳入空 query 守卫（`bulkQueryMutations` 注册表）；where 构建由 `ClipboardHelper.applyClipboardFilterFields` 承担（`BulkWhereBuildersTest` 锁死）。
   - **2026-09-25 第三批（breaking）**：剪贴板族整体对齐实体单复数——`Clipboard`→`ClipboardItem`、`clipboard`→`clipboardItems`、`clipboardCount`→`clipboardItemCount`、`deleteClipboards`→`deleteClipboardItems`。旧名由 `ApiContractTest.legacyShapesAreGone` 锁死禁回潮。
+  - **2026-09-26（breaking）**：删除 mutation `sendScreenMirrorControl`（连同 GraphQL 侧 `ScreenMirrorControlInput`/`TouchPointInput` input 类型）——屏幕镜像触控/控制唯一通道是 WS §12，禁止 GraphQL/WS 双方案并存（用户定）。`ScreenMirrorControlInput` 类保留，仅作 WS JSON 信封载荷（§12.5）。
 - 配对/发现域的 `platform: String` 是自由字符串（`android`/`ios`/`macos`…，QR 配对可为空串）；
   **类型化枚举只有 `DeviceInfo.platform: DevicePlatform`**。发现协议不保证枚举闭包，勿改。
 
@@ -123,7 +124,6 @@ term       := [field ":"] value op?
 | `subscriptionId`（Sim 字段、sendSms 参数） | `Int` | Android SIM 订阅整数（槽位序号） |
 | `FeedEntry.rawId` | `String` | 上游 RSS guid，外部标识 |
 | `sendMms/sendSms requestId` | `String` | 幂等键，非实体 id |
-| `ScreenMirrorControlInput.pointerId` | `Int` | 多指触控槽位序号 |
 | `ChatFiles.ids` / `ChatImages.ids` / `ChatText.linkPreviewImageIds` | `[String]` | app 文件仓 fileId（2026-09-20 用户定 String；2026-09-21 起并入全域 fileId String 政策） |
 | `Audio.albumFileId` / `AppFile.id` | `String` | 相册封面显示令牌 / app 文件仓内容寻址 fileId，非实体 id（2026-09-21 用户定） |
 | `uploadedChunks` / `mergeStatus` / `deleteChunks` / `mergeChunks` / `mergeAppFileChunks` 的 `fileId` 参数 | `String` | 客户端自选的分片集合 id，非实体 id（2026-09-21 用户定） |
@@ -198,7 +198,7 @@ GraphQL schema 没有 Subscription；实时变更走专用 WS 旁路。**事件�
 
 ## 12. WebSocket 上行控制协议（Screen Mirror 触控/控制通道，2026-09-26 冻结记录）
 
-GraphQL 之外的客户端→手机实时控制旁路，协议与 plain-cast 同源（`plain-cast docs/touch-low-latency-design.md`）。
+GraphQL 之外的客户端→手机实时控制旁路，协议与 plain-cast 同源（`plain-cast docs/touch-low-latency-design.md`）。屏幕镜像触控/控制**只有这一条通道**（GraphQL 无控制 mutation，2026-09-26 起）。
 权威源码：`shared/src/commonMain/kotlin/com/ismartcoding/plain/httpserver/routes/WebSocketRoutes.kt`（`handleUpstreamControl`/`decodeTouchFrame`）与
 `shared/src/androidMain/kotlin/com/ismartcoding/plain/services/StreamTouchInjector.kt`。改动视同 breaking。
 
@@ -216,11 +216,22 @@ GraphQL 之外的客户端→手机实时控制旁路，协议与 plain-cast 同
 
 ### 12.3 控制帧分派（解密后的明文）
 
+分派规则（热路径先查首字节、零 JSON 解析）：
+
 | 明文首字节 | 含义 |
 |---|---|
 | 空 | 忽略 |
 | `0x54` | 二进制触摸帧（12.4，热路径） |
-| 其他 | UTF-8 JSON `ScreenMirrorControlInput`（12.5，冷路径） |
+| 其他 | UTF-8 JSON **类型信封**（12.5，冷路径） |
+
+**JSON 上行一律走类型信封**：`{"type":"<注册名>", …}`（kotlinx 多态判别字段，服务端 `UpstreamMessage` sealed interface）。**裸 `ScreenMirrorControlInput` 不被接受**（防 `ignoreUnknownKeys` 误路由：不相关事件碰巧带 `action` 字段不得注入触控）。当前注册：`screenMirrorControl`（字段 `input: ScreenMirrorControlInput`）。未知 `type` / 畸形 JSON / 非法枚举：kotlinx 判别查找在读 payload 前即抛出，服务端 log 后丢弃（发送端无回执）。
+
+**双注册表（新增上行协议的唯一入口）**：二进制 magic 字节与 JSON type 名均在此登记，禁止复用/重载已有值——新二进制协议取新 magic 字节（`0x54` 已占用），新 JSON 事件加新 type 名 + sealed 子类 + 服务端 when 分支。对齐 §11 下行事件编号的管理纪律。
+
+| 注册名 / magic | 协议 | 载荷 |
+|---|---|---|
+| `0x54` | 二进制触摸帧（12.4） | 紧凑样本帧 |
+| `screenMirrorControl` | 屏幕镜像控制（12.5） | `input: ScreenMirrorControlInput` |
 
 ### 12.4 二进制触摸帧（touch 热路径）
 
@@ -237,9 +248,9 @@ little-endian，与 plain-cast 逐字节同格式。`streamId` 本通道恒 0。
 
 每个样本语义等价于 `TOUCH_DOWN/MOVE/UP` 的 `ScreenMirrorControlInput`；多指帧合法但 a11y 注入单流——第二指 DOWN 被忽略（plain-cast 未激活内核注入时同款行为）。
 
-### 12.5 JSON 控制帧（`ScreenMirrorControlInput`）
+### 12.5 JSON 控制帧（`screenMirrorControl` 信封 → `ScreenMirrorControlInput`）
 
-字段定义（归一化 Float 0..1 = 相对**渲染画面矩形**，越界值服务端钳制不丢弃）：
+帧形如 `{"type":"screenMirrorControl","input":{…}}`；`input` 字段定义（归一化 Float 0..1 = 相对**渲染画面矩形**，越界值服务端钳制不丢弃）：
 
 | 字段 | 类型 | 用途 | 必传于 |
 |---|---|---|---|
@@ -249,7 +260,7 @@ little-endian，与 plain-cast 逐字节同格式。`streamId` 本通道恒 0。
 | `durationMs` | Long | 时长（LONG_PRESS 缺省 500，SWIPE 缺省 300） | LONG_PRESS/SWIPE |
 | `deltaX` / `deltaY` | Float | 像素增量，服务端钳 ±500 | SCROLL |
 | `pathPoints` | `[TouchPointInput]` | 轨迹点 `{x: Float, y: Float, tMs: Int}`，tMs 相对首点毫秒 | TOUCH |
-| `pointerId` | Int | 触控槽位（u8 域 0..255，§8 例外项） | TOUCH_DOWN/MOVE/UP |
+| `pointerId` | Int | 触控槽位（u8 域 0..255） | TOUCH_DOWN/MOVE/UP |
 | `key` | String | 按键名（保留，暂只记日志） | KEY |
 | `pressure` | Float | 兼容字段，服务端忽略 | — |
 
@@ -269,6 +280,6 @@ action 语义：
 ### 12.6 客户端选路契约
 
 - 触摸样本（DOWN/MOVE/UP/CANCEL）**必须走二进制帧**——每秒上百样本，HTTP 逐请求不可接受；流式手势必须以 UP/CANCEL 终结，无终结帧 = 触摸滞留到 stale watchdog（10s）强制释放。
-- 冷路径动作走 JSON 帧；WS 不可用时可回落 GraphQL `sendScreenMirrorControl(input)`（同一 input schema），触摸热路径**禁止**回落。
+- 冷路径动作走 JSON 信封帧（12.3）。**GraphQL 无控制通道**：`sendScreenMirrorControl` mutation 已删（2026-09-26，禁双方案），WS 断开时控制帧直接丢弃——服务端断连即 `resetScreenMirrorTouchStream`（12.1），客户端无需也不得另寻通道补发。
 - 无障碍服务未启用时控制帧静默丢弃（`dispatchScreenMirrorControl` 返回 false 不抛错）；开关状态以 GraphQL `screenMirrorControlEnabled` 为准。
 - 同一 WebSocket 同时承载 §11 下行事件与 §12 上行控制，互不影响。
