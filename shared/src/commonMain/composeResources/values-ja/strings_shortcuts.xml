@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">ランチャーショートカット</string>
+    <string name="launcher_shortcuts_hint">アプリアイコンを長押ししたときに表示するツールを最大4つ選択できます</string>
+    <string name="launcher_shortcuts_limit">選択できるのは最大4つです</string>
+</resources>

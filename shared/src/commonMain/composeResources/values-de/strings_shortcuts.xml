@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Launcher-Verknüpfungen</string>
+    <string name="launcher_shortcuts_hint">Wähle bis zu 4 Werkzeuge, die beim langen Drücken auf das App-Symbol angezeigt werden</string>
+    <string name="launcher_shortcuts_limit">Du kannst bis zu 4 Werkzeuge auswählen</string>
+</resources>

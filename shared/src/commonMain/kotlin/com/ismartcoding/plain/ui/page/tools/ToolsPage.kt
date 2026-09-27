@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,11 +28,16 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.i18n.Res
+import com.ismartcoding.plain.i18n.customize_home_features
+import com.ismartcoding.plain.i18n.grid_3x3
+import com.ismartcoding.plain.i18n.launcher_shortcuts
 import com.ismartcoding.plain.i18n.casting
 import com.ismartcoding.plain.i18n.casting_to
+import com.ismartcoding.plain.i18n.layout_grid
 import com.ismartcoding.plain.i18n.tools
-import com.ismartcoding.plain.ui.base.ActionButtonAdd
+import com.ismartcoding.plain.ui.base.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.StatusIndicator
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -46,6 +53,7 @@ import com.ismartcoding.plain.ui.page.home.HomeFeatureItemsGrid
 import com.ismartcoding.plain.ui.theme.greenPill
 import com.ismartcoding.plain.ui.theme.greenText
 import kotlinx.coroutines.flow.map
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,8 +78,33 @@ fun ToolsPage(
             PTopAppBar(
                 title = stringResource(Res.string.tools),
                 actions = {
-                    ActionButtonAdd {
-                        navController.navigate(Routing.CustomFeatures)
+                    ActionButtonAddWithMenu { dismiss ->
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(Res.string.customize_home_features)) },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(Res.drawable.layout_grid),
+                                    contentDescription = null,
+                                )
+                            },
+                            onClick = {
+                                dismiss()
+                                navController.navigate(Routing.CustomFeatures)
+                            },
+                        )
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(Res.string.launcher_shortcuts)) },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(Res.drawable.grid_3x3),
+                                    contentDescription = null,
+                                )
+                            },
+                            onClick = {
+                                dismiss()
+                                navController.navigate(Routing.LauncherShortcuts)
+                            },
+                        )
                     }
                 },
             )

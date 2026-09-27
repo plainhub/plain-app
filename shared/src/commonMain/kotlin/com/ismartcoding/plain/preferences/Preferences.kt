@@ -805,6 +805,24 @@ object QuickNoteDraftPreference : BasePreference<String>() {
     override val key = stringPreferencesKey("quick_note_draft")
 }
 
+object LauncherShortcutsPreference : BasePreference<String>() {
+    private const val SEPARATOR = "|"
+    override val default = com.ismartcoding.plain.ui.nav.LauncherShortcutTools.DEFAULT.joinToString(SEPARATOR) { it.name }
+    override val key = stringPreferencesKey("launcher_shortcuts_v1")
+
+    fun parseList(value: String): List<String> =
+        if (value.isEmpty()) emptyList() else value.split(SEPARATOR).filter { it.isNotBlank() }
+
+    fun formatList(list: List<com.ismartcoding.plain.enums.AppFeatureType>): String =
+        list.joinToString(SEPARATOR) { it.name }
+
+    /** Selected shortcut tools, matching known candidates by name. */
+    fun selected(value: String): List<com.ismartcoding.plain.enums.AppFeatureType> =
+        parseList(value).mapNotNull { name ->
+            com.ismartcoding.plain.ui.nav.LauncherShortcutTools.ALL.firstOrNull { it.name == name }
+        }
+}
+
 object HomeSectionCollapsedPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("home_section_collapsed")

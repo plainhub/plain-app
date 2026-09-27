@@ -5,7 +5,7 @@
     <string name="shortcut_notes">Notizen</string>
     <string name="shortcut_docs">Dokumente</string>
     <string name="shortcut_feeds">Feeds</string>
-    <string name="shortcut_pomodoro">Pomodoro-Timer</string>
+    <string name="shortcut_pomodoro_timer">Pomodoro-Timer</string>
     <string name="shortcut_images">Bilder</string>
     <string name="shortcut_videos">Videos</string>
     <string name="shortcut_audio">Audio</string>

@@ -5,7 +5,7 @@
     <string name="shortcut_notes">참고</string>
     <string name="shortcut_docs">문서</string>
     <string name="shortcut_feeds">피드</string>
-    <string name="shortcut_pomodoro">포모도로 타이머</string>
+    <string name="shortcut_pomodoro_timer">포모도로 타이머</string>
     <string name="shortcut_images">이미지</string>
     <string name="shortcut_videos">비디오</string>
     <string name="shortcut_audio">오디오</string>

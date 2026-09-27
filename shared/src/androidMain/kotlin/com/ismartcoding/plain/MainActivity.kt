@@ -39,6 +39,8 @@ import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.bluetooth.client.BluetoothPermission
 import com.ismartcoding.plain.platform.isGranted
 import com.ismartcoding.plain.preferences.SettingsProvider
+import com.ismartcoding.plain.preferences.LauncherShortcutsPreference
+import com.ismartcoding.plain.platform.publishLauncherShortcuts
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.PlainAccessibilityService
@@ -182,6 +184,9 @@ class MainActivity : AppCompatActivity() {
         }
         AudioPlayer.ensurePlayer(this)
         HttpServerManager.ensureStarted()
+        lifecycleScope.launch(Dispatchers.Default) {
+            publishLauncherShortcuts(LauncherShortcutsPreference.selected(LauncherShortcutsPreference.getAsync()))
+        }
     }
 
     override fun onDestroy() {

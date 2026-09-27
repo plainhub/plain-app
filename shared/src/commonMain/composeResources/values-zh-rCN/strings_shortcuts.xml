@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">桌面快捷方式</string>
+    <string name="launcher_shortcuts_hint">最多选择 4 个工具，长按应用图标时显示</string>
+    <string name="launcher_shortcuts_limit">最多只能选择 4 个工具</string>
+</resources>

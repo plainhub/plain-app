@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Scorciatoie del launcher</string>
+    <string name="launcher_shortcuts_hint">Scegli fino a 4 strumenti da mostrare tenendo premuta l'icona dell'app</string>
+    <string name="launcher_shortcuts_limit">Puoi scegliere fino a 4 strumenti</string>
+</resources>

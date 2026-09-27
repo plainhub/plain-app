@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Launcher-snelkoppelingen</string>
+    <string name="launcher_shortcuts_hint">Kies maximaal 4 hulpmiddelen die verschijnen als je lang op het app-icoon drukt</string>
+    <string name="launcher_shortcuts_limit">Je kunt maximaal 4 hulpmiddelen kiezen</string>
+</resources>

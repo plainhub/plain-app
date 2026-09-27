@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">லாஞ்சர் குறுக்குவழிகள்</string>
+    <string name="launcher_shortcuts_hint">பயன்பாட்டு படவுருவை நீண்ட நேரம் அழுத்தும்போது காட்ட 4 கருவிகள் வரை தேர்ந்தெடுக்கவும்</string>
+    <string name="launcher_shortcuts_limit">நீங்கள் அதிகபட்சம் 4 கருவிகளை மட்டுமே தேர்ந்தெடுக்கலாம்</string>
+</resources>

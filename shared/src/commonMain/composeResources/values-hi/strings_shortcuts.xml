@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">लॉन्चर शॉर्टकट</string>
+    <string name="launcher_shortcuts_hint">ऐप आइकन को देर तक दबाने पर दिखाने के लिए अधिकतम 4 टूल चुनें</string>
+    <string name="launcher_shortcuts_limit">आप अधिकतम 4 टूल चुन सकते हैं</string>
+</resources>

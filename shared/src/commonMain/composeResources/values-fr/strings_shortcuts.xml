@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Raccourcis du lanceur</string>
+    <string name="launcher_shortcuts_hint">Choisissez jusqu'à 4 outils à afficher lors d'un appui long sur l'icône de l'application</string>
+    <string name="launcher_shortcuts_limit">Vous pouvez choisir jusqu'à 4 outils</string>
+</resources>

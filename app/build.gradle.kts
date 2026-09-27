@@ -1,72 +1,7 @@
 import java.io.FileInputStream
 import java.util.Properties
-import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-// Launcher shortcuts (res/xml/shortcuts.xml) need the variant applicationId as
-// the intent action prefix. XML cannot reference string resources there, so the
-// file is generated per variant instead of being committed as a static resource.
-abstract class GenerateShortcutsXmlTask : DefaultTask() {
-    @get:Input abstract val applicationId: Property<String>
-    @get:Input abstract val namespace: Property<String>
-    @get:OutputDirectory abstract val outputDir: DirectoryProperty
-
-    @TaskAction
-    fun generate() {
-        val appId = applicationId.get()
-        val entries = listOf(
-            "notes" to "OPEN_NOTES",
-            "docs" to "OPEN_DOCS",
-            "feeds" to "OPEN_FEEDS",
-            "pomodoro" to "OPEN_POMODORO",
-            "images" to "OPEN_IMAGES",
-            "videos" to "OPEN_VIDEOS",
-            "audio" to "OPEN_AUDIO",
-            "files" to "OPEN_FILES",
-        ).joinToString("\n") { (id, action) ->
-            """    <shortcut
-        android:shortcutId="$id"
-        android:enabled="true"
-        android:icon="@drawable/shortcut_$id"
-        android:shortcutShortLabel="@string/shortcut_$id"
-        android:shortcutLongLabel="@string/shortcut_$id">
-        <intent
-            android:action="$appId.action.$action"
-            android:targetPackage="$appId"
-            android:targetClass="${namespace.get()}.MainActivity" />
-    </shortcut>"""
-        }
-        val dir = outputDir.asFile.get().resolve("xml")
-        dir.mkdirs()
-        dir.resolve("shortcuts.xml").writeText(
-            """<?xml version="1.0" encoding="utf-8"?>
-<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
-$entries
-</shortcuts>
-""",
-        )
-    }
-}
-
-androidComponents {
-    onVariants { variant ->
-        val genTask = tasks.register(
-            "generate${variant.name.replaceFirstChar { it.uppercase() }}ShortcutsXml",
-            GenerateShortcutsXmlTask::class,
-        ) {
-            applicationId.set(variant.applicationId)
-            namespace.set(variant.namespace)
-            outputDir.set(layout.buildDirectory.dir("generated/shortcutsXml/${variant.name}"))
-        }
-        variant.sources.res?.addGeneratedSourceDirectory(genTask, GenerateShortcutsXmlTask::outputDir)
-    }
-}
 
 plugins {
     id("com.android.application")

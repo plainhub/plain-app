@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">桌面捷徑</string>
+    <string name="launcher_shortcuts_hint">最多選擇 4 個工具，長按應用程式圖示時顯示</string>
+    <string name="launcher_shortcuts_limit">最多只能選擇 4 個工具</string>
+</resources>

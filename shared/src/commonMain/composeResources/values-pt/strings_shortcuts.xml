@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Atalhos do launcher</string>
+    <string name="launcher_shortcuts_hint">Escolha até 4 ferramentas para mostrar ao pressionar e segurar o ícone do app</string>
+    <string name="launcher_shortcuts_limit">Você pode escolher até 4 ferramentas</string>
+</resources>

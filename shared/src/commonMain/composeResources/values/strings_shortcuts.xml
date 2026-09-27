@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Launcher shortcuts</string>
+    <string name="launcher_shortcuts_hint">Pick up to 4 tools to show when you long-press the app icon</string>
+    <string name="launcher_shortcuts_limit">You can pick up to 4 tools</string>
+</resources>

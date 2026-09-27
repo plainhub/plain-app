@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Başlatıcı kısayolları</string>
+    <string name="launcher_shortcuts_hint">Uygulama simgesine uzun bastığınızda gösterilecek en fazla 4 araç seçin</string>
+    <string name="launcher_shortcuts_limit">En fazla 4 araç seçebilirsiniz</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Ярлыки лаунчера</string>
+    <string name="launcher_shortcuts_hint">Выберите до 4 инструментов для долгого нажатия на значок приложения</string>
+    <string name="launcher_shortcuts_limit">Можно выбрать не более 4 инструментов</string>
+</resources>

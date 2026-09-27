@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Phím tắt launcher</string>
+    <string name="launcher_shortcuts_hint">Chọn tối đa 4 công cụ hiển thị khi nhấn giữ biểu tượng ứng dụng</string>
+    <string name="launcher_shortcuts_limit">Bạn chỉ có thể chọn tối đa 4 công cụ</string>
+</resources>

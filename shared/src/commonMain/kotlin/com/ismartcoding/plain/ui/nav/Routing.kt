@@ -28,6 +28,9 @@ class Routing {
     object CustomFeatures
 
     @Serializable
+    object LauncherShortcuts
+
+    @Serializable
     object NotificationSettings
 
     @Serializable

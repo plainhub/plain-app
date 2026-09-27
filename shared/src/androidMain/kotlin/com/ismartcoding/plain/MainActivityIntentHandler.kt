@@ -3,6 +3,7 @@ package com.ismartcoding.plain
 import android.content.Intent
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.i18n.Res
 import com.ismartcoding.plain.i18n.not_supported_error
@@ -14,16 +15,16 @@ import com.ismartcoding.plain.ui.nav.navigateShareImage
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 
 internal fun MainActivity.handleIntent(intent: Intent) {
-    // Launcher shortcuts (app/src/main/res/xml/shortcuts.xml): open the tool page directly.
+    // Launcher shortcuts (long-press app icon): open the tool page directly.
     when (intent.action) {
-        AppIntents.ACTION_OPEN_NOTES -> openToolShortcut(Routing.Notes)
-        AppIntents.ACTION_OPEN_DOCS -> openToolShortcut(Routing.Docs)
-        AppIntents.ACTION_OPEN_POMODORO -> openToolShortcut(Routing.PomodoroTimer)
-        AppIntents.ACTION_OPEN_FEEDS -> openToolShortcut(Routing.FeedEntries(""))
-        AppIntents.ACTION_OPEN_IMAGES -> openToolShortcut(Routing.Images)
-        AppIntents.ACTION_OPEN_VIDEOS -> openToolShortcut(Routing.Videos)
-        AppIntents.ACTION_OPEN_AUDIO -> openToolShortcut(Routing.Audio)
-        AppIntents.ACTION_OPEN_FILES -> openToolShortcut(Routing.Files())
+        AppIntents.actionOpenShortcut(AppFeatureType.NOTES) -> openToolShortcut(Routing.Notes)
+        AppIntents.actionOpenShortcut(AppFeatureType.DOCS) -> openToolShortcut(Routing.Docs)
+        AppIntents.actionOpenShortcut(AppFeatureType.POMODORO_TIMER) -> openToolShortcut(Routing.PomodoroTimer)
+        AppIntents.actionOpenShortcut(AppFeatureType.FEEDS) -> openToolShortcut(Routing.FeedEntries(""))
+        AppIntents.actionOpenShortcut(AppFeatureType.IMAGES) -> openToolShortcut(Routing.Images)
+        AppIntents.actionOpenShortcut(AppFeatureType.VIDEOS) -> openToolShortcut(Routing.Videos)
+        AppIntents.actionOpenShortcut(AppFeatureType.AUDIO) -> openToolShortcut(Routing.Audio)
+        AppIntents.actionOpenShortcut(AppFeatureType.FILES) -> openToolShortcut(Routing.Files())
     }
 
     if (intent.getBooleanExtra("navigate_to_web_settings", false)) {

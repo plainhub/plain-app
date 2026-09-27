@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">লঞ্চার শর্টকাট</string>
+    <string name="launcher_shortcuts_hint">অ্যাপ আইকনে চাপ ধরে রাখলে দেখানোর জন্য সর্বোচ্চ ৪টি টুল বেছে নিন</string>
+    <string name="launcher_shortcuts_limit">আপনি সর্বোচ্চ ৪টি টুল বেছে নিতে পারেন</string>
+</resources>

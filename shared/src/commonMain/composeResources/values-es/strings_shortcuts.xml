@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="launcher_shortcuts">Accesos directos del launcher</string>
+    <string name="launcher_shortcuts_hint">Elige hasta 4 herramientas que se mostrarán al mantener pulsado el icono de la app</string>
+    <string name="launcher_shortcuts_limit">Puedes elegir hasta 4 herramientas</string>
+</resources>
