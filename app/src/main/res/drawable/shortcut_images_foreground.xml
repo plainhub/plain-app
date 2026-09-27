@@ -10,7 +10,25 @@
       android:scaleX="2.25"
       android:scaleY="2.25">
   <path
-            android:pathData="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0 0v-560 560Zm80-80h400q12 0 18-11t-2-21L586-459q-6-8-16-8t-16 8L450-320l-74-99q-6-8-16-8t-16 8l-80 107q-8 10-2 21t18 11Z"
-            android:fillColor="#000000"/>
+          android:pathData="M6,3h12a2,2 0,0 1,2 2v12a2,2 0,0 1,-2 2H6a2,2 0,0 1,-2 -2V5a2,2 0,0 1,2 -2z"
+          android:strokeLineJoin="round"
+          android:strokeWidth="2"
+          android:fillColor="#00000000"
+          android:strokeColor="@color/app_icon"
+          android:strokeLineCap="round"/>
+  <path
+          android:pathData="M11,9a2,2 0,1 1,-4,0a2,2 0,1 1,4,0"
+          android:strokeLineJoin="round"
+          android:strokeWidth="2"
+          android:fillColor="#00000000"
+          android:strokeColor="@color/app_icon"
+          android:strokeLineCap="round"/>
+  <path
+          android:pathData="m21,15l-3.086,-3.086a2,2 0,0 0,-2.828 0L6,21"
+          android:strokeLineJoin="round"
+          android:strokeWidth="2"
+          android:fillColor="#00000000"
+          android:strokeColor="@color/app_icon"
+          android:strokeLineCap="round"/>
   </group>
 </vector>
