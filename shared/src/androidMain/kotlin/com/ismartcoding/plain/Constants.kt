@@ -8,6 +8,15 @@ object AppIntents {
     val ACTION_PEER_CHAT_REPLY: String get() = "${appContext.packageName}.action.PEER_CHAT_REPLY"
     val ACTION_REPOST_HTTP_NOTIFICATION: String get() = "${appContext.packageName}.action.REPOST_HTTP_NOTIFICATION"
     val ACTION_PLAY_MEDIA: String get() = "${appContext.packageName}.action.PLAY_MEDIA"
+
+    // Actions of the static launcher shortcuts. shortcuts.xml is generated per
+    // variant (app/build.gradle.kts) with the variant applicationId as the
+    // prefix, so deriving from the runtime package here always matches,
+    // including the debug build's applicationIdSuffix.
+    val ACTION_OPEN_NOTES: String get() = "${appContext.packageName}.action.OPEN_NOTES"
+    val ACTION_OPEN_DOCS: String get() = "${appContext.packageName}.action.OPEN_DOCS"
+    val ACTION_OPEN_POMODORO: String get() = "${appContext.packageName}.action.OPEN_POMODORO"
+    val ACTION_OPEN_FEEDS: String get() = "${appContext.packageName}.action.OPEN_FEEDS"
 }
 
 object IntentExtras {

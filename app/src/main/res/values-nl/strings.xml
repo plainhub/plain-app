@@ -2,4 +2,8 @@
 <resources>
     <string name="accessibility_service_label">PlainApp Afstandsbediening</string>
     <string name="accessibility_service_description">PlainApp gebruikt deze toegankelijkheidsservice om afstandsbediening tijdens schermspiegeling mogelijk te maken. Het injecteert aanraakgebeurtenissen (tikken, vegen, scrollen) en navigatieacties (Terug, Start, Recent) die vanuit de webinterface worden verzonden.</string>
+    <string name="shortcut_notes">Notities</string>
+    <string name="shortcut_docs">Documenten</string>
+    <string name="shortcut_feeds">Feeds</string>
+    <string name="shortcut_pomodoro">Pomodoro Timer</string>
 </resources>

@@ -2,4 +2,8 @@
 <resources>
     <string name="accessibility_service_label">PlainApp দূরবর্তী নিয়ন্ত্রণ</string>
     <string name="accessibility_service_description">স্ক্রিন মিররিং চলাকালীন দূরবর্তী নিয়ন্ত্রণ সক্ষম করতে PlainApp এই অ্যাক্সেসিবিলিটি সার্ভিস ব্যবহার করে। এটি ওয়েব ইন্টারফেস থেকে পাঠানো টাচ ইভেন্ট (ট্যাপ, সোয়াইপ, স্ক্রল) এবং ন্যাভিগেশন অ্যাকশন (পেছনে, হোম, সাম্প্রতিক) ইনজেক্ট করে।</string>
+    <string name="shortcut_notes">নোটস</string>
+    <string name="shortcut_docs">ডকুমেন্ট</string>
+    <string name="shortcut_feeds">ফিডস</string>
+    <string name="shortcut_pomodoro">পামোডরো টাইমার</string>
 </resources>

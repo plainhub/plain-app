@@ -2,4 +2,8 @@
 <resources>
     <string name="accessibility_service_label">Удалённое управление PlainApp</string>
     <string name="accessibility_service_description">PlainApp использует эту службу специальных возможностей, чтобы включить удалённое управление во время трансляции экрана. Она внедряет касания (нажатие, свайп, прокрутка) и действия навигации (Назад, Домой, Недавние), отправленные из веб‑интерфейса.</string>
+    <string name="shortcut_notes">Примечания</string>
+    <string name="shortcut_docs">Документы</string>
+    <string name="shortcut_feeds">Подписки</string>
+    <string name="shortcut_pomodoro">Таймер Помодоро</string>
 </resources>

@@ -2,4 +2,8 @@
 <resources>
     <string name="accessibility_service_label">PlainApp リモート操作</string>
     <string name="accessibility_service_description">PlainApp は画面ミラーリング中のリモート操作を有効にするために、このユーザー補助サービスを使用します。Web インターフェースから送信されたタッチ操作（タップ、スワイプ、スクロール）およびナビゲーション操作（戻る、ホーム、最近のアプリ）を注入します。</string>
+    <string name="shortcut_notes">ノート</string>
+    <string name="shortcut_docs">ドキュメント</string>
+    <string name="shortcut_feeds">フィード</string>
+    <string name="shortcut_pomodoro">ポモドーロタイマー</string>
 </resources>

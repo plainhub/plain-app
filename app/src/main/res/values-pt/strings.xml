@@ -2,4 +2,8 @@
 <resources>
     <string name="accessibility_service_label">Controle remoto do PlainApp</string>
     <string name="accessibility_service_description">O PlainApp usa este serviço de acessibilidade para permitir o controle remoto durante o espelhamento de tela. Ele injeta eventos de toque (toque, deslizar, rolar) e ações de navegação (Voltar, Início, Recentes) enviados pela interface web.</string>
+    <string name="shortcut_notes">Notas</string>
+    <string name="shortcut_docs">Documentos</string>
+    <string name="shortcut_feeds">Feeds</string>
+    <string name="shortcut_pomodoro">Temporizador Pomodoro</string>
 </resources>

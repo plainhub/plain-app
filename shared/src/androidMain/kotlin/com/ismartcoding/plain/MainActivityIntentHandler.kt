@@ -14,6 +14,14 @@ import com.ismartcoding.plain.ui.nav.navigateShareImage
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 
 internal fun MainActivity.handleIntent(intent: Intent) {
+    // Launcher shortcuts (app/src/main/res/xml/shortcuts.xml): open the tool page directly.
+    when (intent.action) {
+        AppIntents.ACTION_OPEN_NOTES -> openToolShortcut(Routing.Notes)
+        AppIntents.ACTION_OPEN_DOCS -> openToolShortcut(Routing.Docs)
+        AppIntents.ACTION_OPEN_POMODORO -> openToolShortcut(Routing.PomodoroTimer)
+        AppIntents.ACTION_OPEN_FEEDS -> openToolShortcut(Routing.FeedEntries(""))
+    }
+
     if (intent.getBooleanExtra("navigate_to_web_settings", false)) {
         val nav = navControllerState.value
         val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute(Routing.DesktopAccessSettings::class) == true
@@ -50,4 +58,10 @@ internal fun MainActivity.handleIntent(intent: Intent) {
             TempData.shortcutMediaPath.value = path
         }
     }
+}
+
+private fun MainActivity.openToolShortcut(route: Any) {
+    val nav = navControllerState.value ?: return
+    if (nav.currentBackStackEntry?.destination?.hasRoute(route::class) == true) return
+    nav.navigate(route)
 }

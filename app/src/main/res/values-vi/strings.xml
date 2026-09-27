@@ -2,4 +2,8 @@
 <resources>
     <string name="accessibility_service_label">Điều khiển từ xa PlainApp</string>
     <string name="accessibility_service_description">PlainApp sử dụng dịch vụ hỗ trợ tiếp cận này để bật điều khiển từ xa khi phản chiếu màn hình. Nó chèn các sự kiện chạm (chạm, vuốt, cuộn) và các thao tác điều hướng (Quay lại, Trang chủ, Gần đây) được gửi từ giao diện web.</string>
+    <string name="shortcut_notes">Ghi chú</string>
+    <string name="shortcut_docs">Tài liệu</string>
+    <string name="shortcut_feeds">Nguồn cấp</string>
+    <string name="shortcut_pomodoro">Bộ hẹn giờ Pomodoro</string>
 </resources>

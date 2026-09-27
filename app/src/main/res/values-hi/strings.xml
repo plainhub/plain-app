@@ -2,4 +2,8 @@
 <resources>
     <string name="accessibility_service_label">PlainApp रिमोट नियंत्रण</string>
     <string name="accessibility_service_description">PlainApp स्क्रीन मिररिंग के दौरान रिमोट नियंत्रण सक्षम करने के लिए इस एक्सेसिबिलिटी सेवा का उपयोग करता है। यह वेब इंटरफ़ेस से भेजे गए टच इवेंट (टैप, स्वाइप, स्क्रॉल) और नेविगेशन क्रियाएँ (वापस, होम, हाल के ऐप्स) इंजेक्ट करता है।</string>
+    <string name="shortcut_notes">नोट्स</string>
+    <string name="shortcut_docs">दस्तावेज़</string>
+    <string name="shortcut_feeds">फ़ीड्स</string>
+    <string name="shortcut_pomodoro">पोमोडोरो टाइमर</string>
 </resources>

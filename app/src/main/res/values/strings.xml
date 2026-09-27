@@ -5,4 +5,8 @@
     <string name="clipboard_sync_tile" translatable="false">Clipboard</string>
     <string name="accessibility_service_label">PlainApp Remote Control</string>
     <string name="accessibility_service_description">PlainApp uses this accessibility service to enable remote control during screen mirroring. It injects touch events (tap, swipe, scroll) and navigation actions (Back, Home, Recents) sent from the web interface.</string>
+    <string name="shortcut_notes">Notes</string>
+    <string name="shortcut_docs">Docs</string>
+    <string name="shortcut_feeds">Feeds</string>
+    <string name="shortcut_pomodoro">Pomodoro timer</string>
 </resources>

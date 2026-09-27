@@ -2,4 +2,8 @@
 <resources>
     <string name="accessibility_service_label">PlainApp 遠端控制</string>
     <string name="accessibility_service_description">PlainApp 使用此無障礙服務以在螢幕鏡像時啟用遠端控制。它會注入來自網頁介面的觸控事件（點擊、滑動、捲動）以及導覽操作（返回、主畫面、最近任務）。</string>
+    <string name="shortcut_notes">筆記</string>
+    <string name="shortcut_docs">文件</string>
+    <string name="shortcut_feeds">訂閱</string>
+    <string name="shortcut_pomodoro">番茄計時器</string>
 </resources>
