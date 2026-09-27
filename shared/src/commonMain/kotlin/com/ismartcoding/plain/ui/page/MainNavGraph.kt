@@ -191,11 +191,11 @@ fun MainNavGraph(
         composable<Routing.Artists> { ArtistsPage(navController, audioVM, audioHomeVM) }
         composable<Routing.ArtistDetail> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.ArtistDetail>()
-            AudioArtistPage(navController, r.name, audioQueueVM, audioVM, audioTagsVM, audioCastVM)
+            AudioArtistPage(navController, r.name, audioQueueVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM)
         }
         composable<Routing.PlaylistDetail> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlaylistDetail>()
-            PlaylistDetailPage(navController, r.id, audioQueueVM, audioVM, audioTagsVM, audioCastVM)
+            PlaylistDetailPage(navController, r.id, audioQueueVM, audioVM, audioTagsVM, audioFoldersVM, audioCastVM)
         }
         composable<Routing.PlaylistAddItems> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PlaylistAddItems>()

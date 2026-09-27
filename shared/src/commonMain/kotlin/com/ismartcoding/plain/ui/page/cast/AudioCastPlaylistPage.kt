@@ -20,10 +20,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +54,22 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val castItems by CastPlayer.items.collectAsState()
     val currentUri by CastPlayer.currentUri.collectAsState()
+    val isPlaying by CastPlayer.isPlaying.collectAsState()
+    val progressMs by CastPlayer.progressMs.collectAsState()
+    val durationMs by CastPlayer.durationMs.collectAsState()
+    val supportsCallback by CastPlayer.supportsCallback.collectAsState()
+    var nowPlayingTitle by remember { mutableStateOf("") }
+    var nowPlayingArtist by remember { mutableStateOf("") }
+    LaunchedEffect(currentUri) {
+        if (currentUri.isNotEmpty()) {
+            val (t, a) = getAudioMetadata(currentUri)
+            nowPlayingTitle = t
+            nowPlayingArtist = a
+        } else {
+            nowPlayingTitle = ""
+            nowPlayingArtist = ""
+        }
+    }
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
         scope.launch(Dispatchers.Default) { castVM.reorderCastItems(from.index, to.index) }
@@ -78,6 +97,20 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
                         }
                     }
                 })
+
+            if (currentUri.isNotEmpty()) {
+                CastNowPlayingControls(
+                    title = nowPlayingTitle,
+                    artist = nowPlayingArtist,
+                    isPlaying = isPlaying,
+                    progressMs = progressMs,
+                    durationMs = durationMs,
+                    supportsCallback = supportsCallback,
+                    deviceName = castVM.currentDeviceName,
+                    onPlay = { castVM.playCast() },
+                    onPause = { castVM.pauseCast() },
+                )
+            }
 
             if (castItems.isEmpty()) {
                 Box(modifier = Modifier

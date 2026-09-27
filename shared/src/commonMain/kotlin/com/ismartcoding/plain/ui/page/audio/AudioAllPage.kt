@@ -39,6 +39,7 @@ import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
+import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
@@ -55,11 +56,12 @@ import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.page.audio.components.AudioFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
-import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
+import com.ismartcoding.plain.ui.page.cast.CastQueueFab
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -140,13 +142,24 @@ fun AudioAllPage(
                         audioVM.loadAsync(tv)
                     }
                 },
-                // Sub-page: back arrow instead of the folder drawer, search-only
-                // trailing actions (no more/close capsule).
+                // Sub-page: back arrow instead of the folder drawer; trailing
+                // actions add sort + cast on top of search (the flat list is
+                // the cast source, so unlike home it keeps a cast entry).
                 navigationIcon = {
                     NavigationBackIcon { navController.navigateUp() }
                 },
                 topBarActions = {
                     ActionButtonSearch { audioVM.enterSearchMode() }
+                    PIconButton(
+                        icon = Res.drawable.sort,
+                        contentDescription = stringResource(Res.string.sort),
+                        click = { audioVM.showSortAndBrowseDialog.value = true },
+                    )
+                    PIconButton(
+                        icon = Res.drawable.cast,
+                        contentDescription = stringResource(Res.string.cast_mode),
+                        click = { castVM.showCastDialog.value = true },
+                    )
                 },
         bottomBar = {
             AnimatedBottomAction(visible = dragSelectState.showBottomActions()) {
@@ -173,7 +186,7 @@ fun AudioAllPage(
             AudioPlayerBar(audioQueueVM, castVM, modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } }, dragSelectState = audioState.dragSelectState)
-            AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = audioState.dragSelectState)
+            CastQueueFab(castVM = castVM, modifier = Modifier.align(Alignment.BottomEnd), dragSelectState = audioState.dragSelectState)
         }
     }
 }

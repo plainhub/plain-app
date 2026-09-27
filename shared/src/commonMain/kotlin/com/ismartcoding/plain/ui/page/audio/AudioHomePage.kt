@@ -64,7 +64,7 @@ import com.ismartcoding.plain.ui.page.audio.components.HomeSectionHeader
 import com.ismartcoding.plain.ui.page.audio.components.PlaylistsRow
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
-import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
+import com.ismartcoding.plain.ui.page.cast.CastQueueFab
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
@@ -137,6 +137,13 @@ fun AudioHomePage(
     }
     CastDialog(castVM)
 
+    // A sidebar folder/tag/trash filter shows the flat filtered list (same as
+    // search mode / the all-items page) instead of the home sections, which
+    // are not filter-aware. Cast Mode needs that list, so the menu only shows
+    // while a filter is active.
+    val sidebarFilterActive =
+        audioVM.trash.value || audioVM.bucketId.value.isNotEmpty() || audioVM.tag.value != null
+
     LaunchedEffect(Unit) {
         homeVM.loadAsync(audioVM)
     }
@@ -152,6 +159,7 @@ fun AudioHomePage(
         mediaFoldersVM = mediaFoldersVM,
         dragSelectState = dragSelectState,
         scrollBehavior = scrollBehavior,
+        showCastModeMenu = sidebarFilterActive,
         bucketsMap = audioState.bucketsMap,
         itemsState = itemsState,
         scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
@@ -189,11 +197,6 @@ fun AudioHomePage(
                     NeedPermissionColumn(Res.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column
                 }
 
-                // A sidebar folder/tag/trash filter shows the flat filtered
-                // list (same as search mode / the all-items page) instead of
-                // the home sections, which are not filter-aware.
-                val sidebarFilterActive =
-                    audioVM.trash.value || audioVM.bucketId.value.isNotEmpty() || audioVM.tag.value != null
                 if (audioVM.showSearchBar.value || sidebarFilterActive) {
                     // Search and filtered views mirror the all-items page;
                     // AudioPageList brings its own pull-to-refresh, so it sits
@@ -243,7 +246,7 @@ fun AudioHomePage(
                     .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } },
                 dragSelectState = dragSelectState,
             )
-            AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = dragSelectState)
+            CastQueueFab(castVM = castVM, modifier = Modifier.align(Alignment.BottomEnd), dragSelectState = dragSelectState)
         }
     }
 

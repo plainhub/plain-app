@@ -9,6 +9,7 @@ import com.ismartcoding.plain.lib.extensions.formatDurationMs
 import com.ismartcoding.plain.lib.coIO
 import com.ismartcoding.plain.lib.withIO
 import com.ismartcoding.plain.audio.DAudio
+import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.features.dlna.sender.DlnaDeviceScanner
 import com.ismartcoding.plain.db.IMedia
@@ -17,6 +18,7 @@ import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class CastViewModel : ViewModel() {
     val castMode: MutableState<Boolean> = mutableStateOf(false)
@@ -142,11 +144,6 @@ class CastViewModel : ViewModel() {
         viewModelScope.launchSafe {
             CastPlayer.setCurrentUri(item.path)
             isLoading.value = true
-            val castItems = CastPlayer.items.value
-            val isInQueue = castItems.any { it.path == item.path }
-            if (!isInQueue) {
-                CastPlayer.addItem(item)
-            }
             try {
                 val mediaUrl = getCastUrl(item.path)
                 val albumArtUri = if (item is DAudio) {
@@ -155,6 +152,13 @@ class CastViewModel : ViewModel() {
                 DlnaTransportController.setAVTransportURIAsync(device, mediaUrl, item.title, albumArtUri)
                 DlnaTransportController.playAVTransportAsync(device)
                 CastPlayer.isPlaying.value = true
+                if (item is DAudio) {
+                    // Register the cast track as the queue's current one so the
+                    // end-of-track auto-advance (DlnaRoutes.advanceCastToNextTrack)
+                    // resolves the track after the one actually casting — the
+                    // same bookkeeping a local manual jump does.
+                    withIO { AudioQueueManager.onPlaying(item.path, item.title, item.artist, item.durationMs) }
+                }
                 if (CastPlayer.sid.isNotEmpty()) {
                     DlnaTransportController.unsubscribeEvent(device, CastPlayer.sid)
                     CastPlayer.sid = ""

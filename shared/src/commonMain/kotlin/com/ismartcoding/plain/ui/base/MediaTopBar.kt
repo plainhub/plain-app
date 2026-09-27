@@ -62,6 +62,10 @@ fun <T : IData> MediaTopBar(
     navigationIcon: (@Composable () -> Unit)? = null,
     /** Replaces the default trailing actions (search + more/close capsule) on sub-pages. */
     topBarActions: (@Composable () -> Unit)? = null,
+    /** Cast Mode menu entry needs a media list to cast from; false hides it (e.g. audio home sections). */
+    showCastModeMenu: Boolean = true,
+    /** Folder/tag sidebar only makes sense on unfiltered library pages; sub-pages (artist, playlist) pass false. */
+    showSidebar: Boolean = true,
     /** Extra items appended to the default more-sheet, below sort/cast. */
     moreMenu: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit = {},
     content: @Composable (PaddingValues) -> Unit,
@@ -88,7 +92,7 @@ fun <T : IData> MediaTopBar(
                 dismiss()
                 mediaVM.showSortAndBrowseDialog.value = true
             }
-            if (!isDocs) {
+            if (!isDocs && showCastModeMenu) {
                 PSheetActionRow(Res.drawable.cast, stringResource(Res.string.cast_mode)) {
                     dismiss()
                     castVM.showCastDialog.value = true
@@ -98,19 +102,7 @@ fun <T : IData> MediaTopBar(
         }
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                MediaSidebarDrawer(
-                    mediaVM = mediaVM,
-                    mediaFoldersVM = mediaFoldersVM,
-                    tagsVM = tagsVM,
-                    drawerState = drawerState,
-                )
-            }
-        },
-    ) {
+    val page: @Composable () -> Unit = {
         Box(Modifier.fillMaxSize()) {
             PScaffold(
                 topBar = {
@@ -183,6 +175,26 @@ fun <T : IData> MediaTopBar(
             }
             DrawerEdgeSwipeStrip(drawerState)
         }
+    }
+
+    if (showSidebar) {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet {
+                    MediaSidebarDrawer(
+                        mediaVM = mediaVM,
+                        mediaFoldersVM = mediaFoldersVM,
+                        tagsVM = tagsVM,
+                        drawerState = drawerState,
+                    )
+                }
+            },
+        ) {
+            page()
+        }
+    } else {
+        page()
     }
 
     if (mediaVM.showSortAndBrowseDialog.value) {

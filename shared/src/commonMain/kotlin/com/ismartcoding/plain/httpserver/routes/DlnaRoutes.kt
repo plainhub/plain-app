@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.httpserver.routes
 
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.features.audio.AudioQueueManager
 import com.ismartcoding.plain.features.dlna.receiver.DlnaHttpRouter
 import com.ismartcoding.plain.features.dlna.receiver.DlnaReceiverEngine
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
@@ -10,6 +12,7 @@ import com.ismartcoding.plain.lib.dlna.common.resolveSenderName
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.lib.withIO
+import com.ismartcoding.plain.lib.extensions.isAudioFast
 import com.ismartcoding.plain.lib.extensions.isImageFast
 import com.ismartcoding.plain.lib.extensions.isUrl
 import com.ismartcoding.plain.lib.logcat.LogCat
@@ -47,7 +50,9 @@ fun HttpRouter.addDlnaRoutes() {
  * `/callback/cast` receives the DLNA renderer's event NOTIFY XML and updates
  * `CastPlayer` state accordingly. When the renderer reports STOPPED (and the
  * callback has no AVTransportURIMetaData — which would indicate a duplicate
- * callback) the player auto-advances to the next playlist item.
+ * callback) the player auto-advances via [advanceCastToNextTrack]: next cast
+ * queue item, or — when the cast queue is empty — the next track of the audio
+ * playback order.
  *
  * These are sender (casting) routes and have no separate feature toggle —
  * they are available whenever the service is running, independently of the
@@ -124,29 +129,7 @@ private fun HttpRouter.addDlnaSenderRoutes() {
         ) {
             withIO {
                 CastPlayer.isPlaying.value = false
-                val castItems = CastPlayer.items.value
-                if (castItems.isNotEmpty()) {
-                    CastPlayer.currentDevice?.let { device ->
-                        val currentUri = CastPlayer.currentUri.value
-                        var index = castItems.indexOfFirst { it.path == currentUri }
-                        index++
-                        if (index > castItems.size - 1) {
-                            index = 0
-                        }
-                        val current = castItems[index]
-                        if (current.path != currentUri) {
-                            LogCat.d(current.path)
-                            val url = UrlHelper.getMediaHttpUrl(current.path)
-                            DlnaTransportController.setAVTransportURIAsync(
-                                device,
-                                url,
-                                current.title,
-                            )
-                            CastPlayer.setCurrentUri(current.path)
-                            CastPlayer.isPlaying.value = true
-                        }
-                    }
-                }
+                advanceCastToNextTrack()
             }
         } else if (xml.contains("TransportState val=\"PLAYING\"")) {
             withIO { CastPlayer.isPlaying.value = true }
@@ -173,6 +156,51 @@ private fun HttpRouter.addDlnaSenderRoutes() {
 
         call.respondNoBody(HttpStatus.OK)
     }
+}
+
+/**
+ * End-of-track auto-advance for the active cast session, run when the renderer
+ * reports a natural STOP:
+ *
+ *  - the explicit cast queue (row toggles) when it can produce a different
+ *    track — it wraps around, so a multi-track queue loops;
+ *  - otherwise, for audio casts only, the audio playback order
+ *    ([AudioQueueManager.resolveNext] — the same resolution local playback
+ *    runs on STATE_ENDED → skipToNext), continuing after the queue's current
+ *    track, which [com.ismartcoding.plain.ui.models.CastViewModel.castItem]
+ *    registers via onPlaying.
+ *
+ * When neither source can advance (queue exhausted on its single track, no
+ * playback order, or a non-audio cast) the cast just stops.
+ */
+private suspend fun advanceCastToNextTrack() {
+    val device = CastPlayer.currentDevice ?: return
+    val currentUri = CastPlayer.currentUri.value
+    val castItems = CastPlayer.items.value
+    var nextPath = ""
+    var nextTitle = ""
+    if (castItems.isNotEmpty()) {
+        var index = castItems.indexOfFirst { it.path == currentUri }
+        index++
+        if (index > castItems.size - 1) {
+            index = 0
+        }
+        val next = castItems[index]
+        nextPath = next.path
+        nextTitle = next.title
+    } else if (currentUri.isAudioFast()) {
+        val next = AudioQueueManager.resolveNext(
+            isNext = true,
+            shuffle = TempData.audioPlayMode.value == MediaPlayMode.SHUFFLE,
+        )
+        nextPath = next?.path ?: ""
+        nextTitle = next?.title ?: ""
+    }
+    if (nextPath.isEmpty() || nextPath == currentUri) return
+    LogCat.d(nextPath)
+    DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(nextPath), nextTitle)
+    CastPlayer.setCurrentUri(nextPath)
+    CastPlayer.isPlaying.value = true
 }
 
 /**

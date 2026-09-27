@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -40,21 +42,24 @@ import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
+import com.ismartcoding.plain.ui.base.MediaTopBar
+import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
-import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.dragselect.listDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
+import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.audio.components.ArtistAvatar
 import com.ismartcoding.plain.ui.page.audio.components.AudioFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
-import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
+import com.ismartcoding.plain.ui.page.cast.CastDialog
+import com.ismartcoding.plain.ui.page.cast.CastQueueFab
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
@@ -73,6 +78,7 @@ fun AudioArtistPage(
     audioQueueVM: AudioQueueViewModel,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
+    mediaFoldersVM: MediaFoldersViewModel,
     castVM: CastViewModel,
 ) {
     val scope = rememberCoroutineScope()
@@ -83,6 +89,9 @@ fun AudioArtistPage(
     var items by remember { mutableStateOf<List<DAudio>>(listOf()) }
     val scrollState = rememberLazyListState()
     val dragSelectState = rememberListDragSelectState({ scrollState })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
+        scrollState.firstVisibleItemIndex > 0 && !dragSelectState.selectMode
+    })
     // Floating player bar clearance, measured live like on the other pages.
     val density = LocalDensity.current
     var playerBarClearance by remember { mutableStateOf(0.dp) }
@@ -90,9 +99,11 @@ fun AudioArtistPage(
     LaunchedEffect(Unit) {
         tagsVM.dataType.value = audioVM.dataType
     }
-    LaunchedEffect(artistName) {
+    // Reload on sort changes so the shared sort dialog re-sorts the tracks.
+    val sortBy = audioVM.sortBy.value
+    LaunchedEffect(artistName, sortBy) {
         items = withIO {
-            searchMedia(DataType.AUDIO, artistName, 500, 0, AudioSortByPreference.getValueAsync())
+            searchMedia(DataType.AUDIO, artistName, 500, 0, sortBy)
         }.filterIsInstance<DAudio>().filter { it.artist == artistName }
     }
 
@@ -114,15 +125,56 @@ fun AudioArtistPage(
         }
     }
 
-    PBackHandler(enabled = dragSelectState.selectMode) {
-        dragSelectState.exitSelectMode()
+    PBackHandler(enabled = dragSelectState.selectMode || castVM.castMode.value) {
+        when {
+            dragSelectState.selectMode -> dragSelectState.exitSelectMode()
+            castVM.castMode.value -> castVM.exitCastMode()
+        }
     }
 
-    PScaffold(
-        topBar = {
-            PTopAppBar(
-                title = "",
-                navController = navController,
+    ViewAudioBottomSheet(
+        audioVM = audioVM,
+        tagsVM = tagsVM,
+        tagsMapState = tagsMapState,
+        tagsState = tagsState,
+        dragSelectState = dragSelectState,
+        castVM = castVM,
+    )
+    CastDialog(castVM)
+
+    MediaTopBar(
+        navController = navController,
+        mediaVM = audioVM,
+        tagsVM = tagsVM,
+        castVM = castVM,
+        mediaFoldersVM = mediaFoldersVM,
+        dragSelectState = dragSelectState,
+        scrollBehavior = scrollBehavior,
+        // Sub-page with its own focused list: no folder/tag sidebar.
+        showSidebar = false,
+        bucketsMap = emptyMap(),
+        itemsState = items,
+        scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
+        onSortSelected = { sortBy ->
+            scope.launch {
+                AudioSortByPreference.putAsync(sortBy)
+                audioVM.sortBy.value = sortBy
+            }
+        },
+        onSearchAction = { },
+        navigationIcon = {
+            NavigationBackIcon { navController.navigateUp() }
+        },
+        topBarActions = {
+            PIconButton(
+                icon = Res.drawable.sort,
+                contentDescription = stringResource(Res.string.sort),
+                click = { audioVM.showSortAndBrowseDialog.value = true },
+            )
+            PIconButton(
+                icon = Res.drawable.cast,
+                contentDescription = stringResource(Res.string.cast_mode),
+                click = { castVM.showCastDialog.value = true },
             )
         },
         bottomBar = {
@@ -137,6 +189,7 @@ fun AudioArtistPage(
         Box(Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
                     // Two header items (hero, acts) precede the track rows.
                     .listDragSelect(items = items, state = dragSelectState, itemIndexOffset = 2),
                 state = scrollState,
@@ -212,16 +265,7 @@ fun AudioArtistPage(
                     .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } },
                 dragSelectState = dragSelectState,
             )
-            AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = dragSelectState)
+            CastQueueFab(castVM = castVM, modifier = Modifier.align(Alignment.BottomEnd), dragSelectState = dragSelectState)
         }
     }
-
-    ViewAudioBottomSheet(
-        audioVM = audioVM,
-        tagsVM = tagsVM,
-        tagsMapState = tagsMapState,
-        tagsState = tagsState,
-        dragSelectState = dragSelectState,
-        castVM = castVM,
-    )
 }

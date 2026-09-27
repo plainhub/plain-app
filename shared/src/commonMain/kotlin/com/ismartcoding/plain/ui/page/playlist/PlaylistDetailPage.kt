@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -34,6 +36,7 @@ import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.platform.audioPause
 import com.ismartcoding.plain.platform.audioPlay
+import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.base.dragselect.listDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
@@ -47,13 +50,14 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioQueueViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
+import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.audio.components.AudioFilesSelectModeBottomActions
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.audio.components.ViewAudioBottomSheet
 import com.ismartcoding.plain.ui.page.audioplayer.components.AudioPlayerBar
-import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
+import com.ismartcoding.plain.ui.page.cast.CastQueueFab
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistActionsRow
 import com.ismartcoding.plain.ui.page.playlist.components.playPlaylistFrom
@@ -62,6 +66,7 @@ import com.ismartcoding.plain.ui.page.playlist.components.pruneTrashedRows
 import com.ismartcoding.plain.ui.page.playlist.components.toDAudio
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistHeaderRow
 import com.ismartcoding.plain.ui.page.playlist.components.PlaylistMoreSheet
+import com.ismartcoding.plain.ui.page.playlist.components.sortedByAudio
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
@@ -74,6 +79,7 @@ fun PlaylistDetailPage(
     audioQueueVM: AudioQueueViewModel,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
+    mediaFoldersVM: MediaFoldersViewModel,
     castVM: CastViewModel,
 ) {
     val scope = rememberCoroutineScope()
@@ -83,6 +89,9 @@ fun PlaylistDetailPage(
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val scrollState = rememberLazyListState()
     val dragSelectState = rememberListDragSelectState({ scrollState })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
+        scrollState.firstVisibleItemIndex > 0 && !dragSelectState.selectMode
+    })
 
     var playlistName by remember { mutableStateOf("") }
     var items by remember { mutableStateOf<List<DAudioPlaylistItem>>(listOf()) }
@@ -124,12 +133,14 @@ fun PlaylistDetailPage(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    // Track rows always list A-Z; "custom" only survives as the play order.
-    val sorted = items.sortedBy { it.title.lowercase() }
+    // Rows resolve to the same DAudio shown in AudioListItem so selection
+    // records one id space (library id, or audioPath for off-page rows); the
+    // sort dialog re-orders them in memory.
+    val sortBy = audioVM.sortBy.value
     val libraryByPath = remember(library) { library.associateBy { it.path } }
-    // Resolve rows to the same DAudio shown in AudioListItem so selection
-    // records one id space (library id, or audioPath for off-page rows).
-    val rowAudios = sorted.map { libraryByPath[it.audioPath] ?: it.toDAudio() }
+    val rowAudios = remember(items, library, sortBy) {
+        items.map { libraryByPath[it.audioPath] ?: it.toDAudio() }.sortedByAudio(sortBy)
+    }
     val selectItems = remember(rowAudios) { rowAudios.map { IDData(it.id) } }
     val pathById = remember(library) { library.associateBy { it.id } }
     // Floating player bar clearance, measured live like on the other pages.
@@ -138,8 +149,11 @@ fun PlaylistDetailPage(
     val contextActive = audioQueueVM.activePlaylistId.value == playlistId
     val isPlayingContext = contextActive && isPlaying
 
-    PBackHandler(enabled = dragSelectState.selectMode) {
-        dragSelectState.exitSelectMode()
+    PBackHandler(enabled = dragSelectState.selectMode || castVM.castMode.value) {
+        when {
+            dragSelectState.selectMode -> dragSelectState.exitSelectMode()
+            castVM.castMode.value -> castVM.exitCastMode()
+        }
     }
 
     val renamedMsg = stringResource(Res.string.renamed)
@@ -188,18 +202,44 @@ fun PlaylistDetailPage(
     )
     CastDialog(castVM)
 
-    PScaffold(
-        topBar = {
-            PTopAppBar(
-                title = "",
-                navController = navController,
-                actions = {
-                    PIconButton(
-                        icon = Res.drawable.more_horiz,
-                        contentDescription = stringResource(Res.string.more),
-                        click = { showMore = true },
-                    )
-                },
+    MediaTopBar(
+        navController = navController,
+        mediaVM = audioVM,
+        tagsVM = tagsVM,
+        castVM = castVM,
+        mediaFoldersVM = mediaFoldersVM,
+        dragSelectState = dragSelectState,
+        scrollBehavior = scrollBehavior,
+        // Sub-page with its own focused list: no folder/tag sidebar.
+        showSidebar = false,
+        bucketsMap = emptyMap(),
+        itemsState = rowAudios,
+        scrollToTop = { scope.launch { scrollState.scrollToItem(0) } },
+        onSortSelected = { sortBy ->
+            scope.launch {
+                AudioSortByPreference.putAsync(sortBy)
+                audioVM.sortBy.value = sortBy
+            }
+        },
+        onSearchAction = { },
+        navigationIcon = {
+            NavigationBackIcon { navController.navigateUp() }
+        },
+        topBarActions = {
+            PIconButton(
+                icon = Res.drawable.sort,
+                contentDescription = stringResource(Res.string.sort),
+                click = { audioVM.showSortAndBrowseDialog.value = true },
+            )
+            PIconButton(
+                icon = Res.drawable.cast,
+                contentDescription = stringResource(Res.string.cast_mode),
+                click = { castVM.showCastDialog.value = true },
+            )
+            PIconButton(
+                icon = Res.drawable.more_horiz,
+                contentDescription = stringResource(Res.string.more),
+                click = { showMore = true },
             )
         },
         bottomBar = {
@@ -238,6 +278,7 @@ fun PlaylistDetailPage(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .nestedScroll(scrollBehavior.nestedScrollConnection)
                         .listDragSelect(items = selectItems, state = dragSelectState, itemIndexOffset = 2),
                     state = scrollState,
                 ) {
@@ -265,7 +306,7 @@ fun PlaylistDetailPage(
                             onShuffle = { scope.launch { playPlaylistShuffled(playlistId, audioQueueVM) } },
                         )
                     }
-                    items(sorted.size, key = { sorted[it].id }) { index ->
+                    items(rowAudios.size, key = { rowAudios[it].id }) { index ->
                         val item = rowAudios[index]
                         AudioListItem(
                             item = item,
@@ -294,7 +335,7 @@ fun PlaylistDetailPage(
                     .onSizeChanged { playerBarClearance = with(density) { it.height.toDp() } },
                 dragSelectState = dragSelectState,
             )
-            AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = dragSelectState)
+            CastQueueFab(castVM = castVM, modifier = Modifier.align(Alignment.BottomEnd), dragSelectState = dragSelectState)
         }
     }
 }
