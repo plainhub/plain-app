@@ -95,7 +95,7 @@ fun GlobalSearchPage(
         when (val action = hit.action) {
             is GlobalSearchAction.Navigate -> navController.navigate(action.route)
             is GlobalSearchAction.PlayAudio -> checkNotificationPermission(Res.string.audio_notification_prompt) {
-                scope.launch(Dispatchers.Default) { audioQueueVM.playAsync(action.audio) }
+                scope.launch(Dispatchers.Default) { audioQueueVM.enqueueAndPlayAsync(action.audio) }
             }
         }
     }

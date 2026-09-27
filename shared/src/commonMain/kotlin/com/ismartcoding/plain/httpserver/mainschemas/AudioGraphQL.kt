@@ -74,12 +74,11 @@ suspend fun audioPlayback(): AudioPlayback {
     )
 }
 
-/** Play the given track: adds it to the manual queue when missing and marks it current. */
+/** Mark the given track as the current one; playback never mutates the queue. Callers that need the track queued send addAudiosToQueue alongside. */
 @GraphQLMutation
 suspend fun playAudio(path: String): AudioItem {
     val audio = playlistAudioFromPath(path)
     AudioPlayingPreference.putAsync(audio.path)
-    AudioQueueManager.enqueue(listOf(audio))
     return audio.toModel()
 }
 

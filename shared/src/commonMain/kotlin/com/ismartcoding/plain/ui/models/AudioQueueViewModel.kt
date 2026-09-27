@@ -81,7 +81,16 @@ class AudioQueueViewModel : ViewModel(), AudioQueueViewModelBase {
         selectedPath.value = path
     }
 
+    /** Queue tap: the item is already in the queue, so play it in place without mutating the queue. */
     suspend fun playAsync(item: DAudio) {
+        val audio = item.toPlaylistAudio()
+        audioJustPlay(audio)
+        setCurrentPlaying(audio.path)
+        refreshWindow()
+    }
+
+    /** Play an audio from outside the queue (e.g. a global search result): append it, then play. */
+    suspend fun enqueueAndPlayAsync(item: DAudio) {
         val audio = item.toPlaylistAudio()
         AudioQueueManager.enqueue(listOf(audio))
         audioJustPlay(audio)

@@ -6,4 +6,8 @@
     <string name="shortcut_docs">Документы</string>
     <string name="shortcut_feeds">Подписки</string>
     <string name="shortcut_pomodoro">Таймер Помодоро</string>
+    <string name="shortcut_images">Изображения</string>
+    <string name="shortcut_videos">Видео</string>
+    <string name="shortcut_audio">Аудио</string>
+    <string name="shortcut_files">Файлы</string>
 </resources>

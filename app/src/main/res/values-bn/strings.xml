@@ -6,4 +6,8 @@
     <string name="shortcut_docs">ডকুমেন্ট</string>
     <string name="shortcut_feeds">ফিডস</string>
     <string name="shortcut_pomodoro">পামোডরো টাইমার</string>
+    <string name="shortcut_images">চিত্র</string>
+    <string name="shortcut_videos">ভিডিও</string>
+    <string name="shortcut_audio">অডিও</string>
+    <string name="shortcut_files">ফাইলগুলি</string>
 </resources>

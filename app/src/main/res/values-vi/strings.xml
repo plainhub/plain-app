@@ -6,4 +6,8 @@
     <string name="shortcut_docs">Tài liệu</string>
     <string name="shortcut_feeds">Nguồn cấp</string>
     <string name="shortcut_pomodoro">Bộ hẹn giờ Pomodoro</string>
+    <string name="shortcut_images">Hình ảnh</string>
+    <string name="shortcut_videos">Video</string>
+    <string name="shortcut_audio">Âm thanh</string>
+    <string name="shortcut_files">Tập tin</string>
 </resources>

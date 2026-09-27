@@ -25,6 +25,10 @@ abstract class GenerateShortcutsXmlTask : DefaultTask() {
             "docs" to "OPEN_DOCS",
             "feeds" to "OPEN_FEEDS",
             "pomodoro" to "OPEN_POMODORO",
+            "images" to "OPEN_IMAGES",
+            "videos" to "OPEN_VIDEOS",
+            "audio" to "OPEN_AUDIO",
+            "files" to "OPEN_FILES",
         ).joinToString("\n") { (id, action) ->
             """    <shortcut
         android:shortcutId="$id"

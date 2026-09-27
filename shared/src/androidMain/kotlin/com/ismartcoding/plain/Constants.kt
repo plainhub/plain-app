@@ -17,6 +17,10 @@ object AppIntents {
     val ACTION_OPEN_DOCS: String get() = "${appContext.packageName}.action.OPEN_DOCS"
     val ACTION_OPEN_POMODORO: String get() = "${appContext.packageName}.action.OPEN_POMODORO"
     val ACTION_OPEN_FEEDS: String get() = "${appContext.packageName}.action.OPEN_FEEDS"
+    val ACTION_OPEN_IMAGES: String get() = "${appContext.packageName}.action.OPEN_IMAGES"
+    val ACTION_OPEN_VIDEOS: String get() = "${appContext.packageName}.action.OPEN_VIDEOS"
+    val ACTION_OPEN_AUDIO: String get() = "${appContext.packageName}.action.OPEN_AUDIO"
+    val ACTION_OPEN_FILES: String get() = "${appContext.packageName}.action.OPEN_FILES"
 }
 
 object IntentExtras {

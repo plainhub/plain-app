@@ -6,4 +6,8 @@
     <string name="shortcut_docs">Documenti</string>
     <string name="shortcut_feeds">Feed</string>
     <string name="shortcut_pomodoro">Timer Pomodoro</string>
+    <string name="shortcut_images">Immagini</string>
+    <string name="shortcut_videos">Video</string>
+    <string name="shortcut_audio">Audio</string>
+    <string name="shortcut_files">File</string>
 </resources>

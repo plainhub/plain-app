@@ -6,4 +6,8 @@
     <string name="shortcut_docs">文件</string>
     <string name="shortcut_feeds">訂閱</string>
     <string name="shortcut_pomodoro">番茄計時器</string>
+    <string name="shortcut_images">圖片</string>
+    <string name="shortcut_videos">影片</string>
+    <string name="shortcut_audio">音訊</string>
+    <string name="shortcut_files">檔案</string>
 </resources>

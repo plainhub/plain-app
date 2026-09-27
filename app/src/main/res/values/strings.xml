@@ -9,4 +9,8 @@
     <string name="shortcut_docs">Docs</string>
     <string name="shortcut_feeds">Feeds</string>
     <string name="shortcut_pomodoro">Pomodoro timer</string>
+    <string name="shortcut_images">Images</string>
+    <string name="shortcut_videos">Videos</string>
+    <string name="shortcut_audio">Audio</string>
+    <string name="shortcut_files">Files</string>
 </resources>

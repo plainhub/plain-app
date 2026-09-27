@@ -20,6 +20,10 @@ internal fun MainActivity.handleIntent(intent: Intent) {
         AppIntents.ACTION_OPEN_DOCS -> openToolShortcut(Routing.Docs)
         AppIntents.ACTION_OPEN_POMODORO -> openToolShortcut(Routing.PomodoroTimer)
         AppIntents.ACTION_OPEN_FEEDS -> openToolShortcut(Routing.FeedEntries(""))
+        AppIntents.ACTION_OPEN_IMAGES -> openToolShortcut(Routing.Images)
+        AppIntents.ACTION_OPEN_VIDEOS -> openToolShortcut(Routing.Videos)
+        AppIntents.ACTION_OPEN_AUDIO -> openToolShortcut(Routing.Audio)
+        AppIntents.ACTION_OPEN_FILES -> openToolShortcut(Routing.Files())
     }
 
     if (intent.getBooleanExtra("navigate_to_web_settings", false)) {
