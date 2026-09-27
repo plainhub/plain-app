@@ -86,13 +86,16 @@ internal fun FeedDayHeaderRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold))
-        HorizontalSpace(dp = 8.dp)
-        Text(
-            meta,
-            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        // A one-entry day needs no "1 · 1 unread" recap.
+        if (row.count > 1) {
+            HorizontalSpace(dp = 8.dp)
+            Text(
+                meta,
+                style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
         Spacer(Modifier.weight(1f))
         if (row.unreadCount > 0) {
             TextButton(onClick = onMarkRead) {
@@ -117,17 +120,17 @@ internal fun FeedDayHeaderRow(
  * Per-feed cluster header, borderless and full-bleed: letter chip + name +
  * counts. Collapse is expressed by the rotating chevron plus child rows
  * indented to align under the feed name (16 margin + 32 chip + 8 gap = 56dp).
+ * [onToggle] is null for a one-entry cluster: the row is inert, no chevron.
  */
 @Composable
 internal fun FeedClusterHeaderRow(
     row: FeedListRow.ClusterHeader,
-    onToggle: () -> Unit,
+    onToggle: (() -> Unit)?,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(onClick = onToggle)
+            .then(if (onToggle != null) Modifier.clip(RoundedCornerShape(8.dp)).clickable(onClick = onToggle) else Modifier)
             .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -166,35 +169,39 @@ internal fun FeedClusterHeaderRow(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false),
         )
-        HorizontalSpace(dp = 8.dp)
-        Text(
-            text = row.count.toString(),
-            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-            maxLines = 1,
-        )
-        if (row.unreadCount > 0) {
+        if (row.count > 1) {
             HorizontalSpace(dp = 8.dp)
             Text(
-                text = stringResource(Res.string.n_unread, row.unreadCount),
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.SemiBold,
-                ),
+                text = row.count.toString(),
+                style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                maxLines = 1,
+            )
+            if (row.unreadCount > 0) {
+                HorizontalSpace(dp = 8.dp)
+                Text(
+                    text = stringResource(Res.string.n_unread, row.unreadCount),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontWeight = FontWeight.SemiBold,
+                    ),
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(horizontal = 8.dp, vertical = 2.dp),
+                )
+            }
+        }
+        if (onToggle != null) {
+            HorizontalSpace(dp = 8.dp)
+            Icon(
+                painter = painterResource(Res.drawable.chevron_right),
+                contentDescription = null,
                 modifier = Modifier
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(horizontal = 8.dp, vertical = 2.dp),
+                    .size(20.dp)
+                    .rotate(if (row.collapsed) 0f else 90f),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        HorizontalSpace(dp = 8.dp)
-        Icon(
-            painter = painterResource(Res.drawable.chevron_right),
-            contentDescription = null,
-            modifier = Modifier
-                .size(20.dp)
-                .rotate(if (row.collapsed) 0f else 90f),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

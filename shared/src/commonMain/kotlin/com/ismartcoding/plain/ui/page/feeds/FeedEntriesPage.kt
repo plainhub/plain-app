@@ -273,9 +273,9 @@ fun FeedEntriesPage(
                                                 })
                                             }
                                             is FeedListRow.ClusterHeader -> item(key = row.key) {
-                                                FeedClusterHeaderRow(row, onToggle = {
-                                                    feedEntriesVM.clusterExpandedOverrides[row.clusterKey] = !row.collapsed
-                                                })
+                                                FeedClusterHeaderRow(row, onToggle = if (row.collapsible) {
+                                                    { feedEntriesVM.clusterExpandedOverrides[row.clusterKey] = !row.collapsed }
+                                                } else null)
                                             }
                                             is FeedListRow.Entry -> item(key = row.key) {
                                                 val m = row.entry

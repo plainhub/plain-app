@@ -39,6 +39,8 @@ internal sealed interface FeedListRow {
         val count: Int,
         val unreadCount: Int,
         val collapsed: Boolean,
+        /** False for a one-entry cluster: shown expanded with no collapse toggle. */
+        val collapsible: Boolean = true,
     ) : FeedListRow
 
     data class Entry(
@@ -60,10 +62,11 @@ internal enum class DayKind { TODAY, YESTERDAY, DATE }
  * Groups a `published_at DESC` entry list into per-day buckets, each clustered
  * by feed. A cluster defaults to collapsed once it has no unread entries;
  * [expandedOverrides] (cluster key → explicit user choice) wins over the
- * default. With [clusterByFeed] false (single-feed filter view) the day is the
- * cluster: the collapse toggle moves onto the day header and no per-feed
- * cluster headers are emitted. Pure and cheap enough to run per recomposition
- * on the paging window.
+ * default. A cluster holding a single entry is never collapsible — it renders
+ * expanded with no toggle. With [clusterByFeed] false (single-feed filter
+ * view) the day is the cluster: the collapse toggle moves onto the day header
+ * (also dropped for a one-entry day) and no per-feed cluster headers are
+ * emitted. Pure and cheap enough to run per recomposition on the paging window.
  */
 internal fun buildFeedListRows(
     items: List<DFeedEntry>,
@@ -84,7 +87,8 @@ internal fun buildFeedListRows(
         }
         if (!clusterByFeed) {
             val clusterKey = "$date/${dayEntries.first().feedId}"
-            val collapsed = expandedOverrides[clusterKey] ?: (dayEntries.count { !it.read } == 0)
+            val single = dayEntries.size == 1
+            val collapsed = !single && (expandedOverrides[clusterKey] ?: (dayEntries.count { !it.read } == 0))
             rows += FeedListRow.DayHeader(
                 dayKey = date.toString(),
                 kind = kind,
@@ -93,7 +97,7 @@ internal fun buildFeedListRows(
                 unreadCount = dayEntries.count { !it.read },
                 markReadIds = dayEntries.map { it.id }.toSet(),
                 collapsed = collapsed,
-                toggleKey = clusterKey,
+                toggleKey = if (single) null else clusterKey,
             )
             if (collapsed) {
                 rows += FeedListRow.CollapsedDigest("$clusterKey/digest", clusterKey, dayEntries.take(2))
@@ -113,8 +117,13 @@ internal fun buildFeedListRows(
         dayEntries.groupBy { it.feedId }.forEach { (feedId, cluster) ->
             val clusterKey = "$date/$feedId"
             val clusterUnread = cluster.count { !it.read }
-            val collapsed = expandedOverrides[clusterKey] ?: (clusterUnread == 0)
-            rows += FeedListRow.ClusterHeader(clusterKey, clusterKey, feeds[feedId], cluster.size, clusterUnread, collapsed)
+            // A one-entry cluster has nothing to fold: always expanded, no toggle.
+            val collapsible = cluster.size > 1
+            val collapsed = collapsible && (expandedOverrides[clusterKey] ?: (clusterUnread == 0))
+            rows += FeedListRow.ClusterHeader(
+                clusterKey, clusterKey, feeds[feedId], cluster.size, clusterUnread, collapsed,
+                collapsible = collapsible,
+            )
             if (collapsed) {
                 rows += FeedListRow.CollapsedDigest("$clusterKey/digest", clusterKey, cluster.take(2))
             } else {

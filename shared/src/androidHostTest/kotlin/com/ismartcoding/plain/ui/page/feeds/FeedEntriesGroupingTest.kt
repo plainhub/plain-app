@@ -107,6 +107,29 @@ class FeedEntriesGroupingTest {
     }
 
     @Test
+    fun singleEntryClusterNeverCollapses() {
+        val items = listOf(entry("1", "a", Instant.parse("2026-09-16T10:00:00Z"), read = true))
+        var rows = buildFeedListRows(items, feeds, emptyMap(), tz, today)
+        assertEquals(listOf("DayHeader", "ClusterHeader", "Entry"), rows.map { it::class.simpleName })
+        val header = rows.filterIsInstance<FeedListRow.ClusterHeader>().single()
+        assertTrue(!header.collapsible && !header.collapsed)
+        // an explicit collapsed override is ignored: there is no toggle to honor
+        rows = buildFeedListRows(items, feeds, mapOf("2026-09-16/a" to true), tz, today)
+        assertEquals(listOf("DayHeader", "ClusterHeader", "Entry"), rows.map { it::class.simpleName })
+    }
+
+    @Test
+    fun singleEntryDayHasNoToggleInFeedView() {
+        val items = listOf(entry("1", "a", Instant.parse("2026-09-16T10:00:00Z"), read = true))
+        var rows = buildFeedListRows(items, feeds, emptyMap(), tz, today, clusterByFeed = false)
+        assertEquals(listOf("DayHeader", "Entry"), rows.map { it::class.simpleName })
+        val day = rows.filterIsInstance<FeedListRow.DayHeader>().single()
+        assertTrue(day.toggleKey == null && !day.collapsed)
+        rows = buildFeedListRows(items, feeds, mapOf("2026-09-16/a" to true), tz, today, clusterByFeed = false)
+        assertEquals(listOf("DayHeader", "Entry"), rows.map { it::class.simpleName })
+    }
+
+    @Test
     fun dayHeaderCountsCoverLoadedWindow() {
         val items =
             listOf(
