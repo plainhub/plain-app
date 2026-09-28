@@ -25,6 +25,7 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: write
+      pages: write
     steps:
       - name: Check out source
         uses: actions/checkout@v4
@@ -67,15 +68,10 @@ jobs:
           PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
-          if git ls-remote --exit-code --heads origin gh-pages >/dev/null; then
-            git fetch origin gh-pages
-            git worktree add pages origin/gh-pages
-          else
-            git worktree add --orphan -b gh-pages pages
-          fi
-
-          mkdir -p pages/maven
-          python3 - plain-common/build/maven-repository pages/maven "$PLAIN_COMMON_VERSION" <<'PY'
+          git fetch origin main
+          git worktree add site origin/main
+          mkdir -p site/maven
+          python3 - plain-common/build/maven-repository site/maven "$PLAIN_COMMON_VERSION" <<'PY'
           import shutil
           import hashlib
           import sys
@@ -134,33 +130,26 @@ jobs:
                       checksum.write_text(hashlib.new(algorithm, content).hexdigest())
           PY
 
-          touch pages/.nojekyll
-          cat > pages/index.html <<'EOF'
-          <!doctype html>
-          <html lang="en">
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>plain-common Maven repository</title>
-            <body>
-              <h1>plain-common</h1>
-              <p>Public Kotlin Multiplatform Maven repository.</p>
-              <p>Repository URL: <code>/plain-app/maven</code></p>
-              <p>Dependency: <code>com.ismartcoding:plain-common</code></p>
-            </body>
-          </html>
-          EOF
-
-      - name: Commit and deploy Pages content
+      - name: Publish Maven files to Pages source
         env:
           PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
-          git -C pages config user.name "github-actions[bot]"
-          git -C pages config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C pages add -A
-          if git -C pages diff --cached --quiet; then
-            echo "No Pages changes to publish"
+          git -C site config user.name "github-actions[bot]"
+          git -C site config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C site add -A maven
+          if git -C site diff --cached --quiet; then
+            echo "No Maven repository changes to publish"
             exit 0
           fi
-          git -C pages commit -m "Publish plain-common $PLAIN_COMMON_VERSION"
-          git -C pages push origin HEAD:gh-pages
+          git -C site commit -m "Publish plain-common $PLAIN_COMMON_VERSION"
+          git -C site push origin HEAD:main
+
+      - name: Rebuild GitHub Pages site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api --hostname "${GITHUB_SERVER_URL#https://}" \
+            "repos/${GITHUB_REPOSITORY}/pages/builds" \
+            --method POST

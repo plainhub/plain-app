@@ -30,9 +30,9 @@ Then add the dependency shown above. Releases use tags named
 ## Publishing
 
 The `Publish plain-common` GitHub Actions workflow builds the KMP publications
-and deploys them to the `gh-pages` branch when a `plain-common-v<version>` tag
-is pushed. Configure the repository's Pages source to `gh-pages` / root once.
-It can also be run manually with a version number. The workflow uses its
-temporary `GITHUB_TOKEN`; no publishing credentials are stored in the repository.
+and adds the Maven files to the existing GitHub Pages source at `maven/` when a
+`plain-common-v<version>` tag is pushed. It can also be run manually with a
+version number. The workflow uses its temporary `GITHUB_TOKEN`; no publishing
+credentials are stored in the repository.
 
 For a local Maven cache, run `./gradlew :plain-common:publishToMavenLocal`.
