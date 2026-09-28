@@ -1,0 +1,166 @@
+name: Publish plain-common
+
+on:
+  push:
+    tags:
+      - "plain-common-v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Published version, without the plain-common-v prefix"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plain-common-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish KMP library to GitHub Pages
+    runs-on: macos-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Resolve publication version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            version="${GITHUB_REF_NAME#plain-common-v}"
+          else
+            version="$INPUT_VERSION"
+          fi
+          if [[ ! "$version" =~ ^[0-9][A-Za-z0-9.+-]*$ ]]; then
+            echo "Invalid publication version" >&2
+            exit 1
+          fi
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Publish Maven layout
+        env:
+          PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          ./gradlew :plain-common:publishAllPublicationsToPlainCommonRepository \
+            -PplainCommonVersion="$PLAIN_COMMON_VERSION" \
+            --no-daemon
+
+      - name: Prepare Pages content
+        env:
+          PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null; then
+            git fetch origin gh-pages
+            git worktree add pages origin/gh-pages
+          else
+            git worktree add --orphan -b gh-pages pages
+          fi
+
+          mkdir -p pages/maven
+          python3 - plain-common/build/maven-repository pages/maven "$PLAIN_COMMON_VERSION" <<'PY'
+          import shutil
+          import hashlib
+          import sys
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          source_root = Path(sys.argv[1])
+          target_root = Path(sys.argv[2])
+          version = sys.argv[3]
+
+          for source in source_root.rglob("*"):
+              if not source.is_file():
+                  continue
+              relative = source.relative_to(source_root)
+              target = target_root / relative
+              target.parent.mkdir(parents=True, exist_ok=True)
+
+              if source.name != "maven-metadata.xml" or not target.exists():
+                  shutil.copy2(source, target)
+                  continue
+
+              old_root = ET.parse(target).getroot()
+              new_root = ET.parse(source).getroot()
+              old_versioning = old_root.find("versioning")
+              new_versioning = new_root.find("versioning")
+              if old_versioning is None or new_versioning is None:
+                  shutil.copy2(source, target)
+                  continue
+
+              old_versions = old_versioning.find("versions")
+              new_versions = new_versioning.find("versions")
+              if old_versions is None:
+                  old_versions = ET.SubElement(old_versioning, "versions")
+              known = {node.text for node in old_versions.findall("version")}
+              if new_versions is not None:
+                  for node in new_versions.findall("version"):
+                      if node.text and node.text not in known:
+                          ET.SubElement(old_versions, "version").text = node.text
+
+              for field in ("latest", "release", "lastUpdated"):
+                  incoming = new_versioning.find(field)
+                  if incoming is not None:
+                      current = old_versioning.find(field)
+                      if current is None:
+                          current = ET.SubElement(old_versioning, field)
+                      current.text = version if field in ("latest", "release") else incoming.text
+
+              ET.indent(old_root, space="  ")
+              ET.ElementTree(old_root).write(target, encoding="UTF-8", xml_declaration=True)
+
+          for metadata in target_root.rglob("maven-metadata.xml"):
+              content = metadata.read_bytes()
+              for suffix, algorithm in (("md5", "md5"), ("sha1", "sha1"), ("sha256", "sha256"), ("sha512", "sha512")):
+                  checksum = metadata.with_name(metadata.name + "." + suffix)
+                  if checksum.exists():
+                      checksum.write_text(hashlib.new(algorithm, content).hexdigest())
+          PY
+
+          touch pages/.nojekyll
+          cat > pages/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>plain-common Maven repository</title>
+            <body>
+              <h1>plain-common</h1>
+              <p>Public Kotlin Multiplatform Maven repository.</p>
+              <p>Repository URL: <code>/plain-app/maven</code></p>
+              <p>Dependency: <code>com.ismartcoding:plain-common</code></p>
+            </body>
+          </html>
+          EOF
+
+      - name: Commit and deploy Pages content
+        env:
+          PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+          git -C pages config user.name "github-actions[bot]"
+          git -C pages config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C pages add -A
+          if git -C pages diff --cached --quiet; then
+            echo "No Pages changes to publish"
+            exit 0
+          fi
+          git -C pages commit -m "Publish plain-common $PLAIN_COMMON_VERSION"
+          git -C pages push origin HEAD:gh-pages

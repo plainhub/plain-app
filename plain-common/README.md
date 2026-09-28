@@ -14,18 +14,25 @@ dependency on `shared-lib`.
 implementation("com.ismartcoding:plain-common:0.1.0-SNAPSHOT")
 ```
 
-Add the Maven repository that hosts the artifact to the consuming project's
-repositories. The default version can be changed with `-PplainCommonVersion=…`.
+Add the public GitHub Pages Maven repository to the consuming project's
+repositories:
+
+```kotlin
+maven {
+    url = uri("https://plainhub.github.io/plain-app/maven")
+}
+```
+
+Then add the dependency shown above. Releases use tags named
+`plain-common-v<version>`; the default local version can be changed with
+`-PplainCommonVersion=…`.
 
 ## Publishing
 
-`publishToMavenLocal` publishes the KMP metadata and platform publications to
-the local Maven cache. To publish to a Maven repository, set
-`plainCommonMavenUrl`; credentials can be supplied through
-`plainCommonMavenUsername` and `plainCommonMavenPassword` Gradle properties.
+The `Publish plain-common` GitHub Actions workflow builds the KMP publications
+and deploys them to the `gh-pages` branch when a `plain-common-v<version>` tag
+is pushed. Configure the repository's Pages source to `gh-pages` / root once.
+It can also be run manually with a version number. The workflow uses its
+temporary `GITHUB_TOKEN`; no publishing credentials are stored in the repository.
 
-```shell
-./gradlew :plain-common:publishAllPublicationsToPlainCommonRepository \
-  -PplainCommonVersion=1.0.0 \
-  -PplainCommonMavenUrl=https://your-maven-repository
-```
+For a local Maven cache, run `./gradlew :plain-common:publishToMavenLocal`.

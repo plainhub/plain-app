@@ -80,18 +80,7 @@ publishing {
     repositories {
         maven {
             name = "plainCommon"
-            url = uri(
-                providers.gradleProperty("plainCommonMavenUrl")
-                    .orElse(layout.buildDirectory.dir("maven-repository").map { it.asFile.toURI().toString() })
-                    .get()
-            )
-
-            if (providers.gradleProperty("plainCommonMavenUsername").isPresent) {
-                credentials {
-                    username = providers.gradleProperty("plainCommonMavenUsername").get()
-                    password = providers.gradleProperty("plainCommonMavenPassword").orNull
-                }
-            }
+            url = uri(layout.buildDirectory.dir("maven-repository"))
         }
     }
 }
