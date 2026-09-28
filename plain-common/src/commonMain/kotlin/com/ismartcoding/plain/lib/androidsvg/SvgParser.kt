@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.lib.androidsvg
 
-import com.ismartcoding.plain.lib.opml.SimpleXmlReader
+import com.ismartcoding.plain.lib.xml.SimpleXmlReader
 
 object SvgParser {
     fun parse(svg: String): SvgDocument {

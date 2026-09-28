@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.lib.opml
 
+import com.ismartcoding.plain.lib.xml.SimpleXmlReader
 import com.ismartcoding.plain.lib.opml.entity.Body
 import com.ismartcoding.plain.lib.opml.entity.Outline
 

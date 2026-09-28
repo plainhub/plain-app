@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.lib.opml
 
+import com.ismartcoding.plain.lib.xml.SimpleXmlReader
+
 internal class OpmlInitHandler : OpmlSectionHandler<String> {
     private var started = false
     private var version: String = ""

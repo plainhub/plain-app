@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.lib.rss
 
-import com.ismartcoding.plain.lib.opml.SimpleXmlReader
+import com.ismartcoding.plain.lib.xml.SimpleXmlReader
 import com.ismartcoding.plain.lib.rss.internal.AtomKeyword
 import com.ismartcoding.plain.lib.rss.internal.RssKeyword
 import com.ismartcoding.plain.lib.rss.internal.contains

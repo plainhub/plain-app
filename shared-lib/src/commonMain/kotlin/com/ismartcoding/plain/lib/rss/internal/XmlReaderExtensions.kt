@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.lib.rss.internal
 
-import com.ismartcoding.plain.lib.opml.SimpleXmlReader
+import com.ismartcoding.plain.lib.xml.SimpleXmlReader
 
 /**
  * Extension functions for SimpleXmlReader, matching the XmlPullParser API

@@ -1,12 +1,12 @@
-package com.ismartcoding.plain.lib.opml
+package com.ismartcoding.plain.lib.xml
 
 import com.ismartcoding.plain.lib.extensions.decodeNumericCharRefs
 
 /**
  * Minimal pure-Kotlin event-based XML reader.
- * Provides a subset of XmlPullParser interface sufficient for OPML parsing.
+ * Provides a small subset of the XmlPullParser interface for XML consumers.
  */
-internal class SimpleXmlReader(private val xml: String) {
+class SimpleXmlReader(private val xml: String) {
 
     companion object {
         const val START_DOCUMENT = 0
@@ -99,7 +99,7 @@ internal class SimpleXmlReader(private val xml: String) {
                 if (pos < xml.length && (xml[pos] == '"' || xml[pos] == '\'')) {
                     val quote = xml[pos++]
                     val valueEnd = xml.indexOf(quote, pos)
-                    if (valueEnd < 0) throw OpmlParseException("Unclosed attribute value in <$name>")
+                    if (valueEnd < 0) throw IllegalArgumentException("Unclosed attribute value in <$name>")
                     attrs.add(attrName to decodeEntities(xml.substring(pos, valueEnd)))
                     pos = valueEnd + 1
                 }

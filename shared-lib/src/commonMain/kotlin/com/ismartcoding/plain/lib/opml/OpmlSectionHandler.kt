@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.lib.opml
 
+import com.ismartcoding.plain.lib.xml.SimpleXmlReader
+
 internal interface OpmlSectionHandler<E> {
     fun startTag(xpp: SimpleXmlReader)
 
