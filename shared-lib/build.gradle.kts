@@ -22,6 +22,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            api(project(":plain-common"))
             api(libs.kotlinx.coroutines.core)
             api(libs.atomicfu)
             api(libs.kotlinx.serialization.json)
