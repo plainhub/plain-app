@@ -42,7 +42,7 @@ import com.ismartcoding.plain.ui.base.PCapsuleMoreClose
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopRightButton
-import com.ismartcoding.plain.ui.base.SearchableTopBar
+import com.ismartcoding.plain.ui.components.SearchableTopBar
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState

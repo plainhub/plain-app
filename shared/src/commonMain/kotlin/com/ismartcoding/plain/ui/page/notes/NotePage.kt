@@ -55,8 +55,8 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
-import com.ismartcoding.plain.ui.base.mdeditor.MdEditor
-import com.ismartcoding.plain.ui.base.mdeditor.MdEditorBottomAppBar
+import com.ismartcoding.plain.ui.components.mdeditor.MdEditor
+import com.ismartcoding.plain.ui.components.mdeditor.MdEditorBottomAppBar
 import com.ismartcoding.plain.platform.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.models.MdEditorViewModel

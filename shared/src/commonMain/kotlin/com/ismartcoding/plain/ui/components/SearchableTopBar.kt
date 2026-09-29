@@ -1,5 +1,6 @@
-package com.ismartcoding.plain.ui.base
+package com.ismartcoding.plain.ui.components
 
+import com.ismartcoding.plain.ui.base.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope

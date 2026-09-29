@@ -23,7 +23,7 @@ import com.ismartcoding.plain.platform.PBackHandler
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.preferences.DocSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
-import com.ismartcoding.plain.ui.base.MediaTopBar
+import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScrollableTabRow

@@ -60,6 +60,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":shared-lib"))
+            api(project(":plain-ui"))
             // Room database module. Exposes AppDatabase, DAOs, entities and the
             // Room runtime so the rest of :shared can reference them without
             // triggering the Room KSP here.

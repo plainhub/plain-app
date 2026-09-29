@@ -34,7 +34,7 @@ import com.ismartcoding.plain.platform.LocaleHelper
 import com.ismartcoding.plain.platform.audioIsPlayingFlow
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
-import com.ismartcoding.plain.ui.base.MediaTopBar
+import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn

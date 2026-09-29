@@ -42,7 +42,7 @@ import com.ismartcoding.plain.platform.audioPlay
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.platform.searchMedia
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
-import com.ismartcoding.plain.ui.base.MediaTopBar
+import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton

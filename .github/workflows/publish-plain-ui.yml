@@ -1,13 +1,13 @@
-name: Publish plain-common
+name: Publish plain-ui
 
 on:
   push:
     tags:
-      - "plain-common-v*"
+      - "plain-ui-v*"
   workflow_dispatch:
     inputs:
       version:
-        description: "Published version, without the plain-common-v prefix"
+        description: "Published version, without the plain-ui-v prefix"
         required: true
         type: string
 
@@ -44,7 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
-            version="${GITHUB_REF_NAME#plain-common-v}"
+            version="${GITHUB_REF_NAME#plain-ui-v}"
           else
             version="$INPUT_VERSION"
           fi
@@ -56,22 +56,22 @@ jobs:
 
       - name: Publish Maven layout
         env:
-          PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
+          PLAIN_UI_VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
-          ./gradlew :plain-common:publishAllPublicationsToPlainCommonRepository \
-            -PplainCommonVersion="$PLAIN_COMMON_VERSION" \
+          ./gradlew :plain-ui:publishAllPublicationsToPlainUiRepository \
+            -PplainUiVersion="$PLAIN_UI_VERSION" \
             --no-daemon
 
       - name: Prepare Pages content
         env:
-          PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
+          PLAIN_UI_VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
           git fetch origin main
           git worktree add site origin/main
           mkdir -p site/maven
-          python3 - plain-common/build/maven-repository site/maven "$PLAIN_COMMON_VERSION" <<'PY'
+          python3 - plain-ui/build/maven-repository site/maven "$PLAIN_UI_VERSION" <<'PY'
           import shutil
           import hashlib
           import sys
@@ -132,7 +132,7 @@ jobs:
 
       - name: Publish Maven files to Pages source
         env:
-          PLAIN_COMMON_VERSION: ${{ steps.version.outputs.value }}
+          PLAIN_UI_VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
           git -C site config user.name "github-actions[bot]"
@@ -142,7 +142,7 @@ jobs:
             echo "No Maven repository changes to publish"
             exit 0
           fi
-          git -C site commit -m "Publish plain-common $PLAIN_COMMON_VERSION"
+          git -C site commit -m "Publish plain-ui $PLAIN_UI_VERSION"
           git -C site push origin HEAD:main
 
       - name: Rebuild GitHub Pages site

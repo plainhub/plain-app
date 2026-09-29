@@ -1,5 +1,6 @@
-package com.ismartcoding.plain.ui.base
+package com.ismartcoding.plain.ui.helpers
 
+import com.ismartcoding.plain.ui.base.ToastManager
 import kotlinx.coroutines.CancellationException
 
 /**

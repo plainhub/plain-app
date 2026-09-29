@@ -48,7 +48,7 @@ import com.ismartcoding.plain.preferences.ImageGridCellsPerRowPreference
 import com.ismartcoding.plain.preferences.ImageSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.MediaTopBar
+import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip

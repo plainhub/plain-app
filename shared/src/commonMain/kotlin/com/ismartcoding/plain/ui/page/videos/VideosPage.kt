@@ -49,7 +49,7 @@ import com.ismartcoding.plain.preferences.VideoGridCellsPerRowPreference
 import com.ismartcoding.plain.preferences.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.MediaTopBar
+import com.ismartcoding.plain.ui.components.MediaTopBar
 import com.ismartcoding.plain.ui.base.StoragePermissionResumeEffect
 import com.ismartcoding.plain.ui.base.refreshStoragePermission
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn

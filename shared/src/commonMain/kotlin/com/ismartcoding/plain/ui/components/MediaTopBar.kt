@@ -1,6 +1,7 @@
-package com.ismartcoding.plain.ui.base
+package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.base.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
