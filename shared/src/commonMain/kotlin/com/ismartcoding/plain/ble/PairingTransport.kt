@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ble
 import com.ismartcoding.plain.platform.bleTransport
+import com.ismartcoding.plain.api.clientHeadersMap
 
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice
@@ -108,7 +109,7 @@ object PairingTransport {
             api.ensureConnected()
             if (!api.isConnected()) return null
 
-            val requestData = BleRequestData.create().copy(
+            val requestData = BleRequestData.create(clientHeadersMap()).copy(
                 body = PairingCore.formatMessage(NearbyMessageType.DISCOVER, "")
             )
             val result = api.requestAsync(BleServices.nearby, requestData)
@@ -151,7 +152,7 @@ object PairingTransport {
             val body = PairingCore.formatMessage(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request))
             LogCat.d("BLE pairViaBle: sending request to ${device.name}")
 
-            if (!api.sendRequest(BleServices.nearby, BleRequestData.create().copy(body = body))) {
+            if (!api.sendRequest(BleServices.nearby, BleRequestData.create(clientHeadersMap()).copy(body = body))) {
                 LogCat.e("BLE pairViaBle: failed to send pairing request")
                 PairingCore.notifyFailed(device.id, device.name, "Failed to send pairing request")
                 return false

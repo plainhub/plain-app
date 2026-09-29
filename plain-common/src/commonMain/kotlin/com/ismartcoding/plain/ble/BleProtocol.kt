@@ -1,9 +1,12 @@
 package com.ismartcoding.plain.ble
 
-import com.ismartcoding.plain.api.clientHeadersMap
-import com.ismartcoding.plain.lib.JsonHelper
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+private val bleJson = Json { encodeDefaults = true; ignoreUnknownKeys = true }
 
 
 @Serializable
@@ -12,16 +15,12 @@ data class BleRequestData(
     @SerialName("b") val body: String = "",
 ) {
     companion object {
-        fun create(): BleRequestData {
-            return BleRequestData(
-                headers = clientHeadersMap(),
-            )
-        }
+        fun create(headers: Map<String, String> = emptyMap()): BleRequestData = BleRequestData(headers = headers)
 
-        fun fromJSON(json: String): BleRequestData = JsonHelper.jsonDecode(json)
+        fun fromJSON(json: String): BleRequestData = bleJson.decodeFromString(json)
     }
 
-    fun toJSON(): String = JsonHelper.jsonEncode(this)
+    fun toJSON(): String = bleJson.encodeToString(this)
 }
 
 @Serializable
@@ -31,7 +30,7 @@ data class BleSegmentData(
 ) {
     fun isEnd(): Boolean = (state and STATE_END_BIT) == STATE_END_BIT
 
-    fun toJSON(): String = JsonHelper.jsonEncode(this)
+    fun toJSON(): String = bleJson.encodeToString(this)
 
     companion object {
         private const val STATE_START_BIT = 1
@@ -53,6 +52,6 @@ data class BleSegmentData(
             return BleSegmentData(data, state)
         }
 
-        fun fromJSON(value: String): BleSegmentData = JsonHelper.jsonDecode(value)
+        fun fromJSON(value: String): BleSegmentData = bleJson.decodeFromString(value)
     }
 }

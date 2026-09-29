@@ -5,8 +5,12 @@ import com.ismartcoding.plain.ble.BleRequestData
 import com.ismartcoding.plain.ble.BleResult
 import com.ismartcoding.plain.ble.BleSegmentData
 import com.ismartcoding.plain.ble.BleService
-import com.ismartcoding.plain.lib.JsonHelper
 import com.ismartcoding.plain.lib.logcat.LogCat
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+private val bleJson = Json { encodeDefaults = true; ignoreUnknownKeys = true }
 
 class BleDeviceApi(val device: BleGattClient) {
     val id = device.id
@@ -100,7 +104,7 @@ class BleDeviceApi(val device: BleGattClient) {
             return false
         }
 
-        val requestJson = JsonHelper.jsonEncode(requestData)
+        val requestJson = bleJson.encodeToString(requestData)
         val chunks = requestJson.chunked(CHUNK_SIZE)
         LogCat.d("$tag sending $requestData")
         chunks.forEachIndexed { index, chunk ->
@@ -109,7 +113,7 @@ class BleDeviceApi(val device: BleGattClient) {
                 start = index == 0,
                 end = index == chunks.lastIndex,
             )
-            val wr = device.writeCharacteristic(service, JsonHelper.jsonEncode(segment))
+            val wr = device.writeCharacteristic(service, bleJson.encodeToString(segment))
             if (!wr) {
                 LogCat.e("$tag FAIL: writeCharacteristic chunk $index/${chunks.size} returned false, connected=${device.isConnected()}")
                 device.setNotification(service, false)

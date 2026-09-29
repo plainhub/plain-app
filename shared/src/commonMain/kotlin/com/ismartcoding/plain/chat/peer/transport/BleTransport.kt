@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.chat.peer.transport
 
 import com.ismartcoding.plain.ble.BleRequestData
+import com.ismartcoding.plain.api.clientHeadersMap
 import com.ismartcoding.plain.ble.BleHttpRequest
 import com.ismartcoding.plain.ble.BleHttpResponse
 import com.ismartcoding.plain.ble.BleServices
@@ -146,7 +147,7 @@ object BleTransport : PeerTransport {
         // All headers (client identity + request-specific c-cid) live in
         // the outer BleRequestData.headers — BleRpcRequest no longer has
         // its own headers field.
-        val baseData = BleRequestData.create()
+        val baseData = BleRequestData.create(clientHeadersMap())
         val requestData = baseData.copy(
             body = JsonHelper.jsonEncode(rpcRequest),
             headers = if (request.channelId.isNotEmpty()) {
@@ -266,7 +267,7 @@ object BleTransport : PeerTransport {
                                 "length" to listOf(CHUNK_SIZE.toString()),
                             ),
                         )
-                        val requestData = BleRequestData.create().copy(
+                        val requestData = BleRequestData.create(clientHeadersMap()).copy(
                             body = JsonHelper.jsonEncode(rpcRequest),
                         )
 
