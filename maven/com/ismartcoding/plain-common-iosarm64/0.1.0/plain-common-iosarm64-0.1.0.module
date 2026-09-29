@@ -1,0 +1,172 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "url": "../../plain-common/0.1.0/plain-common-0.1.0.module",
+    "group": "com.ismartcoding",
+    "module": "plain-common",
+    "version": "0.1.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.7.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "iosArm64ApiElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-api",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.11.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "atomicfu",
+          "version": {
+            "requires": "0.32.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-json",
+          "version": {
+            "requires": "1.11.0"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-http",
+          "version": {
+            "requires": "3.5.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.runtime",
+          "module": "runtime",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "plain-common-iosArm64Main-0.1.0.klib",
+          "url": "plain-common-iosarm64-0.1.0.klib",
+          "size": 1239712,
+          "sha512": "8f5af98e224f1574ed58abd238e088fb62c8ee5184325b8d270c57bb86c70942be87681a99ce27ec759ccc565fcf26016079d4f0ee975aad6933f72d1bdb83f1",
+          "sha256": "e5f8a981d1e8b51955fe20cb3cc06a5f84602ac223c0499a957dd88179d00b98",
+          "sha1": "1b3d9c4efbe2d86e803d4bdda105e03f77f8774e",
+          "md5": "e441e17a76664c9ed40012cf7723fb16"
+        }
+      ]
+    },
+    {
+      "name": "iosArm64SourcesElements-published",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-runtime",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "files": [
+        {
+          "name": "plain-common-iosarm64-0.1.0-sources.jar",
+          "url": "plain-common-iosarm64-0.1.0-sources.jar",
+          "size": 278804,
+          "sha512": "6e4535f0ccc5215406860eb772ae3a7e335016fc85181c4d48642ba84e4142def72c3f06668b88ca42c6951b884b3f5ff0f37a910714bf68e0c1829ac8bc4d53",
+          "sha256": "6a4a4346c004de46eaf4fdbbb7fbaff25f3a48d0c7080514163d58f60e15249f",
+          "sha1": "e79e9ee80655a8ba2a32f0f7b315d88429252964",
+          "md5": "a7de378216e03ceb8c77a8bdc54c1db2"
+        }
+      ]
+    },
+    {
+      "name": "iosArm64MetadataElements-published",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.jvm.environment": "non-jvm",
+        "org.gradle.usage": "kotlin-metadata",
+        "org.jetbrains.kotlin.native.target": "ios_arm64",
+        "org.jetbrains.kotlin.platform.type": "native"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
+          "version": {
+            "requires": "1.11.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "atomicfu",
+          "version": {
+            "requires": "0.32.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-serialization-json",
+          "version": {
+            "requires": "1.11.0"
+          }
+        },
+        {
+          "group": "io.ktor",
+          "module": "ktor-http",
+          "version": {
+            "requires": "3.5.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.compose.runtime",
+          "module": "runtime",
+          "version": {
+            "requires": "1.12.0"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "2.4.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "plain-common-iosarm64-0.1.0-metadata.jar",
+          "url": "plain-common-iosarm64-0.1.0-metadata.jar",
+          "size": 6403,
+          "sha512": "b0feafeadbc28b65d1e677f9138fbe4c264e1605d51e1ebe3c434400b198824f5608a3455c1c92401f2c28d5eedc939bbf75c9e7a1383f93c5446b17ba0a58e6",
+          "sha256": "725781ac7ba208b9bbdfe53d20130011887f4d2a3d6c191d80d4bf666e31cad6",
+          "sha1": "a6a9395631ccac72e637a2095c63606afdbc8c40",
+          "md5": "7b559d828339ea9590f8e723e114d572"
+        }
+      ]
+    }
+  ]
+}
