@@ -4,7 +4,7 @@
 #
 # Schemas covered:
 #   PackageGraphQL  : packages, packageStatuses, packageCount
-#   DataStoreGraphQL: dataStorePath, dataStoreEntries
+#   DataStoreGraphQL: dataStorePath, dataStoreEntries, prefs
 #   DbGraphQL       : dbPath, dbTables, dbTableRowCount, dbTableRows, dbTableInfo
 #
 # Destructive endpoints (uninstallPackages, installPackage,
@@ -173,6 +173,11 @@ api_dse_count=$(printf '%s' "$DSE" | jq '.data.dataStoreEntries | length')
 api_dse_nokey=$(printf '%s' "$DSE" | jq '[.data.dataStoreEntries[] | select(.key == "" or .key == null)] | length')
 [[ "$api_dse_nokey" == "0" ]] && pass "device-read-C08b dataStoreEntries every entry has a key ($api_dse_count entries)" \
                                 || fail "device-read-C08b dataStoreEntries has $api_dse_nokey entries with no key"
+
+PREFS=$(call_gql '{ prefs { key value } }')
+api_prefs_invalid=$(printf '%s' "$PREFS" | jq '[.data.prefs[] | select(.key == "" or (.key | startswith("admin.")))] | length')
+[[ "$api_prefs_invalid" == "0" ]] && pass "device-read-C08c prefs exposes only unprefixed keys" \
+                                  || fail "device-read-C08c prefs contains invalid keys"
 
 # ----------------------------------------------------------------------------
 # device-read-C09  dbPath matches the device's databases/plain.db

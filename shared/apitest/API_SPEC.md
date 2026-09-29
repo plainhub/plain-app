@@ -144,6 +144,8 @@ term       := [field ":"] value op?
 
 ## 10. 已知待办与既定不动项
 
+- `prefs` / `setPref` / `deletePref` 只操作当前用户的前端偏好；现阶段用户固定为 `admin`，DataStore 键为 `admin.<key>`。GraphQL 仅收发不带用户前缀的 key，value 为字符串（复杂值由客户端 JSON 编解码），不读取或改写系统设置。`dataStoreEntries` 诊断 API 保持原有行为。
+
 - ~~P2：`Message`/`MessageConversation` 命名、sendSms/sendMms 不对称、`ChatItemContent` union 建模、WS 事件协议文档化、`AudioPlayback` 缺 isPlaying/positionMs~~ —— 2026-09-20 第五轮已落地：SMS 域类型改名 `Sms`/`SmsConversation`/`SmsAttachment`；`ChatItemContent` 的 `ChatFiles/ChatImages.ids` → `[ID!]!`、`ChatText.ids` → `linkPreviewImageIds`（文本本体在 `content`）；`AudioPlayback` 补 `isPlaying`/`positionMs` 且 `currentPath` 空串改暴露 null；`Notification.time` → `postedAt`；`BookmarkGroup` 补 `itemCount`；sendSms/sendMms/replyNotification 已加语义 description。事件协议见 §11。
 - **debug/工具 API（dbTables 系、dataStore 系、appLogs 系、sessions/events 审计系）是产品需求，常驻主 schema，不做门控/拆分（2026-09-20 用户定；2026-09-22 复核再次确认：主 schema 有意暴露这些测试/诊断 API——这不是问题，是设计，禁止再议）。**
 - `DriveType` 封闭集保持现状：NAS 恒 `INTERNAL_STORAGE` + `remote: Boolean!` 区分网络挂载；将来桌面网络盘需要时**新增枚举成员是增量安全操作**。

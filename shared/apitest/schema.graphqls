@@ -66,6 +66,7 @@ type Query {
   isDiscovering: Boolean!
   pomodoroSettings: PomodoroSettings!
   pomodoroToday: PomodoroToday!
+  prefs: [KeyValuePair!]!
   dataStorePath: String!
   dataStoreEntries: [KeyValuePair!]!
   imageEditorProjects: [ImageEditorProjectSummary!]!
@@ -219,6 +220,8 @@ type Mutation {
   startPomodoro(durationSec: Int!): Boolean!
   pausePomodoro: Boolean!
   stopPomodoro: Boolean!
+  setPref(key: String!, value: String!): KeyValuePair!
+  deletePref(key: String!): Boolean!
   deleteDataStoreEntry(key: String!): Boolean!
   saveImageEditorProject(id: ID!, input: ImageEditorProjectInput!): ImageEditorProject!
   deleteImageEditorProject(id: ID!): Boolean!
