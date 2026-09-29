@@ -72,11 +72,11 @@
         {
           "name": "plain-common-iosSimulatorArm64Main-0.1.0.klib",
           "url": "plain-common-iossimulatorarm64-0.1.0.klib",
-          "size": 1239777,
-          "sha512": "c4276682d79d41343aef27b55843faaa521b20622c2770162c73fe522910e4af0cc7e05324191bd368b699a527da37f7cbfb2f0fde936a5cc998e780366af7c4",
-          "sha256": "58ca982e004f57604fa954a1f602326bf2198935ad69168ef6f6e1ded6ce76af",
-          "sha1": "8c6e9b2c690421f2849b99737b52e835407275ae",
-          "md5": "b1d515ccaa37274b0a913140531e6d3d"
+          "size": 1171826,
+          "sha512": "c2419ea4e6d25c88d5b02964d89c5e068ba0325c54b2bf763d39c9c37c236391b666693c2ee63cdb493f7b2bf07bfbed1f20a731cbf65003b8b98f60af6dcd76",
+          "sha256": "37800eefbda0674d4069f834d90bcc5766d005a826b7538a86913a7751cf4941",
+          "sha1": "99d53df4bd9bd4005d5f77227bd2df6e4295a467",
+          "md5": "369c958f99b17c0fe41b2ba3c80abf57"
         }
       ]
     },
@@ -95,11 +95,11 @@
         {
           "name": "plain-common-iossimulatorarm64-0.1.0-sources.jar",
           "url": "plain-common-iossimulatorarm64-0.1.0-sources.jar",
-          "size": 278804,
-          "sha512": "6e4535f0ccc5215406860eb772ae3a7e335016fc85181c4d48642ba84e4142def72c3f06668b88ca42c6951b884b3f5ff0f37a910714bf68e0c1829ac8bc4d53",
-          "sha256": "6a4a4346c004de46eaf4fdbbb7fbaff25f3a48d0c7080514163d58f60e15249f",
-          "sha1": "e79e9ee80655a8ba2a32f0f7b315d88429252964",
-          "md5": "a7de378216e03ceb8c77a8bdc54c1db2"
+          "size": 266887,
+          "sha512": "fabfddc87561000adb2edfb77d5a9eb96c56ddc51e996db0f7953395e03b081dfc62df0e93a82788f512cc5bcc59f5680a7bd48e0a29084c243115d83aba9683",
+          "sha256": "0f83a6c93b496609fedfcd7e4f35cb7b98e3cd07720e445c576669c9b28d0157",
+          "sha1": "57f60fb94a5582ad64ed73dc55f5e3cd4d4098dc",
+          "md5": "4f077311fd99d1f4bea40a7230e305a6"
         }
       ]
     },
