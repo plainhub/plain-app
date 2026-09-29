@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">Yükleniyor…</string>
+<string name="srl_header_pulling">Yenilemek için aşağı çekin</string>
+<string name="srl_header_release">Yenilemek için bırakın</string>
+<string name="srl_header_refreshing">Yenileniyor…</string>
+<string name="srl_header_finish">Yenilendi</string>
+<string name="srl_header_failed">Yenileme başarısız</string>
+<string name="back">Geri</string>
+</resources>

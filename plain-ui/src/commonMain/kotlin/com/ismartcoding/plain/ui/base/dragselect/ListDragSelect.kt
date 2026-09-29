@@ -10,13 +10,13 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
-import com.ismartcoding.plain.db.IData
+import com.ismartcoding.plain.ui.Identifiable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlin.math.abs
 
 fun Modifier.listDragSelect(
-    items: List<IData>,
+    items: List<Identifiable>,
     state: DragSelectState,
     enableAutoScroll: Boolean = true,
     autoScrollThreshold: Float? = null,

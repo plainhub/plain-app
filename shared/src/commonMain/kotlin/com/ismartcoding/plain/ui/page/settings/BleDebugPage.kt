@@ -45,7 +45,7 @@ fun BleDebugPage(navController: NavHostController) {
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.ble_debug),
             )
         },

@@ -86,7 +86,7 @@ fun ArtistsPage(
         topBar = {
             PTopAppBar(
                 title = stringResource(Res.string.artists),
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
             )
         },
     ) { paddingValues ->

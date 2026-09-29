@@ -155,7 +155,7 @@ fun ImageEditorPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 navigationIcon = { NavigationBackIcon { handleBack() } },
                 title = stringResource(Res.string.image_editor),
                 actions = {

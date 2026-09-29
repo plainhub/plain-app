@@ -82,7 +82,7 @@ fun PlaylistAddItemsPage(
             } else {
                 PTopAppBar(
                     title = stringResource(Res.string.add_items),
-                    navController = navController,
+                    onNavigateBack = { navController.navigateUp() },
                     actions = {
                         PIconButton(
                             icon = UiRes.drawable.ui_drawable_search,

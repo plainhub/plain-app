@@ -228,7 +228,7 @@ fun ScanPage(navController: NavHostController) {
 
     PScaffold(topBar = {
         PTopAppBar(
-            navController = navController,
+            onNavigateBack = { navController.navigateUp() },
             navigationIcon = if (multiFrozen || showingPicker) {
                 {
                     NavigationCloseIcon {

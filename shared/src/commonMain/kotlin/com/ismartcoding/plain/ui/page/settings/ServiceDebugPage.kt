@@ -43,7 +43,7 @@ fun ServiceDebugPage(navController: NavHostController) {
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.service_debug),
             )
         },

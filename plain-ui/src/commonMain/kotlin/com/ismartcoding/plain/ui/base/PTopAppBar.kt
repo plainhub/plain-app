@@ -6,6 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.arrow_left as ui_drawable_arrow_left
+import com.ismartcoding.plain.ui.resources.back as ui_string_back
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,14 +27,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PTopAppBar(
-    navController: Any? = null,
+    onNavigateBack: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     navigationIcon: (@Composable () -> Unit)? = null,
     title: String,
@@ -40,7 +45,6 @@ fun PTopAppBar(
 ) {
     val topBarColor = containerColor ?: MaterialTheme.colorScheme.background
     val topBarSubtitleColor = subtitleColor ?: MaterialTheme.colorScheme.onSurfaceVariant
-    val nav = navController as? NavHostController
     // Material3 TopAppBar animates its container color internally, which lags behind the
     // instantly-changing page background during theme switches. Draw the color on an instant
     // Surface here and keep the inner bar transparent so both change together.
@@ -83,7 +87,7 @@ fun PTopAppBar(
             navigationIcon = {
                 when {
                     navigationIcon != null -> navigationIcon()
-                    nav != null -> NavigationBackIcon(onClick = { nav.navigateUp() })
+                    onNavigateBack != null -> BackIcon(onClick = onNavigateBack)
                 }
             },
             actions = {
@@ -95,6 +99,17 @@ fun PTopAppBar(
                 scrolledContainerColor = Color.Transparent,
             ),
             scrollBehavior = scrollBehavior,
+        )
+    }
+}
+
+@Composable
+private fun BackIcon(onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = painterResource(UiRes.drawable.ui_drawable_arrow_left),
+            contentDescription = stringResource(UiRes.string.ui_string_back),
+            tint = MaterialTheme.colorScheme.onSurface,
         )
     }
 }

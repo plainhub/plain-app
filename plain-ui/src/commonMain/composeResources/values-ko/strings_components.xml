@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">로딩 중…</string>
+<string name="srl_header_pulling">아래로 당겨 새로고침</string>
+<string name="srl_header_release">새로고침하려면 놓으세요</string>
+<string name="srl_header_refreshing">새로고침 중…</string>
+<string name="srl_header_finish">새로 고침됨</string>
+<string name="srl_header_failed">새로고침 실패</string>
+<string name="back">뒤로</string>
+</resources>

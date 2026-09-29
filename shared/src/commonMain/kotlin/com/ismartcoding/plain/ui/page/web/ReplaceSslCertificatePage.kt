@@ -109,7 +109,7 @@ fun ReplaceSslCertificatePage(navController: NavHostController) {
     }
 
     PScaffold(
-        topBar = { PTopAppBar(navController = navController, title = stringResource(Res.string.https_certificate)) },
+        topBar = { PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.https_certificate)) },
         content = { paddingValues ->
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item { TopSpace() }

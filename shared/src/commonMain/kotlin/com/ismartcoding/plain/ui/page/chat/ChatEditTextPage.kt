@@ -40,7 +40,7 @@ fun ChatEditTextPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.edit_text),
                 actions = {
                     PIconButton(

@@ -61,7 +61,7 @@ fun FeedCatalogPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.feed_catalog),
             )
         },

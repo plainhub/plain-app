@@ -41,7 +41,7 @@ fun LanguagePage(navController: NavHostController) {
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(Res.string.language))
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.language))
         },
         content = { paddingValues ->
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {

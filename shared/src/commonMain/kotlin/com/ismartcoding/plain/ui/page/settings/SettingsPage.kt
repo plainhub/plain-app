@@ -85,7 +85,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     UpdateDialog(updateViewModel)
 
     PScaffold(
-        topBar = { PTopAppBar(navController = navController, title = stringResource(Res.string.settings)) },
+        topBar = { PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.settings)) },
         content = { paddingValues ->
             LazyColumn(
                 state = listState,

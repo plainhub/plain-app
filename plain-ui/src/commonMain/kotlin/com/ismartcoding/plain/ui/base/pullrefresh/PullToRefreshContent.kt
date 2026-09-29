@@ -1,6 +1,12 @@
 package com.ismartcoding.plain.ui.base.pullrefresh
 
-import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.loading as ui_string_loading
+import com.ismartcoding.plain.ui.resources.srl_header_failed as ui_string_srl_header_failed
+import com.ismartcoding.plain.ui.resources.srl_header_finish as ui_string_srl_header_finish
+import com.ismartcoding.plain.ui.resources.srl_header_refreshing as ui_string_srl_header_refreshing
+import com.ismartcoding.plain.ui.resources.srl_header_pulling as ui_string_srl_header_pulling
+import com.ismartcoding.plain.ui.resources.srl_header_release as ui_string_srl_header_release
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -19,14 +25,14 @@ import kotlin.math.abs
 fun RefreshLayoutState.PullToRefreshContent(
     createText: @Composable (RefreshContentState) -> String = {
         when (it) {
-            RefreshContentState.Failed -> stringResource(Res.string.srl_header_failed)
-            RefreshContentState.Finished -> stringResource(Res.string.srl_header_finish)
-            RefreshContentState.Refreshing -> stringResource(Res.string.srl_header_refreshing)
+            RefreshContentState.Failed -> stringResource(UiRes.string.ui_string_srl_header_failed)
+            RefreshContentState.Finished -> stringResource(UiRes.string.ui_string_srl_header_finish)
+            RefreshContentState.Refreshing -> stringResource(UiRes.string.ui_string_srl_header_refreshing)
             RefreshContentState.Dragging -> {
                 if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) {
-                    stringResource(Res.string.srl_header_pulling)
+                    stringResource(UiRes.string.ui_string_srl_header_pulling)
                 } else {
-                    stringResource(Res.string.srl_header_release)
+                    stringResource(UiRes.string.ui_string_srl_header_release)
                 }
             }
         }

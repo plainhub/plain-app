@@ -83,7 +83,7 @@ fun NearbyPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 navigationIcon = {
                     NavigationBackIcon { navController.navigateUp() }
                 },

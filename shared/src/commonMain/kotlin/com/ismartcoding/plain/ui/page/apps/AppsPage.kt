@@ -92,7 +92,7 @@ fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel
     PScaffold(topBar = {
         if (appsVM.showSearchBar.value) { ListSearchBar(viewModel = appsVM, onSearch = onSearch); return@PScaffold }
         PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollState.scrollToItem(0) } }),
-            navController = navController,
+            onNavigateBack = { navController.navigateUp() },
             navigationIcon = { PIconButton(icon = UiRes.drawable.ui_drawable_left_panel_open, contentDescription = stringResource(Res.string.apps), click = { scope.launch { if (drawerState.isOpen) drawerState.close() else drawerState.open() } }) },
             title = title, scrollBehavior = scrollBehavior, actions = {
                 ActionButtonSearch { appsVM.enterSearchMode() }

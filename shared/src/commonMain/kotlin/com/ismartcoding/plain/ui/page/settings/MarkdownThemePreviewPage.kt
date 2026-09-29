@@ -118,7 +118,7 @@ fun MarkdownThemePreviewPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = "Markdown Preview",
             )
         },

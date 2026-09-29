@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.plain.ui.base.*
+import androidx.navigation.NavHostController
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.RowScope
@@ -58,7 +59,7 @@ fun <T : IData> SearchableTopBar(
     
     PTopAppBar(
         modifier = topBarModifier,
-        navController = navController,
+        onNavigateBack = { (navController as? NavHostController)?.navigateUp() },
         title = title,
         subtitle = subtitle,
         containerColor = containerColor,

@@ -47,7 +47,7 @@ fun AppPage(navController: NavHostController, id: String) {
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = item?.name ?: "", actions = {
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = item?.name ?: "", actions = {
                 if (isShareable) {
                     PIconButton(icon = UiRes.drawable.ui_drawable_share_2, contentDescription = stringResource(Res.string.share),
                         tint = MaterialTheme.colorScheme.onSurface) {

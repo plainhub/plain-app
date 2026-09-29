@@ -57,7 +57,7 @@ internal fun FeedEntryTopBar(
     var showFontSizeDialog by remember { mutableStateOf(false) }
     PTopAppBar(
         modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { onScrollToTop() }),
-        navController = navController, title = "", scrollBehavior = scrollBehavior,
+        onNavigateBack = { navController.navigateUp() }, title = "", scrollBehavior = scrollBehavior,
         actions = {
             PIconButton(icon = UiRes.drawable.ui_drawable_label, contentDescription = stringResource(Res.string.select_tags), tint = MaterialTheme.colorScheme.onSurface) {
                 feedEntryVM.showSelectTagsDialog.value = true

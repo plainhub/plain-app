@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">Загрузка…</string>
+<string name="srl_header_pulling">Потяните вниз, чтобы обновить</string>
+<string name="srl_header_release">Отпустите, чтобы обновить</string>
+<string name="srl_header_refreshing">Обновление…</string>
+<string name="srl_header_finish">Обновлено</string>
+<string name="srl_header_failed">Обновление не удалось</string>
+<string name="back">Назад</string>
+</resources>

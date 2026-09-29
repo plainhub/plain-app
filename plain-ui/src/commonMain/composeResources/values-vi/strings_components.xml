@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">Đang tải...</string>
+<string name="srl_header_pulling">Kéo xuống để làm mới</string>
+<string name="srl_header_release">Thả để làm mới</string>
+<string name="srl_header_refreshing">Đang làm mới...</string>
+<string name="srl_header_finish">Đã làm mới</string>
+<string name="srl_header_failed">Làm mới thất bại</string>
+<string name="back">Quay lại</string>
+</resources>

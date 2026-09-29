@@ -51,7 +51,7 @@ fun PeerInfoPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.peer_info),
             )
         },

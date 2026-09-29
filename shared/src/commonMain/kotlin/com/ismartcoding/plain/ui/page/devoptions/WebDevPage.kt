@@ -42,7 +42,7 @@ fun WebDevPage(
         PScaffold(
             topBar = {
                 PTopAppBar(
-                    navController = navController,
+                    onNavigateBack = { navController.navigateUp() },
                     title = stringResource(Res.string.adb_automation),
                 )
             },

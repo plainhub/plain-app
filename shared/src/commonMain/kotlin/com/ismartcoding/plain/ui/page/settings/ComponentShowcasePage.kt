@@ -48,7 +48,7 @@ import com.ismartcoding.plain.i18n.settings
 fun ComponentShowcasePage(navController: NavHostController) {
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(Res.string.ui_components))
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.ui_components))
         },
     ) { paddingValues ->
         LazyColumn(

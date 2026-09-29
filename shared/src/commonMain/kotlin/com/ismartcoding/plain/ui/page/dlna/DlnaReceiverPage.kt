@@ -52,7 +52,7 @@ fun DlnaReceiverPage(navController: NavHostController) {
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.dlna_receiver),
                 actions = {
                     PIconButton(

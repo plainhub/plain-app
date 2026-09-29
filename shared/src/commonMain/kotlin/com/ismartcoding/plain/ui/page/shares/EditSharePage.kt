@@ -132,7 +132,7 @@ fun EditSharePage(
     if (current == null) {
         // Unknown share id: nothing to edit.
         PScaffold(
-            topBar = { PTopAppBar(navController = navController, title = stringResource(Res.string.edit_share_link)) },
+            topBar = { PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.edit_share_link)) },
         ) { }
         return
     }
@@ -151,7 +151,7 @@ fun EditSharePage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.edit_share_link),
                 actions = {
                     PTextButton(text = stringResource(Res.string.save), onClick = save)

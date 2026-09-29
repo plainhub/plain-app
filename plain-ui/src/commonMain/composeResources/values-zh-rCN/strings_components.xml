@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">加载中…</string>
+<string name="srl_header_pulling">下拉可以刷新</string>
+<string name="srl_header_refreshing">正在刷新…</string>
+<string name="srl_header_release">释放立即刷新</string>
+<string name="srl_header_finish">刷新完成</string>
+<string name="srl_header_failed">刷新失败</string>
+<string name="back">后退</string>
+</resources>

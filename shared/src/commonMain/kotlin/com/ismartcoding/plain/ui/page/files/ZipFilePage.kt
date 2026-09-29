@@ -116,7 +116,7 @@ fun ZipFilePage(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 scrollBehavior = scrollBehavior,
                 title = pageTitle,
                 navigationIcon = { NavigationBackIcon { navController.navigateUp() } },

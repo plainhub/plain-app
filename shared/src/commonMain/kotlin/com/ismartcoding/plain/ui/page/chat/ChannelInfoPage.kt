@@ -135,7 +135,7 @@ fun ChannelInfoPage(
 
     PScaffold(topBar = {
         PTopAppBar(
-            navController = navController,
+            onNavigateBack = { navController.navigateUp() },
             title = stringResource(Res.string.channel_info)
         )
     }) { paddingValues ->

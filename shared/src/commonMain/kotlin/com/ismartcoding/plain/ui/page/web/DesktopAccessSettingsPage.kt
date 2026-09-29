@@ -119,7 +119,7 @@ fun DesktopAccessSettingsPage(navController: NavHostController, webVM: DesktopAc
         WebSettingsEffects(permissionList, shouldIgnoreOptimize, systemAlertWindow, notificationListenerGranted)
 
         PScaffold(topBar = {
-            PTopAppBar(navController = navController, title = stringResource(Res.string.access_settings))
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.access_settings))
         }, content = { paddingValues ->
             Box(
                 modifier = Modifier

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">लोड हो रहा है...</string>
+<string name="srl_header_pulling">ताज़े करने के लिए नीचे खींचें</string>
+<string name="srl_header_release">ताज़े करने के लिए छोड़ें</string>
+<string name="srl_header_refreshing">ताज़ा किया जा रहा है...</string>
+<string name="srl_header_finish">ताज़ा हो गया</string>
+<string name="srl_header_failed">ताज़ा करने में विफल हो गया</string>
+<string name="back">वापस</string>
+</resources>

@@ -40,7 +40,7 @@ fun TextPage(
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = title, actions = {
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = title, actions = {
                 ActionButtonMore {
                     textFileVM.showMoreActions.value = true
                 }

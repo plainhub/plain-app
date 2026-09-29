@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.db
 
-interface IData {
-    var id: String
+import com.ismartcoding.plain.ui.Identifiable
+
+interface IData : Identifiable {
+    override var id: String
 }
 
 data class IDData(override var id: String) : IData

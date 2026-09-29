@@ -220,7 +220,7 @@ fun ChatPage(
         topBar = {
             PTopAppBar(
                 modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollState.scrollToItem(0) } }),
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 navigationIcon = {
                     if (chatVM.selectMode.value) NavigationCloseIcon { chatVM.exitSelectMode() }
                     else NavigationBackIcon { navController.navigateUp() }

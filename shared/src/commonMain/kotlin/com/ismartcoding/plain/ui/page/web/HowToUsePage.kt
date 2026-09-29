@@ -68,7 +68,7 @@ fun HowToUsePage(
 
         PScaffold(
             topBar = {
-                PTopAppBar(navController = navController, title = stringResource(Res.string.how_to_use))
+                PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.how_to_use))
             },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {

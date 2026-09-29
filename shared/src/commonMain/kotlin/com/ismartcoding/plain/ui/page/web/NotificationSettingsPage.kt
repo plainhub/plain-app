@@ -55,7 +55,7 @@ fun NotificationSettingsPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.notification_filter_settings),
                 actions = {
                     if (selectedAppsState.isNotEmpty()) {

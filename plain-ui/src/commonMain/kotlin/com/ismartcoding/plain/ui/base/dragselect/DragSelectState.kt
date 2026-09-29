@@ -7,7 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.ismartcoding.plain.db.IData
+import com.ismartcoding.plain.ui.Identifiable
 
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -97,11 +97,11 @@ class DragSelectState(
         autoScrollSpeed.value = 0f
     }
 
-    fun isAllSelected(allItems: List<IData>): Boolean {
+    fun isAllSelected(allItems: List<Identifiable>): Boolean {
         return selectedIds.size == allItems.size
     }
 
-    fun toggleSelectAll(allItems: List<IData>) {
+    fun toggleSelectAll(allItems: List<Identifiable>) {
         selectedIds = if (isAllSelected(allItems)) {
             emptyList()
         } else {

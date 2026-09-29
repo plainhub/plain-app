@@ -70,7 +70,7 @@ fun ClipboardHistoryPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.clipboard_history),
                 actions = {
                     if (items.isNotEmpty()) {

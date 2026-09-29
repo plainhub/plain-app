@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">Caricamento…</string>
+<string name="srl_header_pulling">Scorri verso il basso per aggiornare</string>
+<string name="srl_header_release">Rilascia per aggiornare</string>
+<string name="srl_header_refreshing">Aggiornamento...</string>
+<string name="srl_header_finish">Aggiornato</string>
+<string name="srl_header_failed">Aggiornamento fallito</string>
+<string name="back">Indietro</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">Cargando...</string>
+<string name="srl_header_pulling">Arrastra hacia abajo para refrescar</string>
+<string name="srl_header_release">Suelta para refrescar</string>
+<string name="srl_header_refreshing">Refrescando...</string>
+<string name="srl_header_finish">Refrescado</string>
+<string name="srl_header_failed">Error al refrescar</string>
+<string name="back">Atrás</string>
+</resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">ஏற்றுகிறது...</string>
+<string name="srl_header_pulling">ரீஃபிரஷு செய்ய விரும்பினார்</string>
+<string name="srl_header_release">ரிலீஸ் செய்ய விரும்பினார்</string>
+<string name="srl_header_refreshing">புதுப்பிக்கப்படுகின்றது...</string>
+<string name="srl_header_finish">புதுப்பிக்கப்படுகின்றது</string>
+<string name="srl_header_failed">புதுப்பிக்க தோல்வி</string>
+<string name="back">பின்</string>
+</resources>

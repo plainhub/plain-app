@@ -81,7 +81,7 @@ fun WebSecurityPage(navController: NavHostController) {
         }
 
         PScaffold(
-            topBar = { PTopAppBar(navController = navController, title = stringResource(Res.string.security)) },
+            topBar = { PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.security)) },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item { TopSpace() }

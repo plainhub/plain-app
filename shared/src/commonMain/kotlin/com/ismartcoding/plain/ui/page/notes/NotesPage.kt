@@ -119,7 +119,7 @@ fun NotesPage(navController: NavHostController, tagsVM: TagsViewModel) {
             topBar = {
                 if (NotesViewModel.showSearchBar.value) { ListSearchBar(viewModel = NotesViewModel, onSearch = onSearch); return@PScaffold }
                 PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollState.scrollToItem(0) } }),
-                    navController = navController, navigationIcon = {
+                    onNavigateBack = { navController.navigateUp() }, navigationIcon = {
                         if (NotesViewModel.selectMode.value) NavigationCloseIcon { NotesViewModel.exitSelectMode() }
                         else PIconButton(
                             icon = UiRes.drawable.ui_drawable_left_panel_open,

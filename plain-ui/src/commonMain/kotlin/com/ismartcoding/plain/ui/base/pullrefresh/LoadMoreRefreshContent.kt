@@ -1,6 +1,12 @@
 package com.ismartcoding.plain.ui.base.pullrefresh
 
-import com.ismartcoding.plain.i18n.*
+import com.ismartcoding.plain.ui.resources.Res as UiRes
+import com.ismartcoding.plain.ui.resources.loading as ui_string_loading
+import com.ismartcoding.plain.ui.resources.srl_header_failed as ui_string_srl_header_failed
+import com.ismartcoding.plain.ui.resources.srl_header_finish as ui_string_srl_header_finish
+import com.ismartcoding.plain.ui.resources.srl_header_refreshing as ui_string_srl_header_refreshing
+import com.ismartcoding.plain.ui.resources.srl_header_pulling as ui_string_srl_header_pulling
+import com.ismartcoding.plain.ui.resources.srl_header_release as ui_string_srl_header_release
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -25,7 +31,7 @@ fun LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
     ) {
         if (!isLoadFinish) {
             Text(
-                text = stringResource(Res.string.loading),
+                text = stringResource(UiRes.string.ui_string_loading),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

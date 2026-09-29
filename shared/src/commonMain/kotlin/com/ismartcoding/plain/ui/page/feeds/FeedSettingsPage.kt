@@ -72,7 +72,7 @@ fun FeedSettingsPage(
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(Res.string.settings))
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.settings))
         },
     ) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {

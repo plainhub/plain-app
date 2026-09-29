@@ -13,12 +13,12 @@ import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.round
 import androidx.compose.ui.unit.toIntRect
-import com.ismartcoding.plain.db.IData
+import com.ismartcoding.plain.ui.Identifiable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
 fun Modifier.gridDragSelect(
-    items: List<IData>,
+    items: List<Identifiable>,
     state: DragSelectState,
     enableAutoScroll: Boolean = true,
     autoScrollThreshold: Float? = null,
@@ -119,7 +119,7 @@ private fun LazyGridState.calculateScrollSpeed(
     }
 }
 
-private fun List<IData>.getWithinRangeIds(
+private fun List<Identifiable>.getWithinRangeIds(
     itemPosition: Int,
     dragState: DragState,
 ): List<String> {

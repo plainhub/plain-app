@@ -84,7 +84,7 @@ fun TextFilePage(
         topBar = {
             PTopAppBar(
                 title = title.ifEmpty { path.getFilenameFromPath() },
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 navigationIcon = {
                     if (textFileVM.controller.readOnly.value) {
                         NavigationBackIcon { navController.navigateUp() }

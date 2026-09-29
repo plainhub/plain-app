@@ -30,7 +30,7 @@ fun PdfPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = title,
                 actions = {
                     PIconButton(

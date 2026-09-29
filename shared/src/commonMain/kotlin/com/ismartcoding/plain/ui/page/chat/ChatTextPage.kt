@@ -43,7 +43,7 @@ fun ChatTextPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 navigationIcon = {
                     NavigationCloseIcon { navController.navigateUp() }
                 },

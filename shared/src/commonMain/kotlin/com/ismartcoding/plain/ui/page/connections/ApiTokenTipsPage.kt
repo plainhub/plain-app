@@ -46,7 +46,7 @@ fun ApiTokenTipsPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.api_tokens) + " · " + stringResource(Res.string.how_to_use),
             )
         },

@@ -60,7 +60,7 @@ fun OtherFilePage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = displayTitle,
                 actions = {
                     PIconButton(

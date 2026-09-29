@@ -67,7 +67,7 @@ fun BackupRestorePage(
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(Res.string.backup_restore))
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.backup_restore))
         },
         content = { paddingValues ->
             Box(

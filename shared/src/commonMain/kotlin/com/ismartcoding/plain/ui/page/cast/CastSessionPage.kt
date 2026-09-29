@@ -69,7 +69,7 @@ fun CastSessionPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = titleText,
             )
         },

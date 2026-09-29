@@ -102,7 +102,7 @@ fun MdnsDebugPage(navController: NavHostController) {
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.mdns_debug),
                 actions = {
                     TextButton(onClick = { paused = !paused }) {

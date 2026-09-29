@@ -2,9 +2,9 @@
 
 Reusable Compose Multiplatform UI primitives shared by Plain applications.
 
-The library currently provides `PScaffold`, `PIcon`, `HorizontalSpace`, and
-`VerticalSpace` in `com.ismartcoding.plain.ui.base`. App-specific resources,
-platform behavior, and ViewModel-backed components stay in their owning app.
+The library provides shared Compose components in `com.ismartcoding.plain.ui.base`, including `PScaffold`, `PTopAppBar`, fast scrollbars, pull to refresh, and drag selection. App-specific resources, platform behavior, and ViewModel-backed components stay in their owning app.
+
+`PTopAppBar` accepts `onNavigateBack` and `navigationIcon` callbacks. Pull refresh strings ship with the library resources. Drag selection uses the small `Identifiable` contract from `plain-common`.
 
 Maven coordinate: `com.ismartcoding:plain-ui`. Releases are published to
 `https://plainhub.github.io/plain-app/maven` from the dedicated `maven` branch (which also carries the policy and terms pages), with the `plain-ui-v<version>` tag
@@ -16,6 +16,5 @@ dependencies {
 }
 ```
 
-Use `PScaffold`, `PIcon`, `HorizontalSpace`, and `VerticalSpace` from
-`com.ismartcoding.plain.ui.base`. Downstream Android clients already use
+Use the shared components from `com.ismartcoding.plain.ui.base` and its `fastscroll`, `pullrefresh`, and `dragselect` packages. Downstream Android clients already use
 the same Maven repository URL as `plain-common`.

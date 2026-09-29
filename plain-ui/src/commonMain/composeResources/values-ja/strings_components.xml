@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">ロード中...</string>
+<string name="srl_header_pulling">下に引っ張って更新</string>
+<string name="srl_header_release">更新するためにリリース</string>
+<string name="srl_header_refreshing">更新中...</string>
+<string name="srl_header_finish">更新済み</string>
+<string name="srl_header_failed">更新に失敗しました</string>
+<string name="back">戻る</string>
+</resources>

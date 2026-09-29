@@ -109,7 +109,7 @@ fun NotePage(
                 )
             })
         } else {
-            PTopAppBar(navController = navController, title = "", scrollBehavior = scrollBehavior, actions = {
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = "", scrollBehavior = scrollBehavior, actions = {
                 if (noteVM.editMode.value) {
                     PIconButton(icon = UiRes.drawable.ui_drawable_undo, contentDescription = stringResource(Res.string.undo), enabled = mdEditorVM.canUndo.value,
                         tint = MaterialTheme.colorScheme.onSurface) { mdEditorVM.undo() }

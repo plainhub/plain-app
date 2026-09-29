@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">লোড হচ্ছে...</string>
+<string name="srl_header_pulling">নিচে টেনে আনুন</string>
+<string name="srl_header_release">রিলিজ করুন</string>
+<string name="srl_header_refreshing">রিফ্রেশ হচ্ছে...</string>
+<string name="srl_header_finish">রিফ্রেশ হয়েছে</string>
+<string name="srl_header_failed">রিফ্রেশ ব্যর্থ হয়েছে</string>
+<string name="back">পেছনে</string>
+</resources>

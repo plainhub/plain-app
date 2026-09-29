@@ -88,7 +88,7 @@ fun LauncherShortcutsPage(navController: NavHostController) {
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(Res.string.launcher_shortcuts))
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.launcher_shortcuts))
         },
         content = { paddingValues ->
             LazyColumn(

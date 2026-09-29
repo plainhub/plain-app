@@ -78,7 +78,7 @@ fun DlnaCastHistoryPage(
 
     PScaffold(
         topBar = {
-            PTopAppBar(navController = navController, title = stringResource(Res.string.dlna_cast_history))
+            PTopAppBar(onNavigateBack = { navController.navigateUp() }, title = stringResource(Res.string.dlna_cast_history))
         },
     ) { paddingValues ->
         if (allowed.isEmpty() && denied.isEmpty()) {

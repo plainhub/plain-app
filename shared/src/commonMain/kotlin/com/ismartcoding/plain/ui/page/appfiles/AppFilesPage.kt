@@ -59,7 +59,7 @@ fun AppFilesPage(
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     NavigationBackIcon { navController.navigateUp() }

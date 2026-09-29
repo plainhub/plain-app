@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">Loading…</string>
+<string name="srl_header_pulling">Pull down to refresh</string>
+<string name="srl_header_release">Release to refresh</string>
+<string name="srl_header_refreshing">Refreshing…</string>
+<string name="srl_header_finish">Refreshed</string>
+<string name="srl_header_failed">Refresh failed</string>
+<string name="back">Back</string>
+</resources>

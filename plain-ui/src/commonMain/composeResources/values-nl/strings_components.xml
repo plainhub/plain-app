@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="loading">Laden…</string>
+<string name="srl_header_pulling">Trek omlaag om te vernieuwen</string>
+<string name="srl_header_release">Laat los om te vernieuwen</string>
+<string name="srl_header_refreshing">Vernieuwen…</string>
+<string name="srl_header_finish">Vernieuwd</string>
+<string name="srl_header_failed">Vernieuwen mislukt</string>
+<string name="back">Terug</string>
+</resources>

@@ -39,7 +39,7 @@ fun AutoCheckUpdatePage(navController: NavHostController, updateViewModel: Updat
     PScaffold(
         topBar = {
             PTopAppBar(
-                navController = navController,
+                onNavigateBack = { navController.navigateUp() },
                 title = stringResource(Res.string.auto_check_update),
             )
         },
