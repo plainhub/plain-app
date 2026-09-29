@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <metadata>
   <groupId>com.ismartcoding</groupId>
   <artifactId>plain-common-iossimulatorarm64</artifactId>
@@ -8,6 +8,6 @@
     <versions>
       <version>0.1.0</version>
     </versions>
-    <lastUpdated>20260928150939</lastUpdated>
+    <lastUpdated>20260929164357</lastUpdated>
   </versioning>
 </metadata>
